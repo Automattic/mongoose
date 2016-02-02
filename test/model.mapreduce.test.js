@@ -43,8 +43,8 @@ var BlogPost = new Schema({
 var collection = 'mapreduce_' + random();
 mongoose.model('MapReduce', BlogPost);
 
-describe('model: mapreduce:', function() {
-  it('works', function(done) {
+describe('model: mapreduce:', function () {
+  it('works', function (done) {
     var db = start(),
         MR = db.model('MapReduce', collection);
 
@@ -57,25 +57,25 @@ describe('model: mapreduce:', function() {
       docs.push({author: authors[i % authors.length], owners: [id], published: true});
     }
 
-    MR.create(docs, function(err, insertedDocs) {
+    MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
 
       magicID = insertedDocs[1]._id;
 
       var o = {
-        map: function() {
+        map: function () {
           emit(this.author, 1);
         },
-        reduce: function(k, vals) {
+        reduce: function (k, vals) {
           return vals.length;
         }
       };
 
-      MR.mapReduce(o, function(err, ret, stats) {
+      MR.mapReduce(o, function (err, ret, stats) {
         assert.ifError(err);
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
-        ret.forEach(function(res) {
+        ret.forEach(function (res) {
           if (res._id === 'aaron') {
             assert.equal(3, res.value);
           }
@@ -91,16 +91,16 @@ describe('model: mapreduce:', function() {
         });
 
         var o = {
-          map: function() {
+          map: function () {
             emit(this.author, 1);
           },
-          reduce: function(k, vals) {
+          reduce: function (k, vals) {
             return vals.length;
           },
           query: {author: 'aaron', published: 1, owners: id}
         };
 
-        MR.mapReduce(o, function(err, ret, stats) {
+        MR.mapReduce(o, function (err, ret, stats) {
           assert.ifError(err);
 
           assert.ok(Array.isArray(ret));
@@ -115,17 +115,17 @@ describe('model: mapreduce:', function() {
 
       function modeling() {
         var o = {
-          map: function() {
+          map: function () {
             emit(this.author, {own: magicID});
           },
           scope: {magicID: magicID},
-          reduce: function(k, vals) {
+          reduce: function (k, vals) {
             return {own: vals[0].own, count: vals.length};
           },
           out: {replace: '_mapreduce_test_' + random()}
         };
 
-        MR.mapReduce(o, function(err, ret) {
+        MR.mapReduce(o, function (err, ret) {
           assert.ifError(err);
 
           // ret is a model
@@ -134,7 +134,7 @@ describe('model: mapreduce:', function() {
           assert.equal('function', typeof ret.mapReduce);
 
           // queries work
-          ret.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
+          ret.where('value.count').gt(1).sort({_id: 1}).exec(function (err, docs) {
             assert.ifError(err);
             assert.equal('aaron', docs[0]._id);
             assert.equal('brian', docs[1]._id);
@@ -142,7 +142,7 @@ describe('model: mapreduce:', function() {
             assert.equal('nathan', docs[3]._id);
 
             // update casting works
-            ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {'new': true}, function(err, doc) {
+            ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function (err, doc) {
               assert.ifError(err);
               assert.ok(doc);
               assert.equal('aaron', doc._id);
@@ -152,7 +152,7 @@ describe('model: mapreduce:', function() {
               ret
               .findOne({_id: 'aaron'})
               .populate({path: 'value.own', model: 'MapReduce'})
-              .exec(function(err, doc) {
+              .exec(function (err, doc) {
                 db.close();
                 assert.ifError(err);
                 assert.equal('guillermo', doc.value.own.author);
@@ -165,54 +165,54 @@ describe('model: mapreduce:', function() {
     });
   });
 
-  it('withholds stats with false verbosity', function(done) {
+  it('withholds stats with false verbosity', function (done) {
     var db = start(),
         MR = db.model('MapReduce', collection);
 
     var o = {
-      map: function() {
+      map: function () {
       },
-      reduce: function() {
+      reduce: function () {
         return 'test';
       },
       verbose: false
     };
 
-    MR.mapReduce(o, function(err, results, stats) {
+    MR.mapReduce(o, function (err, results, stats) {
       assert.equal('undefined', typeof stats);
       db.close(done);
     });
   });
 
-  describe('promises (gh-1628)', function() {
-    it('are returned', function(done) {
+  describe('promises (gh-1628)', function () {
+    it('are returned', function (done) {
       var db = start(),
           MR = db.model('MapReduce', collection);
 
       var o = {
-        map: function() {
+        map: function () {
         },
-        reduce: function() {
+        reduce: function () {
           return 'test';
         }
       };
 
-      var promise = MR.mapReduce(o, function() {
+      var promise = MR.mapReduce(o, function () {
       });
       assert.ok(promise instanceof mongoose.Promise);
 
       db.close(done);
     });
 
-    it('allow not passing a callback', function(done) {
+    it('allow not passing a callback', function (done) {
       var db = start(),
           MR = db.model('MapReduce', collection);
 
       var o = {
-        map: function() {
+        map: function () {
           emit(this.author, 1);
         },
-        reduce: function(k, vals) {
+        reduce: function (k, vals) {
           return vals.length;
         },
         query: {author: 'aaron', published: 1}
@@ -232,7 +232,7 @@ describe('model: mapreduce:', function() {
 
       var promise;
 
-      assert.doesNotThrow(function() {
+      assert.doesNotThrow(function () {
         promise = MR.mapReduce(o);
       });
 
@@ -240,7 +240,7 @@ describe('model: mapreduce:', function() {
     });
   });
 
-  it('works using then', function(done) {
+  it('works using then', function (done) {
     var db = start(),
         MR = db.model('MapReduce', collection);
 
@@ -253,25 +253,25 @@ describe('model: mapreduce:', function() {
       docs.push({author: authors[i % authors.length], owners: [id], published: true});
     }
 
-    MR.create(docs, function(err, insertedDocs) {
+    MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
 
       var b = insertedDocs[1];
       magicID = b._id;
 
       var o = {
-        map: function() {
+        map: function () {
           emit(this.author, 1);
         },
-        reduce: function(k, vals) {
+        reduce: function (k, vals) {
           return vals.length;
         }
       };
 
-      MR.mapReduce(o).then(function(ret, stats) {
+      MR.mapReduce(o).then(function (ret, stats) {
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
-        ret.forEach(function(res) {
+        ret.forEach(function (res) {
           if (res._id === 'aaron') {
             assert.equal(6, res.value);
           }
@@ -287,16 +287,16 @@ describe('model: mapreduce:', function() {
         });
 
         var o = {
-          map: function() {
+          map: function () {
             emit(this.author, 1);
           },
-          reduce: function(k, vals) {
+          reduce: function (k, vals) {
             return vals.length;
           },
           query: {author: 'aaron', published: 1, owners: id}
         };
 
-        MR.mapReduce(o).then(function(ret, stats) {
+        MR.mapReduce(o).then(function (ret, stats) {
           assert.ok(Array.isArray(ret));
           assert.equal(1, ret.length);
           assert.equal('aaron', ret[0]._id);
@@ -308,24 +308,24 @@ describe('model: mapreduce:', function() {
 
       function modeling() {
         var o = {
-          map: function() {
+          map: function () {
             emit(this.author, {own: magicID});
           },
           scope: {magicID: magicID},
-          reduce: function(k, vals) {
+          reduce: function (k, vals) {
             return {own: vals[0].own, count: vals.length};
           },
           out: {replace: '_mapreduce_test_' + random()}
         };
 
-        MR.mapReduce(o).then(function(ret) {
+        MR.mapReduce(o).then(function (ret) {
           // ret is a model
           assert.ok(!Array.isArray(ret));
           assert.equal('function', typeof ret.findOne);
           assert.equal('function', typeof ret.mapReduce);
 
           // queries work
-          ret.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
+          ret.where('value.count').gt(1).sort({_id: 1}).exec(function (err, docs) {
             assert.ifError(err);
             assert.equal('aaron', docs[0]._id);
             assert.equal('brian', docs[1]._id);
@@ -333,7 +333,7 @@ describe('model: mapreduce:', function() {
             assert.equal('nathan', docs[3]._id);
 
             // update casting works
-            ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {'new': true}, function(err, doc) {
+            ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function (err, doc) {
               assert.ifError(err);
               assert.ok(doc);
               assert.equal('aaron', doc._id);
@@ -343,7 +343,7 @@ describe('model: mapreduce:', function() {
               ret
               .findOne({_id: 'aaron'})
               .populate({path: 'value.own', model: 'MapReduce'})
-              .exec(function(err, doc) {
+              .exec(function (err, doc) {
                 db.close();
                 assert.ifError(err);
                 assert.equal('guillermo', doc.value.own.author);
@@ -356,20 +356,20 @@ describe('model: mapreduce:', function() {
     });
   });
 
-  it('withholds stats with false verbosity using then', function(done) {
+  it('withholds stats with false verbosity using then', function (done) {
     var db = start(),
         MR = db.model('MapReduce', collection);
 
     var o = {
-      map: function() {
+      map: function () {
       },
-      reduce: function() {
+      reduce: function () {
         return 'test';
       },
       verbose: false
     };
 
-    MR.mapReduce(o).then(function(results, stats) {
+    MR.mapReduce(o).then(function (results, stats) {
       assert.equal('undefined', typeof stats);
       db.close(done);
     });

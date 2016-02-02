@@ -14,20 +14,20 @@ var schema = new Schema({
   complex: {},
   type: String
 });
-schema.index({'pos': 'geoHaystack', type: 1}, {bucketSize: 1});
+schema.index({pos: 'geoHaystack', type: 1}, {bucketSize: 1});
 
 function getModel(db) {
   return db.model('GeoSearch', schema, 'geosearch-' + random());
 }
 
-describe('model', function() {
-  describe('geoSearch', function() {
-    it('works', function(done) {
+describe('model', function () {
+  describe('geoSearch', function () {
+    it('works', function (done) {
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -38,14 +38,14 @@ describe('model', function() {
         var count = geos.length;
 
         for (var i = 0; i < geos.length; i++) {
-          geos[i].save(function(err) {
+          geos[i].save(function (err) {
             assert.ifError(err);
             --count || next();
           });
         }
 
         function next() {
-          Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function(err, results) {
+          Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function (err, results) {
             assert.ifError(err);
             assert.equal(1, results.length);
 
@@ -56,7 +56,7 @@ describe('model', function() {
             assert.equal(results[0].id, geos[0].id);
             assert.ok(results[0] instanceof Geo);
 
-            Geo.geoSearch({type: 'place'}, {near: [40, 40], maxDistance: 5}, function(err, results) {
+            Geo.geoSearch({type: 'place'}, {near: [40, 40], maxDistance: 5}, function (err, results) {
               assert.ifError(err);
               assert.equal(0, results.length);
               db.close(done);
@@ -65,12 +65,12 @@ describe('model', function() {
         }
       });
     });
-    it('works with lean', function(done) {
+    it('works with lean', function (done) {
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -81,14 +81,14 @@ describe('model', function() {
         var count = geos.length;
 
         for (var i = 0; i < geos.length; i++) {
-          geos[i].save(function(err) {
+          geos[i].save(function (err) {
             assert.ifError(err);
             --count || next();
           });
         }
 
         function next() {
-          Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5, lean: true}, function(err, results) {
+          Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5, lean: true}, function (err, results) {
             assert.ifError(err);
             assert.equal(1, results.length);
 
@@ -104,29 +104,29 @@ describe('model', function() {
         }
       });
     });
-    it('throws the correct error messages', function(done) {
+    it('throws the correct error messages', function (done) {
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var g = new Geo({pos: [10, 10], type: 'place'});
-        g.save(function() {
-          Geo.geoSearch([], {}, function(e) {
+        g.save(function () {
+          Geo.geoSearch([], {}, function (e) {
             assert.ok(e);
             assert.equal(e.message, 'Must pass conditions to geoSearch');
 
-            Geo.geoSearch({type: 'test'}, {}, function(e) {
+            Geo.geoSearch({type: 'test'}, {}, function (e) {
               assert.ok(e);
               assert.equal(e.message, 'Must specify the near option in geoSearch');
 
-              Geo.geoSearch({type: 'test'}, {near: 'hello'}, function(e) {
+              Geo.geoSearch({type: 'test'}, {near: 'hello'}, function (e) {
                 assert.ok(e);
                 assert.equal(e.message, 'near option must be an array [x, y]');
 
-                Geo.geoSearch({type: 'test'}, {near: [1, 2]}, function(err) {
+                Geo.geoSearch({type: 'test'}, {near: [1, 2]}, function (err) {
                   assert.ok(err);
                   assert.ok(/maxDistance needs a number/.test(err));
                   db.close(done);
@@ -137,27 +137,27 @@ describe('model', function() {
         });
       });
     });
-    it('returns a promise (gh-1614)', function(done) {
+    it('returns a promise (gh-1614)', function (done) {
       var db = start();
       var Geo = getModel(db);
 
-      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function() {});
+      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function () {});
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
     });
 
-    it('allows not passing a callback (gh-1614)', function(done) {
+    it('allows not passing a callback (gh-1614)', function (done) {
       var db = start();
       var Geo = getModel(db);
-      Geo.on('index', function(err) {
+      Geo.on('index', function (err) {
         assert.ifError(err);
         var g = new Geo({pos: [10, 10], type: 'place'});
-        g.save(function(err) {
+        g.save(function (err) {
           assert.ifError(err);
 
           var promise;
-          assert.doesNotThrow(function() {
+          assert.doesNotThrow(function () {
             promise = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
           });
           function validate(ret, stat) {

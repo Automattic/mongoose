@@ -19,11 +19,11 @@ var utils = require('../../lib/utils.js');
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
+mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
   if (err) {
     throw err;
   }
-  mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
+  mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
     if (err) {
       throw err;
     }
@@ -108,7 +108,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     var count = 4000;
     for (i = 0; i < 1000; i++) {
       data.age = Math.floor(Math.random() * 50);
-      User.create(data, function(err, u) {
+      User.create(data, function (err, u) {
         if (err) {
           throw err;
         }
@@ -116,14 +116,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         --count || next();
       });
       var nData = utils.clone(data);
-      user.insert(nData, function(err, res) {
+      user.insert(nData, function (err, res) {
         if (err) {
           throw err;
         }
         dIds.push(res[0]._id);
         --count || next();
       });
-      BlogPost.create(blogData, function(err, bp) {
+      BlogPost.create(blogData, function (err, bp) {
         if (err) {
           throw err;
         }
@@ -132,7 +132,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       });
 
       var bpData = utils.clone(blogData);
-      blogpost.insert(bpData, function(err, res) {
+      blogpost.insert(bpData, function (err, res) {
         if (err) {
           throw err;
         }
@@ -167,7 +167,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }
 
     function closeDB() {
-      mongoose.connection.db.dropDatabase(function() {
+      mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
       });
@@ -175,8 +175,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
 
     suite.add('Read - Mongoose - Basic', {
       defer: true,
-      fn: function(deferred) {
-        User.findOne({_id: getNextmId()}, function(err) {
+      fn: function (deferred) {
+        User.findOne({_id: getNextmId()}, function (err) {
           if (err) {
             throw err;
           }
@@ -185,8 +185,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Driver - Basic', {
       defer: true,
-      fn: function(deferred) {
-        user.findOne({_id: getNextdId()}, function(err) {
+      fn: function (deferred) {
+        user.findOne({_id: getNextdId()}, function (err) {
           if (err) {
             throw err;
           }
@@ -195,8 +195,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Mongoose - With lean', {
       defer: true,
-      fn: function(deferred) {
-        User.findOne({_id: getNextmId()}, {}, {lean: true}, function(err) {
+      fn: function (deferred) {
+        User.findOne({_id: getNextmId()}, {}, {lean: true}, function (err) {
           if (err) {
             throw err;
           }
@@ -205,12 +205,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Mongoose - Multiple Items', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var ids = [];
         for (var i = 0; i < 25; i++) {
           ids.push(getNextmId());
         }
-        User.find({_id: {$in: ids}}, function(err) {
+        User.find({_id: {$in: ids}}, function (err) {
           if (err) {
             throw err;
           }
@@ -219,16 +219,16 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Driver - Multiple Items', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var ids = [];
         for (var i = 0; i < 25; i++) {
           ids.push(getNextdId());
         }
-        user.find({_id: {$in: ids}}, function(err, cursor) {
+        user.find({_id: {$in: ids}}, function (err, cursor) {
           if (err) {
             throw err;
           }
-          cursor.toArray(function(err) {
+          cursor.toArray(function (err) {
             if (err) {
               throw err;
             }
@@ -238,10 +238,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Mongoose - Non-index', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var age = Math.floor(Math.random() * 50);
 
-        User.find({age: age}, function(err) {
+        User.find({age: age}, function (err) {
           if (err) {
             throw err;
           }
@@ -250,14 +250,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Driver - Non-index', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var age = Math.floor(Math.random() * 50);
 
-        user.find({age: age}, function(err, cursor) {
+        user.find({age: age}, function (err, cursor) {
           if (err) {
             throw err;
           }
-          cursor.toArray(function(err) {
+          cursor.toArray(function (err) {
             if (err) {
               throw err;
             }
@@ -267,8 +267,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Mongoose - Embedded Docs', {
       defer: true,
-      fn: function(deferred) {
-        BlogPost.find({_id: getNextbmId()}, function(err) {
+      fn: function (deferred) {
+        BlogPost.find({_id: getNextbmId()}, function (err) {
           if (err) {
             throw err;
           }
@@ -277,12 +277,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Read - Driver - Embedded Docs', {
       defer: true,
-      fn: function(deferred) {
-        blogpost.find({_id: getNextbdId()}, function(err, cursor) {
+      fn: function (deferred) {
+        blogpost.find({_id: getNextbdId()}, function (err, cursor) {
           if (err) {
             throw err;
           }
-          cursor.toArray(function(err) {
+          cursor.toArray(function (err) {
             if (err) {
               throw err;
             }
@@ -291,15 +291,15 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         });
       }
     })
-    .on('cycle', function(evt) {
+    .on('cycle', function (evt) {
       if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
         console.log(String(evt.target));
       }
-    }).on('complete', function() {
+    }).on('complete', function () {
       closeDB();
       if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
         var outObj = {};
-        this.forEach(function(item) {
+        this.forEach(function (item) {
           var out = {};
           out.stats = item.stats;
           delete out.stats.sample;

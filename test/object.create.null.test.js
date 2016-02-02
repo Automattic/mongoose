@@ -3,7 +3,7 @@
  */
 
 var start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema;
 

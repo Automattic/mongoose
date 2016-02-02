@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-var assert = require('assert');
+var assert = require('power-assert');
 
 var Promise = require('../lib/promise');
 

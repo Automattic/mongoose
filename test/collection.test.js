@@ -1,6 +1,6 @@
 var start = require('./common'),
     mongoose = start.mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     Collection = require('../lib/collection');
 
 describe('collections:', function() {

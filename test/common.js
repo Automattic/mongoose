@@ -4,7 +4,7 @@
 
 var mongoose = require('../'),
     Collection = mongoose.Collection,
-    assert = require('assert'),
+    assert = require('power-assert'),
     queryCount = 0,
     opened = 0,
     closed = 0;

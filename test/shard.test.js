@@ -1,5 +1,5 @@
 var start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     random = require('../lib/utils').random,
     mongoose = start.mongoose,
     Schema = mongoose.Schema;

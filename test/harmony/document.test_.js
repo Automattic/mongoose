@@ -3,7 +3,7 @@ var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
 var ValidationError = require('../../lib/error/validation');
 var co = require('co');
-var assert = require('assert');
+var assert = require('power-assert');
 
 /**
  *  Asynchronous document functions return

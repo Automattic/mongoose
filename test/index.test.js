@@ -1,7 +1,7 @@
 
 var url = require('url'),
     start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     mongoose = start.mongoose,
     Mongoose = mongoose.Mongoose,
     Schema = mongoose.Schema,

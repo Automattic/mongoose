@@ -3,7 +3,7 @@ var start = require('../common');
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
 var co = require('co');
-var assert = require('assert');
+var assert = require('power-assert');
 
 /**
  *  Asynchronous functions on Model return

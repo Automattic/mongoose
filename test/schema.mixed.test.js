@@ -5,7 +5,7 @@
 
 var start = require('./common'),
     mongoose = new start.mongoose.Mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     Schema = mongoose.Schema;
 
 describe('schematype mixed', function() {

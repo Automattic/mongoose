@@ -6,7 +6,7 @@ var start = require('./common'),
     Aggregate = require('../lib/aggregate'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,
-    assert = require('assert');
+    assert = require('power-assert');
 
 /**
  * Test data

@@ -4,7 +4,7 @@
  */
 
 var mongoose = require('./common').mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     Schema = mongoose.Schema;
 
 describe('schematype', function() {

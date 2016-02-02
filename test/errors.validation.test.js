@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var assert = require('assert'),
+var assert = require('power-assert'),
     start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,

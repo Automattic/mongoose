@@ -4,7 +4,7 @@
 
 var start = require('./common'),
     mongoose = start.mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     Schema = mongoose.Schema,
     Document = mongoose.Document,
     VirtualType = mongoose.VirtualType,

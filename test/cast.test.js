@@ -3,7 +3,7 @@
  */
 
 var Schema = require('../lib/schema');
-var assert = require('assert');
+var assert = require('power-assert');
 var cast = require('../lib/cast');
 
 describe('cast: ', function() {

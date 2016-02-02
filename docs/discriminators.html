@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Discriminators v4.3.7</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES6 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="the-model-discriminator-function"><p>The <code>model.discriminator()</code> function</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Discriminators v4.4.0</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES6 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="the-model-discriminator-function"><p>The <code>model.discriminator()</code> function</p>
 </h2><p>Discriminators are a schema inheritance mechanism. They enable
 you to have multiple models with overlapping schemas on top of the
 same underlying MongoDB collection.</p>
@@ -10,23 +10,23 @@ using the <code>model.discriminator()</code> function. This function takes
 model whose schema is the union of the base schema and the
 discriminator schema.</p>
 <pre><code class="javascript">
-    var options = { discriminatorKey: 'kind' };
+    var options = {discriminatorKey: 'kind'};
 
-    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var eventSchema = new mongoose.Schema({time: Date}, options);
     var Event = mongoose.model('Event', eventSchema);
 
     // ClickedLinkEvent is a special type of Event that has
     // a URL.
     var ClickedLinkEvent = Event.discriminator('ClickedLink',
-      new mongoose.Schema({ url: String }, options));
+      new mongoose.Schema({url: String}, options));
 
     // When you create a generic event, it can't have a URL field...
-    var genericEvent = new Event({ time: Date.now(), url: 'google.com' });
+    var genericEvent = new Event({time: Date.now(), url: 'google.com'});
     assert.ok(!genericEvent.url);
 
     // But a ClickedLinkEvent can
     var clickedEvent =
-      new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+      new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
     assert.ok(clickedEvent.url);
   </code></pre><h2 id="discriminators-save-to-the-event-models-collection"><p>Discriminators save to the Event model&#39;s collection</p>
 </h2><p>Suppose you created another discriminator to track events where
@@ -34,19 +34,19 @@ a new user registered. These <code>SignedUpEvent</code> instances will be
 stored in the same collection as generic events and <code>ClickedLinkEvent</code>
 instances.</p>
 <pre><code class="javascript">
-    var event1 = new Event({ time: Date.now() });
-    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
-    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+    var event1 = new Event({time: Date.now()});
+    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    var save = function(doc, callback) {
-      doc.save(function(error, doc) {
+    var save = function (doc, callback) {
+      doc.save(function (error, doc) {
         callback(error, doc);
       });
     };
 
-    async.map([event1, event2, event3], save, function(error) {
+    async.map([event1, event2, event3], save, function (error) {
 
-      Event.count({}, function(error, count) {
+      Event.count({}, function (error, count) {
         assert.equal(count, 3);
       });
     });
@@ -57,9 +57,9 @@ discriminator models is by the &#39;discriminator key&#39;, which is
 to your schemas that it uses to track which discriminator
 this document is an instance of.</p>
 <pre><code class="javascript">
-    var event1 = new Event({ time: Date.now() });
-    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
-    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+    var event1 = new Event({time: Date.now()});
+    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
     assert.ok(!event1.kind);
     assert.equal(event2.kind, 'ClickedLink');
@@ -69,19 +69,19 @@ this document is an instance of.</p>
 to queries. In other words, <code>find()</code>, <code>count()</code>, <code>aggregate()</code>, etc.
 are smart enough to account for discriminators.</p>
 <pre><code class="javascript">
-    var event1 = new Event({ time: Date.now() });
-    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
-    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+    var event1 = new Event({time: Date.now()});
+    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    var save = function(doc, callback) {
-      doc.save(function(error, doc) {
+    var save = function (doc, callback) {
+      doc.save(function (error, doc) {
         callback(error, doc);
       });
     };
 
-    async.map([event1, event2, event3], save, function(error) {
+    async.map([event1, event2, event3], save, function (error) {
 
-      ClickedLinkEvent.find({}, function(error, docs) {
+      ClickedLinkEvent.find({}, function (error, docs) {
         assert.equal(docs.length, 1);
         assert.equal(docs[0]._id.toString(), event2._id.toString());
         assert.equal(docs[0].url, 'google.com');
@@ -92,19 +92,19 @@ are smart enough to account for discriminators.</p>
 However, you can also attach middleware to the discriminator schema
 without affecting the base schema.</p>
 <pre><code class="javascript">
-    var options = { discriminatorKey: 'kind' };
+    var options = {discriminatorKey: 'kind'};
 
-    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var eventSchema = new mongoose.Schema({time: Date}, options);
     var eventSchemaCalls = 0;
-    eventSchema.pre('validate', function(next) {
+    eventSchema.pre('validate', function (next) {
       ++eventSchemaCalls;
       next();
     });
     var Event = mongoose.model('GenericEvent', eventSchema);
 
-    var clickedLinkSchema = new mongoose.Schema({ url: String }, options);
+    var clickedLinkSchema = new mongoose.Schema({url: String}, options);
     var clickedSchemaCalls = 0;
-    clickedLinkSchema.pre('validate', function(next) {
+    clickedLinkSchema.pre('validate', function (next) {
       ++clickedSchemaCalls;
       next();
     });
@@ -112,12 +112,12 @@ without affecting the base schema.</p>
       clickedLinkSchema);
 
     var event1 = new ClickedLinkEvent();
-    event1.validate(function() {
+    event1.validate(function () {
       assert.equal(eventSchemaCalls, 1);
       assert.equal(clickedSchemaCalls, 1);
 
       var generic = new Event();
-      generic.validate(function() {
+      generic.validate(function () {
         assert.equal(eventSchemaCalls, 2);
         assert.equal(clickedSchemaCalls, 1);
       });
@@ -132,14 +132,14 @@ field. A schema gets an <code>_id</code> field by default, so the base schema&#3
 <p>You can work around this by setting the <code>_id</code> option to false in the
 discriminator schema as shown below.</p>
 <pre><code class="javascript">
-    var options = { discriminatorKey: 'kind' };
+    var options = {discriminatorKey: 'kind'};
 
     // Base schema has a String _id...
-    var eventSchema = new mongoose.Schema({ _id: String, time: Date },
+    var eventSchema = new mongoose.Schema({_id: String, time: Date},
       options);
     var Event = mongoose.model('BaseEvent', eventSchema);
 
-    var clickedLinkSchema = new mongoose.Schema({ url: String }, options);
+    var clickedLinkSchema = new mongoose.Schema({url: String}, options);
     var ClickedLinkEvent = Event.discriminator('ChildEventBad',
       clickedLinkSchema);
 
@@ -148,20 +148,20 @@ discriminator schema as shown below.</p>
     assert.ok(event1._id instanceof mongoose.Types.ObjectId);
 
     // But if you set `_id` option to false...
-    clickedLinkSchema = new mongoose.Schema({ url: String },
-      { discriminatorKey: 'kind', _id: false });
+    clickedLinkSchema = new mongoose.Schema({url: String},
+      {discriminatorKey: 'kind', _id: false});
     ClickedLinkEvent = Event.discriminator('ChildEventGood',
       clickedLinkSchema);
 
     // The custom _id from the base schema comes through
-    var event2 = new ClickedLinkEvent({ _id: 'test' });
+    var event2 = new ClickedLinkEvent({_id: 'test'});
     assert.ok(event2._id.toString() === event2._id);
   </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';
   var gcse = document.createElement('script');
   gcse.type = 'text/javascript';
   gcse.async = true;
-  gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
       '//www.google.com/cse/cse.js?cx=' + cx;
   var s = document.getElementsByTagName('script')[0];
   s.parentNode.insertBefore(gcse, s);
@@ -171,6 +171,6 @@ _gaq.push(['_trackPageview', location.pathname + location.search + location.hash
 
 (function() {
   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();</script></body></html>

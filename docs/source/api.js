@@ -9,7 +9,7 @@ var md = require('markdown')
 
 module.exports = {
     docs: []
-  , github: 'https://github.com/LearnBoost/mongoose/blob/'
+  , github: 'https://github.com/Automattic/mongoose/blob/'
   , title: 'API docs'
 }
 
@@ -214,10 +214,12 @@ function fix (str) {
 function order (docs) {
   var sortByCtxName = function (a, b) {
     if (!a.ctx) {
-      console.error('missing ctx', a);
+      console.warn('missing ctx', a);
+      return -1;
     }
     if (!b.ctx) {
-      console.error('missing ctx', b);
+      console.warn('missing ctx', b);
+      return 1;
     }
     return a.ctx.name.localeCompare(b.ctx.name);
   };

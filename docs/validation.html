@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.3.7</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES6 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>Validation</h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.4.0</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES6 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>Validation</h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
 
 <ul><li>Validation is defined in the <a href="./schematypes.html">SchemaType</a></li><li>Validation is an internal piece of <a href="./middleware.html">middleware</a></li><li>Validation occurs when a document attempts to be <a href="./api.html#model_Model-save">saved</a>, after defaults have been applied</li><li>Validators are not run on undefined values. The only exception is the <a href="./api.html#schematype_SchemaType-required"><code>required</code> validator</a>.</li><li>Validation is asynchronously recursive; when you call <a href="./api.html#model_Model-save">Model#save</a>, sub-document validation is executed as well. If an error occurs, your <a href="./api.html#model_Model-save">Model#save</a> callback receives it</li><li>Validation supports complete customization</li></ul><h3 id="built-in-validators">Built in validators</h3><p>Mongoose has several built in validators.</p>
 
@@ -8,55 +8,55 @@
 
 <p>Custom validation is declared by passing a validation function.
 You can find detailed instructions on how to do this in the
-<a href="./api.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p><pre><code class="javascript"><span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({
+<a href="./api.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> userSchema = <span class="hljs-keyword">new</span> Schema({
   phone: {
-    type: String,
+    type: <span class="hljs-built_in">String</span>,
     validate: {
-      validator: <span class="keyword">function</span>(v) {
-        <span class="keyword">return</span> <span class="regexp">/d{3}-d{3}-d{4}/</span>.test(v);
+      validator: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-regexp">/d{3}-d{3}-d{4}/</span>.test(v);
       },
-      message: <span class="string">'{VALUE} is not a valid phone number!'</span>
+      message: <span class="hljs-string">'{VALUE} is not a valid phone number!'</span>
     }
   }
 });
 
-<span class="keyword">var</span> User = mongoose.model(<span class="string">'user'</span>, userSchema);
+<span class="hljs-keyword">var</span> User = mongoose.model(<span class="hljs-string">'user'</span>, userSchema);
 
-<span class="keyword">var</span> u = <span class="keyword">new</span> User();
+<span class="hljs-keyword">var</span> u = <span class="hljs-keyword">new</span> User();
 
-u.phone = <span class="string">'555.0123'</span>;
-<span class="comment">// Prints "ValidationError: 555.0123 is not a valid phone number!"</span>
-console.log(u.validateSync().toString());
+u.phone = <span class="hljs-string">'555.0123'</span>;
+<span class="hljs-comment">// Prints "ValidationError: 555.0123 is not a valid phone number!"</span>
+<span class="hljs-built_in">console</span>.log(u.validateSync().toString());
 
-u.phone = <span class="string">'201-555-0123'</span>;
-<span class="comment">// Prints undefined - validation succeeded!</span>
-console.log(u.validateSync());</code></pre><h3 id="validation-errors">Validation errors</h3><p>Errors returned after failed validation contain an <code>errors</code> object
+u.phone = <span class="hljs-string">'201-555-0123'</span>;
+<span class="hljs-comment">// Prints undefined - validation succeeded!</span>
+<span class="hljs-built_in">console</span>.log(u.validateSync());</code></pre><h3 id="validation-errors">Validation errors</h3><p>Errors returned after failed validation contain an <code>errors</code> object
 holding the actual <code>ValidatorError</code> objects. Each
 <a href="./api.html#error-validation-js">ValidatorError</a> has <code>kind</code>, <code>path</code>,
-<code>value</code>, and <code>message</code> properties.</p><pre><code class="javascript"><span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
-  color: String,
-  name: String
+<code>value</code>, and <code>message</code> properties.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+  color: <span class="hljs-built_in">String</span>,
+  name: <span class="hljs-built_in">String</span>
 });
 
-<span class="keyword">var</span> Toy = mongoose.model(<span class="string">'Toy'</span>, toySchema);
+<span class="hljs-keyword">var</span> Toy = mongoose.model(<span class="hljs-string">'Toy'</span>, toySchema);
 
-Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-  <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
-}, <span class="string">'Invalid color'</span>);
+Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+}, <span class="hljs-string">'Invalid color'</span>);
 
-<span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'grease'</span>});
+<span class="hljs-keyword">var</span> toy = <span class="hljs-keyword">new</span> Toy({ color: <span class="hljs-string">'grease'</span>});
 
-toy.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-  <span class="comment">// err is our ValidationError object</span>
-  <span class="comment">// err.errors.color is a ValidatorError object</span>
+toy.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-comment">// err is our ValidationError object</span>
+  <span class="hljs-comment">// err.errors.color is a ValidatorError object</span>
   
-  console.log(err.errors.color.message) <span class="comment">// prints 'Validator "Invalid color" failed for path color with value `grease`'</span>
-  console.log(String(err.errors.color)) <span class="comment">// prints 'Validator "Invalid color" failed for path color with value `grease`'</span>
-  console.log(err.errors.color.kind)  <span class="comment">// prints "Invalid color"</span>
-  console.log(err.errors.color.path)  <span class="comment">// prints "color"</span>
-  console.log(err.errors.color.value) <span class="comment">// prints "grease"</span>
-  console.log(err.name) <span class="comment">// prints "ValidationError"</span>
-  console.log(err.message) <span class="comment">// prints "Validation failed"</span>
+  <span class="hljs-built_in">console</span>.log(err.errors.color.message) <span class="hljs-comment">// prints 'Validator "Invalid color" failed for path color with value `grease`'</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">String</span>(err.errors.color)) <span class="hljs-comment">// prints 'Validator "Invalid color" failed for path color with value `grease`'</span>
+  <span class="hljs-built_in">console</span>.log(err.errors.color.kind)  <span class="hljs-comment">// prints "Invalid color"</span>
+  <span class="hljs-built_in">console</span>.log(err.errors.color.path)  <span class="hljs-comment">// prints "color"</span>
+  <span class="hljs-built_in">console</span>.log(err.errors.color.value) <span class="hljs-comment">// prints "grease"</span>
+  <span class="hljs-built_in">console</span>.log(err.name) <span class="hljs-comment">// prints "ValidationError"</span>
+  <span class="hljs-built_in">console</span>.log(err.message) <span class="hljs-comment">// prints "Validation failed"</span>
 });
 </code></pre><p>After a validation error, the document will also have the same <code>errors</code> property available:</p><pre><code class="javascript">toy.errors.color.message === err.errors.color.message
 </code></pre><h3 id="validate-sync">Synchronous Validation</h3><p>Validation is asynchronous by default. Mongoose evaluates each individual
@@ -68,90 +68,90 @@ it&#39;s often more convenient to validate synchronously.</p>
 <p>Mongoose documents also have a <code>validateSync()</code> function, which returns
 a <code>ValidationError</code> if there was an error, or falsy if there was no error.
 Note that <code>validateSync()</code> <strong>only</strong> executes synchronous validators.
-Custom asynchronous validators won&#39;t execute.</p><pre><code class="javascript"><span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
-  color: String,
-  name: String
+Custom asynchronous validators won&#39;t execute.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+  color: <span class="hljs-built_in">String</span>,
+  name: <span class="hljs-built_in">String</span>
 });
 
-<span class="keyword">var</span> Toy = mongoose.model(<span class="string">'Toy'</span>, toySchema);
+<span class="hljs-keyword">var</span> Toy = mongoose.model(<span class="hljs-string">'Toy'</span>, toySchema);
 
-Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-  <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
-}, <span class="string">'Invalid color'</span>);
+Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+}, <span class="hljs-string">'Invalid color'</span>);
 
-<span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'grease'</span>});
+<span class="hljs-keyword">var</span> toy = <span class="hljs-keyword">new</span> Toy({ color: <span class="hljs-string">'grease'</span>});
 
-<span class="comment">// `error` is a ValidationError analogous to the one from `validate()`</span>
-<span class="keyword">var</span> error = toy.validateSync();
+<span class="hljs-comment">// `error` is a ValidationError analogous to the one from `validate()`</span>
+<span class="hljs-keyword">var</span> error = toy.validateSync();
 
-<span class="comment">// prints 'Validator "Invalid color" failed for path color with value `grease`'</span>
-console.log(error.errors.color.message);
+<span class="hljs-comment">// prints 'Validator "Invalid color" failed for path color with value `grease`'</span>
+<span class="hljs-built_in">console</span>.log(error.errors.color.message);
 </code></pre><h3 id="update-validators">Update Validators</h3><p>In the above examples, you learned about document validation. Mongoose also
 supports validation for <code>update()</code> and <code>findOneAndUpdate()</code> operations.
 In Mongoose 4.x, update validators are off by default - you need to specify
-the <code>runValidators</code> option.</p><pre><code class="javascript"><span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
-  color: String,
-  name: String
+the <code>runValidators</code> option.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+  color: <span class="hljs-built_in">String</span>,
+  name: <span class="hljs-built_in">String</span>
 });
 
-<span class="keyword">var</span> Toy = mongoose.model(<span class="string">'Toy'</span>, toySchema);
+<span class="hljs-keyword">var</span> Toy = mongoose.model(<span class="hljs-string">'Toy'</span>, toySchema);
 
-Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-  <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
-}, <span class="string">'Invalid color'</span>);
+Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+}, <span class="hljs-string">'Invalid color'</span>);
 
-Toy.update({}, { color: <span class="string">'bacon'</span> }, { runValidators: <span class="literal">true</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-  console.log(err.errors.color.message); <span class="comment">// prints 'Validator "Invalid color" failed for path color with value `bacon`'</span>
+Toy.update({}, { color: <span class="hljs-string">'bacon'</span> }, { runValidators: <span class="hljs-literal">true</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(err.errors.color.message); <span class="hljs-comment">// prints 'Validator "Invalid color" failed for path color with value `bacon`'</span>
 });</code></pre><p>There are a couple of key differences between update validators and
 document validators. In the color validation function above, <code>this</code> refers
 to the document being validated when using document validation.
 However, when running update validators, the document being updated
 may not be in the server&#39;s memory, so by default the value of <code>this</code> is
 not defined. However, you can set the <code>context</code> option to &#39;query&#39; to make
-<code>this</code> refer to the underlying query.</p><pre><code class="javascript">Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-  <span class="keyword">this</span>.schema; <span class="comment">// refers to the query's schema if you set the `context` option</span>
-  <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
-}, <span class="string">'Invalid color'</span>);
+<code>this</code> refer to the underlying query.</p><pre><code class="javascript">Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+  <span class="hljs-keyword">this</span>.schema; <span class="hljs-comment">// refers to the query's schema if you set the `context` option</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+}, <span class="hljs-string">'Invalid color'</span>);
 
-<span class="keyword">var</span> options = { runValidators: <span class="literal">true</span>, context: <span class="string">'query'</span> };
-Toy.update({}, { color: <span class="string">'bacon'</span> }, options, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-  console.log(err.errors.color.message); <span class="comment">// prints 'Validator "Invalid color" failed for path color with value `bacon`'</span>
+<span class="hljs-keyword">var</span> options = { runValidators: <span class="hljs-literal">true</span>, context: <span class="hljs-string">'query'</span> };
+Toy.update({}, { color: <span class="hljs-string">'bacon'</span> }, options, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(err.errors.color.message); <span class="hljs-comment">// prints 'Validator "Invalid color" failed for path color with value `bacon`'</span>
 });
 </code></pre><p>The other key difference that update validators only run on the paths
 specified in the update. For instance, in the below example, because
 &#39;name&#39; is not specified in the update operation, update validation will
-succeed.</p><pre><code class="javascript"><span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
-  color: String,
-  name: { type: String, required: <span class="literal">true</span> }
+succeed.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+  color: <span class="hljs-built_in">String</span>,
+  name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> }
 });
 
-<span class="keyword">var</span> Toy = mongoose.model(<span class="string">'Toy'</span>, toySchema);
+<span class="hljs-keyword">var</span> Toy = mongoose.model(<span class="hljs-string">'Toy'</span>, toySchema);
 
-Toy.update({}, { color: <span class="string">'blue'</span> }, { runValidators: <span class="literal">true</span> }, <span class="keyword">function</span>(err) {
-  <span class="comment">// Operation succeeds despite the fact that 'name' is not specified</span>
+Toy.update({}, { color: <span class="hljs-string">'blue'</span> }, { runValidators: <span class="hljs-literal">true</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-comment">// Operation succeeds despite the fact that 'name' is not specified</span>
 });
 </code></pre><p>When using update validators, <code>required</code> validators <strong>only</strong> fail when
-you try to explicitly <code>$unset</code> the key.</p><pre><code class="javascript"><span class="keyword">var</span> unsetOp = { $unset: { name: <span class="number">1</span> } };
-Toy.update({}, unsetOp, { runValidators: <span class="literal">true</span> }, <span class="keyword">function</span>(err) {
-  <span class="comment">// Operation fails because 'name' is required</span>
+you try to explicitly <code>$unset</code> the key.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> unsetOp = { $unset: { name: <span class="hljs-number">1</span> } };
+Toy.update({}, unsetOp, { runValidators: <span class="hljs-literal">true</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-comment">// Operation fails because 'name' is required</span>
 });
 </code></pre><p>One final detail worth noting: update validators <strong>only</strong> run on <code>$set</code>
 and <code>$unset</code> operations. For instance, the below update will succeed,
-regardless of the value of <code>number</code>.</p><pre><code class="javascript"><span class="keyword">var</span> testSchema = <span class="keyword">new</span> Schema({
-  number: { type: Number, max: <span class="number">0</span> },
+regardless of the value of <code>number</code>.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> testSchema = <span class="hljs-keyword">new</span> Schema({
+  number: { type: <span class="hljs-built_in">Number</span>, max: <span class="hljs-number">0</span> },
 });
 
-<span class="keyword">var</span> Test = mongoose.model(<span class="string">'Test'</span>, testSchema);
+<span class="hljs-keyword">var</span> Test = mongoose.model(<span class="hljs-string">'Test'</span>, testSchema);
 
-Test.update({}, { $inc: { number: <span class="number">1</span> } }, { runValidators: <span class="literal">true</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-  <span class="comment">// There will never be a validation error here</span>
+Test.update({}, { $inc: { number: <span class="hljs-number">1</span> } }, { runValidators: <span class="hljs-literal">true</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-comment">// There will never be a validation error here</span>
 });
 </code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>validation</code>, let&#39;s take a look at how you might handle advanced validation with Mongoose&#39;s <a href="/docs/middleware.html">middleware</a>.</p></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';
   var gcse = document.createElement('script');
   gcse.type = 'text/javascript';
   gcse.async = true;
-  gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
       '//www.google.com/cse/cse.js?cx=' + cx;
   var s = document.getElementsByTagName('script')[0];
   s.parentNode.insertBefore(gcse, s);
@@ -161,6 +161,6 @@ _gaq.push(['_trackPageview', location.pathname + location.search + location.hash
 
 (function() {
   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();</script></body></html>

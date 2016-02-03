@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Middleware v4.4.0</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES6 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>Middleware</h2><p>Middleware (also called pre and post <em>hooks</em>) are functions which are passed
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Middleware v4.4.1</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES6 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>Middleware</h2><p>Middleware (also called pre and post <em>hooks</em>) are functions which are passed
 control during execution of asynchronous functions. Middleware is specified
 on the schema level and is useful for writing <a href="./plugins.html">plugins</a>.
 Mongoose 4.0 has 2 types
@@ -16,79 +16,79 @@ How pre and post hooks work is described in more detail below.</p>
 
 <p><strong>Note:</strong> There is no query hook for <code>remove()</code>, only for documents.
 If you set a &#39;remove&#39; hook, it will be fired when you call <code>myDoc.remove()</code>,
-not when you call <code>MyModel.remove()</code>.</p><h3 id="pre">Pre</h3><p>There are two types of <code>pre</code> hooks, serial and parallel.</p><h4 id="serial">Serial</h4><p>Serial middleware are executed one after another, when each middleware calls <code>next</code>.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema(..);
-schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
-  <span class="hljs-comment">// do stuff</span>
+not when you call <code>MyModel.remove()</code>.</p><h3 id="pre">Pre</h3><p>There are two types of <code>pre</code> hooks, serial and parallel.</p><h4 id="serial">Serial</h4><p>Serial middleware are executed one after another, when each middleware calls <code>next</code>.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
+schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {
+  <span class="comment">// do stuff</span>
   next();
-});</code></pre><h4 id="parallel">Parallel</h4><p>Parallel middleware offer more fine-grained flow control.</p><pre><code class="javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema(..);
+});</code></pre><h4 id="parallel">Parallel</h4><p>Parallel middleware offer more fine-grained flow control.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
 
-<span class="hljs-comment">// `true` means this is a parallel middleware. You **must** specify `true`</span>
-<span class="hljs-comment">// as the second parameter if you want to use parallel middleware.</span>
-schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-literal">true</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next, done</span>) </span>{
-  <span class="hljs-comment">// calling next kicks off the next middleware in parallel</span>
+<span class="comment">// `true` means this is a parallel middleware. You **must** specify `true`</span>
+<span class="comment">// as the second parameter if you want to use parallel middleware.</span>
+schema.pre(<span class="string">'save'</span>, <span class="literal">true</span>, <span class="keyword">function</span>(next, done) {
+  <span class="comment">// calling next kicks off the next middleware in parallel</span>
   next();
-  setTimeout(done, <span class="hljs-number">100</span>);
+  setTimeout(done, <span class="number">100</span>);
 });</code></pre><p>The hooked method, in this case <code>save</code>, will not be executed until <code>done</code> is called by each middleware.</p><h4 id="use-cases">Use Cases</h4><p>Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:<ul><li>complex validation</li><li>removing dependent documents<ul><li>(removing a user removes all his blogposts)</li></ul></li><li>asynchronous defaults</li><li>asynchronous tasks that a certain action triggers<ul><li>triggering custom events</li><li>notifications</li></ul></li></ul></p><h4 id="error-handling">Error handling</h4><p>If any middleware calls <code>next</code> or <code>done</code> with a parameter of type <code>Error</code>,
-the flow is interrupted, and the error is passed to the callback.</p><pre><code class="javascript">schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
-  <span class="hljs-comment">// You **must** do `new Error()`. `next('something went wrong')` will</span>
-  <span class="hljs-comment">// **not** work</span>
-  <span class="hljs-keyword">var</span> err = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'something went wrong'</span>);
+the flow is interrupted, and the error is passed to the callback.</p><pre><code class="javascript">schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {
+  <span class="comment">// You **must** do `new Error()`. `next('something went wrong')` will</span>
+  <span class="comment">// **not** work</span>
+  <span class="keyword">var</span> err = <span class="keyword">new</span> Error(<span class="string">'something went wrong'</span>);
   next(err);
 });
 
-<span class="hljs-comment">// later...</span>
+<span class="comment">// later...</span>
 
-myDoc.save(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(err.message) <span class="hljs-comment">// something went wrong</span>
+myDoc.save(<span class="keyword">function</span>(err) {
+  console.log(err.message) <span class="comment">// something went wrong</span>
 });
 </code></pre><h3 id="post">Post middleware</h3><p><a href="/docs/api.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
 the hooked method and all of its <code>pre</code> middleware have completed.
 <code>post</code> middleware do not directly receive flow control, e.g. no <code>next</code> or
 <code>done</code> callbacks are passed to it. <code>post</code> hooks are a way to register
-traditional event listeners for these methods.</p><pre><code class="javascript">schema.post(<span class="hljs-string">'init'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s has been initialized from the db'</span>, doc._id);
+traditional event listeners for these methods.</p><pre><code class="javascript">schema.post(<span class="string">'init'</span>, <span class="keyword">function</span>(doc) {
+  console.log(<span class="string">'%s has been initialized from the db'</span>, doc._id);
 });
-schema.post(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s has been validated (but not saved yet)'</span>, doc._id);
+schema.post(<span class="string">'validate'</span>, <span class="keyword">function</span>(doc) {
+  console.log(<span class="string">'%s has been validated (but not saved yet)'</span>, doc._id);
 });
-schema.post(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s has been saved'</span>, doc._id);
+schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc) {
+  console.log(<span class="string">'%s has been saved'</span>, doc._id);
 });
-schema.post(<span class="hljs-string">'remove'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s has been removed'</span>, doc._id);
+schema.post(<span class="string">'remove'</span>, <span class="keyword">function</span>(doc) {
+  console.log(<span class="string">'%s has been removed'</span>, doc._id);
 });
 </code></pre><h3 id="post-async">Asynchronous Post Hooks</h3><p>While post middleware doesn&#39;t receive flow control, you can still make
 sure that asynchronous post hooks are executed in a pre-defined order.
 If your post hook function takes at least 2 parameters, mongoose will
 assume the second parameter is a <code>next()</code> function that you will call to
-trigger the next middleware in the sequence.</p><pre><code class="javascript"><span class="hljs-comment">// Takes 2 parameters: this is an asynchronous post hook</span>
-schema.post(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) </span>{
-  setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'post1'</span>);
-    <span class="hljs-comment">// Kick off the second post hook</span>
+trigger the next middleware in the sequence.</p><pre><code class="javascript"><span class="comment">// Takes 2 parameters: this is an asynchronous post hook</span>
+schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc, next) {
+  setTimeout(<span class="keyword">function</span>() {
+    console.log(<span class="string">'post1'</span>);
+    <span class="comment">// Kick off the second post hook</span>
     next();
-  }, <span class="hljs-number">10</span>);
+  }, <span class="number">10</span>);
 });
 
-<span class="hljs-comment">// Will not execute until the first middleware calls `next()`</span>
-schema.post(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'post2'</span>);
+<span class="comment">// Will not execute until the first middleware calls `next()`</span>
+schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc, next) {
+  console.log(<span class="string">'post2'</span>);
   next();
 });
 </code></pre><h3 id="notes">Notes on findAndUpdate() and Query Middleware</h3><p>Pre and post <code>save()</code> hooks are <strong>not</strong> executed on <code>update()</code>,
 <code>findOneAndUpdate()</code>, etc. You can see a more detailed discussion why in
 <a href="http://github.com/Automattic/mongoose/issues/964">this GitHub issue</a>.
-Mongoose 4.0 has distinct hooks for these functions.</p><pre><code class="javascript">schema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> mongoose.Query); <span class="hljs-comment">// true</span>
-  <span class="hljs-keyword">this</span>.start = <span class="hljs-built_in">Date</span>.now();
+Mongoose 4.0 has distinct hooks for these functions.</p><pre><code class="javascript">schema.pre(<span class="string">'find'</span>, <span class="keyword">function</span>() {
+  console.log(<span class="keyword">this</span> <span class="keyword">instanceof</span> mongoose.Query); <span class="comment">// true</span>
+  <span class="keyword">this</span>.start = Date.now();
 });
 
-schema.post(<span class="hljs-string">'find'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">result</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> mongoose.Query); <span class="hljs-comment">// true</span>
-  <span class="hljs-comment">// prints returned documents</span>
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'find() returned '</span> + <span class="hljs-built_in">JSON</span>.stringify(result));
-  <span class="hljs-comment">// prints number of milliseconds the query took</span>
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'find() took '</span> + (<span class="hljs-built_in">Date</span>.now() - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">' millis'</span>);
+schema.post(<span class="string">'find'</span>, <span class="keyword">function</span>(result) {
+  console.log(<span class="keyword">this</span> <span class="keyword">instanceof</span> mongoose.Query); <span class="comment">// true</span>
+  <span class="comment">// prints returned documents</span>
+  console.log(<span class="string">'find() returned '</span> + JSON.stringify(result));
+  <span class="comment">// prints number of milliseconds the query took</span>
+  console.log(<span class="string">'find() took '</span> + (Date.now() - <span class="keyword">this</span>.start) + <span class="string">' millis'</span>);
 });
 </code></pre><p>Query middleware differs from document middleware in a subtle but
 important way: in document middleware, <code>this</code> refers to the document
@@ -97,8 +97,8 @@ a reference to the document being updated, so <code>this</code> refers to the
 <strong>query</strong> object rather than the document being updated.</p>
 
 <p>For instance, if you wanted to add an <code>updatedAt</code> timestamp to every
-<code>update()</code> call, you would use the following pre hook.</p><pre><code class="javascript">schema.pre(<span class="hljs-string">'update'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">this</span>.update({},{ $set: { updatedAt: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>() } });
+<code>update()</code> call, you would use the following pre hook.</p><pre><code class="javascript">schema.pre(<span class="string">'update'</span>, <span class="keyword">function</span>() {
+  <span class="keyword">this</span>.update({},{ $set: { updatedAt: <span class="keyword">new</span> Date() } });
 });
 </code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered middleware, let&#39;s take a look at Mongoose&#39;s approach
 to faking JOINs with its query <a href="/docs/populate.html">population</a> helper.</p></div></div><script>document.body.className = 'load';</script><script>;(function() {

@@ -1,7 +1,7 @@
 var start = require('./common'),
     mongoose = start.mongoose,
     assert = require('power-assert'),
-    Collection = require('../lib/collection');
+    Collection = require('../build/collection');
 
 describe('collections:', function() {
   it('should buffer commands until connection is established', function(done) {

@@ -7,7 +7,7 @@ var start = require('./common'),
     assert = require('power-assert'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
-    Document = require('../lib/document'),
+    Document = require('../build/document'),
     DocumentObjectId = mongoose.Types.ObjectId;
 
 /**

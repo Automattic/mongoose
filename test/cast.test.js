@@ -2,9 +2,9 @@
  * Module dependencies.
  */
 
-var Schema = require('../lib/schema');
+var Schema = require('../build/schema');
 var assert = require('power-assert');
-var cast = require('../lib/cast');
+var cast = require('../build/cast');
 
 describe('cast: ', function() {
   describe('bitwise query operators: ', function() {

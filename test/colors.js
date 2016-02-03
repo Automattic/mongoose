@@ -7,8 +7,8 @@ var start = require('./common'),
     assert = require('power-assert'),
     Schema = mongoose.Schema,
     MongooseDocumentArray = mongoose.Types.DocumentArray,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray');
+    EmbeddedDocument = require('../build/types/embedded'),
+    DocumentArray = require('../build/types/documentarray');
 
 /**
  * setup

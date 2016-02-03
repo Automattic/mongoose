@@ -11,7 +11,7 @@ var start = require('./common'),
     ObjectId = SchemaTypes.ObjectId,
     Mixed = SchemaTypes.Mixed,
     DocumentObjectId = mongoose.Types.ObjectId,
-    random = require('../lib/utils').random;
+    random = require('../build/utils').random;
 
 describe('schema', function() {
   describe('validation', function() {

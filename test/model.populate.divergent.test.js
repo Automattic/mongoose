@@ -7,7 +7,7 @@ var start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
     DivergentArrayError = mongoose.Error.DivergentArrayError,
-    utils = require('../lib/utils'),
+    utils = require('../build/utils'),
     random = utils.random;
 
 /**

@@ -246,11 +246,10 @@ var Types = require('./schema/index');
  * Handles internal casting for queries
  *
  * @param {Schema} schema
- * @param {Object obj Object to cast
+ * @param {Object} obj Object to cast
  * @api private
  */
-
-var cast = module.exports = function(schema, obj) {
+module.exports = function cast(schema, obj) {
   var paths = Object.keys(obj),
       i = paths.length,
       any$conditionals,
@@ -365,29 +364,7 @@ var cast = module.exports = function(schema, obj) {
             value = value.$geometry.coordinates;
           }
 
-          (function _cast(val) {
-            if (Array.isArray(val)) {
-              val.forEach(function(item, i) {
-                if (Array.isArray(item) || utils.isObject(item)) {
-                  return _cast(item);
-                }
-                val[i] = numbertype.castForQuery(item);
-              });
-            } else {
-              var nearKeys = Object.keys(val);
-              var nearLen = nearKeys.length;
-              while (nearLen--) {
-                var nkey = nearKeys[nearLen];
-                var item = val[nkey];
-                if (Array.isArray(item) || utils.isObject(item)) {
-                  _cast(item);
-                  val[nkey] = item;
-                } else {
-                  val[nkey] = numbertype.castForQuery(item);
-                }
-              }
-            }
-          })(value);
+          _cast(value, numbertype);
         }
       } else if (val === null || val === undefined) {
         obj[path] = null;
@@ -438,6 +415,30 @@ var cast = module.exports = function(schema, obj) {
 
   return obj;
 };
+
+function _cast(val, numbertype) {
+  if (Array.isArray(val)) {
+    val.forEach(function(item, i) {
+      if (Array.isArray(item) || utils.isObject(item)) {
+        return _cast(item, numbertype);
+      }
+      val[i] = numbertype.castForQuery(item);
+    });
+  } else {
+    var nearKeys = Object.keys(val);
+    var nearLen = nearKeys.length;
+    while (nearLen--) {
+      var nkey = nearKeys[nearLen];
+      var item = val[nkey];
+      if (Array.isArray(item) || utils.isObject(item)) {
+        _cast(item, numbertype);
+        val[nkey] = item;
+      } else {
+        val[nkey] = numbertype.castForQuery(item);
+      }
+    }
+  }
+}
 
 },{"./schema/index":33,"./utils":48}],5:[function(require,module,exports){
 (function (process,Buffer){
@@ -716,7 +717,8 @@ Document.prototype.init = function(doc, opts, fn) {
 
   // handle docs with populated paths
   // If doc._id is not null or undefined
-  if (doc._id !== null && opts && opts.populated && opts.populated.length) {
+  if (doc._id !== null && doc._id !== undefined &&
+    opts && opts.populated && opts.populated.length) {
     var id = String(doc._id);
     for (var i = 0; i < opts.populated.length; ++i) {
       var item = opts.populated[i];
@@ -819,8 +821,7 @@ Document.prototype.$__storeShard = function() {
     val = this.getValue(paths[i]);
     if (isMongooseObject(val)) {
       orig[paths[i]] = val.toObject({depopulate: true});
-    } else if (val !== null &&
-        val.valueOf &&
+    } else if (val !== null && val !== undefined && val.valueOf &&
           // Explicitly don't take value of dates
         (!val.constructor || utils.getFunctionName(val.constructor) !== 'Date')) {
       orig[paths[i]] = val.valueOf();
@@ -946,6 +947,7 @@ Document.prototype.set = function(path, val, type, options) {
         pathtype = this.schema.pathType(pathName);
 
         if (path[key] !== null
+            && path[key] !== undefined
               // need to know if plain object - no Buffer, ObjectId, ref, etc
             && utils.isObject(path[key])
             && (!path[key].constructor || utils.getFunctionName(path[key].constructor) === 'Object')
@@ -1162,6 +1164,7 @@ Document.prototype.$__shouldModify = function(pathToMark, path, constructing, pa
 
   if (!constructing &&
       val !== null &&
+      val !== undefined &&
       path in this.$__.activePaths.states.default &&
       deepEqual(val, schema.getDefault(this, constructing))) {
     // a path with a default was $unset on the server
@@ -4919,7 +4922,7 @@ Schema.prototype.indexes = function() {
       } else {
         index = path._index;
 
-        if (index !== false && index !== null) {
+        if (index !== false && index !== null && index !== undefined) {
           field = {};
           isObject = utils.isObject(index);
           options = isObject ? index : {};
@@ -4929,6 +4932,9 @@ Schema.prototype.indexes = function() {
 
           if (type && ~Schema.indexTypes.indexOf(type)) {
             field[prefix + key] = type;
+          } else if (options.text) {
+            field[prefix + key] = 'text';
+            delete options.text;
           } else {
             field[prefix + key] = 1;
           }
@@ -5056,8 +5062,7 @@ Schema.prototype._getSchema = function(path) {
     return pathschema;
   }
 
-  // look for arrays
-  return (function search(parts, schema) {
+  function search(parts, schema) {
     var p = parts.length + 1,
         foundschema,
         trypath;
@@ -5090,7 +5095,10 @@ Schema.prototype._getSchema = function(path) {
         return foundschema;
       }
     }
-  })(path.split('.'), _this);
+  }
+
+  // look for arrays
+  return search(path.split('.'), _this);
 };
 
 /*!
@@ -5701,7 +5709,7 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (value === null || value === void 0) {
+    if (value === null || value === undefined) {
       return value;
     }
 
@@ -5780,14 +5788,14 @@ function handleSingle(val) {
 
 SchemaBuffer.prototype.$conditionalHandlers =
     utils.options(SchemaType.prototype.$conditionalHandlers, {
-      '$bitsAllClear': handleBitwiseOperator,
-      '$bitsAnyClear': handleBitwiseOperator,
-      '$bitsAllSet': handleBitwiseOperator,
-      '$bitsAnySet': handleBitwiseOperator,
-      '$gt': handleSingle,
-      '$gte': handleSingle,
-      '$lt': handleSingle,
-      '$lte': handleSingle
+      $bitsAllClear: handleBitwiseOperator,
+      $bitsAnyClear: handleBitwiseOperator,
+      $bitsAllSet: handleBitwiseOperator,
+      $bitsAnySet: handleBitwiseOperator,
+      $gt: handleSingle,
+      $gte: handleSingle,
+      $lt: handleSingle,
+      $lte: handleSingle
     });
 
 /**
@@ -6067,10 +6075,10 @@ function handleSingle(val) {
 
 SchemaDate.prototype.$conditionalHandlers =
     utils.options(SchemaType.prototype.$conditionalHandlers, {
-      '$gt': handleSingle,
-      '$gte': handleSingle,
-      '$lt': handleSingle,
-      '$lte': handleSingle
+      $gt: handleSingle,
+      $gte: handleSingle,
+      $lt: handleSingle,
+      $lte: handleSingle
     });
 
 
@@ -6204,6 +6212,13 @@ DocumentArray.prototype.doValidate = function(array, fn, scope, options) {
     // iterate over sparse elements yet reports array.length including
     // them :(
 
+    function callback(err) {
+      if (err) {
+        error = err;
+      }
+      --count || fn(error);
+    }
+
     for (var i = 0, len = count; i < len; ++i) {
       // sidestep sparse entries
       var doc = array[i];
@@ -6215,19 +6230,9 @@ DocumentArray.prototype.doValidate = function(array, fn, scope, options) {
       // HACK: use $__original_validate to avoid promises so bluebird doesn't
       // complain
       if (doc.$__original_validate) {
-        doc.$__original_validate({__noPromise: true}, function(err) {
-          if (err) {
-            error = err;
-          }
-          --count || fn(error);
-        });
+        doc.$__original_validate({__noPromise: true}, callback);
       } else {
-        doc.validate({__noPromise: true}, function(err) {
-          if (err) {
-            error = err;
-          }
-          --count || fn(error);
-        });
+        doc.validate({__noPromise: true}, callback);
       }
     }
   }, scope);
@@ -6751,7 +6756,7 @@ SchemaNumber.prototype.min = function(value, message) {
     }, this);
   }
 
-  if (value !== null && value !== void 0) {
+  if (value !== null && value !== undefined) {
     var msg = message || errorMessages.Number.min;
     msg = msg.replace(/{MIN}/, value);
     this.validators.push({
@@ -6805,7 +6810,7 @@ SchemaNumber.prototype.max = function(value, message) {
     }, this);
   }
 
-  if (value !== null && value !== void 0) {
+  if (value !== null && value !== undefined) {
     var msg = message || errorMessages.Number.max;
     msg = msg.replace(/{MAX}/, value);
     this.validators.push({
@@ -6834,7 +6839,7 @@ SchemaNumber.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (value === null || value === void 0) {
+    if (value === null || value === undefined) {
       return value;
     }
 
@@ -6912,15 +6917,15 @@ function handleArray(val) {
 
 SchemaNumber.prototype.$conditionalHandlers =
     utils.options(SchemaType.prototype.$conditionalHandlers, {
-      '$bitsAllClear': handleBitwiseOperator,
-      '$bitsAnyClear': handleBitwiseOperator,
-      '$bitsAllSet': handleBitwiseOperator,
-      '$bitsAnySet': handleBitwiseOperator,
-      '$gt': handleSingle,
-      '$gte': handleSingle,
-      '$lt': handleSingle,
-      '$lte': handleSingle,
-      '$mod': handleArray
+      $bitsAllClear: handleBitwiseOperator,
+      $bitsAnyClear: handleBitwiseOperator,
+      $bitsAllSet: handleBitwiseOperator,
+      $bitsAnySet: handleBitwiseOperator,
+      $gt: handleSingle,
+      $gte: handleSingle,
+      $lt: handleSingle,
+      $lte: handleSingle,
+      $mod: handleArray
     });
 
 /**
@@ -7034,7 +7039,7 @@ ObjectId.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (value === null || value === void 0) {
+    if (value === null || value === undefined) {
       return value;
     }
 
@@ -7064,8 +7069,7 @@ ObjectId.prototype.cast = function(value, doc, init) {
     return ret;
   }
 
-  // If null or undefined
-  if (value === null || value === void 0) {
+  if (value === null || value === undefined) {
     return value;
   }
 
@@ -7106,10 +7110,10 @@ function handleSingle(val) {
 
 ObjectId.prototype.$conditionalHandlers =
     utils.options(SchemaType.prototype.$conditionalHandlers, {
-      '$gt': handleSingle,
-      '$gte': handleSingle,
-      '$lt': handleSingle,
-      '$lte': handleSingle
+      $gt: handleSingle,
+      $gte: handleSingle,
+      $lt: handleSingle,
+      $lte: handleSingle
     });
 
 /**
@@ -7431,7 +7435,7 @@ SchemaString.prototype.minlength = function(value, message) {
     }, this);
   }
 
-  if (value !== null) {
+  if (value !== null && value !== undefined) {
     var msg = message || errorMessages.String.minlength;
     msg = msg.replace(/{MINLENGTH}/, value);
     this.validators.push({
@@ -7485,7 +7489,7 @@ SchemaString.prototype.maxlength = function(value, message) {
     }, this);
   }
 
-  if (value != null) {
+  if (value !== null && value !== undefined) {
     var msg = message || errorMessages.String.maxlength;
     msg = msg.replace(/{MAXLENGTH}/, value);
     this.validators.push({
@@ -7588,7 +7592,7 @@ SchemaString.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (value === null) {
+    if (value === null || value === undefined) {
       return value;
     }
 
@@ -7619,7 +7623,7 @@ SchemaString.prototype.cast = function(value, doc, init) {
   }
 
   // If null or undefined
-  if (value === null || value === void 0) {
+  if (value === null || value === undefined) {
     return value;
   }
 
@@ -7660,13 +7664,13 @@ function handleArray(val) {
 
 SchemaString.prototype.$conditionalHandlers =
     utils.options(SchemaType.prototype.$conditionalHandlers, {
-      '$all': handleArray,
-      '$gt': handleSingle,
-      '$gte': handleSingle,
-      '$lt': handleSingle,
-      '$lte': handleSingle,
-      '$options': handleSingle,
-      '$regex': handleSingle
+      $all: handleArray,
+      $gt: handleSingle,
+      $gte: handleSingle,
+      $lt: handleSingle,
+      $lte: handleSingle,
+      $options: handleSingle,
+      $regex: handleSingle
     });
 
 /**
@@ -7849,7 +7853,8 @@ SchemaType.prototype.index = function(options) {
  */
 
 SchemaType.prototype.unique = function(bool) {
-  if (this._index === null || typeof this._index === 'boolean') {
+  if (this._index === null || this._index === undefined ||
+    typeof this._index === 'boolean') {
     this._index = {};
   } else if (typeof this._index === 'string') {
     this._index = {type: this._index};
@@ -7872,7 +7877,8 @@ SchemaType.prototype.unique = function(bool) {
  */
 
 SchemaType.prototype.text = function(bool) {
-  if (this._index === null || typeof this._index === 'boolean') {
+  if (this._index === null || this._index === undefined ||
+    typeof this._index === 'boolean') {
     this._index = {};
   } else if (typeof this._index === 'string') {
     this._index = {type: this._index};
@@ -7896,7 +7902,8 @@ SchemaType.prototype.text = function(bool) {
  */
 
 SchemaType.prototype.sparse = function(bool) {
-  if (this._index === null || typeof this._index === 'boolean') {
+  if (this._index === null || this._index === undefined ||
+    typeof this._index === 'boolean') {
     this._index = {};
   } else if (typeof this._index === 'string') {
     this._index = {type: this._index};
@@ -8261,7 +8268,7 @@ SchemaType.prototype.getDefault = function(scope, init) {
       ? this.defaultValue.call(scope)
       : this.defaultValue;
 
-  if (ret !== null && undefined !== ret) {
+  if (ret !== null && ret !== undefined) {
     return this.cast(ret, scope, init);
   }
   return ret;
@@ -8294,7 +8301,7 @@ SchemaType.prototype.applySetters = function(value, scope, init, priorVal, optio
     v = newVal;
   }
 
-  if (v === null || v === void 0) {
+  if (v === null || v === undefined) {
     return v;
   }
 
@@ -8878,7 +8885,7 @@ MongooseArray.mixin = {
       populated = owner.populated(this._path, true);
     }
 
-    if (populated && value !== null) {
+    if (populated && value !== null && value !== undefined) {
       // cast to the populated Models schema
       Model = populated.options.model;
 
@@ -8988,7 +8995,7 @@ MongooseArray.mixin = {
           return v.toObject({virtuals: false});
         }));
       } else {
-        selector = pullOp['_id'] || (pullOp['_id'] = {'$in': []});
+        selector = pullOp['_id'] || (pullOp['_id'] = {$in: []});
         selector['$in'] = selector['$in'].concat(val);
       }
     } else {
@@ -9294,9 +9301,10 @@ MongooseArray.mixin = {
     while (i--) {
       mem = cur[i];
       if (mem instanceof Document) {
-        if (values.some(function(v) {
+        var some = values.some(function(v) {
           return v.equals(mem);
-        })) {
+        });
+        if (some) {
           [].splice.call(cur, i, 1);
         }
       } else if (~cur.indexOf.call(values, mem)) {
@@ -9583,7 +9591,7 @@ function MongooseBuffer(value, encode, offset) {
   var length = arguments.length;
   var val;
 
-  if (length === 0 || arguments[0] === null || arguments[0] === void 0) {
+  if (length === 0 || arguments[0] === null || arguments[0] === undefined) {
     val = 0;
   } else {
     val = value;
@@ -11247,7 +11255,7 @@ exports.object.hasOwnProperty = function(obj, prop) {
  */
 
 exports.isNullOrUndefined = function(val) {
-  return val === null || val === void 0;
+  return val === null || val === undefined;
 };
 
 /*!

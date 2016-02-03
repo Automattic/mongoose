@@ -117,7 +117,8 @@ describe('types array', function() {
     function save(doc, cb) {
       doc.save(function(err) {
         if (err) {
-          return cb(err);
+          cb(err);
+          return;
         }
         doc.constructor.findById(doc._id, cb);
       });
@@ -1212,7 +1213,8 @@ describe('types array', function() {
     function save(doc, cb) {
       doc.save(function(err) {
         if (err) {
-          return cb(err);
+          cb(err);
+          return;
         }
         doc.constructor.findById(doc._id, cb);
       });

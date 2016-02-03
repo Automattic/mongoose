@@ -14,7 +14,7 @@ var schema = new Schema({
   complex: {},
   type: String
 });
-schema.index({'pos': 'geoHaystack', type: 1}, {bucketSize: 1});
+schema.index({pos: 'geoHaystack', type: 1}, {bucketSize: 1});
 
 function getModel(db) {
   return db.model('GeoSearch', schema, 'geosearch-' + random());

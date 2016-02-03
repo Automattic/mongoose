@@ -606,7 +606,7 @@ describe('model', function() {
             assert.ifError(err);
             conversionEvent.save(function(err) {
               assert.ifError(err);
-              var query = ConversionEvent.findOneAndUpdate({name: 'Conversion event'}, {$set: {name: 'Conversion event - updated'}}, {'new': true});
+              var query = ConversionEvent.findOneAndUpdate({name: 'Conversion event'}, {$set: {name: 'Conversion event - updated'}}, {new: true});
               assert.deepEqual(query._conditions, {name: 'Conversion event', __t: 'model-discriminator-querying-conversion'});
               query.exec(function(err, document) {
                 assert.ifError(err);
@@ -631,7 +631,7 @@ describe('model', function() {
             assert.ifError(err);
             conversionEvent.save(function(err) {
               assert.ifError(err);
-              var query = BaseEvent.findOneAndUpdate({name: 'Conversion event'}, {$set: {name: 'Conversion event - updated'}}, {'new': true});
+              var query = BaseEvent.findOneAndUpdate({name: 'Conversion event'}, {$set: {name: 'Conversion event - updated'}}, {new: true});
               assert.deepEqual(query._conditions, {name: 'Conversion event'});
               query.exec(function(err, document) {
                 assert.ifError(err);

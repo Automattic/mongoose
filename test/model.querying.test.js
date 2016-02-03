@@ -1579,18 +1579,28 @@ describe('model: querying:', function() {
         });
       });
 
-      it('works when text search is called by a schema', function(done) {
+      it('works when text search is called by a schema (gh-3824)', function(done) {
+        if (!mongo26_or_greater) {
+          return done();
+        }
+
         var db = start();
 
         var exampleSchema = new Schema({
           title: String,
-          name: {type: String, text: true},
+          name: { type: String, text: true },
           large_text: String
         });
 
-        var indexes = exampleSchema.indexes();
-        assert.equal(indexes[0][1].text, true);
-        db.close(done);
+        var Example = db.model('gh3824', exampleSchema);
+
+        Example.on('index', function(error) {
+          assert.ifError(error);
+          Example.findOne({ $text: { $search: 'text search' } }, function(error) {
+            assert.ifError(error);
+            db.close(done);
+          });
+        });
       });
     });
   });
@@ -2233,7 +2243,8 @@ describe('geo-spatial', function() {
           return;
         }
         if (err) {
-          return done(complete.ran = err);
+          done(complete.ran = err);
+          return;
         }
         --pending || test();
       };
@@ -2247,7 +2258,7 @@ describe('geo-spatial', function() {
       var test = function() {
         var q = new Query({}, {}, null, Test.collection);
         q.find({
-          'loc': {
+          loc: {
             $nearSphere: {
               $geometry: {type: 'Point', coordinates: [30, 40]},
               $maxDistance: 10000000
@@ -2274,7 +2285,8 @@ describe('geo-spatial', function() {
           return;
         }
         if (err) {
-          return done(complete.ran = err);
+          done(complete.ran = err);
+          return;
         }
         --pending || test();
       }

@@ -121,11 +121,11 @@ describe('model: findOneAndUpdate:', function() {
           published: false, // becomes $set
           mixed: {x: 'ECKS', y: 'why'}, // $set
           $pullAll: {numbers: [4, 6]},
-          $pull: {'owners': id0},
+          $pull: {owners: id0},
           'comments.1.body': 8 // $set
         };
 
-        M.findOneAndUpdate({title: title}, update, {'new': true}, function(err, up) {
+        M.findOneAndUpdate({title: title}, update, {new: true}, function(err, up) {
           db.close();
           assert.equal(err, null, err && err.stack);
 
@@ -457,12 +457,14 @@ describe('model: findOneAndUpdate:', function() {
     post.save(function(err) {
       assert.ifError(err);
 
+      function callback(err) {
+        assert.ifError(err);
+        --totalDocs || complete();
+      }
+
       for (var i = 0; i < 4; ++i) {
         BlogPost
-        .findOneAndUpdate({_id: post._id}, {$inc: {'meta.visitors': 1}}, function(err) {
-          assert.ifError(err);
-          --totalDocs || complete();
-        });
+        .findOneAndUpdate({_id: post._id}, {$inc: {'meta.visitors': 1}}, callback);
       }
 
       function complete() {
@@ -484,7 +486,7 @@ describe('model: findOneAndUpdate:', function() {
     s.save(function(err) {
       assert.ifError(err);
       var name = Date.now();
-      S.findOneAndUpdate({name: name}, {ignore: true}, {upsert: true, 'new': true}, function(err, doc) {
+      S.findOneAndUpdate({name: name}, {ignore: true}, {upsert: true, new: true}, function(err, doc) {
         assert.ifError(err);
         assert.ok(doc);
         assert.ok(doc._id);
@@ -796,7 +798,7 @@ describe('model: findByIdAndUpdate:', function() {
       assert.ifError(err);
 
       B
-      .findByIdAndUpdate(doc._id, {title: 'woot'}, {'new': true})
+      .findByIdAndUpdate(doc._id, {title: 'woot'}, {new: true})
       .select({title: 1, ids: {$elemMatch: {$in: [_id2.toString()]}}})
       .exec(function(err, found) {
         assert.ifError(err);
@@ -845,17 +847,17 @@ describe('model: findByIdAndUpdate:', function() {
       _id: String,
       flag: {
         type: Boolean,
-        'default': false
+        default: false
       }
     });
 
     var Thing = db.model('Thing', thingSchema);
     var key = 'some-id';
 
-    Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, 'new': false}).exec(function(err, thing) {
+    Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false}).exec(function(err, thing) {
       assert.ifError(err);
       assert.equal(null, thing);
-      Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, 'new': false}).exec(function(err, thing2) {
+      Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false}).exec(function(err, thing2) {
         assert.ifError(err);
         assert.equal(key, thing2.id);
         assert.equal(false, thing2.flag);
@@ -877,7 +879,7 @@ describe('model: findByIdAndUpdate:', function() {
       if (err) {
         return done(err);
       }
-      Thing.findOneAndUpdate({_id: thing._id}, {name: null}, {'new': true})
+      Thing.findOneAndUpdate({_id: thing._id}, {name: null}, {new: true})
       .exec(function(err, doc) {
         if (err) {
           return done(err);
@@ -896,7 +898,7 @@ describe('model: findByIdAndUpdate:', function() {
       if (err) {
         return done(err);
       }
-      M.findByIdAndUpdate(doc._id, {change: true}, {overwrite: true, 'new': true}, function(err, doc) {
+      M.findByIdAndUpdate(doc._id, {change: true}, {overwrite: true, new: true}, function(err, doc) {
         if (err) {
           return done(err);
         }
@@ -930,7 +932,7 @@ describe('model: findByIdAndUpdate:', function() {
         Account.findOneAndUpdate(
             {name: 'parent'},
             {$push: {contacts: {account: a2._id, name: 'child'}}},
-            {'new': true},
+            {new: true},
             function(error, doc) {
               assert.ifError(error);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
@@ -1035,7 +1037,7 @@ describe('model: findByIdAndUpdate:', function() {
     var Breakfast = db.model('gh2947', s);
     var q = Breakfast.findOneAndUpdate({},
         {notInSchema: {a: 1}, test: 'abc'},
-        {'new': true, strict: true, upsert: true});
+        {new: true, strict: true, upsert: true});
 
     q.lean();
     q.exec(function(error, doc) {
@@ -1124,7 +1126,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-0', s);
 
-      var updateOptions = {upsert: true, setDefaultsOnInsert: true, 'new': true};
+      var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
           {},
           {base: 'eggs'},
@@ -1150,7 +1152,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-1', s);
 
-      var updateOptions = {upsert: true, setDefaultsOnInsert: true, 'new': true};
+      var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
           {topping: 'sausage'},
           {base: 'eggs'},
@@ -1173,7 +1175,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-2', s);
 
-      var updateOptions = {upsert: true, setDefaultsOnInsert: true, 'new': true};
+      var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
           {topping: {$ne: 'sausage'}},
           {base: 'eggs'},
@@ -1213,7 +1215,7 @@ describe('model: findByIdAndUpdate:', function() {
         upsert: true,
         setDefaultsOnInsert: true,
         runValidators: true,
-        'new': true
+        new: true
       };
       Breakfast.findOneAndUpdate(
           {},
@@ -1245,7 +1247,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-4', s);
 
-      var updateOptions = {runValidators: true, 'new': true};
+      var updateOptions = {runValidators: true, new: true};
       Breakfast.findOneAndUpdate(
           {},
           {$unset: {steak: ''}, $setOnInsert: {eggs: 'softboiled'}},
@@ -1273,7 +1275,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-5', s);
 
-      var updateOptions = {runValidators: true, 'new': true};
+      var updateOptions = {runValidators: true, new: true};
       Breakfast.findOneAndUpdate(
           {},
           {$set: {steak: 'ribeye', eggs: 3, bacon: '3 strips'}},
@@ -1321,7 +1323,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-6', s);
 
-      var updateOptions = {runValidators: true, 'new': true};
+      var updateOptions = {runValidators: true, new: true};
       Breakfast.findOneAndUpdate(
           {},
           {$set: {steak: 'tofu', eggs: 2, bacon: '3 strips'}},
@@ -1346,7 +1348,7 @@ describe('model: findByIdAndUpdate:', function() {
       });
       var Breakfast = db.model('fam-gh-860-7', s);
 
-      var updateOptions = {runValidators: true, upsert: true, 'new': true};
+      var updateOptions = {runValidators: true, upsert: true, new: true};
       Breakfast.findOneAndUpdate(
           {},
           {$inc: {eggs: 1}},
@@ -1442,7 +1444,7 @@ describe('model: findByIdAndUpdate:', function() {
 
       var TestModel = db.model('gh3107', testSchema);
       TestModel
-      .findOneAndUpdate({id: '1'}, {$setOnInsert: {a: [{foo: 'bar'}], b: [2]}}, {upsert: true, 'new': true, setDefaultsOnInsert: true},
+      .findOneAndUpdate({id: '1'}, {$setOnInsert: {a: [{foo: 'bar'}], b: [2]}}, {upsert: true, new: true, setDefaultsOnInsert: true},
           function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.a.length, 1);
@@ -1462,7 +1464,7 @@ describe('model: findByIdAndUpdate:', function() {
 
       var TestModel = db.model('gh3173', testSchema);
 
-      TestModel.findOneAndUpdate({}, {$set: {test: 'abc'}}, {upsert: true, 'new': true, passRawResult: true}).
+      TestModel.findOneAndUpdate({}, {$set: {test: 'abc'}}, {upsert: true, new: true, passRawResult: true}).
       exec(function(error, doc, res) {
         assert.ifError(error);
         assert.ok(res);
@@ -1495,7 +1497,7 @@ describe('model: findByIdAndUpdate:', function() {
         Shift.findOneAndUpdate({userId: 'tom'}, {
           records: [{kind: 'kind1', amount: NaN}]
         }, {
-          'new': true
+          new: true
         }, function(error) {
           assert.ok(error);
           assert.ok(error instanceof CastError);
@@ -1530,7 +1532,7 @@ describe('model: findByIdAndUpdate:', function() {
       MyModel.create({nested: {arr: [{num: 5}]}}, function(error) {
         assert.ifError(error);
         var update = {$pull: {'nested.arr': {num: 5}}};
-        var options = {'new': true};
+        var options = {new: true};
         MyModel.findOneAndUpdate({}, update, options, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.nested.arr.length, 0);

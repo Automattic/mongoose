@@ -6,5 +6,8 @@ node_js:
   - "0.12"
   - "0.10"
   - "iojs"
-services:
-  - mongodb
+before_script:
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.6.11.tgz
+  - tar -zxvf mongodb-linux-x86_64-2.6.11.tgz
+  - mkdir -p ./data/db
+  - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --nopreallocj --dbpath ./data/db --syslog --port 27017

@@ -1,3 +1,14 @@
+4.4.1 / 2016-02-03
+==================
+ * fix: linting broke some cases where we use `== null` as shorthand #3852
+ * docs: fix up schematype.html conflict #3848 #3843 [mynameiscoffey](https://github.com/mynameiscoffey)
+ * fix: backwards breaking change with `.connect()` return value #3847
+ * docs: downgrade dox and highlight.js to fix docs build #3845
+ * docs: clean up typo #3842 [Flash-](https://github.com/Flash-)
+ * fix(document): storeShard handles undefined values #3841
+ * chore: more linting #3838 [TrejGun](https://github.com/TrejGun)
+ * fix(schema): handle `text: true` as a way to declare a text index #3824
+
 4.4.0 / 2016-02-02
 ==================
  * docs: fix expireAfterSeconds index option name #3831 [Flash-](https://github.com/Flash-)
@@ -14,7 +25,7 @@
  * feat: connect, open, openSet, and disconnect return ES2015 promises #3790 #3622 [TrejGun](https://github.com/TrejGun)
  * feat: custom type for int32 via mongoose-int32 npm package #3652 #3102
  * feat: basic custom schema type API #995
- * feat(model): `insertAll()` for more performant bulk inserts #723
+ * feat(model): `insertMany()` for more performant bulk inserts #723
 
 4.3.7 / 2016-01-23
 ==================

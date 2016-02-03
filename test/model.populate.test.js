@@ -2283,7 +2283,7 @@ describe('model: populate:', function() {
         select: 'name',
         model: 'RefAlternateUser',
         match: {name: /u/},
-        options: {sort: {'name': -1}}
+        options: {sort: {name: -1}}
       })
       .exec(function(err, post) {
         assert.ifError(err);

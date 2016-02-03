@@ -1579,18 +1579,24 @@ describe('model: querying:', function() {
         });
       });
 
-      it('works when text search is called by a schema', function(done) {
+      it('works when text search is called by a schema (gh-3824)', function(done) {
         var db = start();
 
         var exampleSchema = new Schema({
           title: String,
-          name: {type: String, text: true},
+          name: { type: String, text: true },
           large_text: String
         });
 
-        var indexes = exampleSchema.indexes();
-        assert.equal(indexes[0][1].text, true);
-        db.close(done);
+        var Example = db.model('gh3824', exampleSchema);
+
+        Example.on('index', function(error) {
+          assert.ifError(error);
+          Example.findOne({ $text: { $search: 'text search' } }, function(error) {
+            assert.ifError(error);
+            db.close(done);
+          });
+        });
       });
     });
   });

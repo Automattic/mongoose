@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -122,9 +121,9 @@ describe('types.buffer', function() {
           var user = users[0];
           var base64 = sampleBuffer.toString('base64');
           assert.equal(base64,
-                       user.serial.toString('base64'), 'buffer mismatch');
+              user.serial.toString('base64'), 'buffer mismatch');
           assert.equal(base64,
-                       user.required.toString('base64'), 'buffer mismatch');
+              user.required.toString('base64'), 'buffer mismatch');
           done();
         });
       });
@@ -160,7 +159,7 @@ describe('types.buffer', function() {
             var expectedBuffer = new Buffer([123, 97, 97, 42, 11]);
 
             assert.equal(expectedBuffer.toString('base64'),
-                         user.serial.toString('base64'), 'buffer mismatch');
+                user.serial.toString('base64'), 'buffer mismatch');
 
             assert.equal(false, tj.isModified('required'));
             tj.serial.copy(tj.required, 1);
@@ -419,9 +418,15 @@ describe('types.buffer', function() {
       var b = new B({buf: new Buffer('hi')});
       b.buf.subtype(128);
       b.save(function(err) {
-        if (err) return done(err);
+        if (err) {
+          done(err);
+          return;
+        }
         B.findById(b, function(err, doc) {
-          if (err) return done(err);
+          if (err) {
+            done(err);
+            return;
+          }
           assert.equal(128, doc.buf._subtype);
           done();
         });
@@ -432,15 +437,27 @@ describe('types.buffer', function() {
       var b = new B({buf: new Buffer('hi')});
       b.buf.subtype(128);
       b.save(function(err) {
-        if (err) return done(err);
+        if (err) {
+          done(err);
+          return;
+        }
         B.findById(b, function(err, doc) {
-          if (err) return done(err);
+          if (err) {
+            done(err);
+            return;
+          }
           assert.equal(128, doc.buf._subtype);
           doc.buf.subtype(0);
           doc.save(function(err) {
-            if (err) return done(err);
+            if (err) {
+              done(err);
+              return;
+            }
             B.findById(b, function(err, doc) {
-              if (err) return done(err);
+              if (err) {
+                done(err);
+                return;
+              }
               assert.strictEqual(0, doc.buf._subtype);
               done();
             });

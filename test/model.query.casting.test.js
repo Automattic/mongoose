@@ -52,7 +52,7 @@ var collection = 'blogposts_' + random();
 
 var geoSchemaArray = new Schema({loc: {type: [Number], index: '2d'}});
 var geoSchemaObject = new Schema({loc: {long: Number, lat: Number}});
-geoSchemaObject.index({'loc': '2d'});
+geoSchemaObject.index({loc: '2d'});
 
 describe('model query casting', function() {
   it('works', function(done) {

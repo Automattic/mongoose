@@ -129,9 +129,9 @@ describe('model: update:', function() {
         $inc: {'meta.visitors': 2},
         $set: {date: new Date},
         published: false, // becomes $set
-        'mixed': {x: 'ECKS', y: 'why'}, // $set
-        $pullAll: {'numbers': [4, 6]},
-        $pull: {'owners': id0},
+        mixed: {x: 'ECKS', y: 'why'}, // $set
+        $pullAll: {numbers: [4, 6]},
+        $pull: {owners: id0},
         'comments.1.body': 8 // $set
       };
 
@@ -376,7 +376,7 @@ describe('model: update:', function() {
     var owner = last.owners[0];
 
     var update = {
-      $addToSet: {'owners': owner}
+      $addToSet: {owners: owner}
     };
 
     BlogPost.update({_id: post._id}, update, function(err) {
@@ -400,7 +400,7 @@ describe('model: update:', function() {
         newowner = new DocumentObjectId;
 
     var update = {
-      $addToSet: {'owners': {$each: [owner, newowner]}}
+      $addToSet: {owners: {$each: [owner, newowner]}}
     };
 
     BlogPost.update({_id: post._id}, update, function(err) {
@@ -422,7 +422,7 @@ describe('model: update:', function() {
         BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
-      $pop: {'owners': -1},
+      $pop: {owners: -1},
       $unset: {title: 1}
     };
 
@@ -560,12 +560,13 @@ describe('model: update:', function() {
 
     post.save(function(err) {
       assert.ifError(err);
+      function callback(err) {
+        assert.ifError(err);
+        --totalDocs || complete();
+      }
       for (var i = 0; i < 4; ++i) {
         BlogPost
-        .update({_id: post._id}, {$inc: {'meta.visitors': 1}}, function(err) {
-          assert.ifError(err);
-          --totalDocs || complete();
-        });
+        .update({_id: post._id}, {$inc: {'meta.visitors': 1}}, callback);
       }
     });
   });
@@ -1574,7 +1575,7 @@ describe('model: update:', function() {
       MyModel.findOneAndUpdate(
           {_id: doc._id, 'children._id': 1},
           {$set: {'children.$': {_id: 2}}},
-          {'new': true},
+          {new: true},
           function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.children[0]._id, 2);
@@ -1592,7 +1593,7 @@ describe('model: update:', function() {
     Model.create({}, function(error, m) {
       assert.ifError(error);
       Model.
-      update({_id: m._id}, {'$push': {'myArr': {'key': 'Value'}}}).
+      update({_id: m._id}, {$push: {myArr: {key: 'Value'}}}).
       exec(function(error, res) {
         assert.ifError(error);
         assert.equal(res.n, 1);
@@ -1609,7 +1610,7 @@ describe('model: update:', function() {
 
     Model.create({}, function(error, m) {
       assert.ifError(error);
-      var update = {'$push': {'attributes.scores.bar': {a: 1}}};
+      var update = {$push: {'attributes.scores.bar': {a: 1}}};
       Model.
       update({_id: m._id}, update).
       exec(function(error, res) {

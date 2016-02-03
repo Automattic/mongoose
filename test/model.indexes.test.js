@@ -70,18 +70,20 @@ describe('model', function() {
         UserModel.collection.getIndexes(function(err, indexes) {
           assert.ifError(err);
 
+          function iter(index) {
+            if (index[0] === 'name') {
+              assertions++;
+            }
+            if (index[0] === 'blogposts._id') {
+              assertions++;
+            }
+            if (index[0] === 'blogposts.title') {
+              assertions++;
+            }
+          }
+
           for (var i in indexes) {
-            indexes[i].forEach(function(index) {
-              if (index[0] === 'name') {
-                assertions++;
-              }
-              if (index[0] === 'blogposts._id') {
-                assertions++;
-              }
-              if (index[0] === 'blogposts.title') {
-                assertions++;
-              }
-            });
+            indexes[i].forEach(iter);
           }
 
           assert.equal(3, assertions);
@@ -111,24 +113,26 @@ describe('model', function() {
         UserModel.collection.getIndexes(function(err, indexes) {
           assert.ifError(err);
 
+          function iter(index) {
+            if (index[0] === 'name') {
+              ++assertions;
+            }
+            if (index[0] === 'blogposts._id') {
+              ++assertions;
+            }
+            if (index[0] === 'blogposts.title') {
+              ++assertions;
+            }
+            if (index[0] === 'featured._id') {
+              ++assertions;
+            }
+            if (index[0] === 'featured.title') {
+              ++assertions;
+            }
+          }
+
           for (var i in indexes) {
-            indexes[i].forEach(function(index) {
-              if (index[0] === 'name') {
-                ++assertions;
-              }
-              if (index[0] === 'blogposts._id') {
-                ++assertions;
-              }
-              if (index[0] === 'blogposts.title') {
-                ++assertions;
-              }
-              if (index[0] === 'featured._id') {
-                ++assertions;
-              }
-              if (index[0] === 'featured.title') {
-                ++assertions;
-              }
-            });
+            indexes[i].forEach(iter);
           }
 
           assert.equal(5, assertions);
@@ -284,16 +288,21 @@ describe('model', function() {
             return index();
           }
           var pending = neededKittens - n;
+
+          function callback(err) {
+            assert.ifError(err);
+            if (--pending) {
+              return;
+            }
+            index();
+          }
+
+          function iter(i) {
+            K.create({name: 'kitten' + i, furryness: i}, callback);
+          }
+
           for (var i = n; i < neededKittens; ++i) {
-            (function(i) {
-              K.create({name: 'kitten' + i, furryness: i}, function(err) {
-                assert.ifError(err);
-                if (--pending) {
-                  return;
-                }
-                index();
-              });
-            })(i);
+            iter(i);
           }
         });
 

@@ -7,7 +7,7 @@ env:
 rules:
   comma-style: 2
   consistent-this:
-    - 1
+    - 2
     - _this
   indent:
     - 2

@@ -76,7 +76,7 @@ describe('schema options.timestamps', function() {
     });
 
     it('should have fields when create with findOneAndUpdate', function(done) {
-      Cat.findOneAndUpdate({name: 'notexistname'}, {$set: {}}, {upsert: true, 'new': true}, function(err, doc) {
+      Cat.findOneAndUpdate({name: 'notexistname'}, {$set: {}}, {upsert: true, new: true}, function(err, doc) {
         assert.ok(doc.createdAt);
         assert.ok(doc.updatedAt);
         assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
@@ -98,7 +98,7 @@ describe('schema options.timestamps', function() {
     it('should change updatedAt when findOneAndUpdate', function(done) {
       Cat.findOne({name: 'newcat'}, function(err, doc) {
         var old = doc.updatedAt;
-        Cat.findOneAndUpdate({name: 'newcat'}, {$set: {hobby: 'fish'}}, {'new': true}, function(err, doc) {
+        Cat.findOneAndUpdate({name: 'newcat'}, {$set: {hobby: 'fish'}}, {new: true}, function(err, doc) {
           assert.ok(doc.updatedAt.getTime() > old.getTime());
           done();
         });

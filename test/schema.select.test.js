@@ -170,7 +170,7 @@ describe('schema select option', function() {
           });
         });
         it('with findOneAndUpdate', function(done) {
-          S.findOneAndUpdate({_id: s._id}, {name: 'changed'}, {'new': true}).select('thin name docs.bool docs.name').exec(function(err, s) {
+          S.findOneAndUpdate({_id: s._id}, {name: 'changed'}, {new: true}).select('thin name docs.bool docs.name').exec(function(err, s) {
             assert.ifError(err);
             assert.strictEqual(true, s.isSelected('name'));
             assert.strictEqual(true, s.isSelected('thin'));
@@ -184,7 +184,7 @@ describe('schema select option', function() {
           });
         });
         it('for findByIdAndUpdate', function(done) {
-          S.findByIdAndUpdate(s, {thin: false}, {'new': true}).select('-name -docs.name').exec(function(err, s) {
+          S.findByIdAndUpdate(s, {thin: false}, {new: true}).select('-name -docs.name').exec(function(err, s) {
             assert.strictEqual(null, err);
             assert.equal(false, s.isSelected('name'));
             assert.equal(true, s.isSelected('thin'));
@@ -240,7 +240,7 @@ describe('schema select option', function() {
           });
         });
         it('with findOneAndUpdate', function(done) {
-          E.findOneAndUpdate({_id: e._id}, {name: 'changed'}, {'new': true}).select('thin name docs.name docs.bool').exec(function(err, e) {
+          E.findOneAndUpdate({_id: e._id}, {name: 'changed'}, {new: true}).select('thin name docs.name docs.bool').exec(function(err, e) {
             assert.strictEqual(null, err);
             assert.equal(true, e.isSelected('name'));
             assert.equal(true, e.isSelected('thin'));

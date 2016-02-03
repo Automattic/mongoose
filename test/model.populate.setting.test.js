@@ -26,10 +26,10 @@ var posts = 'blogposts_' + random(),
 describe('model: populate:', function() {
   describe('setting populated paths (gh-570)', function() {
     var types = {
-      'ObjectId': DocObjectId,
-      'String': String,
-      'Number': Number,
-      'Buffer': Buffer
+      ObjectId: DocObjectId,
+      String: String,
+      Number: Number,
+      Buffer: Buffer
     };
 
     var construct = {};

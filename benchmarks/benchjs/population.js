@@ -256,19 +256,22 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
       blog[6].dummy4.push(getNextdId(8));
     }
 
-    // insert all of the data here
     var count = 7;
+
+    function iter(c) {
+      BlogPost.create(blog[c], function(err, bl) {
+        if (err) {
+          throw err;
+        }
+        blog[c] = bl;
+        --count || next();
+      });
+    }
+
+    // insert all of the data here
     for (i = 0; i < blog.length; i++) {
       // use some closure magic to make sure we retain the index
-      (function(c) {
-        BlogPost.create(blog[c], function(err, bl) {
-          if (err) {
-            throw err;
-          }
-          blog[c] = bl;
-          --count || next();
-        });
-      })(i);
+      iter(i);
     }
   }
 

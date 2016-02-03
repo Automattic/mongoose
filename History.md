@@ -14,7 +14,7 @@
  * feat: connect, open, openSet, and disconnect return ES2015 promises #3790 #3622 [TrejGun](https://github.com/TrejGun)
  * feat: custom type for int32 via mongoose-int32 npm package #3652 #3102
  * feat: basic custom schema type API #995
- * feat(model): `insertAll()` for more performant bulk inserts #723
+ * feat(model): `insertMany()` for more performant bulk inserts #723
 
 4.3.7 / 2016-01-23
 ==================

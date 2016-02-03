@@ -37,6 +37,16 @@ describe('mongoose module:', function() {
         });
       });
     });
+
+    it('with promise (gh-3790)', function(done) {
+      var goose = new Mongoose;
+      var db = goose.connection,
+          uri = 'mongodb://localhost/mongoose_test';
+
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri).then(function() {
+        db.close(done);
+      });
+    });
   });
 
   it('{g,s}etting options', function(done) {
@@ -128,8 +138,8 @@ describe('mongoose module:', function() {
           cb(new Error('bam'));
         };
 
-        mong.disconnect()
-          .on('error', function(error) {
+        mong.disconnect().connection.
+          on('error', function(error) {
             assert.equal('bam', error.message);
           });
 
@@ -147,6 +157,17 @@ describe('mongoose module:', function() {
         mong.disconnect(function() {
           done();
         });
+      });
+    });
+
+    it('with promise (gh-3790)', function(done) {
+      var mong = new Mongoose();
+      var uri = 'mongodb://localhost/mongoose_test';
+
+      mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+
+      mong.connection.on('open', function() {
+        mong.disconnect().then(function() { done(); });
       });
     });
   });

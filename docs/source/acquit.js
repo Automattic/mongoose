@@ -21,8 +21,8 @@ var files = [
     title: 'Promises'
   },
   {
-    input: 'test/docs/schematypes.test.js',
-    output: 'schematypes.html',
+    input: 'test/docs/customschematypes.test.js',
+    output: 'customschematypes.html',
     title: 'Custom Schema Types'
   }
 ];

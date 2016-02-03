@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mongoose = require('../../');
 
-describe('schemaTypes', function () {
+describe('customSchemaTypes', function () {
   var db;
   var Schema = mongoose.Schema;
 

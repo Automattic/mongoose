@@ -28,7 +28,7 @@ block content
     To return the document with modifications made on the update, use the `new: true` option.
 
   :js
-    MyModel.findOneAndUpdate({}, { $set: { test: 1 } }, { 'new': true }, callback);
+    MyModel.findOneAndUpdate({}, { $set: { test: 1 } }, { new: true }, callback);
 
   h3 CastError and ValidationError now use `kind` instead of `type` to report error types
   :markdown

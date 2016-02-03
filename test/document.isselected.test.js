@@ -125,10 +125,10 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath')); // not a path
 
     var selection = {
-      'test': 1,
-      'numbers': 1,
+      test: 1,
+      numbers: 1,
       'nested.deep': 1,
-      'oids': 1
+      oids: 1
     };
 
     doc = new TestDocument(undefined, selection);
@@ -192,7 +192,7 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
-      'em': 0
+      em: 0
     };
 
     doc = new TestDocument(undefined, selection);
@@ -229,7 +229,7 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 0
+      _id: 0
     };
 
     doc = new TestDocument(undefined, selection);
@@ -270,7 +270,7 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 1
+      _id: 1
     };
 
     doc = new TestDocument(undefined, selection);
@@ -301,8 +301,8 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 1,
-      'n': 1
+      _id: 1,
+      n: 1
     };
 
     doc = new TestDocument(undefined, selection);

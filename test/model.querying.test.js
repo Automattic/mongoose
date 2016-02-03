@@ -2233,7 +2233,8 @@ describe('geo-spatial', function() {
           return;
         }
         if (err) {
-          return done(complete.ran = err);
+          done(complete.ran = err);
+          return;
         }
         --pending || test();
       };
@@ -2247,7 +2248,7 @@ describe('geo-spatial', function() {
       var test = function() {
         var q = new Query({}, {}, null, Test.collection);
         q.find({
-          'loc': {
+          loc: {
             $nearSphere: {
               $geometry: {type: 'Point', coordinates: [30, 40]},
               $maxDistance: 10000000
@@ -2274,7 +2275,8 @@ describe('geo-spatial', function() {
           return;
         }
         if (err) {
-          return done(complete.ran = err);
+          done(complete.ran = err);
+          return;
         }
         --pending || test();
       }

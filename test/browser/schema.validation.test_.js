@@ -416,11 +416,11 @@ describe('schema', function() {
           ferret: {
             type: Boolean,
             validate: [{
-              'validator': validator,
-              'msg': 'validator1'
+              validator: validator,
+              msg: 'validator1'
             }, {
-              'validator': validator,
-              'msg': 'validator2'
+              validator: validator,
+              msg: 'validator2'
             }]
           }
         });
@@ -596,11 +596,11 @@ describe('schema', function() {
           ferret: {
             type: Boolean,
             validate: [{
-              'validator': validator,
-              'msg': 'validator1'
+              validator: validator,
+              msg: 'validator1'
             }, {
-              'validator': validator,
-              'msg': 'validator2'
+              validator: validator,
+              msg: 'validator2'
             }]
           }
         });

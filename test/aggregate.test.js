@@ -667,4 +667,19 @@ describe('aggregate: ', function() {
       db.close(done);
     });
   });
+
+  it('cursor() without options (gh-3855)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh3855', {name: String});
+
+    db.on('open', function() {
+      var cursor = MyModel.
+        aggregate([{$match: {name: 'test'}}]).
+        cursor().
+        exec();
+      assert.ok(cursor instanceof require('stream').Readable);
+      done();
+    });
+  });
 });

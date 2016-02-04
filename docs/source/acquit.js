@@ -22,7 +22,7 @@ var files = [
   },
   {
     input: 'test/docs/schematypes.test.js',
-    output: 'schematypes.html',
+    output: 'customschematypes.html',
     title: 'Custom Schema Types'
   }
 ];

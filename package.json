@@ -43,7 +43,7 @@
     "highlight.js": "7.0.1",
     "istanbul": "0.4.2",
     "jade": "0.26.3",
-    "markdown": "0.5.0",
+    "markdown": "0.3.1",
     "marked": "0.3.5",
     "mocha": "2.3.4",
     "node-static": "0.7.7",

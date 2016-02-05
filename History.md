@@ -1,3 +1,11 @@
+4.4.2 / 2016-02-05
+==================
+ * fix(aggregate): handle calling .cursor() with no options #3855
+ * fix: upgrade mongodb driver to 2.1.5 for GridFS memory leak fix #3854
+ * docs: fix schematype.html conflict #3853 #3850 #3843
+ * fix(model): bluebird unhandled rejection with ensureIndexes() on init #3837
+ * docs: autoIndex option for createConnection #3805
+
 4.4.1 / 2016-02-03
 ==================
  * fix: linting broke some cases where we use `== null` as shorthand #3852

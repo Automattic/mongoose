@@ -1182,10 +1182,11 @@ Document.prototype.$__shouldModify = function(pathToMark, path, constructing, pa
  * @memberOf Document
  */
 
-Document.prototype.$__set = function(pathToMark, path, constructing, parts, schema, val/* , priorVal */) {
+Document.prototype.$__set = function(pathToMark, path, constructing, parts, schema, val, priorVal) {
   Embedded = Embedded || require('./types/embedded');
 
-  var shouldModify = this.$__shouldModify.apply(this, arguments);
+  var shouldModify = this.$__shouldModify(pathToMark, path, constructing, parts,
+    schema, val, priorVal);
   var _this = this;
 
   if (shouldModify) {
@@ -1392,6 +1393,7 @@ Document.prototype.isModified = function(path) {
  *
  * @param {String} [path]
  * @return {Boolean}
+ * @method $isDefault
  * @api public
  */
 

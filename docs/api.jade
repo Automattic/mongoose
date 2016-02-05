@@ -108,7 +108,7 @@ html(lang='en')
                                 if i+1 < tag.types.length
                                   | , 
                               | &gt; 
-                          span= tag.description
+                          span!= tag.description
                 if method.return
                   .returns
                     h4 Returns:

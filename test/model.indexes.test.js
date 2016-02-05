@@ -262,7 +262,7 @@ describe('model', function() {
     });
 
     it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done) {
-      this.timeout(45000);
+      this.timeout(90000);
 
       var db = start({uri: 'mongodb://localhost/mongoose_test_indexing'});
 

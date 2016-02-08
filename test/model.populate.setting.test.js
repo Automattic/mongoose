@@ -7,7 +7,7 @@
 var start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
-    utils = require('../lib/utils'),
+    utils = require('../build/utils'),
     random = utils.random,
     Schema = mongoose.Schema,
     DocObjectId = mongoose.Types.ObjectId;
@@ -95,7 +95,6 @@ describe('model: populate:', function() {
               title: 'Woot2',
               fans: [fan2, fan1],
               adhoc: [{subdoc: fan1, subarray: [{things: [fan2]}]}],
-              _creator: fan1,
               _creator: fan2,
               embed: [{other: fan2, array: [fan2, fan1]}, {other: fan1, array: [fan1, fan2]}]
             }, function(err, post1, post2) {

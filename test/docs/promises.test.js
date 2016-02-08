@@ -1,4 +1,4 @@
-var PromiseProvider = require('../../lib/promise_provider');
+var PromiseProvider = require('../../build/promise_provider');
 var assert = require('power-assert');
 var mongoose = require('../../');
 

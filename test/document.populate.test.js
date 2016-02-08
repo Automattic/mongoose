@@ -6,11 +6,11 @@
 var start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
-    utils = require('../lib/utils'),
+    utils = require('../build/utils'),
     random = utils.random,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
-    Document = require('../lib/document');
+    Document = require('../build/document');
 
 /**
  * Setup.

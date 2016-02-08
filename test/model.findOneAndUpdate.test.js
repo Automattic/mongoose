@@ -2,12 +2,12 @@
  * Test dependencies.
  */
 
-var CastError = require('../lib/error/cast');
+var CastError = require('../build/error/cast');
 var start = require('./common');
 var assert = require('power-assert');
 var mongoose = start.mongoose;
-var random = require('../lib/utils').random;
-var Utils = require('../lib/utils');
+var random = require('../build/utils').random;
+var Utils = require('../build/utils');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 var DocumentObjectId = mongoose.Types.ObjectId;

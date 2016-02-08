@@ -6,10 +6,10 @@
 var start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,
-    utils = require('../lib/utils'),
-    StateMachine = require('../lib/statemachine'),
-    ObjectId = require('../lib/types/objectid'),
-    MongooseBuffer = require('../lib/types/buffer'),
+    utils = require('../build/utils'),
+    StateMachine = require('../build/statemachine'),
+    ObjectId = require('../build/types/objectid'),
+    MongooseBuffer = require('../build/types/buffer'),
     assert = require('power-assert');
 
 /**

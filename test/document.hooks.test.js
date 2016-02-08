@@ -7,8 +7,8 @@ var start = require('./common'),
     assert = require('power-assert'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
-    Document = require('../lib/document'),
-    EmbeddedDocument = require('../lib/types/embedded');
+    Document = require('../build/document'),
+    EmbeddedDocument = require('../build/types/embedded');
 
 /**
  * Test Document constructor.

@@ -2,8 +2,8 @@ var start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,
     assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Query = require('../lib/query');
+    random = require('../build/utils').random,
+    Query = require('../build/query');
 
 
 var Comment = new Schema({

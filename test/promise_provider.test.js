@@ -7,8 +7,8 @@ var bluebird = require('bluebird');
 var q = require('q');
 var start = require('./common');
 
-var PromiseProvider = require('../lib/promise_provider');
-var Schema = require('../lib/schema');
+var PromiseProvider = require('../build/promise_provider');
+var Schema = require('../build/schema');
 
 var db;
 var testSchema = new Schema({test: {type: String, required: true}});

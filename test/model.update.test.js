@@ -1565,61 +1565,98 @@ describe('model: update:', function() {
     });
   });
 
-  it('allows objects with positional operator (gh-3185)', function(done) {
-    var db = start();
-    var schema = new Schema({children: [{_id: Number}]});
-    var MyModel = db.model('gh3185', schema, 'gh3185');
+  describe('deep casting', function() {
+    var db;
 
-    MyModel.create({children: [{_id: 1}]}, function(error, doc) {
-      assert.ifError(error);
-      MyModel.findOneAndUpdate(
-          {_id: doc._id, 'children._id': 1},
-          {$set: {'children.$': {_id: 2}}},
-          {new: true},
-          function(error, doc) {
-            assert.ifError(error);
-            assert.equal(doc.children[0]._id, 2);
-            db.close(done);
-          });
+    before(function() {
+      db = start();
     });
-  });
 
-  it('mixed type casting (gh-3305)', function(done) {
-    var db = start();
+    after(function(done) {
+      db.close(done);
+    });
 
-    var Schema = mongoose.Schema({}, {strict: false});
-    var Model = db.model('gh3305', Schema);
+    it('allows objects with positional operator (gh-3185)', function(done) {
+      var schema = new Schema({children: [{_id: Number}]});
+      var MyModel = db.model('gh3185', schema, 'gh3185');
 
-    Model.create({}, function(error, m) {
-      assert.ifError(error);
-      Model.
-      update({_id: m._id}, {$push: {myArr: {key: 'Value'}}}).
-      exec(function(error, res) {
+      MyModel.create({children: [{_id: 1}]}, function(error, doc) {
         assert.ifError(error);
-        assert.equal(res.n, 1);
-        db.close(done);
+        MyModel.findOneAndUpdate(
+            {_id: doc._id, 'children._id': 1},
+            {$set: {'children.$': {_id: 2}}},
+            {new: true},
+            function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.children[0]._id, 2);
+              done();
+            });
       });
     });
-  });
 
-  it('mixed nested type casting (gh-3337)', function(done) {
-    var db = start();
+    it('mixed type casting (gh-3305)', function(done) {
+      var Schema = mongoose.Schema({}, {strict: false});
+      var Model = db.model('gh3305', Schema);
 
-    var Schema = mongoose.Schema({attributes: {}}, {strict: true});
-    var Model = db.model('gh3337', Schema);
-
-    Model.create({}, function(error, m) {
-      assert.ifError(error);
-      var update = {$push: {'attributes.scores.bar': {a: 1}}};
-      Model.
-      update({_id: m._id}, update).
-      exec(function(error, res) {
+      Model.create({}, function(error, m) {
         assert.ifError(error);
-        assert.equal(res.n, 1);
-        Model.findById(m._id, function(error, doc) {
+        Model.
+        update({_id: m._id}, {$push: {myArr: {key: 'Value'}}}).
+        exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(doc.attributes.scores.bar.length, 1);
-          db.close(done);
+          assert.equal(res.n, 1);
+          done();
+        });
+      });
+    });
+
+    it('mixed nested type casting (gh-3337)', function(done) {
+      var Schema = mongoose.Schema({attributes: {}}, {strict: true});
+      var Model = db.model('gh3337', Schema);
+
+      Model.create({}, function(error, m) {
+        assert.ifError(error);
+        var update = {$push: {'attributes.scores.bar': {a: 1}}};
+        Model.
+        update({_id: m._id}, update).
+        exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.n, 1);
+          Model.findById(m._id, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.attributes.scores.bar.length, 1);
+            done();
+          });
+        });
+      });
+    });
+
+    it('with single nested (gh-3820)', function(done) {
+      var child = new mongoose.Schema({
+        item2: {
+          item3: String,
+          item4: String
+        }
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: String,
+        item1: child
+      });
+
+      var Parent = db.model('Parent', parentSchema);
+
+      Parent.create({ name: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        var update = { 'item1.item2': { item3: 'test1', item4: 'test2' } };
+        doc.update(update, function(error) {
+          assert.ifError(error);
+          Parent.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.item1.item2.item3, 'test1');
+            assert.equal(doc.item1.item2.item4, 'test2');
+            done();
+          });
         });
       });
     });

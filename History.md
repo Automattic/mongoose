@@ -1,3 +1,11 @@
+4.4.3 / 2016-02-09
+==================
+ * fix: upgrade to mongodb 2.1.6 to remove kerberos log output #3861 #3860 [cartuchogl](https://github.com/cartuchogl)
+ * fix: require('mongoose') is no longer a pseudo-promise #3856
+ * fix(query): update casting for single nested docs #3820
+ * fix(populate): deep populating multiple paths with same options #3808
+ * docs(middleware): clarify save/validate hook order #1149
+
 4.4.2 / 2016-02-05
 ==================
  * fix(aggregate): handle calling .cursor() with no options #3855

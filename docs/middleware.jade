@@ -136,6 +136,26 @@ block content
       next();
     });
 
+  h3#order Save/Validate Hooks
+  :markdown
+    The `save()` function triggers `validate()` hooks, because mongoose
+    has a built-in `pre('save')` hook that calls `validate()`. This means
+    that all `pre('validate')` and `post('validate')` hooks get called
+    **before** any `pre('save')` hooks.
+  :js
+    schema.pre('validate', function() {
+      console.log('this gets printed first');
+    });
+    schema.post('validate', function() {
+      console.log('this gets printed second');
+    });
+    schema.pre('save', function() {
+      console.log('this gets printed third');
+    });
+    schema.post('save', function() {
+      console.log('this gets printed fourth');
+    });
+
   h3#notes Notes on findAndUpdate() and Query Middleware
   :markdown
     Pre and post `save()` hooks are **not** executed on `update()`,

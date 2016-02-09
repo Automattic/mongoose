@@ -2,14 +2,14 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    utils = require('../lib/utils'),
-    random = utils.random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    DocObjectId = mongoose.Types.ObjectId;
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var utils = require('../lib/utils');
+var random = utils.random;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
+var DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -152,53 +152,129 @@ describe('model: populate:', function() {
     });
   });
 
-  it('deep population with refs (gh-3507)', function(done) {
-    var db = start();
-    // handler schema
-    var handlerSchema = new Schema({
-      name: String
+  describe('deep populate', function() {
+    var db;
+
+    before(function() {
+      db = start();
     });
 
-    // task schema
-    var taskSchema = new Schema({
-      name: String,
-      handler: {type: Schema.Types.ObjectId, ref: 'gh3507_0'}
+    after(function(done) {
+      db.close(done);
     });
 
-    // application schema
-    var applicationSchema = new Schema({
-      name: String,
-      tasks: [{type: Schema.Types.ObjectId, ref: 'gh3507_1'}]
-    });
+    it('deep population with refs (gh-3507)', function(done) {
+      // handler schema
+      var handlerSchema = new Schema({
+        name: String
+      });
 
-    var Handler = db.model('gh3507_0', handlerSchema);
-    var Task = db.model('gh3507_1', taskSchema);
-    var Application = db.model('gh3507_2', applicationSchema);
+      // task schema
+      var taskSchema = new Schema({
+        name: String,
+        handler: {type: Schema.Types.ObjectId, ref: 'gh3507_0'}
+      });
 
-    Handler.create({name: 'test'}, function(error, doc) {
-      assert.ifError(error);
-      Task.create({name: 'test2', handler: doc._id}, function(error, doc) {
+      // application schema
+      var applicationSchema = new Schema({
+        name: String,
+        tasks: [{type: Schema.Types.ObjectId, ref: 'gh3507_1'}]
+      });
+
+      var Handler = db.model('gh3507_0', handlerSchema);
+      var Task = db.model('gh3507_1', taskSchema);
+      var Application = db.model('gh3507_2', applicationSchema);
+
+      Handler.create({name: 'test'}, function(error, doc) {
         assert.ifError(error);
-        var obj = {name: 'test3', tasks: [doc._id]};
-        Application.create(obj, function(error, doc) {
+        Task.create({name: 'test2', handler: doc._id}, function(error, doc) {
           assert.ifError(error);
-          test(doc._id);
+          var obj = {name: 'test3', tasks: [doc._id]};
+          Application.create(obj, function(error, doc) {
+            assert.ifError(error);
+            test(doc._id);
+          });
         });
       });
+
+      function test(id) {
+        Application.
+        findById(id).
+        populate([
+          {path: 'tasks', populate: {path: 'handler'}}
+        ]).
+        exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.tasks[0].handler._id);
+          done();
+        });
+      }
     });
 
-    function test(id) {
-      Application.
-      findById(id).
-      populate([
-        {path: 'tasks', populate: {path: 'handler'}}
-      ]).
-      exec(function(error, doc) {
-        assert.ifError(error);
-        assert.ok(doc.tasks[0].handler._id);
-        db.close(done);
+    it('multiple paths with same options (gh-3808)', function(done) {
+      var companySchema = new Schema({
+        name:  String,
+        description:  String
       });
-    }
+
+      var userSchema = new Schema({
+        name:  String,
+        company: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Company',
+          select: false
+        }
+      });
+
+      var messageSchema = new Schema({
+        message:  String,
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        target: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+      });
+
+      var Company = db.model('Company', companySchema);
+      var User = db.model('User', userSchema);
+      var Message = db.model('Message', messageSchema);
+
+      var company = new Company({ name: 'IniTech' });
+      var user1 = new User({ name: 'Bill', company: company._id });
+      var user2 = new User({ name: 'Peter', company: company._id });
+      var message = new Message({
+        message: 'Problems with TPS Report',
+        author: user1._id,
+        target: user2._id
+      });
+
+      company.save(function(error) {
+        assert.ifError(error);
+        User.create(user1, user2, function(error) {
+          assert.ifError(error);
+          message.save(function(error) {
+            assert.ifError(error);
+            next();
+          });
+        });
+      });
+
+      function next() {
+        Message.findOne({ _id: message._id }, function(error, message) {
+          assert.ifError(error);
+          var options = {
+            path: 'author target',
+            select: '_id name company',
+            populate: {
+              path: 'company',
+              model: 'Company'
+            }
+          };
+          message.populate(options, function(error) {
+            assert.ifError(error);
+            assert.equal(message.target.company.name, 'IniTech');
+            done();
+          });
+        });
+      }
+    });
   });
 
   it('populating a single ref', function(done) {

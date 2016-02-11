@@ -2377,5 +2377,30 @@ describe('document', function() {
         });
       });
     });
+
+    it('handles conflicting names (gh-3867)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        things: [{
+          name: {
+            type: String,
+            required: true
+          }
+        }]
+      });
+
+      var M = mongoose.model('gh3867', testSchema);
+
+      var doc = M({
+        things: [{}]
+      });
+
+      var fields = Object.keys(doc.validateSync().errors).sort();
+      assert.deepEqual(fields, ['name', 'things.0.name']);
+      done();
+    });
   });
 });

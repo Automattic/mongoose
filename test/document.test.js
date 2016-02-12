@@ -2402,5 +2402,42 @@ describe('document', function() {
       assert.deepEqual(fields, ['name', 'things.0.name']);
       done();
     });
+
+    it('populate with lean (gh-3873)', function(done) {
+      var companySchema = new mongoose.Schema({
+        name:  String,
+        description:  String,
+        userCnt: { type: Number, default: 0, select: false }
+      });
+
+      var userSchema = new mongoose.Schema({
+        name:  String,
+        company: { type: mongoose.Schema.Types.ObjectId, ref: 'gh3873' }
+      });
+
+      var Company = db.model('gh3873', companySchema);
+      var User = db.model('gh3873_0', userSchema);
+
+      var company = new Company({ name: 'IniTech', userCnt: 1 });
+      var user = new User({ name: 'Peter', company: company._id });
+
+      company.save(function(error) {
+        assert.ifError(error);
+        user.save(function(error) {
+          assert.ifError(error);
+          next();
+        });
+      });
+
+      function next() {
+        var pop = { path: 'company', select: 'name', options: { lean: true } };
+        User.find({}).populate(pop).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 1);
+          assert.strictEqual(docs[0].company.userCnt, undefined);
+          done();
+        });
+      }
+    });
   });
 });

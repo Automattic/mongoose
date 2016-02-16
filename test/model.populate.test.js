@@ -533,6 +533,58 @@ describe('model: populate:', function() {
     });
   });
 
+  it('undefined for nested paths (gh-3859)', function(done) {
+    var db = start();
+
+    var companySchema = new mongoose.Schema({
+      name:  String,
+      description:  String
+    });
+
+    var userSchema = new mongoose.Schema({
+      name:  String,
+      company: {type: mongoose.Schema.Types.ObjectId, ref: 'Company'}
+    });
+
+    var sampleSchema = new mongoose.Schema({
+      items:  [userSchema]
+    });
+
+    var Company = db.model('gh3859_0', companySchema);
+    var User = db.model('gh3859_1', userSchema);
+    var Sample = db.model('gh3859_2', sampleSchema);
+
+    var company = new Company({name: 'Reynholm Industrie'});
+    var user1 = new User({name: 'Douglas', company: company._id});
+    var user2 = new User({name: 'Lambda'});
+    var sample = new Sample({
+      items: [user1, user2]
+    });
+
+    company.save(function(error) {
+      assert.ifError(error);
+      User.create(user1, user2, function(error) {
+        assert.ifError(error);
+        sample.save(function(error) {
+          assert.ifError(error);
+          next();
+        });
+      });
+    });
+
+    function next() {
+      Sample.findOne({}, function(error, sample) {
+        assert.ifError(error);
+        var opts = { path: 'items.company', options: { lean: true } };
+        Company.populate(sample, opts, function(error) {
+          assert.ifError(error);
+          assert.strictEqual(sample.items[1].company, void 0);
+          db.close(done);
+        });
+      });
+    }
+  });
+
   it('population and changing a reference', function(done) {
     var db = start(),
         BlogPost = db.model('RefBlogPost', posts),

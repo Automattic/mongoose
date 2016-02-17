@@ -3105,10 +3105,18 @@ describe('model: populate:', function() {
     }
   });
 
-  describe('gh-2252', function() {
-    it('handles skip', function(done) {
-      var db = start();
+  describe('edge cases', function() {
+    var db;
 
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('handles skip', function(done) {
       var movieSchema = new Schema({});
       var categorySchema = new Schema({movies: [{type: ObjectId, ref: 'gh-2252-1'}]});
 
@@ -3125,117 +3133,111 @@ describe('model: populate:', function() {
             Category.findOne({}).populate({path: 'movies', options: {limit: 2, skip: 1}}).exec(function(error, category) {
               assert.ifError(error);
               assert.equal(2, category.movies.length);
-              db.close(done);
+              done();
             });
           });
         });
       });
     });
-  });
 
-  it('handles slice (gh-1934)', function(done) {
-    var db = start();
+    it('handles slice (gh-1934)', function(done) {
+      var movieSchema = new Schema({title: String, actors: [String]});
+      var categorySchema = new Schema({movies: [{type: ObjectId, ref: 'gh-1934-1'}]});
 
-    var movieSchema = new Schema({title: String, actors: [String]});
-    var categorySchema = new Schema({movies: [{type: ObjectId, ref: 'gh-1934-1'}]});
-
-    var Movie = db.model('gh-1934-1', movieSchema);
-    var Category = db.model('gh-1934-2', categorySchema);
-    var movies = [
-      {title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl']},
-      {title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba']},
-      {title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams']}
-    ];
-    Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
-      assert.ifError(error);
-      Category.create({movies: [m1._id, m2._id, m3._id]}, function(error) {
+      var Movie = db.model('gh-1934-1', movieSchema);
+      var Category = db.model('gh-1934-2', categorySchema);
+      var movies = [
+        {title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl']},
+        {title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba']},
+        {title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams']}
+      ];
+      Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
         assert.ifError(error);
-        Category.findOne({}).populate({path: 'movies', options: {slice: {actors: 1}}}).exec(function(error, category) {
+        Category.create({movies: [m1._id, m2._id, m3._id]}, function(error) {
           assert.ifError(error);
-          assert.equal(category.movies.length, 3);
-          assert.equal(category.movies[0].actors.length, 1);
-          assert.equal(category.movies[1].actors.length, 1);
-          assert.equal(category.movies[2].actors.length, 1);
-          done();
+          Category.findOne({}).populate({path: 'movies', options: {slice: {actors: 1}}}).exec(function(error, category) {
+            assert.ifError(error);
+            assert.equal(category.movies.length, 3);
+            assert.equal(category.movies[0].actors.length, 1);
+            assert.equal(category.movies[1].actors.length, 1);
+            assert.equal(category.movies[2].actors.length, 1);
+            done();
+          });
         });
       });
     });
-  });
 
-  it('handles toObject() (gh-3279)', function(done) {
-    var db = start();
+    it('handles toObject() (gh-3279)', function(done) {
+      var teamSchema = new Schema({
+        members: [{
+          user: {type: ObjectId, ref: 'gh3279'},
+          role: String
+        }]
+      });
 
-    var teamSchema = new Schema({
-      members: [{
-        user: {type: ObjectId, ref: 'gh3279'},
-        role: String
-      }]
-    });
-
-    var calls = 0;
-    teamSchema.set('toJSON', {
-      transform: function(doc, ret) {
-        ++calls;
-        return ret;
-      }
-    });
+      var calls = 0;
+      teamSchema.set('toJSON', {
+        transform: function(doc, ret) {
+          ++calls;
+          return ret;
+        }
+      });
 
 
-    var Team = db.model('gh3279_1', teamSchema);
+      var Team = db.model('gh3279_1', teamSchema);
 
-    var userSchema = new Schema({
-      username: String
-    });
+      var userSchema = new Schema({
+        username: String
+      });
 
-    userSchema.set('toJSON', {
-      transform: function(doc, ret) {
-        return ret;
-      }
-    });
+      userSchema.set('toJSON', {
+        transform: function(doc, ret) {
+          return ret;
+        }
+      });
 
-    var User = db.model('gh3279', userSchema);
+      var User = db.model('gh3279', userSchema);
 
-    var user = new User({username: 'Test'});
+      var user = new User({username: 'Test'});
 
-    user.save(function(err) {
-      assert.ifError(err);
-      var team = new Team({members: [{user: user}]});
-
-      team.save(function(err) {
+      user.save(function(err) {
         assert.ifError(err);
-        team.populate('members.user', function() {
-          team.toJSON();
-          assert.equal(calls, 1);
-          done();
+        var team = new Team({members: [{user: user}]});
+
+        team.save(function(err) {
+          assert.ifError(err);
+          team.populate('members.user', function() {
+            team.toJSON();
+            assert.equal(calls, 1);
+            done();
+          });
         });
       });
     });
-  });
 
-  it('populate option (gh-2321)', function(done) {
-    var db = start();
-
-    var User = db.model('User', {name: String});
-    var Group = db.model('Group', {
-      users: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-      name: String
-    });
-
-    User.create({name: 'Val'}, function(error, user) {
-      assert.ifError(error);
-      Group.create({users: [user._id], name: 'test'}, function(error, group) {
-        assert.ifError(error);
-        test(group._id);
+    it('populate option (gh-2321)', function(done) {
+      var User = db.model('User', {name: String});
+      var Group = db.model('Group', {
+        users: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+        name: String
       });
-    });
 
-    var test = function(id) {
-      var options = {populate: {path: 'users', model: 'User'}};
-      Group.find({_id: id}, '-name', options, function(error, group) {
+      User.create({name: 'Val'}, function(error, user) {
         assert.ifError(error);
-        assert.ok(group[0].users[0]._id);
-        db.close(done);
+        Group.create({users: [user._id], name: 'test'}, function(error, group) {
+          assert.ifError(error);
+          test(group._id);
+        });
       });
-    };
+
+      var test = function(id) {
+        var options = {populate: {path: 'users', model: 'User'}};
+        Group.find({_id: id}, '-name', options, function(error, group) {
+          assert.ifError(error);
+          assert.ok(group[0].users[0]._id);
+          db.close(done);
+        });
+      };
+    });
   });
 });

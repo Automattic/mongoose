@@ -3235,9 +3235,50 @@ describe('model: populate:', function() {
         Group.find({_id: id}, '-name', options, function(error, group) {
           assert.ifError(error);
           assert.ok(group[0].users[0]._id);
-          db.close(done);
+          done();
         });
       };
+    });
+
+    it('discriminator child schemas (gh-3878)', function(done) {
+      var options = { discriminatorKey: 'kind' };
+      var activitySchema = new Schema({ title: { type: String } }, options);
+
+      var dateActivitySchema = new Schema({
+        postedBy: { type: Schema.Types.ObjectId, ref: 'gh3878', required: true }
+      }, options);
+
+      var eventActivitySchema = new Schema({ test: String }, options);
+
+      var User = db.model('gh3878', { name: String });
+      var Activity = db.model('gh3878_0', activitySchema);
+      var DateActivity = Activity.discriminator('Date', dateActivitySchema);
+      var EventActivity = Activity.discriminator('Event', eventActivitySchema);
+
+      User.create({ name: 'val' }, function(error, user) {
+        assert.ifError(error);
+        var dateActivity = { title: 'test', postedBy: user._id };
+        DateActivity.create(dateActivity, function(error) {
+          assert.ifError(error);
+          var eventActivity = {
+            title: 'test2',
+            test: 'test'
+          };
+          EventActivity.create(eventActivity, function(error) {
+            assert.ifError(error);
+            test();
+          });
+        });
+      });
+
+      function test() {
+        Activity.find({}).populate('postedBy').exec(function(error, results) {
+          assert.ifError(error);
+          assert.equal(results.length, 2);
+          assert.equal(results[0].postedBy.name, 'val');
+          done();
+        });
+      }
     });
   });
 });

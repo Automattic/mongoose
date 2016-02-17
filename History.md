@@ -1,3 +1,16 @@
+4.4.4 / 2016-02-17
+==================
+ * fix(schema): handle field selection when casting single nested subdocs #3880
+ * fix(populate): populating using base model with multiple child models in result #3878
+ * fix: ability to properly use return value of `mongoose.connect()` #3874
+ * fix(populate): dont hydrate populated subdoc if lean option set #3873
+ * fix(connection): dont re-auth if already connected with useDb #3871
+ * docs: cover how to set underlying driver's promise lib #3869
+ * fix(document): handle conflicting names in validation errors with subdocs #3867
+ * fix(populate): set undefined instead of null consistently when populate couldn't find results #3859
+ * docs: link to `execPopulate()` in `doc.populate()` docs #3836
+ * docs(plugin): link to the `mongoose.plugin()` function #3732
+
 4.4.3 / 2016-02-09
 ==================
  * fix: upgrade to mongodb 2.1.6 to remove kerberos log output #3861 #3860 [cartuchogl](https://github.com/cartuchogl)

@@ -599,6 +599,7 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
 
   // determine if this doc is a result of a query with
   // excluded fields
+
   if (fields && utils.getFunctionName(fields.constructor) === 'Object') {
     keys = Object.keys(fields);
     ki = keys.length;
@@ -1078,13 +1079,14 @@ Document.prototype.set = function(path, val, type, options) {
         schema.options.ref === val.constructor.modelName) {
       if (this.ownerDocument) {
         this.ownerDocument().populated(this.$__fullPath(path),
-            val._id, {model: val.constructor});
+          val._id, {model: val.constructor});
       } else {
         this.populated(path, val._id, {model: val.constructor});
       }
       didPopulate = true;
     }
 
+    var popOpts;
     if (schema.options &&
         Array.isArray(schema.options.type) &&
         schema.options.type.length &&
@@ -1095,17 +1097,12 @@ Document.prototype.set = function(path, val, type, options) {
         val[0].constructor.modelName &&
         schema.options.type[0].ref === val[0].constructor.modelName) {
       if (this.ownerDocument) {
+        popOpts = { model: val[0].constructor };
         this.ownerDocument().populated(this.$__fullPath(path),
-            val.map(function(v) {
-              return v._id;
-            }),
-            {model: val[0].constructor});
+          val.map(function(v) { return v._id; }), popOpts);
       } else {
-        this.populated(path, val
-        .map(function(v) {
-          return v._id;
-        }),
-            {model: val[0].constructor});
+        popOpts = { model: val[0].constructor };
+        this.populated(path, val.map(function(v) { return v._id; }), popOpts);
       }
       didPopulate = true;
     }
@@ -2652,6 +2649,8 @@ Document.prototype.equals = function(doc) {
 
 /**
  * Populates document references, executing the `callback` when complete.
+ * If you want to use promises instead, use this function with
+ * [`execPopulate()`](#document_Document-execPopulate)
  *
  * ####Example:
  *
@@ -2668,11 +2667,12 @@ Document.prototype.equals = function(doc) {
  *     })
  *
  *     // summary
- *     doc.populate(path)               // not executed
- *     doc.populate(options);           // not executed
- *     doc.populate(path, callback)     // executed
- *     doc.populate(options, callback); // executed
- *     doc.populate(callback);          // executed
+ *     doc.populate(path)                   // not executed
+ *     doc.populate(options);               // not executed
+ *     doc.populate(path, callback)         // executed
+ *     doc.populate(options, callback);     // executed
+ *     doc.populate(callback);              // executed
+ *     doc.populate(options).execPopulate() // executed, returns promise
  *
  *
  * ####NOTE:
@@ -2683,6 +2683,7 @@ Document.prototype.equals = function(doc) {
  * See [Model.populate()](#model_Model.populate) for explaination of options.
  *
  * @see Model.populate #model_Model.populate
+ * @see Document.execPopulate #document_Document-execPopulate
  * @param {String|Object} [path] The path to populate or an options object
  * @param {Function} [callback] When passed, population is invoked
  * @api public
@@ -2722,7 +2723,7 @@ Document.prototype.populate = function populate() {
 };
 
 /**
- * Explicitly executes population and returns a promise. Useful for ES6
+ * Explicitly executes population and returns a promise. Useful for ES2015
  * integration.
  *
  * ####Example:
@@ -2739,7 +2740,7 @@ Document.prototype.populate = function populate() {
  *       execPopulate();
  *
  *     // summary
- *     doc.execPopulate()
+ *     doc.execPopulate().then(resolve, reject);
  *
  *
  * @see Document.populate #Document_model.populate
@@ -6527,7 +6528,7 @@ Embedded.prototype.cast = function(val, doc, init) {
   if (val && val.$isSingleNested) {
     return val;
   }
-  var subdoc = new this.caster(undefined, undefined, doc);
+  var subdoc = new this.caster(undefined, doc.$__.selected, doc);
   if (init) {
     subdoc.init(val);
   } else {
@@ -7125,8 +7126,16 @@ ObjectId.prototype.cast = function(value, doc, init) {
     var path = doc.$__fullPath(this.path);
     var owner = doc.ownerDocument ? doc.ownerDocument() : doc;
     var pop = owner.populated(path, true);
-    var ret = new pop.options.model(value);
-    ret.$__.wasPopulated = true;
+    var ret = value;
+    if (!doc.$__.populated ||
+        !doc.$__.populated[path] ||
+        !doc.$__.populated[path].options ||
+        !doc.$__.populated[path].options.options ||
+        !doc.$__.populated[path].options.options.lean) {
+      ret = new pop.options.model(value);
+      ret.$__.wasPopulated = true;
+    }
+
     return ret;
   }
 
@@ -10381,7 +10390,8 @@ EmbeddedDocument.prototype.$markValid = function(path) {
 EmbeddedDocument.prototype.$isValid = function(path) {
   var index = this.__index;
   if (typeof index !== 'undefined') {
-    return !this.__parent.$__.validationError || !this.__parent.$__.validationError.errors[path];
+    return !this.__parent.$__.validationError ||
+      !this.__parent.$__.validationError.errors[this.$__fullPath(path)];
   }
 
   return true;
@@ -10519,8 +10529,8 @@ module.exports = Subdocument;
  */
 
 function Subdocument() {
-  Document.apply(this, arguments);
   this.$isSingleNested = true;
+  Document.apply(this, arguments);
 }
 
 Subdocument.prototype = Object.create(Document.prototype);

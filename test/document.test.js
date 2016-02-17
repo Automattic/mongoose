@@ -2439,5 +2439,36 @@ describe('document', function() {
         });
       }
     });
+
+    it('init single nested subdoc with select (gh-3880)', function(done) {
+      var childSchema = new mongoose.Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: { type: String },
+        child: childSchema
+      });
+
+      var Parent = db.model('gh3880', parentSchema);
+      var p = new Parent({
+        name: 'Mufasa',
+        child: {
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        var fields = 'name child.name';
+        Parent.findById(p._id).select(fields).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.child.friends, void 0);
+          done();
+        });
+      });
+    });
   });
 });

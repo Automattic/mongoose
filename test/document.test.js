@@ -2377,5 +2377,98 @@ describe('document', function() {
         });
       });
     });
+
+    it('handles conflicting names (gh-3867)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        things: [{
+          name: {
+            type: String,
+            required: true
+          }
+        }]
+      });
+
+      var M = mongoose.model('gh3867', testSchema);
+
+      var doc = M({
+        things: [{}]
+      });
+
+      var fields = Object.keys(doc.validateSync().errors).sort();
+      assert.deepEqual(fields, ['name', 'things.0.name']);
+      done();
+    });
+
+    it('populate with lean (gh-3873)', function(done) {
+      var companySchema = new mongoose.Schema({
+        name:  String,
+        description:  String,
+        userCnt: { type: Number, default: 0, select: false }
+      });
+
+      var userSchema = new mongoose.Schema({
+        name:  String,
+        company: { type: mongoose.Schema.Types.ObjectId, ref: 'gh3873' }
+      });
+
+      var Company = db.model('gh3873', companySchema);
+      var User = db.model('gh3873_0', userSchema);
+
+      var company = new Company({ name: 'IniTech', userCnt: 1 });
+      var user = new User({ name: 'Peter', company: company._id });
+
+      company.save(function(error) {
+        assert.ifError(error);
+        user.save(function(error) {
+          assert.ifError(error);
+          next();
+        });
+      });
+
+      function next() {
+        var pop = { path: 'company', select: 'name', options: { lean: true } };
+        User.find({}).populate(pop).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 1);
+          assert.strictEqual(docs[0].company.userCnt, undefined);
+          done();
+        });
+      }
+    });
+
+    it('init single nested subdoc with select (gh-3880)', function(done) {
+      var childSchema = new mongoose.Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: { type: String },
+        child: childSchema
+      });
+
+      var Parent = db.model('gh3880', parentSchema);
+      var p = new Parent({
+        name: 'Mufasa',
+        child: {
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        var fields = 'name child.name';
+        Parent.findById(p._id).select(fields).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.child.friends, void 0);
+          done();
+        });
+      });
+    });
   });
 });

@@ -7,7 +7,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 - Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
   - Please describe the issue you are experiencing, along with any associated stack trace.
   - Please post code that reproduces the issue, the version of mongoose, node version, and mongodb version.
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_.
 
 ### Requesting new features
 
@@ -18,7 +18,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Fixing bugs / Adding features
 
 - Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. You can create a new issue [here](https://github.com/learnboost/mongoose/issues/new).
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_.
 - Fork the [repo](https://github.com/Automattic/mongoose) _or_ for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 - Follow the general coding style of the rest of the project:
   - 2 space tabs
@@ -48,4 +48,4 @@ If you'd like to preview your documentation changes, first commit your changes t
 
 ### Plugins website
 
-The [plugins](http://plugins.mongoosejs.com/) site is also an [open source project](https://github.com/aheckmann/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/aheckmann/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!

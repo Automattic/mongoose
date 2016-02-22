@@ -624,6 +624,37 @@ block content
     var thing = new Thing();
     thing.save(); // `created_at` & `updatedAt` will be included
 
+  h4#useNestedStrict option: useNestedStrict
+  :markdown
+    In mongoose 4, `update()` and `findOneAndUpdate()` only check the top-level
+    schema's strict mode setting.
+  :js
+    var childSchema = new Schema({}, { strict: false });
+    var parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
+    var Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+      // Error because parentSchema has `strict: throw`, even though
+      // `childSchema` has `strict: false`
+    });
+
+    var update = { 'child.name': 'Luke Skywalker' };
+    var opts = { strict: false };
+    Parent.update({}, update, opts, function(error) {
+      // This works because passing `strict: false` to `update()` overwrites
+      // the parent schema.
+    });
+  :markdown
+    If you set `useNestedStrict` to true, mongoose will use the child schema's
+    `strict` option for casting updates.
+  :js
+    var childSchema = new Schema({}, { strict: false });
+    var parentSchema = new Schema({ child: childSchema },
+      { strict: 'throw', useNestedStrict: true });
+    var Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+      // Works!
+    });
+
   h3#plugins Pluggable
   p
     | Schemas are also 

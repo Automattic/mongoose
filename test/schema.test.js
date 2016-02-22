@@ -1548,5 +1548,14 @@ describe('schema', function() {
       assert.strictEqual(this.schema.path('g'), undefined);
       done();
     });
+
+    it('works properly with virtuals (gh-2398)', function(done) {
+      this.schema.remove('a');
+      this.schema.virtual('a').get(function() { return 42; });
+      var Test = mongoose.model('gh2398', this.schema);
+      var t = new Test();
+      assert.equal(t.a, 42);
+      done();
+    });
   });
 });

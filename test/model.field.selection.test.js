@@ -380,6 +380,26 @@ describe('model field selection', function() {
     });
   });
 
+  it('select properties named length (gh-3903)', function(done) {
+    var db = start();
+
+    var schema = new mongoose.Schema({
+      length: Number,
+      name: String
+    });
+
+    var MyModel = db.model('gh3903', schema);
+
+    MyModel.create({ name: 'val', length: 3 }, function(error) {
+      assert.ifError(error);
+      MyModel.findOne({}).select({ length: 1 }).exec(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.name);
+        db.close(done);
+      });
+    });
+  });
+
   it('appropriately filters subdocuments based on properties (gh-1280)', function(done) {
     var db = start();
     var RouteSchema = new Schema({

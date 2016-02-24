@@ -3881,6 +3881,7 @@ var IS_QUERY_HOOK = {
  * - [toJSON](/docs/guide.html#toJSON) - object - no default
  * - [toObject](/docs/guide.html#toObject) - object - no default
  * - [typeKey](/docs/guide.html#typeKey) - string - defaults to 'type'
+ * - [useNestedStrict](/docs/guide.html#useNestedStrict) - boolean - defaults to false
  * - [validateBeforeSave](/docs/guide.html#validateBeforeSave) - bool - defaults to `true`
  * - [versionKey](/docs/guide.html#versionKey): string - defaults to "__v"
  *
@@ -5048,6 +5049,14 @@ Schema.prototype.remove = function(path) {
     path.forEach(function(name) {
       if (this.path(name)) {
         delete this.paths[name];
+
+        var pieces = name.split('.');
+        var last = pieces.pop();
+        var branch = this.tree;
+        for (var i = 0; i < pieces.length; ++i) {
+          branch = branch[pieces[i]];
+        }
+        delete branch[last];
       }
     }, this);
   }
@@ -5128,7 +5137,7 @@ Schema.prototype._getPathType = function(path) {
         if (foundschema.caster) {
           // array of Mixed?
           if (foundschema.caster instanceof MongooseTypes.Mixed) {
-            return 'mixed';
+            return { schema: foundschema, pathType: 'mixed' };
           }
 
           // Now that we found the array, we need to check if there
@@ -5140,7 +5149,7 @@ Schema.prototype._getPathType = function(path) {
           if (p !== parts.length && foundschema.schema) {
             if (parts[p] === '$') {
               if (p === parts.length - 1) {
-                return 'nested';
+                return { schema: foundschema, pathType: 'nested' };
               }
               // comments.$.comments.$.title
               return search(parts.slice(p + 1), foundschema.schema);
@@ -5148,14 +5157,17 @@ Schema.prototype._getPathType = function(path) {
             // this is the last path of the selector
             return search(parts.slice(p), foundschema.schema);
           }
-          return foundschema.$isSingleNested ? 'nested' : 'array';
+          return {
+            schema: foundschema,
+            pathType: foundschema.$isSingleNested ? 'nested' : 'array'
+          };
         }
-        return 'real';
+        return { schema: foundschema, pathType: 'real' };
       } else if (p === parts.length && schema.nested[trypath]) {
-        return 'nested';
+        return { schema: schema, pathType: 'nested' };
       }
     }
-    return 'undefined';
+    return { schema: foundschema || schema, pathType: 'undefined' };
   }
 
   // look for arrays
@@ -5302,10 +5314,12 @@ SchemaArray.prototype = Object.create(SchemaType.prototype);
 SchemaArray.prototype.constructor = SchemaArray;
 
 /**
- * Check required
+ * Check if the given value satisfies a required validator. The given value
+ * must be not null nor undefined, and have a non-zero length.
  *
- * @param {Array} value
- * @api private
+ * @param {Any} value
+ * @return {Boolean}
+ * @api public
  */
 
 SchemaArray.prototype.checkRequired = function(value) {
@@ -5362,7 +5376,7 @@ SchemaArray.prototype.cast = function(value, doc, init) {
         }
       } catch (e) {
         // rethrow
-        throw new CastError(e.type, value, this.path);
+        throw new CastError(e.type, value, this.path, e);
       }
     }
 
@@ -5637,9 +5651,13 @@ SchemaBoolean.prototype = Object.create(SchemaType.prototype);
 SchemaBoolean.prototype.constructor = SchemaBoolean;
 
 /**
- * Required validator
+ * Check if the given value satisfies a required validator. For a boolean
+ * to satisfy a required validator, it must be strictly equal to true or to
+ * false.
  *
- * @api private
+ * @param {Any} value
+ * @return {Boolean}
+ * @api public
  */
 
 SchemaBoolean.prototype.checkRequired = function(value) {
@@ -5745,9 +5763,14 @@ SchemaBuffer.prototype = Object.create(SchemaType.prototype);
 SchemaBuffer.prototype.constructor = SchemaBuffer;
 
 /**
- * Check required
+ * Check if the given value satisfies a required validator. To satisfy a
+ * required validator, a buffer must not be null or undefined and have
+ * non-zero length.
  *
- * @api private
+ * @param {Any} value
+ * @param {Document} doc
+ * @return {Boolean}
+ * @api public
  */
 
 SchemaBuffer.prototype.checkRequired = function(value, doc) {
@@ -5969,9 +5992,13 @@ SchemaDate.prototype.expires = function(when) {
 };
 
 /**
- * Required validator for date
+ * Check if the given value satisfies a required validator. To satisfy
+ * a required validator, the given value must be an instance of `Date`.
  *
- * @api private
+ * @param {Any} value
+ * @param {Document} doc
+ * @return {Boolean}
+ * @api public
  */
 
 SchemaDate.prototype.checkRequired = function(value) {
@@ -6418,7 +6445,7 @@ DocumentArray.prototype.cast = function(value, doc, init, prev, options) {
             // see gh-746
             value[i] = subdoc;
           } catch (error) {
-            throw new CastError('embedded', value[i], value._path);
+            throw new CastError('embedded', value[i], value._path, error);
           }
         }
       }
@@ -6528,7 +6555,7 @@ Embedded.prototype.cast = function(val, doc, init) {
   if (val && val.$isSingleNested) {
     return val;
   }
-  var subdoc = new this.caster(undefined, doc.$__.selected, doc);
+  var subdoc = new this.caster(void 0, doc ? doc.$__.selected : void 0, doc);
   if (init) {
     subdoc.init(val);
   } else {
@@ -6591,16 +6618,6 @@ Embedded.prototype.doValidateSync = function(value) {
     return;
   }
   return value.validateSync();
-};
-
-/**
- * Required validator for single nested docs
- *
- * @api private
- */
-
-Embedded.prototype.checkRequired = function(value) {
-  return !!value && value.$isSingleNested;
 };
 
 },{"../schematype":39,"../types/subdocument":47}],33:[function(require,module,exports){
@@ -6684,16 +6701,6 @@ Mixed.prototype = Object.create(SchemaType.prototype);
 Mixed.prototype.constructor = Mixed;
 
 /**
- * Required validator
- *
- * @api private
- */
-
-Mixed.prototype.checkRequired = function(val) {
-  return (val !== undefined) && (val !== null);
-};
-
-/**
  * Casts `val` for Mixed.
  *
  * _this is a no-op_
@@ -6768,9 +6775,12 @@ SchemaNumber.prototype = Object.create(SchemaType.prototype);
 SchemaNumber.prototype.constructor = SchemaNumber;
 
 /**
- * Required validator for number
+ * Check if the given value satisfies a required validator.
  *
- * @api private
+ * @param {Any} value
+ * @param {Document} doc
+ * @return {Boolean}
+ * @api public
  */
 
 SchemaNumber.prototype.checkRequired = function checkRequired(value, doc) {
@@ -7076,9 +7086,12 @@ ObjectId.prototype.auto = function(turnOn) {
 };
 
 /**
- * Check required
+ * Check if the given value satisfies a required validator.
  *
- * @api private
+ * @param {Any} value
+ * @param {Document} doc
+ * @return {Boolean}
+ * @api public
  */
 
 ObjectId.prototype.checkRequired = function checkRequired(value, doc) {
@@ -7639,10 +7652,12 @@ SchemaString.prototype.match = function match(regExp, message) {
 };
 
 /**
- * Check required
+ * Check if the given value satisfies a required validator.
  *
- * @param {String|null|undefined} value
- * @api private
+ * @param {Any} value
+ * @param {Document} doc
+ * @return {Boolean}
+ * @api public
  */
 
 SchemaString.prototype.checkRequired = function checkRequired(value, doc) {
@@ -8259,8 +8274,8 @@ SchemaType.prototype.validate = function(obj, message, type) {
 };
 
 /**
- * Adds a required validator to this schematype. The required validator is added
- * to the front of the validators array using `unshift()`.
+ * Adds a required validator to this SchemaType. The validator gets added
+ * to the front of this SchemaType's validators array using `unshift()`.
  *
  * ####Example:
  *
@@ -8278,11 +8293,26 @@ SchemaType.prototype.validate = function(obj, message, type) {
  *
  *     Schema.path('name').required(true, 'grrr :( ');
  *
+ *     // or make a path conditionally required based on a function
+ *     var isOver18 = function() { return this.age >= 18; };
+ *     Schema.path('voterRegistrationId').required(isOver18);
+ *
+ * The required validator uses the SchemaType's `checkRequired` function to
+ * determine whether a given value satisfies the required validator. By default,
+ * a value satisfies the required validator if `val != null` (that is, if
+ * the value is not null nor undefined). However, most built-in mongoose schema
+ * types override the default `checkRequired` function:
  *
  * @param {Boolean} required enable/disable the validator
  * @param {String} [message] optional custom error message
  * @return {SchemaType} this
  * @see Customized Error Messages #error_messages_MongooseError-messages
+ * @see SchemaArray#checkRequired #schema_array_SchemaArray.checkRequired
+ * @see SchemaBoolean#checkRequired #schema_boolean_SchemaBoolean-checkRequired
+ * @see SchemaBuffer#checkRequired #schema_buffer_SchemaBuffer.schemaName
+ * @see SchemaNumber#checkRequired #schema_number_SchemaNumber-min
+ * @see SchemaObjectId#checkRequired #schema_objectid_ObjectId-auto
+ * @see SchemaString#checkRequired #schema_string_SchemaString-checkRequired
  * @api public
  */
 
@@ -21727,6 +21757,14 @@ NodeCollection.prototype.findStream = function(match, findOptions, streamOptions
 }
 
 /**
+ * var cursor = findCursor(match, findOptions)
+ */
+
+NodeCollection.prototype.findCursor = function(match, findOptions) {
+  return this.collection.find(match, findOptions);
+}
+
+/**
  * aggregation(operators..., function(err, doc))
  * TODO
  */
@@ -22841,7 +22879,8 @@ Query.prototype.select = function select () {
   var fields = this._fields || (this._fields = {});
   var type = typeof arg;
 
-  if ('string' == type || 'object' == type && 'number' == typeof arg.length && !Array.isArray(arg)) {
+  if (('string' == type || utils.isArgumentsObject(arg)) &&
+    'number' == typeof arg.length) {
     if ('string' == type)
       arg = arg.split(/\s+/);
 
@@ -23395,6 +23434,37 @@ Query.prototype.find = function (criteria, callback) {
 
   this._collection.find(conds, options, utils.tick(callback));
   return this;
+}
+
+/**
+ * Returns the query cursor
+ *
+ * ####Examples
+ *
+ *     query.find().cursor();
+ *     query.cursor({ name: 'Burning Lights' });
+ *
+ * @param {Object} [criteria] mongodb selector
+ * @return {Object} cursor
+ * @api public
+ */
+
+Query.prototype.cursor = function cursor (criteria) {
+  if (this.op) {
+    if (this.op !== 'find') {
+      throw new TypeError(".cursor only support .find method");
+    }
+  } else {
+    this.find(criteria);
+  }
+
+  var conds = this._conditions
+    , options = this._optionsForExec()
+
+  options.fields = this._fieldsForExec()
+
+  debug('findCursor', this._collection.collectionName, conds, options);
+  return this._collection.findCursor(conds, options);
 }
 
 /**
@@ -24291,6 +24361,7 @@ Query.prototype._updateForExec = function () {
     }
   }
 
+  this._compiledUpdate = ret;
   return ret;
 }
 
@@ -24802,6 +24873,17 @@ exports.cloneBuffer = function (buff) {
   var dupe = new Buffer(buff.length);
   buff.copy(dupe, 0, 0, buff.length);
   return dupe;
+};
+
+/**
+ * Check if this object is an arguments object
+ *
+ * @param {Any} v
+ * @return {Boolean}
+ */
+
+exports.isArgumentsObject = function(v) {
+  return Object.prototype.toString.call(v) === '[object Arguments]';
 };
 
 }).call(this,require("g5I+bs"),require("buffer").Buffer)

@@ -1,3 +1,15 @@
+4.4.5 / 2016-02-24
+==================
+ * fix(query): ability to select a length field (upgrade to mquery 1.7.0) #3903
+ * fix: include nested CastError as reason for array CastError #3897 [kotarou3](https://github.com/kotarou3)
+ * fix(schema): check for doc existence before taking fields #3889
+ * feat(schema): useNestedStrict option to take nested strict mode for update #3883
+ * docs(validation): clarify relationship between required and checkRequired #3822
+ * docs(populate): dynamic reference docs #3809
+ * docs: expand dropdown when clicking on file name #3807
+ * docs: plugins.mongoose.io is up #3127
+ * fix(schema): ability to add a virtual with same name as removed path #2398
+
 4.4.4 / 2016-02-17
 ==================
  * fix(schema): handle field selection when casting single nested subdocs #3880

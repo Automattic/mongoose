@@ -7,7 +7,7 @@
  * docs(validation): clarify relationship between required and checkRequired #3822
  * docs(populate): dynamic reference docs #3809
  * docs: expand dropdown when clicking on file name #3807
- * docs: plugins.mongoose.io is up #3127
+ * docs: plugins.mongoosejs.io is up #3127
  * fix(schema): ability to add a virtual with same name as removed path #2398
 
 4.4.4 / 2016-02-17

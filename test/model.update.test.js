@@ -14,7 +14,7 @@ var start = require('./common'),
  * Setup.
  */
 
-var Comments = new Schema;
+var Comments = new Schema({});
 
 Comments.add({
   title: String,
@@ -1702,6 +1702,30 @@ describe('model: update:', function() {
     assert.equal(query.getUpdate().$set.name, 'Val');
 
     db.close(done);
+  });
+
+  it('nested schemas with strict false (gh-3883)', function(done) {
+    var db = start();
+    var OrderSchema = new mongoose.Schema({
+    }, { strict: false, _id: false });
+
+    var SeasonSchema = new mongoose.Schema({
+      regions: [OrderSchema]
+    }, { useNestedStrict: true });
+
+    var Season = db.model('gh3883', SeasonSchema);
+    var obj = { regions: [{ r: 'test', action: { order: 'hold' } }] };
+    Season.create(obj, function(error) {
+      assert.ifError(error);
+      var query = { 'regions.r': 'test' };
+      var update = { $set: { 'regions.$.action': { order: 'move' } } };
+      var opts = { 'new': true };
+      Season.findOneAndUpdate(query, update, opts, function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.toObject().regions[0].action.order, 'move');
+        done();
+      });
+    });
   });
 
   it('middleware update with exec (gh-3549)', function(done) {

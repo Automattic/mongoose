@@ -1540,5 +1540,19 @@ describe('model: findByIdAndUpdate:', function() {
         });
       });
     });
+
+    it('setting nested schema (gh-3889)', function(done) {
+      var db = start();
+      var nested = new Schema({ test: String });
+      var s = new Schema({ nested: nested });
+      var MyModel = db.model('gh3889', s);
+      MyModel.findOneAndUpdate(
+        {},
+        { $set: { nested: { test: 'abc' } } },
+        function(error) {
+          assert.ifError(error);
+          db.close(done);
+        });
+    });
   });
 });

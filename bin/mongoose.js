@@ -10734,6 +10734,7 @@ exports.pluralization = [
   [/(matr|vert|ind)ix|ex$/gi, '$1ices'],
   [/([m|l])ouse$/gi, '$1ice'],
   [/(kn|w|l)ife$/gi, '$1ives'],
+  [/(hero|zero)$/gi, '$1es'],
   [/(quiz)$/gi, '$1zes'],
   [/s$/gi, 's'],
   [/([^a-z])$/, '$1'],

@@ -1556,6 +1556,42 @@ describe('Query', function() {
     db.close(done);
   });
 
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('allows sort with count (gh-3914)', function(done) {
+      var Post = db.model('gh3914_0', {
+        title: String
+      });
+
+      Post.count({}).sort({ title: 1 }).exec(function(error, count) {
+        assert.ifError(error);
+        assert.strictEqual(count, 0);
+        done();
+      });
+    });
+
+    it('allows sort with select (gh-3914)', function(done) {
+      var Post = db.model('gh3914_1', {
+        title: String
+      });
+
+      Post.count({}).select({ _id: 0 }).exec(function(error, count) {
+        assert.ifError(error);
+        assert.strictEqual(count, 0);
+        done();
+      });
+    });
+  });
+
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
     var db = start();
     var MyModel;

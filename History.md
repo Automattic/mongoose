@@ -1,3 +1,10 @@
+4.4.6 / 2016-03-02
+==================
+ * fix: upgrade mongodb driver to 2.1.7 #3938
+ * docs: fix plugins link #3917 #3909 [fbertone](https://github.com/fbertone)
+ * fix(query): sort+select with count works #3914
+ * fix(query): improve mergeUpdate's ability to handle nested docs #3890
+
 4.4.5 / 2016-02-24
 ==================
  * fix(query): ability to select a length field (upgrade to mquery 1.7.0) #3903

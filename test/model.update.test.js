@@ -1787,4 +1787,31 @@ describe('model: update:', function() {
       });
     });
   });
+
+  it('$push with buffer doesnt throw error (gh-3890)', function(done) {
+    var db = start();
+
+    var InfoSchema = new Schema({
+      prop: { type: Buffer }
+    });
+
+    var ModelASchema = new Schema({
+      infoList: { type: [InfoSchema] }
+    });
+
+    var ModelA = db.model('gh3890', ModelASchema);
+
+    var propValue = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+
+    var update = {
+      $push: {
+        info_list: { prop: propValue }
+      }
+    };
+
+    ModelA.update({}, update, function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
 });

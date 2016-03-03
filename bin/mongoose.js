@@ -11490,7 +11490,11 @@ exports.mergeClone = function(to, from) {
       to[key] = exports.clone(from[key], {retainKeyOrder: 1});
     } else {
       if (exports.isObject(from[key])) {
-        exports.mergeClone(to[key], from[key]);
+        var obj = from[key];
+        if (isMongooseObject(from[key])) {
+          obj = obj.toObject({ virtuals: false });
+        }
+        exports.mergeClone(to[key], obj);
       } else {
         // make sure to retain key order here because of a bug handling the
         // $each operator in mongodb 2.4.4
@@ -24149,7 +24153,19 @@ Query.prototype.exec = function exec (op, callback) {
     callback || (callback = true);
   }
 
-  this[this.op](callback);
+  var self = this;
+
+  if ('function' == typeof callback) {
+    this[this.op](callback);
+  } else {
+    return new Query.Promise(function(success, error) {
+      self[self.op](function(err, val) {
+        if (err) error(err);
+        else success(val);
+        self = success = error = null;
+      });
+    });
+  }
 }
 
 /**
@@ -24532,9 +24548,7 @@ denied.count = function (self) {
   return err;
 }
 
-denied.count.select =
 denied.count.slice =
-denied.count.sort =
 denied.count.batchSize =
 denied.count.comment =
 denied.count.maxScan =

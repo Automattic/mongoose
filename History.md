@@ -1,3 +1,10 @@
+4.4.6 / 2016-03-02
+==================
+ * fix: upgrade mongodb driver to 2.1.7 #3938
+ * docs: fix plugins link #3917 #3909 [fbertone](https://github.com/fbertone)
+ * fix(query): sort+select with count works #3914
+ * fix(query): improve mergeUpdate's ability to handle nested docs #3890
+
 4.4.5 / 2016-02-24
 ==================
  * fix(query): ability to select a length field (upgrade to mquery 1.7.0) #3903
@@ -7,7 +14,7 @@
  * docs(validation): clarify relationship between required and checkRequired #3822
  * docs(populate): dynamic reference docs #3809
  * docs: expand dropdown when clicking on file name #3807
- * docs: plugins.mongoose.io is up #3127
+ * docs: plugins.mongoosejs.io is up #3127
  * fix(schema): ability to add a virtual with same name as removed path #2398
 
 4.4.4 / 2016-02-17

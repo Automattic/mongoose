@@ -2005,173 +2005,6 @@ describe('document', function() {
     });
   });
 
-  it('single embedded schemas with populate (gh-3501)', function(done) {
-    var db = start();
-    var PopulateMeSchema = new Schema({});
-
-    var Child = db.model('gh3501', PopulateMeSchema);
-
-    var SingleNestedSchema = new Schema({
-      populateMeArray: [{
-        type: Schema.Types.ObjectId,
-        ref: 'gh3501'
-      }]
-    });
-
-    var parentSchema = new Schema({
-      singleNested: SingleNestedSchema
-    });
-
-    var P = db.model('gh3501_1', parentSchema);
-
-    Child.create([{}, {}], function(error, docs) {
-      assert.ifError(error);
-      var obj = {
-        singleNested: {populateMeArray: [docs[0]._id, docs[1]._id]}
-      };
-      P.create(obj, function(error, doc) {
-        assert.ifError(error);
-        P.
-        findById(doc._id).
-        populate('singleNested.populateMeArray').
-        exec(function(error, doc) {
-          assert.ok(doc.singleNested.populateMeArray[0]._id);
-          db.close(done);
-        });
-      });
-    });
-  });
-
-  it('single embedded schemas with methods (gh-3534)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-    personSchema.methods.firstName = function() {
-      return this.name.substr(0, this.name.indexOf(' '));
-    };
-
-    var bandSchema = new Schema({leadSinger: personSchema});
-    var Band = db.model('gh3534', bandSchema);
-
-    var gnr = new Band({leadSinger: {name: 'Axl Rose'}});
-    assert.equal(gnr.leadSinger.firstName(), 'Axl');
-    db.close(done);
-  });
-
-  it('single embedded schemas with models (gh-3535)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-    var Person = db.model('gh3535_0', personSchema);
-
-    var bandSchema = new Schema({leadSinger: personSchema});
-    var Band = db.model('gh3535', bandSchema);
-
-    var axl = new Person({name: 'Axl Rose'});
-    var gnr = new Band({leadSinger: axl});
-
-    gnr.save(function(error) {
-      assert.ifError(error);
-      assert.equal(gnr.leadSinger.name, 'Axl Rose');
-      db.close(done);
-    });
-  });
-
-  it('single embedded schemas with indexes (gh-3594)', function(done) {
-    var personSchema = new Schema({name: {type: String, unique: true}});
-
-    var bandSchema = new Schema({leadSinger: personSchema});
-
-    assert.equal(bandSchema.indexes().length, 1);
-    var index = bandSchema.indexes()[0];
-    assert.deepEqual(index[0], {'leadSinger.name': 1});
-    assert.ok(index[1].unique);
-    done();
-  });
-
-  it('single embedded docs have an ownerDocument function (gh-3589)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-    personSchema.methods.display = function() {
-      return this.name + ' of ' + this.ownerDocument().name;
-    };
-
-    var bandSchema = new Schema({leadSinger: personSchema, name: String});
-    var Band = db.model('gh3589', bandSchema);
-
-    var gnr = new Band({
-      name: 'Guns N\' Roses',
-      leadSinger: {name: 'Axl Rose'}
-    });
-    assert.equal(gnr.leadSinger.display(), 'Axl Rose of Guns N\' Roses');
-    db.close(done);
-  });
-
-  it('removing single embedded docs (gh-3596)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-
-    var bandSchema = new Schema({guitarist: personSchema, name: String});
-    var Band = db.model('gh3596', bandSchema);
-
-    var gnr = new Band({
-      name: 'Guns N\' Roses',
-      guitarist: {name: 'Slash'}
-    });
-    gnr.save(function(error, gnr) {
-      assert.ifError(error);
-      gnr.guitarist = undefined;
-      gnr.save(function(error, gnr) {
-        assert.ifError(error);
-        assert.ok(!gnr.guitarist);
-        db.close(done);
-      });
-    });
-  });
-
-  it('setting single embedded docs (gh-3601)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-
-    var bandSchema = new Schema({guitarist: personSchema, name: String});
-    var Band = db.model('gh3601', bandSchema);
-
-    var gnr = new Band({
-      name: 'Guns N\' Roses',
-      guitarist: {name: 'Slash'}
-    });
-    var velvetRevolver = new Band({
-      name: 'Velvet Revolver'
-    });
-    velvetRevolver.guitarist = gnr.guitarist;
-    velvetRevolver.save(function(error) {
-      assert.ifError(error);
-      assert.equal(velvetRevolver.guitarist, gnr.guitarist);
-      db.close(done);
-    });
-  });
-
-  it('single embedded docs init obeys strict mode (gh-3642)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-
-    var bandSchema = new Schema({guitarist: personSchema, name: String});
-    var Band = db.model('gh3642', bandSchema);
-
-    var velvetRevolver = new Band({
-      name: 'Velvet Revolver',
-      guitarist: {name: 'Slash', realName: 'Saul Hudson'}
-    });
-
-    velvetRevolver.save(function(error) {
-      assert.ifError(error);
-      var query = {name: 'Velvet Revolver'};
-      Band.collection.findOne(query, function(error, band) {
-        assert.ifError(error);
-        assert.ok(!band.guitarist.realName);
-        db.close(done);
-      });
-    });
-  });
-
   describe('bug fixes', function() {
     var db;
 
@@ -2181,6 +2014,150 @@ describe('document', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('single embedded schemas with populate (gh-3501)', function(done) {
+      var PopulateMeSchema = new Schema({});
+
+      var Child = db.model('gh3501', PopulateMeSchema);
+
+      var SingleNestedSchema = new Schema({
+        populateMeArray: [{
+          type: Schema.Types.ObjectId,
+          ref: 'gh3501'
+        }]
+      });
+
+      var parentSchema = new Schema({
+        singleNested: SingleNestedSchema
+      });
+
+      var P = db.model('gh3501_1', parentSchema);
+
+      Child.create([{}, {}], function(error, docs) {
+        assert.ifError(error);
+        var obj = {
+          singleNested: {populateMeArray: [docs[0]._id, docs[1]._id]}
+        };
+        P.create(obj, function(error, doc) {
+          assert.ifError(error);
+          P.
+          findById(doc._id).
+          populate('singleNested.populateMeArray').
+          exec(function(error, doc) {
+            assert.ok(doc.singleNested.populateMeArray[0]._id);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single embedded schemas with methods (gh-3534)', function(done) {
+      var personSchema = new Schema({name: String});
+      personSchema.methods.firstName = function() {
+        return this.name.substr(0, this.name.indexOf(' '));
+      };
+
+      var bandSchema = new Schema({leadSinger: personSchema});
+      var Band = db.model('gh3534', bandSchema);
+
+      var gnr = new Band({leadSinger: {name: 'Axl Rose'}});
+      assert.equal(gnr.leadSinger.firstName(), 'Axl');
+      done();
+    });
+
+    it('single embedded schemas with models (gh-3535)', function(done) {
+      var db = start();
+      var personSchema = new Schema({name: String});
+      var Person = db.model('gh3535_0', personSchema);
+
+      var bandSchema = new Schema({leadSinger: personSchema});
+      var Band = db.model('gh3535', bandSchema);
+
+      var axl = new Person({name: 'Axl Rose'});
+      var gnr = new Band({leadSinger: axl});
+
+      gnr.save(function(error) {
+        assert.ifError(error);
+        assert.equal(gnr.leadSinger.name, 'Axl Rose');
+        done();
+      });
+    });
+
+    it('single embedded schemas with indexes (gh-3594)', function(done) {
+      var personSchema = new Schema({name: {type: String, unique: true}});
+
+      var bandSchema = new Schema({leadSinger: personSchema});
+
+      assert.equal(bandSchema.indexes().length, 1);
+      var index = bandSchema.indexes()[0];
+      assert.deepEqual(index[0], {'leadSinger.name': 1});
+      assert.ok(index[1].unique);
+      done();
+    });
+
+    it('removing single embedded docs (gh-3596)', function(done) {
+      var personSchema = new Schema({name: String});
+
+      var bandSchema = new Schema({guitarist: personSchema, name: String});
+      var Band = db.model('gh3596', bandSchema);
+
+      var gnr = new Band({
+        name: 'Guns N\' Roses',
+        guitarist: {name: 'Slash'}
+      });
+      gnr.save(function(error, gnr) {
+        assert.ifError(error);
+        gnr.guitarist = undefined;
+        gnr.save(function(error, gnr) {
+          assert.ifError(error);
+          assert.ok(!gnr.guitarist);
+          done();
+        });
+      });
+    });
+
+    it('setting single embedded docs (gh-3601)', function(done) {
+      var personSchema = new Schema({name: String});
+
+      var bandSchema = new Schema({guitarist: personSchema, name: String});
+      var Band = db.model('gh3601', bandSchema);
+
+      var gnr = new Band({
+        name: 'Guns N\' Roses',
+        guitarist: {name: 'Slash'}
+      });
+      var velvetRevolver = new Band({
+        name: 'Velvet Revolver'
+      });
+      velvetRevolver.guitarist = gnr.guitarist;
+      velvetRevolver.save(function(error) {
+        assert.ifError(error);
+        assert.equal(velvetRevolver.guitarist, gnr.guitarist);
+        done();
+      });
+    });
+
+    it('single embedded docs init obeys strict mode (gh-3642)', function(done) {
+      var personSchema = new Schema({name: String});
+
+      var bandSchema = new Schema({guitarist: personSchema, name: String});
+      var Band = db.model('gh3642', bandSchema);
+
+      var velvetRevolver = new Band({
+        name: 'Velvet Revolver',
+        guitarist: {name: 'Slash', realName: 'Saul Hudson'}
+      });
+
+      velvetRevolver.save(function(error) {
+        assert.ifError(error);
+        var query = {name: 'Velvet Revolver'};
+        Band.collection.findOne(query, function(error, band) {
+          assert.ifError(error);
+          assert.ok(!band.guitarist.realName);
+          done();
+        });
+      });
     });
 
     it('single embedded docs post hooks (gh-3679)', function(done) {

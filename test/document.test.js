@@ -17,6 +17,8 @@ var start = require('./common'),
     EmbeddedDocument = require('../lib/types/embedded'),
     Query = require('../lib/query');
 
+var _ = require('lodash');
+
 /**
  * Test Document constructor.
  */
@@ -2445,6 +2447,21 @@ describe('document', function() {
           assert.strictEqual(doc.child.friends, void 0);
           done();
         });
+      });
+    });
+
+    it('pre and post as schema keys (gh-3902)', function(done) {
+      var schema = new mongoose.Schema({
+        pre: String,
+        post: String
+      }, { versionKey: false });
+      var MyModel = db.model('gh3902', schema);
+
+      MyModel.create({ pre: 'test', post: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        assert.deepEqual(_.omit(doc.toObject(), '_id'),
+          { pre: 'test', post: 'test' });
+        done();
       });
     });
   });

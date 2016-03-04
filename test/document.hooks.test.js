@@ -83,7 +83,7 @@ describe('document: hooks:', function() {
         steps = 0;
 
     // serial
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       setTimeout(function() {
         // make sure next step hasn't executed yet
@@ -92,13 +92,13 @@ describe('document: hooks:', function() {
       }, 50);
     });
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
     // parallel
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       assert.equal(3, steps);
       setTimeout(function() {
@@ -111,7 +111,7 @@ describe('document: hooks:', function() {
       next();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       setTimeout(function() {
         assert.equal(4, steps);
@@ -134,13 +134,13 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
       next();
     });
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
     });
@@ -156,14 +156,14 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
@@ -181,17 +181,17 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next(new Error);
     });
 
-    doc.pre('hooksTest', function() {
+    doc.$pre('hooksTest', function() {
       steps++;
     });
 
@@ -205,7 +205,7 @@ describe('document: hooks:', function() {
   it('errors from last serial hook', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       next(new Error);
     });
 
@@ -218,7 +218,7 @@ describe('document: hooks:', function() {
   it('mutating incoming args via middleware', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('set', function(next, path, val) {
+    doc.$pre('set', function(next, path, val) {
       next(path, 'altered-' + val);
     });
 
@@ -231,19 +231,19 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done(new Error);
@@ -259,7 +259,7 @@ describe('document: hooks:', function() {
   it('passing two arguments to a method subject to hooks and return value', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       next();
     });
 
@@ -411,7 +411,7 @@ describe('document: hooks:', function() {
     var Bar = db.model('gh-1335-2', BarSchema);
 
     var b = new Bar();
-    b.pre('save', function(next) {
+    b.$pre('save', function(next) {
       if (this.isNew && this.foos.length === 0) {
         this.foos = undefined;
       }

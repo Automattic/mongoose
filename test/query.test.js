@@ -1490,72 +1490,6 @@ describe('Query', function() {
     });
   });
 
-  it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
-    var db = start();
-    var User = db.model('gh3010', {
-      _id: {
-        select: false,
-        type: Schema.Types.ObjectId,
-        default: mongoose.Types.ObjectId
-      },
-      username: String
-    });
-
-    User.create({username: 'Val'}, function(error, user) {
-      assert.ifError(error);
-      User.find({_id: user._id}).select('username').exec(function(error, users) {
-        assert.ifError(error);
-        assert.equal(users.length, 1);
-        assert.ok(!users[0]._id);
-        assert.equal(users[0].username, 'Val');
-        db.close(done);
-      });
-    });
-  });
-
-  it('doesnt reverse key order for update docs (gh-3215)', function(done) {
-    var db = start();
-    var Test = db.model('gh3215', {
-      arr: [{date: Date, value: Number}]
-    });
-
-    var q = Test.update({}, {
-      $push: {
-        arr: {
-          $each: [{date: new Date(), value: 1}],
-          $sort: {value: -1, date: -1}
-        }
-      }
-    });
-
-    assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
-        ['value', 'date']);
-    db.close(done);
-  });
-
-  it('handles nested $ (gh-3265)', function(done) {
-    var db = start();
-    var Post = db.model('gh3265', {
-      title: String,
-      answers: [{
-        details: String,
-        stats: {
-          votes: Number,
-          count: Number
-        }
-      }]
-    });
-
-    var answersUpdate = {details: 'blah', stats: {votes: 1, count: '3'}};
-    var q = Post.update(
-        {'answers._id': '507f1f77bcf86cd799439011'},
-        {$set: {'answers.$': answersUpdate}});
-
-    assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
-        {votes: 1, count: 3});
-    db.close(done);
-  });
-
   describe('bug fixes', function() {
     var db;
 
@@ -1565,6 +1499,47 @@ describe('Query', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
+      var User = db.model('gh3010', {
+        _id: {
+          select: false,
+          type: Schema.Types.ObjectId,
+          default: mongoose.Types.ObjectId
+        },
+        username: String
+      });
+
+      User.create({username: 'Val'}, function(error, user) {
+        assert.ifError(error);
+        User.find({_id: user._id}).select('username').exec(function(error, users) {
+          assert.ifError(error);
+          assert.equal(users.length, 1);
+          assert.ok(!users[0]._id);
+          assert.equal(users[0].username, 'Val');
+          done();
+        });
+      });
+    });
+
+    it('doesnt reverse key order for update docs (gh-3215)', function(done) {
+      var Test = db.model('gh3215', {
+        arr: [{date: Date, value: Number}]
+      });
+
+      var q = Test.update({}, {
+        $push: {
+          arr: {
+            $each: [{date: new Date(), value: 1}],
+            $sort: {value: -1, date: -1}
+          }
+        }
+      });
+
+      assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
+          ['value', 'date']);
+      done();
     });
 
     it('allows sort with count (gh-3914)', function(done) {
@@ -1589,6 +1564,28 @@ describe('Query', function() {
         assert.strictEqual(count, 0);
         done();
       });
+    });
+
+    it('handles nested $ (gh-3265)', function(done) {
+      var Post = db.model('gh3265', {
+        title: String,
+        answers: [{
+          details: String,
+          stats: {
+            votes: Number,
+            count: Number
+          }
+        }]
+      });
+
+      var answersUpdate = {details: 'blah', stats: {votes: 1, count: '3'}};
+      var q = Post.update(
+          {'answers._id': '507f1f77bcf86cd799439011'},
+          {$set: {'answers.$': answersUpdate}});
+
+      assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
+          {votes: 1, count: 3});
+      done();
     });
   });
 

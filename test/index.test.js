@@ -392,6 +392,7 @@ describe('mongoose module:', function() {
       assert.equal('function', typeof mongoose.Collection);
       assert.equal('function', typeof mongoose.Connection);
       assert.equal('function', typeof mongoose.Schema);
+      assert.ok(mongoose.Schema.Types);
       assert.equal('function', typeof mongoose.SchemaType);
       assert.equal('function', typeof mongoose.Query);
       assert.equal('function', typeof mongoose.Promise);
@@ -411,6 +412,13 @@ describe('mongoose module:', function() {
 
     it('of new Mongoose instances', function(done) {
       test(new mongoose.Mongoose);
+      done();
+    });
+
+    it('of result from .connect() (gh-3940)', function(done) {
+      var m = new mongoose.Mongoose;
+      test(m.connect('mongodb://localhost:27017'));
+      m.disconnect();
       done();
     });
   });

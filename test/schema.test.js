@@ -1512,6 +1512,20 @@ describe('schema', function() {
     done();
   });
 
+  it('booleans cause cast error for date (gh-3935)', function(done) {
+    var testSchema = new Schema({
+      test: Date
+    });
+
+    var Test = mongoose.model('gh3935', testSchema);
+    var test = new Test({ test: true });
+
+    assert.ok(test.validateSync());
+    assert.equal(test.validateSync().errors.test.name, 'CastError');
+
+    done();
+  });
+
   describe('remove()', function() {
     before(function() {
       this.schema = new Schema({

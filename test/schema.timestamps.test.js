@@ -22,6 +22,18 @@ describe('schema options.timestamps', function() {
       done();
     });
 
+    it('should have createdAt and updatedAt fields', function(done) {
+      var TestSchema = new Schema({
+        name: String
+      });
+
+      TestSchema.set('timestamps', true);
+
+      assert.ok(TestSchema.path('createdAt'));
+      assert.ok(TestSchema.path('updatedAt'));
+      done();
+    });
+
     it('should have created and updatedAt fields', function(done) {
       var TestSchema = new Schema({
         name: String
@@ -29,6 +41,20 @@ describe('schema options.timestamps', function() {
         timestamps: {
           createdAt: 'created'
         }
+      });
+
+      assert.ok(TestSchema.path('created'));
+      assert.ok(TestSchema.path('updatedAt'));
+      done();
+    });
+
+    it('should have created and updatedAt fields', function(done) {
+      var TestSchema = new Schema({
+        name: String
+      });
+
+      TestSchema.set('timestamps', {
+        createdAt: 'created'
       });
 
       assert.ok(TestSchema.path('created'));
@@ -44,6 +70,21 @@ describe('schema options.timestamps', function() {
           createdAt: 'created',
           updatedAt: 'updated'
         }
+      });
+
+      assert.ok(TestSchema.path('created'));
+      assert.ok(TestSchema.path('updated'));
+      done();
+    });
+
+    it('should have created and updated fields', function(done) {
+      var TestSchema = new Schema({
+        name: String
+      });
+
+      TestSchema.set('timestamps', {
+        createdAt: 'created',
+        updatedAt: 'updated'
       });
 
       assert.ok(TestSchema.path('created'));

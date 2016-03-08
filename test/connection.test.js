@@ -391,7 +391,7 @@ describe('connections:', function() {
             + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
             + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true'
             + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
-            + 'dc:ny,rack:1&readPreferenceTags=dc:sf';
+            + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true';
 
         var db = mongoose.createConnection(conn);
         db.on('error', function() {
@@ -425,6 +425,7 @@ describe('connections:', function() {
         assert.equal('nearest', db.options.db.readPreference);
         assert.deepEqual([{dc: 'ny', rack: 1}, {dc: 'sf'}], db.options.db.read_preference_tags);
         assert.equal(false, db.options.db.forceServerObjectId);
+        assert.strictEqual(db.options.server.sslValidate, true);
         done();
       });
       it('mixed with passed options', function(done) {

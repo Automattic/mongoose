@@ -117,7 +117,100 @@ describe('schema options.timestamps', function() {
       });
     });
 
+    it('should have createdAt and updatedAt fields as unix timestamps', function(done) {
+      var CatSchema = new Schema({
+        name: String
+      }, {
+        timestamps: {
+          fieldType: Number,
+          dateFunc: function () {
+            return Math.round(new Date().getTime()/1000); /* timestamp in seconds */
+          }
+        },
+      });
+
+      var conn = start();
+      var Cat = conn.model('Cat', CatSchema);
+
+      var newCat = new Cat({name: 'newcat'});
+      newCat.save(function (err) {
+        Cat.findById(newCat._id, function (err, doc) {
+          assert.ok(typeof(doc.createdAt) === 'number');
+          assert.ok(typeof(doc.updatedAt) === 'number');
+        });
+      });
+      
+      done();
+    });
+
+    it('should change updatedAt timestamp', function(done) {
+      var CatSchema = new Schema({
+        name: String
+      }, {
+        timestamps: {
+          fieldType: Number,
+          dateFunc: function () {
+            return Math.round(new Date().getTime()/1000); /* timestamp in seconds */
+          }
+        },
+      });
+
+      var conn = start();
+      var Cat = conn.model('Cat', CatSchema);
+
+      var newCat = new Cat({name: 'newcat'});
+      newCat.save(function (err) {
+        Cat.update({_id: newCat._id}, {name: 'newcat2'}, function (err, doc) {
+          /**
+           * Update returns unchanged document, so find it again.
+           */
+          setTimeout(function () {
+            Cat.findById(newCat._id, function (err, doc) {
+              assert.ok(doc.createdAt === newCat.createdAt);
+              assert.ok(doc.updatedAt >= newCat.updatedAt);
+              done();
+            });
+          }, 1000);
+        });
+      });
+    });
+
+    it('should not change createdAt if doc.save() is called more than once', function(done) {
+      var CatSchema = new Schema({
+        name: String
+      }, {
+        timestamps: {
+          fieldType: Number,
+          dateFunc: function () {
+            return Math.round(new Date().getTime()/1000); /* timestamp in seconds */
+          }
+        },
+      });
+
+      var conn = start();
+      var Cat = conn.model('Cat', CatSchema);
+
+      var newCat = new Cat({name: 'newcat'});
+      newCat.save(function (err) {
+        newCat.name = 'newcat2';
+        
+        newCat.save(function () {
+          setTimeout(function () {
+            Cat.findById(newCat._id, function (err, doc) {
+              assert.ok(doc.createdAt === newCat.createdAt);
+              assert.ok(doc.updatedAt >= newCat.updatedAt);
+              done();
+            });
+          }, 1000);
+
+          done();
+        });
+      });
+    });
+
+
     after(function(done) {
+      console.log('after');
       Cat.remove({}, function() {
         conn.close(done);
       });

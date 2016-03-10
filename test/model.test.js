@@ -4816,8 +4816,17 @@ describe('Model', function() {
   });
 
   describe('Skip setting default value for Geospatial-indexed fields (gh-1668)', function() {
+    var db;
+
+    before(function() {
+      db = start({ noErrorListener: true });
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('2dsphere indexed field with value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4841,14 +4850,12 @@ describe('Model', function() {
 
           assert.equal(personDoc.loc[0], loc[0]);
           assert.equal(personDoc.loc[1], loc[1]);
-          db.close();
           done();
         });
       });
     });
 
     it('2dsphere indexed field without value is saved (gh-1668)', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4870,14 +4877,12 @@ describe('Model', function() {
 
           assert.equal(personDoc.name, 'Jimmy Page');
           assert.equal(personDoc.loc, undefined);
-          db.close();
           done();
         });
       });
     });
 
     it('2dsphere indexed field in subdoc without value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: {type: String, required: true},
         nested: {
@@ -4906,14 +4911,12 @@ describe('Model', function() {
           assert.equal(personDoc.name, 'Jimmy Page');
           assert.equal(personDoc.nested.tag, 'guitarist');
           assert.equal(personDoc.nested.loc, undefined);
-          db.close();
           done();
         });
       });
     });
 
     it('Doc with 2dsphere indexed field without initial value can be updated', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4941,14 +4944,12 @@ describe('Model', function() {
 
           assert.equal(personDoc.loc[0], updates.$set.loc[0]);
           assert.equal(personDoc.loc[1], updates.$set.loc[1]);
-          db.close();
           done();
         });
       });
     });
 
     it('2dsphere indexed required field without value is rejected', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4966,13 +4967,11 @@ describe('Model', function() {
       p.save(function(err) {
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
-        db.close();
         done();
       });
     });
 
     it('2dsphere field without value but with schema default is saved', function(done) {
-      var db = start();
       var loc = [0, 1];
       var PersonSchema = new Schema({
         name: String,
@@ -4996,14 +4995,12 @@ describe('Model', function() {
 
           assert.equal(loc[0], personDoc.loc[0]);
           assert.equal(loc[1], personDoc.loc[1]);
-          db.close();
           done();
         });
       });
     });
 
     it('2d indexed field without value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -5024,14 +5021,12 @@ describe('Model', function() {
           assert.ifError(err);
 
           assert.equal(undefined, personDoc.loc);
-          db.close();
           done();
         });
       });
     });
 
     it('Compound index with 2dsphere field without value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         type: String,
@@ -5058,7 +5053,6 @@ describe('Model', function() {
 
           assert.equal('Jimmy Page', personDoc.name);
           assert.equal(undefined, personDoc.loc);
-          db.close();
           done();
         });
       });
@@ -5066,7 +5060,6 @@ describe('Model', function() {
 
 
     it('Compound index on field earlier declared with 2dsphere index is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         type: String,
@@ -5094,7 +5087,6 @@ describe('Model', function() {
 
           assert.equal('Jimmy Page', personDoc.name);
           assert.equal(undefined, personDoc.loc);
-          db.close();
           done();
         });
       });

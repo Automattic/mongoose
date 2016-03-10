@@ -2450,6 +2450,40 @@ describe('document', function() {
       });
     });
 
+    it('single nested subdoc isModified() (gh-3910)', function(done) {
+      var called = 0;
+
+      var ChildSchema = new Schema({
+        name: String
+      });
+
+      ChildSchema.pre('save', function(next) {
+        assert.ok(this.isModified('name'));
+        ++called;
+        next();
+      });
+
+      var ParentSchema = new Schema({
+        name: String,
+        child: ChildSchema
+      });
+
+      var Parent = db.model('gh3910', ParentSchema);
+
+      var p = new Parent({
+        name: 'Darth Vader',
+        child: {
+          name: 'Luke Skywalker'
+        }
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        assert.strictEqual(called, 1);
+        done();
+      });
+    });
+
     it('pre and post as schema keys (gh-3902)', function(done) {
       var schema = new mongoose.Schema({
         pre: String,

@@ -24,6 +24,11 @@ var files = [
     input: 'test/docs/schematypes.test.js',
     output: 'customschematypes.html',
     title: 'Custom Schema Types'
+  },
+  {
+    input: 'test/docs/validation.test.js',
+    output: 'validation.html',
+    title: 'Validation'
   }
 ];
 

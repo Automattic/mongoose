@@ -38,7 +38,8 @@ block content
             return /\d{3}-\d{3}-\d{4}/.test(v);
           },
           message: '{VALUE} is not a valid phone number!'
-        }
+        },
+        required: [true, 'User phone number required']
       }
     });
     
@@ -48,6 +49,10 @@ block content
 
     u.phone = '555.0123';
     // Prints "ValidationError: 555.0123 is not a valid phone number!"
+    console.log(u.validateSync().toString());
+
+    u.phone = '';
+    // Prints "ValidationError: User phone number required"
     console.log(u.validateSync().toString());
 
     u.phone = '201-555-0123';

@@ -5101,15 +5101,51 @@ describe('Model', function() {
     });
   });
 
-  describe('gh-1920', function() {
+  it('save max bson size error with buffering (gh-3906)', function(done) {
+    this.timeout(10000);
+    var db = start({ noErrorListener: true });
+    var Test = db.model('gh3906_0', { name: Object });
 
+    var test = new Test({
+      name: {
+        data: (new Array(16 * 1024 * 1024)).join('x')
+      }
+    });
+
+    test.save(function(error) {
+      assert.ok(error);
+      assert.equal(error.toString(),
+        'MongoError: document is larger than the maximum size 16777216');
+      db.close(done);
+    });
+  });
+
+  it('reports max bson size error in save (gh-3906)', function(done) {
+    this.timeout(10000);
+    var db = start({ noErrorListener: true });
+    var Test = db.model('gh3906', { name: Object });
+
+    var test = new Test({
+      name: {
+        data: (new Array(16 * 1024 * 1024)).join('x')
+      }
+    });
+
+    db.on('connected', function() {
+      test.save(function(error) {
+        assert.ok(error);
+        assert.equal(error.toString(),
+          'MongoError: document is larger than the maximum size 16777216');
+        db.close(done);
+      });
+    });
   });
 
   describe('bug fixes', function() {
     var db;
 
     before(function() {
-      db = start();
+      db = start({ noErrorListener: true });
     });
 
     after(function(done) {

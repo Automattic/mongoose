@@ -5102,9 +5102,21 @@ describe('Model', function() {
   });
 
   describe('gh-1920', function() {
-    it('doesnt crash', function(done) {
-      var db = start();
 
+  });
+
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('doesnt crash (gh-1920)', function(done) {
       var parentSchema = new Schema({
         children: [new Schema({
           name: String
@@ -5120,16 +5132,12 @@ describe('Model', function() {
         parent.children.push({name: 'another child'});
         Parent.findByIdAndUpdate(it._id, {$set: {children: parent.children}}, function(err) {
           assert.ifError(err);
-          db.close(done);
+          done();
         });
       });
     });
-  });
 
-  describe('save failure', function() {
     it('doesnt reset "modified" status for fields', function(done) {
-      var db = start();
-
       var UniqueSchema = new Schema({
         changer: String,
         unique: {
@@ -5163,35 +5171,30 @@ describe('Model', function() {
             u2.save(function(err) {
               assert.ok(err);
               assert.ok(u2.isModified('changer'));
-              db.close(done);
+              done();
             });
           });
         });
       });
     });
-  });
 
-  it('insertMany() (gh-723)', function(done) {
-    var db = start();
-    var schema = new Schema({name: String});
-    var Movie = db.model('gh723', schema);
+    it('insertMany() (gh-723)', function(done) {
+      var schema = new Schema({name: String});
+      var Movie = db.model('gh723', schema);
 
-    var arr = [{name: 'Star Wars'}, {name: 'The Empire Strikes Back'}];
-    Movie.insertMany(arr, function(error, docs) {
-      assert.ifError(error);
-      assert.equal(docs.length, 2);
-      Movie.find({}, function(error, docs) {
+      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
-        done();
+        Movie.find({}, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 2);
+          done();
+        });
       });
     });
-  });
 
-  describe('gh-2442', function() {
-    it('marks array as modified when initializing non-array from db', function(done) {
-      var db = start();
-
+    it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed
       }, {minimize: false});
@@ -5226,7 +5229,7 @@ describe('Model', function() {
               assert.ok(!doc.isModified('array'));
               assert.deepEqual(doc.array[0].value, 1);
               assert.equal('[{"value":1}]', JSON.stringify(doc.array));
-              db.close(done);
+              done();
             });
           });
         });

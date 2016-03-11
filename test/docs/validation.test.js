@@ -255,7 +255,6 @@ describe('validation docs', function() {
         // update validators
         assert.ok(error);
         // acquit:ignore:start
-        assert.ok(error.toString().indexOf('TypeError: Cannot read') !== -1);
         done();
         // acquit:ignore:end
       });

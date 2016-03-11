@@ -1,3 +1,18 @@
+4.4.7 / 2016-03-11
+==================
+ * fix(query): stop infinite recursion caused by merging a mongoose buffer #3961
+ * fix(populate): handle deep populate array -> array #3954
+ * fix(schema): allow setting timestamps with .set() #3952 #3951 #3907 [Fonger](https://github.com/Fonger)
+ * fix: MongooseThenable doesn't overwrite constructors #3940
+ * fix(schema): don't cast boolean to date #3935
+ * fix(drivers): support sslValidate in connection string #3929
+ * fix(types): correct markModified() for single nested subdocs #3910
+ * fix(drivers): catch and report any errors that occur in driver methods #3906
+ * fix(populate): get subpopulate model correctly when array under nested #3904
+ * fix(document): allow fields named 'pre' and 'post' #3902
+ * docs(query): clarify runValidators and setDefaultsOnInsert options #3892
+ * docs(validation): show how to use custom required messages in schema #2616
+
 4.4.6 / 2016-03-02
 ==================
  * fix: upgrade mongodb driver to 2.1.7 #3938

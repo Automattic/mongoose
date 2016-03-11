@@ -1,4 +1,3 @@
-Error.stackTraceLimit = Infinity;
 /**
  * Test dependencies.
  */

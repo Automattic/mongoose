@@ -1799,5 +1799,26 @@ describe('model: update:', function() {
         done();
       });
     });
+
+    it('$set with buffer (gh-3961)', function(done) {
+      var schema = {
+        name: Buffer
+      };
+
+      var Model = db.model('gh3961', schema);
+
+      var value = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+      var instance = new Model({ name: null });
+
+      instance.save(function(error) {
+        assert.ifError(error);
+        var query = { _id: instance._id };
+        var update = { $set: { name: value } };
+        var ok = function() {
+          done();
+        };
+        Model.update(query, update).then(ok, done);
+      });
+    });
   });
 });

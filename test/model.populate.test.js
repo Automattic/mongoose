@@ -2,6 +2,7 @@
  * Test dependencies.
  */
 
+var _ = require('lodash');
 var start = require('./common');
 var assert = require('power-assert');
 var mongoose = start.mongoose;
@@ -3276,6 +3277,142 @@ describe('model: populate:', function() {
           assert.ifError(error);
           assert.equal(results.length, 2);
           assert.equal(results[0].postedBy.name, 'val');
+          done();
+        });
+      }
+    });
+
+    it('deep populate single -> array (gh-3904)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+
+      var teamSchema = new Schema({
+        name: { type: String },
+        members: [{ type: Schema.Types.ObjectId, ref: 'gh3904' }]
+      });
+
+      var gameSchema = new Schema({
+        team: { type: Schema.Types.ObjectId, ref: 'gh3904_0' },
+        opponent: { type: Schema.Types.ObjectId, ref: 'gh3904_0' }
+      });
+
+      var Person = db.model('gh3904', personSchema);
+      var Team = db.model('gh3904_0', teamSchema);
+      var Game = db.model('gh3904_1', gameSchema);
+
+      var people = [
+        { name: 'Shaq' },
+        { name: 'Kobe' },
+        { name: 'Horry' },
+        { name: 'Duncan' },
+        { name: 'Robinson' },
+        { name: 'Johnson' }
+      ];
+
+      Person.create(people, function(error, people) {
+        assert.ifError(error);
+        var lakers = {
+          name: 'Lakers',
+          members: [people[0]._id, people[1]._id, people[2]._id]
+        };
+        var spurs = {
+          name: 'Spurs',
+          members: [people[3]._id, people[4]._id, people[5]._id]
+        };
+        var teams = [lakers, spurs];
+        Team.create(teams, function(error, teams) {
+          assert.ifError(error);
+          var game = { team: teams[0]._id, opponent: teams[1]._id };
+          Game.create(game, function(error, game) {
+            assert.ifError(error);
+            test(game._id);
+          });
+        });
+      });
+
+      function test(id) {
+        var query = Game.findById(id).populate({
+          path: 'team',
+          select: 'name members',
+          populate: { path: 'members', select: 'name' }
+        });
+        query.exec(function(error, doc) {
+          assert.ifError(error);
+          var arr = _.map(doc.toObject().team.members, function(v) {
+            return v.name;
+          });
+          assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
+          done();
+        });
+      }
+    });
+
+    it('deep populate array -> array (gh-3954)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+
+      var teamSchema = new Schema({
+        name: { type: String },
+        members: [{ type: Schema.Types.ObjectId, ref: 'gh3954' }]
+      });
+
+      var gameSchema = new Schema({
+        teams: [{ type: Schema.Types.ObjectId, ref: 'gh3954_0' }]
+      });
+
+      var Person = db.model('gh3954', personSchema);
+      var Team = db.model('gh3954_0', teamSchema);
+      var Game = db.model('gh3954_1', gameSchema);
+
+      var people = [
+        { name: 'Shaq' },
+        { name: 'Kobe' },
+        { name: 'Horry' },
+        { name: 'Duncan' },
+        { name: 'Robinson' },
+        { name: 'Johnson' }
+      ];
+
+      Person.create(people, function(error, people) {
+        assert.ifError(error);
+        var lakers = {
+          name: 'Lakers',
+          members: [people[0]._id, people[1]._id, people[2]._id]
+        };
+        var spurs = {
+          name: 'Spurs',
+          members: [people[3]._id, people[4]._id, people[5]._id]
+        };
+        var teams = [lakers, spurs];
+        Team.create(teams, function(error, teams) {
+          assert.ifError(error);
+          var game = {
+            teams: [teams[0]._id, teams[1]._id]
+          };
+          Game.create(game, function(error, game) {
+            assert.ifError(error);
+            test(game._id);
+          });
+        });
+      });
+
+      function test(id) {
+        var query = Game.findById(id).populate({
+          path: 'teams',
+          select: 'name members',
+          populate: { path: 'members', select: 'name' }
+        });
+        query.exec(function(error, doc) {
+          assert.ifError(error);
+          var players = doc.toObject().teams[0].members.
+            concat(doc.toObject().teams[1].members);
+          var arr = _.map(players, function(v) {
+            return v.name;
+          });
+          assert.deepEqual(arr,
+            ['Shaq', 'Kobe', 'Horry', 'Duncan', 'Robinson', 'Johnson']);
           done();
         });
       }

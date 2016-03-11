@@ -837,7 +837,11 @@ Document.prototype.$__storeShard = function() {
  */
 
 for (var k in hooks) {
-  Document.prototype[k] = Document[k] = hooks[k];
+  if (k === 'pre' || k === 'post') {
+    Document.prototype['$' + k] = Document['$' + k] = hooks[k];
+  } else {
+    Document.prototype[k] = Document[k] = hooks[k];
+  }
 }
 
 /**
@@ -2209,12 +2213,12 @@ Document.prototype.$__registerHooksFromSchema = function() {
   if (toWrap.init && _this instanceof Embedded) {
     if (toWrap.init.pre) {
       toWrap.init.pre.forEach(function(args) {
-        _this.pre.apply(_this, args);
+        _this.$pre.apply(_this, args);
       });
     }
     if (toWrap.init.post) {
       toWrap.init.post.forEach(function(args) {
-        _this.post.apply(_this, args);
+        _this.$post.apply(_this, args);
       });
     }
     delete toWrap.init;
@@ -2222,12 +2226,12 @@ Document.prototype.$__registerHooksFromSchema = function() {
     // Set hooks also need to be sync re: gh-3479
     if (toWrap.set.pre) {
       toWrap.set.pre.forEach(function(args) {
-        _this.pre.apply(_this, args);
+        _this.$pre.apply(_this, args);
       });
     }
     if (toWrap.set.post) {
       toWrap.set.post.forEach(function(args) {
-        _this.post.apply(_this, args);
+        _this.$post.apply(_this, args);
       });
     }
     delete toWrap.set;
@@ -2269,11 +2273,11 @@ Document.prototype.$__registerHooksFromSchema = function() {
 
     toWrap[pointCut].pre.forEach(function(args) {
       args[0] = newName;
-      _this.pre.apply(_this, args);
+      _this.$pre.apply(_this, args);
     });
     toWrap[pointCut].post.forEach(function(args) {
       args[0] = newName;
-      _this.post.apply(_this, args);
+      _this.$post.apply(_this, args);
     });
   });
   return _this;
@@ -3952,51 +3956,8 @@ function Schema(obj, options) {
     this[m.kind](m.hook, !!m.isAsync, m.fn);
   }
 
-  // adds updatedAt and createdAt timestamps to documents if enabled
-  var timestamps = this.options.timestamps;
-  if (timestamps) {
-    var createdAt = timestamps.createdAt || 'createdAt',
-        updatedAt = timestamps.updatedAt || 'updatedAt',
-        schemaAdditions = {};
-
-    schemaAdditions[updatedAt] = Date;
-
-    if (!this.paths[createdAt]) {
-      schemaAdditions[createdAt] = Date;
-    }
-
-    this.add(schemaAdditions);
-
-    this.pre('save', function(next) {
-      var defaultTimestamp = new Date();
-
-      if (!this[createdAt]) {
-        this[createdAt] = auto_id ? this._id.getTimestamp() : defaultTimestamp;
-      }
-
-      this[updatedAt] = this.isNew ? this[createdAt] : defaultTimestamp;
-
-      next();
-    });
-
-    var genUpdates = function() {
-      var now = new Date();
-      var updates = {$set: {}, $setOnInsert: {}};
-      updates.$set[updatedAt] = now;
-      updates.$setOnInsert[createdAt] = now;
-
-      return updates;
-    };
-
-    this.pre('findOneAndUpdate', function(next) {
-      this.findOneAndUpdate({}, genUpdates());
-      next();
-    });
-
-    this.pre('update', function(next) {
-      this.update({}, genUpdates());
-      next();
-    });
+  if (this.options.timestamps) {
+    this.setupTimestamp(this.options.timestamps);
   }
 }
 
@@ -4555,6 +4516,60 @@ Schema.prototype.hasMixedParent = function(path) {
   return false;
 };
 
+/**
+ * Setup updatedAt and createdAt timestamps to documents if enabled
+ *
+ * @param {Boolean|Object} timestamps timestamps options
+ * @api private
+ */
+Schema.prototype.setupTimestamp = function(timestamps) {
+  if (timestamps) {
+    var createdAt = timestamps.createdAt || 'createdAt',
+        updatedAt = timestamps.updatedAt || 'updatedAt',
+        schemaAdditions = {};
+
+    schemaAdditions[updatedAt] = Date;
+
+    if (!this.paths[createdAt]) {
+      schemaAdditions[createdAt] = Date;
+    }
+
+    this.add(schemaAdditions);
+
+    this.pre('save', function(next) {
+      var defaultTimestamp = new Date();
+      var auto_id = this._id && this._id.auto;
+
+      if (!this[createdAt]) {
+        this[createdAt] = auto_id ? this._id.getTimestamp() : defaultTimestamp;
+      }
+
+      this[updatedAt] = this.isNew ? this[createdAt] : defaultTimestamp;
+
+      next();
+    });
+
+    var genUpdates = function() {
+      var now = new Date();
+      var updates = {$set: {}, $setOnInsert: {}};
+      updates.$set[updatedAt] = now;
+      updates.$setOnInsert[createdAt] = now;
+
+      return updates;
+    };
+
+    this.pre('findOneAndUpdate', function(next) {
+      this.findOneAndUpdate({}, genUpdates());
+      next();
+    });
+
+    this.pre('update', function(next) {
+      this.update({}, genUpdates());
+      next();
+    });
+  }
+};
+
 /*!
  * ignore
  */
@@ -4857,6 +4872,10 @@ Schema.prototype.set = function(key, value, _tags) {
       this.options[key] = value === false
           ? {w: 0}
           : value;
+      break;
+    case 'timestamps':
+      this.setupTimestamp(value);
+      this.options[key] = value;
       break;
     default:
       this.options[key] = value;
@@ -6135,6 +6154,10 @@ SchemaDate.prototype.cast = function(value) {
   }
 
   var date;
+
+  if (typeof value === 'boolean') {
+    throw new CastError('date', value, this.path);
+  }
 
   if (value instanceof Number || typeof value === 'number'
       || String(value) == Number(value)) {
@@ -10592,6 +10615,7 @@ Subdocument.prototype.$isValid = function(path) {
 };
 
 Subdocument.prototype.markModified = function(path) {
+  Document.prototype.markModified.call(this, path);
   if (this.$parent) {
     this.$parent.markModified([this.$basePath, path].join('.'));
   }
@@ -11473,12 +11497,12 @@ exports.decorate = function(destination, source) {
  * merges to with a copy of from
  *
  * @param {Object} to
- * @param {Object} from
+ * @param {Object} fromObj
  * @api private
  */
 
-exports.mergeClone = function(to, from) {
-  var keys = Object.keys(from),
+exports.mergeClone = function(to, fromObj) {
+  var keys = Object.keys(fromObj),
       i = keys.length,
       key;
 
@@ -11487,18 +11511,18 @@ exports.mergeClone = function(to, from) {
     if (typeof to[key] === 'undefined') {
       // make sure to retain key order here because of a bug handling the $each
       // operator in mongodb 2.4.4
-      to[key] = exports.clone(from[key], {retainKeyOrder: 1});
+      to[key] = exports.clone(fromObj[key], {retainKeyOrder: 1});
     } else {
-      if (exports.isObject(from[key])) {
-        var obj = from[key];
-        if (isMongooseObject(from[key])) {
+      if (exports.isObject(fromObj[key])) {
+        var obj = fromObj[key];
+        if (isMongooseObject(fromObj[key]) && !fromObj[key].isMongooseBuffer) {
           obj = obj.toObject({ virtuals: false });
         }
         exports.mergeClone(to[key], obj);
       } else {
         // make sure to retain key order here because of a bug handling the
         // $each operator in mongodb 2.4.4
-        to[key] = exports.clone(from[key], {retainKeyOrder: 1});
+        to[key] = exports.clone(fromObj[key], {retainKeyOrder: 1});
       }
     }
   }

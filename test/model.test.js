@@ -1,4 +1,3 @@
-Error.stackTraceLimit = Infinity;
 /**
  * Test dependencies.
  */
@@ -4816,8 +4815,17 @@ describe('Model', function() {
   });
 
   describe('Skip setting default value for Geospatial-indexed fields (gh-1668)', function() {
+    var db;
+
+    before(function() {
+      db = start({ noErrorListener: true });
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('2dsphere indexed field with value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4841,14 +4849,12 @@ describe('Model', function() {
 
           assert.equal(personDoc.loc[0], loc[0]);
           assert.equal(personDoc.loc[1], loc[1]);
-          db.close();
           done();
         });
       });
     });
 
     it('2dsphere indexed field without value is saved (gh-1668)', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4870,14 +4876,12 @@ describe('Model', function() {
 
           assert.equal(personDoc.name, 'Jimmy Page');
           assert.equal(personDoc.loc, undefined);
-          db.close();
           done();
         });
       });
     });
 
     it('2dsphere indexed field in subdoc without value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: {type: String, required: true},
         nested: {
@@ -4906,14 +4910,12 @@ describe('Model', function() {
           assert.equal(personDoc.name, 'Jimmy Page');
           assert.equal(personDoc.nested.tag, 'guitarist');
           assert.equal(personDoc.nested.loc, undefined);
-          db.close();
           done();
         });
       });
     });
 
     it('Doc with 2dsphere indexed field without initial value can be updated', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4941,14 +4943,12 @@ describe('Model', function() {
 
           assert.equal(personDoc.loc[0], updates.$set.loc[0]);
           assert.equal(personDoc.loc[1], updates.$set.loc[1]);
-          db.close();
           done();
         });
       });
     });
 
     it('2dsphere indexed required field without value is rejected', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -4966,13 +4966,11 @@ describe('Model', function() {
       p.save(function(err) {
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
-        db.close();
         done();
       });
     });
 
     it('2dsphere field without value but with schema default is saved', function(done) {
-      var db = start();
       var loc = [0, 1];
       var PersonSchema = new Schema({
         name: String,
@@ -4996,14 +4994,12 @@ describe('Model', function() {
 
           assert.equal(loc[0], personDoc.loc[0]);
           assert.equal(loc[1], personDoc.loc[1]);
-          db.close();
           done();
         });
       });
     });
 
     it('2d indexed field without value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         loc: {
@@ -5024,14 +5020,12 @@ describe('Model', function() {
           assert.ifError(err);
 
           assert.equal(undefined, personDoc.loc);
-          db.close();
           done();
         });
       });
     });
 
     it('Compound index with 2dsphere field without value is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         type: String,
@@ -5058,7 +5052,6 @@ describe('Model', function() {
 
           assert.equal('Jimmy Page', personDoc.name);
           assert.equal(undefined, personDoc.loc);
-          db.close();
           done();
         });
       });
@@ -5066,7 +5059,6 @@ describe('Model', function() {
 
 
     it('Compound index on field earlier declared with 2dsphere index is saved', function(done) {
-      var db = start();
       var PersonSchema = new Schema({
         name: String,
         type: String,
@@ -5094,17 +5086,64 @@ describe('Model', function() {
 
           assert.equal('Jimmy Page', personDoc.name);
           assert.equal(undefined, personDoc.loc);
-          db.close();
           done();
         });
       });
     });
   });
 
-  describe('gh-1920', function() {
-    it('doesnt crash', function(done) {
-      var db = start();
+  it('save max bson size error with buffering (gh-3906)', function(done) {
+    this.timeout(10000);
+    var db = start({ noErrorListener: true });
+    var Test = db.model('gh3906_0', { name: Object });
 
+    var test = new Test({
+      name: {
+        data: (new Array(16 * 1024 * 1024)).join('x')
+      }
+    });
+
+    test.save(function(error) {
+      assert.ok(error);
+      assert.equal(error.toString(),
+        'MongoError: document is larger than the maximum size 16777216');
+      db.close(done);
+    });
+  });
+
+  it('reports max bson size error in save (gh-3906)', function(done) {
+    this.timeout(10000);
+    var db = start({ noErrorListener: true });
+    var Test = db.model('gh3906', { name: Object });
+
+    var test = new Test({
+      name: {
+        data: (new Array(16 * 1024 * 1024)).join('x')
+      }
+    });
+
+    db.on('connected', function() {
+      test.save(function(error) {
+        assert.ok(error);
+        assert.equal(error.toString(),
+          'MongoError: document is larger than the maximum size 16777216');
+        db.close(done);
+      });
+    });
+  });
+
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start({ noErrorListener: true });
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('doesnt crash (gh-1920)', function(done) {
       var parentSchema = new Schema({
         children: [new Schema({
           name: String
@@ -5120,16 +5159,12 @@ describe('Model', function() {
         parent.children.push({name: 'another child'});
         Parent.findByIdAndUpdate(it._id, {$set: {children: parent.children}}, function(err) {
           assert.ifError(err);
-          db.close(done);
+          done();
         });
       });
     });
-  });
 
-  describe('save failure', function() {
     it('doesnt reset "modified" status for fields', function(done) {
-      var db = start();
-
       var UniqueSchema = new Schema({
         changer: String,
         unique: {
@@ -5163,35 +5198,30 @@ describe('Model', function() {
             u2.save(function(err) {
               assert.ok(err);
               assert.ok(u2.isModified('changer'));
-              db.close(done);
+              done();
             });
           });
         });
       });
     });
-  });
 
-  it('insertMany() (gh-723)', function(done) {
-    var db = start();
-    var schema = new Schema({name: String});
-    var Movie = db.model('gh723', schema);
+    it('insertMany() (gh-723)', function(done) {
+      var schema = new Schema({name: String});
+      var Movie = db.model('gh723', schema);
 
-    var arr = [{name: 'Star Wars'}, {name: 'The Empire Strikes Back'}];
-    Movie.insertMany(arr, function(error, docs) {
-      assert.ifError(error);
-      assert.equal(docs.length, 2);
-      Movie.find({}, function(error, docs) {
+      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
-        done();
+        Movie.find({}, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 2);
+          done();
+        });
       });
     });
-  });
 
-  describe('gh-2442', function() {
-    it('marks array as modified when initializing non-array from db', function(done) {
-      var db = start();
-
+    it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed
       }, {minimize: false});
@@ -5226,7 +5256,7 @@ describe('Model', function() {
               assert.ok(!doc.isModified('array'));
               assert.deepEqual(doc.array[0].value, 1);
               assert.equal('[{"value":1}]', JSON.stringify(doc.array));
-              db.close(done);
+              done();
             });
           });
         });

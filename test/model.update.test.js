@@ -1554,18 +1554,7 @@ describe('model: update:', function() {
     });
   });
 
-  it('can $rename (gh-1845)', function(done) {
-    var db = start();
-    var schema = new Schema({foo: Date, bar: Date});
-    var Model = db.model('gh1845', schema, 'gh1845');
-
-    Model.update({}, {$rename: {foo: 'bar'}}, function(error) {
-      assert.ifError(error);
-      db.close(done);
-    });
-  });
-
-  describe('deep casting', function() {
+  describe('bug fixes', function() {
     var db;
 
     before(function() {
@@ -1574,6 +1563,16 @@ describe('model: update:', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('can $rename (gh-1845)', function(done) {
+      var schema = new Schema({foo: Date, bar: Date});
+      var Model = db.model('gh1845', schema, 'gh1845');
+
+      Model.update({}, {$rename: {foo: 'bar'}}, function(error) {
+        assert.ifError(error);
+        done();
+      });
     });
 
     it('allows objects with positional operator (gh-3185)', function(done) {
@@ -1660,158 +1659,166 @@ describe('model: update:', function() {
         });
       });
     });
-  });
 
-  it('works with buffers (gh-3496)', function(done) {
-    var db = start();
+    it('works with buffers (gh-3496)', function(done) {
+      var Schema = mongoose.Schema({myBufferField: Buffer});
+      var Model = db.model('gh3496', Schema);
 
-    var Schema = mongoose.Schema({myBufferField: Buffer});
-    var Model = db.model('gh3496', Schema);
-
-    Model.update({}, {myBufferField: new Buffer(1)}, function(error) {
-      assert.ifError(error);
-      db.close(done);
-    });
-  });
-
-  it('dontThrowCastError option (gh-3512)', function(done) {
-    var db = start();
-
-    var Schema = mongoose.Schema({name: String});
-    var Model = db.model('gh3412', Schema);
-
-    var badQuery = {_id: 'foo'};
-    var update = {name: 'test'};
-    var options = {dontThrowCastError: true};
-    Model.update(badQuery, update, options).then(null, function(error) {
-      assert.ok(error);
-      db.close(done);
-    });
-  });
-
-  it('.update(doc) (gh-3221)', function(done) {
-    var db = start();
-
-    var Schema = mongoose.Schema({name: String});
-    var Model = db.model('gh3412', Schema);
-
-    var query = Model.update({name: 'Val'});
-    assert.equal(query.getUpdate().$set.name, 'Val');
-
-    query = Model.find().update({name: 'Val'});
-    assert.equal(query.getUpdate().$set.name, 'Val');
-
-    db.close(done);
-  });
-
-  it('nested schemas with strict false (gh-3883)', function(done) {
-    var db = start();
-    var OrderSchema = new mongoose.Schema({
-    }, { strict: false, _id: false });
-
-    var SeasonSchema = new mongoose.Schema({
-      regions: [OrderSchema]
-    }, { useNestedStrict: true });
-
-    var Season = db.model('gh3883', SeasonSchema);
-    var obj = { regions: [{ r: 'test', action: { order: 'hold' } }] };
-    Season.create(obj, function(error) {
-      assert.ifError(error);
-      var query = { 'regions.r': 'test' };
-      var update = { $set: { 'regions.$.action': { order: 'move' } } };
-      var opts = { 'new': true };
-      Season.findOneAndUpdate(query, update, opts, function(error, doc) {
+      Model.update({}, {myBufferField: new Buffer(1)}, function(error) {
         assert.ifError(error);
-        assert.equal(doc.toObject().regions[0].action.order, 'move');
         done();
       });
     });
-  });
 
-  it('middleware update with exec (gh-3549)', function(done) {
-    var db = start();
+    it('dontThrowCastError option (gh-3512)', function(done) {
+      var Schema = mongoose.Schema({name: String});
+      var Model = db.model('gh3412', Schema);
 
-    var Schema = mongoose.Schema({name: String});
-
-    Schema.pre('update', function(next) {
-      this.update({name: 'Val'});
-      next();
+      var badQuery = {_id: 'foo'};
+      var update = {name: 'test'};
+      var options = {dontThrowCastError: true};
+      Model.update(badQuery, update, options).then(null, function(error) {
+        assert.ok(error);
+        done();
+      });
     });
 
-    var Model = db.model('gh3549', Schema);
+    it('.update(doc) (gh-3221)', function(done) {
+      var Schema = mongoose.Schema({name: String});
+      var Model = db.model('gh3221', Schema);
 
-    Model.create({}, function(error, doc) {
-      assert.ifError(error);
-      Model.update({_id: doc._id}, {name: 'test'}).exec(function(error) {
+      var query = Model.update({name: 'Val'});
+      assert.equal(query.getUpdate().$set.name, 'Val');
+
+      query = Model.find().update({name: 'Val'});
+      assert.equal(query.getUpdate().$set.name, 'Val');
+
+      done();
+    });
+
+    it('nested schemas with strict false (gh-3883)', function(done) {
+      var OrderSchema = new mongoose.Schema({
+      }, { strict: false, _id: false });
+
+      var SeasonSchema = new mongoose.Schema({
+        regions: [OrderSchema]
+      }, { useNestedStrict: true });
+
+      var Season = db.model('gh3883', SeasonSchema);
+      var obj = { regions: [{ r: 'test', action: { order: 'hold' } }] };
+      Season.create(obj, function(error) {
         assert.ifError(error);
-        Model.findOne({_id: doc._id}, function(error, doc) {
+        var query = { 'regions.r': 'test' };
+        var update = { $set: { 'regions.$.action': { order: 'move' } } };
+        var opts = { 'new': true };
+        Season.findOneAndUpdate(query, update, opts, function(error, doc) {
           assert.ifError(error);
-          assert.equal(doc.name, 'Val');
-          db.close(done);
+          assert.equal(doc.toObject().regions[0].action.order, 'move');
+          done();
         });
       });
     });
-  });
 
-  it('casting $push with overwrite (gh-3564)', function(done) {
-    var db = start();
+    it('middleware update with exec (gh-3549)', function(done) {
+      var Schema = mongoose.Schema({name: String});
 
-    var schema = mongoose.Schema({
-      topicId: Number,
-      name: String,
-      followers: [Number]
+      Schema.pre('update', function(next) {
+        this.update({name: 'Val'});
+        next();
+      });
+
+      var Model = db.model('gh3549', Schema);
+
+      Model.create({}, function(error, doc) {
+        assert.ifError(error);
+        Model.update({_id: doc._id}, {name: 'test'}).exec(function(error) {
+          assert.ifError(error);
+          Model.findOne({_id: doc._id}, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.name, 'Val');
+            done();
+          });
+        });
+      });
     });
 
-    var doc = {
-      topicId: 100,
-      name: 'name',
-      followers: [500]
-    };
+    it('casting $push with overwrite (gh-3564)', function(done) {
+      var schema = mongoose.Schema({
+        topicId: Number,
+        name: String,
+        followers: [Number]
+      });
 
-    var M = db.model('gh-3564', schema);
+      var doc = {
+        topicId: 100,
+        name: 'name',
+        followers: [500]
+      };
 
-    M.create(doc, function(err) {
-      assert.ifError(err);
+      var M = db.model('gh-3564', schema);
 
-      var update = {$push: {followers: 200}};
-      var opts = {overwrite: true, new: true, safe: true, upsert: false, multi: false};
-
-      M.update({topicId: doc.topicId}, update, opts, function(err) {
+      M.create(doc, function(err) {
         assert.ifError(err);
-        M.findOne({topicId: doc.topicId}, function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.name, 'name');
-          assert.deepEqual(doc.followers.toObject(), [500, 200]);
-          db.close(done);
+
+        var update = {$push: {followers: 200}};
+        var opts = {overwrite: true, new: true, safe: true, upsert: false, multi: false};
+
+        M.update({topicId: doc.topicId}, update, opts, function(err) {
+          assert.ifError(err);
+          M.findOne({topicId: doc.topicId}, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.name, 'name');
+            assert.deepEqual(doc.followers.toObject(), [500, 200]);
+            done();
+          });
         });
       });
     });
-  });
 
-  it('$push with buffer doesnt throw error (gh-3890)', function(done) {
-    var db = start();
+    it('$push with buffer doesnt throw error (gh-3890)', function(done) {
+      var InfoSchema = new Schema({
+        prop: { type: Buffer }
+      });
 
-    var InfoSchema = new Schema({
-      prop: { type: Buffer }
+      var ModelASchema = new Schema({
+        infoList: { type: [InfoSchema] }
+      });
+
+      var ModelA = db.model('gh3890', ModelASchema);
+
+      var propValue = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+
+      var update = {
+        $push: {
+          info_list: { prop: propValue }
+        }
+      };
+
+      ModelA.update({}, update, function(error) {
+        assert.ifError(error);
+        done();
+      });
     });
 
-    var ModelASchema = new Schema({
-      infoList: { type: [InfoSchema] }
-    });
+    it('$set with buffer (gh-3961)', function(done) {
+      var schema = {
+        name: Buffer
+      };
 
-    var ModelA = db.model('gh3890', ModelASchema);
+      var Model = db.model('gh3961', schema);
 
-    var propValue = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+      var value = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+      var instance = new Model({ name: null });
 
-    var update = {
-      $push: {
-        info_list: { prop: propValue }
-      }
-    };
-
-    ModelA.update({}, update, function(error) {
-      assert.ifError(error);
-      db.close(done);
+      instance.save(function(error) {
+        assert.ifError(error);
+        var query = { _id: instance._id };
+        var update = { $set: { name: value } };
+        var ok = function() {
+          done();
+        };
+        Model.update(query, update).then(ok, done);
+      });
     });
   });
 });

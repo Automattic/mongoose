@@ -249,13 +249,13 @@ describe('validation docs', function() {
       var opts = { runValidators: true };
 
       Toy.update({}, update, opts, function(error) {
-        // The update validator throws an error, because `this`
-        // is **not** the document in the validator when using
+        // The update validator throws an error:
+        // "TypeError: Cannot read property 'toLowerCase' of undefined",
+        // because `this` is **not** the document being updated when using
         // update validators
         assert.ok(error);
-        assert.equal(error.toString(),
-          "TypeError: Cannot read property 'toLowerCase' of undefined");
         // acquit:ignore:start
+        assert.ok(error.toString().indexOf('TypeError: Cannot read') !== -1);
         done();
         // acquit:ignore:end
       });

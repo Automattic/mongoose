@@ -3417,5 +3417,72 @@ describe('model: populate:', function() {
         });
       }
     });
+
+    it('does not assign null under array (gh-3937)', function(done) {
+      this.skip();
+      var personSchema = new mongoose.Schema({
+        name: String
+      });
+
+      var saleSchema = new mongoose.Schema({
+        amount: Number,
+        person: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh3937'
+        }
+      });
+
+      var companySchema = new mongoose.Schema({
+        name: String,
+        description: String,
+        sales: [saleSchema]
+      });
+
+      var Person = db.model('gh3937', personSchema);
+      var Company = db.model('gh3937_0', companySchema);
+      var Sale = db.model('gh3937_1', saleSchema);
+
+      var acmeCorp = new Company({
+        name: 'ACME Corp'
+      });
+      var person1 = new Person({
+        name: 'John'
+      });
+      var person2 = new Person({
+        name: 'Phantom InMemory'
+      });
+      var sale1 = new Sale({
+        amount: 100,
+        person: person1
+      });
+      var sale2 = new Sale({
+        amount: 200,
+        person: person2.id
+      });
+
+      acmeCorp.sales = [sale1, sale2];
+
+      Company.create(acmeCorp, function(error, company) {
+        assert.ifError(error);
+        Sale.create([sale1, sale2], function(error) {
+          assert.ifError(error);
+          Person.create(person1, function(error) {
+            assert.ifError(error);
+            test(company._id);
+          });
+        });
+      });
+
+      function test(id) {
+        var path = 'sales.person';
+        Company.findById(id).populate(path).exec(function(error, company) {
+          assert.ifError(error);
+          assert.strictEqual(company.sales[1].person, undefined);
+          assert.deepEqual(Object.keys(company.toObject().sales[1]),
+            ['_id', 'amount']);
+          done();
+        });
+      }
+    });
   });
 });

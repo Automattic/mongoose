@@ -73,11 +73,10 @@ describe('model aggregate', function() {
       });
     });
 
-    it('should return promise', function(done) {
+    it('when return promise', function(done) {
       this.timeout(4000);
 
-      A.aggregate(group, project).then( function(err, res) {
-        assert.ifError(err);
+      A.aggregate(group, project).then( function(res) {
         assert.ok(res);
         assert.equal(1, res.length);
         assert.ok('maxAge' in res[0]);

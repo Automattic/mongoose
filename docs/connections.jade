@@ -52,6 +52,14 @@ block content
     The db option `forceServerObjectId` is set to false which _cannot_ be overridden.
 
     See the [driver](https://github.com/mongodb/node-mongodb-native) for more information about available options.
+  :markdown
+    **Note:**
+    If `auto_reconnect` is on, mongoose will give up trying to reconnect after a certain number of failures. Set the [`server.reconnectTries` and `server.reconnectInterval` options](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html) to increase the number of times mongoose will try to reconnect.
+  :js
+    // Good way to make sure mongoose never stops trying to reconnect
+    mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
+     
+
 
   h4#connection-string-options Connection String Options
   :markdown

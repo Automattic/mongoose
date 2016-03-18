@@ -3417,5 +3417,63 @@ describe('model: populate:', function() {
         });
       }
     });
+
+    it('4 level population (gh-3973)', function(done) {
+      var level4Schema = new Schema({
+        name: { type: String }
+      });
+
+      var level3Schema = new Schema({
+        name: { type: String },
+        level4: [{ type: Schema.Types.ObjectId, ref: 'level_4' }]
+      });
+
+      var level2Schema = new Schema({
+        name: { type: String },
+        level3: [{ type: Schema.Types.ObjectId, ref: 'level_3' }]
+      });
+
+      var level1Schema = new Schema({
+        name: { type: String },
+        level2: [{ type: Schema.Types.ObjectId, ref: 'level_2' }]
+      });
+
+      var level4 = db.model('level_4', level4Schema);
+      var level3 = db.model('level_3', level3Schema);
+      var level2 = db.model('level_2', level2Schema);
+      var level1 = db.model('level_1', level1Schema);
+
+      var l4docs = [{ name: 'level 4' }];
+
+      level4.create(l4docs, function(error, l4) {
+        assert.ifError(error);
+        var l3docs = [{ name: 'level 3', level4: l4[0]._id }];
+        level3.create(l3docs, function(error, l3) {
+          assert.ifError(error);
+          var l2docs = [{ name: 'level 2', level3: l3[0]._id }];
+          level2.create(l2docs, function(error, l2) {
+            assert.ifError(error);
+            var l1docs = [{ name: 'level 1', level2: l2[0]._id }];
+            level1.create(l1docs, function(error, l1) {
+              assert.ifError(error);
+              var opts = {
+                path: 'level2',
+                populate: {
+                  path: 'level3',
+                  populate: {
+                    path: 'level4'
+                  }
+                }
+              };
+              level1.findById(l1[0]._id).populate(opts).exec(function(error, obj) {
+                assert.ifError(error);
+                assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 });

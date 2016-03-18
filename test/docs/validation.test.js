@@ -195,7 +195,7 @@ describe('validation docs', function() {
     assert.throws(function() {
       // This throws an error, because 'name' isn't a full fledged path
       personSchema.path('name').required(true);
-    }, /Cannot read property 'required'/);
+    }, /Cannot.*'required'/);
 
     // To make a nested object required, use a single nested schema
     var nameSchema = new Schema({

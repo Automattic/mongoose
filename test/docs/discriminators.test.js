@@ -11,16 +11,14 @@ describe('discriminator docs', function () {
   before(function (done) {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
 
-    var options = {discriminatorKey: 'kind'};
-
-    var eventSchema = new mongoose.Schema({time: Date}, options);
+    var eventSchema = new mongoose.Schema({time: Date});
     Event = db.model('_event', eventSchema);
 
     ClickedLinkEvent = Event.discriminator('ClickedLink',
-      new mongoose.Schema({url: String}, options));
+      new mongoose.Schema({url: String}));
 
     SignedUpEvent = Event.discriminator('SignedUp',
-      new mongoose.Schema({username: String}, options));
+      new mongoose.Schema({username: String}));
 
     done();
   });
@@ -108,7 +106,7 @@ describe('discriminator docs', function () {
   /**
    * The way mongoose tells the difference between the different
    * discriminator models is by the 'discriminator key', which is
-   * `kind` by default. Mongoose adds a String path called `kind`
+   * `__t` by default. Mongoose adds a String path called `__t`
    * to your schemas that it uses to track which discriminator
    * this document is an instance of.
    */
@@ -117,9 +115,9 @@ describe('discriminator docs', function () {
     var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
     var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    assert.ok(!event1.kind);
-    assert.equal(event2.kind, 'ClickedLink');
-    assert.equal(event3.kind, 'SignedUp');
+    assert.ok(!event1.__t);
+    assert.equal(event2.__t, 'ClickedLink');
+    assert.equal(event3.__t, 'SignedUp');
 
     // acquit:ignore:start
     done();

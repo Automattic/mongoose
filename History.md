@@ -1,3 +1,21 @@
+4.4.8 / 2016-03-18
+==================
+ * docs(aggregate): clarify promises #3990 [megagon](https://github.com/megagon)
+ * fix: upgrade mquery -> 1.10 #3988 [matskiv](https://github.com/matskiv)
+ * feat(connection): 'all' event for repl sets #3986 [xizhibei](https://github.com/xizhibei)
+ * docs(types): clarify Array.pull #3985 [seriousManual](https://github.com/seriousManual)
+ * feat(query): support array syntax for .sort() via mquery 1.9 #3980
+ * fix(populate): support > 3 level nested populate #3973
+ * fix: MongooseThenable exposes connection correctly #3972
+ * docs(connection): add note about reconnectTries and reconnectInterval #3969
+ * feat(document): invalidate returns the new validationError #3964
+ * fix(query): .eq() as shorthand for .equals #3953 [Fonger](https://github.com/Fonger)
+ * docs(connection): clarify connection string vs passed options #3941
+ * docs(query): select option for findOneAndUpdate #3933
+ * fix(error): ValidationError.properties no longer enumerable #3925
+ * docs(validation): clarify how required validators work with nested schemas #3915
+ * fix: upgrade mongodb driver -> 2.1.8 to make partial index errors more sane #3864
+
 4.4.7 / 2016-03-11
 ==================
  * fix(query): stop infinite recursion caused by merging a mongoose buffer #3961

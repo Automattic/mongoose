@@ -180,6 +180,47 @@ describe('validation docs', function() {
   });
 
   /**
+   * Defining validators on nested objects in mongoose is tricky, because
+   * nested objects are not fully fledged paths.
+   */
+
+  it('Required Validators On Nested Objects', function(done) {
+    var personSchema = new Schema({
+      name: {
+        first: String,
+        last: String
+      }
+    });
+
+    assert.throws(function() {
+      // This throws an error, because 'name' isn't a full fledged path
+      personSchema.path('name').required(true);
+    }, /Cannot.*'required'/);
+
+    // To make a nested object required, use a single nested schema
+    var nameSchema = new Schema({
+      first: String,
+      last: String
+    });
+
+    personSchema = new Schema({
+      name: {
+        type: nameSchema,
+        required: true
+      }
+    });
+
+    var Person = db.model('Person', personSchema);
+
+    var person = new Person();
+    var error = person.validateSync();
+    assert.ok(error.errors['name']);
+    // acquit:ignore:start
+    done();
+    // acquit:ignore:end
+  });
+
+  /**
    * In the above examples, you learned about document validation. Mongoose also
    * supports validation for `update()` and `findOneAndUpdate()` operations.
    * In Mongoose 4.x, update validators are off by default - you need to specify

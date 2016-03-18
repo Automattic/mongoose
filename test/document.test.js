@@ -1314,7 +1314,8 @@ describe('document', function() {
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    post.invalidate('baz', 'validation failed for path {PATH}');
+    var _err = post.invalidate('baz', 'validation failed for path {PATH}');
+    assert.ok(_err instanceof ValidationError);
 
     post.save(function(err) {
       assert.ok(err instanceof MongooseError);

@@ -29,9 +29,9 @@ block content
   :markdown
     The following option keys are available:
 
-         db      - passed to the connection db instance
-         server  - passed to the connection server instance(s)
-         replset - passed to the connection ReplSet instance
+         db      - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+         server  - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+         replset - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
          user    - username for authentication (if not specified in uri)
          pass    - password for authentication (if not specified in uri)
          auth    - options for authentication
@@ -52,6 +52,36 @@ block content
     The db option `forceServerObjectId` is set to false which _cannot_ be overridden.
 
     See the [driver](https://github.com/mongodb/node-mongodb-native) for more information about available options.
+  :markdown
+    **Note:**
+    If `auto_reconnect` is on, mongoose will give up trying to reconnect after a certain number of failures. Set the [`server.reconnectTries` and `server.reconnectInterval` options](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html) to increase the number of times mongoose will try to reconnect.
+  :js
+    // Good way to make sure mongoose never stops trying to reconnect
+    mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
+     
+
+
+  h4#connection-string-options Connection String Options
+  :markdown
+    Mongoose supports the following options in the connection string.
+    
+    * [ssl](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [poolSize](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [autoReconnect](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [socketTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [connectTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [authSource](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [retries](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [reconnectWait](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [rs_name](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+    * [replicaSet](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+    * [nativeParser](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [w](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [journal](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [wtimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [readPreference](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [readPreferenceTags](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [sslValidate](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
 
   h4#keepAlive A note about keepAlive
   .important

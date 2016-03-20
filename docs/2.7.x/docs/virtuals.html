@@ -223,7 +223,26 @@
       , last: String
     }
 });
-
+</code></pre>
+If you want the virtual field to be displayed on client side, then 
+set {virtuals: true} for toObject and toJSON in schema options 
+as below:
+  <pre><code>var PersonSchema = new Schema({
+    name: {
+        first: String
+      , last: String
+    }
+}, {
+  toObject: {
+  virtuals: true
+  },
+  toJSON: {
+  virtuals: true 
+  }
+});
+<code></pre>
+then set,
+<pre><code>
 var Person = mongoose.model('Person', PersonSchema);
 
 var theSituation = new Person({

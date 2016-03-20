@@ -42,7 +42,6 @@ var BlogPost = mongoose.model('BlogPost', blogpost);
  */
 
 mongoose.connection.on('open', function() {
-
   /**
    * Generate data
    */
@@ -99,7 +98,7 @@ mongoose.connection.on('open', function() {
        */
 
       BlogPost
-      .find({ tags: 'fun' })
+      .find({tags: 'fun'})
       .lean()
       .populate('author')
       .exec(function(err, docs) {
@@ -112,13 +111,13 @@ mongoose.connection.on('open', function() {
         var opts = {
           path: 'author.friends',
           select: 'name',
-          options: { limit: 2 }
+          options: {limit: 2}
         };
 
         BlogPost.populate(docs, opts, function(err, docs) {
           assert.ifError(err);
           console.log('populated');
-          var s = require('util').inspect(docs, { depth: null });
+          var s = require('util').inspect(docs, {depth: null, colors: true});
           console.log(s);
           done();
         });

@@ -1,29 +1,33 @@
-var assert = require('assert');
+var assert = require('power-assert');
 var async = require('async');
 var mongoose = require('../../');
 
-describe('discriminator docs', function() {
+describe('discriminator docs', function () {
   var Event;
   var ClickedLinkEvent;
   var SignedUpEvent;
-  var db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+  var db;
 
-  before(function(done) {
-    var options = { discriminatorKey: 'kind' };
+  before(function (done) {
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
 
-    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var eventSchema = new mongoose.Schema({time: Date});
     Event = db.model('_event', eventSchema);
 
     ClickedLinkEvent = Event.discriminator('ClickedLink',
-      new mongoose.Schema({ url: String }, options));
+      new mongoose.Schema({url: String}));
 
     SignedUpEvent = Event.discriminator('SignedUp',
-      new mongoose.Schema({ username: String }, options));
+      new mongoose.Schema({username: String}));
 
     done();
   });
 
-  beforeEach(function(done) {
+  after(function (done) {
+    db.close(done);
+  });
+
+  beforeEach(function (done) {
     Event.remove({}, done);
   });
 
@@ -40,24 +44,24 @@ describe('discriminator docs', function() {
    * model whose schema is the union of the base schema and the
    * discriminator schema.
    */
-  it('The `model.discriminator()` function', function(done) {
-    var options = { discriminatorKey: 'kind' };
+  it('The `model.discriminator()` function', function (done) {
+    var options = {discriminatorKey: 'kind'};
 
-    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var eventSchema = new mongoose.Schema({time: Date}, options);
     var Event = mongoose.model('Event', eventSchema);
 
     // ClickedLinkEvent is a special type of Event that has
     // a URL.
     var ClickedLinkEvent = Event.discriminator('ClickedLink',
-      new mongoose.Schema({ url: String }, options));
+      new mongoose.Schema({url: String}, options));
 
     // When you create a generic event, it can't have a URL field...
-    var genericEvent = new Event({ time: Date.now(), url: 'google.com' });
+    var genericEvent = new Event({time: Date.now(), url: 'google.com'});
     assert.ok(!genericEvent.url);
 
     // But a ClickedLinkEvent can
     var clickedEvent =
-      new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+      new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
     assert.ok(clickedEvent.url);
 
     // acquit:ignore:start
@@ -71,23 +75,23 @@ describe('discriminator docs', function() {
    * stored in the same collection as generic events and `ClickedLinkEvent`
    * instances.
    */
-  it('Discriminators save to the Event model\'s collection', function(done) {
-    var event1 = new Event({ time: Date.now() });
-    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
-    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+  it('Discriminators save to the Event model\'s collection', function (done) {
+    var event1 = new Event({time: Date.now()});
+    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    var save = function(doc, callback) {
-      doc.save(function(error, doc) {
+    var save = function (doc, callback) {
+      doc.save(function (error, doc) {
         callback(error, doc);
       });
     };
 
-    async.map([event1, event2, event3], save, function(error) {
+    async.map([event1, event2, event3], save, function (error) {
       // acquit:ignore:start
       assert.ifError(error);
       // acquit:ignore:end
 
-      Event.count({}, function(error, count) {
+      Event.count({}, function (error, count) {
         // acquit:ignore:start
         assert.ifError(error);
         // acquit:ignore:end
@@ -102,18 +106,18 @@ describe('discriminator docs', function() {
   /**
    * The way mongoose tells the difference between the different
    * discriminator models is by the 'discriminator key', which is
-   * `kind` by default. Mongoose adds a String path called `kind`
+   * `__t` by default. Mongoose adds a String path called `__t`
    * to your schemas that it uses to track which discriminator
    * this document is an instance of.
    */
-  it('Discriminator keys', function(done) {
-    var event1 = new Event({ time: Date.now() });
-    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
-    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+  it('Discriminator keys', function (done) {
+    var event1 = new Event({time: Date.now()});
+    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    assert.ok(!event1.kind);
-    assert.equal(event2.kind, 'ClickedLink');
-    assert.equal(event3.kind, 'SignedUp');
+    assert.ok(!event1.__t);
+    assert.equal(event2.__t, 'ClickedLink');
+    assert.equal(event3.__t, 'SignedUp');
 
     // acquit:ignore:start
     done();
@@ -125,23 +129,23 @@ describe('discriminator docs', function() {
    * to queries. In other words, `find()`, `count()`, `aggregate()`, etc.
    * are smart enough to account for discriminators.
    */
-  it('Discriminators add the discriminator key to queries', function(done) {
-    var event1 = new Event({ time: Date.now() });
-    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
-    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+  it('Discriminators add the discriminator key to queries', function (done) {
+    var event1 = new Event({time: Date.now()});
+    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    var save = function(doc, callback) {
-      doc.save(function(error, doc) {
+    var save = function (doc, callback) {
+      doc.save(function (error, doc) {
         callback(error, doc);
       });
     };
 
-    async.map([event1, event2, event3], save, function(error) {
+    async.map([event1, event2, event3], save, function (error) {
       // acquit:ignore:start
       assert.ifError(error);
       // acquit:ignore:end
 
-      ClickedLinkEvent.find({}, function(error, docs) {
+      ClickedLinkEvent.find({}, function (error, docs) {
         // acquit:ignore:start
         assert.ifError(error);
         // acquit:ignore:end
@@ -160,20 +164,20 @@ describe('discriminator docs', function() {
    * However, you can also attach middleware to the discriminator schema
    * without affecting the base schema.
    */
-  it('Discriminators copy pre and post hooks', function(done) {
-    var options = { discriminatorKey: 'kind' };
+  it('Discriminators copy pre and post hooks', function (done) {
+    var options = {discriminatorKey: 'kind'};
 
-    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var eventSchema = new mongoose.Schema({time: Date}, options);
     var eventSchemaCalls = 0;
-    eventSchema.pre('validate', function(next) {
+    eventSchema.pre('validate', function (next) {
       ++eventSchemaCalls;
       next();
     });
     var Event = mongoose.model('GenericEvent', eventSchema);
 
-    var clickedLinkSchema = new mongoose.Schema({ url: String }, options);
+    var clickedLinkSchema = new mongoose.Schema({url: String}, options);
     var clickedSchemaCalls = 0;
-    clickedLinkSchema.pre('validate', function(next) {
+    clickedLinkSchema.pre('validate', function (next) {
       ++clickedSchemaCalls;
       next();
     });
@@ -181,12 +185,12 @@ describe('discriminator docs', function() {
       clickedLinkSchema);
 
     var event1 = new ClickedLinkEvent();
-    event1.validate(function() {
+    event1.validate(function () {
       assert.equal(eventSchemaCalls, 1);
       assert.equal(clickedSchemaCalls, 1);
 
       var generic = new Event();
-      generic.validate(function() {
+      generic.validate(function () {
         assert.equal(eventSchemaCalls, 2);
         assert.equal(clickedSchemaCalls, 1);
         // acquit:ignore:start
@@ -194,5 +198,46 @@ describe('discriminator docs', function() {
         // acquit:ignore:end
       });
     });
+  });
+
+  /**
+   * A discriminator's fields are the union of the base schema's fields and
+   * the discriminator schema's fields, and the discriminator schema's fields
+   * take precedence. This behavior gets quirky when you have a custom `_id`
+   * field. A schema gets an `_id` field by default, so the base schema's
+   * `_id` field will get overridden by the discriminator schema's default
+   * `_id` field.
+   *
+   * You can work around this by setting the `_id` option to false in the
+   * discriminator schema as shown below.
+   */
+  it('Handling custom _id fields', function (done) {
+    var options = {discriminatorKey: 'kind'};
+
+    // Base schema has a String _id...
+    var eventSchema = new mongoose.Schema({_id: String, time: Date},
+      options);
+    var Event = mongoose.model('BaseEvent', eventSchema);
+
+    var clickedLinkSchema = new mongoose.Schema({url: String}, options);
+    var ClickedLinkEvent = Event.discriminator('ChildEventBad',
+      clickedLinkSchema);
+
+    var event1 = new ClickedLinkEvent();
+    // Woops, clickedLinkSchema overwrote the custom _id
+    assert.ok(event1._id instanceof mongoose.Types.ObjectId);
+
+    // But if you set `_id` option to false...
+    clickedLinkSchema = new mongoose.Schema({url: String},
+      {discriminatorKey: 'kind', _id: false});
+    ClickedLinkEvent = Event.discriminator('ChildEventGood',
+      clickedLinkSchema);
+
+    // The custom _id from the base schema comes through
+    var event2 = new ClickedLinkEvent({_id: 'test'});
+    assert.ok(event2._id.toString() === event2._id);
+    // acquit:ignore:start
+    done();
+    // acquit:ignore:end
   });
 });

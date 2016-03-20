@@ -9,8 +9,15 @@ console.log('Running mongoose version %s', mongoose.version);
  */
 
 var CharacterSchema = Schema({
-  name: { type: String, required: true }
-  , health: { type: Number, min: 0, max: 100 }
+  name: {
+    type: String,
+    required: true
+  },
+  health: {
+    type: Number,
+    min: 0,
+    max: 100
+  }
 });
 
 /**
@@ -50,7 +57,7 @@ mongoose.connect(uri, function(err) {
  */
 
 function example() {
-  Character.create({ name: 'Link', health: 100 }, function(err, link) {
+  Character.create({name: 'Link', health: 100}, function(err, link) {
     if (err) return done(err);
     console.log('found', link);
     link.attack(); // 'Link is attacking'

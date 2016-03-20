@@ -1,7 +1,7 @@
 
 var mongoose = require('../../');
 var Schema = mongoose.Schema;
-var assert = require('assert')
+var assert = require('power-assert')
 
 console.log('\n===========');
 console.log('    mongoose version: %s', mongoose.version);

@@ -25,7 +25,7 @@ html(lang='en')
           li
             a(href="docs/guide.html") Read the Docs
           li
-            a(href="http://plugins.mongoosejs.com") Discover Plugins
+            a(href="http://plugins.mongoosejs.io") Discover Plugins
       #follow
         ul
           li
@@ -50,8 +50,11 @@ html(lang='en')
 
             var kitty = new Cat({ name: 'Zildjian' });
             kitty.save(function (err) {
-              if (err) // ...
-              console.log('meow');
+              if (err) {
+                console.log(err);
+              } else {
+                console.log('meow');
+              }
             });
         p.what Mongoose provides a straight-forward, schema-based solution to model your application data. It includes built-in type casting, validation, query building, business logic hooks and more, out of the box.
         #getstarted

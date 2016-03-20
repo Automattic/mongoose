@@ -3,7 +3,8 @@ extends layout
 block content
   h2 Sub Docs
   :markdown
-    [Sub-documents](./api.html#types-embedded-js) are docs with schemas of their own which are elements of a parents document array:
+    [Sub-documents](./api.html#types-embedded-js) are docs with schemas of
+    their own which are elements of a parents document array:
   :js
     var childSchema = new Schema({ name: 'string' });
 
@@ -12,7 +13,10 @@ block content
     })
 
   :markdown
-    Sub-documents enjoy all the same features as normal [documents](./api.html#document-js). The only difference is that they are not saved individually, they are saved whenever their top-level parent document is saved.
+    Sub-documents enjoy all the same features as normal
+    [documents](./api.html#document-js). The only difference is that they are
+    not saved individually, they are saved whenever their top-level parent
+    document is saved.
   :js
     var Parent = mongoose.model('Parent', parentSchema);
     var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
@@ -41,7 +45,11 @@ block content
 
   h3 Adding sub-docs
   :markdown
-    MongooseArray methods such as [push](./api.html#types_array_MongooseArray-push), [unshift](./api.html#types_array_MongooseArray-unshift), [addToSet](./api.html#types_array_MongooseArray-addToSet), and others cast arguments to their proper types transparently:
+    MongooseArray methods such as
+    [push](./api.html#types_array_MongooseArray.push),
+    [unshift](./api.html#types_array_MongooseArray.unshift),
+    [addToSet](./api.html#types_array_MongooseArray.addToSet),
+    and others cast arguments to their proper types transparently:
   :js
     var Parent = mongoose.model('Parent');
     var parent = new Parent;
@@ -57,13 +65,16 @@ block content
       console.log('Success!');
     });
   :markdown
-    Sub-docs may also be created without adding them to the array by using the [create](./api.html#types_documentarray_MongooseDocumentArray-create) method of MongooseArrays.
+    Sub-docs may also be created without adding them to the array by using the
+    [create](./api.html#types_documentarray_MongooseDocumentArray.create)
+    method of MongooseArrays.
   :js
     var newdoc = parent.children.create({ name: 'Aaron' });
 
   h3 Removing docs
   :markdown
-    Each sub-document has it's own [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
+    Each sub-document has it's own
+    [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
   :js
     var doc = parent.children.id(id).remove();
     parent.save(function (err) {
@@ -73,12 +84,38 @@ block content
 
   h4#altsyntax Alternate declaration syntax
   :markdown
-    _New in v3_ If you don't need access to the sub-document schema instance, you may also declare sub-docs by simply passing an object literal:
+    If you don't need access to the sub-document schema instance,
+    you may also declare sub-docs by simply passing an object literal:
   :js
     var parentSchema = new Schema({
       children: [{ name: 'string' }]
     })
+  
+  h4#single-embedded Single Embedded Subdocs
+  :markdown
+    **New in 4.2.0**
+    
+    You can also embed schemas without using arrays.
+  :js
+    var childSchema = new Schema({ name: 'string' });
+
+    var parentSchema = new Schema({
+      child: childSchema
+    });
+  :markdown
+    A single embedded sub-document behaves similarly to an embedded array.
+    It only gets saved when the parent document gets saved, and its pre/post
+    document middleware get executed.
+  :js
+    childSchema.pre('save', function(next) {
+      console.log(this.name); // prints 'Leia'
+    });
+    var Parent = mongoose.model('Parent', parentSchema);
+    var parent = new Parent({ child: { name: 'Luke' } })
+    parent.child.name = 'Leia';
+    parent.save(callback); // Triggers the pre middleware.
 
   h3#next Next Up
   :markdown
-    Now that we've covered `Sub-documents`, let's take a look at [querying](/docs/queries.html).
+    Now that we've covered `Sub-documents`, let's take a look at
+    [querying](/docs/queries.html).

@@ -1,0 +1,31 @@
+extends: 'eslint:recommended'
+
+env:
+  node: true
+  mocha: true
+
+rules:
+  comma-style: 2
+  consistent-this:
+    - 2
+    - _this
+  indent:
+    - 2
+    - 2
+    - SwitchCase: 1
+      VariableDeclarator: 2
+  keyword-spacing: 2
+  no-console: 0
+  no-multi-spaces: 2
+  no-spaced-func: 2
+  no-trailing-spaces: 2
+  quotes:
+    - 2
+    - single
+  semi: 2
+  space-before-blocks: 2
+  space-before-function-paren:
+    - 2
+    - never
+  space-infix-ops: 2
+  space-unary-ops: 2

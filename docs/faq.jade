@@ -10,12 +10,17 @@ block append style
 block content
   h2 FAQ
   :markdown
-    **Q**. Why don't my changes to arrays get saved when I update an element directly?
+    **Q**. Why don't my changes to arrays get saved when I update an element
+    directly?
   :js
     doc.array[3] = 'changed';
     doc.save();
   :markdown
-    **A**. Mongoose doesn't create getters/setters for array indexes; without them mongoose never gets notified of the change and so doesn't know to persist the new value. The work-around is to use [MongooseArray#set](./api.html#types_array_MongooseArray-set) available in **Mongoose >= 3.2.0**.
+    **A**. Mongoose doesn't create getters/setters for array indexes; without
+    them mongoose never gets notified of the change and so doesn't know to
+    persist the new value. The work-around is to use
+    [MongooseArray#set](./api.html#types_array_MongooseArray.set) available
+    in **Mongoose >= 3.2.0**.
   :js
     // 3.2.0
     doc.array.set(3, 'changed');
@@ -25,20 +30,26 @@ block content
     doc.array[3] = 'changed';
     doc.markModified('array');
     doc.save();
-  hr#assign_schemas_to_paths
+  hr#date_changes
   :markdown
-    **Q**. Why doesn't mongoose allow me to directly assign schemas to paths?
+    **Q**. Why don't in-place modifications to date objects
+    (e.g. `date.setMonth(1);`) get saved?
   :js
-    var userSchema = new Schema({ name: String });
-    new Schema({ user: userSchema })
+    doc.createdAt.setDate(2011, 5, 1);
+    doc.save(); // createdAt changes won't get saved!
   :markdown
-    **A**. Schemas have a one-to-one mapping with documents. Documents have `save` and `remove` methods along with their own `pre` and `post` hooks which would lead to code like the following:
+    **A**. Mongoose currently doesn't watch for in-place updates to date
+    objects. If you have need for this feature, feel free to discuss on
+    [this GitHub issue](https://github.com/Automattic/mongoose/issues/3738).
+    There are several workarounds:
   :js
-    doc.user.save();  // ?
-    doc.user.remove();// ?
-    doc.save()
-  :markdown
-    We've felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling `save` on a sub-document is a no-op and exists only to support `pre` save hooks). In the future this is likely to be revisited.
+    doc.createdAt.setDate(2011, 5, 1);
+    doc.markModified('createdAt');
+    doc.save(); // Works
+  :js
+    doc.createdAt = new Date(2011, 5, 1).setHours(4);
+    doc.save(); // Works
+  
   hr#enable_debugging
   :markdown
     **Q**. How can I enable debugging?
@@ -66,6 +77,28 @@ block content
     **Q**. Should I create/destroy a new connection for each database operation?
 
     **A**. No. Open your connection when your application starts up and leave it open until the application shuts down.
+  hr#overwrite-model-error
+  :markdown
+    **Q**. Why do I get "OverwriteModelError: Cannot overwrite .. model once
+    compiled" when I use nodemon / a testing framework?
+    
+    **A**. `mongoose.model('ModelName', schema)` requires 'ModelName' to be
+    unique, so you can access the model by using `mongoose.model('ModelName')`.
+    If you put `mongoose.model('ModelName', schema);` in a
+    [mocha `beforeEach()` hook](https://mochajs.org/#hooks), this code will
+    attempt to create a new model named 'ModelName' before **every** test,
+    and so you will get an error. Make sure you only create a new model with
+    a given name **once**. If you need to create multiple models with the
+    same name, create a new connection and bind the model to the connection.
+  :js
+    var mongoose = require('mongoose');
+    var connection = mongoose.createConnection(..);
+
+    // use mongoose.Schema
+    var kittySchema = mongoose.Schema({ name: String });
+    
+    // use connection.model
+    var Kitten = connection.model('Kitten', kittySchema);
 
   hr
   :markdown
@@ -73,4 +106,3 @@ block content
 
     If you'd like to contribute to this page, please [visit it](https://github.com/Automattic/mongoose/tree/master/docs/faq.jade) on github and use the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button to send a pull request.
   br
-

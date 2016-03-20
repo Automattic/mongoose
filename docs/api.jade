@@ -22,10 +22,11 @@ html(lang='en')
       .doclinks
         each item in docs
           div.file(class=item.hasPublic ? '' : 'private')
-            a.section(href='#' + item.cleantitle)
-              | #{item.title}
-            | &nbsp;
-            i.fa.fa-caret-right.toggle-item
+            span.toggle-item
+              a.section(href='#' + item.cleantitle)
+                | #{item.title}
+              | &nbsp;
+              i.fa.fa-caret-right
             ul
               each method in item.methods
                 if method.ctx && !method.ignore
@@ -108,7 +109,7 @@ html(lang='en')
                                 if i+1 < tag.types.length
                                   | , 
                               | &gt; 
-                          span= tag.description
+                          span!= tag.description
                 if method.return
                   .returns
                     h4 Returns:

@@ -1,6 +1,6 @@
 # Mongoose
 
-Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -15,12 +15,12 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
   - [bug reports](https://github.com/Automattic/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB support](http://www.mongodb.org/display/DOCS/Technical+Support)
+  - [MongoDB support](https://docs.mongodb.org/manual/support/)
   - (irc) #mongoosejs on freenode
 
 ## Plugins
 
-Check out the [plugins search site](http://plugins.mongoosejs.com/) to see hundreds of related modules from the community.
+Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundreds of related modules from the community.
 
 Build your own Mongoose plugin through [generator-mongoose-plugin](https://github.com/huei90/generator-mongoose-plugin).
 
@@ -29,11 +29,11 @@ Build your own Mongoose plugin through [generator-mongoose-plugin](https://githu
 View all 100+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
-<a href="http://runnable.com/mongoose" target="_blank"><img src="http://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
+<a href="http://code.runnable.com/mongoose" target="_blank"><img src="http://i.imgur.com/4yNYDLI.png"></a>
 
 ## Installation
 
-First install [node.js](http://nodejs.org/) and [mongodb](http://www.mongodb.org/downloads). Then:
+First install [node.js](http://nodejs.org/) and [mongodb](https://www.mongodb.org/downloads). Then:
 
 ```sh
 $ npm install mongoose
@@ -41,7 +41,7 @@ $ npm install mongoose
 
 ## Stability
 
-The current stable branch is [master](https://github.com/Automattic/mongoose/tree/master). The [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x) branch contains legacy support for the 3.x release series, which will continue to be actively maintained until September 1, 2015.
+The current stable branch is [master](https://github.com/Automattic/mongoose/tree/master). The [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x) branch contains legacy support for the 3.x release series, which is no longer under active development as of September 2015. The [3.8.x docs](http://mongoosejs.com/docs/3.8.x/) are still available.
 
 ## Overview
 
@@ -57,7 +57,7 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/my_database');
 ```
 
-Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`. 
+Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
 
 **Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
@@ -68,14 +68,14 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 Models are defined through the `Schema` interface.
 
 ```js
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
+var Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-    author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
+    author    : ObjectId,
+    title     : String,
+    body      : String,
+    date      : Date
 });
 ```
 
@@ -96,11 +96,11 @@ The following example shows some of these features:
 
 ```js
 var Comment = new Schema({
-    name  :  { type: String, default: 'hahaha' }
-  , age   :  { type: Number, min: 18, index: true }
-  , bio   :  { type: String, match: /[a-z]/ }
-  , date  :  { type: Date, default: Date.now }
-  , buff  :  Buffer
+  name: { type: String, default: 'hahaha' },
+  age: { type: Number, min: 18, index: true },
+  bio: { type: String, match: /[a-z]/ },
+  date: { type: Date, default: Date.now },
+  buff: Buffer
 });
 
 // a setter
@@ -162,18 +162,18 @@ You can also `findOne`, `findById`, `update`, etc. For more details check out [t
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 
 ```js
-var conn = mongoose.createConnection('your connection string')
-  , MyModel = conn.model('ModelName', schema)
-  , m = new MyModel;
+var conn = mongoose.createConnection('your connection string'),
+    MyModel = conn.model('ModelName', schema),
+    m = new MyModel;
 m.save(); // works
 ```
 
 vs
 
 ```js
-var conn = mongoose.createConnection('your connection string')
-  , MyModel = mongoose.model('ModelName', schema)
-  , m = new MyModel;
+var conn = mongoose.createConnection('your connection string'),
+    MyModel = mongoose.model('ModelName', schema),
+    m = new MyModel;
 m.save(); // does not work b/c the default connection object was never connected
 ```
 
@@ -217,7 +217,6 @@ BlogPost.findById(myId, function (err, post) {
 
 Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the `save()` error callback, so error handling is a snap!
 
-Mongoose interacts with your embedded documents in arrays _atomically_, out of the box.
 
 ### Middleware
 
@@ -269,30 +268,30 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 
 ```js
 new Schema({
-    broken: { type: Boolean }
-  , asset : {
-        name: String
-      , type: String // uh oh, it broke. asset will be interpreted as String
+  broken: { type: Boolean },
+    asset : {
+      name: String,
+      type: String // uh oh, it broke. asset will be interpreted as String
     }
 });
 
 new Schema({
-    works: { type: Boolean }
-  , asset : {
-        name: String
-      , type: { type: String } // works. asset is an object with a type property
-    }
+  works: { type: Boolean },
+  asset: {
+    name: String,
+    type: { type: String } // works. asset is an object with a type property
+  }
 });
 ```
 
-### Driver access
+### Driver Access
 
-The driver being used defaults to [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) and is directly accessible through `YourModel.collection`. **Note**: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.
+Mongoose is built on top of the [official MongoDB Node.js driver](https://github.com/mongodb/node-mongodb-native). Each mongoose model keeps a reference to a [native MongoDB driver collection](http://mongodb.github.io/node-mongodb-native/2.1/api/Collection.html). The collection object can be accessed using `YourModel.collection`. However, using the collection object directly bypasses all mongoose features, including hooks, validation, etc. 
 
 ## API Docs
 
-Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](http://github.com/visionmedia/dox)
-and [acquit](http://github.com/vkarpov15/acquit).
+Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](https://github.com/tj/dox)
+and [acquit](https://github.com/vkarpov15/acquit).
 
 ## License
 

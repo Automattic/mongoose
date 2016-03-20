@@ -26,7 +26,7 @@ block content
     var Story  = mongoose.model('Story', storySchema);
     var Person = mongoose.model('Person', personSchema);
   :markdown
-    So far we've created two [Models](./models.html). Our `Person` model has it's `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose which model to use during population, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also declared the `Story` `_creator` property as a `Number`, the same type as the `_id` used in the `personSchema`. It is important to match the type of `_id` to the type of ref.
+    So far we've created two [Models](./models.html). Our `Person` model has its `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose which model to use during population, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also declared the `Story` `_creator` property as a `Number`, the same type as the `_id` used in the `personSchema`. It is important to match the type of `_id` to the type of ref.
   .important
     :markdown
       **Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use as refs.
@@ -190,11 +190,123 @@ block content
 
   h3#populate_an_existing_mongoose_document Populating an existing document
   :markdown
-    If we have an existing mongoose document and want to populate some of its paths, **mongoose >= 3.6** supports the [document#populate()](./api.html#document_Document-populate) method.
+    If we have an existing mongoose document and want to populate some of its
+    paths, **mongoose >= 3.6** supports the
+    [document#populate()](./api.html#document_Document-populate) method.
 
   h3#populate_multiple_documents Populating multiple existing documents
   :markdown
-    If we have one or many mongoose documents or even plain objects (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may populate them using the [Model.populate()](./api.html#model_Model.populate) method available in **mongoose >= 3.6**. This is what `document#populate()` and `query#populate()` use to populate documents.
+    If we have one or many mongoose documents or even plain objects
+    (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may
+    populate them using the [Model.populate()](./api.html#model_Model.populate)
+    method available in **mongoose >= 3.6**. This is what `document#populate()`
+    and `query#populate()` use to populate documents.
+  
+  h3#deep-populate Populating across multiple levels
+  :markdown
+    Say you have a user schema which keeps track of the user's friends.
+  :js
+    var userSchema = new Schema({
+      name: String,
+      friends: [{ type: ObjectId, ref: 'User' }]
+    });
+  :markdown
+    Populate lets you get a list of a user's friends, but what if you also
+    wanted a user's friends of friends? Specify the `populate` option to tell
+    mongoose to populate the `friends` array of all the user's friends:
+  :js
+    User.
+      findOne({ name: 'Val' }).
+      populate({
+        path: 'friends',
+        // Get friends of friends - populate the 'friends' array for every friend
+        populate: { path: 'friends' }
+      });
+  
+  h3#cross-db-populate Populating across Databases
+  :markdown
+    Let's say you have a schema representing events, and a schema representing
+    conversations. Each event has a corresponding conversation thread.
+  :js
+    var eventSchema = new Schema({
+      name: String,
+      // The id of the corresponding conversation
+      // Notice there's no ref here!
+      conversation: ObjectId
+    });
+    var conversationSchema = new Schema({
+      numMessages: Number
+    });
+  :markdown
+    Also, suppose that events and conversations are stored in separate MongoDB
+    instances.
+  :js
+    var db1 = mongoose.createConnection('localhost:27000/db1');
+    var db2 = mongoose.createConnection('localhost:27001/db2');
+    
+    var Event = db1.model('Event', eventSchema);
+    var Conversation = db2.model('Conversation', conversationSchema);
+  :markdown
+    In this situation, you will **not** be able to `populate()` normally.
+    The `conversation` field will always be null, because `populate()` doesn't
+    know which model to use. However,
+    [you can specify the model explicitly](http://mongoosejs.com/docs/api.html#model_Model.populate).
+  :js
+    Event.
+      find().
+      populate({ path: 'conversation', model: Conversation }).
+      exec(function(error, docs) { /* ... */ });
+  :markdown
+    This is known as a "cross-database populate," because it enables you to
+    populate across MongoDB databases and even acrosss MongoDB instances.
+
+  h3#dynamic-ref Dynamic References
+  :markdown
+    Mongoose can also populate from multiple collections at the same time.
+    Let's say you have a user schema that has an array of "connections" - a
+    user can be connected to either other users or an organization.
+  :js
+    var userSchema = new Schema({
+      name: String,
+      connections: [{
+        kind: String,
+        item: { type: ObjectId, refPath: 'connections.kind' }
+      }]
+    });
+    
+    var organizationSchema = new Schema({ name: String, kind: String });
+    
+    var User = mongoose.model('User', userSchema);
+    var Organization = mongoose.model('Organization', organizationSchema);
+  :markdown
+    The `refPath` property above means that mongoose will look at the
+    `connections.kind` path to determine which model to use for `populate()`.
+    In other words, the `refPath` property enables you to make the `ref`
+    property dynamic.
+  :js
+    // Say we have one organization:
+    // `{ _id: ObjectId('000000000000000000000001'), name: "Guns N' Roses", kind: 'Band' }`
+    // And two users:
+    // {
+    //   _id: ObjectId('000000000000000000000002')
+    //   name: 'Axl Rose',
+    //   connections: [
+    //     { kind: 'User', item: ObjectId('000000000000000000000003') },
+    //     { kind: 'Organization', item: ObjectId('000000000000000000000001') }
+    //   ]
+    // },
+    // {
+    //   _id: ObjectId('000000000000000000000003')
+    //   name: 'Slash',
+    //   connections: []
+    // }
+    User.
+      findOne({ name: 'Axl Rose' }).
+      populate('connections').
+      exec(function(error, doc) {
+        // doc.connections[0].item is a User doc
+        // doc.connections[1].item is an Organization doc
+      });
 
   h3#next Next Up
   :markdown

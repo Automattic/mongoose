@@ -11,17 +11,24 @@ block content
   :markdown
     There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes) to be aware of when migrating from Mongoose 3 to Mongoose 4.
 
-  h3 findOneAndUpdate() new field is now `false` by default
+  h3#findandmodify-new
+    | `findOneAndUpdate()` new field is now `false` by default
   :markdown
-    Mongoose's `findOneAndUpdate()` and `findOneAndRemove()` functions are just wrappers around MongoDB's [`findAndModify` command](http://docs.mongodb.org/manual/reference/method/db.collection.findAndModify/).
-    Both the MongoDB server and the MongoDB NodeJS driver set the `new` option to false by default, but mongoose 3 overwrote this default.
-    In order to be more consistent with the MongoDB server's documentation, mongoose will use false by default.
-    That is, `findOneAndUpdate({}, { $set: { test: 1 } }, callback);` will return the document as it was *before* the `$set` operation was applied.
+    Mongoose's `findOneAndUpdate()`, `findOneAndRemove()`,
+    `findByIdAndUpdate()`, and `findByIdAndRemove()` functions are just
+    wrappers around MongoDB's
+    [`findAndModify` command](http://docs.mongodb.org/manual/reference/method/db.collection.findAndModify/).
+    Both the MongoDB server and the MongoDB NodeJS driver set the `new` option
+    to false by default, but mongoose 3 overwrote this default. In order to be
+    more consistent with the MongoDB server's documentation, mongoose will
+    use false by default. That is,
+    `findOneAndUpdate({}, { $set: { test: 1 } }, callback);` will return the
+    document as it was *before* the `$set` operation was applied.
 
     To return the document with modifications made on the update, use the `new: true` option.
 
   :js
-    MyModel.findOneAndUpdate({}, { $set: { test: 1 } }, { 'new': true }, callback);
+    MyModel.findOneAndUpdate({}, { $set: { test: 1 } }, { new: true }, callback);
 
   h3 CastError and ValidationError now use `kind` instead of `type` to report error types
   :markdown

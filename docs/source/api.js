@@ -4,8 +4,8 @@
 
 var fs = require('fs');
 var link = require('../helpers/linktype');
-var hl = require('highlight.js')
-var md = require('markdown')
+var hl = require('highlight.js');
+var md = require('markdown');
 
 module.exports = {
     docs: []
@@ -39,8 +39,9 @@ function parse (docs) {
     var constructor = null;
 
     json.forEach(function (comment) {
-      if (comment.description)
+      if (comment.description) {
         highlight(comment.description);
+      }
 
       var prop = false;
       comment.params = [];
@@ -102,6 +103,8 @@ function parse (docs) {
         case 'param':
           comment.params.unshift(tag);
           comment.tags.splice(i, 1);
+          tag.description = tag.description ?
+            md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') : '';
           break;
         case 'return':
           comment.return = tag;
@@ -139,7 +142,14 @@ function parse (docs) {
     props = props.filter(ignored);
 
     function ignored (method) {
-      if (method.ignore) return false;
+      if (method.ignore) {
+        return false;
+      }
+      // Ignore eslint declarations
+      if (method.description && method.description.full &&
+        method.description.full.indexOf('<p>eslint') === 0) {
+        return false;
+      }
       return true;
     }
 
@@ -147,7 +157,7 @@ function parse (docs) {
 
     // add constructor to properties too
     methods.some(function (method) {
-      if (method.ctx && 'method' == method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
+      if (method.ctx && 'method' === method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
         props.forEach(function (prop) {
           prop.ctx.constructor = method.ctx.constructor;
         });
@@ -201,7 +211,7 @@ function fix (str) {
     // parse out the ```language
     var code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
 
-    if ('js' == code[1] || !code[1]) {
+    if ('js' === code[1] || !code[1]) {
       code[1] = 'javascript';
     }
 
@@ -226,9 +236,9 @@ function order (docs) {
   for (var i = 0; i < docs.length; ++i) {
     var doc = docs[i];
 
-    if ('index.js' == doc.title) {
+    if ('index.js' === doc.title) {
       docs.unshift(docs.splice(i, 1)[0]);
-    } else if ('collection.js' == doc.title) {
+    } else if ('collection.js' === doc.title) {
       docs.push(docs.splice(i, 1)[0]);
     }
 

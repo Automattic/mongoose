@@ -1,10 +1,8 @@
-/* eslint no-unused-vars: 1 */
-
 /**
  * Module dependencies.
  */
 
-var assert = require('assert');
+var assert = require('power-assert');
 var bluebird = require('bluebird');
 var q = require('q');
 var start = require('./common');
@@ -12,9 +10,8 @@ var start = require('./common');
 var PromiseProvider = require('../lib/promise_provider');
 var Schema = require('../lib/schema');
 
-var Promise;
 var db;
-var testSchema = new Schema({ test: { type: String, required: true } });
+var testSchema = new Schema({test: {type: String, required: true}});
 testSchema.pre('save', function(next) {
   if (this.$__saveSucceeds === false) {
     return next(new Error('fail'));
@@ -43,7 +40,6 @@ describe('ES6 promises: ', function() {
 
     before(function() {
       PromiseProvider.set(global.Promise);
-      Promise = PromiseProvider.get();
     });
 
     before(function() {
@@ -51,8 +47,9 @@ describe('ES6 promises: ', function() {
       MyModel = db.model('es6promise', testSchema);
     });
 
-    after(function() {
+    after(function(done) {
       PromiseProvider.reset();
+      db.close(done);
     });
 
     afterEach(function(done) {
@@ -60,7 +57,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save()', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       var promise = m.save();
       assert.equal(promise.constructor, global.Promise);
       promise.then(function(doc) {
@@ -79,13 +76,13 @@ describe('ES6 promises: ', function() {
         }).
         catch(function(err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
 
     it('save() with middleware error', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       m.$__saveSucceeds = false;
       var promise = m.save();
       assert.equal(promise.constructor, global.Promise);
@@ -101,7 +98,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save() with validation middleware error', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       m.$__validateSucceeds = false;
       var promise = m.save();
       assert.equal(promise.constructor, global.Promise);
@@ -126,16 +123,16 @@ describe('ES6 promises: ', function() {
         }).
         catch(function(err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
 
     it('queries', function(done) {
-      MyModel.create({ test: '123' }, function(error) {
+      MyModel.create({test: '123'}, function(error) {
         assert.ifError(error);
 
-        var promise = MyModel.findOne({ test: '123' }).exec();
+        var promise = MyModel.findOne({test: '123'}).exec();
         assert.equal(promise.constructor, global.Promise);
 
         promise.then(function(doc) {
@@ -146,10 +143,10 @@ describe('ES6 promises: ', function() {
     });
 
     it('queries with errors', function(done) {
-      MyModel.create({ test: '123' }, function(error) {
+      MyModel.create({test: '123'}, function(error) {
         assert.ifError(error);
 
-        var query = MyModel.findOne({ test: '123' });
+        var query = MyModel.findOne({test: '123'});
         query.$__findOneSucceeds = false;
         var promise = query.exec();
         assert.equal(promise.constructor, global.Promise);
@@ -167,7 +164,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('create', function(done) {
-      var promise = MyModel.create({ test: '123' });
+      var promise = MyModel.create({test: '123'});
       assert.equal(promise.constructor, global.Promise);
       promise.then(function() {
         done();
@@ -178,7 +175,6 @@ describe('ES6 promises: ', function() {
   describe('bluebird: ', function() {
     before(function() {
       PromiseProvider.set(bluebird);
-      Promise = PromiseProvider.get();
     });
 
     before(function() {
@@ -186,8 +182,9 @@ describe('ES6 promises: ', function() {
       MyModel = db.model('es6promise_bluebird', testSchema);
     });
 
-    after(function() {
+    after(function(done) {
       PromiseProvider.reset();
+      db.close(done);
     });
 
     afterEach(function(done) {
@@ -195,7 +192,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save()', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
       promise.then(function(doc) {
@@ -214,13 +211,13 @@ describe('ES6 promises: ', function() {
         }).
         catch(function(err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
 
     it('save() with middleware error', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       m.$__saveSucceeds = false;
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
@@ -236,7 +233,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save() with validation middleware error', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       m.$__validateSucceeds = false;
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
@@ -261,16 +258,16 @@ describe('ES6 promises: ', function() {
         }).
         catch(function(err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
 
     it('queries', function(done) {
-      MyModel.create({ test: '123' }, function(error) {
+      MyModel.create({test: '123'}, function(error) {
         assert.ifError(error);
 
-        var promise = MyModel.findOne({ test: '123' }).exec();
+        var promise = MyModel.findOne({test: '123'}).exec();
         assert.equal(promise.constructor, bluebird);
 
         promise.then(function(doc) {
@@ -281,10 +278,10 @@ describe('ES6 promises: ', function() {
     });
 
     it('queries with errors', function(done) {
-      MyModel.create({ test: '123' }, function(error) {
+      MyModel.create({test: '123'}, function(error) {
         assert.ifError(error);
 
-        var query = MyModel.findOne({ test: '123' });
+        var query = MyModel.findOne({test: '123'});
         query.$__findOneSucceeds = false;
         var promise = query.exec();
         assert.equal(promise.constructor, bluebird);
@@ -302,9 +299,51 @@ describe('ES6 promises: ', function() {
     });
 
     it('create', function(done) {
-      var promise = MyModel.create({ test: '123' });
+      var promise = MyModel.create({test: '123'});
       assert.equal(promise.constructor, bluebird);
       promise.then(function() {
+        var p = MyModel.create({});
+        p.catch(function(error) {
+          assert.ok(error);
+          done();
+        });
+      });
+    });
+
+    it('subdocument validation (gh-3681)', function(done) {
+      var subSchema = new Schema({name: {type: String, required: true}});
+      var parentSchema = new Schema({sub: [subSchema]});
+      var Parent = db.model('gh3681', parentSchema);
+
+      Parent.create({sub: [{}]}).catch(function() {
+        done();
+      });
+    });
+
+    it('Model.populate (gh-3734)', function(done) {
+      var doc = new MyModel({});
+      var promise = MyModel.populate(doc, 'test');
+      assert.equal(promise.constructor, bluebird);
+      done();
+    });
+
+    it('subdoc pre doesnt cause unhandled rejection (gh-3669)', function(done) {
+      var nestedSchema = new Schema({
+        name: {type: String, required: true}
+      });
+
+      nestedSchema.pre('validate', function(next) {
+        next();
+      });
+
+      var schema = new Schema({
+        items: [nestedSchema]
+      });
+
+      var MyModel = db.model('gh3669', schema);
+
+      MyModel.create({items: [{name: null}]}).catch(function(error) {
+        assert.ok(error);
         done();
       });
     });
@@ -313,7 +352,6 @@ describe('ES6 promises: ', function() {
   describe('q: ', function() {
     before(function() {
       PromiseProvider.set(q.Promise);
-      Promise = PromiseProvider.get();
     });
 
     before(function() {
@@ -321,8 +359,9 @@ describe('ES6 promises: ', function() {
       MyModel = db.model('es6promise_q', testSchema);
     });
 
-    after(function() {
+    after(function(done) {
       PromiseProvider.reset();
+      db.close(done);
     });
 
     afterEach(function(done) {
@@ -330,7 +369,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save()', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       var promise = m.save();
       assert.ok(promise instanceof q.makePromise);
       promise.then(function(doc) {
@@ -349,13 +388,13 @@ describe('ES6 promises: ', function() {
         }).
         catch(function(err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
 
     it('save() with middleware error', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       m.$__saveSucceeds = false;
       var promise = m.save();
       assert.ok(promise instanceof q.makePromise);
@@ -371,7 +410,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save() with validation middleware error', function(done) {
-      var m = new MyModel({ test: '123' });
+      var m = new MyModel({test: '123'});
       m.$__validateSucceeds = false;
       var promise = m.save();
       assert.ok(promise instanceof q.makePromise);
@@ -396,16 +435,16 @@ describe('ES6 promises: ', function() {
         }).
         catch(function(err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
 
     it('queries', function(done) {
-      MyModel.create({ test: '123' }, function(error) {
+      MyModel.create({test: '123'}, function(error) {
         assert.ifError(error);
 
-        var promise = MyModel.findOne({ test: '123' }).exec();
+        var promise = MyModel.findOne({test: '123'}).exec();
         assert.ok(promise instanceof q.makePromise);
 
         promise.then(function(doc) {
@@ -416,10 +455,10 @@ describe('ES6 promises: ', function() {
     });
 
     it('queries with errors', function(done) {
-      MyModel.create({ test: '123' }, function(error) {
+      MyModel.create({test: '123'}, function(error) {
         assert.ifError(error);
 
-        var query = MyModel.findOne({ test: '123' });
+        var query = MyModel.findOne({test: '123'});
         query.$__findOneSucceeds = false;
         var promise = query.exec();
         assert.ok(promise instanceof q.makePromise);
@@ -437,7 +476,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('create', function(done) {
-      var promise = MyModel.create({ test: '123' });
+      var promise = MyModel.create({test: '123'});
       assert.ok(promise instanceof q.makePromise);
       promise.then(function() {
         done();

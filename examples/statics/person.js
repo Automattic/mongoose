@@ -1,4 +1,3 @@
-
 // import the necessary modules
 var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
@@ -7,14 +6,14 @@ var Schema = mongoose.Schema;
 module.exports = function() {
   // define schema
   var PersonSchema = new Schema({
-    name : String,
-    age : Number,
-    birthday : Date
+    name: String,
+    age: Number,
+    birthday: Date
   });
 
   // define a static
   PersonSchema.statics.findPersonByName = function(name, cb) {
-    this.find({ name : new RegExp(name, 'i') }, cb);
+    this.find({name: new RegExp(name, 'i')}, cb);
   };
 
   mongoose.model('Person', PersonSchema);

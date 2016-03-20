@@ -3,10 +3,10 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    assert = require('power-assert'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema;
 
 describe('model middleware', function() {
   it('post save', function(done) {
@@ -37,14 +37,14 @@ describe('model middleware', function() {
       next();
     });
 
-    var db = start()
-      , TestMiddleware = db.model('TestPostSaveMiddleware', schema);
+    var db = start(),
+        TestMiddleware = db.model('TestPostSaveMiddleware', schema);
 
-    var test = new TestMiddleware({ title: 'Little Green Running Hood'});
+    var test = new TestMiddleware({title: 'Little Green Running Hood'});
 
     test.save(function(err) {
       assert.ifError(err);
-      assert.equal(test.title,'Little Green Running Hood');
+      assert.equal(test.title, 'Little Green Running Hood');
       assert.equal(3, called);
       db.close();
       done();
@@ -100,8 +100,8 @@ describe('model middleware', function() {
 
     mongoose.model('TestMiddleware', schema);
 
-    var db = start()
-      , TestMiddleware = db.model('TestMiddleware');
+    var db = start(),
+        TestMiddleware = db.model('TestMiddleware');
 
     var test = new TestMiddleware();
 
@@ -113,7 +113,7 @@ describe('model middleware', function() {
 
     test.save(function(err) {
       assert.ok(err instanceof Error);
-      assert.equal(err.message,'Error 101');
+      assert.equal(err.message, 'Error 101');
       assert.equal(2, called);
 
       test.remove(function(err) {
@@ -130,8 +130,8 @@ describe('model middleware', function() {
       title: String
     });
 
-    var preinit = 0
-      , postinit = 0;
+    var preinit = 0,
+        postinit = 0;
 
     schema.pre('init', function(next) {
       ++preinit;
@@ -145,10 +145,10 @@ describe('model middleware', function() {
 
     mongoose.model('TestPostInitMiddleware', schema);
 
-    var db = start()
-      , Test = db.model('TestPostInitMiddleware');
+    var db = start(),
+        Test = db.model('TestPostInitMiddleware');
 
-    var test = new Test({ title: "banana" });
+    var test = new Test({title: 'banana'});
 
     test.save(function(err) {
       assert.ifError(err);
@@ -197,24 +197,24 @@ describe('model middleware', function() {
     var parent = new Parent({
       name: 'Han',
       children: [
-        { name: 'Jaina' },
-        { name: 'Jacen' }
+        {name: 'Jaina'},
+        {name: 'Jacen'}
       ]
     });
 
     parent.save(function(error) {
       assert.ifError(error);
       assert.equal(2, childPreCalls);
-      assert.equal(1, childPreCallsByName['Jaina']);
-      assert.equal(1, childPreCallsByName['Jacen']);
+      assert.equal(1, childPreCallsByName.Jaina);
+      assert.equal(1, childPreCallsByName.Jacen);
       assert.equal(1, parentPreCalls);
       parent.children[0].name = 'Anakin';
       parent.save(function(error) {
         assert.ifError(error);
         assert.equal(4, childPreCalls);
-        assert.equal(1, childPreCallsByName['Anakin']);
-        assert.equal(1, childPreCallsByName['Jaina']);
-        assert.equal(2, childPreCallsByName['Jacen']);
+        assert.equal(1, childPreCallsByName.Anakin);
+        assert.equal(1, childPreCallsByName.Jaina);
+        assert.equal(2, childPreCallsByName.Jacen);
 
         assert.equal(2, parentPreCalls);
         db.close();
@@ -228,10 +228,10 @@ describe('model middleware', function() {
       title: String
     });
 
-    var preValidate = 0
-      , postValidate = 0
-      , preRemove = 0
-      , postRemove = 0;
+    var preValidate = 0,
+        postValidate = 0,
+        preRemove = 0,
+        postRemove = 0;
 
     schema.pre('validate', function(next) {
       ++preValidate;
@@ -253,10 +253,10 @@ describe('model middleware', function() {
       ++postRemove;
     });
 
-    var db = start()
-      , Test = db.model('TestPostValidateMiddleware', schema);
+    var db = start(),
+        Test = db.model('TestPostValidateMiddleware', schema);
 
-    var test = new Test({ title: "banana" });
+    var test = new Test({title: 'banana'});
 
     test.save(function(err) {
       assert.ifError(err);

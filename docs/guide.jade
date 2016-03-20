@@ -145,7 +145,7 @@ block content
     :markdown
       When your application starts up, Mongoose automatically calls `ensureIndex` for each defined index in your schema.
       Mongoose will call `ensureIndex` for each index sequentially, and emit an 'index' event on the model when all the `ensureIndex` calls succeeded or when there was an error.
-      While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](http://docs.mongodb.org/manual/core/indexes/#index-creation-operations). Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `config.autoIndex` to `flase`.
+      While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](http://docs.mongodb.org/manual/core/indexes/#index-creation-operations). Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `config.autoIndex` to `false`.
 
   :js
     animalSchema.set('autoIndex', false);
@@ -243,6 +243,7 @@ block content
     - [autoIndex](#autoIndex)
     - [capped](#capped)
     - [collection](#collection)
+    - [emitIndexErrors](#emitIndexErrors)
     - [id](#id)
     - [_id](#_id)
     - [minimize](#minimize)
@@ -252,9 +253,11 @@ block content
     - [strict](#strict)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
+    - [typeKey](#typeKey)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
     - [skipVersioning](#skipVersioning)
+    - [timestamps](#timestamps)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -286,6 +289,30 @@ block content
   :js
     var dataSchema = new Schema({..}, { collection: 'data' });
 
+  h4#emitIndexErrors option: emitIndexErrors
+  :markdown
+    By default, mongoose will build any indexes you specify in your schema for
+    you, and emit an 'index' event on the model when the index build either
+    succeeds or errors out.
+  :js
+    MyModel.on('index', function(error) {
+      /* If error is truthy, index build failed */
+    });
+  :markdown
+    However, this makes it tricky to catch when your index build fails. The
+    `emitIndexErrors` option makes seeing when your index build fails simpler.
+    If this option is on, mongoose will additionally emit an 'error' event
+    on the model when an index build fails.
+  :js
+    MyModel.schema.options.emitIndexErrors; // true
+    MyModel.on('error', function(error) {
+      // gets an error whenever index build fails
+    });
+  :markdown
+    Node.js' built-in
+    [event emitter throws an exception if an error event is emitted and there are no listeners](https://nodejs.org/api/events.html#events_class_events_eventemitter),
+    so its easy to configure your application to fail fast when an index build fails.
+
   h4#id option: id
   :markdown
     Mongoose assigns each of your schemas an `id` virtual getter by default which returns the documents `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
@@ -304,9 +331,15 @@ block content
 
   h4#_id option: _id
   :markdown
-    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assigned is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
-
-    Pass this option *during schema construction* to prevent documents from getting an `_id` created by Mongoose (parent documents will still have an `_id` created by MongoDB when inserted). _Passing the option later using `Schema.set('_id', false)` will not work. See issue [#1512](https://github.com/Automattic/mongoose/issues/1512)._
+    Mongoose assigns each of your schemas an `_id` field by default if one
+    is not passed into the [Schema](/docs/api.html#schema-js) constructor.
+    The type assigned is an [ObjectId](/docs/api.html#schema_Schema.Types)
+    to coincide with MongoDB's default behavior. If you don't want an `_id`
+    added to your schema at all, you may disable it using this option.
+    
+    You can **only** use this option on sub-documents. Mongoose can't
+    save a document without knowing its id, so you will get an error if
+    you try to save a document without an `_id`.
   :js
     // default behavior
     var schema = new Schema({ name: String });
@@ -315,27 +348,14 @@ block content
     console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
 
     // disabled _id
-    var schema = new Schema({ name: String }, { _id: false });
+    var childSchema = new Schema({ name: String }, { _id: false });
+    var parentSchema = new Schema({ children: [childSchema] });
 
-    // Don't set _id to false after schema construction as in
-    // var schema = new Schema({ name: String });
-    // schema.set('_id', false);
-
-    var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
-    console.log(p); // { name: 'mongodb.org' }
-
-    // MongoDB will create the _id when inserted
-    p.save(function (err) {
-      if (err) return handleError(err);
-      Page.findById(p, function (err, doc) {
-        if (err) return handleError(err);
-        console.log(doc); // { name: 'mongodb.org', _id: '50341373e894ad16347efe12' }
-      })
-    })
-
-  :markdown
-    Note that currently you must disable the `_id` 
+    var Model = mongoose.model('Model', parentSchema);
+    
+    Model.create({ children: [{ name: 'Luke' }] }, function(error, doc) {
+      // doc.children[0]._id will be undefined
+    });
 
   h4#minimize option: minimize
   :markdown
@@ -516,6 +536,28 @@ block content
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
     
+  h4#typeKey option: typeKey
+  :markdown
+    By default, if you have an object with key 'type' in your schema, mongoose
+    will interpret it as a type declaration.
+  
+  :js
+    // Mongoose interprets this as 'loc is a String'
+    var schema = new Schema({ loc: { type: String, coordinates: [Number] } });
+    
+  :markdown
+    However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
+    the 'type' property is important. If you want to control which key mongoose
+    uses to find type declarations, set the 'typeKey' schema option.
+    
+  :js
+    var schema = new Schema({
+      // Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'
+      loc: { type: String, coordinates: [Number] },
+      // Mongoose interprets this as 'name is a String'
+      name: { $type: String }
+    }, { typeKey: '$type' }); // A '$type' key means this object is a type declaration
+    
   h4#validateBeforeSave option: validateBeforeSave
   :markdown
     By default, documents are automatically validated before they are saved to the database. This is to prevent saving an invalid document. If you want to handle validation manually, and be able to save objects which don't pass validation, you can set validateBeforeSave to false.
@@ -535,7 +577,12 @@ block content
 
   h4#versionKey option: versionKey
   :markdown
-    The `versionKey` is a property set on each document when first created by Mongoose. This keys value contains the internal [revision](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning) of the document. The name of this document property is configurable. The default is `__v`. If this conflicts with your application you can configure as such:
+    The `versionKey` is a property set on each document when first created by
+    Mongoose. This keys value contains the internal
+    [revision](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning)
+    of the document. The `versionKey` option is a string that represents the
+    path to use for versioning. The default is `__v`. If this conflicts with
+    your application you can configure as such:
   :js
     var schema = new Schema({ name: 'string' });
     var Thing = mongoose.model('Thing', schema);
@@ -549,27 +596,71 @@ block content
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
 
   :markdown
-    Document versioning can also be disabled by setting the `versionKey` to false. _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning)._
+    Document versioning can also be disabled by setting the `versionKey` to
+    `false`.
+    _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning)._
   :js
     new Schema({..}, { versionKey: false });
     var Thing = mongoose.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
 
-    h4#skipVersioning option: skipVersioning
+  h4#skipVersioning option: skipVersioning
   :markdown
-    `skipVersioning` allows excluding paths from versioning (i.e the internal revision will not be incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
+    `skipVersioning` allows excluding paths from versioning (i.e., the internal revision will not be incremented even if these paths are updated). DO NOT do this unless you know what you're doing. For sub-documents, include this on the parent document using the fully qualified path. 
   :js
     new Schema({..}, { skipVersioning: { dontVersionMe: true } });
     thing.dontVersionMe.push('hey');
     thing.save(); // version is not incremented
+
+  h4#timestamps option: timestamps
+  :markdown
+    If set `timestamps`, mongoose assigns `createdAt` and `updatedAt` fields to your schema, the type assigned is [Date](http://mongoosejs.com/docs/api.html#schema-date-js).
+
+    By default, the name of two fields are `createdAt` and `updatedAt`, custom the field name by setting `timestamps.createdAt` and `timestamps.updatedAt`.
+  :js
+    var thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
+    var Thing = mongoose.model('Thing', thingSchema);
+    var thing = new Thing();
+    thing.save(); // `created_at` & `updatedAt` will be included
+
+  h4#useNestedStrict option: useNestedStrict
+  :markdown
+    In mongoose 4, `update()` and `findOneAndUpdate()` only check the top-level
+    schema's strict mode setting.
+  :js
+    var childSchema = new Schema({}, { strict: false });
+    var parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
+    var Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+      // Error because parentSchema has `strict: throw`, even though
+      // `childSchema` has `strict: false`
+    });
+
+    var update = { 'child.name': 'Luke Skywalker' };
+    var opts = { strict: false };
+    Parent.update({}, update, opts, function(error) {
+      // This works because passing `strict: false` to `update()` overwrites
+      // the parent schema.
+    });
+  :markdown
+    If you set `useNestedStrict` to true, mongoose will use the child schema's
+    `strict` option for casting updates.
+  :js
+    var childSchema = new Schema({}, { strict: false });
+    var parentSchema = new Schema({ child: childSchema },
+      { strict: 'throw', useNestedStrict: true });
+    var Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+      // Works!
+    });
 
   h3#plugins Pluggable
   p
     | Schemas are also 
     a(href="./plugins.html") pluggable
     |  which allows us to package up reusable features into 
-    a(href="http://plugins.mongoosejs.com") plugins
+    a(href="http://plugins.mongoosejs.io") plugins
     |  that can be shared with the community or just between your projects.
 
   h3#next Next Up

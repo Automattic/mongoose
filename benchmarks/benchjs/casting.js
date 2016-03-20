@@ -1,4 +1,3 @@
-
 var mongoose = require('../../lib');
 var Benchmark = require('benchmark');
 
@@ -22,42 +21,50 @@ var utils = require('../../lib/utils.js');
 var Comments = new Schema;
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  tags: [String],
+  owners: [ObjectId],
+  comments: [Comments],
+  def: {
+    type: String,
+    default: 'kandinsky'
   }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , tags      : [String]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
-  , def       : { type: String, default: 'kandinsky' }
 });
 
 var blogData = {
-  title : 'dummy post',
-  author : 'somebody',
-  slug : 'test.post',
-  date : new Date(),
-  meta : { date : new Date(), visitors: 9001},
-  published : true,
-  mixed : { thisIsRandom : true },
-  numbers : [1,2,7,10,23432],
-  tags : ['test', 'BENCH', 'things', 'more things'],
-  def : 'THANGS!!!',
-  comments : []
+  title: 'dummy post',
+  author: 'somebody',
+  slug: 'test.post',
+  date: new Date(),
+  meta: {
+    date: new Date(),
+    visitors: 9001
+  },
+  published: true,
+  mixed: {
+    thisIsRandom: true
+  },
+  numbers: [1, 2, 7, 10, 23432],
+  tags: ['test', 'BENCH', 'things', 'more things'],
+  def: 'THANGS!!!',
+  comments: []
 };
 
 var blogData10 = utils.clone(blogData);
@@ -77,39 +84,39 @@ for (i = 0; i < 10000; i++) {
   blogData10000.comments.push(commentData);
 }
 var commentData = {
-  title : 'test comment',
-  date : new Date(),
-  body : 'this be some crazzzyyyyy text that would go in a comment',
-  comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
+  title: 'test comment',
+  date: new Date(),
+  body: 'this be some crazzzyyyyy text that would go in a comment',
+  comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
 };
 BlogPost = mongoose.model('BlogPost', BlogPost);
 
 suite.add('Casting - Embedded Docs - 0 Docs', {
-  fn : function() {
+  fn: function() {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData);
   }
 }).add('Casting - Embedded Docs - 10 Docs', {
-  fn : function() {
+  fn: function() {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData10);
   }
 }).add('Casting - Embedded Docs - 100 Docs', {
-  fn : function() {
+  fn: function() {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData100);
   }
 }).add('Casting - Embedded Docs - 1000 Docs', {
-  fn : function() {
+  fn: function() {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData1000);
   }
 }).add('Casting - Embedded Docs - 10000 Docs', {
-  fn : function() {
+  fn: function() {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData10000);
@@ -127,8 +134,8 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
       out.stats = item.stats;
       delete out.stats.sample;
       out.ops = item.hz;
-      outObj[item.name.replace(/\s/g, "")] = out;
+      outObj[item.name.replace(/\s/g, '')] = out;
     });
     console.log(JSON.stringify(outObj));
   }
-}).run({ async : true });
+}).run({async: true});

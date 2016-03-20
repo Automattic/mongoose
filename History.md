@@ -1,3 +1,372 @@
+4.4.8 / 2016-03-18
+==================
+ * docs(aggregate): clarify promises #3990 [megagon](https://github.com/megagon)
+ * fix: upgrade mquery -> 1.10 #3988 [matskiv](https://github.com/matskiv)
+ * feat(connection): 'all' event for repl sets #3986 [xizhibei](https://github.com/xizhibei)
+ * docs(types): clarify Array.pull #3985 [seriousManual](https://github.com/seriousManual)
+ * feat(query): support array syntax for .sort() via mquery 1.9 #3980
+ * fix(populate): support > 3 level nested populate #3973
+ * fix: MongooseThenable exposes connection correctly #3972
+ * docs(connection): add note about reconnectTries and reconnectInterval #3969
+ * feat(document): invalidate returns the new validationError #3964
+ * fix(query): .eq() as shorthand for .equals #3953 [Fonger](https://github.com/Fonger)
+ * docs(connection): clarify connection string vs passed options #3941
+ * docs(query): select option for findOneAndUpdate #3933
+ * fix(error): ValidationError.properties no longer enumerable #3925
+ * docs(validation): clarify how required validators work with nested schemas #3915
+ * fix: upgrade mongodb driver -> 2.1.8 to make partial index errors more sane #3864
+
+4.4.7 / 2016-03-11
+==================
+ * fix(query): stop infinite recursion caused by merging a mongoose buffer #3961
+ * fix(populate): handle deep populate array -> array #3954
+ * fix(schema): allow setting timestamps with .set() #3952 #3951 #3907 [Fonger](https://github.com/Fonger)
+ * fix: MongooseThenable doesn't overwrite constructors #3940
+ * fix(schema): don't cast boolean to date #3935
+ * fix(drivers): support sslValidate in connection string #3929
+ * fix(types): correct markModified() for single nested subdocs #3910
+ * fix(drivers): catch and report any errors that occur in driver methods #3906
+ * fix(populate): get subpopulate model correctly when array under nested #3904
+ * fix(document): allow fields named 'pre' and 'post' #3902
+ * docs(query): clarify runValidators and setDefaultsOnInsert options #3892
+ * docs(validation): show how to use custom required messages in schema #2616
+
+4.4.6 / 2016-03-02
+==================
+ * fix: upgrade mongodb driver to 2.1.7 #3938
+ * docs: fix plugins link #3917 #3909 [fbertone](https://github.com/fbertone)
+ * fix(query): sort+select with count works #3914
+ * fix(query): improve mergeUpdate's ability to handle nested docs #3890
+
+4.4.5 / 2016-02-24
+==================
+ * fix(query): ability to select a length field (upgrade to mquery 1.7.0) #3903
+ * fix: include nested CastError as reason for array CastError #3897 [kotarou3](https://github.com/kotarou3)
+ * fix(schema): check for doc existence before taking fields #3889
+ * feat(schema): useNestedStrict option to take nested strict mode for update #3883
+ * docs(validation): clarify relationship between required and checkRequired #3822
+ * docs(populate): dynamic reference docs #3809
+ * docs: expand dropdown when clicking on file name #3807
+ * docs: plugins.mongoosejs.io is up #3127
+ * fix(schema): ability to add a virtual with same name as removed path #2398
+
+4.4.4 / 2016-02-17
+==================
+ * fix(schema): handle field selection when casting single nested subdocs #3880
+ * fix(populate): populating using base model with multiple child models in result #3878
+ * fix: ability to properly use return value of `mongoose.connect()` #3874
+ * fix(populate): dont hydrate populated subdoc if lean option set #3873
+ * fix(connection): dont re-auth if already connected with useDb #3871
+ * docs: cover how to set underlying driver's promise lib #3869
+ * fix(document): handle conflicting names in validation errors with subdocs #3867
+ * fix(populate): set undefined instead of null consistently when populate couldn't find results #3859
+ * docs: link to `execPopulate()` in `doc.populate()` docs #3836
+ * docs(plugin): link to the `mongoose.plugin()` function #3732
+
+4.4.3 / 2016-02-09
+==================
+ * fix: upgrade to mongodb 2.1.6 to remove kerberos log output #3861 #3860 [cartuchogl](https://github.com/cartuchogl)
+ * fix: require('mongoose') is no longer a pseudo-promise #3856
+ * fix(query): update casting for single nested docs #3820
+ * fix(populate): deep populating multiple paths with same options #3808
+ * docs(middleware): clarify save/validate hook order #1149
+
+4.4.2 / 2016-02-05
+==================
+ * fix(aggregate): handle calling .cursor() with no options #3855
+ * fix: upgrade mongodb driver to 2.1.5 for GridFS memory leak fix #3854
+ * docs: fix schematype.html conflict #3853 #3850 #3843
+ * fix(model): bluebird unhandled rejection with ensureIndexes() on init #3837
+ * docs: autoIndex option for createConnection #3805
+
+4.4.1 / 2016-02-03
+==================
+ * fix: linting broke some cases where we use `== null` as shorthand #3852
+ * docs: fix up schematype.html conflict #3848 #3843 [mynameiscoffey](https://github.com/mynameiscoffey)
+ * fix: backwards breaking change with `.connect()` return value #3847
+ * docs: downgrade dox and highlight.js to fix docs build #3845
+ * docs: clean up typo #3842 [Flash-](https://github.com/Flash-)
+ * fix(document): storeShard handles undefined values #3841
+ * chore: more linting #3838 [TrejGun](https://github.com/TrejGun)
+ * fix(schema): handle `text: true` as a way to declare a text index #3824
+
+4.4.0 / 2016-02-02
+==================
+ * docs: fix expireAfterSeconds index option name #3831 [Flash-](https://github.com/Flash-)
+ * chore: run lint after test #3829 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * chore: use power-assert instead of assert #3828 [TrejGun](https://github.com/TrejGun)
+ * chore: stricter lint #3827 [TrejGun](https://github.com/TrejGun)
+ * feat(types): casting moment to date #3813 [TrejGun](https://github.com/TrejGun)
+ * chore: comma-last lint for test folder #3810 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: upgrade async mpath, mpromise, muri, and sliced #3801 [TrejGun](https://github.com/TrejGun)
+ * fix(query): geo queries now return proper ES2015 promises #3800 [TrejGun](https://github.com/TrejGun)
+ * perf(types): use `Object.defineProperties()` for array #3799 [TrejGun](https://github.com/TrejGun)
+ * fix(model): mapReduce, ensureIndexes, remove, and save properly return ES2015 promises #3795 #3628 #3595 [TrejGun](https://github.com/TrejGun)
+ * docs: fixed dates in History.md #3791 [Jokero](https://github.com/Jokero)
+ * feat: connect, open, openSet, and disconnect return ES2015 promises #3790 #3622 [TrejGun](https://github.com/TrejGun)
+ * feat: custom type for int32 via mongoose-int32 npm package #3652 #3102
+ * feat: basic custom schema type API #995
+ * feat(model): `insertMany()` for more performant bulk inserts #723
+
+4.3.7 / 2016-01-23
+==================
+ * docs: grammar fix in timestamps docs #3786 [zclancy](https://github.com/zclancy)
+ * fix(document): setting nested populated docs #3783 [slamuu](https://github.com/slamuu)
+ * fix(document): don't call post save hooks twice for pushed docs #3780
+ * fix(model): handle `_id=0` correctly #3776
+ * docs(middleware): async post hooks #3770
+ * docs: remove confusing sentence #3765 [marcusmellis89](https://github.com/marcusmellis89)
+
+3.8.39 / 2016-01-15
+===================
+ * fixed; casting a number to a buffer #3764
+ * fixed; enumerating virtual property with nested objects #3743 [kusold](https://github.com/kusold)
+
+4.3.6 / 2016-01-15
+==================
+ * fix(types): casting a number to a buffer #3764
+ * fix: add "listener" to reserved keywords #3759
+ * chore: upgrade uglify #3757 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: broken execPopulate() in 4.3.5 #3755 #3753
+ * fix: ability to remove() a single embedded doc #3754
+ * style: comma-last in test folder #3751 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs: clarify versionKey option #3747
+ * fix: improve colorization for arrays #3744 [TrejGun](https://github.com/TrejGun)
+ * fix: webpack build #3713
+
+4.3.5 / 2016-01-09
+==================
+ * fix(query): throw when 4th parameter to update not a function #3741 [kasselTrankos](https://github.com/kasselTrankos)
+ * fix(document): separate error type for setting an object to a primitive #3735
+ * fix(populate): Model.populate returns ES6 promise #3734
+ * fix(drivers): re-register event handlers after manual reconnect #3729
+ * docs: broken links #3727
+ * fix(validation): update validators run array validation #3724
+ * docs: clarify the need to use markModified with in-place date ops #3722
+ * fix(document): mark correct path as populated when manually populating array #3721
+ * fix(aggregate): support for array pipeline argument to append #3718 [dbkup](https://github.com/dbkup)
+ * docs: clarify `.connect()` callback #3705
+ * fix(schema): properly validate nested single nested docs #3702
+ * fix(types): handle setting documentarray of wrong type #3701
+ * docs: broken links #3700
+ * fix(drivers): debug output properly displays '0' #3689
+
+3.8.38 / 2016-01-07
+===================
+ * fixed; aggregate.append an array #3730 [dbkup](https://github.com/dbkup)
+
+4.3.4 / 2015-12-23
+==================
+ * fix: upgrade mongodb driver to 2.1.2 for repl set error #3712 [sansmischevia](https://github.com/sansmischevia)
+ * docs: validation docs typo #3709 [ivanmaeder](https://github.com/ivanmaeder)
+ * style: remove unused variables #3708 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix(schema): duck-typing for schemas #3703 [mgcrea](https://github.com/mgcrea)
+ * docs: connection sample code issue #3697
+ * fix(schema): duck-typing for schemas #3693 [mgcrea](https://github.com/mgcrea)
+ * docs: clarify id schema option #3638
+
+4.3.3 / 2015-12-18
+==================
+ * fix(connection): properly support 'replSet' as well as 'replset' #3688 [taxilian](https://github.com/taxilian)
+ * fix(document): single nested doc pre hooks called before nested doc array #3687 [aliatsis](https://github.com/aliatsis)
+
+4.3.2 / 2015-12-17
+==================
+ * fix(document): .set() into single nested schemas #3686
+ * fix(connection): support 'replSet' as well as 'replset' option #3685
+ * fix(document): bluebird unhandled rejection when validating doc arrays #3681
+ * fix(document): hooks for doc arrays in single nested schemas #3680
+ * fix(document): post hooks for single nested schemas #3679
+ * fix: remove unused npm module #3674 [sybarite](https://github.com/sybarite)
+ * fix(model): don't swallow exceptions in nested doc save callback #3671
+ * docs: update keepAlive info #3667 [ChrisZieba](https://github.com/ChrisZieba)
+ * fix(document): strict 'throw' throws a specific mongoose error #3662
+ * fix: flakey test #3332
+ * fix(query): more robust check for RegExp #2969
+
+4.3.1 / 2015-12-11
+==================
+ * feat(aggregate): `.sample()` helper #3665
+ * fix(query): bitwise query operators with buffers #3663
+ * docs(migration): clarify `new` option and findByIdAndUpdate #3661
+
+4.3.0 / 2015-12-09
+==================
+ * feat(query): support for mongodb 3.2 bitwise query operators #3660
+ * style: use comma-last style consistently #3657 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * feat: upgrade mongodb driver to 2.1.0 for full MongoDB 3.2 support #3656
+ * feat(aggregate): `.lookup()` helper #3532
+
+4.2.10 / 2015-12-08
+===================
+ * fixed; upgraded marked #3653 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs; cross-db populate #3648
+ * docs; update mocha URL #3646 [ojhaujjwal](https://github.com/ojhaujjwal)
+ * fixed; call close callback asynchronously #3645
+ * docs; virtuals.html issue #3644 [Psarna94](https://github.com/Psarna94)
+ * fixed; single embedded doc casting on init #3642
+ * docs; validation docs improvements #3640
+
+4.2.9 / 2015-12-02
+==================
+ * docs; defaults docs #3625
+ * fix; nested numeric keys causing an embedded document crash #3623
+ * fix; apply path getters before virtual getters #3618
+ * fix; casting for arrays in single nested schemas #3616
+
+4.2.8 / 2015-11-25
+==================
+ * docs; clean up README links #3612 [ReadmeCritic](https://github.com/ReadmeCritic)
+ * fix; ESLint improvements #3605 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix; assigning single nested subdocs #3601
+ * docs; describe custom logging functions in `mongoose.set()` docs #3557
+
+4.2.7 / 2015-11-20
+==================
+ * fixed; readPreference connection string option #3600
+ * fixed; pulling from manually populated arrays #3598 #3579
+ * docs; FAQ about OverwriteModelError #3597 [stcruy](https://github.com/stcruy)
+ * fixed; setting single embedded schemas to null #3596
+ * fixed; indexes for single embedded schemas #3594
+ * docs; clarify projection for `findOne()` #3593 [gunar](https://github.com/gunar)
+ * fixed; .ownerDocument() method on single embedded schemas #3589
+ * fixed; properly throw casterror for query on single embedded schema #3580
+ * upgraded; mongodb driver -> 2.0.49 for reconnect issue fix #3481
+
+4.2.6 / 2015-11-16
+==================
+ * fixed; ability to manually populate an array #3575
+ * docs; clarify `isAsync` parameter to hooks #3573
+ * fixed; use captureStackTrace if possible instead #3571
+ * fixed; crash with buffer and update validators #3565 [johnpeb](https://github.com/johnpeb)
+ * fixed; update casting with operators overwrite: true #3564
+ * fixed; validation with single embedded docs #3562
+ * fixed; inline docs inherit parents $type key #3560
+ * docs; bad grammar in populate docs #3559 [amaurymedeiros](https://github.com/amaurymedeiros)
+ * fixed; properly handle populate option for find() #2321
+
+3.8.37 / 2015-11-16
+===================
+ * fixed; use retainKeyOrder for cloning update op #3572
+
+4.2.5 / 2015-11-09
+==================
+ * fixed; handle setting fields in pre update hooks with exec #3549
+ * upgraded; ESLint #3547 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; bluebird unhandled rejections with cast errors and .exec #3543
+ * fixed; min/max validators handling undefined #3539
+ * fixed; standalone mongos connections #3537
+ * fixed; call `.toObject()` when setting a single nested doc #3535
+ * fixed; single nested docs now have methods #3534
+ * fixed; single nested docs with .create() #3533 #3521 [tusbar](https://github.com/tusbar)
+ * docs; deep populate docs #3528
+ * fixed; deep populate schema ref handling #3507
+ * upgraded; mongodb driver -> 2.0.48 for sort overflow issue #3493
+ * docs; clarify default ids for discriminators #3482
+ * fixed; properly support .update(doc) #3221
+
+4.2.4 / 2015-11-02
+==================
+ * fixed; upgraded `ms` package for security vulnerability #3254 [fhemberger](https://github.com/fhemberger)
+ * fixed; ESlint rules #3517 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs; typo in aggregation docs #3513 [rafakato](https://github.com/rafakato)
+ * fixed; add `dontThrowCastError` option to .update() for promises #3512
+ * fixed; don't double-cast buffers in node 4.x #3510 #3496
+ * fixed; population with single embedded schemas #3501
+ * fixed; pre('set') hooks work properly #3479
+ * docs; promises guide #3441
+
+4.2.3 / 2015-10-26
+==================
+ * docs; remove unreferenced function in middleware.jade #3506
+ * fixed; handling auth with no username/password #3500 #3498 #3484 [mleanos](https://github.com/mleanos)
+ * fixed; more ESlint rules #3491 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; swallowing exceptions in save callback #3478
+ * docs; fixed broken links in subdocs guide #3477
+ * fixed; casting booleans to numbers #3475
+ * fixed; report CastError for subdoc arrays in findOneAndUpdate #3468
+ * fixed; geoNear returns ES6 promise #3458
+
+4.2.2 / 2015-10-22
+==================
+ * fixed; go back to old pluralization code #3490
+
+4.2.1 / 2015-10-22
+==================
+ * fixed; pluralization issues #3492 [ChristianMurphy](https://github.com/ChristianMurphy)
+
+4.2.0 / 2015-10-22
+==================
+ * added; support for skipVersioning for document arrays #3467 [chazmo03](https://github.com/chazmo03)
+ * added; ability to customize schema 'type' key #3459 #3245
+ * fixed; writeConcern for index builds #3455
+ * added; emit event when individual index build starts #3440 [objectiveSee](https://github.com/objectiveSee)
+ * added; 'context' option for update validators #3430
+ * refactor; pluralization now in separate pluralize-mongoose npm module #3415 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * added; customizable error validation messages #3406 [geronime](https://github.com/geronime)
+ * added; support for passing 'minimize' option to update #3381
+ * added; ability to customize debug logging format #3261
+ * added; baseModelName property for discriminator models #3202
+ * added; 'emitIndexErrors' option #3174
+ * added; 'async' option for aggregation cursor to support buffering #3160
+ * added; ability to skip validation for individual save() calls #2981
+ * added; single embedded schema support #2689 #585
+ * added; depopulate function #2509
+
+4.1.12 / 2015-10-19
+===================
+ * docs; use readPreference instead of slaveOk for Query.setOptions docs #3471 [buunguyen](https://github.com/buunguyen)
+ * fixed; more helpful error when regexp contains null bytes #3456
+ * fixed; x509 auth issue #3454 [NoxHarmonium](https://github.com/NoxHarmonium)
+
+3.8.36 / 2015-10-18
+===================
+ * fixed; Make array props non-enumerable #3461 [boblauer](https://github.com/boblauer)
+
+4.1.11 / 2015-10-12
+===================
+ * fixed; update timestamps for update() if they're enabled #3450 [isayme](https://github.com/isayme)
+ * fixed; unit test error on node 0.10 #3449 [isayme](https://github.com/isayme)
+ * docs; timestamp option docs #3448 [isayme](https://github.com/isayme)
+ * docs; fix unexpected indent #3443 [isayme](https://github.com/isayme)
+ * fixed; use ES6 promises for Model.prototype.remove() #3442
+ * fixed; don't use unused 'safe' option for index builds #3439
+ * fixed; elemMatch casting bug #3437 #3435 [DefinitelyCarter](https://github.com/DefinitelyCarter)
+ * docs; schema.index docs #3434
+ * fixed; exceptions in save() callback getting swallowed on mongodb 2.4 #3371
+
+4.1.10 / 2015-10-05
+===================
+ * docs; improve virtuals docs to explain virtuals schema option #3433 [zoyaH](https://github.com/zoyaH)
+ * docs; MongoDB server version compatibility guide #3427
+ * docs; clarify that findById and findByIdAndUpdate fire hooks #3422
+ * docs; clean up Model.save() docs #3420
+ * fixed; properly handle projection with just id #3407 #3412
+ * fixed; infinite loop when database document is corrupted #3405
+ * docs; clarify remove middleware #3388
+
+4.1.9 / 2015-09-28
+==================
+ * docs; minlength and maxlength string validation docs #3368 #3413 [cosmosgenius](https://github.com/cosmosgenius)
+ * fixed; linting for infix operators #3397 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; proper casting for $all #3394
+ * fixed; unhandled rejection warnings with .create() #3391
+ * docs; clarify update validators on paths that aren't explicitly set #3386
+ * docs; custom validator examples #2778
+
+4.1.8 / 2015-09-21
+==================
+ * docs; fixed typo in example #3390 [kmctown](https://github.com/kmctown)
+ * fixed; error in toObject() #3387 [guumaster](https://github.com/guumaster)
+ * fixed; handling for casting null dates #3383 [alexmingoia](https://github.com/alexmingoia)
+ * fixed; passing composite ids to `findByIdAndUpdate` #3380
+ * fixed; linting #3376 #3375 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; added NodeJS v4 to Travis #3374 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; casting $elemMatch inside of $not #3373 [gaguirre](https://github.com/gaguirre)
+ * fixed; handle case where $slice is 0 #3369
+ * fixed; avoid running getters if path is populated #3357
+ * fixed; cast documents to objects when setting to a nested path #3346
+
 4.1.7 / 2015-09-14
 ==================
  * docs; typos in SchemaType documentation #3367 [jasson15](https://github.com/jasson15)

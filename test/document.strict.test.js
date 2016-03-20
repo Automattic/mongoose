@@ -1,13 +1,12 @@
-
 /**
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('power-assert'),
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema;
 
 describe('document: strict mode:', function() {
   describe('should work', function() {
@@ -17,14 +16,14 @@ describe('document: strict mode:', function() {
       db = start();
 
       var raw = {
-        ts  : { type: Date, default: Date.now }
-        , content: String
-        , mixed: {}
-        , deepMixed: { '4a': {}}
-        , arrayMixed: []
+        ts: {type: Date, default: Date.now},
+        content: String,
+        mixed: {},
+        deepMixed: {'4a': {}},
+        arrayMixed: []
       };
 
-      var lax = new Schema(raw, { strict: false });
+      var lax = new Schema(raw, {strict: false});
       var strict = new Schema(raw);
 
       Lax = db.model('Lax', lax);
@@ -112,31 +111,31 @@ describe('document: strict mode:', function() {
     var db = start();
 
     var lax = new Schema({
-      name: { last: String }
-    }, { strict: false });
+      name: {last: String}
+    }, {strict: false});
 
     var strict = new Schema({
-      name: { last: String }
+      name: {last: String}
     });
 
     var Lax = db.model('NestedLax', lax, 'nestdoc' + random());
     var Strict = db.model('NestedStrict', strict, 'nestdoc' + random());
 
     var l = new Lax;
-    l.set('name', { last: 'goose', hack: 'xx' });
+    l.set('name', {last: 'goose', hack: 'xx'});
     l = l.toObject();
     assert.equal('goose', l.name.last);
     assert.equal('xx', l.name.hack);
 
     var s = new Strict;
-    s.set({ name: { last: 'goose', hack: 'xx' }});
+    s.set({name: {last: 'goose', hack: 'xx'}});
     s = s.toObject();
     assert.equal('goose', s.name.last);
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
 
     s = new Strict;
-    s.set('name', { last: 'goose', hack: 'xx' });
+    s.set('name', {last: 'goose', hack: 'xx'});
     s.set('shouldnt.exist', ':(');
     s = s.toObject();
     assert.equal('goose', s.name.last);
@@ -150,26 +149,26 @@ describe('document: strict mode:', function() {
     var db = start();
 
     var lax = new Schema({
-      ts  : { type: Date, default: Date.now }
-      , content: String
-    }, { strict: false });
+      ts: {type: Date, default: Date.now},
+      content: String
+    }, {strict: false});
 
     var strict = new Schema({
-      ts  : { type: Date, default: Date.now }
-      , content: String
+      ts: {type: Date, default: Date.now},
+      content: String
     });
 
-    var Lax = db.model('EmbeddedLax', new Schema({ dox: [lax] }, { strict: false }), 'embdoc' + random());
-    var Strict = db.model('EmbeddedStrict', new Schema({ dox: [strict] }, { strict: false }), 'embdoc' + random());
+    var Lax = db.model('EmbeddedLax', new Schema({dox: [lax]}, {strict: false}), 'embdoc' + random());
+    var Strict = db.model('EmbeddedStrict', new Schema({dox: [strict]}, {strict: false}), 'embdoc' + random());
 
-    var l = new Lax({ dox: [{content: 'sample', rouge: 'data'}] });
+    var l = new Lax({dox: [{content: 'sample', rouge: 'data'}]});
     assert.equal(false, l.dox[0].$__.strictMode);
     l = l.dox[0].toObject();
     assert.equal('sample', l.content);
     assert.equal('data', l.rouge);
     assert.ok(l.rouge);
 
-    var s = new Strict({ dox: [{content: 'sample', rouge: 'data'}] });
+    var s = new Strict({dox: [{content: 'sample', rouge: 'data'}]});
     assert.equal(true, s.dox[0].$__.strictMode);
     s = s.dox[0].toObject();
     assert.ok('ts' in s);
@@ -186,7 +185,7 @@ describe('document: strict mode:', function() {
     assert.ok(!s3.dox[0].rouge);
 
     // strict on create
-    Strict.create({dox:[{content: 'sample2', rouge: 'data'}]}, function(err, doc) {
+    Strict.create({dox: [{content: 'sample2', rouge: 'data'}]}, function(err, doc) {
       assert.equal('sample2', doc.dox[0].content);
       assert.ok(!('rouge' in doc.dox[0]));
       assert.ok(!doc.dox[0].rouge);
@@ -197,12 +196,12 @@ describe('document: strict mode:', function() {
   it('virtuals', function(done) {
     var db = start();
 
-    var getCount = 0
-      , setCount = 0;
+    var getCount = 0,
+        setCount = 0;
 
     var strictSchema = new Schema({
-      email: String
-      , prop: String
+      email: String,
+      prop: String
     });
 
     strictSchema
@@ -219,8 +218,8 @@ describe('document: strict mode:', function() {
     var StrictModel = db.model('StrictVirtual', strictSchema);
 
     var strictInstance = new StrictModel({
-      email: 'hunter@skookum.com'
-      , myvirtual: 'test'
+      email: 'hunter@skookum.com',
+      myvirtual: 'test'
     });
 
     assert.equal(0, getCount);
@@ -246,20 +245,20 @@ describe('document: strict mode:', function() {
     });
 
     var Strict = db.model('Strict', strict);
-    var s = new Strict({ bool: true });
+    var s = new Strict({bool: true});
 
     // insert non-schema property
     var doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insert(doc, { w: 1 }, function(err) {
+    Strict.collection.insert(doc, {w: 1}, function(err) {
       assert.ifError(err);
       Strict.findById(doc._id, function(err, doc) {
         assert.ifError(err);
         assert.equal(true, doc._doc.bool);
         assert.equal(true, doc._doc.notInSchema);
         doc.bool = undefined;
-        doc.set('notInSchema', undefined, { strict: false });
+        doc.set('notInSchema', undefined, {strict: false});
         doc.save(function() {
           Strict.findById(doc._id, function(err, doc) {
             assert.ifError(err);
@@ -280,13 +279,13 @@ describe('document: strict mode:', function() {
     });
 
     var Strict = db.model('Strict', strict);
-    var s = new Strict({ bool: true });
+    var s = new Strict({bool: true});
 
     // insert non-schema property
     var doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insert(doc, { w: 1 }, function(err) {
+    Strict.collection.insert(doc, {w: 1}, function(err) {
       assert.ifError(err);
 
       Strict.findById(doc._id, function(err, doc) {
@@ -294,22 +293,18 @@ describe('document: strict mode:', function() {
         assert.equal(true, doc._doc.bool);
         assert.equal(true, doc._doc.notInSchema);
 
-        Strict.update(
-            { _id: doc._id }
-          , { $unset: { bool: 1, notInSchema: 1 }}
-          , { strict: false, w: 1 }
-          , function(err) {
+        Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
+            function(err) {
+              assert.ifError(err);
 
-          assert.ifError(err);
-
-          Strict.findById(doc._id, function(err, doc) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(undefined, doc._doc.bool);
-            assert.equal(undefined, doc._doc.notInSchema);
-            done();
-          });
-        });
+              Strict.findById(doc._id, function(err, doc) {
+                db.close();
+                assert.ifError(err);
+                assert.equal(undefined, doc._doc.bool);
+                assert.equal(undefined, doc._doc.notInSchema);
+                done();
+              });
+            });
       });
     });
   });
@@ -322,13 +317,13 @@ describe('document: strict mode:', function() {
     });
 
     var Strict = db.model('Strict', strict);
-    var s = new Strict({ bool: true });
+    var s = new Strict({bool: true});
 
     // insert non-schema property
     var doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insert(doc, { w: 1 }, function(err) {
+    Strict.collection.insert(doc, {w: 1}, function(err) {
       assert.ifError(err);
 
       Strict.findById(doc._id, function(err, doc) {
@@ -336,28 +331,24 @@ describe('document: strict mode:', function() {
         assert.equal(true, doc._doc.bool);
         assert.equal(true, doc._doc.notInSchema);
 
-        Strict.findOneAndUpdate(
-            { _id: doc._id }
-          , { $unset: { bool: 1, notInSchema: 1 }}
-          , { strict: false, w: 1 }
-          , function(err) {
+        Strict.findOneAndUpdate({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
+            function(err) {
+              assert.ifError(err);
 
-          assert.ifError(err);
-
-          Strict.findById(doc._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(undefined, doc._doc.bool);
-            assert.equal(undefined, doc._doc.notInSchema);
-            db.close(done);
-          });
-        });
+              Strict.findById(doc._id, function(err, doc) {
+                assert.ifError(err);
+                assert.equal(undefined, doc._doc.bool);
+                assert.equal(undefined, doc._doc.notInSchema);
+                db.close(done);
+              });
+            });
       });
     });
   });
 
   describe('"throws" mode', function() {
     it('throws on set() of unknown property', function(done) {
-      var schema = Schema({ n: String, docs:[{x:[{y:String}]}] });
+      var schema = new Schema({n: String, docs: [{x: [{y: String}]}]});
       schema.set('strict', 'throw');
       var M = mongoose.model('throwStrictSet', schema, 'tss_' + random());
       var m = new M;
@@ -406,8 +397,8 @@ describe('document: strict mode:', function() {
     it('fails with extra fields', function(done) {
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
-        name: { type: String }
-      }, {strict: "throw"});
+        name: {type: String}
+      }, {strict: 'throw'});
 
       // Create the model
       var Foo = mongoose.model('Foo1234', FooSchema);
@@ -427,17 +418,32 @@ describe('document: strict mode:', function() {
     it('doesnt throw with refs (gh-2665)', function(done) {
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
-        name: { type: mongoose.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
-        father: { name: { full: String } }
-      }, {strict: "throw"});
+        name: {type: mongoose.Schema.Types.ObjectId, ref: 'test', required: false, default: null},
+        father: {name: {full: String}}
+      }, {strict: 'throw'});
 
       // Create the model
       var Foo = mongoose.model('Foo', FooSchema);
 
       assert.doesNotThrow(function() {
-        new Foo({name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
+        new Foo({name: mongoose.Types.ObjectId(), father: {name: {full: 'bacon'}}});
       });
 
+      done();
+    });
+
+    it('set nested to num throws ObjectExpectedError (gh-3735)', function(done) {
+      var schema = new Schema({
+        resolved: {
+          by: {type: String}
+        }
+      }, {strict: 'throw'});
+
+      var Test = mongoose.model('gh3735', schema);
+
+      assert.throws(function() {
+        new Test({resolved: 123});
+      }, /ObjectExpectedError/);
       done();
     });
   });

@@ -138,7 +138,7 @@ describe('schema options.timestamps', function() {
       });
     });
 
-    it('should not change updatedAt when save with no modifications', function (done) {
+    it('should not change updatedAt when save with no modifications', function(done) {
       Cat.findOne({name: 'newcat'}, function(err, doc) {
         var old = doc.updatedAt;
 

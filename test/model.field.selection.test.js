@@ -413,10 +413,10 @@ describe('model field selection', function() {
           loc: {type: [Number], index: '2d'}
         },
         points: [
-            {
-              name: {type: String},
-              loc: {type: [Number], index: '2d'}
-            }
+          {
+            name: {type: String},
+            loc: {type: [Number], index: '2d'}
+          }
         ]
       }
     });

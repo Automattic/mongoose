@@ -28,7 +28,7 @@ block content
     })
   :markdown
     Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
-    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result` 
+    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
     will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
   .important
     :markdown
@@ -55,7 +55,7 @@ block content
     // With a JSON doc
     Person.
       find({
-        occupation: /host/,
+        occupation: '/host/',
         'name.last': 'Ghost',
         age: { $gt: 17, $lt: 66 },
         likes: { $in: ['vaporizing', 'talking'] }
@@ -67,7 +67,7 @@ block content
 
     // Using query builder
     Person.
-      find({ occupation: /host/ }).
+      find({ occupation: '/host/' }).
       where('name.last').equals('Ghost').
       where('age').gt(17).lt(66).
       where('likes').in(['vaporizing', 'talking']).

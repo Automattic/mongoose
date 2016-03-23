@@ -1,3 +1,8 @@
+4.4.9 / 2016-03-22
+==================
+ * fix: upgrade mongodb -> 2.1.10 re https://jira.mongodb.org/browse/NODE-679 #4010
+ * docs: add syntax highlighting for acquit examples #3975
+
 4.4.8 / 2016-03-18
 ==================
  * docs(aggregate): clarify promises #3990 [megagon](https://github.com/megagon)

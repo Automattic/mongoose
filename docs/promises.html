@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Promises v4.4.8</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.io">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html">types</a></li><li class="customschematypes"><a href="./customschematypes.html">custom</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./customschematypes.html">custom schema types</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="built-in-promises"><p>Built-in Promises</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Promises v4.4.9</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.io">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html">types</a></li><li class="customschematypes"><a href="./customschematypes.html">custom</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./customschematypes.html">custom schema types</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="built-in-promises"><p>Built-in Promises</p>
 </h2><p>Mongoose async operations, like <code>.save()</code> and queries, return
 <a href="https://promisesaplus.com/">Promises/A+ conformant promises</a>.
 This means that you can do things like <code>MyModel.findOne({}).then()</code> and
@@ -6,36 +6,36 @@ This means that you can do things like <code>MyModel.findOne({}).then()</code> a
 <p>For backwards compatibility, Mongoose 4 returns <a href="https://www.npmjs.com/package/mpromise">mpromise</a>
 promises by default.</p>
 <pre><code class="javascript">
-    var gnr = new Band({
-      name: &quot;Guns N' Roses&quot;,
-      members: ['Axl', 'Slash']
+    <span class="keyword">var</span> gnr = <span class="keyword">new</span> Band({
+      name: <span class="string">"Guns N' Roses"</span>,
+      members: [<span class="string">'Axl'</span>, <span class="string">'Slash'</span>]
     });
 
-    var promise = gnr.save();
-    assert.ok(promise instanceof require('mpromise'));
+    <span class="keyword">var</span> promise = gnr.save();
+    assert.ok(promise <span class="keyword">instanceof</span> require(<span class="string">'mpromise'</span>));
 
-    promise.then(function (doc) {
-      assert.equal(doc.name, &quot;Guns N' Roses&quot;);
+    promise.then(<span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
+      assert.equal(doc.name, <span class="string">"Guns N' Roses"</span>);
     });
   </code></pre><h2 id="queries-are-not-promises"><p>Queries are not promises</p>
 </h2><p>Mongoose queries are <strong>not</strong> promises. However, they do have a <code>.then()</code>
 function for <code>yield</code> and async/await. If you need
 a fully-fledged promise, use the <code>.exec()</code> function.</p>
 <pre><code class="javascript">
-    var query = Band.findOne({name: &quot;Guns N' Roses&quot;});
-    assert.ok(!(query instanceof require('mpromise')));
+    <span class="keyword">var</span> query = Band.findOne({name: <span class="string">"Guns N' Roses"</span>});
+    assert.ok(!(query <span class="keyword">instanceof</span> require(<span class="string">'mpromise'</span>)));
 
-    // A query is not a fully-fledged promise, but it does have a `.then()`.
-    query.then(function (doc) {
-      // use doc
+    <span class="comment">// A query is not a fully-fledged promise, but it does have a `.then()`.</span>
+    query.then(<span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
+      <span class="comment">// use doc</span>
     });
 
-    // `.exec()` gives you a fully-fledged promise
-    var promise = query.exec();
-    assert.ok(promise instanceof require('mpromise'));
+    <span class="comment">// `.exec()` gives you a fully-fledged promise</span>
+    <span class="keyword">var</span> promise = query.exec();
+    assert.ok(promise <span class="keyword">instanceof</span> require(<span class="string">'mpromise'</span>));
 
-    promise.then(function (doc) {
-      // use doc
+    promise.then(<span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
+      <span class="comment">// use doc</span>
     });
   </code></pre><h2 id="plugging-in-your-own-promises-library"><p>Plugging in your own Promises Library</p>
 </h2><p><em>New in Mongoose 4.1.0</em></p>
@@ -52,19 +52,19 @@ an ES6-style promise constructor should work in theory, but theory
 often differs from practice. If you find a bug, open
 <a href="https://github.com/Automattic/mongoose/issues">an issue on GitHub</a></p>
 <pre><code class="javascript">
-    var query = Band.findOne({name: &quot;Guns N' Roses&quot;});
+    <span class="keyword">var</span> query = Band.findOne({name: <span class="string">"Guns N' Roses"</span>});
 
-    // Use native promises
+    <span class="comment">// Use native promises</span>
     mongoose.Promise = global.Promise;
     assert.equal(query.exec().constructor, global.Promise);
 
-    // Use bluebird
-    mongoose.Promise = require('bluebird');
-    assert.equal(query.exec().constructor, require('bluebird'));
+    <span class="comment">// Use bluebird</span>
+    mongoose.Promise = require(<span class="string">'bluebird'</span>);
+    assert.equal(query.exec().constructor, require(<span class="string">'bluebird'</span>));
 
-    // Use q. Note that you **must** use `require('q').Promise`.
-    mongoose.Promise = require('q').Promise;
-    assert.ok(query.exec() instanceof require('q').makePromise);
+    <span class="comment">// Use q. Note that you **must** use `require('q').Promise`.</span>
+    mongoose.Promise = require(<span class="string">'q'</span>).Promise;
+    assert.ok(query.exec() <span class="keyword">instanceof</span> require(<span class="string">'q'</span>).makePromise);
   </code></pre><h2 id="promises-for-the-mongodb-driver"><p>Promises for the MongoDB Driver</p>
 </h2><p>The <code>mongoose.Promise</code> property sets the promises mongoose uses. However,
 this does <strong>not</strong> affect the underlying MongoDB driver. If you use the
@@ -72,15 +72,15 @@ underlying driver, for instance <code>Model.collection.db.insert()</code>, you
 need to do a little extra work to change the underlying promises library.
 Note that the below code assumes mongoose &gt;= 4.4.4.</p>
 <pre><code class="javascript">
-    var uri = 'mongodb://localhost:27017/mongoose_test';
-    // Use bluebird
-    var options = { promiseLibrary: require('bluebird') };
-    var db = mongoose.createConnection(uri, options);
+    <span class="keyword">var</span> uri = <span class="string">'mongodb://localhost:27017/mongoose_test'</span>;
+    <span class="comment">// Use bluebird</span>
+    <span class="keyword">var</span> options = { promiseLibrary: require(<span class="string">'bluebird'</span>) };
+    <span class="keyword">var</span> db = mongoose.createConnection(uri, options);
 
-    Band = db.model('band-promises', { name: String });
+    Band = db.model(<span class="string">'band-promises'</span>, { name: String });
 
-    db.on('open', function() {
-      assert.equal(Band.collection.findOne().constructor, require('bluebird'));
+    db.on(<span class="string">'open'</span>, <span class="keyword">function</span>() {
+      assert.equal(Band.collection.findOne().constructor, require(<span class="string">'bluebird'</span>));
     });
   </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';

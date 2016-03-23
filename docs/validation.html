@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.4.8</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.io">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html">types</a></li><li class="customschematypes"><a href="./customschematypes.html">custom</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./customschematypes.html">custom schema types</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="validation"><p>Validation</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.4.9</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.io">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html">types</a></li><li class="customschematypes"><a href="./customschematypes.html">custom</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./customschematypes.html">custom schema types</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="validation"><p>Validation</p>
 </h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
 <ul>
 <li>Validation is defined in the <a href="./schematypes.html">SchemaType</a></li>
@@ -9,23 +9,23 @@
 <li>Validation is customizable</li>
 </ul>
 <pre><code class="javascript">
-    var schema = new Schema({
+    <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({
       name: {
         type: String,
-        required: true
+        required: <span class="literal">true</span>
       }
     });
-    var Cat = db.model('Cat', schema);
+    <span class="keyword">var</span> Cat = db.model(<span class="string">'Cat'</span>, schema);
 
-    // This cat has no name :(
-    var cat = new Cat();
-    cat.save(function(error) {
-      assert.equal(error.errors['name'].message,
-        'Path `name` is required.');
+    <span class="comment">// This cat has no name :(</span>
+    <span class="keyword">var</span> cat = <span class="keyword">new</span> Cat();
+    cat.save(<span class="keyword">function</span>(error) {
+      assert.equal(error.errors[<span class="string">'name'</span>].message,
+        <span class="string">'Path `name` is required.'</span>);
 
       error = cat.validateSync();
-      assert.equal(error.errors['name'].message,
-        'Path `name` is required.');
+      assert.equal(error.errors[<span class="string">'name'</span>].message,
+        <span class="string">'Path `name` is required.'</span>);
     });
   </code></pre><h2 id="built-in-validators"><p>Built-in Validators</p>
 </h2><p>Mongoose has several built-in validators.</p>
@@ -36,38 +36,38 @@
 </ul>
 <p>Each of the validator links above provide more information about how to enable them and customize their error messages.</p>
 <pre><code class="javascript">
-    var breakfastSchema = new Schema({
+    <span class="keyword">var</span> breakfastSchema = <span class="keyword">new</span> Schema({
       eggs: {
         type: Number,
-        min: [6, 'Too few eggs'],
-        max: 12
+        min: [<span class="number">6</span>, <span class="string">'Too few eggs'</span>],
+        max: <span class="number">12</span>
       },
       bacon: {
         type: Number,
-        required: [true, 'Why no bacon?']
+        required: [<span class="literal">true</span>, <span class="string">'Why no bacon?'</span>]
       },
       drink: {
         type: String,
-        enum: ['Coffee', 'Tea']
+        enum: [<span class="string">'Coffee'</span>, <span class="string">'Tea'</span>]
       }
     });
-    var Breakfast = db.model('Breakfast', breakfastSchema);
+    <span class="keyword">var</span> Breakfast = db.model(<span class="string">'Breakfast'</span>, breakfastSchema);
 
-    var badBreakfast = new Breakfast({
-      eggs: 2,
-      bacon: 0,
-      drink: 'Milk'
+    <span class="keyword">var</span> badBreakfast = <span class="keyword">new</span> Breakfast({
+      eggs: <span class="number">2</span>,
+      bacon: <span class="number">0</span>,
+      drink: <span class="string">'Milk'</span>
     });
-    var error = badBreakfast.validateSync();
-    assert.equal(error.errors['eggs'].message,
-      'Too few eggs');
-    assert.ok(!error.errors['bacon']);
-    assert.equal(error.errors['drink'].message,
-      '`Milk` is not a valid enum value for path `drink`.');
+    <span class="keyword">var</span> error = badBreakfast.validateSync();
+    assert.equal(error.errors[<span class="string">'eggs'</span>].message,
+      <span class="string">'Too few eggs'</span>);
+    assert.ok(!error.errors[<span class="string">'bacon'</span>]);
+    assert.equal(error.errors[<span class="string">'drink'</span>].message,
+      <span class="string">'`Milk` is not a valid enum value for path `drink`.'</span>);
 
-    badBreakfast.bacon = null;
+    badBreakfast.bacon = <span class="literal">null</span>;
     error = badBreakfast.validateSync();
-    assert.equal(error.errors['bacon'].message, 'Why no bacon?');
+    assert.equal(error.errors[<span class="string">'bacon'</span>].message, <span class="string">'Why no bacon?'</span>);
   </code></pre><h2 id="custom-validators"><p>Custom Validators</p>
 </h2><p>If the built-in validators aren&#39;t enough, you can define custom validators
 to suit your needs.</p>
@@ -75,102 +75,102 @@ to suit your needs.</p>
 You can find detailed instructions on how to do this in the
 <a href="./api.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p>
 <pre><code class="javascript">
-    var userSchema = new Schema({
+    <span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({
       phone: {
         type: String,
         validate: {
-          validator: function(v) {
-            return /\d{3}-\d{3}-\d{4}/.test(v);
+          validator: <span class="keyword">function</span>(v) {
+            <span class="keyword">return</span> <span class="regexp">/\d{3}-\d{3}-\d{4}/</span>.test(v);
           },
-          message: '{VALUE} is not a valid phone number!'
+          message: <span class="string">'{VALUE} is not a valid phone number!'</span>
         },
-        required: [true, 'User phone number required']
+        required: [<span class="literal">true</span>, <span class="string">'User phone number required'</span>]
       }
     });
 
-    var User = db.model('user', userSchema);
-    var user = new User();
-    var error;
+    <span class="keyword">var</span> User = db.model(<span class="string">'user'</span>, userSchema);
+    <span class="keyword">var</span> user = <span class="keyword">new</span> User();
+    <span class="keyword">var</span> error;
 
-    user.phone = '555.0123';
+    user.phone = <span class="string">'555.0123'</span>;
     error = user.validateSync();
-    assert.equal(error.errors['phone'].message,
-      '555.0123 is not a valid phone number!');
+    assert.equal(error.errors[<span class="string">'phone'</span>].message,
+      <span class="string">'555.0123 is not a valid phone number!'</span>);
 
-    user.phone = '';
+    user.phone = <span class="string">''</span>;
     error = user.validateSync();
-    assert.equal(error.errors['phone'].message,
-      'User phone number required');
+    assert.equal(error.errors[<span class="string">'phone'</span>].message,
+      <span class="string">'User phone number required'</span>);
 
-    user.phone = '201-555-0123';
-    // Validation succeeds! Phone number is defined
-    // and fits `DDD-DDD-DDDD`
+    user.phone = <span class="string">'201-555-0123'</span>;
+    <span class="comment">// Validation succeeds! Phone number is defined</span>
+    <span class="comment">// and fits `DDD-DDD-DDDD`</span>
     error = user.validateSync();
-    assert.equal(error, null);
+    assert.equal(error, <span class="literal">null</span>);
   </code></pre><h2 id="validation-errors"><p>Validation Errors</p>
 </h2><p>Errors returned after failed validation contain an <code>errors</code> object
 holding the actual <code>ValidatorError</code> objects. Each
 <a href="./api.html#error-validation-js">ValidatorError</a> has <code>kind</code>, <code>path</code>,
 <code>value</code>, and <code>message</code> properties.</p>
 <pre><code class="javascript">
-    var toySchema = new Schema({
+    <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
       color: String,
       name: String
     });
 
-    var Toy = db.model('Toy', toySchema);
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'Toy'</span>, toySchema);
 
-    var validator = function (value) {
-      return /blue|green|white|red|orange|periwinkle/i.test(value);
+    <span class="keyword">var</span> validator = <span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
+      <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
     };
-    Toy.schema.path('color').validate(validator,
-      'Color `{VALUE}` not valid', 'Invalid color');
+    Toy.schema.path(<span class="string">'color'</span>).validate(validator,
+      <span class="string">'Color `{VALUE}` not valid'</span>, <span class="string">'Invalid color'</span>);
 
-    var toy = new Toy({ color: 'grease'});
+    <span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'grease'</span>});
 
-    toy.save(function (err) {
-      // err is our ValidationError object
-      // err.errors.color is a ValidatorError object
-      assert.equal(err.errors.color.message, 'Color `grease` not valid');
-      assert.equal(err.errors.color.kind, 'Invalid color');
-      assert.equal(err.errors.color.path, 'color');
-      assert.equal(err.errors.color.value, 'grease');
-      assert.equal(err.name, 'ValidationError');
+    toy.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+      <span class="comment">// err is our ValidationError object</span>
+      <span class="comment">// err.errors.color is a ValidatorError object</span>
+      assert.equal(err.errors.color.message, <span class="string">'Color `grease` not valid'</span>);
+      assert.equal(err.errors.color.kind, <span class="string">'Invalid color'</span>);
+      assert.equal(err.errors.color.path, <span class="string">'color'</span>);
+      assert.equal(err.errors.color.value, <span class="string">'grease'</span>);
+      assert.equal(err.name, <span class="string">'ValidationError'</span>);
     });
   </code></pre><h2 id="required-validators-on-nested-objects"><p>Required Validators On Nested Objects</p>
 </h2><p>Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.</p>
 <pre><code class="javascript">
-    var personSchema = new Schema({
+    <span class="keyword">var</span> personSchema = <span class="keyword">new</span> Schema({
       name: {
         first: String,
         last: String
       }
     });
 
-    assert.throws(function() {
-      // This throws an error, because 'name' isn't a full fledged path
-      personSchema.path('name').required(true);
-    }, /Cannot.*'required'/);
+    assert.throws(<span class="keyword">function</span>() {
+      <span class="comment">// This throws an error, because 'name' isn't a full fledged path</span>
+      personSchema.path(<span class="string">'name'</span>).required(<span class="literal">true</span>);
+    }, <span class="regexp">/Cannot.*'required'/</span>);
 
-    // To make a nested object required, use a single nested schema
-    var nameSchema = new Schema({
+    <span class="comment">// To make a nested object required, use a single nested schema</span>
+    <span class="keyword">var</span> nameSchema = <span class="keyword">new</span> Schema({
       first: String,
       last: String
     });
 
-    personSchema = new Schema({
+    personSchema = <span class="keyword">new</span> Schema({
       name: {
         type: nameSchema,
-        required: true
+        required: <span class="literal">true</span>
       }
     });
 
-    var Person = db.model('Person', personSchema);
+    <span class="keyword">var</span> Person = db.model(<span class="string">'Person'</span>, personSchema);
 
-    var person = new Person();
-    var error = person.validateSync();
-    assert.ok(error.errors['name']);
+    <span class="keyword">var</span> person = <span class="keyword">new</span> Person();
+    <span class="keyword">var</span> error = person.validateSync();
+    assert.ok(error.errors[<span class="string">'name'</span>]);
   </code></pre><h2 id="update-validators"><p>Update Validators</p>
 </h2><p>In the above examples, you learned about document validation. Mongoose also
 supports validation for <code>update()</code> and <code>findOneAndUpdate()</code> operations.

@@ -2499,5 +2499,44 @@ describe('document', function() {
         done();
       });
     });
+
+    it('manual population and isNew (gh-3982)', function(done) {
+      var NestedModelSchema = new mongoose.Schema({
+        field: String
+      });
+
+      var NestedModel = db.model('gh3982', NestedModelSchema);
+
+      var ModelSchema = new mongoose.Schema({
+        field: String,
+        array: [{
+          type: mongoose.Schema.ObjectId,
+          ref: 'gh3982',
+          required: true
+        }]
+      });
+
+      var Model = db.model('gh3982_0', ModelSchema);
+
+      var nestedModel = new NestedModel({
+        'field': 'nestedModel'
+      });
+
+      nestedModel.save(function(error, nestedModel) {
+        assert.ifError(error);
+        Model.create({ array: [nestedModel._id] }, function(error, doc) {
+          assert.ifError(error);
+          Model.findById(doc._id).populate('array').exec(function(error, doc) {
+            assert.ifError(error);
+            doc.array.push(nestedModel);
+            assert.strictEqual(doc.isNew, false);
+            assert.strictEqual(doc.array[0].isNew, false);
+            assert.strictEqual(doc.array[1].isNew, false);
+            assert.strictEqual(nestedModel.isNew, false);
+            done();
+          });
+        });
+      });
+    });
   });
 });

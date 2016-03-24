@@ -1,3 +1,9 @@
+4.4.10 / 2016-03-24
+===================
+ * fix(document): copy isNew when copying a document #3982
+ * fix(document): don't override defaults with undefined keys #3981
+ * fix(populate): merge multiple deep populate options for the same path #3974
+
 4.4.9 / 2016-03-22
 ==================
  * fix: upgrade mongodb -> 2.1.10 re https://jira.mongodb.org/browse/NODE-679 #4010

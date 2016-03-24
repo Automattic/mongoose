@@ -503,6 +503,9 @@ function Document(obj, fields, skipId) {
   this._doc = this.$__buildDoc(obj, fields, skipId);
 
   if (obj) {
+    if (obj instanceof Document) {
+      this.isNew = obj.isNew;
+    }
     this.set(obj, undefined, true);
   }
 
@@ -952,7 +955,7 @@ Document.prototype.set = function(path, val, type, options) {
         pathtype = this.schema.pathType(pathName);
 
         if (path[key] !== null
-            && path[key] !== undefined
+            && path[key] !== void 0
               // need to know if plain object - no Buffer, ObjectId, ref, etc
             && utils.isObject(path[key])
             && (!path[key].constructor || utils.getFunctionName(path[key].constructor) === 'Object')
@@ -964,6 +967,12 @@ Document.prototype.set = function(path, val, type, options) {
             this.schema.paths[pathName].options.ref)) {
           this.set(path[key], prefix + key, constructing);
         } else if (strict) {
+          // Don't overwrite defaults with undefined keys (gh-3981)
+          if (constructing && path[key] === void 0 &&
+              this.get(key) !== void 0) {
+            continue;
+          }
+
           if (pathtype === 'real' || pathtype === 'virtual') {
             // Check for setting single embedded schema to document (gh-3535)
             if (this.schema.paths[pathName] &&
@@ -982,7 +991,7 @@ Document.prototype.set = function(path, val, type, options) {
               throw new StrictModeError(key);
             }
           }
-        } else if (undefined !== path[key]) {
+        } else if (path[key] !== void 0) {
           this.set(prefix + key, path[key], constructing);
         }
       }

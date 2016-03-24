@@ -3475,5 +3475,63 @@ describe('model: populate:', function() {
         });
       });
     });
+
+    it('deep populate two paths (gh-3974)', function(done) {
+      var level3Schema = new Schema({
+        name: { type: String }
+      });
+
+      var level2Schema = new Schema({
+        name: { type: String },
+        level31: [{ type: Schema.Types.ObjectId, ref: 'gh3974' }],
+        level32: [{ type: Schema.Types.ObjectId, ref: 'gh3974' }]
+      });
+
+      var level1Schema = new Schema({
+        name: { type: String },
+        level2: [{ type: Schema.Types.ObjectId, ref: 'gh3974_0' }]
+      });
+
+      var level3 = db.model('gh3974', level3Schema);
+      var level2 = db.model('gh3974_0', level2Schema);
+      var level1 = db.model('gh3974_1', level1Schema);
+
+      var l3 = [
+        { name: 'level 3/1' },
+        { name: 'level 3/2' }
+      ];
+      level3.create(l3, function(error, l3) {
+        assert.ifError(error);
+        var l2 = [
+          { name: 'level 2', level31: l3[0]._id, level32: l3[1]._id }
+        ];
+        level2.create(l2, function(error, l2) {
+          assert.ifError(error);
+          var l1 = [{ name: 'level 1', level2: l2[0]._id }];
+          level1.create(l1, function(error, l1) {
+            assert.ifError(error);
+            level1.findById(l1[0]._id).
+              populate({
+                path: 'level2',
+                populate: [{
+                  path: 'level31'
+                }]
+              }).
+              populate({
+                path: 'level2',
+                populate: [{
+                  path: 'level32'
+                }]
+              }).
+              exec(function(error, obj) {
+                assert.ifError(error);
+                assert.equal(obj.level2[0].level31[0].name, 'level 3/1');
+                assert.equal(obj.level2[0].level32[0].name, 'level 3/2');
+                done();
+              });
+          });
+        });
+      });
+    });
   });
 });

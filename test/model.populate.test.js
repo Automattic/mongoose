@@ -2962,15 +2962,15 @@ describe('model: populate:', function() {
           }
         },
         items: [
-            {
-              id: {
-                type: Number,
-                refPath: 'items.type'
-              },
-              type: {
-                type: String
-              }
+          {
+            id: {
+              type: Number,
+              refPath: 'items.type'
+            },
+            type: {
+              type: String
             }
+          }
         ]
       });
 

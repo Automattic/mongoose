@@ -1314,7 +1314,8 @@ describe('document', function() {
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    var _err = post.invalidate('baz', 'validation failed for path {PATH}');
+    var _err = post.invalidate('baz', 'validation failed for path {PATH}',
+      'val', 'custom error');
     assert.ok(_err instanceof ValidationError);
 
     post.save(function(err) {
@@ -1322,8 +1323,9 @@ describe('document', function() {
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
       assert.equal(err.errors.baz.message, 'validation failed for path baz');
-      assert.equal(err.errors.baz.kind, 'user defined');
       assert.equal(err.errors.baz.path, 'baz');
+      assert.equal(err.errors.baz.value, 'val');
+      assert.equal(err.errors.baz.kind, 'custom error');
 
       post.save(function(err) {
         db.close();

@@ -5,6 +5,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
+[![Dependency Status](https://gemnasium.com/Automattic/mongoose.svg)](https://gemnasium.com/Automattic/mongoose)
 
 ## Documentation
 

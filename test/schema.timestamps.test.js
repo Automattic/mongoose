@@ -129,8 +129,21 @@ describe('schema options.timestamps', function() {
       Cat.findOne({name: 'newcat'}, function(err, doc) {
         var old = doc.updatedAt;
 
+        doc.hobby = 'coding';
+
         doc.save(function(err, doc) {
           assert.ok(doc.updatedAt.getTime() > old.getTime());
+          done();
+        });
+      });
+    });
+
+    it('should not change updatedAt when save with no modifications', function(done) {
+      Cat.findOne({name: 'newcat'}, function(err, doc) {
+        var old = doc.updatedAt;
+
+        doc.save(function(err, doc) {
+          assert.ok(doc.updatedAt.getTime() === old.getTime());
           done();
         });
       });

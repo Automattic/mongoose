@@ -3101,7 +3101,6 @@ describe('model: populate:', function() {
               }
 
               Article.find().populate('mediaAttach').exec(function(err, docs) {
-                db.close();
                 assert.ifError(err);
 
                 var a2 = docs.filter(function(d) {
@@ -3278,6 +3277,33 @@ describe('model: populate:', function() {
           done();
         });
       }
+    });
+
+    it('set to obj w/ same id doesnt mark modified (gh-3992)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+      var jobSchema = new Schema({
+        title: String,
+        person: { type: Schema.Types.ObjectId, ref: 'gh3992' }
+      });
+
+      var Person = db.model('gh3992', personSchema);
+      var Job = db.model('gh3992_0', jobSchema);
+
+      Person.create({ name: 'Val' }, function(error, person) {
+        assert.ifError(error);
+        var job = { title: 'Engineer', person: person._id };
+        Job.create(job, function(error, job) {
+          assert.ifError(error);
+          Job.findById(job._id, function(error, job) {
+            assert.ifError(error);
+            job.person = person;
+            assert.ok(!job.isModified('person'));
+            done();
+          });
+        });
+      });
     });
 
     it('deep populate single -> array (gh-3904)', function(done) {

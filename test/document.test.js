@@ -2573,5 +2573,26 @@ describe('document', function() {
         });
       });
     });
+
+    it('doesnt skipId for single nested subdocs (gh-4008)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4008', parentSchema);
+
+      Parent.create({ child: { name: 'My child' } }, function(error, doc) {
+        assert.ifError(error);
+        Parent.collection.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.child._id);
+          done();
+        });
+      });
+    });
   });
 });

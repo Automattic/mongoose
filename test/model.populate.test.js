@@ -1555,7 +1555,7 @@ describe('model: populate:', function() {
           var opts = {
             path: 'author.friends',
             select: 'name',
-            options: {limit: 1}
+            options: { limit: 1 }
           };
 
           BlogPost.populate(docs, opts, function(err, docs) {
@@ -1563,6 +1563,7 @@ describe('model: populate:', function() {
             assert.equal(2, docs.length);
             assert.equal(1, docs[0].author.friends.length);
             assert.equal(1, docs[1].author.friends.length);
+            assert.equal(opts.options.limit, 1);
             db.close(done);
           });
         });

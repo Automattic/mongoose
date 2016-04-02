@@ -2540,5 +2540,38 @@ describe('document', function() {
         });
       });
     });
+
+    it('inspect inherits schema options (gh-4001)', function(done) {
+      var opts = {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      };
+      var taskSchema = mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      }, opts);
+
+      taskSchema.virtual('title').
+        get(function() {
+          return this.name;
+        }).
+        set(function(title) {
+          this.name = title;
+        });
+
+      var Task = db.model('gh4001', taskSchema);
+
+      var doc = { name: 'task1', title: 'task999' };
+      Task.collection.insert(doc, function(error) {
+        assert.ifError(error);
+        Task.findById(doc._id, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.inspect().title, 'task1');
+          done();
+        });
+      });
+    });
   });
 });

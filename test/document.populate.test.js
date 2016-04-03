@@ -537,10 +537,10 @@ describe('document.populate', function() {
       var Person = db.model('gh-2214-2', {
         name: String,
         cars: [
-            {
-              type: Schema.Types.ObjectId,
-              ref: 'gh-2214-1'
-            }
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'gh-2214-1'
+          }
         ]
       });
 

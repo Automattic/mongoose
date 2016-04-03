@@ -1314,7 +1314,8 @@ describe('document', function() {
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    var _err = post.invalidate('baz', 'validation failed for path {PATH}');
+    var _err = post.invalidate('baz', 'validation failed for path {PATH}',
+      'val', 'custom error');
     assert.ok(_err instanceof ValidationError);
 
     post.save(function(err) {
@@ -1322,8 +1323,9 @@ describe('document', function() {
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
       assert.equal(err.errors.baz.message, 'validation failed for path baz');
-      assert.equal(err.errors.baz.kind, 'user defined');
       assert.equal(err.errors.baz.path, 'baz');
+      assert.equal(err.errors.baz.value, 'val');
+      assert.equal(err.errors.baz.kind, 'custom error');
 
       post.save(function(err) {
         db.close();
@@ -2535,6 +2537,60 @@ describe('document', function() {
             assert.strictEqual(nestedModel.isNew, false);
             done();
           });
+        });
+      });
+    });
+
+    it('inspect inherits schema options (gh-4001)', function(done) {
+      var opts = {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      };
+      var taskSchema = mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      }, opts);
+
+      taskSchema.virtual('title').
+        get(function() {
+          return this.name;
+        }).
+        set(function(title) {
+          this.name = title;
+        });
+
+      var Task = db.model('gh4001', taskSchema);
+
+      var doc = { name: 'task1', title: 'task999' };
+      Task.collection.insert(doc, function(error) {
+        assert.ifError(error);
+        Task.findById(doc._id, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.inspect().title, 'task1');
+          done();
+        });
+      });
+    });
+
+    it('doesnt skipId for single nested subdocs (gh-4008)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4008', parentSchema);
+
+      Parent.create({ child: { name: 'My child' } }, function(error, doc) {
+        assert.ifError(error);
+        Parent.collection.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.child._id);
+          done();
         });
       });
     });

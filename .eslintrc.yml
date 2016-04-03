@@ -5,27 +5,27 @@ env:
   mocha: true
 
 rules:
-  comma-style: 2
+  comma-style: error
   consistent-this:
-    - 2
+    - error
     - _this
   indent:
-    - 2
+    - error
     - 2
     - SwitchCase: 1
       VariableDeclarator: 2
-  keyword-spacing: 2
-  no-console: 0
-  no-multi-spaces: 2
-  no-spaced-func: 2
-  no-trailing-spaces: 2
+  keyword-spacing: error
+  no-console: off
+  no-multi-spaces: error
+  no-spaced-func: error
+  no-trailing-spaces: error
   quotes:
-    - 2
+    - error
     - single
-  semi: 2
-  space-before-blocks: 2
+  semi: error
+  space-before-blocks: error
   space-before-function-paren:
-    - 2
+    - error
     - never
-  space-infix-ops: 2
-  space-unary-ops: 2
+  space-infix-ops: error
+  space-unary-ops: error

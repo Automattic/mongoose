@@ -1168,6 +1168,14 @@ Document.prototype.$__shouldModify = function(pathToMark, path, constructing, pa
     return false;
   }
 
+  // gh-3992: if setting a populated field to a doc, don't mark modified
+  // if they have the same _id
+  if (this.populated(path) &&
+      val instanceof Document &&
+      deepEqual(val._id, priorVal)) {
+    return false;
+  }
+
   if (!deepEqual(val, priorVal || this.get(path))) {
     return true;
   }
@@ -1773,11 +1781,12 @@ Document.prototype.validateSync = function(pathsToValidate) {
  * @param {String} path the field to invalidate
  * @param {String|Error} errorMsg the error which states the reason `path` was invalid
  * @param {Object|String|Number|any} value optional invalid value
+ * @param {String} [kind] optional `kind` property for the error
  * @return {ValidationError} the current ValidationError, with all currently invalidated paths
  * @api public
  */
 
-Document.prototype.invalidate = function(path, err, val) {
+Document.prototype.invalidate = function(path, err, val, kind) {
   if (!this.$__.validationError) {
     this.$__.validationError = new ValidationError(this);
   }
@@ -1790,7 +1799,7 @@ Document.prototype.invalidate = function(path, err, val) {
     err = new ValidatorError({
       path: path,
       message: err,
-      type: 'user defined',
+      type: kind || 'user defined',
       value: val
     });
   }
@@ -2333,14 +2342,14 @@ Document.prototype.$toObject = function(options, json) {
       (options && options._useSchemaOptions)) {
     if (json) {
       options = this.schema.options.toJSON ?
-          clone(this.schema.options.toJSON) :
-      {};
+        clone(this.schema.options.toJSON) :
+        {};
       options.json = true;
       options._useSchemaOptions = true;
     } else {
       options = this.schema.options.toObject ?
-          clone(this.schema.options.toObject) :
-      {};
+        clone(this.schema.options.toObject) :
+        {};
       options.json = false;
       options._useSchemaOptions = true;
     }
@@ -2622,7 +2631,16 @@ Document.prototype.toJSON = function(options) {
  */
 
 Document.prototype.inspect = function(options) {
-  var opts = options && utils.getFunctionName(options.constructor) === 'Object' ? options : {};
+  var isPOJO = options &&
+    utils.getFunctionName(options.constructor) === 'Object';
+  var opts;
+  if (isPOJO) {
+    opts = options;
+  } else if (this.schema.options.toObject) {
+    opts = clone(this.schema.options.toObject);
+  } else {
+    opts = {};
+  }
   opts.minimize = false;
   opts.retainKeyOrder = true;
   return this.toObject(opts);
@@ -4566,7 +4584,9 @@ Schema.prototype.setupTimestamp = function(timestamps) {
         this[createdAt] = auto_id ? this._id.getTimestamp() : defaultTimestamp;
       }
 
-      this[updatedAt] = this.isNew ? this[createdAt] : defaultTimestamp;
+      if (this.isNew || this.isModified()) {
+        this[updatedAt] = this.isNew ? this[createdAt] : defaultTimestamp;
+      }
 
       next();
     });
@@ -10605,9 +10625,9 @@ module.exports = Subdocument;
  * @api private
  */
 
-function Subdocument() {
+function Subdocument(value, fields) {
   this.$isSingleNested = true;
-  Document.apply(this, arguments);
+  Document.call(this, value, fields);
 }
 
 Subdocument.prototype = Object.create(Document.prototype);
@@ -11328,6 +11348,7 @@ exports.populate = function populate(path, select, model, match, options, subPop
 
   var ret = [];
   var paths = path.split(' ');
+  options = exports.clone(options, { retainKeyOrder: true });
   for (var i = 0; i < paths.length; ++i) {
     ret.push(new PopulateOptions(paths[i], select, match, options, model, subPopulate));
   }
@@ -13426,11 +13447,15 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
 },{}],53:[function(require,module,exports){
+(function (global){
 /**
  * Module dependencies.
  * @ignore
  */
-if(typeof window === 'undefined') {
+
+// Test if we're in Node via presence of "global" not absence of "window"
+// to support hybrid environments like Electron
+if(typeof global !== 'undefined') {
   var Buffer = require('buffer').Buffer; // TODO just use global Buffer
 }
 
@@ -13771,6 +13796,7 @@ Binary.SUBTYPE_USER_DEFINED = 128;
 module.exports = Binary;
 module.exports.Binary = Binary;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"buffer":71}],54:[function(require,module,exports){
 (function (process){
 /**
@@ -15972,6 +15998,9 @@ ObjectID.isValid = function isValid(id) {
   if(typeof id == 'string') {
     return id.length == 12 || (id.length == 24 && checkForHexRegExp.test(id));
   }
+  if(id instanceof ObjectID) {
+    return true;
+  }
   return false;
 };
 
@@ -16334,7 +16363,7 @@ var deserialize = function(buffer, options, isArray) {
 	options = options == null ? {} : options;
 	var index = options && options.index ? options.index : 0;
 	// Read the document size
-  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+  var size = buffer[index] | buffer[index+1] << 8 | buffer[index+2] << 16 | buffer[index+3] << 24;
 
 	// Ensure buffer is valid size
   if(size < 5 || buffer.length < size) {
@@ -16342,12 +16371,12 @@ var deserialize = function(buffer, options, isArray) {
 	}
 
 	// Illegal end value
-	if(buffer[size - 1] != 0) {
+	if(buffer[index + size - 1] != 0) {
 		throw new Error("One object, sized correctly, with a spot for an EOO, but the EOO isn't 0x00");
 	}
 
 	// Start deserializtion
-	return deserializeObject(buffer, index - 4, options, isArray);
+	return deserializeObject(buffer, index, options, isArray);
 }
 
 var deserializeObject = function(buffer, index, options, isArray) {
@@ -16707,6 +16736,12 @@ BSON.BSON_DATA_ARRAY = 4;
  * @classconstant BSON_DATA_BINARY
  **/
 BSON.BSON_DATA_BINARY = 5;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_UNDEFINED
+ **/
+BSON.BSON_DATA_UNDEFINED = 7;
 /**
  * ObjectID BSON Type
  *

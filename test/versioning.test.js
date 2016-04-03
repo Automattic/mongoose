@@ -23,28 +23,28 @@ Comments.add({
 });
 
 var BlogPost = new Schema(
-    {
-      title: String,
+  {
+    title: String,
+    date: Date,
+    meta: {
       date: Date,
-      meta: {
-        date: Date,
-        visitors: Number,
-        nested: [Comments],
-        numbers: [Number]
-      },
-      mixed: {},
-      numbers: [Number],
-      comments: [Comments],
-      arr: [],
-      dontVersionMe: []
+      visitors: Number,
+      nested: [Comments],
+      numbers: [Number]
     },
-    {
-      collection: 'versioning_' + random(),
-      skipVersioning: {
-        dontVersionMe: true,
-        'comments.dontVersionMeEither': true
-      }
-    });
+    mixed: {},
+    numbers: [Number],
+    comments: [Comments],
+    arr: [],
+    dontVersionMe: []
+  },
+  {
+    collection: 'versioning_' + random(),
+    skipVersioning: {
+      dontVersionMe: true,
+      'comments.dontVersionMeEither': true
+    }
+  });
 
 mongoose.model('Versioning', BlogPost);
 

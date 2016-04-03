@@ -1555,7 +1555,7 @@ describe('model: populate:', function() {
           var opts = {
             path: 'author.friends',
             select: 'name',
-            options: {limit: 1}
+            options: { limit: 1 }
           };
 
           BlogPost.populate(docs, opts, function(err, docs) {
@@ -1563,6 +1563,7 @@ describe('model: populate:', function() {
             assert.equal(2, docs.length);
             assert.equal(1, docs[0].author.friends.length);
             assert.equal(1, docs[1].author.friends.length);
+            assert.equal(opts.options.limit, 1);
             db.close(done);
           });
         });
@@ -2900,47 +2901,6 @@ describe('model: populate:', function() {
     });
   });
 
-  it('maps results back to correct document (gh-1444)', function(done) {
-    var db = start();
-
-    var articleSchema = new Schema({
-      body: String,
-      mediaAttach: {type: Schema.ObjectId, ref: '1444-Media'},
-      author: String
-    });
-    var Article = db.model('1444-Article', articleSchema);
-
-    var mediaSchema = new Schema({
-      filename: String
-    });
-    var Media = db.model('1444-Media', mediaSchema);
-
-    Media.create({filename: 'one'}, function(err, media) {
-      assert.ifError(err);
-
-      Article.create(
-          {body: 'body1', author: 'a'}
-          , {body: 'body2', author: 'a', mediaAttach: media._id}
-          , {body: 'body3', author: 'a'}, function(err) {
-            if (err) {
-              return done(err);
-            }
-
-            Article.find().populate('mediaAttach').exec(function(err, docs) {
-              db.close();
-              assert.ifError(err);
-
-              var a2 = docs.filter(function(d) {
-                return d.body === 'body2';
-              })[0];
-              assert.equal(a2.mediaAttach.id, media.id);
-
-              done();
-            });
-          });
-    });
-  });
-
   describe('DynRef', function() {
     var db;
     var Review;
@@ -2962,15 +2922,15 @@ describe('model: populate:', function() {
           }
         },
         items: [
-            {
-              id: {
-                type: Number,
-                refPath: 'items.type'
-              },
-              type: {
-                type: String
-              }
+          {
+            id: {
+              type: Number,
+              refPath: 'items.type'
+            },
+            type: {
+              type: String
             }
+          }
         ]
       });
 
@@ -3115,6 +3075,44 @@ describe('model: populate:', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('maps results back to correct document (gh-1444)', function(done) {
+      var articleSchema = new Schema({
+        body: String,
+        mediaAttach: {type: Schema.ObjectId, ref: '1444-Media'},
+        author: String
+      });
+      var Article = db.model('1444-Article', articleSchema);
+
+      var mediaSchema = new Schema({
+        filename: String
+      });
+      var Media = db.model('1444-Media', mediaSchema);
+
+      Media.create({filename: 'one'}, function(err, media) {
+        assert.ifError(err);
+
+        Article.create(
+            {body: 'body1', author: 'a'}
+            , {body: 'body2', author: 'a', mediaAttach: media._id}
+            , {body: 'body3', author: 'a'}, function(err) {
+              if (err) {
+                return done(err);
+              }
+
+              Article.find().populate('mediaAttach').exec(function(err, docs) {
+                assert.ifError(err);
+
+                var a2 = docs.filter(function(d) {
+                  return d.body === 'body2';
+                })[0];
+                assert.equal(a2.mediaAttach.id, media.id);
+
+                done();
+              });
+            });
+      });
     });
 
     it('handles skip', function(done) {
@@ -3280,6 +3278,33 @@ describe('model: populate:', function() {
           done();
         });
       }
+    });
+
+    it('set to obj w/ same id doesnt mark modified (gh-3992)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+      var jobSchema = new Schema({
+        title: String,
+        person: { type: Schema.Types.ObjectId, ref: 'gh3992' }
+      });
+
+      var Person = db.model('gh3992', personSchema);
+      var Job = db.model('gh3992_0', jobSchema);
+
+      Person.create({ name: 'Val' }, function(error, person) {
+        assert.ifError(error);
+        var job = { title: 'Engineer', person: person._id };
+        Job.create(job, function(error, job) {
+          assert.ifError(error);
+          Job.findById(job._id, function(error, job) {
+            assert.ifError(error);
+            job.person = person;
+            assert.ok(!job.isModified('person'));
+            done();
+          });
+        });
+      });
     });
 
     it('deep populate single -> array (gh-3904)', function(done) {

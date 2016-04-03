@@ -2,13 +2,13 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    Schema = mongoose.Schema,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Query = require('../lib/query');
+var start = require('./common');
+var mongoose = start.mongoose;
+var DocumentObjectId = mongoose.Types.ObjectId;
+var Schema = mongoose.Schema;
+var assert = require('power-assert');
+var random = require('../lib/utils').random;
+var Query = require('../lib/query');
 
 var Comment = new Schema({
   text: String

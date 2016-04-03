@@ -43,12 +43,6 @@ function setupData(callback) {
   });
 }
 
-function clearData(db, callback) {
-  db.model('Employee').remove(function() {
-    db.close(callback);
-  });
-}
-
 /**
  * Test.
  */
@@ -384,164 +378,143 @@ describe('aggregate: ', function() {
   });
 
   describe('exec', function() {
+    var db;
+
+    before(function(done) {
+      setupData(function(_db) {
+        db = _db;
+        done();
+      });
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('project', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .project({sal: 1, sal_k: {$divide: ['$sal', 1000]}})
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              docs.forEach(function(doc) {
-                assert.equal(doc.sal / 1000, doc.sal_k);
-              });
+      aggregate.
+        model(db.model('Employee')).
+        project({sal: 1, sal_k: {$divide: ['$sal', 1000]}}).
+        exec(function(err, docs) {
+          assert.ifError(err);
+          docs.forEach(function(doc) {
+            assert.equal(doc.sal / 1000, doc.sal_k);
+          });
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('group', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .group({_id: '$dept'})
-            .exec(function(err, docs) {
-              var depts;
+      aggregate.
+        model(db.model('Employee')).
+        group({_id: '$dept'}).
+        exec(function(err, docs) {
+          var depts;
+          assert.ifError(err);
+          assert.equal(docs.length, 2);
 
-              assert.ifError(err);
-              assert.equal(docs.length, 2);
-
-              depts = docs.map(function(doc) {
-                return doc._id;
-              });
-              assert.notEqual(depts.indexOf('sales'), -1);
-              assert.notEqual(depts.indexOf('r&d'), -1);
-
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          depts = docs.map(function(doc) {
+            return doc._id;
+          });
+          assert.notEqual(depts.indexOf('sales'), -1);
+          assert.notEqual(depts.indexOf('r&d'), -1);
+          done();
+        });
     });
 
     it('skip', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .skip(1)
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 3);
+      aggregate.
+        model(db.model('Employee')).
+        skip(1).
+        exec(function(err, docs) {
+          assert.ifError(err);
+          assert.equal(docs.length, 3);
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('limit', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .limit(3)
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 3);
+      aggregate.
+        model(db.model('Employee')).
+        limit(3).
+        exec(function(err, docs) {
+          assert.ifError(err);
+          assert.equal(docs.length, 3);
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('unwind', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .unwind('customers')
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 5);
+      aggregate.
+        model(db.model('Employee')).
+        unwind('customers').
+        exec(function(err, docs) {
+          assert.ifError(err);
+          assert.equal(docs.length, 5);
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('match', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .match({sal: {$gt: 15000}})
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
+      aggregate.
+        model(db.model('Employee')).
+        match({sal: {$gt: 15000}}).
+        exec(function(err, docs) {
+          assert.ifError(err);
+          assert.equal(docs.length, 1);
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('sort', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .sort('sal')
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs[0].sal, 14000);
+      aggregate.
+        model(db.model('Employee')).
+        sort('sal').
+        exec(function(err, docs) {
+          assert.ifError(err);
+          assert.equal(docs[0].sal, 14000);
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('complex pipeline', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function(db) {
-        aggregate
-            .model(db.model('Employee'))
-            .match({sal: {$lt: 16000}})
-            .unwind('customers')
-            .project({emp: '$name', cust: '$customers'})
-            .sort('-cust')
-            .skip(2)
-            .exec(function(err, docs) {
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(docs[0].cust, 'Gary');
-              assert.equal(docs[0].emp, 'Bob');
+      aggregate.
+        model(db.model('Employee')).
+        match({sal: {$lt: 16000}}).
+        unwind('customers').
+        project({emp: '$name', cust: '$customers'}).
+        sort('-cust').
+        skip(2).
+        exec(function(err, docs) {
+          assert.ifError(err);
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].cust, 'Gary');
+          assert.equal(docs[0].emp, 'Bob');
 
-              clearData(db, function() {
-                done();
-              });
-            });
-      });
+          done();
+        });
     });
 
     it('explain()', function(done) {
@@ -557,8 +530,7 @@ describe('aggregate: ', function() {
           return;
         }
 
-        setupData(function(db) {
-          aggregate.
+        aggregate.
           model(db.model('Employee')).
           match({sal: {$lt: 16000}}).
           explain(function(err1, output) {
@@ -567,26 +539,22 @@ describe('aggregate: ', function() {
             // make sure we got explain output
             assert.ok(output.stages);
 
-            clearData(db, function() {
-              done();
-            });
+            done();
           });
-        });
       });
     });
 
     describe('error when empty pipeline', function() {
       it('without a callback', function(done) {
         var agg = new Aggregate;
-        setupData(function(db) {
-          agg.model(db.model('Employee'));
-          var promise = agg.exec();
-          assert.ok(promise instanceof mongoose.Promise);
-          promise.onResolve(function(err) {
-            assert.ok(err);
-            assert.equal(err.message, 'Aggregate has empty pipeline');
-            done();
-          });
+
+        agg.model(db.model('Employee'));
+        var promise = agg.exec();
+        assert.ok(promise instanceof mongoose.Promise);
+        promise.onResolve(function(err) {
+          assert.ok(err);
+          assert.equal(err.message, 'Aggregate has empty pipeline');
+          done();
         });
       });
 
@@ -594,16 +562,14 @@ describe('aggregate: ', function() {
         var aggregate = new Aggregate();
         var callback;
 
-        setupData(function(db) {
-          aggregate.model(db.model('Employee'));
-          callback = function(err) {
-            assert.ok(err);
-            assert.equal(err.message, 'Aggregate has empty pipeline');
-            done();
-          };
+        aggregate.model(db.model('Employee'));
+        callback = function(err) {
+          assert.ok(err);
+          assert.equal(err.message, 'Aggregate has empty pipeline');
+          done();
+        };
 
-          aggregate.exec(callback);
-        });
+        aggregate.exec(callback);
       });
     });
 
@@ -621,34 +587,32 @@ describe('aggregate: ', function() {
     });
 
     it('handles aggregation options', function(done) {
-      setupData(function(db) {
-        start.mongodVersion(function(err, version) {
-          if (err) {
-            throw err;
-          }
-          var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          throw err;
+        }
+        var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
 
-          var m = db.model('Employee');
-          var match = {$match: {sal: {$gt: 15000}}};
-          var pref = 'primaryPreferred';
-          var aggregate = m.aggregate(match).read(pref);
-          if (mongo26_or_greater) {
-            aggregate.allowDiskUse(true);
-          }
+        var m = db.model('Employee');
+        var match = {$match: {sal: {$gt: 15000}}};
+        var pref = 'primaryPreferred';
+        var aggregate = m.aggregate(match).read(pref);
+        if (mongo26_or_greater) {
+          aggregate.allowDiskUse(true);
+        }
 
-          assert.equal(aggregate.options.readPreference.mode, pref);
-          if (mongo26_or_greater) {
-            assert.equal(aggregate.options.allowDiskUse, true);
-          }
+        assert.equal(aggregate.options.readPreference.mode, pref);
+        if (mongo26_or_greater) {
+          assert.equal(aggregate.options.allowDiskUse, true);
+        }
 
-          aggregate
-              .exec(function(err, docs) {
-                assert.ifError(err);
-                assert.equal(1, docs.length);
-                assert.equal(docs[0].sal, 18000);
-                clearData(db, done);
-              });
-        });
+        aggregate.
+          exec(function(err, docs) {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            assert.equal(docs[0].sal, 18000);
+            done();
+          });
       });
     });
   });
@@ -659,13 +623,13 @@ describe('aggregate: ', function() {
     var MyModel = db.model('gh3160', {name: String});
 
     MyModel.
-    aggregate([{$match: {name: 'test'}}]).
-    cursor({async: true}).
-    exec(function(error, cursor) {
-      assert.ifError(error);
-      assert.ok(cursor);
-      db.close(done);
-    });
+      aggregate([{$match: {name: 'test'}}]).
+      cursor({async: true}).
+      exec(function(error, cursor) {
+        assert.ifError(error);
+        assert.ok(cursor);
+        db.close(done);
+      });
   });
 
   it('cursor() without options (gh-3855)', function(done) {

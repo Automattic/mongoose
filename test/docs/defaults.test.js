@@ -17,7 +17,7 @@ describe('defaults docs', function () {
    * Your schemas can define default values for certain paths. If you create
    * a new document without that path set, the default will kick in.
    */
-  it('Declaring defaults in your schema', function() {
+  it('Declaring defaults in your schema', function(done) {
     var schema = new Schema({
       name: String,
       role: { type: String, default: 'guitarist' }

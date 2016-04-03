@@ -1455,23 +1455,6 @@ describe('model: findByIdAndUpdate:', function() {
           });
     });
 
-    it('passes raw result as 3rd param (gh-3173)', function(done) {
-      var db = start();
-
-      var testSchema = new mongoose.Schema({
-        test: String
-      });
-
-      var TestModel = db.model('gh3173', testSchema);
-
-      TestModel.findOneAndUpdate({}, {$set: {test: 'abc'}}, {upsert: true, new: true, passRawResult: true}).
-      exec(function(error, doc, res) {
-        assert.ifError(error);
-        assert.ok(res);
-        assert.ok(res.ok);
-        db.close(done);
-      });
-    });
 
     it('handles nested cast errors (gh-3468)', function(done) {
       var db = start();
@@ -1551,6 +1534,62 @@ describe('model: findByIdAndUpdate:', function() {
         { $set: { nested: { test: 'abc' } } },
         function(error) {
           assert.ifError(error);
+          db.close(done);
+        });
+    });
+  });
+
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('passes raw result as 3rd param (gh-3173)', function(done) {
+      var db = start();
+
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh3173', testSchema);
+      var options = { upsert: true, new: true, passRawResult: true };
+      var update = { $set: { test: 'abc' } };
+
+      TestModel.findOneAndUpdate({}, update, options).
+        exec(function(error, doc, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+
+          db.close(done);
+        });
+    });
+
+    it('raw result as 3rd param w/ no result (gh-4023)', function(done) {
+      var db = start();
+
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh4023', testSchema);
+      var options = { upsert: true, new: false, passRawResult: true };
+      var update = { $set: { test: 'abc' } };
+
+      TestModel.findOneAndUpdate({}, update, options).
+        exec(function(error, doc, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+
+          options.new = false;
+
           db.close(done);
         });
     });

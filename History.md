@@ -1,3 +1,19 @@
+4.4.11 / 2016-04-03
+===================
+ * fix: upgrade to mongodb driver 2.1.14 #4036 #4030 #3945
+ * fix(connection): allow connecting with { mongos: true } to handle query params #4032 [burtonjc](https://github.com/burtonjc)
+ * docs(connection): add autoIndex example #4026 [tilleps](https://github.com/tilleps)
+ * fix(query): handle passRawResult option when zero results #4023
+ * fix(populate): clone options before modifying #4022
+ * docs: add missing whitespace #4019 [chenxsan](https://github.com/chenxsan)
+ * chore: upgrade to ESLint 2.4.0 #4015 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix(types): single nested subdocs get ids by default #4008
+ * chore(project): add dependency status badge #4007 [Maheshkumar-Kakade](http://github.com/Maheshkumar-Kakade)
+ * fix: make sure timestamps don't trigger unnecessary updates #4005 #3991 [tommarien](https://github.com/tommarien)
+ * fix(document): inspect inherits schema options #4001
+ * fix(populate): don't mark populated path as modified if setting to object w/ same id #3992
+ * fix(document): support kind argument to invalidate #3965
+
 4.4.10 / 2016-03-24
 ===================
  * fix(document): copy isNew when copying a document #3982

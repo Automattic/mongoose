@@ -176,7 +176,110 @@ nested objects are not fully fledged paths.</p>
 supports validation for <code>update()</code> and <code>findOneAndUpdate()</code> operations.
 In Mongoose 4.x, update validators are off by default - you need to specify
 the <code>runValidators</code> option.</p>
-<pre><code class="javascript"></code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
+<p>To turn on update validators, set the <code>runValidators</code> option for
+<code>update()</code> or <code>findOneAndUpdate()</code>. Be careful: update validators
+are off by default because they have several caveats.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
+      color: String,
+      name: String
+    });
+
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'Toys'</span>, toySchema);
+
+    Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
+      <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+    }, <span class="string">'Invalid color'</span>);
+
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Toy.update({}, { color: <span class="string">'bacon'</span> }, opts, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+      assert.equal(err.errors.color.message,
+        <span class="string">'Invalid color'</span>);
+    });
+  </code></pre><h2 id="update-validators-and-this"><p>Update Validators and <code>this</code></p>
+</h2><p>There are a couple of key differences between update validators and
+document validators. In the color validation function above, <code>this</code> refers
+to the document being validated when using document validation.
+However, when running update validators, the document being updated
+may not be in the server&#39;s memory, so by default the value of <code>this</code> is
+not defined. However, you can set the <code>context</code> option to &#39;query&#39; to make
+<code>this</code> refer to the underlying query.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
+      color: String,
+      name: String
+    });
+
+    toySchema.path(<span class="string">'color'</span>).validate(<span class="keyword">function</span>(value) {
+      <span class="comment">// When running in `validate()` or `validateSync()`, the</span>
+      <span class="comment">// validator can access the document using `this`.</span>
+      <span class="comment">// Does **not** work with update validators.</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.name.toLowerCase().indexOf(<span class="string">'red'</span>) !== -<span class="number">1</span>) {
+        <span class="keyword">return</span> value !== <span class="string">'red'</span>;
+      }
+      <span class="keyword">return</span> <span class="literal">true</span>;
+    });
+
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'ActionFigure'</span>, toySchema);
+
+    <span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'red'</span>, name: <span class="string">'Red Power Ranger'</span> });
+    <span class="keyword">var</span> error = toy.validateSync();
+    assert.ok(error.errors[<span class="string">'color'</span>]);
+
+    <span class="keyword">var</span> update = { color: <span class="string">'red'</span>, name: <span class="string">'Red Power Ranger'</span> };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+
+    Toy.update({}, update, opts, <span class="keyword">function</span>(error) {
+      <span class="comment">// The update validator throws an error:</span>
+      <span class="comment">// "TypeError: Cannot read property 'toLowerCase' of undefined",</span>
+      <span class="comment">// because `this` is **not** the document being updated when using</span>
+      <span class="comment">// update validators</span>
+      assert.ok(error);
+    });
+  </code></pre><h2 id="update-validator-paths"><p>Update Validator Paths</p>
+</h2><p>The other key difference that update validators only run on the paths
+specified in the update. For instance, in the below example, because
+&#39;name&#39; is not specified in the update operation, update validation will
+succeed.</p>
+<p>When using update validators, <code>required</code> validators <strong>only</strong> fail when
+you try to explicitly <code>$unset</code> the key.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> kittenSchema = <span class="keyword">new</span> Schema({
+      name: { type: String, required: <span class="literal">true</span> },
+      age: Number
+    });
+
+    <span class="keyword">var</span> Kitten = db.model(<span class="string">'Kitten'</span>, kittenSchema);
+
+    <span class="keyword">var</span> update = { color: <span class="string">'blue'</span> };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Kitten.update({}, update, opts, <span class="keyword">function</span>(err) {
+      <span class="comment">// Operation succeeds despite the fact that 'name' is not specified</span>
+    });
+
+    <span class="keyword">var</span> unset = { $unset: { name: <span class="number">1</span> } };
+    Kitten.update({}, unset, opts, <span class="keyword">function</span>(err) {
+      <span class="comment">// Operation fails because 'name' is required</span>
+      assert.ok(err);
+      assert.ok(err.errors[<span class="string">'name'</span>]);
+    });
+  </code></pre><h2 id="update-validators-only-run-on-specified-paths"><p>Update Validators Only Run On Specified Paths</p>
+</h2><p>One final detail worth noting: update validators <strong>only</strong> run on <code>$set</code>
+and <code>$unset</code> operations. For instance, the below update will succeed,
+regardless of the value of <code>number</code>.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> testSchema = <span class="keyword">new</span> Schema({
+      number: { type: Number, max: <span class="number">0</span> },
+    });
+
+    <span class="keyword">var</span> Test = db.model(<span class="string">'Test'</span>, testSchema);
+
+    <span class="keyword">var</span> update = { $inc: { number: <span class="number">1</span> } };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Test.update({}, update, opts, <span class="keyword">function</span>(error) {
+      <span class="comment">// There will never be a validation error here</span>
+    });
+  </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';
   var gcse = document.createElement('script');
   gcse.type = 'text/javascript';

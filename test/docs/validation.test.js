@@ -225,145 +225,142 @@ describe('validation docs', function() {
    * supports validation for `update()` and `findOneAndUpdate()` operations.
    * In Mongoose 4.x, update validators are off by default - you need to specify
    * the `runValidators` option.
+   *
+   * To turn on update validators, set the `runValidators` option for
+   * `update()` or `findOneAndUpdate()`. Be careful: update validators
+   * are off by default because they have several caveats.
    */
-  describe('Update Validators', function() {
-    /**
-     * To turn on update validators, set the `runValidators` option for
-     * `update()` or `findOneAndUpdate()`. Be careful: update validators
-     * are off by default because they have several caveats.
-     */
-    it('Basic Update Validators', function(done) {
-      var toySchema = new Schema({
-        color: String,
-        name: String
-      });
-
-      var Toy = db.model('Toys', toySchema);
-
-      Toy.schema.path('color').validate(function (value) {
-        return /blue|green|white|red|orange|periwinkle/i.test(value);
-      }, 'Invalid color');
-
-      var opts = { runValidators: true };
-      Toy.update({}, { color: 'bacon' }, opts, function (err) {
-        assert.equal(err.errors.color.message,
-          'Invalid color');
-        // acquit:ignore:start
-        done();
-        // acquit:ignore:end
-      });
+  it('Update Validators', function(done) {
+    var toySchema = new Schema({
+      color: String,
+      name: String
     });
 
-    /**
-     * There are a couple of key differences between update validators and
-     * document validators. In the color validation function above, `this` refers
-     * to the document being validated when using document validation.
-     * However, when running update validators, the document being updated
-     * may not be in the server's memory, so by default the value of `this` is
-     * not defined. However, you can set the `context` option to 'query' to make
-     * `this` refer to the underlying query.
-     */
+    var Toy = db.model('Toys', toySchema);
 
-    it('Update Validators and `this`', function(done) {
-      var toySchema = new Schema({
-        color: String,
-        name: String
-      });
+    Toy.schema.path('color').validate(function (value) {
+      return /blue|green|white|red|orange|periwinkle/i.test(value);
+    }, 'Invalid color');
 
-      toySchema.path('color').validate(function(value) {
-        // When running in `validate()` or `validateSync()`, the
-        // validator can access the document using `this`.
-        // Does **not** work with update validators.
-        if (this.name.toLowerCase().indexOf('red') !== -1) {
-          return value !== 'red';
-        }
-        return true;
-      });
-
-      var Toy = db.model('ActionFigure', toySchema);
-
-      var toy = new Toy({ color: 'red', name: 'Red Power Ranger' });
-      var error = toy.validateSync();
-      assert.ok(error.errors['color']);
-
-      var update = { color: 'red', name: 'Red Power Ranger' };
-      var opts = { runValidators: true };
-
-      Toy.update({}, update, opts, function(error) {
-        // The update validator throws an error:
-        // "TypeError: Cannot read property 'toLowerCase' of undefined",
-        // because `this` is **not** the document being updated when using
-        // update validators
-        assert.ok(error);
-        // acquit:ignore:start
-        done();
-        // acquit:ignore:end
-      });
-    });
-
-    /**
-     * The other key difference that update validators only run on the paths
-     * specified in the update. For instance, in the below example, because
-     * 'name' is not specified in the update operation, update validation will
-     * succeed.
-     *
-     * When using update validators, `required` validators **only** fail when
-     * you try to explicitly `$unset` the key.
-     */
-
-    it('Update Validator Paths', function(done) {
+    var opts = { runValidators: true };
+    Toy.update({}, { color: 'bacon' }, opts, function (err) {
+      assert.equal(err.errors.color.message,
+        'Invalid color');
       // acquit:ignore:start
-      var outstanding = 2;
+      done();
       // acquit:ignore:end
-      var kittenSchema = new Schema({
-        name: { type: String, required: true },
-        age: Number
-      });
+    });
+  });
 
-      var Kitten = db.model('Kitten', kittenSchema);
+  /**
+   * There are a couple of key differences between update validators and
+   * document validators. In the color validation function above, `this` refers
+   * to the document being validated when using document validation.
+   * However, when running update validators, the document being updated
+   * may not be in the server's memory, so by default the value of `this` is
+   * not defined. However, you can set the `context` option to 'query' to make
+   * `this` refer to the underlying query.
+   */
 
-      var update = { color: 'blue' };
-      var opts = { runValidators: true };
-      Kitten.update({}, update, opts, function(err) {
-        // Operation succeeds despite the fact that 'name' is not specified
-        // acquit:ignore:start
-        --outstanding || done();
-        // acquit:ignore:end
-      });
-
-      var unset = { $unset: { name: 1 } };
-      Kitten.update({}, unset, opts, function(err) {
-        // Operation fails because 'name' is required
-        assert.ok(err);
-        assert.ok(err.errors['name']);
-        // acquit:ignore:start
-        --outstanding || done();
-        // acquit:ignore:end
-      });
+  it('Update Validators and `this`', function(done) {
+    var toySchema = new Schema({
+      color: String,
+      name: String
     });
 
-    /**
-     * One final detail worth noting: update validators **only** run on `$set`
-     * and `$unset` operations. For instance, the below update will succeed,
-     * regardless of the value of `number`.
-     */
+    toySchema.path('color').validate(function(value) {
+      // When running in `validate()` or `validateSync()`, the
+      // validator can access the document using `this`.
+      // Does **not** work with update validators.
+      if (this.name.toLowerCase().indexOf('red') !== -1) {
+        return value !== 'red';
+      }
+      return true;
+    });
 
-    it('Update Validators Only Run On Specified Paths', function(done) {
-      var testSchema = new Schema({
-        number: { type: Number, max: 0 },
-      });
+    var Toy = db.model('ActionFigure', toySchema);
 
-      var Test = db.model('Test', testSchema);
+    var toy = new Toy({ color: 'red', name: 'Red Power Ranger' });
+    var error = toy.validateSync();
+    assert.ok(error.errors['color']);
 
-      var update = { $inc: { number: 1 } };
-      var opts = { runValidators: true };
-      Test.update({}, update, opts, function(error) {
-        // There will never be a validation error here
-        // acquit:ignore:start
-        assert.ifError(error);
-        done();
-        // acquit:ignore:end
-      });
+    var update = { color: 'red', name: 'Red Power Ranger' };
+    var opts = { runValidators: true };
+
+    Toy.update({}, update, opts, function(error) {
+      // The update validator throws an error:
+      // "TypeError: Cannot read property 'toLowerCase' of undefined",
+      // because `this` is **not** the document being updated when using
+      // update validators
+      assert.ok(error);
+      // acquit:ignore:start
+      done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
+   * The other key difference that update validators only run on the paths
+   * specified in the update. For instance, in the below example, because
+   * 'name' is not specified in the update operation, update validation will
+   * succeed.
+   *
+   * When using update validators, `required` validators **only** fail when
+   * you try to explicitly `$unset` the key.
+   */
+
+  it('Update Validator Paths', function(done) {
+    // acquit:ignore:start
+    var outstanding = 2;
+    // acquit:ignore:end
+    var kittenSchema = new Schema({
+      name: { type: String, required: true },
+      age: Number
+    });
+
+    var Kitten = db.model('Kitten', kittenSchema);
+
+    var update = { color: 'blue' };
+    var opts = { runValidators: true };
+    Kitten.update({}, update, opts, function(err) {
+      // Operation succeeds despite the fact that 'name' is not specified
+      // acquit:ignore:start
+      --outstanding || done();
+      // acquit:ignore:end
+    });
+
+    var unset = { $unset: { name: 1 } };
+    Kitten.update({}, unset, opts, function(err) {
+      // Operation fails because 'name' is required
+      assert.ok(err);
+      assert.ok(err.errors['name']);
+      // acquit:ignore:start
+      --outstanding || done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
+   * One final detail worth noting: update validators **only** run on `$set`
+   * and `$unset` operations. For instance, the below update will succeed,
+   * regardless of the value of `number`.
+   */
+
+  it('Update Validators Only Run On Specified Paths', function(done) {
+    var testSchema = new Schema({
+      number: { type: Number, max: 0 },
+    });
+
+    var Test = db.model('Test', testSchema);
+
+    var update = { $inc: { number: 1 } };
+    var opts = { runValidators: true };
+    Test.update({}, update, opts, function(error) {
+      // There will never be a validation error here
+      // acquit:ignore:start
+      assert.ifError(error);
+      done();
+      // acquit:ignore:end
     });
   });
 });

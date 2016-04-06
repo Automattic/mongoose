@@ -118,7 +118,9 @@ block content
     var conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 
   :markdown
-    This [connection](./api.html#connection_Connection) object can then be used for creating and retrieving [models](./api.html#model_Model) that are scoped only to this specific connection.
+    This [connection](./api.html#connection_Connection) object is then used to
+    create and retrieve [models](./api.html#model_Model). Models are
+    **always** scoped to a single connection.
 
   h3#connection_pools Connection pools
   :markdown

@@ -34,9 +34,17 @@ block content
       // saved!
     })
   :markdown
-    Note that no tanks will be created/removed until the connection your model uses is open. In this case we are using `mongoose.model()` so let's open the default mongoose connection:
+    Note that no tanks will be created/removed until the connection your model
+    uses is open. Every model has an associated connection. When you use
+    `mongoose.model()`, your model will use the default mongoose connection.
   :js
     mongoose.connect('localhost', 'gettingstarted');
+  :markdown
+    If you create a custom connection, use that connection's `model()` function
+    instead.
+  :js
+    var connection = mongoose.createConnection('mongodb://localhost:27017/test');
+    var Tank = connection.model('Tank', yourSchema);
 
   h3 Querying
   :markdown

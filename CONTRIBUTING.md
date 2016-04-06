@@ -4,10 +4,13 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 
 ### Reporting bugs
 
-- Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
-  - Please describe the issue you are experiencing, along with any associated stack trace.
-  - Please post code that reproduces the issue, the version of mongoose, node version, and mongodb version.
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_.
+- Before opening a new issue, look for existing [issues](https://github.com/Automattic/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/Automattic/mongoose/issues/new).
+  - Please post any relevant code samples, preferably a standalone script that
+  reproduces your issue. Do **not** describe your issue in prose, show your
+  code.
+  - If the bug involves an error, please post the stack trace.
+  - Please post the version of mongoose and mongodb that you're using.
+  - Please write bug reports in JavaScript (ES5 or ES2015), not coffeescript, typescript, etc.
 
 ### Requesting new features
 

@@ -31,7 +31,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
     - `if (..) {`
     - `for (..) {`
     - `while (..) {`
-    - `function(err) {`
+    - `function (err) {`
 - Write tests and make sure they pass (tests are in the [test](https://github.com/Automattic/mongoose/tree/master/test) directory).
 
 ### Running the tests

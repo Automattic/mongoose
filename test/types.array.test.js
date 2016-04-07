@@ -1664,72 +1664,81 @@ describe('types array', function() {
     });
   });
 
-  it('modifying subdoc props and manipulating the array works (gh-842)', function(done) {
-    var db = start();
-    var schema = new Schema({em: [new Schema({username: String})]});
-    var M = db.model('modifyingSubDocAndPushing', schema);
-    var m = new M({em: [{username: 'Arrietty'}]});
+  describe('bug fixes', function() {
+    var db;
 
-    m.save(function(err) {
-      assert.ifError(err);
-      M.findById(m, function(err, m) {
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('modifying subdoc props and manipulating the array works (gh-842)', function(done) {
+      var schema = new Schema({em: [new Schema({username: String})]});
+      var M = db.model('modifyingSubDocAndPushing', schema);
+      var m = new M({em: [{username: 'Arrietty'}]});
+
+      m.save(function(err) {
         assert.ifError(err);
-        assert.equal(m.em[0].username, 'Arrietty');
-
-        m.em[0].username = 'Shawn';
-        m.em.push({username: 'Homily'});
-        m.save(function(err) {
+        M.findById(m, function(err, m) {
           assert.ifError(err);
+          assert.equal(m.em[0].username, 'Arrietty');
 
-          M.findById(m, function(err, m) {
+          m.em[0].username = 'Shawn';
+          m.em.push({username: 'Homily'});
+          m.save(function(err) {
             assert.ifError(err);
-            assert.equal(m.em.length, 2);
-            assert.equal(m.em[0].username, 'Shawn');
-            assert.equal(m.em[1].username, 'Homily');
 
-            m.em[0].username = 'Arrietty';
-            m.em[1].remove();
-            m.save(function(err) {
+            M.findById(m, function(err, m) {
               assert.ifError(err);
+              assert.equal(m.em.length, 2);
+              assert.equal(m.em[0].username, 'Shawn');
+              assert.equal(m.em[1].username, 'Homily');
 
-              M.findById(m, function(err, m) {
-                db.close();
+              m.em[0].username = 'Arrietty';
+              m.em[1].remove();
+              m.save(function(err) {
                 assert.ifError(err);
-                assert.equal(m.em.length, 1);
-                assert.equal(m.em[0].username, 'Arrietty');
-                done();
+
+                M.findById(m, function(err, m) {
+                  assert.ifError(err);
+                  assert.equal(m.em.length, 1);
+                  assert.equal(m.em[0].username, 'Arrietty');
+                  done();
+                });
               });
             });
           });
         });
       });
     });
-  });
 
-  it('pushing top level arrays and subarrays works (gh-1073)', function(done) {
-    var db = start();
-    var schema = new Schema({em: [new Schema({sub: [String]})]});
-    var M = db.model('gh1073', schema);
-    var m = new M({em: [{sub: []}]});
-    m.save(function() {
-      M.findById(m, function(err, m) {
-        assert.ifError(err);
-
-        m.em[m.em.length - 1].sub.push('a');
-        m.em.push({sub: []});
-
-        assert.equal(2, m.em.length);
-        assert.equal(1, m.em[0].sub.length);
-
-        m.save(function(err) {
+    it('pushing top level arrays and subarrays works (gh-1073)', function(done) {
+      var schema = new Schema({em: [new Schema({sub: [String]})]});
+      var M = db.model('gh1073', schema);
+      var m = new M({em: [{sub: []}]});
+      m.save(function() {
+        M.findById(m, function(err, m) {
           assert.ifError(err);
 
-          M.findById(m, function(err, m) {
+          m.em[m.em.length - 1].sub.push('a');
+          m.em.push({sub: []});
+
+          assert.equal(2, m.em.length);
+          assert.equal(1, m.em[0].sub.length);
+
+          m.save(function(err) {
             assert.ifError(err);
-            assert.equal(2, m.em.length);
-            assert.equal(1, m.em[0].sub.length);
-            assert.equal('a', m.em[0].sub[0]);
-            db.close(done);
+
+            M.findById(m, function(err, m) {
+              assert.ifError(err);
+              assert.equal(2, m.em.length);
+              assert.equal(1, m.em[0].sub.length);
+              assert.equal('a', m.em[0].sub[0]);
+              done();
+            });
           });
         });
       });

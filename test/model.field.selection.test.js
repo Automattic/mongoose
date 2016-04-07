@@ -327,13 +327,14 @@ describe('model field selection', function() {
           assert.ifError(err);
           assert.equal(1, found.ids.length);
           assert.equal(1, found.ids2.length);
-          found.ids = [];
+          found.ids.pull(_id2);
           found.ids2.set(0, _id2);
           found.save(function(err) {
             assert.ifError(err);
 
             B.findById(doc._id).exec(function(err, found) {
-              assert.equal(0, found.ids.length); //FIXME is this the intended behaviour?
+              assert.equal(1, found.ids.length);
+              assert.equal(_id1.toHexString(), found.ids[0].toHexString());
 
               assert.equal(2, found.ids2.length);
               assert.equal(_id2.toHexString(), found.ids2[0].toHexString());

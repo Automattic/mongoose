@@ -2,13 +2,14 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = require('./common').mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
-    MongooseArray = mongoose.Types.Array,
-    collection = 'avengers_' + random();
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = require('./common').mongoose;
+var Schema = mongoose.Schema;
+var random = require('../lib/utils').random;
+var mongodb = require('mongodb');
+var MongooseArray = mongoose.Types.Array;
+var collection = 'avengers_' + random();
 
 var User = new Schema({
   name: String,
@@ -1742,6 +1743,25 @@ describe('types array', function() {
           });
         });
       });
+    });
+
+    it('finding ids by string (gh-4011)', function(done) {
+      var sub = new Schema({
+        _id: String,
+        other: String
+      });
+
+      var main = new Schema({
+        subs: [sub]
+      });
+
+      var Model = db.model('gh4011', main);
+
+      var doc = new Model({ subs: [{ _id: '57067021ee0870440c76f489' }] });
+
+      assert.ok(doc.subs.id('57067021ee0870440c76f489'));
+      assert.ok(doc.subs.id(new mongodb.ObjectId('57067021ee0870440c76f489')));
+      done();
     });
   });
 

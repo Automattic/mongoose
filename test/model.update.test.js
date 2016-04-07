@@ -1527,18 +1527,6 @@ describe('model: update:', function() {
     });
   });
 
-  it('can $rename (gh-1845)', function(done) {
-    var db = start();
-
-    var schema = new Schema({foo: Date, bar: Date});
-    var Model = db.model('gh1845', schema, 'gh1845');
-
-    Model.update({}, {$rename: {foo: 'bar'}}, function(error) {
-      assert.ifError(error);
-      db.close(done);
-    });
-  });
-
   it('doesnt modify original argument doc (gh-3008)', function(done) {
     var db = start();
     var FooSchema = new mongoose.Schema({
@@ -1566,12 +1554,20 @@ describe('model: update:', function() {
     });
 
     it('can $rename (gh-1845)', function(done) {
-      var schema = new Schema({foo: Date, bar: Date});
+      var db = start();
+
+      var schema = new Schema({ foo: Date, bar: Date });
       var Model = db.model('gh1845', schema, 'gh1845');
 
-      Model.update({}, {$rename: {foo: 'bar'}}, function(error) {
+      var update = { $rename: { foo: 'bar'} };
+      Model.create({ foo: Date.now() }, function(error) {
         assert.ifError(error);
-        done();
+        Model.update({}, update, { multi: true }, function(error, res) {
+          assert.ifError(error);
+          assert.ok(res.ok);
+          assert.equal(res.nModified, 1);
+          db.close(done);
+        });
       });
     });
 

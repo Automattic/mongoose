@@ -319,7 +319,7 @@ describe('validation docs', function() {
       return true;
     });
 
-    var Toy = db.model('ActionFigure', toySchema);
+    var Toy = db.model('Figure', toySchema);
 
     var update = { color: 'blue', name: 'Red Power Ranger' };
     // Note the context option

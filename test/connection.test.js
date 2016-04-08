@@ -649,29 +649,6 @@ describe('connections:', function() {
     });
   });
 
-  describe('missing protocols', function() {
-    it('are allowed with replsets', function(done) {
-      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326?replicaSet=bacon', function(err) {
-        // force missing db error so we don't actually connect.
-        assert.ok(err);
-      });
-      assert.deepEqual([{host: 'localhost', port: 12345}, {host: '127.0.0.1', port: 14326}], conn.hosts);
-      assert.deepEqual(null, conn.host);
-      assert.deepEqual(null, conn.port);
-      setTimeout(done, 10);
-    });
-
-    it('are allowed with single connections', function(done) {
-      var conn = mongoose.createConnection();
-      conn.doOpen = function() {
-      };
-      conn.open('localhost:12345/woot');
-      assert.deepEqual('localhost', conn.host);
-      assert.deepEqual(12345, conn.port);
-      done();
-    });
-  });
-
   describe('connect callbacks', function() {
     it('execute with user:pwd connection strings', function(done) {
       var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {server: {auto_reconnect: true}}, function() {

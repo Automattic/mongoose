@@ -1,3 +1,13 @@
+4.4.12 / 2016-04-08
+===================
+ * docs(query): document context option for update and findOneAndUpdate #4055
+ * docs(query): correct link to $geoWithin docs #4050
+ * fix(project): upgrade to mongodb driver 2.1.16 #4048 [schmalliso](https://github.com/schmalliso)
+ * docs(validation): fix validation docs #4028
+ * fix(types): improve .id() check for document arrays #4011
+ * fix(query): remove premature return when using $rename #3171
+ * docs(connection): clarify relationship between models and connections #2157
+
 4.4.11 / 2016-04-03
 ===================
  * fix: upgrade to mongodb driver 2.1.14 #4036 #4030 #3945

@@ -258,8 +258,7 @@ describe('validation docs', function() {
    * to the document being validated when using document validation.
    * However, when running update validators, the document being updated
    * may not be in the server's memory, so by default the value of `this` is
-   * not defined. However, you can set the `context` option to 'query' to make
-   * `this` refer to the underlying query.
+   * not defined.
    */
 
   it('Update Validators and `this`', function(done) {
@@ -293,6 +292,41 @@ describe('validation docs', function() {
       // because `this` is **not** the document being updated when using
       // update validators
       assert.ok(error);
+      // acquit:ignore:start
+      done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
+   * The `context` option lets you set the value of `this` in update validators
+   * to the underlying query.
+   */
+
+  it('The `context` option', function(done) {
+    // acquit:ignore:start
+    var toySchema = new Schema({
+      color: String,
+      name: String
+    });
+    // acquit:ignore:end
+    toySchema.path('color').validate(function(value) {
+      // When running update validators with the `context` option set to
+      // 'query', `this` refers to the query object.
+      if (this.getUpdate().$set.name.toLowerCase().indexOf('red') !== -1) {
+        return value === 'red';
+      }
+      return true;
+    });
+
+    var Toy = db.model('Figure', toySchema);
+
+    var update = { color: 'blue', name: 'Red Power Ranger' };
+    // Note the context option
+    var opts = { runValidators: true, context: 'query' };
+
+    Toy.update({}, update, opts, function(error) {
+      assert.ok(error.errors['color']);
       // acquit:ignore:start
       done();
       // acquit:ignore:end

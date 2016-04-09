@@ -226,7 +226,7 @@ describe('model', function() {
       var PersonSchema = new BaseSchema();
       var BossSchema = new BaseSchema({
         department: String
-      });
+      }, { id: false });
 
       assert.doesNotThrow(function() {
         var Person = db.model('gh2821', PersonSchema);
@@ -249,15 +249,12 @@ describe('model', function() {
       });
 
       it('is not customizable', function(done) {
-        var errorMessage,
-            CustomizedSchema = new Schema({}, {capped: true});
-        try {
-          Person.discriminator('model-discriminator-custom', CustomizedSchema);
-        } catch (e) {
-          errorMessage = e.message;
-        }
+        var CustomizedSchema = new Schema({}, {capped: true});
 
-        assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON, toObject, _id)');
+        assert.throws(function() {
+          Person.discriminator('model-discriminator-custom', CustomizedSchema);
+        }, /Can't customize discriminator option capped/);
+
         done();
       });
     });

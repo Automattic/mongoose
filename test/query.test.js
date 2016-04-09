@@ -1587,6 +1587,36 @@ describe('Query', function() {
           {votes: 1, count: 3});
       done();
     });
+
+    it('$geoWithin with single nested schemas (gh-4044)', function(done) {
+      var locationSchema = new Schema({
+        type: { type: String },
+        coordinates: []
+      }, { _id:false });
+
+      var schema = new Schema({
+        title : String,
+        location: { type: locationSchema, required: true }
+      });
+      schema.index({ location: '2dsphere' });
+
+      var Model = db.model('gh4044', schema);
+
+      var query = {
+        location:{
+          $geoWithin:{
+            $geometry:{
+              type: 'Polygon',
+              coordinates: [[[-1,0],[-1,3],[4,3],[4,0],[-1,0]]]
+            }
+          }
+        }
+      };
+      Model.find(query, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {

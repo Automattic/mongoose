@@ -1470,26 +1470,6 @@ describe('Query', function() {
     });
   });
 
-  describe('gh-1950', function() {
-    it('ignores sort when passed to count', function(done) {
-      var db = start();
-      var Product = db.model('Product', 'Product_setOptions_test');
-      Product.find().sort({_id: 1}).count({}).exec(function(error) {
-        assert.ifError(error);
-        db.close(done);
-      });
-    });
-
-    it('ignores count when passed to sort', function(done) {
-      var db = start();
-      var Product = db.model('Product', 'Product_setOptions_test');
-      Product.find().count({}).sort({_id: 1}).exec(function(error) {
-        assert.ifError(error);
-        db.close(done);
-      });
-    });
-  });
-
   describe('bug fixes', function() {
     var db;
 
@@ -1499,6 +1479,24 @@ describe('Query', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    describe('gh-1950', function() {
+      it('ignores sort when passed to count', function(done) {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        Product.find().sort({_id: 1}).count({}).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+
+      it('ignores count when passed to sort', function(done) {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        Product.find().count({}).sort({_id: 1}).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
     });
 
     it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {

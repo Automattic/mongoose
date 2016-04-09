@@ -2010,6 +2010,38 @@ describe('document', function() {
     });
   });
 
+  describe('error processing (gh-2284)', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('save errors', function(done) {
+      var opts = {
+        processError: function() {
+          return new Error('catchAll');
+        }
+      };
+
+      var schema = new Schema({
+        name: { type: String, required: true }
+      }, opts);
+
+      var Model = mongoose.model('gh2284', schema);
+
+      Model.create({}, function(error) {
+        assert.ok(error);
+        assert.equal(error.toString(), 'Error: catchAll');
+        done();
+      });
+    });
+  });
+
   describe('bug fixes', function() {
     var db;
 

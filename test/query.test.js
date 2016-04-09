@@ -1590,7 +1590,7 @@ describe('Query', function() {
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
-    var db = start();
+    var db;
     var MyModel;
 
     before(function(done) {
@@ -1625,8 +1625,8 @@ describe('Query', function() {
       });
     });
 
-    after(function() {
-      db.close();
+    after(function(done) {
+      db.close(done);
     });
 
     it('falsy projection', function(done) {

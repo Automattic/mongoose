@@ -171,6 +171,43 @@ describe('schema options.timestamps', function() {
       });
     });
 
+    it('nested docs (gh-4049)', function(done) {
+      var GroupSchema = new Schema({
+        cats: [CatSchema]
+      });
+
+      var Group = conn.model('gh4049', GroupSchema);
+      var now = Date.now();
+      Group.create({ cats: [{ name: 'Garfield' }] }, function(error, group) {
+        assert.ifError(error);
+        assert.ok(group.cats[0].createdAt);
+        assert.ok(group.cats[0].createdAt.getTime() >= now);
+        done();
+      });
+    });
+
+    it('nested docs with push (gh-4049)', function(done) {
+      var GroupSchema = new Schema({
+        cats: [CatSchema]
+      });
+
+      var Group = conn.model('gh4049_0', GroupSchema);
+      var now = Date.now();
+      Group.create({ cats: [{ name: 'Garfield' }] }, function(error, group) {
+        assert.ifError(error);
+        group.cats.push({ name: 'Keanu' });
+        group.save(function(error) {
+          assert.ifError(error);
+          Group.findById(group._id, function(error, group) {
+            assert.ifError(error);
+            assert.ok(group.cats[1].createdAt);
+            assert.ok(group.cats[1].createdAt.getTime() > now);
+            done();
+          });
+        });
+      });
+    });
+
     after(function(done) {
       Cat.remove({}, function() {
         conn.close(done);

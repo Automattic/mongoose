@@ -1551,8 +1551,6 @@ describe('model: findByIdAndUpdate:', function() {
     });
 
     it('passes raw result as 3rd param (gh-3173)', function(done) {
-      var db = start();
-
       var testSchema = new mongoose.Schema({
         test: String
       });
@@ -1566,14 +1564,11 @@ describe('model: findByIdAndUpdate:', function() {
           assert.ifError(error);
           assert.ok(res);
           assert.ok(res.ok);
-
-          db.close(done);
+          done();
         });
     });
 
     it('raw result as 3rd param w/ no result (gh-4023)', function(done) {
-      var db = start();
-
       var testSchema = new mongoose.Schema({
         test: String
       });
@@ -1588,9 +1583,7 @@ describe('model: findByIdAndUpdate:', function() {
           assert.ok(res);
           assert.ok(res.ok);
 
-          options.new = false;
-
-          db.close(done);
+          done();
         });
     });
   });

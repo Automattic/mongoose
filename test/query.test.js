@@ -1470,26 +1470,6 @@ describe('Query', function() {
     });
   });
 
-  describe('gh-1950', function() {
-    it('ignores sort when passed to count', function(done) {
-      var db = start();
-      var Product = db.model('Product', 'Product_setOptions_test');
-      Product.find().sort({_id: 1}).count({}).exec(function(error) {
-        assert.ifError(error);
-        db.close(done);
-      });
-    });
-
-    it('ignores count when passed to sort', function(done) {
-      var db = start();
-      var Product = db.model('Product', 'Product_setOptions_test');
-      Product.find().count({}).sort({_id: 1}).exec(function(error) {
-        assert.ifError(error);
-        db.close(done);
-      });
-    });
-  });
-
   describe('bug fixes', function() {
     var db;
 
@@ -1499,6 +1479,24 @@ describe('Query', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    describe('gh-1950', function() {
+      it('ignores sort when passed to count', function(done) {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        Product.find().sort({_id: 1}).count({}).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+
+      it('ignores count when passed to sort', function(done) {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        Product.find().count({}).sort({_id: 1}).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
     });
 
     it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
@@ -1587,10 +1585,61 @@ describe('Query', function() {
           {votes: 1, count: 3});
       done();
     });
+
+    it('$geoWithin with single nested schemas (gh-4044)', function(done) {
+      var locationSchema = new Schema({
+        type: { type: String },
+        coordinates: []
+      }, { _id:false });
+
+      var schema = new Schema({
+        title : String,
+        location: { type: locationSchema, required: true }
+      });
+      schema.index({ location: '2dsphere' });
+
+      var Model = db.model('gh4044', schema);
+
+      var query = {
+        location:{
+          $geoWithin:{
+            $geometry:{
+              type: 'Polygon',
+              coordinates: [[[-1,0],[-1,3],[4,3],[4,0],[-1,0]]]
+            }
+          }
+        }
+      };
+      Model.find(query, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('setDefaultsOnInsert with empty update (gh-3825)', function(done) {
+      var schema = new mongoose.Schema({
+        test: { type: Number, default: 8472 },
+        name: String
+      });
+
+      var MyModel = db.model('gh3825', schema);
+
+      var opts = { setDefaultsOnInsert: true, upsert: true };
+      MyModel.update({}, {}, opts, function(error) {
+        assert.ifError(error);
+        MyModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.strictEqual(doc.test, 8472);
+          assert.ok(!doc.name);
+          done();
+        });
+      });
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
-    var db = start();
+    var db;
     var MyModel;
 
     before(function(done) {
@@ -1625,8 +1674,8 @@ describe('Query', function() {
       });
     });
 
-    after(function() {
-      db.close();
+    after(function(done) {
+      db.close(done);
     });
 
     it('falsy projection', function(done) {

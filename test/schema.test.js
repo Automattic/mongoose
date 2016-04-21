@@ -1526,6 +1526,17 @@ describe('schema', function() {
     done();
   });
 
+  it('trim: false works with strings (gh-4042)', function(done) {
+    var testSchema = new Schema({
+      test: { type: String, trim: false }
+    });
+
+    var Test = mongoose.model('gh4042', testSchema);
+    var test = new Test({ test: ' test ' });
+    assert.equal(test.test, ' test ');
+    done();
+  });
+
   describe('remove()', function() {
     before(function() {
       this.schema = new Schema({

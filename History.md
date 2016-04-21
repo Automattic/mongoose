@@ -1,3 +1,11 @@
+4.4.13 / 2016-04-21
+===================
+ * docs: add docs favicons #4082 [robertjustjones](https://github.com/robertjustjones)
+ * docs(model): correct Model.remove() return value #4075 [Jokero](https://github.com/Jokero)
+ * fix(query): add $geoWithin query casting for single embedded docs #4044
+ * fix(schema): handle setting trim option to falsy #4042
+ * fix(query): handle setDefaultsOnInsert with empty update #3835
+
 4.4.12 / 2016-04-08
 ===================
  * docs(query): document context option for update and findOneAndUpdate #4055

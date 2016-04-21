@@ -1615,6 +1615,27 @@ describe('Query', function() {
         done();
       });
     });
+
+    it('setDefaultsOnInsert with empty update (gh-3825)', function(done) {
+      var schema = new mongoose.Schema({
+        test: { type: Number, default: 8472 },
+        name: String
+      });
+
+      var MyModel = db.model('gh3825', schema);
+
+      var opts = { setDefaultsOnInsert: true, upsert: true };
+      MyModel.update({}, {}, opts, function(error) {
+        assert.ifError(error);
+        MyModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.strictEqual(doc.test, 8472);
+          assert.ok(!doc.name);
+          done();
+        });
+      });
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {

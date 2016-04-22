@@ -312,7 +312,7 @@
 
 4.2.4 / 2015-11-02
 ==================
- * fixed; upgraded `ms` package for security vulnerability #3254 [fhemberger](https://github.com/fhemberger)
+ * fixed; upgraded `ms` package for security vulnerability #3524 [fhemberger](https://github.com/fhemberger)
  * fixed; ESlint rules #3517 [ChristianMurphy](https://github.com/ChristianMurphy)
  * docs; typo in aggregation docs #3513 [rafakato](https://github.com/rafakato)
  * fixed; add `dontThrowCastError` option to .update() for promises #3512

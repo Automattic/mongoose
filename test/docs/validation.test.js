@@ -167,7 +167,7 @@ describe('validation docs', function() {
       }
     });
 
-    var User = db.model('user', userSchema);
+    var User = db.model('User', userSchema);
     var user = new User();
     var error;
 

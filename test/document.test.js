@@ -2626,5 +2626,36 @@ describe('document', function() {
         });
       });
     });
+
+    it('single embedded docs with $near (gh-4014)', function(done) {
+      var schema = new mongoose.Schema({
+        placeName: String
+      });
+
+      var geoSchema = new mongoose.Schema({
+        type: {
+          type: String,
+          enum: 'Point',
+          default: 'Point'
+        },
+        coordinates: {
+          type: [Number],
+          default: [0, 0]
+        }
+      });
+
+      schema.add({ geo: geoSchema });
+      schema.index({ geo: '2dsphere' });
+
+      var MyModel = db.model('gh4014', schema);
+
+      MyModel.
+        where('geo').near({ center: [50, 50] }).
+        exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+
+    });
   });
 });

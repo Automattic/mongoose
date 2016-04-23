@@ -143,6 +143,46 @@ describe('validation docs', function() {
   });
 
   /**
+   * Custom validators can also be asynchronous. If your validator function
+   * takes 2 arguments, mongoose will assume the 2nd argument is a callback.
+   *
+   * Even if you don't want to use asynchronous validators, be careful,
+   * because mongoose 4 will assume that **all** functions that take 2
+   * arguments are asynchronous, like the
+   * [`validator.isEmail` function](https://www.npmjs.com/package/validator)
+   */
+  it('Async Custom Validators', function(done) {
+    var userSchema = new Schema({
+      phone: {
+        type: String,
+        validate: {
+          validator: function(v, cb) {
+            setTimeout(function() {
+              cb(/\d{3}-\d{3}-\d{4}/.test(v));
+            }, 5);
+          },
+          message: '{VALUE} is not a valid phone number!'
+        },
+        required: [true, 'User phone number required']
+      }
+    });
+
+    var User = db.model('User', userSchema);
+    var user = new User();
+    var error;
+
+    user.phone = '555.0123';
+    user.validate(function(error) {
+      assert.ok(error);
+      assert.equal(error.errors['phone'].message,
+        '555.0123 is not a valid phone number!');
+      // acquit:ignore:start
+      done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
    * Errors returned after failed validation contain an `errors` object
    * holding the actual `ValidatorError` objects. Each
    * [ValidatorError](./api.html#error-validation-js) has `kind`, `path`,

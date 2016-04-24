@@ -1,3 +1,7 @@
+3.8.40 / 2016-04-24
+===================
+ * upgraded; mquery -> 1.10.0 #3989
+
 4.4.13 / 2016-04-21
 ===================
  * docs: add docs favicons #4082 [robertjustjones](https://github.com/robertjustjones)

@@ -52,6 +52,7 @@ var BlogPost = new Schema({
 
 mongoose.model('Versioning', BlogPost);
 
+
 describe('versioning', function(){
   it('is only added to parent schema (gh-1265)', function(done){
     assert.ok(BlogPost.path('__v'));
@@ -60,7 +61,69 @@ describe('versioning', function(){
     done();
   })
 
-  it('works', function (done) {
+  it('works', function(done) {
+    var db = start()
+      , V = db.model('Versioning')
+
+    var doc = new V;
+    doc.title = 'testing versioning'
+
+    doc.save(function (err) {
+      var a , b;
+      assert.ifError(err);
+      // test 2 concurrent ops
+      V.findById(doc, function (err, _a) {
+        assert.ifError(err);
+        a = _a;
+        a && b && test1(a, b);
+      });
+      V.findById(doc, function (err, _b) {
+        assert.ifError(err);
+        b = _b;
+        a && b && test1(a, b);
+      });
+    });
+
+    function test1 (a, b) {
+      a.title = "correct";
+      b.title = "incorrect";
+      save(a, b, test2);
+    }
+
+    function test2(err, a, b) {
+      assert.equal("correct", a.title);
+      db.close();
+      done();
+    }
+
+    function save (a, b, cb) {
+      var pending = 2;
+      var e;
+      // make sure that a saves before b
+      a.save(function (err) {
+        if (err) e = err;
+        b.save(function (err) {
+          if (err) e = err;
+          lookup();
+        });
+      });
+      function lookup () {
+        var a1, b1;
+        V.findById(a, function (err, a_) {
+          if (err && !e) e = err;
+          a1 = a_;
+          a1 && b1 && cb(e, a1, b1);
+        });
+        V.findById(b, function (err, b_) {
+          if (err && !e) e = err;
+          b1 = b_;
+          a1 && b1 && cb(e, a1, b1);
+        });
+      }
+    }
+  })
+
+  it('works on arrays', function (done) {
     var db = start()
       , V = db.model('Versioning')
 
@@ -284,7 +347,6 @@ describe('versioning', function(){
         });
       }
     }
-
   })
 
   it('versioning without version key', function (done) {

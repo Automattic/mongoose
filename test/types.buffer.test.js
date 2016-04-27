@@ -331,7 +331,8 @@ describe('types.buffer', function() {
               set: function() {
                 reset(tj);
                 not(tj);
-                tj.required.set(0, 1);
+                tj.required[0] = 1;
+                tj.markModified('required');
                 is(tj);
               }
             };

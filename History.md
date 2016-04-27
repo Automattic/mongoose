@@ -1,3 +1,14 @@
+4.4.14 / 2016-04-27
+===================
+ * fix: upgrade mongodb -> 2.1.18 #4102
+ * feat(connection): allow setting mongos as a uri query param #4093 #4035 [burtonjc](https://github.com/burtonjc)
+ * fix(populate): make sure to use correct assignment order for each model #4073
+ * fix(schema): add complete set of geospatial operators for single embedded subdocs #4014
+
+3.8.40 / 2016-04-24
+===================
+ * upgraded; mquery -> 1.10.0 #3989
+
 4.4.13 / 2016-04-21
 ===================
  * docs: add docs favicons #4082 [robertjustjones](https://github.com/robertjustjones)
@@ -312,7 +323,7 @@
 
 4.2.4 / 2015-11-02
 ==================
- * fixed; upgraded `ms` package for security vulnerability #3254 [fhemberger](https://github.com/fhemberger)
+ * fixed; upgraded `ms` package for security vulnerability #3524 [fhemberger](https://github.com/fhemberger)
  * fixed; ESlint rules #3517 [ChristianMurphy](https://github.com/ChristianMurphy)
  * docs; typo in aggregation docs #3513 [rafakato](https://github.com/rafakato)
  * fixed; add `dontThrowCastError` option to .update() for promises #3512

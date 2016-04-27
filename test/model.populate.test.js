@@ -4,6 +4,7 @@
 
 var _ = require('lodash');
 var start = require('./common');
+var async = require('async');
 var assert = require('power-assert');
 var mongoose = start.mongoose;
 var utils = require('../lib/utils');
@@ -3557,6 +3558,115 @@ describe('model: populate:', function() {
           });
         });
       });
+    });
+
+    it('out-of-order discriminators (gh-4073)', function(done) {
+      var UserSchema = new Schema({
+        name: String
+      });
+
+      var CommentSchema = new Schema({
+        content: String
+      });
+
+      var BlogPostSchema = new Schema({
+        title: String
+      });
+
+      var EventSchema = new Schema({
+        name: String,
+        createdAt: { type: Date, default: Date.now }
+      });
+
+      var UserEventSchema = new Schema({
+        user: { type: ObjectId, ref: 'gh4073_0' }
+      });
+
+      var CommentEventSchema = new Schema({
+        comment: { type: ObjectId, ref: 'gh4073_1' }
+      });
+
+      var BlogPostEventSchema = new Schema({
+        blogpost: { type: ObjectId, ref: 'gh4073_2' }
+      });
+
+      var User = db.model('gh4073_0', UserSchema);
+      var Comment = db.model('gh4073_1', CommentSchema);
+      var BlogPost = db.model('gh4073_2', BlogPostSchema);
+
+      var Event = db.model('gh4073_3', EventSchema);
+      var UserEvent = Event.discriminator('User4073', UserEventSchema);
+      var CommentEvent = Event.discriminator('Comment4073',
+        CommentEventSchema);
+      var BlogPostEvent = Event.discriminator('BlogPost4073', BlogPostEventSchema);
+
+      var u1 = new User({ name: 'user 1' });
+      var u2 = new User({ name: 'user 2' });
+      var u3 = new User({ name: 'user 3' });
+      var c1 = new Comment({ content: 'comment 1' });
+      var c2 = new Comment({ content: 'comment 2' });
+      var c3 = new Comment({ content: 'comment 3' });
+      var b1 = new BlogPost({ title: 'blog post 1' });
+      var b2 = new BlogPost({ title: 'blog post 2' });
+      var b3 = new BlogPost({ title: 'blog post 3' });
+      var ue1 = new UserEvent({ user: u1 });
+      var ue2 = new UserEvent({ user: u2 });
+      var ue3 = new UserEvent({ user: u3 });
+      var ce1 = new CommentEvent({ comment: c1 });
+      var ce2 = new CommentEvent({ comment: c2 });
+      var ce3 = new CommentEvent({ comment: c3 });
+      var be1 = new BlogPostEvent({ blogpost: b1 });
+      var be2 = new BlogPostEvent({ blogpost: b2 });
+      var be3 = new BlogPostEvent({ blogpost: b3 });
+
+      async.series(
+        [
+          u1.save,
+          u2.save,
+          u3.save,
+
+          c1.save,
+          c2.save,
+          c3.save,
+
+          b1.save,
+          b2.save,
+          b3.save,
+
+          ce1.save,
+          ue1.save,
+          be1.save,
+
+          ce2.save,
+          ue2.save,
+          be2.save,
+
+          ce3.save,
+          ue3.save,
+          be3.save,
+
+          function(next) {
+            Event.
+              find({}).
+              populate('user comment blogpost').
+              exec(function(err, docs) {
+                docs.forEach(function(doc) {
+                  if (doc.__t === 'User4073') {
+                    assert.ok(doc.user.name.indexOf('user') !== -1);
+                  } else if (doc.__t === 'Comment4073') {
+                    assert.ok(doc.comment.content.indexOf('comment') !== -1);
+                  } else if (doc.__t === 'BlogPost4073') {
+                    assert.ok(doc.blogpost.title.indexOf('blog post') !== -1);
+                  } else {
+                    assert.ok(false);
+                  }
+                });
+                next();
+              });
+          }
+        ],
+        done
+      );
     });
   });
 });

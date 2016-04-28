@@ -2623,7 +2623,20 @@ describe('document', function() {
           assert.ifError(error);
           done();
         });
+    });
 
+    it('skip validation if required returns false (gh-4094)', function(done) {
+      var schema = new Schema({
+        div: {
+          type: Number,
+          required: function() { return false; },
+          validate: function(v) { return !!v; }
+        }
+      });
+      var Model = db.model('gh4094', schema);
+      var m = new Model();
+      assert.ifError(m.validateSync());
+      done();
     });
   });
 });

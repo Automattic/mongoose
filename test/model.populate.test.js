@@ -3668,5 +3668,44 @@ describe('model: populate:', function() {
         done
       );
     });
+
+    it('dynref bug (gh-4104)', function(done) {
+      var PersonSchema = new Schema({
+        name: { type: String }
+      });
+
+      var AnimalSchema = new Schema({
+        name: { type: String }
+      });
+
+      var ThingSchema = new Schema({
+        createdByModel: { type: String },
+        createdBy: {
+          type: mongoose.Schema.Types.ObjectId, refPath: 'createdByModel'
+        }
+      });
+
+      var Thing = db.model('Thing4104', ThingSchema);
+      var Person = db.model('Person4104', PersonSchema);
+      var Animal = db.model('Animal4104', AnimalSchema);
+
+      Person.create({ name: 'Val' }, function(error, person) {
+        assert.ifError(error);
+        Animal.create({ name: 'Air Bud' }, function(error, animal) {
+          assert.ifError(error);
+          var obj1 = { createdByModel: 'Person4104', createdBy: person._id };
+          var obj2 = { createdByModel: 'Animal4104', createdBy: animal._id };
+          Thing.create(obj1, obj2, function(error) {
+            assert.ifError(error);
+            Thing.find({}).populate('createdBy').exec(function(error, things) {
+              assert.ifError(error);
+              assert.ok(things[0].createdBy.name);
+              assert.ok(things[1].createdBy.name);
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 });

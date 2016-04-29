@@ -5213,6 +5213,8 @@ describe('Model', function() {
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
+        assert.ok(!docs[0].isNew);
+        assert.ok(!docs[1].isNew);
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);

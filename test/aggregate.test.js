@@ -622,14 +622,21 @@ describe('aggregate: ', function() {
 
     var MyModel = db.model('gh3160', {name: String});
 
-    MyModel.
-      aggregate([{$match: {name: 'test'}}]).
-      cursor({async: true}).
-      exec(function(error, cursor) {
-        assert.ifError(error);
-        assert.ok(cursor);
-        db.close(done);
-      });
+    MyModel.create({ name: 'test' }, function(error) {
+      assert.ifError(error);
+      MyModel.
+        aggregate([{$match: {name: 'test'}}, {$project:{name:'$name'}}]).
+        allowDiskUse(true).
+        cursor({ batchSize: 2500, async: true }).
+        exec(function(error, cursor) {
+          assert.ifError(error);
+          assert.ok(cursor);
+          cursor.toArray(function(error) {
+            assert.ifError(error);
+            db.close(done);
+          });
+        });
+    });
   });
 
   it('cursor() without options (gh-3855)', function(done) {

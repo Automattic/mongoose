@@ -2655,7 +2655,41 @@ describe('document', function() {
           assert.ifError(error);
           done();
         });
+    });
 
+    it('skip validation if required returns false (gh-4094)', function(done) {
+      var schema = new Schema({
+        div: {
+          type: Number,
+          required: function() { return false; },
+          validate: function(v) { return !!v; }
+        }
+      });
+      var Model = db.model('gh4094', schema);
+      var m = new Model();
+      assert.ifError(m.validateSync());
+      done();
+    });
+
+    it('ability to overwrite array default (gh-4109)', function(done) {
+      var schema = new Schema({
+        names: {
+          type: [String],
+          default: void 0
+        }
+      });
+
+      var Model = db.model('gh4109', schema);
+      var m = new Model();
+      assert.ok(!m.names);
+      m.save(function(error, m) {
+        assert.ifError(error);
+        Model.collection.findOne({ _id: m._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!('names' in doc));
+          done();
+        });
+      });
     });
   });
 });

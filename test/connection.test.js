@@ -553,8 +553,8 @@ describe('connections:', function() {
         done();
       });
     });
-    describe('when mongos is passed', function() {
-      it('works when specifying {mongos: true}', function(done) {
+    describe('for sharded clusters (mongos)', function() {
+      it('works when specifying {mongos: true} as an option', function(done) {
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
             + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
             + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
@@ -599,7 +599,54 @@ describe('connections:', function() {
         assert.strictEqual(db.options.mongos.sslValidate, true);
         done();
       });
-      it('works when specifying mongos opts', function(done) {
+      it('works when specifying mongos as a query param on the connection string', function(done) {
+        var newQueryParam = '&mongos=true';
+        var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
+            + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
+            + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
+            + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true'
+            + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
+            + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true'
+            + newQueryParam;
+
+        var db = mongoose.createConnection(conn);
+        db.on('error', done);
+        db.close();
+        assert.strictEqual(typeof db.options, 'object');
+        assert.strictEqual(typeof db.options.server, 'object');
+        assert.strictEqual(typeof db.options.server.socketOptions, 'object');
+        assert.strictEqual(typeof db.options.db, 'object');
+        assert.strictEqual(typeof db.options.replset, 'object');
+        assert.strictEqual(typeof db.options.replset.socketOptions, 'object');
+        assert.strictEqual(typeof db.options.mongos, 'object');
+        assert.strictEqual(db.options.server.auto_reconnect, false);
+        assert.strictEqual(db.options.server.poolSize, 2);
+        assert.strictEqual(db.options.server.slave_ok, false);
+        assert.strictEqual(db.options.server.ssl, true);
+        assert.strictEqual(db.options.replset.ssl, true);
+        assert.strictEqual(db.options.mongos.ssl, true);
+        assert.strictEqual(db.options.server.socketOptions.socketTimeoutMS, 10);
+        assert.strictEqual(db.options.replset.socketOptions.socketTimeoutMS, 10);
+        assert.strictEqual(db.options.server.socketOptions.connectTimeoutMS, 12);
+        assert.strictEqual(db.options.replset.socketOptions.connectTimeoutMS, 12);
+        assert.strictEqual(db.options.replset.retries, 10);
+        assert.strictEqual(db.options.replset.reconnectWait, 5);
+        assert.strictEqual(db.options.replset.rs_name, 'replworld');
+        assert.strictEqual(db.options.replset.read_secondary, true);
+        assert.strictEqual(db.options.db.native_parser, false);
+        assert.strictEqual(db.options.db.w, 2);
+        assert.strictEqual(db.options.db.safe, true);
+        assert.strictEqual(db.options.db.fsync, true);
+        assert.strictEqual(db.options.db.journal, true);
+        assert.strictEqual(db.options.db.wtimeoutMS, 80);
+        assert.strictEqual(db.options.db.readPreference, 'nearest');
+        assert.deepEqual(db.options.db.read_preference_tags, [{dc: 'ny', rack: 1}, {dc: 'sf'}]);
+        assert.strictEqual(db.options.db.forceServerObjectId, false);
+        assert.strictEqual(db.options.server.sslValidate, true);
+        assert.strictEqual(db.options.mongos.sslValidate, true);
+        done();
+      });
+      it('works when specifying mongos as an object with options', function(done) {
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
             + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
             + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'

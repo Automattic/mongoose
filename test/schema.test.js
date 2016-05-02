@@ -886,6 +886,22 @@ describe('schema', function() {
       assert.equal(true, called);
       done();
     });
+
+    it('does not apply more than once', function(done) {
+      var Tobi = new Schema,
+          called = 0;
+
+      var plugin = function(schema) {
+        assert.equal(schema, Tobi);
+        called += 1;
+      };
+
+      Tobi.plugin(plugin);
+      Tobi.plugin(plugin);
+
+      assert.equal(1, called);
+      done();
+    });
   });
 
   describe('options', function() {

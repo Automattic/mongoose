@@ -20,10 +20,10 @@
   "license": "MIT",
   "dependencies": {
     "async": "1.5.2",
-    "bson": "~0.4.21",
+    "bson": "~0.4.23",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
-    "mongodb": "2.1.16",
+    "mongodb": "2.1.18",
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
     "mquery": "1.10.0",

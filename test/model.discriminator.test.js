@@ -338,6 +338,12 @@ describe('model', function() {
         assert.deepEqual(personOptions, employeeOptions);
         done();
       });
+
+      it('does not allow setting discriminator key (gh-2041)', function(done) {
+        var doc = new Employee({ __t: 'fake' });
+        assert.equal(doc.__t, 'model-discriminator-employee');
+        done();
+      });
     });
   });
 });

@@ -30,17 +30,78 @@ describe('QueryCursor', function() {
     db.close(done);
   });
 
-  it('#next()', function(done) {
-    var cursor = Model.find().sort({ name: 1 }).cursor();
-    cursor.next(function(error, doc) {
-      assert.ifError(error);
-      assert.equal(doc.name, 'Axl');
-      assert.equal(doc.test, 'test');
+  describe('#next()', function() {
+    it('with callbacks', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor();
       cursor.next(function(error, doc) {
         assert.ifError(error);
-        assert.equal(doc.name, 'Slash');
+        assert.equal(doc.name, 'Axl');
         assert.equal(doc.test, 'test');
-        done();
+        cursor.next(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Slash');
+          assert.equal(doc.test, 'test');
+          done();
+        });
+      });
+    });
+
+    it('with promises', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor();
+      cursor.next().then(function(doc) {
+        assert.equal(doc.name, 'Axl');
+        assert.equal(doc.test, 'test');
+        cursor.next().then(function(doc) {
+          assert.equal(doc.name, 'Slash');
+          assert.equal(doc.test, 'test');
+          done();
+        });
+      });
+    });
+
+    it('with populate', function(done) {
+      var bandSchema = new Schema({
+        name: String,
+        members: [{ type: mongoose.Schema.ObjectId, ref: 'Person1907' }]
+      });
+      var personSchema = new Schema({
+        name: String
+      });
+
+      var Person = db.model('Person1907', personSchema);
+      var Band = db.model('Band1907', bandSchema);
+
+      var people = [
+        { name: 'Axl Rose' },
+        { name: 'Slash' },
+        { name: 'Nikki Sixx' },
+        { name: 'Vince Neil' }
+      ];
+      Person.create(people, function(error, docs) {
+        assert.ifError(error);
+        var bands = [
+          { name: 'Guns N\' Roses', members: [docs[0], docs[1]] },
+          { name: 'Motley Crue', members: [docs[2], docs[3]] }
+        ];
+        Band.create(bands, function(error) {
+          assert.ifError(error);
+          var cursor =
+            Band.find().sort({ name: 1 }).populate('members').cursor();
+          cursor.next(function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.name, 'Guns N\' Roses');
+            assert.equal(doc.members.length, 2);
+            assert.equal(doc.members[0].name, 'Axl Rose');
+            assert.equal(doc.members[1].name, 'Slash');
+            cursor.next(function(error, doc) {
+              assert.equal(doc.name, 'Motley Crue');
+              assert.equal(doc.members.length, 2);
+              assert.equal(doc.members[0].name, 'Nikki Sixx');
+              assert.equal(doc.members[1].name, 'Vince Neil');
+              done();
+            });
+          });
+        });
       });
     });
   });

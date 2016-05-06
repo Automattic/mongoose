@@ -1,3 +1,12 @@
+4.4.15 / 2016-05-06
+===================
+ * fix(schema): support overwriting array default #4109
+ * fix(populate): assign values when resolving each populate #4104
+ * fix(aggregate): dont send async option to server #4101
+ * fix(model): ensure isNew set to false after insertMany #4099
+ * fix(connection): emit on error if listeners and no callback #4098
+ * fix(document): treat required fn that returns false as required: false #4094
+
 4.4.14 / 2016-04-27
 ===================
  * fix: upgrade mongodb -> 2.1.18 #4102

@@ -793,18 +793,21 @@ describe('schema', function() {
       });
     });
 
-    it('should validate subdocuments subproperty enums', function(done) {
+    it('should validate subdocuments subproperty enums (gh-4111)', function(done) {
       var M = mongoose.model('M', new Schema({
+        p: {
+          val: { type: String, enum: ['test'] }
+        },
         children: [{
           prop: {
-            val: {type: String, enum: ['valid']}
+            val: { type: String, enum: ['valid'] }
           }
         }]
       }));
 
       var model = new M();
+      model.p = { val: 'test' };
       var child = model.children.create();
-
       child.prop = {
         val: 'valid'
       };
@@ -821,7 +824,7 @@ describe('schema', function() {
         model.validate(function(error) {
           assert.ok(error);
           assert.equal(error.errors['children.0.prop.val'].message,
-              '`invalid` is not a valid enum value for path `prop.val`.');
+            '`invalid` is not a valid enum value for path `prop.val`.');
 
           done();
         });

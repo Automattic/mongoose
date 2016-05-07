@@ -793,6 +793,41 @@ describe('schema', function() {
       });
     });
 
+    it('should validate subdocuments subproperty enums', function(done) {
+      var M = mongoose.model('M', new Schema({
+        children: [{
+          prop: {
+            val: {type: String, enum: ['valid']}
+          }
+        }]
+      }));
+
+      var model = new M();
+      var child = model.children.create();
+
+      child.prop = {
+        val: 'valid'
+      };
+
+      model.children.push(child);
+
+      model.validate(function(error) {
+        assert.ifError(error);
+
+        child.prop.val = 'invalid';
+
+        assert.equal(model.children[0].prop.val, 'invalid');
+
+        model.validate(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['children.0.prop.val'].message,
+              '`invalid` is not a valid enum value for path `prop.val`.');
+
+          done();
+        });
+      });
+    });
+
     it('doesnt do double validation on document arrays (gh-2618)', function(done) {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});

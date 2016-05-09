@@ -2690,5 +2690,27 @@ describe('document', function() {
         });
       });
     });
+
+    it('single embedded with defaults have $parent (gh-4115)', function(done) {
+      var ChildSchema = new Schema({
+        name: {
+          type: String,
+          'default': 'child'
+        }
+      });
+
+      var ParentSchema = new Schema({
+        child: {
+          type: ChildSchema,
+          'default': {}
+        }
+      });
+
+      var Parent = db.model('gh4115', ParentSchema);
+
+      var p = new Parent();
+      assert.equal(p.child.$parent, p);
+      done();
+    });
   });
 });

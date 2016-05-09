@@ -1,3 +1,13 @@
+4.4.16 / 2016-05-09
+===================
+ * refactor(document): use function reference #4133 [dciccale](https://github.com/dciccale)
+ * docs(querystream): clarify `destroy()` and close event #4126 [AnthonyCC](https://github.com/AnthonyCC)
+ * test: make before hook fail fast if it can't connect #4121
+ * docs: add description of CastError constructor params #4120
+ * fix(schematype): ensure single embedded defaults have $parent #4115
+ * fix(document): mark nested paths for validation #4111
+ * fix(schema): make sure element is always a subdoc in doc array validation #3816
+
 4.4.15 / 2016-05-06
 ===================
  * fix(schema): support overwriting array default #4109

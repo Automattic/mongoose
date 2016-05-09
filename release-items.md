@@ -7,10 +7,9 @@
 5.  git tag x.x.x
 6.  git push origin BRANCH --tags && npm publish
 7.  update mongoosejs.com (see "updating the website" below)
-8.  announce to google groups - include the relevant change log and links to issues
-9.  tweet google group announcement from [@mongoosejs](https://twitter.com/mongoosejs)
-10. change package.json version to next patch version suffixed with '-pre' and commit "now working on x.x.x"
-11. if this is a legacy release, `git merge` changes into master.
+8.  tweet changelog link from [@mongoosejs](https://twitter.com/mongoosejs)
+9. change package.json version to next patch version suffixed with '-pre' and commit "now working on x.x.x"
+10. if this is a legacy release, `git merge` changes into master.
 
 ## updating the website
 

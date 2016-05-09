@@ -301,7 +301,7 @@ stream.paused // true
 
 <h2>QueryStream#destroy</h2>
 
-<p>Destroys the stream. No more events will be emitted after<br />calling this method.</p>
+<p>Destroys the stream and emits the close event. No more events will be emitted after<br />the close event.</p>
 
 <pre><code>stream.destroy([err])
 </code></pre>

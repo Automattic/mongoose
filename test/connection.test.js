@@ -24,6 +24,7 @@ describe('connections:', function() {
     var db = mongoose.createConnection('mongodb://localhost/fake');
     db.on('error', function() {
     });
+    assert.ok(db instanceof mongoose.Connection);
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
     assert.equal(true, db.options.server.auto_reconnect);

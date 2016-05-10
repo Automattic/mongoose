@@ -58,7 +58,6 @@ describe('documents should not be converted to _id (gh-1408)', function() {
 
         doc.set('settings', newData.settings, {merge: true});
         doc.markModified('settings'); // <== this caused the bug
-
         doc.save(function(err) {
           if (err) return done(err);
 

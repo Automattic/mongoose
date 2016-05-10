@@ -38,12 +38,11 @@ describe('schemaTypes', function () {
     Int8.prototype.cast = function(val) {
       var _val = Number(val);
       if (isNaN(_val)) {
-        throw new mongoose.SchemaType.CastError('Int8',
-          val + ' is not a number');
+        throw new Error('Int8: ' + val + ' is not a number');
       }
       _val = Math.round(_val);
       if (_val < -0x80 || _val > 0x7F) {
-        throw new mongoose.SchemaType.CastError('Int8', val +
+        throw new Error('Int8: ' + val +
           ' is outside of the range of valid 8-bit ints');
       }
       return _val;
@@ -61,5 +60,7 @@ describe('schemaTypes', function () {
     assert.equal(t.validateSync().errors['test'].name, 'CastError');
     assert.equal(t.validateSync().errors['test'].message,
       'Cast to Int8 failed for value "abc" at path "test"');
+    assert.equal(t.validateSync().errors['test'].reason.message,
+      'Int8: abc is not a number');
   });
 });

@@ -2691,5 +2691,58 @@ describe('document', function() {
         });
       });
     });
+
+    it('validation works when setting array index (gh-3816)', function(done) {
+      var mySchema = new mongoose.Schema({
+        items: [
+          { month: Number, date: Date }
+        ]
+      });
+
+      var Test = db.model('test', mySchema);
+
+      var a = [
+        { month: 0, date: new Date() },
+        { month: 1, date: new Date() }
+      ];
+      Test.create({ items: a }, function(error, doc) {
+        assert.ifError(error);
+        Test.findById(doc._id).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          doc.items[0] = {
+            month: 5,
+            date : new Date()
+          };
+          doc.markModified('items');
+          doc.save(function(error) {
+            assert.ifError(error);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single embedded with defaults have $parent (gh-4115)', function(done) {
+      var ChildSchema = new Schema({
+        name: {
+          type: String,
+          'default': 'child'
+        }
+      });
+
+      var ParentSchema = new Schema({
+        child: {
+          type: ChildSchema,
+          'default': {}
+        }
+      });
+
+      var Parent = db.model('gh4115', ParentSchema);
+
+      var p = new Parent();
+      assert.equal(p.child.$parent, p);
+      done();
+    });
   });
 });

@@ -856,7 +856,8 @@ describe('schema', function() {
       var myValidator = function() {
         ++calls;
         return true;
-      }
+      };
+
       var InnerSchema = new mongoose.Schema({
         myfield: {
           type: String,

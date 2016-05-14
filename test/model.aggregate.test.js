@@ -73,6 +73,18 @@ describe('model aggregate', function() {
       });
     });
 
+    it('when return promise', function(done) {
+      this.timeout(4000);
+
+      A.aggregate(group, project).then( function(res) {
+        assert.ok(res);
+        assert.equal(1, res.length);
+        assert.ok('maxAge' in res[0]);
+        assert.equal(maxAge, res[0].maxAge);
+        done();
+      });
+    });
+
     it('with arrays', function(done) {
       this.timeout(4000);
 

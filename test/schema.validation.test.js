@@ -851,6 +851,51 @@ describe('schema', function() {
       });
     });
 
+    it('no double validation on set nested docarray (gh-4145)', function(done) {
+      var calls = 0;
+      var myValidator = function() {
+        ++calls;
+        return true;
+      };
+
+      var InnerSchema = new mongoose.Schema({
+        myfield: {
+          type: String,
+          validate: {
+            validator: myValidator,
+            message: 'Message'
+          }
+        },
+        sibling: String
+      });
+
+      var MySchema = new mongoose.Schema({
+        nest: {
+          myarray: [InnerSchema]
+        },
+        rootSibling: String
+      });
+
+      var Model = mongoose.model('gh4145', MySchema);
+
+      var instance = new Model({
+        rootSibling: 'This is the root sibling'
+      });
+      // Direct object assignment
+      instance.nest = {
+        myarray: [{
+          myfield: 'This is my field',
+          sibling: 'This is the nested sibling'
+        }]
+      };
+
+      instance.validate(function(error) {
+        assert.ifError(error);
+        assert.equal(calls, 1);
+        done();
+      });
+    });
+
     it('returns cast errors', function(done) {
       var breakfastSchema = new Schema({
         eggs: Number

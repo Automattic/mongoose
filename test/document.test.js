@@ -2746,5 +2746,36 @@ describe('document', function() {
       assert.equal(p.child.$parent, p);
       done();
     });
+
+    it('removing parent doc calls remove hooks on subdocs (gh-2348)', function(done) {
+      var ChildSchema = new Schema({
+        name: String
+      });
+
+      var called = {};
+      ChildSchema.pre('remove', function(next) {
+        called[this.name] = true;
+        next();
+      });
+
+      var ParentSchema = new Schema({
+        children: [ChildSchema]
+      });
+
+      var Parent = db.model('gh2348', ParentSchema);
+
+      var doc = { children: [{ name: 'Luke' }, { name: 'Leia' }] };
+      Parent.create(doc, function(error, doc) {
+        assert.ifError(error);
+        doc.remove(function(error) {
+          assert.ifError(error);
+          assert.deepEqual(called, {
+            Luke: true,
+            Leia: true
+          });
+          done();
+        });
+      });
+    });
   });
 });

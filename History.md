@@ -1,3 +1,9 @@
+4.4.17 / 2016-05-13
+===================
+ * docs: remove repetition in QueryStream docs #4147 [hugoabonizio](https://github.com/hugoabonizio)
+ * fix(document): dont double-validate doc array elements #4145
+ * fix(document): call required function with correct scope #4142 [JedWatson](https://github.com/JedWatson)
+
 4.4.16 / 2016-05-09
 ===================
  * refactor(document): use function reference #4133 [dciccale](https://github.com/dciccale)

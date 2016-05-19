@@ -202,12 +202,41 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({title: 'Professional AngularJS'}).count(function(error, count) {
+      Author.
+        find({ title: 'Professional AngularJS' }).
+        count(function(error, count) {
+          assert.ifError(error);
+          assert.equal(1, count);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+  });
+
+  it('error handlers (gh-2284)', function(done) {
+    var testSchema = new Schema({ title: { type: String, unique: true } });
+
+    testSchema.post('update', function(error, res, next) {
+      next(new Error('woops'));
+    });
+
+    var Book = db.model('gh2284', testSchema);
+
+    Book.on('index', function(error) {
+      assert.ifError(error);
+      var books = [
+        { title: 'Professional AngularJS' },
+        { title: 'The 80/20 Guide to ES2015 Generators' }
+      ];
+      Book.create(books, function(error, books) {
         assert.ifError(error);
-        assert.equal(1, count);
-        assert.equal(1, preCount);
-        assert.equal(1, postCount);
-        done();
+        var query = { _id: books[1]._id };
+        var update = { title: 'Professional AngularJS' };
+        Book.update(query, update, function(error) {
+          assert.equal(error.message, 'woops');
+          done();
+        });
       });
     });
   });

@@ -2022,21 +2022,23 @@ describe('document', function() {
     });
 
     it('save errors', function(done) {
-      var opts = {
-        processError: function() {
-          return new Error('catchAll');
-        }
-      };
-
       var schema = new Schema({
         name: { type: String, required: true }
-      }, opts);
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
 
       var Model = mongoose.model('gh2284', schema);
 
       Model.create({}, function(error) {
         assert.ok(error);
-        assert.equal(error.toString(), 'Error: catchAll');
+        assert.equal(error.message, 'Catch all #2');
         done();
       });
     });

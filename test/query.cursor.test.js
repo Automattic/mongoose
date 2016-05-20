@@ -125,4 +125,30 @@ describe('QueryCursor', function() {
       done();
     });
   });
+
+  describe('#eachAsync()', function() {
+    it('iterates one-by-one, stopping for promises', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor();
+
+      var expectedNames = ['Axl', 'Slash'];
+      var cur = 0;
+
+      var checkDoc = function(doc) {
+        var _cur = cur;
+        assert.equal(doc.name, expectedNames[cur]);
+        return {
+          then: function(onResolve) {
+            setTimeout(function() {
+              assert.equal(_cur, cur++);
+              onResolve();
+            }, 50);
+          }
+        };
+      };
+      cursor.eachAsync(checkDoc).then(function() {
+        assert.equal(cur, 2);
+        done();
+      }).catch(done);
+    });
+  });
 });

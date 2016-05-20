@@ -273,7 +273,9 @@ block content
 
   h4#bufferCommands option: bufferCommands
   :markdown
-    When running with the drivers `autoReconnect` option disabled and connected to a single `mongod` (non-replica-set), mongoose buffers commands when the connection goes down until you manually reconnect. To disable mongoose buffering under these conditions, set this option to `false`.
+    By default, mongoose buffers commands when the connection goes down until
+    the driver manages to reconnect. To disable buffering, set `bufferCommands`
+    to false.
   :js
     var schema = new Schema({..}, { bufferCommands: false });
 

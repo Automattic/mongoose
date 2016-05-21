@@ -11,7 +11,7 @@ doc.save()</code></pre><p>We&#39;ve felt that this api would be more confusing t
 
 <p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p><pre><code class="javascript">mongoose.set(<span class="string">'debug'</span>, <span class="literal">true</span>)</code></pre><hr><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
 
-<p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc) are queued until the <code>connection</code> opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.</p><pre><code class="javascript"><span class="comment">// if connecting on the default mongoose connection</span>
+<p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc.) are queued until the <code>connection</code> opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.</p><pre><code class="javascript"><span class="comment">// if connecting on the default mongoose connection</span>
 mongoose.connect(..);
 mongoose.connection.on(<span class="string">'error'</span>, handleError);
 

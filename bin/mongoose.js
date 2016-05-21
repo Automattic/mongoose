@@ -21109,93 +21109,161 @@ Kareem.prototype.execPre = function(name, context, callback) {
   next();
 };
 
-Kareem.prototype.execPost = function(name, context, args, callback) {
+Kareem.prototype.execPreSync = function(name, context) {
+  var pres = this._pres[name] || [];
+  var numPres = pres.length;
+
+  for (var i = 0; i < numPres; ++i) {
+    pres[i].fn.call(context);
+  }
+};
+
+Kareem.prototype.execPost = function(name, context, args, options, callback) {
+  if (arguments.length < 5) {
+    callback = options;
+    options = null;
+  }
   var posts = this._posts[name] || [];
   var numPosts = posts.length;
   var currentPost = 0;
 
+  var firstError = null;
+  if (options && options.error) {
+    firstError = options.error;
+  }
+
   if (!numPosts) {
     return process.nextTick(function() {
-      callback.apply(null, [null].concat(args));
+      callback.apply(null, [firstError].concat(args));
     });
   }
 
   var next = function() {
     var post = posts[currentPost];
 
-    if (post.length > args.length) {
-      post.apply(context, args.concat(function(error) {
-        if (error) {
-          return callback(error);
+    if (firstError) {
+      if (post.length === args.length + 2) {
+        post.apply(context, [firstError].concat(args).concat(function(error) {
+          if (error) {
+            firstError = error;
+          }
+          if (++currentPost >= numPosts) {
+            return callback.call(null, firstError);
+          }
+          next();
+        }));
+      } else {
+        if (++currentPost >= numPosts) {
+          return callback.call(null, firstError);
         }
+        next();
+      }
+    } else {
+      if (post.length === args.length + 1) {
+        post.apply(context, args.concat(function(error) {
+          if (error) {
+            firstError = error;
+            return next();
+          }
+
+          if (++currentPost >= numPosts) {
+            return callback.apply(null, [null].concat(args));
+          }
+
+          next();
+        }));
+      } else {
+        post.apply(context, args);
 
         if (++currentPost >= numPosts) {
           return callback.apply(null, [null].concat(args));
         }
 
         next();
-      }));
-    } else {
-      post.apply(context, args);
-
-      if (++currentPost >= numPosts) {
-        return callback.apply(null, [null].concat(args));
       }
-
-      next();
     }
   };
 
   next();
 };
 
-Kareem.prototype.wrap = function(name, fn, context, args, useLegacyPost) {
+Kareem.prototype.execPostSync = function(name, context) {
+  var posts = this._posts[name] || [];
+  var numPosts = posts.length;
+
+  for (var i = 0; i < numPosts; ++i) {
+    posts[i].call(context);
+  }
+};
+
+function _handleWrapError(instance, error, name, context, args, options, callback) {
+  if (options.useErrorHandlers) {
+    var _options = { error: error };
+    return instance.execPost(name, context, args, _options, function(error) {
+      return typeof callback === 'function' && callback(error);
+    });
+  } else {
+    return typeof callback === 'function' ?
+      callback(error) :
+      undefined;
+  }
+}
+
+Kareem.prototype.wrap = function(name, fn, context, args, options) {
   var lastArg = (args.length > 0 ? args[args.length - 1] : null);
+  var argsWithoutCb = typeof lastArg === 'function' ?
+    args.slice(1) :
+    args;
   var _this = this;
+
+  var useLegacyPost;
+  if (typeof options === 'object') {
+    useLegacyPost = options && options.useLegacyPost;
+  } else {
+    useLegacyPost = options;
+  }
+  options = options || {};
 
   this.execPre(name, context, function(error) {
     if (error) {
-      if (typeof lastArg === 'function') {
-        return lastArg(error);
-      }
-      return;
+      return _handleWrapError(_this, error, name, context, argsWithoutCb,
+        options, lastArg)
     }
 
     var end = (typeof lastArg === 'function' ? args.length - 1 : args.length);
 
     fn.apply(context, args.slice(0, end).concat(function() {
+      var argsWithoutError = Array.prototype.slice.call(arguments, 1);
       if (arguments[0]) {
         // Assume error
-        return typeof lastArg === 'function' ?
-          lastArg(arguments[0]) :
-          undefined;
-      }
-
-      if (useLegacyPost && typeof lastArg === 'function') {
-        lastArg.apply(context, arguments);
-      }
-
-      var argsWithoutError = Array.prototype.slice.call(arguments, 1);
-      _this.execPost(name, context, argsWithoutError, function() {
-        if (arguments[0]) {
-          return typeof lastArg === 'function' ?
-            lastArg(arguments[0]) :
-            undefined;
+        return _handleWrapError(_this, arguments[0], name, context,
+          argsWithoutError, options, lastArg);
+      } else {
+        if (useLegacyPost && typeof lastArg === 'function') {
+          lastArg.apply(context, arguments);
         }
 
-        return typeof lastArg === 'function' && !useLegacyPost ?
-          lastArg.apply(context, arguments) :
-          undefined;
-      });
+        _this.execPost(name, context, argsWithoutError, function() {
+          if (arguments[0]) {
+            return typeof lastArg === 'function' ?
+              lastArg(arguments[0]) :
+              undefined;
+          }
+
+          return typeof lastArg === 'function' && !useLegacyPost ?
+            lastArg.apply(context, arguments) :
+            undefined;
+        });
+      }
     }));
   });
 };
 
-Kareem.prototype.createWrapper = function(name, fn, context) {
+Kareem.prototype.createWrapper = function(name, fn, context, options) {
   var _this = this;
   return function() {
     var args = Array.prototype.slice.call(arguments);
-    _this.wrap(name, fn, context, args);
+    _this.wrap(name, fn, context, args, options);
   };
 };
 

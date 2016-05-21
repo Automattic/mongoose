@@ -5206,7 +5206,9 @@ describe('Model', function() {
     });
 
     it('insertMany() (gh-723)', function(done) {
-      var schema = new Schema({name: String});
+      var schema = new Schema({
+        name: String
+      }, { timestamps: true });
       var Movie = db.model('gh723', schema);
 
       var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
@@ -5215,9 +5217,13 @@ describe('Model', function() {
         assert.equal(docs.length, 2);
         assert.ok(!docs[0].isNew);
         assert.ok(!docs[1].isNew);
+        assert.ok(docs[0].createdAt);
+        assert.ok(docs[1].createdAt);
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);
+          assert.ok(docs[0].createdAt);
+          assert.ok(docs[1].createdAt);
           done();
         });
       });

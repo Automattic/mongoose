@@ -5229,6 +5229,31 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() hooks (gh-3846)', function(done) {
+      var schema = new Schema({
+        name: String
+      });
+      var calledPre = 0;
+      var calledPost = 0;
+      schema.pre('insertMany', function(next) {
+        ++calledPre;
+        next();
+      });
+      schema.post('insertMany', function() {
+        ++calledPost;
+      });
+      var Movie = db.model('gh3846', schema);
+
+      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      Movie.insertMany(arr, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 2);
+        assert.equal(calledPre, 1);
+        assert.equal(calledPost, 1);
+        done();
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

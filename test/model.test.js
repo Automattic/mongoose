@@ -5229,6 +5229,26 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() with timestamps (gh-723)', function(done) {
+      var schema = new Schema({
+        name: String
+      });
+      var Movie = db.model('gh723_0', schema);
+
+      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      Movie.insertMany(arr, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 2);
+        assert.ok(!docs[0].isNew);
+        assert.ok(!docs[1].isNew);
+        Movie.find({}, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 2);
+          done();
+        });
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

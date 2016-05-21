@@ -1,3 +1,7 @@
+4.4.19 / 2016-05-21
+===================
+ * fix(model): handle insertMany if timestamps not set #4171
+
 4.4.18 / 2016-05-21
 ===================
  * docs: add missing period #4170 [gitname](https://github.com/gitname)

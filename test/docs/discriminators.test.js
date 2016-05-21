@@ -181,7 +181,7 @@ describe('discriminator docs', function () {
       ++clickedSchemaCalls;
       next();
     });
-    var ClickedLinkEvent = Event.discriminator('ClickedLink',
+    var ClickedLinkEvent = Event.discriminator('ClickedLinkEvent',
       clickedLinkSchema);
 
     var event1 = new ClickedLinkEvent();

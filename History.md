@@ -1,3 +1,11 @@
+4.4.18 / 2016-05-21
+===================
+ * docs: add missing period #4170 [gitname](https://github.com/gitname)
+ * docs: change build badge to svg #4158 [a0viedo](https://github.com/a0viedo)
+ * fix(model): update timestamps when setting `createdAt` #4155
+ * fix(utils): make sure to require in document properly #4152
+ * fix(model): throw overwrite error when discriminator name conflicts #4148
+
 4.4.17 / 2016-05-13
 ===================
  * docs: remove repetition in QueryStream docs #4147 [hugoabonizio](https://github.com/hugoabonizio)

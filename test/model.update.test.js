@@ -1816,5 +1816,25 @@ describe('model: update:', function() {
         Model.update(query, update).then(ok, done);
       });
     });
+
+    it('versioning with setDefaultsOnInsert (gh-2593)', function(done) {
+      var schema = new Schema({
+        num: Number,
+        arr: [{ num: Number }]
+      });
+
+      var Model = db.model('gh2593', schema);
+      var update = { $inc: { num: 1 }, $push: { arr: { num: 5 } } };
+      var options = {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        new: true,
+        runValidators: true
+      };
+      Model.update({}, update, options, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 });

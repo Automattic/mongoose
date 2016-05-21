@@ -202,6 +202,17 @@ describe('model', function() {
       done();
     });
 
+    it('throws error if model name is taken (gh-4148)', function(done) {
+      var Foo = db.model('model-discriminator-4148', new Schema({}));
+      db.model('model-discriminator-4148-bar', new Schema({}));
+      assert.throws(
+        function() {
+          Foo.discriminator('model-discriminator-4148-bar', new Schema());
+        },
+        /Cannot overwrite `model-discriminator-4148-bar`/);
+      done();
+    });
+
     it('works with nested schemas (gh-2821)', function(done) {
       var MinionSchema = function() {
         mongoose.Schema.apply(this, arguments);
@@ -230,7 +241,7 @@ describe('model', function() {
 
       assert.doesNotThrow(function() {
         var Person = db.model('gh2821', PersonSchema);
-        Person.discriminator('Boss', BossSchema);
+        Person.discriminator('gh2821-Boss', BossSchema);
       });
       done();
     });

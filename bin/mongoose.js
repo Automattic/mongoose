@@ -4619,6 +4619,16 @@ Schema.prototype.setupTimestamp = function(timestamps) {
       return updates;
     };
 
+    this.methods.initializeTimestamps = function() {
+      if (!this[createdAt]) {
+        this[createdAt] = new Date();
+      }
+      if (!this[updatedAt]) {
+        this[updatedAt] = new Date();
+      }
+      return this;
+    };
+
     this.pre('findOneAndUpdate', function(next) {
       this.findOneAndUpdate({}, genUpdates());
       next();
@@ -11350,6 +11360,7 @@ var toString = Object.prototype.toString;
  */
 
 exports.toObject = function toObject(obj) {
+  Document || (Document = require('./document'));
   var ret;
 
   if (exports.isNullOrUndefined(obj)) {

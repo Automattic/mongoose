@@ -52,9 +52,9 @@ describe('Models in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, results.length);
-      assert.equal('sunny-side up', results[0].eggs);
-      assert.equal('scrambled', results[1].eggs);
+      assert.equal(results.length, 2);
+      assert.equal(results[0].eggs, 'sunny-side up');
+      assert.equal(results[1].eggs, 'scrambled');
 
       done();
     })();
@@ -87,11 +87,11 @@ describe('Models in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, results.length);
-      assert.equal(false, results[0]._id);
-      assert.equal('sunny-side up', results[0].eggs);
-      assert.equal(true, results[1]._id);
-      assert.equal('scrambled', results[1].eggs);
+      assert.equal(results.length, 2);
+      assert.equal(results[0]._id, false);
+      assert.equal(results[0].eggs, 'sunny-side up');
+      assert.equal(results[1]._id, true);
+      assert.equal(results[1].eggs, 'scrambled');
 
       done();
     })();
@@ -125,7 +125,7 @@ describe('Models in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, results.length);
+      assert.equal(results.length, 2);
       assert.ok(results[0]._id === 'sunny-side up' || results[1]._id === 'sunny-side up');
       assert.ok(results[0]._id === 'scrambled' || results[1]._id === 'scrambled');
 
@@ -133,3 +133,4 @@ describe('Models in ES6', function() {
     })();
   });
 });
+

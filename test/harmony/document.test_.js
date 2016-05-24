@@ -60,7 +60,7 @@ describe('Documents in ES6', function() {
       }
 
       assert.ok(!error);
-      assert.equal(true, called);
+      assert.equal(called, true);
       called = false;
 
       // The validator function above should now fail
@@ -103,7 +103,7 @@ describe('Documents in ES6', function() {
         error = e;
       }
       assert.ifError(error);
-      assert.equal('eggs & bacon', result.description);
+      assert.equal(result.description, 'eggs & bacon');
 
       // Should cause a validation error because `description` is required
       var badBreakfast = new Breakfast({});
@@ -158,7 +158,7 @@ describe('Documents in ES6', function() {
         error = e;
       }
       assert.ifError(error);
-      assert.equal(2, result.foods.length);
+      assert.equal(result.foods.length, 2);
 
       try {
         result = yield result.populate('foods').execPopulate();
@@ -166,9 +166,9 @@ describe('Documents in ES6', function() {
         error = e;
       }
       assert.ifError(error);
-      assert.equal(2, result.foods.length);
-      assert.equal('bacon', result.foods[0].name);
-      assert.equal('eggs', result.foods[1].name);
+      assert.equal(result.foods.length, 2);
+      assert.equal(result.foods[0].name, 'bacon');
+      assert.equal(result.foods[1].name, 'eggs');
 
       done();
     })();
@@ -201,9 +201,10 @@ describe('Documents in ES6', function() {
       }
       assert.ifError(error);
       assert.equal(breakfast._id.toString(), result._id.toString());
-      assert.equal('Ribeye', result.steak);
-      assert.equal('Scrambled', result.eggs);
+      assert.equal(result.steak, 'Ribeye');
+      assert.equal(result.eggs, 'Scrambled');
       done();
     })();
   });
 });
+

@@ -25,7 +25,7 @@ describe('schema.onthefly', function() {
     db.close();
     var post = new Decorated();
     post.set('adhoc', '9', Number);
-    assert.equal(9, post.get('adhoc').valueOf());
+    assert.equal(post.get('adhoc').valueOf(), 9);
     done();
   });
 
@@ -51,23 +51,23 @@ describe('schema.onthefly', function() {
     var post = new Decorated({title: 'AD HOC'});
     // Interpret adhoc as a Number
     post.set('adhoc', '9', Number);
-    assert.equal(9, post.get('adhoc').valueOf());
+    assert.equal(post.get('adhoc').valueOf(), 9);
     post.save(function(err) {
       assert.ifError(err);
       assert.strictEqual(null, err);
       Decorated.findById(post.id, function(err, found) {
         db.close();
         assert.strictEqual(null, err);
-        assert.equal(9, found.get('adhoc'));
+        assert.equal(found.get('adhoc'), 9);
         // Interpret adhoc as a String instead of a Number now
-        assert.equal('9', found.get('adhoc', String));
-        assert.equal('9', found.get('adhoc'));
+        assert.equal(found.get('adhoc', String), '9');
+        assert.equal(found.get('adhoc'), '9');
 
         // set adhoc as an Object
         found.set('adhoc', '3', Object);
-        assert.equal('string', typeof found.get('adhoc'));
+        assert.equal(typeof found.get('adhoc'), 'string');
         found.set('adhoc', 3, Object);
-        assert.equal('number', typeof found.get('adhoc'));
+        assert.equal(typeof found.get('adhoc'), 'number');
 
         found.set('adhoc', ['hello'], Object);
         assert.ok(Array.isArray(found.get('adhoc')));
@@ -75,9 +75,9 @@ describe('schema.onthefly', function() {
         assert.ok(Array.isArray(found.get('adhoc')));
 
         found.set('adhoc', 3, String);
-        assert.equal('string', typeof found.get('adhoc'));
+        assert.equal(typeof found.get('adhoc'), 'string');
         found.set('adhoc', 3, Object);
-        assert.equal('number', typeof found.get('adhoc'));
+        assert.equal(typeof found.get('adhoc'), 'number');
         done();
       });
     });
@@ -108,14 +108,14 @@ describe('schema.onthefly', function() {
         db.close();
         assert.ifError(err);
         var rankingPreCast = found.get('moderators')[0].ranking;
-        assert.equal(1, rankingPreCast);
+        assert.equal(rankingPreCast, 1);
         assert.strictEqual(undefined, rankingPreCast.increment);
         var rankingPostCast = found.get('moderators', [ModeratorSchema])[0].ranking;
-        assert.equal(1, rankingPostCast);
+        assert.equal(rankingPostCast, 1);
 
         var NewModeratorSchema = new Schema({name: String, ranking: String});
         rankingPostCast = found.get('moderators', [NewModeratorSchema])[0].ranking;
-        assert.equal(1, rankingPostCast);
+        assert.equal(rankingPostCast, 1);
         done();
       });
     });
@@ -126,13 +126,13 @@ describe('schema.onthefly', function() {
     var Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
 
     var d = new Decorated({title: '1'});
-    assert.equal('number', typeof d.get('title', 'Number'));
+    assert.equal(typeof d.get('title', Number), 'number');
 
     d.title = '000000000000000000000001';
     assert.equal(d.get('title', ObjectId).constructor.name, 'ObjectID');
 
     d.set('title', 1, Number);
-    assert.equal('number', typeof d.get('title'));
+    assert.equal(typeof d.get('title'), 'number');
 
     db.close(done);
   });

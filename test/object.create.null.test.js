@@ -64,11 +64,11 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
 
       var m = new M(o);
 
-      assert.equal(9, m.b.c);
-      assert.equal('hi i am a string', m.b.d[0].e);
+      assert.equal(m.b.c, 9);
+      assert.equal(m.b.d[0].e, 'hi i am a string');
       assert.equal(date, m.f.g);
-      assert.equal(1, m.h.ad);
-      assert.equal(2, m.h.hoc);
+      assert.equal(m.h.ad, 1);
+      assert.equal(m.h.hoc, 2);
       assert.deepEqual({}, m.h.obj);
     });
 
@@ -96,8 +96,8 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     thing.h = 'yes';
     m.set('h.obj.thing', thing);
 
-    assert.equal(9, m.b.c);
-    assert.equal('hi i am a string', m.b.d[0].e);
+    assert.equal(m.b.c, 9);
+    assert.equal(m.b.d[0].e, 'hi i am a string');
     assert.equal(date, m.f.g);
     assert.deepEqual('yes', m.h.obj.thing.h);
     done();
@@ -133,3 +133,4 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     done();
   });
 });
+

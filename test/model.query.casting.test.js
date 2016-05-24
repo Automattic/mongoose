@@ -70,7 +70,7 @@ describe('model query casting', function() {
 
       BlogPostB.findOne({_id: id}, function(err, doc) {
         assert.ifError(err);
-        assert.equal(title, doc.get('title'));
+        assert.equal(doc.get('title'), title);
         db.close(done);
       });
     });
@@ -104,7 +104,7 @@ describe('model query casting', function() {
             assert.ifError(err);
 
             assert.ok(found);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0].get('_id').toString(), post.get('_id'));
             assert.equal(found[0].get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
             db.close(done);
@@ -169,7 +169,7 @@ describe('model query casting', function() {
           assert.ifError(err);
           Nin.find({num: {$nin: [2]}}, function(err, found) {
             assert.ifError(err);
-            assert.equal(2, found.length);
+            assert.equal(found.length, 2);
             db.close(done);
           });
         });
@@ -288,7 +288,7 @@ describe('model query casting', function() {
         Test.find({loc: {$near: ['30', '40']}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           done();
         });
       }
@@ -315,7 +315,7 @@ describe('model query casting', function() {
         Test.find({loc: {$near: ['30', '40'], $maxDistance: 51}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           done();
         });
       }
@@ -348,7 +348,7 @@ describe('model query casting', function() {
         Test.find({'loc.nested': {$near: ['30', '40'], $maxDistance: '50'}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, docs.length);
+          assert.equal(docs.length, 1);
           done();
         });
       }
@@ -387,7 +387,7 @@ describe('model query casting', function() {
         Test.find({loc: {$nearSphere: ['30', '40']}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           done();
         });
       }
@@ -416,7 +416,7 @@ describe('model query casting', function() {
         Test.find({loc: {$nearSphere: ['30', '40'], $maxDistance: 1}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           done();
         });
       }
@@ -448,7 +448,7 @@ describe('model query casting', function() {
         Test.find({'loc.nested': {$nearSphere: ['30', '40'], $maxDistance: 1}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           done();
         });
       }
@@ -482,7 +482,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$centerSphere: [['11', '20'], '0.4']}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -511,7 +511,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$centerSphere: [['11', '20'], '0.4']}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -543,7 +543,7 @@ describe('model query casting', function() {
           Test.find({'loc.nested': {$within: {$centerSphere: [['11', '20'], '0.4']}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -574,7 +574,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$center: [['11', '20'], '1']}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -603,7 +603,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$center: [['11', '20'], '1']}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -635,7 +635,7 @@ describe('model query casting', function() {
           Test.find({'loc.nested': {$within: {$center: [['11', '20'], '1']}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -666,7 +666,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$polygon: [['8', '1'], ['8', '100'], ['50', '100'], ['50', '1']]}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
             done();
           });
         }
@@ -695,7 +695,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$polygon: [['8', '1'], ['8', '100'], ['50', '100'], ['50', '1']]}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
             done();
           });
         }
@@ -727,7 +727,7 @@ describe('model query casting', function() {
           Test.find({'loc.nested': {$within: {$polygon: [['8', '1'], ['8', '100'], ['50', '100'], ['50', '1']]}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
             done();
           });
         }
@@ -758,7 +758,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$box: [['8', '1'], ['50', '100']]}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
             done();
           });
         }
@@ -787,7 +787,7 @@ describe('model query casting', function() {
           Test.find({loc: {$within: {$box: [['8', '1'], ['50', '100']]}}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
             done();
           });
         }
@@ -818,7 +818,7 @@ describe('model query casting', function() {
         function test() {
           Test.find({'loc.nested': {$within: {$box: [['8', '1'], ['50', '100']]}}}, function(err, docs) {
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
             db.close(done);
           });
         }
@@ -837,7 +837,7 @@ describe('model query casting', function() {
           B = db.model(modelName, collection + random()),
           result = B.find({}).cast(B, {tags: {$regex: /a/, $options: opts}});
 
-      assert.equal('img', result.tags.$options);
+      assert.equal(result.tags.$options, 'img');
       db.close(done);
     });
   });

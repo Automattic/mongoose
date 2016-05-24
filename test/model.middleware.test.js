@@ -19,20 +19,20 @@ describe('model middleware', function() {
     schema.post('save', function(obj) {
       assert.equal(obj.title, 'Little Green Running Hood');
       assert.equal(this.title, 'Little Green Running Hood');
-      assert.equal(0, called);
+      assert.equal(called, 0);
       called++;
     });
 
     schema.post('save', function(obj) {
       assert.equal(obj.title, 'Little Green Running Hood');
       assert.equal(this.title, 'Little Green Running Hood');
-      assert.equal(1, called);
+      assert.equal(called, 1);
       called++;
     });
 
     schema.post('save', function(obj, next) {
       assert.equal(obj.title, 'Little Green Running Hood');
-      assert.equal(2, called);
+      assert.equal(called, 2);
       called++;
       next();
     });
@@ -45,7 +45,7 @@ describe('model middleware', function() {
     test.save(function(err) {
       assert.ifError(err);
       assert.equal(test.title, 'Little Green Running Hood');
-      assert.equal(3, called);
+      assert.equal(called, 3);
       db.close();
       done();
     });
@@ -58,12 +58,12 @@ describe('model middleware', function() {
     var count = 0;
 
     schema.pre('validate', function(next) {
-      assert.equal(0, count++);
+      assert.equal(count++, 0);
       next();
     });
 
     schema.pre('save', function(next) {
-      assert.equal(1, count++);
+      assert.equal(count++, 1);
       next();
     });
 
@@ -109,17 +109,17 @@ describe('model middleware', function() {
       title: 'Test'
     });
 
-    assert.equal(1, called);
+    assert.equal(called, 1);
 
     test.save(function(err) {
       assert.ok(err instanceof Error);
       assert.equal(err.message, 'Error 101');
-      assert.equal(2, called);
+      assert.equal(called, 2);
 
       test.remove(function(err) {
         db.close();
         assert.ifError(err);
-        assert.equal(3, called);
+        assert.equal(called, 3);
         done();
       });
     });
@@ -155,8 +155,8 @@ describe('model middleware', function() {
 
       Test.findById(test._id, function(err, test) {
         assert.ifError(err);
-        assert.equal(1, preinit);
-        assert.equal(1, postinit);
+        assert.equal(preinit, 1);
+        assert.equal(postinit, 1);
         test.remove(function() {
           db.close();
           done();
@@ -204,19 +204,19 @@ describe('model middleware', function() {
 
     parent.save(function(error) {
       assert.ifError(error);
-      assert.equal(2, childPreCalls);
-      assert.equal(1, childPreCallsByName.Jaina);
-      assert.equal(1, childPreCallsByName.Jacen);
-      assert.equal(1, parentPreCalls);
+      assert.equal(childPreCalls, 2);
+      assert.equal(childPreCallsByName.Jaina, 1);
+      assert.equal(childPreCallsByName.Jacen, 1);
+      assert.equal(parentPreCalls, 1);
       parent.children[0].name = 'Anakin';
       parent.save(function(error) {
         assert.ifError(error);
-        assert.equal(4, childPreCalls);
-        assert.equal(1, childPreCallsByName.Anakin);
-        assert.equal(1, childPreCallsByName.Jaina);
-        assert.equal(2, childPreCallsByName.Jacen);
+        assert.equal(childPreCalls, 4);
+        assert.equal(childPreCallsByName.Anakin, 1);
+        assert.equal(childPreCallsByName.Jaina, 1);
+        assert.equal(childPreCallsByName.Jacen, 2);
 
-        assert.equal(2, parentPreCalls);
+        assert.equal(parentPreCalls, 2);
         db.close();
         done();
       });
@@ -260,19 +260,20 @@ describe('model middleware', function() {
 
     test.save(function(err) {
       assert.ifError(err);
-      assert.equal(1, preValidate);
-      assert.equal(1, postValidate);
-      assert.equal(0, preRemove);
-      assert.equal(0, postRemove);
+      assert.equal(preValidate, 1);
+      assert.equal(postValidate, 1);
+      assert.equal(preRemove, 0);
+      assert.equal(postRemove, 0);
       test.remove(function(err) {
         db.close();
         assert.ifError(err);
-        assert.equal(1, preValidate);
-        assert.equal(1, postValidate);
-        assert.equal(1, preRemove);
-        assert.equal(1, postRemove);
+        assert.equal(preValidate, 1);
+        assert.equal(postValidate, 1);
+        assert.equal(preRemove, 1);
+        assert.equal(postRemove, 1);
         done();
       });
     });
   });
 });
+

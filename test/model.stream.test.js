@@ -55,11 +55,11 @@ describe('query stream:', function() {
     function cb() {
       db.close();
       assert.strictEqual(undefined, err);
-      assert.equal(i, names.length);
-      assert.equal(1, closed);
-      assert.equal(1, paused);
-      assert.equal(1, resumed);
-      assert.equal(true, stream._cursor.isClosed());
+      assert.equal(names.length, i);
+      assert.equal(closed, 1);
+      assert.equal(paused, 1);
+      assert.equal(resumed, 1);
+      assert.equal(stream._cursor.isClosed(), true);
       done();
     }
 
@@ -79,22 +79,22 @@ describe('query stream:', function() {
       ++i;
 
       if (i === 3) {
-        assert.equal(false, stream.paused);
+        assert.equal(stream.paused, false);
         stream.pause();
-        assert.equal(true, stream.paused);
+        assert.equal(stream.paused, true);
         paused++;
 
         setTimeout(function() {
-          assert.equal(true, stream.paused);
+          assert.equal(stream.paused, true);
           resumed++;
           stream.resume();
-          assert.equal(false, stream.paused);
+          assert.equal(stream.paused, false);
         }, 20);
       } else if (i === 4) {
         stream.pause();
-        assert.equal(true, stream.paused);
+        assert.equal(stream.paused, true);
         stream.resume();
-        assert.equal(false, stream.paused);
+        assert.equal(stream.paused, false);
       }
     });
 
@@ -118,7 +118,7 @@ describe('query stream:', function() {
 
     function cb(err) {
       assert.ifError(err);
-      assert.equal(0, i);
+      assert.equal(i, 0);
       process.nextTick(function() {
         db.close();
         assert.strictEqual(null, stream._fields);
@@ -146,18 +146,18 @@ describe('query stream:', function() {
     var stream = P.where('name').exists().limit(10).select('_id').stream();
 
     assert.strictEqual(null, stream._destroyed);
-    assert.equal(true, stream.readable);
+    assert.equal(stream.readable, true);
 
     function cb(err) {
       ++finished;
       setTimeout(function() {
         db.close();
         assert.strictEqual(undefined, err);
-        assert.equal(5, i);
-        assert.equal(1, finished);
-        assert.equal(true, stream._destroyed);
-        assert.equal(false, stream.readable);
-        assert.equal(true, stream._cursor.isClosed());
+        assert.equal(i, 5);
+        assert.equal(finished, 1);
+        assert.equal(stream._destroyed, true);
+        assert.equal(stream.readable, false);
+        assert.equal(stream._cursor.isClosed(), true);
         done();
       }, 100);
     }
@@ -166,7 +166,7 @@ describe('query stream:', function() {
       assert.strictEqual(undefined, doc.name);
       if (++i === 5) {
         stream.destroy();
-        assert.equal(false, stream.readable);
+        assert.equal(stream.readable, false);
       }
     });
 
@@ -190,8 +190,8 @@ describe('query stream:', function() {
       setTimeout(function() {
         assert.ok(/destroyed/.test(err.message), err.message);
         assert.equal(i, 5);
-        assert.equal(1, closed);
-        assert.equal(1, finished);
+        assert.equal(closed, 1);
+        assert.equal(finished, 1);
         assert.equal(stream._destroyed, true);
         assert.equal(stream.readable, false);
         assert.equal(stream._cursor.isClosed(), true);
@@ -251,9 +251,9 @@ describe('query stream:', function() {
     function cb() {
       db.close();
       assert.strictEqual(undefined, err);
-      assert.equal(i, names.length);
-      assert.equal(1, closed);
-      assert.equal(true, stream._cursor.isClosed());
+      assert.equal(names.length, i);
+      assert.equal(closed, 1);
+      assert.equal(stream._cursor.isClosed(), true);
       done();
     }
 
@@ -263,16 +263,16 @@ describe('query stream:', function() {
 
       if (i === 1) {
         stream.pause();
-        assert.equal(true, stream.paused);
+        assert.equal(stream.paused, true);
         stream.resume();
-        assert.equal(false, stream.paused);
+        assert.equal(stream.paused, false);
       } else if (i === 2) {
         stream.pause();
-        assert.equal(true, stream.paused);
+        assert.equal(stream.paused, true);
         process.nextTick(function() {
-          assert.equal(true, stream.paused);
+          assert.equal(stream.paused, true);
           stream.resume();
-          assert.equal(false, stream.paused);
+          assert.equal(stream.paused, false);
         });
       }
     });
@@ -314,7 +314,7 @@ describe('query stream:', function() {
       stream.
         on('data', function(found) {
           assert.equal(found.id, doc.id);
-          assert.equal(1, found.ids.length);
+          assert.equal(found.ids.length, 1);
           assert.equal(_id2.toString(), found.ids[0].toString());
         }).
         on('error', function(err) {
@@ -381,7 +381,7 @@ describe('query stream:', function() {
     User.create({fullname: 'val', password: 'taco'}, function(error) {
       assert.ifError(error);
       User.find().stream().on('data', function(doc) {
-        assert.equal(undefined, doc.password);
+        assert.equal(doc.password, undefined);
         db.close(done);
       });
     });
@@ -487,8 +487,8 @@ describe('query stream:', function() {
 
       stream.on('data', function(doc) {
         ++count;
-        assert.equal('Val', doc.items[0].id.name);
-        assert.equal('Val', doc.items[1].id.otherName);
+        assert.equal(doc.items[0].id.name, 'Val');
+        assert.equal(doc.items[1].id.otherName, 'Val');
       });
 
       stream.on('close', function() {

@@ -47,7 +47,7 @@ describe('model', function() {
         function next() {
           Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function(err, results) {
             assert.ifError(err);
-            assert.equal(1, results.length);
+            assert.equal(results.length, 1);
 
             assert.equal(results[0].type, 'place');
             assert.equal(results[0].pos.length, 2);
@@ -58,7 +58,7 @@ describe('model', function() {
 
             Geo.geoSearch({type: 'place'}, {near: [40, 40], maxDistance: 5}, function(err, results) {
               assert.ifError(err);
-              assert.equal(0, results.length);
+              assert.equal(results.length, 0);
               db.close(done);
             });
           });
@@ -90,7 +90,7 @@ describe('model', function() {
         function next() {
           Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5, lean: true}, function(err, results) {
             assert.ifError(err);
-            assert.equal(1, results.length);
+            assert.equal(results.length, 1);
 
             assert.equal(results[0].type, 'place');
             assert.equal(results[0].pos.length, 2);
@@ -161,7 +161,7 @@ describe('model', function() {
             promise = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
           });
           function validate(ret, stat) {
-            assert.equal(1, ret.length);
+            assert.equal(ret.length, 1);
             assert.equal(ret[0].pos[0], 10);
             assert.equal(ret[0].pos[1], 10);
             assert.ok(stat);

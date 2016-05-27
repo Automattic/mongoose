@@ -2712,6 +2712,15 @@ describe('document', function() {
       assert.equal(p.child.$parent, p);
       done();
     });
+
+    it('strings of length 12 are valid oids (gh-3365)', function(done) {
+      var schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
+      var M = db.model('gh3365', schema);
+      var doc = new M({ myId: 'blablablabla' });
+      doc.validate(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 });
-

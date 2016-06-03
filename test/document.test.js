@@ -2722,5 +2722,30 @@ describe('document', function() {
         done();
       });
     });
+
+    it('set() empty obj unmodifies subpaths (gh-4182)', function(done) {
+      var omeletteSchema = new Schema({
+        topping: {
+          meat: {
+            type: String,
+            enum: ['bacon', 'sausage']
+          },
+          cheese: Boolean
+        }
+      });
+      var Omelette = db.model('gh4182', omeletteSchema);
+      var doc = new Omelette({
+        topping: {
+          meat: 'bacon',
+          cheese: true
+        }
+      });
+      doc.topping = {};
+      doc.save(function(error) {
+        assert.ifError(error);
+        assert.strictEqual(doc.topping.meat, void 0);
+        done();
+      });
+    });
   });
 });

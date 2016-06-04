@@ -218,5 +218,21 @@ describe('Promise', function() {
     });
     done();
   });
-});
 
+  it('.catch() works correctly (gh-4189)', function(done) {
+    var promise = new Promise.ES6(function(resolve, reject) {
+      reject(new Error('error1'));
+    });
+    promise.
+      catch(function(error) {
+        assert.ok(error);
+        return new Promise.ES6(function(resolve, reject) {
+          reject(new Error('error2'));
+        });
+      }).
+      catch(function(error) {
+        assert.equal(error.message, 'error2');
+        done();
+      });
+  });
+});

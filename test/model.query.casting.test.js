@@ -4,15 +4,16 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    SchemaType = mongoose.SchemaType,
-    CastError = SchemaType.CastError,
-    ObjectId = Schema.Types.ObjectId,
-    DocumentObjectId = mongoose.Types.ObjectId;
+var assert = require('power-assert');
+var random = require('../lib/utils').random;
+var start = require('./common');
+
+var mongoose = start.mongoose;
+
+var CastError = mongoose.SchemaType.CastError;
+var DocumentObjectId = mongoose.Types.ObjectId;
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Schema = mongoose.Schema;
 
 /**
  * Setup.
@@ -903,4 +904,51 @@ describe('model query casting', function() {
       });
     });
   });
+
+  it('minDistance (gh-4197)', function(done) {
+    var db = start();
+
+    var schema = new Schema({
+      name: String,
+      loc: {
+        type: { type: String },
+        coordinates: [Number]
+      }
+    });
+
+    schema.index({ loc: '2dsphere' });
+
+    var MyModel = db.model('gh4197', schema);
+
+    MyModel.on('index', function(error) {
+      assert.ifError(error);
+      var docs = [
+        { name: 'San Mateo Caltrain', loc: _geojsonPoint([-122.33, 37.57]) },
+        { name: 'Squaw Valley', loc: _geojsonPoint([-120.24, 39.21]) },
+        { name: 'Mammoth Lakes', loc: _geojsonPoint([-118.9, 37.61]) }
+      ];
+      var RADIUS_OF_EARTH_IN_METERS = 6378100;
+      MyModel.create(docs, function(error) {
+        assert.ifError(error);
+        MyModel.
+          find().
+          near('loc', {
+            center: [-122.33, 37.57],
+            minDistance: (1000 / RADIUS_OF_EARTH_IN_METERS).toString(),
+            maxDistance: (280000 / RADIUS_OF_EARTH_IN_METERS).toString(),
+            spherical: true
+          }).
+          exec(function(error, results) {
+            assert.ifError(error);
+            assert.equal(results.length, 1);
+            assert.equal(results[0].name, 'Squaw Valley');
+            done();
+          });
+      });
+    });
+  });
 });
+
+function _geojsonPoint(coordinates) {
+  return { type: 'Point', coordinates: coordinates };
+}

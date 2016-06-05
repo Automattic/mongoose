@@ -327,6 +327,45 @@ describe('ES6 promises: ', function() {
       done();
     });
 
+    it('gh-4177', function(done) {
+      var subSchema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      var mainSchema = new Schema({
+        name: String,
+        type: String,
+        children: [subSchema]
+      });
+
+      mainSchema.index({ name: 1, account: 1 }, { unique: true });
+
+      var Main = db.model('gh4177', mainSchema);
+
+      Main.on('index', function(error) {
+        assert.ifError(error);
+
+        var data = {
+          name: 'foo',
+          type: 'bar',
+          children: [{ name: 'child' }]
+        };
+
+        var firstSucceeded = false;
+        new Main(data).
+          save().
+          then(function() {
+            firstSucceeded = true;
+            return new Main(data).save();
+          }).
+          catch(function(error) {
+            assert.ok(firstSucceeded);
+            assert.ok(error.toString().indexOf('E11000') !== -1);
+            done();
+          });
+      });
+    });
+
     it('subdoc pre doesnt cause unhandled rejection (gh-3669)', function(done) {
       var nestedSchema = new Schema({
         name: {type: String, required: true}

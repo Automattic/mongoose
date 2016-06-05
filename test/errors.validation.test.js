@@ -192,7 +192,7 @@ describe('ValidationError', function() {
       var message = 'I had {BASE} and {TOPPING} for breakfast';
 
       var result = ValidatorError.prototype.formatMessage(message, props);
-      assert.equal('I had eggs and bacon for breakfast', result);
+      assert.equal(result, 'I had eggs and bacon for breakfast');
       done();
     });
   });

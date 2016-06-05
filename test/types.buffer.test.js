@@ -371,8 +371,8 @@ describe('types.buffer', function() {
       User.findById(doc, function(err, doc) {
         db.close();
         assert.ifError(err);
-        assert.equal(1, doc.array.length);
-        assert.equal(null, doc.array[0]);
+        assert.equal(doc.array.length, 1);
+        assert.equal(doc.array[0], null);
         done();
       });
     });
@@ -428,7 +428,7 @@ describe('types.buffer', function() {
             done(err);
             return;
           }
-          assert.equal(128, doc.buf._subtype);
+          assert.equal(doc.buf._subtype, 128);
           done();
         });
       });
@@ -447,7 +447,7 @@ describe('types.buffer', function() {
             done(err);
             return;
           }
-          assert.equal(128, doc.buf._subtype);
+          assert.equal(doc.buf._subtype, 128);
           doc.buf.subtype(0);
           doc.save(function(err) {
             if (err) {

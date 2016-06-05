@@ -32,7 +32,7 @@ describe('collections: capped:', function() {
 
   it('schemas should have option size', function(done) {
     assert.ok(capped.options.capped);
-    assert.equal(1000, capped.options.capped.size);
+    assert.equal(capped.options.capped.size, 1000);
     done();
   });
   it('creation', function(done) {
@@ -57,7 +57,7 @@ describe('collections: capped:', function() {
     Capped.collection.options(function(err, options) {
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
-      assert.equal(8192, options.size);
+      assert.equal(options.size, 8192);
       done();
     });
   });

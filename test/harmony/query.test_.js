@@ -54,7 +54,7 @@ describe('Queries in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, result.bacon);
+      assert.equal(result.bacon, 2);
 
       var results;
       try {
@@ -63,9 +63,9 @@ describe('Queries in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, results.length);
-      assert.equal(2, results[0].bacon);
-      assert.equal(3, results[1].bacon);
+      assert.equal(results.length, 2);
+      assert.equal(results[0].bacon, 2);
+      assert.equal(results[1].bacon, 3);
 
       var count;
       try {
@@ -74,7 +74,7 @@ describe('Queries in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, count);
+      assert.equal(count, 2);
 
       done();
     })();
@@ -108,9 +108,10 @@ describe('Queries in ES6', function() {
         return done(e);
       }
 
-      assert.equal('Victor Hugo', result.author.name);
+      assert.equal(result.author.name, 'Victor Hugo');
 
       done();
     })();
   });
 });
+

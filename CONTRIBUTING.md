@@ -37,9 +37,11 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Running the tests
 - Open a terminal and navigate to the root of the project
 - execute `npm install` to install the necessary dependencies
+- start a mongodb instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data> --port 27017`
 - execute `npm test` to run the tests (we're using [mocha](http://mochajs.org/))
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   - any mocha flags can be specified with `-- <mocha flags here>`
+  - For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
 
 ### Documentation
 

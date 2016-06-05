@@ -23,7 +23,7 @@ describe('sharding', function() {
     d._doc = {date: currentTime};
 
     d.$__storeShard();
-    assert.equal(currentTime, d.$__.shardval.date);
+    assert.equal(d.$__.shardval.date, currentTime);
     done();
   });
 });

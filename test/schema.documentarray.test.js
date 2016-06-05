@@ -32,8 +32,8 @@ describe('schema.documentarray', function() {
     [M, N, O].forEach(function(M) {
       var m = new M;
       assert.ok(Array.isArray(m.x));
-      assert.equal(1, m.x.length);
-      assert.equal('Prometheus', m.x[0].title);
+      assert.equal(m.x.length, 1);
+      assert.equal(m.x[0].title, 'Prometheus');
     });
     done();
   });

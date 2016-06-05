@@ -17,7 +17,7 @@ For 4.x
 
 0. Change to the master branch
 1. execute `make docs` (when this process completes you'll be on the gh-pages branch)
-2. `git commit -a -m 'website; regen <4.x.x>'`
+2. `git commit -a -m 'docs: release 4.x.x'`
 3. `git push origin gh-pages`
 
 For 3.8.x:

@@ -82,7 +82,7 @@ var dateSetterCalled = false;
 schema.path('date').set(function(v) {
   // should not have been cast to a Date yet
   if (v !== undefined) {
-    assert.equal('string', typeof v);
+    assert.equal(typeof v, 'string');
   }
   dateSetterCalled = true;
   return v;
@@ -129,14 +129,14 @@ describe('document', function() {
         }
       });
 
-      assert.equal('test', doc.test);
+      assert.equal(doc.test, 'test');
       assert.ok(doc.oids instanceof Array);
       assert.equal(doc.nested.age, 5);
       assert.equal(String(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
-      assert.equal(7, doc.nested.agePlus2);
-      assert.equal('5my path', doc.nested.path);
+      assert.equal(doc.nested.agePlus2, 7);
+      assert.equal(doc.nested.path, '5my path');
       doc.nested.setAge = 10;
-      assert.equal(10, doc.nested.age);
+      assert.equal(doc.nested.age, 10);
       doc.nested.setr = 'set it';
       assert.equal(doc.getValue('nested.setr'), 'set it setter');
 
@@ -151,7 +151,7 @@ describe('document', function() {
         }
       });
 
-      assert.equal('toop', doc2.test);
+      assert.equal(doc2.test, 'toop');
       assert.ok(doc2.oids instanceof Array);
       assert.equal(doc2.nested.age, 2);
 
@@ -169,7 +169,7 @@ describe('document', function() {
       assert.equal(doc2.nested2.yup.nested2, undefined);
       assert.equal(doc2.nested2.yup.yup, undefined);
       assert.equal(doc2.nested2.yup.age, undefined);
-      assert.equal('object', typeof doc2.nested2.yup);
+      assert.equal(typeof doc2.nested2.yup, 'object');
 
       doc2.nested2.yup = {
         age: 150,
@@ -185,7 +185,7 @@ describe('document', function() {
       assert.equal(doc2.nested2.nested, 'y');
       assert.equal(doc2.nested2.yup.nested, true);
       assert.equal(doc2.nested2.yup.yup, 'Yesiree');
-      assert.equal(150, doc2.nested2.yup.age);
+      assert.equal(doc2.nested2.yup.age, 150);
 
       assert.equal(String(doc2.nested.cool), '4cf70857337498f95900001c');
 
@@ -206,18 +206,18 @@ describe('document', function() {
 
     assert.equal(doc.isModified('test'), false);
     doc.test = 'Woot';
-    assert.equal('Woot', doc.test);
-    assert.equal(true, doc.isModified('test'));
+    assert.equal(doc.test, 'Woot');
+    assert.equal(doc.isModified('test'), true);
 
     assert.equal(doc.isModified('nested.age'), false);
     doc.nested.age = 2;
-    assert.equal(2, doc.nested.age);
+    assert.equal(doc.nested.age, 2);
     assert.ok(doc.isModified('nested.age'));
 
     doc.nested = {path: 'overwrite the entire nested object'};
-    assert.equal(undefined, doc.nested.age);
-    assert.equal(1, Object.keys(doc._doc.nested).length);
-    assert.equal('overwrite the entire nested object', doc.nested.path);
+    assert.equal(doc.nested.age, undefined);
+    assert.equal(Object.keys(doc._doc.nested).length, 1);
+    assert.equal(doc.nested.path, 'overwrite the entire nested object');
     assert.ok(doc.isModified('nested'));
     done();
   });
@@ -230,7 +230,7 @@ describe('document', function() {
 
   it('test shortcut of id hexString', function(done) {
     var doc = new TestDocument();
-    assert.equal('string', typeof doc.id);
+    assert.equal(typeof doc.id, 'string');
     done();
   });
 
@@ -279,70 +279,70 @@ describe('document', function() {
 
     assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('5my path', clone.nested.path);
-    assert.equal(undefined, clone.nested.agePlus2);
-    assert.equal(undefined, clone.em[0].works);
+    assert.equal(clone.nested.path, '5my path');
+    assert.equal(clone.nested.agePlus2, undefined);
+    assert.equal(clone.em[0].works, undefined);
     assert.ok(clone.date instanceof Date);
 
     clone = doc.toObject({virtuals: true});
 
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.nested.agePlus2, 7);
     assert.equal(clone.em[0].works, 'em virtual works');
 
     clone = doc.toObject({getters: true});
 
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('5my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
-    assert.equal('em virtual works', clone.em[0].works);
+    assert.equal(clone.nested.path, '5my path');
+    assert.equal(clone.nested.agePlus2, 7);
+    assert.equal(clone.em[0].works, 'em virtual works');
 
     // test toObject options
     doc.schema.options.toObject = {virtuals: true};
     clone = doc.toObject({transform: false, virtuals: true});
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
 
-    assert.equal('my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
-    assert.equal('asdf', clone.em[0].title);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.nested.agePlus2, 7);
+    assert.equal(clone.em[0].title, 'asdf');
     delete doc.schema.options.toObject;
 
     // minimize
     clone = doc.toObject({minimize: true});
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
     clone = doc.toObject({minimize: true, getters: true});
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
     clone = doc.toObject({minimize: false});
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     clone = doc.toObject('2');
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
 
     doc.schema.options.toObject = {minimize: false};
     clone = doc.toObject({transform: false, minimize: false});
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     delete doc.schema.options.toObject;
 
     doc.schema.options.minimize = false;
     clone = doc.toObject();
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     doc.schema.options.minimize = true;
     clone = doc.toObject();
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
 
     // transform
     doc.schema.options.toObject = {};
@@ -363,8 +363,8 @@ describe('document', function() {
     assert.ok(undefined === clone.em);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
-    assert.equal('test', clone.test);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.test, 'test');
+    assert.equal(clone.nested.age, 5);
 
     // transform with return value
     var out = {myid: doc._id.toString()};
@@ -383,12 +383,12 @@ describe('document', function() {
     // ignored transform with inline options
     clone = doc.toObject({x: 1, transform: false});
     assert.ok(!('myid' in clone));
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal('Object', clone.em[0].constructor.name);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.em[0].constructor.name, 'Object');
 
     // applied transform when inline transform is true
     clone = doc.toObject({x: 1});
@@ -405,7 +405,7 @@ describe('document', function() {
       transform: xform,
       fields: '_id em numbers oids nested'
     });
-    assert.equal('test', doc.test);
+    assert.equal(doc.test, 'test');
     assert.ok(undefined === clone.em);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
@@ -573,10 +573,10 @@ describe('document', function() {
     });
 
     var output = topic.toObject({transform: true});
-    assert.equal('favorite foods', output.title);
-    assert.equal('a@b.co', output.email);
-    assert.equal('Val', output.followers[0].name);
-    assert.equal(undefined, output.followers[0].email);
+    assert.equal(output.title, 'favorite foods');
+    assert.equal(output.email, 'a@b.co');
+    assert.equal(output.followers[0].name, 'Val');
+    assert.equal(output.followers[0].email, undefined);
     db.close(done);
   });
 
@@ -647,24 +647,24 @@ describe('document', function() {
 
     doc.schema.options.toJSON = {virtuals: true};
     var clone = doc.toJSON();
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
-    assert.equal('Object', clone.em[0].constructor.name);
-    assert.equal(0, Object.keys(clone.em[0]).length);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.nested.agePlus2, 7);
+    assert.equal(clone.em[0].constructor.name, 'Object');
+    assert.equal(Object.keys(clone.em[0]).length, 0);
     delete doc.schema.options.toJSON;
     delete path.casterConstructor.prototype.toJSON;
 
     doc.schema.options.toJSON = {minimize: false};
     clone = doc.toJSON();
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     clone = doc.toJSON('8');
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
 
     // gh-852
     var arr = [doc],
@@ -675,10 +675,10 @@ describe('document', function() {
     } catch (_) {
       err = true;
     }
-    assert.equal(false, err);
+    assert.equal(err, false);
     assert.ok(/nested2/.test(str));
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
 
     // transform
     doc.schema.options.toJSON = {};
@@ -695,12 +695,12 @@ describe('document', function() {
     };
 
     clone = doc.toJSON();
-    assert.equal(doc.id, clone._id);
+    assert.equal(clone._id, doc.id);
     assert.ok(undefined === clone.em);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
-    assert.equal('test', clone.test);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.test, 'test');
+    assert.equal(clone.nested.age, 5);
 
     // transform with return value
     var out = {myid: doc._id.toString()};
@@ -719,12 +719,12 @@ describe('document', function() {
     // ignored transform with inline options
     clone = doc.toJSON({x: 1, transform: false});
     assert.ok(!('myid' in clone));
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal('Object', clone.em[0].constructor.name);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.em[0].constructor.name, 'Object');
 
     // applied transform when inline transform is true
     clone = doc.toJSON({x: 1});
@@ -741,7 +741,7 @@ describe('document', function() {
       transform: xform,
       fields: '_id em numbers oids nested'
     });
-    assert.equal('test', doc.test);
+    assert.equal(doc.test, 'test');
     assert.ok(undefined === clone.em);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
@@ -761,7 +761,7 @@ describe('document', function() {
     // parse again
     var obj = JSON.parse(json);
 
-    assert.equal('woot', obj.test);
+    assert.equal(obj.test, 'woot');
     assert.equal(obj._id, oidString);
     done();
   });
@@ -814,10 +814,10 @@ describe('document', function() {
       d.save(function() {
         var oldUpdate = docs.update;
         docs.update = function(query, operation) {
-          assert.equal(1, Object.keys(query).length);
-          assert.equal(query._id, d._id);
-          assert.equal(1, Object.keys(operation).length);
-          assert.equal(1, Object.keys(operation.$set).length);
+          assert.equal(Object.keys(query).length, 1);
+          assert.equal(d._id, query._id);
+          assert.equal(Object.keys(operation).length, 1);
+          assert.equal(Object.keys(operation.$set).length, 1);
           assert.equal(operation.$set.text, 'A changed doc');
           called = true;
           docs.update = oldUpdate;
@@ -825,7 +825,7 @@ describe('document', function() {
         };
         d.update({$set: {text: 'A changed doc'}}, function(err) {
           assert.ifError(err);
-          assert.equal(true, called);
+          assert.equal(called, true);
           db.close(done);
         });
       });
@@ -873,28 +873,28 @@ describe('document', function() {
     db.close();
 
     var p = new P({embed: [{name: 'peanut'}]});
-    assert.equal('function', typeof p.embed[0].test);
-    assert.equal('function', typeof E.ten);
-    assert.equal('peanut butter', p.embed[0].test());
-    assert.equal(10, E.ten());
+    assert.equal(typeof p.embed[0].test, 'function');
+    assert.equal(typeof E.ten, 'function');
+    assert.equal(p.embed[0].test(), 'peanut butter');
+    assert.equal(E.ten(), 10);
 
     // test push casting
     p = new P;
     p.embed.push({name: 'apple'});
-    assert.equal('function', typeof p.embed[0].test);
-    assert.equal('function', typeof E.ten);
-    assert.equal('apple butter', p.embed[0].test());
+    assert.equal(typeof p.embed[0].test, 'function');
+    assert.equal(typeof E.ten, 'function');
+    assert.equal(p.embed[0].test(), 'apple butter');
     done();
   });
 
   it('setting a positional path does not cast value to array', function(done) {
     var doc = new TestDocument;
     doc.init({numbers: [1, 3]});
-    assert.equal(1, doc.numbers[0]);
-    assert.equal(3, doc.numbers[1]);
+    assert.equal(doc.numbers[0], 1);
+    assert.equal(doc.numbers[1], 3);
     doc.set('numbers.1', 2);
-    assert.equal(1, doc.numbers[0]);
-    assert.equal(2, doc.numbers[1]);
+    assert.equal(doc.numbers[0], 1);
+    assert.equal(doc.numbers[1], 2);
     done();
   });
 
@@ -928,7 +928,7 @@ describe('document', function() {
 
     new S({title: 'test'});
     db.close();
-    assert.equal(false, traced);
+    assert.equal(traced, false);
     done();
   });
 
@@ -942,7 +942,7 @@ describe('document', function() {
       assert.ifError(err);
       T.findById(t).select('name').exec(function(err, t) {
         assert.ifError(err);
-        assert.equal(undefined, t.req);
+        assert.equal(t.req, void 0);
         t.name = 'wooo';
         t.save(function(err) {
           assert.ifError(err);
@@ -995,14 +995,14 @@ describe('document', function() {
       var m = new M({prop: 'gh891', nick: 'validation test'});
       m.save(function(err) {
         assert.ifError(err);
-        assert.equal(true, called);
+        assert.equal(called, true);
         called = false;
         M.findById(m, 'nick', function(err, m) {
-          assert.equal(false, called);
+          assert.equal(called, false);
           assert.ifError(err);
           m.nick = 'gh-891';
           m.save(function(err) {
-            assert.equal(false, called);
+            assert.equal(called, false);
             assert.ifError(err);
             db.close(done);
           });
@@ -1155,14 +1155,14 @@ describe('document', function() {
 
         var M = db.model('validateSchema-array2', schema, collection);
         var m = new M({name: 'gh1109-2', arr: [1]});
-        assert.equal(false, called);
+        assert.equal(called, false);
         m.save(function(err) {
-          assert.equal('ValidationError: BAM', String(err));
-          assert.equal(true, called);
+          assert.equal(String(err), 'ValidationError: BAM');
+          assert.equal(called, true);
           m.arr.push(2);
           called = false;
           m.save(function(err) {
-            assert.equal(true, called);
+            assert.equal(called, true);
             assert.ifError(err);
             done();
           });
@@ -1417,7 +1417,7 @@ describe('document', function() {
     it('works with undefined (gh-1892)', function(done) {
       var d = new TestDocument();
       d.nested.setr = undefined;
-      assert.equal('undefined setter', d.nested.setr);
+      assert.equal(d.nested.setr, 'undefined setter');
       dateSetterCalled = false;
       d.date = undefined;
       d.validate(function(err) {
@@ -1440,16 +1440,16 @@ describe('document', function() {
           });
 
           doc.set('nested', {path: 'overwrite the entire nested object'});
-          assert.equal(undefined, doc.nested.age);
-          assert.equal(1, Object.keys(doc._doc.nested).length);
-          assert.equal('overwrite the entire nested object', doc.nested.path);
+          assert.equal(doc.nested.age, undefined);
+          assert.equal(Object.keys(doc._doc.nested).length, 1);
+          assert.equal(doc.nested.path, 'overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
 
           // vs merging using doc.set(object)
           doc.set({test: 'Test', nested: {age: 4}});
-          assert.equal('4overwrite the entire nested object', doc.nested.path);
-          assert.equal(4, doc.nested.age);
-          assert.equal(2, Object.keys(doc._doc.nested).length);
+          assert.equal(doc.nested.path, '4overwrite the entire nested object');
+          assert.equal(doc.nested.age, 4);
+          assert.equal(Object.keys(doc._doc.nested).length, 2);
           assert.ok(doc.isModified('nested'));
 
           doc = new TestDocument();
@@ -1462,9 +1462,9 @@ describe('document', function() {
 
           // vs merging using doc.set(path, object, {merge: true})
           doc.set('nested', {path: 'did not overwrite the nested object'}, {merge: true});
-          assert.equal('5did not overwrite the nested object', doc.nested.path);
-          assert.equal(5, doc.nested.age);
-          assert.equal(3, Object.keys(doc._doc.nested).length);
+          assert.equal(doc.nested.path, '5did not overwrite the nested object');
+          assert.equal(doc.nested.age, 5);
+          assert.equal(Object.keys(doc._doc.nested).length, 3);
           assert.ok(doc.isModified('nested'));
 
           doc = new TestDocument();
@@ -1482,16 +1482,16 @@ describe('document', function() {
           assert.ok(!doc.isModified('nested.age'));
 
           doc.nested = {path: 'overwrite the entire nested object', age: 5};
-          assert.equal(5, doc.nested.age);
-          assert.equal(2, Object.keys(doc._doc.nested).length);
-          assert.equal('5overwrite the entire nested object', doc.nested.path);
+          assert.equal(doc.nested.age, 5);
+          assert.equal(Object.keys(doc._doc.nested).length, 2);
+          assert.equal(doc.nested.path, '5overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
 
           doc.nested.deep = {x: 'Hank and Marie'};
-          assert.equal(3, Object.keys(doc._doc.nested).length);
-          assert.equal('5overwrite the entire nested object', doc.nested.path);
+          assert.equal(Object.keys(doc._doc.nested).length, 3);
+          assert.equal(doc.nested.path, '5overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
-          assert.equal('Hank and Marie', doc.nested.deep.x);
+          assert.equal(doc.nested.deep.x, 'Hank and Marie');
 
           doc = new TestDocument();
           doc.init({
@@ -1502,13 +1502,13 @@ describe('document', function() {
           });
 
           doc.set('nested.deep', {x: 'Hank and Marie'});
-          assert.equal(2, Object.keys(doc._doc.nested).length);
-          assert.equal(1, Object.keys(doc._doc.nested.deep).length);
+          assert.equal(Object.keys(doc._doc.nested).length, 2);
+          assert.equal(Object.keys(doc._doc.nested.deep).length, 1);
           assert.ok(doc.isModified('nested'));
           assert.ok(!doc.isModified('nested.path'));
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
-          assert.equal('Hank and Marie', doc.nested.deep.x);
+          assert.equal(doc.nested.deep.x, 'Hank and Marie');
 
           done();
         });
@@ -1532,8 +1532,8 @@ describe('document', function() {
           assert.ok(doc.schedule);
           assert.ok(doc.schedule.isMongooseDocumentArray);
           assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
-          assert.equal(1100, doc.schedule[0].open);
-          assert.equal(1900, doc.schedule[0].close);
+          assert.equal(doc.schedule[0].open, 1100);
+          assert.equal(doc.schedule[0].close, 1900);
 
           done();
         });
@@ -1611,7 +1611,7 @@ describe('document', function() {
               assert.ifError(err);
               Parent.findOne({}, function(error, parent) {
                 assert.ifError(error);
-                assert.equal(2, parent.children[0].counter);
+                assert.equal(parent.children[0].counter, 2);
                 db.close(done);
               });
             });
@@ -1669,7 +1669,7 @@ describe('document', function() {
         p.children = [c2];
         p.save(function(error, doc) {
           assert.ifError(error);
-          assert.equal(1, doc.children.length);
+          assert.equal(doc.children.length, 1);
           db.close(done);
         });
       });
@@ -1697,7 +1697,7 @@ describe('document', function() {
           // item.st is 3 but may not be saved to DB
           Item.findById(item._id, function(error, doc) {
             assert.ifError(error);
-            assert.equal(3, doc.st);
+            assert.equal(doc.st, 3);
             db.close(done);
           });
         });
@@ -2711,6 +2711,41 @@ describe('document', function() {
       var p = new Parent();
       assert.equal(p.child.$parent, p);
       done();
+    });
+
+    it('strings of length 12 are valid oids (gh-3365)', function(done) {
+      var schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
+      var M = db.model('gh3365', schema);
+      var doc = new M({ myId: 'blablablabla' });
+      doc.validate(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('set() empty obj unmodifies subpaths (gh-4182)', function(done) {
+      var omeletteSchema = new Schema({
+        topping: {
+          meat: {
+            type: String,
+            enum: ['bacon', 'sausage']
+          },
+          cheese: Boolean
+        }
+      });
+      var Omelette = db.model('gh4182', omeletteSchema);
+      var doc = new Omelette({
+        topping: {
+          meat: 'bacon',
+          cheese: true
+        }
+      });
+      doc.topping = {};
+      doc.save(function(error) {
+        assert.ifError(error);
+        assert.strictEqual(doc.topping.meat, void 0);
+        done();
+      });
     });
   });
 });

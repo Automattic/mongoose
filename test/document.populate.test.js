@@ -147,17 +147,17 @@ describe('document.populate', function() {
         B.findById(post, function(err, post) {
           assert.ifError(err);
           post.populate('_creator');
-          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.equal(Object.keys(post.$__.populate).length, 1);
           assert.ok('_creator' in post.$__.populate);
           post.populate('_creator');
-          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.equal(Object.keys(post.$__.populate).length, 1);
           assert.ok('_creator' in post.$__.populate);
           post.populate('_creator fans');
-          assert.equal(2, Object.keys(post.$__.populate).length);
+          assert.equal(Object.keys(post.$__.populate).length, 2);
           assert.ok('_creator' in post.$__.populate);
           assert.ok('fans' in post.$__.populate);
           post.populate({path: '_creator'});
-          assert.equal(2, Object.keys(post.$__.populate).length);
+          assert.equal(Object.keys(post.$__.populate).length, 2);
           assert.ok('_creator' in post.$__.populate);
           assert.ok('fans' in post.$__.populate);
           done();
@@ -167,12 +167,12 @@ describe('document.populate', function() {
         B.findById(post, function(err, post) {
           assert.ifError(err);
           post.populate('_creator');
-          assert.equal(1, Object.keys(post.$__.populate).length);
-          assert.equal(undefined, post.$__.populate._creator.select);
+          assert.equal(Object.keys(post.$__.populate).length, 1);
+          assert.equal(post.$__.populate._creator.select, undefined);
           post.populate({path: '_creator', select: 'name'});
-          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.equal(Object.keys(post.$__.populate).length, 1);
           assert.ok('_creator' in post.$__.populate);
-          assert.equal('name', post.$__.populate._creator.select);
+          assert.equal(post.$__.populate._creator.select, 'name');
           done();
         });
       });
@@ -187,7 +187,7 @@ describe('document.populate', function() {
           assert.ifError(err);
           assert.ok(!post.$__.populate);
           assert.ok(post._creator);
-          assert.equal(String(creator_id), String(post._creator._id));
+          assert.equal(String(post._creator._id), String(creator_id));
           done();
         });
       });
@@ -209,9 +209,9 @@ describe('document.populate', function() {
         post.populate('_creator fans', function(err) {
           assert.ifError(err);
           assert.ok(post._creator);
-          assert.equal(String(creator_id), String(post._creator._id));
-          assert.equal(String(creator_id), String(post.fans[0]._id));
-          assert.equal(String(alt_id), String(post.fans[1]._id));
+          assert.equal(String(post._creator._id), String(creator_id));
+          assert.equal(String(post.fans[0]._id), String(creator_id));
+          assert.equal(String(post.fans[1]._id), String(alt_id));
           done();
         });
       });
@@ -225,8 +225,8 @@ describe('document.populate', function() {
       post.populate('_creator').populate(function(err) {
         assert.ifError(err);
         assert.ok(post._creator);
-        assert.equal(String(creator_id), String(post._creator._id));
-        assert.equal(String(alt_id), String(post.fans[1]));
+        assert.equal(String(post._creator._id), String(creator_id));
+        assert.equal(String(post.fans[1]), String(alt_id));
         done();
       });
     });
@@ -243,10 +243,10 @@ describe('document.populate', function() {
       var alt_id = post.fans[1];
       post.populate(param, function(err, post) {
         assert.ifError(err);
-        assert.equal(2, post.fans.length);
-        assert.equal(String(creator_id), String(post._creator._id));
-        assert.equal(String(creator_id), String(post.fans[1]._id));
-        assert.equal(String(alt_id), String(post.fans[0]._id));
+        assert.equal(post.fans.length, 2);
+        assert.equal(String(post._creator._id), String(creator_id));
+        assert.equal(String(post.fans[1]._id), String(creator_id));
+        assert.equal(String(post.fans[0]._id), String(alt_id));
         assert.ok(!post.fans[0].email);
         assert.ok(!post.fans[1].email);
         assert.ok(!post.fans[0].isInit('email'));
@@ -270,10 +270,10 @@ describe('document.populate', function() {
 
       post.populate(param, function(err, post) {
         assert.ifError(err);
-        assert.equal(2, post.fans.length);
-        assert.equal(String(creator_id), String(post._creator._id));
-        assert.equal(String(creator_id), String(post.fans[1]._id));
-        assert.equal(String(alt_id), String(post.fans[0]._id));
+        assert.equal(post.fans.length, 2);
+        assert.equal(String(post._creator._id), String(creator_id));
+        assert.equal(String(post.fans[1]._id), String(creator_id));
+        assert.equal(String(post.fans[0]._id), String(alt_id));
         assert.ok(!post.fans[0].email);
         assert.ok(!post.fans[1].email);
         assert.ok(!post.fans[0].isInit('email'));
@@ -295,10 +295,10 @@ describe('document.populate', function() {
       var alt_id = post.fans[1];
       post.populate(param, function(err, post) {
         assert.ifError(err);
-        assert.equal(2, post.fans.length);
-        assert.equal(String(creator_id), String(post._creator._id));
-        assert.equal(String(creator_id), String(post.fans[1]._id));
-        assert.equal(String(alt_id), String(post.fans[0]._id));
+        assert.equal(post.fans.length, 2);
+        assert.equal(String(post._creator._id), String(creator_id));
+        assert.equal(String(post.fans[1]._id), String(creator_id));
+        assert.equal(String(post.fans[0]._id), String(alt_id));
         assert.ok(!post.fans[0].email);
         assert.ok(!post.fans[1].email);
         assert.ok(!post.fans[0].isInit('email'));
@@ -321,7 +321,7 @@ describe('document.populate', function() {
         post.populate({path: 'idontexist', model: 'doc.populate.u'}, function(err, post) {
           assert.ifError(err);
           assert.ok(post);
-          assert.equal(post.get('idontexist')._id, user1._id.toString());
+          assert.equal(user1._id.toString(), post.get('idontexist')._id);
           assert.equal(post.get('idontexist').name, 'Phoenix');
           done();
         });
@@ -385,7 +385,7 @@ describe('document.populate', function() {
         db.close();
         assert.ifError(err);
         assert.ok(note.author);
-        assert.equal('alice', note.author._id);
+        assert.equal(note.author._id, 'alice');
         assert.equal(note.author.name, 'Alice In Wonderland');
         done();
       });
@@ -419,7 +419,7 @@ describe('document.populate', function() {
 
         Note.findById(note.id, function(err, note) {
           assert.ifError(err);
-          assert.equal('alice', note.author);
+          assert.equal(note.author, 'alice');
           note.populate('author', function(err, note) {
             db.close();
             assert.ifError(err);
@@ -459,8 +459,8 @@ describe('document.populate', function() {
         db.close();
         assert.ifError(err);
         assert.ok(note.author);
-        assert.equal(2359, note.author._id);
-        assert.equal(note.author.name, 'Alice');
+        assert.equal(note.author._id, 2359);
+        assert.equal('Alice', note.author.name);
         done();
       });
     });
@@ -473,9 +473,9 @@ describe('document.populate', function() {
         var id1 = post.comments[1]._creator;
         post.populate('comments._creator', function(err, post) {
           assert.ifError(err);
-          assert.equal(2, post.comments.length);
-          assert.equal(id0, post.comments[0]._creator.id);
-          assert.equal(id1, post.comments[1]._creator.id);
+          assert.equal(post.comments.length, 2);
+          assert.equal(post.comments[0]._creator.id, id0);
+          assert.equal(post.comments[1]._creator.id, id1);
           done();
         });
       });
@@ -487,7 +487,7 @@ describe('document.populate', function() {
       var b = new B({_creator: user1});
       b.populate('_creator', function(err, b) {
         if (err) return done(err);
-        assert.equal('Phoenix', b._creator.name);
+        assert.equal(b._creator.name, 'Phoenix');
         b.save(function(err) {
           assert.ifError(err);
           B.collection.findOne({_id: b._id}, function(err, b) {

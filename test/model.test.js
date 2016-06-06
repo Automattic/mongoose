@@ -5274,6 +5274,21 @@ describe('Model', function() {
       });
     });
 
+    it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
+      var schema = new Schema({ name: 'String' });
+      var Movie = db.model('gh3222', schema);
+
+      Movie.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Movie.create({ name: 'Conan the Barbarian' }, function(error) {
+        assert.ifError(error);
+        throw new Error('fail!');
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

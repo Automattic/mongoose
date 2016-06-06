@@ -2812,5 +2812,78 @@ describe('document', function() {
         done();
       });
     });
+
+    it('emits cb errors on model for save (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for save with hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.pre('save', function(next) {
+        next();
+      });
+
+      testSchema.post('save', function(doc, next) {
+        next();
+      });
+
+      var Test = db.model('gh3499_0', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499_1', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() + hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.post('find', function(results, next) {
+        assert.equal(results.length, 0);
+        next();
+      });
+
+      var Test = db.model('gh3499_2', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
+      });
+    });
   });
 });

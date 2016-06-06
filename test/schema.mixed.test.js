@@ -16,8 +16,8 @@ describe('schematype mixed', function() {
       var m1 = new M;
       var m2 = new M;
       m1.mix.val = 3;
-      assert.equal(3, m1.mix.val);
-      assert.equal(undefined, m2.mix.val);
+      assert.equal(m1.mix.val, 3);
+      assert.equal(m2.mix.val, undefined);
       done();
     });
     it('can be forced to share the object between documents', function(done) {
@@ -27,8 +27,8 @@ describe('schematype mixed', function() {
       var m1 = new M;
       var m2 = new M;
       m1.mix.val = 3;
-      assert.equal(3, m1.mix.val);
-      assert.equal(3, m2.mix.val);
+      assert.equal(m1.mix.val, 3);
+      assert.equal(m2.mix.val, 3);
       done();
     });
   });

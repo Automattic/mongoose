@@ -151,20 +151,20 @@ describe('versioning', function() {
     function test12(err, a, b) {
       assert.ok(err instanceof VersionError);
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(5, a.comments.length);
+      assert.equal(a.comments.length, 5);
 
       a.comments.addToSet({title: 'aven'});
       a.comments.addToSet({title: 'avengers'});
       var d = a.$__delta();
 
-      assert.equal(undefined, d[0].__v, 'version should not be included in where clause');
+      assert.equal(d[0].__v, undefined, 'version should not be included in where clause');
       assert.ok(!d[1].$set);
       assert.ok(d[1].$addToSet);
       assert.ok(d[1].$addToSet.comments);
 
       a.comments.$shift();
       d = a.$__delta();
-      assert.equal(12, d[0].__v, 'version should be included in where clause');
+      assert.equal(d[0].__v, 12, 'version should be included in where clause');
       assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
       assert.ok(!d[1].$addToSet);
@@ -174,10 +174,10 @@ describe('versioning', function() {
     function test11(err, a, b) {
       assert.ifError(err);
       assert.equal(a._doc.__v, 11);
-      assert.equal(6, a.mixed.arr.length);
-      assert.equal(1, a.mixed.arr[4].x);
-      assert.equal('woot', a.mixed.arr[5]);
-      assert.equal(10, a.mixed.arr[3][0]);
+      assert.equal(a.mixed.arr.length, 6);
+      assert.equal(a.mixed.arr[4].x, 1);
+      assert.equal(a.mixed.arr[5], 'woot');
+      assert.equal(a.mixed.arr[3][0], 10);
 
       a.comments.addToSet({title: 'monkey'});
       b.markModified('comments');
@@ -190,11 +190,11 @@ describe('versioning', function() {
 
     function test10(err, a, b) {
       assert.ifError(err);
-      assert.equal('two', b.meta.nested[2].title);
-      assert.equal('zero', b.meta.nested[0].title);
-      assert.equal('sub one', b.meta.nested[1].comments[0].title);
+      assert.equal(b.meta.nested[2].title, 'two');
+      assert.equal(b.meta.nested[0].title, 'zero');
+      assert.equal(b.meta.nested[1].comments[0].title, 'sub one');
       assert.equal(a._doc.__v, 10);
-      assert.equal(3, a.mixed.arr.length);
+      assert.equal(a.mixed.arr.length, 3);
       a.mixed.arr.push([10], {x: 1}, 'woot');
       a.markModified('mixed.arr');
       save(a, b, test11);
@@ -202,7 +202,7 @@ describe('versioning', function() {
 
     function test9(err, a, b) {
       assert.ifError(err);
-      assert.equal(6, a.meta.nested.length);
+      assert.equal(a.meta.nested.length, 6);
       assert.equal(a._doc.__v, 10);
       // nested subdoc property changes should not trigger version increments
       a.meta.nested[2].title = 'two';
@@ -229,8 +229,8 @@ describe('versioning', function() {
     function test7(err, a, b) {
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.arr.length, 2);
-      assert.equal('updated', a.arr[0][0]);
-      assert.equal('woot', a.arr[1]);
+      assert.equal(a.arr[0][0], 'updated');
+      assert.equal(a.arr[1], 'woot');
       assert.equal(a._doc.__v, 7);
       a.meta.nested.$pop();
       b.meta.nested.$pop();
@@ -240,8 +240,8 @@ describe('versioning', function() {
     function test6(err, a, b) {
       assert.ifError(err);
       assert.equal(a.arr.length, 2);
-      assert.equal('updated', a.arr[0][0]);
-      assert.equal('using set', a.arr[1]);
+      assert.equal(a.arr[0][0], 'updated');
+      assert.equal(a.arr[1], 'using set');
       assert.equal(a._doc.__v, 6);
       b.set('arr.0', 'not an array');
       // should overwrite b's changes, last write wins
@@ -254,7 +254,7 @@ describe('versioning', function() {
 
     function test5(err, a, b) {
       assert.ifError(err);
-      assert.equal('updated', a.arr[0][0]);
+      assert.equal(a.arr[0][0], 'updated');
       assert.equal(a._doc.__v, 5);
       a.set('arr.0', 'not an array');
       // should overwrite a's changes, last write wins
@@ -359,16 +359,16 @@ describe('versioning', function() {
       assert.ifError(err);
       M.find(m, function(err, m) {
         assert.ifError(err);
-        assert.equal(1, m.length);
+        assert.equal(m.length, 1);
         m = m[0];
-        assert.equal(0, m._doc.__v);
+        assert.equal(m._doc.__v, 0);
         m.str.pull('death');
         m.save(function(err) {
           assert.ifError(err);
           M.findById(m, function(err, m) {
             assert.ifError(err);
-            assert.equal(1, m._doc.__v);
-            assert.equal(2, m.str.length);
+            assert.equal(m._doc.__v, 1);
+            assert.equal(m.str.length, 2);
             assert.ok(!~m.str.indexOf('death'));
             done();
           });
@@ -387,12 +387,12 @@ describe('versioning', function() {
         assert.ok(!d._doc.__v);
         d.numbers.splice(1, 1, 10);
         var o = d.$__delta();
-        assert.equal(undefined, o[0].__v);
+        assert.equal(o[0].__v, undefined);
         assert.ok(o[1].$inc);
-        assert.equal(1, o[1].$inc.__v);
+        assert.equal(o[1].$inc.__v, 1);
         d.save(function(err, d) {
           assert.ifError(err);
-          assert.equal(1, d._doc.__v);
+          assert.equal(d._doc.__v, 1);
           V.findById(d, function(err, d) {
             assert.ifError(err);
             assert.ok(d);
@@ -413,7 +413,7 @@ describe('versioning', function() {
       assert.ifError(err);
       V.findById(v, function(err1, v) {
         assert.ifError(err1);
-        assert.equal(0, v._doc.lolwat);
+        assert.equal(v._doc.lolwat, 0);
         done();
       });
     });
@@ -424,18 +424,18 @@ describe('versioning', function() {
     var M = db.model('disabledVersioning', schema, 's' + random());
     M.create({x: ['hi']}, function(err, doc) {
       assert.ifError(err);
-      assert.equal(false, '__v' in doc._doc);
+      assert.equal('__v' in doc._doc, false);
       doc.x.pull('hi');
       doc.save(function(err) {
         assert.ifError(err);
-        assert.equal(false, '__v' in doc._doc);
+        assert.equal('__v' in doc._doc, false);
 
         doc.set('x.0', 'updated');
         var d = doc.$__delta()[0];
-        assert.equal(undefined, d.__v, 'version should not be added to where clause');
+        assert.equal(d.__v, undefined, 'version should not be added to where clause');
 
         M.collection.findOne({_id: doc._id}, function(err, doc) {
-          assert.equal(false, '__v' in doc);
+          assert.equal('__v' in doc, false);
           done();
         });
       });
@@ -460,18 +460,18 @@ describe('versioning', function() {
       var doc = new V;
       doc.save(function(err) {
         assert.ifError(err);
-        assert.equal(0, doc.__v);
+        assert.equal(doc.__v, 0);
 
         doc.increment();
 
         doc.save(function(err) {
           assert.ifError(err);
 
-          assert.equal(1, doc.__v);
+          assert.equal(doc.__v, 1);
 
           V.findById(doc, function(err, doc) {
             assert.ifError(err);
-            assert.equal(1, doc.__v);
+            assert.equal(doc.__v, 1);
             done();
           });
         });
@@ -521,9 +521,9 @@ describe('versioning', function() {
     m.save(function(err, m) {
       assert.ifError(err);
       var obj = m.toObject();
-      assert.equal(0, obj.__v);
+      assert.equal(obj.__v, 0);
       obj = m.toObject({versionKey: false});
-      assert.equal(undefined, obj.__v);
+      assert.equal(obj.__v, undefined);
       done();
     });
   });

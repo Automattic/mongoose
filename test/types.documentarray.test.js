@@ -142,7 +142,7 @@ describe('types.documentarray', function() {
     } catch (err) {
       threw = err;
     }
-    assert.equal(false, threw);
+    assert.equal(threw, false);
 
     // test the _id option, noId is deprecated
     NoId = new Schema({
@@ -161,7 +161,7 @@ describe('types.documentarray', function() {
     } catch (err) {
       threw = err;
     }
-    assert.equal(false, threw);
+    assert.equal(threw, false);
     // undefined and null should not match a nonexistent _id
     assert.strictEqual(null, a.id(undefined));
     assert.strictEqual(null, a.id(null));
@@ -235,7 +235,7 @@ describe('types.documentarray', function() {
       var m = new M;
       m.docs.push({docs: [{title: 'hello'}]});
       var delta = m.$__delta()[1];
-      assert.equal(undefined, delta.$pushAll.docs[0].changed);
+      assert.equal(delta.$pushAll.docs[0].changed, undefined);
       done();
     });
     it('uses the correct transform (gh-1412)', function(done) {
@@ -281,12 +281,12 @@ describe('types.documentarray', function() {
   describe('create()', function() {
     it('works', function(done) {
       var a = new MongooseDocumentArray([]);
-      assert.equal('function', typeof a.create);
+      assert.equal(typeof a.create, 'function');
 
       var schema = new Schema({docs: [new Schema({name: 'string'})]});
       var T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa' + random());
       var t = new T;
-      assert.equal('function', typeof t.docs.create);
+      assert.equal(typeof t.docs.create, 'function');
       var subdoc = t.docs.create({name: 100});
       assert.ok(subdoc._id);
       assert.equal(subdoc.name, '100');
@@ -312,9 +312,9 @@ describe('types.documentarray', function() {
         M.findById(m._id, function(err, doc) {
           assert.ifError(err);
           var c = doc.children.create({name: 'first'});
-          assert.equal(undefined, c.date);
+          assert.equal(c.date, undefined);
           doc.children.push(c);
-          assert.equal(undefined, c.date);
+          assert.equal(c.date, undefined);
           doc.save(function(err) {
             assert.ifError(err);
             assert.ok(doc.children[doc.children.length - 1].date);
@@ -327,7 +327,7 @@ describe('types.documentarray', function() {
               assert.ifError(err);
               M.findById(m._id, function(err, doc) {
                 assert.ifError(err);
-                assert.equal(3, doc.children.length);
+                assert.equal(doc.children.length, 3);
                 doc.children.forEach(function(child) {
                   assert.equal(doc.children[0].id, child.id);
                 });
@@ -431,7 +431,7 @@ describe('types.documentarray', function() {
       var M = db.model('embedded-invalidate', schema);
       var m = new M({docs: [{v: 900}]});
       m.save(function(err) {
-        assert.equal(900, err.errors['docs.0.v'].value);
+        assert.equal(err.errors['docs.0.v'].value, 900);
         db.close(done);
       });
     });
@@ -458,3 +458,4 @@ describe('types.documentarray', function() {
     });
   });
 });
+

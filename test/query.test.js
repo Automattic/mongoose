@@ -819,10 +819,10 @@ describe('Query', function() {
         _docs: {}
       };
       q.populate(o);
-      assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
+      assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       q.populate('yellow.brick');
-      assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
+      assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
       o.match = undefined;
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       done();
@@ -839,7 +839,7 @@ describe('Query', function() {
         options: undefined,
         _docs: {}
       };
-      assert.equal(2, Object.keys(q._mongooseOptions.populate).length);
+      assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       o.path = 'dirt';
       assert.deepEqual(o, q._mongooseOptions.populate.dirt);
@@ -1031,13 +1031,13 @@ describe('Query', function() {
         setTimeout(function() {
           Product.find({tags: 12345}, function(err, p) {
             assert.ifError(err);
-            assert.equal(1, p.length);
+            assert.equal(p.length, 1);
 
             Product.find({tags: 123456}).remove();
             setTimeout(function() {
               Product.find({tags: 123456}, function(err, p) {
                 assert.ifError(err);
-                assert.equal(0, p.length);
+                assert.equal(p.length, 0);
                 db.close();
                 done();
               });
@@ -1185,7 +1185,7 @@ describe('Query', function() {
       q.hint(hint);
 
       var options = q._optionsForExec({schema: {options: {safe: true}}});
-      assert.equal(a, JSON.stringify(options));
+      assert.equal(JSON.stringify(options), a);
       done();
     });
   });
@@ -1206,15 +1206,15 @@ describe('Query', function() {
       it('works', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.slaveOk();
-        assert.equal(true, query.options.slaveOk);
+        assert.equal(query.options.slaveOk, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.slaveOk(true);
-        assert.equal(true, query.options.slaveOk);
+        assert.equal(query.options.slaveOk, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.slaveOk(false);
-        assert.equal(false, query.options.slaveOk);
+        assert.equal(query.options.slaveOk, false);
         done();
       });
     });
@@ -1223,22 +1223,22 @@ describe('Query', function() {
       it('works', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.tailable();
-        assert.equal(true, query.options.tailable);
+        assert.equal(query.options.tailable, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.tailable(true);
-        assert.equal(true, query.options.tailable);
+        assert.equal(query.options.tailable, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.tailable(false);
-        assert.equal(false, query.options.tailable);
+        assert.equal(query.options.tailable, false);
         done();
       });
       it('supports passing the `await` option', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.tailable({awaitdata: true});
-        assert.equal(true, query.options.tailable);
-        assert.equal(true, query.options.awaitdata);
+        assert.equal(query.options.tailable, true);
+        assert.equal(query.options.awaitdata, true);
         done();
       });
     });
@@ -1246,7 +1246,7 @@ describe('Query', function() {
     describe('comment', function() {
       it('works', function(done) {
         var query = new Query;
-        assert.equal('function', typeof query.comment);
+        assert.equal(typeof query.comment, 'function');
         assert.equal(query.comment('Lowpass is more fun'), query);
         assert.equal(query.options.comment, 'Lowpass is more fun');
         done();
@@ -1272,7 +1272,7 @@ describe('Query', function() {
       it('works', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.snapshot(true);
-        assert.equal(true, query.options.snapshot);
+        assert.equal(query.options.snapshot, true);
         done();
       });
     });
@@ -1400,7 +1400,7 @@ describe('Query', function() {
             var ret = getopts.call(this, model);
 
             assert.ok(ret.readPreference);
-            assert.equal('secondary', ret.readPreference.mode);
+            assert.equal(ret.readPreference.mode, 'secondary');
             assert.deepEqual({w: 'majority'}, ret.safe);
             called = true;
 

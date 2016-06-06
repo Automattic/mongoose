@@ -77,16 +77,16 @@ describe('model: mapreduce:', function() {
         assert.ok(stats);
         ret.forEach(function(res) {
           if (res._id === 'aaron') {
-            assert.equal(3, res.value);
+            assert.equal(res.value, 3);
           }
           if (res._id === 'guillermo') {
-            assert.equal(3, res.value);
+            assert.equal(res.value, 3);
           }
           if (res._id === 'brian') {
-            assert.equal(2, res.value);
+            assert.equal(res.value, 2);
           }
           if (res._id === 'nathan') {
-            assert.equal(2, res.value);
+            assert.equal(res.value, 2);
           }
         });
 
@@ -104,9 +104,9 @@ describe('model: mapreduce:', function() {
           assert.ifError(err);
 
           assert.ok(Array.isArray(ret));
-          assert.equal(1, ret.length);
-          assert.equal('aaron', ret[0]._id);
-          assert.equal(3, ret[0].value);
+          assert.equal(ret.length, 1);
+          assert.equal(ret[0]._id, 'aaron');
+          assert.equal(ret[0].value, 3);
           assert.ok(stats);
 
           modeling();
@@ -130,23 +130,23 @@ describe('model: mapreduce:', function() {
 
           // ret is a model
           assert.ok(!Array.isArray(ret));
-          assert.equal('function', typeof ret.findOne);
-          assert.equal('function', typeof ret.mapReduce);
+          assert.equal(typeof ret.findOne, 'function');
+          assert.equal(typeof ret.mapReduce, 'function');
 
           // queries work
           ret.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
             assert.ifError(err);
-            assert.equal('aaron', docs[0]._id);
-            assert.equal('brian', docs[1]._id);
-            assert.equal('guillermo', docs[2]._id);
-            assert.equal('nathan', docs[3]._id);
+            assert.equal(docs[0]._id, 'aaron');
+            assert.equal(docs[1]._id, 'brian');
+            assert.equal(docs[2]._id, 'guillermo');
+            assert.equal(docs[3]._id, 'nathan');
 
             // update casting works
             ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function(err, doc) {
               assert.ifError(err);
               assert.ok(doc);
-              assert.equal('aaron', doc._id);
-              assert.equal(true, doc.published);
+              assert.equal(doc._id, 'aaron');
+              assert.equal(doc.published, true);
 
               // ad-hoc population works
               ret
@@ -155,7 +155,7 @@ describe('model: mapreduce:', function() {
               .exec(function(err, doc) {
                 db.close();
                 assert.ifError(err);
-                assert.equal('guillermo', doc.value.own.author);
+                assert.equal(doc.value.own.author, 'guillermo');
                 done();
               });
             });
@@ -179,7 +179,7 @@ describe('model: mapreduce:', function() {
     };
 
     MR.mapReduce(o, function(err, results, stats) {
-      assert.equal('undefined', typeof stats);
+      assert.equal(typeof stats, 'undefined');
       db.close(done);
     });
   });
@@ -220,9 +220,9 @@ describe('model: mapreduce:', function() {
 
       function validate(ret, stats) {
         assert.ok(Array.isArray(ret));
-        assert.equal(1, ret.length);
-        assert.equal('aaron', ret[0]._id);
-        assert.equal(6, ret[0].value);
+        assert.equal(ret.length, 1);
+        assert.equal(ret[0]._id, 'aaron');
+        assert.equal(ret[0].value, 6);
         assert.ok(stats);
       }
 
@@ -273,16 +273,16 @@ describe('model: mapreduce:', function() {
         assert.ok(stats);
         ret.forEach(function(res) {
           if (res._id === 'aaron') {
-            assert.equal(6, res.value);
+            assert.equal(res.value, 6);
           }
           if (res._id === 'guillermo') {
-            assert.equal(6, res.value);
+            assert.equal(res.value, 6);
           }
           if (res._id === 'brian') {
-            assert.equal(4, res.value);
+            assert.equal(res.value, 4);
           }
           if (res._id === 'nathan') {
-            assert.equal(4, res.value);
+            assert.equal(res.value, 4);
           }
         });
 
@@ -298,9 +298,9 @@ describe('model: mapreduce:', function() {
 
         MR.mapReduce(o).then(function(ret, stats) {
           assert.ok(Array.isArray(ret));
-          assert.equal(1, ret.length);
-          assert.equal('aaron', ret[0]._id);
-          assert.equal(3, ret[0].value);
+          assert.equal(ret.length, 1);
+          assert.equal(ret[0]._id, 'aaron');
+          assert.equal(ret[0].value, 3);
           assert.ok(stats);
           modeling();
         });
@@ -321,23 +321,23 @@ describe('model: mapreduce:', function() {
         MR.mapReduce(o).then(function(ret) {
           // ret is a model
           assert.ok(!Array.isArray(ret));
-          assert.equal('function', typeof ret.findOne);
-          assert.equal('function', typeof ret.mapReduce);
+          assert.equal(typeof ret.findOne, 'function');
+          assert.equal(typeof ret.mapReduce, 'function');
 
           // queries work
           ret.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
             assert.ifError(err);
-            assert.equal('aaron', docs[0]._id);
-            assert.equal('brian', docs[1]._id);
-            assert.equal('guillermo', docs[2]._id);
-            assert.equal('nathan', docs[3]._id);
+            assert.equal(docs[0]._id, 'aaron');
+            assert.equal(docs[1]._id, 'brian');
+            assert.equal(docs[2]._id, 'guillermo');
+            assert.equal(docs[3]._id, 'nathan');
 
             // update casting works
             ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function(err, doc) {
               assert.ifError(err);
               assert.ok(doc);
-              assert.equal('aaron', doc._id);
-              assert.equal(true, doc.published);
+              assert.equal(doc._id, 'aaron');
+              assert.equal(doc.published, true);
 
               // ad-hoc population works
               ret
@@ -346,7 +346,7 @@ describe('model: mapreduce:', function() {
               .exec(function(err, doc) {
                 db.close();
                 assert.ifError(err);
-                assert.equal('guillermo', doc.value.own.author);
+                assert.equal(doc.value.own.author, 'guillermo');
                 done();
               });
             });
@@ -370,8 +370,9 @@ describe('model: mapreduce:', function() {
     };
 
     MR.mapReduce(o).then(function(results, stats) {
-      assert.equal('undefined', typeof stats);
+      assert.equal(typeof stats, 'undefined');
       db.close(done);
     });
   });
 });
+

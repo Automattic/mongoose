@@ -1,3 +1,13 @@
+4.4.20 / 2016-06-05
+===================
+ * docs: clarify command buffering when using driver directly #4195
+ * fix(promise): correct broken mpromise .catch() #4189
+ * fix(document): clean modified subpaths when set path to empty obj #4182
+ * fix(query): support minDistance with query casting and `.near()` #4179
+ * fix(model): remove unnecessary .save() promise #4177
+ * fix(schema): cast all valid ObjectId strings to object ids #3365
+ * docs: remove unclear "unsafe" term in query docs #3282
+
 4.4.19 / 2016-05-21
 ===================
  * fix(model): handle insertMany if timestamps not set #4171

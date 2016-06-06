@@ -169,7 +169,7 @@ describe('model: populate:', function() {
              assert.equal(doc._creator.email, u1.email);
 
              doc._creator = null;
-             assert.equal(null, doc._creator);
+             assert.equal(doc._creator, null);
 
              var creator = user('creator');
              doc._creator = creator;
@@ -203,7 +203,7 @@ describe('model: populate:', function() {
                B.findById(b1).exec(function(err, doc) {
                 // db is closed in after()
                  assert.ifError(err);
-                 assert.equal(8, doc.fans.length);
+                 assert.equal(doc.fans.length, 8);
                  assert.equal(doc.fans[0], user8.id);
                  assert.equal(doc.fans[5], user7.id);
                  assert.equal(doc.fans[6], null);
@@ -231,32 +231,32 @@ describe('model: populate:', function() {
              var name = 'fan1';
              doc.fans.push(userLiteral(name));
              assert.ok(doc.fans[2]._id);
-             assert.equal(name, doc.fans[2].name);
+             assert.equal(doc.fans[2].name, name);
 
              name = 'fan2';
              doc.fans.nonAtomicPush(userLiteral(name));
              assert.ok(doc.fans[3]._id);
-             assert.equal(name, doc.fans[3].name);
+             assert.equal(doc.fans[3].name, name);
 
              name = 'fan3';
              doc.fans.splice(2, 1, userLiteral(name));
              assert.ok(doc.fans[2]._id);
-             assert.equal(name, doc.fans[2].name);
+             assert.equal(doc.fans[2].name, name);
 
              name = 'fan4';
              doc.fans.unshift(userLiteral(name));
              assert.ok(doc.fans[0]._id);
-             assert.equal(name, doc.fans[0].name);
+             assert.equal(doc.fans[0].name, name);
 
              name = 'fan5';
              doc.fans.addToSet(userLiteral(name));
              assert.ok(doc.fans[5]._id);
-             assert.equal(name, doc.fans[5].name);
+             assert.equal(doc.fans[5].name, name);
 
              name = 'fan6';
              doc.fans.set(0, userLiteral(name));
              assert.ok(doc.fans[0]._id);
-             assert.equal(name, doc.fans[0].name);
+             assert.equal(doc.fans[0].name, name);
 
              doc.fans.forEach(function(doc) {
                assert.ok(doc instanceof U);
@@ -267,7 +267,7 @@ describe('model: populate:', function() {
              doc._creator = creator;
              var creatorId = doc._creator._id;
              assert.ok(creatorId);
-             assert.equal(name, doc._creator.name);
+             assert.equal(doc._creator.name, name);
              assert.ok(doc._creator instanceof U);
 
              var fan2Id = doc.fans[2]._id;
@@ -276,26 +276,26 @@ describe('model: populate:', function() {
              name = 'user1a';
              var user1a = userLiteral(name);
              doc.embed[0].array.set(0, user1a);
-             assert.equal(name, doc.embed[0].array[0].name);
+             assert.equal(doc.embed[0].array[0].name, name);
              var user1aId = doc.embed[0].array[0]._id;
 
              name = 'user1b';
              var user1b = userLiteral(name);
              doc.embed[0].other = user1b;
-             assert.equal(name, doc.embed[0].other.name);
+             assert.equal(doc.embed[0].other.name, name);
              var user1bId = doc.embed[0].other._id;
 
              name = 'user1c';
              var user1c = userLiteral(name);
              doc.embed[0].nested = [{subdoc: user1c}];
-             assert.equal(name, doc.embed[0].nested[0].subdoc.name);
+             assert.equal(doc.embed[0].nested[0].subdoc.name, name);
              var user1cId = doc.embed[0].nested[0].subdoc._id;
 
             // embedded without declared ref in schema
              name = 'user2a';
              var user2a = userLiteral(name);
              doc.adhoc[0].subdoc = user2a;
-             assert.equal(name, doc.adhoc[0].subdoc.name);
+             assert.equal(doc.adhoc[0].subdoc.name, name);
              var user2aId = doc.adhoc[0].subdoc._id;
 
              name = 'user2b';
@@ -309,7 +309,7 @@ describe('model: populate:', function() {
                B.findById(b2).exec(function(err, doc) {
                 // db is closed in after()
                  assert.ifError(err);
-                 assert.equal(6, doc.fans.length);
+                 assert.equal(doc.fans.length, 6);
                  assert.equal(String(doc._creator), creatorId);
                  assert.equal(doc.fans[2], String(fan2Id));
                  assert.equal(doc.fans[5], String(fan5Id));

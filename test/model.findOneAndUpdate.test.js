@@ -96,19 +96,19 @@ describe('model: findOneAndUpdate:', function() {
       assert.ifError(err);
       M.findById(post._id, function(err, cf) {
         assert.ifError(err);
-        assert.equal(title, cf.title);
-        assert.equal(author, cf.author);
-        assert.equal(0, cf.meta.visitors.valueOf());
-        assert.equal(post.date.toString(), cf.date);
-        assert.equal(true, cf.published);
-        assert.equal('ex', cf.mixed.x);
+        assert.equal(cf.title, title);
+        assert.equal(cf.author, author);
+        assert.equal(cf.meta.visitors.valueOf(), 0);
+        assert.equal(cf.date, post.date.toString());
+        assert.equal(cf.published, true);
+        assert.equal(cf.mixed.x, 'ex');
         assert.deepEqual([4, 5, 6, 7], cf.numbers.toObject());
-        assert.equal(2, cf.owners.length);
-        assert.equal(id0.toString(), cf.owners[0].toString());
-        assert.equal(id1.toString(), cf.owners[1].toString());
-        assert.equal(2, cf.comments.length);
-        assert.equal('been there', cf.comments[0].body);
-        assert.equal('done that', cf.comments[1].body);
+        assert.equal(cf.owners.length, 2);
+        assert.equal(cf.owners[0].toString(), id0.toString());
+        assert.equal(cf.owners[1].toString(), id1.toString());
+        assert.equal(cf.comments.length, 2);
+        assert.equal(cf.comments[0].body, 'been there');
+        assert.equal(cf.comments[1].body, 'done that');
         assert.ok(cf.comments[0]._id);
         assert.ok(cf.comments[1]._id);
         assert.ok(cf.comments[0]._id instanceof DocumentObjectId);
@@ -127,20 +127,20 @@ describe('model: findOneAndUpdate:', function() {
 
         M.findOneAndUpdate({title: title}, update, {new: true}, function(err, up) {
           db.close();
-          assert.equal(err, null, err && err.stack);
+          assert.equal(err && err.stack, err, null);
 
-          assert.equal(newTitle, up.title);
-          assert.equal(author, up.author);
-          assert.equal(2, up.meta.visitors.valueOf());
-          assert.equal(update.$set.date.toString(), up.date.toString());
-          assert.equal(false, up.published);
-          assert.equal('ECKS', up.mixed.x);
-          assert.equal('why', up.mixed.y);
+          assert.equal(up.title, newTitle);
+          assert.equal(up.author, author);
+          assert.equal(up.meta.visitors.valueOf(), 2);
+          assert.equal(up.date.toString(), update.$set.date.toString());
+          assert.equal(up.published, false);
+          assert.equal(up.mixed.x, 'ECKS');
+          assert.equal(up.mixed.y, 'why');
           assert.deepEqual([5, 7], up.numbers.toObject());
-          assert.equal(1, up.owners.length);
-          assert.equal(id1.toString(), up.owners[0].toString());
-          assert.equal('been there', up.comments[0].body);
-          assert.equal('8', up.comments[1].body);
+          assert.equal(up.owners.length, 1);
+          assert.equal(up.owners[0].toString(), id1.toString());
+          assert.equal(up.comments[0].body, 'been there');
+          assert.equal(up.comments[1].body, '8');
           assert.ok(up.comments[0]._id);
           assert.ok(up.comments[1]._id);
           assert.ok(up.comments[0]._id instanceof DocumentObjectId);
@@ -259,18 +259,18 @@ describe('model: findOneAndUpdate:', function() {
           db.close();
           assert.ifError(err);
 
-          assert.equal(post.title, up.title);
-          assert.equal(post.author, up.author);
-          assert.equal(post.meta.visitors, up.meta.visitors.valueOf());
-          assert.equal(up.date.toString(), post.date.toString());
-          assert.equal(up.published, post.published);
-          assert.equal(up.mixed.x, post.mixed.x);
-          assert.equal(up.mixed.y, post.mixed.y);
+          assert.equal(up.title, post.title);
+          assert.equal(up.author, post.author);
+          assert.equal(up.meta.visitors.valueOf(), post.meta.visitors);
+          assert.equal(post.date.toString(), up.date.toString());
+          assert.equal(post.published, up.published);
+          assert.equal(post.mixed.x, up.mixed.x);
+          assert.equal(post.mixed.y, up.mixed.y);
           assert.deepEqual(up.numbers.toObject(), post.numbers.toObject());
-          assert.equal(up.owners.length, post.owners.length);
-          assert.equal(up.owners[0].toString(), post.owners[0].toString());
-          assert.equal(up.comments[0].body, post.comments[0].body);
-          assert.equal(up.comments[1].body, post.comments[1].body);
+          assert.equal(post.owners.length, up.owners.length);
+          assert.equal(post.owners[0].toString(), up.owners[0].toString());
+          assert.equal(post.comments[0].body, up.comments[0].body);
+          assert.equal(post.comments[1].body, up.comments[1].body);
           assert.ok(up.comments[0]._id);
           assert.ok(up.comments[1]._id);
           assert.ok(up.comments[0]._id instanceof DocumentObjectId);
@@ -315,10 +315,10 @@ describe('model: findOneAndUpdate:', function() {
       db.close();
       assert.ifError(err);
 
-      assert.equal(newTitle, up.title);
-      assert.equal(2, up.meta.visitors.valueOf());
-      assert.equal(up.date.toString(), update.$set.date.toString());
-      assert.equal(update.published, up.published);
+      assert.equal(up.title, newTitle);
+      assert.equal(up.meta.visitors.valueOf(), 2);
+      assert.equal(update.$set.date.toString(), up.date.toString());
+      assert.equal(up.published, update.published);
       assert.deepEqual(update.mixed.x, up.mixed.x);
       assert.strictEqual(up.mixed.y, update.mixed.y);
       assert.ok(Array.isArray(up.numbers));
@@ -342,43 +342,43 @@ describe('model: findOneAndUpdate:', function() {
     query = M.findOneAndUpdate({author: 'aaron'}, {$set: {date: now}}, {new: false, fields: 'author'});
     assert.strictEqual(false, query.options.new);
     assert.strictEqual(1, query._fields.author);
-    assert.equal(now.toString(), query._update.$set.date.toString());
+    assert.equal(query._update.$set.date.toString(), now.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.findOneAndUpdate({author: 'aaron'}, {$set: {date: now}});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now.toString(), query._update.$set.date.toString());
+    assert.equal(query._update.$set.date.toString(), now.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.findOneAndUpdate({$set: {date: now}});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now.toString(), query._update.$set.date.toString());
+    assert.equal(query._update.$set.date.toString(), now.toString());
     assert.strictEqual(undefined, query._conditions.author);
 
     query = M.findOneAndUpdate();
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(undefined, query._update);
+    assert.equal(query._update, undefined);
     assert.strictEqual(undefined, query._conditions.author);
 
     // Query.findOneAndUpdate
     query = M.where('author', 'aaron').findOneAndUpdate({date: now});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now.toString(), query._update.date.toString());
+    assert.equal(query._update.date.toString(), now.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.find().findOneAndUpdate({author: 'aaron'}, {date: now});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now.toString(), query._update.date.toString());
+    assert.equal(query._update.date.toString(), now.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.find().findOneAndUpdate({date: now});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now.toString(), query._update.date.toString());
+    assert.equal(query._update.date.toString(), now.toString());
     assert.strictEqual(undefined, query._conditions.author);
 
     query = M.find().findOneAndUpdate();
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(undefined, query._update);
+    assert.equal(query._update, undefined);
     assert.strictEqual(undefined, query._conditions.author);
     done();
   });
@@ -471,7 +471,7 @@ describe('model: findOneAndUpdate:', function() {
         BlogPost.findOne({_id: post.get('_id')}, function(err, doc) {
           db.close();
           assert.ifError(err);
-          assert.equal(9, doc.get('meta.visitors'));
+          assert.equal(doc.get('meta.visitors'), 9);
           done();
         });
       }
@@ -490,20 +490,20 @@ describe('model: findOneAndUpdate:', function() {
         assert.ifError(err);
         assert.ok(doc);
         assert.ok(doc._id);
-        assert.equal(undefined, doc.ignore);
-        assert.equal(undefined, doc._doc.ignore);
-        assert.equal(name, doc.name);
+        assert.equal(doc.ignore, undefined);
+        assert.equal(doc._doc.ignore, undefined);
+        assert.equal(doc.name, name);
         S.findOneAndUpdate({name: 'orange crush'}, {ignore: true}, {upsert: true}, function(err, doc) {
           assert.ifError(err);
           assert.ok(!doc.ignore);
           assert.ok(!doc._doc.ignore);
-          assert.equal('orange crush', doc.name);
+          assert.equal(doc.name, 'orange crush');
           S.findOneAndUpdate({name: 'orange crush'}, {ignore: true}, function(err, doc) {
             db.close();
             assert.ifError(err);
             assert.ok(!doc.ignore);
             assert.ok(!doc._doc.ignore);
-            assert.equal('orange crush', doc.name);
+            assert.equal(doc.name, 'orange crush');
             done();
           });
         });
@@ -632,18 +632,18 @@ describe('model: findByIdAndUpdate:', function() {
         M.findByIdAndUpdate(post.id, update, {new: false}, function(err, up) {
           assert.ifError(err);
 
-          assert.equal(up.title, post.title);
-          assert.equal(up.author, post.author);
-          assert.equal(up.meta.visitors.valueOf(), post.meta.visitors);
-          assert.equal(up.date.toString(), post.date.toString());
-          assert.equal(up.published, post.published);
-          assert.equal(up.mixed.x, post.mixed.x);
+          assert.equal(post.title, up.title);
+          assert.equal(post.author, up.author);
+          assert.equal(post.meta.visitors, up.meta.visitors.valueOf());
+          assert.equal(post.date.toString(), up.date.toString());
+          assert.equal(post.published, up.published);
+          assert.equal(post.mixed.x, up.mixed.x);
           assert.strictEqual(up.mixed.y, post.mixed.y);
           assert.deepEqual(up.numbers.toObject(), post.numbers.toObject());
-          assert.equal(up.owners.length, post.owners.length);
-          assert.equal(up.owners[0].toString(), post.owners[0].toString());
-          assert.equal(up.comments[0].body, post.comments[0].body);
-          assert.equal(up.comments[1].body, post.comments[1].body);
+          assert.equal(post.owners.length, up.owners.length);
+          assert.equal(post.owners[0].toString(), up.owners[0].toString());
+          assert.equal(post.comments[0].body, up.comments[0].body);
+          assert.equal(post.comments[1].body, up.comments[1].body);
           assert.ok(up.comments[0]._id);
           assert.ok(up.comments[1]._id);
           assert.ok(up.comments[0]._id instanceof DocumentObjectId);
@@ -666,12 +666,12 @@ describe('model: findByIdAndUpdate:', function() {
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {new: false, fields: 'author'});
     assert.strictEqual(false, query.options.new);
     assert.strictEqual(1, query._fields.author);
-    assert.equal(now.toString(), query._update.$set.date.toString());
+    assert.equal(query._update.$set.date.toString(), now.toString());
     assert.strictEqual(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now.toString(), query._update.$set.date.toString());
+    assert.equal(query._update.$set.date.toString(), now.toString());
     assert.strictEqual(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndUpdate(_id);
@@ -680,7 +680,7 @@ describe('model: findByIdAndUpdate:', function() {
 
     query = M.findByIdAndUpdate();
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(undefined, query._update);
+    assert.equal(query._update, undefined);
     assert.strictEqual(undefined, query._conditions._id);
     db.close(done);
   });
@@ -730,14 +730,14 @@ describe('model: findByIdAndUpdate:', function() {
     var query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {sort: 'author -title'});
-    assert.equal(2, Object.keys(query.options.sort).length);
-    assert.equal(1, query.options.sort.author);
-    assert.equal(-1, query.options.sort.title);
+    assert.equal(Object.keys(query.options.sort).length, 2);
+    assert.equal(query.options.sort.author, 1);
+    assert.equal(query.options.sort.title, -1);
 
     query = M.findOneAndUpdate({}, {$set: {date: now}}, {sort: 'author -title'});
-    assert.equal(2, Object.keys(query.options.sort).length);
-    assert.equal(1, query.options.sort.author);
-    assert.equal(-1, query.options.sort.title);
+    assert.equal(Object.keys(query.options.sort).length, 2);
+    assert.equal(query.options.sort.author, 1);
+    assert.equal(query.options.sort.title, -1);
 
     // gh-1887
     M.create(
@@ -755,7 +755,7 @@ describe('model: findByIdAndUpdate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal(10, doc.meta.visitors);
+            assert.equal(doc.meta.visitors, 10);
             db.close(done);
           });
         });
@@ -770,14 +770,14 @@ describe('model: findByIdAndUpdate:', function() {
         query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {sort: {author: 1, title: -1}});
-    assert.equal(2, Object.keys(query.options.sort).length);
-    assert.equal(1, query.options.sort.author);
-    assert.equal(-1, query.options.sort.title);
+    assert.equal(Object.keys(query.options.sort).length, 2);
+    assert.equal(query.options.sort.author, 1);
+    assert.equal(query.options.sort.title, -1);
 
     query = M.findOneAndUpdate(_id, {$set: {date: now}}, {sort: {author: 1, title: -1}});
-    assert.equal(2, Object.keys(query.options.sort).length);
-    assert.equal(1, query.options.sort.author);
-    assert.equal(-1, query.options.sort.title);
+    assert.equal(Object.keys(query.options.sort).length, 2);
+    assert.equal(query.options.sort.author, 1);
+    assert.equal(query.options.sort.title, -1);
 
     db.close(done);
   });
@@ -803,10 +803,10 @@ describe('model: findByIdAndUpdate:', function() {
       .exec(function(err, found) {
         assert.ifError(err);
         assert.ok(found);
-        assert.equal(found.id, doc.id);
-        assert.equal('woot', found.title);
-        assert.equal(1, found.ids.length);
-        assert.equal(_id2.toString(), found.ids[0].toString());
+        assert.equal(doc.id, found.id);
+        assert.equal(found.title, 'woot');
+        assert.equal(found.ids.length, 1);
+        assert.equal(found.ids[0].toString(), _id2.toString());
         db.close(done);
       });
     });
@@ -834,7 +834,7 @@ describe('model: findByIdAndUpdate:', function() {
           }
           assert.ok(doc);
           assert.ok(doc.a);
-          assert.equal(doc.a.name, 'i am an A');
+          assert.equal('i am an A', doc.a.name);
           db.close(done);
         });
       });
@@ -856,11 +856,11 @@ describe('model: findByIdAndUpdate:', function() {
 
     Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false}).exec(function(err, thing) {
       assert.ifError(err);
-      assert.equal(null, thing);
+      assert.equal(thing, null);
       Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false}).exec(function(err, thing2) {
         assert.ifError(err);
-        assert.equal(key, thing2.id);
-        assert.equal(false, thing2.flag);
+        assert.equal(thing2.id, key);
+        assert.equal(thing2.flag, false);
         db.close(done);
       });
     });
@@ -885,7 +885,7 @@ describe('model: findByIdAndUpdate:', function() {
           return done(err);
         }
         assert.ok(doc);
-        assert.equal(doc.name, null);
+        assert.equal(null, doc.name);
         db.close(done);
       });
     });
@@ -903,7 +903,7 @@ describe('model: findByIdAndUpdate:', function() {
           return done(err);
         }
         assert.ok(doc.change);
-        assert.equal(undefined, doc.name);
+        assert.equal(doc.name, undefined);
         db.close(done);
       });
     });
@@ -964,7 +964,7 @@ describe('model: findByIdAndUpdate:', function() {
         {upsert: true, new: true},
         function(error, doc) {
           assert.ifError(error);
-          assert.equal(0, doc.__v);
+          assert.equal(doc.__v, 0);
           db.close(done);
         });
   });
@@ -984,8 +984,8 @@ describe('model: findByIdAndUpdate:', function() {
             assert.ifError(error);
             TestModel.findOne({}, function(error, doc) {
               assert.ifError(error);
-              assert.equal(1, doc.ticks.length);
-              assert.equal('coffee', doc.ticks[0].name);
+              assert.equal(doc.ticks.length, 1);
+              assert.equal(doc.ticks[0].name, 'coffee');
               db.close(done);
             });
           });
@@ -1081,8 +1081,8 @@ describe('model: findByIdAndUpdate:', function() {
           {},
           function(error) {
             assert.ifError(error);
-            assert.equal(1, preCount);
-            assert.equal(1, postCount);
+            assert.equal(preCount, 1);
+            assert.equal(postCount, 1);
             done();
           });
     });
@@ -1109,8 +1109,8 @@ describe('model: findByIdAndUpdate:', function() {
       findOneAndUpdate({}, {base: 'eggs'}, {}).
       exec(function(error) {
         assert.ifError(error);
-        assert.equal(1, preCount);
-        assert.equal(1, postCount);
+        assert.equal(preCount, 1);
+        assert.equal(postCount, 1);
         done();
       });
     });
@@ -1133,11 +1133,11 @@ describe('model: findByIdAndUpdate:', function() {
           updateOptions,
           function(error, breakfast) {
             assert.ifError(error);
-            assert.equal('eggs', breakfast.base);
-            assert.equal('bacon', breakfast.topping);
+            assert.equal(breakfast.base, 'eggs');
+            assert.equal(breakfast.topping, 'bacon');
             Breakfast.count({topping: 'bacon'}, function(error, count) {
               assert.ifError(error);
-              assert.equal(count, 1);
+              assert.equal(1, count);
               db.close(done);
             });
           });
@@ -1159,8 +1159,8 @@ describe('model: findByIdAndUpdate:', function() {
           updateOptions,
           function(error, breakfast) {
             assert.ifError(error);
-            assert.equal('eggs', breakfast.base);
-            assert.equal('sausage', breakfast.topping);
+            assert.equal(breakfast.base, 'eggs');
+            assert.equal(breakfast.topping, 'sausage');
             db.close();
             done();
           });
@@ -1182,11 +1182,11 @@ describe('model: findByIdAndUpdate:', function() {
           updateOptions,
           function(error, breakfast) {
             assert.ifError(error);
-            assert.equal('eggs', breakfast.base);
-            assert.equal('bacon', breakfast.topping);
+            assert.equal(breakfast.base, 'eggs');
+            assert.equal(breakfast.topping, 'bacon');
             Breakfast.count({topping: 'bacon'}, function(error, count) {
               assert.ifError(error);
-              assert.equal(count, 1);
+              assert.equal(1, count);
               db.close(done);
             });
           });
@@ -1224,9 +1224,9 @@ describe('model: findByIdAndUpdate:', function() {
           function(error, breakfast) {
             assert.ok(!!error);
             assert.ok(!breakfast);
-            assert.equal(1, Object.keys(error.errors).length);
-            assert.equal('topping', Object.keys(error.errors)[0]);
-            assert.equal('Validator failed for path `topping` with value `bacon`', error.errors.topping.message);
+            assert.equal(Object.keys(error.errors).length, 1);
+            assert.equal(Object.keys(error.errors)[0], 'topping');
+            assert.equal(error.errors.topping.message, 'Validator failed for path `topping` with value `bacon`');
 
             assert.ok(!breakfast);
             db.close();
@@ -1255,11 +1255,11 @@ describe('model: findByIdAndUpdate:', function() {
           function(error, breakfast) {
             assert.ok(!!error);
             assert.ok(!breakfast);
-            assert.equal(2, Object.keys(error.errors).length);
+            assert.equal(Object.keys(error.errors).length, 2);
             assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
             assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
-            assert.equal('Validator failed for path `eggs` with value `softboiled`', error.errors.eggs.message);
-            assert.equal('Path `steak` is required.', error.errors.steak.message);
+            assert.equal(error.errors.eggs.message, 'Validator failed for path `eggs` with value `softboiled`');
+            assert.equal(error.errors.steak.message, 'Path `steak` is required.');
             db.close();
             done();
           });
@@ -1282,9 +1282,9 @@ describe('model: findByIdAndUpdate:', function() {
           updateOptions,
           function(error) {
             assert.ok(!!error);
-            assert.equal(1, Object.keys(error.errors).length);
-            assert.equal('eggs', Object.keys(error.errors)[0]);
-            assert.equal('Path `eggs` (3) is less than minimum allowed value (4).', error.errors.eggs.message);
+            assert.equal(Object.keys(error.errors).length, 1);
+            assert.equal(Object.keys(error.errors)[0], 'eggs');
+            assert.equal(error.errors.eggs.message, 'Path `eggs` (3) is less than minimum allowed value (4).');
 
             Breakfast.findOneAndUpdate(
                 {},
@@ -1292,9 +1292,9 @@ describe('model: findByIdAndUpdate:', function() {
                 updateOptions,
                 function(error) {
                   assert.ok(!!error);
-                  assert.equal(1, Object.keys(error.errors).length);
-                  assert.equal('steak', Object.keys(error.errors)[0]);
-                  assert.equal('`tofu` is not a valid enum value for path `steak`.', error.errors.steak);
+                  assert.equal(Object.keys(error.errors).length, 1);
+                  assert.equal(Object.keys(error.errors)[0], 'steak');
+                  assert.equal(error.errors.steak, '`tofu` is not a valid enum value for path `steak`.');
 
                   Breakfast.findOneAndUpdate(
                       {},
@@ -1302,9 +1302,9 @@ describe('model: findByIdAndUpdate:', function() {
                       updateOptions,
                       function(error) {
                         assert.ok(!!error);
-                        assert.equal(1, Object.keys(error.errors).length);
-                        assert.equal('bacon', Object.keys(error.errors)[0]);
-                        assert.equal('Path `bacon` is invalid (none).', error.errors.bacon.message);
+                        assert.equal(Object.keys(error.errors).length, 1);
+                        assert.equal(Object.keys(error.errors)[0], 'bacon');
+                        assert.equal(error.errors.bacon.message, 'Path `bacon` is invalid (none).');
 
                         db.close();
                         done();
@@ -1330,7 +1330,7 @@ describe('model: findByIdAndUpdate:', function() {
           updateOptions,
           function(error, breakfast) {
             assert.ok(!!error);
-            assert.equal(2, Object.keys(error.errors).length);
+            assert.equal(Object.keys(error.errors).length, 2);
             assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
             assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
             assert.ok(!breakfast);
@@ -1356,7 +1356,7 @@ describe('model: findByIdAndUpdate:', function() {
           function(error, breakfast) {
             assert.ifError(error);
             assert.ok(!!breakfast);
-            assert.equal(1, breakfast.eggs);
+            assert.equal(breakfast.eggs, 1);
             db.close(done);
           });
     });

@@ -196,7 +196,7 @@ describe('schema', function() {
     });
 
     // check for global variable leak
-    assert.equal('undefined', typeof errorMessage);
+    assert.equal(typeof errorMessage, 'undefined');
 
     var Person = new Schema({
       name: String,
@@ -240,7 +240,7 @@ describe('schema', function() {
       },
       callback: {
         $type: Number, default: function() {
-          assert.equal('b', this.a);
+          assert.equal(this.a, 'b');
           return '3';
         }
       }
@@ -281,11 +281,11 @@ describe('schema', function() {
       });
 
       // test String -> Number cast
-      assert.equal('number', typeof Tobi.path('age').cast('0'));
-      assert.equal(0, (+Tobi.path('age').cast('0')));
+      assert.equal(typeof Tobi.path('age').cast('0'), 'number');
+      assert.equal((+Tobi.path('age').cast('0')), 0);
 
-      assert.equal('number', typeof Tobi.path('age').cast(0));
-      assert.equal(0, (+Tobi.path('age').cast(0)));
+      assert.equal(typeof Tobi.path('age').cast(0), 'number');
+      assert.equal((+Tobi.path('age').cast(0)), 0);
       done();
     });
 
@@ -303,12 +303,12 @@ describe('schema', function() {
         };
 
         // test Number -> String cast
-        assert.equal('string', typeof Tobi.path('nickname').cast(0));
-        assert.equal('0', Tobi.path('nickname').cast(0));
+        assert.equal(typeof Tobi.path('nickname').cast(0), 'string');
+        assert.equal(Tobi.path('nickname').cast(0), '0');
 
         // test any object that implements toString
-        assert.equal('string', typeof Tobi.path('nickname').cast(new Test));
-        assert.equal('woot', Tobi.path('nickname').cast(new Test));
+        assert.equal(typeof Tobi.path('nickname').cast(new Test), 'string');
+        assert.equal(Tobi.path('nickname').cast(new Test), 'woot');
         done();
       });
     });
@@ -340,7 +340,7 @@ describe('schema', function() {
 
       assert.ok(Loki.path('owner').cast(doc) instanceof DocumentObjectId);
 
-      assert.equal(id, Loki.path('owner').cast(doc).toString());
+      assert.equal(Loki.path('owner').cast(doc).toString(), id);
       done();
     });
 
@@ -373,10 +373,10 @@ describe('schema', function() {
       var strings = Loki.path('strings').cast(['test', 123]);
 
       assert.equal(typeof strings[0], 'string');
-      assert.equal('test', strings[0]);
+      assert.equal(strings[0], 'test');
 
       assert.equal(typeof strings[1], 'string');
-      assert.equal('123', strings[1]);
+      assert.equal(strings[1], '123');
 
       var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer('abc')]);
 
@@ -386,10 +386,10 @@ describe('schema', function() {
       var nocasts = Loki.path('nocast').cast(['test', 123]);
 
       assert.equal(typeof nocasts[0], 'string');
-      assert.equal('test', nocasts[0]);
+      assert.equal(nocasts[0], 'test');
 
       assert.equal(typeof nocasts[1], 'number');
-      assert.equal(123, nocasts[1]);
+      assert.equal(nocasts[1], 123);
 
       var mixed = Loki.path('mixed').cast(['test', 123, '123', {}, new Date, new DocumentObjectId]);
 
@@ -433,16 +433,16 @@ describe('schema', function() {
       });
 
       assert.strictEqual(Animal.path('isFerret').cast(null), null);
-      assert.equal(false, Animal.path('isFerret').cast(undefined));
-      assert.equal(false, Animal.path('isFerret').cast(false));
-      assert.equal(false, Animal.path('isFerret').cast(0));
-      assert.equal(false, Animal.path('isFerret').cast('0'));
-      assert.equal(false, Animal.path('isFerret').cast('false'));
-      assert.equal(true, Animal.path('isFerret').cast({}));
-      assert.equal(true, Animal.path('isFerret').cast(true));
-      assert.equal(true, Animal.path('isFerret').cast(1));
-      assert.equal(true, Animal.path('isFerret').cast('1'));
-      assert.equal(true, Animal.path('isFerret').cast('true'));
+      assert.equal(Animal.path('isFerret').cast(undefined), false);
+      assert.equal(Animal.path('isFerret').cast(false), false);
+      assert.equal(Animal.path('isFerret').cast(0), false);
+      assert.equal(Animal.path('isFerret').cast('0'), false);
+      assert.equal(Animal.path('isFerret').cast('false'), false);
+      assert.equal(Animal.path('isFerret').cast({}), true);
+      assert.equal(Animal.path('isFerret').cast(true), true);
+      assert.equal(Animal.path('isFerret').cast(1), true);
+      assert.equal(Animal.path('isFerret').cast('1'), true);
+      assert.equal(Animal.path('isFerret').cast('true'), true);
       done();
     });
   });
@@ -457,7 +457,7 @@ describe('schema', function() {
       b: function() {
       }
     });
-    assert.equal(3, Object.keys(a.methods).length);
+    assert.equal(Object.keys(a.methods).length, 3);
     done();
   });
 
@@ -488,15 +488,15 @@ describe('schema', function() {
         name: {type: String, set: lowercase}
       });
 
-      assert.equal('woot', Tobi.path('name').applySetters('WOOT'));
-      assert.equal(1, Tobi.path('name').setters.length);
+      assert.equal(Tobi.path('name').applySetters('WOOT'), 'woot');
+      assert.equal(Tobi.path('name').setters.length, 1);
 
       Tobi.path('name').set(function(v) {
         return v + 'WOOT';
       });
 
-      assert.equal('wootwoot', Tobi.path('name').applySetters('WOOT'));
-      assert.equal(2, Tobi.path('name').setters.length);
+      assert.equal(Tobi.path('name').applySetters('WOOT'), 'wootwoot');
+      assert.equal(Tobi.path('name').setters.length, 2);
       done();
     });
 
@@ -523,8 +523,8 @@ describe('schema', function() {
 
     it('scope', function(done) {
       function lowercase(v, self) {
-        assert.equal('b', this.a);
-        assert.equal('name', self.path);
+        assert.equal(this.a, 'b');
+        assert.equal(self.path, 'name');
         return v.toLowerCase();
       }
 
@@ -532,14 +532,14 @@ describe('schema', function() {
         name: {type: String, set: lowercase}
       });
 
-      assert.equal('what', Tobi.path('name').applySetters('WHAT', {a: 'b'}));
+      assert.equal(Tobi.path('name').applySetters('WHAT', {a: 'b'}), 'what');
       done();
     });
 
     it('casting', function(done) {
       function last(v) {
-        assert.equal('number', typeof v);
-        assert.equal(0, v);
+        assert.equal(typeof v, 'number');
+        assert.equal(v, 0);
         return 'last';
       }
 
@@ -552,7 +552,7 @@ describe('schema', function() {
       });
 
       Tobi.path('name').set(first);
-      assert.equal('last', Tobi.path('name').applySetters('woot'));
+      assert.equal(Tobi.path('name').applySetters('woot'), 'last');
       done();
     });
 
@@ -575,8 +575,8 @@ describe('schema', function() {
           name: {type: String, lowercase: true}
         });
 
-        assert.equal('what', Tobi.path('name').applySetters('WHAT'));
-        assert.equal('1977', Tobi.path('name').applySetters(1977));
+        assert.equal(Tobi.path('name').applySetters('WHAT'), 'what');
+        assert.equal(Tobi.path('name').applySetters(1977), '1977');
         done();
       });
       it('uppercase', function(done) {
@@ -584,8 +584,8 @@ describe('schema', function() {
           name: {type: String, uppercase: true}
         });
 
-        assert.equal('WHAT', Tobi.path('name').applySetters('what'));
-        assert.equal('1977', Tobi.path('name').applySetters(1977));
+        assert.equal(Tobi.path('name').applySetters('what'), 'WHAT');
+        assert.equal(Tobi.path('name').applySetters(1977), '1977');
         done();
       });
       it('trim', function(done) {
@@ -593,8 +593,8 @@ describe('schema', function() {
           name: {type: String, uppercase: true, trim: true}
         });
 
-        assert.equal('WHAT', Tobi.path('name').applySetters('  what   '));
-        assert.equal('1977', Tobi.path('name').applySetters(1977));
+        assert.equal(Tobi.path('name').applySetters('  what   '), 'WHAT');
+        assert.equal(Tobi.path('name').applySetters(1977), '1977');
         done();
       });
     });
@@ -604,7 +604,7 @@ describe('schema', function() {
         name: String
       });
 
-      assert.equal('woot', Tobi.path('name').applySetters('woot'));
+      assert.equal(Tobi.path('name').applySetters('woot'), 'woot');
       done();
     });
 
@@ -634,8 +634,8 @@ describe('schema', function() {
         name: {type: String, get: woot}
       });
 
-      assert.equal(1, Tobi.path('name').getters.length);
-      assert.equal('test woot', Tobi.path('name').applyGetters('test'));
+      assert.equal(Tobi.path('name').getters.length, 1);
+      assert.equal(Tobi.path('name').applyGetters('test'), 'test woot');
       done();
     });
     it('order', function(done) {
@@ -649,13 +649,13 @@ describe('schema', function() {
         name: {type: Number, get: format}
       });
 
-      assert.equal('$30', Tobi.path('name').applyGetters(30, {a: 'b'}));
+      assert.equal(Tobi.path('name').applyGetters(30, {a: 'b'}), '$30');
       done();
     });
     it('scope', function(done) {
       function woot(v, self) {
-        assert.equal('b', this.a);
-        assert.equal('name', self.path);
+        assert.equal(this.a, 'b');
+        assert.equal(self.path, 'name');
         return v.toLowerCase();
       }
 
@@ -663,13 +663,13 @@ describe('schema', function() {
         name: {type: String, get: woot}
       });
 
-      assert.equal('yep', Tobi.path('name').applyGetters('YEP', {a: 'b'}));
+      assert.equal(Tobi.path('name').applyGetters('YEP', {a: 'b'}), 'yep');
       done();
     });
     it('casting', function(done) {
       function last(v) {
-        assert.equal('number', typeof v);
-        assert.equal(0, v);
+        assert.equal(typeof v, 'number');
+        assert.equal(v, 0);
         return 'last';
       }
 
@@ -682,7 +682,7 @@ describe('schema', function() {
       });
 
       Tobi.path('name').get(first);
-      assert.equal('last', Tobi.path('name').applyGetters('woot'));
+      assert.equal(Tobi.path('name').applyGetters('woot'), 'last');
       done();
     });
     it('applying when none have been defined', function(done) {
@@ -690,7 +690,7 @@ describe('schema', function() {
         name: String
       });
 
-      assert.equal('woot', Tobi.path('name').applyGetters('woot'));
+      assert.equal(Tobi.path('name').applyGetters('woot'), 'woot');
       done();
     });
     it('assignment of non-functions throw', function(done) {
@@ -721,7 +721,7 @@ describe('schema', function() {
       schema = new Schema({
         name: String
       }, {_id: false});
-      assert.equal(undefined, schema.path('_id'));
+      assert.equal(schema.path('_id'), undefined);
 
       // old options
       schema = new Schema({
@@ -732,7 +732,7 @@ describe('schema', function() {
       schema = new Schema({
         name: String
       }, {noId: true});
-      assert.equal(undefined, schema.path('_id'));
+      assert.equal(schema.path('_id'), undefined);
       done();
     });
 
@@ -750,7 +750,7 @@ describe('schema', function() {
       schema = new Schema({
         name: String
       }, {id: false});
-      assert.equal(undefined, schema.virtualpath('id'));
+      assert.equal(schema.virtualpath('id'), undefined);
 
       // old options
       schema = new Schema({
@@ -761,7 +761,7 @@ describe('schema', function() {
       schema = new Schema({
         name: String
       }, {noVirtualId: true});
-      assert.equal(undefined, schema.virtualpath('id'));
+      assert.equal(schema.virtualpath('id'), undefined);
       done();
     });
   });
@@ -792,7 +792,7 @@ describe('schema', function() {
           name: {type: String, index: true}
         });
 
-        assert.equal(true, Tobi.path('name')._index);
+        assert.equal(Tobi.path('name')._index, true);
         Tobi.path('name').index({unique: true});
         assert.deepEqual(Tobi.path('name')._index, {unique: true});
         Tobi.path('name').unique(false);
@@ -829,24 +829,24 @@ describe('schema', function() {
           name: {type: String, unique: true, sparse: true}
         });
         i = T.path('name')._index;
-        assert.equal(true, i.unique);
-        assert.equal(true, i.sparse);
+        assert.equal(i.unique, true);
+        assert.equal(i.sparse, true);
 
         T = new Schema({
           name: {type: String, index: {sparse: true, unique: true, expireAfterSeconds: 65}}
         });
         i = T.path('name')._index;
-        assert.equal(true, i.unique);
-        assert.equal(true, i.sparse);
-        assert.equal(65, i.expireAfterSeconds);
+        assert.equal(i.unique, true);
+        assert.equal(i.sparse, true);
+        assert.equal(i.expireAfterSeconds, 65);
 
         T = new Schema({
           name: {type: Date, index: {sparse: true, unique: true, expires: '24h'}}
         });
         i = T.path('name')._index;
-        assert.equal(true, i.unique);
-        assert.equal(true, i.sparse);
-        assert.equal(60 * 60 * 24, i.expireAfterSeconds);
+        assert.equal(i.unique, true);
+        assert.equal(i.sparse, true);
+        assert.equal(i.expireAfterSeconds, 60 * 60 * 24);
 
         done();
       });
@@ -883,7 +883,7 @@ describe('schema', function() {
         called = true;
       });
 
-      assert.equal(true, called);
+      assert.equal(called, true);
       done();
     });
   });
@@ -892,15 +892,15 @@ describe('schema', function() {
     it('defaults are set', function(done) {
       var Tobi = new Schema();
 
-      assert.equal('object', typeof Tobi.options);
-      assert.equal(undefined, Tobi.options.safe);
-      assert.equal(true, Tobi.options.strict);
-      assert.equal(false, Tobi.options.capped);
-      assert.equal('__v', Tobi.options.versionKey);
-      assert.equal('__t', Tobi.options.discriminatorKey);
-      assert.equal(null, Tobi.options.shardKey);
-      assert.equal(null, Tobi.options.read);
-      assert.equal(true, Tobi.options._id);
+      assert.equal(typeof Tobi.options, 'object');
+      assert.equal(Tobi.options.safe, undefined);
+      assert.equal(Tobi.options.strict, true);
+      assert.equal(Tobi.options.capped, false);
+      assert.equal(Tobi.options.versionKey, '__v');
+      assert.equal(Tobi.options.discriminatorKey, '__t');
+      assert.equal(Tobi.options.shardKey, null);
+      assert.equal(Tobi.options.read, null);
+      assert.equal(Tobi.options._id, true);
       done();
     });
 
@@ -909,151 +909,151 @@ describe('schema', function() {
 
       Tobi.set('a', 'b');
       Tobi.set('safe', false);
-      assert.equal('users', Tobi.options.collection);
+      assert.equal(Tobi.options.collection, 'users');
 
-      assert.equal('b', Tobi.options.a);
+      assert.equal(Tobi.options.a, 'b');
       assert.deepEqual(Tobi.options.safe, {w: 0});
-      assert.equal(null, Tobi.options.read);
+      assert.equal(Tobi.options.read, null);
 
       var tags = [{x: 1}];
 
       Tobi.set('read', 'n');
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
 
       Tobi.set('read', 'n', tags);
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi.set('read', ['n', tags]);
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'p'});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primary');
 
       Tobi = new Schema({}, {read: ['p', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'primary'});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primary');
 
       Tobi = new Schema({}, {read: ['primary', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 's'});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondary');
 
       Tobi = new Schema({}, {read: ['s', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'secondary'});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondary');
 
       Tobi = new Schema({}, {read: ['secondary', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondary', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'pp'});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('primaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primaryPreferred');
 
       Tobi = new Schema({}, {read: ['pp', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('primaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'primaryPreferred'});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('primaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primaryPreferred');
 
       Tobi = new Schema({}, {read: ['primaryPreferred', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('primaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'primaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'sp'});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('secondaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
 
       Tobi = new Schema({}, {read: ['sp', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('secondaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'secondaryPreferred'});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('secondaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
 
       Tobi = new Schema({}, {read: ['secondaryPreferred', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('secondaryPreferred', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'secondaryPreferred');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'n'});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
 
       Tobi = new Schema({}, {read: ['n', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       Tobi = new Schema({}, {read: 'nearest'});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
 
       Tobi = new Schema({}, {read: ['nearest', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.ok(Tobi.options.read.isValid());
-      assert.equal('nearest', Tobi.options.read.mode);
+      assert.equal(Tobi.options.read.mode, 'nearest');
       assert.ok(Array.isArray(Tobi.options.read.tags));
-      assert.equal(1, Tobi.options.read.tags.length);
-      assert.equal(1, Tobi.options.read.tags[0].x);
+      assert.equal(Tobi.options.read.tags.length, 1);
+      assert.equal(Tobi.options.read.tags[0].x, 1);
 
       done();
     });
@@ -1100,12 +1100,12 @@ describe('schema', function() {
         var Tobi = new Schema;
 
         Tobi.virtual('name').get(function(v, self) {
-          assert.equal('b', this.a);
-          assert.equal('name', self.path);
+          assert.equal(this.a, 'b');
+          assert.equal(self.path, 'name');
           return v.toLowerCase();
         });
 
-        assert.equal('yep', Tobi.virtualpath('name').applyGetters('YEP', {a: 'b'}));
+        assert.equal(Tobi.virtualpath('name').applyGetters('YEP', {a: 'b'}), 'yep');
         done();
       });
     });
@@ -1115,12 +1115,12 @@ describe('schema', function() {
         var Tobi = new Schema;
 
         Tobi.virtual('name').set(function(v, self) {
-          assert.equal('b', this.a);
-          assert.equal('name', self.path);
+          assert.equal(this.a, 'b');
+          assert.equal(self.path, 'name');
           return v.toLowerCase();
         });
 
-        assert.equal('yep', Tobi.virtualpath('name').applySetters('YEP', {a: 'b'}));
+        assert.equal(Tobi.virtualpath('name').applySetters('YEP', {a: 'b'}), 'yep');
         done();
       });
     });
@@ -1166,7 +1166,7 @@ describe('schema', function() {
       assert.throws(function() {
         s.add({age: {x: Number}}, 'name.');
       }, /Cannot set nested path/);
-      assert.equal(false, ('age' in o.name));
+      assert.equal(('age' in o.name), false);
 
       o = {name: 'string'};
       s = new Schema(o);
@@ -1179,7 +1179,7 @@ describe('schema', function() {
         s.add({age: {x: Number}}, 'name.');
       }, /Cannot set nested path/);
 
-      assert.equal('string', o.name);
+      assert.equal(o.name, 'string');
       done();
     });
 
@@ -1254,7 +1254,7 @@ describe('schema', function() {
       assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
       var M = goose.model('objectliteralschema', s);
       var m = new M({arr: [{something: 'wicked this way comes'}]});
-      assert.equal('wicked this way comes', m.arr[0].something);
+      assert.equal(m.arr[0].something, 'wicked this way comes');
       assert.ok(m.arr[0]._id);
       done();
     });
@@ -1269,7 +1269,7 @@ describe('schema', function() {
       assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
       var M = goose.model('objectliteralschema2', s);
       var m = new M({arr: [{type: 'works'}]});
-      assert.equal('works', m.arr[0].type);
+      assert.equal(m.arr[0].type, 'works');
       assert.ok(m.arr[0]._id);
       done();
     });
@@ -1285,7 +1285,7 @@ describe('schema', function() {
       };
 
       new Schema(schema);
-      assert.equal(6, Object.keys(schema).length);
+      assert.equal(Object.keys(schema).length, 6);
       assert.deepEqual([{type: Schema.ObjectId, ref: 'something'}], schema.ids);
       assert.deepEqual({type: Array}, schema.a);
       assert.deepEqual(Array, schema.b);
@@ -1443,45 +1443,45 @@ describe('schema', function() {
 
     describe('when called on an explicit real path', function() {
       it('returns "real"', function(done) {
-        assert.equal('real', schema.pathType('n'));
-        assert.equal('real', schema.pathType('nest.thing.nests'));
-        assert.equal('real', schema.pathType('docs'));
-        assert.equal('real', schema.pathType('docs.0.x'));
-        assert.equal('real', schema.pathType('docs.0.x.3.y'));
-        assert.equal('real', schema.pathType('mixed'));
+        assert.equal(schema.pathType('n'), 'real');
+        assert.equal(schema.pathType('nest.thing.nests'), 'real');
+        assert.equal(schema.pathType('docs'), 'real');
+        assert.equal(schema.pathType('docs.0.x'), 'real');
+        assert.equal(schema.pathType('docs.0.x.3.y'), 'real');
+        assert.equal(schema.pathType('mixed'), 'real');
         done();
       });
     });
     describe('when called on a virtual', function() {
       it('returns virtual', function(done) {
-        assert.equal('virtual', schema.pathType('id'));
+        assert.equal(schema.pathType('id'), 'virtual');
         done();
       });
     });
     describe('when called on nested structure', function() {
       it('returns nested', function(done) {
-        assert.equal('nested', schema.pathType('nest'));
-        assert.equal('nested', schema.pathType('nest.thing'));
+        assert.equal(schema.pathType('nest'), 'nested');
+        assert.equal(schema.pathType('nest.thing'), 'nested');
         done();
       });
     });
     describe('when called on undefined path', function() {
       it('returns adHocOrUndefined', function(done) {
-        assert.equal('adhocOrUndefined', schema.pathType('mixed.what'));
-        assert.equal('adhocOrUndefined', schema.pathType('mixed.4'));
-        assert.equal('adhocOrUndefined', schema.pathType('mixed.4.thing'));
-        assert.equal('adhocOrUndefined', schema.pathType('mixed.4a.thing'));
-        assert.equal('adhocOrUndefined', schema.pathType('mixed.4.9.thing'));
-        assert.equal('adhocOrUndefined', schema.pathType('n.3'));
-        assert.equal('adhocOrUndefined', schema.pathType('n.3a'));
-        assert.equal('adhocOrUndefined', schema.pathType('n.3.four'));
-        assert.equal('adhocOrUndefined', schema.pathType('n.3.4'));
-        assert.equal('adhocOrUndefined', schema.pathType('n.3.4a'));
-        assert.equal('adhocOrUndefined', schema.pathType('nest.x'));
-        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.x'));
-        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.9'));
-        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.9a'));
-        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.a'));
+        assert.equal(schema.pathType('mixed.what'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('mixed.4'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('mixed.4.thing'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('mixed.4a.thing'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('mixed.4.9.thing'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('n.3'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('n.3a'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('n.3.four'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('n.3.4'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('n.3.4a'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('nest.x'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('nest.thing.x'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('nest.thing.nests.9'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('nest.thing.nests.9a'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('nest.thing.nests.a'), 'adhocOrUndefined');
         done();
       });
     });

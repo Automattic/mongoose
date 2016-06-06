@@ -418,7 +418,7 @@ describe('model: populate:', function() {
         .exec(function(err) {
           db.close();
           assert.ok(err instanceof Error);
-          assert.equal('woot', err.message);
+          assert.equal(err.message, 'woot');
           done();
         });
       });
@@ -450,7 +450,7 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           assert.ok(post._creator instanceof User);
-          assert.equal(false, post._creator.isInit('name'));
+          assert.equal(post._creator.isInit('name'), false);
           assert.equal(post._creator.email, 'rauchg@gmail.com');
           done();
         });
@@ -1255,12 +1255,12 @@ describe('model: populate:', function() {
           .populate('comments._creator')
           .populate('comments.asers')
           .exec(function(err, posts) {
-            assert.equal(false, ran);
+            assert.equal(ran, false);
             ran = true;
             assert.ifError(err);
             assert.ok(posts.length);
             assert.ok(posts[1].comments[0]._creator);
-            assert.equal('gh-1055-1', posts[1].comments[0]._creator.name);
+            assert.equal(posts[1].comments[0]._creator.name, 'gh-1055-1');
             db.close(done);
           });
         });
@@ -1289,16 +1289,16 @@ describe('model: populate:', function() {
             populate('_creator').
             exec(function(error, posts) {
               assert.ifError(error);
-              assert.equal(1, posts.length);
-              assert.equal('aaron', posts[0]._creator.name);
+              assert.equal(posts.length, 1);
+              assert.equal(posts[0]._creator.name, 'aaron');
               posts[0]._creator = user2;
-              assert.equal('val', posts[0]._creator.name);
+              assert.equal(posts[0]._creator.name, 'val');
               posts[0].save(function(error, post) {
                 assert.ifError(error);
-                assert.equal('val', post._creator.name);
+                assert.equal(post._creator.name, 'val');
                 posts[0].populate('_creator', function(error, doc) {
                   assert.ifError(error);
-                  assert.equal('val', doc._creator.name);
+                  assert.equal(doc._creator.name, 'val');
                   db.close(done);
                 });
               });
@@ -1561,9 +1561,9 @@ describe('model: populate:', function() {
 
           BlogPost.populate(docs, opts, function(err, docs) {
             assert.ifError(err);
-            assert.equal(2, docs.length);
-            assert.equal(1, docs[0].author.friends.length);
-            assert.equal(1, docs[1].author.friends.length);
+            assert.equal(docs.length, 2);
+            assert.equal(docs[0].author.friends.length, 1);
+            assert.equal(docs[1].author.friends.length, 1);
             assert.equal(opts.options.limit, 1);
             db.close(done);
           });
@@ -2297,7 +2297,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2320,7 +2320,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2343,7 +2343,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2366,7 +2366,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2420,7 +2420,7 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         assert.ok(Array.isArray(post.fans));
-        assert.equal(2, post.fans.length);
+        assert.equal(post.fans.length, 2);
         assert.ok(post.fans[0] instanceof User);
         assert.ok(post.fans[1] instanceof User);
         assert.equal(post.fans[0].isInit('name'), true);
@@ -2501,7 +2501,7 @@ describe('model: populate:', function() {
             assert.ifError(err);
             assert.ok(post);
             assert.ok(post._creator instanceof User);
-            assert.equal('Phoenix', post._creator.name);
+            assert.equal(post._creator.name, 'Phoenix');
             done();
           });
         });
@@ -2518,7 +2518,7 @@ describe('model: populate:', function() {
               assert.ok(post);
               assert.ok(post._creator instanceof User);
               assert.equal('Phoenix', post._creator.name);
-              assert.equal(2, post.fans.length);
+              assert.equal(post.fans.length, 2);
               assert.equal(post.fans[0].name, user1.name);
               assert.equal(post.fans[1].name, user2.name);
 
@@ -2529,8 +2529,8 @@ describe('model: populate:', function() {
                 assert.ifError(err);
                 assert.ok(post);
                 assert.ok(post._creator instanceof User);
-                assert.equal('Phoenix', post._creator.name);
-                assert.equal(2, post.fans.length);
+                assert.equal(post._creator.name, 'Phoenix');
+                assert.equal(post.fans.length, 2);
                 assert.equal(post.fans[0].name, user1.name);
                 assert.equal(post.fans[1].name, user2.name);
                 assert.ok(Array.isArray(post.populated('fans')));
@@ -2551,8 +2551,8 @@ describe('model: populate:', function() {
               assert.ifError(err);
               assert.ok(post);
               assert.ok(post._creator instanceof User);
-              assert.equal('Phoenix', post._creator.name);
-              assert.equal(2, post.fans.length);
+              assert.equal(post._creator.name, 'Phoenix');
+              assert.equal(post.fans.length, 2);
               assert.equal(post.fans[0].name, user1.name);
               assert.equal(post.fans[1].name, user2.name);
 
@@ -2567,8 +2567,8 @@ describe('model: populate:', function() {
                 assert.ifError(err);
                 assert.ok(post);
                 assert.ok(post._creator instanceof User);
-                assert.equal('Phoenix', post._creator.name);
-                assert.equal(2, post.fans.length);
+                assert.equal(post._creator.name, 'Phoenix');
+                assert.equal(post.fans.length, 2);
                 assert.equal(post.fans[0].name, user1.name);
                 assert.equal(post.fans[1].name, user2.name);
                 assert.ok(Array.isArray(post.populated('fans')));
@@ -2597,13 +2597,13 @@ describe('model: populate:', function() {
             B.populate([post1, post2], ret, function(err, posts) {
               assert.ifError(err);
               assert.ok(posts);
-              assert.equal(2, posts.length);
+              assert.equal(posts.length, 2);
               var p1 = posts[0];
               var p2 = posts[1];
               assert.ok(p1._creator instanceof User);
-              assert.equal('Phoenix', p1._creator.name);
+              assert.equal(p1._creator.name, 'Phoenix');
               assert.ok(p2._creator instanceof User);
-              assert.equal('Newark', p2._creator.name);
+              assert.equal(p2._creator.name, 'Newark');
               done();
             });
           });
@@ -2641,7 +2641,7 @@ describe('model: populate:', function() {
             assert.ok(utils.isObject(post._creator));
             assert.equal(post._creator.name, 'Guillermo');
             assert.equal(post._creator.email, 'rauchg@gmail.com');
-            assert.equal('undefined', typeof post._creator.update);
+            assert.equal(typeof post._creator.update, 'undefined');
             done();
           });
         });
@@ -2680,17 +2680,17 @@ describe('model: populate:', function() {
 
             assert.equal(blogposts[0].fans[0].name, 'Fan 1');
             assert.equal(blogposts[0].fans[0].email, 'fan1@learnboost.com');
-            assert.equal('undefined', typeof blogposts[0].fans[0].update);
+            assert.equal(typeof blogposts[0].fans[0].update, 'undefined');
             assert.equal(blogposts[0].fans[1].name, 'Fan 2');
             assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
-            assert.equal('undefined', typeof blogposts[0].fans[1].update);
+            assert.equal(typeof blogposts[0].fans[1].update, 'undefined');
 
             assert.equal(blogposts[1].fans[0].name, 'Fan 2');
             assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
-            assert.equal('undefined', typeof blogposts[1].fans[0].update);
+            assert.equal(typeof blogposts[1].fans[0].update, 'undefined');
             assert.equal(blogposts[1].fans[1].name, 'Fan 1');
             assert.equal(blogposts[1].fans[1].email, 'fan1@learnboost.com');
-            assert.equal('undefined', typeof blogposts[1].fans[1].update);
+            assert.equal(typeof blogposts[1].fans[1].update, 'undefined');
             db.close(done);
           });
         });
@@ -2745,7 +2745,7 @@ describe('model: populate:', function() {
       B.findById(b1).populate('fans _creator').exec(function(err, doc) {
         assert.ifError(err);
         assert.ok(Array.isArray(doc.populated('fans')));
-        assert.equal(2, doc.populated('fans').length);
+        assert.equal(doc.populated('fans').length, 2);
         assert.equal(doc.populated('fans')[0], String(u1._id));
         assert.equal(doc.populated('fans')[1], String(u2._id));
         assert.equal(doc.populated('_creator'), String(u1._id));
@@ -2756,20 +2756,20 @@ describe('model: populate:', function() {
     it('with find', function(done) {
       B.find().sort('title').populate('fans _creator').exec(function(err, docs) {
         assert.ifError(err);
-        assert.equal(2, docs.length);
+        assert.equal(docs.length, 2);
 
         var doc1 = docs[0];
         var doc2 = docs[1];
 
         assert.ok(Array.isArray(doc1.populated('fans')));
-        assert.equal(2, doc1.populated('fans').length);
+        assert.equal(doc1.populated('fans').length, 2);
 
         assert.equal(doc1.populated('fans')[0], String(u1._id));
         assert.equal(doc1.populated('fans')[1], String(u2._id));
         assert.equal(doc1.populated('_creator'), String(u1._id));
 
         assert.ok(Array.isArray(doc2.populated('fans')));
-        assert.equal(2, doc2.populated('fans').length);
+        assert.equal(doc2.populated('fans').length, 2);
         assert.equal(doc2.populated('fans')[0], String(u2._id));
         assert.equal(doc2.populated('fans')[1], String(u1._id));
         assert.equal(doc2.populated('_creator'), String(u2._id));
@@ -2819,30 +2819,30 @@ describe('model: populate:', function() {
 
           var doc = docs[0];
           assert.ok(Array.isArray(doc.comments), 'comments should be an array: ' + JSON.stringify(doc));
-          assert.equal(2, doc.comments.length, 'invalid comments length for ' + JSON.stringify(doc));
+          assert.equal(doc.comments.length, 2, 'invalid comments length for ' + JSON.stringify(doc));
           doc.comments.forEach(function(d) {
-            assert.equal(undefined, d._id);
-            assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
+            assert.equal(d._id, undefined);
+            assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
             assert.ok(d.body.length);
-            assert.equal('number', typeof d._doc.__v);
+            assert.equal(typeof d._doc.__v, 'number');
           });
 
           U.findOne({name: 'u1'}).populate('comments', 'title -_id').exec(function(err, doc) {
             assert.ifError(err);
-            assert.equal(2, doc.comments.length);
+            assert.equal(doc.comments.length, 2);
             doc.comments.forEach(function(d) {
-              assert.equal(undefined, d._id);
-              assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
+              assert.equal(d._id, undefined);
+              assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
               assert.ok(d.title.length);
-              assert.equal(undefined, d.body);
+              assert.equal(d.body, undefined);
               assert.equal(typeof d._doc.__v, 'undefined');
             });
             U.findOne({name: 'u1'}).populate('comments', '-_id').exec(function(err, doc) {
               assert.ifError(err);
-              assert.equal(2, doc.comments.length);
+              assert.equal(doc.comments.length, 2);
               doc.comments.forEach(function(d) {
-                assert.equal(undefined, d._id);
-                assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
+                assert.equal(d._id, undefined);
+                assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
                 assert.ok(d.title.length);
                 assert.ok(d.body.length);
                 assert.equal(typeof d._doc.__v, 'number');
@@ -2858,20 +2858,20 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           var doc = docs[0];
-          assert.equal(2, doc.comments.length);
+          assert.equal(doc.comments.length, 2);
           doc.comments.forEach(function(d) {
             assert.ok(!('_id' in d));
             assert.ok(d.body.length);
-            assert.equal('number', typeof d.__v);
+            assert.equal(typeof d.__v, 'number');
           });
 
           U.findOne({name: 'u1'}).lean().populate('comments', '-_id', null, {lean: true}).exec(function(err, doc) {
             assert.ifError(err);
-            assert.equal(2, doc.comments.length);
+            assert.equal(doc.comments.length, 2);
             doc.comments.forEach(function(d) {
               assert.ok(!('_id' in d));
               assert.ok(d.body.length);
-              assert.equal('number', typeof d.__v);
+              assert.equal(typeof d.__v, 'number');
             });
             done();
           });
@@ -2885,14 +2885,14 @@ describe('model: populate:', function() {
         .select('-_id comment name')
         .populate('comment', {_id: 0}).exec(function(err, docs) {
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
 
           docs.forEach(function(doc) {
             assert.ok(doc.comment && doc.comment.body);
             if (doc.name === 'u1') {
-              assert.equal('comment 1', doc.comment.body);
+              assert.equal(doc.comment.body, 'comment 1');
             } else {
-              assert.equal('comment 2', doc.comment.body);
+              assert.equal(doc.comment.body, 'comment 2');
             }
           });
 
@@ -2981,9 +2981,9 @@ describe('model: populate:', function() {
     it('Simple populate', function(done) {
       Review.find({}).populate('item.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(1, results.length);
+        assert.equal(results.length, 1);
         var result = results[0];
-        assert.equal('Val', result.item.id.name);
+        assert.equal(result.item.id.name, 'Val');
         done();
       });
     });
@@ -2991,11 +2991,11 @@ describe('model: populate:', function() {
     it('Array populate', function(done) {
       Review.find({}).populate('items.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(1, results.length);
+        assert.equal(results.length, 1);
         var result = results[0];
-        assert.equal(2, result.items.length);
-        assert.equal('Val', result.items[0].id.name);
-        assert.equal('Val', result.items[1].id.otherName);
+        assert.equal(result.items.length, 2);
+        assert.equal(result.items[0].id.name, 'Val');
+        assert.equal(result.items[1].id.otherName, 'Val');
         done();
       });
     });
@@ -3132,7 +3132,7 @@ describe('model: populate:', function() {
             assert.ifError(error);
             Category.findOne({}).populate({path: 'movies', options: {limit: 2, skip: 1}}).exec(function(error, category) {
               assert.ifError(error);
-              assert.equal(2, category.movies.length);
+              assert.equal(category.movies.length, 2);
               done();
             });
           });

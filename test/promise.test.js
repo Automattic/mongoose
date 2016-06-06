@@ -29,7 +29,7 @@ describe('Promise', function() {
       called++;
     });
 
-    assert.equal(2, called);
+    assert.equal(called, 2);
     done();
   });
 
@@ -49,7 +49,7 @@ describe('Promise', function() {
       called++;
     });
 
-    assert.equal(2, called);
+    assert.equal(called, 2);
     done();
   });
 
@@ -58,18 +58,18 @@ describe('Promise', function() {
         called = 0;
 
     promise.on('reject', function(err) {
-      assert.equal(9, err);
+      assert.equal(err, 9);
       called++;
     });
 
     promise.reject(9);
 
     promise.on('reject', function(err) {
-      assert.equal(9, err);
+      assert.equal(err, 9);
       called++;
     });
 
-    assert.equal(2, called);
+    assert.equal(called, 2);
     done();
   });
 
@@ -84,7 +84,7 @@ describe('Promise', function() {
 
       promise.reject(new Error('dawg'));
 
-      assert.equal(1, called);
+      assert.equal(called, 1);
       done();
     });
 
@@ -104,7 +104,7 @@ describe('Promise', function() {
         called++;
       });
 
-      assert.equal(2, called);
+      assert.equal(called, 2);
       done();
     });
 
@@ -123,7 +123,7 @@ describe('Promise', function() {
         assert.ok(err instanceof Error);
         called++;
       });
-      assert.equal(2, called);
+      assert.equal(called, 2);
       done();
     });
   });
@@ -140,7 +140,7 @@ describe('Promise', function() {
 
       promise.fulfill();
 
-      assert.equal(1, called);
+      assert.equal(called, 1);
       done();
     });
   });
@@ -156,7 +156,7 @@ describe('Promise', function() {
       });
 
       promise.reject(new Error);
-      assert.equal(1, called);
+      assert.equal(called, 1);
       done();
     });
   });
@@ -190,7 +190,7 @@ describe('Promise', function() {
       it('casts arguments to Error', function(done) {
         var p = new Promise(function(err) {
           assert.ok(err instanceof Error);
-          assert.equal('3', err.message);
+          assert.equal(err.message, '3');
           done();
         });
 
@@ -201,7 +201,7 @@ describe('Promise', function() {
     describe('reject()', function() {
       it('does not cast arguments to Error', function(done) {
         var p = new Promise(function(err) {
-          assert.equal(3, err);
+          assert.equal(err, 3);
           done();
         });
 
@@ -217,5 +217,22 @@ describe('Promise', function() {
       });
     });
     done();
+  });
+
+  it('.catch() works correctly (gh-4189)', function(done) {
+    var promise = new Promise.ES6(function(resolve, reject) {
+      reject(new Error('error1'));
+    });
+    promise.
+      catch(function(error) {
+        assert.ok(error);
+        return new Promise.ES6(function(resolve, reject) {
+          reject(new Error('error2'));
+        });
+      }).
+      catch(function(error) {
+        assert.equal(error.message, 'error2');
+        done();
+      });
   });
 });

@@ -231,9 +231,6 @@ describe('query middleware', function() {
       ];
       Book.create(books, function(error, books) {
         assert.ifError(error);
-        assert.equal(count, 1);
-        assert.equal(preCount, 1);
-        assert.equal(postCount, 1);
         var query = { _id: books[1]._id };
         var update = { title: 'Professional AngularJS' };
         Book.update(query, update, function(error) {

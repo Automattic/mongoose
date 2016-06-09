@@ -36,7 +36,7 @@
     "acquit": "0.4.1",
     "acquit-ignore": "0.0.3",
     "benchmark": "2.0.0",
-    "bluebird": "3.1.4",
+    "bluebird": "3.4.0",
     "co": "4.6.0",
     "dox": "0.3.1",
     "eslint": "2.4.0",

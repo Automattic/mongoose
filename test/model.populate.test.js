@@ -3727,13 +3727,13 @@ describe('model: populate:', function() {
       var Band = db.model('gh2562_0', BandSchema);
 
       var people = ['Axl Rose', 'Slash'].map(function(v) {
-        return { name: v, band: "Guns N' Roses" };
+        return { name: v, band: 'Guns N\' Roses' };
       });
       Person.create(people, function(error) {
         assert.ifError(error);
-        Band.create({ name: "Guns N' Roses" }, function(error) {
+        Band.create({ name: 'Guns N\' Roses' }, function(error) {
           assert.ifError(error);
-          var query = { name: "Guns N' Roses" };
+          var query = { name: 'Guns N\' Roses' };
           Band.findOne(query).populate('members').exec(function(error, gnr) {
             assert.ifError(error);
             assert.equal(gnr.members.length, 2);

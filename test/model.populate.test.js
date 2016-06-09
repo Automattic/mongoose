@@ -3707,5 +3707,40 @@ describe('model: populate:', function() {
         });
       });
     });
+
+    it('basic populate virtuals (gh-2562)', function(done) {
+      var PersonSchema = new Schema({
+        name: String,
+        band: String
+      });
+
+      var BandSchema = new Schema({
+        name: String
+      });
+      BandSchema.virtual('members', {
+        ref: 'gh2562',
+        localField: 'name',
+        foreignField: 'band'
+      });
+
+      var Person = db.model('gh2562', PersonSchema);
+      var Band = db.model('gh2562_0', BandSchema);
+
+      var people = ['Axl Rose', 'Slash'].map(function(v) {
+        return { name: v, band: "Guns N' Roses" };
+      });
+      Person.create(people, function(error) {
+        assert.ifError(error);
+        Band.create({ name: "Guns N' Roses" }, function(error) {
+          assert.ifError(error);
+          var query = { name: "Guns N' Roses" };
+          Band.findOne(query).populate('members').exec(function(error, gnr) {
+            assert.ifError(error);
+            assert.equal(gnr.members.length, 2);
+            done();
+          });
+        });
+      });
+    });
   });
 });

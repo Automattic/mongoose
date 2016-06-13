@@ -408,10 +408,12 @@ describe('schema', function() {
         nums: [[Number]]
       });
       var nums = test.path('nums').cast([['1', '2']]);
-      assert.deepEqual(nums, [[1, 2]]);
+      assert.equal(nums.length, 1);
+      assert.deepEqual(nums[0].toObject(), [1, 2]);
 
       nums = test.path('nums').cast(1);
-      assert.deepEqual(nums, [[1]]);
+      assert.equal(nums.length, 1);
+      assert.deepEqual(nums[0].toObject(), [1]);
 
       var threw = false;
       try {

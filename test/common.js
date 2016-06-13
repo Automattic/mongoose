@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+Error.stackTraceLimit = 10;
+
 var mongoose = require('../'),
     Collection = mongoose.Collection,
     assert = require('power-assert'),

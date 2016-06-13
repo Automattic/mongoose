@@ -25,35 +25,35 @@ mongoose.model('PersonForStream', Person);
 var collection = 'personforstream_' + random();
 
 describe('query stream:', function() {
-  before(function(done) {
-    var db = start(),
-        P = db.model('PersonForStream', collection);
+  var db = start();
+  var P = db.model('PersonForStream', collection);
 
+  before(function(done) {
     var people = names.map(function(name) {
       return {name: name};
     });
 
     P.create(people, function(err) {
       assert.ifError(err);
-      db.close();
       done();
     });
   });
 
+  after(function(done) {
+    db.close(done);
+  });
+
   it('works', function(done) {
-    var db = start(),
-        P = db.model('PersonForStream', collection),
-        i = 0,
-        closed = 0,
-        paused = 0,
-        resumed = 0,
-        seen = {},
-        err;
+    var i = 0;
+    var closed = 0;
+    var paused = 0;
+    var resumed = 0;
+    var seen = {};
+    var err;
 
     var stream = P.find().batchSize(3).stream();
 
     function cb() {
-      db.close();
       assert.strictEqual(undefined, err);
       assert.equal(names.length, i);
       assert.equal(closed, 1);
@@ -110,9 +110,7 @@ describe('query stream:', function() {
   });
 
   it('immediately destroying a stream prevents the query from executing', function(done) {
-    var db = start(),
-        P = db.model('PersonForStream', collection),
-        i = 0;
+    var i = 0;
 
     var stream = P.where('name', 'Jonah').select('name').findOne().stream();
 
@@ -120,7 +118,6 @@ describe('query stream:', function() {
       assert.ifError(err);
       assert.equal(i, 0);
       process.nextTick(function() {
-        db.close();
         assert.strictEqual(null, stream._fields);
         done();
       });
@@ -138,10 +135,8 @@ describe('query stream:', function() {
   it('destroying a stream stops it', function(done) {
     this.slow(300);
 
-    var db = start(),
-        P = db.model('PersonForStream', collection),
-        finished = 0,
-        i = 0;
+    var finished = 0;
+    var i = 0;
 
     var stream = P.where('name').exists().limit(10).select('_id').stream();
 
@@ -151,7 +146,6 @@ describe('query stream:', function() {
     function cb(err) {
       ++finished;
       setTimeout(function() {
-        db.close();
         assert.strictEqual(undefined, err);
         assert.equal(i, 5);
         assert.equal(finished, 1);
@@ -177,11 +171,12 @@ describe('query stream:', function() {
   it('errors', function(done) {
     this.slow(300);
 
-    var db = start({server: {auto_reconnect: false}}),
-        P = db.model('PersonForStream', collection),
-        finished = 0,
-        closed = 0,
-        i = 0;
+    var db = start({server: {auto_reconnect: false}});
+    var P = db.model('PersonForStream', collection);
+
+    var finished = 0;
+    var closed = 0;
+    var i = 0;
 
     var stream = P.find().batchSize(5).stream();
 
@@ -213,17 +208,14 @@ describe('query stream:', function() {
   });
 
   it('pipe', function(done) {
-    var db = start(),
-        P = db.model('PersonForStream', collection),
-        filename = '/tmp/_mongoose_stream_out.txt',
-        out = fs.createWriteStream(filename);
+    var filename = '/tmp/_mongoose_stream_out.txt';
+    var out = fs.createWriteStream(filename);
 
     var opts = {transform: JSON.stringify};
     var stream = P.find().sort('name').limit(20).stream(opts);
     stream.pipe(out);
 
     function cb(err) {
-      db.close();
       assert.ifError(err);
       var contents = fs.readFileSync(filename, 'utf8');
       assert.ok(/Aaden/.test(contents));
@@ -240,16 +232,13 @@ describe('query stream:', function() {
   });
 
   it('lean', function(done) {
-    var db = start(),
-        P = db.model('PersonForStream', collection),
-        i = 0,
-        closed = 0,
-        err;
+    var i = 0;
+    var closed = 0;
+    var err;
 
     var stream = P.find({}).lean().stream();
 
     function cb() {
-      db.close();
       assert.strictEqual(undefined, err);
       assert.equal(names.length, i);
       assert.equal(closed, 1);
@@ -291,8 +280,6 @@ describe('query stream:', function() {
   it('supports $elemMatch with $in (gh-1091)', function(done) {
     this.timeout(3000);
 
-    var db = start();
-
     var postSchema = new Schema({
       ids: [{type: Schema.ObjectId}],
       title: String
@@ -321,15 +308,12 @@ describe('query stream:', function() {
           error = err;
         }).
         on('close', function() {
-          db.close();
           done(error);
         });
     });
   });
 
   it('supports population (gh-1411)', function(done) {
-    var db = start();
-
     var barSchema = new Schema({
       value: Number
     });
@@ -347,7 +331,7 @@ describe('query stream:', function() {
         assert.ok(~found.indexOf(2));
         assert.ok(~found.indexOf(3));
       }
-      db.close(done);
+      done();
     }
 
     Bar.create({value: 2}, {value: 3}, function(err, bar1, bar2) {
@@ -370,8 +354,6 @@ describe('query stream:', function() {
   });
 
   it('respects schema options (gh-1862)', function(done) {
-    var db = start();
-
     var schema = new Schema({
       fullname: {type: String},
       password: {type: String, select: false}
@@ -381,15 +363,13 @@ describe('query stream:', function() {
     User.create({fullname: 'val', password: 'taco'}, function(error) {
       assert.ifError(error);
       User.find().stream().on('data', function(doc) {
-        assert.equal(doc.password, undefined);
-        db.close(done);
+        assert.equal(doc.password, void 0);
+        done();
       });
     });
   });
 
   it('works with populate + lean (gh-2841)', function(done) {
-    var db = start();
-
     var Sku = db.model('Sku', {}, 'gh2841_0');
     var Item = db.model('Item', {
       sku: {ref: 'Sku', type: Schema.Types.ObjectId}
@@ -409,15 +389,13 @@ describe('query stream:', function() {
         });
         stream.on('end', function() {
           assert.equal(found, 1);
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   it('works with populate + dynref (gh-3108)', function(done) {
-    var db = start();
-
     var reviewSchema = new Schema({
       _id: Number,
       text: String,
@@ -493,7 +471,7 @@ describe('query stream:', function() {
 
       stream.on('close', function() {
         assert.equal(count, 2);
-        db.close(done);
+        done();
       });
     };
 

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.4.20",
+  "version": "4.5.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,7 +22,7 @@
     "async": "1.5.2",
     "bson": "~0.4.23",
     "hooks-fixed": "1.1.0",
-    "kareem": "1.0.1",
+    "kareem": "1.1.0",
     "mongodb": "2.1.18",
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
@@ -36,7 +36,7 @@
     "acquit": "0.4.1",
     "acquit-ignore": "0.0.3",
     "benchmark": "2.0.0",
-    "bluebird": "3.1.4",
+    "bluebird": "3.4.0",
     "co": "4.6.0",
     "dox": "0.3.1",
     "eslint": "2.4.0",

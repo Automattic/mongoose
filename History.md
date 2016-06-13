@@ -1,3 +1,21 @@
+4.5.0 / 2016-06-13
+==================
+ * feat(query): added Query.prototype.catch() #4215 #4173 [adambuczynski](https://github.com/adambuczynski)
+ * feat(query): add Query.prototype.cursor() as a .stream() alternative #4117 #3637 #1907
+ * feat(document): add markUnmodified() function #4092 [vincentcr](https://github.com/vincentcr)
+ * feat(aggregate): convert aggregate object to a thenable #3995 #3946 [megagon](https://github.com/megagon)
+ * perf(types): remove defineProperties call for array #3886
+ * feat(model): add hooks for insertMany() #3846
+ * feat(schema): add support for custom query methods #3740 #2372
+ * feat(drivers): emit error on 'serverClosed' because that means that reconnect failed #3615
+ * feat(model): emit error event when callback throws exception #3499
+ * feat(model): inherit options from discriminator base schema #3414 #1818
+ * feat(populate): expose mongoose-populate-virtuals inspired populate API #2562
+ * feat(document): trigger remove hooks on subdocs when removing parent #2348
+ * feat(schema): add support for express-style error handling middleware #2284
+ * fix(model): disallow setting discriminator key #2041
+ * feat(schema): add support for nested arrays #1361
+
 4.4.20 / 2016-06-05
 ===================
  * docs: clarify command buffering when using driver directly #4195

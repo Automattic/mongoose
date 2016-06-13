@@ -1723,289 +1723,326 @@ describe('document', function() {
     db.close(done);
   });
 
-  it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
-    var db = start();
-    var parentSchema = mongoose.Schema({
-      c: {type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1'}
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
     });
 
-    var called = [];
-    parentSchema.options.toJSON = {
-      transform: function(doc, ret) {
-        called.push(ret);
-        return ret;
-      }
-    };
-
-    var childSchema = mongoose.Schema({
-      name: String
+    after(function(done) {
+      db.close(done);
     });
 
-    var childCalled = [];
-    childSchema.options.toJSON = {
-      transform: function(doc, ret) {
-        childCalled.push(ret);
-        return ret;
-      }
-    };
+    it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
+      var parentSchema = mongoose.Schema({
+        c: {type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1'}
+      });
 
-    var Child = db.model('gh-2910-1', childSchema);
-    var Parent = db.model('gh-2910-0', parentSchema);
+      var called = [];
+      parentSchema.options.toJSON = {
+        transform: function(doc, ret) {
+          called.push(ret);
+          return ret;
+        }
+      };
 
-    Child.create({name: 'test'}, function(error, c) {
-      Parent.create({c: c._id}, function(error, p) {
-        Parent.findOne({_id: p._id}).populate('c').exec(function(error, p) {
-          var doc = p.toJSON();
-          assert.equal(called.length, 1);
-          assert.equal(called[0]._id.toString(), p._id.toString());
-          assert.equal(doc._id.toString(), p._id.toString());
-          assert.equal(childCalled.length, 1);
-          assert.equal(childCalled[0]._id.toString(), c._id.toString());
+      var childSchema = mongoose.Schema({
+        name: String
+      });
 
-          called = [];
-          childCalled = [];
+      var childCalled = [];
+      childSchema.options.toJSON = {
+        transform: function(doc, ret) {
+          childCalled.push(ret);
+          return ret;
+        }
+      };
 
-          // JSON.stringify() passes field name, so make sure we don't treat
-          // that as a param to toJSON (gh-2990)
-          doc = JSON.parse(JSON.stringify({parent: p})).parent;
-          assert.equal(called.length, 1);
-          assert.equal(called[0]._id.toString(), p._id.toString());
-          assert.equal(doc._id.toString(), p._id.toString());
-          assert.equal(childCalled.length, 1);
-          assert.equal(childCalled[0]._id.toString(), c._id.toString());
+      var Child = db.model('gh-2910-1', childSchema);
+      var Parent = db.model('gh-2910-0', parentSchema);
 
-          db.close(done);
+      Child.create({name: 'test'}, function(error, c) {
+        Parent.create({c: c._id}, function(error, p) {
+          Parent.findOne({_id: p._id}).populate('c').exec(function(error, p) {
+            var doc = p.toJSON();
+            assert.equal(called.length, 1);
+            assert.equal(called[0]._id.toString(), p._id.toString());
+            assert.equal(doc._id.toString(), p._id.toString());
+            assert.equal(childCalled.length, 1);
+            assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
+            called = [];
+            childCalled = [];
+
+            // JSON.stringify() passes field name, so make sure we don't treat
+            // that as a param to toJSON (gh-2990)
+            doc = JSON.parse(JSON.stringify({parent: p})).parent;
+            assert.equal(called.length, 1);
+            assert.equal(called[0]._id.toString(), p._id.toString());
+            assert.equal(doc._id.toString(), p._id.toString());
+            assert.equal(childCalled.length, 1);
+            assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
+            done();
+          });
         });
       });
     });
-  });
 
-  it('setters firing with objects on real paths (gh-2943)', function(done) {
-    var M = mongoose.model('gh2943', {
-      myStr: {
-        type: String, set: function(v) {
-          return v.value;
-        }
-      },
-      otherStr: String
+    it('setters firing with objects on real paths (gh-2943)', function(done) {
+      var M = mongoose.model('gh2943', {
+        myStr: {
+          type: String, set: function(v) {
+            return v.value;
+          }
+        },
+        otherStr: String
+      });
+
+      var t = new M({myStr: {value: 'test'}});
+      assert.equal(t.myStr, 'test');
+
+      new M({otherStr: {value: 'test'}});
+      assert.ok(!t.otherStr);
+
+      done();
     });
 
-    var t = new M({myStr: {value: 'test'}});
-    assert.equal(t.myStr, 'test');
+    describe('gh-2782', function() {
+      it('should set data from a sub doc', function(done) {
+        var schema1 = new mongoose.Schema({
+          data: {
+            email: String
+          }
+        });
+        var schema2 = new mongoose.Schema({
+          email: String
+        });
+        var Model1 = mongoose.model('gh-2782-1', schema1);
+        var Model2 = mongoose.model('gh-2782-2', schema2);
 
-    new M({otherStr: {value: 'test'}});
-    assert.ok(!t.otherStr);
+        var doc1 = new Model1({'data.email': 'some@example.com'});
+        assert.equal(doc1.data.email, 'some@example.com');
+        var doc2 = new Model2();
+        doc2.set(doc1.data);
+        assert.equal(doc2.email, 'some@example.com');
+        done();
+      });
+    });
 
-    done();
-  });
-
-  describe('gh-2782', function() {
-    it('should set data from a sub doc', function(done) {
+    it('set data from subdoc keys (gh-3346)', function(done) {
       var schema1 = new mongoose.Schema({
         data: {
           email: String
         }
       });
-      var schema2 = new mongoose.Schema({
-        email: String
-      });
-      var Model1 = mongoose.model('gh-2782-1', schema1);
-      var Model2 = mongoose.model('gh-2782-2', schema2);
+      var Model1 = mongoose.model('gh3346', schema1);
 
       var doc1 = new Model1({'data.email': 'some@example.com'});
       assert.equal(doc1.data.email, 'some@example.com');
-      var doc2 = new Model2();
-      doc2.set(doc1.data);
-      assert.equal(doc2.email, 'some@example.com');
+      var doc2 = new Model1({data: doc1.data});
+      assert.equal(doc2.data.email, 'some@example.com');
       done();
     });
-  });
 
-  it('set data from subdoc keys (gh-3346)', function(done) {
-    var schema1 = new mongoose.Schema({
-      data: {
+    it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
+      var M = mongoose.model('gh3030', {
+        myStr: {
+          type: String
+        }
+      });
+
+      var t = new M({myStr: {thisIs: 'anObject'}});
+      assert.ok(!t.myStr);
+      t.validate(function(error) {
+        assert.ok(error);
+        done();
+      });
+    });
+
+    it('single embedded schemas (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
         email: String
-      }
-    });
-    var Model1 = mongoose.model('gh3346', schema1);
+      }, {_id: false, id: false});
 
-    var doc1 = new Model1({'data.email': 'some@example.com'});
-    assert.equal(doc1.data.email, 'some@example.com');
-    var doc2 = new Model1({data: doc1.data});
-    assert.equal(doc2.data.email, 'some@example.com');
-    done();
-  });
-
-  it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
-    var M = mongoose.model('gh3030', {
-      myStr: {
-        type: String
-      }
-    });
-
-    var t = new M({myStr: {thisIs: 'anObject'}});
-    assert.ok(!t.myStr);
-    t.validate(function(error) {
-      assert.ok(error);
-      done();
-    });
-  });
-
-  it('single embedded schemas (gh-2689)', function(done) {
-    var db = start();
-
-    var userSchema = new mongoose.Schema({
-      name: String,
-      email: String
-    }, {_id: false, id: false});
-
-    var userHookCount = 0;
-    userSchema.pre('save', function(next) {
-      ++userHookCount;
-      next();
-    });
-
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
-
-    var eventHookCount = 0;
-    eventSchema.pre('save', function(next) {
-      ++eventHookCount;
-      next();
-    });
-
-    var Event = db.model('gh2689', eventSchema);
-
-    var e = new Event({name: 'test', user: {name: 123, email: 'val'}});
-    e.save(function(error) {
-      assert.ifError(error);
-      assert.strictEqual(e.user.name, '123');
-      assert.equal(eventHookCount, 1);
-      assert.equal(userHookCount, 1);
-
-      Event.findOne(
-          {user: {name: '123', email: 'val'}},
-          function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-
-            Event.findOne(
-                {user: {$in: [{name: '123', email: 'val'}]}},
-                function(error, doc) {
-                  assert.ifError(error);
-                  assert.ok(doc);
-                  db.close(done);
-                });
-          });
-    });
-  });
-
-  it('single embedded schemas with validation (gh-2689)', function(done) {
-    var db = start();
-
-    var userSchema = new mongoose.Schema({
-      name: String,
-      email: {type: String, required: true, match: /.+@.+/}
-    }, {_id: false, id: false});
-
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
-
-    var Event = db.model('gh2689_1', eventSchema);
-
-    var e = new Event({name: 'test', user: {}});
-    var error = e.validateSync();
-    assert.ok(error);
-    assert.ok(error.errors['user.email']);
-    assert.equal(error.errors['user.email'].kind, 'required');
-
-    e.user.email = 'val';
-    error = e.validateSync();
-
-    assert.ok(error);
-    assert.ok(error.errors['user.email']);
-    assert.equal(error.errors['user.email'].kind, 'regexp');
-
-    db.close(done);
-  });
-
-  it('single embedded schemas with markmodified (gh-2689)', function(done) {
-    var db = start();
-
-    var userSchema = new mongoose.Schema({
-      name: String,
-      email: {type: String, required: true, match: /.+@.+/}
-    }, {_id: false, id: false});
-
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
-
-    var Event = db.model('gh2689_2', eventSchema);
-
-    var e = new Event({name: 'test', user: {email: 'a@b'}});
-    e.save(function(error, doc) {
-      assert.ifError(error);
-      assert.ok(doc);
-      assert.ok(!doc.isModified('user'));
-      assert.ok(!doc.isModified('user.email'));
-      assert.ok(!doc.isModified('user.name'));
-      doc.user.name = 'Val';
-      assert.ok(doc.isModified('user'));
-      assert.ok(!doc.isModified('user.email'));
-      assert.ok(doc.isModified('user.name'));
-
-      var delta = doc.$__delta()[1];
-      assert.deepEqual(delta, {
-        $set: {'user.name': 'Val'}
+      var userHookCount = 0;
+      userSchema.pre('save', function(next) {
+        ++userHookCount;
+        next();
       });
 
-      doc.save(function(error) {
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var eventHookCount = 0;
+      eventSchema.pre('save', function(next) {
+        ++eventHookCount;
+        next();
+      });
+
+      var Event = db.model('gh2689', eventSchema);
+
+      var e = new Event({name: 'test', user: {name: 123, email: 'val'}});
+      e.save(function(error) {
         assert.ifError(error);
-        Event.findOne({_id: doc._id}, function(error, doc) {
-          assert.ifError(error);
-          assert.deepEqual(doc.user.toObject(), {email: 'a@b', name: 'Val'});
-          db.close(done);
-        });
+        assert.strictEqual(e.user.name, '123');
+        assert.equal(eventHookCount, 1);
+        assert.equal(userHookCount, 1);
+
+        Event.findOne(
+            {user: {name: '123', email: 'val'}},
+            function(error, doc) {
+              assert.ifError(error);
+              assert.ok(doc);
+
+              Event.findOne(
+                  {user: {$in: [{name: '123', email: 'val'}]}},
+                  function(error, doc) {
+                    assert.ifError(error);
+                    assert.ok(doc);
+                    done();
+                  });
+            });
       });
     });
-  });
 
-  it('single embedded schemas + update validators (gh-2689)', function(done) {
-    var db = start();
+    it('single embedded schemas with validation (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
 
-    var userSchema = new mongoose.Schema({
-      name: {type: String, default: 'Val'},
-      email: {type: String, required: true, match: /.+@.+/}
-    }, {_id: false, id: false});
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
 
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
+      var Event = db.model('gh2689_1', eventSchema);
 
-    var Event = db.model('gh2689_3', eventSchema);
-
-    var badUpdate = {$set: {'user.email': 'a'}};
-    var options = {runValidators: true};
-    Event.update({}, badUpdate, options, function(error) {
+      var e = new Event({name: 'test', user: {}});
+      var error = e.validateSync();
       assert.ok(error);
+      assert.ok(error.errors['user.email']);
+      assert.equal(error.errors['user.email'].kind, 'required');
+
+      e.user.email = 'val';
+      error = e.validateSync();
+
+      assert.ok(error);
+      assert.ok(error.errors['user.email']);
       assert.equal(error.errors['user.email'].kind, 'regexp');
 
-      var nestedUpdate = {name: 'test'};
-      var options = {upsert: true, setDefaultsOnInsert: true};
-      Event.update({}, nestedUpdate, options, function(error) {
+      done();
+    });
+
+    it('single embedded schemas with markmodified (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh2689_2', eventSchema);
+
+      var e = new Event({name: 'test', user: {email: 'a@b'}});
+      e.save(function(error, doc) {
         assert.ifError(error);
-        Event.findOne({name: 'test'}, function(error, ev) {
-          assert.ifError(error);
-          assert.equal(ev.user.name, 'Val');
-          db.close(done);
+        assert.ok(doc);
+        assert.ok(!doc.isModified('user'));
+        assert.ok(!doc.isModified('user.email'));
+        assert.ok(!doc.isModified('user.name'));
+        doc.user.name = 'Val';
+        assert.ok(doc.isModified('user'));
+        assert.ok(!doc.isModified('user.email'));
+        assert.ok(doc.isModified('user.name'));
+
+        var delta = doc.$__delta()[1];
+        assert.deepEqual(delta, {
+          $set: {'user.name': 'Val'}
         });
+
+        doc.save(function(error) {
+          assert.ifError(error);
+          Event.findOne({_id: doc._id}, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.user.toObject(), {email: 'a@b', name: 'Val'});
+            done();
+          });
+        });
+      });
+    });
+
+    it('single embedded schemas + update validators (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: {type: String, default: 'Val'},
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh2689_3', eventSchema);
+
+      var badUpdate = {$set: {'user.email': 'a'}};
+      var options = {runValidators: true};
+      Event.update({}, badUpdate, options, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['user.email'].kind, 'regexp');
+
+        var nestedUpdate = {name: 'test'};
+        var options = {upsert: true, setDefaultsOnInsert: true};
+        Event.update({}, nestedUpdate, options, function(error) {
+          assert.ifError(error);
+          Event.findOne({name: 'test'}, function(error, ev) {
+            assert.ifError(error);
+            assert.equal(ev.user.name, 'Val');
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  describe('error processing (gh-2284)', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('save errors', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
+
+      var Model = mongoose.model('gh2284', schema);
+
+      Model.create({}, function(error) {
+        assert.ok(error);
+        assert.equal(error.message, 'Catch all #2');
+        done();
       });
     });
   });
@@ -2713,6 +2750,37 @@ describe('document', function() {
       done();
     });
 
+    it('removing parent doc calls remove hooks on subdocs (gh-2348)', function(done) {
+      var ChildSchema = new Schema({
+        name: String
+      });
+
+      var called = {};
+      ChildSchema.pre('remove', function(next) {
+        called[this.name] = true;
+        next();
+      });
+
+      var ParentSchema = new Schema({
+        children: [ChildSchema]
+      });
+
+      var Parent = db.model('gh2348', ParentSchema);
+
+      var doc = { children: [{ name: 'Luke' }, { name: 'Leia' }] };
+      Parent.create(doc, function(error, doc) {
+        assert.ifError(error);
+        doc.remove(function(error) {
+          assert.ifError(error);
+          assert.deepEqual(called, {
+            Luke: true,
+            Leia: true
+          });
+          done();
+        });
+      });
+    });
+
     it('strings of length 12 are valid oids (gh-3365)', function(done) {
       var schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
       var M = db.model('gh3365', schema);
@@ -2745,6 +2813,79 @@ describe('document', function() {
         assert.ifError(error);
         assert.strictEqual(doc.topping.meat, void 0);
         done();
+      });
+    });
+
+    it('emits cb errors on model for save (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for save with hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.pre('save', function(next) {
+        next();
+      });
+
+      testSchema.post('save', function(doc, next) {
+        next();
+      });
+
+      var Test = db.model('gh3499_0', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499_1', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() + hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.post('find', function(results, next) {
+        assert.equal(results.length, 0);
+        next();
+      });
+
+      var Test = db.model('gh3499_2', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
       });
     });
   });

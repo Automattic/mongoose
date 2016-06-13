@@ -513,5 +513,49 @@ describe('document modified', function() {
             });
           });
     });
+
+
+    it('should reset the modified state after calling unmarkModified', function(done) {
+      var db = start();
+      var BlogPost = db.model(modelName, collection);
+
+      var b = new BlogPost();
+      assert.equal(b.isModified('author'), false);
+      b.author = 'foo';
+      assert.equal(b.isModified('author'), true);
+      assert.equal(b.isModified(), true);
+      b.unmarkModified('author');
+      assert.equal(b.isModified('author'), false);
+      assert.equal(b.isModified(), false);
+
+      b.save(function(err) {
+        assert.strictEqual(null, err);
+
+        BlogPost.findById(b._id, function(err2, b2) {
+          assert.strictEqual(null, err2);
+
+          assert.equal(b2.isModified('author'), false);
+          assert.equal(b2.isModified(), false);
+          b2.author = 'bar';
+          assert.equal(b2.isModified('author'), true);
+          assert.equal(b2.isModified(), true);
+          b2.unmarkModified('author');
+          assert.equal(b2.isModified('author'), false);
+          assert.equal(b2.isModified(), false);
+
+          b2.save(function(err3) {
+            assert.strictEqual(err3, null);
+            BlogPost.findById(b._id, function(err4, b3) {
+              assert.strictEqual(err4, null);
+              // was not saved because modified state was unset
+              assert.equal(b3.author, 'foo');
+              db.close();
+              done();
+            });
+          });
+        });
+      });
+    });
+
   });
 });

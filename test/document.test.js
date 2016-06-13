@@ -2011,6 +2011,52 @@ describe('document', function() {
         });
       });
     });
+  });
+
+  describe('error processing (gh-2284)', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('save errors', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
+
+      var Model = mongoose.model('gh2284', schema);
+
+      Model.create({}, function(error) {
+        assert.ok(error);
+        assert.equal(error.message, 'Catch all #2');
+        done();
+      });
+    });
+  });
+
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
 
     it('single embedded schemas with populate (gh-3501)', function(done) {
       var PopulateMeSchema = new Schema({});
@@ -2704,6 +2750,37 @@ describe('document', function() {
       done();
     });
 
+    it('removing parent doc calls remove hooks on subdocs (gh-2348)', function(done) {
+      var ChildSchema = new Schema({
+        name: String
+      });
+
+      var called = {};
+      ChildSchema.pre('remove', function(next) {
+        called[this.name] = true;
+        next();
+      });
+
+      var ParentSchema = new Schema({
+        children: [ChildSchema]
+      });
+
+      var Parent = db.model('gh2348', ParentSchema);
+
+      var doc = { children: [{ name: 'Luke' }, { name: 'Leia' }] };
+      Parent.create(doc, function(error, doc) {
+        assert.ifError(error);
+        doc.remove(function(error) {
+          assert.ifError(error);
+          assert.deepEqual(called, {
+            Luke: true,
+            Leia: true
+          });
+          done();
+        });
+      });
+    });
+
     it('strings of length 12 are valid oids (gh-3365)', function(done) {
       var schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
       var M = db.model('gh3365', schema);
@@ -2736,6 +2813,79 @@ describe('document', function() {
         assert.ifError(error);
         assert.strictEqual(doc.topping.meat, void 0);
         done();
+      });
+    });
+
+    it('emits cb errors on model for save (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for save with hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.pre('save', function(next) {
+        next();
+      });
+
+      testSchema.post('save', function(doc, next) {
+        next();
+      });
+
+      var Test = db.model('gh3499_0', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499_1', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() + hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.post('find', function(results, next) {
+        assert.equal(results.length, 0);
+        next();
+      });
+
+      var Test = db.model('gh3499_2', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
       });
     });
   });

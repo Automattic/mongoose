@@ -1636,6 +1636,28 @@ describe('Query', function() {
         });
       });
     });
+
+    it('custom query methods (gh-3714)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      schema.query.byName = function(name) {
+        return this.find({ name: name });
+      };
+
+      var MyModel = db.model('gh3714', schema);
+
+      MyModel.create({ name: 'Val' }, function(error) {
+        assert.ifError(error);
+        MyModel.find().byName('Val').exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].name, 'Val');
+          done();
+        });
+      });
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {

@@ -399,6 +399,31 @@ describe('schema', function() {
       assert.equal(typeof mixed[3], 'object');
       assert.ok(mixed[4] instanceof Date);
       assert.ok(mixed[5] instanceof DocumentObjectId);
+
+      done();
+    });
+
+    it('array of arrays', function(done) {
+      var test = new Schema({
+        nums: [[Number]]
+      });
+      var nums = test.path('nums').cast([['1', '2']]);
+      assert.deepEqual(nums, [[1, 2]]);
+
+      nums = test.path('nums').cast(1);
+      assert.deepEqual(nums, [[1]]);
+
+      var threw = false;
+      try {
+        test.path('nums').cast([['abcd']]);
+      } catch (error) {
+        threw = true;
+        assert.equal(error.name, 'CastError');
+        assert.equal(error.message,
+          'Cast to [[number]] failed for value "[["abcd"]]" at path "nums"');
+      }
+      assert.ok(threw);
+
       done();
     });
 
@@ -747,15 +772,15 @@ describe('schema', function() {
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 3);
+      assert.equal(Tobi.callQueue.length, 4);
 
       Tobi.post('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 4);
+      assert.equal(Tobi.callQueue.length, 5);
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 5);
+      assert.equal(Tobi.callQueue.length, 6);
       done();
     });
   });

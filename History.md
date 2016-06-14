@@ -4,7 +4,7 @@
  * feat(query): add Query.prototype.cursor() as a .stream() alternative #4117 #3637 #1907
  * feat(document): add markUnmodified() function #4092 [vincentcr](https://github.com/vincentcr)
  * feat(aggregate): convert aggregate object to a thenable #3995 #3946 [megagon](https://github.com/megagon)
- * perf(types): remove defineProperties call for array #3886
+ * perf(types): remove defineProperties call for array (**Note:** Because of this, a mongoose array will no longer `assert.deepEqual()` a plain old JS array) #3886
  * feat(model): add hooks for insertMany() #3846
  * feat(schema): add support for custom query methods #3740 #2372
  * feat(drivers): emit error on 'serverClosed' because that means that reconnect failed #3615

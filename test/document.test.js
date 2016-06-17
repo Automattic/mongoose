@@ -2964,5 +2964,34 @@ describe('document', function() {
         throw new Error('fail!');
       });
     });
+
+    it('clears subpaths when removing single nested (gh-4216)', function(done) {
+      var RecurrenceSchema = new Schema({
+        frequency: Number,
+        interval: {
+          type: String,
+          enum: ['days', 'weeks', 'months', 'years']
+        }
+      }, { _id: false });
+
+      var EventSchema = new Schema({
+        name: {
+          type: String,
+          trim: true
+        },
+        recurrence: RecurrenceSchema
+      });
+
+      var Event = db.model('gh4216', EventSchema);
+      var ev = new Event({
+        name: 'test',
+        recurrence: { frequency: 2, interval: 'days' }
+      });
+      ev.recurrence = null;
+      ev.save(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 });

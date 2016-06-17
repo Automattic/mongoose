@@ -2993,5 +2993,29 @@ describe('document', function() {
         done();
       });
     });
+
+    it('setting path to empty object works (gh-4218)', function(done) {
+      var schema = new Schema({
+        object: {
+          nested: {
+            field1: { type: Number, default: 1 }
+          }
+        }
+      });
+
+      var MyModel = db.model('gh4218', schema);
+
+      MyModel.create({}, function(error, doc) {
+        doc.object.nested = {};
+        doc.save(function(error, doc) {
+          assert.ifError(error);
+          MyModel.collection.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.object.nested, {});
+            done();
+          });
+        });
+      });
+    });
   });
 });

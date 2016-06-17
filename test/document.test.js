@@ -816,6 +816,96 @@ describe('document', function() {
     });
   });
 
+  describe('inspect', function() {
+    var db;
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('inspect inherits schema options (gh-4001)', function(done) {
+      var opts = {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      };
+      var taskSchema = mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      }, opts);
+
+      taskSchema.virtual('title').
+        get(function() {
+          return this.name;
+        }).
+        set(function(title) {
+          this.name = title;
+        });
+
+      var Task = db.model('gh4001', taskSchema);
+
+      var doc = { name: 'task1', title: 'task999' };
+      Task.collection.insert(doc, function(error) {
+        assert.ifError(error);
+        Task.findById(doc._id, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.inspect().title, 'task1');
+          done();
+        });
+      });
+    });
+
+    it('does not apply transform to populated docs (gh-4213)', function(done) {
+      var UserSchema = new Schema({
+        name: String
+      });
+
+      var PostSchema = new Schema({
+        title: String,
+        postedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh4213'
+        }
+      }, {
+        toObject: {
+          transform: function(doc, ret) {
+            delete ret._id;
+          }
+        },
+        toJSON: {
+          transform: function(doc, ret) {
+            delete ret._id;
+          }
+        }
+      });
+
+      var User = db.model('gh4213', UserSchema);
+      var Post = db.model('gh4213_0', PostSchema);
+
+      var val = new User({ name: 'Val' });
+      var post = new Post({ title: 'Test', postedBy: val._id });
+
+      Post.create(post, function(error) {
+        assert.ifError(error);
+        User.create(val, function(error) {
+          assert.ifError(error);
+          Post.find({}).
+            populate('postedBy').
+            exec(function(error, posts) {
+              assert.ifError(error);
+              assert.equal(posts.length, 1);
+              assert.ok(posts[0].postedBy._id);
+              done();
+            });
+        });
+      });
+    });
+  });
+
   describe('#update', function() {
     it('returns a Query', function(done) {
       var mg = new mongoose.Mongoose;
@@ -2593,39 +2683,6 @@ describe('document', function() {
             assert.strictEqual(nestedModel.isNew, false);
             done();
           });
-        });
-      });
-    });
-
-    it('inspect inherits schema options (gh-4001)', function(done) {
-      var opts = {
-        toObject: { virtuals: true },
-        toJSON: { virtuals: true }
-      };
-      var taskSchema = mongoose.Schema({
-        name: {
-          type: String,
-          required: true
-        }
-      }, opts);
-
-      taskSchema.virtual('title').
-        get(function() {
-          return this.name;
-        }).
-        set(function(title) {
-          this.name = title;
-        });
-
-      var Task = db.model('gh4001', taskSchema);
-
-      var doc = { name: 'task1', title: 'task999' };
-      Task.collection.insert(doc, function(error) {
-        assert.ifError(error);
-        Task.findById(doc._id, function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.inspect().title, 'task1');
-          done();
         });
       });
     });

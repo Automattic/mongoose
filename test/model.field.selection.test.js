@@ -304,7 +304,7 @@ describe('model field selection', function() {
       });
     });
 
-    it('disallows saving modified elemMatch paths (gh-1334)', function(done) {
+    it('saves modified elemMatch paths (gh-1334)', function(done) {
       var db = start();
 
       var postSchema = new Schema({
@@ -321,20 +321,32 @@ describe('model field selection', function() {
 
         B
         .findById(doc._id)
-        .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
         .select({ids2: {$elemMatch: {$in: [_id1.toString()]}}})
         .exec(function(err, found) {
           assert.ifError(err);
-          assert.equal(found.ids.length, 1);
           assert.equal(found.ids2.length, 1);
-          found.ids = [];
           found.ids2.set(0, _id2);
+
           found.save(function(err) {
-            db.close();
-            assert.ok(/\$elemMatch projection/.test(err));
-            assert.ok(/ ids/.test(err));
-            assert.ok(/ ids2/.test(err));
-            done();
+            assert.ifError(err);
+
+            B
+            .findById(doc._id)
+            .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
+            .select('ids2')
+            .exec(function(err, found) {
+              assert.equal(2, found.ids2.length);
+              assert.equal(_id2.toHexString(), found.ids2[0].toHexString());
+              assert.equal(_id2.toHexString(), found.ids2[1].toHexString());
+
+              found.ids.pull(_id2);
+
+              found.save(function(err) {
+                assert.ok(err);
+
+                db.close(done);
+              });
+            });
           });
         });
       });

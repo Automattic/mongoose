@@ -237,7 +237,7 @@ describe('model', function() {
       var PersonSchema = new BaseSchema();
       var BossSchema = new BaseSchema({
         department: String
-      });
+      }, { id: false });
 
       assert.doesNotThrow(function() {
         var Person = db.model('gh2821', PersonSchema);
@@ -260,15 +260,12 @@ describe('model', function() {
       });
 
       it('is not customizable', function(done) {
-        var errorMessage,
-            CustomizedSchema = new Schema({}, {capped: true});
-        try {
-          Person.discriminator('model-discriminator-custom', CustomizedSchema);
-        } catch (e) {
-          errorMessage = e.message;
-        }
+        var CustomizedSchema = new Schema({}, {capped: true});
 
-        assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON, toObject, _id)');
+        assert.throws(function() {
+          Person.discriminator('model-discriminator-custom', CustomizedSchema);
+        }, /Can't customize discriminator option capped/);
+
         done();
       });
     });
@@ -322,7 +319,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 4);
+        assert.equal(Employee.schema.callQueue.length, 5);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
@@ -350,6 +347,12 @@ describe('model', function() {
         delete employeeOptions.toObject;
 
         assert.deepEqual(personOptions, employeeOptions);
+        done();
+      });
+
+      it('does not allow setting discriminator key (gh-2041)', function(done) {
+        var doc = new Employee({ __t: 'fake' });
+        assert.equal(doc.__t, 'model-discriminator-employee');
         done();
       });
     });

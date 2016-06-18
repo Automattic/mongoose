@@ -5229,6 +5229,31 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() hooks (gh-3846)', function(done) {
+      var schema = new Schema({
+        name: String
+      });
+      var calledPre = 0;
+      var calledPost = 0;
+      schema.pre('insertMany', function(next) {
+        ++calledPre;
+        next();
+      });
+      schema.post('insertMany', function() {
+        ++calledPost;
+      });
+      var Movie = db.model('gh3846', schema);
+
+      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      Movie.insertMany(arr, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 2);
+        assert.equal(calledPre, 1);
+        assert.equal(calledPost, 1);
+        done();
+      });
+    });
+
     it('insertMany() with timestamps (gh-723)', function(done) {
       var schema = new Schema({
         name: String
@@ -5246,6 +5271,21 @@ describe('Model', function() {
           assert.equal(docs.length, 2);
           done();
         });
+      });
+    });
+
+    it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
+      var schema = new Schema({ name: 'String' });
+      var Movie = db.model('gh3222', schema);
+
+      Movie.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Movie.create({ name: 'Conan the Barbarian' }, function(error) {
+        assert.ifError(error);
+        throw new Error('fail!');
       });
     });
 

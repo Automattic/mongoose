@@ -3067,7 +3067,7 @@ describe('model: populate:', function() {
     }
   });
 
-  describe('edge cases', function() {
+  describe('github issues', function() {
     var db;
 
     before(function() {
@@ -3703,6 +3703,155 @@ describe('model: populate:', function() {
               assert.ok(things[1].createdBy.name);
               done();
             });
+          });
+        });
+      });
+    });
+
+    describe('populate virtuals (gh-2562)', function() {
+      it('basic populate virtuals', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          band: String
+        });
+
+        var BandSchema = new Schema({
+          name: String
+        });
+        BandSchema.virtual('members', {
+          ref: 'gh2562',
+          localField: 'name',
+          foreignField: 'band'
+        });
+
+        var Person = db.model('gh2562', PersonSchema);
+        var Band = db.model('gh2562_0', BandSchema);
+
+        var people = _.map(['Axl Rose', 'Slash'], function(v) {
+          return { name: v, band: 'Guns N\' Roses' };
+        });
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          Band.create({ name: 'Guns N\' Roses' }, function(error) {
+            assert.ifError(error);
+            var query = { name: 'Guns N\' Roses' };
+            Band.findOne(query).populate('members').exec(function(error, gnr) {
+              assert.ifError(error);
+              assert.equal(gnr.members.length, 2);
+              done();
+            });
+          });
+        });
+      });
+
+      it('multiple source docs', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          band: String
+        });
+
+        var BandSchema = new Schema({
+          name: String
+        });
+        BandSchema.virtual('members', {
+          ref: 'gh2562_a0',
+          localField: 'name',
+          foreignField: 'band'
+        });
+
+        var Person = db.model('gh2562_a0', PersonSchema);
+        var Band = db.model('gh2562_a1', BandSchema);
+
+        var people = _.map(['Axl Rose', 'Slash'], function(v) {
+          return { name: v, band: 'Guns N\' Roses' };
+        });
+        people = people.concat(_.map(['Vince Neil', 'Nikki Sixx'], function(v) {
+          return { name: v, band: 'Motley Crue' };
+        }));
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          var bands = [
+            { name: 'Guns N\' Roses' },
+            { name: 'Motley Crue' }
+          ];
+          Band.create(bands, function(error) {
+            assert.ifError(error);
+            Band.
+              find({}).
+              sort({ name: 1 }).
+              populate({ path: 'members', options: { sort: { name: 1 } } }).
+              exec(function(error, bands) {
+                assert.ifError(error);
+
+                assert.equal(bands.length, 2);
+                assert.equal(bands[0].name, 'Guns N\' Roses');
+                assert.equal(bands[0].members.length, 2);
+                assert.deepEqual(_.map(bands[0].members, 'name'),
+                  ['Axl Rose', 'Slash']);
+
+                assert.equal(bands[1].name, 'Motley Crue');
+                assert.equal(bands[1].members.length, 2);
+                assert.deepEqual(_.map(bands[1].members, 'name'),
+                  ['Nikki Sixx', 'Vince Neil']);
+                done();
+              });
+          });
+        });
+      });
+
+      it('source array', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        var BandSchema = new Schema({
+          name: String,
+          people: [String]
+        });
+        BandSchema.virtual('members', {
+          ref: 'gh2562_b0',
+          localField: 'people',
+          foreignField: 'name'
+        });
+
+        var Person = db.model('gh2562_b0', PersonSchema);
+        var Band = db.model('gh2562_b1', BandSchema);
+
+        var bands = [
+          { name: 'Guns N\' Roses', people: ['Axl Rose', 'Slash'] },
+          { name: 'Motley Crue', people: ['Vince Neil', 'Nikki Sixx'] }
+        ];
+        var people = [
+          { name: 'Axl Rose' },
+          { name: 'Slash' },
+          { name: 'Vince Neil' },
+          { name: 'Nikki Sixx' }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          Band.insertMany(bands, function(error) {
+            assert.ifError(error);
+            Band.
+              find({}).
+              sort({ name: 1 }).
+              populate({ path: 'members', options: { sort: { name: 1 } } }).
+              exec(function(error, bands) {
+                assert.ifError(error);
+
+                assert.equal(bands.length, 2);
+                assert.equal(bands[0].name, 'Guns N\' Roses');
+                assert.equal(bands[0].members.length, 2);
+                assert.deepEqual(_.map(bands[0].members, 'name'),
+                  ['Axl Rose', 'Slash']);
+
+                assert.equal(bands[1].name, 'Motley Crue');
+                assert.equal(bands[1].members.length, 2);
+                assert.deepEqual(_.map(bands[1].members, 'name'),
+                  ['Nikki Sixx', 'Vince Neil']);
+
+                done();
+              });
           });
         });
       });

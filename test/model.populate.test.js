@@ -3855,6 +3855,54 @@ describe('model: populate:', function() {
           });
         });
       });
+
+      it('multiple paths (gh-4234)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number],
+          favorites: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: 'gh4234',
+          localField: '_id',
+          foreignField: 'authored'
+        });
+        BlogPostSchema.virtual('favoritedBy', {
+          ref: 'gh4234',
+          localField: '_id',
+          foreignField: 'favorites'
+        });
+
+        var Person = db.model('gh4234', PersonSchema);
+        var BlogPost = db.model('gh4234_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [{ name: 'Val', authored: [0], favorites: [0] }];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate('authors favoritedBy').
+              exec(function(error, post) {
+                assert.ifError(error);
+                console.log(post.toObject({ virtuals: true }));
+                assert.equal(post.authors.length, 1);
+                assert.equal(post.authors[0].name, 'Val');
+                assert.equal(post.favoritedBy.length, 1);
+                assert.equal(post.favoritedBy[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
     });
   });
 });

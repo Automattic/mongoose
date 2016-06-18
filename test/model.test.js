@@ -5274,6 +5274,25 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() with promises (gh-4237)', function(done) {
+      var schema = new Schema({
+        name: String
+      });
+      var Movie = db.model('gh4237', schema);
+
+      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      Movie.insertMany(arr).then(function(docs) {
+        assert.equal(docs.length, 2);
+        assert.ok(!docs[0].isNew);
+        assert.ok(!docs[1].isNew);
+        Movie.find({}, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 2);
+          done();
+        });
+      });
+    });
+
     it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
       var schema = new Schema({ name: 'String' });
       var Movie = db.model('gh3222', schema);

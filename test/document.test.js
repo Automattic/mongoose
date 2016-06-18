@@ -499,299 +499,408 @@ describe('document', function() {
     });
   });
 
-  it('does not apply toObject functions of subdocuments to root document', function(done) {
-    var subdocSchema = new Schema({
-      test: String,
-      wow: String
+  describe('toObject', function() {
+    var db;
+    before(function() {
+      db = start();
     });
 
-    subdocSchema.options.toObject = {};
-    subdocSchema.options.toObject.transform = function(doc, ret) {
-      delete ret.wow;
-    };
-
-    var docSchema = new Schema({
-      foo: String,
-      wow: Boolean,
-      sub: [subdocSchema]
-    });
-
-    var db = start(),
-        Doc = db.model('Doc', docSchema);
-
-    Doc.create({
-      foo: 'someString',
-      wow: true,
-      sub: [{
-        test: 'someOtherString',
-        wow: 'thisIsAString'
-      }]
-    }, function(err, doc) {
-      var obj = doc.toObject({
-        transform: function(doc, ret) {
-          ret.phew = 'new';
-        }
-      });
-
-      assert.equal(obj.phew, 'new');
-      assert.ok(!doc.sub.wow);
-
+    after(function(done) {
       db.close(done);
     });
-  });
 
-  it('handles child schema transforms', function(done) {
-    var db = start();
-    var userSchema = new Schema({
-      name: String,
-      email: String
-    });
-    var topicSchema = new Schema({
-      title: String,
-      email: String,
-      followers: [userSchema]
-    });
+    it('does not apply toObject functions of subdocuments to root document', function(done) {
+      var subdocSchema = new Schema({
+        test: String,
+        wow: String
+      });
 
-    userSchema.options.toObject = {
-      transform: function(doc, ret) {
-        delete ret.email;
-      }
-    };
+      subdocSchema.options.toObject = {};
+      subdocSchema.options.toObject.transform = function(doc, ret) {
+        delete ret.wow;
+      };
 
-    topicSchema.options.toObject = {
-      transform: function(doc, ret) {
-        ret.title = ret.title.toLowerCase();
-      }
-    };
+      var docSchema = new Schema({
+        foo: String,
+        wow: Boolean,
+        sub: [subdocSchema]
+      });
 
-    var Topic = db.model('gh2691', topicSchema, 'gh2691');
+      var Doc = db.model('Doc', docSchema);
 
-    var topic = new Topic({
-      title: 'Favorite Foods',
-      email: 'a@b.co',
-      followers: [{name: 'Val', email: 'val@test.co'}]
-    });
+      Doc.create({
+        foo: 'someString',
+        wow: true,
+        sub: [{
+          test: 'someOtherString',
+          wow: 'thisIsAString'
+        }]
+      }, function(err, doc) {
+        var obj = doc.toObject({
+          transform: function(doc, ret) {
+            ret.phew = 'new';
+          }
+        });
 
-    var output = topic.toObject({transform: true});
-    assert.equal(output.title, 'favorite foods');
-    assert.equal(output.email, 'a@b.co');
-    assert.equal(output.followers[0].name, 'Val');
-    assert.equal(output.followers[0].email, undefined);
-    db.close(done);
-  });
+        assert.equal(obj.phew, 'new');
+        assert.ok(!doc.sub.wow);
 
-  it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
-    var db = start();
-    var userSchema = new Schema({
-      firstName: String,
-      lastName: String,
-      password: String
+        done();
+      });
     });
 
-    userSchema.virtual('fullName').get(function() {
-      return this.firstName + ' ' + this.lastName;
+    it('handles child schema transforms', function(done) {
+      var userSchema = new Schema({
+        name: String,
+        email: String
+      });
+      var topicSchema = new Schema({
+        title: String,
+        email: String,
+        followers: [userSchema]
+      });
+
+      userSchema.options.toObject = {
+        transform: function(doc, ret) {
+          delete ret.email;
+        }
+      };
+
+      topicSchema.options.toObject = {
+        transform: function(doc, ret) {
+          ret.title = ret.title.toLowerCase();
+        }
+      };
+
+      var Topic = db.model('gh2691', topicSchema, 'gh2691');
+
+      var topic = new Topic({
+        title: 'Favorite Foods',
+        email: 'a@b.co',
+        followers: [{name: 'Val', email: 'val@test.co'}]
+      });
+
+      var output = topic.toObject({transform: true});
+      assert.equal(output.title, 'favorite foods');
+      assert.equal(output.email, 'a@b.co');
+      assert.equal(output.followers[0].name, 'Val');
+      assert.equal(output.followers[0].email, undefined);
+      done();
     });
 
-    userSchema.set('toObject', {virtuals: false});
+    it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
+      var userSchema = new Schema({
+        firstName: String,
+        lastName: String,
+        password: String
+      });
 
-    var postSchema = new Schema({
-      owner: {type: Schema.Types.ObjectId, ref: 'gh-2035-user'},
-      content: String
-    });
+      userSchema.virtual('fullName').get(function() {
+        return this.firstName + ' ' + this.lastName;
+      });
 
-    postSchema.virtual('capContent').get(function() {
-      return this.content.toUpperCase();
-    });
+      userSchema.set('toObject', {virtuals: false});
 
-    postSchema.set('toObject', {virtuals: true});
-    var User = db.model('gh-2035-user', userSchema, 'gh-2035-user');
-    var Post = db.model('gh-2035-post', postSchema, 'gh-2035-post');
+      var postSchema = new Schema({
+        owner: {type: Schema.Types.ObjectId, ref: 'gh-2035-user'},
+        content: String
+      });
 
-    var user = new User({firstName: 'Joe', lastName: 'Smith', password: 'password'});
+      postSchema.virtual('capContent').get(function() {
+        return this.content.toUpperCase();
+      });
 
-    user.save(function(err, savedUser) {
-      assert.ifError(err);
-      var post = new Post({owner: savedUser._id, content: 'lorem ipsum'});
-      post.save(function(err, savedPost) {
+      postSchema.set('toObject', {virtuals: true});
+      var User = db.model('gh-2035-user', userSchema, 'gh-2035-user');
+      var Post = db.model('gh-2035-post', postSchema, 'gh-2035-post');
+
+      var user = new User({firstName: 'Joe', lastName: 'Smith', password: 'password'});
+
+      user.save(function(err, savedUser) {
         assert.ifError(err);
-        Post.findById(savedPost._id).populate('owner').exec(function(err, newPost) {
+        var post = new Post({owner: savedUser._id, content: 'lorem ipsum'});
+        post.save(function(err, savedPost) {
           assert.ifError(err);
-          var obj = newPost.toObject();
-          assert.equal(obj.owner.fullName, undefined);
-          db.close(done);
+          Post.findById(savedPost._id).populate('owner').exec(function(err, newPost) {
+            assert.ifError(err);
+            var obj = newPost.toObject();
+            assert.equal(obj.owner.fullName, undefined);
+            done();
+          });
         });
       });
     });
   });
 
-  it('toJSON options', function(done) {
-    var doc = new TestDocument();
-
-    doc.init({
-      test: 'test',
-      oids: [],
-      em: [{title: 'asdf'}],
-      nested: {
-        age: 5,
-        cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
-        path: 'my path'
-      },
-      nested2: {}
+  describe('toJSON', function() {
+    var db;
+    before(function() {
+      db = start();
     });
 
-    // override to check if toJSON gets fired
-    var path = TestDocument.prototype.schema.path('em');
-    path.casterConstructor.prototype.toJSON = function() {
-      return {};
-    };
+    after(function(done) {
+      db.close(done);
+    });
 
-    doc.schema.options.toJSON = {virtuals: true};
-    var clone = doc.toJSON();
-    assert.equal(clone.test, 'test');
-    assert.ok(clone.oids instanceof Array);
-    assert.equal(clone.nested.age, 5);
-    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal(clone.nested.path, 'my path');
-    assert.equal(clone.nested.agePlus2, 7);
-    assert.equal(clone.em[0].constructor.name, 'Object');
-    assert.equal(Object.keys(clone.em[0]).length, 0);
-    delete doc.schema.options.toJSON;
-    delete path.casterConstructor.prototype.toJSON;
+    it('toJSON options', function(done) {
+      var doc = new TestDocument();
 
-    doc.schema.options.toJSON = {minimize: false};
-    clone = doc.toJSON();
-    assert.equal(clone.nested2.constructor.name, 'Object');
-    assert.equal(Object.keys(clone.nested2).length, 1);
-    clone = doc.toJSON('8');
-    assert.equal(clone.nested2.constructor.name, 'Object');
-    assert.equal(Object.keys(clone.nested2).length, 1);
-
-    // gh-852
-    var arr = [doc],
-        err = false,
-        str;
-    try {
-      str = JSON.stringify(arr);
-    } catch (_) {
-      err = true;
-    }
-    assert.equal(err, false);
-    assert.ok(/nested2/.test(str));
-    assert.equal(clone.nested2.constructor.name, 'Object');
-    assert.equal(Object.keys(clone.nested2).length, 1);
-
-    // transform
-    doc.schema.options.toJSON = {};
-    doc.schema.options.toJSON.transform = function xform(doc, ret) {
-      // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
-        return;
-      }
-
-      delete ret.em;
-      delete ret.numbers;
-      delete ret.oids;
-      ret._id = ret._id.toString();
-    };
-
-    clone = doc.toJSON();
-    assert.equal(clone._id, doc.id);
-    assert.ok(undefined === clone.em);
-    assert.ok(undefined === clone.numbers);
-    assert.ok(undefined === clone.oids);
-    assert.equal(clone.test, 'test');
-    assert.equal(clone.nested.age, 5);
-
-    // transform with return value
-    var out = {myid: doc._id.toString()};
-    doc.schema.options.toJSON.transform = function(doc, ret) {
-      // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
-        return;
-      }
-
-      return {myid: ret._id.toString()};
-    };
-
-    clone = doc.toJSON();
-    assert.deepEqual(out, clone);
-
-    // ignored transform with inline options
-    clone = doc.toJSON({x: 1, transform: false});
-    assert.ok(!('myid' in clone));
-    assert.equal(clone.test, 'test');
-    assert.ok(clone.oids instanceof Array);
-    assert.equal(clone.nested.age, 5);
-    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal(clone.nested.path, 'my path');
-    assert.equal(clone.em[0].constructor.name, 'Object');
-
-    // applied transform when inline transform is true
-    clone = doc.toJSON({x: 1});
-    assert.deepEqual(out, clone);
-
-    // transform passed inline
-    function xform(self, doc, opts) {
-      opts.fields.split(' ').forEach(function(field) {
-        delete doc[field];
+      doc.init({
+        test: 'test',
+        oids: [],
+        em: [{title: 'asdf'}],
+        nested: {
+          age: 5,
+          cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+          path: 'my path'
+        },
+        nested2: {}
       });
-    }
 
-    clone = doc.toJSON({
-      transform: xform,
-      fields: '_id em numbers oids nested'
+      // override to check if toJSON gets fired
+      var path = TestDocument.prototype.schema.path('em');
+      path.casterConstructor.prototype.toJSON = function() {
+        return {};
+      };
+
+      doc.schema.options.toJSON = {virtuals: true};
+      var clone = doc.toJSON();
+      assert.equal(clone.test, 'test');
+      assert.ok(clone.oids instanceof Array);
+      assert.equal(clone.nested.age, 5);
+      assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
+      assert.equal(clone.nested.path, 'my path');
+      assert.equal(clone.nested.agePlus2, 7);
+      assert.equal(clone.em[0].constructor.name, 'Object');
+      assert.equal(Object.keys(clone.em[0]).length, 0);
+      delete doc.schema.options.toJSON;
+      delete path.casterConstructor.prototype.toJSON;
+
+      doc.schema.options.toJSON = {minimize: false};
+      clone = doc.toJSON();
+      assert.equal(clone.nested2.constructor.name, 'Object');
+      assert.equal(Object.keys(clone.nested2).length, 1);
+      clone = doc.toJSON('8');
+      assert.equal(clone.nested2.constructor.name, 'Object');
+      assert.equal(Object.keys(clone.nested2).length, 1);
+
+      // gh-852
+      var arr = [doc],
+          err = false,
+          str;
+      try {
+        str = JSON.stringify(arr);
+      } catch (_) {
+        err = true;
+      }
+      assert.equal(err, false);
+      assert.ok(/nested2/.test(str));
+      assert.equal(clone.nested2.constructor.name, 'Object');
+      assert.equal(Object.keys(clone.nested2).length, 1);
+
+      // transform
+      doc.schema.options.toJSON = {};
+      doc.schema.options.toJSON.transform = function xform(doc, ret) {
+        // ignore embedded docs
+        if (typeof doc.ownerDocument === 'function') {
+          return;
+        }
+
+        delete ret.em;
+        delete ret.numbers;
+        delete ret.oids;
+        ret._id = ret._id.toString();
+      };
+
+      clone = doc.toJSON();
+      assert.equal(clone._id, doc.id);
+      assert.ok(undefined === clone.em);
+      assert.ok(undefined === clone.numbers);
+      assert.ok(undefined === clone.oids);
+      assert.equal(clone.test, 'test');
+      assert.equal(clone.nested.age, 5);
+
+      // transform with return value
+      var out = {myid: doc._id.toString()};
+      doc.schema.options.toJSON.transform = function(doc, ret) {
+        // ignore embedded docs
+        if (typeof doc.ownerDocument === 'function') {
+          return;
+        }
+
+        return {myid: ret._id.toString()};
+      };
+
+      clone = doc.toJSON();
+      assert.deepEqual(out, clone);
+
+      // ignored transform with inline options
+      clone = doc.toJSON({x: 1, transform: false});
+      assert.ok(!('myid' in clone));
+      assert.equal(clone.test, 'test');
+      assert.ok(clone.oids instanceof Array);
+      assert.equal(clone.nested.age, 5);
+      assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
+      assert.equal(clone.nested.path, 'my path');
+      assert.equal(clone.em[0].constructor.name, 'Object');
+
+      // applied transform when inline transform is true
+      clone = doc.toJSON({x: 1});
+      assert.deepEqual(out, clone);
+
+      // transform passed inline
+      function xform(self, doc, opts) {
+        opts.fields.split(' ').forEach(function(field) {
+          delete doc[field];
+        });
+      }
+
+      clone = doc.toJSON({
+        transform: xform,
+        fields: '_id em numbers oids nested'
+      });
+      assert.equal(doc.test, 'test');
+      assert.ok(undefined === clone.em);
+      assert.ok(undefined === clone.numbers);
+      assert.ok(undefined === clone.oids);
+      assert.ok(undefined === clone._id);
+      assert.ok(undefined === clone.nested);
+
+      // all done
+      delete doc.schema.options.toJSON;
+      done();
     });
-    assert.equal(doc.test, 'test');
-    assert.ok(undefined === clone.em);
-    assert.ok(undefined === clone.numbers);
-    assert.ok(undefined === clone.oids);
-    assert.ok(undefined === clone._id);
-    assert.ok(undefined === clone.nested);
 
-    // all done
-    delete doc.schema.options.toJSON;
-    done();
+    it('jsonifying an object', function(done) {
+      var doc = new TestDocument({test: 'woot'}),
+          oidString = doc._id.toString();
+      // convert to json string
+      var json = JSON.stringify(doc);
+      // parse again
+      var obj = JSON.parse(json);
+
+      assert.equal(obj.test, 'woot');
+      assert.equal(obj._id, oidString);
+      done();
+    });
+
+    it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
+      var userSchema, User, groupSchema, Group;
+
+      userSchema = new Schema({name: String});
+      // includes virtual path when 'toJSON'
+      userSchema.set('toJSON', {getters: true});
+      userSchema.virtual('hello').get(function() {
+        return 'Hello, ' + this.name;
+      });
+      User = db.model('User', userSchema);
+
+      groupSchema = new Schema({
+        name: String,
+        _users: [{type: Schema.ObjectId, ref: 'User'}]
+      });
+
+      Group = db.model('Group', groupSchema);
+
+      User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
+        assert.ifError(err);
+
+        new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
+          Group.findById(group).populate('_users').exec(function(err, group) {
+            assert.ifError(err);
+            assert.ok(group.toJSON()._users[0].hello);
+            done();
+          });
+        });
+      });
+    });
   });
 
-  it('jsonifying an object', function(done) {
-    var doc = new TestDocument({test: 'woot'}),
-        oidString = doc._id.toString();
-    // convert to json string
-    var json = JSON.stringify(doc);
-    // parse again
-    var obj = JSON.parse(json);
-
-    assert.equal(obj.test, 'woot');
-    assert.equal(obj._id, oidString);
-    done();
-  });
-  it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
-    var db = start();
-    var userSchema, User, groupSchema, Group;
-
-    userSchema = new Schema({name: String});
-    // includes virtual path when 'toJSON'
-    userSchema.set('toJSON', {getters: true});
-    userSchema.virtual('hello').get(function() {
-      return 'Hello, ' + this.name;
-    });
-    User = db.model('User', userSchema);
-
-    groupSchema = new Schema({
-      name: String,
-      _users: [{type: Schema.ObjectId, ref: 'User'}]
+  describe('inspect', function() {
+    var db;
+    before(function() {
+      db = start();
     });
 
-    Group = db.model('Group', groupSchema);
+    after(function(done) {
+      db.close(done);
+    });
 
-    User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
-      assert.ifError(err);
+    it('inspect inherits schema options (gh-4001)', function(done) {
+      var opts = {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      };
+      var taskSchema = mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      }, opts);
 
-      new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
-        Group.findById(group).populate('_users').exec(function(err, group) {
-          assert.ifError(err);
-          assert.ok(group.toJSON()._users[0].hello);
-          db.close(done);
+      taskSchema.virtual('title').
+        get(function() {
+          return this.name;
+        }).
+        set(function(title) {
+          this.name = title;
+        });
+
+      var Task = db.model('gh4001', taskSchema);
+
+      var doc = { name: 'task1', title: 'task999' };
+      Task.collection.insert(doc, function(error) {
+        assert.ifError(error);
+        Task.findById(doc._id, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.inspect().title, 'task1');
+          done();
+        });
+      });
+    });
+
+    it('does not apply transform to populated docs (gh-4213)', function(done) {
+      var UserSchema = new Schema({
+        name: String
+      });
+
+      var PostSchema = new Schema({
+        title: String,
+        postedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh4213'
+        }
+      }, {
+        toObject: {
+          transform: function(doc, ret) {
+            delete ret._id;
+          }
+        },
+        toJSON: {
+          transform: function(doc, ret) {
+            delete ret._id;
+          }
+        }
+      });
+
+      var User = db.model('gh4213', UserSchema);
+      var Post = db.model('gh4213_0', PostSchema);
+
+      var val = new User({ name: 'Val' });
+      var post = new Post({ title: 'Test', postedBy: val._id });
+
+      Post.create(post, function(error) {
+        assert.ifError(error);
+        User.create(val, function(error) {
+          assert.ifError(error);
+          Post.find({}).
+            populate('postedBy').
+            exec(function(error, posts) {
+              assert.ifError(error);
+              assert.equal(posts.length, 1);
+              assert.ok(posts[0].postedBy._id);
+              done();
+            });
         });
       });
     });
@@ -2578,39 +2687,6 @@ describe('document', function() {
       });
     });
 
-    it('inspect inherits schema options (gh-4001)', function(done) {
-      var opts = {
-        toObject: { virtuals: true },
-        toJSON: { virtuals: true }
-      };
-      var taskSchema = mongoose.Schema({
-        name: {
-          type: String,
-          required: true
-        }
-      }, opts);
-
-      taskSchema.virtual('title').
-        get(function() {
-          return this.name;
-        }).
-        set(function(title) {
-          this.name = title;
-        });
-
-      var Task = db.model('gh4001', taskSchema);
-
-      var doc = { name: 'task1', title: 'task999' };
-      Task.collection.insert(doc, function(error) {
-        assert.ifError(error);
-        Task.findById(doc._id, function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.inspect().title, 'task1');
-          done();
-        });
-      });
-    });
-
     it('doesnt skipId for single nested subdocs (gh-4008)', function(done) {
       var childSchema = new Schema({
         name: String
@@ -2886,6 +2962,59 @@ describe('document', function() {
 
       Test.find({}, function() {
         throw new Error('fail!');
+      });
+    });
+
+    it('clears subpaths when removing single nested (gh-4216)', function(done) {
+      var RecurrenceSchema = new Schema({
+        frequency: Number,
+        interval: {
+          type: String,
+          enum: ['days', 'weeks', 'months', 'years']
+        }
+      }, { _id: false });
+
+      var EventSchema = new Schema({
+        name: {
+          type: String,
+          trim: true
+        },
+        recurrence: RecurrenceSchema
+      });
+
+      var Event = db.model('gh4216', EventSchema);
+      var ev = new Event({
+        name: 'test',
+        recurrence: { frequency: 2, interval: 'days' }
+      });
+      ev.recurrence = null;
+      ev.save(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('setting path to empty object works (gh-4218)', function(done) {
+      var schema = new Schema({
+        object: {
+          nested: {
+            field1: { type: Number, default: 1 }
+          }
+        }
+      });
+
+      var MyModel = db.model('gh4218', schema);
+
+      MyModel.create({}, function(error, doc) {
+        doc.object.nested = {};
+        doc.save(function(error, doc) {
+          assert.ifError(error);
+          MyModel.collection.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.object.nested, {});
+            done();
+          });
+        });
       });
     });
   });

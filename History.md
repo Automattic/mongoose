@@ -1,10 +1,23 @@
+4.5.1 / 2016-06-18
+==================
+ * fix(model): ensure wrapped insertMany() returns a promise #4237
+ * fix(populate): dont overwrite populateVirtuals when populating multiple paths #4234
+ * docs(model): clarify relationship between create() and save() #4233
+ * fix(types): handle option param in subdoc remove() #4231 [tdebarochez](https://github.com/tdebarochez)
+ * fix(document): dedupe modified paths #4226 #4223 [adambuczynski](https://github.com/adambuczynski)
+ * fix(model): don't modify user-provided options object #4221
+ * fix(document): handle setting nested path to empty object #4218 #4182
+ * fix(document): clean subpaths when removing single nested #4216
+ * fix(document): don't force transform on subdocs with inspect #4213
+ * fix(error): allow setting .messages object #4207
+
 4.5.0 / 2016-06-13
 ==================
  * feat(query): added Query.prototype.catch() #4215 #4173 [adambuczynski](https://github.com/adambuczynski)
  * feat(query): add Query.prototype.cursor() as a .stream() alternative #4117 #3637 #1907
  * feat(document): add markUnmodified() function #4092 [vincentcr](https://github.com/vincentcr)
  * feat(aggregate): convert aggregate object to a thenable #3995 #3946 [megagon](https://github.com/megagon)
- * perf(types): remove defineProperties call for array #3886
+ * perf(types): remove defineProperties call for array (**Note:** Because of this, a mongoose array will no longer `assert.deepEqual()` a plain old JS array) #3886
  * feat(model): add hooks for insertMany() #3846
  * feat(schema): add support for custom query methods #3740 #2372
  * feat(drivers): emit error on 'serverClosed' because that means that reconnect failed #3615

@@ -150,6 +150,7 @@ describe('versioning', function() {
 
     function test12(err, a, b) {
       assert.ok(err instanceof VersionError);
+      assert.ok(err.stack.indexOf('versioning.test.js') !== -1);
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.comments.length, 5);
 

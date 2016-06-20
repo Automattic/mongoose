@@ -653,4 +653,22 @@ describe('aggregate: ', function() {
       done();
     });
   });
+
+  it('ability to add noCursorTimeout option (gh-4241)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4241', {
+      name: String
+    });
+
+    MyModel.
+      aggregate([{ $match: {name: 'test' } }]).
+      addCursorFlag('noCursorTimeout', true).
+      cursor({ async: true }).
+      exec(function(error, cursor) {
+        assert.ifError(error);
+        assert.ok(cursor.s.cmd.noCursorTimeout);
+        done();
+      });
+  });
 });

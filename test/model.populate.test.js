@@ -3893,7 +3893,6 @@ describe('model: populate:', function() {
               populate('authors favoritedBy').
               exec(function(error, post) {
                 assert.ifError(error);
-                console.log(post.toObject({ virtuals: true }));
                 assert.equal(post.authors.length, 1);
                 assert.equal(post.authors[0].name, 'Val');
                 assert.equal(post.favoritedBy.length, 1);

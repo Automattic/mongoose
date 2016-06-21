@@ -161,7 +161,6 @@ describe('QueryCursor', function() {
       cursor.on('data', function(doc) {
         assert.equal(doc.name, expectedNames[cur++]);
         assert.strictEqual(false, doc instanceof mongoose.Document);
-        assert.equal(doc.test, 'test');
       });
 
       cursor.on('error', function(error) {

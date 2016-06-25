@@ -89,9 +89,9 @@ block content
     var animalSchema = new Schema({ name: String, type: String });
 
     // assign a function to the "methods" object of our animalSchema
-    animalSchema.methods.findSimilarTypes = function (cb) {
+    animalSchema.methods.findSimilarTypes = function(cb) {
       return this.model('Animal').find({ type: this.type }, cb);
-    }
+    };
   p
     | Now all of our 
     code animal
@@ -102,7 +102,7 @@ block content
     var Animal = mongoose.model('Animal', animalSchema);
     var dog = new Animal({ type: 'dog' });
 
-    dog.findSimilarTypes(function (err, dogs) {
+    dog.findSimilarTypes(function(err, dogs) {
       console.log(dogs); // woof
     });
 
@@ -116,12 +116,28 @@ block content
 
   :js
     // assign a function to the "statics" object of our animalSchema
-    animalSchema.statics.findByName = function (name, cb) {
+    animalSchema.statics.findByName = function(name, cb) {
       return this.find({ name: new RegExp(name, 'i') }, cb);
-    }
+    };
 
     var Animal = mongoose.model('Animal', animalSchema);
-    Animal.findByName('fido', function (err, animals) {
+    Animal.findByName('fido', function(err, animals) {
+      console.log(animals);
+    });
+
+  h3#query-helpers Query Helpers
+  :markdown
+    You can also add query helper functions, which are like instance methods,
+    but for mongoose queries. Query helper methods let you extend mongoose's
+    [chainable query builder API](./queries.html).
+    
+  :js
+    animalSchema.query.byName = function(name) {
+      return this.find({ name: new RegExp(name, 'i') });
+    };
+    
+    var Animal = mongoose.model('Animal', animalSchema);
+    Animal.find().byName('fido').exec(function(err, animals) {
       console.log(animals);
     });
 

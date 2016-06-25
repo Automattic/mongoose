@@ -3902,6 +3902,48 @@ describe('model: populate:', function() {
           });
         });
       });
+
+      it('justOne option (gh-4263)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('author', {
+          ref: 'gh4263',
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: true
+        });
+
+        var Person = db.model('gh4263', PersonSchema);
+        var BlogPost = db.model('gh4263_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [
+          { name: 'Val', authored: [0] },
+          { name: 'Test', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate('author').
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.author.name, 'Val');
+                done();
+              });
+          });
+        });
+      });
     });
   });
 });

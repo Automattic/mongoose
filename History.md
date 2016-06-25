@@ -1,3 +1,13 @@
+4.5.2 / 2016-06-24
+==================
+ * fix(connection): add checks for collection presence for `onOpen` and `onClose` #4259 [nodkz](https://github.com/nodkz)
+ * fix(cast): allow strings for $type operator #4256
+ * fix(querycursor): support lean() #4255 [pyramation](https://github.com/pyramation)
+ * fix(aggregate): allow setting noCursorTimeout option #4241
+ * fix(document): handle undefined for Array.pull #4222 [Sebmaster](https://github.com/Sebmaster)
+ * fix(connection): ensure promise.catch() catches initial connection error #4135
+ * fix(document): show additional context for VersionError #2633
+
 4.5.1 / 2016-06-18
 ==================
  * fix(model): ensure wrapped insertMany() returns a promise #4237

@@ -151,4 +151,28 @@ describe('QueryCursor', function() {
       }).catch(done);
     });
   });
+
+  describe('#lean()', function() {
+    it('lean', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).lean().cursor();
+
+      var expectedNames = ['Axl', 'Slash'];
+      var cur = 0;
+      cursor.on('data', function(doc) {
+        assert.equal(doc.name, expectedNames[cur++]);
+        assert.strictEqual(false, doc instanceof mongoose.Document);
+      });
+
+      cursor.on('error', function(error) {
+        done(error);
+      });
+
+      cursor.on('end', function() {
+        assert.equal(cur, 2);
+        done();
+      });
+
+    });
+  });
+
 });

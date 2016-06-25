@@ -207,11 +207,11 @@ describe('model query casting', function() {
   });
 
   it('works with $type matching', function(done) {
-    var db = start(),
-        B = db.model(modelName, collection);
+    var db = start();
+    var B = db.model(modelName, collection);
 
-    B.find({title: {$type: 'asd'}}, function(err) {
-      assert.equal(err.message, '$type parameter must be Number');
+    B.find({title: {$type: {x:1}}}, function(err) {
+      assert.equal(err.message, '$type parameter must be number or string');
 
       B.find({title: {$type: 2}}, function(err, posts) {
         assert.ifError(err);

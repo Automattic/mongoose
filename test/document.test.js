@@ -2154,6 +2154,27 @@ describe('document', function() {
         done();
       });
     });
+
+    it('handles non-errors', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
+
+      var Model = db.model('gh2284_1', schema);
+
+      Model.create({ name: 'test' }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 
   describe('bug fixes', function() {

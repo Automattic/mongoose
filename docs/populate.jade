@@ -311,7 +311,7 @@ block content
   h3#populate-virtuals Populate Virtuals
   :markdown
     _New in 4.5.0_
-    
+  
     So far you've only populated based on the `_id` field. However, that's
     sometimes not the right choice.
     In particular, [arrays that grow without bound are a MongoDB anti-pattern](https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/).
@@ -342,11 +342,7 @@ block content
      * "Vince Neil" and "Nikki Sixx" with "Motley Crue"
      */
     Band.find({}).populate('members').exec(function(error, bands) {
-      /**
-       * [ { name: 'Guns N\' Roses', members: [ [Object], [Object] ] },
-       * { name: 'Motley Crue', members: [ [Object], [Object] ] } ]
-       */
-      console.log(bands);
+      /* `bands.members` is now an array of instances of `Person` */
     });
 
   h3#next Next Up

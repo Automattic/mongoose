@@ -3945,6 +3945,59 @@ describe('model: populate:', function() {
         });
       });
 
+      it('deep populate (gh-4261)', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        PersonSchema.virtual('blogPosts', {
+          ref: 'gh4261',
+          localField: '_id',
+          foreignField: 'author'
+        });
+
+        var BlogPostSchema = new Schema({
+          title: String,
+          author: { type: ObjectId },
+          comments: [{ author: { type: ObjectId, ref: 'gh4261' } }]
+        });
+
+        var Person = db.model('gh4261', PersonSchema);
+        var BlogPost = db.model('gh4261_0', BlogPostSchema);
+
+        var people = [
+          { name: 'Val' },
+          { name: 'Test' }
+        ];
+
+        Person.create(people, function(error, people) {
+          assert.ifError(error);
+          var post = {
+            title: 'Test1',
+            author: people[0]._id,
+            comments: [{ author: people[1]._id }]
+          };
+          BlogPost.create(post, function(error) {
+            assert.ifError(error);
+            Person.findById(people[0]._id).
+              populate({
+                path: 'blogPosts',
+                model: BlogPost,
+                populate: {
+                  path: 'comments.author',
+                  model: Person
+                }
+              }).
+              exec(function(error, person) {
+                assert.ifError(error);
+                assert.equal(person.blogPosts[0].comments[0].author.name,
+                  'Test');
+                done();
+              });
+          });
+        });
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

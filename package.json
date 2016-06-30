@@ -52,7 +52,8 @@
     "q": "1.4.1",
     "tbd": "0.6.4",
     "uglify-js": "2.6.1",
-    "underscore": "1.8.3"
+    "underscore": "1.8.3",
+    "validator": "5.4.0"
   },
   "browserDependencies": {
     "browserify": "4.1.10",

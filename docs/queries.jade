@@ -85,7 +85,19 @@ block content
 
   h3 Streaming
   :markdown
-    Queries can be [streamed](http://nodejs.org/api/stream.html) from MongoDB to your application as well. Simply call the query's [stream](./api.html#query_Query-stream) method instead of [exec](./api.html#query_Query-exec) to return an instance of [QueryStream](./api.html#querystream_QueryStream). Note: QueryStreams are Node.js 0.8 style read streams not Node.js 0.10 style.
+    You can [stream](http://nodejs.org/api/stream.html) query results from
+    MongoDB. You need to call the
+    [Query#cursor()](./api.html#query_Query-stream) function instead of
+    [Query#exec](./api.html#query_Query-exec) to return an instance of
+    [QueryCursor](./api.html#querycursor-js).
+  :js
+    var cursor = Person.find({ occupation: /host/ }).cursor();
+    cursor.on('data', function(doc) {
+      // Called once for every document
+    });
+    cursor.on('close', function() {
+      // Called when done
+    });
 
   h3#next Next Up
   :markdown

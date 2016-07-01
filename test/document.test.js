@@ -2,20 +2,21 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    Document = require('../lib/document'),
-    DocumentObjectId = mongoose.Types.ObjectId,
-    SchemaType = mongoose.SchemaType,
-    ValidatorError = SchemaType.ValidatorError,
-    ValidationError = mongoose.Document.ValidationError,
-    MongooseError = mongoose.Error,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    Query = require('../lib/query');
+var start = require('./common');
+var mongoose = start.mongoose;
+var assert = require('power-assert');
+var random = require('../lib/utils').random;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
+var Document = require('../lib/document');
+var DocumentObjectId = mongoose.Types.ObjectId;
+var SchemaType = mongoose.SchemaType;
+var ValidatorError = SchemaType.ValidatorError;
+var ValidationError = mongoose.Document.ValidationError;
+var MongooseError = mongoose.Error;
+var EmbeddedDocument = require('../lib/types/embedded');
+var Query = require('../lib/query');
+var validator = require('validator');
 
 var _ = require('lodash');
 
@@ -2154,6 +2155,27 @@ describe('document', function() {
         done();
       });
     });
+
+    it('handles non-errors', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
+
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
+
+      var Model = db.model('gh2284_1', schema);
+
+      Model.create({ name: 'test' }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 
   describe('bug fixes', function() {
@@ -2990,6 +3012,20 @@ describe('document', function() {
       ev.recurrence = null;
       ev.save(function(error) {
         assert.ifError(error);
+        done();
+      });
+    });
+
+    it('using validator.isEmail as a validator (gh-4064) (gh-4084)', function(done) {
+      var schema = new Schema({
+        email: { type: String, validate: validator.isEmail }
+      });
+
+      var MyModel = db.model('gh4064', schema);
+
+      MyModel.create({ email: 'invalid' }, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['email']);
         done();
       });
     });

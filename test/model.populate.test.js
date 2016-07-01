@@ -3902,6 +3902,142 @@ describe('model: populate:', function() {
           });
         });
       });
+
+      it('justOne option (gh-4263)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('author', {
+          ref: 'gh4263',
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: true
+        });
+
+        var Person = db.model('gh4263', PersonSchema);
+        var BlogPost = db.model('gh4263_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [
+          { name: 'Val', authored: [0] },
+          { name: 'Test', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate('author').
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.author.name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
+      it('deep populate (gh-4261)', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        PersonSchema.virtual('blogPosts', {
+          ref: 'gh4261',
+          localField: '_id',
+          foreignField: 'author'
+        });
+
+        var BlogPostSchema = new Schema({
+          title: String,
+          author: { type: ObjectId },
+          comments: [{ author: { type: ObjectId, ref: 'gh4261' } }]
+        });
+
+        var Person = db.model('gh4261', PersonSchema);
+        var BlogPost = db.model('gh4261_0', BlogPostSchema);
+
+        var people = [
+          { name: 'Val' },
+          { name: 'Test' }
+        ];
+
+        Person.create(people, function(error, people) {
+          assert.ifError(error);
+          var post = {
+            title: 'Test1',
+            author: people[0]._id,
+            comments: [{ author: people[1]._id }]
+          };
+          BlogPost.create(post, function(error) {
+            assert.ifError(error);
+            Person.findById(people[0]._id).
+              populate({
+                path: 'blogPosts',
+                model: BlogPost,
+                populate: {
+                  path: 'comments.author',
+                  model: Person
+                }
+              }).
+              exec(function(error, person) {
+                assert.ifError(error);
+                assert.equal(person.blogPosts[0].comments[0].author.name,
+                  'Test');
+                done();
+              });
+          });
+        });
+      });
+
+      it('specify model in populate (gh-4264)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: true,
+          localField: '_id',
+          foreignField: 'authored'
+        });
+
+        var Person = db.model('gh4264', PersonSchema);
+        var BlogPost = db.model('gh4264_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [
+          { name: 'Val', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate({ path: 'authors', model: Person }).
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.authors.length, 1);
+                assert.equal(post.authors[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
     });
   });
 });

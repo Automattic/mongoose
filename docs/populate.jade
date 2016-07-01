@@ -302,7 +302,7 @@ block content
     // }
     User.
       findOne({ name: 'Axl Rose' }).
-      populate('connections').
+      populate('connections.item').
       exec(function(error, doc) {
         // doc.connections[0].item is a User doc
         // doc.connections[1].item is an Organization doc

@@ -1,3 +1,17 @@
+4.5.3 / 2016-06-30
+==================
+ * fix(query): pass correct options to QueryCursor #4277 #4266
+ * fix(querycursor): handle lean option correctly #4276 [gchudnov](https://github.com/gchudnov)
+ * fix(document): fix error handling when no error occurred #4275
+ * fix(error): use strict mode for version error #4272
+ * docs(populate): fix crashing compilation for populate.jade #4267
+ * fix(populate): support `justOne` option for populate virtuals #4263
+ * fix(populate): ensure model param gets used for populate virtuals #4261 #4243
+ * fix(querycursor): add ability to properly close the cursor #4258
+ * docs(model): correct link to Document #4250
+ * docs(populate): correct path for refPath populate #4240
+ * fix(document): support validator.isEmail as validator #4064
+
 4.5.2 / 2016-06-24
 ==================
  * fix(connection): add checks for collection presence for `onOpen` and `onClose` #4259 [nodkz](https://github.com/nodkz)

@@ -59,6 +59,19 @@ describe('QueryCursor', function() {
       });
     });
 
+    it('with limit (gh-4266)', function(done) {
+      var cursor = Model.find().limit(1).sort({ name: 1 }).cursor();
+      cursor.next(function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.name, 'Axl');
+        cursor.next(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!doc);
+          done();
+        });
+      });
+    });
+
     it('with populate', function(done) {
       var bandSchema = new Schema({
         name: String,
@@ -175,4 +188,29 @@ describe('QueryCursor', function() {
     });
   });
 
+  describe('#close()', function() {
+    it('works (gh-4258)', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor();
+      cursor.next(function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.name, 'Axl');
+        assert.equal(doc.test, 'test');
+
+        var closed = false;
+        cursor.on('close', function() {
+          closed = true;
+        });
+
+        cursor.close(function(error) {
+          assert.ifError(error);
+          assert.ok(closed);
+          cursor.next(function(error) {
+            assert.ok(error);
+            assert.equal(error.message, 'Cursor is closed');
+            done();
+          });
+        });
+      });
+    });
+  });
 });

@@ -2012,7 +2012,7 @@ describe('model: populate:', function() {
     user.save(next);
 
     function next(err) {
-      assert.strictEqual(null, err);
+      assert.strictEqual(err, null);
       if (--pending) {
         return;
       }
@@ -2035,7 +2035,7 @@ describe('model: populate:', function() {
         comment.str = 'my string';
 
         comment.save(function(err, comment) {
-          assert.strictEqual(null, err);
+          assert.strictEqual(err, null);
 
           Comment
           .findById(comment.id)
@@ -3708,6 +3708,32 @@ describe('model: populate:', function() {
       });
     });
 
+    it('empty array (gh-4284)', function(done) {
+      var PersonSchema = new Schema({
+        name: { type: String }
+      });
+
+      var BandSchema = new Schema({
+        people: [{
+          type: mongoose.Schema.Types.ObjectId
+        }]
+      });
+
+      var Person = db.model('gh4284_b', PersonSchema);
+      var Band = db.model('gh4284_b0', BandSchema);
+
+      var band = { people: [new mongoose.Types.ObjectId()] };
+      Band.create(band, function(error, band) {
+        assert.ifError(error);
+        var opts = { path: 'people', model: Person };
+        Band.findById(band).populate(opts).exec(function(error, band) {
+          assert.ifError(error);
+          assert.equal(band.people.length, 0);
+          done();
+        });
+      });
+    });
+
     describe('populate virtuals (gh-2562)', function() {
       it('basic populate virtuals', function(done) {
         var PersonSchema = new Schema({
@@ -3939,6 +3965,103 @@ describe('model: populate:', function() {
               exec(function(error, post) {
                 assert.ifError(error);
                 assert.equal(post.author.name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
+      it('with no results and justOne (gh-4284)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('author', {
+          ref: 'gh4284',
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: true
+        });
+
+        var Person = db.model('gh4284', PersonSchema);
+        var BlogPost = db.model('gh4284_0', BlogPostSchema);
+
+        var blogPosts = [
+          { _id: 0, title: 'Bacon is Great' },
+          { _id: 1, title: 'Bacon is OK' }
+        ];
+        var people = [
+          { name: 'Val', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              find({}).
+              sort({ title: 1 }).
+              populate('author').
+              exec(function(error, posts) {
+                assert.ifError(error);
+                assert.equal(posts[0].author.name, 'Val');
+                assert.strictEqual(posts[1].author, null);
+                done();
+              });
+          });
+        });
+      });
+
+      it('with no results (gh-4284)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: 'gh4284_a',
+          localField: '_id',
+          foreignField: 'authored'
+        });
+
+        var Person = db.model('gh4284_a', PersonSchema);
+        var BlogPost = db.model('gh4284_a0', BlogPostSchema);
+
+        var blogPosts = [
+          { _id: 0, title: 'Bacon is Great' },
+          { _id: 1, title: 'Bacon is OK' },
+          { _id: 2, title: 'Bacon is not great' }
+        ];
+        var people = [
+          { name: 'Val', authored: [0] },
+          { name: 'Test', authored: [0, 1] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              find({}).
+              sort({ _id: 1 }).
+              populate('authors').
+              exec(function(error, posts) {
+                assert.ifError(error);
+                assert.equal(posts[0].authors.length, 2);
+                assert.equal(posts[0].authors[0].name, 'Val');
+                assert.equal(posts[0].authors[1].name, 'Test');
+                assert.equal(posts[1].authors.length, 1);
+                assert.equal(posts[1].authors[0].name, 'Test');
+                assert.equal(posts[2].authors.length, 0);
                 done();
               });
           });

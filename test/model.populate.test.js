@@ -4121,6 +4121,51 @@ describe('model: populate:', function() {
         });
       });
 
+      it('lean with single result and no justOne (gh-4288)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: true,
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: false
+        });
+
+        var Person = db.model('gh4288', PersonSchema);
+        var BlogPost = db.model('gh4288_0', BlogPostSchema);
+
+        var blogPosts = [
+          { _id: 0, title: 'Bacon is Great' }
+        ];
+        var people = [
+          { name: 'Val', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({}).
+              lean().
+              populate({ path: 'authors', model: Person }).
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.authors.length, 1);
+                assert.equal(post.authors[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

@@ -400,16 +400,16 @@ describe('model: populate:', function() {
       }, function(err, post) {
         assert.ifError(err);
 
-        var origFind = User.find;
+        var origExec = User.Query.prototype.exec;
 
         // mock an error
-        User.find = function() {
+        User.Query.prototype.exec = function() {
           var args = Array.prototype.map.call(arguments, function(arg) {
             return typeof arg === 'function' ? function() {
               arg(new Error('woot'));
             } : arg;
           });
-          return origFind.apply(this, args);
+          return origExec.apply(this, args);
         };
 
         BlogPost
@@ -419,6 +419,7 @@ describe('model: populate:', function() {
           db.close();
           assert.ok(err instanceof Error);
           assert.equal(err.message, 'woot');
+          User.Query.prototype.exec = origExec;
           done();
         });
       });
@@ -780,14 +781,14 @@ describe('model: populate:', function() {
             assert.ifError(err);
 
             // mock an error
-            var origFind = User.find;
-            User.find = function() {
+            var origExec = User.Query.prototype.exec;
+            User.Query.prototype.exec = function() {
               var args = Array.prototype.map.call(arguments, function(arg) {
                 return typeof arg === 'function' ? function() {
                   arg(new Error('woot 2'));
                 } : arg;
               });
-              return origFind.apply(this, args);
+              return origExec.apply(this, args);
             };
 
             BlogPost
@@ -798,6 +799,7 @@ describe('model: populate:', function() {
 
               assert.ok(err instanceof Error);
               assert.equal(err.message, 'woot 2');
+              User.Query.prototype.exec = origExec;
               done();
             });
           });
@@ -4129,7 +4131,7 @@ describe('model: populate:', function() {
           ref: 'gh4278_1',
           localField: '_id',
           foreignField: 'a'
-        })
+        });
 
         var BSchema = new Schema({
           a: mongoose.Schema.Types.ObjectId,
@@ -4139,7 +4141,7 @@ describe('model: populate:', function() {
           ref: 'gh4278_2',
           localField: '_id',
           foreignField: 'b'
-        })
+        });
 
         var CSchema = new Schema({
           b: mongoose.Schema.Types.ObjectId,
@@ -4154,7 +4156,7 @@ describe('model: populate:', function() {
           assert.ifError(error);
           B.create({ name: 'B1', a: a._id }, function(error, b) {
             assert.ifError(error);
-            C.create({ name: 'C1', b: b._id }, function(error, c) {
+            C.create({ name: 'C1', b: b._id }, function(error) {
               assert.ifError(error);
               var options = {
                 path: 'bs',
@@ -4164,10 +4166,8 @@ describe('model: populate:', function() {
               };
               A.findById(a).populate(options).exec(function(error, res) {
                 assert.ifError(error);
-                console.log(require('util').inspect(res.toObject({ virtuals: true }), { depth: 10, colors: true }))
                 assert.equal(res.bs.length, 1);
                 assert.equal(res.bs[0].name, 'B1');
-                console.log('FT', res.bs[0]);
                 assert.equal(res.bs[0].cs.length, 1);
                 assert.equal(res.bs[0].cs[0].name, 'C1');
                 done();

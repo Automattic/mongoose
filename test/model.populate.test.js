@@ -4068,7 +4068,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('deep populate (gh-4261)', function(done) {
+      it('deep populate virtual -> conventional (gh-4261)', function(done) {
         var PersonSchema = new Schema({
           name: String
         });
@@ -4117,6 +4117,62 @@ describe('model: populate:', function() {
                   'Test');
                 done();
               });
+          });
+        });
+      });
+
+      it('deep populate virtual -> virtual (gh-4278)', function(done) {
+        var ASchema = new Schema({
+          name: String
+        });
+        ASchema.virtual('bs', {
+          ref: 'gh4278_1',
+          localField: '_id',
+          foreignField: 'a'
+        })
+
+        var BSchema = new Schema({
+          a: mongoose.Schema.Types.ObjectId,
+          name: String
+        });
+        BSchema.virtual('cs', {
+          ref: 'gh4278_2',
+          localField: '_id',
+          foreignField: 'b'
+        })
+
+        var CSchema = new Schema({
+          b: mongoose.Schema.Types.ObjectId,
+          name: String
+        });
+
+        var A = db.model('gh4278_0', ASchema);
+        var B = db.model('gh4278_1', BSchema);
+        var C = db.model('gh4278_2', CSchema);
+
+        A.create({ name: 'A1' }, function(error, a) {
+          assert.ifError(error);
+          B.create({ name: 'B1', a: a._id }, function(error, b) {
+            assert.ifError(error);
+            C.create({ name: 'C1', b: b._id }, function(error, c) {
+              assert.ifError(error);
+              var options = {
+                path: 'bs',
+                populate: {
+                  path: 'cs'
+                }
+              };
+              A.findById(a).populate(options).exec(function(error, res) {
+                assert.ifError(error);
+                console.log(require('util').inspect(res.toObject({ virtuals: true }), { depth: 10, colors: true }))
+                assert.equal(res.bs.length, 1);
+                assert.equal(res.bs[0].name, 'B1');
+                console.log('FT', res.bs[0]);
+                assert.equal(res.bs[0].cs.length, 1);
+                assert.equal(res.bs[0].cs[0].name, 'C1');
+                done();
+              });
+            });
           });
         });
       });

@@ -1836,5 +1836,25 @@ describe('model: update:', function() {
         done();
       });
     });
+
+    it('update handles casting with mongoose-long (gh-4283)', function(done) {
+      require('mongoose-long')(mongoose);
+
+      var Model = db.model('gh4283', {
+        number: { type: mongoose.Types.Long }
+      });
+
+      Model.create({ number: mongoose.mongo.Long.fromString('0') }, function(error) {
+        assert.ifError(error);
+        Model.update({}, { $inc: { number: mongoose.mongo.Long.fromString('2147483648') } }, function(error) {
+          assert.ifError(error);
+          Model.findOne({ number: { $type: 18 } }, function(error, doc) {
+            assert.ifError(error);
+            assert.ok(doc);
+            done();
+          });
+        });
+      });
+    });
   });
 });

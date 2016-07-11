@@ -1586,5 +1586,29 @@ describe('model: findByIdAndUpdate:', function() {
           done();
         });
     });
+
+    it('handles setting single embedded docs to null (gh-4281)', function(done) {
+      var foodSchema = new mongoose.Schema({
+        name: { type: String, default: 'Bacon' }
+      });
+
+      var breakfastSchema = new mongoose.Schema({
+        main: foodSchema,
+        for: String
+      });
+
+      var TestModel = db.model('gh4281', breakfastSchema);
+      var options = { upsert: true, new: true };
+      var update = { $set: { main: null, for: 'Val' } };
+
+      TestModel.findOneAndUpdate({}, update, options).
+        exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(doc.main, null);
+
+          done();
+        });
+    });
   });
 });

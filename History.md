@@ -1,3 +1,17 @@
+4.5.4 / 2016-07-11
+==================
+ * fix(types): fix removing embedded documents #4309 [RoCat](https://github.com/RoCat)
+ * docs: various docs improvements #4302 #4294 [simonxca](https://github.com/simonxca)
+ * fix: upgrade mongodb -> 2.1.21 #4295 #4202 [RoCat](https://github.com/RoCat)
+ * fix(populate): convert single result to array for virtual populate because of lean #4288
+ * fix(populate): handle empty results for populate virtuals properly #4285 #4284
+ * fix(query): dont cast $inc to number if type is long #4283
+ * fix(types): allow setting single nested doc to null #4281
+ * fix(populate): handle deeply nested virtual populate #4278
+ * fix(document): allow setting empty obj if strict mode is false #4274
+ * fix(aggregate): allow passing obj to .unwind() #4239
+ * docs(document): add return statements to transform examples #1963
+
 4.5.3 / 2016-06-30
 ==================
  * fix(query): pass correct options to QueryCursor #4277 #4266

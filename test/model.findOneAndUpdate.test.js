@@ -1610,5 +1610,25 @@ describe('model: findByIdAndUpdate:', function() {
           done();
         });
     });
+
+    it('single nested doc cast errors (gh-3602)', function(done) {
+      var AddressSchema = new Schema({
+        street: {
+          type: Number
+        }
+      });
+
+      var PersonSchema = new Schema({
+        addresses: [AddressSchema]
+      });
+
+      var Person = db.model('gh3602', PersonSchema);
+
+      var update = { $push: { addresses: { street: 'not a num' } } };
+      Person.findOneAndUpdate({}, update, function(error) {
+        assert.ok(error.message.indexOf('street') !== -1);
+        done();
+      });
+    });
   });
 });

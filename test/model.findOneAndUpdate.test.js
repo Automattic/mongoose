@@ -1627,6 +1627,8 @@ describe('model: findByIdAndUpdate:', function() {
       var update = { $push: { addresses: { street: 'not a num' } } };
       Person.findOneAndUpdate({}, update, function(error) {
         assert.ok(error.message.indexOf('street') !== -1);
+        assert.equal(error.reason.message,
+          'Cast to Number failed for value "not a num" at path "street"');
         done();
       });
     });

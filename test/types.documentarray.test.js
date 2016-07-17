@@ -409,7 +409,7 @@ describe('types.documentarray', function() {
       assert.throws(function() {
         // has no parent array
         subdoc.invalidate('name', 'junk', 47);
-      }, /^Error: Unable to invalidate a subdocument/);
+      });
       t.validate(function() {
         var e = t.errors['docs.0.name'];
         assert.ok(e);

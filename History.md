@@ -1,3 +1,13 @@
+4.5.5 / 2016-07-18
+==================
+ * fix(document): handle setting root to empty obj if minimize false #4337
+ * fix: downgrade to mongodb 2.1.18 #4335 #4334 #4328 #4323
+ * perf(types): remove defineProperty usage in documentarray #4333
+ * fix(query): correctly pass model in .toConstructor() #4318
+ * fix(services): avoid double-validating mixed types with update validators #4305
+ * docs(middleware): add docs describing error handling middleware #4229
+ * fix(types): throw correct error when invalidating doc array #3602
+
 4.5.4 / 2016-07-11
 ==================
  * fix(types): fix removing embedded documents #4309 [RoCat](https://github.com/RoCat)

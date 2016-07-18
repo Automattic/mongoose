@@ -1611,6 +1611,56 @@ describe('model: findByIdAndUpdate:', function() {
         });
     });
 
+    it('custom validator on mixed field (gh-4305)', function(done) {
+      var called = 0;
+
+      var boardSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        structure: {
+          type: Schema.Types.Mixed,
+          required: true,
+          validate: {
+            validator: function() {
+              ++called;
+              return true;
+            },
+            message: 'The structure of the board is invalid'
+          }
+        }
+      });
+      var Board = db.model('gh4305', boardSchema);
+
+      var update = {
+        structure: [
+          {
+            capacity: 0,
+            size: 0,
+            category: 0,
+            isColumn: true,
+            title: 'Backlog'
+          }
+        ]
+      };
+      var opts = {
+        'new': true,
+        upsert: false,
+        passRawResult: false,
+        overwrite: false,
+        runValidators: true,
+        setDefaultsOnInsert: true
+      };
+      Board.
+        findOneAndUpdate({}, update, opts).
+        exec(function(error) {
+          assert.ifError(error);
+          assert.equal(called, 1);
+          done();
+        });
+    });
+
     it('single nested doc cast errors (gh-3602)', function(done) {
       var AddressSchema = new Schema({
         street: {

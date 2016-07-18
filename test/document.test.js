@@ -3053,5 +3053,23 @@ describe('document', function() {
         });
       });
     });
+
+    it('minimize + empty object (gh-4337)', function(done) {
+      var SomeModel;
+      var SomeModelSchema;
+
+      SomeModelSchema = new mongoose.Schema({}, {
+        minimize: false
+      });
+
+      SomeModel = mongoose.model('somemodel', SomeModelSchema);
+
+      try {
+        new SomeModel({});
+      } catch (error) {
+        assert.ifError(error);
+      }
+      done();
+    });
   });
 });

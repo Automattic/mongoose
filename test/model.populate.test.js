@@ -4019,6 +4019,52 @@ describe('model: populate:', function() {
         });
       });
 
+      it('with multiple results and justOne (gh-4329)', function(done) {
+        var UserSchema = new Schema({
+          openId: {
+            type: String,
+            unique: true
+          }
+        });
+        var TaskSchema = new Schema({
+          openId: {
+            type: String
+          }
+        });
+
+        TaskSchema.virtual('user', {
+          ref: 'gh4329',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true
+        });
+
+        var User = db.model('gh4329', UserSchema);
+        var Task = db.model('gh4329_0', TaskSchema);
+
+        User.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+          assert.ifError(error);
+          Task.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+            assert.ifError(error);
+            Task.
+              find().
+              sort({ openId: 1 }).
+              populate('user').
+              exec(function(error, tasks) {
+                assert.ifError(error);
+
+                assert.ok(tasks[0].user);
+                assert.ok(tasks[1].user);
+                var users = tasks.map(function(task) {
+                  return task.user.openId;
+                });
+                assert.deepEqual(users, ['user1', 'user2']);
+                done();
+              });
+          });
+        });
+      });
+
       it('with no results (gh-4284)', function(done) {
         var PersonSchema = new Schema({
           name: String,

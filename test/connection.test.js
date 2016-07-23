@@ -1057,7 +1057,9 @@ describe('connections:', function() {
   it('connecting to single mongos (gh-3537)', function(done) {
     var db = mongoose.createConnection('localhost:27017', {mongos: true});
     assert.ok(db.db.serverConfig instanceof mongoose.mongo.Mongos);
-    db.close(done);
+    db.on('error', function() {
+      done();
+    });
   });
 
   describe('connecting to multiple mongos nodes (gh-1037)', function() {

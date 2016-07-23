@@ -4111,7 +4111,7 @@ describe('Model', function() {
           promise.onResolve(function(err, found) {
             db.close();
             assert.ifError(err);
-            assert.equal(found._id.id, created._id.id);
+            assert.equal(found._id.toHexString(), created._id.toHexString());
             done();
           });
         });

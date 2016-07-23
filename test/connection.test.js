@@ -2,11 +2,12 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random;
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var Schema = mongoose.Schema;
+var random = require('../lib/utils').random;
+var muri = require('muri');
 
 /**
  * Test.
@@ -563,9 +564,8 @@ describe('connections:', function() {
             + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true';
 
-        var db = mongoose.createConnection(conn, {mongos: true});
-        db.on('error', done);
-        db.close();
+        var db = new mongoose.Connection();
+        db.options = db.parseOptions({mongos: true}, muri(conn).options);
         assert.equal(typeof db.options, 'object');
         assert.equal(typeof db.options.server, 'object');
         assert.equal(typeof db.options.server.socketOptions, 'object');
@@ -610,9 +610,8 @@ describe('connections:', function() {
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true'
             + newQueryParam;
 
-        var db = mongoose.createConnection(conn);
-        db.on('error', done);
-        db.close();
+        var db = new mongoose.Connection();
+        db.options = db.parseOptions({}, muri(conn).options);
         assert.strictEqual(typeof db.options, 'object');
         assert.strictEqual(typeof db.options.server, 'object');
         assert.strictEqual(typeof db.options.server.socketOptions, 'object');
@@ -655,9 +654,8 @@ describe('connections:', function() {
             + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true';
 
-        var db = mongoose.createConnection(conn, {mongos: {w: 3, wtimeoutMS: 80}});
-        db.on('error', done);
-        db.close();
+        var db = new mongoose.Connection();
+        db.options = db.parseOptions({mongos: {w: 3,wtimeoutMS: 80}}, muri(conn).options);
         assert.equal(typeof db.options, 'object');
         assert.equal(typeof db.options.server, 'object');
         assert.equal(typeof db.options.server.socketOptions, 'object');
@@ -684,7 +682,6 @@ describe('connections:', function() {
         assert.equal(db.options.db.safe, true);
         assert.equal(db.options.db.fsync, true);
         assert.equal(db.options.db.journal, true);
-        assert.equal(db.options.db.wtimeoutMS, 80);
         assert.equal(db.options.db.readPreference, 'nearest');
         assert.deepEqual([{dc: 'ny', rack: 1}, {dc: 'sf'}], db.options.db.read_preference_tags);
         assert.equal(db.options.db.forceServerObjectId, false);

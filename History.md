@@ -1,3 +1,7 @@
+4.5.7 / 2016-07-25
+==================
+ * fix(document): ensure no unhandled rejections if callback specified for save #4364
+
 4.5.6 / 2016-07-23
 ==================
  * fix(schema): don't overwrite createdAt if it isn't selected #4351 [tusbar](https://github.com/tusbar)

@@ -774,15 +774,15 @@ describe('schema', function() {
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 4);
+      assert.equal(Tobi.callQueue.length, 5);
 
       Tobi.post('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 5);
+      assert.equal(Tobi.callQueue.length, 6);
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 6);
+      assert.equal(Tobi.callQueue.length, 7);
       done();
     });
   });

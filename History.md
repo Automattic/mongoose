@@ -1,3 +1,19 @@
+4.5.7 / 2016-07-25
+==================
+ * fix(document): ensure no unhandled rejections if callback specified for save #4364
+
+4.5.6 / 2016-07-23
+==================
+ * fix(schema): don't overwrite createdAt if it isn't selected #4351 [tusbar](https://github.com/tusbar)
+ * docs(api): fix link to populate() and add a new one from depopulate() #4345 [Delapouite](https://github.com/Delapouite)
+ * fix(types): ownerDocument() works properly with single nested docs #4344 [vichle](https://github.com/vichle)
+ * fix(populate): dont use findOne when justOne option set #4329
+ * fix(document): dont trigger .then() deprecated warning when calling doc.remove() #4291
+ * docs(connection): add promiseLibrary option #4280
+ * fix(plugins): apply global plugins to subschemas #4271
+ * fix(model): ensure `ensureIndex()` never calls back in the same tick #4246
+ * docs(schema): improve post hook docs on schema #4238
+
 4.5.5 / 2016-07-18
 ==================
  * fix(document): handle setting root to empty obj if minimize false #4337

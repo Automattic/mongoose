@@ -302,7 +302,7 @@ block content
     // }
     User.
       findOne({ name: 'Axl Rose' }).
-      populate('connections').
+      populate('connections.item').
       exec(function(error, doc) {
         // doc.connections[0].item is a User doc
         // doc.connections[1].item is an Organization doc
@@ -342,11 +342,7 @@ block content
      * "Vince Neil" and "Nikki Sixx" with "Motley Crue"
      */
     Band.find({}).populate('members').exec(function(error, bands) {
-      /**
-       * [ { name: 'Guns N\' Roses', members: [ [Object], [Object] ] },
-       * { name: 'Motley Crue', members: [ [Object], [Object] ] } ]
-       */
-      console.log(bands);
+      /* `bands.members` is now an array of instances of `Person` */
     });
 
   h3#next Next Up

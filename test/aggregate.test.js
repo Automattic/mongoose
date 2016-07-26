@@ -469,6 +469,35 @@ describe('aggregate: ', function() {
         });
     });
 
+    it('unwind with obj', function(done) {
+      var aggregate = new Aggregate();
+
+      var agg = aggregate.
+        model(db.model('Employee')).
+        unwind({ path: '$customers', preserveNullAndEmptyArrays: true });
+
+      assert.equal(agg._pipeline.length, 1);
+      assert.strictEqual(agg._pipeline[0].$unwind.preserveNullAndEmptyArrays,
+        true);
+      done();
+    });
+
+    it('unwind throws with bad arg', function(done) {
+      var aggregate = new Aggregate();
+
+      var threw = false;
+      try {
+        aggregate.
+          model(db.model('Employee')).
+          unwind(36);
+      } catch (err) {
+        assert.ok(err.message.indexOf('to unwind()') !== -1);
+        threw = true;
+      }
+      assert.ok(threw);
+      done();
+    });
+
     it('match', function(done) {
       var aggregate = new Aggregate();
 
@@ -652,5 +681,23 @@ describe('aggregate: ', function() {
       assert.ok(cursor instanceof require('stream').Readable);
       done();
     });
+  });
+
+  it('ability to add noCursorTimeout option (gh-4241)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4241', {
+      name: String
+    });
+
+    MyModel.
+      aggregate([{ $match: {name: 'test' } }]).
+      addCursorFlag('noCursorTimeout', true).
+      cursor({ async: true }).
+      exec(function(error, cursor) {
+        assert.ifError(error);
+        assert.ok(cursor.s.cmd.noCursorTimeout);
+        done();
+      });
   });
 });

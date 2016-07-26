@@ -1586,5 +1586,101 @@ describe('model: findByIdAndUpdate:', function() {
           done();
         });
     });
+
+    it('handles setting single embedded docs to null (gh-4281)', function(done) {
+      var foodSchema = new mongoose.Schema({
+        name: { type: String, default: 'Bacon' }
+      });
+
+      var breakfastSchema = new mongoose.Schema({
+        main: foodSchema,
+        for: String
+      });
+
+      var TestModel = db.model('gh4281', breakfastSchema);
+      var options = { upsert: true, new: true };
+      var update = { $set: { main: null, for: 'Val' } };
+
+      TestModel.findOneAndUpdate({}, update, options).
+        exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(doc.main, null);
+
+          done();
+        });
+    });
+
+    it('custom validator on mixed field (gh-4305)', function(done) {
+      var called = 0;
+
+      var boardSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        structure: {
+          type: Schema.Types.Mixed,
+          required: true,
+          validate: {
+            validator: function() {
+              ++called;
+              return true;
+            },
+            message: 'The structure of the board is invalid'
+          }
+        }
+      });
+      var Board = db.model('gh4305', boardSchema);
+
+      var update = {
+        structure: [
+          {
+            capacity: 0,
+            size: 0,
+            category: 0,
+            isColumn: true,
+            title: 'Backlog'
+          }
+        ]
+      };
+      var opts = {
+        'new': true,
+        upsert: false,
+        passRawResult: false,
+        overwrite: false,
+        runValidators: true,
+        setDefaultsOnInsert: true
+      };
+      Board.
+        findOneAndUpdate({}, update, opts).
+        exec(function(error) {
+          assert.ifError(error);
+          assert.equal(called, 1);
+          done();
+        });
+    });
+
+    it('single nested doc cast errors (gh-3602)', function(done) {
+      var AddressSchema = new Schema({
+        street: {
+          type: Number
+        }
+      });
+
+      var PersonSchema = new Schema({
+        addresses: [AddressSchema]
+      });
+
+      var Person = db.model('gh3602', PersonSchema);
+
+      var update = { $push: { addresses: { street: 'not a num' } } };
+      Person.findOneAndUpdate({}, update, function(error) {
+        assert.ok(error.message.indexOf('street') !== -1);
+        assert.equal(error.reason.message,
+          'Cast to Number failed for value "not a num" at path "street"');
+        done();
+      });
+    });
   });
 });

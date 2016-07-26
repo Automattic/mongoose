@@ -1,3 +1,80 @@
+4.5.7 / 2016-07-25
+==================
+ * fix(document): ensure no unhandled rejections if callback specified for save #4364
+
+4.5.6 / 2016-07-23
+==================
+ * fix(schema): don't overwrite createdAt if it isn't selected #4351 [tusbar](https://github.com/tusbar)
+ * docs(api): fix link to populate() and add a new one from depopulate() #4345 [Delapouite](https://github.com/Delapouite)
+ * fix(types): ownerDocument() works properly with single nested docs #4344 [vichle](https://github.com/vichle)
+ * fix(populate): dont use findOne when justOne option set #4329
+ * fix(document): dont trigger .then() deprecated warning when calling doc.remove() #4291
+ * docs(connection): add promiseLibrary option #4280
+ * fix(plugins): apply global plugins to subschemas #4271
+ * fix(model): ensure `ensureIndex()` never calls back in the same tick #4246
+ * docs(schema): improve post hook docs on schema #4238
+
+4.5.5 / 2016-07-18
+==================
+ * fix(document): handle setting root to empty obj if minimize false #4337
+ * fix: downgrade to mongodb 2.1.18 #4335 #4334 #4328 #4323
+ * perf(types): remove defineProperty usage in documentarray #4333
+ * fix(query): correctly pass model in .toConstructor() #4318
+ * fix(services): avoid double-validating mixed types with update validators #4305
+ * docs(middleware): add docs describing error handling middleware #4229
+ * fix(types): throw correct error when invalidating doc array #3602
+
+4.5.4 / 2016-07-11
+==================
+ * fix(types): fix removing embedded documents #4309 [RoCat](https://github.com/RoCat)
+ * docs: various docs improvements #4302 #4294 [simonxca](https://github.com/simonxca)
+ * fix: upgrade mongodb -> 2.1.21 #4295 #4202 [RoCat](https://github.com/RoCat)
+ * fix(populate): convert single result to array for virtual populate because of lean #4288
+ * fix(populate): handle empty results for populate virtuals properly #4285 #4284
+ * fix(query): dont cast $inc to number if type is long #4283
+ * fix(types): allow setting single nested doc to null #4281
+ * fix(populate): handle deeply nested virtual populate #4278
+ * fix(document): allow setting empty obj if strict mode is false #4274
+ * fix(aggregate): allow passing obj to .unwind() #4239
+ * docs(document): add return statements to transform examples #1963
+
+4.5.3 / 2016-06-30
+==================
+ * fix(query): pass correct options to QueryCursor #4277 #4266
+ * fix(querycursor): handle lean option correctly #4276 [gchudnov](https://github.com/gchudnov)
+ * fix(document): fix error handling when no error occurred #4275
+ * fix(error): use strict mode for version error #4272
+ * docs(populate): fix crashing compilation for populate.jade #4267
+ * fix(populate): support `justOne` option for populate virtuals #4263
+ * fix(populate): ensure model param gets used for populate virtuals #4261 #4243
+ * fix(querycursor): add ability to properly close the cursor #4258
+ * docs(model): correct link to Document #4250
+ * docs(populate): correct path for refPath populate #4240
+ * fix(document): support validator.isEmail as validator #4064
+
+4.5.2 / 2016-06-24
+==================
+ * fix(connection): add checks for collection presence for `onOpen` and `onClose` #4259 [nodkz](https://github.com/nodkz)
+ * fix(cast): allow strings for $type operator #4256
+ * fix(querycursor): support lean() #4255 [pyramation](https://github.com/pyramation)
+ * fix(aggregate): allow setting noCursorTimeout option #4241
+ * fix(document): handle undefined for Array.pull #4222 [Sebmaster](https://github.com/Sebmaster)
+ * fix(connection): ensure promise.catch() catches initial connection error #4135
+ * fix(document): show additional context for VersionError #2633
+
+4.5.1 / 2016-06-18
+==================
+ * fix(model): ensure wrapped insertMany() returns a promise #4237
+ * fix(populate): dont overwrite populateVirtuals when populating multiple paths #4234
+ * docs(model): clarify relationship between create() and save() #4233
+ * fix(types): handle option param in subdoc remove() #4231 [tdebarochez](https://github.com/tdebarochez)
+ * fix(document): dedupe modified paths #4226 #4223 [adambuczynski](https://github.com/adambuczynski)
+ * fix(model): don't modify user-provided options object #4221
+ * fix(document): handle setting nested path to empty object #4218 #4182
+ * fix(document): clean subpaths when removing single nested #4216
+ * fix(document): don't force transform on subdocs with inspect #4213
+ * fix(error): allow setting .messages object #4207
+
 4.5.0 / 2016-06-13
 ==================
  * feat(query): added Query.prototype.catch() #4215 #4173 [adambuczynski](https://github.com/adambuczynski)

@@ -23,7 +23,7 @@ describe('document: strict mode:', function() {
         arrayMixed: []
       };
 
-      var lax = new Schema(raw, {strict: false});
+      var lax = new Schema(raw, {strict: false, minimize: false});
       var strict = new Schema(raw);
 
       Lax = db.model('Lax', lax);
@@ -34,8 +34,8 @@ describe('document: strict mode:', function() {
       db.close(done);
     });
 
-    it('when creating models with non-strict schemas', function(done) {
-      var l = new Lax({content: 'sample', rouge: 'data'});
+    it('when creating models with non-strict schemas (gh-4274)', function(done) {
+      var l = new Lax({ content: 'sample', rouge: 'data', items: {} });
       assert.equal(l.$__.strictMode, false);
 
       var lo = l.toObject();
@@ -45,7 +45,20 @@ describe('document: strict mode:', function() {
       assert.equal(lo.content, 'sample');
       assert.equal(l.rouge, 'data');
       assert.equal(lo.rouge, 'data');
-      done();
+      assert.deepEqual(l.items, {});
+      assert.deepEqual(lo.items, {});
+
+      l.save(function(error) {
+        assert.ifError(error);
+        Lax.findById(l).exec(function(error, doc) {
+          assert.ifError(error);
+          var lo = doc.toObject();
+          assert.equal(lo.content, 'sample');
+          assert.equal(lo.rouge, 'data');
+          assert.deepEqual(lo.items, {});
+          done();
+        });
+      });
     });
 
     it('when creating models with strict schemas', function(done) {
@@ -448,4 +461,3 @@ describe('document: strict mode:', function() {
     });
   });
 });
-

@@ -54,7 +54,6 @@ describe('types.documentarray', function() {
     assert.ok(a.isMongooseDocumentArray);
     assert.ok(Array.isArray(a));
 
-    assert.deepEqual(Object.keys(a), Object.keys(a.toObject()));
     assert.deepEqual(a._atomics.constructor, Object);
 
     done();
@@ -410,7 +409,7 @@ describe('types.documentarray', function() {
       assert.throws(function() {
         // has no parent array
         subdoc.invalidate('name', 'junk', 47);
-      }, /^Error: Unable to invalidate a subdocument/);
+      });
       t.validate(function() {
         var e = t.errors['docs.0.name'];
         assert.ok(e);
@@ -458,4 +457,3 @@ describe('types.documentarray', function() {
     });
   });
 });
-

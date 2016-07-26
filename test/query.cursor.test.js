@@ -117,6 +117,19 @@ describe('QueryCursor', function() {
         });
       });
     });
+
+    it('casting ObjectIds with where() (gh-4355)', function(done) {
+      Model.findOne(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(doc);
+        var query = { _id: doc._id.toHexString() };
+        Model.find().where(query).cursor().next(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          done();
+        });
+      });
+    });
   });
 
   it('as readable stream', function(done) {

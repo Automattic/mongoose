@@ -130,6 +130,15 @@ describe('QueryCursor', function() {
         });
       });
     });
+
+    it('cast errors (gh-4355)', function(done) {
+      Model.find().where({ _id: 'BadId' }).cursor().next(function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'CastError');
+        assert.equal(error.path, '_id');
+        done();
+      });
+    });
   });
 
   it('as readable stream', function(done) {

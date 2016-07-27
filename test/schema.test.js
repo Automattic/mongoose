@@ -850,6 +850,12 @@ describe('schema', function() {
         assert.equal(i.sparse, true);
         assert.equal(i.expireAfterSeconds, 60 * 60 * 24);
 
+        T = new Schema({
+          name: {type: String, index: false, unique: false}
+        });
+        assert.equal(T.path('name')._index, false);
+        assert.equal(T.indexes().length, 0);
+
         done();
       });
       it('compound', function(done) {

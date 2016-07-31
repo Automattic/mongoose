@@ -38,9 +38,6 @@ PersonSchema.virtual('name.full').set(function(name) {
 PersonSchema.path('gender').validate(function(value) {
   return /[A-Z]/.test(value);
 }, 'Invalid name');
-PersonSchema.post('save', function(next) {
-  next();
-});
 PersonSchema.set('toObject', {getters: true, virtuals: true});
 PersonSchema.set('toJSON', {getters: true, virtuals: true});
 
@@ -319,7 +316,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 6);
+        assert.equal(Employee.schema.callQueue.length, 5);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
@@ -353,7 +350,12 @@ describe('model', function() {
       it('does not allow setting discriminator key (gh-2041)', function(done) {
         var doc = new Employee({ __t: 'fake' });
         assert.equal(doc.__t, 'model-discriminator-employee');
-        done();
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['__t'].reason.message,
+            'Can\'t set discriminator key "__t"');
+          done();
+        });
       });
     });
   });

@@ -1,3 +1,13 @@
+4.5.8 / 2016-08-01
+==================
+ * fix(model): make changing the discriminator key cause a cast error #4374
+ * fix(query): pass projection fields to cursor #4371 #4342 [Corei13](https://github.com/Corei13)
+ * fix(document): support multiple paths for isModified #4370 [adambuczynski](https://github.com/adambuczynski)
+ * fix(querycursor): always cast fields before returning cursor #4355
+ * fix(query): support projection as alias for fields in findOneAndUpdate #4315
+ * fix(schema): treat index false + unique false as no index #4304
+ * fix(types): dont mark single nested subpath as modified if whole doc already modified #4224
+
 4.5.7 / 2016-07-25
 ==================
  * fix(document): ensure no unhandled rejections if callback specified for save #4364

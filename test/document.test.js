@@ -3071,5 +3071,23 @@ describe('document', function() {
       }
       done();
     });
+
+    it('doesnt markModified child paths if parent is modified (gh-4224)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4224', parentSchema);
+      Parent.create({ child: { name: 'Jacen' } }, function(error, doc) {
+        assert.ifError(error);
+        doc.child = { name: 'Jaina' };
+        doc.child.name = 'Anakin';
+        assert.deepEqual(doc.modifiedPaths(), ['child']);
+        done();
+      });
+    });
   });
 });

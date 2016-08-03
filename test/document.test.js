@@ -3089,5 +3089,30 @@ describe('document', function() {
         done();
       });
     });
+
+    it('single nested isNew (gh-4369)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4369', parentSchema);
+      var remaining = 2;
+
+      var doc = new Parent({ child: { name: 'Jacen' } });
+      doc.child.on('isNew', function(val) {
+        assert.ok(!val);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+
+      doc.save(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+    });
   });
 });

@@ -28,12 +28,17 @@ describe('updateValidators', function() {
       });
       fn(function(err) {
         assert.ifError(err);
-        assert.equal(schema._getSchema.calls.length, 2);
-        assert.equal(schema.doValidate.calls.length, 2);
-        assert.equal(schema._getSchema.calls[0], 'test.a');
-        assert.equal(schema._getSchema.calls[1], 'test.b');
-        assert.equal(schema.doValidate.calls[0].v, 1);
-        assert.equal(schema.doValidate.calls[1].v, null);
+        assert.equal(schema._getSchema.calls.length, 3);
+        assert.equal(schema.doValidate.calls.length, 3);
+        assert.equal(schema._getSchema.calls[0], 'test');
+        assert.equal(schema._getSchema.calls[1], 'test.a');
+        assert.equal(schema._getSchema.calls[2], 'test.b');
+        assert.deepEqual(schema.doValidate.calls[0].v, {
+          a: 1,
+          b: null
+        });
+        assert.equal(schema.doValidate.calls[1].v, 1);
+        assert.equal(schema.doValidate.calls[2].v, null);
         done();
       });
     });
@@ -70,4 +75,3 @@ describe('updateValidators', function() {
     });
   });
 });
-

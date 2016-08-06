@@ -1837,6 +1837,42 @@ describe('model: update:', function() {
       });
     });
 
+    it('update validators on single nested (gh-4332)', function(done) {
+      var AreaSchema = new Schema({
+        a: String
+      });
+
+      var CompanySchema = new Schema({
+        area: {
+          type: AreaSchema,
+          validate: {
+            validator: function() {
+              return false;
+            },
+            message: 'Not valid Area'
+          }
+        }
+      });
+
+      var Company = mongoose.model('Company', CompanySchema);
+
+      var update = {
+        area: {
+          a: 'Helo'
+        }
+      };
+
+      var opts = {
+        runValidators: true
+      };
+
+      Company.update({}, update, opts, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['area'].message, 'Not valid Area');
+        done();
+      });
+    });
+
     it('update handles casting with mongoose-long (gh-4283)', function(done) {
       require('mongoose-long')(mongoose);
 

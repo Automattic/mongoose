@@ -98,7 +98,7 @@ block content
     options.server.socketOptions = options.replset.socketOptions = { keepAlive: 120 };
     mongoose.connect(uri, options);
 
-  h3#replicaset_connections ReplicaSet Connections
+  h3#replicaset_connections Replica Set Connections
   :markdown
     The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
 

@@ -3114,5 +3114,24 @@ describe('document', function() {
         --remaining || done();
       });
     });
+
+    it('default values with subdoc array (gh-4390)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: [childSchema]
+      });
+
+      parentSchema.path('child').default([{ name: 'test' }]);
+
+      var Parent = db.model('gh4390', parentSchema);
+
+      Parent.create({}, function(error, doc) {
+        assert.ifError(error);
+        assert.deepEqual(doc.toObject().child, [{ name: 'test' }]);
+        done();
+      });
+    });
   });
 });

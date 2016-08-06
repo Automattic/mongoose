@@ -357,6 +357,16 @@ describe('model', function() {
           done();
         });
       });
+
+      it('with typeKey (gh-4339)', function(done) {
+        var options = { typeKey: '$type', discriminatorKey: '_t' };
+        var schema = new Schema({ test: { $type: String } }, options);
+        var Model = mongoose.model('gh4339', schema);
+        Model.discriminator('gh4339_0', new Schema({
+          test2: String
+        }, options));
+        done();
+      });
     });
   });
 });

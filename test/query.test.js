@@ -1658,6 +1658,20 @@ describe('Query', function() {
         });
       });
     });
+
+    it('string as input (gh-4378)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var MyModel = db.model('gh4378', schema);
+
+      assert.throws(function() {
+        MyModel.findOne('');
+      }, /Invalid argument to findOne()/);
+
+      done();
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {

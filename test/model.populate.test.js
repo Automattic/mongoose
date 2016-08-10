@@ -3736,6 +3736,55 @@ describe('model: populate:', function() {
       });
     });
 
+    it('checks field name correctly with nested arrays (gh-4365)', function(done) {
+      var UserSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          default: ''
+        }
+      });
+      db.model('gh4365_0', UserSchema);
+
+      var GroupSchema = new mongoose.Schema({
+        name: String,
+        members: [String]
+      });
+
+      var OrganizationSchema = new mongoose.Schema({
+        members: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh4365_0'
+        }],
+        groups: [GroupSchema]
+      });
+      var OrganizationModel = db.model('gh4365_1', OrganizationSchema);
+
+      var org = {
+        members: [],
+        groups: []
+      };
+      OrganizationModel.create(org, function(error) {
+        assert.ifError(error);
+        OrganizationModel.
+          findOne({}).
+          populate('members', 'name').
+          exec(function(error, org) {
+            assert.ifError(error);
+            org.groups.push({ name: 'Team Rocket' });
+            org.save(function(error) {
+              assert.ifError(error);
+              org.groups[0].members.push('Jessie');
+              assert.equal(org.groups[0].members[0], 'Jessie');
+              org.save(function(error) {
+                assert.ifError(error);
+                assert.equal(org.groups[0].members[0], 'Jessie');
+                done();
+              });
+            });
+          });
+      });
+    });
+
     describe('populate virtuals (gh-2562)', function() {
       it('basic populate virtuals', function(done) {
         var PersonSchema = new Schema({

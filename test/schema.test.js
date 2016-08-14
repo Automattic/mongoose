@@ -1232,6 +1232,16 @@ describe('schema', function() {
         });
       });
     });
+
+    it('prefix (gh-1730)', function(done) {
+      var s = new Schema({});
+
+      s.add({ n: Number }, 'prefix.');
+
+      assert.equal(s.pathType('prefix.n'), 'real');
+      assert.equal(s.pathType('prefix'), 'nested');
+      done();
+    });
   });
 
   it('debugging msgs', function(done) {

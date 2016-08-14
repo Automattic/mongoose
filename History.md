@@ -1,3 +1,17 @@
+4.5.9 / 2016-08-14
+==================
+ * docs: add mixed schema doc for Object literal #4400 [Kikobeats](https://github.com/Kikobeats)
+ * fix(query): cast $geoWithin and convert mongoose objects to POJOs before casting #4392
+ * fix(schematype): dont cast defaults without parent doc #4390
+ * fix(query): disallow passing empty string to findOne() #4378
+ * fix(document): set single nested doc isNew correctly #4369
+ * fix(types): checks field name correctly with nested arrays and populate #4365
+ * fix(drivers): make debug output copy-pastable into mongodb shell #4352
+ * fix(services): run update validators on nested paths #4332
+ * fix(model): handle typeKey with discriminators #4339
+ * fix(query): apply timestamps to child schemas when explicitly specified in update #4049
+ * fix(schema): set prefix as nested path with add() #1730
+
 4.5.8 / 2016-08-01
 ==================
  * fix(model): make changing the discriminator key cause a cast error #4374

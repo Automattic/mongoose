@@ -3089,5 +3089,49 @@ describe('document', function() {
         done();
       });
     });
+
+    it('single nested isNew (gh-4369)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4369', parentSchema);
+      var remaining = 2;
+
+      var doc = new Parent({ child: { name: 'Jacen' } });
+      doc.child.on('isNew', function(val) {
+        assert.ok(!val);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+
+      doc.save(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+    });
+
+    it('default values with subdoc array (gh-4390)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: [childSchema]
+      });
+
+      parentSchema.path('child').default([{ name: 'test' }]);
+
+      var Parent = db.model('gh4390', parentSchema);
+
+      Parent.create({}, function(error, doc) {
+        assert.ifError(error);
+        assert.deepEqual(doc.toObject().child, [{ name: 'test' }]);
+        done();
+      });
+    });
   });
 });

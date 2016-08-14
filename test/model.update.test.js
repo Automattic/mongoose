@@ -1873,6 +1873,89 @@ describe('model: update:', function() {
       });
     });
 
+    it('updates child schema timestamps with $push (gh-4049)', function(done) {
+      var opts = {
+        timestamps: true,
+        toObject: {
+          virtuals: true
+        },
+        toJSON: {
+          virtuals: true
+        }
+      };
+
+      var childSchema = new mongoose.Schema({
+        senderId: { type: String }
+      }, opts);
+
+      var parentSchema = new mongoose.Schema({
+        children: [childSchema]
+      }, opts);
+
+      var Parent = db.model('gh4049', parentSchema);
+
+      var b2 = new Parent();
+      b2.save(function(err, doc) {
+        var query = { _id: doc._id };
+        var update = { $push: { children: { senderId: '234' } } };
+        var opts = { 'new': true };
+        Parent.findOneAndUpdate(query, update, opts).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.children.length, 1);
+          assert.equal(res.children[0].senderId, '234');
+          assert.ok(res.children[0].createdAt);
+          assert.ok(res.children[0].updatedAt);
+          done();
+        });
+      });
+    });
+
+    it('updates child schema timestamps with $set (gh-4049)', function(done) {
+      var opts = {
+        timestamps: true,
+        toObject: {
+          virtuals: true
+        },
+        toJSON: {
+          virtuals: true
+        }
+      };
+
+      var childSchema = new mongoose.Schema({
+        senderId: { type: String }
+      }, opts);
+
+      var parentSchema = new mongoose.Schema({
+        children: [childSchema],
+        child: childSchema
+      }, opts);
+
+      var Parent = db.model('gh4049_0', parentSchema);
+
+      var b2 = new Parent();
+      b2.save(function(err, doc) {
+        var query = { _id: doc._id };
+        var update = {
+          $set: {
+            children: [{ senderId: '234' }],
+            child: { senderId: '567' }
+          }
+        };
+        var opts = { 'new': true };
+        Parent.findOneAndUpdate(query, update, opts).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.children.length, 1);
+          assert.equal(res.children[0].senderId, '234');
+          assert.ok(res.children[0].createdAt);
+          assert.ok(res.children[0].updatedAt);
+
+          assert.ok(res.child.createdAt);
+          assert.ok(res.child.updatedAt);
+          done();
+        });
+      });
+    });
+
     it('update handles casting with mongoose-long (gh-4283)', function(done) {
       require('mongoose-long')(mongoose);
 

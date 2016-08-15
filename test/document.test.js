@@ -3133,5 +3133,19 @@ describe('document', function() {
         done();
       });
     });
+
+    it('handles invalid dates (gh-4404)', function(done) {
+      var testSchema = new Schema({
+        date: Date
+      });
+
+      var Test = db.model('gh4404', testSchema);
+
+      Test.create({ date: new Date('invalid date') }, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['date'].name, 'CastError');
+        done();
+      });
+    });
   });
 });

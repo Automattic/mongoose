@@ -38,9 +38,6 @@ PersonSchema.virtual('name.full').set(function(name) {
 PersonSchema.path('gender').validate(function(value) {
   return /[A-Z]/.test(value);
 }, 'Invalid name');
-PersonSchema.post('save', function(next) {
-  next();
-});
 PersonSchema.set('toObject', {getters: true, virtuals: true});
 PersonSchema.set('toJSON', {getters: true, virtuals: true});
 
@@ -202,6 +199,17 @@ describe('model', function() {
       done();
     });
 
+    it('throws error if model name is taken (gh-4148)', function(done) {
+      var Foo = db.model('model-discriminator-4148', new Schema({}));
+      db.model('model-discriminator-4148-bar', new Schema({}));
+      assert.throws(
+        function() {
+          Foo.discriminator('model-discriminator-4148-bar', new Schema());
+        },
+        /Cannot overwrite `model-discriminator-4148-bar`/);
+      done();
+    });
+
     it('works with nested schemas (gh-2821)', function(done) {
       var MinionSchema = function() {
         mongoose.Schema.apply(this, arguments);
@@ -226,11 +234,11 @@ describe('model', function() {
       var PersonSchema = new BaseSchema();
       var BossSchema = new BaseSchema({
         department: String
-      });
+      }, { id: false });
 
       assert.doesNotThrow(function() {
         var Person = db.model('gh2821', PersonSchema);
-        Person.discriminator('Boss', BossSchema);
+        Person.discriminator('gh2821-Boss', BossSchema);
       });
       done();
     });
@@ -249,15 +257,12 @@ describe('model', function() {
       });
 
       it('is not customizable', function(done) {
-        var errorMessage,
-            CustomizedSchema = new Schema({}, {capped: true});
-        try {
-          Person.discriminator('model-discriminator-custom', CustomizedSchema);
-        } catch (e) {
-          errorMessage = e.message;
-        }
+        var CustomizedSchema = new Schema({}, {capped: true});
 
-        assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON, toObject, _id)');
+        assert.throws(function() {
+          Person.discriminator('model-discriminator-custom', CustomizedSchema);
+        }, /Can't customize discriminator option capped/);
+
         done();
       });
     });
@@ -311,7 +316,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 4);
+        assert.equal(Employee.schema.callQueue.length, 5);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
@@ -340,6 +345,38 @@ describe('model', function() {
 
         assert.deepEqual(personOptions, employeeOptions);
         done();
+      });
+
+      it('does not allow setting discriminator key (gh-2041)', function(done) {
+        var doc = new Employee({ __t: 'fake' });
+        assert.equal(doc.__t, 'model-discriminator-employee');
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['__t'].reason.message,
+            'Can\'t set discriminator key "__t"');
+          done();
+        });
+      });
+
+      it('with typeKey (gh-4339)', function(done) {
+        var options = { typeKey: '$type', discriminatorKey: '_t' };
+        var schema = new Schema({ test: { $type: String } }, options);
+        var Model = mongoose.model('gh4339', schema);
+        Model.discriminator('gh4339_0', new Schema({
+          test2: String
+        }, options));
+        done();
+      });
+
+      it('cloning with discriminator key (gh-4387)', function(done) {
+        var employee = new Employee({ name: { first: 'Val', last: 'Karpov' } });
+        var clone = new employee.constructor(employee);
+
+        // Should not error because we have the same discriminator key
+        clone.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
       });
     });
   });

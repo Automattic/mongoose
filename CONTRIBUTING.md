@@ -1,13 +1,16 @@
 ## Contributing to Mongoose
 
-If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](http://stackoverflow.com/questions/tagged/mongoose), our [Google Group](http://groups.google.com/group/mongoose-orm), or on the #mongoosejs irc channel on freenode.
+If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](http://stackoverflow.com/questions/tagged/mongoose), or on [Gitter](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Reporting bugs
 
-- Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
-  - Please describe the issue you are experiencing, along with any associated stack trace.
-  - Please post code that reproduces the issue, the version of mongoose, node version, and mongodb version.
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+- Before opening a new issue, look for existing [issues](https://github.com/Automattic/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/Automattic/mongoose/issues/new).
+  - Please post any relevant code samples, preferably a standalone script that
+  reproduces your issue. Do **not** describe your issue in prose, show your
+  code.
+  - If the bug involves an error, please post the stack trace.
+  - Please post the version of mongoose and mongodb that you're using.
+  - Please write bug reports in JavaScript (ES5 or ES2015), not coffeescript, typescript, etc.
 
 ### Requesting new features
 
@@ -18,13 +21,13 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Fixing bugs / Adding features
 
 - Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. You can create a new issue [here](https://github.com/learnboost/mongoose/issues/new).
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_.
 - Fork the [repo](https://github.com/Automattic/mongoose) _or_ for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 - Follow the general coding style of the rest of the project:
   - 2 space tabs
   - no trailing whitespace
   - inline documentation for new methods, class members, etc.
-  - 1 space between conditionals/functions, and their parenthesis and curly braces
+  - 1 space between conditionals, no space before function parenthesis
     - `if (..) {`
     - `for (..) {`
     - `while (..) {`
@@ -34,9 +37,11 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Running the tests
 - Open a terminal and navigate to the root of the project
 - execute `npm install` to install the necessary dependencies
+- start a mongodb instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data> --port 27017`
 - execute `npm test` to run the tests (we're using [mocha](http://mochajs.org/))
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   - any mocha flags can be specified with `-- <mocha flags here>`
+  - For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
 
 ### Documentation
 
@@ -48,4 +53,4 @@ If you'd like to preview your documentation changes, first commit your changes t
 
 ### Plugins website
 
-The [plugins](http://plugins.mongoosejs.com/) site is also an [open source project](https://github.com/aheckmann/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!

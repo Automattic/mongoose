@@ -2,20 +2,23 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    random = require('../build/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    Document = require('../build/document'),
-    DocumentObjectId = mongoose.Types.ObjectId,
-    SchemaType = mongoose.SchemaType,
-    ValidatorError = SchemaType.ValidatorError,
-    ValidationError = mongoose.Document.ValidationError,
-    MongooseError = mongoose.Error,
-    EmbeddedDocument = require('../build/types/embedded'),
-    Query = require('../build/query');
+var start = require('./common');
+var mongoose = start.mongoose;
+var assert = require('power-assert');
+var random = require('../build/utils').random;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
+var Document = require('../build/document');
+var DocumentObjectId = mongoose.Types.ObjectId;
+var SchemaType = mongoose.SchemaType;
+var ValidatorError = SchemaType.ValidatorError;
+var ValidationError = mongoose.Document.ValidationError;
+var MongooseError = mongoose.Error;
+var EmbeddedDocument = require('../build/types/embedded');
+var Query = require('../build/query');
+var validator = require('validator');
+
+var _ = require('lodash');
 
 /**
  * Test Document constructor.
@@ -80,7 +83,7 @@ var dateSetterCalled = false;
 schema.path('date').set(function(v) {
   // should not have been cast to a Date yet
   if (v !== undefined) {
-    assert.equal('string', typeof v);
+    assert.equal(typeof v, 'string');
   }
   dateSetterCalled = true;
   return v;
@@ -127,14 +130,14 @@ describe('document', function() {
         }
       });
 
-      assert.equal('test', doc.test);
+      assert.equal(doc.test, 'test');
       assert.ok(doc.oids instanceof Array);
       assert.equal(doc.nested.age, 5);
       assert.equal(String(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
-      assert.equal(7, doc.nested.agePlus2);
-      assert.equal('5my path', doc.nested.path);
+      assert.equal(doc.nested.agePlus2, 7);
+      assert.equal(doc.nested.path, '5my path');
       doc.nested.setAge = 10;
-      assert.equal(10, doc.nested.age);
+      assert.equal(doc.nested.age, 10);
       doc.nested.setr = 'set it';
       assert.equal(doc.getValue('nested.setr'), 'set it setter');
 
@@ -149,7 +152,7 @@ describe('document', function() {
         }
       });
 
-      assert.equal('toop', doc2.test);
+      assert.equal(doc2.test, 'toop');
       assert.ok(doc2.oids instanceof Array);
       assert.equal(doc2.nested.age, 2);
 
@@ -167,7 +170,7 @@ describe('document', function() {
       assert.equal(doc2.nested2.yup.nested2, undefined);
       assert.equal(doc2.nested2.yup.yup, undefined);
       assert.equal(doc2.nested2.yup.age, undefined);
-      assert.equal('object', typeof doc2.nested2.yup);
+      assert.equal(typeof doc2.nested2.yup, 'object');
 
       doc2.nested2.yup = {
         age: 150,
@@ -183,7 +186,7 @@ describe('document', function() {
       assert.equal(doc2.nested2.nested, 'y');
       assert.equal(doc2.nested2.yup.nested, true);
       assert.equal(doc2.nested2.yup.yup, 'Yesiree');
-      assert.equal(150, doc2.nested2.yup.age);
+      assert.equal(doc2.nested2.yup.age, 150);
 
       assert.equal(String(doc2.nested.cool), '4cf70857337498f95900001c');
 
@@ -204,18 +207,18 @@ describe('document', function() {
 
     assert.equal(doc.isModified('test'), false);
     doc.test = 'Woot';
-    assert.equal('Woot', doc.test);
-    assert.equal(true, doc.isModified('test'));
+    assert.equal(doc.test, 'Woot');
+    assert.equal(doc.isModified('test'), true);
 
     assert.equal(doc.isModified('nested.age'), false);
     doc.nested.age = 2;
-    assert.equal(2, doc.nested.age);
+    assert.equal(doc.nested.age, 2);
     assert.ok(doc.isModified('nested.age'));
 
     doc.nested = {path: 'overwrite the entire nested object'};
-    assert.equal(undefined, doc.nested.age);
-    assert.equal(1, Object.keys(doc._doc.nested).length);
-    assert.equal('overwrite the entire nested object', doc.nested.path);
+    assert.equal(doc.nested.age, undefined);
+    assert.equal(Object.keys(doc._doc.nested).length, 1);
+    assert.equal(doc.nested.path, 'overwrite the entire nested object');
     assert.ok(doc.isModified('nested'));
     done();
   });
@@ -228,7 +231,7 @@ describe('document', function() {
 
   it('test shortcut of id hexString', function(done) {
     var doc = new TestDocument();
-    assert.equal('string', typeof doc.id);
+    assert.equal(typeof doc.id, 'string');
     done();
   });
 
@@ -277,70 +280,70 @@ describe('document', function() {
 
     assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('5my path', clone.nested.path);
-    assert.equal(undefined, clone.nested.agePlus2);
-    assert.equal(undefined, clone.em[0].works);
+    assert.equal(clone.nested.path, '5my path');
+    assert.equal(clone.nested.agePlus2, undefined);
+    assert.equal(clone.em[0].works, undefined);
     assert.ok(clone.date instanceof Date);
 
     clone = doc.toObject({virtuals: true});
 
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.nested.agePlus2, 7);
     assert.equal(clone.em[0].works, 'em virtual works');
 
     clone = doc.toObject({getters: true});
 
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('5my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
-    assert.equal('em virtual works', clone.em[0].works);
+    assert.equal(clone.nested.path, '5my path');
+    assert.equal(clone.nested.agePlus2, 7);
+    assert.equal(clone.em[0].works, 'em virtual works');
 
     // test toObject options
     doc.schema.options.toObject = {virtuals: true};
     clone = doc.toObject({transform: false, virtuals: true});
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
 
-    assert.equal('my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
-    assert.equal('asdf', clone.em[0].title);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.nested.agePlus2, 7);
+    assert.equal(clone.em[0].title, 'asdf');
     delete doc.schema.options.toObject;
 
     // minimize
     clone = doc.toObject({minimize: true});
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
     clone = doc.toObject({minimize: true, getters: true});
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
     clone = doc.toObject({minimize: false});
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     clone = doc.toObject('2');
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
 
     doc.schema.options.toObject = {minimize: false};
     clone = doc.toObject({transform: false, minimize: false});
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     delete doc.schema.options.toObject;
 
     doc.schema.options.minimize = false;
     clone = doc.toObject();
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
+    assert.equal(clone.nested2.constructor.name, 'Object');
+    assert.equal(Object.keys(clone.nested2).length, 1);
     doc.schema.options.minimize = true;
     clone = doc.toObject();
-    assert.equal(undefined, clone.nested2);
+    assert.equal(clone.nested2, undefined);
 
     // transform
     doc.schema.options.toObject = {};
@@ -361,8 +364,8 @@ describe('document', function() {
     assert.ok(undefined === clone.em);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
-    assert.equal('test', clone.test);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.test, 'test');
+    assert.equal(clone.nested.age, 5);
 
     // transform with return value
     var out = {myid: doc._id.toString()};
@@ -381,12 +384,12 @@ describe('document', function() {
     // ignored transform with inline options
     clone = doc.toObject({x: 1, transform: false});
     assert.ok(!('myid' in clone));
-    assert.equal('test', clone.test);
+    assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
+    assert.equal(clone.nested.age, 5);
     assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal('Object', clone.em[0].constructor.name);
+    assert.equal(clone.nested.path, 'my path');
+    assert.equal(clone.em[0].constructor.name, 'Object');
 
     // applied transform when inline transform is true
     clone = doc.toObject({x: 1});
@@ -403,7 +406,7 @@ describe('document', function() {
       transform: xform,
       fields: '_id em numbers oids nested'
     });
-    assert.equal('test', doc.test);
+    assert.equal(doc.test, 'test');
     assert.ok(undefined === clone.em);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
@@ -497,299 +500,408 @@ describe('document', function() {
     });
   });
 
-  it('does not apply toObject functions of subdocuments to root document', function(done) {
-    var subdocSchema = new Schema({
-      test: String,
-      wow: String
+  describe('toObject', function() {
+    var db;
+    before(function() {
+      db = start();
     });
 
-    subdocSchema.options.toObject = {};
-    subdocSchema.options.toObject.transform = function(doc, ret) {
-      delete ret.wow;
-    };
-
-    var docSchema = new Schema({
-      foo: String,
-      wow: Boolean,
-      sub: [subdocSchema]
-    });
-
-    var db = start(),
-        Doc = db.model('Doc', docSchema);
-
-    Doc.create({
-      foo: 'someString',
-      wow: true,
-      sub: [{
-        test: 'someOtherString',
-        wow: 'thisIsAString'
-      }]
-    }, function(err, doc) {
-      var obj = doc.toObject({
-        transform: function(doc, ret) {
-          ret.phew = 'new';
-        }
-      });
-
-      assert.equal(obj.phew, 'new');
-      assert.ok(!doc.sub.wow);
-
+    after(function(done) {
       db.close(done);
     });
-  });
 
-  it('handles child schema transforms', function(done) {
-    var db = start();
-    var userSchema = new Schema({
-      name: String,
-      email: String
-    });
-    var topicSchema = new Schema({
-      title: String,
-      email: String,
-      followers: [userSchema]
-    });
+    it('does not apply toObject functions of subdocuments to root document', function(done) {
+      var subdocSchema = new Schema({
+        test: String,
+        wow: String
+      });
 
-    userSchema.options.toObject = {
-      transform: function(doc, ret) {
-        delete ret.email;
-      }
-    };
+      subdocSchema.options.toObject = {};
+      subdocSchema.options.toObject.transform = function(doc, ret) {
+        delete ret.wow;
+      };
 
-    topicSchema.options.toObject = {
-      transform: function(doc, ret) {
-        ret.title = ret.title.toLowerCase();
-      }
-    };
+      var docSchema = new Schema({
+        foo: String,
+        wow: Boolean,
+        sub: [subdocSchema]
+      });
 
-    var Topic = db.model('gh2691', topicSchema, 'gh2691');
+      var Doc = db.model('Doc', docSchema);
 
-    var topic = new Topic({
-      title: 'Favorite Foods',
-      email: 'a@b.co',
-      followers: [{name: 'Val', email: 'val@test.co'}]
-    });
+      Doc.create({
+        foo: 'someString',
+        wow: true,
+        sub: [{
+          test: 'someOtherString',
+          wow: 'thisIsAString'
+        }]
+      }, function(err, doc) {
+        var obj = doc.toObject({
+          transform: function(doc, ret) {
+            ret.phew = 'new';
+          }
+        });
 
-    var output = topic.toObject({transform: true});
-    assert.equal('favorite foods', output.title);
-    assert.equal('a@b.co', output.email);
-    assert.equal('Val', output.followers[0].name);
-    assert.equal(undefined, output.followers[0].email);
-    db.close(done);
-  });
+        assert.equal(obj.phew, 'new');
+        assert.ok(!doc.sub.wow);
 
-  it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
-    var db = start();
-    var userSchema = new Schema({
-      firstName: String,
-      lastName: String,
-      password: String
+        done();
+      });
     });
 
-    userSchema.virtual('fullName').get(function() {
-      return this.firstName + ' ' + this.lastName;
+    it('handles child schema transforms', function(done) {
+      var userSchema = new Schema({
+        name: String,
+        email: String
+      });
+      var topicSchema = new Schema({
+        title: String,
+        email: String,
+        followers: [userSchema]
+      });
+
+      userSchema.options.toObject = {
+        transform: function(doc, ret) {
+          delete ret.email;
+        }
+      };
+
+      topicSchema.options.toObject = {
+        transform: function(doc, ret) {
+          ret.title = ret.title.toLowerCase();
+        }
+      };
+
+      var Topic = db.model('gh2691', topicSchema, 'gh2691');
+
+      var topic = new Topic({
+        title: 'Favorite Foods',
+        email: 'a@b.co',
+        followers: [{name: 'Val', email: 'val@test.co'}]
+      });
+
+      var output = topic.toObject({transform: true});
+      assert.equal(output.title, 'favorite foods');
+      assert.equal(output.email, 'a@b.co');
+      assert.equal(output.followers[0].name, 'Val');
+      assert.equal(output.followers[0].email, undefined);
+      done();
     });
 
-    userSchema.set('toObject', {virtuals: false});
+    it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
+      var userSchema = new Schema({
+        firstName: String,
+        lastName: String,
+        password: String
+      });
 
-    var postSchema = new Schema({
-      owner: {type: Schema.Types.ObjectId, ref: 'gh-2035-user'},
-      content: String
-    });
+      userSchema.virtual('fullName').get(function() {
+        return this.firstName + ' ' + this.lastName;
+      });
 
-    postSchema.virtual('capContent').get(function() {
-      return this.content.toUpperCase();
-    });
+      userSchema.set('toObject', {virtuals: false});
 
-    postSchema.set('toObject', {virtuals: true});
-    var User = db.model('gh-2035-user', userSchema, 'gh-2035-user');
-    var Post = db.model('gh-2035-post', postSchema, 'gh-2035-post');
+      var postSchema = new Schema({
+        owner: {type: Schema.Types.ObjectId, ref: 'gh-2035-user'},
+        content: String
+      });
 
-    var user = new User({firstName: 'Joe', lastName: 'Smith', password: 'password'});
+      postSchema.virtual('capContent').get(function() {
+        return this.content.toUpperCase();
+      });
 
-    user.save(function(err, savedUser) {
-      assert.ifError(err);
-      var post = new Post({owner: savedUser._id, content: 'lorem ipsum'});
-      post.save(function(err, savedPost) {
+      postSchema.set('toObject', {virtuals: true});
+      var User = db.model('gh-2035-user', userSchema, 'gh-2035-user');
+      var Post = db.model('gh-2035-post', postSchema, 'gh-2035-post');
+
+      var user = new User({firstName: 'Joe', lastName: 'Smith', password: 'password'});
+
+      user.save(function(err, savedUser) {
         assert.ifError(err);
-        Post.findById(savedPost._id).populate('owner').exec(function(err, newPost) {
+        var post = new Post({owner: savedUser._id, content: 'lorem ipsum'});
+        post.save(function(err, savedPost) {
           assert.ifError(err);
-          var obj = newPost.toObject();
-          assert.equal(obj.owner.fullName, undefined);
-          db.close(done);
+          Post.findById(savedPost._id).populate('owner').exec(function(err, newPost) {
+            assert.ifError(err);
+            var obj = newPost.toObject();
+            assert.equal(obj.owner.fullName, undefined);
+            done();
+          });
         });
       });
     });
   });
 
-  it('toJSON options', function(done) {
-    var doc = new TestDocument();
-
-    doc.init({
-      test: 'test',
-      oids: [],
-      em: [{title: 'asdf'}],
-      nested: {
-        age: 5,
-        cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
-        path: 'my path'
-      },
-      nested2: {}
+  describe('toJSON', function() {
+    var db;
+    before(function() {
+      db = start();
     });
 
-    // override to check if toJSON gets fired
-    var path = TestDocument.prototype.schema.path('em');
-    path.casterConstructor.prototype.toJSON = function() {
-      return {};
-    };
+    after(function(done) {
+      db.close(done);
+    });
 
-    doc.schema.options.toJSON = {virtuals: true};
-    var clone = doc.toJSON();
-    assert.equal('test', clone.test);
-    assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
-    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal(7, clone.nested.agePlus2);
-    assert.equal('Object', clone.em[0].constructor.name);
-    assert.equal(0, Object.keys(clone.em[0]).length);
-    delete doc.schema.options.toJSON;
-    delete path.casterConstructor.prototype.toJSON;
+    it('toJSON options', function(done) {
+      var doc = new TestDocument();
 
-    doc.schema.options.toJSON = {minimize: false};
-    clone = doc.toJSON();
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
-    clone = doc.toJSON('8');
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
-
-    // gh-852
-    var arr = [doc],
-        err = false,
-        str;
-    try {
-      str = JSON.stringify(arr);
-    } catch (_) {
-      err = true;
-    }
-    assert.equal(false, err);
-    assert.ok(/nested2/.test(str));
-    assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(1, Object.keys(clone.nested2).length);
-
-    // transform
-    doc.schema.options.toJSON = {};
-    doc.schema.options.toJSON.transform = function xform(doc, ret) {
-      // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
-        return;
-      }
-
-      delete ret.em;
-      delete ret.numbers;
-      delete ret.oids;
-      ret._id = ret._id.toString();
-    };
-
-    clone = doc.toJSON();
-    assert.equal(doc.id, clone._id);
-    assert.ok(undefined === clone.em);
-    assert.ok(undefined === clone.numbers);
-    assert.ok(undefined === clone.oids);
-    assert.equal('test', clone.test);
-    assert.equal(5, clone.nested.age);
-
-    // transform with return value
-    var out = {myid: doc._id.toString()};
-    doc.schema.options.toJSON.transform = function(doc, ret) {
-      // ignore embedded docs
-      if (typeof doc.ownerDocument === 'function') {
-        return;
-      }
-
-      return {myid: ret._id.toString()};
-    };
-
-    clone = doc.toJSON();
-    assert.deepEqual(out, clone);
-
-    // ignored transform with inline options
-    clone = doc.toJSON({x: 1, transform: false});
-    assert.ok(!('myid' in clone));
-    assert.equal('test', clone.test);
-    assert.ok(clone.oids instanceof Array);
-    assert.equal(5, clone.nested.age);
-    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal('my path', clone.nested.path);
-    assert.equal('Object', clone.em[0].constructor.name);
-
-    // applied transform when inline transform is true
-    clone = doc.toJSON({x: 1});
-    assert.deepEqual(out, clone);
-
-    // transform passed inline
-    function xform(self, doc, opts) {
-      opts.fields.split(' ').forEach(function(field) {
-        delete doc[field];
+      doc.init({
+        test: 'test',
+        oids: [],
+        em: [{title: 'asdf'}],
+        nested: {
+          age: 5,
+          cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+          path: 'my path'
+        },
+        nested2: {}
       });
-    }
 
-    clone = doc.toJSON({
-      transform: xform,
-      fields: '_id em numbers oids nested'
+      // override to check if toJSON gets fired
+      var path = TestDocument.prototype.schema.path('em');
+      path.casterConstructor.prototype.toJSON = function() {
+        return {};
+      };
+
+      doc.schema.options.toJSON = {virtuals: true};
+      var clone = doc.toJSON();
+      assert.equal(clone.test, 'test');
+      assert.ok(clone.oids instanceof Array);
+      assert.equal(clone.nested.age, 5);
+      assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
+      assert.equal(clone.nested.path, 'my path');
+      assert.equal(clone.nested.agePlus2, 7);
+      assert.equal(clone.em[0].constructor.name, 'Object');
+      assert.equal(Object.keys(clone.em[0]).length, 0);
+      delete doc.schema.options.toJSON;
+      delete path.casterConstructor.prototype.toJSON;
+
+      doc.schema.options.toJSON = {minimize: false};
+      clone = doc.toJSON();
+      assert.equal(clone.nested2.constructor.name, 'Object');
+      assert.equal(Object.keys(clone.nested2).length, 1);
+      clone = doc.toJSON('8');
+      assert.equal(clone.nested2.constructor.name, 'Object');
+      assert.equal(Object.keys(clone.nested2).length, 1);
+
+      // gh-852
+      var arr = [doc],
+          err = false,
+          str;
+      try {
+        str = JSON.stringify(arr);
+      } catch (_) {
+        err = true;
+      }
+      assert.equal(err, false);
+      assert.ok(/nested2/.test(str));
+      assert.equal(clone.nested2.constructor.name, 'Object');
+      assert.equal(Object.keys(clone.nested2).length, 1);
+
+      // transform
+      doc.schema.options.toJSON = {};
+      doc.schema.options.toJSON.transform = function xform(doc, ret) {
+        // ignore embedded docs
+        if (typeof doc.ownerDocument === 'function') {
+          return;
+        }
+
+        delete ret.em;
+        delete ret.numbers;
+        delete ret.oids;
+        ret._id = ret._id.toString();
+      };
+
+      clone = doc.toJSON();
+      assert.equal(clone._id, doc.id);
+      assert.ok(undefined === clone.em);
+      assert.ok(undefined === clone.numbers);
+      assert.ok(undefined === clone.oids);
+      assert.equal(clone.test, 'test');
+      assert.equal(clone.nested.age, 5);
+
+      // transform with return value
+      var out = {myid: doc._id.toString()};
+      doc.schema.options.toJSON.transform = function(doc, ret) {
+        // ignore embedded docs
+        if (typeof doc.ownerDocument === 'function') {
+          return;
+        }
+
+        return {myid: ret._id.toString()};
+      };
+
+      clone = doc.toJSON();
+      assert.deepEqual(out, clone);
+
+      // ignored transform with inline options
+      clone = doc.toJSON({x: 1, transform: false});
+      assert.ok(!('myid' in clone));
+      assert.equal(clone.test, 'test');
+      assert.ok(clone.oids instanceof Array);
+      assert.equal(clone.nested.age, 5);
+      assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
+      assert.equal(clone.nested.path, 'my path');
+      assert.equal(clone.em[0].constructor.name, 'Object');
+
+      // applied transform when inline transform is true
+      clone = doc.toJSON({x: 1});
+      assert.deepEqual(out, clone);
+
+      // transform passed inline
+      function xform(self, doc, opts) {
+        opts.fields.split(' ').forEach(function(field) {
+          delete doc[field];
+        });
+      }
+
+      clone = doc.toJSON({
+        transform: xform,
+        fields: '_id em numbers oids nested'
+      });
+      assert.equal(doc.test, 'test');
+      assert.ok(undefined === clone.em);
+      assert.ok(undefined === clone.numbers);
+      assert.ok(undefined === clone.oids);
+      assert.ok(undefined === clone._id);
+      assert.ok(undefined === clone.nested);
+
+      // all done
+      delete doc.schema.options.toJSON;
+      done();
     });
-    assert.equal('test', doc.test);
-    assert.ok(undefined === clone.em);
-    assert.ok(undefined === clone.numbers);
-    assert.ok(undefined === clone.oids);
-    assert.ok(undefined === clone._id);
-    assert.ok(undefined === clone.nested);
 
-    // all done
-    delete doc.schema.options.toJSON;
-    done();
+    it('jsonifying an object', function(done) {
+      var doc = new TestDocument({test: 'woot'}),
+          oidString = doc._id.toString();
+      // convert to json string
+      var json = JSON.stringify(doc);
+      // parse again
+      var obj = JSON.parse(json);
+
+      assert.equal(obj.test, 'woot');
+      assert.equal(obj._id, oidString);
+      done();
+    });
+
+    it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
+      var userSchema, User, groupSchema, Group;
+
+      userSchema = new Schema({name: String});
+      // includes virtual path when 'toJSON'
+      userSchema.set('toJSON', {getters: true});
+      userSchema.virtual('hello').get(function() {
+        return 'Hello, ' + this.name;
+      });
+      User = db.model('User', userSchema);
+
+      groupSchema = new Schema({
+        name: String,
+        _users: [{type: Schema.ObjectId, ref: 'User'}]
+      });
+
+      Group = db.model('Group', groupSchema);
+
+      User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
+        assert.ifError(err);
+
+        new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
+          Group.findById(group).populate('_users').exec(function(err, group) {
+            assert.ifError(err);
+            assert.ok(group.toJSON()._users[0].hello);
+            done();
+          });
+        });
+      });
+    });
   });
 
-  it('jsonifying an object', function(done) {
-    var doc = new TestDocument({test: 'woot'}),
-        oidString = doc._id.toString();
-    // convert to json string
-    var json = JSON.stringify(doc);
-    // parse again
-    var obj = JSON.parse(json);
-
-    assert.equal('woot', obj.test);
-    assert.equal(obj._id, oidString);
-    done();
-  });
-  it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
-    var db = start();
-    var userSchema, User, groupSchema, Group;
-
-    userSchema = new Schema({name: String});
-    // includes virtual path when 'toJSON'
-    userSchema.set('toJSON', {getters: true});
-    userSchema.virtual('hello').get(function() {
-      return 'Hello, ' + this.name;
-    });
-    User = db.model('User', userSchema);
-
-    groupSchema = new Schema({
-      name: String,
-      _users: [{type: Schema.ObjectId, ref: 'User'}]
+  describe('inspect', function() {
+    var db;
+    before(function() {
+      db = start();
     });
 
-    Group = db.model('Group', groupSchema);
+    after(function(done) {
+      db.close(done);
+    });
 
-    User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
-      assert.ifError(err);
+    it('inspect inherits schema options (gh-4001)', function(done) {
+      var opts = {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      };
+      var taskSchema = mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      }, opts);
 
-      new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
-        Group.findById(group).populate('_users').exec(function(err, group) {
-          assert.ifError(err);
-          assert.ok(group.toJSON()._users[0].hello);
-          db.close(done);
+      taskSchema.virtual('title').
+        get(function() {
+          return this.name;
+        }).
+        set(function(title) {
+          this.name = title;
+        });
+
+      var Task = db.model('gh4001', taskSchema);
+
+      var doc = { name: 'task1', title: 'task999' };
+      Task.collection.insert(doc, function(error) {
+        assert.ifError(error);
+        Task.findById(doc._id, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.inspect().title, 'task1');
+          done();
+        });
+      });
+    });
+
+    it('does not apply transform to populated docs (gh-4213)', function(done) {
+      var UserSchema = new Schema({
+        name: String
+      });
+
+      var PostSchema = new Schema({
+        title: String,
+        postedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh4213'
+        }
+      }, {
+        toObject: {
+          transform: function(doc, ret) {
+            delete ret._id;
+          }
+        },
+        toJSON: {
+          transform: function(doc, ret) {
+            delete ret._id;
+          }
+        }
+      });
+
+      var User = db.model('gh4213', UserSchema);
+      var Post = db.model('gh4213_0', PostSchema);
+
+      var val = new User({ name: 'Val' });
+      var post = new Post({ title: 'Test', postedBy: val._id });
+
+      Post.create(post, function(error) {
+        assert.ifError(error);
+        User.create(val, function(error) {
+          assert.ifError(error);
+          Post.find({}).
+            populate('postedBy').
+            exec(function(error, posts) {
+              assert.ifError(error);
+              assert.equal(posts.length, 1);
+              assert.ok(posts[0].postedBy._id);
+              done();
+            });
         });
       });
     });
@@ -812,10 +924,10 @@ describe('document', function() {
       d.save(function() {
         var oldUpdate = docs.update;
         docs.update = function(query, operation) {
-          assert.equal(1, Object.keys(query).length);
-          assert.equal(query._id, d._id);
-          assert.equal(1, Object.keys(operation).length);
-          assert.equal(1, Object.keys(operation.$set).length);
+          assert.equal(Object.keys(query).length, 1);
+          assert.equal(d._id, query._id);
+          assert.equal(Object.keys(operation).length, 1);
+          assert.equal(Object.keys(operation.$set).length, 1);
           assert.equal(operation.$set.text, 'A changed doc');
           called = true;
           docs.update = oldUpdate;
@@ -823,7 +935,7 @@ describe('document', function() {
         };
         d.update({$set: {text: 'A changed doc'}}, function(err) {
           assert.ifError(err);
-          assert.equal(true, called);
+          assert.equal(called, true);
           db.close(done);
         });
       });
@@ -871,28 +983,28 @@ describe('document', function() {
     db.close();
 
     var p = new P({embed: [{name: 'peanut'}]});
-    assert.equal('function', typeof p.embed[0].test);
-    assert.equal('function', typeof E.ten);
-    assert.equal('peanut butter', p.embed[0].test());
-    assert.equal(10, E.ten());
+    assert.equal(typeof p.embed[0].test, 'function');
+    assert.equal(typeof E.ten, 'function');
+    assert.equal(p.embed[0].test(), 'peanut butter');
+    assert.equal(E.ten(), 10);
 
     // test push casting
     p = new P;
     p.embed.push({name: 'apple'});
-    assert.equal('function', typeof p.embed[0].test);
-    assert.equal('function', typeof E.ten);
-    assert.equal('apple butter', p.embed[0].test());
+    assert.equal(typeof p.embed[0].test, 'function');
+    assert.equal(typeof E.ten, 'function');
+    assert.equal(p.embed[0].test(), 'apple butter');
     done();
   });
 
   it('setting a positional path does not cast value to array', function(done) {
     var doc = new TestDocument;
     doc.init({numbers: [1, 3]});
-    assert.equal(1, doc.numbers[0]);
-    assert.equal(3, doc.numbers[1]);
+    assert.equal(doc.numbers[0], 1);
+    assert.equal(doc.numbers[1], 3);
     doc.set('numbers.1', 2);
-    assert.equal(1, doc.numbers[0]);
-    assert.equal(2, doc.numbers[1]);
+    assert.equal(doc.numbers[0], 1);
+    assert.equal(doc.numbers[1], 2);
     done();
   });
 
@@ -926,7 +1038,7 @@ describe('document', function() {
 
     new S({title: 'test'});
     db.close();
-    assert.equal(false, traced);
+    assert.equal(traced, false);
     done();
   });
 
@@ -940,7 +1052,7 @@ describe('document', function() {
       assert.ifError(err);
       T.findById(t).select('name').exec(function(err, t) {
         assert.ifError(err);
-        assert.equal(undefined, t.req);
+        assert.equal(t.req, void 0);
         t.name = 'wooo';
         t.save(function(err) {
           assert.ifError(err);
@@ -993,14 +1105,14 @@ describe('document', function() {
       var m = new M({prop: 'gh891', nick: 'validation test'});
       m.save(function(err) {
         assert.ifError(err);
-        assert.equal(true, called);
+        assert.equal(called, true);
         called = false;
         M.findById(m, 'nick', function(err, m) {
-          assert.equal(false, called);
+          assert.equal(called, false);
           assert.ifError(err);
           m.nick = 'gh-891';
           m.save(function(err) {
-            assert.equal(false, called);
+            assert.equal(called, false);
             assert.ifError(err);
             db.close(done);
           });
@@ -1153,14 +1265,14 @@ describe('document', function() {
 
         var M = db.model('validateSchema-array2', schema, collection);
         var m = new M({name: 'gh1109-2', arr: [1]});
-        assert.equal(false, called);
+        assert.equal(called, false);
         m.save(function(err) {
-          assert.equal('ValidationError: BAM', String(err));
-          assert.equal(true, called);
+          assert.equal(String(err), 'ValidationError: BAM');
+          assert.equal(called, true);
           m.arr.push(2);
           called = false;
           m.save(function(err) {
-            assert.equal(true, called);
+            assert.equal(called, true);
             assert.ifError(err);
             done();
           });
@@ -1312,15 +1424,18 @@ describe('document', function() {
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    post.invalidate('baz', 'validation failed for path {PATH}');
+    var _err = post.invalidate('baz', 'validation failed for path {PATH}',
+      'val', 'custom error');
+    assert.ok(_err instanceof ValidationError);
 
     post.save(function(err) {
       assert.ok(err instanceof MongooseError);
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
       assert.equal(err.errors.baz.message, 'validation failed for path baz');
-      assert.equal(err.errors.baz.kind, 'user defined');
       assert.equal(err.errors.baz.path, 'baz');
+      assert.equal(err.errors.baz.value, 'val');
+      assert.equal(err.errors.baz.kind, 'custom error');
 
       post.save(function(err) {
         db.close();
@@ -1412,7 +1527,7 @@ describe('document', function() {
     it('works with undefined (gh-1892)', function(done) {
       var d = new TestDocument();
       d.nested.setr = undefined;
-      assert.equal('undefined setter', d.nested.setr);
+      assert.equal(d.nested.setr, 'undefined setter');
       dateSetterCalled = false;
       d.date = undefined;
       d.validate(function(err) {
@@ -1435,16 +1550,16 @@ describe('document', function() {
           });
 
           doc.set('nested', {path: 'overwrite the entire nested object'});
-          assert.equal(undefined, doc.nested.age);
-          assert.equal(1, Object.keys(doc._doc.nested).length);
-          assert.equal('overwrite the entire nested object', doc.nested.path);
+          assert.equal(doc.nested.age, undefined);
+          assert.equal(Object.keys(doc._doc.nested).length, 1);
+          assert.equal(doc.nested.path, 'overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
 
           // vs merging using doc.set(object)
           doc.set({test: 'Test', nested: {age: 4}});
-          assert.equal('4overwrite the entire nested object', doc.nested.path);
-          assert.equal(4, doc.nested.age);
-          assert.equal(2, Object.keys(doc._doc.nested).length);
+          assert.equal(doc.nested.path, '4overwrite the entire nested object');
+          assert.equal(doc.nested.age, 4);
+          assert.equal(Object.keys(doc._doc.nested).length, 2);
           assert.ok(doc.isModified('nested'));
 
           doc = new TestDocument();
@@ -1457,9 +1572,9 @@ describe('document', function() {
 
           // vs merging using doc.set(path, object, {merge: true})
           doc.set('nested', {path: 'did not overwrite the nested object'}, {merge: true});
-          assert.equal('5did not overwrite the nested object', doc.nested.path);
-          assert.equal(5, doc.nested.age);
-          assert.equal(3, Object.keys(doc._doc.nested).length);
+          assert.equal(doc.nested.path, '5did not overwrite the nested object');
+          assert.equal(doc.nested.age, 5);
+          assert.equal(Object.keys(doc._doc.nested).length, 3);
           assert.ok(doc.isModified('nested'));
 
           doc = new TestDocument();
@@ -1477,16 +1592,16 @@ describe('document', function() {
           assert.ok(!doc.isModified('nested.age'));
 
           doc.nested = {path: 'overwrite the entire nested object', age: 5};
-          assert.equal(5, doc.nested.age);
-          assert.equal(2, Object.keys(doc._doc.nested).length);
-          assert.equal('5overwrite the entire nested object', doc.nested.path);
+          assert.equal(doc.nested.age, 5);
+          assert.equal(Object.keys(doc._doc.nested).length, 2);
+          assert.equal(doc.nested.path, '5overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
 
           doc.nested.deep = {x: 'Hank and Marie'};
-          assert.equal(3, Object.keys(doc._doc.nested).length);
-          assert.equal('5overwrite the entire nested object', doc.nested.path);
+          assert.equal(Object.keys(doc._doc.nested).length, 3);
+          assert.equal(doc.nested.path, '5overwrite the entire nested object');
           assert.ok(doc.isModified('nested'));
-          assert.equal('Hank and Marie', doc.nested.deep.x);
+          assert.equal(doc.nested.deep.x, 'Hank and Marie');
 
           doc = new TestDocument();
           doc.init({
@@ -1497,13 +1612,13 @@ describe('document', function() {
           });
 
           doc.set('nested.deep', {x: 'Hank and Marie'});
-          assert.equal(2, Object.keys(doc._doc.nested).length);
-          assert.equal(1, Object.keys(doc._doc.nested.deep).length);
+          assert.equal(Object.keys(doc._doc.nested).length, 2);
+          assert.equal(Object.keys(doc._doc.nested.deep).length, 1);
           assert.ok(doc.isModified('nested'));
           assert.ok(!doc.isModified('nested.path'));
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
-          assert.equal('Hank and Marie', doc.nested.deep.x);
+          assert.equal(doc.nested.deep.x, 'Hank and Marie');
 
           done();
         });
@@ -1527,8 +1642,8 @@ describe('document', function() {
           assert.ok(doc.schedule);
           assert.ok(doc.schedule.isMongooseDocumentArray);
           assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
-          assert.equal(1100, doc.schedule[0].open);
-          assert.equal(1900, doc.schedule[0].close);
+          assert.equal(doc.schedule[0].open, 1100);
+          assert.equal(doc.schedule[0].close, 1900);
 
           done();
         });
@@ -1606,7 +1721,7 @@ describe('document', function() {
               assert.ifError(err);
               Parent.findOne({}, function(error, parent) {
                 assert.ifError(error);
-                assert.equal(2, parent.children[0].counter);
+                assert.equal(parent.children[0].counter, 2);
                 db.close(done);
               });
             });
@@ -1664,7 +1779,7 @@ describe('document', function() {
         p.children = [c2];
         p.save(function(error, doc) {
           assert.ifError(error);
-          assert.equal(1, doc.children.length);
+          assert.equal(doc.children.length, 1);
           db.close(done);
         });
       });
@@ -1692,7 +1807,7 @@ describe('document', function() {
           // item.st is 3 but may not be saved to DB
           Item.findById(item._id, function(error, doc) {
             assert.ifError(error);
-            assert.equal(3, doc.st);
+            assert.equal(doc.st, 3);
             db.close(done);
           });
         });
@@ -1718,456 +1833,347 @@ describe('document', function() {
     db.close(done);
   });
 
-  it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
-    var db = start();
-    var parentSchema = mongoose.Schema({
-      c: {type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1'}
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
     });
 
-    var called = [];
-    parentSchema.options.toJSON = {
-      transform: function(doc, ret) {
-        called.push(ret);
-        return ret;
-      }
-    };
-
-    var childSchema = mongoose.Schema({
-      name: String
+    after(function(done) {
+      db.close(done);
     });
 
-    var childCalled = [];
-    childSchema.options.toJSON = {
-      transform: function(doc, ret) {
-        childCalled.push(ret);
-        return ret;
-      }
-    };
+    it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
+      var parentSchema = mongoose.Schema({
+        c: {type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1'}
+      });
 
-    var Child = db.model('gh-2910-1', childSchema);
-    var Parent = db.model('gh-2910-0', parentSchema);
+      var called = [];
+      parentSchema.options.toJSON = {
+        transform: function(doc, ret) {
+          called.push(ret);
+          return ret;
+        }
+      };
 
-    Child.create({name: 'test'}, function(error, c) {
-      Parent.create({c: c._id}, function(error, p) {
-        Parent.findOne({_id: p._id}).populate('c').exec(function(error, p) {
-          var doc = p.toJSON();
-          assert.equal(called.length, 1);
-          assert.equal(called[0]._id.toString(), p._id.toString());
-          assert.equal(doc._id.toString(), p._id.toString());
-          assert.equal(childCalled.length, 1);
-          assert.equal(childCalled[0]._id.toString(), c._id.toString());
+      var childSchema = mongoose.Schema({
+        name: String
+      });
 
-          called = [];
-          childCalled = [];
+      var childCalled = [];
+      childSchema.options.toJSON = {
+        transform: function(doc, ret) {
+          childCalled.push(ret);
+          return ret;
+        }
+      };
 
-          // JSON.stringify() passes field name, so make sure we don't treat
-          // that as a param to toJSON (gh-2990)
-          doc = JSON.parse(JSON.stringify({parent: p})).parent;
-          assert.equal(called.length, 1);
-          assert.equal(called[0]._id.toString(), p._id.toString());
-          assert.equal(doc._id.toString(), p._id.toString());
-          assert.equal(childCalled.length, 1);
-          assert.equal(childCalled[0]._id.toString(), c._id.toString());
+      var Child = db.model('gh-2910-1', childSchema);
+      var Parent = db.model('gh-2910-0', parentSchema);
 
-          db.close(done);
+      Child.create({name: 'test'}, function(error, c) {
+        Parent.create({c: c._id}, function(error, p) {
+          Parent.findOne({_id: p._id}).populate('c').exec(function(error, p) {
+            var doc = p.toJSON();
+            assert.equal(called.length, 1);
+            assert.equal(called[0]._id.toString(), p._id.toString());
+            assert.equal(doc._id.toString(), p._id.toString());
+            assert.equal(childCalled.length, 1);
+            assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
+            called = [];
+            childCalled = [];
+
+            // JSON.stringify() passes field name, so make sure we don't treat
+            // that as a param to toJSON (gh-2990)
+            doc = JSON.parse(JSON.stringify({parent: p})).parent;
+            assert.equal(called.length, 1);
+            assert.equal(called[0]._id.toString(), p._id.toString());
+            assert.equal(doc._id.toString(), p._id.toString());
+            assert.equal(childCalled.length, 1);
+            assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
+            done();
+          });
         });
       });
     });
-  });
 
-  it('setters firing with objects on real paths (gh-2943)', function(done) {
-    var M = mongoose.model('gh2943', {
-      myStr: {
-        type: String, set: function(v) {
-          return v.value;
-        }
-      },
-      otherStr: String
+    it('setters firing with objects on real paths (gh-2943)', function(done) {
+      var M = mongoose.model('gh2943', {
+        myStr: {
+          type: String, set: function(v) {
+            return v.value;
+          }
+        },
+        otherStr: String
+      });
+
+      var t = new M({myStr: {value: 'test'}});
+      assert.equal(t.myStr, 'test');
+
+      new M({otherStr: {value: 'test'}});
+      assert.ok(!t.otherStr);
+
+      done();
     });
 
-    var t = new M({myStr: {value: 'test'}});
-    assert.equal(t.myStr, 'test');
+    describe('gh-2782', function() {
+      it('should set data from a sub doc', function(done) {
+        var schema1 = new mongoose.Schema({
+          data: {
+            email: String
+          }
+        });
+        var schema2 = new mongoose.Schema({
+          email: String
+        });
+        var Model1 = mongoose.model('gh-2782-1', schema1);
+        var Model2 = mongoose.model('gh-2782-2', schema2);
 
-    new M({otherStr: {value: 'test'}});
-    assert.ok(!t.otherStr);
+        var doc1 = new Model1({'data.email': 'some@example.com'});
+        assert.equal(doc1.data.email, 'some@example.com');
+        var doc2 = new Model2();
+        doc2.set(doc1.data);
+        assert.equal(doc2.email, 'some@example.com');
+        done();
+      });
+    });
 
-    done();
-  });
-
-  describe('gh-2782', function() {
-    it('should set data from a sub doc', function(done) {
+    it('set data from subdoc keys (gh-3346)', function(done) {
       var schema1 = new mongoose.Schema({
         data: {
           email: String
         }
       });
-      var schema2 = new mongoose.Schema({
-        email: String
-      });
-      var Model1 = mongoose.model('gh-2782-1', schema1);
-      var Model2 = mongoose.model('gh-2782-2', schema2);
+      var Model1 = mongoose.model('gh3346', schema1);
 
       var doc1 = new Model1({'data.email': 'some@example.com'});
       assert.equal(doc1.data.email, 'some@example.com');
-      var doc2 = new Model2();
-      doc2.set(doc1.data);
-      assert.equal(doc2.email, 'some@example.com');
+      var doc2 = new Model1({data: doc1.data});
+      assert.equal(doc2.data.email, 'some@example.com');
       done();
     });
-  });
 
-  it('set data from subdoc keys (gh-3346)', function(done) {
-    var schema1 = new mongoose.Schema({
-      data: {
+    it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
+      var M = mongoose.model('gh3030', {
+        myStr: {
+          type: String
+        }
+      });
+
+      var t = new M({myStr: {thisIs: 'anObject'}});
+      assert.ok(!t.myStr);
+      t.validate(function(error) {
+        assert.ok(error);
+        done();
+      });
+    });
+
+    it('single embedded schemas (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
         email: String
-      }
-    });
-    var Model1 = mongoose.model('gh3346', schema1);
+      }, {_id: false, id: false});
 
-    var doc1 = new Model1({'data.email': 'some@example.com'});
-    assert.equal(doc1.data.email, 'some@example.com');
-    var doc2 = new Model1({data: doc1.data});
-    assert.equal(doc2.data.email, 'some@example.com');
-    done();
-  });
-
-  it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
-    var M = mongoose.model('gh3030', {
-      myStr: {
-        type: String
-      }
-    });
-
-    var t = new M({myStr: {thisIs: 'anObject'}});
-    assert.ok(!t.myStr);
-    t.validate(function(error) {
-      assert.ok(error);
-      done();
-    });
-  });
-
-  it('single embedded schemas (gh-2689)', function(done) {
-    var db = start();
-
-    var userSchema = new mongoose.Schema({
-      name: String,
-      email: String
-    }, {_id: false, id: false});
-
-    var userHookCount = 0;
-    userSchema.pre('save', function(next) {
-      ++userHookCount;
-      next();
-    });
-
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
-
-    var eventHookCount = 0;
-    eventSchema.pre('save', function(next) {
-      ++eventHookCount;
-      next();
-    });
-
-    var Event = db.model('gh2689', eventSchema);
-
-    var e = new Event({name: 'test', user: {name: 123, email: 'val'}});
-    e.save(function(error) {
-      assert.ifError(error);
-      assert.strictEqual(e.user.name, '123');
-      assert.equal(eventHookCount, 1);
-      assert.equal(userHookCount, 1);
-
-      Event.findOne(
-          {user: {name: '123', email: 'val'}},
-          function(error, doc) {
-            assert.ifError(error);
-            assert.ok(doc);
-
-            Event.findOne(
-                {user: {$in: [{name: '123', email: 'val'}]}},
-                function(error, doc) {
-                  assert.ifError(error);
-                  assert.ok(doc);
-                  db.close(done);
-                });
-          });
-    });
-  });
-
-  it('single embedded schemas with validation (gh-2689)', function(done) {
-    var db = start();
-
-    var userSchema = new mongoose.Schema({
-      name: String,
-      email: {type: String, required: true, match: /.+@.+/}
-    }, {_id: false, id: false});
-
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
-
-    var Event = db.model('gh2689_1', eventSchema);
-
-    var e = new Event({name: 'test', user: {}});
-    var error = e.validateSync();
-    assert.ok(error);
-    assert.ok(error.errors['user.email']);
-    assert.equal(error.errors['user.email'].kind, 'required');
-
-    e.user.email = 'val';
-    error = e.validateSync();
-
-    assert.ok(error);
-    assert.ok(error.errors['user.email']);
-    assert.equal(error.errors['user.email'].kind, 'regexp');
-
-    db.close(done);
-  });
-
-  it('single embedded schemas with markmodified (gh-2689)', function(done) {
-    var db = start();
-
-    var userSchema = new mongoose.Schema({
-      name: String,
-      email: {type: String, required: true, match: /.+@.+/}
-    }, {_id: false, id: false});
-
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
-
-    var Event = db.model('gh2689_2', eventSchema);
-
-    var e = new Event({name: 'test', user: {email: 'a@b'}});
-    e.save(function(error, doc) {
-      assert.ifError(error);
-      assert.ok(doc);
-      assert.ok(!doc.isModified('user'));
-      assert.ok(!doc.isModified('user.email'));
-      assert.ok(!doc.isModified('user.name'));
-      doc.user.name = 'Val';
-      assert.ok(doc.isModified('user'));
-      assert.ok(!doc.isModified('user.email'));
-      assert.ok(doc.isModified('user.name'));
-
-      var delta = doc.$__delta()[1];
-      assert.deepEqual(delta, {
-        $set: {'user.name': 'Val'}
+      var userHookCount = 0;
+      userSchema.pre('save', function(next) {
+        ++userHookCount;
+        next();
       });
 
-      doc.save(function(error) {
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var eventHookCount = 0;
+      eventSchema.pre('save', function(next) {
+        ++eventHookCount;
+        next();
+      });
+
+      var Event = db.model('gh2689', eventSchema);
+
+      var e = new Event({name: 'test', user: {name: 123, email: 'val'}});
+      e.save(function(error) {
         assert.ifError(error);
-        Event.findOne({_id: doc._id}, function(error, doc) {
-          assert.ifError(error);
-          assert.deepEqual(doc.user.toObject(), {email: 'a@b', name: 'Val'});
-          db.close(done);
-        });
+        assert.strictEqual(e.user.name, '123');
+        assert.equal(eventHookCount, 1);
+        assert.equal(userHookCount, 1);
+
+        Event.findOne(
+            {user: {name: '123', email: 'val'}},
+            function(error, doc) {
+              assert.ifError(error);
+              assert.ok(doc);
+
+              Event.findOne(
+                  {user: {$in: [{name: '123', email: 'val'}]}},
+                  function(error, doc) {
+                    assert.ifError(error);
+                    assert.ok(doc);
+                    done();
+                  });
+            });
       });
     });
-  });
 
-  it('single embedded schemas + update validators (gh-2689)', function(done) {
-    var db = start();
+    it('single embedded schemas with validation (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
 
-    var userSchema = new mongoose.Schema({
-      name: {type: String, default: 'Val'},
-      email: {type: String, required: true, match: /.+@.+/}
-    }, {_id: false, id: false});
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
 
-    var eventSchema = new mongoose.Schema({
-      user: userSchema,
-      name: String
-    });
+      var Event = db.model('gh2689_1', eventSchema);
 
-    var Event = db.model('gh2689_3', eventSchema);
-
-    var badUpdate = {$set: {'user.email': 'a'}};
-    var options = {runValidators: true};
-    Event.update({}, badUpdate, options, function(error) {
+      var e = new Event({name: 'test', user: {}});
+      var error = e.validateSync();
       assert.ok(error);
+      assert.ok(error.errors['user.email']);
+      assert.equal(error.errors['user.email'].kind, 'required');
+
+      e.user.email = 'val';
+      error = e.validateSync();
+
+      assert.ok(error);
+      assert.ok(error.errors['user.email']);
       assert.equal(error.errors['user.email'].kind, 'regexp');
 
-      var nestedUpdate = {name: 'test'};
-      var options = {upsert: true, setDefaultsOnInsert: true};
-      Event.update({}, nestedUpdate, options, function(error) {
+      done();
+    });
+
+    it('single embedded schemas with markmodified (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh2689_2', eventSchema);
+
+      var e = new Event({name: 'test', user: {email: 'a@b'}});
+      e.save(function(error, doc) {
         assert.ifError(error);
-        Event.findOne({name: 'test'}, function(error, ev) {
+        assert.ok(doc);
+        assert.ok(!doc.isModified('user'));
+        assert.ok(!doc.isModified('user.email'));
+        assert.ok(!doc.isModified('user.name'));
+        doc.user.name = 'Val';
+        assert.ok(doc.isModified('user'));
+        assert.ok(!doc.isModified('user.email'));
+        assert.ok(doc.isModified('user.name'));
+
+        var delta = doc.$__delta()[1];
+        assert.deepEqual(delta, {
+          $set: {'user.name': 'Val'}
+        });
+
+        doc.save(function(error) {
           assert.ifError(error);
-          assert.equal(ev.user.name, 'Val');
-          db.close(done);
+          Event.findOne({_id: doc._id}, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.user.toObject(), {email: 'a@b', name: 'Val'});
+            done();
+          });
+        });
+      });
+    });
+
+    it('single embedded schemas + update validators (gh-2689)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: {type: String, default: 'Val'},
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh2689_3', eventSchema);
+
+      var badUpdate = {$set: {'user.email': 'a'}};
+      var options = {runValidators: true};
+      Event.update({}, badUpdate, options, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['user.email'].kind, 'regexp');
+
+        var nestedUpdate = {name: 'test'};
+        var options = {upsert: true, setDefaultsOnInsert: true};
+        Event.update({}, nestedUpdate, options, function(error) {
+          assert.ifError(error);
+          Event.findOne({name: 'test'}, function(error, ev) {
+            assert.ifError(error);
+            assert.equal(ev.user.name, 'Val');
+            done();
+          });
         });
       });
     });
   });
 
-  it('single embedded schemas with populate (gh-3501)', function(done) {
-    var db = start();
-    var PopulateMeSchema = new Schema({});
+  describe('error processing (gh-2284)', function() {
+    var db;
 
-    var Child = db.model('gh3501', PopulateMeSchema);
-
-    var SingleNestedSchema = new Schema({
-      populateMeArray: [{
-        type: Schema.Types.ObjectId,
-        ref: 'gh3501'
-      }]
+    before(function() {
+      db = start();
     });
 
-    var parentSchema = new Schema({
-      singleNested: SingleNestedSchema
-    });
-
-    var P = db.model('gh3501_1', parentSchema);
-
-    Child.create([{}, {}], function(error, docs) {
-      assert.ifError(error);
-      var obj = {
-        singleNested: {populateMeArray: [docs[0]._id, docs[1]._id]}
-      };
-      P.create(obj, function(error, doc) {
-        assert.ifError(error);
-        P.
-        findById(doc._id).
-        populate('singleNested.populateMeArray').
-        exec(function(error, doc) {
-          assert.ok(doc.singleNested.populateMeArray[0]._id);
-          db.close(done);
-        });
-      });
-    });
-  });
-
-  it('single embedded schemas with methods (gh-3534)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-    personSchema.methods.firstName = function() {
-      return this.name.substr(0, this.name.indexOf(' '));
-    };
-
-    var bandSchema = new Schema({leadSinger: personSchema});
-    var Band = db.model('gh3534', bandSchema);
-
-    var gnr = new Band({leadSinger: {name: 'Axl Rose'}});
-    assert.equal(gnr.leadSinger.firstName(), 'Axl');
-    db.close(done);
-  });
-
-  it('single embedded schemas with models (gh-3535)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-    var Person = db.model('gh3535_0', personSchema);
-
-    var bandSchema = new Schema({leadSinger: personSchema});
-    var Band = db.model('gh3535', bandSchema);
-
-    var axl = new Person({name: 'Axl Rose'});
-    var gnr = new Band({leadSinger: axl});
-
-    gnr.save(function(error) {
-      assert.ifError(error);
-      assert.equal(gnr.leadSinger.name, 'Axl Rose');
+    after(function(done) {
       db.close(done);
     });
-  });
 
-  it('single embedded schemas with indexes (gh-3594)', function(done) {
-    var personSchema = new Schema({name: {type: String, unique: true}});
+    it('save errors', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
 
-    var bandSchema = new Schema({leadSinger: personSchema});
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
 
-    assert.equal(bandSchema.indexes().length, 1);
-    var index = bandSchema.indexes()[0];
-    assert.deepEqual(index[0], {'leadSinger.name': 1});
-    assert.ok(index[1].unique);
-    done();
-  });
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
 
-  it('single embedded docs have an ownerDocument function (gh-3589)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-    personSchema.methods.display = function() {
-      return this.name + ' of ' + this.ownerDocument().name;
-    };
+      var Model = mongoose.model('gh2284', schema);
 
-    var bandSchema = new Schema({leadSinger: personSchema, name: String});
-    var Band = db.model('gh3589', bandSchema);
-
-    var gnr = new Band({
-      name: 'Guns N\' Roses',
-      leadSinger: {name: 'Axl Rose'}
-    });
-    assert.equal(gnr.leadSinger.display(), 'Axl Rose of Guns N\' Roses');
-    db.close(done);
-  });
-
-  it('removing single embedded docs (gh-3596)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
-
-    var bandSchema = new Schema({guitarist: personSchema, name: String});
-    var Band = db.model('gh3596', bandSchema);
-
-    var gnr = new Band({
-      name: 'Guns N\' Roses',
-      guitarist: {name: 'Slash'}
-    });
-    gnr.save(function(error, gnr) {
-      assert.ifError(error);
-      gnr.guitarist = undefined;
-      gnr.save(function(error, gnr) {
-        assert.ifError(error);
-        assert.ok(!gnr.guitarist);
-        db.close(done);
+      Model.create({}, function(error) {
+        assert.ok(error);
+        assert.equal(error.message, 'Catch all #2');
+        done();
       });
     });
-  });
 
-  it('setting single embedded docs (gh-3601)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
+    it('handles non-errors', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
 
-    var bandSchema = new Schema({guitarist: personSchema, name: String});
-    var Band = db.model('gh3601', bandSchema);
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all'));
+      });
 
-    var gnr = new Band({
-      name: 'Guns N\' Roses',
-      guitarist: {name: 'Slash'}
-    });
-    var velvetRevolver = new Band({
-      name: 'Velvet Revolver'
-    });
-    velvetRevolver.guitarist = gnr.guitarist;
-    velvetRevolver.save(function(error) {
-      assert.ifError(error);
-      assert.equal(velvetRevolver.guitarist, gnr.guitarist);
-      db.close(done);
-    });
-  });
+      schema.post('save', function(error, doc, next) {
+        next(new Error('Catch all #2'));
+      });
 
-  it('single embedded docs init obeys strict mode (gh-3642)', function(done) {
-    var db = start();
-    var personSchema = new Schema({name: String});
+      var Model = db.model('gh2284_1', schema);
 
-    var bandSchema = new Schema({guitarist: personSchema, name: String});
-    var Band = db.model('gh3642', bandSchema);
-
-    var velvetRevolver = new Band({
-      name: 'Velvet Revolver',
-      guitarist: {name: 'Slash', realName: 'Saul Hudson'}
-    });
-
-    velvetRevolver.save(function(error) {
-      assert.ifError(error);
-      var query = {name: 'Velvet Revolver'};
-      Band.collection.findOne(query, function(error, band) {
+      Model.create({ name: 'test' }, function(error) {
         assert.ifError(error);
-        assert.ok(!band.guitarist.realName);
-        db.close(done);
+        done();
       });
     });
   });
@@ -2181,6 +2187,150 @@ describe('document', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('single embedded schemas with populate (gh-3501)', function(done) {
+      var PopulateMeSchema = new Schema({});
+
+      var Child = db.model('gh3501', PopulateMeSchema);
+
+      var SingleNestedSchema = new Schema({
+        populateMeArray: [{
+          type: Schema.Types.ObjectId,
+          ref: 'gh3501'
+        }]
+      });
+
+      var parentSchema = new Schema({
+        singleNested: SingleNestedSchema
+      });
+
+      var P = db.model('gh3501_1', parentSchema);
+
+      Child.create([{}, {}], function(error, docs) {
+        assert.ifError(error);
+        var obj = {
+          singleNested: {populateMeArray: [docs[0]._id, docs[1]._id]}
+        };
+        P.create(obj, function(error, doc) {
+          assert.ifError(error);
+          P.
+          findById(doc._id).
+          populate('singleNested.populateMeArray').
+          exec(function(error, doc) {
+            assert.ok(doc.singleNested.populateMeArray[0]._id);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single embedded schemas with methods (gh-3534)', function(done) {
+      var personSchema = new Schema({name: String});
+      personSchema.methods.firstName = function() {
+        return this.name.substr(0, this.name.indexOf(' '));
+      };
+
+      var bandSchema = new Schema({leadSinger: personSchema});
+      var Band = db.model('gh3534', bandSchema);
+
+      var gnr = new Band({leadSinger: {name: 'Axl Rose'}});
+      assert.equal(gnr.leadSinger.firstName(), 'Axl');
+      done();
+    });
+
+    it('single embedded schemas with models (gh-3535)', function(done) {
+      var db = start();
+      var personSchema = new Schema({name: String});
+      var Person = db.model('gh3535_0', personSchema);
+
+      var bandSchema = new Schema({leadSinger: personSchema});
+      var Band = db.model('gh3535', bandSchema);
+
+      var axl = new Person({name: 'Axl Rose'});
+      var gnr = new Band({leadSinger: axl});
+
+      gnr.save(function(error) {
+        assert.ifError(error);
+        assert.equal(gnr.leadSinger.name, 'Axl Rose');
+        done();
+      });
+    });
+
+    it('single embedded schemas with indexes (gh-3594)', function(done) {
+      var personSchema = new Schema({name: {type: String, unique: true}});
+
+      var bandSchema = new Schema({leadSinger: personSchema});
+
+      assert.equal(bandSchema.indexes().length, 1);
+      var index = bandSchema.indexes()[0];
+      assert.deepEqual(index[0], {'leadSinger.name': 1});
+      assert.ok(index[1].unique);
+      done();
+    });
+
+    it('removing single embedded docs (gh-3596)', function(done) {
+      var personSchema = new Schema({name: String});
+
+      var bandSchema = new Schema({guitarist: personSchema, name: String});
+      var Band = db.model('gh3596', bandSchema);
+
+      var gnr = new Band({
+        name: 'Guns N\' Roses',
+        guitarist: {name: 'Slash'}
+      });
+      gnr.save(function(error, gnr) {
+        assert.ifError(error);
+        gnr.guitarist = undefined;
+        gnr.save(function(error, gnr) {
+          assert.ifError(error);
+          assert.ok(!gnr.guitarist);
+          done();
+        });
+      });
+    });
+
+    it('setting single embedded docs (gh-3601)', function(done) {
+      var personSchema = new Schema({name: String});
+
+      var bandSchema = new Schema({guitarist: personSchema, name: String});
+      var Band = db.model('gh3601', bandSchema);
+
+      var gnr = new Band({
+        name: 'Guns N\' Roses',
+        guitarist: {name: 'Slash'}
+      });
+      var velvetRevolver = new Band({
+        name: 'Velvet Revolver'
+      });
+      velvetRevolver.guitarist = gnr.guitarist;
+      velvetRevolver.save(function(error) {
+        assert.ifError(error);
+        assert.equal(velvetRevolver.guitarist, gnr.guitarist);
+        done();
+      });
+    });
+
+    it('single embedded docs init obeys strict mode (gh-3642)', function(done) {
+      var personSchema = new Schema({name: String});
+
+      var bandSchema = new Schema({guitarist: personSchema, name: String});
+      var Band = db.model('gh3642', bandSchema);
+
+      var velvetRevolver = new Band({
+        name: 'Velvet Revolver',
+        guitarist: {name: 'Slash', realName: 'Saul Hudson'}
+      });
+
+      velvetRevolver.save(function(error) {
+        assert.ifError(error);
+        var query = {name: 'Velvet Revolver'};
+        Band.collection.findOne(query, function(error, band) {
+          assert.ifError(error);
+          assert.ok(!band.guitarist.realName);
+          done();
+        });
+      });
     });
 
     it('single embedded docs post hooks (gh-3679)', function(done) {
@@ -2374,6 +2524,673 @@ describe('document', function() {
         alice.save(function(error) {
           assert.ifError(error);
           done();
+        });
+      });
+    });
+
+    it('handles conflicting names (gh-3867)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        things: [{
+          name: {
+            type: String,
+            required: true
+          }
+        }]
+      });
+
+      var M = mongoose.model('gh3867', testSchema);
+
+      var doc = M({
+        things: [{}]
+      });
+
+      var fields = Object.keys(doc.validateSync().errors).sort();
+      assert.deepEqual(fields, ['name', 'things.0.name']);
+      done();
+    });
+
+    it('populate with lean (gh-3873)', function(done) {
+      var companySchema = new mongoose.Schema({
+        name:  String,
+        description:  String,
+        userCnt: { type: Number, default: 0, select: false }
+      });
+
+      var userSchema = new mongoose.Schema({
+        name:  String,
+        company: { type: mongoose.Schema.Types.ObjectId, ref: 'gh3873' }
+      });
+
+      var Company = db.model('gh3873', companySchema);
+      var User = db.model('gh3873_0', userSchema);
+
+      var company = new Company({ name: 'IniTech', userCnt: 1 });
+      var user = new User({ name: 'Peter', company: company._id });
+
+      company.save(function(error) {
+        assert.ifError(error);
+        user.save(function(error) {
+          assert.ifError(error);
+          next();
+        });
+      });
+
+      function next() {
+        var pop = { path: 'company', select: 'name', options: { lean: true } };
+        User.find({}).populate(pop).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 1);
+          assert.strictEqual(docs[0].company.userCnt, undefined);
+          done();
+        });
+      }
+    });
+
+    it('init single nested subdoc with select (gh-3880)', function(done) {
+      var childSchema = new mongoose.Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: { type: String },
+        child: childSchema
+      });
+
+      var Parent = db.model('gh3880', parentSchema);
+      var p = new Parent({
+        name: 'Mufasa',
+        child: {
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        var fields = 'name child.name';
+        Parent.findById(p._id).select(fields).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.child.friends, void 0);
+          done();
+        });
+      });
+    });
+
+    it('single nested subdoc isModified() (gh-3910)', function(done) {
+      var called = 0;
+
+      var ChildSchema = new Schema({
+        name: String
+      });
+
+      ChildSchema.pre('save', function(next) {
+        assert.ok(this.isModified('name'));
+        ++called;
+        next();
+      });
+
+      var ParentSchema = new Schema({
+        name: String,
+        child: ChildSchema
+      });
+
+      var Parent = db.model('gh3910', ParentSchema);
+
+      var p = new Parent({
+        name: 'Darth Vader',
+        child: {
+          name: 'Luke Skywalker'
+        }
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        assert.strictEqual(called, 1);
+        done();
+      });
+    });
+
+    it('pre and post as schema keys (gh-3902)', function(done) {
+      var schema = new mongoose.Schema({
+        pre: String,
+        post: String
+      }, { versionKey: false });
+      var MyModel = db.model('gh3902', schema);
+
+      MyModel.create({ pre: 'test', post: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        assert.deepEqual(_.omit(doc.toObject(), '_id'),
+          { pre: 'test', post: 'test' });
+        done();
+      });
+    });
+
+    it('manual population and isNew (gh-3982)', function(done) {
+      var NestedModelSchema = new mongoose.Schema({
+        field: String
+      });
+
+      var NestedModel = db.model('gh3982', NestedModelSchema);
+
+      var ModelSchema = new mongoose.Schema({
+        field: String,
+        array: [{
+          type: mongoose.Schema.ObjectId,
+          ref: 'gh3982',
+          required: true
+        }]
+      });
+
+      var Model = db.model('gh3982_0', ModelSchema);
+
+      var nestedModel = new NestedModel({
+        'field': 'nestedModel'
+      });
+
+      nestedModel.save(function(error, nestedModel) {
+        assert.ifError(error);
+        Model.create({ array: [nestedModel._id] }, function(error, doc) {
+          assert.ifError(error);
+          Model.findById(doc._id).populate('array').exec(function(error, doc) {
+            assert.ifError(error);
+            doc.array.push(nestedModel);
+            assert.strictEqual(doc.isNew, false);
+            assert.strictEqual(doc.array[0].isNew, false);
+            assert.strictEqual(doc.array[1].isNew, false);
+            assert.strictEqual(nestedModel.isNew, false);
+            done();
+          });
+        });
+      });
+    });
+
+    it('doesnt skipId for single nested subdocs (gh-4008)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4008', parentSchema);
+
+      Parent.create({ child: { name: 'My child' } }, function(error, doc) {
+        assert.ifError(error);
+        Parent.collection.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.child._id);
+          done();
+        });
+      });
+    });
+
+    it('single embedded docs with $near (gh-4014)', function(done) {
+      var schema = new mongoose.Schema({
+        placeName: String
+      });
+
+      var geoSchema = new mongoose.Schema({
+        type: {
+          type: String,
+          enum: 'Point',
+          default: 'Point'
+        },
+        coordinates: {
+          type: [Number],
+          default: [0, 0]
+        }
+      });
+
+      schema.add({ geo: geoSchema });
+      schema.index({ geo: '2dsphere' });
+
+      var MyModel = db.model('gh4014', schema);
+
+      MyModel.
+        where('geo').near({ center: [50, 50] }).
+        exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+    });
+
+    it('skip validation if required returns false (gh-4094)', function(done) {
+      var schema = new Schema({
+        div: {
+          type: Number,
+          required: function() { return false; },
+          validate: function(v) { return !!v; }
+        }
+      });
+      var Model = db.model('gh4094', schema);
+      var m = new Model();
+      assert.ifError(m.validateSync());
+      done();
+    });
+
+    it('ability to overwrite array default (gh-4109)', function(done) {
+      var schema = new Schema({
+        names: {
+          type: [String],
+          default: void 0
+        }
+      });
+
+      var Model = db.model('gh4109', schema);
+      var m = new Model();
+      assert.ok(!m.names);
+      m.save(function(error, m) {
+        assert.ifError(error);
+        Model.collection.findOne({ _id: m._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!('names' in doc));
+          done();
+        });
+      });
+    });
+
+    it('validation works when setting array index (gh-3816)', function(done) {
+      var mySchema = new mongoose.Schema({
+        items: [
+          { month: Number, date: Date }
+        ]
+      });
+
+      var Test = db.model('test', mySchema);
+
+      var a = [
+        { month: 0, date: new Date() },
+        { month: 1, date: new Date() }
+      ];
+      Test.create({ items: a }, function(error, doc) {
+        assert.ifError(error);
+        Test.findById(doc._id).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          doc.items[0] = {
+            month: 5,
+            date : new Date()
+          };
+          doc.markModified('items');
+          doc.save(function(error) {
+            assert.ifError(error);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single embedded with defaults have $parent (gh-4115)', function(done) {
+      var ChildSchema = new Schema({
+        name: {
+          type: String,
+          'default': 'child'
+        }
+      });
+
+      var ParentSchema = new Schema({
+        child: {
+          type: ChildSchema,
+          'default': {}
+        }
+      });
+
+      var Parent = db.model('gh4115', ParentSchema);
+
+      var p = new Parent();
+      assert.equal(p.child.$parent, p);
+      done();
+    });
+
+    it('removing parent doc calls remove hooks on subdocs (gh-2348)', function(done) {
+      var ChildSchema = new Schema({
+        name: String
+      });
+
+      var called = {};
+      ChildSchema.pre('remove', function(next) {
+        called[this.name] = true;
+        next();
+      });
+
+      var ParentSchema = new Schema({
+        children: [ChildSchema]
+      });
+
+      var Parent = db.model('gh2348', ParentSchema);
+
+      var doc = { children: [{ name: 'Luke' }, { name: 'Leia' }] };
+      Parent.create(doc, function(error, doc) {
+        assert.ifError(error);
+        doc.remove(function(error) {
+          assert.ifError(error);
+          assert.deepEqual(called, {
+            Luke: true,
+            Leia: true
+          });
+          done();
+        });
+      });
+    });
+
+    it('strings of length 12 are valid oids (gh-3365)', function(done) {
+      var schema = new Schema({ myId: mongoose.Schema.Types.ObjectId });
+      var M = db.model('gh3365', schema);
+      var doc = new M({ myId: 'blablablabla' });
+      doc.validate(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('set() empty obj unmodifies subpaths (gh-4182)', function(done) {
+      var omeletteSchema = new Schema({
+        topping: {
+          meat: {
+            type: String,
+            enum: ['bacon', 'sausage']
+          },
+          cheese: Boolean
+        }
+      });
+      var Omelette = db.model('gh4182', omeletteSchema);
+      var doc = new Omelette({
+        topping: {
+          meat: 'bacon',
+          cheese: true
+        }
+      });
+      doc.topping = {};
+      doc.save(function(error) {
+        assert.ifError(error);
+        assert.strictEqual(doc.topping.meat, void 0);
+        done();
+      });
+    });
+
+    it('emits cb errors on model for save (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for save with hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.pre('save', function(next) {
+        next();
+      });
+
+      testSchema.post('save', function(doc, next) {
+        next();
+      });
+
+      var Test = db.model('gh3499_0', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      new Test({}).save(function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      var Test = db.model('gh3499_1', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('emits cb errors on model for find() + hooks (gh-3499)', function(done) {
+      var testSchema = new Schema({ name: String });
+
+      testSchema.post('find', function(results, next) {
+        assert.equal(results.length, 0);
+        next();
+      });
+
+      var Test = db.model('gh3499_2', testSchema);
+
+      Test.on('error', function(error) {
+        assert.equal(error.message, 'fail!');
+        done();
+      });
+
+      Test.find({}, function() {
+        throw new Error('fail!');
+      });
+    });
+
+    it('clears subpaths when removing single nested (gh-4216)', function(done) {
+      var RecurrenceSchema = new Schema({
+        frequency: Number,
+        interval: {
+          type: String,
+          enum: ['days', 'weeks', 'months', 'years']
+        }
+      }, { _id: false });
+
+      var EventSchema = new Schema({
+        name: {
+          type: String,
+          trim: true
+        },
+        recurrence: RecurrenceSchema
+      });
+
+      var Event = db.model('gh4216', EventSchema);
+      var ev = new Event({
+        name: 'test',
+        recurrence: { frequency: 2, interval: 'days' }
+      });
+      ev.recurrence = null;
+      ev.save(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('using validator.isEmail as a validator (gh-4064) (gh-4084)', function(done) {
+      var schema = new Schema({
+        email: { type: String, validate: validator.isEmail }
+      });
+
+      var MyModel = db.model('gh4064', schema);
+
+      MyModel.create({ email: 'invalid' }, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['email']);
+        done();
+      });
+    });
+
+    it('setting path to empty object works (gh-4218)', function(done) {
+      var schema = new Schema({
+        object: {
+          nested: {
+            field1: { type: Number, default: 1 }
+          }
+        }
+      });
+
+      var MyModel = db.model('gh4218', schema);
+
+      MyModel.create({}, function(error, doc) {
+        doc.object.nested = {};
+        doc.save(function(error, doc) {
+          assert.ifError(error);
+          MyModel.collection.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.object.nested, {});
+            done();
+          });
+        });
+      });
+    });
+
+    it('minimize + empty object (gh-4337)', function(done) {
+      var SomeModel;
+      var SomeModelSchema;
+
+      SomeModelSchema = new mongoose.Schema({}, {
+        minimize: false
+      });
+
+      SomeModel = mongoose.model('somemodel', SomeModelSchema);
+
+      try {
+        new SomeModel({});
+      } catch (error) {
+        assert.ifError(error);
+      }
+      done();
+    });
+
+    it('doesnt markModified child paths if parent is modified (gh-4224)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4224', parentSchema);
+      Parent.create({ child: { name: 'Jacen' } }, function(error, doc) {
+        assert.ifError(error);
+        doc.child = { name: 'Jaina' };
+        doc.child.name = 'Anakin';
+        assert.deepEqual(doc.modifiedPaths(), ['child']);
+        done();
+      });
+    });
+
+    it('single nested isNew (gh-4369)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4369', parentSchema);
+      var remaining = 2;
+
+      var doc = new Parent({ child: { name: 'Jacen' } });
+      doc.child.on('isNew', function(val) {
+        assert.ok(!val);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+
+      doc.save(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+    });
+
+    it('default values with subdoc array (gh-4390)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: [childSchema]
+      });
+
+      parentSchema.path('child').default([{ name: 'test' }]);
+
+      var Parent = db.model('gh4390', parentSchema);
+
+      Parent.create({}, function(error, doc) {
+        assert.ifError(error);
+        assert.deepEqual(doc.toObject().child, [{ name: 'test' }]);
+        done();
+      });
+    });
+
+    it('handles invalid dates (gh-4404)', function(done) {
+      var testSchema = new Schema({
+        date: Date
+      });
+
+      var Test = db.model('gh4404', testSchema);
+
+      Test.create({ date: new Date('invalid date') }, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['date'].name, 'CastError');
+        done();
+      });
+    });
+
+    it('modify multiple subdoc paths (gh-4405)', function(done) {
+      var ChildObjectSchema = new Schema({
+        childProperty1: String,
+        childProperty2: String,
+        childProperty3: String
+      });
+
+      var ParentObjectSchema = new Schema({
+        parentProperty1: String,
+        parentProperty2: String,
+        child: ChildObjectSchema
+      });
+
+      var Parent = db.model('gh4405', ParentObjectSchema);
+
+      var p = new Parent({
+        parentProperty1: 'abc',
+        parentProperty2: '123',
+        child: {
+          childProperty1: 'a',
+          childProperty2: 'b',
+          childProperty3: 'c'
+        }
+      });
+      p.save(function(error) {
+        assert.ifError(error);
+        Parent.findById(p._id, function(error, p) {
+          assert.ifError(error);
+          p.parentProperty1 = 'foo';
+          p.parentProperty2 = 'bar';
+          p.child.childProperty1 = 'ping';
+          p.child.childProperty2 = 'pong';
+          p.child.childProperty3 = 'weee';
+          p.save(function(error) {
+            assert.ifError(error);
+            Parent.findById(p._id, function(error, p) {
+              assert.ifError(error);
+              assert.equal(p.child.childProperty1, 'ping');
+              assert.equal(p.child.childProperty2, 'pong');
+              assert.equal(p.child.childProperty3, 'weee');
+              done();
+            });
+          });
         });
       });
     });

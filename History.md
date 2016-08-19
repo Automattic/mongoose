@@ -1,3 +1,306 @@
+4.5.9 / 2016-08-14
+==================
+ * docs: add mixed schema doc for Object literal #4400 [Kikobeats](https://github.com/Kikobeats)
+ * fix(query): cast $geoWithin and convert mongoose objects to POJOs before casting #4392
+ * fix(schematype): dont cast defaults without parent doc #4390
+ * fix(query): disallow passing empty string to findOne() #4378
+ * fix(document): set single nested doc isNew correctly #4369
+ * fix(types): checks field name correctly with nested arrays and populate #4365
+ * fix(drivers): make debug output copy-pastable into mongodb shell #4352
+ * fix(services): run update validators on nested paths #4332
+ * fix(model): handle typeKey with discriminators #4339
+ * fix(query): apply timestamps to child schemas when explicitly specified in update #4049
+ * fix(schema): set prefix as nested path with add() #1730
+
+4.5.8 / 2016-08-01
+==================
+ * fix(model): make changing the discriminator key cause a cast error #4374
+ * fix(query): pass projection fields to cursor #4371 #4342 [Corei13](https://github.com/Corei13)
+ * fix(document): support multiple paths for isModified #4370 [adambuczynski](https://github.com/adambuczynski)
+ * fix(querycursor): always cast fields before returning cursor #4355
+ * fix(query): support projection as alias for fields in findOneAndUpdate #4315
+ * fix(schema): treat index false + unique false as no index #4304
+ * fix(types): dont mark single nested subpath as modified if whole doc already modified #4224
+
+4.5.7 / 2016-07-25
+==================
+ * fix(document): ensure no unhandled rejections if callback specified for save #4364
+
+4.5.6 / 2016-07-23
+==================
+ * fix(schema): don't overwrite createdAt if it isn't selected #4351 [tusbar](https://github.com/tusbar)
+ * docs(api): fix link to populate() and add a new one from depopulate() #4345 [Delapouite](https://github.com/Delapouite)
+ * fix(types): ownerDocument() works properly with single nested docs #4344 [vichle](https://github.com/vichle)
+ * fix(populate): dont use findOne when justOne option set #4329
+ * fix(document): dont trigger .then() deprecated warning when calling doc.remove() #4291
+ * docs(connection): add promiseLibrary option #4280
+ * fix(plugins): apply global plugins to subschemas #4271
+ * fix(model): ensure `ensureIndex()` never calls back in the same tick #4246
+ * docs(schema): improve post hook docs on schema #4238
+
+4.5.5 / 2016-07-18
+==================
+ * fix(document): handle setting root to empty obj if minimize false #4337
+ * fix: downgrade to mongodb 2.1.18 #4335 #4334 #4328 #4323
+ * perf(types): remove defineProperty usage in documentarray #4333
+ * fix(query): correctly pass model in .toConstructor() #4318
+ * fix(services): avoid double-validating mixed types with update validators #4305
+ * docs(middleware): add docs describing error handling middleware #4229
+ * fix(types): throw correct error when invalidating doc array #3602
+
+4.5.4 / 2016-07-11
+==================
+ * fix(types): fix removing embedded documents #4309 [RoCat](https://github.com/RoCat)
+ * docs: various docs improvements #4302 #4294 [simonxca](https://github.com/simonxca)
+ * fix: upgrade mongodb -> 2.1.21 #4295 #4202 [RoCat](https://github.com/RoCat)
+ * fix(populate): convert single result to array for virtual populate because of lean #4288
+ * fix(populate): handle empty results for populate virtuals properly #4285 #4284
+ * fix(query): dont cast $inc to number if type is long #4283
+ * fix(types): allow setting single nested doc to null #4281
+ * fix(populate): handle deeply nested virtual populate #4278
+ * fix(document): allow setting empty obj if strict mode is false #4274
+ * fix(aggregate): allow passing obj to .unwind() #4239
+ * docs(document): add return statements to transform examples #1963
+
+4.5.3 / 2016-06-30
+==================
+ * fix(query): pass correct options to QueryCursor #4277 #4266
+ * fix(querycursor): handle lean option correctly #4276 [gchudnov](https://github.com/gchudnov)
+ * fix(document): fix error handling when no error occurred #4275
+ * fix(error): use strict mode for version error #4272
+ * docs(populate): fix crashing compilation for populate.jade #4267
+ * fix(populate): support `justOne` option for populate virtuals #4263
+ * fix(populate): ensure model param gets used for populate virtuals #4261 #4243
+ * fix(querycursor): add ability to properly close the cursor #4258
+ * docs(model): correct link to Document #4250
+ * docs(populate): correct path for refPath populate #4240
+ * fix(document): support validator.isEmail as validator #4064
+
+4.5.2 / 2016-06-24
+==================
+ * fix(connection): add checks for collection presence for `onOpen` and `onClose` #4259 [nodkz](https://github.com/nodkz)
+ * fix(cast): allow strings for $type operator #4256
+ * fix(querycursor): support lean() #4255 [pyramation](https://github.com/pyramation)
+ * fix(aggregate): allow setting noCursorTimeout option #4241
+ * fix(document): handle undefined for Array.pull #4222 [Sebmaster](https://github.com/Sebmaster)
+ * fix(connection): ensure promise.catch() catches initial connection error #4135
+ * fix(document): show additional context for VersionError #2633
+
+4.5.1 / 2016-06-18
+==================
+ * fix(model): ensure wrapped insertMany() returns a promise #4237
+ * fix(populate): dont overwrite populateVirtuals when populating multiple paths #4234
+ * docs(model): clarify relationship between create() and save() #4233
+ * fix(types): handle option param in subdoc remove() #4231 [tdebarochez](https://github.com/tdebarochez)
+ * fix(document): dedupe modified paths #4226 #4223 [adambuczynski](https://github.com/adambuczynski)
+ * fix(model): don't modify user-provided options object #4221
+ * fix(document): handle setting nested path to empty object #4218 #4182
+ * fix(document): clean subpaths when removing single nested #4216
+ * fix(document): don't force transform on subdocs with inspect #4213
+ * fix(error): allow setting .messages object #4207
+
+4.5.0 / 2016-06-13
+==================
+ * feat(query): added Query.prototype.catch() #4215 #4173 [adambuczynski](https://github.com/adambuczynski)
+ * feat(query): add Query.prototype.cursor() as a .stream() alternative #4117 #3637 #1907
+ * feat(document): add markUnmodified() function #4092 [vincentcr](https://github.com/vincentcr)
+ * feat(aggregate): convert aggregate object to a thenable #3995 #3946 [megagon](https://github.com/megagon)
+ * perf(types): remove defineProperties call for array (**Note:** Because of this, a mongoose array will no longer `assert.deepEqual()` a plain old JS array) #3886
+ * feat(model): add hooks for insertMany() #3846
+ * feat(schema): add support for custom query methods #3740 #2372
+ * feat(drivers): emit error on 'serverClosed' because that means that reconnect failed #3615
+ * feat(model): emit error event when callback throws exception #3499
+ * feat(model): inherit options from discriminator base schema #3414 #1818
+ * feat(populate): expose mongoose-populate-virtuals inspired populate API #2562
+ * feat(document): trigger remove hooks on subdocs when removing parent #2348
+ * feat(schema): add support for express-style error handling middleware #2284
+ * fix(model): disallow setting discriminator key #2041
+ * feat(schema): add support for nested arrays #1361
+
+4.4.20 / 2016-06-05
+===================
+ * docs: clarify command buffering when using driver directly #4195
+ * fix(promise): correct broken mpromise .catch() #4189
+ * fix(document): clean modified subpaths when set path to empty obj #4182
+ * fix(query): support minDistance with query casting and `.near()` #4179
+ * fix(model): remove unnecessary .save() promise #4177
+ * fix(schema): cast all valid ObjectId strings to object ids #3365
+ * docs: remove unclear "unsafe" term in query docs #3282
+
+4.4.19 / 2016-05-21
+===================
+ * fix(model): handle insertMany if timestamps not set #4171
+
+4.4.18 / 2016-05-21
+===================
+ * docs: add missing period #4170 [gitname](https://github.com/gitname)
+ * docs: change build badge to svg #4158 [a0viedo](https://github.com/a0viedo)
+ * fix(model): update timestamps when setting `createdAt` #4155
+ * fix(utils): make sure to require in document properly #4152
+ * fix(model): throw overwrite error when discriminator name conflicts #4148
+
+4.4.17 / 2016-05-13
+===================
+ * docs: remove repetition in QueryStream docs #4147 [hugoabonizio](https://github.com/hugoabonizio)
+ * fix(document): dont double-validate doc array elements #4145
+ * fix(document): call required function with correct scope #4142 [JedWatson](https://github.com/JedWatson)
+
+4.4.16 / 2016-05-09
+===================
+ * refactor(document): use function reference #4133 [dciccale](https://github.com/dciccale)
+ * docs(querystream): clarify `destroy()` and close event #4126 [AnthonyCC](https://github.com/AnthonyCC)
+ * test: make before hook fail fast if it can't connect #4121
+ * docs: add description of CastError constructor params #4120
+ * fix(schematype): ensure single embedded defaults have $parent #4115
+ * fix(document): mark nested paths for validation #4111
+ * fix(schema): make sure element is always a subdoc in doc array validation #3816
+
+4.4.15 / 2016-05-06
+===================
+ * fix(schema): support overwriting array default #4109
+ * fix(populate): assign values when resolving each populate #4104
+ * fix(aggregate): dont send async option to server #4101
+ * fix(model): ensure isNew set to false after insertMany #4099
+ * fix(connection): emit on error if listeners and no callback #4098
+ * fix(document): treat required fn that returns false as required: false #4094
+
+4.4.14 / 2016-04-27
+===================
+ * fix: upgrade mongodb -> 2.1.18 #4102
+ * feat(connection): allow setting mongos as a uri query param #4093 #4035 [burtonjc](https://github.com/burtonjc)
+ * fix(populate): make sure to use correct assignment order for each model #4073
+ * fix(schema): add complete set of geospatial operators for single embedded subdocs #4014
+
+3.8.40 / 2016-04-24
+===================
+ * upgraded; mquery -> 1.10.0 #3989
+
+4.4.13 / 2016-04-21
+===================
+ * docs: add docs favicons #4082 [robertjustjones](https://github.com/robertjustjones)
+ * docs(model): correct Model.remove() return value #4075 [Jokero](https://github.com/Jokero)
+ * fix(query): add $geoWithin query casting for single embedded docs #4044
+ * fix(schema): handle setting trim option to falsy #4042
+ * fix(query): handle setDefaultsOnInsert with empty update #3835
+
+4.4.12 / 2016-04-08
+===================
+ * docs(query): document context option for update and findOneAndUpdate #4055
+ * docs(query): correct link to $geoWithin docs #4050
+ * fix(project): upgrade to mongodb driver 2.1.16 #4048 [schmalliso](https://github.com/schmalliso)
+ * docs(validation): fix validation docs #4028
+ * fix(types): improve .id() check for document arrays #4011
+ * fix(query): remove premature return when using $rename #3171
+ * docs(connection): clarify relationship between models and connections #2157
+
+4.4.11 / 2016-04-03
+===================
+ * fix: upgrade to mongodb driver 2.1.14 #4036 #4030 #3945
+ * fix(connection): allow connecting with { mongos: true } to handle query params #4032 [burtonjc](https://github.com/burtonjc)
+ * docs(connection): add autoIndex example #4026 [tilleps](https://github.com/tilleps)
+ * fix(query): handle passRawResult option when zero results #4023
+ * fix(populate): clone options before modifying #4022
+ * docs: add missing whitespace #4019 [chenxsan](https://github.com/chenxsan)
+ * chore: upgrade to ESLint 2.4.0 #4015 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix(types): single nested subdocs get ids by default #4008
+ * chore(project): add dependency status badge #4007 [Maheshkumar-Kakade](http://github.com/Maheshkumar-Kakade)
+ * fix: make sure timestamps don't trigger unnecessary updates #4005 #3991 [tommarien](https://github.com/tommarien)
+ * fix(document): inspect inherits schema options #4001
+ * fix(populate): don't mark populated path as modified if setting to object w/ same id #3992
+ * fix(document): support kind argument to invalidate #3965
+
+4.4.10 / 2016-03-24
+===================
+ * fix(document): copy isNew when copying a document #3982
+ * fix(document): don't override defaults with undefined keys #3981
+ * fix(populate): merge multiple deep populate options for the same path #3974
+
+4.4.9 / 2016-03-22
+==================
+ * fix: upgrade mongodb -> 2.1.10 re https://jira.mongodb.org/browse/NODE-679 #4010
+ * docs: add syntax highlighting for acquit examples #3975
+
+4.4.8 / 2016-03-18
+==================
+ * docs(aggregate): clarify promises #3990 [megagon](https://github.com/megagon)
+ * fix: upgrade mquery -> 1.10 #3988 [matskiv](https://github.com/matskiv)
+ * feat(connection): 'all' event for repl sets #3986 [xizhibei](https://github.com/xizhibei)
+ * docs(types): clarify Array.pull #3985 [seriousManual](https://github.com/seriousManual)
+ * feat(query): support array syntax for .sort() via mquery 1.9 #3980
+ * fix(populate): support > 3 level nested populate #3973
+ * fix: MongooseThenable exposes connection correctly #3972
+ * docs(connection): add note about reconnectTries and reconnectInterval #3969
+ * feat(document): invalidate returns the new validationError #3964
+ * fix(query): .eq() as shorthand for .equals #3953 [Fonger](https://github.com/Fonger)
+ * docs(connection): clarify connection string vs passed options #3941
+ * docs(query): select option for findOneAndUpdate #3933
+ * fix(error): ValidationError.properties no longer enumerable #3925
+ * docs(validation): clarify how required validators work with nested schemas #3915
+ * fix: upgrade mongodb driver -> 2.1.8 to make partial index errors more sane #3864
+
+4.4.7 / 2016-03-11
+==================
+ * fix(query): stop infinite recursion caused by merging a mongoose buffer #3961
+ * fix(populate): handle deep populate array -> array #3954
+ * fix(schema): allow setting timestamps with .set() #3952 #3951 #3907 [Fonger](https://github.com/Fonger)
+ * fix: MongooseThenable doesn't overwrite constructors #3940
+ * fix(schema): don't cast boolean to date #3935
+ * fix(drivers): support sslValidate in connection string #3929
+ * fix(types): correct markModified() for single nested subdocs #3910
+ * fix(drivers): catch and report any errors that occur in driver methods #3906
+ * fix(populate): get subpopulate model correctly when array under nested #3904
+ * fix(document): allow fields named 'pre' and 'post' #3902
+ * docs(query): clarify runValidators and setDefaultsOnInsert options #3892
+ * docs(validation): show how to use custom required messages in schema #2616
+
+4.4.6 / 2016-03-02
+==================
+ * fix: upgrade mongodb driver to 2.1.7 #3938
+ * docs: fix plugins link #3917 #3909 [fbertone](https://github.com/fbertone)
+ * fix(query): sort+select with count works #3914
+ * fix(query): improve mergeUpdate's ability to handle nested docs #3890
+
+4.4.5 / 2016-02-24
+==================
+ * fix(query): ability to select a length field (upgrade to mquery 1.7.0) #3903
+ * fix: include nested CastError as reason for array CastError #3897 [kotarou3](https://github.com/kotarou3)
+ * fix(schema): check for doc existence before taking fields #3889
+ * feat(schema): useNestedStrict option to take nested strict mode for update #3883
+ * docs(validation): clarify relationship between required and checkRequired #3822
+ * docs(populate): dynamic reference docs #3809
+ * docs: expand dropdown when clicking on file name #3807
+ * docs: plugins.mongoosejs.io is up #3127
+ * fix(schema): ability to add a virtual with same name as removed path #2398
+
+4.4.4 / 2016-02-17
+==================
+ * fix(schema): handle field selection when casting single nested subdocs #3880
+ * fix(populate): populating using base model with multiple child models in result #3878
+ * fix: ability to properly use return value of `mongoose.connect()` #3874
+ * fix(populate): dont hydrate populated subdoc if lean option set #3873
+ * fix(connection): dont re-auth if already connected with useDb #3871
+ * docs: cover how to set underlying driver's promise lib #3869
+ * fix(document): handle conflicting names in validation errors with subdocs #3867
+ * fix(populate): set undefined instead of null consistently when populate couldn't find results #3859
+ * docs: link to `execPopulate()` in `doc.populate()` docs #3836
+ * docs(plugin): link to the `mongoose.plugin()` function #3732
+
+4.4.3 / 2016-02-09
+==================
+ * fix: upgrade to mongodb 2.1.6 to remove kerberos log output #3861 #3860 [cartuchogl](https://github.com/cartuchogl)
+ * fix: require('mongoose') is no longer a pseudo-promise #3856
+ * fix(query): update casting for single nested docs #3820
+ * fix(populate): deep populating multiple paths with same options #3808
+ * docs(middleware): clarify save/validate hook order #1149
+
+4.4.2 / 2016-02-05
+==================
+ * fix(aggregate): handle calling .cursor() with no options #3855
+ * fix: upgrade mongodb driver to 2.1.5 for GridFS memory leak fix #3854
+ * docs: fix schematype.html conflict #3853 #3850 #3843
+ * fix(model): bluebird unhandled rejection with ensureIndexes() on init #3837
+ * docs: autoIndex option for createConnection #3805
+
 4.4.1 / 2016-02-03
 ==================
  * fix: linting broke some cases where we use `== null` as shorthand #3852
@@ -186,7 +489,7 @@
 
 4.2.4 / 2015-11-02
 ==================
- * fixed; upgraded `ms` package for security vulnerability #3254 [fhemberger](https://github.com/fhemberger)
+ * fixed; upgraded `ms` package for security vulnerability #3524 [fhemberger](https://github.com/fhemberger)
  * fixed; ESlint rules #3517 [ChristianMurphy](https://github.com/ChristianMurphy)
  * docs; typo in aggregation docs #3513 [rafakato](https://github.com/rafakato)
  * fixed; add `dontThrowCastError` option to .update() for promises #3512

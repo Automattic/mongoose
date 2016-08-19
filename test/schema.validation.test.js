@@ -105,14 +105,14 @@ describe('schema', function() {
         simple: {type: String, match: /[a-z]/}
       });
 
-      assert.equal(1, Test.path('simple').validators.length);
+      assert.equal(Test.path('simple').validators.length, 1);
 
       Test.path('simple').doValidate('az', function(err) {
         assert.ifError(err);
       });
 
       Test.path('simple').match(/[0-9]/);
-      assert.equal(2, Test.path('simple').validators.length);
+      assert.equal(Test.path('simple').validators.length, 2);
 
       Test.path('simple').doValidate('12', function(err) {
         assert.ok(err instanceof ValidatorError);
@@ -199,15 +199,15 @@ describe('schema', function() {
 
         Tobi.path('friends').doValidate(100, function(err) {
           assert.ok(err instanceof ValidatorError);
-          assert.equal('friends', err.path);
-          assert.equal('max', err.kind);
-          assert.equal(100, err.value);
+          assert.equal(err.path, 'friends');
+          assert.equal(err.kind, 'max');
+          assert.equal(err.value, 100);
         });
 
         Tobi.path('friends').doValidate(1, function(err) {
           assert.ok(err instanceof ValidatorError);
-          assert.equal('friends', err.path);
-          assert.equal('min', err.kind);
+          assert.equal(err.path, 'friends');
+          assert.equal(err.kind, 'min');
         });
 
         // null is allowed
@@ -540,7 +540,7 @@ describe('schema', function() {
         var called = false;
 
         function validator(value, fn) {
-          assert.equal('b', this.a);
+          assert.equal(this.a, 'b');
 
           setTimeout(function() {
             called = true;
@@ -554,7 +554,7 @@ describe('schema', function() {
 
         Animal.path('ferret').doValidate(true, function(err) {
           assert.ifError(err);
-          assert.equal(true, called);
+          assert.equal(called, true);
           done();
         }, {a: 'b'});
       });
@@ -580,8 +580,8 @@ describe('schema', function() {
 
           var a = new A;
           a.validate(function(err) {
-            assert.equal('Path `requiredString1` is required.', err.errors.requiredString1);
-            assert.equal('oops, requiredString2 is missing. required', err.errors.requiredString2);
+            assert.equal(err.errors.requiredString1, 'Path `requiredString1` is required.');
+            assert.equal(err.errors.requiredString2, 'oops, requiredString2 is missing. required');
 
             a.requiredString1 = a.requiredString2 = 'hi';
             a.name = 'three';
@@ -591,14 +591,14 @@ describe('schema', function() {
             a.numMax0 = a.numMax1 = 30;
 
             a.validate(function(err) {
-              assert.equal('`three` is not a valid enum value for path `name`.', err.errors.name);
-              assert.equal('enum validator failed for path: myenum with y', err.errors.myenum);
-              assert.equal('Path `matchString0` is invalid (no match).', err.errors.matchString0);
-              assert.equal('invalid string for matchString1 with value: no match', err.errors.matchString1);
-              assert.equal('Path `numMin0` (2) is less than minimum allowed value (10).', String(err.errors.numMin0));
-              assert.equal('hey, numMin1 is too small', String(err.errors.numMin1));
-              assert.equal('Path `numMax0` (30) is more than maximum allowed value (20).', err.errors.numMax0);
-              assert.equal('hey, numMax1 (30) is greater than 20', String(err.errors.numMax1));
+              assert.equal(err.errors.name, '`three` is not a valid enum value for path `name`.');
+              assert.equal(err.errors.myenum, 'enum validator failed for path: myenum with y');
+              assert.equal(err.errors.matchString0, 'Path `matchString0` is invalid (no match).');
+              assert.equal(err.errors.matchString1, 'invalid string for matchString1 with value: no match');
+              assert.equal(String(err.errors.numMin0), 'Path `numMin0` (2) is less than minimum allowed value (10).');
+              assert.equal(String(err.errors.numMin1), 'hey, numMin1 is too small');
+              assert.equal(err.errors.numMax0, 'Path `numMax0` (30) is more than maximum allowed value (20).');
+              assert.equal(String(err.errors.numMax1), 'hey, numMax1 (30) is greater than 20');
 
               a.name = 'one';
               a.myenum = 'x';
@@ -622,8 +622,8 @@ describe('schema', function() {
           var m = new M({x: [3, 4, 5, 6]});
 
           m.validate(function(err) {
-            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('user defined', err.errors.x.kind);
+            assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
+            assert.equal(err.errors.x.kind, 'user defined');
             done();
           });
         });
@@ -645,8 +645,8 @@ describe('schema', function() {
 
           var m = new M({x: 'a'});
           m.validate(function(err) {
-            assert.equal('Error code 25', err.errors.x.toString());
-            assert.equal(25, err.errors.x.properties.errorCode);
+            assert.equal(err.errors.x.toString(), 'Error code 25');
+            assert.equal(err.errors.x.properties.errorCode, 25);
             done();
           });
         });
@@ -667,7 +667,7 @@ describe('schema', function() {
 
           var m = new M({x: 'whatever'});
           m.validate(function(err) {
-            assert.equal('Custom message', err.errors.x.toString());
+            assert.equal(err.errors.x.toString(), 'Custom message');
             done();
           });
         });
@@ -689,8 +689,8 @@ describe('schema', function() {
           var m = new M({x: [3, 4, 5, 6]});
 
           m.validate(function(err) {
-            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('customType', err.errors.x.kind);
+            assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
+            assert.equal(err.errors.x.kind, 'customType');
             done();
           });
         });
@@ -709,8 +709,8 @@ describe('schema', function() {
           var m = new M({x: [3, 4, 5, 6]});
 
           m.validate(function(err) {
-            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('customType', err.errors.x.kind);
+            assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
+            assert.equal(err.errors.x.kind, 'customType');
             done();
           });
         });
@@ -793,6 +793,44 @@ describe('schema', function() {
       });
     });
 
+    it('should validate subdocuments subproperty enums (gh-4111)', function(done) {
+      var M = mongoose.model('M', new Schema({
+        p: {
+          val: { type: String, enum: ['test'] }
+        },
+        children: [{
+          prop: {
+            val: { type: String, enum: ['valid'] }
+          }
+        }]
+      }));
+
+      var model = new M();
+      model.p = { val: 'test' };
+      var child = model.children.create();
+      child.prop = {
+        val: 'valid'
+      };
+
+      model.children.push(child);
+
+      model.validate(function(error) {
+        assert.ifError(error);
+
+        child.prop.val = 'invalid';
+
+        assert.equal(model.children[0].prop.val, 'invalid');
+
+        model.validate(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['children.0.prop.val'].message,
+            '`invalid` is not a valid enum value for path `prop.val`.');
+
+          done();
+        });
+      });
+    });
+
     it('doesnt do double validation on document arrays (gh-2618)', function(done) {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});
@@ -808,7 +846,52 @@ describe('schema', function() {
       p.a.push({str: 'asdf'});
       p.validate(function(err) {
         assert.ifError(err);
-        assert.equal(1, validateCalls);
+        assert.equal(validateCalls, 1);
+        done();
+      });
+    });
+
+    it('no double validation on set nested docarray (gh-4145)', function(done) {
+      var calls = 0;
+      var myValidator = function() {
+        ++calls;
+        return true;
+      };
+
+      var InnerSchema = new mongoose.Schema({
+        myfield: {
+          type: String,
+          validate: {
+            validator: myValidator,
+            message: 'Message'
+          }
+        },
+        sibling: String
+      });
+
+      var MySchema = new mongoose.Schema({
+        nest: {
+          myarray: [InnerSchema]
+        },
+        rootSibling: String
+      });
+
+      var Model = mongoose.model('gh4145', MySchema);
+
+      var instance = new Model({
+        rootSibling: 'This is the root sibling'
+      });
+      // Direct object assignment
+      instance.nest = {
+        myarray: [{
+          myfield: 'This is my field',
+          sibling: 'This is the nested sibling'
+        }]
+      };
+
+      instance.validate(function(error) {
+        assert.ifError(error);
+        assert.equal(calls, 1);
         done();
       });
     });
@@ -1049,3 +1132,4 @@ describe('schema', function() {
     });
   });
 });
+

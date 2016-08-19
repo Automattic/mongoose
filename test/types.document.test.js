@@ -181,7 +181,7 @@ describe('types.document', function() {
               movie.save(function() {
                 Movie.findById(super8._id, function(err, movie) {
                   assert.ifError(err);
-                  assert.equal(0, movie.ratings.length);
+                  assert.equal(movie.ratings.length, 0);
                   db.close(done);
                 });
               });

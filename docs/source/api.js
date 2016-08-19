@@ -4,8 +4,8 @@
 
 var fs = require('fs');
 var link = require('../helpers/linktype');
-var hl = require('highlight.js')
-var md = require('markdown')
+var hl = require('highlight.js');
+var md = require('markdown');
 
 module.exports = {
     docs: []
@@ -39,8 +39,9 @@ function parse (docs) {
     var constructor = null;
 
     json.forEach(function (comment) {
-      if (comment.description)
+      if (comment.description) {
         highlight(comment.description);
+      }
 
       var prop = false;
       comment.params = [];
@@ -102,6 +103,8 @@ function parse (docs) {
         case 'param':
           comment.params.unshift(tag);
           comment.tags.splice(i, 1);
+          tag.description = tag.description ?
+            md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') : '';
           break;
         case 'return':
           comment.return = tag;
@@ -139,7 +142,14 @@ function parse (docs) {
     props = props.filter(ignored);
 
     function ignored (method) {
-      if (method.ignore) return false;
+      if (method.ignore) {
+        return false;
+      }
+      // Ignore eslint declarations
+      if (method.description && method.description.full &&
+        method.description.full.indexOf('<p>eslint') === 0) {
+        return false;
+      }
       return true;
     }
 

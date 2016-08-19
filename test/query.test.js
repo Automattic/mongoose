@@ -2,13 +2,13 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    Schema = mongoose.Schema,
-    assert = require('power-assert'),
-    random = require('../build/utils').random,
-    Query = require('../build/query');
+var start = require('./common');
+var mongoose = start.mongoose;
+var DocumentObjectId = mongoose.Types.ObjectId;
+var Schema = mongoose.Schema;
+var assert = require('power-assert');
+var random = require('../build/utils').random;
+var Query = require('../build/query');
 
 var Comment = new Schema({
   text: String
@@ -819,10 +819,10 @@ describe('Query', function() {
         _docs: {}
       };
       q.populate(o);
-      assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
+      assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       q.populate('yellow.brick');
-      assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
+      assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
       o.match = undefined;
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       done();
@@ -839,7 +839,7 @@ describe('Query', function() {
         options: undefined,
         _docs: {}
       };
-      assert.equal(2, Object.keys(q._mongooseOptions.populate).length);
+      assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       o.path = 'dirt';
       assert.deepEqual(o, q._mongooseOptions.populate.dirt);
@@ -1031,13 +1031,13 @@ describe('Query', function() {
         setTimeout(function() {
           Product.find({tags: 12345}, function(err, p) {
             assert.ifError(err);
-            assert.equal(1, p.length);
+            assert.equal(p.length, 1);
 
             Product.find({tags: 123456}).remove();
             setTimeout(function() {
               Product.find({tags: 123456}, function(err, p) {
                 assert.ifError(err);
-                assert.equal(0, p.length);
+                assert.equal(p.length, 0);
                 db.close();
                 done();
               });
@@ -1185,7 +1185,7 @@ describe('Query', function() {
       q.hint(hint);
 
       var options = q._optionsForExec({schema: {options: {safe: true}}});
-      assert.equal(a, JSON.stringify(options));
+      assert.equal(JSON.stringify(options), a);
       done();
     });
   });
@@ -1206,15 +1206,15 @@ describe('Query', function() {
       it('works', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.slaveOk();
-        assert.equal(true, query.options.slaveOk);
+        assert.equal(query.options.slaveOk, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.slaveOk(true);
-        assert.equal(true, query.options.slaveOk);
+        assert.equal(query.options.slaveOk, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.slaveOk(false);
-        assert.equal(false, query.options.slaveOk);
+        assert.equal(query.options.slaveOk, false);
         done();
       });
     });
@@ -1223,22 +1223,22 @@ describe('Query', function() {
       it('works', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.tailable();
-        assert.equal(true, query.options.tailable);
+        assert.equal(query.options.tailable, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.tailable(true);
-        assert.equal(true, query.options.tailable);
+        assert.equal(query.options.tailable, true);
 
         query = new Query({}, {}, null, p1.collection);
         query.tailable(false);
-        assert.equal(false, query.options.tailable);
+        assert.equal(query.options.tailable, false);
         done();
       });
       it('supports passing the `await` option', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.tailable({awaitdata: true});
-        assert.equal(true, query.options.tailable);
-        assert.equal(true, query.options.awaitdata);
+        assert.equal(query.options.tailable, true);
+        assert.equal(query.options.awaitdata, true);
         done();
       });
     });
@@ -1246,7 +1246,7 @@ describe('Query', function() {
     describe('comment', function() {
       it('works', function(done) {
         var query = new Query;
-        assert.equal('function', typeof query.comment);
+        assert.equal(typeof query.comment, 'function');
         assert.equal(query.comment('Lowpass is more fun'), query);
         assert.equal(query.options.comment, 'Lowpass is more fun');
         done();
@@ -1272,7 +1272,7 @@ describe('Query', function() {
       it('works', function(done) {
         var query = new Query({}, {}, null, p1.collection);
         query.snapshot(true);
-        assert.equal(true, query.options.snapshot);
+        assert.equal(query.options.snapshot, true);
         done();
       });
     });
@@ -1400,7 +1400,7 @@ describe('Query', function() {
             var ret = getopts.call(this, model);
 
             assert.ok(ret.readPreference);
-            assert.equal('secondary', ret.readPreference.mode);
+            assert.equal(ret.readPreference.mode, 'secondary');
             assert.deepEqual({w: 'majority'}, ret.safe);
             called = true;
 
@@ -1470,94 +1470,283 @@ describe('Query', function() {
     });
   });
 
-  describe('gh-1950', function() {
-    it('ignores sort when passed to count', function(done) {
-      var db = start();
-      var Product = db.model('Product', 'Product_setOptions_test');
-      Product.find().sort({_id: 1}).count({}).exec(function(error) {
-        assert.ifError(error);
-        db.close(done);
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    describe('gh-1950', function() {
+      it('ignores sort when passed to count', function(done) {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        Product.find().sort({_id: 1}).count({}).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+
+      it('ignores count when passed to sort', function(done) {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        Product.find().count({}).sort({_id: 1}).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
       });
     });
 
-    it('ignores count when passed to sort', function(done) {
-      var db = start();
-      var Product = db.model('Product', 'Product_setOptions_test');
-      Product.find().count({}).sort({_id: 1}).exec(function(error) {
+    it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
+      var User = db.model('gh3010', {
+        _id: {
+          select: false,
+          type: Schema.Types.ObjectId,
+          default: mongoose.Types.ObjectId
+        },
+        username: String
+      });
+
+      User.create({username: 'Val'}, function(error, user) {
         assert.ifError(error);
-        db.close(done);
+        User.find({_id: user._id}).select('username').exec(function(error, users) {
+          assert.ifError(error);
+          assert.equal(users.length, 1);
+          assert.ok(!users[0]._id);
+          assert.equal(users[0].username, 'Val');
+          done();
+        });
       });
     });
-  });
 
-  it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
-    var db = start();
-    var User = db.model('gh3010', {
-      _id: {
-        select: false,
-        type: Schema.Types.ObjectId,
-        default: mongoose.Types.ObjectId
-      },
-      username: String
-    });
-
-    User.create({username: 'Val'}, function(error, user) {
-      assert.ifError(error);
-      User.find({_id: user._id}).select('username').exec(function(error, users) {
-        assert.ifError(error);
-        assert.equal(users.length, 1);
-        assert.ok(!users[0]._id);
-        assert.equal(users[0].username, 'Val');
-        db.close(done);
+    it('doesnt reverse key order for update docs (gh-3215)', function(done) {
+      var Test = db.model('gh3215', {
+        arr: [{date: Date, value: Number}]
       });
-    });
-  });
 
-  it('doesnt reverse key order for update docs (gh-3215)', function(done) {
-    var db = start();
-    var Test = db.model('gh3215', {
-      arr: [{date: Date, value: Number}]
-    });
-
-    var q = Test.update({}, {
-      $push: {
-        arr: {
-          $each: [{date: new Date(), value: 1}],
-          $sort: {value: -1, date: -1}
+      var q = Test.update({}, {
+        $push: {
+          arr: {
+            $each: [{date: new Date(), value: 1}],
+            $sort: {value: -1, date: -1}
+          }
         }
-      }
+      });
+
+      assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
+          ['value', 'date']);
+      done();
     });
 
-    assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
-        ['value', 'date']);
-    db.close(done);
-  });
+    it('allows sort with count (gh-3914)', function(done) {
+      var Post = db.model('gh3914_0', {
+        title: String
+      });
 
-  it('handles nested $ (gh-3265)', function(done) {
-    var db = start();
-    var Post = db.model('gh3265', {
-      title: String,
-      answers: [{
-        details: String,
-        stats: {
-          votes: Number,
-          count: Number
+      Post.count({}).sort({ title: 1 }).exec(function(error, count) {
+        assert.ifError(error);
+        assert.strictEqual(count, 0);
+        done();
+      });
+    });
+
+    it('allows sort with select (gh-3914)', function(done) {
+      var Post = db.model('gh3914_1', {
+        title: String
+      });
+
+      Post.count({}).select({ _id: 0 }).exec(function(error, count) {
+        assert.ifError(error);
+        assert.strictEqual(count, 0);
+        done();
+      });
+    });
+
+    it('handles nested $ (gh-3265)', function(done) {
+      var Post = db.model('gh3265', {
+        title: String,
+        answers: [{
+          details: String,
+          stats: {
+            votes: Number,
+            count: Number
+          }
+        }]
+      });
+
+      var answersUpdate = {details: 'blah', stats: {votes: 1, count: '3'}};
+      var q = Post.update(
+          {'answers._id': '507f1f77bcf86cd799439011'},
+          {$set: {'answers.$': answersUpdate}});
+
+      assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
+          {votes: 1, count: 3});
+      done();
+    });
+
+    it('$geoWithin with single nested schemas (gh-4044)', function(done) {
+      var locationSchema = new Schema({
+        type: { type: String },
+        coordinates: []
+      }, { _id:false });
+
+      var schema = new Schema({
+        title : String,
+        location: { type: locationSchema, required: true }
+      });
+      schema.index({ location: '2dsphere' });
+
+      var Model = db.model('gh4044', schema);
+
+      var query = {
+        location:{
+          $geoWithin:{
+            $geometry:{
+              type: 'Polygon',
+              coordinates: [[[-1,0],[-1,3],[4,3],[4,0],[-1,0]]]
+            }
+          }
         }
-      }]
+      };
+      Model.find(query, function(error) {
+        assert.ifError(error);
+        done();
+      });
     });
 
-    var answersUpdate = {details: 'blah', stats: {votes: 1, count: '3'}};
-    var q = Post.update(
-        {'answers._id': '507f1f77bcf86cd799439011'},
-        {$set: {'answers.$': answersUpdate}});
+    it('setDefaultsOnInsert with empty update (gh-3825)', function(done) {
+      var schema = new mongoose.Schema({
+        test: { type: Number, default: 8472 },
+        name: String
+      });
 
-    assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
-        {votes: 1, count: 3});
-    db.close(done);
+      var MyModel = db.model('gh3825', schema);
+
+      var opts = { setDefaultsOnInsert: true, upsert: true };
+      MyModel.update({}, {}, opts, function(error) {
+        assert.ifError(error);
+        MyModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.strictEqual(doc.test, 8472);
+          assert.ok(!doc.name);
+          done();
+        });
+      });
+    });
+
+    it('custom query methods (gh-3714)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      schema.query.byName = function(name) {
+        return this.find({ name: name });
+      };
+
+      var MyModel = db.model('gh3714', schema);
+
+      MyModel.create({ name: 'Val' }, function(error) {
+        assert.ifError(error);
+        MyModel.find().byName('Val').exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].name, 'Val');
+          done();
+        });
+      });
+    });
+
+    it('string as input (gh-4378)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var MyModel = db.model('gh4378', schema);
+
+      assert.throws(function() {
+        MyModel.findOne('');
+      }, /Invalid argument to findOne()/);
+
+      done();
+    });
+
+    it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
+      var areaSchema = new Schema({
+        name: {type: String},
+        loc: {
+          type: {
+            type: String,
+            enum: ['Polygon'],
+            default: 'Polygon'
+          },
+          coordinates: [[[Number]]]
+        }
+      });
+
+      var Area = db.model('gh4392_0', areaSchema);
+
+      var observationSchema = new Schema({
+        geometry: {
+          type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+          },
+          coordinates: { type: [Number] }
+        },
+        properties: {
+          temperature: { type: Number }
+        }
+      });
+      observationSchema.index({ geometry: '2dsphere' });
+
+      var Observation = db.model('gh4392_1', observationSchema);
+
+      Observation.on('index', function(error) {
+        assert.ifError(error);
+        var tromso = new Area({
+          name: 'Tromso, Norway',
+          loc: {
+            type: 'Polygon',
+            coordinates: [[
+              [18.89, 69.62],
+              [18.89, 69.72],
+              [19.03, 69.72],
+              [19.03, 69.62],
+              [18.89, 69.62]
+            ]]
+          }
+        });
+        tromso.save(function(error) {
+          assert.ifError(error);
+          var observation = {
+            geometry: {
+              type: 'Point',
+              coordinates: [18.895, 69.67]
+            }
+          };
+          Observation.create(observation, function(error) {
+            assert.ifError(error);
+
+            Observation.
+              find().
+              where('geometry').within().geometry(tromso.loc).
+              exec(function(error, docs) {
+                assert.ifError(error);
+                assert.equal(docs.length, 1);
+                done();
+              });
+          });
+        });
+      });
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {
-    var db = start();
+    var db;
     var MyModel;
 
     before(function(done) {
@@ -1592,8 +1781,8 @@ describe('Query', function() {
       });
     });
 
-    after(function() {
-      db.close();
+    after(function(done) {
+      db.close(done);
     });
 
     it('falsy projection', function(done) {

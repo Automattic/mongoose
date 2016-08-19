@@ -66,6 +66,18 @@ describe('model aggregate', function() {
       A.aggregate(group, project, function(err, res) {
         assert.ifError(err);
         assert.ok(res);
+        assert.equal(res.length, 1);
+        assert.ok('maxAge' in res[0]);
+        assert.equal(res[0].maxAge, maxAge);
+        done();
+      });
+    });
+
+    it('when return promise', function(done) {
+      this.timeout(4000);
+
+      A.aggregate(group, project).then( function(res) {
+        assert.ok(res);
         assert.equal(1, res.length);
         assert.ok('maxAge' in res[0]);
         assert.equal(maxAge, res[0].maxAge);
@@ -79,9 +91,9 @@ describe('model aggregate', function() {
       A.aggregate([group, project], function(err, res) {
         assert.ifError(err);
         assert.ok(res);
-        assert.equal(1, res.length);
+        assert.equal(res.length, 1);
         assert.ok('maxAge' in res[0]);
-        assert.equal(maxAge, res[0].maxAge);
+        assert.equal(res[0].maxAge, maxAge);
         done();
       });
     });
@@ -96,9 +108,9 @@ describe('model aggregate', function() {
           assert.ifError(err);
           assert.ok(promise instanceof mongoose.Promise);
           assert.ok(res);
-          assert.equal(1, res.length);
+          assert.equal(res.length, 1);
           assert.ok('maxAge' in res[0]);
-          assert.equal(maxAge, res[0].maxAge);
+          assert.equal(res[0].maxAge, maxAge);
           done();
         });
     });
@@ -114,7 +126,7 @@ describe('model aggregate', function() {
       promise.then(function(res) {
         assert.ok(promise instanceof mongoose.Promise);
         assert.ok(res);
-        assert.equal(1, res.length);
+        assert.equal(res.length, 1);
         assert.ok('maxAge' in res[0]);
         assert.equal(maxAge, res[0].maxAge);
         done();
@@ -142,7 +154,7 @@ describe('model aggregate', function() {
           assert.ifError(error);
           A.db.collection(outputCollection).find().toArray(function(error, documents) {
             assert.ifError(error);
-            assert.equal(1, documents.length);
+            assert.equal(documents.length, 1);
             assert.ok('maxAge' in documents[0]);
             assert.equal(maxAge, documents[0].maxAge);
             done();

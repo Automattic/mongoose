@@ -156,7 +156,7 @@
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
-      
+
       function getMembers(data){
         if (!(data && data.query && data.query.results && data.query.results.p)) return;
         var members = document.createElement('span');
@@ -483,14 +483,14 @@ myModel.save(function (err) {
 // pre declaration is chainable
 .pre(method, function secondPre (next, methodArg1, methodArg2) {
   console.log(methodArg1);
-  // =&gt; 'altered-originalValOfMethodArg1' 
+  // =&gt; 'altered-originalValOfMethodArg1'
 
   console.log(methodArg2);
-  // =&gt; 'originalValOfMethodArg2' 
+  // =&gt; 'originalValOfMethodArg2'
 
   // Passing no arguments to `next` automatically passes along the current argument values
   // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-  // and also equivalent to, with the example method arg 
+  // and also equivalent to, with the example method arg
   // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
   next();
 })
@@ -529,7 +529,14 @@ new Schema({
 
 <h2>Driver access</h2>
 
-<p>The driver being used defaults to <a href="https://github.com/mongodb/node-mongodb-native">node-mongodb-native</a> and is directly accessible through <code>YourModel.collection</code>. <strong>Note</strong>: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.</p>
+The driver being used defaults to
+<a href="https://github.com/mongodb/node-mongodb-native">node-mongodb-native</a>
+and is directly accessible through <code>YourModel.collection</code>.
+<strong>Note</strong>: using the driver directly bypasses all Mongoose
+power-tools like validation, getters, setters, hooks, etc., with the
+notable exception that <code>YourModel.collection</code> still buffers
+commands. As such, <code>YourModel.collection.find()</code> will <b>not</b>
+return a cursor.
 
 <h2>Mongoose Plugins</h2>
 

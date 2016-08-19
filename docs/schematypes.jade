@@ -97,6 +97,7 @@ block content
   p An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
   :js
     var Any = new Schema({ any: {} });
+    var Any = new Schema({ any: Object });
     var Any = new Schema({ any: Schema.Types.Mixed });
   p
     | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the 
@@ -149,6 +150,8 @@ block content
     a(href="http://plugins.mongoosejs.com") plugins
     |  site for compatible types like 
     a(href="https://github.com/aheckmann/mongoose-long") mongoose-long
+    | ,&nbsp;
+    a(href="https://github.com/vkarpov15/mongoose-int32") mongoose-int32
     |  and 
     a(href="https://github.com/aheckmann/mongoose-function") other
     | 

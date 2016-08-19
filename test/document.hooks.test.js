@@ -83,26 +83,26 @@ describe('document: hooks:', function() {
         steps = 0;
 
     // serial
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       setTimeout(function() {
         // make sure next step hasn't executed yet
-        assert.equal(1, steps);
+        assert.equal(steps, 1);
         next();
       }, 50);
     });
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
     // parallel
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
-      assert.equal(3, steps);
+      assert.equal(steps, 3);
       setTimeout(function() {
-        assert.equal(4, steps);
+        assert.equal(steps, 4);
       }, 10);
       setTimeout(function() {
         steps++;
@@ -111,10 +111,10 @@ describe('document: hooks:', function() {
       next();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       setTimeout(function() {
-        assert.equal(4, steps);
+        assert.equal(steps, 4);
       }, 10);
       setTimeout(function() {
         steps++;
@@ -125,7 +125,7 @@ describe('document: hooks:', function() {
 
     doc.hooksTest(function(err) {
       assert.ifError(err);
-      assert.equal(6, steps);
+      assert.equal(steps, 6);
       done();
     });
   });
@@ -134,20 +134,20 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
       next();
     });
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
     doc.hooksTest(function(err) {
       assert.ifError(err);
-      assert.equal(2, steps);
+      assert.equal(steps, 2);
       done();
     });
   });
@@ -156,14 +156,14 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
@@ -172,7 +172,7 @@ describe('document: hooks:', function() {
 
     doc.hooksTest(function(err) {
       assert.ifError(err);
-      assert.equal(2, steps);
+      assert.equal(steps, 2);
       done();
     });
   });
@@ -181,23 +181,23 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       steps++;
       next(new Error);
     });
 
-    doc.pre('hooksTest', function() {
+    doc.$pre('hooksTest', function() {
       steps++;
     });
 
     doc.hooksTest(function(err) {
       assert.ok(err instanceof Error);
-      assert.equal(2, steps);
+      assert.equal(steps, 2);
       done();
     });
   });
@@ -205,7 +205,7 @@ describe('document: hooks:', function() {
   it('errors from last serial hook', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       next(new Error);
     });
 
@@ -218,12 +218,12 @@ describe('document: hooks:', function() {
   it('mutating incoming args via middleware', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('set', function(next, path, val) {
+    doc.$pre('set', function(next, path, val) {
       next(path, 'altered-' + val);
     });
 
     doc.set('test', 'me');
-    assert.equal('altered-me', doc.test);
+    assert.equal(doc.test, 'altered-me');
     done();
   });
 
@@ -231,19 +231,19 @@ describe('document: hooks:', function() {
     var doc = new TestDocument(),
         steps = 0;
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done) {
+    doc.$pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done(new Error);
@@ -251,7 +251,7 @@ describe('document: hooks:', function() {
 
     doc.hooksTest(function(err) {
       assert.ok(err instanceof Error);
-      assert.equal(3, steps);
+      assert.equal(steps, 3);
       done();
     });
   });
@@ -259,12 +259,12 @@ describe('document: hooks:', function() {
   it('passing two arguments to a method subject to hooks and return value', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next) {
+    doc.$pre('hooksTest', function(next) {
       next();
     });
 
     doc.hooksTest(function(err, args) {
-      assert.equal(2, args.length);
+      assert.equal(args.length, 2);
       assert.equal(args[1], 'test');
       done();
     }, 'test');
@@ -301,7 +301,7 @@ describe('document: hooks:', function() {
           S.findById(s.id, function(err, s) {
             db.close();
             assert.ifError(err);
-            assert.equal('bye', s.e[0].text);
+            assert.equal(s.e[0].text, 'bye');
             done();
           });
         });
@@ -333,7 +333,7 @@ describe('document: hooks:', function() {
       try {
         assert.ok(err);
         assert.ok(err.errors['e.0.text']);
-        assert.equal(false, presave);
+        assert.equal(presave, false);
         done();
       } catch (e) {
         done(e);
@@ -362,8 +362,8 @@ describe('document: hooks:', function() {
     var m = new M({sub: [{_id: 1}, {_id: 2}]});
     m.save(function(err) {
       assert.ifError(err);
-      assert.equal(0, called.pre);
-      assert.equal(0, called.post);
+      assert.equal(called.pre, 0);
+      assert.equal(called.post, 0);
 
       M.findById(m, function(err1, doc) {
         assert.ifError(err1);
@@ -371,27 +371,27 @@ describe('document: hooks:', function() {
         doc.sub.id(1).remove();
         doc.save(function(err2) {
           assert.ifError(err2);
-          assert.equal(1, called.pre);
-          assert.equal(1, called.post);
+          assert.equal(called.pre, 1);
+          assert.equal(called.post, 1);
 
           // does not get called when not removed
           doc.name = 'changed1';
           doc.save(function(err3) {
             assert.ifError(err3);
-            assert.equal(1, called.pre);
-            assert.equal(1, called.post);
+            assert.equal(called.pre, 1);
+            assert.equal(called.post, 1);
 
             doc.sub.id(2).remove();
             doc.remove(function(err4) {
               assert.ifError(err4);
-              assert.equal(2, called.pre);
-              assert.equal(2, called.post);
+              assert.equal(called.pre, 2);
+              assert.equal(called.post, 2);
 
               // does not get called twice
               doc.remove(function(err5) {
                 assert.ifError(err5);
-                assert.equal(2, called.pre);
-                assert.equal(2, called.post);
+                assert.equal(called.pre, 2);
+                assert.equal(called.post, 2);
                 db.close(done);
               });
             });
@@ -411,7 +411,7 @@ describe('document: hooks:', function() {
     var Bar = db.model('gh-1335-2', BarSchema);
 
     var b = new Bar();
-    b.pre('save', function(next) {
+    b.$pre('save', function(next) {
       if (this.isNew && this.foos.length === 0) {
         this.foos = undefined;
       }
@@ -467,7 +467,7 @@ describe('document: hooks:', function() {
 
     m.save(function(err) {
       assert.ifError(err);
-      assert.equal(2, called.post);
+      assert.equal(called.post, 2);
       called.post = 0;
 
       M.findById(m, function(err, doc) {

@@ -140,7 +140,7 @@ describe('utils', function() {
     var o = {a: 1, b: 2, c: 3, 0: 'zero1'};
     var defaults = {b: 10, d: 20, 0: 'zero2'};
     var result = utils.options(defaults, o);
-    assert.equal(1, result.a);
+    assert.equal(result.a, 1);
     assert.equal(result.b, 2);
     assert.equal(result.c, 3);
     assert.equal(result.d, 20);
@@ -244,7 +244,7 @@ describe('utils', function() {
       assert.strictEqual('0', out.b);
       assert.strictEqual(1, out.c);
       assert.strictEqual('1', out.d);
-      assert.equal(4, Object.keys(out).length);
+      assert.equal(Object.keys(out).length, 4);
 
       done();
     });

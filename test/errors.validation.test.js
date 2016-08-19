@@ -131,6 +131,32 @@ describe('ValidationError', function() {
         });
       });
     });
+
+    it('with correct error message (gh-4207)', function(done) {
+      var old = mongoose.Error.messages;
+      mongoose.Error.messages = {
+        'String': {
+          minlength: 'woops!'
+        }
+      };
+
+      var AddressSchema = new Schema({
+        postalCode: { type: String, minlength: 5 }
+      });
+
+      var Address = mongoose.model('gh4207', AddressSchema);
+
+      var model = new Address({
+        postalCode: '9512'
+      });
+
+      // should fail validation
+      model.validate(function(err) {
+        assert.equal(err.errors['postalCode'].message, 'woops!');
+        mongoose.Error.messages = old;
+        done();
+      });
+    });
   });
 
   describe('#maxlength', function() {
@@ -192,7 +218,7 @@ describe('ValidationError', function() {
       var message = 'I had {BASE} and {TOPPING} for breakfast';
 
       var result = ValidatorError.prototype.formatMessage(message, props);
-      assert.equal('I had eggs and bacon for breakfast', result);
+      assert.equal(result, 'I had eggs and bacon for breakfast');
       done();
     });
   });

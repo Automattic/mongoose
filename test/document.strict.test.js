@@ -23,7 +23,7 @@ describe('document: strict mode:', function() {
         arrayMixed: []
       };
 
-      var lax = new Schema(raw, {strict: false});
+      var lax = new Schema(raw, {strict: false, minimize: false});
       var strict = new Schema(raw);
 
       Lax = db.model('Lax', lax);
@@ -34,29 +34,42 @@ describe('document: strict mode:', function() {
       db.close(done);
     });
 
-    it('when creating models with non-strict schemas', function(done) {
-      var l = new Lax({content: 'sample', rouge: 'data'});
-      assert.equal(false, l.$__.strictMode);
+    it('when creating models with non-strict schemas (gh-4274)', function(done) {
+      var l = new Lax({ content: 'sample', rouge: 'data', items: {} });
+      assert.equal(l.$__.strictMode, false);
 
       var lo = l.toObject();
       assert.ok('ts' in l);
       assert.ok('ts' in lo);
-      assert.equal('sample', l.content);
-      assert.equal('sample', lo.content);
-      assert.equal('data', l.rouge);
-      assert.equal('data', lo.rouge);
-      done();
+      assert.equal(l.content, 'sample');
+      assert.equal(lo.content, 'sample');
+      assert.equal(l.rouge, 'data');
+      assert.equal(lo.rouge, 'data');
+      assert.deepEqual(l.items, {});
+      assert.deepEqual(lo.items, {});
+
+      l.save(function(error) {
+        assert.ifError(error);
+        Lax.findById(l).exec(function(error, doc) {
+          assert.ifError(error);
+          var lo = doc.toObject();
+          assert.equal(lo.content, 'sample');
+          assert.equal(lo.rouge, 'data');
+          assert.deepEqual(lo.items, {});
+          done();
+        });
+      });
     });
 
     it('when creating models with strict schemas', function(done) {
       var s = new Strict({content: 'sample', rouge: 'data'});
-      assert.equal(true, s.$__.strictMode);
+      assert.equal(s.$__.strictMode, true);
 
       var so = s.toObject();
       assert.ok('ts' in s);
       assert.ok('ts' in so);
-      assert.equal('sample', s.content);
-      assert.equal('sample', so.content);
+      assert.equal(s.content, 'sample');
+      assert.equal(so.content, 'sample');
       assert.ok(!('rouge' in s));
       assert.ok(!('rouge' in so));
       assert.ok(!s.rouge);
@@ -70,23 +83,23 @@ describe('document: strict mode:', function() {
       assert.ok(instance.$__.strictMode);
 
       instance = instance.toObject();
-      assert.equal('sample', instance.content);
+      assert.equal(instance.content, 'sample');
       assert.ok(!instance.rouge);
       assert.ok('ts' in instance);
 
       // hydrate works as normal, but supports the schema level flag.
       var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
-      assert.equal(false, s2.$__.strictMode);
+      assert.equal(s2.$__.strictMode, false);
       s2 = s2.toObject();
       assert.ok('ts' in s2);
-      assert.equal('sample', s2.content);
+      assert.equal(s2.content, 'sample');
       assert.ok('rouge' in s2);
 
       // testing init
       var s3 = new Strict();
       s3.init({content: 'sample', rouge: 'data'});
       s3.toObject();
-      assert.equal('sample', s3.content);
+      assert.equal(s3.content, 'sample');
       assert.ok(!('rouge' in s3));
       assert.ok(!s3.rouge);
       done();
@@ -95,7 +108,7 @@ describe('document: strict mode:', function() {
     it('when using Model#create', function(done) {
       // strict on create
       Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc) {
-        assert.equal('sample2', doc.content);
+        assert.equal(doc.content, 'sample2');
         assert.ok(!('rouge' in doc));
         assert.ok(!doc.rouge);
         done();
@@ -124,13 +137,13 @@ describe('document: strict mode:', function() {
     var l = new Lax;
     l.set('name', {last: 'goose', hack: 'xx'});
     l = l.toObject();
-    assert.equal('goose', l.name.last);
-    assert.equal('xx', l.name.hack);
+    assert.equal(l.name.last, 'goose');
+    assert.equal(l.name.hack, 'xx');
 
     var s = new Strict;
     s.set({name: {last: 'goose', hack: 'xx'}});
     s = s.toObject();
-    assert.equal('goose', s.name.last);
+    assert.equal(s.name.last, 'goose');
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
 
@@ -138,7 +151,7 @@ describe('document: strict mode:', function() {
     s.set('name', {last: 'goose', hack: 'xx'});
     s.set('shouldnt.exist', ':(');
     s = s.toObject();
-    assert.equal('goose', s.name.last);
+    assert.equal(s.name.last, 'goose');
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
@@ -162,17 +175,17 @@ describe('document: strict mode:', function() {
     var Strict = db.model('EmbeddedStrict', new Schema({dox: [strict]}, {strict: false}), 'embdoc' + random());
 
     var l = new Lax({dox: [{content: 'sample', rouge: 'data'}]});
-    assert.equal(false, l.dox[0].$__.strictMode);
+    assert.equal(l.dox[0].$__.strictMode, false);
     l = l.dox[0].toObject();
-    assert.equal('sample', l.content);
-    assert.equal('data', l.rouge);
+    assert.equal(l.content, 'sample');
+    assert.equal(l.rouge, 'data');
     assert.ok(l.rouge);
 
     var s = new Strict({dox: [{content: 'sample', rouge: 'data'}]});
-    assert.equal(true, s.dox[0].$__.strictMode);
+    assert.equal(s.dox[0].$__.strictMode, true);
     s = s.dox[0].toObject();
     assert.ok('ts' in s);
-    assert.equal('sample', s.content);
+    assert.equal(s.content, 'sample');
     assert.ok(!('rouge' in s));
     assert.ok(!s.rouge);
 
@@ -180,13 +193,13 @@ describe('document: strict mode:', function() {
     var s3 = new Strict();
     s3.init({dox: [{content: 'sample', rouge: 'data'}]});
     s3.toObject();
-    assert.equal('sample', s3.dox[0].content);
+    assert.equal(s3.dox[0].content, 'sample');
     assert.ok(!('rouge' in s3.dox[0]));
     assert.ok(!s3.dox[0].rouge);
 
     // strict on create
     Strict.create({dox: [{content: 'sample2', rouge: 'data'}]}, function(err, doc) {
-      assert.equal('sample2', doc.dox[0].content);
+      assert.equal(doc.dox[0].content, 'sample2');
       assert.ok(!('rouge' in doc.dox[0]));
       assert.ok(!doc.dox[0].rouge);
       db.close(done);
@@ -222,17 +235,17 @@ describe('document: strict mode:', function() {
       myvirtual: 'test'
     });
 
-    assert.equal(0, getCount);
-    assert.equal(1, setCount);
+    assert.equal(getCount, 0);
+    assert.equal(setCount, 1);
 
     strictInstance.myvirtual = 'anotherone';
-    assert.equal(0, getCount);
-    assert.equal(2, setCount);
+    assert.equal(getCount, 0);
+    assert.equal(setCount, 2);
 
     var temp = strictInstance.myvirtual;
-    assert.equal(typeof temp, 'string');
-    assert.equal(1, getCount);
-    assert.equal(2, setCount);
+    assert.equal('string', typeof temp);
+    assert.equal(getCount, 1);
+    assert.equal(setCount, 2);
 
     db.close(done);
   });
@@ -255,15 +268,15 @@ describe('document: strict mode:', function() {
       assert.ifError(err);
       Strict.findById(doc._id, function(err, doc) {
         assert.ifError(err);
-        assert.equal(true, doc._doc.bool);
-        assert.equal(true, doc._doc.notInSchema);
+        assert.equal(doc._doc.bool, true);
+        assert.equal(doc._doc.notInSchema, true);
         doc.bool = undefined;
         doc.set('notInSchema', undefined, {strict: false});
         doc.save(function() {
           Strict.findById(doc._id, function(err, doc) {
             assert.ifError(err);
-            assert.equal(undefined, doc._doc.bool);
-            assert.equal(undefined, doc._doc.notInSchema);
+            assert.equal(doc._doc.bool, undefined);
+            assert.equal(doc._doc.notInSchema, undefined);
             db.close(done);
           });
         });
@@ -290,8 +303,8 @@ describe('document: strict mode:', function() {
 
       Strict.findById(doc._id, function(err, doc) {
         assert.ifError(err);
-        assert.equal(true, doc._doc.bool);
-        assert.equal(true, doc._doc.notInSchema);
+        assert.equal(doc._doc.bool, true);
+        assert.equal(doc._doc.notInSchema, true);
 
         Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
             function(err) {
@@ -300,8 +313,8 @@ describe('document: strict mode:', function() {
               Strict.findById(doc._id, function(err, doc) {
                 db.close();
                 assert.ifError(err);
-                assert.equal(undefined, doc._doc.bool);
-                assert.equal(undefined, doc._doc.notInSchema);
+                assert.equal(doc._doc.bool, undefined);
+                assert.equal(doc._doc.notInSchema, undefined);
                 done();
               });
             });
@@ -328,8 +341,8 @@ describe('document: strict mode:', function() {
 
       Strict.findById(doc._id, function(err, doc) {
         assert.ifError(err);
-        assert.equal(true, doc._doc.bool);
-        assert.equal(true, doc._doc.notInSchema);
+        assert.equal(doc._doc.bool, true);
+        assert.equal(doc._doc.notInSchema, true);
 
         Strict.findOneAndUpdate({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
             function(err) {
@@ -337,8 +350,8 @@ describe('document: strict mode:', function() {
 
               Strict.findById(doc._id, function(err, doc) {
                 assert.ifError(err);
-                assert.equal(undefined, doc._doc.bool);
-                assert.equal(undefined, doc._doc.notInSchema);
+                assert.equal(doc._doc.bool, undefined);
+                assert.equal(doc._doc.notInSchema, undefined);
                 db.close(done);
               });
             });

@@ -2,14 +2,16 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    utils = require('../build/utils'),
-    random = utils.random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    DocObjectId = mongoose.Types.ObjectId;
+var _ = require('lodash');
+var start = require('./common');
+var async = require('async');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var utils = require('../build/utils');
+var random = utils.random;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
+var DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -152,53 +154,129 @@ describe('model: populate:', function() {
     });
   });
 
-  it('deep population with refs (gh-3507)', function(done) {
-    var db = start();
-    // handler schema
-    var handlerSchema = new Schema({
-      name: String
+  describe('deep populate', function() {
+    var db;
+
+    before(function() {
+      db = start();
     });
 
-    // task schema
-    var taskSchema = new Schema({
-      name: String,
-      handler: {type: Schema.Types.ObjectId, ref: 'gh3507_0'}
+    after(function(done) {
+      db.close(done);
     });
 
-    // application schema
-    var applicationSchema = new Schema({
-      name: String,
-      tasks: [{type: Schema.Types.ObjectId, ref: 'gh3507_1'}]
-    });
+    it('deep population with refs (gh-3507)', function(done) {
+      // handler schema
+      var handlerSchema = new Schema({
+        name: String
+      });
 
-    var Handler = db.model('gh3507_0', handlerSchema);
-    var Task = db.model('gh3507_1', taskSchema);
-    var Application = db.model('gh3507_2', applicationSchema);
+      // task schema
+      var taskSchema = new Schema({
+        name: String,
+        handler: {type: Schema.Types.ObjectId, ref: 'gh3507_0'}
+      });
 
-    Handler.create({name: 'test'}, function(error, doc) {
-      assert.ifError(error);
-      Task.create({name: 'test2', handler: doc._id}, function(error, doc) {
+      // application schema
+      var applicationSchema = new Schema({
+        name: String,
+        tasks: [{type: Schema.Types.ObjectId, ref: 'gh3507_1'}]
+      });
+
+      var Handler = db.model('gh3507_0', handlerSchema);
+      var Task = db.model('gh3507_1', taskSchema);
+      var Application = db.model('gh3507_2', applicationSchema);
+
+      Handler.create({name: 'test'}, function(error, doc) {
         assert.ifError(error);
-        var obj = {name: 'test3', tasks: [doc._id]};
-        Application.create(obj, function(error, doc) {
+        Task.create({name: 'test2', handler: doc._id}, function(error, doc) {
           assert.ifError(error);
-          test(doc._id);
+          var obj = {name: 'test3', tasks: [doc._id]};
+          Application.create(obj, function(error, doc) {
+            assert.ifError(error);
+            test(doc._id);
+          });
         });
       });
+
+      function test(id) {
+        Application.
+        findById(id).
+        populate([
+          {path: 'tasks', populate: {path: 'handler'}}
+        ]).
+        exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.tasks[0].handler._id);
+          done();
+        });
+      }
     });
 
-    function test(id) {
-      Application.
-      findById(id).
-      populate([
-        {path: 'tasks', populate: {path: 'handler'}}
-      ]).
-      exec(function(error, doc) {
-        assert.ifError(error);
-        assert.ok(doc.tasks[0].handler._id);
-        db.close(done);
+    it('multiple paths with same options (gh-3808)', function(done) {
+      var companySchema = new Schema({
+        name:  String,
+        description:  String
       });
-    }
+
+      var userSchema = new Schema({
+        name:  String,
+        company: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Company',
+          select: false
+        }
+      });
+
+      var messageSchema = new Schema({
+        message:  String,
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        target: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+      });
+
+      var Company = db.model('Company', companySchema);
+      var User = db.model('User', userSchema);
+      var Message = db.model('Message', messageSchema);
+
+      var company = new Company({ name: 'IniTech' });
+      var user1 = new User({ name: 'Bill', company: company._id });
+      var user2 = new User({ name: 'Peter', company: company._id });
+      var message = new Message({
+        message: 'Problems with TPS Report',
+        author: user1._id,
+        target: user2._id
+      });
+
+      company.save(function(error) {
+        assert.ifError(error);
+        User.create(user1, user2, function(error) {
+          assert.ifError(error);
+          message.save(function(error) {
+            assert.ifError(error);
+            next();
+          });
+        });
+      });
+
+      function next() {
+        Message.findOne({ _id: message._id }, function(error, message) {
+          assert.ifError(error);
+          var options = {
+            path: 'author target',
+            select: '_id name company',
+            populate: {
+              path: 'company',
+              model: 'Company'
+            }
+          };
+          message.populate(options, function(error) {
+            assert.ifError(error);
+            assert.equal(message.target.company.name, 'IniTech');
+            done();
+          });
+        });
+      }
+    });
   });
 
   it('populating a single ref', function(done) {
@@ -322,16 +400,16 @@ describe('model: populate:', function() {
       }, function(err, post) {
         assert.ifError(err);
 
-        var origFind = User.find;
+        var origExec = User.Query.prototype.exec;
 
         // mock an error
-        User.find = function() {
+        User.Query.prototype.exec = function() {
           var args = Array.prototype.map.call(arguments, function(arg) {
             return typeof arg === 'function' ? function() {
               arg(new Error('woot'));
             } : arg;
           });
-          return origFind.apply(this, args);
+          return origExec.apply(this, args);
         };
 
         BlogPost
@@ -340,7 +418,8 @@ describe('model: populate:', function() {
         .exec(function(err) {
           db.close();
           assert.ok(err instanceof Error);
-          assert.equal('woot', err.message);
+          assert.equal(err.message, 'woot');
+          User.Query.prototype.exec = origExec;
           done();
         });
       });
@@ -372,7 +451,7 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           assert.ok(post._creator instanceof User);
-          assert.equal(false, post._creator.isInit('name'));
+          assert.equal(post._creator.isInit('name'), false);
           assert.equal(post._creator.email, 'rauchg@gmail.com');
           done();
         });
@@ -455,6 +534,58 @@ describe('model: populate:', function() {
         });
       });
     });
+  });
+
+  it('undefined for nested paths (gh-3859)', function(done) {
+    var db = start();
+
+    var companySchema = new mongoose.Schema({
+      name:  String,
+      description:  String
+    });
+
+    var userSchema = new mongoose.Schema({
+      name:  String,
+      company: {type: mongoose.Schema.Types.ObjectId, ref: 'Company'}
+    });
+
+    var sampleSchema = new mongoose.Schema({
+      items:  [userSchema]
+    });
+
+    var Company = db.model('gh3859_0', companySchema);
+    var User = db.model('gh3859_1', userSchema);
+    var Sample = db.model('gh3859_2', sampleSchema);
+
+    var company = new Company({name: 'Reynholm Industrie'});
+    var user1 = new User({name: 'Douglas', company: company._id});
+    var user2 = new User({name: 'Lambda'});
+    var sample = new Sample({
+      items: [user1, user2]
+    });
+
+    company.save(function(error) {
+      assert.ifError(error);
+      User.create(user1, user2, function(error) {
+        assert.ifError(error);
+        sample.save(function(error) {
+          assert.ifError(error);
+          next();
+        });
+      });
+    });
+
+    function next() {
+      Sample.findOne({}, function(error, sample) {
+        assert.ifError(error);
+        var opts = { path: 'items.company', options: { lean: true } };
+        Company.populate(sample, opts, function(error) {
+          assert.ifError(error);
+          assert.strictEqual(sample.items[1].company, void 0);
+          db.close(done);
+        });
+      });
+    }
   });
 
   it('population and changing a reference', function(done) {
@@ -650,14 +781,14 @@ describe('model: populate:', function() {
             assert.ifError(err);
 
             // mock an error
-            var origFind = User.find;
-            User.find = function() {
+            var origExec = User.Query.prototype.exec;
+            User.Query.prototype.exec = function() {
               var args = Array.prototype.map.call(arguments, function(arg) {
                 return typeof arg === 'function' ? function() {
                   arg(new Error('woot 2'));
                 } : arg;
               });
-              return origFind.apply(this, args);
+              return origExec.apply(this, args);
             };
 
             BlogPost
@@ -668,6 +799,7 @@ describe('model: populate:', function() {
 
               assert.ok(err instanceof Error);
               assert.equal(err.message, 'woot 2');
+              User.Query.prototype.exec = origExec;
               done();
             });
           });
@@ -1125,12 +1257,12 @@ describe('model: populate:', function() {
           .populate('comments._creator')
           .populate('comments.asers')
           .exec(function(err, posts) {
-            assert.equal(false, ran);
+            assert.equal(ran, false);
             ran = true;
             assert.ifError(err);
             assert.ok(posts.length);
             assert.ok(posts[1].comments[0]._creator);
-            assert.equal('gh-1055-1', posts[1].comments[0]._creator.name);
+            assert.equal(posts[1].comments[0]._creator.name, 'gh-1055-1');
             db.close(done);
           });
         });
@@ -1159,16 +1291,16 @@ describe('model: populate:', function() {
             populate('_creator').
             exec(function(error, posts) {
               assert.ifError(error);
-              assert.equal(1, posts.length);
-              assert.equal('aaron', posts[0]._creator.name);
+              assert.equal(posts.length, 1);
+              assert.equal(posts[0]._creator.name, 'aaron');
               posts[0]._creator = user2;
-              assert.equal('val', posts[0]._creator.name);
+              assert.equal(posts[0]._creator.name, 'val');
               posts[0].save(function(error, post) {
                 assert.ifError(error);
-                assert.equal('val', post._creator.name);
+                assert.equal(post._creator.name, 'val');
                 posts[0].populate('_creator', function(error, doc) {
                   assert.ifError(error);
-                  assert.equal('val', doc._creator.name);
+                  assert.equal(doc._creator.name, 'val');
                   db.close(done);
                 });
               });
@@ -1426,14 +1558,15 @@ describe('model: populate:', function() {
           var opts = {
             path: 'author.friends',
             select: 'name',
-            options: {limit: 1}
+            options: { limit: 1 }
           };
 
           BlogPost.populate(docs, opts, function(err, docs) {
             assert.ifError(err);
-            assert.equal(2, docs.length);
-            assert.equal(1, docs[0].author.friends.length);
-            assert.equal(1, docs[1].author.friends.length);
+            assert.equal(docs.length, 2);
+            assert.equal(docs[0].author.friends.length, 1);
+            assert.equal(docs[1].author.friends.length, 1);
+            assert.equal(opts.options.limit, 1);
             db.close(done);
           });
         });
@@ -1881,7 +2014,7 @@ describe('model: populate:', function() {
     user.save(next);
 
     function next(err) {
-      assert.strictEqual(null, err);
+      assert.strictEqual(err, null);
       if (--pending) {
         return;
       }
@@ -1904,7 +2037,7 @@ describe('model: populate:', function() {
         comment.str = 'my string';
 
         comment.save(function(err, comment) {
-          assert.strictEqual(null, err);
+          assert.strictEqual(err, null);
 
           Comment
           .findById(comment.id)
@@ -2166,7 +2299,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2189,7 +2322,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2212,7 +2345,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2235,7 +2368,7 @@ describe('model: populate:', function() {
             if (err) {
               return done(err);
             }
-            assert.equal('hello', b.other.name);
+            assert.equal(b.other.name, 'hello');
             done();
           });
         });
@@ -2289,7 +2422,7 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         assert.ok(Array.isArray(post.fans));
-        assert.equal(2, post.fans.length);
+        assert.equal(post.fans.length, 2);
         assert.ok(post.fans[0] instanceof User);
         assert.ok(post.fans[1] instanceof User);
         assert.equal(post.fans[0].isInit('name'), true);
@@ -2370,7 +2503,7 @@ describe('model: populate:', function() {
             assert.ifError(err);
             assert.ok(post);
             assert.ok(post._creator instanceof User);
-            assert.equal('Phoenix', post._creator.name);
+            assert.equal(post._creator.name, 'Phoenix');
             done();
           });
         });
@@ -2387,7 +2520,7 @@ describe('model: populate:', function() {
               assert.ok(post);
               assert.ok(post._creator instanceof User);
               assert.equal('Phoenix', post._creator.name);
-              assert.equal(2, post.fans.length);
+              assert.equal(post.fans.length, 2);
               assert.equal(post.fans[0].name, user1.name);
               assert.equal(post.fans[1].name, user2.name);
 
@@ -2398,8 +2531,8 @@ describe('model: populate:', function() {
                 assert.ifError(err);
                 assert.ok(post);
                 assert.ok(post._creator instanceof User);
-                assert.equal('Phoenix', post._creator.name);
-                assert.equal(2, post.fans.length);
+                assert.equal(post._creator.name, 'Phoenix');
+                assert.equal(post.fans.length, 2);
                 assert.equal(post.fans[0].name, user1.name);
                 assert.equal(post.fans[1].name, user2.name);
                 assert.ok(Array.isArray(post.populated('fans')));
@@ -2420,8 +2553,8 @@ describe('model: populate:', function() {
               assert.ifError(err);
               assert.ok(post);
               assert.ok(post._creator instanceof User);
-              assert.equal('Phoenix', post._creator.name);
-              assert.equal(2, post.fans.length);
+              assert.equal(post._creator.name, 'Phoenix');
+              assert.equal(post.fans.length, 2);
               assert.equal(post.fans[0].name, user1.name);
               assert.equal(post.fans[1].name, user2.name);
 
@@ -2436,8 +2569,8 @@ describe('model: populate:', function() {
                 assert.ifError(err);
                 assert.ok(post);
                 assert.ok(post._creator instanceof User);
-                assert.equal('Phoenix', post._creator.name);
-                assert.equal(2, post.fans.length);
+                assert.equal(post._creator.name, 'Phoenix');
+                assert.equal(post.fans.length, 2);
                 assert.equal(post.fans[0].name, user1.name);
                 assert.equal(post.fans[1].name, user2.name);
                 assert.ok(Array.isArray(post.populated('fans')));
@@ -2466,13 +2599,13 @@ describe('model: populate:', function() {
             B.populate([post1, post2], ret, function(err, posts) {
               assert.ifError(err);
               assert.ok(posts);
-              assert.equal(2, posts.length);
+              assert.equal(posts.length, 2);
               var p1 = posts[0];
               var p2 = posts[1];
               assert.ok(p1._creator instanceof User);
-              assert.equal('Phoenix', p1._creator.name);
+              assert.equal(p1._creator.name, 'Phoenix');
               assert.ok(p2._creator instanceof User);
-              assert.equal('Newark', p2._creator.name);
+              assert.equal(p2._creator.name, 'Newark');
               done();
             });
           });
@@ -2510,7 +2643,7 @@ describe('model: populate:', function() {
             assert.ok(utils.isObject(post._creator));
             assert.equal(post._creator.name, 'Guillermo');
             assert.equal(post._creator.email, 'rauchg@gmail.com');
-            assert.equal('undefined', typeof post._creator.update);
+            assert.equal(typeof post._creator.update, 'undefined');
             done();
           });
         });
@@ -2549,17 +2682,17 @@ describe('model: populate:', function() {
 
             assert.equal(blogposts[0].fans[0].name, 'Fan 1');
             assert.equal(blogposts[0].fans[0].email, 'fan1@learnboost.com');
-            assert.equal('undefined', typeof blogposts[0].fans[0].update);
+            assert.equal(typeof blogposts[0].fans[0].update, 'undefined');
             assert.equal(blogposts[0].fans[1].name, 'Fan 2');
             assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
-            assert.equal('undefined', typeof blogposts[0].fans[1].update);
+            assert.equal(typeof blogposts[0].fans[1].update, 'undefined');
 
             assert.equal(blogposts[1].fans[0].name, 'Fan 2');
             assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
-            assert.equal('undefined', typeof blogposts[1].fans[0].update);
+            assert.equal(typeof blogposts[1].fans[0].update, 'undefined');
             assert.equal(blogposts[1].fans[1].name, 'Fan 1');
             assert.equal(blogposts[1].fans[1].email, 'fan1@learnboost.com');
-            assert.equal('undefined', typeof blogposts[1].fans[1].update);
+            assert.equal(typeof blogposts[1].fans[1].update, 'undefined');
             db.close(done);
           });
         });
@@ -2614,7 +2747,7 @@ describe('model: populate:', function() {
       B.findById(b1).populate('fans _creator').exec(function(err, doc) {
         assert.ifError(err);
         assert.ok(Array.isArray(doc.populated('fans')));
-        assert.equal(2, doc.populated('fans').length);
+        assert.equal(doc.populated('fans').length, 2);
         assert.equal(doc.populated('fans')[0], String(u1._id));
         assert.equal(doc.populated('fans')[1], String(u2._id));
         assert.equal(doc.populated('_creator'), String(u1._id));
@@ -2625,20 +2758,20 @@ describe('model: populate:', function() {
     it('with find', function(done) {
       B.find().sort('title').populate('fans _creator').exec(function(err, docs) {
         assert.ifError(err);
-        assert.equal(2, docs.length);
+        assert.equal(docs.length, 2);
 
         var doc1 = docs[0];
         var doc2 = docs[1];
 
         assert.ok(Array.isArray(doc1.populated('fans')));
-        assert.equal(2, doc1.populated('fans').length);
+        assert.equal(doc1.populated('fans').length, 2);
 
         assert.equal(doc1.populated('fans')[0], String(u1._id));
         assert.equal(doc1.populated('fans')[1], String(u2._id));
         assert.equal(doc1.populated('_creator'), String(u1._id));
 
         assert.ok(Array.isArray(doc2.populated('fans')));
-        assert.equal(2, doc2.populated('fans').length);
+        assert.equal(doc2.populated('fans').length, 2);
         assert.equal(doc2.populated('fans')[0], String(u2._id));
         assert.equal(doc2.populated('fans')[1], String(u1._id));
         assert.equal(doc2.populated('_creator'), String(u2._id));
@@ -2688,30 +2821,30 @@ describe('model: populate:', function() {
 
           var doc = docs[0];
           assert.ok(Array.isArray(doc.comments), 'comments should be an array: ' + JSON.stringify(doc));
-          assert.equal(2, doc.comments.length, 'invalid comments length for ' + JSON.stringify(doc));
+          assert.equal(doc.comments.length, 2, 'invalid comments length for ' + JSON.stringify(doc));
           doc.comments.forEach(function(d) {
-            assert.equal(undefined, d._id);
-            assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
+            assert.equal(d._id, undefined);
+            assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
             assert.ok(d.body.length);
-            assert.equal('number', typeof d._doc.__v);
+            assert.equal(typeof d._doc.__v, 'number');
           });
 
           U.findOne({name: 'u1'}).populate('comments', 'title -_id').exec(function(err, doc) {
             assert.ifError(err);
-            assert.equal(2, doc.comments.length);
+            assert.equal(doc.comments.length, 2);
             doc.comments.forEach(function(d) {
-              assert.equal(undefined, d._id);
-              assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
+              assert.equal(d._id, undefined);
+              assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
               assert.ok(d.title.length);
-              assert.equal(undefined, d.body);
+              assert.equal(d.body, undefined);
               assert.equal(typeof d._doc.__v, 'undefined');
             });
             U.findOne({name: 'u1'}).populate('comments', '-_id').exec(function(err, doc) {
               assert.ifError(err);
-              assert.equal(2, doc.comments.length);
+              assert.equal(doc.comments.length, 2);
               doc.comments.forEach(function(d) {
-                assert.equal(undefined, d._id);
-                assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
+                assert.equal(d._id, undefined);
+                assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
                 assert.ok(d.title.length);
                 assert.ok(d.body.length);
                 assert.equal(typeof d._doc.__v, 'number');
@@ -2727,20 +2860,20 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           var doc = docs[0];
-          assert.equal(2, doc.comments.length);
+          assert.equal(doc.comments.length, 2);
           doc.comments.forEach(function(d) {
             assert.ok(!('_id' in d));
             assert.ok(d.body.length);
-            assert.equal('number', typeof d.__v);
+            assert.equal(typeof d.__v, 'number');
           });
 
           U.findOne({name: 'u1'}).lean().populate('comments', '-_id', null, {lean: true}).exec(function(err, doc) {
             assert.ifError(err);
-            assert.equal(2, doc.comments.length);
+            assert.equal(doc.comments.length, 2);
             doc.comments.forEach(function(d) {
               assert.ok(!('_id' in d));
               assert.ok(d.body.length);
-              assert.equal('number', typeof d.__v);
+              assert.equal(typeof d.__v, 'number');
             });
             done();
           });
@@ -2754,61 +2887,20 @@ describe('model: populate:', function() {
         .select('-_id comment name')
         .populate('comment', {_id: 0}).exec(function(err, docs) {
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
 
           docs.forEach(function(doc) {
             assert.ok(doc.comment && doc.comment.body);
             if (doc.name === 'u1') {
-              assert.equal('comment 1', doc.comment.body);
+              assert.equal(doc.comment.body, 'comment 1');
             } else {
-              assert.equal('comment 2', doc.comment.body);
+              assert.equal(doc.comment.body, 'comment 2');
             }
           });
 
           done();
         });
       });
-    });
-  });
-
-  it('maps results back to correct document (gh-1444)', function(done) {
-    var db = start();
-
-    var articleSchema = new Schema({
-      body: String,
-      mediaAttach: {type: Schema.ObjectId, ref: '1444-Media'},
-      author: String
-    });
-    var Article = db.model('1444-Article', articleSchema);
-
-    var mediaSchema = new Schema({
-      filename: String
-    });
-    var Media = db.model('1444-Media', mediaSchema);
-
-    Media.create({filename: 'one'}, function(err, media) {
-      assert.ifError(err);
-
-      Article.create(
-          {body: 'body1', author: 'a'}
-          , {body: 'body2', author: 'a', mediaAttach: media._id}
-          , {body: 'body3', author: 'a'}, function(err) {
-            if (err) {
-              return done(err);
-            }
-
-            Article.find().populate('mediaAttach').exec(function(err, docs) {
-              db.close();
-              assert.ifError(err);
-
-              var a2 = docs.filter(function(d) {
-                return d.body === 'body2';
-              })[0];
-              assert.equal(a2.mediaAttach.id, media.id);
-
-              done();
-            });
-          });
     });
   });
 
@@ -2833,15 +2925,15 @@ describe('model: populate:', function() {
           }
         },
         items: [
-            {
-              id: {
-                type: Number,
-                refPath: 'items.type'
-              },
-              type: {
-                type: String
-              }
+          {
+            id: {
+              type: Number,
+              refPath: 'items.type'
+            },
+            type: {
+              type: String
             }
+          }
         ]
       });
 
@@ -2891,9 +2983,9 @@ describe('model: populate:', function() {
     it('Simple populate', function(done) {
       Review.find({}).populate('item.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(1, results.length);
+        assert.equal(results.length, 1);
         var result = results[0];
-        assert.equal('Val', result.item.id.name);
+        assert.equal(result.item.id.name, 'Val');
         done();
       });
     });
@@ -2901,11 +2993,11 @@ describe('model: populate:', function() {
     it('Array populate', function(done) {
       Review.find({}).populate('items.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(1, results.length);
+        assert.equal(results.length, 1);
         var result = results[0];
-        assert.equal(2, result.items.length);
-        assert.equal('Val', result.items[0].id.name);
-        assert.equal('Val', result.items[1].id.otherName);
+        assert.equal(result.items.length, 2);
+        assert.equal(result.items[0].id.name, 'Val');
+        assert.equal(result.items[1].id.otherName, 'Val');
         done();
       });
     });
@@ -2977,10 +3069,56 @@ describe('model: populate:', function() {
     }
   });
 
-  describe('gh-2252', function() {
-    it('handles skip', function(done) {
-      var db = start();
+  describe('github issues', function() {
+    var db;
 
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('maps results back to correct document (gh-1444)', function(done) {
+      var articleSchema = new Schema({
+        body: String,
+        mediaAttach: {type: Schema.ObjectId, ref: '1444-Media'},
+        author: String
+      });
+      var Article = db.model('1444-Article', articleSchema);
+
+      var mediaSchema = new Schema({
+        filename: String
+      });
+      var Media = db.model('1444-Media', mediaSchema);
+
+      Media.create({filename: 'one'}, function(err, media) {
+        assert.ifError(err);
+
+        Article.create(
+            {body: 'body1', author: 'a'}
+            , {body: 'body2', author: 'a', mediaAttach: media._id}
+            , {body: 'body3', author: 'a'}, function(err) {
+              if (err) {
+                return done(err);
+              }
+
+              Article.find().populate('mediaAttach').exec(function(err, docs) {
+                assert.ifError(err);
+
+                var a2 = docs.filter(function(d) {
+                  return d.body === 'body2';
+                })[0];
+                assert.equal(a2.mediaAttach.id, media.id);
+
+                done();
+              });
+            });
+      });
+    });
+
+    it('handles skip', function(done) {
       var movieSchema = new Schema({});
       var categorySchema = new Schema({movies: [{type: ObjectId, ref: 'gh-2252-1'}]});
 
@@ -2996,118 +3134,1229 @@ describe('model: populate:', function() {
             assert.ifError(error);
             Category.findOne({}).populate({path: 'movies', options: {limit: 2, skip: 1}}).exec(function(error, category) {
               assert.ifError(error);
-              assert.equal(2, category.movies.length);
-              db.close(done);
+              assert.equal(category.movies.length, 2);
+              done();
             });
           });
         });
       });
     });
-  });
 
-  it('handles slice (gh-1934)', function(done) {
-    var db = start();
+    it('handles slice (gh-1934)', function(done) {
+      var movieSchema = new Schema({title: String, actors: [String]});
+      var categorySchema = new Schema({movies: [{type: ObjectId, ref: 'gh-1934-1'}]});
 
-    var movieSchema = new Schema({title: String, actors: [String]});
-    var categorySchema = new Schema({movies: [{type: ObjectId, ref: 'gh-1934-1'}]});
-
-    var Movie = db.model('gh-1934-1', movieSchema);
-    var Category = db.model('gh-1934-2', categorySchema);
-    var movies = [
-      {title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl']},
-      {title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba']},
-      {title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams']}
-    ];
-    Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
-      assert.ifError(error);
-      Category.create({movies: [m1._id, m2._id, m3._id]}, function(error) {
+      var Movie = db.model('gh-1934-1', movieSchema);
+      var Category = db.model('gh-1934-2', categorySchema);
+      var movies = [
+        {title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl']},
+        {title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba']},
+        {title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams']}
+      ];
+      Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
         assert.ifError(error);
-        Category.findOne({}).populate({path: 'movies', options: {slice: {actors: 1}}}).exec(function(error, category) {
+        Category.create({movies: [m1._id, m2._id, m3._id]}, function(error) {
           assert.ifError(error);
-          assert.equal(category.movies.length, 3);
-          assert.equal(category.movies[0].actors.length, 1);
-          assert.equal(category.movies[1].actors.length, 1);
-          assert.equal(category.movies[2].actors.length, 1);
-          done();
+          Category.findOne({}).populate({path: 'movies', options: {slice: {actors: 1}}}).exec(function(error, category) {
+            assert.ifError(error);
+            assert.equal(category.movies.length, 3);
+            assert.equal(category.movies[0].actors.length, 1);
+            assert.equal(category.movies[1].actors.length, 1);
+            assert.equal(category.movies[2].actors.length, 1);
+            done();
+          });
         });
       });
     });
-  });
 
-  it('handles toObject() (gh-3279)', function(done) {
-    var db = start();
+    it('handles toObject() (gh-3279)', function(done) {
+      var teamSchema = new Schema({
+        members: [{
+          user: {type: ObjectId, ref: 'gh3279'},
+          role: String
+        }]
+      });
 
-    var teamSchema = new Schema({
-      members: [{
-        user: {type: ObjectId, ref: 'gh3279'},
-        role: String
-      }]
-    });
-
-    var calls = 0;
-    teamSchema.set('toJSON', {
-      transform: function(doc, ret) {
-        ++calls;
-        return ret;
-      }
-    });
+      var calls = 0;
+      teamSchema.set('toJSON', {
+        transform: function(doc, ret) {
+          ++calls;
+          return ret;
+        }
+      });
 
 
-    var Team = db.model('gh3279_1', teamSchema);
+      var Team = db.model('gh3279_1', teamSchema);
 
-    var userSchema = new Schema({
-      username: String
-    });
+      var userSchema = new Schema({
+        username: String
+      });
 
-    userSchema.set('toJSON', {
-      transform: function(doc, ret) {
-        return ret;
-      }
-    });
+      userSchema.set('toJSON', {
+        transform: function(doc, ret) {
+          return ret;
+        }
+      });
 
-    var User = db.model('gh3279', userSchema);
+      var User = db.model('gh3279', userSchema);
 
-    var user = new User({username: 'Test'});
+      var user = new User({username: 'Test'});
 
-    user.save(function(err) {
-      assert.ifError(err);
-      var team = new Team({members: [{user: user}]});
-
-      team.save(function(err) {
+      user.save(function(err) {
         assert.ifError(err);
-        team.populate('members.user', function() {
-          team.toJSON();
-          assert.equal(calls, 1);
+        var team = new Team({members: [{user: user}]});
+
+        team.save(function(err) {
+          assert.ifError(err);
+          team.populate('members.user', function() {
+            team.toJSON();
+            assert.equal(calls, 1);
+            done();
+          });
+        });
+      });
+    });
+
+    it('populate option (gh-2321)', function(done) {
+      var User = db.model('User', {name: String});
+      var Group = db.model('Group', {
+        users: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+        name: String
+      });
+
+      User.create({name: 'Val'}, function(error, user) {
+        assert.ifError(error);
+        Group.create({users: [user._id], name: 'test'}, function(error, group) {
+          assert.ifError(error);
+          test(group._id);
+        });
+      });
+
+      var test = function(id) {
+        var options = {populate: {path: 'users', model: 'User'}};
+        Group.find({_id: id}, '-name', options, function(error, group) {
+          assert.ifError(error);
+          assert.ok(group[0].users[0]._id);
+          done();
+        });
+      };
+    });
+
+    it('discriminator child schemas (gh-3878)', function(done) {
+      var options = { discriminatorKey: 'kind' };
+      var activitySchema = new Schema({ title: { type: String } }, options);
+
+      var dateActivitySchema = new Schema({
+        postedBy: { type: Schema.Types.ObjectId, ref: 'gh3878', required: true }
+      }, options);
+
+      var eventActivitySchema = new Schema({ test: String }, options);
+
+      var User = db.model('gh3878', { name: String });
+      var Activity = db.model('gh3878_0', activitySchema);
+      var DateActivity = Activity.discriminator('Date', dateActivitySchema);
+      var EventActivity = Activity.discriminator('Event', eventActivitySchema);
+
+      User.create({ name: 'val' }, function(error, user) {
+        assert.ifError(error);
+        var dateActivity = { title: 'test', postedBy: user._id };
+        DateActivity.create(dateActivity, function(error) {
+          assert.ifError(error);
+          var eventActivity = {
+            title: 'test2',
+            test: 'test'
+          };
+          EventActivity.create(eventActivity, function(error) {
+            assert.ifError(error);
+            test();
+          });
+        });
+      });
+
+      function test() {
+        Activity.find({}).populate('postedBy').exec(function(error, results) {
+          assert.ifError(error);
+          assert.equal(results.length, 2);
+          assert.equal(results[0].postedBy.name, 'val');
+          done();
+        });
+      }
+    });
+
+    it('set to obj w/ same id doesnt mark modified (gh-3992)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+      var jobSchema = new Schema({
+        title: String,
+        person: { type: Schema.Types.ObjectId, ref: 'gh3992' }
+      });
+
+      var Person = db.model('gh3992', personSchema);
+      var Job = db.model('gh3992_0', jobSchema);
+
+      Person.create({ name: 'Val' }, function(error, person) {
+        assert.ifError(error);
+        var job = { title: 'Engineer', person: person._id };
+        Job.create(job, function(error, job) {
+          assert.ifError(error);
+          Job.findById(job._id, function(error, job) {
+            assert.ifError(error);
+            job.person = person;
+            assert.ok(!job.isModified('person'));
+            done();
+          });
+        });
+      });
+    });
+
+    it('deep populate single -> array (gh-3904)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+
+      var teamSchema = new Schema({
+        name: { type: String },
+        members: [{ type: Schema.Types.ObjectId, ref: 'gh3904' }]
+      });
+
+      var gameSchema = new Schema({
+        team: { type: Schema.Types.ObjectId, ref: 'gh3904_0' },
+        opponent: { type: Schema.Types.ObjectId, ref: 'gh3904_0' }
+      });
+
+      var Person = db.model('gh3904', personSchema);
+      var Team = db.model('gh3904_0', teamSchema);
+      var Game = db.model('gh3904_1', gameSchema);
+
+      var people = [
+        { name: 'Shaq' },
+        { name: 'Kobe' },
+        { name: 'Horry' },
+        { name: 'Duncan' },
+        { name: 'Robinson' },
+        { name: 'Johnson' }
+      ];
+
+      Person.create(people, function(error, people) {
+        assert.ifError(error);
+        var lakers = {
+          name: 'Lakers',
+          members: [people[0]._id, people[1]._id, people[2]._id]
+        };
+        var spurs = {
+          name: 'Spurs',
+          members: [people[3]._id, people[4]._id, people[5]._id]
+        };
+        var teams = [lakers, spurs];
+        Team.create(teams, function(error, teams) {
+          assert.ifError(error);
+          var game = { team: teams[0]._id, opponent: teams[1]._id };
+          Game.create(game, function(error, game) {
+            assert.ifError(error);
+            test(game._id);
+          });
+        });
+      });
+
+      function test(id) {
+        var query = Game.findById(id).populate({
+          path: 'team',
+          select: 'name members',
+          populate: { path: 'members', select: 'name' }
+        });
+        query.exec(function(error, doc) {
+          assert.ifError(error);
+          var arr = _.map(doc.toObject().team.members, function(v) {
+            return v.name;
+          });
+          assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
+          done();
+        });
+      }
+    });
+
+    it('deep populate array -> array (gh-3954)', function(done) {
+      var personSchema = new Schema({
+        name: { type: String }
+      });
+
+      var teamSchema = new Schema({
+        name: { type: String },
+        members: [{ type: Schema.Types.ObjectId, ref: 'gh3954' }]
+      });
+
+      var gameSchema = new Schema({
+        teams: [{ type: Schema.Types.ObjectId, ref: 'gh3954_0' }]
+      });
+
+      var Person = db.model('gh3954', personSchema);
+      var Team = db.model('gh3954_0', teamSchema);
+      var Game = db.model('gh3954_1', gameSchema);
+
+      var people = [
+        { name: 'Shaq' },
+        { name: 'Kobe' },
+        { name: 'Horry' },
+        { name: 'Duncan' },
+        { name: 'Robinson' },
+        { name: 'Johnson' }
+      ];
+
+      Person.create(people, function(error, people) {
+        assert.ifError(error);
+        var lakers = {
+          name: 'Lakers',
+          members: [people[0]._id, people[1]._id, people[2]._id]
+        };
+        var spurs = {
+          name: 'Spurs',
+          members: [people[3]._id, people[4]._id, people[5]._id]
+        };
+        var teams = [lakers, spurs];
+        Team.create(teams, function(error, teams) {
+          assert.ifError(error);
+          var game = {
+            teams: [teams[0]._id, teams[1]._id]
+          };
+          Game.create(game, function(error, game) {
+            assert.ifError(error);
+            test(game._id);
+          });
+        });
+      });
+
+      function test(id) {
+        var query = Game.findById(id).populate({
+          path: 'teams',
+          select: 'name members',
+          populate: { path: 'members', select: 'name' }
+        });
+        query.exec(function(error, doc) {
+          assert.ifError(error);
+          var players = doc.toObject().teams[0].members.
+            concat(doc.toObject().teams[1].members);
+          var arr = _.map(players, function(v) {
+            return v.name;
+          });
+          assert.deepEqual(arr,
+            ['Shaq', 'Kobe', 'Horry', 'Duncan', 'Robinson', 'Johnson']);
+          done();
+        });
+      }
+    });
+
+    it('4 level population (gh-3973)', function(done) {
+      var level4Schema = new Schema({
+        name: { type: String }
+      });
+
+      var level3Schema = new Schema({
+        name: { type: String },
+        level4: [{ type: Schema.Types.ObjectId, ref: 'level_4' }]
+      });
+
+      var level2Schema = new Schema({
+        name: { type: String },
+        level3: [{ type: Schema.Types.ObjectId, ref: 'level_3' }]
+      });
+
+      var level1Schema = new Schema({
+        name: { type: String },
+        level2: [{ type: Schema.Types.ObjectId, ref: 'level_2' }]
+      });
+
+      var level4 = db.model('level_4', level4Schema);
+      var level3 = db.model('level_3', level3Schema);
+      var level2 = db.model('level_2', level2Schema);
+      var level1 = db.model('level_1', level1Schema);
+
+      var l4docs = [{ name: 'level 4' }];
+
+      level4.create(l4docs, function(error, l4) {
+        assert.ifError(error);
+        var l3docs = [{ name: 'level 3', level4: l4[0]._id }];
+        level3.create(l3docs, function(error, l3) {
+          assert.ifError(error);
+          var l2docs = [{ name: 'level 2', level3: l3[0]._id }];
+          level2.create(l2docs, function(error, l2) {
+            assert.ifError(error);
+            var l1docs = [{ name: 'level 1', level2: l2[0]._id }];
+            level1.create(l1docs, function(error, l1) {
+              assert.ifError(error);
+              var opts = {
+                path: 'level2',
+                populate: {
+                  path: 'level3',
+                  populate: {
+                    path: 'level4'
+                  }
+                }
+              };
+              level1.findById(l1[0]._id).populate(opts).exec(function(error, obj) {
+                assert.ifError(error);
+                assert.equal(obj.level2[0].level3[0].level4[0].name, 'level 4');
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('deep populate two paths (gh-3974)', function(done) {
+      var level3Schema = new Schema({
+        name: { type: String }
+      });
+
+      var level2Schema = new Schema({
+        name: { type: String },
+        level31: [{ type: Schema.Types.ObjectId, ref: 'gh3974' }],
+        level32: [{ type: Schema.Types.ObjectId, ref: 'gh3974' }]
+      });
+
+      var level1Schema = new Schema({
+        name: { type: String },
+        level2: [{ type: Schema.Types.ObjectId, ref: 'gh3974_0' }]
+      });
+
+      var level3 = db.model('gh3974', level3Schema);
+      var level2 = db.model('gh3974_0', level2Schema);
+      var level1 = db.model('gh3974_1', level1Schema);
+
+      var l3 = [
+        { name: 'level 3/1' },
+        { name: 'level 3/2' }
+      ];
+      level3.create(l3, function(error, l3) {
+        assert.ifError(error);
+        var l2 = [
+          { name: 'level 2', level31: l3[0]._id, level32: l3[1]._id }
+        ];
+        level2.create(l2, function(error, l2) {
+          assert.ifError(error);
+          var l1 = [{ name: 'level 1', level2: l2[0]._id }];
+          level1.create(l1, function(error, l1) {
+            assert.ifError(error);
+            level1.findById(l1[0]._id).
+              populate({
+                path: 'level2',
+                populate: [{
+                  path: 'level31'
+                }]
+              }).
+              populate({
+                path: 'level2',
+                populate: [{
+                  path: 'level32'
+                }]
+              }).
+              exec(function(error, obj) {
+                assert.ifError(error);
+                assert.equal(obj.level2[0].level31[0].name, 'level 3/1');
+                assert.equal(obj.level2[0].level32[0].name, 'level 3/2');
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    it('out-of-order discriminators (gh-4073)', function(done) {
+      var UserSchema = new Schema({
+        name: String
+      });
+
+      var CommentSchema = new Schema({
+        content: String
+      });
+
+      var BlogPostSchema = new Schema({
+        title: String
+      });
+
+      var EventSchema = new Schema({
+        name: String,
+        createdAt: { type: Date, default: Date.now }
+      });
+
+      var UserEventSchema = new Schema({
+        user: { type: ObjectId, ref: 'gh4073_0' }
+      });
+
+      var CommentEventSchema = new Schema({
+        comment: { type: ObjectId, ref: 'gh4073_1' }
+      });
+
+      var BlogPostEventSchema = new Schema({
+        blogpost: { type: ObjectId, ref: 'gh4073_2' }
+      });
+
+      var User = db.model('gh4073_0', UserSchema);
+      var Comment = db.model('gh4073_1', CommentSchema);
+      var BlogPost = db.model('gh4073_2', BlogPostSchema);
+
+      var Event = db.model('gh4073_3', EventSchema);
+      var UserEvent = Event.discriminator('User4073', UserEventSchema);
+      var CommentEvent = Event.discriminator('Comment4073',
+        CommentEventSchema);
+      var BlogPostEvent = Event.discriminator('BlogPost4073', BlogPostEventSchema);
+
+      var u1 = new User({ name: 'user 1' });
+      var u2 = new User({ name: 'user 2' });
+      var u3 = new User({ name: 'user 3' });
+      var c1 = new Comment({ content: 'comment 1' });
+      var c2 = new Comment({ content: 'comment 2' });
+      var c3 = new Comment({ content: 'comment 3' });
+      var b1 = new BlogPost({ title: 'blog post 1' });
+      var b2 = new BlogPost({ title: 'blog post 2' });
+      var b3 = new BlogPost({ title: 'blog post 3' });
+      var ue1 = new UserEvent({ user: u1 });
+      var ue2 = new UserEvent({ user: u2 });
+      var ue3 = new UserEvent({ user: u3 });
+      var ce1 = new CommentEvent({ comment: c1 });
+      var ce2 = new CommentEvent({ comment: c2 });
+      var ce3 = new CommentEvent({ comment: c3 });
+      var be1 = new BlogPostEvent({ blogpost: b1 });
+      var be2 = new BlogPostEvent({ blogpost: b2 });
+      var be3 = new BlogPostEvent({ blogpost: b3 });
+
+      async.series(
+        [
+          u1.save,
+          u2.save,
+          u3.save,
+
+          c1.save,
+          c2.save,
+          c3.save,
+
+          b1.save,
+          b2.save,
+          b3.save,
+
+          ce1.save,
+          ue1.save,
+          be1.save,
+
+          ce2.save,
+          ue2.save,
+          be2.save,
+
+          ce3.save,
+          ue3.save,
+          be3.save,
+
+          function(next) {
+            Event.
+              find({}).
+              populate('user comment blogpost').
+              exec(function(err, docs) {
+                docs.forEach(function(doc) {
+                  if (doc.__t === 'User4073') {
+                    assert.ok(doc.user.name.indexOf('user') !== -1);
+                  } else if (doc.__t === 'Comment4073') {
+                    assert.ok(doc.comment.content.indexOf('comment') !== -1);
+                  } else if (doc.__t === 'BlogPost4073') {
+                    assert.ok(doc.blogpost.title.indexOf('blog post') !== -1);
+                  } else {
+                    assert.ok(false);
+                  }
+                });
+                next();
+              });
+          }
+        ],
+        done
+      );
+    });
+
+    it('dynref bug (gh-4104)', function(done) {
+      var PersonSchema = new Schema({
+        name: { type: String }
+      });
+
+      var AnimalSchema = new Schema({
+        name: { type: String }
+      });
+
+      var ThingSchema = new Schema({
+        createdByModel: { type: String },
+        createdBy: {
+          type: mongoose.Schema.Types.ObjectId, refPath: 'createdByModel'
+        }
+      });
+
+      var Thing = db.model('Thing4104', ThingSchema);
+      var Person = db.model('Person4104', PersonSchema);
+      var Animal = db.model('Animal4104', AnimalSchema);
+
+      Person.create({ name: 'Val' }, function(error, person) {
+        assert.ifError(error);
+        Animal.create({ name: 'Air Bud' }, function(error, animal) {
+          assert.ifError(error);
+          var obj1 = { createdByModel: 'Person4104', createdBy: person._id };
+          var obj2 = { createdByModel: 'Animal4104', createdBy: animal._id };
+          Thing.create(obj1, obj2, function(error) {
+            assert.ifError(error);
+            Thing.find({}).populate('createdBy').exec(function(error, things) {
+              assert.ifError(error);
+              assert.ok(things[0].createdBy.name);
+              assert.ok(things[1].createdBy.name);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('empty array (gh-4284)', function(done) {
+      var PersonSchema = new Schema({
+        name: { type: String }
+      });
+
+      var BandSchema = new Schema({
+        people: [{
+          type: mongoose.Schema.Types.ObjectId
+        }]
+      });
+
+      var Person = db.model('gh4284_b', PersonSchema);
+      var Band = db.model('gh4284_b0', BandSchema);
+
+      var band = { people: [new mongoose.Types.ObjectId()] };
+      Band.create(band, function(error, band) {
+        assert.ifError(error);
+        var opts = { path: 'people', model: Person };
+        Band.findById(band).populate(opts).exec(function(error, band) {
+          assert.ifError(error);
+          assert.equal(band.people.length, 0);
           done();
         });
       });
     });
-  });
 
-  it('populate option (gh-2321)', function(done) {
-    var db = start();
+    it('checks field name correctly with nested arrays (gh-4365)', function(done) {
+      var UserSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          default: ''
+        }
+      });
+      db.model('gh4365_0', UserSchema);
 
-    var User = db.model('User', {name: String});
-    var Group = db.model('Group', {
-      users: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-      name: String
-    });
+      var GroupSchema = new mongoose.Schema({
+        name: String,
+        members: [String]
+      });
 
-    User.create({name: 'Val'}, function(error, user) {
-      assert.ifError(error);
-      Group.create({users: [user._id], name: 'test'}, function(error, group) {
+      var OrganizationSchema = new mongoose.Schema({
+        members: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh4365_0'
+        }],
+        groups: [GroupSchema]
+      });
+      var OrganizationModel = db.model('gh4365_1', OrganizationSchema);
+
+      var org = {
+        members: [],
+        groups: []
+      };
+      OrganizationModel.create(org, function(error) {
         assert.ifError(error);
-        test(group._id);
+        OrganizationModel.
+          findOne({}).
+          populate('members', 'name').
+          exec(function(error, org) {
+            assert.ifError(error);
+            org.groups.push({ name: 'Team Rocket' });
+            org.save(function(error) {
+              assert.ifError(error);
+              org.groups[0].members.push('Jessie');
+              assert.equal(org.groups[0].members[0], 'Jessie');
+              org.save(function(error) {
+                assert.ifError(error);
+                assert.equal(org.groups[0].members[0], 'Jessie');
+                done();
+              });
+            });
+          });
       });
     });
 
-    var test = function(id) {
-      var options = {populate: {path: 'users', model: 'User'}};
-      Group.find({_id: id}, '-name', options, function(error, group) {
-        assert.ifError(error);
-        assert.ok(group[0].users[0]._id);
-        db.close(done);
+    describe('populate virtuals (gh-2562)', function() {
+      it('basic populate virtuals', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          band: String
+        });
+
+        var BandSchema = new Schema({
+          name: String
+        });
+        BandSchema.virtual('members', {
+          ref: 'gh2562',
+          localField: 'name',
+          foreignField: 'band'
+        });
+
+        var Person = db.model('gh2562', PersonSchema);
+        var Band = db.model('gh2562_0', BandSchema);
+
+        var people = _.map(['Axl Rose', 'Slash'], function(v) {
+          return { name: v, band: 'Guns N\' Roses' };
+        });
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          Band.create({ name: 'Guns N\' Roses' }, function(error) {
+            assert.ifError(error);
+            var query = { name: 'Guns N\' Roses' };
+            Band.findOne(query).populate('members').exec(function(error, gnr) {
+              assert.ifError(error);
+              assert.equal(gnr.members.length, 2);
+              done();
+            });
+          });
+        });
       });
-    };
+
+      it('multiple source docs', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          band: String
+        });
+
+        var BandSchema = new Schema({
+          name: String
+        });
+        BandSchema.virtual('members', {
+          ref: 'gh2562_a0',
+          localField: 'name',
+          foreignField: 'band'
+        });
+
+        var Person = db.model('gh2562_a0', PersonSchema);
+        var Band = db.model('gh2562_a1', BandSchema);
+
+        var people = _.map(['Axl Rose', 'Slash'], function(v) {
+          return { name: v, band: 'Guns N\' Roses' };
+        });
+        people = people.concat(_.map(['Vince Neil', 'Nikki Sixx'], function(v) {
+          return { name: v, band: 'Motley Crue' };
+        }));
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          var bands = [
+            { name: 'Guns N\' Roses' },
+            { name: 'Motley Crue' }
+          ];
+          Band.create(bands, function(error) {
+            assert.ifError(error);
+            Band.
+              find({}).
+              sort({ name: 1 }).
+              populate({ path: 'members', options: { sort: { name: 1 } } }).
+              exec(function(error, bands) {
+                assert.ifError(error);
+
+                assert.equal(bands.length, 2);
+                assert.equal(bands[0].name, 'Guns N\' Roses');
+                assert.equal(bands[0].members.length, 2);
+                assert.deepEqual(_.map(bands[0].members, 'name'),
+                  ['Axl Rose', 'Slash']);
+
+                assert.equal(bands[1].name, 'Motley Crue');
+                assert.equal(bands[1].members.length, 2);
+                assert.deepEqual(_.map(bands[1].members, 'name'),
+                  ['Nikki Sixx', 'Vince Neil']);
+                done();
+              });
+          });
+        });
+      });
+
+      it('source array', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        var BandSchema = new Schema({
+          name: String,
+          people: [String]
+        });
+        BandSchema.virtual('members', {
+          ref: 'gh2562_b0',
+          localField: 'people',
+          foreignField: 'name'
+        });
+
+        var Person = db.model('gh2562_b0', PersonSchema);
+        var Band = db.model('gh2562_b1', BandSchema);
+
+        var bands = [
+          { name: 'Guns N\' Roses', people: ['Axl Rose', 'Slash'] },
+          { name: 'Motley Crue', people: ['Vince Neil', 'Nikki Sixx'] }
+        ];
+        var people = [
+          { name: 'Axl Rose' },
+          { name: 'Slash' },
+          { name: 'Vince Neil' },
+          { name: 'Nikki Sixx' }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          Band.insertMany(bands, function(error) {
+            assert.ifError(error);
+            Band.
+              find({}).
+              sort({ name: 1 }).
+              populate({ path: 'members', options: { sort: { name: 1 } } }).
+              exec(function(error, bands) {
+                assert.ifError(error);
+
+                assert.equal(bands.length, 2);
+                assert.equal(bands[0].name, 'Guns N\' Roses');
+                assert.equal(bands[0].members.length, 2);
+                assert.deepEqual(_.map(bands[0].members, 'name'),
+                  ['Axl Rose', 'Slash']);
+
+                assert.equal(bands[1].name, 'Motley Crue');
+                assert.equal(bands[1].members.length, 2);
+                assert.deepEqual(_.map(bands[1].members, 'name'),
+                  ['Nikki Sixx', 'Vince Neil']);
+
+                done();
+              });
+          });
+        });
+      });
+
+      it('multiple paths (gh-4234)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number],
+          favorites: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: 'gh4234',
+          localField: '_id',
+          foreignField: 'authored'
+        });
+        BlogPostSchema.virtual('favoritedBy', {
+          ref: 'gh4234',
+          localField: '_id',
+          foreignField: 'favorites'
+        });
+
+        var Person = db.model('gh4234', PersonSchema);
+        var BlogPost = db.model('gh4234_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [{ name: 'Val', authored: [0], favorites: [0] }];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate('authors favoritedBy').
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.authors.length, 1);
+                assert.equal(post.authors[0].name, 'Val');
+                assert.equal(post.favoritedBy.length, 1);
+                assert.equal(post.favoritedBy[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
+      it('justOne option (gh-4263)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('author', {
+          ref: 'gh4263',
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: true
+        });
+
+        var Person = db.model('gh4263', PersonSchema);
+        var BlogPost = db.model('gh4263_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [
+          { name: 'Val', authored: [0] },
+          { name: 'Test', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate('author').
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.author.name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
+      it('with no results and justOne (gh-4284)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('author', {
+          ref: 'gh4284',
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: true
+        });
+
+        var Person = db.model('gh4284', PersonSchema);
+        var BlogPost = db.model('gh4284_0', BlogPostSchema);
+
+        var blogPosts = [
+          { _id: 0, title: 'Bacon is Great' },
+          { _id: 1, title: 'Bacon is OK' }
+        ];
+        var people = [
+          { name: 'Val', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              find({}).
+              sort({ title: 1 }).
+              populate('author').
+              exec(function(error, posts) {
+                assert.ifError(error);
+                assert.equal(posts[0].author.name, 'Val');
+                assert.strictEqual(posts[1].author, null);
+                done();
+              });
+          });
+        });
+      });
+
+      it('with multiple results and justOne (gh-4329)', function(done) {
+        var UserSchema = new Schema({
+          openId: {
+            type: String,
+            unique: true
+          }
+        });
+        var TaskSchema = new Schema({
+          openId: {
+            type: String
+          }
+        });
+
+        TaskSchema.virtual('user', {
+          ref: 'gh4329',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true
+        });
+
+        var User = db.model('gh4329', UserSchema);
+        var Task = db.model('gh4329_0', TaskSchema);
+
+        User.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+          assert.ifError(error);
+          Task.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+            assert.ifError(error);
+            Task.
+              find().
+              sort({ openId: 1 }).
+              populate('user').
+              exec(function(error, tasks) {
+                assert.ifError(error);
+
+                assert.ok(tasks[0].user);
+                assert.ok(tasks[1].user);
+                var users = tasks.map(function(task) {
+                  return task.user.openId;
+                });
+                assert.deepEqual(users, ['user1', 'user2']);
+                done();
+              });
+          });
+        });
+      });
+
+      it('with no results (gh-4284)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: 'gh4284_a',
+          localField: '_id',
+          foreignField: 'authored'
+        });
+
+        var Person = db.model('gh4284_a', PersonSchema);
+        var BlogPost = db.model('gh4284_a0', BlogPostSchema);
+
+        var blogPosts = [
+          { _id: 0, title: 'Bacon is Great' },
+          { _id: 1, title: 'Bacon is OK' },
+          { _id: 2, title: 'Bacon is not great' }
+        ];
+        var people = [
+          { name: 'Val', authored: [0] },
+          { name: 'Test', authored: [0, 1] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              find({}).
+              sort({ _id: 1 }).
+              populate('authors').
+              exec(function(error, posts) {
+                assert.ifError(error);
+                assert.equal(posts[0].authors.length, 2);
+                assert.equal(posts[0].authors[0].name, 'Val');
+                assert.equal(posts[0].authors[1].name, 'Test');
+                assert.equal(posts[1].authors.length, 1);
+                assert.equal(posts[1].authors[0].name, 'Test');
+                assert.equal(posts[2].authors.length, 0);
+                done();
+              });
+          });
+        });
+      });
+
+      it('deep populate virtual -> conventional (gh-4261)', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        PersonSchema.virtual('blogPosts', {
+          ref: 'gh4261',
+          localField: '_id',
+          foreignField: 'author'
+        });
+
+        var BlogPostSchema = new Schema({
+          title: String,
+          author: { type: ObjectId },
+          comments: [{ author: { type: ObjectId, ref: 'gh4261' } }]
+        });
+
+        var Person = db.model('gh4261', PersonSchema);
+        var BlogPost = db.model('gh4261_0', BlogPostSchema);
+
+        var people = [
+          { name: 'Val' },
+          { name: 'Test' }
+        ];
+
+        Person.create(people, function(error, people) {
+          assert.ifError(error);
+          var post = {
+            title: 'Test1',
+            author: people[0]._id,
+            comments: [{ author: people[1]._id }]
+          };
+          BlogPost.create(post, function(error) {
+            assert.ifError(error);
+            Person.findById(people[0]._id).
+              populate({
+                path: 'blogPosts',
+                model: BlogPost,
+                populate: {
+                  path: 'comments.author',
+                  model: Person
+                }
+              }).
+              exec(function(error, person) {
+                assert.ifError(error);
+                assert.equal(person.blogPosts[0].comments[0].author.name,
+                  'Test');
+                done();
+              });
+          });
+        });
+      });
+
+      it('deep populate virtual -> virtual (gh-4278)', function(done) {
+        var ASchema = new Schema({
+          name: String
+        });
+        ASchema.virtual('bs', {
+          ref: 'gh4278_1',
+          localField: '_id',
+          foreignField: 'a'
+        });
+
+        var BSchema = new Schema({
+          a: mongoose.Schema.Types.ObjectId,
+          name: String
+        });
+        BSchema.virtual('cs', {
+          ref: 'gh4278_2',
+          localField: '_id',
+          foreignField: 'b'
+        });
+
+        var CSchema = new Schema({
+          b: mongoose.Schema.Types.ObjectId,
+          name: String
+        });
+
+        var A = db.model('gh4278_0', ASchema);
+        var B = db.model('gh4278_1', BSchema);
+        var C = db.model('gh4278_2', CSchema);
+
+        A.create({ name: 'A1' }, function(error, a) {
+          assert.ifError(error);
+          B.create({ name: 'B1', a: a._id }, function(error, b) {
+            assert.ifError(error);
+            C.create({ name: 'C1', b: b._id }, function(error) {
+              assert.ifError(error);
+              var options = {
+                path: 'bs',
+                populate: {
+                  path: 'cs'
+                }
+              };
+              A.findById(a).populate(options).exec(function(error, res) {
+                assert.ifError(error);
+                assert.equal(res.bs.length, 1);
+                assert.equal(res.bs[0].name, 'B1');
+                assert.equal(res.bs[0].cs.length, 1);
+                assert.equal(res.bs[0].cs[0].name, 'C1');
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('lean with single result and no justOne (gh-4288)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: true,
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: false
+        });
+
+        var Person = db.model('gh4288', PersonSchema);
+        var BlogPost = db.model('gh4288_0', BlogPostSchema);
+
+        var blogPosts = [
+          { _id: 0, title: 'Bacon is Great' }
+        ];
+        var people = [
+          { name: 'Val', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({}).
+              lean().
+              populate({ path: 'authors', model: Person }).
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.authors.length, 1);
+                assert.equal(post.authors[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
+      it('specify model in populate (gh-4264)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: true,
+          localField: '_id',
+          foreignField: 'authored'
+        });
+
+        var Person = db.model('gh4264', PersonSchema);
+        var BlogPost = db.model('gh4264_0', BlogPostSchema);
+
+        var blogPosts = [{ _id: 0, title: 'Bacon is Great' }];
+        var people = [
+          { name: 'Val', authored: [0] }
+        ];
+
+        Person.create(people, function(error) {
+          assert.ifError(error);
+          BlogPost.create(blogPosts, function(error) {
+            assert.ifError(error);
+            BlogPost.
+              findOne({ _id: 0 }).
+              populate({ path: 'authors', model: Person }).
+              exec(function(error, post) {
+                assert.ifError(error);
+                assert.equal(post.authors.length, 1);
+                assert.equal(post.authors[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+    });
   });
 });

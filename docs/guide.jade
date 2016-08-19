@@ -89,9 +89,9 @@ block content
     var animalSchema = new Schema({ name: String, type: String });
 
     // assign a function to the "methods" object of our animalSchema
-    animalSchema.methods.findSimilarTypes = function (cb) {
+    animalSchema.methods.findSimilarTypes = function(cb) {
       return this.model('Animal').find({ type: this.type }, cb);
-    }
+    };
   p
     | Now all of our 
     code animal
@@ -102,7 +102,7 @@ block content
     var Animal = mongoose.model('Animal', animalSchema);
     var dog = new Animal({ type: 'dog' });
 
-    dog.findSimilarTypes(function (err, dogs) {
+    dog.findSimilarTypes(function(err, dogs) {
       console.log(dogs); // woof
     });
 
@@ -116,12 +116,28 @@ block content
 
   :js
     // assign a function to the "statics" object of our animalSchema
-    animalSchema.statics.findByName = function (name, cb) {
+    animalSchema.statics.findByName = function(name, cb) {
       return this.find({ name: new RegExp(name, 'i') }, cb);
-    }
+    };
 
     var Animal = mongoose.model('Animal', animalSchema);
-    Animal.findByName('fido', function (err, animals) {
+    Animal.findByName('fido', function(err, animals) {
+      console.log(animals);
+    });
+
+  h3#query-helpers Query Helpers
+  :markdown
+    You can also add query helper functions, which are like instance methods,
+    but for mongoose queries. Query helper methods let you extend mongoose's
+    [chainable query builder API](./queries.html).
+    
+  :js
+    animalSchema.query.byName = function(name) {
+      return this.find({ name: new RegExp(name, 'i') });
+    };
+    
+    var Animal = mongoose.model('Animal', animalSchema);
+    Animal.find().byName('fido').exec(function(err, animals) {
       console.log(animals);
     });
 
@@ -148,9 +164,28 @@ block content
       While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](http://docs.mongodb.org/manual/core/indexes/#index-creation-operations). Disable the behavior by setting the `autoIndex` option of your schema to `false`, or globally on the connection by setting the option `config.autoIndex` to `false`.
 
   :js
+    mongoose.connect('mongodb://user:pass@localhost:port/database', { config: { autoIndex: false } });
+    // or  
+    mongoose.createConnection('mongodb://user:pass@localhost:port/database', { config: { autoIndex: false } });
+    // or
     animalSchema.set('autoIndex', false);
     // or
     new Schema({..}, { autoIndex: false });
+
+  :markdown
+    Mongoose will emit an `index` event on the model when indexes are done
+    building or an error occurred.
+    
+  :js
+    // Will cause an error because mongodb has an _id index by default that
+    // is not sparse
+    animalSchema.index({ _id: 1 }, { sparse: true });
+    var Animal = mongoose.model('Animal', animalSchema);
+    
+    Animal.on('index', function(error) {
+      // "_id index cannot be sparse"
+      console.log(error.message);
+    });
 
   :markdown
     See also the [Model#ensureIndexes](./api.html#model_Model.ensureIndexes) method.
@@ -269,7 +304,9 @@ block content
 
   h4#bufferCommands option: bufferCommands
   :markdown
-    When running with the drivers `autoReconnect` option disabled and connected to a single `mongod` (non-replica-set), mongoose buffers commands when the connection goes down until you manually reconnect. To disable mongoose buffering under these conditions, set this option to `false`.
+    By default, mongoose buffers commands when the connection goes down until
+    the driver manages to reconnect. To disable buffering, set `bufferCommands`
+    to false.
   :js
     var schema = new Schema({..}, { bufferCommands: false });
 
@@ -624,12 +661,43 @@ block content
     var thing = new Thing();
     thing.save(); // `created_at` & `updatedAt` will be included
 
+  h4#useNestedStrict option: useNestedStrict
+  :markdown
+    In mongoose 4, `update()` and `findOneAndUpdate()` only check the top-level
+    schema's strict mode setting.
+  :js
+    var childSchema = new Schema({}, { strict: false });
+    var parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
+    var Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+      // Error because parentSchema has `strict: throw`, even though
+      // `childSchema` has `strict: false`
+    });
+
+    var update = { 'child.name': 'Luke Skywalker' };
+    var opts = { strict: false };
+    Parent.update({}, update, opts, function(error) {
+      // This works because passing `strict: false` to `update()` overwrites
+      // the parent schema.
+    });
+  :markdown
+    If you set `useNestedStrict` to true, mongoose will use the child schema's
+    `strict` option for casting updates.
+  :js
+    var childSchema = new Schema({}, { strict: false });
+    var parentSchema = new Schema({ child: childSchema },
+      { strict: 'throw', useNestedStrict: true });
+    var Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+      // Works!
+    });
+
   h3#plugins Pluggable
   p
     | Schemas are also 
     a(href="./plugins.html") pluggable
     |  which allows us to package up reusable features into 
-    a(href="http://plugins.mongoosejs.com") plugins
+    a(href="http://plugins.mongoosejs.io") plugins
     |  that can be shared with the community or just between your projects.
 
   h3#next Next Up

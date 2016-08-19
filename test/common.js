@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+Error.stackTraceLimit = 10;
+
 var mongoose = require('../'),
     Collection = mongoose.Collection,
     assert = require('power-assert'),
@@ -132,7 +134,7 @@ module.exports.mongodVersion = function(cb) {
 };
 
 function dropDBs(done) {
-  var db = module.exports();
+  var db = module.exports({ noErrorListener: true });
   db.once('open', function() {
     // drop the default test database
     db.db.dropDatabase(function() {

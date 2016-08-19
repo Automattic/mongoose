@@ -33,9 +33,23 @@ block content
     Player.plugin(lastMod);
   :markdown
     We just added last-modified behavior to both our `Game` and `Player` schemas and declared an index on the `lastMod` path of our Games to boot. Not bad for a few lines of code.
+  h3#global Global Plugins
+  :markdown
+    Want to register a plugin for all schemas? The mongoose singleton has a
+    `.plugin()` function that registers a plugin for every schema. For
+    example:
+  :js
+    var mongoose = require('mongoose');
+    mongoose.plugin(require('./lastMod'));
+    
+    var gameSchema = new Schema({ ... });
+    var playerSchema = new Schema({ ... });
+    // `lastModifiedPlugin` gets attached to both schemas
+    var Game = mongoose.model('Game', gameSchema);
+    var Player = mongoose.model('Player', playerSchema);
   h3 Community!
   :markdown
-    Not only can you re-use schema functionality in your own projects but you also reap the benefits of the Mongoose community as well. Any plugin published to [npm](https://npmjs.org/) and [tagged](https://npmjs.org/doc/tag.html) with `mongoose` will show up on our [search results](http://plugins.mongoosejs.com) page.
+    Not only can you re-use schema functionality in your own projects but you also reap the benefits of the Mongoose community as well. Any plugin published to [npm](https://npmjs.org/) and [tagged](https://npmjs.org/doc/tag.html) with `mongoose` will show up on our [search results](http://plugins.mongoosejs.io) page.
 
   h3#next Next Up
   :markdown

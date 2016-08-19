@@ -77,7 +77,7 @@ describe('query middleware', function() {
       assert.ifError(error);
       Author.find({x: 1}, function(error) {
         assert.ifError(error);
-        assert.equal(1, count);
+        assert.equal(count, 1);
         done();
       });
     });
@@ -86,9 +86,9 @@ describe('query middleware', function() {
   it('has post find hooks', function(done) {
     var postCount = 0;
     schema.post('find', function(results, next) {
-      assert.equal(1, results.length);
-      assert.equal('Val', results[0].author);
-      assert.equal('bacon', results[0].options);
+      assert.equal(results.length, 1);
+      assert.equal(results[0].author, 'Val');
+      assert.equal(results[0].options, 'bacon');
       ++postCount;
       next();
     });
@@ -97,8 +97,8 @@ describe('query middleware', function() {
       assert.ifError(error);
       Author.find({title: 'Professional AngularJS'}, function(error, docs) {
         assert.ifError(error);
-        assert.equal(1, postCount);
-        assert.equal(1, docs.length);
+        assert.equal(postCount, 1);
+        assert.equal(docs.length, 1);
         done();
       });
     });
@@ -113,8 +113,8 @@ describe('query middleware', function() {
 
     var postCount = 0;
     schema.post('find', function(results, next) {
-      assert.equal(1, results.length);
-      assert.equal('Val', results[0].author);
+      assert.equal(results.length, 1);
+      assert.equal(results[0].author, 'Val');
       ++postCount;
       next();
     });
@@ -122,9 +122,9 @@ describe('query middleware', function() {
     initializeData(function() {
       Author.find({title: 'Professional AngularJS'}).exec(function(error, docs) {
         assert.ifError(error);
-        assert.equal(1, count);
-        assert.equal(1, postCount);
-        assert.equal(1, docs.length);
+        assert.equal(count, 1);
+        assert.equal(postCount, 1);
+        assert.equal(docs.length, 1);
         done();
       });
     });
@@ -139,7 +139,7 @@ describe('query middleware', function() {
 
     var postCount = 0;
     schema.post('findOne', function(result, next) {
-      assert.equal('Val', result.author);
+      assert.equal(result.author, 'Val');
       ++postCount;
       next();
     });
@@ -147,9 +147,9 @@ describe('query middleware', function() {
     initializeData(function() {
       Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
-        assert.equal(1, count);
-        assert.equal(1, postCount);
-        assert.equal('Val', doc.author);
+        assert.equal(count, 1);
+        assert.equal(postCount, 1);
+        assert.equal(doc.author, 'Val');
         done();
       });
     });
@@ -164,8 +164,8 @@ describe('query middleware', function() {
     initializeData(function() {
       Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
-        assert.equal('Val', doc.author);
-        assert.equal('Wiley', doc.publisher.name);
+        assert.equal(doc.author, 'Val');
+        assert.equal(doc.publisher.name, 'Wiley');
         done();
       });
     });
@@ -181,8 +181,8 @@ describe('query middleware', function() {
     initializeData(function() {
       Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
-        assert.equal('Val', doc.author);
-        assert.equal('Wiley', doc.publisher.name);
+        assert.equal(doc.author, 'Val');
+        assert.equal(doc.publisher.name, 'Wiley');
         done();
       });
     });
@@ -202,12 +202,41 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({title: 'Professional AngularJS'}).count(function(error, count) {
+      Author.
+        find({ title: 'Professional AngularJS' }).
+        count(function(error, count) {
+          assert.ifError(error);
+          assert.equal(1, count);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+  });
+
+  it('error handlers (gh-2284)', function(done) {
+    var testSchema = new Schema({ title: { type: String, unique: true } });
+
+    testSchema.post('update', function(error, res, next) {
+      next(new Error('woops'));
+    });
+
+    var Book = db.model('gh2284', testSchema);
+
+    Book.on('index', function(error) {
+      assert.ifError(error);
+      var books = [
+        { title: 'Professional AngularJS' },
+        { title: 'The 80/20 Guide to ES2015 Generators' }
+      ];
+      Book.create(books, function(error, books) {
         assert.ifError(error);
-        assert.equal(1, count);
-        assert.equal(1, preCount);
-        assert.equal(1, postCount);
-        done();
+        var query = { _id: books[1]._id };
+        var update = { title: 'Professional AngularJS' };
+        Book.update(query, update, function(error) {
+          assert.equal(error.message, 'woops');
+          done();
+        });
       });
     });
   });

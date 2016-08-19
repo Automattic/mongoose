@@ -10,10 +10,10 @@ var mongoose = require('./common').mongoose,
 describe('schematype', function() {
   it('honors the selected option', function(done) {
     var s = new Schema({thought: {type: String, select: false}});
-    assert.equal(false, s.path('thought').selected);
+    assert.ok(!s.path('thought').selected);
 
     var a = new Schema({thought: {type: String, select: true}});
-    assert.equal(true, a.path('thought').selected);
+    assert.ok(a.path('thought').selected);
     done();
   });
 

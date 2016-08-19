@@ -2,9 +2,10 @@
 
 Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
-[![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
+[![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
+[![Dependency Status](https://gemnasium.com/Automattic/mongoose.svg)](https://gemnasium.com/Automattic/mongoose)
 
 ## Documentation
 
@@ -16,17 +17,17 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
   - [bug reports](https://github.com/Automattic/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB support](https://docs.mongodb.org/manual/support/)
-  - (irc) #mongoosejs on freenode
+  - [Mongoose Slack Channel](https://mongoosejs.slack.com/)
 
 ## Plugins
 
-Check out the [plugins search site](http://plugins.mongoosejs.com/) to see hundreds of related modules from the community.
+Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundreds of related modules from the community.
 
 Build your own Mongoose plugin through [generator-mongoose-plugin](https://github.com/huei90/generator-mongoose-plugin).
 
 ## Contributors
 
-View all 100+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
+View all 200+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
 <a href="http://code.runnable.com/mongoose" target="_blank"><img src="http://i.imgur.com/4yNYDLI.png"></a>
@@ -284,9 +285,12 @@ new Schema({
 });
 ```
 
-### Driver access
+### Driver Access
 
-The driver being used defaults to [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) and is directly accessible through `YourModel.collection`. **Note**: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.
+Mongoose is built on top of the [official MongoDB Node.js driver](https://github.com/mongodb/node-mongodb-native). Each mongoose model keeps a reference to a [native MongoDB driver collection](http://mongodb.github.io/node-mongodb-native/2.1/api/Collection.html). The collection object can be accessed using `YourModel.collection`. However, using the collection object directly bypasses all mongoose features, including hooks, validation, etc. The one
+notable exception that `YourModel.collection` still buffers
+commands. As such, `YourModel.collection.find()` will **not**
+return a cursor.
 
 ## API Docs
 

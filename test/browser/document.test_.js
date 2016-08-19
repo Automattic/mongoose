@@ -68,15 +68,15 @@ describe('browser:document', function() {
     assert.equal(doc.getValue('nested.setr'), 'set it setter');
 
     var doc2 = new mongoose.Document(
-        {
-          test: 'toop',
-          oids: [],
-          nested: {
-            age: 2,
-            cool: mongoose.Types.ObjectId.createFromHexString('4cf70857337498f95900001c'),
-            deep: {x: 'yay'}
-          }
-        },
+      {
+        test: 'toop',
+        oids: [],
+        nested: {
+          age: 2,
+          cool: mongoose.Types.ObjectId.createFromHexString('4cf70857337498f95900001c'),
+          deep: {x: 'yay'}
+        }
+      },
         schema);
 
     assert.equal('toop', doc2.get('test'));

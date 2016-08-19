@@ -123,7 +123,7 @@ describe('model', function() {
       it('with one doc', function(done) {
         var p = B.create({title: 'optional callback'});
         p.then(function(doc) {
-          assert.equal('optional callback', doc.title);
+          assert.equal(doc.title, 'optional callback');
           done();
         }, done).end();
       });
@@ -131,8 +131,8 @@ describe('model', function() {
       it('with more than one doc', function(done) {
         var p = B.create({title: 'optional callback 2'}, {title: 'orient expressions'});
         p.then(function(doc1, doc2) {
-          assert.equal('optional callback 2', doc1.title);
-          assert.equal('orient expressions', doc2.title);
+          assert.equal(doc1.title, 'optional callback 2');
+          assert.equal(doc2.title, 'orient expressions');
           done();
         }, done).end();
       });
@@ -144,8 +144,8 @@ describe('model', function() {
           assert.equal(docs.length, 2);
           var doc1 = docs[0];
           var doc2 = docs[1];
-          assert.equal('optional callback3', doc1.title);
-          assert.equal('3', doc2.title);
+          assert.equal(doc1.title, 'optional callback3');
+          assert.equal(doc2.title, '3');
           done();
         }, done).end();
       });

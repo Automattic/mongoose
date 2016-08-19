@@ -134,7 +134,7 @@ describe('model', function() {
           Geo.geoNear(pnt, {spherical: true, maxDistance: 300}, function(err, results) {
             assert.ifError(err);
 
-            assert.equal(1, results.length);
+            assert.equal(results.length, 1);
 
             assert.equal(results[0].obj.type, 'Point');
             assert.equal(results[0].obj.coordinates.length, 2);
@@ -187,7 +187,7 @@ describe('model', function() {
           Geo.geoNear(pnt, {spherical: true, maxDistance: 300, lean: true}, function(err, results) {
             assert.ifError(err);
 
-            assert.equal(1, results.length);
+            assert.equal(results.length, 1);
 
             assert.equal(results[0].obj.type, 'Point');
             assert.equal(results[0].obj.coordinates.length, 2);
@@ -266,7 +266,7 @@ describe('model', function() {
           });
 
           function validate(ret, stat) {
-            assert.equal(1, ret.length);
+            assert.equal(ret.length, 1);
             assert.equal(ret[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
             assert.equal(ret[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.ok(stat);

@@ -63,7 +63,7 @@ block content
   :markdown
     **Q**. My `save()` callback never executes. What am I doing wrong?
 
-    **A**. All `collection` actions (insert, remove, queries, etc) are queued until the `connection` opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.
+    **A**. All `collection` actions (insert, remove, queries, etc.) are queued until the `connection` opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.
   :js
     // if connecting on the default mongoose connection
     mongoose.connect(..);

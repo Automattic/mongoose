@@ -28,12 +28,17 @@ describe('updateValidators', function() {
       });
       fn(function(err) {
         assert.ifError(err);
-        assert.equal(schema._getSchema.calls.length, 2);
-        assert.equal(schema.doValidate.calls.length, 2);
-        assert.equal('test.a', schema._getSchema.calls[0]);
-        assert.equal('test.b', schema._getSchema.calls[1]);
-        assert.equal(1, schema.doValidate.calls[0].v);
-        assert.equal(null, schema.doValidate.calls[1].v);
+        assert.equal(schema._getSchema.calls.length, 3);
+        assert.equal(schema.doValidate.calls.length, 3);
+        assert.equal(schema._getSchema.calls[0], 'test');
+        assert.equal(schema._getSchema.calls[1], 'test.a');
+        assert.equal(schema._getSchema.calls[2], 'test.b');
+        assert.deepEqual(schema.doValidate.calls[0].v, {
+          a: 1,
+          b: null
+        });
+        assert.equal(schema.doValidate.calls[1].v, 1);
+        assert.equal(schema.doValidate.calls[2].v, null);
         done();
       });
     });
@@ -48,7 +53,7 @@ describe('updateValidators', function() {
         assert.ifError(err);
         assert.equal(schema._getSchema.calls.length, 1);
         assert.equal(schema.doValidate.calls.length, 1);
-        assert.equal('test', schema._getSchema.calls[0]);
+        assert.equal(schema._getSchema.calls[0], 'test');
         assert.equal(dt, schema.doValidate.calls[0].v);
         done();
       });
@@ -63,7 +68,7 @@ describe('updateValidators', function() {
         assert.ifError(err);
         assert.equal(schema._getSchema.calls.length, 1);
         assert.equal(schema.doValidate.calls.length, 1);
-        assert.equal('test', schema._getSchema.calls[0]);
+        assert.equal(schema._getSchema.calls[0], 'test');
         assert.deepEqual(schema.doValidate.calls[0].v, []);
         done();
       });

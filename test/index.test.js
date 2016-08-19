@@ -55,20 +55,23 @@ describe('mongoose module:', function() {
     mongoose.set('a', 'b');
     mongoose.set('long option', 'c');
 
-    assert.equal('b', mongoose.get('a'));
-    assert.equal('b', mongoose.set('a'));
-    assert.equal('c', mongoose.get('long option'));
+    assert.equal(mongoose.get('a'), 'b');
+    assert.equal(mongoose.set('a'), 'b');
+    assert.equal(mongoose.get('long option'), 'c');
     done();
   });
 
   it('declaring global plugins', function(done) {
-    var mong = new Mongoose(),
-        schema = new Schema(),
-        called = 0;
+    var mong = new Mongoose();
+    var subSchema = new Schema();
+    var schema = new Schema({
+      test: [subSchema]
+    });
+    var called = 0;
 
+    var calls = [];
     mong.plugin(function(s) {
-      assert.equal(s, schema);
-      called++;
+      calls.push(s);
     });
 
     schema.plugin(function(s) {
@@ -78,7 +81,10 @@ describe('mongoose module:', function() {
 
     mong.model('GlobalPlugins', schema);
 
-    assert.equal(2, called);
+    assert.equal(called, 1);
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0], schema);
+    assert.equal(calls[1], subSchema);
     done();
   });
 
@@ -96,8 +102,8 @@ describe('mongoose module:', function() {
 
         function cb() {
           if (--pending) return;
-          assert.equal(2, connections);
-          assert.equal(2, disconnections);
+          assert.equal(connections, 2);
+          assert.equal(disconnections, 2);
           done();
         }
 
@@ -140,7 +146,7 @@ describe('mongoose module:', function() {
 
         mong.disconnect().connection.
           on('error', function(error) {
-            assert.equal('bam', error.message);
+            assert.equal(error.message, 'bam');
           });
 
         done();
@@ -184,7 +190,7 @@ describe('mongoose module:', function() {
         thrown = true;
       }
 
-      assert.equal(true, thrown);
+      assert.equal(thrown, true);
       done();
     });
 
@@ -198,7 +204,7 @@ describe('mongoose module:', function() {
       var schema = new Schema({number: Number});
       var Numbered = mongoose.model('Numbered', schema, collection);
       var n3 = new Numbered({number: 1234});
-      assert.equal(1234, n3.number.valueOf());
+      assert.equal(n3.number.valueOf(), 1234);
       done();
     });
 
@@ -330,7 +336,7 @@ describe('mongoose module:', function() {
 
         Test.findById(test._id, function(err, doc) {
           assert.ifError(err);
-          assert.equal('aa', doc.test);
+          assert.equal(doc.test, 'aa');
           mong.connection.close();
           complete();
         });
@@ -369,7 +375,7 @@ describe('mongoose module:', function() {
 
         Test.findById(test._id, function(err, doc) {
           assert.ifError(err);
-          assert.equal('aa', doc.test);
+          assert.equal(doc.test, 'aa');
           conn.close();
           complete();
         });
@@ -387,21 +393,22 @@ describe('mongoose module:', function() {
 
   describe('exports', function() {
     function test(mongoose) {
-      assert.equal('string', typeof mongoose.version);
-      assert.equal('function', typeof mongoose.Mongoose);
-      assert.equal('function', typeof mongoose.Collection);
-      assert.equal('function', typeof mongoose.Connection);
-      assert.equal('function', typeof mongoose.Schema);
-      assert.equal('function', typeof mongoose.SchemaType);
-      assert.equal('function', typeof mongoose.Query);
-      assert.equal('function', typeof mongoose.Promise);
-      assert.equal('function', typeof mongoose.Model);
-      assert.equal('function', typeof mongoose.Document);
-      assert.equal('function', typeof mongoose.Error);
-      assert.equal('function', typeof mongoose.Error.CastError);
-      assert.equal('function', typeof mongoose.Error.ValidationError);
-      assert.equal('function', typeof mongoose.Error.ValidatorError);
-      assert.equal('function', typeof mongoose.Error.VersionError);
+      assert.equal(typeof mongoose.version, 'string');
+      assert.equal(typeof mongoose.Mongoose, 'function');
+      assert.equal(typeof mongoose.Collection, 'function');
+      assert.equal(typeof mongoose.Connection, 'function');
+      assert.equal(typeof mongoose.Schema, 'function');
+      assert.ok(mongoose.Schema.Types);
+      assert.equal(typeof mongoose.SchemaType, 'function');
+      assert.equal(typeof mongoose.Query, 'function');
+      assert.equal(typeof mongoose.Promise, 'function');
+      assert.equal(typeof mongoose.Model, 'function');
+      assert.equal(typeof mongoose.Document, 'function');
+      assert.equal(typeof mongoose.Error, 'function');
+      assert.equal(typeof mongoose.Error.CastError, 'function');
+      assert.equal(typeof mongoose.Error.ValidationError, 'function');
+      assert.equal(typeof mongoose.Error.ValidatorError, 'function');
+      assert.equal(typeof mongoose.Error.VersionError, 'function');
     }
 
     it('of module', function(done) {
@@ -411,6 +418,13 @@ describe('mongoose module:', function() {
 
     it('of new Mongoose instances', function(done) {
       test(new mongoose.Mongoose);
+      done();
+    });
+
+    it('of result from .connect() (gh-3940)', function(done) {
+      var m = new mongoose.Mongoose;
+      test(m.connect('mongodb://localhost:27017'));
+      m.disconnect();
       done();
     });
   });

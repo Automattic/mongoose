@@ -71,7 +71,7 @@ schema.path('nested.setr').set(function(v) {
 
 schema.path('date').set(function(v) {
   // should not have been cast to a Date yet
-  assert.equal('string', typeof v);
+  assert.equal(typeof v, 'string');
   return v;
 });
 

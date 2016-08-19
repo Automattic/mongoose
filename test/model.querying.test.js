@@ -230,8 +230,8 @@ describe('model: querying:', function() {
           BlogPostB.count({title: title}, function(err, count) {
             assert.ifError(err);
 
-            assert.equal('number', typeof count);
-            assert.equal(2, count);
+            assert.equal(typeof count, 'number');
+            assert.equal(count, 2);
 
             db.close();
             done();
@@ -260,7 +260,7 @@ describe('model: querying:', function() {
         assert.strictEqual(null, err);
         var query = Address.distinct('zip', {}, function(err, results) {
           assert.ifError(err);
-          assert.equal(2, results.length);
+          assert.equal(results.length, 2);
           assert.ok(results.indexOf('10010') > -1);
           assert.ok(results.indexOf('99701') > -1);
           db.close(done);
@@ -277,7 +277,7 @@ describe('model: querying:', function() {
         assert.ifError(err);
         Address.distinct('zip', function(err, results) {
           assert.ifError(err);
-          assert.equal(2, results.length);
+          assert.equal(results.length, 2);
           assert.ok(results.indexOf('10010') > -1);
           assert.ok(results.indexOf('99701') > -1);
           db.close(done);
@@ -345,7 +345,7 @@ describe('model: querying:', function() {
         BlogPostB.findOne({title: title}, function(err, doc) {
           assert.ifError(err);
           assert.equal(title, doc.get('title'));
-          assert.equal(false, doc.isNew);
+          assert.equal(doc.isNew, false);
 
           db.close();
           done();
@@ -696,7 +696,7 @@ describe('model: querying:', function() {
 
         BlogPostB.findById(undefined, function(err, doc) {
           assert.ifError(err);
-          assert.equal(null, doc);
+          assert.equal(doc, null);
           db.close(done);
         });
       });
@@ -718,7 +718,7 @@ describe('model: querying:', function() {
         BlogPostB.findById(post.get('_id'), function(err, doc) {
           assert.ifError(err);
           assert.ok(doc instanceof BlogPostB);
-          assert.equal(title, doc.get('title'));
+          assert.equal(doc.get('title'), title);
           if (--pending) {
             return;
           }
@@ -729,7 +729,7 @@ describe('model: querying:', function() {
         BlogPostB.findById(post.get('_id').toHexString(), function(err, doc) {
           assert.ifError(err);
           assert.ok(doc instanceof BlogPostB);
-          assert.equal(title, doc.get('title'));
+          assert.equal(doc.get('title'), title);
           if (--pending) {
             return;
           }
@@ -757,12 +757,12 @@ describe('model: querying:', function() {
         BlogPostB.findById(post.get('_id'), function(err, doc) {
           assert.ifError(err);
 
-          assert.equal(true, doc.isInit('title'));
-          assert.equal(true, doc.isInit('slug'));
-          assert.equal(false, doc.isInit('date'));
-          assert.equal(true, doc.isInit('meta.visitors'));
-          assert.equal(53, doc.meta.visitors.valueOf());
-          assert.equal(2, doc.tags.length);
+          assert.equal(doc.isInit('title'), true);
+          assert.equal(doc.isInit('slug'), true);
+          assert.equal(doc.isInit('date'), false);
+          assert.equal(doc.isInit('meta.visitors'), true);
+          assert.equal(doc.meta.visitors.valueOf(), 53);
+          assert.equal(doc.tags.length, 2);
           if (--queries) {
             return;
           }
@@ -772,12 +772,12 @@ describe('model: querying:', function() {
 
         BlogPostB.findById(post.get('_id'), 'title', function(err, doc) {
           assert.ifError(err);
-          assert.equal(true, doc.isInit('title'));
-          assert.equal(false, doc.isInit('slug'));
-          assert.equal(false, doc.isInit('date'));
-          assert.equal(false, doc.isInit('meta.visitors'));
-          assert.equal(undefined, doc.meta.visitors);
-          assert.equal(undefined, doc.tags);
+          assert.equal(doc.isInit('title'), true);
+          assert.equal(doc.isInit('slug'), false);
+          assert.equal(doc.isInit('date'), false);
+          assert.equal(doc.isInit('meta.visitors'), false);
+          assert.equal(doc.meta.visitors, undefined);
+          assert.equal(doc.tags, undefined);
           if (--queries) {
             return;
           }
@@ -787,12 +787,12 @@ describe('model: querying:', function() {
 
         BlogPostB.findById(post.get('_id'), '-slug', function(err, doc) {
           assert.ifError(err);
-          assert.equal(true, doc.isInit('title'));
-          assert.equal(false, doc.isInit('slug'));
-          assert.equal(false, doc.isInit('date'));
-          assert.equal(true, doc.isInit('meta.visitors'));
-          assert.equal(53, doc.meta.visitors);
-          assert.equal(2, doc.tags.length);
+          assert.equal(doc.isInit('title'), true);
+          assert.equal(doc.isInit('slug'), false);
+          assert.equal(doc.isInit('date'), false);
+          assert.equal(doc.isInit('meta.visitors'), true);
+          assert.equal(doc.meta.visitors, 53);
+          assert.equal(doc.tags.length, 2);
           if (--queries) {
             return;
           }
@@ -802,12 +802,12 @@ describe('model: querying:', function() {
 
         BlogPostB.findById(post.get('_id'), {title: 1}, function(err, doc) {
           assert.ifError(err);
-          assert.equal(true, doc.isInit('title'));
-          assert.equal(false, doc.isInit('slug'));
-          assert.equal(false, doc.isInit('date'));
-          assert.equal(false, doc.isInit('meta.visitors'));
-          assert.equal(undefined, doc.meta.visitors);
-          assert.equal(undefined, doc.tags);
+          assert.equal(doc.isInit('title'), true);
+          assert.equal(doc.isInit('slug'), false);
+          assert.equal(doc.isInit('date'), false);
+          assert.equal(doc.isInit('meta.visitors'), false);
+          assert.equal(doc.meta.visitors, undefined);
+          assert.equal(doc.tags, undefined);
           if (--queries) {
             return;
           }
@@ -817,12 +817,12 @@ describe('model: querying:', function() {
 
         BlogPostB.findById(post.get('_id'), 'slug', function(err, doc) {
           assert.ifError(err);
-          assert.equal(false, doc.isInit('title'));
-          assert.equal(true, doc.isInit('slug'));
-          assert.equal(false, doc.isInit('date'));
-          assert.equal(false, doc.isInit('meta.visitors'));
-          assert.equal(undefined, doc.meta.visitors);
-          assert.equal(undefined, doc.tags);
+          assert.equal(doc.isInit('title'), false);
+          assert.equal(doc.isInit('slug'), true);
+          assert.equal(doc.isInit('date'), false);
+          assert.equal(doc.isInit('meta.visitors'), false);
+          assert.equal(doc.meta.visitors, undefined);
+          assert.equal(doc.tags, undefined);
           if (--queries) {
             return;
           }
@@ -862,21 +862,21 @@ describe('model: querying:', function() {
         BlogPostB.findById(created._id, {numbers: {$slice: 2}}, function(err, found) {
           assert.ifError(err);
           assert.equal(found._id.toString(), created._id);
-          assert.equal(2, found.numbers.length);
-          assert.equal(500, found.numbers[0]);
-          assert.equal(600, found.numbers[1]);
+          assert.equal(found.numbers.length, 2);
+          assert.equal(found.numbers[0], 500);
+          assert.equal(found.numbers[1], 600);
           BlogPostB.findById(created._id, {numbers: {$slice: -2}}, function(err, found) {
             assert.ifError(err);
             assert.equal(found._id.toString(), created._id);
-            assert.equal(2, found.numbers.length);
-            assert.equal(700, found.numbers[0]);
-            assert.equal(800, found.numbers[1]);
+            assert.equal(found.numbers.length, 2);
+            assert.equal(found.numbers[0], 700);
+            assert.equal(found.numbers[1], 800);
             BlogPostB.findById(created._id, {numbers: {$slice: [1, 2]}}, function(err, found) {
               assert.ifError(err);
               assert.equal(found._id.toString(), created._id);
-              assert.equal(2, found.numbers.length);
-              assert.equal(600, found.numbers[0]);
-              assert.equal(700, found.numbers[1]);
+              assert.equal(found.numbers.length, 2);
+              assert.equal(found.numbers[0], 600);
+              assert.equal(found.numbers[1], 700);
               db.close();
               done();
             });
@@ -906,13 +906,13 @@ describe('model: querying:', function() {
 
           BlogPostB.find({title: title}, function(err, docs) {
             assert.ifError(err);
-            assert.equal(2, docs.length);
+            assert.equal(docs.length, 2);
 
             assert.equal(title, docs[0].get('title'));
-            assert.equal(false, docs[0].isNew);
+            assert.equal(docs[0].isNew, false);
 
             assert.equal(title, docs[1].get('title'));
-            assert.equal(false, docs[1].isNew);
+            assert.equal(docs[1].isNew, false);
 
             db.close();
             done();
@@ -928,7 +928,7 @@ describe('model: querying:', function() {
         assert.ifError(err);
         BlogPostB.find({numbers: 100}, function(err, found) {
           assert.ifError(err);
-          assert.equal(1, found.length);
+          assert.equal(found.length, 1);
           assert.equal(found[0]._id.toString(), created._id);
           db.close();
           done();
@@ -958,18 +958,18 @@ describe('model: querying:', function() {
           var query = NE.find({'b': id3.toString(), 'ids': {$ne: id1}});
           query.exec(function(err, nes1) {
             assert.ifError(err);
-            assert.equal(1, nes1.length);
+            assert.equal(nes1.length, 1);
 
             NE.find({b: {$ne: [1]}}, function(err) {
-              assert.equal('Cast to ObjectId failed for value "1" at path "b"', err.message);
+              assert.equal(err.message, 'Cast to ObjectId failed for value "[ 1 ]" at path "b"');
 
               NE.find({b: {$ne: 4}}, function(err) {
-                assert.equal('Cast to ObjectId failed for value "4" at path "b"', err.message);
+                assert.equal(err.message, 'Cast to ObjectId failed for value "4" at path "b"');
 
                 NE.find({b: id3, ids: {$ne: id4}}, function(err, nes4) {
                   db.close();
                   assert.ifError(err);
-                  assert.equal(0, nes4.length);
+                  assert.equal(nes4.length, 0);
                   done();
                 });
               });
@@ -994,9 +994,9 @@ describe('model: querying:', function() {
 
         BlogPostB.find({_id: post.get('_id')}, function(err, docs) {
           assert.ifError(err);
-          assert.equal(true, docs[0].isInit('title'));
-          assert.equal(true, docs[0].isInit('slug'));
-          assert.equal(false, docs[0].isInit('date'));
+          assert.equal(docs[0].isInit('title'), true);
+          assert.equal(docs[0].isInit('slug'), true);
+          assert.equal(docs[0].isInit('date'), false);
           assert.strictEqual('kandinsky', docs[0].def);
           if (--queries) {
             return;
@@ -1007,9 +1007,9 @@ describe('model: querying:', function() {
 
         BlogPostB.find({_id: post.get('_id')}, 'title', function(err, docs) {
           assert.ifError(err);
-          assert.equal(true, docs[0].isInit('title'));
-          assert.equal(false, docs[0].isInit('slug'));
-          assert.equal(false, docs[0].isInit('date'));
+          assert.equal(docs[0].isInit('title'), true);
+          assert.equal(docs[0].isInit('slug'), false);
+          assert.equal(docs[0].isInit('date'), false);
           assert.strictEqual(undefined, docs[0].def);
           if (--queries) {
             return;
@@ -1020,9 +1020,9 @@ describe('model: querying:', function() {
 
         BlogPostB.find({_id: post.get('_id')}, {slug: 0, def: 0}, function(err, docs) {
           assert.ifError(err);
-          assert.equal(true, docs[0].isInit('title'));
-          assert.equal(false, docs[0].isInit('slug'));
-          assert.equal(false, docs[0].isInit('date'));
+          assert.equal(docs[0].isInit('title'), true);
+          assert.equal(docs[0].isInit('slug'), false);
+          assert.equal(docs[0].isInit('date'), false);
           assert.strictEqual(undefined, docs[0].def);
           if (--queries) {
             return;
@@ -1033,9 +1033,9 @@ describe('model: querying:', function() {
 
         BlogPostB.find({_id: post.get('_id')}, 'slug', function(err, docs) {
           assert.ifError(err);
-          assert.equal(false, docs[0].isInit('title'));
-          assert.equal(true, docs[0].isInit('slug'));
-          assert.equal(false, docs[0].isInit('date'));
+          assert.equal(docs[0].isInit('title'), false);
+          assert.equal(docs[0].isInit('slug'), true);
+          assert.equal(docs[0].isInit('date'), false);
           assert.strictEqual(undefined, docs[0].def);
           if (--queries) {
             return;
@@ -1061,7 +1061,7 @@ describe('model: querying:', function() {
           Exists.find({b: {$exists: true}}, function(err, docs) {
             assert.ifError(err);
             db.close();
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         });
@@ -1079,7 +1079,7 @@ describe('model: querying:', function() {
         BlogPostB.find({owners: {'$elemMatch': {$in: [id2.toString()]}}}, function(err, found) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, found.length);
+          assert.equal(found.length, 1);
           done();
         });
       });
@@ -1094,7 +1094,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           Mod.find({num: {$mod: [2, 1]}}, function(err, found) {
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), one._id);
             db.close();
             done();
@@ -1112,7 +1112,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           Mod.find({num: {$not: {$mod: [2, 1]}}}, function(err, found) {
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), two._id);
             db.close();
             done();
@@ -1137,7 +1137,7 @@ describe('model: querying:', function() {
           Mod.find({$or: [{num: 1}, {num: 2}]}, function(err, found) {
             cb();
             assert.ifError(err);
-            assert.equal(2, found.length);
+            assert.equal(found.length, 2);
 
             var found1 = false;
             var found2 = false;
@@ -1159,7 +1159,7 @@ describe('model: querying:', function() {
           Mod.find({$or: [{str: 'two'}, {str: 'three'}]}, function(err, found) {
             cb();
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), two._id);
           });
         }
@@ -1168,7 +1168,7 @@ describe('model: querying:', function() {
           Mod.find({$or: [{num: 1}]}).or([{str: 'two'}]).exec(function(err, found) {
             cb();
             assert.ifError(err);
-            assert.equal(2, found.length);
+            assert.equal(found.length, 2);
 
             var found1 = false;
             var found2 = false;
@@ -1206,7 +1206,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           Mod.find({$or: found}, function(err, found) {
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), one._id);
             db.close();
             done();
@@ -1254,7 +1254,7 @@ describe('model: querying:', function() {
           Mod.find({$nor: [{num: 1}, {num: 3}]}, function(err, found) {
             cb();
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), two._id);
           });
         }
@@ -1263,7 +1263,7 @@ describe('model: querying:', function() {
           Mod.find({$nor: [{str: 'two'}, {str: 'three'}]}, function(err, found) {
             cb();
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), one._id);
           });
         }
@@ -1272,7 +1272,7 @@ describe('model: querying:', function() {
           Mod.find({$nor: [{num: 2}]}).nor([{str: 'two'}]).exec(function(err, found) {
             cb();
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), one._id);
           });
         }
@@ -1298,7 +1298,7 @@ describe('model: querying:', function() {
         BlogPostB.find({author: {$in: [null], $exists: true}}, function(err, found) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, found.length);
+          assert.equal(found.length, 1);
           assert.equal(found[0]._id.toString(), createdA._id);
           done();
         });
@@ -1316,7 +1316,7 @@ describe('model: querying:', function() {
             BlogPostB.find({author: null}, function(err, found) {
               db.close();
               assert.ifError(err);
-              assert.equal(2, found.length);
+              assert.equal(found.length, 2);
               done();
             });
           });
@@ -1340,19 +1340,19 @@ describe('model: querying:', function() {
 
           BlogPostB.find({title: {'$all': ['Aristocats']}}, function(err, docs) {
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
 
             BlogPostB.find({title: {'$all': [/^Aristocats/]}}, function(err, docs) {
               assert.ifError(err);
-              assert.equal(1, docs.length);
+              assert.equal(docs.length, 1);
 
               BlogPostB.find({tags: {'$all': ['onex', 'twox', 'threex']}}, function(err, docs) {
                 assert.ifError(err);
-                assert.equal(1, docs.length);
+                assert.equal(docs.length, 1);
 
                 BlogPostB.find({tags: {'$all': [/^onex/i]}}, function(err, docs) {
                   assert.ifError(err);
-                  assert.equal(1, docs.length);
+                  assert.equal(docs.length, 1);
 
                   BlogPostB.findOne({tags: {'$all': /^two/}}, function(err, doc) {
                     db.close();
@@ -1388,7 +1388,7 @@ describe('model: querying:', function() {
         P.find({$nor: [query0, query1]}, function(err, posts) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, posts.length);
+          assert.equal(posts.length, 1);
           assert.equal(posts[0].id, post0.id);
           done();
         });
@@ -1409,7 +1409,7 @@ describe('model: querying:', function() {
 
           BlogPostB.find({title: {$regex: reg}}, function(err, found) {
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), created._id);
 
             BlogPostB.findOne({title: {$regex: reg}}, function(err, found) {
@@ -1443,15 +1443,15 @@ describe('model: querying:', function() {
 
         BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function(err, found) {
           assert.ifError(err);
-          assert.equal(2, found.length);
+          assert.equal(found.length, 2);
           BlogPostB.find({'meta.visitors': {$all: [4]}}, function(err, found) {
             assert.ifError(err);
-            assert.equal(1, found.length);
+            assert.equal(found.length, 1);
             assert.equal(found[0]._id.toString(), whereoutZero._id);
             BlogPostB.find({numbers: {$all: [0, -1]}}, function(err, found) {
               db.close();
               assert.ifError(err);
-              assert.equal(1, found.length);
+              assert.equal(found.length, 1);
               assert.equal(found[0]._id.toString(), whereZero._id);
               done();
             });
@@ -1472,10 +1472,10 @@ describe('model: querying:', function() {
             assert.ifError(err);
             BlogPostB.find({numbers: {$size: 10}}, function(err, found) {
               assert.ifError(err);
-              assert.equal(2, found.length);
+              assert.equal(found.length, 2);
               BlogPostB.find({numbers: {$size: 11}}, function(err, found) {
                 assert.ifError(err);
-                assert.equal(1, found.length);
+                assert.equal(found.length, 1);
                 db.close();
                 done();
               });
@@ -1514,11 +1514,11 @@ describe('model: querying:', function() {
             done();
           }
           assert.ifError(err);
-          assert.equal(3, docs.length);
+          assert.equal(docs.length, 3);
           assert.equal(docs[0].dt, '2011-03-30');
           assert.equal(docs[1].dt, '2011-03-31');
           assert.equal(docs[2].dt, '2011-04-01');
-          assert.equal(false, docs.some(function(d) {
+          assert.ok(!docs.some(function(d) {
             return d.dt === '2011-04-02';
           }));
         });
@@ -1529,13 +1529,13 @@ describe('model: querying:', function() {
             done();
           }
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           assert.equal(docs[0].dt, '2011-03-31');
           assert.equal(docs[1].dt, '2011-04-01');
-          assert.equal(false, docs.some(function(d) {
+          assert.ok(!docs.some(function(d) {
             return d.dt === '2011-03-30';
           }));
-          assert.equal(false, docs.some(function(d) {
+          assert.ok(!docs.some(function(d) {
             return d.dt === '2011-04-02';
           }));
         });
@@ -1564,8 +1564,8 @@ describe('model: querying:', function() {
               limit(2).
               exec(function(error, documents) {
                 assert.ifError(error);
-                assert.equal(1, documents.length);
-                assert.equal('text search in mongoose', documents[0].title);
+                assert.equal(documents.length, 1);
+                assert.equal(documents[0].title, 'text search in mongoose');
                 a.remove(function(error) {
                   assert.ifError(error);
                   b.remove(function(error) {
@@ -1619,7 +1619,7 @@ describe('model: querying:', function() {
             BlogPostB.find({title: /limit$/}).limit(2).find(function(err, found) {
               db.close();
               assert.ifError(err);
-              assert.equal(2, found.length);
+              assert.equal(found.length, 2);
               assert.equal(found[0].id, first.id);
               assert.equal(found[1].id, second.id);
               done();
@@ -1643,7 +1643,7 @@ describe('model: querying:', function() {
             assert.ifError(err);
             BlogPostB.find({title: /skip$/}).sort({title: 1}).skip(1).limit(2).find(function(err, found) {
               assert.ifError(err);
-              assert.equal(2, found.length);
+              assert.equal(found.length, 2);
               assert.equal(found[0].id, second._id);
               assert.equal(found[1].id, third._id);
               db.close();
@@ -1671,7 +1671,7 @@ describe('model: querying:', function() {
             .sort('-meta.visitors')
             .find(function(err, found) {
               assert.ifError(err);
-              assert.equal(3, found.length);
+              assert.equal(found.length, 3);
               assert.equal(found[0].id, largest._id);
               assert.equal(found[1].id, middle._id);
               assert.equal(found[2].id, least._id);
@@ -1704,9 +1704,9 @@ describe('model: querying:', function() {
             limit(2).
             exec(function(error, documents) {
               assert.ifError(error);
-              assert.equal(2, documents.length);
-              assert.equal('text search in mongoose', documents[0].title);
-              assert.equal('searching in mongoose', documents[1].title);
+              assert.equal(documents.length, 2);
+              assert.equal(documents[0].title, 'text search in mongoose');
+              assert.equal(documents[1].title, 'searching in mongoose');
               db.close();
               done();
             });
@@ -1740,7 +1740,7 @@ describe('model: querying:', function() {
       Test.find({date: now}, function(err, docs) {
         db.close();
         assert.ifError(err);
-        assert.equal(1, docs.length);
+        assert.equal(docs.length, 1);
         done();
       });
     });
@@ -1760,8 +1760,8 @@ describe('model: querying:', function() {
 
       M.find({a: {name: 'Frodo'}, b: '10'}, function(err, docs) {
         assert.ifError(err);
-        assert.equal(5, docs[0].a.length);
-        assert.equal(10, docs[0].b.valueOf());
+        assert.equal(docs[0].a.length, 5);
+        assert.equal(docs[0].b.valueOf(), 10);
 
         var query = {
           a: {
@@ -1772,7 +1772,7 @@ describe('model: querying:', function() {
         M.find(query, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(5, docs[0].a.length);
+          assert.equal(docs[0].a.length, 5);
           done();
         });
       });
@@ -1802,7 +1802,7 @@ describe('model: querying:', function() {
 
           P.findOne({'sub._id': {$all: [o0, new DocumentObjectId]}}, function(err, doc) {
             assert.ifError(err);
-            assert.equal(false, !!doc);
+            assert.equal(!!doc, false);
 
             P.findOne({'sub._id': {$all: [o2]}}, function(err, doc) {
               db.close();
@@ -1842,7 +1842,7 @@ describe('model: querying:', function() {
 
           P.findOne({'sub.d': {$all: [o0, new Date]}}, function(err, doc) {
             assert.ifError(err);
-            assert.equal(false, !!doc);
+            assert.equal(!!doc, false);
 
             P.findOne({'sub.d': {$all: [o2]}}, function(err, doc) {
               assert.ifError(err);
@@ -1896,15 +1896,15 @@ describe('model: querying:', function() {
 
         B.find({$and: [{title: 'and operator'}]}, function(err, docs) {
           assert.ifError(err);
-          assert.equal(1, docs.length);
+          assert.equal(docs.length, 1);
 
           B.find({$and: [{title: 'and operator'}, {published: true}]}, function(err, docs) {
             assert.ifError(err);
-            assert.equal(0, docs.length);
+            assert.equal(docs.length, 0);
 
             B.find({$and: [{title: 'and operator'}, {published: false}]}, function(err, docs) {
               assert.ifError(err);
-              assert.equal(1, docs.length);
+              assert.equal(docs.length, 1);
 
               var query = B.find();
               query.and([
@@ -1913,7 +1913,7 @@ describe('model: querying:', function() {
               ]);
               query.exec(function(err, docs) {
                 assert.ifError(err);
-                assert.equal(1, docs.length);
+                assert.equal(docs.length, 1);
 
                 var query = B.find();
                 query.and([
@@ -1922,7 +1922,7 @@ describe('model: querying:', function() {
                 ]);
                 query.exec(function(err, docs) {
                   assert.ifError(err);
-                  assert.equal(0, docs.length);
+                  assert.equal(docs.length, 0);
                   db.close(done);
                 });
               });
@@ -2020,57 +2020,57 @@ describe('buffers', function() {
       Test.find({block: {$in: [[195, 188, 98, 101, 114], 'buffer shtuffs are neat', new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(3, tests.length);
+        assert.equal(tests.length, 3);
       });
 
       Test.find({block: {$in: ['über', 'hello world']}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(2, tests.length);
+        assert.equal(tests.length, 2);
       });
 
       Test.find({block: {$in: ['über']}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(1, tests.length);
+        assert.equal(tests.length, 1);
         assert.equal(tests[0].block.toString('utf8'), 'über');
       });
 
       Test.find({block: {$nin: ['über']}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(2, tests.length);
+        assert.equal(tests.length, 2);
       });
 
       Test.find({block: {$nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(1, tests.length);
+        assert.equal(tests.length, 1);
         assert.equal(tests[0].block.toString('utf8'), 'buffer shtuffs are neat');
       });
 
       Test.find({block: {$ne: 'über'}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(2, tests.length);
+        assert.equal(tests.length, 2);
       });
 
       Test.find({block: {$gt: 'über'}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(2, tests.length);
+        assert.equal(tests.length, 2);
       });
 
       Test.find({block: {$gte: 'über'}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(3, tests.length);
+        assert.equal(tests.length, 3);
       });
 
       Test.find({block: {$lt: new Buffer('buffer shtuffs are neat')}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(2, tests.length);
+        assert.equal(tests.length, 2);
         var ret = {};
         ret[tests[0].block.toString('utf8')] = 1;
         ret[tests[1].block.toString('utf8')] = 1;
@@ -2081,7 +2081,7 @@ describe('buffers', function() {
       Test.find({block: {$lte: 'buffer shtuffs are neat'}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(3, tests.length);
+        assert.equal(tests.length, 3);
       });
 
       var pending = 9;
@@ -2111,7 +2111,7 @@ describe('backwards compatibility', function() {
 
       BlogPostB.findOne({_id: b.ops[0]._id}, function(err, found) {
         assert.ifError(err);
-        assert.equal(9898, found.get('meta.visitors').valueOf());
+        assert.equal(found.get('meta.visitors').valueOf(), 9898);
         db.close();
         done();
       });
@@ -2128,7 +2128,7 @@ describe('backwards compatibility', function() {
 
       BlogPostB.findOne({_id: b.ops[0]._id}, function(err, found) {
         assert.ifError(err);
-        assert.equal(9898, found.get('meta.visitors').valueOf());
+        assert.equal(found.get('meta.visitors').valueOf(), 9898);
         found.save(function(err) {
           assert.ifError(err);
           db.close();
@@ -2164,7 +2164,7 @@ describe('geo-spatial', function() {
         Test.find({loc: {$near: [30, 40]}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           done();
         });
       }
@@ -2193,7 +2193,7 @@ describe('geo-spatial', function() {
         Test.find({loc: {'$within': {'$box': [[30, 40], [40, 60]]}}}, function(err, docs) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, docs.length);
+          assert.equal(docs.length, 1);
           done();
         });
       }
@@ -2221,7 +2221,7 @@ describe('geo-spatial', function() {
       function test() {
         Test.find({loc: {$nearSphere: [30, 40]}}, function(err, docs) {
           assert.ifError(err);
-          assert.equal(2, docs.length);
+          assert.equal(docs.length, 2);
           db.close(done);
         });
       }
@@ -2297,11 +2297,11 @@ describe('geo-spatial', function() {
       function test() {
         Test.find({loc: {$near: [25, 31], $maxDistance: 1}}, function(err, docs) {
           assert.ifError(err);
-          assert.equal(1, docs.length);
+          assert.equal(docs.length, 1);
           Test.find({loc: {$near: [25, 32], $maxDistance: 1}}, function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(0, docs.length);
+            assert.equal(docs.length, 0);
             done();
           });
         });
@@ -2367,12 +2367,12 @@ describe('geo-spatial', function() {
 
             Test.find({loc: {$within: {$geometry: geojsonPoly}}}, function(err, docs) {
               assert.ifError(err);
-              assert.equal(1, docs.length);
+              assert.equal(docs.length, 1);
               assert.equal(created.id, docs[0].id);
 
               Test.where('loc').within().geometry(geojsonPoly).exec(function(err, docs) {
                 assert.ifError(err);
-                assert.equal(1, docs.length);
+                assert.equal(docs.length, 1);
                 assert.equal(created.id, docs[0].id);
                 db.close(done);
               });
@@ -2401,7 +2401,7 @@ describe('geo-spatial', function() {
 
             Test.find({line: {$geoIntersects: {$geometry: geojsonLine}}}, function(err, docs) {
               assert.ifError(err);
-              assert.equal(1, docs.length);
+              assert.equal(docs.length, 1);
               assert.equal(created.id, docs[0].id);
 
               Test.where('line').intersects().geometry(geojsonLine).findOne(function(err, doc) {
@@ -2432,7 +2432,7 @@ describe('geo-spatial', function() {
 
           Test.find({geom: {$geoIntersects: {$geometry: geojsonLine}}}, function(err, docs) {
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             assert.equal(created.id, docs[0].id);
 
             Test.where('geom').intersects().geometry(geojsonLine).findOne(function(err, doc) {
@@ -2462,7 +2462,7 @@ describe('geo-spatial', function() {
 
           Test.find({geom: {$geoIntersects: {$geometry: geojsonPolygon}}}, function(err, docs) {
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             assert.equal(created.id, docs[0].id);
 
             Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function(err, doc) {
@@ -2494,12 +2494,12 @@ describe('geo-spatial', function() {
 
             Test.find({line: {$near: geojsonPoint}}, function(err, docs) {
               assert.ifError(err);
-              assert.equal(1, docs.length);
+              assert.equal(docs.length, 1);
               assert.equal(created.id, docs[0].id);
 
               Test.find({line: {$near: {$geometry: geojsonPoint, $maxDistance: 50}}}, function(err, docs) {
                 assert.ifError(err);
-                assert.equal(1, docs.length);
+                assert.equal(docs.length, 1);
                 assert.equal(created.id, docs[0].id);
                 db.close(done);
               });
@@ -2548,7 +2548,7 @@ describe('geo-spatial', function() {
           }).exec(function(err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
+            assert.equal(docs.length, 1);
             done();
           });
         }
@@ -2675,10 +2675,10 @@ describe('lean option:', function() {
       ]
     };
     var q = M.find(cond);
-    assert.equal('number', typeof q._conditions.$and[0].$or[0].num);
-    assert.equal('number', typeof q._conditions.$and[0].$or[1]['subdoc.num']);
-    assert.equal('string', typeof q._conditions.$and[1].$and[0]['subdoc.title']);
-    assert.equal('number', typeof q._conditions.$and[1].$and[1].num);
+    assert.equal(typeof q._conditions.$and[0].$or[0].num, 'number');
+    assert.equal(typeof q._conditions.$and[0].$or[1]['subdoc.num'], 'number');
+    assert.equal(typeof q._conditions.$and[1].$and[0]['subdoc.title'], 'string');
+    assert.equal(typeof q._conditions.$and[1].$and[1].num, 'number');
     done();
   });
   it('properly casts deeply nested and/or queries (gh-676)', function(done) {
@@ -2693,8 +2693,8 @@ describe('lean option:', function() {
       $and: [{$or: [{$and: [{$or: [{num: '12345'}, {'subdoc.num': '56789'}]}]}]}]
     };
     var q = M.find(cond);
-    assert.equal('number', typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num);
-    assert.equal('number', typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num']);
+    assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num, 'number');
+    assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num'], 'number');
     done();
   });
 

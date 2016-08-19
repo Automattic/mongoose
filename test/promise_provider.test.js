@@ -192,12 +192,18 @@ describe('ES6 promises: ', function() {
     });
 
     it('save()', function(done) {
-      var m = new MyModel({test: '123'});
+      var m = new MyModel({ test: '123' });
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
       promise.then(function(doc) {
         assert.equal(m, doc);
-        done();
+        m.test = '456';
+        m.save(function(error, doc, numAffected) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(numAffected, 1);
+          done();
+        });
       });
     });
 
@@ -217,7 +223,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save() with middleware error', function(done) {
-      var m = new MyModel({test: '123'});
+      var m = new MyModel({ test: '123' });
       m.$__saveSucceeds = false;
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
@@ -228,7 +234,13 @@ describe('ES6 promises: ', function() {
         catch(function(err) {
           assert.ok(err);
           assert.equal(err.toString(), 'Error: fail');
-          done();
+
+          // Shouldn't log an unhandled rejection error
+          m.save(function(err) {
+            assert.ok(err);
+            assert.equal(err.toString(), 'Error: fail');
+            done();
+          });
         });
     });
 
@@ -325,6 +337,45 @@ describe('ES6 promises: ', function() {
       var promise = MyModel.populate(doc, 'test');
       assert.equal(promise.constructor, bluebird);
       done();
+    });
+
+    it('gh-4177', function(done) {
+      var subSchema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      var mainSchema = new Schema({
+        name: String,
+        type: String,
+        children: [subSchema]
+      });
+
+      mainSchema.index({ name: 1, account: 1 }, { unique: true });
+
+      var Main = db.model('gh4177', mainSchema);
+
+      Main.on('index', function(error) {
+        assert.ifError(error);
+
+        var data = {
+          name: 'foo',
+          type: 'bar',
+          children: [{ name: 'child' }]
+        };
+
+        var firstSucceeded = false;
+        new Main(data).
+          save().
+          then(function() {
+            firstSucceeded = true;
+            return new Main(data).save();
+          }).
+          catch(function(error) {
+            assert.ok(firstSucceeded);
+            assert.ok(error.toString().indexOf('E11000') !== -1);
+            done();
+          });
+      });
     });
 
     it('subdoc pre doesnt cause unhandled rejection (gh-3669)', function(done) {

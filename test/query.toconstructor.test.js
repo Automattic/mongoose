@@ -26,18 +26,25 @@ mongoose.model(cName, Comment);
 
 describe('Query:', function() {
   describe('toConstructor', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('creates a query', function(done) {
-      var db = start();
       var Product = db.model(prodName);
       var prodQ = Product.find({title: /test/}).toConstructor();
 
       assert.ok(prodQ() instanceof Query);
-
-      db.close(done);
+      done();
     });
 
     it('copies all the right values', function(done) {
-      var db = start();
       var Product = db.model(prodName);
 
       var prodQ = Product.update({title: /test/}, {title: 'blah'});
@@ -53,19 +60,16 @@ describe('Query:', function() {
       assert.deepEqual(prodQ.model, prodC().model);
       assert.deepEqual(prodQ.mongooseCollection, prodC().mongooseCollection);
       assert.deepEqual(prodQ._mongooseOptions, prodC()._mongooseOptions);
-
-      db.close(done);
+      done();
     });
 
     it('gets expected results', function(done) {
-      var db = start();
       var Product = db.model(prodName);
       Product.create({title: 'this is a test'}, function(err, p) {
         assert.ifError(err);
         var prodC = Product.find({title: /test/}).toConstructor();
 
         prodC().exec(function(err, results) {
-          db.close();
           assert.ifError(err);
           assert.equal(results.length, 1);
           assert.equal(p.title, results[0].title);
@@ -75,7 +79,6 @@ describe('Query:', function() {
     });
 
     it('can be re-used multiple times', function(done) {
-      var db = start();
       var Product = db.model(prodName);
 
       Product.create([{title: 'moar thing'}, {title: 'second thing'}], function(err, prods) {
@@ -93,7 +96,6 @@ describe('Query:', function() {
             assert.equal(res.length, 1);
 
             prodC().exec(function(err, res) {
-              db.close();
               assert.ifError(err);
               assert.equal(res.length, 2);
               done();
@@ -104,9 +106,7 @@ describe('Query:', function() {
     });
 
     it('options get merged properly', function(done) {
-      var db = start();
       var Product = db.model(prodName);
-      db.close();
 
       var prodC = Product.find({title: /blah/}).setOptions({sort: 'title', lean: true});
       prodC = prodC.toConstructor();
@@ -118,9 +118,7 @@ describe('Query:', function() {
     });
 
     it('options get cloned (gh-3176)', function(done) {
-      var db = start();
       var Product = db.model(prodName);
-      db.close();
 
       var prodC = Product.find({title: /blah/}).setOptions({sort: 'title', lean: true});
       prodC = prodC.toConstructor();
@@ -131,13 +129,12 @@ describe('Query:', function() {
       var nq2 = prodC(null, {limit: 5});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
       assert.deepEqual(nq2._mongooseOptions, {lean: true, limit: 5});
+
       done();
     });
 
     it('creates subclasses of mquery', function(done) {
-      var db = start();
       var Product = db.model(prodName);
-      db.close();
 
       var opts = {safe: {w: 'majority'}, readPreference: 'p'};
       var match = {title: 'test', count: {$gt: 101}};
@@ -162,6 +159,22 @@ describe('Query:', function() {
       assert.equal(path, m._path);
       assert.equal('find', m.op);
       done();
+    });
+
+    it('with findOneAndUpdate (gh-4318)', function(done) {
+      var Product = db.model(prodName);
+
+      var Q = Product.where({ title: 'test' }).toConstructor();
+
+      var query = { 'tags.test': 1 };
+      var update = {
+        strings: ['123'],
+        numbers: [1, 2, 3]
+      };
+      Q().findOneAndUpdate(query, update, function(error) {
+        assert.ifError(error);
+        done();
+      });
     });
   });
 });

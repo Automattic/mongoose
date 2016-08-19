@@ -72,7 +72,7 @@ describe('types.buffer', function() {
           assert.equal(err.name, 'ValidationError');
           assert.equal(err.errors.required.name, 'CastError');
           assert.equal(err.errors.required.kind, 'Buffer');
-          assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "[object Object]" at path "required"');
+          assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "{ x: [ 20 ] }" at path "required"');
           assert.deepEqual(err.errors.required.value, {x: [20]});
           t.required = new Buffer('hello');
 
@@ -331,7 +331,8 @@ describe('types.buffer', function() {
               set: function() {
                 reset(tj);
                 not(tj);
-                tj.required.set(0, 1);
+                tj.required[0] = 1;
+                tj.markModified('required');
                 is(tj);
               }
             };
@@ -370,8 +371,8 @@ describe('types.buffer', function() {
       User.findById(doc, function(err, doc) {
         db.close();
         assert.ifError(err);
-        assert.equal(1, doc.array.length);
-        assert.equal(null, doc.array[0]);
+        assert.equal(doc.array.length, 1);
+        assert.equal(doc.array[0], null);
         done();
       });
     });
@@ -427,7 +428,7 @@ describe('types.buffer', function() {
             done(err);
             return;
           }
-          assert.equal(128, doc.buf._subtype);
+          assert.equal(doc.buf._subtype, 128);
           done();
         });
       });
@@ -446,7 +447,7 @@ describe('types.buffer', function() {
             done(err);
             return;
           }
-          assert.equal(128, doc.buf._subtype);
+          assert.equal(doc.buf._subtype, 128);
           doc.buf.subtype(0);
           doc.save(function(err) {
             if (err) {

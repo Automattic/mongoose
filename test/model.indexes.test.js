@@ -44,7 +44,7 @@ describe('model', function() {
             }
           });
 
-          assert.equal(4, assertions);
+          assert.equal(assertions, 4);
           db.close(done);
         });
       });
@@ -86,7 +86,7 @@ describe('model', function() {
             indexes[i].forEach(iter);
           }
 
-          assert.equal(3, assertions);
+          assert.equal(assertions, 3);
           db.close(done);
         });
       });
@@ -135,7 +135,7 @@ describe('model', function() {
             indexes[i].forEach(iter);
           }
 
-          assert.equal(5, assertions);
+          assert.equal(assertions, 5);
           db.close(done);
         });
       });
@@ -172,7 +172,7 @@ describe('model', function() {
           }
 
           db.close();
-          assert.equal(2, found);
+          assert.equal(found, 2);
           done();
         });
       });
@@ -233,7 +233,7 @@ describe('model', function() {
             assert.ok(true, 'Model.ensureIndexes() was called');
             Test.collection.getIndexes(function(err, indexes) {
               assert.ifError(err);
-              assert.equal(2, Object.keys(indexes).length);
+              assert.equal(Object.keys(indexes).length, 2);
               db.close(done);
             });
           });
@@ -262,7 +262,7 @@ describe('model', function() {
     });
 
     it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done) {
-      this.timeout(45000);
+      this.timeout(90000);
 
       var db = start({uri: 'mongodb://localhost/mongoose_test_indexing'});
 
@@ -320,7 +320,7 @@ describe('model', function() {
       it('is a function', function(done) {
         var schema = mongoose.Schema({x: 'string'});
         var Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);
-        assert.equal('function', typeof Test.ensureIndexes);
+        assert.equal(typeof Test.ensureIndexes, 'function');
         done();
       });
 

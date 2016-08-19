@@ -71,13 +71,13 @@ describe('model field selection', function() {
         assert.strictEqual('kandinsky', found.def);
         assert.strictEqual('me', found.author);
         assert.strictEqual(true, Array.isArray(found.numbers));
-        assert.equal(undefined, found.meta.date);
+        assert.equal(found.meta.date, undefined);
         assert.equal(found.numbers.length, 0);
-        assert.equal(undefined, found.owners);
+        assert.equal(found.owners, undefined);
         assert.strictEqual(true, Array.isArray(found.comments));
         assert.equal(found.comments.length, 2);
         found.comments.forEach(function(comment) {
-          assert.equal(undefined, comment.user);
+          assert.equal(comment.user, undefined);
         });
         done();
       });
@@ -198,7 +198,7 @@ describe('model field selection', function() {
             assert.strictEqual('kandinsky', found.def);
             assert.strictEqual(undefined, found.author);
             assert.strictEqual(true, Array.isArray(found.comments));
-            assert.equal(0, found.comments.length);
+            assert.equal(found.comments.length, 0);
             done();
           });
         });
@@ -215,13 +215,13 @@ describe('model field selection', function() {
         db.close();
         assert.ifError(err);
         assert.ok(found);
-        assert.equal(found._id.toString(), doc._id.toString());
+        assert.equal(doc._id.toString(), found._id.toString());
         assert.strictEqual(undefined, found.title);
         assert.strictEqual(true, Array.isArray(found.comments));
         found.comments.forEach(function(comment) {
-          assert.equal(undefined, comment.body);
-          assert.equal(undefined, comment.comments);
-          assert.equal(undefined, comment._id);
+          assert.equal(comment.body, undefined);
+          assert.equal(comment.comments, undefined);
+          assert.equal(comment._id, undefined);
           assert.ok(!!comment.title);
         });
         done();
@@ -240,19 +240,19 @@ describe('model field selection', function() {
         db.close();
         assert.ifError(err);
         assert.ok(found);
-        assert.equal(undefined, found._id);
-        assert.strictEqual('top', found.title);
-        assert.equal(undefined, found.numbers);
+        assert.equal(found._id, undefined);
+        assert.strictEqual(found.title, 'top');
+        assert.equal(found.numbers, undefined);
         assert.strictEqual(true, Array.isArray(found.comments));
         found.comments.forEach(function(comment) {
-          assert.equal(undefined, comment.title);
-          assert.equal('body', comment.body);
-          assert.strictEqual(true, Array.isArray(comment.comments));
+          assert.equal(comment.title, undefined);
+          assert.equal(comment.body, 'body');
+          assert.strictEqual(Array.isArray(comment.comments), true);
           assert.ok(comment._id);
           comment.comments.forEach(function(comment) {
-            assert.equal('c', comment.title);
-            assert.equal(undefined, comment.body);
-            assert.equal(undefined, comment.comments);
+            assert.equal(comment.title, 'c');
+            assert.equal(comment.body, undefined);
+            assert.equal(comment.comments, undefined);
             assert.ok(comment._id);
           });
         });
@@ -285,8 +285,8 @@ describe('model field selection', function() {
           assert.ifError(err);
           assert.ok(found);
           assert.equal(found.id, doc.id);
-          assert.equal(1, found.ids.length);
-          assert.equal(_id2.toString(), found.ids[0].toString());
+          assert.equal(found.ids.length, 1);
+          assert.equal(found.ids[0].toString(), _id2.toString());
 
           B
           .find({_id: doc._id})
@@ -296,15 +296,15 @@ describe('model field selection', function() {
             assert.ok(found.length);
             found = found[0];
             assert.equal(found.id, doc.id);
-            assert.equal(1, found.ids.length);
-            assert.equal(_id2.toString(), found.ids[0].toString());
+            assert.equal(found.ids.length, 1);
+            assert.equal(found.ids[0].toString(), _id2.toString());
             db.close(done);
           });
         });
       });
     });
 
-    it('disallows saving modified elemMatch paths (gh-1334)', function(done) {
+    it('saves modified elemMatch paths (gh-1334)', function(done) {
       var db = start();
 
       var postSchema = new Schema({
@@ -321,20 +321,32 @@ describe('model field selection', function() {
 
         B
         .findById(doc._id)
-        .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
         .select({ids2: {$elemMatch: {$in: [_id1.toString()]}}})
         .exec(function(err, found) {
           assert.ifError(err);
-          assert.equal(1, found.ids.length);
-          assert.equal(1, found.ids2.length);
-          found.ids = [];
+          assert.equal(found.ids2.length, 1);
           found.ids2.set(0, _id2);
+
           found.save(function(err) {
-            db.close();
-            assert.ok(/\$elemMatch projection/.test(err));
-            assert.ok(/ ids/.test(err));
-            assert.ok(/ ids2/.test(err));
-            done();
+            assert.ifError(err);
+
+            B
+            .findById(doc._id)
+            .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
+            .select('ids2')
+            .exec(function(err, found) {
+              assert.equal(2, found.ids2.length);
+              assert.equal(_id2.toHexString(), found.ids2[0].toHexString());
+              assert.equal(_id2.toHexString(), found.ids2[1].toHexString());
+
+              found.ids.pull(_id2);
+
+              found.save(function(err) {
+                assert.ok(err);
+
+                db.close(done);
+              });
+            });
           });
         });
       });
@@ -373,8 +385,28 @@ describe('model field selection', function() {
       M.findById(doc._id).select('comments').exec(function(err, found) {
         assert.ifError(err);
         assert.ok(Array.isArray(found.comments));
-        assert.equal(1, found.comments.length);
+        assert.equal(found.comments.length, 1);
         assert.ok(Array.isArray(found.comments[0].comments));
+        db.close(done);
+      });
+    });
+  });
+
+  it('select properties named length (gh-3903)', function(done) {
+    var db = start();
+
+    var schema = new mongoose.Schema({
+      length: Number,
+      name: String
+    });
+
+    var MyModel = db.model('gh3903', schema);
+
+    MyModel.create({ name: 'val', length: 3 }, function(error) {
+      assert.ifError(error);
+      MyModel.findOne({}).select({ length: 1 }).exec(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.name);
         db.close(done);
       });
     });
@@ -393,10 +425,10 @@ describe('model field selection', function() {
           loc: {type: [Number], index: '2d'}
         },
         points: [
-            {
-              name: {type: String},
-              loc: {type: [Number], index: '2d'}
-            }
+          {
+            name: {type: String},
+            loc: {type: [Number], index: '2d'}
+          }
         ]
       }
     });

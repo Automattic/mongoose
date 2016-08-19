@@ -17,26 +17,41 @@ describe('defaults docs', function () {
    * Your schemas can define default values for certain paths. If you create
    * a new document without that path set, the default will kick in.
    */
-  it('Declaring defaults in your schema', function () {
+  it('Declaring defaults in your schema', function(done) {
     var schema = new Schema({
       name: String,
-      role: {type: String, default: 'guitarist'}
+      role: { type: String, default: 'guitarist' }
     });
 
     var Person = db.model('Person', schema);
 
-    var axl = new Person({name: 'Axl Rose', role: 'singer'});
+    var axl = new Person({ name: 'Axl Rose', role: 'singer' });
     assert.equal(axl.role, 'singer');
 
-    var slash = new Person({name: 'Slash'});
+    var slash = new Person({ name: 'Slash' });
     assert.equal(slash.role, 'guitarist');
+
+    var izzy = new Person({ name: 'Izzy', role: undefined });
+    assert.equal(izzy.role, 'guitarist');
+
+    Person.create(axl, slash, function(error) {
+      assert.ifError(error);
+      Person.find({ role: 'guitarist' }, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].name, 'Slash');
+        // acquit:ignore:start
+        done();
+        // acquit:ignore:end
+      });
+    });
   });
 
   /**
    * You can also set the `default` schema option to a function. Mongoose will
    * execute that function and use the return value as the default.
    */
-  it('Default functions', function () {
+  it('Default functions', function() {
     var schema = new Schema({
       title: String,
       date: {
@@ -68,7 +83,7 @@ describe('defaults docs', function () {
    * The `$setOnInsert` operator was introduced in MongoDB 2.4. If you're
    * using MongoDB server < 2.4.0, do **not** use `setDefaultsOnInsert`.
    */
-  it('The `setDefaultsOnInsert` option', function (done) {
+  it('The `setDefaultsOnInsert` option', function(done) {
     var schema = new Schema({
       title: String,
       genre: {type: String, default: 'Action'}

@@ -1975,5 +1975,28 @@ describe('model: update:', function() {
         });
       });
     });
+
+    it('single nested with runValidators (gh-4420)', function(done) {
+      var FileSchema = new Schema({
+        name: String
+      });
+
+      var CompanySchema = new Schema({
+        name: String,
+        file: FileSchema
+      });
+
+      var Company = db.model('Company', CompanySchema);
+
+      Company.create({ name: 'Booster Fuels' }, function(error) {
+        assert.ifError(error);
+        var update = { file: { name: 'new-name' } };
+        var options = { runValidators: true };
+        Company.update({}, update, options, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
   });
 });

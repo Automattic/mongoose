@@ -1971,7 +1971,7 @@ describe('document', function() {
       });
     });
 
-    it('single embedded schemas (gh-2689)', function(done) {
+    it('single embedded schemas 1 (gh-2689)', function(done) {
       var userSchema = new mongoose.Schema({
         name: String,
         email: String

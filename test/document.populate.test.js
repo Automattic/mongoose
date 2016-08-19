@@ -526,7 +526,7 @@ describe('document.populate', function() {
   });
 
   describe('gh-2214', function() {
-    it('should return a real document array when populating', function(done) {
+    it('should return a real document array when populating', function() {
       var db = start();
 
       var Car = db.model('gh-2214-1', {
@@ -565,7 +565,6 @@ describe('document.populate', function() {
               joe.cars.push(car);
               assert.ok(joe.isModified('cars'));
               db.close();
-              done();
             });
           });
         });

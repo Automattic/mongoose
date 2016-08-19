@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-var assert = require('assert');
+var assert = require('power-assert');
 var start = require('./common');
 
 var mongoose = start.mongoose;

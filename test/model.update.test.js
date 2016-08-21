@@ -1956,6 +1956,23 @@ describe('model: update:', function() {
       });
     });
 
+    it('handles positional operator with timestamps (gh-4418)', function(done) {
+      var schema = new Schema({
+        thing: [{
+          thing2: { type: String },
+          test: String
+        }]
+      }, { timestamps: true });
+
+      var Model = db.model('gh4418', schema);
+      var query = { 'thing.thing2': 'test' };
+      var update = { $set: { 'thing.$.test': 'test' } };
+      Model.update(query, update, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('update handles casting with mongoose-long (gh-4283)', function(done) {
       require('mongoose-long')(mongoose);
 

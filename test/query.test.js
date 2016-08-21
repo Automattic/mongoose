@@ -1673,6 +1673,60 @@ describe('Query', function() {
       done();
     });
 
+    it('handles geoWithin with $center and mongoose object (gh-4419)', function(done) {
+      var areaSchema = new Schema({
+        name: String,
+        circle: Array
+      });
+      var Area = db.model('gh4419', areaSchema);
+
+      var placeSchema = new Schema({
+        name: String,
+        geometry: {
+          type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+          },
+          coordinates: { type: [Number] }
+        }
+      });
+      placeSchema.index({ geometry: '2dsphere' });
+      var Place = db.model('gh4419_0', placeSchema);
+
+      var tromso = new Area({
+        name: 'Tromso, Norway',
+        circle: [[18.89, 69.62], 10 / 3963.2]
+      });
+      tromso.save(function(error) {
+        assert.ifError(error);
+
+        var airport = {
+          name: 'Center',
+          geometry: {
+            type: 'Point',
+            coordinates: [18.895, 69.67]
+          }
+        };
+        Place.create(airport, function(error) {
+          assert.ifError(error);
+          var q = {
+            geometry: {
+              $geoWithin: {
+                $centerSphere: tromso.circle
+              }
+            }
+          };
+          Place.find(q).exec(function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].name, 'Center');
+            done();
+          });
+        });
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

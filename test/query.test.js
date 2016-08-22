@@ -1727,6 +1727,49 @@ describe('Query', function() {
       });
     });
 
+    it('geoIntersects with mongoose doc as coords (gh-4408)', function(done) {
+      var lineStringSchema = new Schema({
+        name: String,
+        geo: {
+          type: { type: String, default: 'LineString' },
+          coordinates: [[Number]]
+        }
+      });
+
+      var LineString = db.model('gh4408', lineStringSchema);
+
+      var ls = {
+        name: 'test',
+        geo: {
+          coordinates: [ [14.59, 24.847], [28.477, 15.961] ]
+        }
+      };
+      var ls2 = {
+        name: 'test2',
+        geo: {
+          coordinates: [ [27.528, 25.006], [14.063, 15.591] ]
+        }
+      };
+      LineString.create(ls, ls2, function(error, ls1) {
+        assert.ifError(error);
+        var query = {
+          geo: {
+            $geoIntersects: {
+              $geometry: {
+                type: 'LineString',
+                coordinates: ls1.geo.coordinates
+              }
+            }
+          }
+        };
+        LineString.find(query, function(error, results) {
+          assert.ifError(error);
+          assert.equal(results.length, 2);
+          done();
+        });
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

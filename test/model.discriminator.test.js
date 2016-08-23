@@ -38,9 +38,6 @@ PersonSchema.virtual('name.full').set(function(name) {
 PersonSchema.path('gender').validate(function(value) {
   return /[A-Z]/.test(value);
 }, 'Invalid name');
-PersonSchema.post('save', function(next) {
-  next();
-});
 PersonSchema.set('toObject', {getters: true, virtuals: true});
 PersonSchema.set('toJSON', {getters: true, virtuals: true});
 
@@ -319,7 +316,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 6);
+        assert.equal(Employee.schema.callQueue.length, 5);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
@@ -353,7 +350,33 @@ describe('model', function() {
       it('does not allow setting discriminator key (gh-2041)', function(done) {
         var doc = new Employee({ __t: 'fake' });
         assert.equal(doc.__t, 'model-discriminator-employee');
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['__t'].reason.message,
+            'Can\'t set discriminator key "__t"');
+          done();
+        });
+      });
+
+      it('with typeKey (gh-4339)', function(done) {
+        var options = { typeKey: '$type', discriminatorKey: '_t' };
+        var schema = new Schema({ test: { $type: String } }, options);
+        var Model = mongoose.model('gh4339', schema);
+        Model.discriminator('gh4339_0', new Schema({
+          test2: String
+        }, options));
         done();
+      });
+
+      it('cloning with discriminator key (gh-4387)', function(done) {
+        var employee = new Employee({ name: { first: 'Val', last: 'Karpov' } });
+        var clone = new employee.constructor(employee);
+
+        // Should not error because we have the same discriminator key
+        clone.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
       });
     });
   });

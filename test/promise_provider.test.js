@@ -310,6 +310,15 @@ describe('ES6 promises: ', function() {
       });
     });
 
+    it('no unhandled rejection on query w/ cb (gh-4379)', function(done) {
+      var query = MyModel.findOne({test: '123'});
+      query.$__findOneSucceeds = false;
+      query.exec(function(error) {
+        assert.ok(error);
+        done();
+      });
+    });
+
     it('create', function(done) {
       var promise = MyModel.create({test: '123'});
       assert.equal(promise.constructor, bluebird);

@@ -17,7 +17,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
   - [bug reports](https://github.com/Automattic/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB support](https://docs.mongodb.org/manual/support/)
-  - (irc) #mongoosejs on freenode
+  - [Mongoose Slack Channel](https://mongoosejs.slack.com/)
 
 ## Plugins
 
@@ -27,7 +27,7 @@ Build your own Mongoose plugin through [generator-mongoose-plugin](https://githu
 
 ## Contributors
 
-View all 100+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
+View all 200+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
 <a href="http://code.runnable.com/mongoose" target="_blank"><img src="http://i.imgur.com/4yNYDLI.png"></a>

@@ -961,7 +961,7 @@ describe('model: querying:', function() {
             assert.equal(nes1.length, 1);
 
             NE.find({b: {$ne: [1]}}, function(err) {
-              assert.equal(err.message, 'Cast to ObjectId failed for value "1" at path "b"');
+              assert.equal(err.message, 'Cast to ObjectId failed for value "[ 1 ]" at path "b"');
 
               NE.find({b: {$ne: 4}}, function(err) {
                 assert.equal(err.message, 'Cast to ObjectId failed for value "4" at path "b"');

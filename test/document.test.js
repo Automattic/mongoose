@@ -1971,7 +1971,7 @@ describe('document', function() {
       });
     });
 
-    it('single embedded schemas (gh-2689)', function(done) {
+    it('single embedded schemas 1 (gh-2689)', function(done) {
       var userSchema = new mongoose.Schema({
         name: String,
         email: String
@@ -3087,6 +3087,111 @@ describe('document', function() {
         doc.child.name = 'Anakin';
         assert.deepEqual(doc.modifiedPaths(), ['child']);
         done();
+      });
+    });
+
+    it('single nested isNew (gh-4369)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh4369', parentSchema);
+      var remaining = 2;
+
+      var doc = new Parent({ child: { name: 'Jacen' } });
+      doc.child.on('isNew', function(val) {
+        assert.ok(!val);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+
+      doc.save(function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.child.isNew);
+        --remaining || done();
+      });
+    });
+
+    it('default values with subdoc array (gh-4390)', function(done) {
+      var childSchema = new Schema({
+        name: String
+      });
+      var parentSchema = new Schema({
+        child: [childSchema]
+      });
+
+      parentSchema.path('child').default([{ name: 'test' }]);
+
+      var Parent = db.model('gh4390', parentSchema);
+
+      Parent.create({}, function(error, doc) {
+        assert.ifError(error);
+        assert.deepEqual(doc.toObject().child, [{ name: 'test' }]);
+        done();
+      });
+    });
+
+    it('handles invalid dates (gh-4404)', function(done) {
+      var testSchema = new Schema({
+        date: Date
+      });
+
+      var Test = db.model('gh4404', testSchema);
+
+      Test.create({ date: new Date('invalid date') }, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['date'].name, 'CastError');
+        done();
+      });
+    });
+
+    it('modify multiple subdoc paths (gh-4405)', function(done) {
+      var ChildObjectSchema = new Schema({
+        childProperty1: String,
+        childProperty2: String,
+        childProperty3: String
+      });
+
+      var ParentObjectSchema = new Schema({
+        parentProperty1: String,
+        parentProperty2: String,
+        child: ChildObjectSchema
+      });
+
+      var Parent = db.model('gh4405', ParentObjectSchema);
+
+      var p = new Parent({
+        parentProperty1: 'abc',
+        parentProperty2: '123',
+        child: {
+          childProperty1: 'a',
+          childProperty2: 'b',
+          childProperty3: 'c'
+        }
+      });
+      p.save(function(error) {
+        assert.ifError(error);
+        Parent.findById(p._id, function(error, p) {
+          assert.ifError(error);
+          p.parentProperty1 = 'foo';
+          p.parentProperty2 = 'bar';
+          p.child.childProperty1 = 'ping';
+          p.child.childProperty2 = 'pong';
+          p.child.childProperty3 = 'weee';
+          p.save(function(error) {
+            assert.ifError(error);
+            Parent.findById(p._id, function(error, p) {
+              assert.ifError(error);
+              assert.equal(p.child.childProperty1, 'ping');
+              assert.equal(p.child.childProperty2, 'pong');
+              assert.equal(p.child.childProperty3, 'weee');
+              done();
+            });
+          });
+        });
       });
     });
   });

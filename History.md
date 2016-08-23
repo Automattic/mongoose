@@ -1,3 +1,43 @@
+4.5.10 / 2016-08-23
+===================
+ * docs: fix typo on documents.jade #4444 [Gabri3l](https://github.com/Gabri3l)
+ * chore: upgrade mocha to 3.0.2 #4437 [TrejGun](https://github.com/TrejGun)
+ * fix: subdocuments causing error with parent timestamp on update #4434 [dyang108](https://github.com/dyang108)
+ * fix(query): don't crash if timestamps on and update doesn't have a path #4425 #4424 #4418
+ * fix(query): ensure single nested subdoc is hydrated when running update validators #4420
+ * fix(query): cast non-$geometry operators for $geoWithin #4419
+ * docs: update contributor count #4415 [AdamZaczek](https://github.com/AdamZaczek)
+ * docs: add more clarification re: the index event #4410
+ * fix(document): only skip modifying subdoc path if parent is direct modified #4405
+ * fix(schema): throw cast error if provided date invalid #4404
+ * feat(error): use util.inspect() so CastError never prints "[object Object]" #4398
+ * fix(model): dont error if the discriminator key is unchanged #4387
+ * fix(query): don't throw unhandled rejection with bluebird when using cbs #4379
+
+4.5.9 / 2016-08-14
+==================
+ * docs: add mixed schema doc for Object literal #4400 [Kikobeats](https://github.com/Kikobeats)
+ * fix(query): cast $geoWithin and convert mongoose objects to POJOs before casting #4392
+ * fix(schematype): dont cast defaults without parent doc #4390
+ * fix(query): disallow passing empty string to findOne() #4378
+ * fix(document): set single nested doc isNew correctly #4369
+ * fix(types): checks field name correctly with nested arrays and populate #4365
+ * fix(drivers): make debug output copy-pastable into mongodb shell #4352
+ * fix(services): run update validators on nested paths #4332
+ * fix(model): handle typeKey with discriminators #4339
+ * fix(query): apply timestamps to child schemas when explicitly specified in update #4049
+ * fix(schema): set prefix as nested path with add() #1730
+
+4.5.8 / 2016-08-01
+==================
+ * fix(model): make changing the discriminator key cause a cast error #4374
+ * fix(query): pass projection fields to cursor #4371 #4342 [Corei13](https://github.com/Corei13)
+ * fix(document): support multiple paths for isModified #4370 [adambuczynski](https://github.com/adambuczynski)
+ * fix(querycursor): always cast fields before returning cursor #4355
+ * fix(query): support projection as alias for fields in findOneAndUpdate #4315
+ * fix(schema): treat index false + unique false as no index #4304
+ * fix(types): dont mark single nested subpath as modified if whole doc already modified #4224
+
 4.5.7 / 2016-07-25
 ==================
  * fix(document): ensure no unhandled rejections if callback specified for save #4364

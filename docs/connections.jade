@@ -98,12 +98,19 @@ block content
     options.server.socketOptions = options.replset.socketOptions = { keepAlive: 120 };
     mongoose.connect(uri, options);
 
-  h3#replicaset_connections ReplicaSet Connections
+  h3#replicaset_connections Replica Set Connections
   :markdown
-    The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
+    To connect to a replica set you pass a comma delimited list of hosts to
+    connect to rather than a single host.
 
   :js
     mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
+
+  :markdown
+    To connect to a single node replica set, specify the `replicaSet` option.
+    
+  :js
+    mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
 
   h3#mongos_connections Multi-mongos support
   :markdown

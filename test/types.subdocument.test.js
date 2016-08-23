@@ -50,4 +50,39 @@ describe('types.subdocument', function() {
     assert.equal(p._id, p.children[0].child.ownerDocument()._id);
     done();
   });
+  it('not setting timestamps in subdocuments', function() {
+    var Thing = mongoose.model('Thing', new Schema({
+      subArray: [{
+        testString: String
+      }]
+    }, {
+      timestamps: true
+    }));
+
+    var thingy = new Thing({
+      subArray: [{
+        testString: 'Test 1'
+      }]
+    });
+    var id;
+    thingy.save(function(err, item) {
+      assert(!err);
+      id = item._id;
+    })
+    .then(function() {
+      var thingy2 = {
+        subArray: [{
+          testString: 'Test 2'
+        }]
+      };
+      return Thing.update({
+        _id: id
+      }, {$set: thingy2});
+    })
+    .then(function() {
+      mongoose.connection.close();
+    }, function(reason) {
+      assert(!reason);
+    });
+  });
 });

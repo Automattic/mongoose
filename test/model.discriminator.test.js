@@ -367,6 +367,17 @@ describe('model', function() {
         }, options));
         done();
       });
+
+      it('cloning with discriminator key (gh-4387)', function(done) {
+        var employee = new Employee({ name: { first: 'Val', last: 'Karpov' } });
+        var clone = new employee.constructor(employee);
+
+        // Should not error because we have the same discriminator key
+        clone.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
     });
   });
 });

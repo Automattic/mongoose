@@ -173,6 +173,21 @@ block content
     new Schema({..}, { autoIndex: false });
 
   :markdown
+    Mongoose will emit an `index` event on the model when indexes are done
+    building or an error occurred.
+    
+  :js
+    // Will cause an error because mongodb has an _id index by default that
+    // is not sparse
+    animalSchema.index({ _id: 1 }, { sparse: true });
+    var Animal = mongoose.model('Animal', animalSchema);
+    
+    Animal.on('index', function(error) {
+      // "_id index cannot be sparse"
+      console.log(error.message);
+    });
+
+  :markdown
     See also the [Model#ensureIndexes](./api.html#model_Model.ensureIndexes) method.
 
   h3#virtuals Virtuals

@@ -1,3 +1,19 @@
+4.5.10 / 2016-08-23
+===================
+ * docs: fix typo on documents.jade #4444 [Gabri3l](https://github.com/Gabri3l)
+ * chore: upgrade mocha to 3.0.2 #4437 [TrejGun](https://github.com/TrejGun)
+ * fix: subdocuments causing error with parent timestamp on update #4434 [dyang108](https://github.com/dyang108)
+ * fix(query): don't crash if timestamps on and update doesn't have a path #4425 #4424 #4418
+ * fix(query): ensure single nested subdoc is hydrated when running update validators #4420
+ * fix(query): cast non-$geometry operators for $geoWithin #4419
+ * docs: update contributor count #4415 [AdamZaczek](https://github.com/AdamZaczek)
+ * docs: add more clarification re: the index event #4410
+ * fix(document): only skip modifying subdoc path if parent is direct modified #4405
+ * fix(schema): throw cast error if provided date invalid #4404
+ * feat(error): use util.inspect() so CastError never prints "[object Object]" #4398
+ * fix(model): dont error if the discriminator key is unchanged #4387
+ * fix(query): don't throw unhandled rejection with bluebird when using cbs #4379
+
 4.5.9 / 2016-08-14
 ==================
  * docs: add mixed schema doc for Object literal #4400 [Kikobeats](https://github.com/Kikobeats)

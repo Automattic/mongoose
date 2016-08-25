@@ -65,9 +65,3 @@ browser:
 	npm install `node format_deps.js`
 	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js
 	./node_modules/uglify-js/bin/uglifyjs ./bin/mongoose.js -o ./bin/mongoose.min.js --screw-ie8 -c -m
-
-browser_debug:
-	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.debug.js lib/browser.js -d
-
-test_browser:
-	./node_modules/karma/bin/karma start karma.local.conf.js

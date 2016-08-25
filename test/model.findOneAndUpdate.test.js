@@ -1682,5 +1682,21 @@ describe('model: findByIdAndUpdate:', function() {
         done();
       });
     });
+
+    it('projection option as alias for fields (gh-4315)', function(done) {
+      var TestSchema = new Schema({
+        test1: String,
+        test2: String
+      });
+      var Test = db.model('gh4315', TestSchema);
+      var update = { $set: { test1: 'a', test2: 'b' } };
+      var options = { projection: { test2: 0 }, new: true, upsert: true };
+      Test.findOneAndUpdate({}, update, options, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.test2);
+        assert.equal(doc.test1, 'a');
+        done();
+      });
+    });
   });
 });

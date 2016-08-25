@@ -27,7 +27,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   - 2 space tabs
   - no trailing whitespace
   - inline documentation for new methods, class members, etc.
-  - 1 space between conditionals/functions, and their parenthesis and curly braces
+  - 1 space between conditionals, no space before function parenthesis
     - `if (..) {`
     - `for (..) {`
     - `while (..) {`
@@ -53,4 +53,4 @@ If you'd like to preview your documentation changes, first commit your changes t
 
 ### Plugins website
 
-The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/aheckmann/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!

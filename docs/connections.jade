@@ -29,13 +29,14 @@ block content
   :markdown
     The following option keys are available:
 
-         db      - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-         server  - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-         replset - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-         user    - username for authentication (if not specified in uri)
-         pass    - password for authentication (if not specified in uri)
-         auth    - options for authentication
-         mongos  - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.0/api/Mongos.html)
+         db             - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+         server         - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+         replset        - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+         user           - username for authentication (if not specified in uri)
+         pass           - password for authentication (if not specified in uri)
+         auth           - options for authentication
+         mongos         - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.1/api/Mongos.html)
+         promiseLibrary - sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html)
     Example:
   :js
     var options = {
@@ -97,12 +98,19 @@ block content
     options.server.socketOptions = options.replset.socketOptions = { keepAlive: 120 };
     mongoose.connect(uri, options);
 
-  h3#replicaset_connections ReplicaSet Connections
+  h3#replicaset_connections Replica Set Connections
   :markdown
-    The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
+    To connect to a replica set you pass a comma delimited list of hosts to
+    connect to rather than a single host.
 
   :js
     mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
+
+  :markdown
+    To connect to a single node replica set, specify the `replicaSet` option.
+    
+  :js
+    mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
 
   h3#mongos_connections Multi-mongos support
   :markdown

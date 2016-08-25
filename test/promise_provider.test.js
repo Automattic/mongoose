@@ -192,12 +192,18 @@ describe('ES6 promises: ', function() {
     });
 
     it('save()', function(done) {
-      var m = new MyModel({test: '123'});
+      var m = new MyModel({ test: '123' });
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
       promise.then(function(doc) {
         assert.equal(m, doc);
-        done();
+        m.test = '456';
+        m.save(function(error, doc, numAffected) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(numAffected, 1);
+          done();
+        });
       });
     });
 
@@ -217,7 +223,7 @@ describe('ES6 promises: ', function() {
     });
 
     it('save() with middleware error', function(done) {
-      var m = new MyModel({test: '123'});
+      var m = new MyModel({ test: '123' });
       m.$__saveSucceeds = false;
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
@@ -228,7 +234,13 @@ describe('ES6 promises: ', function() {
         catch(function(err) {
           assert.ok(err);
           assert.equal(err.toString(), 'Error: fail');
-          done();
+
+          // Shouldn't log an unhandled rejection error
+          m.save(function(err) {
+            assert.ok(err);
+            assert.equal(err.toString(), 'Error: fail');
+            done();
+          });
         });
     });
 
@@ -295,6 +307,15 @@ describe('ES6 promises: ', function() {
             assert.equal(err.toString(), 'Error: findOne failed');
             done();
           });
+      });
+    });
+
+    it('no unhandled rejection on query w/ cb (gh-4379)', function(done) {
+      var query = MyModel.findOne({test: '123'});
+      query.$__findOneSucceeds = false;
+      query.exec(function(error) {
+        assert.ok(error);
+        done();
       });
     });
 

@@ -3736,6 +3736,55 @@ describe('model: populate:', function() {
       });
     });
 
+    it('checks field name correctly with nested arrays (gh-4365)', function(done) {
+      var UserSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          default: ''
+        }
+      });
+      db.model('gh4365_0', UserSchema);
+
+      var GroupSchema = new mongoose.Schema({
+        name: String,
+        members: [String]
+      });
+
+      var OrganizationSchema = new mongoose.Schema({
+        members: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh4365_0'
+        }],
+        groups: [GroupSchema]
+      });
+      var OrganizationModel = db.model('gh4365_1', OrganizationSchema);
+
+      var org = {
+        members: [],
+        groups: []
+      };
+      OrganizationModel.create(org, function(error) {
+        assert.ifError(error);
+        OrganizationModel.
+          findOne({}).
+          populate('members', 'name').
+          exec(function(error, org) {
+            assert.ifError(error);
+            org.groups.push({ name: 'Team Rocket' });
+            org.save(function(error) {
+              assert.ifError(error);
+              org.groups[0].members.push('Jessie');
+              assert.equal(org.groups[0].members[0], 'Jessie');
+              org.save(function(error) {
+                assert.ifError(error);
+                assert.equal(org.groups[0].members[0], 'Jessie');
+                done();
+              });
+            });
+          });
+      });
+    });
+
     describe('populate virtuals (gh-2562)', function() {
       it('basic populate virtuals', function(done) {
         var PersonSchema = new Schema({
@@ -4013,6 +4062,52 @@ describe('model: populate:', function() {
                 assert.ifError(error);
                 assert.equal(posts[0].author.name, 'Val');
                 assert.strictEqual(posts[1].author, null);
+                done();
+              });
+          });
+        });
+      });
+
+      it('with multiple results and justOne (gh-4329)', function(done) {
+        var UserSchema = new Schema({
+          openId: {
+            type: String,
+            unique: true
+          }
+        });
+        var TaskSchema = new Schema({
+          openId: {
+            type: String
+          }
+        });
+
+        TaskSchema.virtual('user', {
+          ref: 'gh4329',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true
+        });
+
+        var User = db.model('gh4329', UserSchema);
+        var Task = db.model('gh4329_0', TaskSchema);
+
+        User.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+          assert.ifError(error);
+          Task.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+            assert.ifError(error);
+            Task.
+              find().
+              sort({ openId: 1 }).
+              populate('user').
+              exec(function(error, tasks) {
+                assert.ifError(error);
+
+                assert.ok(tasks[0].user);
+                assert.ok(tasks[1].user);
+                var users = tasks.map(function(task) {
+                  return task.user.openId;
+                });
+                assert.deepEqual(users, ['user1', 'user2']);
                 done();
               });
           });

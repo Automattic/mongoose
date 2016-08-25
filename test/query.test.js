@@ -1658,6 +1658,188 @@ describe('Query', function() {
         });
       });
     });
+
+    it('string as input (gh-4378)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var MyModel = db.model('gh4378', schema);
+
+      assert.throws(function() {
+        MyModel.findOne('');
+      }, /Invalid argument to findOne()/);
+
+      done();
+    });
+
+    it('handles geoWithin with $center and mongoose object (gh-4419)', function(done) {
+      var areaSchema = new Schema({
+        name: String,
+        circle: Array
+      });
+      var Area = db.model('gh4419', areaSchema);
+
+      var placeSchema = new Schema({
+        name: String,
+        geometry: {
+          type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+          },
+          coordinates: { type: [Number] }
+        }
+      });
+      placeSchema.index({ geometry: '2dsphere' });
+      var Place = db.model('gh4419_0', placeSchema);
+
+      var tromso = new Area({
+        name: 'Tromso, Norway',
+        circle: [[18.89, 69.62], 10 / 3963.2]
+      });
+      tromso.save(function(error) {
+        assert.ifError(error);
+
+        var airport = {
+          name: 'Center',
+          geometry: {
+            type: 'Point',
+            coordinates: [18.895, 69.67]
+          }
+        };
+        Place.create(airport, function(error) {
+          assert.ifError(error);
+          var q = {
+            geometry: {
+              $geoWithin: {
+                $centerSphere: tromso.circle
+              }
+            }
+          };
+          Place.find(q).exec(function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].name, 'Center');
+            done();
+          });
+        });
+      });
+    });
+
+    it('geoIntersects with mongoose doc as coords (gh-4408)', function(done) {
+      var lineStringSchema = new Schema({
+        name: String,
+        geo: {
+          type: { type: String, default: 'LineString' },
+          coordinates: [[Number]]
+        }
+      });
+
+      var LineString = db.model('gh4408', lineStringSchema);
+
+      var ls = {
+        name: 'test',
+        geo: {
+          coordinates: [ [14.59, 24.847], [28.477, 15.961] ]
+        }
+      };
+      var ls2 = {
+        name: 'test2',
+        geo: {
+          coordinates: [ [27.528, 25.006], [14.063, 15.591] ]
+        }
+      };
+      LineString.create(ls, ls2, function(error, ls1) {
+        assert.ifError(error);
+        var query = {
+          geo: {
+            $geoIntersects: {
+              $geometry: {
+                type: 'LineString',
+                coordinates: ls1.geo.coordinates
+              }
+            }
+          }
+        };
+        LineString.find(query, function(error, results) {
+          assert.ifError(error);
+          assert.equal(results.length, 2);
+          done();
+        });
+      });
+    });
+
+    it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
+      var areaSchema = new Schema({
+        name: {type: String},
+        loc: {
+          type: {
+            type: String,
+            enum: ['Polygon'],
+            default: 'Polygon'
+          },
+          coordinates: [[[Number]]]
+        }
+      });
+
+      var Area = db.model('gh4392_0', areaSchema);
+
+      var observationSchema = new Schema({
+        geometry: {
+          type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+          },
+          coordinates: { type: [Number] }
+        },
+        properties: {
+          temperature: { type: Number }
+        }
+      });
+      observationSchema.index({ geometry: '2dsphere' });
+
+      var Observation = db.model('gh4392_1', observationSchema);
+
+      Observation.on('index', function(error) {
+        assert.ifError(error);
+        var tromso = new Area({
+          name: 'Tromso, Norway',
+          loc: {
+            type: 'Polygon',
+            coordinates: [[
+              [18.89, 69.62],
+              [18.89, 69.72],
+              [19.03, 69.72],
+              [19.03, 69.62],
+              [18.89, 69.62]
+            ]]
+          }
+        });
+        tromso.save(function(error) {
+          assert.ifError(error);
+          var observation = {
+            geometry: {
+              type: 'Point',
+              coordinates: [18.895, 69.67]
+            }
+          };
+          Observation.create(observation, function(error) {
+            assert.ifError(error);
+
+            Observation.
+              find().
+              where('geometry').within().geometry(tromso.loc).
+              exec(function(error, docs) {
+                assert.ifError(error);
+                assert.equal(docs.length, 1);
+                done();
+              });
+          });
+        });
+      });
+    });
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {

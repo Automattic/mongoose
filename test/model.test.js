@@ -5328,7 +5328,18 @@ describe('Model', function() {
           User.findById(val, function(error, val) {
             assert.ifError(error);
             assert.deepEqual(val.toObject().todos, [{ title: 'Groceries' }]);
-            done();
+            var u2 = new User();
+            val.todos = u2.todos;
+            val.todos.push({ title: 'Cook' });
+            val.save(function(error) {
+              assert.ifError(error);
+              User.findById(val, function(error, val) {
+                assert.ifError(error);
+                assert.equal(val.todos.length, 1);
+                assert.equal(val.todos[0].title, 'Cook');
+                done();
+              });
+            });
           });
         });
       });

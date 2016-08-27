@@ -5308,6 +5308,20 @@ describe('Model', function() {
       });
     });
 
+    it('create() reuses existing doc if one passed in (gh-4449)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String
+      });
+      var Test = db.model('gh4449_0', testSchema);
+
+      var t = new Test();
+      Test.create(t, function(error, t2) {
+        assert.ifError(error);
+        assert.strictEqual(t, t2);
+        done();
+      });
+    });
+
     it('creates new array when initializing from existing doc (gh-4449)', function(done) {
       var TodoSchema = new mongoose.Schema({
         title: String

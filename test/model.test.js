@@ -5317,7 +5317,7 @@ describe('Model', function() {
       var t = new Test();
       Test.create(t, function(error, t2) {
         assert.ifError(error);
-        assert.strictEqual(t, t2);
+        assert.ok(t === t2);
         done();
       });
     });

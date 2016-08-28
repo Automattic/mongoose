@@ -41,7 +41,7 @@ block content
   :markdown
     Each document has an `_id`. DocumentArrays have a special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method for looking up a document by its `_id`.
   :js
-    var doc = parent.children.id(id);
+    var doc = parent.children.id(_id);
 
   h3 Adding sub-docs
   :markdown
@@ -76,7 +76,7 @@ block content
     Each sub-document has it's own
     [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
   :js
-    var doc = parent.children.id(id).remove();
+    var doc = parent.children.id(_id).remove();
     parent.save(function (err) {
       if (err) return handleError(err);
       console.log('the sub-doc was removed')

@@ -15,9 +15,9 @@ block content
       if (err) return handleError(err);
 
       tank.size = 'large';
-      tank.save(function (err) {
+      tank.save(function (err, updatedTank) {
         if (err) return handleError(err);
-        res.send(tank);
+        res.send(updatedTank);
       });
     });
   :markdown

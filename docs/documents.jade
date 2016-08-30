@@ -27,7 +27,7 @@ block content
   :markdown
     If we do need the document returned in our application there is another, often [better](./api.html#model_Model.findByIdAndUpdate), option:
   :js
-    Tank.findByIdAndUpdate(id, { $set: { size: 'large' }}, function (err, tank) {
+    Tank.findByIdAndUpdate(id, { $set: { size: 'large' }}, { new: true }, function (err, tank) {
       if (err) return handleError(err);
       res.send(tank);
     });

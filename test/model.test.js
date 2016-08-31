@@ -5308,6 +5308,57 @@ describe('Model', function() {
       });
     });
 
+    it('create() reuses existing doc if one passed in (gh-4449)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String
+      });
+      var Test = db.model('gh4449_0', testSchema);
+
+      var t = new Test();
+      Test.create(t, function(error, t2) {
+        assert.ifError(error);
+        assert.ok(t === t2);
+        done();
+      });
+    });
+
+    it('creates new array when initializing from existing doc (gh-4449)', function(done) {
+      var TodoSchema = new mongoose.Schema({
+        title: String
+      }, { _id: false });
+
+      var UserSchema = new mongoose.Schema({
+        name: String,
+        todos: [TodoSchema]
+      });
+      var User = db.model('User', UserSchema);
+
+      var val = new User({ name: 'Val' });
+      User.create(val, function(error, val) {
+        assert.ifError(error);
+        val.todos.push({ title: 'Groceries' });
+        val.save(function(error) {
+          assert.ifError(error);
+          User.findById(val, function(error, val) {
+            assert.ifError(error);
+            assert.deepEqual(val.toObject().todos, [{ title: 'Groceries' }]);
+            var u2 = new User();
+            val.todos = u2.todos;
+            val.todos.push({ title: 'Cook' });
+            val.save(function(error) {
+              assert.ifError(error);
+              User.findById(val, function(error, val) {
+                assert.ifError(error);
+                assert.equal(val.todos.length, 1);
+                assert.equal(val.todos[0].title, 'Cook');
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

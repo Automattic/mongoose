@@ -365,8 +365,8 @@ describe('types.documentarray', function() {
 
     var p = new Post({title: 'comment nesting'});
     var c1 = p.comments.create({title: 'c1'});
-    var c2 = p.comments.create({title: 'c2'});
-    var c3 = p.comments.create({title: 'c3'});
+    var c2 = c1.comments.create({title: 'c2'});
+    var c3 = c2.comments.create({title: 'c3'});
 
     p.comments.push(c1);
     c1.comments.push(c2);
@@ -378,8 +378,7 @@ describe('types.documentarray', function() {
       Post.findById(p._id, function(err, p) {
         assert.ifError(err);
 
-        var c4 = p.comments.create({title: 'c4'});
-        p.comments[0].comments[0].comments[0].comments.push(c4);
+        p.comments[0].comments[0].comments[0].comments.push({title: 'c4'});
         p.save(function(err) {
           assert.ifError(err);
 

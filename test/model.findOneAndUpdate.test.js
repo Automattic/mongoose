@@ -909,7 +909,7 @@ describe('model: findByIdAndUpdate:', function() {
     });
   });
 
-  it.only('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
     var db = start();
 
     var accountSchema = new Schema({
@@ -959,7 +959,7 @@ describe('model: findByIdAndUpdate:', function() {
 
     function compareBuffers(a, b) {
       if (Buffer.isBuffer(a) && Buffer.isBuffer(b)) {
-        return a.toString('hex') === b.toString('hex')
+        return a.toString('hex') === b.toString('hex');
       }
     }
   });

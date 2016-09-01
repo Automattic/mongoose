@@ -7,8 +7,8 @@ var start = require('./common'),
     Schema = mongoose.Schema,
     assert = require('power-assert'),
     util = require('util'),
-    clone = require('../lib/utils').clone,
-    random = require('../lib/utils').random;
+    clone = require('../build/utils').clone,
+    random = require('../build/utils').random;
 
 /**
  * Setup

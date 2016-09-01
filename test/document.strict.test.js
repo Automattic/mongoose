@@ -5,7 +5,7 @@
 var start = require('./common'),
     mongoose = start.mongoose,
     assert = require('power-assert'),
-    random = require('../lib/utils').random,
+    random = require('../build/utils').random,
     Schema = mongoose.Schema;
 
 describe('document: strict mode:', function() {

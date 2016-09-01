@@ -6,8 +6,8 @@
 var assert = require('power-assert'),
     start = require('./common'),
     mongoose = start.mongoose,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray'),
+    EmbeddedDocument = require('../build/types/embedded'),
+    DocumentArray = require('../build/types/documentarray'),
     Schema = mongoose.Schema,
     ValidationError = mongoose.Document.ValidationError;
 

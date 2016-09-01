@@ -4,7 +4,7 @@
 
 var assert = require('power-assert');
 
-var Promise = require('../lib/promise');
+var Promise = require('../build/promise');
 
 /**
  * Test.

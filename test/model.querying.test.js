@@ -5,12 +5,12 @@
 var start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
-    random = require('../lib/utils').random,
+    random = require('../build/utils').random,
     Schema = mongoose.Schema,
     ObjectId = Schema.Types.ObjectId,
     MongooseBuffer = mongoose.Types.Buffer,
     DocumentObjectId = mongoose.Types.ObjectId,
-    Query = require('../lib/query');
+    Query = require('../build/query');
 
 /**
  * Setup.

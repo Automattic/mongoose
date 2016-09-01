@@ -6,8 +6,8 @@
 var start = require('./common'),
     mongoose = start.mongoose,
     assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Aggregate = require('../lib/aggregate'),
+    random = require('../build/utils').random,
+    Aggregate = require('../build/aggregate'),
     Schema = mongoose.Schema;
 
 /**

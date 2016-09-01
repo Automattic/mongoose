@@ -6,7 +6,7 @@ var start = require('./common'),
     assert = require('power-assert'),
     mongoose = require('./common').mongoose,
     Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
+    random = require('../build/utils').random,
     MongooseBuffer = mongoose.Types.Buffer;
 
 function valid(v) {

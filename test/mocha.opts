@@ -1,2 +1,3 @@
 --reporter dot
 --ui bdd
+--compilers js:babel-core/register

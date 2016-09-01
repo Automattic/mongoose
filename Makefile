@@ -63,5 +63,5 @@ copylegacy:
 
 browser:
 	npm install `node format_deps.js`
-	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js
+	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js build/browser.js
 	./node_modules/uglify-js/bin/uglifyjs ./bin/mongoose.js -o ./bin/mongoose.min.js --screw-ie8 -c -m

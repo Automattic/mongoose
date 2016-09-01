@@ -5,7 +5,7 @@ var url = require('url'),
     mongoose = start.mongoose,
     Mongoose = mongoose.Mongoose,
     Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
+    random = require('../build/utils').random,
     collection = 'blogposts_' + random();
 
 describe('mongoose module:', function() {
@@ -311,10 +311,10 @@ describe('mongoose module:', function() {
     var uri = process.env.MONGOOSE_SET_TEST_URI;
 
     if (!uri) {
-      console.log('\033[31m', '\n', 'You\'re not testing replica sets!'
+      console.log('\u001b[31m', '\n', 'You\'re not testing replica sets!'
                 , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
                 , 'e.g: `mongodb://localhost:27017/db,localhost…`', '\n'
-                , '\033[39m');
+                , '\u001b[39m');
       return done();
     }
 

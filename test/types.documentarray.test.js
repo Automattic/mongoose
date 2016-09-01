@@ -4,11 +4,11 @@
 
 var start = require('./common'),
     mongoose = require('./common').mongoose,
-    random = require('../lib/utils').random,
-    setValue = require('../lib/utils').setValue,
+    random = require('../build/utils').random,
+    setValue = require('../build/utils').setValue,
     MongooseDocumentArray = mongoose.Types.DocumentArray,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray'),
+    EmbeddedDocument = require('../build/types/embedded'),
+    DocumentArray = require('../build/types/documentarray'),
     Schema = mongoose.Schema,
     assert = require('power-assert'),
     collection = 'types.documentarray_' + random();

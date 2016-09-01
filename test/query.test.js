@@ -7,8 +7,8 @@ var mongoose = start.mongoose;
 var DocumentObjectId = mongoose.Types.ObjectId;
 var Schema = mongoose.Schema;
 var assert = require('power-assert');
-var random = require('../lib/utils').random;
-var Query = require('../lib/query');
+var random = require('../build/utils').random;
+var Query = require('../build/query');
 
 var Comment = new Schema({
   text: String

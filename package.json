@@ -33,6 +33,13 @@
     "sliced": "1.0.1"
   },
   "devDependencies": {
+    "babel-core": "6.13.2",
+    "babel-cli": "6.11.4",
+    "babel-plugin-espower": "2.3.1",
+    "babel-plugin-lodash": "3.2.6",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015": "6.13.2",
+    "babel-preset-stage-0": "6.5.0",
     "acquit": "0.4.1",
     "acquit-ignore": "0.0.3",
     "bluebird": "3.4.1",
@@ -40,7 +47,7 @@
     "dox": "0.3.1",
     "eslint": "2.4.0",
     "highlight.js": "7.0.1",
-    "istanbul": "0.4.4",
+    "istanbul": "1.1.0-alpha.1",
     "jade": "0.26.3",
     "lodash": "4.14.1",
     "markdown": "0.3.1",
@@ -48,7 +55,7 @@
     "mocha": "3.0.2",
     "mongoose-long": "0.1.0",
     "node-static": "0.7.7",
-    "power-assert": "1.2.0",
+    "power-assert": "1.4.1",
     "q": "1.4.1",
     "tbd": "0.6.4",
     "uglify-js": "2.7.0",
@@ -72,7 +79,8 @@
     "install-browser": "npm install `node format_deps.js`",
     "test": "mocha test/*.test.js test/**/*.test.js",
     "posttest": "eslint . --quiet",
-    "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
+    "test-cov": "babel-node node_modules/istanbul/lib/cli cover --report text --report html node_modules/.bin/_mocha test/*.test.js",
+    "build": "rm -rf build && babel -d ./build ./lib"
   },
   "main": "./index.js",
   "engines": {
@@ -87,5 +95,5 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "http://mongoosejs.com",
-  "browser": "lib/browser.js"
+  "browser": "build/browser.js"
 }

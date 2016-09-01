@@ -5,7 +5,7 @@
  */
 
 var assert = require('power-assert');
-var random = require('../lib/utils').random;
+var random = require('../build/utils').random;
 var start = require('./common');
 
 var mongoose = start.mongoose;

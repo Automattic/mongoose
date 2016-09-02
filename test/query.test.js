@@ -1460,6 +1460,14 @@ describe('Query', function() {
             });
           });
     });
+
+    it('populate as array in options (gh-4446)', function(done) {
+      var q = new Query;
+      q.setOptions({ populate: [{ path: 'path1' }, { path: 'path2' }] });
+      assert.deepEqual(Object.keys(q._mongooseOptions.populate),
+        ['path1', 'path2']);
+      done();
+    });
   });
 
   describe('update', function() {

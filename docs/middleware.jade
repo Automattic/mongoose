@@ -22,6 +22,7 @@ block content
     * [findOne](./api.html#query_Query-findOne)
     * [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
     * [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
+    * [insertMany](./api.html#model_Model.insertMany)
     * [update](./api.html#query_Query-update)
 
     Both document middleware and query middleware support pre and post hooks.
@@ -30,6 +31,7 @@ block content
     **Note:** There is no query hook for `remove()`, only for documents.
     If you set a 'remove' hook, it will be fired when you call `myDoc.remove()`,
     not when you call `MyModel.remove()`.
+    **Note:** The `create()` function fires `save()` hooks.
 
   h3#pre Pre
   :markdown

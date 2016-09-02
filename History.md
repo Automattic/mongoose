@@ -1,3 +1,14 @@
+4.6.0 / 2016-09-02
+==================
+ * docs(document): clarify the findById and findByIdAndUpdate examples #4471 [mdcanham](https://github.com/mdcanham)
+ * docs(schematypes): add details re: options #4452
+ * docs(middleware): add docs for insertMany hooks #4451
+ * fix(schema): create new array when copying from existing object to preserve change tracking #4449
+ * docs: fix typo in index.jade #4448
+ * fix(query): allow array for populate options #4446
+ * fix(model): create should not cause unhandle reject promise #4439
+ * fix: upgrade to mongodb driver 2.2.9 #4363 #4341 #4311 (see [comments here](https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0#commitcomment-18850498) if you use node 0.10)
+
 4.5.10 / 2016-08-23
 ===================
  * docs: fix typo on documents.jade #4444 [Gabri3l](https://github.com/Gabri3l)

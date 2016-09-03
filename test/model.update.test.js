@@ -2015,5 +2015,19 @@ describe('model: update:', function() {
         });
       });
     });
+
+    it('single nested schema with geo (gh-4465)', function(done) {
+      var addressSchema = new Schema({
+        geo: {type: [Number], index: '2dsphere'}
+      }, { _id : false });
+      var containerSchema = new Schema({ address: addressSchema });
+      var Container = db.model('gh4465', containerSchema);
+
+      Container.update({}, { address: { geo: [-120.24, 39.21] } }).
+        exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+    });
   });
 });

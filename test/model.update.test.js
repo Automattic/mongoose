@@ -2029,5 +2029,31 @@ describe('model: update:', function() {
           done();
         });
     });
+
+    it('runs validation on Mixed properties of embedded arrays during updates (gh-4441)', function(done) {
+      var db = start();
+
+      var A = new Schema({ str: {} });
+      var validateCalls = 0;
+      A.path('str').validate(function(val, next) {
+        ++validateCalls;
+        next();
+      });
+
+      var B = new Schema({a: [A]});
+
+      B = db.model('b', B);
+
+      B.findOneAndUpdate(
+        {foo: 'bar'},
+        {$set: {a: [{str: {somekey: 'someval'}}]}},
+        {runValidators: true},
+        function(err) {
+          assert.ifError(err);
+          assert.equal(validateCalls, 1); // AssertionError: 0 == 1
+          db.close(done);
+        }
+      );
+    });
   });
 });

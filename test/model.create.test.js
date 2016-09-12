@@ -70,12 +70,23 @@ describe('model', function() {
     it('should not cause unhandled reject promise', function(done) {
       mongoose.Promise = global.Promise;
       mongoose.Promise = require('bluebird');
+
       B.create({title: 'reject promise'}, function(err, b) {
         assert.ifError(err);
-        B.create({_id: b._id}, function(err) {
+
+        var perr = null;
+        var p = B.create({_id: b._id}, function(err) {
           assert(err);
-          PromiseProvider.reset();
-          done();
+          setTimeout(function() {
+            PromiseProvider.reset();
+            // perr should be null
+            done(perr);
+          }, 100);
+        });
+
+        p.catch(function(err) {
+          // should not go here
+          perr = err;
         });
       });
     });

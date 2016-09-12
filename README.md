@@ -270,10 +270,10 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 ```js
 new Schema({
   broken: { type: Boolean },
-    asset : {
-      name: String,
-      type: String // uh oh, it broke. asset will be interpreted as String
-    }
+  asset: {
+    name: String,
+    type: String // uh oh, it broke. asset will be interpreted as String
+  }
 });
 
 new Schema({

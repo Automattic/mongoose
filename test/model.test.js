@@ -5293,6 +5293,26 @@ describe('Model', function() {
       });
     });
 
+    it('method with same name as prop should throw (gh-4475)', function(done) {
+      var testSchema = new mongoose.Schema({
+        isPaid: Boolean
+      });
+      testSchema.methods.isPaid = function() {
+        return false;
+      };
+
+      var threw = false;
+      try {
+        db.model('gh4475', testSchema);
+      } catch (error) {
+        threw = true;
+        assert.equal(error.message, 'You have a method and a property in ' +
+          'your schema both named "isPaid"');
+      }
+      assert.ok(threw);
+      done();
+    });
+
     it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
       var schema = new Schema({ name: 'String' });
       var Movie = db.model('gh3222', schema);

@@ -888,7 +888,7 @@ describe('model query casting', function() {
       var db = start();
 
       var child = new Schema({
-          _id: {type: String}
+        _id: {type: String}
       }, {_id: false});
 
       var parent = new Schema({
@@ -904,12 +904,12 @@ describe('model query casting', function() {
 
       function test() {
         Parent.find({
-            $and: [{children: {$elemMatch: {_id: 'foobar'}}}]
+          $and: [{children: {$elemMatch: {_id: 'foobar'}}}]
         }, function(error, docs) {
           assert.ifError(error);
 
           assert.equal(docs.length, 1);
-          db.close(done); 
+          db.close(done);
         });
       }
     });
@@ -918,7 +918,7 @@ describe('model query casting', function() {
       var db = start();
 
       var child = new Schema({
-          _id: {type: String}
+        _id: {type: String}
       }, {_id: false});
 
       var parent = new Schema({
@@ -934,12 +934,12 @@ describe('model query casting', function() {
 
       function test() {
         Parent.find({
-            $and: [{children: {$not: {$elemMatch: {_id: 'foobar'}}}}]
+          $and: [{children: {$not: {$elemMatch: {_id: 'foobar'}}}}]
         }, function(error, docs) {
           assert.ifError(error);
 
           assert.equal(docs.length, 0);
-          db.close(done); 
+          db.close(done);
         });
       }
     });

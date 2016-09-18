@@ -514,7 +514,6 @@ describe('document modified', function() {
           });
     });
 
-
     it('should reset the modified state after calling unmarkModified', function(done) {
       var db = start();
       var BlogPost = db.model(modelName, collection);
@@ -556,6 +555,5 @@ describe('document modified', function() {
         });
       });
     });
-
   });
 });

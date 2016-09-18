@@ -5342,6 +5342,24 @@ describe('Model', function() {
       });
     });
 
+    it('emits errors correctly from exec (gh-4500)', function(done) {
+      var someModel = db.model('gh4500', new Schema({}));
+
+      someModel.on('error', function(error) {
+        assert.equal(error.message, 'This error will not disappear');
+        assert.ok(cleared);
+        done();
+      });
+
+      var cleared = false;
+      someModel.findOne().exec(function() {
+        setImmediate(function() {
+          cleared = true;
+        });
+        throw new Error('This error will not disappear');
+      });
+    });
+
     it('creates new array when initializing from existing doc (gh-4449)', function(done) {
       var TodoSchema = new mongoose.Schema({
         title: String

@@ -1,3 +1,22 @@
+4.6.1 / 2016-09-20
+==================
+ * fix(query): improve handling of $not with $elemMatch #4531 #3719 [timbowhite](https://github.com/timbowhite)
+ * fix: upgrade mongodb -> 2.2.10 #4517
+ * chore: fix webpack build issue #4512 [saiichihashimoto](https://github.com/saiichihashimoto)
+ * fix(query): emit error on next tick when exec callback errors #4500
+ * test: improve test case #4496 [isayme](https://github.com/isayme)
+ * fix(schema): use same check for array types and top-level types #4493
+ * style: fix indentation in docs #4489 [dhurlburtusa](https://github.com/dhurlburtusa)
+ * fix(schema): expose original object passed to constructor #4486
+ * fix(query): handle findOneAndUpdate with array of arrays #4484 #4470 [fedotov](https://github.com/fedotov)
+ * feat(document): add $ignore to make a path ignored #4480
+ * fix(query): properly handle setting single embedded in update #4475 #4466 #4465
+ * fix(updateValidators): handle single nested schema subpaths correctly #4479
+ * fix(model): throw handy error when method name conflicts with property name #4475
+ * fix(schema): handle .set() with array field #4472
+ * fix(query): check nested path when avoiding double-validating Mixed #4441
+ * fix(schema): handle calling path.trim() with no args correctly #4042
+
 4.6.0 / 2016-09-02
 ==================
  * docs(document): clarify the findById and findByIdAndUpdate examples #4471 [mdcanham](https://github.com/mdcanham)

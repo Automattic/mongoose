@@ -1042,9 +1042,17 @@ describe('model: update:', function() {
   });
 
   describe('defaults and validators (gh-860)', function() {
-    it('applies defaults on upsert', function(done) {
-      var db = start();
+    var db;
 
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('applies defaults on upsert', function(done) {
       var s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
       var Breakfast = db.model('gh-860-0', s);
       var updateOptions = {upsert: true, setDefaultsOnInsert: true};
@@ -1054,14 +1062,12 @@ describe('model: update:', function() {
           assert.ifError(error);
           assert.equal(breakfast.base, 'eggs');
           assert.equal(breakfast.topping, 'bacon');
-          db.close(done);
+          done();
         });
       });
     });
 
     it('doesnt set default on upsert if query sets it', function(done) {
-      var db = start();
-
       var s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
       var Breakfast = db.model('gh-860-1', s);
 
@@ -1072,15 +1078,12 @@ describe('model: update:', function() {
           assert.ifError(error);
           assert.equal(breakfast.base, 'eggs');
           assert.equal(breakfast.topping, 'sausage');
-          db.close();
           done();
         });
       });
     });
 
     it('properly sets default on upsert if query wont set it', function(done) {
-      var db = start();
-
       var s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
       var Breakfast = db.model('gh-860-2', s);
 
@@ -1091,15 +1094,12 @@ describe('model: update:', function() {
           assert.ifError(error);
           assert.equal(breakfast.base, 'eggs');
           assert.equal(breakfast.topping, 'bacon');
-          db.close();
           done();
         });
       });
     });
 
     it('runs validators if theyre set', function(done) {
-      var db = start();
-
       var s = new Schema({
         topping: {
           type: String,
@@ -1126,15 +1126,12 @@ describe('model: update:', function() {
         Breakfast.findOne({}, function(error, breakfast) {
           assert.ifError(error);
           assert.ok(!breakfast);
-          db.close();
           done();
         });
       });
     });
 
     it('validators handle $unset and $setOnInsert', function(done) {
-      var db = start();
-
       var s = new Schema({
         steak: {type: String, required: true},
         eggs: {
@@ -1155,14 +1152,11 @@ describe('model: update:', function() {
         assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
         assert.equal(error.errors.eggs.message, 'Validator failed for path `eggs` with value `softboiled`');
         assert.equal(error.errors.steak.message, 'Path `steak` is required.');
-        db.close();
         done();
       });
     });
 
     it('min/max, enum, and regex built-in validators work', function(done) {
-      var db = start();
-
       var s = new Schema({
         steak: {type: String, enum: ['ribeye', 'sirloin']},
         eggs: {type: Number, min: 4, max: 6},
@@ -1189,7 +1183,6 @@ describe('model: update:', function() {
             assert.equal(Object.keys(error.errors)[0], 'bacon');
             assert.equal(error.errors.bacon.message, 'Path `bacon` is invalid (none).');
 
-            db.close();
             done();
           });
         });
@@ -1197,8 +1190,6 @@ describe('model: update:', function() {
     });
 
     it('multiple validation errors', function(done) {
-      var db = start();
-
       var s = new Schema({
         steak: {type: String, enum: ['ribeye', 'sirloin']},
         eggs: {type: Number, min: 4, max: 6},
@@ -1212,14 +1203,11 @@ describe('model: update:', function() {
         assert.equal(Object.keys(error.errors).length, 2);
         assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
         assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
-        db.close();
         done();
       });
     });
 
     it('validators ignore $inc', function(done) {
-      var db = start();
-
       var s = new Schema({
         steak: {type: String, required: true},
         eggs: {type: Number, min: 4}
@@ -1229,14 +1217,11 @@ describe('model: update:', function() {
       var updateOptions = {runValidators: true};
       Breakfast.update({}, {$inc: {eggs: 1}}, updateOptions, function(error) {
         assert.ifError(error);
-        db.close();
         done();
       });
     });
 
     it('validators handle positional operator (gh-3167)', function(done) {
-      var db = start();
-
       var s = new Schema({
         toppings: [{name: {type: String, enum: ['bacon', 'cheese']}}]
       });
@@ -1250,8 +1235,31 @@ describe('model: update:', function() {
           function(error) {
             assert.ok(error);
             assert.ok(error.errors['toppings.0.name']);
-            db.close(done);
+            done();
           });
+    });
+
+    it('required and single nested (gh-4479)', function(done) {
+      var FileSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      });
+
+      var CompanySchema = new Schema({
+        file: FileSchema
+      });
+
+      var Company = db.model('gh4479', CompanySchema);
+      var update = { file: { name: '' } };
+      var options = { runValidators: true };
+      Company.update({}, update, options, function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['file.name'].message,
+          'Path `name` is required.');
+        done();
+      });
     });
   });
 
@@ -2014,6 +2022,46 @@ describe('model: update:', function() {
           done();
         });
       });
+    });
+
+    it('single nested schema with geo (gh-4465)', function(done) {
+      var addressSchema = new Schema({
+        geo: {type: [Number], index: '2dsphere'}
+      }, { _id : false });
+      var containerSchema = new Schema({ address: addressSchema });
+      var Container = db.model('gh4465', containerSchema);
+
+      Container.update({}, { address: { geo: [-120.24, 39.21] } }).
+        exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+    });
+
+    it('runs validation on Mixed properties of embedded arrays during updates (gh-4441)', function(done) {
+      var db = start();
+
+      var A = new Schema({ str: {} });
+      var validateCalls = 0;
+      A.path('str').validate(function(val, next) {
+        ++validateCalls;
+        next();
+      });
+
+      var B = new Schema({a: [A]});
+
+      B = db.model('b', B);
+
+      B.findOneAndUpdate(
+        {foo: 'bar'},
+        {$set: {a: [{str: {somekey: 'someval'}}]}},
+        {runValidators: true},
+        function(err) {
+          assert.ifError(err);
+          assert.equal(validateCalls, 1); // AssertionError: 0 == 1
+          db.close(done);
+        }
+      );
     });
   });
 });

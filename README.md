@@ -2,8 +2,8 @@
 
 Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
+[![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
 [![Dependency Status](https://gemnasium.com/Automattic/mongoose.svg)](https://gemnasium.com/Automattic/mongoose)
 
@@ -14,10 +14,10 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 ## Support
 
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
-  - [bug reports](https://github.com/Automattic/mongoose/issues/)
-  - [help forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB support](https://docs.mongodb.org/manual/support/)
-  - [Mongoose Slack Channel](https://mongoosejs.slack.com/)
+  - [Bug Reports](https://github.com/Automattic/mongoose/issues/)
+  - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
+  - [Help Forum](http://groups.google.com/group/mongoose-orm)
+  - [MongoDB Support](https://docs.mongodb.org/manual/support/)
 
 ## Plugins
 
@@ -270,10 +270,10 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 ```js
 new Schema({
   broken: { type: Boolean },
-    asset : {
-      name: String,
-      type: String // uh oh, it broke. asset will be interpreted as String
-    }
+  asset: {
+    name: String,
+    type: String // uh oh, it broke. asset will be interpreted as String
+  }
 });
 
 new Schema({

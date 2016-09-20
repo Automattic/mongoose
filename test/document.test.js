@@ -3148,6 +3148,55 @@ describe('document', function() {
       });
     });
 
+    it('setting array subpath (gh-4472)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      }, { _id: false });
+
+      var ParentSchema = new mongoose.Schema({
+        data: {
+          children: [ChildSchema]
+        }
+      });
+
+      var Parent = db.model('gh4472', ParentSchema);
+
+      var p = new Parent();
+      p.set('data.children.0', {
+        name: 'Bob',
+        age: 900
+      });
+
+      assert.deepEqual(p.toObject().data.children, [{ name: 'Bob', age: 900 }]);
+      done();
+    });
+
+    it('ignore paths (gh-4480)', function(done) {
+      var TestSchema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      var Test = db.model('gh4480', TestSchema);
+
+      Test.create({ name: 'val' }, function(error) {
+        assert.ifError(error);
+        Test.findOne(function(error, doc) {
+          assert.ifError(error);
+          doc.name = null;
+          doc.$ignore('name');
+          doc.save(function(error) {
+            assert.ifError(error);
+            Test.findById(doc._id, function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.name, 'val');
+              done();
+            });
+          });
+        });
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

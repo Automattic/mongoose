@@ -1713,5 +1713,29 @@ describe('model: findByIdAndUpdate:', function() {
         done();
       });
     });
+
+    it('doesnt do double validation on document arrays during updates (gh-4440)', function(done) {
+      var A = new Schema({str: String});
+      var B = new Schema({a: [A]});
+      var validateCalls = 0;
+      B.path('a').validate(function(val, next) {
+        ++validateCalls;
+        assert(Array.isArray(val));
+        next();
+      });
+
+      B = db.model('b', B);
+
+      B.findOneAndUpdate(
+        {foo: 'bar'},
+        {$set: {a: [{str: 'asdf'}]}},
+        {runValidators: true},
+        function(err) {
+          assert.ifError(err);
+          assert.equal(validateCalls, 1); // Assertion error: 1 == 2
+          db.close(done);
+        }
+      );
+    });
   });
 });

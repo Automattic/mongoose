@@ -1625,5 +1625,14 @@ describe('schema', function() {
       assert.equal(t.a, 42);
       done();
     });
+
+    it('methods named toString (gh-4551)', function(done) {
+      this.schema.methods.toString = function() {
+        return 'test';
+      };
+      // should not throw
+      mongoose.model('gh4551', this.schema);
+      done();
+    });
   });
 });

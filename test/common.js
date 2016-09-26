@@ -162,6 +162,7 @@ before(function(done) {
 });
 after(function(done) {
   // DropDBs can be extraordinarily slow on 3.2
-  this.timeout(120 * 1000);
-  dropDBs(done);
+  //this.timeout(120 * 1000);
+  //dropDBs(done);
+  done();
 });

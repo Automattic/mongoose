@@ -26,7 +26,7 @@
     "mongodb": "2.2.10",
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
-    "mquery": "1.11.0",
+    "mquery": "2.0.0",
     "ms": "0.7.1",
     "muri": "1.1.0",
     "regexp-clone": "0.0.1",

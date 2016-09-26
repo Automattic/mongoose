@@ -581,7 +581,7 @@ describe('model query casting', function() {
         }
       });
 
-      it('with objects', function(done) {
+      it('with objects (lv426)', function(done) {
         var db = start(),
             Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 

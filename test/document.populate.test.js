@@ -614,6 +614,28 @@ describe('document.populate', function() {
     });
   });
 
+  it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
+    var EmbeddedSchema = new Schema({
+      reference: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Reference'
+      }
+    });
+
+    var ModelSchema = new Schema({
+      embedded: EmbeddedSchema
+    });
+
+    var Model = db.model('gh4552', ModelSchema);
+
+    var m = new Model({});
+    m.embedded = {};
+    assert.throws(function() {
+      m.embedded.populate('reference');
+    }, /on nested docs/);
+    done();
+  });
+
   it('handles pulling from populated array (gh-3579)', function(done) {
     var db = start();
     var barSchema = new Schema({name: String});

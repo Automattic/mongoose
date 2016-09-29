@@ -19,7 +19,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "1.5.2",
+    "async": "2.0.1",
     "bson": "~0.5.4",
     "hooks-fixed": "1.2.0",
     "kareem": "1.1.3",

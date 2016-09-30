@@ -1735,6 +1735,26 @@ describe('Query', function() {
       });
     });
 
+    it('$not with objects (gh-4495)', function(done) {
+      var schema = new Schema({
+        createdAt: Date
+      });
+
+      var M = db.model('gh4495', schema);
+      var q = M.find({
+        createdAt:{
+          $not:{
+            $gte: '2016/09/02 00:00:00',
+            $lte: '2016/09/02 23:59:59'
+          }
+        }
+      });
+
+      assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
+      assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);
+      done();
+    });
+
     it('geoIntersects with mongoose doc as coords (gh-4408)', function(done) {
       var lineStringSchema = new Schema({
         name: String,

@@ -3217,6 +3217,30 @@ describe('document', function() {
       });
     });
 
+    it('setting full path under single nested schema works (gh-4578)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        age: Number
+      });
+
+      var ParentSchema = new mongoose.Schema({
+        age: Number,
+        family: {
+          child: ChildSchema
+        }
+      });
+
+      var M = db.model('gh4578', ParentSchema);
+
+      M.create({ age: 45 }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.family.child);
+        doc.set('family.child.age', 15);
+        assert.ok(doc.family.child.schema);
+        assert.equal(doc.family.child.toObject().age, 15);
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

@@ -3115,6 +3115,21 @@ describe('document', function() {
       });
     });
 
+    it('deep default array values (gh-4540)', function(done) {
+      var schema = new Schema({
+        arr: [{
+          test: {
+            type: Array,
+            default: ['test']
+          }
+        }]
+      });
+      assert.doesNotThrow(function() {
+        db.model('gh4540', schema);
+      });
+      done();
+    });
+
     it('default values with subdoc array (gh-4390)', function(done) {
       var childSchema = new Schema({
         name: String
@@ -3129,7 +3144,12 @@ describe('document', function() {
 
       Parent.create({}, function(error, doc) {
         assert.ifError(error);
-        assert.deepEqual(doc.toObject().child, [{ name: 'test' }]);
+        var arr = doc.toObject().child.map(function(doc) {
+          assert.ok(doc._id);
+          delete doc._id;
+          return doc;
+        });
+        assert.deepEqual(arr, [{ name: 'test' }]);
         done();
       });
     });

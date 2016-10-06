@@ -1,3 +1,12 @@
+4.6.3 / 2016-10-05
+==================
+ * fix(document): ensure single nested docs get initialized correctly when setting nested paths #4578
+ * fix: turn off transforms when writing nested docs to db #4574
+ * fix(document): don't set single nested subdocs to null when removing parent doc #4566
+ * fix(model): ensure versionKey gets set in insertMany #4561
+ * fix(schema): handle typeKey in arrays #4548
+ * feat(schema): set $implicitlyCreated on schema if created by interpretAsType #4443
+
 4.6.2 / 2016-09-30
 ==================
  * chore: upgrade to async 2.0.1 internally #4579 [billouboq](https://github.com/billouboq)

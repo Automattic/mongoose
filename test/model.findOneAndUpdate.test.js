@@ -1714,6 +1714,37 @@ describe('model: findByIdAndUpdate:', function() {
       });
     });
 
+    it('should not apply schema transforms (gh-4574)', function(done) {
+      var options = {
+        toObject: {
+          transform: function() {
+            assert.ok(false, 'should not call transform');
+          }
+        }
+      };
+
+      var SubdocSchema = new Schema({ test: String }, options);
+
+      var CollectionSchema = new Schema({
+        field1: { type: String },
+        field2 : {
+          arrayField: [SubdocSchema]
+        }
+      }, options);
+
+      var Collection = db.model('test', CollectionSchema);
+
+      Collection.create({ field2: { arrayField: [] } }).
+        then(function(doc) {
+          return Collection.findByIdAndUpdate(doc._id, {
+            $push: { 'field2.arrayField': { test: 'test' } }
+          }, { new: true });
+        }).
+        then(function() {
+          done();
+        });
+    });
+
     it('doesnt do double validation on document arrays during updates (gh-4440)', function(done) {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});

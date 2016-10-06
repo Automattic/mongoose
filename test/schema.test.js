@@ -1580,6 +1580,19 @@ describe('schema', function() {
     done();
   });
 
+  it('arrays with typeKey (gh-4548)', function(done) {
+    var testSchema = new Schema({
+      test: [{ $type: String }]
+    }, { typeKey: '$type' });
+
+    assert.equal(testSchema.paths.test.caster.instance, 'String');
+
+    var Test = mongoose.model('gh4548', testSchema);
+    var test = new Test({ test: [123] });
+    assert.strictEqual(test.test[0], '123');
+    done();
+  });
+
   describe('remove()', function() {
     before(function() {
       this.schema = new Schema({

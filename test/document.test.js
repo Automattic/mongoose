@@ -2848,7 +2848,7 @@ describe('document', function() {
       done();
     });
 
-    it('removing parent doc calls remove hooks on subdocs (gh-2348)', function(done) {
+    it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', function(done) {
       var ChildSchema = new Schema({
         name: String
       });
@@ -2860,20 +2860,28 @@ describe('document', function() {
       });
 
       var ParentSchema = new Schema({
-        children: [ChildSchema]
+        children: [ChildSchema],
+        child: ChildSchema
       });
 
       var Parent = db.model('gh2348', ParentSchema);
 
-      var doc = { children: [{ name: 'Luke' }, { name: 'Leia' }] };
+      var doc = {
+        children: [{ name: 'Jacen' }, { name: 'Jaina' }],
+        child: { name: 'Anakin' }
+      };
       Parent.create(doc, function(error, doc) {
         assert.ifError(error);
-        doc.remove(function(error) {
+        doc.remove(function(error, doc) {
           assert.ifError(error);
           assert.deepEqual(called, {
-            Luke: true,
-            Leia: true
+            Jacen: true,
+            Jaina: true,
+            Anakin: true
           });
+          var arr = doc.children.toObject().map(function(v) { return v.name; });
+          assert.deepEqual(arr, ['Jacen', 'Jaina']);
+          assert.equal(doc.child.name, 'Anakin');
           done();
         });
       });
@@ -3214,6 +3222,30 @@ describe('document', function() {
             });
           });
         });
+      });
+    });
+
+    it('setting full path under single nested schema works (gh-4578)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        age: Number
+      });
+
+      var ParentSchema = new mongoose.Schema({
+        age: Number,
+        family: {
+          child: ChildSchema
+        }
+      });
+
+      var M = db.model('gh4578', ParentSchema);
+
+      M.create({ age: 45 }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.family.child);
+        doc.set('family.child.age', 15);
+        assert.ok(doc.family.child.schema);
+        assert.equal(doc.family.child.toObject().age, 15);
+        done();
       });
     });
 

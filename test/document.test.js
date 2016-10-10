@@ -3094,6 +3094,7 @@ describe('document', function() {
         doc.child = { name: 'Jaina' };
         doc.child.name = 'Anakin';
         assert.deepEqual(doc.modifiedPaths(), ['child']);
+        assert.ok(doc.isModified('child.name'));
         done();
       });
     });
@@ -3225,7 +3226,7 @@ describe('document', function() {
       });
     });
 
-    it('setting full path under single nested schema works (gh-4578)', function(done) {
+    it('setting full path under single nested schema works (gh-4578) (gh-4528)', function(done) {
       var ChildSchema = new mongoose.Schema({
         age: Number
       });
@@ -3244,6 +3245,8 @@ describe('document', function() {
         assert.ok(!doc.family.child);
         doc.set('family.child.age', 15);
         assert.ok(doc.family.child.schema);
+        assert.ok(doc.isModified('family.child'));
+        assert.ok(doc.isModified('family.child.age'));
         assert.equal(doc.family.child.toObject().age, 15);
         done();
       });

@@ -1798,6 +1798,19 @@ describe('Query', function() {
       });
     });
 
+    it('string with $not (gh-4592)', function(done) {
+      var TestSchema = new Schema({
+        test: String
+      });
+
+      var Test = db.model('gh4592', TestSchema);
+
+      Test.findOne({ test: { $not: /test/ } }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

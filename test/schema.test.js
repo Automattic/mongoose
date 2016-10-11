@@ -233,6 +233,9 @@ describe('schema', function() {
       simple: {$type: String, default: 'a'},
       array: {$type: Array, default: [1, 2, 3, 4, 5]},
       arrayX: {$type: Array, default: 9},
+      arrayZero: {$type: Array, default: 0},
+      arrayFalse: {$type: Array, default: false},
+      arrayString: {$type: Array, default: ""},
       arrayFn: {
         $type: Array, default: function() {
           return [8];
@@ -254,6 +257,9 @@ describe('schema', function() {
     assert.equal(typeof Test.path('array').defaultValue, 'function');
     assert.equal(Test.path('array').getDefault(new TestDocument)[3], 4);
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
+    assert.equal(Test.path('arrayZero').getDefault(new TestDocument)[0], 0);
+    assert.equal(Test.path('arrayFalse').getDefault(new TestDocument)[0], false);
+    assert.equal(Test.path('arrayString').getDefault(new TestDocument)[0], "");
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
     assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
     assert.ok(Test.path('arrayX').getDefault(new TestDocument).isMongooseArray);

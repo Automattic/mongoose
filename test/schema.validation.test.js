@@ -959,7 +959,7 @@ describe('schema', function() {
               // Remove the cast error using array.set()
               bad.foods.set(1, {eggs: 1});
               bad.validate(function(error) {
-                assert.deepEqual(['foods.0.eggs','id'], Object.keys(error.errors).sort());
+                assert.deepEqual(['foods.0.eggs', 'id'], Object.keys(error.errors).sort());
                 assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
 
                 done();

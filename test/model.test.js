@@ -5219,6 +5219,8 @@ describe('Model', function() {
         assert.ok(!docs[1].isNew);
         assert.ok(docs[0].createdAt);
         assert.ok(docs[1].createdAt);
+        assert.strictEqual(docs[0].__v, 0);
+        assert.strictEqual(docs[1].__v, 0);
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);
@@ -5269,6 +5271,34 @@ describe('Model', function() {
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);
+          done();
+        });
+      });
+    });
+
+    it('insertMany() depopulate (gh-4590)', function(done) {
+      var personSchema = new Schema({
+        name: String
+      });
+      var movieSchema = new Schema({
+        name: String,
+        leadActor: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh4590'
+        }
+      });
+
+      var Person = db.model('gh4590', personSchema);
+      var Movie = db.model('gh4590_0', movieSchema);
+
+      var arnold = new Person({ name: 'Arnold Schwarzenegger' });
+      var movies = [{ name: 'Predator', leadActor: arnold }];
+      Movie.insertMany(movies, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 1);
+        Movie.findOne({ name: 'Predator' }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.leadActor.toHexString(), arnold._id.toHexString());
           done();
         });
       });

@@ -50,6 +50,14 @@ block content
     doc.createdAt = new Date(2011, 5, 1).setHours(4);
     doc.save(); // Works
   
+  hr#model_functions_hanging
+  :markdown
+    **Q**. All function calls on my models hang, what am I doing wrong?
+    
+    **A**. By default, mongoose will buffer your function calls until it can
+    connect to MongoDB. Read the [buffering section of the connection docs](http://mongoosejs.com/docs/connections.html#buffering)
+    for more information.
+  
   hr#enable_debugging
   :markdown
     **Q**. How can I enable debugging?

@@ -2058,10 +2058,41 @@ describe('model: update:', function() {
         {runValidators: true},
         function(err) {
           assert.ifError(err);
-          assert.equal(validateCalls, 1); // AssertionError: 0 == 1
+          assert.equal(validateCalls, 1);
           db.close(done);
         }
       );
+    });
+
+    it('single embedded schema under document array (gh-4519)', function(done) {
+      var PermissionSchema = new mongoose.Schema({
+        read: { type: Boolean, required: true },
+        write: Boolean
+      });
+      var UserSchema = new mongoose.Schema({
+        permission: {
+          type: PermissionSchema
+        }
+      });
+      var GroupSchema = new mongoose.Schema({
+        users: [UserSchema]
+      });
+
+      var Group = db.model('Group', GroupSchema);
+      var update = {
+        users:[{
+          permission:{}
+        }]
+      };
+      var opts = {
+        runValidators: true
+      };
+
+      Group.update({}, update, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['users.0.permission']);
+        done();
+      });
     });
   });
 });

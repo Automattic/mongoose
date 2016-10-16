@@ -1,3 +1,24 @@
+4.6.3 / 2016-10-05
+==================
+ * fix(document): ensure single nested docs get initialized correctly when setting nested paths #4578
+ * fix: turn off transforms when writing nested docs to db #4574
+ * fix(document): don't set single nested subdocs to null when removing parent doc #4566
+ * fix(model): ensure versionKey gets set in insertMany #4561
+ * fix(schema): handle typeKey in arrays #4548
+ * feat(schema): set $implicitlyCreated on schema if created by interpretAsType #4443
+
+4.6.2 / 2016-09-30
+==================
+ * chore: upgrade to async 2.0.1 internally #4579 [billouboq](https://github.com/billouboq)
+ * fix(types): ensure nested single doc schema errors reach update validators #4557 #4519
+ * fix(connection): handle rs names with leading numbers (muri 1.1.1) #4556
+ * fix(model): don't throw if method name conflicts with Object.prototype prop #4551
+ * docs: fix broken link #4544 [VFedyk](https://github.com/VFedyk)
+ * fix: allow overwriting model on mongoose singleton #4541 [Nainterceptor](https://github.com/Nainterceptor)
+ * fix(document): don't use init: true when building doc defaults #4540
+ * fix(connection): use replSet option if replset not specified #4535
+ * fix(query): cast $not objects #4495
+
 4.6.1 / 2016-09-20
 ==================
  * fix(query): improve handling of $not with $elemMatch #4531 #3719 [timbowhite](https://github.com/timbowhite)

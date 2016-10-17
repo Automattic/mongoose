@@ -1,3 +1,17 @@
+4.6.4 / 2016-10-16
+==================
+ * fix(query): cast $not correctly #4616 #4592 [prssn](https://github.com/prssn)
+ * fix: address issue with caching global plugins #4608 #4601 [TrejGun](https://github.com/TrejGun)
+ * fix(model): make sure to depopulate in insertMany #4590
+ * fix(model): buffer autoIndex if bufferCommands disabled #4589
+ * fix(populate): copy ids array before modifying #4585
+ * feat(schema): add retainKeyOrder prop #4542
+ * fix(document): return isModified true for children of direct modified paths #4528
+ * fix(connection): add dropDatabase() helper #4490
+ * fix(model): add usePushEach option for schemas #4455
+ * docs(connections): add some warnings about buffering #4413
+ * fix: add ability to set promise implementation in browser #4395
+
 4.6.3 / 2016-10-05
 ==================
  * fix(document): ensure single nested docs get initialized correctly when setting nested paths #4578

@@ -976,6 +976,22 @@ describe('model query casting', function() {
     });
   });
 
+  it('_id = 0 (gh-4610)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4610', { _id: Number });
+
+    MyModel.create({ _id: 0 }, function(error) {
+      assert.ifError(error);
+      MyModel.findById({ _id: 0 }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(doc);
+        assert.equal(doc._id, 0);
+        done();
+      });
+    });
+  });
+
   it('minDistance (gh-4197)', function(done) {
     var db = start();
 

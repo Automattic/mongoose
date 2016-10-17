@@ -4272,6 +4272,62 @@ describe('model: populate:', function() {
         });
       });
 
+      it('source array (gh-4585)', function(done) {
+        var tagSchema = new mongoose.Schema({
+          name: String,
+          tagId: { type:String, unique:true }
+        });
+
+        var blogPostSchema = new mongoose.Schema({
+          name : String,
+          body: String,
+          tags : [String]
+        });
+
+        blogPostSchema.virtual('tagsDocuments', {
+          ref: 'gh4585', // model
+          localField: 'tags',
+          foreignField: 'tagId'
+        });
+
+        var Tag = db.model('gh4585', tagSchema);
+        var BlogPost = db.model('gh4585_0', blogPostSchema);
+
+        var tags = [
+          {
+            name : 'angular.js',
+            tagId : 'angular'
+          },
+          {
+            name : 'node.js',
+            tagId : 'node'
+          },
+          {
+            name : 'javascript',
+            tagId : 'javascript'
+          }
+        ];
+
+        Tag.create(tags).
+          then(function() {
+            return BlogPost.create({
+              title: 'test',
+              tags: ['angular', 'javascript']
+            });
+          }).
+          then(function(post) {
+            return BlogPost.findById(post._id).populate('tagsDocuments');
+          }).
+          then(function(doc) {
+            assert.equal(doc.tags[0], 'angular');
+            assert.equal(doc.tags[1], 'javascript');
+            assert.equal(doc.tagsDocuments[0].tagId, 'angular');
+            assert.equal(doc.tagsDocuments[1].tagId, 'javascript');
+            done();
+          }).
+          catch(done);
+      });
+
       it('lean with single result and no justOne (gh-4288)', function(done) {
         var PersonSchema = new Schema({
           name: String,

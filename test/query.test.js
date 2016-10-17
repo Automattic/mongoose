@@ -1153,12 +1153,12 @@ describe('Query', function() {
       prod.save(function(err) {
         assert.ifError(err);
 
-        Product.findOne(prod, function(err, product) {
+        Product.findOne({ _id: prod._id }, function(err, product) {
           assert.ifError(err);
           assert.equal(product.comments.length, 1);
           assert.equal(product.comments[0].text, 'hello');
 
-          Product.update(product, prod2doc, function(err) {
+          Product.update({ _id: prod._id }, prod2doc, function(err) {
             assert.ifError(err);
 
             Product.collection.findOne({_id: product._id}, function(err, doc) {
@@ -1795,6 +1795,19 @@ describe('Query', function() {
           assert.equal(results.length, 2);
           done();
         });
+      });
+    });
+
+    it('string with $not (gh-4592)', function(done) {
+      var TestSchema = new Schema({
+        test: String
+      });
+
+      var Test = db.model('gh4592', TestSchema);
+
+      Test.findOne({ test: { $not: /test/ } }, function(error) {
+        assert.ifError(error);
+        done();
       });
     });
 

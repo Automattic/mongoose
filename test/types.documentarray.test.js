@@ -215,7 +215,7 @@ describe('types.documentarray', function() {
       assert.ok(!threw);
       done();
     });
-    it('passes options to its documents (gh-1415)', function(done) {
+    it('passes options to its documents (gh-1415) (gh-4455)', function(done) {
       var subSchema = new Schema({
         title: {type: String}
       });
@@ -235,6 +235,15 @@ describe('types.documentarray', function() {
       m.docs.push({docs: [{title: 'hello'}]});
       var delta = m.$__delta()[1];
       assert.equal(delta.$pushAll.docs[0].changed, undefined);
+
+      M = db.model('gh-1415-1', new Schema({docs: [subSchema]}, {
+        usePushEach: true
+      }));
+      m = new M;
+      m.docs.push({docs: [{title: 'hello'}]});
+      delta = m.$__delta()[1];
+      assert.equal(delta.$push.docs.$each[0].changed, undefined);
+
       done();
     });
     it('uses the correct transform (gh-1412)', function(done) {

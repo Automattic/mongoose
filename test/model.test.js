@@ -5276,6 +5276,34 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() depopulate (gh-4590)', function(done) {
+      var personSchema = new Schema({
+        name: String
+      });
+      var movieSchema = new Schema({
+        name: String,
+        leadActor: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh4590'
+        }
+      });
+
+      var Person = db.model('gh4590', personSchema);
+      var Movie = db.model('gh4590_0', movieSchema);
+
+      var arnold = new Person({ name: 'Arnold Schwarzenegger' });
+      var movies = [{ name: 'Predator', leadActor: arnold }];
+      Movie.insertMany(movies, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 1);
+        Movie.findOne({ name: 'Predator' }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.leadActor.toHexString(), arnold._id.toHexString());
+          done();
+        });
+      });
+    });
+
     it('insertMany() with promises (gh-4237)', function(done) {
       var schema = new Schema({
         name: String

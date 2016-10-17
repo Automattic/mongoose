@@ -293,6 +293,7 @@ block content
     - [versionKey](#versionKey)
     - [skipVersioning](#skipVersioning)
     - [timestamps](#timestamps)
+    - [retainKeyOrder](#retainKeyOrder)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -691,6 +692,17 @@ block content
     Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
       // Works!
     });
+
+  h4#retainKeyOrder option: retainKeyOrder
+  :markdown
+    By default, mongoose reverses key order in documents as a performance optimization. For example, `new Model({ first: 1, second: 2 });` would actually be stored in MongoDB as `{ second: 2, first: 1 }`. This behavior is [considered deprecated](https://github.com/Automattic/mongoose/wiki/5.0-Deprecation-Warnings) because it has numerous unintended side effects, including making it difficult to manipulate documents whose `_id` field is an object.
+    
+    Mongoose >= 4.6.4 has a `retainKeyOrder` option for schemas that ensures that mongoose will always keep the correct order for your object keys.
+    
+  :js
+    var testSchema = new Schema({ first: Number, second: Number }, { retainKeyOrder: true });
+    var Test = mongoose.model('Test', testSchema);
+    Test.create({ first: 1, second: 2 }); // Will be stored in mongodb as `{ first: 1, second: 2 }`
 
   h3#plugins Pluggable
   p

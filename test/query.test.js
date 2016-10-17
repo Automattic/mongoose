@@ -1153,12 +1153,12 @@ describe('Query', function() {
       prod.save(function(err) {
         assert.ifError(err);
 
-        Product.findOne(prod, function(err, product) {
+        Product.findOne({ _id: prod._id }, function(err, product) {
           assert.ifError(err);
           assert.equal(product.comments.length, 1);
           assert.equal(product.comments[0].text, 'hello');
 
-          Product.update(product, prod2doc, function(err) {
+          Product.update({ _id: prod._id }, prod2doc, function(err) {
             assert.ifError(err);
 
             Product.collection.findOne({_id: product._id}, function(err, doc) {

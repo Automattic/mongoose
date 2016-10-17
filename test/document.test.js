@@ -3254,6 +3254,30 @@ describe('document', function() {
         catch(done);
     });
 
+    it('validateSync with undefined and conditional required (gh-4607)', function(done) {
+      var schema = new mongoose.Schema({
+        type: mongoose.SchemaTypes.Number,
+        conditional: {
+          type: mongoose.SchemaTypes.String,
+          required: function() {
+            return this.type === 1;
+          },
+          maxlength: 128
+        }
+      });
+
+      var Model = db.model('gh4607', schema);
+
+      assert.doesNotThrow(function() {
+        new Model({
+          type: 2,
+          conditional: void 0
+        }).validateSync();
+      });
+
+      done();
+    });
+
     it('setting full path under single nested schema works (gh-4578) (gh-4528)', function(done) {
       var ChildSchema = new mongoose.Schema({
         age: Number

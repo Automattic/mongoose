@@ -965,6 +965,17 @@ describe('model query casting', function() {
     });
   });
 
+  it('date with $not + $type (gh-4632)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4632', { test: Date });
+
+    MyModel.find({ test: { $not: { $type: 9 } } }, function(error) {
+      assert.ifError(error);
+      done();
+    });
+  });
+
   it('minDistance (gh-4197)', function(done) {
     var db = start();
 

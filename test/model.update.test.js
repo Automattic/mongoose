@@ -1664,6 +1664,40 @@ describe('model: update:', function() {
       });
     });
 
+    it('with single nested and transform (gh-4621)', function(done) {
+      var SubdocSchema = new Schema({
+        name: String
+      }, {
+        toObject: {
+          transform: function(doc, ret) {
+            ret.id = ret._id.toString();
+            delete ret._id;
+          }
+        }
+      });
+
+      var CollectionSchema = new Schema({
+        field2: SubdocSchema
+      });
+
+      var Collection = db.model('gh4621', CollectionSchema);
+
+      Collection.create({}, function(error, doc) {
+        assert.ifError(error);
+        var update = { 'field2': { name: 'test' } };
+        Collection.update({ _id: doc._id }, update, function(err) {
+          assert.ifError(err);
+          Collection.collection.findOne({ _id: doc._id }, function(err, doc) {
+            assert.ifError(err);
+            assert.ok(doc.field2._id);
+            assert.ok(!doc.field2.id);
+            done();
+          });
+        });
+      });
+
+    });
+
     it('works with buffers (gh-3496)', function(done) {
       var Schema = mongoose.Schema({myBufferField: Buffer});
       var Model = db.model('gh3496', Schema);

@@ -4,7 +4,7 @@ block content
   h2 Sub Docs
   :markdown
     [Sub-documents](./api.html#types-embedded-js) are docs with schemas of
-    their own which are elements of a parents document array:
+    their own which are elements of a parent document array:
   :js
     var childSchema = new Schema({ name: 'string' });
 
@@ -24,7 +24,7 @@ block content
     parent.save(callback);
 
   :markdown
-    If an error occurs in a sub-documents' middleware, it is bubbled up to the `save()` callback of the parent, so error handling is a snap!
+    If an error occurs in a sub-document's middleware, it is bubbled up to the `save()` callback of the parent, so error handling is a snap!
 
   :js
     childSchema.pre('save', function (next) {

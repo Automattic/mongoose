@@ -3304,6 +3304,21 @@ describe('document', function() {
       });
     });
 
+    it('toObject() does not depopulate top level (gh-3057)', function(done) {
+      var Cat = db.model('gh3057', { name: String });
+      var Human = db.model('gh3057_0', {
+        name: String,
+        petCat: { type: mongoose.Schema.Types.ObjectId, ref: 'gh3057' }
+      });
+
+      var kitty = new Cat({ name: 'Zildjian' });
+      var person = new Human({ name: 'Val', petCat: kitty });
+
+      assert.equal(kitty.toObject({ depopulate: true }).name, 'Zildjian');
+      assert.ok(!person.toObject({ depopulate: true }).petCat.name);
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

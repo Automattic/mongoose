@@ -745,7 +745,7 @@ describe('model', function() {
             })
           });
         });
-      })
+      });
 
       it('reference in child schemas (gh-2719-2)', function(done){
         var EventSchema, Event, TalkSchema, Talk, Survey;
@@ -806,7 +806,48 @@ describe('model', function() {
             });
           })
         });
-      })
+      });
+
+      it('populates parent array reference', function(done) {
+        var vehicleSchema = new Schema({ wheels: [{ type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorArrayRefPopulationWheel' }] });
+        var wheelSchema = new Schema({ brand: String });
+        var busSchema = new Schema({ speed: Number });
+
+        var Vehicle = db.model('ModelDiscriminatorArrayRefPopulationVehicle', vehicleSchema)
+          , Bus = Vehicle.discriminator('ModelDiscriminatorArrayRefPopulationBus', busSchema)
+          , Wheel = db.model('ModelDiscriminatorArrayRefPopulationWheel', wheelSchema);
+
+        Wheel.create({ brand: 'Rotiform ' }, function(err, wheel) {
+          assert.ifError(err);
+          Vehicle.create({ wheels: [wheel] }, function(err, vehicle) {
+            assert.ifError(err);
+            Bus.create({ speed: 80 }, function(err, bus) {
+              assert.ifError(err);
+              Bus.findOne({}).populate('wheels').exec(function(err, bus) {
+                assert.ifError(err);
+
+                var expected = {
+                    __t: 'ModelDiscriminatorArrayRefPopulationBus',
+                    __v: 0,
+                    _id: bus._id,
+                    speed: 80,
+                    wheels: [{
+                        __v: 0,
+                        _id: wheel._id,
+                        brand: 'Rotiform'
+                    }],
+                };
+
+                assert.deepEqual(bus.toJSON(), expected);
+                assert.ok(bus instanceof Vehicle);
+                assert.ok(bus instanceof Bus);
+                assert.ok(bus.wheels[0] instanceof Wheel);
+                done();
+              });
+            });
+          });
+        });
+      });
     });
 
     describe('aggregate', function() {

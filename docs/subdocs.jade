@@ -104,8 +104,8 @@ block content
     });
   :markdown
     A single embedded sub-document behaves similarly to an embedded array.
-    It only gets saved when the parent document gets saved, and its pre/post
-    document middleware get executed.
+    It only gets saved when the parent document gets saved and its pre/post
+    document middleware gets executed.
   :js
     childSchema.pre('save', function(next) {
       console.log(this.name); // prints 'Leia'

@@ -3001,6 +3001,54 @@ describe('model: populate:', function() {
         done();
       });
     });
+
+    it('with nonexistant refPath (gh-4637)', function(done) {
+      var baseballSchema = mongoose.Schema({
+        seam: String
+      });
+      var Baseball = db.model('Baseball', baseballSchema);
+
+      var ballSchema = mongoose.Schema({
+        league: String,
+        kind: String,
+        ball: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: 'balls.kind'
+        }
+      });
+
+      var basketSchema = mongoose.Schema({
+        balls: [ballSchema]
+      });
+      var Basket = db.model('Basket', basketSchema);
+
+      new Baseball({seam: 'yarn'}).
+        save().
+        then(function(baseball) {
+          return new Basket({
+            balls: [
+              {
+                league: 'MLB',
+                kind: 'Baseball',
+                ball: baseball._id
+              },
+              {
+                league: 'NBA'
+              }
+            ]
+          }).save();
+        }).
+        then(function(basket) {
+          return basket.populate('balls.ball').execPopulate();
+        }).
+        then(function(basket) {
+          assert.equal(basket.balls[0].ball.seam, 'yarn');
+          assert.ok(!basket.balls[1].kind);
+          assert.ok(!basket.balls[1].ball);
+          done();
+        }).
+        catch(done);
+    });
   });
 
   describe('leaves Documents within Mixed properties alone (gh-1471)', function() {

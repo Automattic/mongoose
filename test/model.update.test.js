@@ -2015,6 +2015,31 @@ describe('model: update:', function() {
       });
     });
 
+    it('push with timestamps (gh-4514)', function(done) {
+      var sampleSchema = new mongoose.Schema({
+        sampleArray: [{
+          values: [String]
+        }]
+      }, { timestamps: true });
+
+      var sampleModel = db.model('gh4514', sampleSchema);
+      var newRecord = new sampleModel({
+        sampleArray: [{ values: ['record1'] }]
+      });
+
+      newRecord.save(function(err) {
+        assert.ifError(err);
+        sampleModel.update({}, {
+          $push: { 'sampleArray.$.values': 'another record' }
+        },
+        { runValidators: true },
+        function(err) {
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+
     it('update with buffer and exec (gh-4609)', function(done) {
       var arrSchema = new Schema({
         ip: mongoose.SchemaTypes.Buffer

@@ -2029,7 +2029,7 @@ describe('model: update:', function() {
 
       newRecord.save(function(err) {
         assert.ifError(err);
-        sampleModel.update({}, {
+        sampleModel.update({ 'sampleArray.values': 'record1' }, {
           $push: { 'sampleArray.$.values': 'another record' }
         },
         { runValidators: true },

@@ -241,6 +241,26 @@ block content
     | 
     a(href="https://github.com/OpenifyIt/mongoose-types") types
     |.
+    
+  h3#path The `schema.path()` Function
+  :markdown
+    The `schema.path()` function returns the instantiated schema type for a
+    given path.
+  :js
+    var sampleSchema = new Schema({ name: { type: String, required: true } });
+    console.log(sampleSchema.path('name'));
+    // Output looks like:
+    /**
+     * SchemaString {
+     *   enumValues: [],
+     *   regExp: null,
+     *   path: 'name',
+     *   instance: 'String',
+     *   validators: ...
+     */
+  :markdown
+    You can use this function to inspect the schema type for a given path,
+    including what validators it has and what the type is.
 
   h3#next Next Up
   :markdown

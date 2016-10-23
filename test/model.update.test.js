@@ -2028,7 +2028,7 @@ describe('model: update:', function() {
       var m = new M({ arr: [{ ip: new Buffer(1) }] });
       m.save(function(error, m) {
         assert.ifError(error);
-        m.update({ $push: { arr: { ip: new Buffer(1) } } }).exec(function(error, doc) {
+        m.update({ $push: { arr: { ip: new Buffer(1) } } }).exec(function(error) {
           assert.ifError(error);
           done();
         });

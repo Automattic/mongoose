@@ -2015,6 +2015,26 @@ describe('model: update:', function() {
       });
     });
 
+    it('update with buffer and exec (gh-4609)', function(done) {
+      var arrSchema = new Schema({
+        ip: mongoose.SchemaTypes.Buffer
+      });
+      var schema = new Schema({
+        arr: [arrSchema]
+      });
+
+      var M = db.model('gh4609', schema);
+
+      var m = new M({ arr: [{ ip: new Buffer(1) }] });
+      m.save(function(error, m) {
+        assert.ifError(error);
+        m.update({ $push: { arr: { ip: new Buffer(1) } } }).exec(function(error, doc) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('update handles casting with mongoose-long (gh-4283)', function(done) {
       require('mongoose-long')(mongoose);
 

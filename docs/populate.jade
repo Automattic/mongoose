@@ -344,6 +344,19 @@ block content
     Band.find({}).populate('members').exec(function(error, bands) {
       /* `bands.members` is now an array of instances of `Person` */
     });
+  
+  :markdown
+    Keep in mind that virtuals are _not_ included in `toJSON()` output by
+    default. If you want populate virtuals to show up when using functions
+    that rely on `JSON.stringify()`, like Express'
+    [`res.json()` function](http://expressjs.com/en/4x/api.html#res.json),
+    set the `virtuals: true` option on your schema's `toJSON` options.
+  
+  :js
+    // Set `virtuals: true` so `res.json()` works
+    var BandSchema = new Schema({
+      name: String
+    }, { toJSON: { virtuals: true } });
 
   h3#next Next Up
   :markdown

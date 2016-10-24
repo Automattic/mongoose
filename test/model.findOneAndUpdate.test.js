@@ -964,7 +964,7 @@ describe('model: findByIdAndUpdate:', function() {
     }
   });
 
-  it('adds __v on upsert (gh-2122)', function(done) {
+  it('adds __v on upsert (gh-2122) (gh-4505)', function(done) {
     var db = start();
 
     var accountSchema = new Schema({
@@ -974,14 +974,21 @@ describe('model: findByIdAndUpdate:', function() {
     var Account = db.model('2122', accountSchema);
 
     Account.findOneAndUpdate(
-        {name: 'account'},
-        {},
-        {upsert: true, new: true},
-        function(error, doc) {
+      {name: 'account'},
+      {name: 'test'},
+      {upsert: true, new: true},
+      function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.__v, 0);
+        Account.update({ name: 'test' }, {}, { upsert: true }, function(error) {
           assert.ifError(error);
-          assert.equal(doc.__v, 0);
-          db.close(done);
+          Account.findOne({ name: 'test' }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.__v, 0);
+            db.close(done);
+          });
         });
+      });
   });
 
   it('works with nested schemas and $pull+$or (gh-1932)', function(done) {

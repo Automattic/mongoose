@@ -1,3 +1,20 @@
+4.6.5 / 2016-10-23
+==================
+ * docs: fix grammar issues #4642 #4640 #4639 [silvermanj7](https://github.com/silvermanj7)
+ * fix(populate): filter out nonexistant values for dynref #4637
+ * fix(query): handle $type as a schematype operator #4632
+ * fix(schema): better handling for uppercase: false and lowercase: false #4622
+ * fix(query): don't run transforms on updateForExec() #4621
+ * fix(query): handle id = 0 in findById #4610
+ * fix(query): handle buffers in mergeClone #4609
+ * fix(document): handle undefined with conditional validator for validateSync #4607
+ * fix: upgrade to mongodb driver 2.2.11 #4581
+ * docs(schematypes): clarify schema.path() #4518
+ * fix(query): ensure path is defined before checking in timestamps #4514
+ * fix(model): set version key in upsert #4505
+ * fix(document): never depopulate top-level doc #3057
+ * refactor: ensure sync for setting non-capped collections #2690
+
 4.6.4 / 2016-10-16
 ==================
  * fix(query): cast $not correctly #4616 #4592 [prssn](https://github.com/prssn)

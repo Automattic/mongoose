@@ -4162,6 +4162,40 @@ describe('model: populate:', function() {
         });
       });
 
+      it('hydrates properly (gh-4618)', function(done) {
+        var ASchema = new Schema({
+          name: { type: String }
+        });
+
+        var BSchema = new Schema({
+          name: { type: String },
+          a_id: { type: ObjectId }
+        }, {
+          toObject: { virtuals: true },
+          toJSON:   { virtuals: true }
+        });
+
+        BSchema.virtual('a', {
+          ref: 'gh4618',
+          localField: 'a_id',
+          foreignField: '_id'
+        });
+
+        var A = db.model('gh4618', ASchema);
+        var B = db.model('gh4618_0', BSchema);
+
+        A.create({ name: 'test' }).
+          then(function(a) {
+            return B.create({ name: 'test2', a_id: a._id });
+          }).
+          then(function(b) { return B.findById(b).populate('a').exec(); }).
+          then(function(b) {
+            assert.equal(b.toObject().a[0].name, 'test');
+            done();
+          }).
+          catch(done);
+      });
+
       it('with no results (gh-4284)', function(done) {
         var PersonSchema = new Schema({
           name: String,

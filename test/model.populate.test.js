@@ -4455,6 +4455,60 @@ describe('model: populate:', function() {
         });
       });
 
+      it('nested populate, virtual -> normal (gh-4631)', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        PersonSchema.virtual('blogPosts', {
+          ref: 'gh4631_0',
+          localField: '_id',
+          foreignField: 'author'
+        });
+
+        var BlogPostSchema = new Schema({
+          title: String,
+          author: { type: ObjectId },
+          comments: [{ author: { type: ObjectId, ref: 'gh4631' } }]
+        });
+
+        var Person = db.model('gh4631', PersonSchema);
+        var BlogPost = db.model('gh4631_0', BlogPostSchema);
+
+        var people = [
+          { name: 'Val' },
+          { name: 'Test' }
+        ];
+
+        Person.create(people, function(error, people) {
+          assert.ifError(error);
+          var post = {
+            title: 'Test1',
+            author: people[0]._id,
+            comments: [{ author: people[1]._id }]
+          };
+          BlogPost.create(post, function(error) {
+            assert.ifError(error);
+
+            Person.findById(people[0]._id).
+              populate({
+                path: 'blogPosts',
+                model: BlogPost,
+                populate: {
+                  path: 'author',
+                  model: Person
+                }
+              }).
+              exec(function(error, doc) {
+                assert.ifError(error);
+                assert.equal(doc.blogPosts.length, 1);
+                assert.equal(doc.blogPosts[0].author.name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

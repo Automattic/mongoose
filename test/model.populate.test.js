@@ -3758,6 +3758,29 @@ describe('model: populate:', function() {
       });
     });
 
+    it('returned array has toObject() (gh-4656)', function(done) {
+      var demoWrapperSchema = new Schema({
+        demo: [{
+          type: String,
+          ref: 'gh4656'
+        }]
+      });
+      var demoSchema = new Schema({ name: String });
+
+      var Demo = db.model('gh4656', demoSchema);
+      var DemoWrapper = db.model('gh4656_0', demoWrapperSchema);
+
+      Demo.create({ name: 'test' }).
+        then(function(demo) { return DemoWrapper.create({ demo: [demo._id] }); }).
+        then(function(wrapper) { return DemoWrapper.findById(wrapper._id); }).
+        then(function(doc) { return doc.populate('demo').execPopulate(); }).
+        then(function(res) {
+          assert.equal(res.demo.toObject()[0].name, 'test');
+          done();
+        }).
+        catch(done);
+    });
+
     it('empty array (gh-4284)', function(done) {
       var PersonSchema = new Schema({
         name: { type: String }

@@ -3758,6 +3758,29 @@ describe('model: populate:', function() {
       });
     });
 
+    it('returned array has toObject() (gh-4656)', function(done) {
+      var demoWrapperSchema = new Schema({
+        demo: [{
+          type: String,
+          ref: 'gh4656'
+        }]
+      });
+      var demoSchema = new Schema({ name: String });
+
+      var Demo = db.model('gh4656', demoSchema);
+      var DemoWrapper = db.model('gh4656_0', demoWrapperSchema);
+
+      Demo.create({ name: 'test' }).
+        then(function(demo) { return DemoWrapper.create({ demo: [demo._id] }); }).
+        then(function(wrapper) { return DemoWrapper.findById(wrapper._id); }).
+        then(function(doc) { return doc.populate('demo').execPopulate(); }).
+        then(function(res) {
+          assert.equal(res.demo.toObject()[0].name, 'test');
+          done();
+        }).
+        catch(done);
+    });
+
     it('empty array (gh-4284)', function(done) {
       var PersonSchema = new Schema({
         name: { type: String }
@@ -4162,6 +4185,40 @@ describe('model: populate:', function() {
         });
       });
 
+      it('hydrates properly (gh-4618)', function(done) {
+        var ASchema = new Schema({
+          name: { type: String }
+        });
+
+        var BSchema = new Schema({
+          name: { type: String },
+          a_id: { type: ObjectId }
+        }, {
+          toObject: { virtuals: true },
+          toJSON:   { virtuals: true }
+        });
+
+        BSchema.virtual('a', {
+          ref: 'gh4618',
+          localField: 'a_id',
+          foreignField: '_id'
+        });
+
+        var A = db.model('gh4618', ASchema);
+        var B = db.model('gh4618_0', BSchema);
+
+        A.create({ name: 'test' }).
+          then(function(a) {
+            return B.create({ name: 'test2', a_id: a._id });
+          }).
+          then(function(b) { return B.findById(b).populate('a').exec(); }).
+          then(function(b) {
+            assert.equal(b.toObject().a[0].name, 'test');
+            done();
+          }).
+          catch(done);
+      });
+
       it('with no results (gh-4284)', function(done) {
         var PersonSchema = new Schema({
           name: String,
@@ -4415,6 +4472,60 @@ describe('model: populate:', function() {
                 assert.ifError(error);
                 assert.equal(post.authors.length, 1);
                 assert.equal(post.authors[0].name, 'Val');
+                done();
+              });
+          });
+        });
+      });
+
+      it('nested populate, virtual -> normal (gh-4631)', function(done) {
+        var PersonSchema = new Schema({
+          name: String
+        });
+
+        PersonSchema.virtual('blogPosts', {
+          ref: 'gh4631_0',
+          localField: '_id',
+          foreignField: 'author'
+        });
+
+        var BlogPostSchema = new Schema({
+          title: String,
+          author: { type: ObjectId },
+          comments: [{ author: { type: ObjectId, ref: 'gh4631' } }]
+        });
+
+        var Person = db.model('gh4631', PersonSchema);
+        var BlogPost = db.model('gh4631_0', BlogPostSchema);
+
+        var people = [
+          { name: 'Val' },
+          { name: 'Test' }
+        ];
+
+        Person.create(people, function(error, people) {
+          assert.ifError(error);
+          var post = {
+            title: 'Test1',
+            author: people[0]._id,
+            comments: [{ author: people[1]._id }]
+          };
+          BlogPost.create(post, function(error) {
+            assert.ifError(error);
+
+            Person.findById(people[0]._id).
+              populate({
+                path: 'blogPosts',
+                model: BlogPost,
+                populate: {
+                  path: 'author',
+                  model: Person
+                }
+              }).
+              exec(function(error, doc) {
+                assert.ifError(error);
+                assert.equal(doc.blogPosts.length, 1);
+                assert.equal(doc.blogPosts[0].author.name, 'Val');
                 done();
               });
           });

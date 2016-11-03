@@ -2143,6 +2143,41 @@ describe('model: update:', function() {
       );
     });
 
+    it('updating single nested doc property casts correctly (gh-4655)', function(done) {
+      var FileSchema = new Schema({});
+
+      var ProfileSchema = new Schema({
+        images: [FileSchema],
+        rules: {
+          hours: {
+            begin: Date,
+            end: Date
+          }
+        }
+      });
+
+      var UserSchema = new Schema({
+        email: { type: String },
+        profiles: [ProfileSchema]
+      });
+
+
+      var User = db.model('gh4655', UserSchema);
+
+      User.create({ profiles: [] }, function(error, user) {
+        assert.ifError(error);
+        User.update({ _id: user._id }, {$set: {'profiles.0.rules': {}}}).
+          exec(function(error) {
+            assert.ifError(error);
+            User.findOne({ _id: user._id }).lean().exec(function(error, doc) {
+              assert.ifError(error);
+              assert.deepEqual(doc.profiles[0], { rules: {} });
+              done();
+            });
+          });
+      });
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

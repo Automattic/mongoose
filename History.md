@@ -1,3 +1,15 @@
+4.6.6 / 2016-11-03
+==================
+ * chore: upgrade deps #4674 [TrejGun](https://github.com/TrejGun)
+ * chore: run tests on node v7 #4673 [TrejGun](https://github.com/TrejGun)
+ * perf: make setDefaultsOnInsert more efficient if upsert is off #4672 [CamHenlin](https://github.com/CamHenlin)
+ * fix(populate): ensure document array is returned #4656
+ * fix(query): cast doc arrays with positionals correctly for update #4655
+ * fix(document): ensure single nested doc validators run with correct context #4654
+ * fix: handle reconnect failed error in new version of driver #4653 [loris](https://github.com/loris)
+ * fix(populate): if setting a populated doc, take its id #4632
+ *  fix(populate): handle populated virtuals in init #4618
+
 4.6.5 / 2016-10-23
 ==================
  * docs: fix grammar issues #4642 #4640 #4639 [silvermanj7](https://github.com/silvermanj7)

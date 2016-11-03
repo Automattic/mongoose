@@ -3319,6 +3319,32 @@ describe('document', function() {
       done();
     });
 
+    it('single nested doc conditional required (gh-4654)', function(done) {
+      var ProfileSchema = new Schema({
+        firstName: String,
+        lastName: String
+      });
+
+      function validator() {
+        assert.equal(this.email, 'test');
+        return true;
+      }
+
+      var UserSchema = new Schema({
+        email: String,
+        profile: {
+          type: ProfileSchema,
+          required: [validator, 'profile required']
+        }
+      });
+
+      var User = db.model('gh4654', UserSchema);
+      User.create({ email: 'test' }, function(error) {
+        assert.equal(error.errors['profile'].message, 'profile required');
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

@@ -3345,6 +3345,52 @@ describe('document', function() {
       });
     });
 
+    it('buffers with subtypes as ids (gh-4506)', function(done) {
+      var uuid = require('uuid');
+
+      var UserSchema = new mongoose.Schema({
+        _id: {
+          type: Buffer,
+          default: function() {
+            return mongoose.Types.Buffer(uuid.parse(uuid.v4())).toObject(4);
+          },
+          unique: true,
+          required: true
+        },
+        email: {
+          type: String,
+          unique: true,
+          lowercase: true,
+          required: true
+        },
+        name: String
+      });
+
+      var User = db.model('gh4506', UserSchema);
+
+      var user = new User({
+        email: 'me@email.com',
+        name: 'My name'
+      });
+
+      user.save().
+        then(function() {
+          return User.findOne({ email: 'me@email.com' });
+        }).
+        then(function(user) {
+          user.name = 'other';
+          return user.save();
+        }).
+        then(function() {
+          return User.findOne({ email: 'me@email.com' });
+        }).
+        then(function(doc) {
+          assert.equal(doc.name, 'other');
+          done();
+        }).
+        catch(done);
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

@@ -1099,6 +1099,27 @@ describe('model: update:', function() {
       });
     });
 
+    it('handles defaults on document arrays (gh-4456)', function(done) {
+      var schema = new Schema({
+        arr: {
+          type: [new Schema({ name: String }, { _id: false })],
+          default: [{ name: 'Val' }]
+        }
+      });
+
+      var M = db.model('gh4456', schema);
+
+      var opts = { upsert: true, setDefaultsOnInsert: true };
+      M.update({}, {}, opts, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.deepEqual(doc.toObject().arr, [{ name: 'Val' }]);
+          done();
+        });
+      });
+    });
+
     it('runs validators if theyre set', function(done) {
       var s = new Schema({
         topping: {

@@ -541,6 +541,40 @@ describe('schema select option', function() {
     });
   });
 
+  it('does not create nested objects if not included (gh-4669)', function(done) {
+    var db = start();
+    var schema = new Schema({
+      field1: String,
+      field2: String,
+      field3: {
+        f1: String,
+        f2: String
+      },
+      field4: {
+        f1: String
+      },
+      field5: String
+    }, { minimize: false });
+
+    var M = db.model('Test', schema);
+    var obj = {
+      field1: 'a',
+      field2: 'b',
+      field3: { f1: 'c', f2: 'd' },
+      field4: { f1: 'e' },
+      field5: 'f'
+    };
+    M.create(obj, function(error, doc) {
+      assert.ifError(error);
+      M.findOne({ _id: doc._id }, 'field1 field2', function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.toObject().field3);
+        assert.ok(!doc.toObject().field4);
+        db.close(done);
+      });
+    });
+  });
+
   it('initializes nested defaults with selected objects (gh-2629)', function(done) {
     var NestedSchema = new mongoose.Schema({
       nested: {

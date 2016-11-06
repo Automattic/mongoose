@@ -3278,6 +3278,27 @@ describe('document', function() {
       done();
     });
 
+    it('conditional required on single nested (gh-4663)', function(done) {
+      var called = 0;
+      var childSchema = new Schema({
+        name: String
+      });
+      var schema = new Schema({
+        child: {
+          type: childSchema,
+          required: function() {
+            assert.equal(this.child.name, 'test');
+            ++called;
+          }
+        }
+      });
+
+      var M = db.model('gh4663', schema);
+
+      new M({ child: { name: 'test' } }).validateSync();
+      done();
+    });
+
     it('setting full path under single nested schema works (gh-4578) (gh-4528)', function(done) {
       var ChildSchema = new mongoose.Schema({
         age: Number

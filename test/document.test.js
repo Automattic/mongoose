@@ -3366,6 +3366,31 @@ describe('document', function() {
       });
     });
 
+    it('handles setting single nested schema to equal value (gh-4676)', function(done) {
+      var companySchema = new mongoose.Schema({
+        _id: false,
+        name: String,
+        description: String
+      });
+
+      var userSchema = new mongoose.Schema({
+        name:  String,
+        company: companySchema
+      });
+
+      var User = db.model('gh4676', userSchema);
+
+      var user = new User({ company: { name: 'Test' } });
+      user.save(function(error) {
+        assert.ifError(error);
+        user.company.description = 'test';
+        assert.ok(user.isModified('company'));
+        user.company = user.company;
+        assert.ok(user.isModified('company'));
+        done();
+      });
+    });
+
     it('buffers with subtypes as ids (gh-4506)', function(done) {
       var uuid = require('uuid');
 

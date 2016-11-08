@@ -3437,6 +3437,40 @@ describe('document', function() {
         catch(done);
     });
 
+    it('should depopulate the shard key when saving (gh-4658)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        name: String
+      });
+
+      var ChildModel = db.model('gh4658', ChildSchema);
+
+      var ParentSchema = new mongoose.Schema({
+        name: String,
+        child: { type: Schema.Types.ObjectId, ref: 'gh4658' }
+      }, {shardKey: {child: 1, _id: 1}});
+
+      var ParentModel = db.model('gh4658_0', ParentSchema);
+
+      ChildModel.create({ name: 'Luke' }).
+        then(function(child) {
+          var p = new ParentModel({ name: 'Vader' });
+          p.child = child;
+          return p.save();
+        }).
+        then(function(p) {
+          p.name = 'Anakin';
+          return p.save();
+        }).
+        then(function(p) {
+          return ParentModel.findById(p);
+        }).
+        then(function(doc) {
+          assert.equal(doc.name, 'Anakin');
+          done();
+        }).
+        catch(done);
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

@@ -3437,6 +3437,26 @@ describe('document', function() {
         catch(done);
     });
 
+    it('embedded docs dont mark parent as invalid (gh-4681)', function(done) {
+      var NestedSchema = new mongoose.Schema({
+        nestedName: { type: String, required: true },
+        createdAt: { type: Date, required: true }
+      });
+      var RootSchema = new mongoose.Schema({
+        rootName:  String,
+        nested: { type: [ NestedSchema ] }
+      });
+
+      var Root = db.model('gh4681', RootSchema);
+      var root = new Root({ rootName: 'root', nested: [ { } ] });
+      root.save(function(error) {
+        assert.ok(error);
+        assert.deepEqual(Object.keys(error.errors).sort(),
+          ['nested.0.createdAt', 'nested.0.nestedName']);
+        done();
+      });
+    });
+
     it('should depopulate the shard key when saving (gh-4658)', function(done) {
       var ChildSchema = new mongoose.Schema({
         name: String

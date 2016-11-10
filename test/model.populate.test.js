@@ -4258,9 +4258,12 @@ describe('model: populate:', function() {
               populate('authors').
               exec(function(error, posts) {
                 assert.ifError(error);
-                assert.equal(posts[0].authors.length, 2);
-                assert.equal(posts[0].authors[0].name, 'Val');
-                assert.equal(posts[0].authors[1].name, 'Test');
+                var arr = posts[0].toObject({ virtuals: true }).authors.
+                  map(function(v) {
+                    return v.name;
+                  }).
+                  sort();
+                assert.deepEqual(arr, ['Test', 'Val']);
                 assert.equal(posts[1].authors.length, 1);
                 assert.equal(posts[1].authors[0].name, 'Test');
                 assert.equal(posts[2].authors.length, 0);

@@ -1,3 +1,15 @@
+4.6.7 / 2016-11-10
+==================
+ * fix(document): only invalidate in subdoc if using update validators #4681
+ * fix(document): don't create subdocs when excluded in projection #4669
+ * fix(document): ensure single embedded schema validator runs with correct context #4663
+ * fix(document): make sure to depopulate top level for sharding #4658
+ * fix(connection): throw more helpful error when .model() called incorrectly #4652
+ * fix(populate): throw more descriptive error when trying to populate a virtual that doesn't have proper options #4602
+ * fix(document): ensure subtype gets set properly when saving with a buffer id #4506
+ * fix(query): handle setDefaultsOnInsert with defaults on doc arrays #4456
+ * fix(drivers): make debug output better by calling toBSON() #4356
+
 4.6.6 / 2016-11-03
 ==================
  * chore: upgrade deps #4674 [TrejGun](https://github.com/TrejGun)

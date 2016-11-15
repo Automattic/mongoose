@@ -1,3 +1,11 @@
+4.6.8 / 2016-11-14
+==================
+ * fix(querycursor): clear stack when iterating onto next doc #4697
+ * fix: handle null keys in validation error #4693 #4689 [arciisine](https://github.com/arciisine)
+ * fix(populate): handle pre init middleware correctly with populate virtuals #4683
+ * fix(connection): ensure consistent return value for open and openSet #4659
+ * fix(schema): handle falsy defaults for arrays #4620
+
 4.6.7 / 2016-11-10
 ==================
  * fix(document): only invalidate in subdoc if using update validators #4681

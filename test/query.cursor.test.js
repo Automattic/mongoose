@@ -217,6 +217,56 @@ describe('QueryCursor', function() {
     });
   });
 
+  describe('#map', function() {
+    it('maps documents', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor()
+        .map(function(obj) {
+          obj.name += '_mapped';
+          return obj;
+        })
+        .map(function(obj) {
+          obj.name += '_mappedagain';
+          return obj;
+        });
+
+      var expectedNames = ['Axl_mapped_mappedagain', 'Slash_mapped_mappedagain'];
+      var cur = 0;
+      cursor.on('data', function(doc) {
+        assert.equal(doc.name, expectedNames[cur++]);
+        assert.equal(doc.test, 'test');
+      });
+
+      cursor.on('error', function(error) {
+        done(error);
+      });
+
+      cursor.on('end', function() {
+        assert.equal(cur, 2);
+        done();
+      });
+    });
+
+    it('with #next', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor()
+        .map(function(obj) {
+          obj.name += '_next';
+          return obj;
+        });
+
+      cursor.next(function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.name, 'Axl_next');
+        assert.equal(doc.test, 'test');
+        cursor.next(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Slash_next');
+          assert.equal(doc.test, 'test');
+          done();
+        });
+      });
+    });
+  });
+
   describe('#eachAsync()', function() {
     it('iterates one-by-one, stopping for promises', function(done) {
       var cursor = Model.find().sort({ name: 1 }).cursor();

@@ -190,6 +190,33 @@ describe('QueryCursor', function() {
     });
   });
 
+  describe('`transform` option', function() {
+    it('transforms document', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor({
+        transform: function(doc) {
+          doc.name += '_transform';
+          return doc;
+        }
+      });
+
+      var expectedNames = ['Axl_transform', 'Slash_transform'];
+      var cur = 0;
+      cursor.on('data', function(doc) {
+        assert.equal(doc.name, expectedNames[cur++]);
+        assert.equal(doc.test, 'test');
+      });
+
+      cursor.on('error', function(error) {
+        done(error);
+      });
+
+      cursor.on('end', function() {
+        assert.equal(cur, 2);
+        done();
+      });
+    });
+  });
+
   describe('#eachAsync()', function() {
     it('iterates one-by-one, stopping for promises', function(done) {
       var cursor = Model.find().sort({ name: 1 }).cursor();

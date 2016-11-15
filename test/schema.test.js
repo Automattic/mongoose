@@ -1647,5 +1647,13 @@ describe('schema', function() {
       mongoose.model('gh4551', this.schema);
       done();
     });
+
+    it('handles default value = 0 (gh-4620)', function(done) {
+      var schema = new Schema({
+        tags: { type: [Number], default: 0 }
+      });
+      assert.deepEqual(schema.path('tags').getDefault().toObject(), [0]);
+      done();
+    });
   });
 });

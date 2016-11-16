@@ -3807,6 +3807,26 @@ describe('model: populate:', function() {
       });
     });
 
+    it('empty populate string is a no-op (gh-4702)', function(done) {
+      var BandSchema = new Schema({
+        people: [{
+          type: mongoose.Schema.Types.ObjectId
+        }]
+      });
+
+      var Band = db.model('gh4702', BandSchema);
+
+      var band = { people: [new mongoose.Types.ObjectId()] };
+      Band.create(band, function(error, band) {
+        assert.ifError(error);
+        Band.findById(band).populate('').exec(function(error, band) {
+          assert.ifError(error);
+          assert.equal(band.people.length, 1);
+          done();
+        });
+      });
+    });
+
     it('checks field name correctly with nested arrays (gh-4365)', function(done) {
       var UserSchema = new mongoose.Schema({
         name: {

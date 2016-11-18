@@ -4555,6 +4555,45 @@ describe('model: populate:', function() {
         });
       });
 
+      it('virtual populate in single nested doc (gh-4715)', function(done) {
+        var someModelSchema = new mongoose.Schema({
+          name: String
+        });
+
+        var SomeModel = db.model('gh4715', someModelSchema);
+
+        var schema0 = new mongoose.Schema({
+          name1: String
+        });
+
+        schema0.virtual('detail', {
+          ref: 'gh4715',
+          localField: '_id',
+          foreignField: '_id',
+          justOne: true
+        });
+
+        var schemaMain = new mongoose.Schema({
+          name: String,
+          obj: schema0
+        });
+
+        var ModelMain = db.model('gh4715_0', schemaMain);
+
+        ModelMain.create({ name: 'Test', obj: {} }).
+          then(function(m) {
+            return SomeModel.create({ _id: m.obj._id, name: 'test' });
+          }).
+          then(function() {
+            return ModelMain.findOne().populate('obj.detail');
+          }).
+          then(function(m) {
+            assert.equal(m.obj.detail.name, 'test');
+            done();
+          }).
+          catch(done);
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

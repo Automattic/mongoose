@@ -1752,6 +1752,44 @@ describe('model: findByIdAndUpdate:', function() {
         });
     });
 
+    it('properly handles casting nested objects in update (gh-4724)', function(done) {
+      var locationSchema = new Schema({
+        _id: false,
+        location: {
+          type: { type: String, default: 'Point' },
+          coordinates: [Number]
+        }
+      });
+
+      var testSchema = new Schema({
+        locations: [locationSchema]
+      });
+
+      var T = db.model('gh4724', testSchema);
+
+      var t = new T({
+        locations: [{
+          location: { type: 'Point', coordinates: [-122, 44] }
+        }]
+      });
+
+      t.save().
+        then(function(t) {
+          return T.findByIdAndUpdate(t._id, {
+            $set: {
+              'locations.0': {
+                location: { type: 'Point', coordinates: [-123, 45] }
+              }
+            }
+          }, { new: true });
+        }).
+        then(function(res) {
+          assert.equal(res.locations[0].location.coordinates[0], -123);
+          done();
+        }).
+        catch(done);
+    });
+
     it('doesnt do double validation on document arrays during updates (gh-4440)', function(done) {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});

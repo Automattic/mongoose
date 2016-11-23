@@ -210,6 +210,56 @@ describe('schema', function(){
         done();
       });
 
+      it('string conditional required', function (done) {
+        var Test = new Schema({
+            simple: String
+        });
+
+        var required = true,
+            isRequired = function () {
+                return required;
+            };
+
+        Test.path('simple').required(isRequired);
+        assert.equal(Test.path('simple').validators.length, 1);
+
+        Test.path('simple').doValidate(null, function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate(undefined, function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate('', function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate('woot', function (err) {
+            assert.ifError(err);
+        });
+
+        required = false;
+
+        Test.path('simple').doValidate(null, function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate(undefined, function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate('', function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate('woot', function (err) {
+            assert.ifError(err);
+        });
+
+        done();
+      });
+
     it('number required', function(done){
       var Edwald = new Schema({
           friends: { type: Number, required: true }

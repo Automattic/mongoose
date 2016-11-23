@@ -21,7 +21,7 @@ parent.save(<span class="function"><span class="keyword">function</span> <span c
 <span class="keyword">var</span> parent = <span class="keyword">new</span> Parent;
 
 <span class="comment">// create a comment</span>
-post.children.push({ name: <span class="string">'Liesl'</span> });
+post.children.unshift({ name: <span class="string">'Liesl'</span> });
 <span class="keyword">var</span> doc = post.children[<span class="number">0</span>];
 console.log(doc) <span class="comment">// { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }</span>
 doc.isNew; <span class="comment">// true</span>

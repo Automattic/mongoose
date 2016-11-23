@@ -1,3 +1,17 @@
+4.7.0 / 2016-11-23
+==================
+ * docs: clean up schematypes #4732 [kidlj](https://github.com/kidlj)
+ * perf: only get stack when necessary with VersionError #4726 [Sebmaster](https://github.com/Sebmaster)
+ * fix(query): ensure correct casting when setting array element #4724
+ * fix(connection): ensure db name gets set when you pass 4 params #4721
+ * fix: prevent TypeError in node v7 #4719 #4706
+ * feat(document): support .set() on virtual subpaths #4716
+ * feat(populate): support populate virtuals on nested schemas #4715
+ * feat(querycursor): support transform option and .map() #4714 #4705 [cblanc](https://github.com/cblanc)
+ * fix(document): dont set defaults on not-selected nested paths #4707
+ * fix(populate): don't throw if empty string passed to populate #4702
+ * feat(model): add `loadClass()` function for importing schema from ES6 class #4668 [rockmacaca](https://github.com/rockmacaca)
+
 4.6.8 / 2016-11-14
 ==================
  * fix(querycursor): clear stack when iterating onto next doc #4697

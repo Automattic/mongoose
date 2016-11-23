@@ -3807,6 +3807,26 @@ describe('model: populate:', function() {
       });
     });
 
+    it('empty populate string is a no-op (gh-4702)', function(done) {
+      var BandSchema = new Schema({
+        people: [{
+          type: mongoose.Schema.Types.ObjectId
+        }]
+      });
+
+      var Band = db.model('gh4702', BandSchema);
+
+      var band = { people: [new mongoose.Types.ObjectId()] };
+      Band.create(band, function(error, band) {
+        assert.ifError(error);
+        Band.findById(band).populate('').exec(function(error, band) {
+          assert.ifError(error);
+          assert.equal(band.people.length, 1);
+          done();
+        });
+      });
+    });
+
     it('checks field name correctly with nested arrays (gh-4365)', function(done) {
       var UserSchema = new mongoose.Schema({
         name: {
@@ -4533,6 +4553,45 @@ describe('model: populate:', function() {
               });
           });
         });
+      });
+
+      it('virtual populate in single nested doc (gh-4715)', function(done) {
+        var someModelSchema = new mongoose.Schema({
+          name: String
+        });
+
+        var SomeModel = db.model('gh4715', someModelSchema);
+
+        var schema0 = new mongoose.Schema({
+          name1: String
+        });
+
+        schema0.virtual('detail', {
+          ref: 'gh4715',
+          localField: '_id',
+          foreignField: '_id',
+          justOne: true
+        });
+
+        var schemaMain = new mongoose.Schema({
+          name: String,
+          obj: schema0
+        });
+
+        var ModelMain = db.model('gh4715_0', schemaMain);
+
+        ModelMain.create({ name: 'Test', obj: {} }).
+          then(function(m) {
+            return SomeModel.create({ _id: m.obj._id, name: 'test' });
+          }).
+          then(function() {
+            return ModelMain.findOne().populate('obj.detail');
+          }).
+          then(function(m) {
+            assert.equal(m.obj.detail.name, 'test');
+            done();
+          }).
+          catch(done);
       });
 
       it('specify model in populate (gh-4264)', function(done) {

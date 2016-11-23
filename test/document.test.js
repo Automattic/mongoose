@@ -3491,6 +3491,39 @@ describe('document', function() {
         catch(done);
     });
 
+    it('handles setting virtual subpaths (gh-4716)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String, default: 'John' },
+        favorites: {
+          color: {
+            type: String,
+            default: 'Blue'
+          }
+        }
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        children: {
+          type: [childSchema],
+          default: [{}]
+        }
+      });
+
+      parentSchema.virtual('favorites').set(function(v) {
+        return this.children[0].set('favorites', v);
+      }).get(function() {
+        return this.children[0].get('favorites');
+      });
+
+      var Parent = db.model('gh4716', parentSchema);
+      var p = new Parent({ name: 'Anakin' });
+      p.set('children.0.name', 'Leah');
+      p.set('favorites.color', 'Red');
+      assert.equal(p.children[0].favorites.color, 'Red');
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

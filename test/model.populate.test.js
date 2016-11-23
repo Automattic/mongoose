@@ -56,6 +56,7 @@ mongoose.model('RefBlogPost', BlogPost);
 mongoose.model('RefUser', User);
 mongoose.model('RefAlternateUser', User);
 
+
 /**
  * Tests.
  */
@@ -124,6 +125,40 @@ describe('model: populate:', function(){
       });
     });
   });
+
+  it('across DBs', function(done) {
+    var db = start()
+      , db2 = mongoose.createConnection('mongodb://localhost/mongoose_test2')
+      , BlogPost = db.model('RefBlogPost', posts + '2')
+      , User = db2.model('RefUser', users + '2');
+
+      User.create({
+        name: 'Guillermo'
+        , email: 'rauchg@gmail.com'
+      }, function (err, creator) {
+          console.dir(creator);
+        assert.ifError(err);
+
+        BlogPost.create({
+          title    : 'woot'
+          , _creator : creator._id
+        }, function (err, post) {
+          assert.ifError(err);
+          BlogPost
+            .findById(post._id)
+            .populate('_creator', 'name', User)
+            .exec(function (err, post) {
+              db.close();
+              db2.close();
+              assert.ifError(err);
+              console.log(post.title);
+                  console.dir(post);
+              assert.ok(post._creator.name == 'Guillermo');
+              done()
+        });
+      });
+    })
+  })
 
   it('an error in single ref population propagates', function(done){
     var db = start()

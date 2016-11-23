@@ -350,11 +350,12 @@ describe('types.documentarray', function(){
 
     var p =new Post({ title: "comment nesting" });
     var c1 = p.comments.create({ title: "c1" });
-    var c2 = p.comments.create({ title: "c2" });
-    var c3 = p.comments.create({ title: "c3" });
-
     p.comments.push(c1);
+
+    var c2 = c1.comments.create({ title: "c2" });
     c1.comments.push(c2);
+
+    var c3 = c2.comments.create({ title: "c3" });
     c2.comments.push(c3);
 
     p.save(function (err) {

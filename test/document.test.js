@@ -3524,6 +3524,29 @@ describe('document', function() {
       done();
     });
 
+    it('handles selected nested elements with defaults (gh-4739)', function(done) {
+      var userSchema = new Schema({
+        preferences: {
+          sleep: { type: Boolean, default: false },
+          test: { type: Boolean, default: true }
+        },
+        name: String
+      });
+
+      var User = db.model('User', userSchema);
+
+      var user = { name: 'test' };
+      User.collection.insertOne(user, function(error) {
+        assert.ifError(error);
+        User.findById(user, { 'preferences.sleep': 1, name: 1 }, function(error, user) {
+          assert.ifError(error);
+          assert.strictEqual(user.preferences.sleep, false);
+          assert.ok(!user.preferences.test);
+          done();
+        });
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

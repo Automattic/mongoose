@@ -2061,6 +2061,30 @@ describe('model: update:', function() {
       });
     });
 
+    it('overwrite with timestamps (gh-4054)', function(done) {
+      var testSchema = new Schema({
+        user: String,
+        something: Number
+      }, { timestamps: true });
+
+      var TestModel = db.model('gh4054', testSchema);
+      var options = { overwrite: true, upsert: true };
+      var update = {
+        user: 'John',
+        something: 1
+      };
+
+      TestModel.update({ name: 'test' }, update, options, function(error) {
+        assert.ifError(error);
+        TestModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.createdAt);
+          assert.ok(doc.updatedAt);
+          done();
+        });
+      });
+    });
+
     it('update with buffer and exec (gh-4609)', function(done) {
       var arrSchema = new Schema({
         ip: mongoose.SchemaTypes.Buffer

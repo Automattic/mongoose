@@ -4501,6 +4501,48 @@ describe('model: populate:', function() {
         });
       });
 
+      it('supports setting default options in schema (gh-4741)', function(done) {
+        var sessionSchema = new Schema({
+          date: { type: Date },
+          user: { type: Schema.ObjectId, ref: 'User' }
+        });
+
+        var userSchema = new Schema({
+          name: String
+        });
+
+        userSchema.virtual('sessions', {
+          ref: 'gh4741',
+          localField: '_id',
+          foreignField: 'user',
+          options: { sort: { date: -1 }, limit: 2 }
+        });
+
+        var Session = db.model('gh4741', sessionSchema);
+        var User = db.model('gh4741_0', userSchema);
+
+        User.create({ name: 'Val' }).
+          then(function(user) {
+            return Session.create([
+              { date: '2011-06-01', user: user._id },
+              { date: '2011-06-02', user: user._id },
+              { date: '2011-06-03', user: user._id }
+            ]);
+          }).
+          then(function(sessions) {
+            return User.findById(sessions[0].user).populate('sessions');
+          }).
+          then(function(user) {
+            assert.equal(user.sessions.length, 2);
+            assert.equal(user.sessions[0].date.valueOf(),
+              new Date('2011-06-03').valueOf());
+            assert.equal(user.sessions[1].date.valueOf(),
+              new Date('2011-06-02').valueOf());
+            done();
+          }).
+          catch(done);
+      });
+
       it('nested populate, virtual -> normal (gh-4631)', function(done) {
         var PersonSchema = new Schema({
           name: String

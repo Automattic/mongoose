@@ -1,3 +1,13 @@
+4.7.1 / 2016-11-30
+==================
+ * fix(schema): throw error if you use prototype as a schema path #4746
+ * fix(schema): throw helpful error if you define a virtual with the same path as a real path #4744
+ * fix(connection): make createConnection not throw rejected promises #4742
+ * fix(populate): allow specifiying options in model schema #4741
+ * fix(document): handle selected nested elements with defaults #4739
+ * fix(query): add model to cast error if possible #4729
+ * fix(query): handle timestamps with overwrite #4054
+
 4.7.0 / 2016-11-23
 ==================
  * docs: clean up schematypes #4732 [kidlj](https://github.com/kidlj)

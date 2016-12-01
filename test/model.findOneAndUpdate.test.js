@@ -1609,6 +1609,25 @@ describe('model: findByIdAndUpdate:', function() {
         });
     });
 
+    it('raw result as 3rd param w/ lean (gh-4761)', function(done) {
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh4761', testSchema);
+      var options = { upsert: true, new: true, passRawResult: true };
+      var update = { $set: { test: 'abc' } };
+
+      TestModel.findOneAndUpdate({}, update, options).lean().
+        exec(function(error, doc, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+
+          done();
+        });
+    });
+
     it('handles setting single embedded docs to null (gh-4281)', function(done) {
       var foodSchema = new mongoose.Schema({
         name: { type: String, default: 'Bacon' }

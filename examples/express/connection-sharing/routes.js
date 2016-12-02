@@ -13,7 +13,7 @@ exports.modelName = function(req, res) {
 };
 
 exports.insert = function(req, res, next) {
-  model.create({ name: 'inserting ' + Date.now() }, function(err, doc) {
+  model.create({name: 'inserting ' + Date.now()}, function(err, doc) {
     if (err) return next(err);
     res.send(doc);
   });

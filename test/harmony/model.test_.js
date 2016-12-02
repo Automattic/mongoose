@@ -3,7 +3,7 @@ var start = require('../common');
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
 var co = require('co');
-var assert = require('assert');
+var assert = require('power-assert');
 
 /**
  *  Asynchronous functions on Model return
@@ -37,8 +37,8 @@ describe('Models in ES6', function() {
   it('`create()` integrates with co and the yield keyword', function(done) {
     co(function * () {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyCreate', schema, getCollectionName());
@@ -46,15 +46,15 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
 
-      assert.equal(2, results.length);
-      assert.equal('sunny-side up', results[0].eggs);
-      assert.equal('scrambled', results[1].eggs);
+      assert.equal(results.length, 2);
+      assert.equal(results[0].eggs, 'sunny-side up');
+      assert.equal(results[1].eggs, 'scrambled');
 
       done();
     })();
@@ -63,16 +63,16 @@ describe('Models in ES6', function() {
   it('`aggregate()` integrates with co and the yield keyword', function(done) {
     co(function*() {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyAggregate', schema, getCollectionName());
 
       try {
         yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -80,18 +80,18 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.aggregate([
-          { $group: { _id: '$bacon', eggs: { $first: '$eggs' } } },
-          { $sort: { _id: 1 } }
+          {$group: {_id: '$bacon', eggs: {$first: '$eggs'}}},
+          {$sort: {_id: 1}}
         ]).exec();
       } catch (e) {
         return done(e);
       }
 
-      assert.equal(2, results.length);
-      assert.equal(false, results[0]._id);
-      assert.equal('sunny-side up', results[0].eggs);
-      assert.equal(true, results[1]._id);
-      assert.equal('scrambled', results[1].eggs);
+      assert.equal(results.length, 2);
+      assert.equal(results[0]._id, false);
+      assert.equal(results[0].eggs, 'sunny-side up');
+      assert.equal(results[1]._id, true);
+      assert.equal(results[1].eggs, 'scrambled');
 
       done();
     })();
@@ -100,17 +100,17 @@ describe('Models in ES6', function() {
   it('`mapReduce()` can also be used with co and yield', function(done) {
     co(function*() {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyMapreduce', schema, getCollectionName());
 
       try {
         yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'sunny-side up', bacon: true },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'sunny-side up', bacon: true},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -125,7 +125,7 @@ describe('Models in ES6', function() {
         return done(e);
       }
 
-      assert.equal(2, results.length);
+      assert.equal(results.length, 2);
       assert.ok(results[0]._id === 'sunny-side up' || results[1]._id === 'sunny-side up');
       assert.ok(results[0]._id === 'scrambled' || results[1]._id === 'scrambled');
 
@@ -133,3 +133,4 @@ describe('Models in ES6', function() {
     })();
   });
 });
+

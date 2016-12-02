@@ -6,4 +6,4 @@ block content
     if block.comments && block.comments.length
       | !{block.comments[block.comments.length - 1]}
       :js
-        #{block.code}
+        !{block.code}

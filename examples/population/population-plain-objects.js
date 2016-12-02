@@ -79,7 +79,7 @@ function createData() {
 
 function example() {
   Game
-  .findOne({ name: /^Legend of Zelda/ })
+  .findOne({name: /^Legend of Zelda/})
   .populate('consoles')
   .lean() // just return plain objects, not documents wrapped by mongoose
   .exec(function(err, ocinara) {

@@ -10,36 +10,36 @@ var Person = mongoose.model('Person');
 
 // define some dummy data
 var data = [
-    {
-      name: 'bill',
-      age: 25,
-      birthday: new Date().setFullYear((new Date().getFullYear() - 25)),
-      gender : "Male"
-    },
-    {
-      name: 'mary',
-      age: 30,
-      birthday: new Date().setFullYear((new Date().getFullYear() - 30)),
-      gender: "Female"
-    },
-    {
-      name: 'bob',
-      age: 21,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 21)),
-      gender: "Male"
-    },
-    {
-      name: 'lilly',
-      age: 26,
-      birthday: new Date().setFullYear((new Date().getFullYear() - 26)),
-      gender: "Female"
-    },
-    {
-      name: 'alucard',
-      age: 1000,
-      birthday: new Date().setFullYear((new Date().getFullYear() - 1000)),
-      gender : "Male"
-    }
+  {
+    name: 'bill',
+    age: 25,
+    birthday: new Date().setFullYear((new Date().getFullYear() - 25)),
+    gender: 'Male'
+  },
+  {
+    name: 'mary',
+    age: 30,
+    birthday: new Date().setFullYear((new Date().getFullYear() - 30)),
+    gender: 'Female'
+  },
+  {
+    name: 'bob',
+    age: 21,
+    birthday: new Date().setFullYear((new Date().getFullYear() - 21)),
+    gender: 'Male'
+  },
+  {
+    name: 'lilly',
+    age: 26,
+    birthday: new Date().setFullYear((new Date().getFullYear() - 26)),
+    gender: 'Female'
+  },
+  {
+    name: 'alucard',
+    age: 1000,
+    birthday: new Date().setFullYear((new Date().getFullYear() - 1000)),
+    gender: 'Male'
+  }
 ];
 
 
@@ -86,7 +86,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
                    // returned, but can also be stored in a new collection
                    // see: http://mongoosejs.com/docs/api.html#model_Model.mapReduce
     Person.mapReduce(o, function(err, results, stats) {
-      console.log("map reduce took %d ms", stats.processtime);
+      console.log('map reduce took %d ms', stats.processtime);
       console.log(results);
       cleanup();
     });

@@ -1,0 +1,31 @@
+extends: 'eslint:recommended'
+
+env:
+  node: true
+  mocha: true
+
+rules:
+  comma-style: error
+  consistent-this:
+    - error
+    - _this
+  indent:
+    - error
+    - 2
+    - SwitchCase: 1
+      VariableDeclarator: 2
+  keyword-spacing: error
+  no-console: off
+  no-multi-spaces: error
+  no-spaced-func: error
+  no-trailing-spaces: error
+  quotes:
+    - error
+    - single
+  semi: error
+  space-before-blocks: error
+  space-before-function-paren:
+    - error
+    - never
+  space-infix-ops: error
+  space-unary-ops: error

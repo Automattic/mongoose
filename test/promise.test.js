@@ -1,9 +1,8 @@
-
 /**
  * Module dependencies.
  */
 
-var assert = require('assert');
+var assert = require('power-assert');
 
 var Promise = require('../lib/promise');
 
@@ -13,8 +12,8 @@ var Promise = require('../lib/promise');
 
 describe('Promise', function() {
   it('events fire right after complete()', function(done) {
-    var promise = new Promise()
-      , called = 0;
+    var promise = new Promise(),
+        called = 0;
 
     promise.on('fulfill', function(a, b) {
       assert.equal(a, '1');
@@ -30,13 +29,13 @@ describe('Promise', function() {
       called++;
     });
 
-    assert.equal(2, called);
+    assert.equal(called, 2);
     done();
   });
 
   it('events fire right after error()', function(done) {
-    var promise = new Promise()
-      , called = 0;
+    var promise = new Promise(),
+        called = 0;
 
     promise.on('reject', function(err) {
       assert.ok(err instanceof Error);
@@ -50,27 +49,27 @@ describe('Promise', function() {
       called++;
     });
 
-    assert.equal(2, called);
+    assert.equal(called, 2);
     done();
   });
 
   it('events fire right after reject()', function(done) {
-    var promise = new Promise()
-      , called = 0;
+    var promise = new Promise(),
+        called = 0;
 
     promise.on('reject', function(err) {
-      assert.equal(9, err);
+      assert.equal(err, 9);
       called++;
     });
 
     promise.reject(9);
 
     promise.on('reject', function(err) {
-      assert.equal(9, err);
+      assert.equal(err, 9);
       called++;
     });
 
-    assert.equal(2, called);
+    assert.equal(called, 2);
     done();
   });
 
@@ -85,18 +84,18 @@ describe('Promise', function() {
 
       promise.reject(new Error('dawg'));
 
-      assert.equal(1, called);
+      assert.equal(called, 1);
       done();
     });
 
     it('after fulfill()', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.fulfill('woot');
 
       promise.onResolve(function(err, data) {
-        assert.equal(data,'woot');
+        assert.equal(data, 'woot');
         called++;
       });
 
@@ -105,13 +104,13 @@ describe('Promise', function() {
         called++;
       });
 
-      assert.equal(2, called);
+      assert.equal(called, 2);
       done();
     });
 
     it('after error()', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.error(new Error('woot'));
 
@@ -124,15 +123,15 @@ describe('Promise', function() {
         assert.ok(err instanceof Error);
         called++;
       });
-      assert.equal(2, called);
+      assert.equal(called, 2);
       done();
     });
   });
 
   describe('onFulfill() shortcut', function() {
     it('works', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.onFulfill(function(woot) {
         assert.strictEqual(woot, undefined);
@@ -141,15 +140,15 @@ describe('Promise', function() {
 
       promise.fulfill();
 
-      assert.equal(1, called);
+      assert.equal(called, 1);
       done();
     });
   });
 
   describe('onReject shortcut', function() {
     it('works', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.onReject(function(err) {
         assert.ok(err instanceof Error);
@@ -157,7 +156,7 @@ describe('Promise', function() {
       });
 
       promise.reject(new Error);
-      assert.equal(1, called);
+      assert.equal(called, 1);
       done();
     });
   });
@@ -191,7 +190,7 @@ describe('Promise', function() {
       it('casts arguments to Error', function(done) {
         var p = new Promise(function(err) {
           assert.ok(err instanceof Error);
-          assert.equal('3', err.message);
+          assert.equal(err.message, '3');
           done();
         });
 
@@ -202,7 +201,7 @@ describe('Promise', function() {
     describe('reject()', function() {
       it('does not cast arguments to Error', function(done) {
         var p = new Promise(function(err) {
-          assert.equal(3, err);
+          assert.equal(err, 3);
           done();
         });
 
@@ -214,9 +213,26 @@ describe('Promise', function() {
   it('doesnt swallow exceptions (gh-3222)', function(done) {
     assert.throws(function() {
       new Promise.ES6(function() {
-        throw 'bacon';
+        throw new Error('bacon');
       });
     });
     done();
+  });
+
+  it('.catch() works correctly (gh-4189)', function(done) {
+    var promise = new Promise.ES6(function(resolve, reject) {
+      reject(new Error('error1'));
+    });
+    promise.
+      catch(function(error) {
+        assert.ok(error);
+        return new Promise.ES6(function(resolve, reject) {
+          reject(new Error('error2'));
+        });
+      }).
+      catch(function(error) {
+        assert.equal(error.message, 'error2');
+        done();
+      });
   });
 });

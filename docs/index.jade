@@ -4,6 +4,7 @@ html(lang='en')
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose Quick Start v#{package.version}
+    include ./includes/favicon.jade
     link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
     link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
     link(href='/docs/css/guide.css', rel='stylesheet', type='text/css')
@@ -38,8 +39,8 @@ html(lang='en')
         :js
           var db = mongoose.connection;
           db.on('error', console.error.bind(console, 'connection error:'));
-          db.once('open', function (callback) {
-            // yay!
+          db.once('open', function() {
+            // we're connected!
           });
         :markdown
           Once our connection opens, our callback will be called. For brevity, let's assume that all following code is within this callback.
@@ -97,7 +98,7 @@ html(lang='en')
           We just logged all of the kittens in our db to the console.
           If we want to filter our kittens by name, Mongoose supports MongoDBs rich [querying](/docs/queries.html) syntax.
         :js
-          Kitten.find({ name: /^Fluff/ }, callback);
+          Kitten.find({ name: /^fluff/ }, callback);
         :markdown
           This performs a search for all documents with a name property that begins with "Fluff" and returns the result as an array of kittens to the callback.
         h3 Congratulations

@@ -78,6 +78,93 @@ block content
     m.nested.stuff = 'good';
     m.save(callback);
 
+  h3 SchemaType Options
+  :markdown
+    You can declare a schema type using the type directly, or an object with
+    a `type` property.
+  :js
+    var schema1 = new Schema({
+      test: String // `test` is a path of type String
+    });
+    
+    var schema2 = new Schema({
+      test: { type: String } // `test` is a path of type string
+    });
+  :markdown
+    In addition to the type property, you can specify additional properties
+    for a path. For example, if you want to lowercase a string before saving:
+  :js
+    var schema2 = new Schema({
+      test: {
+        type: String,
+        lowercase: true // Always convert `test` to lowercase
+      }
+    });
+  :markdown
+    The `lowercase` property only works for strings. There are certain options
+    which apply for all schema types, and some that apply for specific schema
+    types.
+  h5 All Schema Types
+  :markdown
+    * `required`: boolean or function, if true adds a [required validator](http://mongoosejs.com/docs/validation.html#built-in-validators) for this property
+    * `default`: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.
+    * `select`: boolean, specifies default [projections](https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/) for queries
+    * `validate: function, adds a [validator function](http://mongoosejs.com/docs/validation.html#built-in-validators) for this property
+    * `get`: function, defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
+    * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
+    
+  :js
+    var numberSchema = new Schema({
+      integerOnly: {
+        type: Number,
+        get: v => Math.round(v),
+        set: v => Math.round(v)
+      }
+    });
+    
+    var Number = mongoose.model('Number', numberSchema);
+    
+    var doc = new Number();
+    doc.integerOnly = 2.001;
+    doc.integerOnly; // 2
+  
+  h5 Indexes
+  p
+  :markdown
+    You can also define [MongoDB indexes](https://docs.mongodb.com/manual/indexes/)
+    using schema type options.
+   
+  :markdown
+    * `index`: boolean, whether to define an on this property.
+    * `unique`: boolean, whether to define a [unique index](https://docs.mongodb.com/manual/core/index-unique/) on this property.
+    * `sparse`: boolean, whether to define a [sparse index](https://docs.mongodb.com/manual/core/index-sparse/) on this property.
+  :js
+    var schema2 = new Schema({
+      test: {
+        type: String,
+        index: true,
+        unique: true // Unique index. If you specify `unique: true`
+        // specifying `index: true` is optional if you do `unique: true`
+      }
+    });
+  h5 String
+  :markdown
+    * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
+    * `uppercase`: boolean, whether to always call `.toUpperCase()` on the value
+    * `trim`: boolean, whether to always call `.trim()` on the value
+    * `match`: RegExp, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value matches the given regular expression
+    * `enum`: Array, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value is in the given array.
+
+  h5 Number
+  :markdown
+    * `min`: Number, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value is greater than or equal to the given minimum.
+    * `max`: Number, creates a [validator](http://mongoosejs.com/docs/validation.html) that checks if the value is less than or equal to the given maximum.
+  
+  h5 Date
+  :markdown
+    * `min`: Date
+    * `max`: Date
+
   h3 Usage notes:
   h4#Dates Dates
   :markdown
@@ -97,6 +184,7 @@ block content
   p An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
   :js
     var Any = new Schema({ any: {} });
+    var Any = new Schema({ any: Object });
     var Any = new Schema({ any: Schema.Types.Mixed });
   p
     | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the 
@@ -149,11 +237,33 @@ block content
     a(href="http://plugins.mongoosejs.com") plugins
     |  site for compatible types like 
     a(href="https://github.com/aheckmann/mongoose-long") mongoose-long
+    | ,&nbsp;
+    a(href="https://github.com/vkarpov15/mongoose-int32") mongoose-int32
     |  and 
     a(href="https://github.com/aheckmann/mongoose-function") other
     | 
     a(href="https://github.com/OpenifyIt/mongoose-types") types
     |.
+    
+  h3#path The `schema.path()` Function
+  :markdown
+    The `schema.path()` function returns the instantiated schema type for a
+    given path.
+  :js
+    var sampleSchema = new Schema({ name: { type: String, required: true } });
+    console.log(sampleSchema.path('name'));
+    // Output looks like:
+    /**
+     * SchemaString {
+     *   enumValues: [],
+     *   regExp: null,
+     *   path: 'name',
+     *   instance: 'String',
+     *   validators: ...
+     */
+  :markdown
+    You can use this function to inspect the schema type for a given path,
+    including what validators it has and what the type is.
 
   h3#next Next Up
   :markdown

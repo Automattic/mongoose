@@ -1,15 +1,14 @@
-
 /**
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , Document = require('../lib/document')
-  , DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('power-assert'),
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
+    Document = require('../lib/document'),
+    DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -29,31 +28,31 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-var em = new Schema({ title: String, body: String });
+var em = new Schema({title: String, body: String});
 em.virtual('works').get(function() {
   return 'em virtual works';
 });
 var schema = new Schema({
-  test    : String
-  , oids    : [ObjectId]
-  , numbers : [Number]
-  , nested  : {
-    age   : Number
-      , cool  : ObjectId
-      , deep  : { x: String }
-      , path  : String
-      , setr  : String
-  }
-  , nested2 : {
-    nested: String
-      , yup   : {
-        nested  : Boolean
-          , yup     : String
-          , age     : Number
-      }
-  }
-  , em: [em]
-  , date: Date
+  test: String,
+  oids: [ObjectId],
+  numbers: [Number],
+  nested: {
+    age: Number,
+    cool: ObjectId,
+    deep: {x: String},
+    path: String,
+    setr: String
+  },
+  nested2: {
+    nested: String,
+    yup: {
+      nested: Boolean,
+      yup: String,
+      age: Number
+    }
+  },
+  em: [em],
+  date: Date
 });
 TestDocument.prototype.$__setSchema(schema);
 
@@ -72,7 +71,7 @@ schema.path('nested.setr').set(function(v) {
 
 schema.path('date').set(function(v) {
   // should not have been cast to a Date yet
-  assert.equal('string', typeof v);
+  assert.equal(typeof v, 'string');
   return v;
 });
 
@@ -93,16 +92,16 @@ describe('document', function() {
     var doc = new TestDocument();
 
     doc.init({
-      test    : 'test'
-      , numbers : [4,5,6,7]
-      , nested  : {
-        age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-          , deep  : { x: 'a string' }
-      }
-      , notapath: 'i am not in the schema'
-      , em: [{ title: 'gocars' }]
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        age: 5,
+        cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path: 'my path',
+        deep: {x: 'a string'}
+      },
+      notapath: 'i am not in the schema',
+      em: [{title: 'gocars'}]
     });
 
     assert.ok(doc.isSelected('_id'));
@@ -126,19 +125,19 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath')); // not a path
 
     var selection = {
-      'test': 1
-      , 'numbers': 1
-      , 'nested.deep': 1
-      , 'oids': 1
+      test: 1,
+      numbers: 1,
+      'nested.deep': 1,
+      oids: 1
     };
 
     doc = new TestDocument(undefined, selection);
 
     doc.init({
-      test    : 'test'
-      , numbers : [4,5,6,7]
-      , nested  : {
-        deep  : { x: 'a string' }
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        deep: {x: 'a string'}
       }
     });
 
@@ -169,7 +168,7 @@ describe('document', function() {
     doc = new TestDocument(undefined, selection);
 
     doc.init({
-      em: [{ title: 'one' }]
+      em: [{title: 'one'}]
     });
 
     assert.ok(doc.isSelected('_id'));
@@ -193,20 +192,20 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
-      'em': 0
+      em: 0
     };
 
     doc = new TestDocument(undefined, selection);
     doc.init({
-      test    : 'test'
-      , numbers : [4,5,6,7]
-      , nested  : {
-        age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-          , deep  : { x: 'a string' }
-      }
-      , notapath: 'i am not in the schema'
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        age: 5,
+        cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path: 'my path',
+        deep: {x: 'a string'}
+      },
+      notapath: 'i am not in the schema'
     });
 
     assert.ok(doc.isSelected('_id'));
@@ -230,26 +229,26 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 0
+      _id: 0
     };
 
     doc = new TestDocument(undefined, selection);
     doc.init({
-      test    : 'test'
-      , numbers : [4,5,6,7]
-      , nested  : {
-        age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-          , deep  : { x: 'a string' }
-      }
-      , notapath: 'i am not in the schema'
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        age: 5,
+        cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path: 'my path',
+        deep: {x: 'a string'}
+      },
+      notapath: 'i am not in the schema'
     });
 
     assert.ok(!doc.isSelected('_id'));
     assert.ok(doc.isSelected('nested.deep.x.no'));
 
-    doc = new TestDocument({ test: 'boom' });
+    doc = new TestDocument({test: 'boom'});
     assert.ok(doc.isSelected('_id'));
     assert.ok(doc.isSelected('test'));
     assert.ok(doc.isSelected('numbers'));
@@ -271,16 +270,16 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 1
+      _id: 1
     };
 
     doc = new TestDocument(undefined, selection);
-    doc.init({ _id: 'test' });
+    doc.init({_id: 'test'});
 
     assert.ok(doc.isSelected('_id'));
     assert.ok(!doc.isSelected('test'));
 
-    doc = new TestDocument({ test: 'boom' }, true);
+    doc = new TestDocument({test: 'boom'}, true);
     assert.ok(doc.isSelected('_id'));
     assert.ok(doc.isSelected('test'));
     assert.ok(doc.isSelected('numbers'));
@@ -302,21 +301,21 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 1,
-      'n': 1
+      _id: 1,
+      n: 1
     };
 
     doc = new TestDocument(undefined, selection);
     doc.init({
-      test    : 'test'
-      , numbers : [4,5,6,7]
-      , nested  : {
-        age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-          , deep  : { x: 'a string' }
-      }
-      , notapath: 'i am not in the schema'
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        age: 5,
+        cool: DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path: 'my path',
+        deep: {x: 'a string'}
+      },
+      notapath: 'i am not in the schema'
     });
 
     assert.ok(doc.isSelected('_id'));

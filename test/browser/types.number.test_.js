@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -10,7 +9,6 @@ var SchemaNumber = mongoose.Schema.Types.Number;
  */
 
 describe('types.number', function() {
-
   it('an empty string casts to null', function(done) {
     var n = new SchemaNumber();
     assert.strictEqual(n.cast(''), null);
@@ -85,5 +83,4 @@ describe('types.number', function() {
     assert.strictEqual(false, !!err, err);
     done();
   });
-
 });

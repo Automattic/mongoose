@@ -4,6 +4,7 @@ html(lang='en')
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose API v#{package.version}
+    include ./includes/favicon.jade
     link( rel="stylesheet"
           href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
     link(href='//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
@@ -22,10 +23,11 @@ html(lang='en')
       .doclinks
         each item in docs
           div.file(class=item.hasPublic ? '' : 'private')
-            a.section(href='#' + item.cleantitle)
-              | #{item.title}
-            | &nbsp;
-            i.fa.fa-caret-right.toggle-item
+            span.toggle-item
+              a.section(href='#' + item.cleantitle)
+                | #{item.title}
+              | &nbsp;
+              i.fa.fa-caret-right
             ul
               each method in item.methods
                 if method.ctx && !method.ignore
@@ -108,7 +110,7 @@ html(lang='en')
                                 if i+1 < tag.types.length
                                   | , 
                               | &gt; 
-                          span= tag.description
+                          span!= tag.description
                 if method.return
                   .returns
                     h4 Returns:

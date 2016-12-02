@@ -1,16 +1,15 @@
-
 // GH-407
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose;
+var start = require('./common'),
+    assert = require('power-assert'),
+    mongoose = start.mongoose;
 
 describe('crash: (gh-407)', function() {
   it('test mongodb crash with invalid objectid string', function(done) {
-    var db = mongoose.createConnection("mongodb://localhost/test-crash");
+    var db = mongoose.createConnection('mongodb://localhost/test-crash');
 
     var IndexedGuy = new mongoose.Schema({
-      name: { type: String }
+      name: {type: String}
     });
 
     var Guy = db.model('Guy', IndexedGuy);
@@ -26,12 +25,12 @@ describe('crash: (gh-407)', function() {
       db.close(done);
 
       try {
-        assert.equal('Cast to ObjectId failed for value "" at path "_id"', err.message);
+        assert.equal(err.message,
+          'Cast to ObjectId failed for value "" at path "_id" for model "Guy"');
       } catch (er) {
         console.error(err);
         throw er;
       }
     });
-
   });
 });

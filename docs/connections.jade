@@ -19,6 +19,37 @@ block content
   :markdown
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
 
+  h3#buffering Operation Buffering
+  :markdown
+    Mongoose lets you start using your models immediately, without waiting for
+    mongoose to establish a connection to MongoDB.
+  
+  :js
+    mongoose.connect('mongodb://localhost/myapp');
+    var MyModel = mongoose.model('Test', new Schema({ name: String }));
+    // Works
+    MyModel.findOne(function(error, result) { /* ... */ });
+  
+  :markdown
+    That's because mongoose buffers model function calls internally. This
+    buffering is convenient, but also a common source of confusion. Mongoose
+    will *not* throw any errors by default if you use a model without
+    connecting.
+  
+  :js
+    var MyModel = mongoose.model('Test', new Schema({ name: String }));
+    // Will just hang until mongoose successfully connects
+    MyModel.findOne(function(error, result) { /* ... */ });
+    
+    setTimeout(function() {
+      mongoose.connect('mongodb://localhost/myapp');
+    }, 60000);
+  
+  :markdown
+    To disable buffering, turn off the [`bufferCommands` option on your schema](http://mongoosejs.com/docs/guide.html#bufferCommands).
+    If you have `bufferCommands` on and your connection is hanging, try turning
+    `bufferCommands` off to see if you haven't opened a connection properly.
+
   h3#options Options
   :markdown
     The `connect` method also accepts an `options` object which will be passed on to the underlying driver. All options included here take precedence over options passed in the connection string.
@@ -29,13 +60,14 @@ block content
   :markdown
     The following option keys are available:
 
-         db      - passed to the connection db instance
-         server  - passed to the connection server instance(s)
-         replset - passed to the connection ReplSet instance
-         user    - username for authentication (if not specified in uri)
-         pass    - password for authentication (if not specified in uri)
-         auth    - options for authentication
-         mongos  - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.0/api/Mongos.html)
+         db             - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+         server         - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+         replset        - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+         user           - username for authentication (if not specified in uri)
+         pass           - password for authentication (if not specified in uri)
+         auth           - options for authentication
+         mongos         - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.1/api/Mongos.html)
+         promiseLibrary - sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html)
     Example:
   :js
     var options = {
@@ -52,22 +84,64 @@ block content
     The db option `forceServerObjectId` is set to false which _cannot_ be overridden.
 
     See the [driver](https://github.com/mongodb/node-mongodb-native) for more information about available options.
+  :markdown
+    **Note:**
+    If `auto_reconnect` is on, mongoose will give up trying to reconnect after a certain number of failures. Set the [`server.reconnectTries` and `server.reconnectInterval` options](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html) to increase the number of times mongoose will try to reconnect.
+  :js
+    // Good way to make sure mongoose never stops trying to reconnect
+    mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
+     
+
+
+  h4#connection-string-options Connection String Options
+  :markdown
+    Mongoose supports the following options in the connection string.
+    
+    * [ssl](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [poolSize](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [autoReconnect](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [socketTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [connectTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [authSource](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [retries](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [reconnectWait](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [rs_name](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+    * [replicaSet](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+    * [nativeParser](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [w](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [journal](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [wtimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [readPreference](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [readPreferenceTags](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+    * [sslValidate](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
 
   h4#keepAlive A note about keepAlive
   .important
     :markdown
-      For long running applictions it is often prudent to enable `keepAlive`. Without it, after some period of time you may start to see `"connection closed"` errors for what seems like no reason. If so, after [reading this](http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html), you may decide to enable `keepAlive`:
+      For long running applications, it is often prudent to enable `keepAlive`
+      with a number of milliseconds. Without it, after some period of time
+      you may start to see `"connection closed"` errors for what seems like
+      no reason. If so, after
+      [reading this](http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html),
+      you may decide to enable `keepAlive`:
 
   :js
-    options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
+    options.server.socketOptions = options.replset.socketOptions = { keepAlive: 120 };
     mongoose.connect(uri, options);
 
-  h3#replicaset_connections ReplicaSet Connections
+  h3#replicaset_connections Replica Set Connections
   :markdown
-    The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
+    To connect to a replica set you pass a comma delimited list of hosts to
+    connect to rather than a single host.
 
   :js
     mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
+
+  :markdown
+    To connect to a single node replica set, specify the `replicaSet` option.
+    
+  :js
+    mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
 
   h3#mongos_connections Multi-mongos support
   :markdown
@@ -83,7 +157,9 @@ block content
     var conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 
   :markdown
-    This [connection](./api.html#connection_Connection) object can then be used for creating and retrieving [models](./api.html#model_Model) that are scoped only to this specific connection.
+    This [connection](./api.html#connection_Connection) object is then used to
+    create and retrieve [models](./api.html#model_Model). Models are
+    **always** scoped to a single connection.
 
   h3#connection_pools Connection pools
   :markdown

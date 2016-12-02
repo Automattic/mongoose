@@ -11,12 +11,12 @@ module.exports = function() {
   // MUST BE VANILLA
   var LocationObject = new Schema({
     loc: {
-      type: { type: String },
+      type: {type: String},
       coordinates: []
     }
   });
   // define the index
-  LocationObject.index({ loc : '2dsphere' });
+  LocationObject.index({loc: '2dsphere'});
 
   mongoose.model('Location', LocationObject);
 };

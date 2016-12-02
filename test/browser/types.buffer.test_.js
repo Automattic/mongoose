@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -10,7 +9,6 @@ var MongooseBuffer = mongoose.Types.Buffer;
  */
 
 describe('types.buffer', function() {
-
   it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
     var a = new MongooseBuffer;
 
@@ -18,7 +16,7 @@ describe('types.buffer', function() {
     assert.equal(true, a.equals(a));
 
     a = new MongooseBuffer([195, 188, 98, 101, 114]);
-    var b = new MongooseBuffer("buffer shtuffs are neat");
+    var b = new MongooseBuffer('buffer shtuffs are neat');
     var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
     var d = new MongooseBuffer(0);
 

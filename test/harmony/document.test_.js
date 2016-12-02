@@ -3,7 +3,7 @@ var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
 var ValidationError = require('../../lib/error/validation');
 var co = require('co');
-var assert = require('assert');
+var assert = require('power-assert');
 
 /**
  *  Asynchronous document functions return
@@ -23,7 +23,7 @@ describe('Documents in ES6', function() {
   };
 
   beforeEach(function() {
-    db = start({ noErrorListener: 1 });
+    db = start({noErrorListener: 1});
   });
 
   afterEach(function(done) {
@@ -46,12 +46,12 @@ describe('Documents in ES6', function() {
       };
 
       schema = new Schema({
-        eggs: { type: String, required: true, validate: validate },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true, validate: validate},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('validateSchema', schema, getCollectionName());
-      var m = new M({ eggs: 'Sunny side up', bacon: false });
+      var m = new M({eggs: 'Sunny side up', bacon: false});
 
       try {
         yield m.validate();
@@ -60,7 +60,7 @@ describe('Documents in ES6', function() {
       }
 
       assert.ok(!error);
-      assert.equal(true, called);
+      assert.equal(called, true);
       called = false;
 
       // The validator function above should now fail
@@ -82,12 +82,12 @@ describe('Documents in ES6', function() {
     co(function*() {
       var error;
       var schema = new Schema({
-        description: { type: String, required: true }
+        description: {type: String, required: true}
       });
 
       var Breakfast = db.model('breakfast', schema, getCollectionName());
 
-      var goodBreakfast = new Breakfast({ description: 'eggs & bacon' });
+      var goodBreakfast = new Breakfast({description: 'eggs & bacon'});
 
       try {
         yield goodBreakfast.save();
@@ -103,7 +103,7 @@ describe('Documents in ES6', function() {
         error = e;
       }
       assert.ifError(error);
-      assert.equal('eggs & bacon', result.description);
+      assert.equal(result.description, 'eggs & bacon');
 
       // Should cause a validation error because `description` is required
       var badBreakfast = new Breakfast({});
@@ -131,7 +131,7 @@ describe('Documents in ES6', function() {
       var breakfastCollectionName = getCollectionName();
       var foodCollectionName = getCollectionName();
       var breakfastSchema = new Schema({
-        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }]
+        foods: [{type: mongoose.Schema.ObjectId, ref: foodCollectionName}]
       });
 
       var foodSchema = new Schema({
@@ -141,9 +141,9 @@ describe('Documents in ES6', function() {
       var Food = db.model(foodCollectionName, foodSchema, foodCollectionName);
       var Breakfast = db.model(breakfastCollectionName, breakfastSchema, breakfastCollectionName);
 
-      var bacon = new Food({ name: 'bacon' });
-      var eggs = new Food({ name: 'eggs' });
-      var goodBreakfast = new Breakfast({ foods: [bacon, eggs] });
+      var bacon = new Food({name: 'bacon'});
+      var eggs = new Food({name: 'eggs'});
+      var goodBreakfast = new Breakfast({foods: [bacon, eggs]});
 
       try {
         yield [bacon.save(), eggs.save(), goodBreakfast.save()];
@@ -158,7 +158,7 @@ describe('Documents in ES6', function() {
         error = e;
       }
       assert.ifError(error);
-      assert.equal(2, result.foods.length);
+      assert.equal(result.foods.length, 2);
 
       try {
         result = yield result.populate('foods').execPopulate();
@@ -166,9 +166,9 @@ describe('Documents in ES6', function() {
         error = e;
       }
       assert.ifError(error);
-      assert.equal(2, result.foods.length);
-      assert.equal('bacon', result.foods[0].name);
-      assert.equal('eggs', result.foods[1].name);
+      assert.equal(result.foods.length, 2);
+      assert.equal(result.foods[0].name, 'bacon');
+      assert.equal(result.foods[1].name, 'eggs');
 
       done();
     })();
@@ -187,7 +187,7 @@ describe('Documents in ES6', function() {
       var error;
 
       try {
-        yield breakfast.update({ steak: 'Ribeye', eggs: 'Scrambled' }, { upsert: true }).exec();
+        yield breakfast.update({steak: 'Ribeye', eggs: 'Scrambled'}, {upsert: true}).exec();
       } catch (e) {
         error = e;
       }
@@ -201,9 +201,10 @@ describe('Documents in ES6', function() {
       }
       assert.ifError(error);
       assert.equal(breakfast._id.toString(), result._id.toString());
-      assert.equal('Ribeye', result.steak);
-      assert.equal('Scrambled', result.eggs);
+      assert.equal(result.steak, 'Ribeye');
+      assert.equal(result.eggs, 'Scrambled');
       done();
     })();
   });
 });
+

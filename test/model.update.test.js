@@ -2223,6 +2223,24 @@ describe('model: update:', function() {
       });
     });
 
+    it('with overwrite and upsert (gh-4749)', function(done) {
+      var schema = new Schema({
+        name: String,
+        meta: { age: { type: Number } }
+      });
+      var User = db.model('gh4749', schema);
+
+      var update = { name: 'Bar', meta: { age: 33 } };
+      var options = { overwrite: true, upsert: true };
+      var q2 = User.update({ name: 'Bar' }, update, options);
+      assert.deepEqual(q2.getUpdate(), {
+        __v: 0,
+        meta: { age: 33 },
+        name: 'Bar'
+      });
+      done();
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

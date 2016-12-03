@@ -964,7 +964,7 @@ describe('model: findByIdAndUpdate:', function() {
     }
   });
 
-  it('adds __v on upsert (gh-2122)', function(done) {
+  it('adds __v on upsert (gh-2122) (gh-4505)', function(done) {
     var db = start();
 
     var accountSchema = new Schema({
@@ -974,14 +974,21 @@ describe('model: findByIdAndUpdate:', function() {
     var Account = db.model('2122', accountSchema);
 
     Account.findOneAndUpdate(
-        {name: 'account'},
-        {},
-        {upsert: true, new: true},
-        function(error, doc) {
+      {name: 'account'},
+      {name: 'test'},
+      {upsert: true, new: true},
+      function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.__v, 0);
+        Account.update({ name: 'test' }, {}, { upsert: true }, function(error) {
           assert.ifError(error);
-          assert.equal(doc.__v, 0);
-          db.close(done);
+          Account.findOne({ name: 'test' }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.__v, 0);
+            db.close(done);
+          });
         });
+      });
   });
 
   it('works with nested schemas and $pull+$or (gh-1932)', function(done) {
@@ -1712,6 +1719,75 @@ describe('model: findByIdAndUpdate:', function() {
         assert.equal(doc.test1, 'a');
         done();
       });
+    });
+
+    it('should not apply schema transforms (gh-4574)', function(done) {
+      var options = {
+        toObject: {
+          transform: function() {
+            assert.ok(false, 'should not call transform');
+          }
+        }
+      };
+
+      var SubdocSchema = new Schema({ test: String }, options);
+
+      var CollectionSchema = new Schema({
+        field1: { type: String },
+        field2 : {
+          arrayField: [SubdocSchema]
+        }
+      }, options);
+
+      var Collection = db.model('test', CollectionSchema);
+
+      Collection.create({ field2: { arrayField: [] } }).
+        then(function(doc) {
+          return Collection.findByIdAndUpdate(doc._id, {
+            $push: { 'field2.arrayField': { test: 'test' } }
+          }, { new: true });
+        }).
+        then(function() {
+          done();
+        });
+    });
+
+    it('properly handles casting nested objects in update (gh-4724)', function(done) {
+      var locationSchema = new Schema({
+        _id: false,
+        location: {
+          type: { type: String, default: 'Point' },
+          coordinates: [Number]
+        }
+      });
+
+      var testSchema = new Schema({
+        locations: [locationSchema]
+      });
+
+      var T = db.model('gh4724', testSchema);
+
+      var t = new T({
+        locations: [{
+          location: { type: 'Point', coordinates: [-122, 44] }
+        }]
+      });
+
+      t.save().
+        then(function(t) {
+          return T.findByIdAndUpdate(t._id, {
+            $set: {
+              'locations.0': {
+                location: { type: 'Point', coordinates: [-123, 45] }
+              }
+            }
+          }, { new: true });
+        }).
+        then(function(res) {
+          assert.equal(res.locations[0].location.coordinates[0], -123);
+          done();
+        }).
+        catch(done);
     });
 
     it('doesnt do double validation on document arrays during updates (gh-4440)', function(done) {

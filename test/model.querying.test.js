@@ -961,10 +961,10 @@ describe('model: querying:', function() {
             assert.equal(nes1.length, 1);
 
             NE.find({b: {$ne: [1]}}, function(err) {
-              assert.equal(err.message, 'Cast to ObjectId failed for value "[ 1 ]" at path "b"');
+              assert.equal(err.message, 'Cast to ObjectId failed for value "[ 1 ]" at path "b" for model "NE_Test"');
 
               NE.find({b: {$ne: 4}}, function(err) {
-                assert.equal(err.message, 'Cast to ObjectId failed for value "4" at path "b"');
+                assert.equal(err.message, 'Cast to ObjectId failed for value "4" at path "b" for model "NE_Test"');
 
                 NE.find({b: id3, ids: {$ne: id4}}, function(err, nes4) {
                   db.close();
@@ -1948,7 +1948,7 @@ describe('buffers', function() {
   it('works with different methods and query types', function(done) {
     var db = start(),
         BufSchema = new Schema({name: String, block: Buffer}),
-        Test = db.model('Buffer', BufSchema, 'buffers');
+        Test = db.model('BufferTest', BufSchema, 'buffers');
 
     var docA = {name: 'A', block: new Buffer('über')};
     var docB = {name: 'B', block: new Buffer('buffer shtuffs are neat')};
@@ -1969,7 +1969,8 @@ describe('buffers', function() {
           assert.equal(rb.block.toString('utf8'), 'buffer shtuffs are neat');
 
           Test.findOne({block: /buffer/i}, function(err) {
-            assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i" at path "block"');
+            assert.equal(err.message, 'Cast to buffer failed for value ' +
+              '"/buffer/i" at path "block" for model "BufferTest"');
             Test.findOne({block: [195, 188, 98, 101, 114]}, function(err, rb) {
               assert.ifError(err);
               assert.equal(rb.block.toString('utf8'), 'über');

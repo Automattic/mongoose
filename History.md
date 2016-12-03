@@ -1,3 +1,111 @@
+4.7.1 / 2016-11-30
+==================
+ * fix(schema): throw error if you use prototype as a schema path #4746
+ * fix(schema): throw helpful error if you define a virtual with the same path as a real path #4744
+ * fix(connection): make createConnection not throw rejected promises #4742
+ * fix(populate): allow specifiying options in model schema #4741
+ * fix(document): handle selected nested elements with defaults #4739
+ * fix(query): add model to cast error if possible #4729
+ * fix(query): handle timestamps with overwrite #4054
+
+4.7.0 / 2016-11-23
+==================
+ * docs: clean up schematypes #4732 [kidlj](https://github.com/kidlj)
+ * perf: only get stack when necessary with VersionError #4726 [Sebmaster](https://github.com/Sebmaster)
+ * fix(query): ensure correct casting when setting array element #4724
+ * fix(connection): ensure db name gets set when you pass 4 params #4721
+ * fix: prevent TypeError in node v7 #4719 #4706
+ * feat(document): support .set() on virtual subpaths #4716
+ * feat(populate): support populate virtuals on nested schemas #4715
+ * feat(querycursor): support transform option and .map() #4714 #4705 [cblanc](https://github.com/cblanc)
+ * fix(document): dont set defaults on not-selected nested paths #4707
+ * fix(populate): don't throw if empty string passed to populate #4702
+ * feat(model): add `loadClass()` function for importing schema from ES6 class #4668 [rockmacaca](https://github.com/rockmacaca)
+
+4.6.8 / 2016-11-14
+==================
+ * fix(querycursor): clear stack when iterating onto next doc #4697
+ * fix: handle null keys in validation error #4693 #4689 [arciisine](https://github.com/arciisine)
+ * fix(populate): handle pre init middleware correctly with populate virtuals #4683
+ * fix(connection): ensure consistent return value for open and openSet #4659
+ * fix(schema): handle falsy defaults for arrays #4620
+
+4.6.7 / 2016-11-10
+==================
+ * fix(document): only invalidate in subdoc if using update validators #4681
+ * fix(document): don't create subdocs when excluded in projection #4669
+ * fix(document): ensure single embedded schema validator runs with correct context #4663
+ * fix(document): make sure to depopulate top level for sharding #4658
+ * fix(connection): throw more helpful error when .model() called incorrectly #4652
+ * fix(populate): throw more descriptive error when trying to populate a virtual that doesn't have proper options #4602
+ * fix(document): ensure subtype gets set properly when saving with a buffer id #4506
+ * fix(query): handle setDefaultsOnInsert with defaults on doc arrays #4456
+ * fix(drivers): make debug output better by calling toBSON() #4356
+
+4.6.6 / 2016-11-03
+==================
+ * chore: upgrade deps #4674 [TrejGun](https://github.com/TrejGun)
+ * chore: run tests on node v7 #4673 [TrejGun](https://github.com/TrejGun)
+ * perf: make setDefaultsOnInsert more efficient if upsert is off #4672 [CamHenlin](https://github.com/CamHenlin)
+ * fix(populate): ensure document array is returned #4656
+ * fix(query): cast doc arrays with positionals correctly for update #4655
+ * fix(document): ensure single nested doc validators run with correct context #4654
+ * fix: handle reconnect failed error in new version of driver #4653 [loris](https://github.com/loris)
+ * fix(populate): if setting a populated doc, take its id #4632
+ *  fix(populate): handle populated virtuals in init #4618
+
+4.6.5 / 2016-10-23
+==================
+ * docs: fix grammar issues #4642 #4640 #4639 [silvermanj7](https://github.com/silvermanj7)
+ * fix(populate): filter out nonexistant values for dynref #4637
+ * fix(query): handle $type as a schematype operator #4632
+ * fix(schema): better handling for uppercase: false and lowercase: false #4622
+ * fix(query): don't run transforms on updateForExec() #4621
+ * fix(query): handle id = 0 in findById #4610
+ * fix(query): handle buffers in mergeClone #4609
+ * fix(document): handle undefined with conditional validator for validateSync #4607
+ * fix: upgrade to mongodb driver 2.2.11 #4581
+ * docs(schematypes): clarify schema.path() #4518
+ * fix(query): ensure path is defined before checking in timestamps #4514
+ * fix(model): set version key in upsert #4505
+ * fix(document): never depopulate top-level doc #3057
+ * refactor: ensure sync for setting non-capped collections #2690
+
+4.6.4 / 2016-10-16
+==================
+ * fix(query): cast $not correctly #4616 #4592 [prssn](https://github.com/prssn)
+ * fix: address issue with caching global plugins #4608 #4601 [TrejGun](https://github.com/TrejGun)
+ * fix(model): make sure to depopulate in insertMany #4590
+ * fix(model): buffer autoIndex if bufferCommands disabled #4589
+ * fix(populate): copy ids array before modifying #4585
+ * feat(schema): add retainKeyOrder prop #4542
+ * fix(document): return isModified true for children of direct modified paths #4528
+ * fix(connection): add dropDatabase() helper #4490
+ * fix(model): add usePushEach option for schemas #4455
+ * docs(connections): add some warnings about buffering #4413
+ * fix: add ability to set promise implementation in browser #4395
+
+4.6.3 / 2016-10-05
+==================
+ * fix(document): ensure single nested docs get initialized correctly when setting nested paths #4578
+ * fix: turn off transforms when writing nested docs to db #4574
+ * fix(document): don't set single nested subdocs to null when removing parent doc #4566
+ * fix(model): ensure versionKey gets set in insertMany #4561
+ * fix(schema): handle typeKey in arrays #4548
+ * feat(schema): set $implicitlyCreated on schema if created by interpretAsType #4443
+
+4.6.2 / 2016-09-30
+==================
+ * chore: upgrade to async 2.0.1 internally #4579 [billouboq](https://github.com/billouboq)
+ * fix(types): ensure nested single doc schema errors reach update validators #4557 #4519
+ * fix(connection): handle rs names with leading numbers (muri 1.1.1) #4556
+ * fix(model): don't throw if method name conflicts with Object.prototype prop #4551
+ * docs: fix broken link #4544 [VFedyk](https://github.com/VFedyk)
+ * fix: allow overwriting model on mongoose singleton #4541 [Nainterceptor](https://github.com/Nainterceptor)
+ * fix(document): don't use init: true when building doc defaults #4540
+ * fix(connection): use replSet option if replset not specified #4535
+ * fix(query): cast $not objects #4495
+
 4.6.1 / 2016-09-20
 ==================
  * fix(query): improve handling of $not with $elemMatch #4531 #3719 [timbowhite](https://github.com/timbowhite)

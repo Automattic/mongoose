@@ -932,19 +932,19 @@ describe('schema', function() {
       var bad = new Breakfast({foods: [{eggs: 'Not a number'}], id: 'Not a number'});
       bad.validate(function(error) {
         assert.ok(error);
-        assert.deepEqual(['id', 'foods.0.eggs'], Object.keys(error.errors));
+        assert.deepEqual(['foods.0.eggs', 'id'], Object.keys(error.errors).sort());
         assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
 
         // Pushing docs with cast errors
         bad.foods.push({eggs: 'Also not a number'});
         bad.validate(function(error) {
-          assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs'], Object.keys(error.errors));
+          assert.deepEqual(['foods.0.eggs', 'foods.1.eggs', 'id'], Object.keys(error.errors).sort());
           assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
 
           // Splicing docs with cast errors
           bad.foods.splice(1, 1, {eggs: 'fail1'}, {eggs: 'fail2'});
           bad.validate(function(error) {
-            assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs', 'foods.2.eggs'], Object.keys(error.errors));
+            assert.deepEqual(['foods.0.eggs', 'foods.1.eggs', 'foods.2.eggs', 'id'], Object.keys(error.errors).sort());
             assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
             assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
             assert.ok(error.errors['foods.2.eggs'] instanceof mongoose.Error.CastError);
@@ -952,14 +952,14 @@ describe('schema', function() {
             // Remove the cast error by setting field
             bad.foods[2].eggs = 3;
             bad.validate(function(error) {
-              assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs'], Object.keys(error.errors));
+              assert.deepEqual(['foods.0.eggs', 'foods.1.eggs', 'id'], Object.keys(error.errors).sort());
               assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
               assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
 
               // Remove the cast error using array.set()
               bad.foods.set(1, {eggs: 1});
               bad.validate(function(error) {
-                assert.deepEqual(['id', 'foods.0.eggs'], Object.keys(error.errors));
+                assert.deepEqual(['foods.0.eggs', 'id'], Object.keys(error.errors).sort());
                 assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
 
                 done();
@@ -1132,4 +1132,3 @@ describe('schema', function() {
     });
   });
 });
-

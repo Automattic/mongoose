@@ -26,7 +26,7 @@ describe('crash: (gh-407)', function() {
 
       try {
         assert.equal(err.message,
-          'Cast to ObjectId failed for value "" at path "_id"');
+          'Cast to ObjectId failed for value "" at path "_id" for model "Guy"');
       } catch (er) {
         console.error(err);
         throw er;

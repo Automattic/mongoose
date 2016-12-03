@@ -2848,7 +2848,7 @@ describe('document', function() {
       done();
     });
 
-    it('removing parent doc calls remove hooks on subdocs (gh-2348)', function(done) {
+    it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', function(done) {
       var ChildSchema = new Schema({
         name: String
       });
@@ -2860,20 +2860,28 @@ describe('document', function() {
       });
 
       var ParentSchema = new Schema({
-        children: [ChildSchema]
+        children: [ChildSchema],
+        child: ChildSchema
       });
 
       var Parent = db.model('gh2348', ParentSchema);
 
-      var doc = { children: [{ name: 'Luke' }, { name: 'Leia' }] };
+      var doc = {
+        children: [{ name: 'Jacen' }, { name: 'Jaina' }],
+        child: { name: 'Anakin' }
+      };
       Parent.create(doc, function(error, doc) {
         assert.ifError(error);
-        doc.remove(function(error) {
+        doc.remove(function(error, doc) {
           assert.ifError(error);
           assert.deepEqual(called, {
-            Luke: true,
-            Leia: true
+            Jacen: true,
+            Jaina: true,
+            Anakin: true
           });
+          var arr = doc.children.toObject().map(function(v) { return v.name; });
+          assert.deepEqual(arr, ['Jacen', 'Jaina']);
+          assert.equal(doc.child.name, 'Anakin');
           done();
         });
       });
@@ -3086,6 +3094,7 @@ describe('document', function() {
         doc.child = { name: 'Jaina' };
         doc.child.name = 'Anakin';
         assert.deepEqual(doc.modifiedPaths(), ['child']);
+        assert.ok(doc.isModified('child.name'));
         done();
       });
     });
@@ -3115,6 +3124,21 @@ describe('document', function() {
       });
     });
 
+    it('deep default array values (gh-4540)', function(done) {
+      var schema = new Schema({
+        arr: [{
+          test: {
+            type: Array,
+            default: ['test']
+          }
+        }]
+      });
+      assert.doesNotThrow(function() {
+        db.model('gh4540', schema);
+      });
+      done();
+    });
+
     it('default values with subdoc array (gh-4390)', function(done) {
       var childSchema = new Schema({
         name: String
@@ -3129,7 +3153,12 @@ describe('document', function() {
 
       Parent.create({}, function(error, doc) {
         assert.ifError(error);
-        assert.deepEqual(doc.toObject().child, [{ name: 'test' }]);
+        var arr = doc.toObject().child.map(function(doc) {
+          assert.ok(doc._id);
+          delete doc._id;
+          return doc;
+        });
+        assert.deepEqual(arr, [{ name: 'test' }]);
         done();
       });
     });
@@ -3193,6 +3222,327 @@ describe('document', function() {
               done();
             });
           });
+        });
+      });
+    });
+
+    it('composite _ids (gh-4542)', function(done) {
+      var schema = new Schema({
+        _id: {
+          key1: String,
+          key2: String
+        },
+        content: String
+      }, { retainKeyOrder: true });
+
+      var Model = db.model('gh4542', schema);
+
+      var object = new Model();
+      object._id = {key1: 'foo', key2: 'bar'};
+      object.save().
+        then(function(obj) {
+          obj.content = 'Hello';
+          return obj.save();
+        }).
+        then(function(obj) {
+          return Model.findOne({ _id: obj._id });
+        }).
+        then(function(obj) {
+          assert.equal(obj.content, 'Hello');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('validateSync with undefined and conditional required (gh-4607)', function(done) {
+      var schema = new mongoose.Schema({
+        type: mongoose.SchemaTypes.Number,
+        conditional: {
+          type: mongoose.SchemaTypes.String,
+          required: function() {
+            return this.type === 1;
+          },
+          maxlength: 128
+        }
+      });
+
+      var Model = db.model('gh4607', schema);
+
+      assert.doesNotThrow(function() {
+        new Model({
+          type: 2,
+          conditional: void 0
+        }).validateSync();
+      });
+
+      done();
+    });
+
+    it('conditional required on single nested (gh-4663)', function(done) {
+      var called = 0;
+      var childSchema = new Schema({
+        name: String
+      });
+      var schema = new Schema({
+        child: {
+          type: childSchema,
+          required: function() {
+            assert.equal(this.child.name, 'test');
+            ++called;
+          }
+        }
+      });
+
+      var M = db.model('gh4663', schema);
+
+      new M({ child: { name: 'test' } }).validateSync();
+      done();
+    });
+
+    it('setting full path under single nested schema works (gh-4578) (gh-4528)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        age: Number
+      });
+
+      var ParentSchema = new mongoose.Schema({
+        age: Number,
+        family: {
+          child: ChildSchema
+        }
+      });
+
+      var M = db.model('gh4578', ParentSchema);
+
+      M.create({ age: 45 }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.family.child);
+        doc.set('family.child.age', 15);
+        assert.ok(doc.family.child.schema);
+        assert.ok(doc.isModified('family.child'));
+        assert.ok(doc.isModified('family.child.age'));
+        assert.equal(doc.family.child.toObject().age, 15);
+        done();
+      });
+    });
+
+    it('toObject() does not depopulate top level (gh-3057)', function(done) {
+      var Cat = db.model('gh3057', { name: String });
+      var Human = db.model('gh3057_0', {
+        name: String,
+        petCat: { type: mongoose.Schema.Types.ObjectId, ref: 'gh3057' }
+      });
+
+      var kitty = new Cat({ name: 'Zildjian' });
+      var person = new Human({ name: 'Val', petCat: kitty });
+
+      assert.equal(kitty.toObject({ depopulate: true }).name, 'Zildjian');
+      assert.ok(!person.toObject({ depopulate: true }).petCat.name);
+      done();
+    });
+
+    it('single nested doc conditional required (gh-4654)', function(done) {
+      var ProfileSchema = new Schema({
+        firstName: String,
+        lastName: String
+      });
+
+      function validator() {
+        assert.equal(this.email, 'test');
+        return true;
+      }
+
+      var UserSchema = new Schema({
+        email: String,
+        profile: {
+          type: ProfileSchema,
+          required: [validator, 'profile required']
+        }
+      });
+
+      var User = db.model('gh4654', UserSchema);
+      User.create({ email: 'test' }, function(error) {
+        assert.equal(error.errors['profile'].message, 'profile required');
+        done();
+      });
+    });
+
+    it('handles setting single nested schema to equal value (gh-4676)', function(done) {
+      var companySchema = new mongoose.Schema({
+        _id: false,
+        name: String,
+        description: String
+      });
+
+      var userSchema = new mongoose.Schema({
+        name:  String,
+        company: companySchema
+      });
+
+      var User = db.model('gh4676', userSchema);
+
+      var user = new User({ company: { name: 'Test' } });
+      user.save(function(error) {
+        assert.ifError(error);
+        user.company.description = 'test';
+        assert.ok(user.isModified('company'));
+        user.company = user.company;
+        assert.ok(user.isModified('company'));
+        done();
+      });
+    });
+
+    it('buffers with subtypes as ids (gh-4506)', function(done) {
+      var uuid = require('uuid');
+
+      var UserSchema = new mongoose.Schema({
+        _id: {
+          type: Buffer,
+          default: function() {
+            return mongoose.Types.Buffer(uuid.parse(uuid.v4())).toObject(4);
+          },
+          unique: true,
+          required: true
+        },
+        email: {
+          type: String,
+          unique: true,
+          lowercase: true,
+          required: true
+        },
+        name: String
+      });
+
+      var User = db.model('gh4506', UserSchema);
+
+      var user = new User({
+        email: 'me@email.com',
+        name: 'My name'
+      });
+
+      user.save().
+        then(function() {
+          return User.findOne({ email: 'me@email.com' });
+        }).
+        then(function(user) {
+          user.name = 'other';
+          return user.save();
+        }).
+        then(function() {
+          return User.findOne({ email: 'me@email.com' });
+        }).
+        then(function(doc) {
+          assert.equal(doc.name, 'other');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('embedded docs dont mark parent as invalid (gh-4681)', function(done) {
+      var NestedSchema = new mongoose.Schema({
+        nestedName: { type: String, required: true },
+        createdAt: { type: Date, required: true }
+      });
+      var RootSchema = new mongoose.Schema({
+        rootName:  String,
+        nested: { type: [ NestedSchema ] }
+      });
+
+      var Root = db.model('gh4681', RootSchema);
+      var root = new Root({ rootName: 'root', nested: [ { } ] });
+      root.save(function(error) {
+        assert.ok(error);
+        assert.deepEqual(Object.keys(error.errors).sort(),
+          ['nested.0.createdAt', 'nested.0.nestedName']);
+        done();
+      });
+    });
+
+    it('should depopulate the shard key when saving (gh-4658)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        name: String
+      });
+
+      var ChildModel = db.model('gh4658', ChildSchema);
+
+      var ParentSchema = new mongoose.Schema({
+        name: String,
+        child: { type: Schema.Types.ObjectId, ref: 'gh4658' }
+      }, {shardKey: {child: 1, _id: 1}});
+
+      var ParentModel = db.model('gh4658_0', ParentSchema);
+
+      ChildModel.create({ name: 'Luke' }).
+        then(function(child) {
+          var p = new ParentModel({ name: 'Vader' });
+          p.child = child;
+          return p.save();
+        }).
+        then(function(p) {
+          p.name = 'Anakin';
+          return p.save();
+        }).
+        then(function(p) {
+          return ParentModel.findById(p);
+        }).
+        then(function(doc) {
+          assert.equal(doc.name, 'Anakin');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('handles setting virtual subpaths (gh-4716)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String, default: 'John' },
+        favorites: {
+          color: {
+            type: String,
+            default: 'Blue'
+          }
+        }
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        children: {
+          type: [childSchema],
+          default: [{}]
+        }
+      });
+
+      parentSchema.virtual('favorites').set(function(v) {
+        return this.children[0].set('favorites', v);
+      }).get(function() {
+        return this.children[0].get('favorites');
+      });
+
+      var Parent = db.model('gh4716', parentSchema);
+      var p = new Parent({ name: 'Anakin' });
+      p.set('children.0.name', 'Leah');
+      p.set('favorites.color', 'Red');
+      assert.equal(p.children[0].favorites.color, 'Red');
+      done();
+    });
+
+    it('handles selected nested elements with defaults (gh-4739)', function(done) {
+      var userSchema = new Schema({
+        preferences: {
+          sleep: { type: Boolean, default: false },
+          test: { type: Boolean, default: true }
+        },
+        name: String
+      });
+
+      var User = db.model('User', userSchema);
+
+      var user = { name: 'test' };
+      User.collection.insertOne(user, function(error) {
+        assert.ifError(error);
+        User.findById(user, { 'preferences.sleep': 1, name: 1 }, function(error, user) {
+          assert.ifError(error);
+          assert.strictEqual(user.preferences.sleep, false);
+          assert.ok(!user.preferences.test);
+          done();
         });
       });
     });

@@ -1099,6 +1099,27 @@ describe('model: update:', function() {
       });
     });
 
+    it('handles defaults on document arrays (gh-4456)', function(done) {
+      var schema = new Schema({
+        arr: {
+          type: [new Schema({ name: String }, { _id: false })],
+          default: [{ name: 'Val' }]
+        }
+      });
+
+      var M = db.model('gh4456', schema);
+
+      var opts = { upsert: true, setDefaultsOnInsert: true };
+      M.update({}, {}, opts, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.deepEqual(doc.toObject().arr, [{ name: 'Val' }]);
+          done();
+        });
+      });
+    });
+
     it('runs validators if theyre set', function(done) {
       var s = new Schema({
         topping: {
@@ -1664,6 +1685,40 @@ describe('model: update:', function() {
       });
     });
 
+    it('with single nested and transform (gh-4621)', function(done) {
+      var SubdocSchema = new Schema({
+        name: String
+      }, {
+        toObject: {
+          transform: function(doc, ret) {
+            ret.id = ret._id.toString();
+            delete ret._id;
+          }
+        }
+      });
+
+      var CollectionSchema = new Schema({
+        field2: SubdocSchema
+      });
+
+      var Collection = db.model('gh4621', CollectionSchema);
+
+      Collection.create({}, function(error, doc) {
+        assert.ifError(error);
+        var update = { 'field2': { name: 'test' } };
+        Collection.update({ _id: doc._id }, update, function(err) {
+          assert.ifError(err);
+          Collection.collection.findOne({ _id: doc._id }, function(err, doc) {
+            assert.ifError(err);
+            assert.ok(doc.field2._id);
+            assert.ok(!doc.field2.id);
+            done();
+          });
+        });
+      });
+
+    });
+
     it('works with buffers (gh-3496)', function(done) {
       var Schema = mongoose.Schema({myBufferField: Buffer});
       var Model = db.model('gh3496', Schema);
@@ -1981,6 +2036,75 @@ describe('model: update:', function() {
       });
     });
 
+    it('push with timestamps (gh-4514)', function(done) {
+      var sampleSchema = new mongoose.Schema({
+        sampleArray: [{
+          values: [String]
+        }]
+      }, { timestamps: true });
+
+      var sampleModel = db.model('gh4514', sampleSchema);
+      var newRecord = new sampleModel({
+        sampleArray: [{ values: ['record1'] }]
+      });
+
+      newRecord.save(function(err) {
+        assert.ifError(err);
+        sampleModel.update({ 'sampleArray.values': 'record1' }, {
+          $push: { 'sampleArray.$.values': 'another record' }
+        },
+        { runValidators: true },
+        function(err) {
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+
+    it('overwrite with timestamps (gh-4054)', function(done) {
+      var testSchema = new Schema({
+        user: String,
+        something: Number
+      }, { timestamps: true });
+
+      var TestModel = db.model('gh4054', testSchema);
+      var options = { overwrite: true, upsert: true };
+      var update = {
+        user: 'John',
+        something: 1
+      };
+
+      TestModel.update({ name: 'test' }, update, options, function(error) {
+        assert.ifError(error);
+        TestModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.createdAt);
+          assert.ok(doc.updatedAt);
+          done();
+        });
+      });
+    });
+
+    it('update with buffer and exec (gh-4609)', function(done) {
+      var arrSchema = new Schema({
+        ip: mongoose.SchemaTypes.Buffer
+      });
+      var schema = new Schema({
+        arr: [arrSchema]
+      });
+
+      var M = db.model('gh4609', schema);
+
+      var m = new M({ arr: [{ ip: new Buffer(1) }] });
+      m.save(function(error, m) {
+        assert.ifError(error);
+        m.update({ $push: { arr: { ip: new Buffer(1) } } }).exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('update handles casting with mongoose-long (gh-4283)', function(done) {
       require('mongoose-long')(mongoose);
 
@@ -2058,10 +2182,94 @@ describe('model: update:', function() {
         {runValidators: true},
         function(err) {
           assert.ifError(err);
-          assert.equal(validateCalls, 1); // AssertionError: 0 == 1
+          assert.equal(validateCalls, 1);
           db.close(done);
         }
       );
+    });
+
+    it('updating single nested doc property casts correctly (gh-4655)', function(done) {
+      var FileSchema = new Schema({});
+
+      var ProfileSchema = new Schema({
+        images: [FileSchema],
+        rules: {
+          hours: {
+            begin: Date,
+            end: Date
+          }
+        }
+      });
+
+      var UserSchema = new Schema({
+        email: { type: String },
+        profiles: [ProfileSchema]
+      });
+
+
+      var User = db.model('gh4655', UserSchema);
+
+      User.create({ profiles: [] }, function(error, user) {
+        assert.ifError(error);
+        User.update({ _id: user._id }, {$set: {'profiles.0.rules': {}}}).
+          exec(function(error) {
+            assert.ifError(error);
+            User.findOne({ _id: user._id }).lean().exec(function(error, doc) {
+              assert.ifError(error);
+              assert.deepEqual(doc.profiles[0], { rules: {} });
+              done();
+            });
+          });
+      });
+    });
+
+    it('with overwrite and upsert (gh-4749)', function(done) {
+      var schema = new Schema({
+        name: String,
+        meta: { age: { type: Number } }
+      });
+      var User = db.model('gh4749', schema);
+
+      var update = { name: 'Bar', meta: { age: 33 } };
+      var options = { overwrite: true, upsert: true };
+      var q2 = User.update({ name: 'Bar' }, update, options);
+      assert.deepEqual(q2.getUpdate(), {
+        __v: 0,
+        meta: { age: 33 },
+        name: 'Bar'
+      });
+      done();
+    });
+
+    it('single embedded schema under document array (gh-4519)', function(done) {
+      var PermissionSchema = new mongoose.Schema({
+        read: { type: Boolean, required: true },
+        write: Boolean
+      });
+      var UserSchema = new mongoose.Schema({
+        permission: {
+          type: PermissionSchema
+        }
+      });
+      var GroupSchema = new mongoose.Schema({
+        users: [UserSchema]
+      });
+
+      var Group = db.model('Group', GroupSchema);
+      var update = {
+        users:[{
+          permission:{}
+        }]
+      };
+      var opts = {
+        runValidators: true
+      };
+
+      Group.update({}, update, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['users.0.permission']);
+        done();
+      });
     });
   });
 });

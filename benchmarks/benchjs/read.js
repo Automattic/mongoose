@@ -306,7 +306,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           out.ops = item.hz;
           outObj[item.name.replace(/\s/g, '')] = out;
         });
-        console.log(JSON.stringify(outObj));
+        console.dir(outObj, {depth: null, colors: true});
       }
     });
     function next() {

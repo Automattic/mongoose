@@ -19,7 +19,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "2.1.2",
+    "async": "2.1.4",
     "bson": "~0.5.4",
     "hooks-fixed": "1.2.0",
     "kareem": "1.1.3",
@@ -27,7 +27,7 @@
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
     "mquery": "2.0.0",
-    "ms": "0.7.1",
+    "ms": "0.7.2",
     "muri": "1.1.1",
     "regexp-clone": "0.0.1",
     "sliced": "1.0.1"

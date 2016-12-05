@@ -1465,8 +1465,10 @@ describe('model: findByIdAndUpdate:', function() {
       });
 
       var TestModel = db.model('gh3107', testSchema);
+      var update = { $setOnInsert: { a: [{foo: 'bar'}], b: [2] } };
+      var opts = {upsert: true, new: true, setDefaultsOnInsert: true};
       TestModel
-      .findOneAndUpdate({id: '1'}, {$setOnInsert: {a: [{foo: 'bar'}], b: [2]}}, {upsert: true, new: true, setDefaultsOnInsert: true},
+      .findOneAndUpdate({name: 'abc'}, update, opts,
           function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.a.length, 1);
@@ -1736,6 +1738,21 @@ describe('model: findByIdAndUpdate:', function() {
         assert.ifError(error);
         assert.ok(!doc.test2);
         assert.equal(doc.test1, 'a');
+        done();
+      });
+    });
+
+    it('handles upserting a non-existing field (gh-4757)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+
+      var Model = db.model('gh4757', modelSchema);
+      Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        new: true
+      }).exec(function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'StrictModeError');
         done();
       });
     });

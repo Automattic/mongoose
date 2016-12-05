@@ -2074,7 +2074,7 @@ describe('model: update:', function() {
         something: 1
       };
 
-      TestModel.update({ name: 'test' }, update, options, function(error) {
+      TestModel.update({ user: 'test' }, update, options, function(error) {
         assert.ifError(error);
         TestModel.findOne({}, function(error, doc) {
           assert.ifError(error);

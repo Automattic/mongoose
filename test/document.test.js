@@ -3391,6 +3391,60 @@ describe('document', function() {
       });
     });
 
+    it('handles setting single nested doc to null after setting (gh-4766)', function(done) {
+      var EntitySchema = new Schema({
+        company: {
+          type: String,
+          required: true
+        },
+        name: {
+          type: String,
+          required: false
+        },
+        email: {
+          type: String,
+          required: false
+        }
+      }, { _id: false, id: false });
+
+      var ShipmentSchema = new Schema({
+        entity: {
+          shipper: {
+            type: EntitySchema,
+            required: false
+          },
+          manufacturer: {
+            type: EntitySchema,
+            required: false
+          }
+        }
+      });
+
+      var Shipment = db.model('gh4766', ShipmentSchema);
+      var doc = new Shipment({
+        entity: {
+          shipper: null,
+          manufacturer: {
+            company: 'test',
+            name: 'test',
+            email: 'test@email'
+          }
+        }
+      });
+
+      doc.save().
+        then(function() { return Shipment.findById(doc._id); }).
+        then(function(shipment) {
+          shipment.entity = shipment.entity;
+          shipment.entity.manufacturer = null;
+          return shipment.save();
+        }).
+        then(function() {
+          done();
+        }).
+        catch(done);
+    });
+
     it('buffers with subtypes as ids (gh-4506)', function(done) {
       var uuid = require('uuid');
 

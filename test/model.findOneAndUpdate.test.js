@@ -1465,8 +1465,10 @@ describe('model: findByIdAndUpdate:', function() {
       });
 
       var TestModel = db.model('gh3107', testSchema);
+      var update = { $setOnInsert: { a: [{foo: 'bar'}], b: [2] } };
+      var opts = {upsert: true, new: true, setDefaultsOnInsert: true};
       TestModel
-      .findOneAndUpdate({id: '1'}, {$setOnInsert: {a: [{foo: 'bar'}], b: [2]}}, {upsert: true, new: true, setDefaultsOnInsert: true},
+      .findOneAndUpdate({name: 'abc'}, update, opts,
           function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.a.length, 1);
@@ -1609,6 +1611,25 @@ describe('model: findByIdAndUpdate:', function() {
         });
     });
 
+    it('raw result as 3rd param w/ lean (gh-4761)', function(done) {
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh4761', testSchema);
+      var options = { upsert: true, new: true, passRawResult: true };
+      var update = { $set: { test: 'abc' } };
+
+      TestModel.findOneAndUpdate({}, update, options).lean().
+        exec(function(error, doc, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+
+          done();
+        });
+    });
+
     it('handles setting single embedded docs to null (gh-4281)', function(done) {
       var foodSchema = new mongoose.Schema({
         name: { type: String, default: 'Bacon' }
@@ -1717,6 +1738,21 @@ describe('model: findByIdAndUpdate:', function() {
         assert.ifError(error);
         assert.ok(!doc.test2);
         assert.equal(doc.test1, 'a');
+        done();
+      });
+    });
+
+    it('handles upserting a non-existing field (gh-4757)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+
+      var Model = db.model('gh4757', modelSchema);
+      Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        new: true
+      }).exec(function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'StrictModeError');
         done();
       });
     });

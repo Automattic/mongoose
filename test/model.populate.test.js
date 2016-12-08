@@ -4106,7 +4106,8 @@ describe('model: populate:', function() {
               populate('author').
               exec(function(error, post) {
                 assert.ifError(error);
-                assert.equal(post.author.name, 'Val');
+                assert.strictEqual(Array.isArray(post.author), false);
+                assert.ok(post.author.name.match(/^(Val|Test)$/));
                 done();
               });
           });

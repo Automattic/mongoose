@@ -1,3 +1,14 @@
+4.7.2 / 2016-12-07
+==================
+ * test(populate): fix justOne test #4772 [cblanc](https://github.com/cblanc)
+ * chore: fix benchmarks #4769 [billouboq](https://github.com/billouboq)
+ * fix(document): handle setting subdoc to null after setting parent doc #4766
+ * fix(query): support passRawResult with lean #4762 #4761 [mhfrantz](https://github.com/mhfrantz)
+ * fix(query): throw StrictModeError if upsert with nonexisting field in condition #4757
+ * test: fix a couple of sort tests #4756 [japod](https://github.com/japod)
+ * chore: upgrade mongodb driver -> 2.2.12 #4753 [mdlavin](https://github.com/mdlavin)
+ * fix(query): handle update with upsert and overwrite correctly #4749
+
 4.7.1 / 2016-11-30
 ==================
  * fix(schema): throw error if you use prototype as a schema path #4746

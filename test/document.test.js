@@ -3601,6 +3601,34 @@ describe('document', function() {
       });
     });
 
+    it('handles mark valid in subdocs correctly (gh-4778)', function(done) {
+      var SubSchema = new mongoose.Schema({
+        field: {
+          nestedField: {
+            type: mongoose.Schema.ObjectId,
+            required: false
+          }
+        }
+      }, { _id: false, id: false });
+
+      var Model2Schema = new mongoose.Schema({
+        sub: {
+          type: SubSchema,
+          required: false
+        }
+      });
+      var Model2 = db.model('gh4778', Model2Schema);
+
+      var doc = new Model2({
+        sub: {}
+      });
+
+      doc.sub.field.nestedField = { };
+      doc.sub.field.nestedField = '574b69d0d9daf106aaa62974';
+      assert.ok(!doc.validateSync());
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

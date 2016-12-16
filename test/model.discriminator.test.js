@@ -364,7 +364,7 @@ describe('model', function() {
         var Model = mongoose.model('gh4339', schema);
         Model.discriminator('gh4339_0', new Schema({
           test2: String
-        }, options));
+        }, { typeKey: '$type' }));
         done();
       });
 

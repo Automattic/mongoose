@@ -1,3 +1,10 @@
+4.7.3 / 2016-12-16
+==================
+ * fix: upgrade mongodb driver -> 2.2.16 for several bug fixes and 3.4 support #4799
+ * fix(model): ensure discriminator key is correct for child schema on discriminator #4790
+ * fix(document): handle mark valid in subdocs correctly #4778
+ * fix(query): check for objects consistently #4775
+
 4.7.2 / 2016-12-07
 ==================
  * test(populate): fix justOne test #4772 [cblanc](https://github.com/cblanc)

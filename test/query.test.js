@@ -1548,6 +1548,24 @@ describe('Query', function() {
       done();
     });
 
+    it('timestamps with $each (gh-4805)', function(done) {
+      var nestedSchema = new Schema({ value: Number }, { timestamps: true });
+      var Test = db.model('gh4805', new Schema({
+        arr: [nestedSchema]
+      }, { timestamps: true }));
+
+      Test.update({}, {
+        $push: {
+          arr: {
+            $each: [{ value: 1 }]
+          }
+        }
+      }).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('allows sort with count (gh-3914)', function(done) {
       var Post = db.model('gh3914_0', {
         title: String

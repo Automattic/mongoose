@@ -3629,6 +3629,28 @@ describe('document', function() {
       done();
     });
 
+    it('toObject() with buffer and minimize (gh-4800)', function(done) {
+      var TestSchema = new mongoose.Schema({ buf: Buffer }, {
+        toObject: {
+          virtuals: true,
+          getters: true
+        }
+      });
+
+      var Test = db.model('gh4800', TestSchema);
+
+      Test.create({ buf: new Buffer('abcd') }).
+        then(function(doc) {
+          return Test.findById(doc._id);
+        }).
+        then(function(doc) {
+          // Should not throw
+          require('util').inspect(doc);
+          done();
+        }).
+        catch(done);
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

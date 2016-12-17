@@ -5,8 +5,8 @@
 **What is the current behavior?**
 
 **If the current behavior is a bug, please provide the steps to reproduce.**
-<!-- If you can, provide a link to a public repository which contains the files necessary to reproduce this. -->
+<!-- If you can, provide a stadalone script / gist to reproduce your issue -->
 
 **What is the expected behavior?**
 
-**Please mention your node.js, mongoose and operating system version.**
+**Please mention your node.js, mongoose and MongoDB version.**

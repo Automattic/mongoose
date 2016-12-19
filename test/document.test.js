@@ -3651,6 +3651,35 @@ describe('document', function() {
         catch(done);
     });
 
+    it('does not overwrite when setting nested (gh-4793)', function(done) {
+      var grandchildSchema = new mongoose.Schema();
+      grandchildSchema.method({
+        foo: function() { return 'bar'; }
+      });
+      var Grandchild = db.model('gh4793_0', grandchildSchema);
+
+      var childSchema = new mongoose.Schema({
+        grandchild: grandchildSchema
+      });
+      var Child = mongoose.model('gh4793_1', childSchema);
+
+      var parentSchema = new mongoose.Schema({
+        children: [childSchema]
+      });
+      var Parent = mongoose.model('gh4793_2', parentSchema);
+
+      var grandchild = new Grandchild();
+      var child = new Child({grandchild: grandchild});
+
+      assert.equal(child.grandchild.foo(), 'bar');
+
+      var p = new Parent({children: [child]});
+
+      assert.equal(child.grandchild.foo(), 'bar');
+      assert.equal(p.children[0].grandchild.foo(), 'bar');
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

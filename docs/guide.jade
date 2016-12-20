@@ -207,54 +207,45 @@ block content
     var Person = mongoose.model('Person', personSchema);
 
     // create a document
-    var bad = new Person({
-        name: { first: 'Walter', last: 'White' }
+    var axl = new Person({
+      name: { first: 'Axl', last: 'Rose' }
     });
 
   :markdown
-    Suppose we want to log the full name of `bad`. We could do this manually like so:
+    Suppose you want to print out the person's full name. You could do it yourself:
 
   :js
-    console.log(bad.name.first + ' ' + bad.name.last); // Walter White
+    console.log(axl.name.first + ' ' + axl.name.last); // Axl Rose
 
   :markdown
-    Or we could define a [virtual property getter](./api.html#virtualtype_VirtualType-get) on our `personSchema` so we don't need to write out this string concatenation mess each time:
+    But concatenating the first and last name every time can get cumbersome. And what if you want to do some extra processing on the name, like [removing diacritics?](https://www.npmjs.com/package/diacritics). A [virtual property getter](./api.html#virtualtype_VirtualType-get) lets you define a `fullName` property that won't get persisted to MongoDB.
 
   :js
-    personSchema.virtual('name.full').get(function () {
+    personSchema.virtual('fullName').get(function () {
       return this.name.first + ' ' + this.name.last;
     });
 
   :markdown
-    Now, when we access our virtual "name.full" property, our getter function will be invoked and the value returned:
+    Now, mongoose will call your getter function every time you access the `fullName` property:
 
   :js
-    console.log('%s is insane', bad.name.full); // Walter White is insane
+    console.log(axl.fullName); // Axl Rose
 
   :markdown
-    Note that if the resulting record is converted to an object or JSON, virtuals are not included by default.
-    Pass `virtuals : true` to either [toObject()](./api.html#document_Document-toObject) or to toJSON() to have them returned. 
+    If you use `toJSON()` or `toObject()` (or use `JSON.stringify()` on a mongoose document) mongoose will *not* include virtuals by default.
+    Pass `{ virtuals: true }` to either [toObject()](./api.html#document_Document-toObject) or `toJSON()`. 
 
-    It would also be nice to be able to set `this.name.first` and `this.name.last` by setting `this.name.full`. For example, if we wanted to change `bad`'s `name.first` and `name.last` to 'Breaking' and 'Bad' respectively, it'd be nice to just:
-
-  :js
-    bad.name.full = 'Breaking Bad';
-
-  :markdown
-    Mongoose lets you do this as well through its [virtual property setters](./api.html#virtualtype_VirtualType-set):
+    You can also add a custom setter to your virtual that will let you set both first name and last name via the `fullName` virtual.
 
   :js
-    personSchema.virtual('name.full').set(function (name) {
-      var split = name.split(' ');
-      this.name.first = split[0];
-      this.name.last = split[1];
-    });
-
-    ...
-
-    mad.name.full = 'Breaking Bad';
-    console.log(mad.name.first); // Breaking
-    console.log(mad.name.last);  // Bad
+    personSchema.virtual('fullName').
+      get(function() { return this.name.first + ' ' + this.name.last; }).
+      set(function(v) {
+        this.name.first = v.substr(0, v.indexOf(' '));
+        this.name.last = v.substr(v.indexOf(' ') + 1);
+      });
+    
+    axl.fullName = 'William Rose'; // Now `axl.name.first` is "William"
 
   :markdown
     Virtual property setters are applied before other validation. So the example above would still work even if the `first` and `last` name fields were required.

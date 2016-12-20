@@ -1,3 +1,12 @@
+4.7.4 / 2016-12-21
+==================
+ * docs: fix typo #4810 [GEEKIAM](https://github.com/GEEKIAM)
+ * fix(query): timestamps with $push + $each #4805
+ * fix(document): handle buffers correctly in minimize #4800
+ * fix: don't disallow overwriting default and cast fns #4795 [pdspicer](https://github.com/pdspicer)
+ * fix(document): don't convert single nested docs to POJOs #4793
+ * fix(connection): handle reconnect to replica set correctly #4972 [gfzabarino](https://github.com/gfzabarino)
+
 4.7.3 / 2016-12-16
 ==================
  * fix: upgrade mongodb driver -> 2.2.16 for several bug fixes and 3.4 support #4799

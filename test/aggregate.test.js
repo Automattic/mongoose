@@ -2,11 +2,11 @@
  * Module dependencies
  */
 
-var start = require('./common'),
-    Aggregate = require('../lib/aggregate'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    assert = require('power-assert');
+var start = require('./common');
+var Aggregate = require('../lib/aggregate');
+var mongoose = start.mongoose;
+var Schema = mongoose.Schema;
+var assert = require('power-assert');
 
 /**
  * Test data
@@ -681,6 +681,37 @@ describe('aggregate: ', function() {
       assert.ok(cursor instanceof require('stream').Readable);
       done();
     });
+  });
+
+  it('cursor() eachAsync (gh-4300)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4300', { name: String });
+
+    var cur = 0;
+    var expectedNames = ['Axl', 'Slash'];
+    MyModel.create([{ name: 'Axl' }, { name: 'Slash' }]).
+      then(function() {
+        return MyModel.aggregate([{ $sort: { name: 1 } }]).
+          cursor().
+          exec().
+          eachAsync(function(doc) {
+            var _cur = cur;
+            assert.equal(doc.name, expectedNames[cur]);
+            return {
+              then: function(onResolve) {
+                setTimeout(function() {
+                  assert.equal(_cur, cur++);
+                  onResolve();
+                }, 50);
+              }
+            };
+          }).
+          then(function() {
+            done();
+          });
+      }).
+      catch(done);
   });
 
   it('ability to add noCursorTimeout option (gh-4241)', function(done) {

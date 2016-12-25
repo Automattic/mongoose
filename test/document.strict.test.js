@@ -436,7 +436,7 @@ describe('document: strict mode:', function() {
       }, {strict: 'throw'});
 
       // Create the model
-      var Foo = mongoose.model('Foo', FooSchema);
+      var Foo = mongoose.model('gh2665', FooSchema);
 
       assert.doesNotThrow(function() {
         new Foo({name: mongoose.Types.ObjectId(), father: {name: {full: 'bacon'}}});

@@ -4544,6 +4544,83 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('handles populating with discriminators that may not have a ref (gh-4817)', function(done) {
+        var imagesSchema = new mongoose.Schema({
+          name: {
+            type: String,
+            required: true
+          }
+        });
+        var Image = db.model('gh4817', imagesSchema, 'images');
+
+        var fieldSchema = new mongoose.Schema({
+          name: {
+            type: String,
+            required: true
+          }
+        });
+        var Field = db.model('gh4817_0', fieldSchema, 'fields');
+
+        var imageFieldSchema = new mongoose.Schema({
+          value: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh4817',
+            default: null
+          }
+        });
+        var FieldImage = Field.discriminator('gh4817_1', imageFieldSchema);
+
+        var textFieldSchema = new mongoose.Schema({
+          value: {
+            type: Schema.Types.Mixed,
+            required: true,
+            default: {}
+          }
+        });
+        var FieldText = Field.discriminator('gh4817_2', textFieldSchema);
+
+        var objectSchema = new mongoose.Schema({
+          name: {
+            type: String,
+            required: true
+          },
+          fields: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh4817_0'
+          }]
+        });
+        var ObjectModel = db.model('gh4817_3', objectSchema, 'objects');
+
+        Image.create({ name: 'testimg' }).
+          then(function(image) {
+            return FieldImage.create({ name: 'test', value: image._id });
+          }).
+          then(function(fieldImage) {
+            return FieldText.create({ name: 'test', value: 'test' }).
+              then(function(fieldText) {
+                return [fieldImage, fieldText];
+              });
+          }).
+          then(function(fields) {
+            return ObjectModel.create({ fields: fields, name: 'test' });
+          }).
+          then(function(obj) {
+            return ObjectModel.findOne({ _id: obj._id }).populate({
+              path: 'fields',
+              populate: {
+                path: 'value'
+              }
+            });
+          }).
+          then(function(obj) {
+            assert.equal(obj.fields.length, 2);
+            assert.equal(obj.fields[0].value.name, 'testimg');
+            assert.equal(obj.fields[1].value, 'test');
+            done();
+          }).
+          catch(done);
+      });
+
       it('nested populate, virtual -> normal (gh-4631)', function(done) {
         var PersonSchema = new Schema({
           name: String

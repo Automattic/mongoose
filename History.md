@@ -1,3 +1,11 @@
+4.7.5 / 2016-12-26
+==================
+ * docs(model): fix spelling mistake #4828 [paulinoj](https://github.com/paulinoj)
+ * fix(aggregate): remove unhandled rejection when using aggregate.then() #4824
+ * perf: remove try/catch that kills optimizer #4821
+ * fix(model): handles populating with discriminators that may not have a ref #4817
+ * fix(document): handle setting array of discriminators #3575
+
 4.7.4 / 2016-12-21
 ==================
  * docs: fix typo #4810 [GEEKIAM](https://github.com/GEEKIAM)

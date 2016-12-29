@@ -61,7 +61,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       nData.likes = data.likes;
       nData.address = data.address;
       user.insert(nData, function(err, res) {
-        dIds.push(res[0]._id);
+        dIds.push(res.insertedIds[0]);
         --count || next();
       });
     }
@@ -120,7 +120,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           out.ops = item.hz;
           outObj[item.name.replace(/\s/g, '')] = out;
         });
-        console.log(JSON.stringify(outObj));
+        console.dir(outObj, {depth: null, colors: true});
       }
     });
     function next() {

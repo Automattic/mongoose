@@ -4621,6 +4621,32 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('populate with no ref using Model.populate (gh-4843)', function(done) {
+        var schema = new Schema({
+          parent: mongoose.Schema.Types.ObjectId,
+          name: String
+        });
+
+        var Person = db.model('gh4843', schema);
+
+        Person.create({ name: 'Anakin' }).
+          then(function(parent) {
+            return Person.create({ name: 'Luke', parent: parent._id });
+          }).
+          then(function(luke) {
+            return Person.findById(luke._id);
+          }).
+          then(function(luke) {
+            return Person.populate(luke, { path: 'parent', model: 'gh4843' });
+          }).
+          then(function(luke) {
+            console.log('test', luke);
+            assert.equal(luke.parent.name, 'Anakin');
+            done();
+          }).
+          catch(done);
+      });
+
       it('nested populate, virtual -> normal (gh-4631)', function(done) {
         var PersonSchema = new Schema({
           name: String

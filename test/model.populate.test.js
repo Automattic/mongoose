@@ -3671,29 +3671,29 @@ describe('model: populate:', function() {
 
       async.series(
         [
-          u1.save,
-          u2.save,
-          u3.save,
+          u1.save.bind(u1),
+          u2.save.bind(u2),
+          u3.save.bind(u3),
 
-          c1.save,
-          c2.save,
-          c3.save,
+          c1.save.bind(c1),
+          c2.save.bind(c2),
+          c3.save.bind(c3),
 
-          b1.save,
-          b2.save,
-          b3.save,
+          b1.save.bind(b1),
+          b2.save.bind(b2),
+          b3.save.bind(b3),
 
-          ce1.save,
-          ue1.save,
-          be1.save,
+          ce1.save.bind(ce1),
+          ue1.save.bind(ue1),
+          be1.save.bind(be1),
 
-          ce2.save,
-          ue2.save,
-          be2.save,
+          ce2.save.bind(ce2),
+          ue2.save.bind(ue2),
+          be2.save.bind(be2),
 
-          ce3.save,
-          ue3.save,
-          be3.save,
+          ce3.save.bind(ce3),
+          ue3.save.bind(ue3),
+          be3.save.bind(be3),
 
           function(next) {
             Event.

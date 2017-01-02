@@ -2,13 +2,14 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    Document = require('../lib/document'),
-    DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common');
+var mongoose = start.mongoose;
+var assert = require('power-assert');
+var EventEmitter = require('events').EventEmitter;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
+var Document = require('../lib/document');
+var DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -23,6 +24,10 @@ function TestDocument() {
  */
 
 TestDocument.prototype.__proto__ = Document.prototype;
+
+for (var i in EventEmitter.prototype) {
+  TestDocument[i] = EventEmitter.prototype[i];
+}
 
 /**
  * Set a dummy schema to simulate compilation.

@@ -342,7 +342,6 @@ describe('document: hooks:', function() {
   });
 
   it('post remove hooks on subdocuments work', function(done) {
-    console.log('------------');
     var db = start();
     var sub = new Schema({_id: Number});
     var called = {pre: 0, post: 0};

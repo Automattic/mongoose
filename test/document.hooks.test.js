@@ -342,6 +342,7 @@ describe('document: hooks:', function() {
   });
 
   it('post remove hooks on subdocuments work', function(done) {
+    console.log('------------');
     var db = start();
     var sub = new Schema({_id: Number});
     var called = {pre: 0, post: 0};
@@ -768,18 +769,18 @@ describe('document: hooks:', function() {
       title: String
     });
 
+    var calls = 0;
+    L3Schema.pre('save', function(next) {
+      ++calls;
+      return next();
+    });
+
     var L2Schema = new Schema({
       items: [L3Schema]
     });
 
     var L1Schema = new Schema({
       items: [L2Schema]
-    });
-
-    var calls = 0;
-    L3Schema.pre('save', function(next) {
-      ++calls;
-      return next();
     });
 
     var db = start();

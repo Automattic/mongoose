@@ -4640,7 +4640,6 @@ describe('model: populate:', function() {
             return Person.populate(luke, { path: 'parent', model: 'gh4843' });
           }).
           then(function(luke) {
-            console.log('test', luke);
             assert.equal(luke.parent.name, 'Anakin');
             done();
           }).

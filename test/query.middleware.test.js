@@ -262,4 +262,26 @@ describe('query middleware', function() {
         done();
       });
   });
+
+  it('error handlers with findOneAndUpdate error and passRawResult (gh-4836)', function(done) {
+    var schema = new Schema({name: {type: String}});
+
+    var called = false;
+    var errorHandler = function(err, res, next) {
+      called = true;
+      next();
+    };
+
+    schema.post('findOneAndUpdate', errorHandler);
+
+    var Person = db.model('Person', schema);
+
+    Person.
+      findOneAndUpdate({}, {_id: 'test'}, {upsert: true, passRawResult: true}).
+      exec(function(error) {
+        assert.ok(error);
+        assert.ok(called);
+        done();
+      });
+  });
 });

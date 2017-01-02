@@ -387,7 +387,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
         out.ops = item.hz;
         outObj[item.name.replace(/\s/g, '')] = out;
       });
-      console.log(JSON.stringify(outObj));
+      console.dir(outObj, {depth: null, colors: true});
     }
   });
   function next() {

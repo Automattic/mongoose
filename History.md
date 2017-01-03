@@ -1,3 +1,13 @@
+4.7.6 / 2017-01-02
+==================
+ * fix(model): allow passing non-array to insertMany #4846
+ * fix(populate): use base model name if no discriminator for backwards compat #4843
+ * fix: allow internal validate callback to be optional #4842 [arciisine](https://github.com/arciisine)
+ * fix(document): don't skip pointCut if save not defined (like in browser doc) #4841
+ * chore: improve benchmarks #4838 [billouboq](https://github.com/billouboq)
+ * perf: remove some unused parameters #4837 [billouboq](https://github.com/billouboq)
+ * fix(query): don't call error handler if passRawResult is true and no error occurred #4836
+
 4.7.5 / 2016-12-26
 ==================
  * docs(model): fix spelling mistake #4828 [paulinoj](https://github.com/paulinoj)

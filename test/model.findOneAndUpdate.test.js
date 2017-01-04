@@ -964,7 +964,7 @@ describe('model: findByIdAndUpdate:', function() {
     }
   });
 
-  it('adds __v on upsert (gh-2122)', function(done) {
+  it('adds __v on upsert (gh-2122) (gh-4505)', function(done) {
     var db = start();
 
     var accountSchema = new Schema({
@@ -974,14 +974,21 @@ describe('model: findByIdAndUpdate:', function() {
     var Account = db.model('2122', accountSchema);
 
     Account.findOneAndUpdate(
-        {name: 'account'},
-        {},
-        {upsert: true, new: true},
-        function(error, doc) {
+      {name: 'account'},
+      {name: 'test'},
+      {upsert: true, new: true},
+      function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.__v, 0);
+        Account.update({ name: 'test' }, {}, { upsert: true }, function(error) {
           assert.ifError(error);
-          assert.equal(doc.__v, 0);
-          db.close(done);
+          Account.findOne({ name: 'test' }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.__v, 0);
+            db.close(done);
+          });
         });
+      });
   });
 
   it('works with nested schemas and $pull+$or (gh-1932)', function(done) {
@@ -1458,8 +1465,10 @@ describe('model: findByIdAndUpdate:', function() {
       });
 
       var TestModel = db.model('gh3107', testSchema);
+      var update = { $setOnInsert: { a: [{foo: 'bar'}], b: [2] } };
+      var opts = {upsert: true, new: true, setDefaultsOnInsert: true};
       TestModel
-      .findOneAndUpdate({id: '1'}, {$setOnInsert: {a: [{foo: 'bar'}], b: [2]}}, {upsert: true, new: true, setDefaultsOnInsert: true},
+      .findOneAndUpdate({name: 'abc'}, update, opts,
           function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.a.length, 1);
@@ -1602,6 +1611,25 @@ describe('model: findByIdAndUpdate:', function() {
         });
     });
 
+    it('raw result as 3rd param w/ lean (gh-4761)', function(done) {
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh4761', testSchema);
+      var options = { upsert: true, new: true, passRawResult: true };
+      var update = { $set: { test: 'abc' } };
+
+      TestModel.findOneAndUpdate({}, update, options).lean().
+        exec(function(error, doc, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+
+          done();
+        });
+    });
+
     it('handles setting single embedded docs to null (gh-4281)', function(done) {
       var foodSchema = new mongoose.Schema({
         name: { type: String, default: 'Bacon' }
@@ -1712,6 +1740,114 @@ describe('model: findByIdAndUpdate:', function() {
         assert.equal(doc.test1, 'a');
         done();
       });
+    });
+
+    it('handles upserting a non-existing field (gh-4757)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+
+      var Model = db.model('gh4757', modelSchema);
+      Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        new: true
+      }).exec(function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'StrictModeError');
+        done();
+      });
+    });
+
+    it('should not apply schema transforms (gh-4574)', function(done) {
+      var options = {
+        toObject: {
+          transform: function() {
+            assert.ok(false, 'should not call transform');
+          }
+        }
+      };
+
+      var SubdocSchema = new Schema({ test: String }, options);
+
+      var CollectionSchema = new Schema({
+        field1: { type: String },
+        field2 : {
+          arrayField: [SubdocSchema]
+        }
+      }, options);
+
+      var Collection = db.model('test', CollectionSchema);
+
+      Collection.create({ field2: { arrayField: [] } }).
+        then(function(doc) {
+          return Collection.findByIdAndUpdate(doc._id, {
+            $push: { 'field2.arrayField': { test: 'test' } }
+          }, { new: true });
+        }).
+        then(function() {
+          done();
+        });
+    });
+
+    it('properly handles casting nested objects in update (gh-4724)', function(done) {
+      var locationSchema = new Schema({
+        _id: false,
+        location: {
+          type: { type: String, default: 'Point' },
+          coordinates: [Number]
+        }
+      });
+
+      var testSchema = new Schema({
+        locations: [locationSchema]
+      });
+
+      var T = db.model('gh4724', testSchema);
+
+      var t = new T({
+        locations: [{
+          location: { type: 'Point', coordinates: [-122, 44] }
+        }]
+      });
+
+      t.save().
+        then(function(t) {
+          return T.findByIdAndUpdate(t._id, {
+            $set: {
+              'locations.0': {
+                location: { type: 'Point', coordinates: [-123, 45] }
+              }
+            }
+          }, { new: true });
+        }).
+        then(function(res) {
+          assert.equal(res.locations[0].location.coordinates[0], -123);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('doesnt do double validation on document arrays during updates (gh-4440)', function(done) {
+      var A = new Schema({str: String});
+      var B = new Schema({a: [A]});
+      var validateCalls = 0;
+      B.path('a').validate(function(val, next) {
+        ++validateCalls;
+        assert(Array.isArray(val));
+        next();
+      });
+
+      B = db.model('b', B);
+
+      B.findOneAndUpdate(
+        {foo: 'bar'},
+        {$set: {a: [{str: 'asdf'}]}},
+        {runValidators: true},
+        function(err) {
+          assert.ifError(err);
+          assert.equal(validateCalls, 1); // Assertion error: 1 == 2
+          db.close(done);
+        }
+      );
     });
   });
 });

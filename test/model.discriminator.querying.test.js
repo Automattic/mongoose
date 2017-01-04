@@ -747,6 +747,38 @@ describe('model', function() {
         });
       });
 
+      it('populates parent array reference (gh-4643)', function(done) {
+        var vehicleSchema = new Schema({
+          wheels: [{
+            type: Schema.Types.ObjectId,
+            ref: 'gh4643'
+          }]
+        });
+        var wheelSchema = new Schema({ brand: String });
+        var busSchema = new Schema({ speed: Number });
+
+        var Vehicle = db.model('gh4643_0', vehicleSchema);
+        var Bus = Vehicle.discriminator('gh4643_00', busSchema);
+        var Wheel = db.model('gh4643', wheelSchema);
+
+        Wheel.create({ brand: 'Rotiform' }, function(err, wheel) {
+          assert.ifError(err);
+          Bus.create({ speed: 80, wheels: [wheel] }, function(err) {
+            assert.ifError(err);
+            Bus.findOne({}).populate('wheels').exec(function(err, bus) {
+              assert.ifError(err);
+
+              assert.ok(bus instanceof Vehicle);
+              assert.ok(bus instanceof Bus);
+              assert.equal(bus.wheels.length, 1);
+              assert.ok(bus.wheels[0] instanceof Wheel);
+              assert.equal(bus.wheels[0].brand, 'Rotiform');
+              done();
+            });
+          });
+        });
+      });
+
       it('reference in child schemas (gh-2719-2)', function(done) {
         var EventSchema, Event, TalkSchema, Talk, Survey;
 

@@ -541,6 +541,70 @@ describe('schema select option', function() {
     });
   });
 
+  it('does not set defaults for nested objects (gh-4707)', function(done) {
+    var db = start();
+    var userSchema = new Schema({
+      name: String,
+      age: Number,
+      profile: {
+        email: String,
+        flags: { type: String, default: 'bacon' }
+      }
+    });
+
+    var User = db.model('gh4707', userSchema);
+
+    var obj = {
+      name: 'Val',
+      age: 28,
+      profile: { email: 'test@a.co', flags: 'abc' }
+    };
+    User.create(obj).
+      then(function(user) {
+        return User.findById(user._id).
+          select('name profile.email');
+      }).
+      then(function(user) {
+        assert.ok(!user.profile.flags);
+        db.close(done);
+      }).
+      catch(done);
+  });
+
+  it('does not create nested objects if not included (gh-4669)', function(done) {
+    var db = start();
+    var schema = new Schema({
+      field1: String,
+      field2: String,
+      field3: {
+        f1: String,
+        f2: { type: String, default: 'abc' }
+      },
+      field4: {
+        f1: String
+      },
+      field5: String
+    }, { minimize: false });
+
+    var M = db.model('Test', schema);
+    var obj = {
+      field1: 'a',
+      field2: 'b',
+      field3: { f1: 'c', f2: 'd' },
+      field4: { f1: 'e' },
+      field5: 'f'
+    };
+    M.create(obj, function(error, doc) {
+      assert.ifError(error);
+      M.findOne({ _id: doc._id }, 'field1 field2', function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.toObject({ minimize: false }).field3);
+        assert.ok(!doc.toObject({ minimize: false }).field4);
+        db.close(done);
+      });
+    });
+  });
+
   it('initializes nested defaults with selected objects (gh-2629)', function(done) {
     var NestedSchema = new mongoose.Schema({
       nested: {

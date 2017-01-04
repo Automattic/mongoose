@@ -1580,6 +1580,19 @@ describe('schema', function() {
     done();
   });
 
+  it('arrays with typeKey (gh-4548)', function(done) {
+    var testSchema = new Schema({
+      test: [{ $type: String }]
+    }, { typeKey: '$type' });
+
+    assert.equal(testSchema.paths.test.caster.instance, 'String');
+
+    var Test = mongoose.model('gh4548', testSchema);
+    var test = new Test({ test: [123] });
+    assert.strictEqual(test.test[0], '123');
+    done();
+  });
+
   describe('remove()', function() {
     before(function() {
       this.schema = new Schema({
@@ -1623,6 +1636,23 @@ describe('schema', function() {
       var Test = mongoose.model('gh2398', this.schema);
       var t = new Test();
       assert.equal(t.a, 42);
+      done();
+    });
+
+    it('methods named toString (gh-4551)', function(done) {
+      this.schema.methods.toString = function() {
+        return 'test';
+      };
+      // should not throw
+      mongoose.model('gh4551', this.schema);
+      done();
+    });
+
+    it('handles default value = 0 (gh-4620)', function(done) {
+      var schema = new Schema({
+        tags: { type: [Number], default: 0 }
+      });
+      assert.deepEqual(schema.path('tags').getDefault().toObject(), [0]);
       done();
     });
   });

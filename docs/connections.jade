@@ -19,6 +19,37 @@ block content
   :markdown
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
 
+  h3#buffering Operation Buffering
+  :markdown
+    Mongoose lets you start using your models immediately, without waiting for
+    mongoose to establish a connection to MongoDB.
+  
+  :js
+    mongoose.connect('mongodb://localhost/myapp');
+    var MyModel = mongoose.model('Test', new Schema({ name: String }));
+    // Works
+    MyModel.findOne(function(error, result) { /* ... */ });
+  
+  :markdown
+    That's because mongoose buffers model function calls internally. This
+    buffering is convenient, but also a common source of confusion. Mongoose
+    will *not* throw any errors by default if you use a model without
+    connecting.
+  
+  :js
+    var MyModel = mongoose.model('Test', new Schema({ name: String }));
+    // Will just hang until mongoose successfully connects
+    MyModel.findOne(function(error, result) { /* ... */ });
+    
+    setTimeout(function() {
+      mongoose.connect('mongodb://localhost/myapp');
+    }, 60000);
+  
+  :markdown
+    To disable buffering, turn off the [`bufferCommands` option on your schema](http://mongoosejs.com/docs/guide.html#bufferCommands).
+    If you have `bufferCommands` on and your connection is hanging, try turning
+    `bufferCommands` off to see if you haven't opened a connection properly.
+
   h3#options Options
   :markdown
     The `connect` method also accepts an `options` object which will be passed on to the underlying driver. All options included here take precedence over options passed in the connection string.

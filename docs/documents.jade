@@ -32,7 +32,9 @@ block content
       res.send(tank);
     });
   :markdown
-    The `findAndUpdate/Remove` static methods all make a change to at most one document, and return it with just one call to the database. There [are](./api.html#model_Model.findByIdAndRemove) [several](./api.html#model_Model.findOneAndUpdate) [variations](./api.html#model_Model.findOneAndRemove) on the [findAndModify](http://www.mongodb.org/display/DOCS/findAndModify+Command) theme. Read the [API](./api.html) docs for more detail. _Note that `findAndUpdate/Remove` do not execute any hooks or validation before making the change in the database. If you need hooks and validation, first query for the document and then save it._
+    The `findAndUpdate/Remove` static methods all make a change to at most one document, and return it with just one call to the database. There [are](./api.html#model_Model.findByIdAndRemove) [several](./api.html#model_Model.findOneAndUpdate) [variations](./api.html#model_Model.findOneAndRemove) on the [findAndModify](http://www.mongodb.org/display/DOCS/findAndModify+Command) theme. Read the [API](./api.html) docs for more detail.
+    
+    _Note that `findAndUpdate/Remove` do *not* execute any hooks or validation before making the change in the database. You can use the [`runValidators` option](/docs/validation.html#update-validators) to access a limited subset of document validation. However, if you need hooks and full document validation, first query for the document and then `save()` it._
 
   h3 Validating
   :markdown

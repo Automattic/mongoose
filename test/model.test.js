@@ -5219,6 +5219,8 @@ describe('Model', function() {
         assert.ok(!docs[1].isNew);
         assert.ok(docs[0].createdAt);
         assert.ok(docs[1].createdAt);
+        assert.strictEqual(docs[0].__v, 0);
+        assert.strictEqual(docs[1].__v, 0);
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);
@@ -5274,6 +5276,34 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() depopulate (gh-4590)', function(done) {
+      var personSchema = new Schema({
+        name: String
+      });
+      var movieSchema = new Schema({
+        name: String,
+        leadActor: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh4590'
+        }
+      });
+
+      var Person = db.model('gh4590', personSchema);
+      var Movie = db.model('gh4590_0', movieSchema);
+
+      var arnold = new Person({ name: 'Arnold Schwarzenegger' });
+      var movies = [{ name: 'Predator', leadActor: arnold }];
+      Movie.insertMany(movies, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 1);
+        Movie.findOne({ name: 'Predator' }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.leadActor.toHexString(), arnold._id.toHexString());
+          done();
+        });
+      });
+    });
+
     it('insertMany() with promises (gh-4237)', function(done) {
       var schema = new Schema({
         name: String
@@ -5291,6 +5321,26 @@ describe('Model', function() {
           done();
         });
       });
+    });
+
+    it('method with same name as prop should throw (gh-4475)', function(done) {
+      var testSchema = new mongoose.Schema({
+        isPaid: Boolean
+      });
+      testSchema.methods.isPaid = function() {
+        return false;
+      };
+
+      var threw = false;
+      try {
+        db.model('gh4475', testSchema);
+      } catch (error) {
+        threw = true;
+        assert.equal(error.message, 'You have a method and a property in ' +
+          'your schema both named "isPaid"');
+      }
+      assert.ok(threw);
+      done();
     });
 
     it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
@@ -5319,6 +5369,24 @@ describe('Model', function() {
         assert.ifError(error);
         assert.ok(t === t2);
         done();
+      });
+    });
+
+    it('emits errors correctly from exec (gh-4500)', function(done) {
+      var someModel = db.model('gh4500', new Schema({}));
+
+      someModel.on('error', function(error) {
+        assert.equal(error.message, 'This error will not disappear');
+        assert.ok(cleared);
+        done();
+      });
+
+      var cleared = false;
+      someModel.findOne().exec(function() {
+        setImmediate(function() {
+          cleared = true;
+        });
+        throw new Error('This error will not disappear');
       });
     });
 

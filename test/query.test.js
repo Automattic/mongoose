@@ -888,7 +888,7 @@ describe('Query', function() {
       assert.equal(params.array.$ne, 5);
       assert.equal(params.ids.$ne, id);
       params.comments.$ne._id.toHexString();
-      assert.deepEqual(params.comments.$ne, castedComment);
+      assert.deepEqual(params.comments.$ne.toObject(), castedComment);
       assert.equal(params.strings.$ne, 'Hi there');
       assert.equal(params.numbers.$ne, 10000);
 
@@ -903,7 +903,7 @@ describe('Query', function() {
       assert.ok(params.ids.$ne instanceof Array);
       assert.equal(params.ids.$ne[0].toString(), id.toString());
       assert.ok(params.comments.$ne instanceof Array);
-      assert.deepEqual(params.comments.$ne[0], castedComment);
+      assert.deepEqual(params.comments.$ne[0].toObject(), castedComment);
       assert.ok(params.strings.$ne instanceof Array);
       assert.equal(params.strings.$ne[0], 'Hi there');
       assert.ok(params.numbers.$ne instanceof Array);
@@ -945,7 +945,7 @@ describe('Query', function() {
       assert.equal(params.array, 5);
       assert.equal(params.ids, id);
       params.comments._id.toHexString();
-      assert.deepEqual(params.comments, castedComment);
+      assert.deepEqual(params.comments.toObject(), castedComment);
       assert.equal(params.strings, 'Hi there');
       assert.equal(params.numbers, 10000);
 
@@ -960,7 +960,7 @@ describe('Query', function() {
       assert.ok(params.ids instanceof Array);
       assert.equal(params.ids[0].toString(), id.toString());
       assert.ok(params.comments instanceof Array);
-      assert.deepEqual(params.comments[0], castedComment);
+      assert.deepEqual(params.comments[0].toObject(), castedComment);
       assert.ok(params.strings instanceof Array);
       assert.equal(params.strings[0], 'Hi there');
       assert.ok(params.numbers instanceof Array);
@@ -999,7 +999,7 @@ describe('Query', function() {
 
       query.cast(Product, params);
       assert.equal(params.ids.$gt, id);
-      assert.deepEqual(params.comments.$gt, castedComment);
+      assert.deepEqual(params.comments.$gt.toObject(), castedComment);
       assert.equal(params.strings.$gt, 'Hi there');
       assert.equal(params.numbers.$gt, 10000);
       done();
@@ -1153,12 +1153,12 @@ describe('Query', function() {
       prod.save(function(err) {
         assert.ifError(err);
 
-        Product.findOne(prod, function(err, product) {
+        Product.findOne({ _id: prod._id }, function(err, product) {
           assert.ifError(err);
           assert.equal(product.comments.length, 1);
           assert.equal(product.comments[0].text, 'hello');
 
-          Product.update(product, prod2doc, function(err) {
+          Product.update({ _id: prod._id }, prod2doc, function(err) {
             assert.ifError(err);
 
             Product.collection.findOne({_id: product._id}, function(err, doc) {
@@ -1548,6 +1548,24 @@ describe('Query', function() {
       done();
     });
 
+    it('timestamps with $each (gh-4805)', function(done) {
+      var nestedSchema = new Schema({ value: Number }, { timestamps: true });
+      var Test = db.model('gh4805', new Schema({
+        arr: [nestedSchema]
+      }, { timestamps: true }));
+
+      Test.update({}, {
+        $push: {
+          arr: {
+            $each: [{ value: 1 }]
+          }
+        }
+      }).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('allows sort with count (gh-3914)', function(done) {
       var Post = db.model('gh3914_0', {
         title: String
@@ -1735,6 +1753,26 @@ describe('Query', function() {
       });
     });
 
+    it('$not with objects (gh-4495)', function(done) {
+      var schema = new Schema({
+        createdAt: Date
+      });
+
+      var M = db.model('gh4495', schema);
+      var q = M.find({
+        createdAt:{
+          $not:{
+            $gte: '2016/09/02 00:00:00',
+            $lte: '2016/09/02 23:59:59'
+          }
+        }
+      });
+
+      assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
+      assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);
+      done();
+    });
+
     it('geoIntersects with mongoose doc as coords (gh-4408)', function(done) {
       var lineStringSchema = new Schema({
         name: String,
@@ -1775,6 +1813,19 @@ describe('Query', function() {
           assert.equal(results.length, 2);
           done();
         });
+      });
+    });
+
+    it('string with $not (gh-4592)', function(done) {
+      var TestSchema = new Schema({
+        test: String
+      });
+
+      var Test = db.model('gh4592', TestSchema);
+
+      Test.findOne({ test: { $not: /test/ } }, function(error) {
+        assert.ifError(error);
+        done();
       });
     });
 

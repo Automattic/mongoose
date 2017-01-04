@@ -883,6 +883,66 @@ describe('model query casting', function() {
         });
       });
     });
+
+    it('should cast subdoc _id typed as String to String in $elemMatch gh3719', function(done) {
+      var db = start();
+
+      var child = new Schema({
+        _id: {type: String}
+      }, {_id: false});
+
+      var parent = new Schema({
+        children: [child]
+      });
+
+      var Parent = db.model('gh3719-1', parent);
+
+      Parent.create({children: [{ _id: 'foobar' }] }, function(error) {
+        assert.ifError(error);
+        test();
+      });
+
+      function test() {
+        Parent.find({
+          $and: [{children: {$elemMatch: {_id: 'foobar'}}}]
+        }, function(error, docs) {
+          assert.ifError(error);
+
+          assert.equal(docs.length, 1);
+          db.close(done);
+        });
+      }
+    });
+
+    it('should cast subdoc _id typed as String to String in $elemMatch inside $not gh3719', function(done) {
+      var db = start();
+
+      var child = new Schema({
+        _id: {type: String}
+      }, {_id: false});
+
+      var parent = new Schema({
+        children: [child]
+      });
+
+      var Parent = db.model('gh3719-2', parent);
+
+      Parent.create({children: [{ _id: 'foobar' }] }, function(error) {
+        assert.ifError(error);
+        test();
+      });
+
+      function test() {
+        Parent.find({
+          $and: [{children: {$not: {$elemMatch: {_id: 'foobar'}}}}]
+        }, function(error, docs) {
+          assert.ifError(error);
+
+          assert.equal(docs.length, 0);
+          db.close(done);
+        });
+      }
+    });
   });
 
   it('works with $all (gh-3394)', function(done) {
@@ -901,6 +961,33 @@ describe('model query casting', function() {
         assert.ifError(error);
         assert.ok(doc);
         db.close(done);
+      });
+    });
+  });
+
+  it('date with $not + $type (gh-4632)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4632', { test: Date });
+
+    MyModel.find({ test: { $not: { $type: 9 } } }, function(error) {
+      assert.ifError(error);
+      done();
+    });
+  });
+
+  it('_id = 0 (gh-4610)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4610', { _id: Number });
+
+    MyModel.create({ _id: 0 }, function(error) {
+      assert.ifError(error);
+      MyModel.findById({ _id: 0 }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(doc);
+        assert.equal(doc._id, 0);
+        done();
       });
     });
   });

@@ -50,6 +50,32 @@ block content
     doc.createdAt = new Date(2011, 5, 1).setHours(4);
     doc.save(); // Works
   
+  hr#populate_sort_order
+  :markdown
+    **Q**. I'm populating a nested property under an array like the below code:
+    
+    ```
+      new Schema({
+        arr: [{
+          child: { ref: 'OtherModel', type: Schema.Types.ObjectId }
+        }]
+      });
+    ```
+    
+    `.populate({ path: 'arr.child', options: { sort: 'name' } })` won't sort
+    by `arr.child.name`?
+  
+  :markdown
+    **A**. See [this GitHub issue](https://github.com/Automattic/mongoose/issues/2202). It's a known issue but one that's exceptionally difficult to fix.
+  
+  hr#model_functions_hanging
+  :markdown
+    **Q**. All function calls on my models hang, what am I doing wrong?
+    
+    **A**. By default, mongoose will buffer your function calls until it can
+    connect to MongoDB. Read the [buffering section of the connection docs](http://mongoosejs.com/docs/connections.html#buffering)
+    for more information.
+  
   hr#enable_debugging
   :markdown
     **Q**. How can I enable debugging?

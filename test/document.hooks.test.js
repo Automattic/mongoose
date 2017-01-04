@@ -485,7 +485,7 @@ describe('document: hooks:', function() {
 
   it('pre save hooks should run in parallel', function(done) {
     // we set the time out to be double that of the validator - 1
-    // (so that running in serial will be greater then that)
+    // (so that running in serial will be greater than that)
     this.timeout(1000);
     var db = start(),
         count = 0;

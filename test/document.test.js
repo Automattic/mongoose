@@ -10,6 +10,7 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var Document = require('../lib/document');
 var DocumentObjectId = mongoose.Types.ObjectId;
+var EventEmitter = require('events').EventEmitter;
 var SchemaType = mongoose.SchemaType;
 var ValidatorError = SchemaType.ValidatorError;
 var ValidationError = mongoose.Document.ValidationError;
@@ -33,6 +34,10 @@ function TestDocument() {
  */
 
 TestDocument.prototype.__proto__ = Document.prototype;
+
+for (var i in EventEmitter.prototype) {
+  TestDocument[i] = EventEmitter.prototype[i];
+}
 
 /**
  * Set a dummy schema to simulate compilation.

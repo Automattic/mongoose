@@ -3851,27 +3851,18 @@ describe('Model', function() {
           title: String
         });
 
-        var ParentSchema = new Schema({
-          embeds: [EmbeddedSchema]
-        });
-
         EmbeddedSchema.post('save', function() {
           save = true;
         });
 
-        // Don't know how to test those on a embedded document.
-        // EmbeddedSchema.post('init', function () {
-        // init = true;
-        // });
-
-        // EmbeddedSchema.post('remove', function () {
-        // remove = true;
-        // });
+        var ParentSchema = new Schema({
+          embeds: [EmbeddedSchema]
+        });
 
         mongoose.model('Parent', ParentSchema);
 
-        var db = start(),
-            Parent = db.model('Parent');
+        var db = start();
+        var Parent = db.model('Parent');
 
         var parent = new Parent();
 

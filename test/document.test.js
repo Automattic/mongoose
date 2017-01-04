@@ -1373,7 +1373,7 @@ describe('document', function() {
 
 
     it('validator should run in parallel', function(done) {
-      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater than that)
       this.timeout(1000);
       var db = start();
       var count = 0;

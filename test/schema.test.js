@@ -1655,5 +1655,20 @@ describe('schema', function() {
       assert.deepEqual(schema.path('tags').getDefault().toObject(), [0]);
       done();
     });
+
+    it('Decimal128 type (gh-4759)', function(done) {
+      var Decimal128 = mongoose.Schema.Types.Decimal128;
+      var schema = new Schema({
+        num: Decimal128,
+        nums: ['Decimal128']
+      });
+      assert.ok(schema.path('num') instanceof Decimal128);
+      assert.ok(schema.path('nums').caster instanceof Decimal128);
+
+      var casted = schema.path('num').cast('6.2e+23');
+      assert.ok(casted instanceof mongoose.Types.Decimal128);
+      assert.equal(casted.toString(), '6.2E+23');
+      done();
+    });
   });
 });

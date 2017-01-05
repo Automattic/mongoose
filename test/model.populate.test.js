@@ -4700,6 +4700,55 @@ describe('model: populate:', function() {
         });
       });
 
+      it('populate with Decimal128 as ref (gh-4759)', function(done) {
+        start.mongodVersion(function(err, version) {
+          if (err) {
+            done(err);
+            return;
+          }
+          var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+          if (!mongo34) {
+            done();
+            return;
+          }
+
+          test();
+        });
+
+        function test() {
+          var parentSchema = new Schema({
+            name: String,
+            child: {
+              type: 'Decimal128',
+              ref: 'gh4759'
+            }
+          });
+
+          var childSchema = new Schema({
+            _id: 'Decimal128',
+            name: String
+          });
+
+          var Child = db.model('gh4759', childSchema);
+          var Parent = db.model('gh4759_0', parentSchema);
+
+          var decimal128 = childSchema.path('_id').cast('1.337e+3');
+          Child.create({ name: 'Luke', _id: '1.337e+3' }).
+            then(function() {
+              return Parent.create({ name: 'Anakin', child: decimal128.bytes });
+            }).
+            then(function(parent) {
+              return Parent.findById(parent._id).populate('child');
+            }).
+            then(function(parent) {
+              assert.equal(parent.child.name, 'Luke');
+              assert.equal(parent.child._id.toString(), '1337');
+              done();
+            }).
+            catch(done);
+        }
+      });
+
       it('virtual populate in single nested doc (gh-4715)', function(done) {
         var someModelSchema = new mongoose.Schema({
           name: String

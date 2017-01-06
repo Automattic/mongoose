@@ -63,7 +63,7 @@ describe('collections: capped:', function() {
   });
   it('attempting to use existing non-capped collection as capped emits error', function(done) {
     db = start();
-    var opts = {safe: true};
+    var opts = {};
     var conn = 'capped_existing_' + random();
 
     db.on('open', function() {

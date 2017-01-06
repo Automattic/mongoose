@@ -1490,37 +1490,53 @@ describe('Query', function() {
     });
 
     it('collation support (gh-4839)', function(done) {
-      var schema = new Schema({
-        name: String
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
       });
 
-      var MyModel = db.model('gh4839', schema);
-      var collation = { locale: 'en_US', strength: 1 };
+      function test() {
+        var schema = new Schema({
+          name: String
+        });
 
-      MyModel.create([{ name: 'a' }, { name: 'A' }]).
-        then(function() {
-          return MyModel.find({ name: 'a' }).collation(collation);
-        }).
-        then(function(docs) {
-          assert.equal(docs.length, 2);
-          return MyModel.find({ name: 'a' }, null, { collation: collation });
-        }).
-        then(function(docs) {
-          assert.equal(docs.length, 2);
-          return MyModel.find({ name: 'a' }, null, { collation: collation }).
-            sort({ _id: -1 }).
-            cursor().
-            next();
-        }).
-        then(function(doc) {
-          assert.equal(doc.name, 'A');
-          return MyModel.find({ name: 'a' });
-        }).
-        then(function(docs) {
-          assert.equal(docs.length, 1);
-          done();
-        }).
-        catch(done);
+        var MyModel = db.model('gh4839', schema);
+        var collation = { locale: 'en_US', strength: 1 };
+
+        MyModel.create([{ name: 'a' }, { name: 'A' }]).
+          then(function() {
+            return MyModel.find({ name: 'a' }).collation(collation);
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            return MyModel.find({ name: 'a' }, null, { collation: collation });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            return MyModel.find({ name: 'a' }, null, { collation: collation }).
+              sort({ _id: -1 }).
+              cursor().
+              next();
+          }).
+          then(function(doc) {
+            assert.equal(doc.name, 'A');
+            return MyModel.find({ name: 'a' });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            done();
+          }).
+          catch(done);
+      }
     });
 
     describe('gh-1950', function() {

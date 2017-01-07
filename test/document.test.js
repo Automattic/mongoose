@@ -3634,6 +3634,54 @@ describe('document', function() {
       done();
     });
 
+    it('supports $where in pre save hook (gh-4004)', function(done) {
+      var Promise = global.Promise;
+
+      var schema = new Schema({
+        name: String
+      }, { timestamps: true, versionKey: null, saveErrorIfNotFound: true });
+
+      schema.pre('save', function(next) {
+        this.$where = { updatedAt: this.updatedAt };
+        next();
+      });
+
+      schema.post('save', function(error, res, next) {
+        if (error instanceof MongooseError.DocumentNotFoundError) {
+          error = new Error('Somebody else updated the document!');
+        }
+        next(error);
+      });
+
+      var MyModel = db.model('gh4004', schema);
+
+      MyModel.create({ name: 'test' }).
+        then(function() {
+          return Promise.all([
+            MyModel.findOne(),
+            MyModel.findOne()
+          ]);
+        }).
+        then(function(docs) {
+          docs[0].name = 'test2';
+          return Promise.all([
+            docs[0].save(),
+            Promise.resolve(docs[1])
+          ]);
+        }).
+        then(function(docs) {
+          docs[1].name = 'test3';
+          return docs[1].save();
+        }).
+        then(function() {
+          done(new Error('Should not get here'));
+        }).
+        catch(function(error) {
+          assert.equal(error.message, 'Somebody else updated the document!');
+          done();
+        });
+    });
+
     it('toObject() with buffer and minimize (gh-4800)', function(done) {
       var TestSchema = new mongoose.Schema({ buf: Buffer }, {
         toObject: {

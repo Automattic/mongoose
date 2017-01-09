@@ -3704,6 +3704,46 @@ describe('document', function() {
         catch(done);
     });
 
+    it('runs validate hooks on single nested subdocs if not directly modified (gh-3884)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+      var count = 0;
+
+      childSchema.pre('validate', function(next) {
+        ++count;
+        next();
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        child: childSchema
+      });
+
+      var Parent = db.model('gh3884', parentSchema);
+
+      var p = new Parent({
+        name: 'Mufasa',
+        child: {
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }
+      });
+
+      p.save().
+        then(function(p) {
+          assert.equal(count, 1);
+          p.child.friends.push('Rafiki');
+          return p.save();
+        }).
+        then(function() {
+          assert.equal(count, 2);
+          done();
+        }).
+        catch(done);
+    });
+
     it('does not overwrite when setting nested (gh-4793)', function(done) {
       var grandchildSchema = new mongoose.Schema();
       grandchildSchema.method({

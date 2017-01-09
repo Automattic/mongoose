@@ -214,6 +214,71 @@ describe('query middleware', function() {
     });
   });
 
+  it('updateOne() (gh-3997)', function(done) {
+    var preCount = 0;
+    var postCount = 0;
+
+    schema.pre('updateOne', function() {
+      ++preCount;
+    });
+
+    schema.post('updateOne', function() {
+      ++postCount;
+    });
+
+    initializeData(function(error) {
+      assert.ifError(error);
+      Author.
+        updateOne({}, { author: 'updatedOne' }).
+        exec(function(error) {
+          assert.ifError(error);
+          assert.equal(preCount, 1);
+          assert.equal(postCount, 1);
+          Author.find({ author: 'updatedOne' }, function(error, res) {
+            assert.ifError(error);
+            assert.equal(res.length, 1);
+            done();
+          });
+        });
+    });
+  });
+
+  it('updateMany() (gh-3997)', function(done) {
+    var preCount = 0;
+    var postCount = 0;
+
+    schema.pre('updateMany', function() {
+      ++preCount;
+    });
+
+    schema.post('updateMany', function() {
+      ++postCount;
+    });
+
+    initializeData(function(error) {
+      assert.ifError(error);
+
+      Author.create({ author: 'test' }, function(error) {
+        assert.ifError(error);
+        Author.
+          updateMany({}, { author: 'updatedMany' }).
+          exec(function(error) {
+            assert.ifError(error);
+            assert.equal(preCount, 1);
+            assert.equal(postCount, 1);
+            Author.find({}, function(error, res) {
+              assert.ifError(error);
+              assert.ok(res.length > 1);
+              res.forEach(function(doc) {
+                assert.equal(doc.author, 'updatedMany');
+              });
+              done();
+            });
+          });
+      });
+    });
+  });
+
   it('error handlers (gh-2284)', function(done) {
     var testSchema = new Schema({ title: { type: String, unique: true } });
 

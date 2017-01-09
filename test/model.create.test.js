@@ -143,6 +143,33 @@ describe('model', function() {
       });
     });
 
+    it('handles discriminators (gh-3624)', function(done) {
+      var shapeSchema = new Schema({
+        name: String
+      }, { discriminatorKey: 'kind' });
+
+      var Shape = db.model('gh3624', shapeSchema);
+
+      var Circle = Shape.discriminator('gh3624_0',
+        new Schema({ radius: Number }));
+      var Square = Shape.discriminator('gh3624_1',
+        new Schema({ side: Number }));
+
+      var shapes = [
+        { name: 'Test' },
+        { kind: 'gh3624_0', radius: 5 },
+        { kind: 'gh3624_1', side: 10 }
+      ];
+      Shape.create(shapes, function(error, shapes) {
+        assert.ifError(error);
+        assert.ok(shapes[0] instanceof Shape);
+        assert.ok(shapes[1] instanceof Circle);
+        assert.equal(shapes[1].radius, 5);
+        assert.ok(shapes[2] instanceof Square);
+        assert.equal(shapes[2].side, 10);
+        done();
+      });
+    });
 
     describe('callback is optional', function() {
       it('with one doc', function(done) {

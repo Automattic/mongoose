@@ -68,14 +68,6 @@ describe('Query', function() {
       done();
     });
 
-    it('["a","b","c"]', function(done) {
-      assert.throws(function() {
-        var query = new Query({}, {}, null, p1.collection);
-        query.select(['a', 'b', 'c']);
-      }, /Invalid select/);
-      done();
-    });
-
     it('should not overwrite fields set in prior calls', function(done) {
       var query = new Query({}, {}, null, p1.collection);
       query.select('a');

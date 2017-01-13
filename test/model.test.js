@@ -5223,29 +5223,45 @@ describe('Model', function() {
     });
 
     it('insertMany() ordered option (gh-3893)', function(done) {
-      var schema = new Schema({
-        name: { type: String, unique: true }
-      });
-      var Movie = db.model('gh3893', schema);
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
 
-      var arr = [
-        { name: 'Star Wars' },
-        { name: 'Star Wars' },
-        { name: 'The Empire Strikes Back' }
-      ];
-      Movie.on('index', function(error) {
-        assert.ifError(error);
-        Movie.insertMany(arr, { ordered: false }, function(error) {
-          assert.equal(error.message.indexOf('E11000'), 0);
-          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
-            assert.ifError(error);
-            assert.equal(docs.length, 2);
-            assert.equal(docs[0].name, 'Star Wars');
-            assert.equal(docs[1].name, 'The Empire Strikes Back');
-            done();
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: { type: String, unique: true }
+        });
+        var Movie = db.model('gh3893', schema);
+
+        var arr = [
+          { name: 'Star Wars' },
+          { name: 'Star Wars' },
+          { name: 'The Empire Strikes Back' }
+        ];
+        Movie.on('index', function(error) {
+          assert.ifError(error);
+          Movie.insertMany(arr, { ordered: false }, function(error) {
+            assert.equal(error.message.indexOf('E11000'), 0);
+            Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+              assert.ifError(error);
+              assert.equal(docs.length, 2);
+              assert.equal(docs[0].name, 'Star Wars');
+              assert.equal(docs[1].name, 'The Empire Strikes Back');
+              done();
+            });
           });
         });
-      });
+      }
     });
 
     it('insertMany() hooks (gh-3846)', function(done) {

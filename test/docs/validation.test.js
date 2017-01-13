@@ -416,8 +416,9 @@ describe('validation docs', function() {
 
   /**
    * One final detail worth noting: update validators **only** run on `$set`
-   * and `$unset` operations. For instance, the below update will succeed,
-   * regardless of the value of `number`.
+   * and `$unset` operations (and `$push` and `$addToSet` in >= 4.8.0).
+   * For instance, the below update will succeed, regardless of the value of
+   * `number`, because update validators ignore `$inc`.
    */
 
   it('Update Validators Only Run On Specified Paths', function(done) {
@@ -433,6 +434,36 @@ describe('validation docs', function() {
       // There will never be a validation error here
       // acquit:ignore:start
       assert.ifError(error);
+      done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
+   * New in 4.8.0: update validators also run on `$push` and `$addToSet`
+   */
+
+  it('On $push and $addToSet', function(done) {
+    var testSchema = new Schema({
+      numbers: [{ type: Number, max: 0 }],
+      docs: [{
+        name: { type: String, required: true }
+      }]
+    });
+
+    var Test = db.model('TestPush', testSchema);
+
+    var update = {
+      $push: {
+        numbers: 1,
+        docs: { name: null }
+      }
+    };
+    var opts = { runValidators: true };
+    Test.update({}, update, opts, function(error) {
+      assert.ok(error.errors['numbers']);
+      assert.ok(error.errors['docs']);
+      // acquit:ignore:start
       done();
       // acquit:ignore:end
     });

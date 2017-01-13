@@ -731,4 +731,19 @@ describe('aggregate: ', function() {
         done();
       });
   });
+
+  it('query by document (gh-4866)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4866', {
+      name: String
+    });
+
+    MyModel.create({ name: 'test' }).
+      then(function(doc) { return MyModel.aggregate([{ $match: doc }]); }).
+      then(function() {
+        done();
+      }).
+      catch(done);
+  });
 });

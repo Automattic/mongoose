@@ -1,3 +1,11 @@
+4.7.7 / 2017-01-15
+==================
+ * fix(utils): don't crash if to[key] is null #4881
+ * fix: upgrade mongodb -> 2.2.21 #4867
+ * fix: add a toBSON to documents for easier querying #4866
+ * fix: suppress bluebird warning #4854 [davidwu226](https://github.com/davidwu226)
+ * fix(populate): handle nested virtuals in virtual populate #4851
+
 4.7.6 / 2017-01-02
 ==================
  * fix(model): allow passing non-array to insertMany #4846

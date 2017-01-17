@@ -16,7 +16,8 @@ var EmployeeSchema = new Schema({
   name: String,
   sal: Number,
   dept: String,
-  customers: [String]
+  customers: [String],
+  reportsTo: String
 });
 
 mongoose.model('Employee', EmployeeSchema);
@@ -25,9 +26,9 @@ function setupData(callback) {
   var saved = 0,
       emps = [
         {name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred']},
-        {name: 'Bob', sal: 15000, dept: 'sales', customers: ['Gary', 'Herbert', 'Isaac']},
-        {name: 'Carol', sal: 14000, dept: 'r&d'},
-        {name: 'Dave', sal: 14500, dept: 'r&d'}
+        {name: 'Bob', sal: 15000, dept: 'sales', customers: ['Gary', 'Herbert', 'Isaac'], reportsTo: 'Alice'},
+        {name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob'},
+        {name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol'}
       ],
       db = start(),
       Employee = db.model('Employee');
@@ -568,6 +569,33 @@ describe('aggregate: ', function() {
 
           done();
         });
+    });
+
+    it('graphLookup', function(done) {
+      var aggregate = new Aggregate();
+
+      aggregate.
+        model(db.model('Employee')).
+        graphLookup({
+          from: 'employees',
+          startWith: '$reportsTo',
+          connectFromField: 'reportsTo',
+          connectToField: 'name',
+          as: 'employeeHierarchy'
+        }).
+        exec(function(err, docs) {
+          if (err) {
+            return done(err);
+          }
+          var lowest = docs[3];
+          assert.equal(lowest.employeeHierarchy.length, 3);
+
+          // First result in array is max depth result
+          assert.equal(lowest.employeeHierarchy[0].name, 'Alice');
+          assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
+          done();
+        });
+      
     });
 
     it('complex pipeline', function(done) {

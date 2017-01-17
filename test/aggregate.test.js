@@ -377,6 +377,50 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('graphLookup', function() {
+    it('works', function(done) {
+      var aggregate = new Aggregate();
+      aggregate.graphLookup({
+        startWith: '$test',
+        from: 'sourceCollection',
+        connectFromField: 'testFromField',
+        connectToField: '_id'
+      });
+
+      assert.equal(aggregate._pipeline.length, 1);
+      assert.deepEqual(aggregate._pipeline[0].$graphLookup, {
+        startWith: '$test',
+        from: 'sourceCollection',
+        connectFromField: 'testFromField',
+        connectToField: '_id'
+      });
+      done();
+    });
+
+    it('automatically prepends $ to the startWith field', function(done) {
+      var aggregate = new Aggregate();
+      aggregate.graphLookup({
+        startWith: 'test'
+      });
+      
+      assert.deepEqual(aggregate._pipeline[0].$graphLookup, {
+        startWith: '$test'
+      });
+      done();
+    });
+
+    it('Throws if no options are passed to graphLookup', function(done) {
+      var aggregate = new Aggregate();
+      try {
+        aggregate.graphLookup('invalid options');
+        done(new Error('Should have errored'));
+      } catch (error) {
+        assert.ok(error instanceof TypeError);
+        done();
+      }
+    });
+  });
+
   describe('exec', function() {
     var db;
 

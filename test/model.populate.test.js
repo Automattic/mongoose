@@ -4749,6 +4749,43 @@ describe('model: populate:', function() {
         }
       });
 
+      it('handles nested virtuals (gh-4851)', function(done) {
+        var AuthorSchema = new Schema({ name: String });
+
+        var BookSchema = new Schema({
+          title: String,
+          author: { id: mongoose.Schema.Types.ObjectId }
+        });
+
+        BookSchema.virtual('author.doc', {
+          ref: 'Author',
+          foreignField: '_id',
+          localField: 'author.id',
+          justOne: true
+        });
+
+        var Author = db.model('Author', AuthorSchema);
+        var Book = db.model('Book', BookSchema);
+
+        Author.create({ name: 'Val' }).
+          then(function(author) {
+            return Book.create({
+              title: 'Professional AngularJS',
+              author: { id: author._id }
+            });
+          }).
+          then(function(book) {
+            return Book.findById(book).populate('author.doc');
+          }).
+          then(function(doc) {
+            assert.equal(doc.author.doc.name, 'Val');
+            doc = doc.toObject({ virtuals: true });
+            assert.equal(doc.author.doc.name, 'Val');
+            done();
+          }).
+          catch(done);
+      });
+
       it('virtual populate in single nested doc (gh-4715)', function(done) {
         var someModelSchema = new mongoose.Schema({
           name: String

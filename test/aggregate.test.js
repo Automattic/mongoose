@@ -403,7 +403,7 @@ describe('aggregate: ', function() {
       aggregate.graphLookup({
         startWith: 'test'
       });
-      
+
       assert.deepEqual(aggregate._pipeline[0].$graphLookup, {
         startWith: '$test'
       });
@@ -595,7 +595,7 @@ describe('aggregate: ', function() {
           assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
           done();
         });
-      
+
     });
 
     it('complex pipeline', function(done) {

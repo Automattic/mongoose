@@ -60,7 +60,7 @@ describe('cast: ', function() {
       done();
     });
 
-    it('throws when Numbers not valid', function(done) {
+    it('throws when Numbers are not valid', function(done) {
       var schema = new Schema({x: Number});
       var numbers = [123, 456, 'asfds'];
       assert.throws(function() {

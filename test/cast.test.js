@@ -45,6 +45,29 @@ describe('cast: ', function() {
       assert.deepEqual(cast(schema, {x: strings}), { x: { $in: strings.map(String) } });
       done();
     });
+
+    it('casts array with Numbers to $in query', function(done) {
+      var schema = new Schema({x: Number});
+      var numbers = [42, 25];
+      assert.deepEqual(cast(schema, {x: numbers}), { x: { $in: numbers } });
+      done();
+    });
+
+    it('casts array with Numbers to $in query when values are strings', function(done) {
+      var schema = new Schema({x: Number});
+      var numbers = ['42', '25'];
+      assert.deepEqual(cast(schema, {x: numbers}), { x: { $in: numbers.map(Number) } });
+      done();
+    });
+
+    it('throws when Numbers not valid', function(done) {
+      var schema = new Schema({x: Number});
+      var numbers = [123, 456, 'asfds'];
+      assert.throws(function() {
+        cast(schema, {x: numbers});
+      }, /Cast to number failed for value "asfds"/);
+      done();
+    });
   });
 
   describe('bitwise query operators: ', function() {

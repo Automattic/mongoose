@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.7.7-pre",
+  "version": "4.7.8-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -20,15 +20,15 @@
   "license": "MIT",
   "dependencies": {
     "async": "2.1.4",
-    "bson": "~1.0.1",
+    "bson": "~1.0.4",
     "hooks-fixed": "1.2.0",
     "kareem": "1.2.0",
-    "mongodb": "2.2.16",
+    "mongodb": "2.2.21",
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
     "mquery": "2.0.0",
     "ms": "0.7.2",
-    "muri": "1.1.1",
+    "muri": "1.2.0",
     "regexp-clone": "0.0.1",
     "sliced": "1.0.1"
   },

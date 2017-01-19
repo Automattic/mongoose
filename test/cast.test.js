@@ -8,11 +8,43 @@ var cast = require('../lib/cast');
 var ObjectId = require('bson').ObjectId;
 
 describe('cast: ', function() {
-  it('with an ObjectId', function(done) {
-    var schema = new Schema({x: Schema.Types.ObjectId});
-    var ids = [new ObjectId(), new ObjectId()];
-    assert.deepEqual(cast(schema, {x: ids}), { x: { $in: ids } });
-    done();
+  describe('when casting an array', function() {
+    it('casts array with ObjectIds to $in query', function(done) {
+      var schema = new Schema({x: Schema.Types.ObjectId});
+      var ids = [new ObjectId(), new ObjectId()];
+      assert.deepEqual(cast(schema, {x: ids}), { x: { $in: ids } });
+      done();
+    });
+
+    it('casts array with ObjectIds to $in query when values are strings', function(done) {
+      var schema = new Schema({x: Schema.Types.ObjectId});
+      var ids = [new ObjectId(), new ObjectId()];
+      assert.deepEqual(cast(schema, {x: ids.map(String)}), { x: { $in: ids } });
+      done();
+    });
+
+    it('throws when ObjectIds not valid', function(done) {
+      var schema = new Schema({x: Schema.Types.ObjectId});
+      var ids = [123, 456, 'asfds'];
+      assert.throws(function() {
+        cast(schema, {x: ids});
+      }, /Cast to ObjectId failed/);
+      done();
+    });
+
+    it('casts array with Strings to $in query', function(done) {
+      var schema = new Schema({x: String});
+      var strings = ['bleep', 'bloop'];
+      assert.deepEqual(cast(schema, {x: strings}), { x: { $in: strings } });
+      done();
+    });
+
+    it('casts array with Strings when necessary', function(done) {
+      var schema = new Schema({x: String});
+      var strings = [123, 456];
+      assert.deepEqual(cast(schema, {x: strings}), { x: { $in: strings.map(String) } });
+      done();
+    });
   });
 
   describe('bitwise query operators: ', function() {

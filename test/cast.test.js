@@ -5,8 +5,16 @@
 var Schema = require('../lib/schema');
 var assert = require('power-assert');
 var cast = require('../lib/cast');
+var ObjectId = require('bson').ObjectId;
 
 describe('cast: ', function() {
+  it('with an ObjectId', function(done) {
+    var schema = new Schema({x: Schema.Types.ObjectId});
+    var ids = [new ObjectId(), new ObjectId()];
+    assert.deepEqual(cast(schema, {x: ids}), { x: { $in: ids } });
+    done();
+  });
+
   describe('bitwise query operators: ', function() {
     it('with a number', function(done) {
       var schema = new Schema({x: Buffer});

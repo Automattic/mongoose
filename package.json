@@ -23,7 +23,6 @@
     "bson": "~1.0.4",
     "hooks-fixed": "1.2.0",
     "kareem": "1.2.0",
-    "mongodb": "2.2.21",
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
     "mquery": "2.0.0",
@@ -31,6 +30,9 @@
     "muri": "1.2.0",
     "regexp-clone": "0.0.1",
     "sliced": "1.0.1"
+  },
+  "peerDependencies": {
+    "mongodb": "^2.2.21"
   },
   "devDependencies": {
     "acquit": "0.4.1",

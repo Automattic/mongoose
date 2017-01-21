@@ -357,6 +357,25 @@ block content
     var BandSchema = new Schema({
       name: String
     }, { toJSON: { virtuals: true } });
+  
+  :markdown
+    If you're using populate projections, make sure `foreignField` is included
+    in the projection.
+    
+  :js
+    Band.
+      find({}).
+      populate({ path: 'members', select: 'name' }).
+      exec(function(error, bands) {
+        // Won't work, foreign field `band` is not selected in the projection
+      });
+
+    Band.
+      find({}).
+      populate({ path: 'members', select: 'name band' }).
+      exec(function(error, bands) {
+        // Works, foreign field `band` is selected
+      });
 
   h3#next Next Up
   :markdown

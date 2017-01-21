@@ -378,6 +378,59 @@ describe('model', function() {
           done();
         });
       });
+
+      it('embedded in document arrays (gh-2723)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+
+        var batchSchema = new Schema({ events: [eventSchema] });
+        batchSchema.path('events').discriminator('Clicked', new Schema({
+          element: String
+        }, { _id: false }));
+        batchSchema.path('events').discriminator('Purchased', new Schema({
+          product: String
+        }, { _id: false }));
+
+        var MyModel = db.model('gh2723', batchSchema);
+        var doc = {
+          events: [
+            { kind: 'Clicked', element: 'Test' },
+            { kind: 'Purchased', product: 'Test2' }
+          ]
+        };
+        MyModel.create(doc).
+          then(function(doc) {
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[0].element, 'Test');
+            assert.equal(doc.events[1].product, 'Test2');
+            var obj = doc.toObject({ virtuals: false });
+            delete obj._id;
+            assert.deepEqual(obj, {
+              __v: 0,
+              events: [
+                { kind: 'Clicked', element: 'Test' },
+                { kind: 'Purchased', product: 'Test2' }
+              ]
+            });
+            done();
+          }).
+          then(function() {
+            return MyModel.findOne({
+              events: {
+                $elemMatch: {
+                  kind: 'Clicked',
+                  element: 'Test'
+                }
+              }
+            }, { 'events.$': 1 });
+          }).
+          then(function(doc) {
+            assert.ok(doc);
+            assert.equal(doc.events.length, 1);
+            assert.equal(doc.events[0].element, 'Test');
+          }).
+          catch(done);
+      });
     });
   });
 });

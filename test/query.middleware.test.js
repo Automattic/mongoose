@@ -241,6 +241,24 @@ describe('query middleware', function() {
     });
   });
 
+  it('error handlers for validate (gh-4885)', function(done) {
+    var testSchema = new Schema({ title: { type: String, required: true } });
+
+    var called = 0;
+    testSchema.post('validate', function(error, doc, next) {
+      ++called;
+      next(error);
+    });
+
+    var Test = db.model('gh4885', testSchema);
+
+    Test.create({}, function(error) {
+      assert.ok(error);
+      assert.equal(called, 1);
+      done();
+    });
+  });
+
   it('error handlers with findOneAndUpdate and passRawResult (gh-4836)', function(done) {
     var schema = new Schema({name: {type: String}});
 

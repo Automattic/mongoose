@@ -1067,6 +1067,30 @@ describe('model: update:', function() {
       });
     });
 
+    it('avoids nested paths if setting parent path (gh-4911)', function(done) {
+      var EmbeddedSchema = mongoose.Schema({
+        embeddedField: String
+      });
+
+      var ParentSchema = mongoose.Schema({
+        embedded: EmbeddedSchema
+      });
+
+      var Parent = db.model('gh4911', ParentSchema);
+
+      var newDoc = {
+        _id: new mongoose.Types.ObjectId(),
+        embedded: null
+      };
+
+      var opts = { upsert: true, setDefaultsOnInsert: true };
+
+      Parent.
+        findOneAndUpdate({ _id: newDoc._id }, newDoc, opts).
+        then(function() { done(); }).
+        catch(done);
+    });
+
     it('doesnt set default on upsert if query sets it', function(done) {
       var s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
       var Breakfast = db.model('gh-860-1', s);

@@ -4502,6 +4502,71 @@ describe('model: populate:', function() {
         });
       });
 
+      it('gh-4923', function(done) {
+        var ClusterSchema = new Schema({
+          name: String
+        });
+        var Cluster = db.model('gh4923', ClusterSchema);
+
+        var ZoneSchema = new Schema({
+          name: String,
+          clusters: {
+            type: [ObjectId],
+            ref: 'gh4923'
+          }
+        });
+        var Zone = db.model('gh4923_1', ZoneSchema);
+
+        var DocSchema = new Schema({
+          activity: [{
+            cluster: {
+              type: ObjectId,
+              ref: 'gh4923'
+            },
+            intensity: Number
+          }]
+        });
+        DocSchema.virtual('activity.zones', {
+          ref: 'gh4923_1',
+          localField: 'activity.cluster',
+          foreignField: 'clusters'
+        });
+        DocSchema.set('toObject', {virtuals: true});
+        DocSchema.set('toJSON', {virtuals: true});
+        var Doc = db.model('gh4923_2', DocSchema);
+
+        Cluster.create([{ name: 'c1' }, { name: 'c2' }, { name: 'c3' }]).
+          then(function(c) {
+            return Zone.create([
+              { name: 'z1', clusters: [c[0]._id, c[1]._id, c[2]._id] },
+              { name: 'z2', clusters: [c[0]._id, c[2]._id] }
+            ]).then(function() { return c; });
+          }).
+          then(function(c) {
+            return Doc.create({
+              activity: [
+                { cluster: c[0]._id, intensity: 1 },
+                { cluster: c[1]._id, intensity: 2 }
+              ]
+            });
+          }).
+          then(function() {
+            return Doc.
+              findOne({}).
+              populate('activity.cluster').
+              populate('activity.zones', 'name clusters').
+              exec(function(error, res) {
+                assert.ifError(error);
+                // Fails if this `.toObject()` is returned, issue #4926
+                res = res.toObject();
+                assert.equal(res.activity[0].zones[0].name, 'z1');
+                assert.equal(res.activity[1].zones[0].name, 'z1');
+                done();
+              });
+          }).
+          catch(done);
+      });
+
       it('supports setting default options in schema (gh-4741)', function(done) {
         var sessionSchema = new Schema({
           date: { type: Date },

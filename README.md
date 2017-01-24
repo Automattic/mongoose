@@ -28,7 +28,7 @@ Build your own Mongoose plugin through [generator-mongoose-plugin](https://githu
 
 ## Contributors
 
-View all 200+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
+View all 300+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Installation
 

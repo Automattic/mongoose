@@ -1,3 +1,13 @@
+4.7.8 / 2017-01-23
+==================
+ * fix(populate): better handling for virtual populate under arrays #4923
+ * docs: upgrade contributors count #4918 [AdamZaczek](https://github.com/AdamZaczek)
+ * fix(query): don't set nested path default if setting parent path #4911
+ * docs(promise): add missing bracket #4907
+ * fix(connection): ensure error handling is consistently async #4905
+ * fix: handle authMechanism in query string #4900
+ * fix(document): ensure error handlers run for validate #4885
+
 4.7.7 / 2017-01-15
 ==================
  * fix(utils): don't crash if to[key] is null #4881

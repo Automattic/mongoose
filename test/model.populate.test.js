@@ -3217,6 +3217,51 @@ describe('model: populate:', function() {
       });
     });
 
+    it('fails if sorting with a doc array subprop (gh-2202)', function(done) {
+      var childSchema = new Schema({ name: String });
+      var Child = db.model('gh2202', childSchema);
+
+      var parentSchema = new Schema({
+        children1: [{
+          child: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh2202'
+          },
+          test: Number
+        }],
+        children2: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh2202'
+        }]
+      });
+      var Parent = db.model('gh2202_0', parentSchema);
+
+      Child.create([{ name: 'test1' }, { name: 'test2' }], function(error, c) {
+        assert.ifError(error);
+        var doc = {
+          children1: [
+            { child: c[0]._id, test: 1 },
+            { child: c[1]._id, test: 2 }
+          ],
+          children2: [c[0]._id, c[1]._id]
+        };
+        Parent.create(doc, function(error, doc) {
+          assert.ifError(error);
+          Parent.findById(doc).populate('children2').exec(function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.children2[0].name, 'test1');
+            Parent.findById(doc).
+              populate({ path: 'children1.child', options: { sort: '-name' } }).
+              exec(function(error) {
+                assert.notEqual(error.message.indexOf('subproperty of a document array'),
+                  -1);
+                done();
+              });
+          });
+        });
+      });
+    });
+
     it('handles toObject() (gh-3279)', function(done) {
       var teamSchema = new Schema({
         members: [{

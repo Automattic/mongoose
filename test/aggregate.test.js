@@ -379,6 +379,21 @@ describe('aggregate: ', function() {
   });
 
   describe('graphLookup', function() {
+    before(function(done) {
+      var _this = this;
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          _this.skip();
+        }
+        done();
+      });
+    });
+
     it('works', function(done) {
       var aggregate = new Aggregate();
       aggregate.graphLookup({
@@ -572,30 +587,44 @@ describe('aggregate: ', function() {
     });
 
     it('graphLookup', function(done) {
-      var aggregate = new Aggregate();
+      var _this = this;
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          _this.skip();
+        }
+        test();
+      });
 
-      aggregate.
-        model(db.model('Employee')).
-        graphLookup({
-          from: 'employees',
-          startWith: '$reportsTo',
-          connectFromField: 'reportsTo',
-          connectToField: 'name',
-          as: 'employeeHierarchy'
-        }).
-        exec(function(err, docs) {
-          if (err) {
-            return done(err);
-          }
-          var lowest = docs[3];
-          assert.equal(lowest.employeeHierarchy.length, 3);
+      function test() {
+        var aggregate = new Aggregate();
 
-          // First result in array is max depth result
-          assert.equal(lowest.employeeHierarchy[0].name, 'Alice');
-          assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
-          done();
-        });
+        aggregate.
+          model(db.model('Employee')).
+          graphLookup({
+            from: 'employees',
+            startWith: '$reportsTo',
+            connectFromField: 'reportsTo',
+            connectToField: 'name',
+            as: 'employeeHierarchy'
+          }).
+          exec(function(err, docs) {
+            if (err) {
+              return done(err);
+            }
+            var lowest = docs[3];
+            assert.equal(lowest.employeeHierarchy.length, 3);
 
+            // First result in array is max depth result
+            assert.equal(lowest.employeeHierarchy[0].name, 'Alice');
+            assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
+            done();
+          });
+      }
     });
 
     it('complex pipeline', function(done) {

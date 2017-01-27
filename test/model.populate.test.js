@@ -4602,8 +4602,18 @@ describe('model: populate:', function() {
               populate('activity.zones', 'name clusters').
               exec(function(error, res) {
                 assert.ifError(error);
-                // Fails if this `.toObject()` is returned, issue #4926
+                // Fails if this `.toObject()` is omitted, issue #4926
                 res = res.toObject();
+                var compare = function(a, b) {
+                  if (a.name < b.name) {
+                    return -1;
+                  } else if (b.name < a.name) {
+                    return 1;
+                  }
+                  return 0;
+                };
+                res.activity[0].zones.sort(compare);
+                res.activity[1].zones.sort(compare);
                 assert.equal(res.activity[0].zones[0].name, 'z1');
                 assert.equal(res.activity[1].zones[0].name, 'z1');
                 done();

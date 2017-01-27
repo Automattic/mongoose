@@ -23,15 +23,15 @@ var EmployeeSchema = new Schema({
 mongoose.model('Employee', EmployeeSchema);
 
 function setupData(callback) {
-  var saved = 0,
-    emps = [
-      { name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred'] },
-      { name: 'Bob', sal: 15000, dept: 'sales', customers: ['Gary', 'Herbert', 'Isaac'], reportsTo: 'Alice' },
-      { name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob' },
-      { name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol' }
-    ],
-    db = start(),
-    Employee = db.model('Employee');
+  var saved = 0;
+  var emps = [
+    { name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred'] },
+    { name: 'Bob', sal: 15000, dept: 'sales', customers: ['Gary', 'Herbert', 'Isaac'], reportsTo: 'Alice' },
+    { name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob' },
+    { name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol' }
+  ];
+  var db = start();
+  var Employee = db.model('Employee');
 
   emps.forEach(function(data) {
     var emp = new Employee(data);
@@ -46,7 +46,7 @@ function setupData(callback) {
 
 /**
  * Helper function to test operators that only work in MongoDB 3.4 and above (such as some aggregation pipeline operators)
- * 
+ *
  * @param {Object} ctx, `this`, so that mocha tests can be skipped
  * @param {Function} done
  * @return {Void}

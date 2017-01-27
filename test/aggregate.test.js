@@ -480,7 +480,8 @@ describe('aggregate: ', function() {
           players: [
             // This will group documents by their `firstName` property
             {
-              $group: { _id: '$firstName', count: { $sum: 1 }
+              $group: {
+                _id: '$firstName', count: { $sum: 1 }
               }
             },
 
@@ -680,6 +681,57 @@ describe('aggregate: ', function() {
             // First result in array is max depth result
             assert.equal(lowest.employeeHierarchy[0].name, 'Alice');
             assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
+            done();
+          });
+      }
+    });
+
+    it('facet', function(done) {
+      var _this = this;
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          _this.skip();
+        }
+        test();
+      });
+
+      function test() {
+        var aggregate = new Aggregate();
+
+        aggregate.
+          model(db.model('Employee')).
+          facet({
+            departments: [
+              {
+                $group: { _id: '$dept', count: { $sum: 1 } }
+              }
+            ],
+            employeesPerCustomer: [
+              { $unwind: '$customers' },
+              { $sortByCount: '$customers' }
+            ]
+          }).
+          exec(function(error, docs) {
+            if (error) {
+              return done(error);
+            }
+            assert.deepEqual(docs[0].departments, [
+              { _id: 'r&d', count: 2 },
+              { _id: 'sales', count: 2 }
+            ]);
+
+            assert.deepEqual(docs[0].employeesPerCustomer, [
+              { _id: 'Herbert', count: 1 },
+              { _id: 'Gary', count: 1 },
+              { _id: 'Isaac', count: 1 },
+              { _id: 'Fred', count: 1 },
+              { _id: 'Eve', count: 1 }
+            ]);
             done();
           });
       }

@@ -1,3 +1,8 @@
+4.7.9 / 2017-01-27
+==================
+ * fix(query): handle casting $exists under $not #4933
+ * chore: upgrade mongodb -> 2.2.22 re: #4931
+
 4.7.8 / 2017-01-23
 ==================
  * fix(populate): better handling for virtual populate under arrays #4923

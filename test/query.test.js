@@ -1829,6 +1829,19 @@ describe('Query', function() {
       });
     });
 
+    it('$exists under $not (gh-4933)', function(done) {
+      var TestSchema = new Schema({
+        test: String
+      });
+
+      var Test = db.model('gh4933', TestSchema);
+
+      Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

@@ -1,3 +1,22 @@
+4.8.0 / 2017-01-28
+==================
+ * feat(schema): add saveErrorIfNotFound option and $where property #4924 #4004
+ * feat(query): add $in implicitly if passed an array #4912 [QuotableWater7](https://github.com/QuotableWater7)
+ * feat(aggregate): helper for $facet #4904 [varunjayaraman](https://github.com/varunjayaraman)
+ * feat(query): add collation method #4839
+ * feat(schema): propogate strict option to implicit array subschemas #4831 [dkrosso](https://github.com/dkrosso)
+ * feat(aggregate): add helper for graphLookup #4819 [varunjayaraman](https://github.com/varunjayaraman)
+ * feat(types): support Decimal128 #4759
+ * feat(aggregate): add eachAsync() to aggregate cursor #4300
+ * feat(query): add updateOne and updateMany #3997
+ * feat(model): support options for insertMany #3893
+ * fix(document): run validation on single nested docs if not directly modified #3884
+ * feat(model): use discriminator constructor based on discriminatorKey in create() #3624
+ * feat: pass collection as context to debug function #3261
+ * feat(query): support push and addToSet for update validators #2933
+ * feat(types): add discriminator() function to doc arrays #2723 #1856
+ * fix(populate): return an error if sorting underneath a doc array #2202
+
 4.7.9 / 2017-01-27
 ==================
  * fix(query): handle casting $exists under $not #4933

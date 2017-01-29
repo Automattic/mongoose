@@ -3,13 +3,14 @@
  * Module dependencies.
  */
 
-var assert = require('power-assert'),
-    start = require('./common'),
-    mongoose = start.mongoose,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray'),
-    Schema = mongoose.Schema,
-    ValidationError = mongoose.Document.ValidationError;
+var assert = require('power-assert');
+var start = require('./common');
+var mongoose = start.mongoose;
+var EmbeddedDocument = require('../lib/types/embedded');
+var EventEmitter = require('events').EventEmitter;
+var DocumentArray = require('../lib/types/documentarray');
+var Schema = mongoose.Schema;
+var ValidationError = mongoose.Document.ValidationError;
 
 /**
  * Setup.
@@ -34,6 +35,10 @@ function Subdocument() {
  */
 
 Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+
+for (var i in EventEmitter.prototype) {
+  Subdocument[i] = EventEmitter.prototype[i];
+}
 
 /**
  * Set schema.

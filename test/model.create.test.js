@@ -143,7 +143,6 @@ describe('model', function() {
       });
     });
 
-
     describe('callback is optional', function() {
       it('with one doc', function(done) {
         var p = B.create({title: 'optional callback'});

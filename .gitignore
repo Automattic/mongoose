@@ -25,3 +25,6 @@ npm-debug.log
 *.ntvs*
 *.njsproj
 *.sln
+
+# Visual STudio Code
+.vscode

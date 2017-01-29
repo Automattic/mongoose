@@ -10,6 +10,7 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var Document = require('../lib/document');
 var DocumentObjectId = mongoose.Types.ObjectId;
+var EventEmitter = require('events').EventEmitter;
 var SchemaType = mongoose.SchemaType;
 var ValidatorError = SchemaType.ValidatorError;
 var ValidationError = mongoose.Document.ValidationError;
@@ -33,6 +34,10 @@ function TestDocument() {
  */
 
 TestDocument.prototype.__proto__ = Document.prototype;
+
+for (var i in EventEmitter.prototype) {
+  TestDocument[i] = EventEmitter.prototype[i];
+}
 
 /**
  * Set a dummy schema to simulate compilation.
@@ -3647,6 +3652,54 @@ describe('document', function() {
       done();
     });
 
+    it('supports $where in pre save hook (gh-4004)', function(done) {
+      var Promise = global.Promise;
+
+      var schema = new Schema({
+        name: String
+      }, { timestamps: true, versionKey: null, saveErrorIfNotFound: true });
+
+      schema.pre('save', function(next) {
+        this.$where = { updatedAt: this.updatedAt };
+        next();
+      });
+
+      schema.post('save', function(error, res, next) {
+        if (error instanceof MongooseError.DocumentNotFoundError) {
+          error = new Error('Somebody else updated the document!');
+        }
+        next(error);
+      });
+
+      var MyModel = db.model('gh4004', schema);
+
+      MyModel.create({ name: 'test' }).
+        then(function() {
+          return Promise.all([
+            MyModel.findOne(),
+            MyModel.findOne()
+          ]);
+        }).
+        then(function(docs) {
+          docs[0].name = 'test2';
+          return Promise.all([
+            docs[0].save(),
+            Promise.resolve(docs[1])
+          ]);
+        }).
+        then(function(docs) {
+          docs[1].name = 'test3';
+          return docs[1].save();
+        }).
+        then(function() {
+          done(new Error('Should not get here'));
+        }).
+        catch(function(error) {
+          assert.equal(error.message, 'Somebody else updated the document!');
+          done();
+        });
+    });
+
     it('toObject() with buffer and minimize (gh-4800)', function(done) {
       var TestSchema = new mongoose.Schema({ buf: Buffer }, {
         toObject: {
@@ -3664,6 +3717,46 @@ describe('document', function() {
         then(function(doc) {
           // Should not throw
           require('util').inspect(doc);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('runs validate hooks on single nested subdocs if not directly modified (gh-3884)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+      var count = 0;
+
+      childSchema.pre('validate', function(next) {
+        ++count;
+        next();
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        child: childSchema
+      });
+
+      var Parent = db.model('gh3884', parentSchema);
+
+      var p = new Parent({
+        name: 'Mufasa',
+        child: {
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }
+      });
+
+      p.save().
+        then(function(p) {
+          assert.equal(count, 1);
+          p.child.friends.push('Rafiki');
+          return p.save();
+        }).
+        then(function() {
+          assert.equal(count, 2);
           done();
         }).
         catch(done);

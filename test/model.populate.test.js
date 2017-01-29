@@ -3217,6 +3217,51 @@ describe('model: populate:', function() {
       });
     });
 
+    it('fails if sorting with a doc array subprop (gh-2202)', function(done) {
+      var childSchema = new Schema({ name: String });
+      var Child = db.model('gh2202', childSchema);
+
+      var parentSchema = new Schema({
+        children1: [{
+          child: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh2202'
+          },
+          test: Number
+        }],
+        children2: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh2202'
+        }]
+      });
+      var Parent = db.model('gh2202_0', parentSchema);
+
+      Child.create([{ name: 'test1' }, { name: 'test2' }], function(error, c) {
+        assert.ifError(error);
+        var doc = {
+          children1: [
+            { child: c[0]._id, test: 1 },
+            { child: c[1]._id, test: 2 }
+          ],
+          children2: [c[0]._id, c[1]._id]
+        };
+        Parent.create(doc, function(error, doc) {
+          assert.ifError(error);
+          Parent.findById(doc).populate('children2').exec(function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.children2[0].name, 'test1');
+            Parent.findById(doc).
+              populate({ path: 'children1.child', options: { sort: '-name' } }).
+              exec(function(error) {
+                assert.notEqual(error.message.indexOf('subproperty of a document array'),
+                  -1);
+                done();
+              });
+          });
+        });
+      });
+    });
+
     it('handles toObject() (gh-3279)', function(done) {
       var teamSchema = new Schema({
         members: [{
@@ -3671,29 +3716,29 @@ describe('model: populate:', function() {
 
       async.series(
         [
-          u1.save,
-          u2.save,
-          u3.save,
+          u1.save.bind(u1),
+          u2.save.bind(u2),
+          u3.save.bind(u3),
 
-          c1.save,
-          c2.save,
-          c3.save,
+          c1.save.bind(c1),
+          c2.save.bind(c2),
+          c3.save.bind(c3),
 
-          b1.save,
-          b2.save,
-          b3.save,
+          b1.save.bind(b1),
+          b2.save.bind(b2),
+          b3.save.bind(b3),
 
-          ce1.save,
-          ue1.save,
-          be1.save,
+          ce1.save.bind(ce1),
+          ue1.save.bind(ue1),
+          be1.save.bind(be1),
 
-          ce2.save,
-          ue2.save,
-          be2.save,
+          ce2.save.bind(ce2),
+          ue2.save.bind(ue2),
+          be2.save.bind(be2),
 
-          ce3.save,
-          ue3.save,
-          be3.save,
+          ce3.save.bind(ce3),
+          ue3.save.bind(ue3),
+          be3.save.bind(be3),
 
           function(next) {
             Event.
@@ -4557,8 +4602,18 @@ describe('model: populate:', function() {
               populate('activity.zones', 'name clusters').
               exec(function(error, res) {
                 assert.ifError(error);
-                // Fails if this `.toObject()` is returned, issue #4926
+                // Fails if this `.toObject()` is omitted, issue #4926
                 res = res.toObject();
+                var compare = function(a, b) {
+                  if (a.name < b.name) {
+                    return -1;
+                  } else if (b.name < a.name) {
+                    return 1;
+                  }
+                  return 0;
+                };
+                res.activity[0].zones.sort(compare);
+                res.activity[1].zones.sort(compare);
                 assert.equal(res.activity[0].zones[0].name, 'z1');
                 assert.equal(res.activity[1].zones[0].name, 'z1');
                 done();
@@ -4763,6 +4818,55 @@ describe('model: populate:', function() {
               });
           });
         });
+      });
+
+      it('populate with Decimal128 as ref (gh-4759)', function(done) {
+        start.mongodVersion(function(err, version) {
+          if (err) {
+            done(err);
+            return;
+          }
+          var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+          if (!mongo34) {
+            done();
+            return;
+          }
+
+          test();
+        });
+
+        function test() {
+          var parentSchema = new Schema({
+            name: String,
+            child: {
+              type: 'Decimal128',
+              ref: 'gh4759'
+            }
+          });
+
+          var childSchema = new Schema({
+            _id: 'Decimal128',
+            name: String
+          });
+
+          var Child = db.model('gh4759', childSchema);
+          var Parent = db.model('gh4759_0', parentSchema);
+
+          var decimal128 = childSchema.path('_id').cast('1.337e+3');
+          Child.create({ name: 'Luke', _id: '1.337e+3' }).
+            then(function() {
+              return Parent.create({ name: 'Anakin', child: decimal128.bytes });
+            }).
+            then(function(parent) {
+              return Parent.findById(parent._id).populate('child');
+            }).
+            then(function(parent) {
+              assert.equal(parent.child.name, 'Luke');
+              assert.equal(parent.child._id.toString(), '1337');
+              done();
+            }).
+            catch(done);
+        }
       });
 
       it('handles nested virtuals (gh-4851)', function(done) {

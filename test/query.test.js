@@ -68,14 +68,6 @@ describe('Query', function() {
       done();
     });
 
-    it('["a","b","c"]', function(done) {
-      assert.throws(function() {
-        var query = new Query({}, {}, null, p1.collection);
-        query.select(['a', 'b', 'c']);
-      }, /Invalid select/);
-      done();
-    });
-
     it('should not overwrite fields set in prior calls', function(done) {
       var query = new Query({}, {}, null, p1.collection);
       query.select('a');
@@ -1487,6 +1479,56 @@ describe('Query', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('collation support (gh-4839)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: String
+        });
+
+        var MyModel = db.model('gh4839', schema);
+        var collation = { locale: 'en_US', strength: 1 };
+
+        MyModel.create([{ name: 'a' }, { name: 'A' }]).
+          then(function() {
+            return MyModel.find({ name: 'a' }).collation(collation);
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            return MyModel.find({ name: 'a' }, null, { collation: collation });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            return MyModel.find({ name: 'a' }, null, { collation: collation }).
+              sort({ _id: -1 }).
+              cursor().
+              next();
+          }).
+          then(function(doc) {
+            assert.equal(doc.name, 'A');
+            return MyModel.find({ name: 'a' });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            done();
+          }).
+          catch(done);
+      }
     });
 
     describe('gh-1950', function() {

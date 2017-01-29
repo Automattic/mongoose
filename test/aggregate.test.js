@@ -713,7 +713,8 @@ describe('aggregate: ', function() {
             ],
             employeesPerCustomer: [
               { $unwind: '$customers' },
-              { $sortByCount: '$customers' }
+              { $sortByCount: '$customers' },
+              { $sort: { _id: 1 } }
             ]
           }).
           exec(function(error, docs) {
@@ -726,11 +727,11 @@ describe('aggregate: ', function() {
             ]);
 
             assert.deepEqual(docs[0].employeesPerCustomer, [
-              { _id: 'Herbert', count: 1 },
-              { _id: 'Gary', count: 1 },
-              { _id: 'Isaac', count: 1 },
+              { _id: 'Eve', count: 1 },
               { _id: 'Fred', count: 1 },
-              { _id: 'Eve', count: 1 }
+              { _id: 'Gary', count: 1 },
+              { _id: 'Herbert', count: 1 },
+              { _id: 'Isaac', count: 1 }
             ]);
             done();
           });

@@ -14,6 +14,7 @@
  * feat(model): use discriminator constructor based on discriminatorKey in create() #3624
  * feat: pass collection as context to debug function #3261
  * feat(query): support push and addToSet for update validators #2933
+ * perf(document): refactor registerHooksFromSchema so hooks are defined on doc prototype #2754
  * feat(types): add discriminator() function to doc arrays #2723 #1856
  * fix(populate): return an error if sorting underneath a doc array #2202
 

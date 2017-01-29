@@ -240,4 +240,38 @@ describe('discriminator docs', function () {
     done();
     // acquit:ignore:end
   });
+
+  /**
+   * When you use `Model.create()`, mongoose
+   */
+  it('Using discriminators with `Model.create()`', function(done) {
+    var Schema = mongoose.Schema;
+    var shapeSchema = new Schema({
+      name: String
+    }, { discriminatorKey: 'kind' });
+
+    var Shape = db.model('Shape', shapeSchema);
+
+    var Circle = Shape.discriminator('Circle',
+      new Schema({ radius: Number }));
+    var Square = Shape.discriminator('Square',
+      new Schema({ side: Number }));
+
+    var shapes = [
+      { name: 'Test' },
+      { kind: 'Circle', radius: 5 },
+      { kind: 'Square', side: 10 }
+    ];
+    Shape.create(shapes, function(error, shapes) {
+      assert.ifError(error);
+      assert.ok(shapes[0] instanceof Shape);
+      assert.ok(shapes[1] instanceof Circle);
+      assert.equal(shapes[1].radius, 5);
+      assert.ok(shapes[2] instanceof Square);
+      assert.equal(shapes[2].side, 10);
+      // acquit:ignore:start
+      done();
+      // acquit:ignore:end
+    });
+  });
 });

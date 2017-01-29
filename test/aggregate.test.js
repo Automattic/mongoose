@@ -2,11 +2,11 @@
  * Module dependencies
  */
 
-var start = require('./common'),
-    Aggregate = require('../lib/aggregate'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    assert = require('power-assert');
+var start = require('./common');
+var Aggregate = require('../lib/aggregate');
+var mongoose = start.mongoose;
+var Schema = mongoose.Schema;
+var assert = require('power-assert');
 
 /**
  * Test data
@@ -16,21 +16,22 @@ var EmployeeSchema = new Schema({
   name: String,
   sal: Number,
   dept: String,
-  customers: [String]
+  customers: [String],
+  reportsTo: String
 });
 
 mongoose.model('Employee', EmployeeSchema);
 
 function setupData(callback) {
-  var saved = 0,
-      emps = [
-        {name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred']},
-        {name: 'Bob', sal: 15000, dept: 'sales', customers: ['Gary', 'Herbert', 'Isaac']},
-        {name: 'Carol', sal: 14000, dept: 'r&d'},
-        {name: 'Dave', sal: 14500, dept: 'r&d'}
-      ],
-      db = start(),
-      Employee = db.model('Employee');
+  var saved = 0;
+  var emps = [
+    { name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred'] },
+    { name: 'Bob', sal: 15000, dept: 'sales', customers: ['Gary', 'Herbert', 'Isaac'], reportsTo: 'Alice' },
+    { name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob' },
+    { name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol' }
+  ];
+  var db = start();
+  var Employee = db.model('Employee');
 
   emps.forEach(function(data) {
     var emp = new Employee(data);
@@ -44,6 +45,27 @@ function setupData(callback) {
 }
 
 /**
+ * Helper function to test operators that only work in MongoDB 3.4 and above (such as some aggregation pipeline operators)
+ *
+ * @param {Object} ctx, `this`, so that mocha tests can be skipped
+ * @param {Function} done
+ * @return {Void}
+ */
+function onlyTestMongo34(ctx, done) {
+  start.mongodVersion(function(err, version) {
+    if (err) {
+      done(err);
+      return;
+    }
+    var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+    if (!mongo34) {
+      ctx.skip();
+    }
+    done();
+  });
+}
+
+/**
  * Test.
  */
 
@@ -52,11 +74,11 @@ describe('aggregate: ', function() {
     it('(pipeline)', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.append({$a: 1}, {$b: 2}, {$c: 3}), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}]);
+      assert.equal(aggregate.append({ $a: 1 }, { $b: 2 }, { $c: 3 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
 
-      aggregate.append({$d: 4}, {$c: 5});
-      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}, {$d: 4}, {$c: 5}]);
+      aggregate.append({ $d: 4 }, { $c: 5 });
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }, { $d: 4 }, { $c: 5 }]);
 
       done();
     });
@@ -64,11 +86,11 @@ describe('aggregate: ', function() {
     it('supports array as single argument', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.append([{$a: 1}, {$b: 2}, {$c: 3}]), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}]);
+      assert.equal(aggregate.append([{ $a: 1 }, { $b: 2 }, { $c: 3 }]), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
 
-      aggregate.append([{$d: 4}, {$c: 5}]);
-      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}, {$d: 4}, {$c: 5}]);
+      aggregate.append([{ $d: 4 }, { $c: 5 }]);
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }, { $d: 4 }, { $c: 5 }]);
 
       done();
     });
@@ -78,19 +100,19 @@ describe('aggregate: ', function() {
       var regexp = /Arguments must be aggregate pipeline operators/;
 
       assert.throws(function() {
-        aggregate.append({$a: 1}, 'string');
+        aggregate.append({ $a: 1 }, 'string');
       }, regexp);
 
       assert.throws(function() {
-        aggregate.append({$a: 1}, ['array']);
+        aggregate.append({ $a: 1 }, ['array']);
       }, regexp);
 
       assert.throws(function() {
-        aggregate.append({$a: 1}, {a: 1});
+        aggregate.append({ $a: 1 }, { a: 1 });
       }, regexp);
 
       assert.throws(function() {
-        aggregate.append([{$a: 1}, {a: 1}]);
+        aggregate.append([{ $a: 1 }, { a: 1 }]);
       }, regexp);
 
       done();
@@ -117,8 +139,8 @@ describe('aggregate: ', function() {
     });
 
     it('called from constructor', function(done) {
-      var aggregate = new Aggregate({$a: 1}, {$b: 2}, {$c: 3});
-      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}]);
+      var aggregate = new Aggregate({ $a: 1 }, { $b: 2 }, { $c: 3 });
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
       done();
     });
   });
@@ -127,11 +149,11 @@ describe('aggregate: ', function() {
     it('(object)', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.project({a: 1, b: 1, c: 0}), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$project: {a: 1, b: 1, c: 0}}]);
+      assert.equal(aggregate.project({ a: 1, b: 1, c: 0 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }]);
 
-      aggregate.project({b: 1});
-      assert.deepEqual(aggregate._pipeline, [{$project: {a: 1, b: 1, c: 0}}, {$project: {b: 1}}]);
+      aggregate.project({ b: 1 });
+      assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
 
       done();
     });
@@ -140,10 +162,10 @@ describe('aggregate: ', function() {
       var aggregate = new Aggregate();
 
       aggregate.project(' a b   -c  ');
-      assert.deepEqual(aggregate._pipeline, [{$project: {a: 1, b: 1, c: 0}}]);
+      assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }]);
 
       aggregate.project('b');
-      assert.deepEqual(aggregate._pipeline, [{$project: {a: 1, b: 1, c: 0}}, {$project: {b: 1}}]);
+      assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
 
       done();
     });
@@ -171,11 +193,11 @@ describe('aggregate: ', function() {
     it('works', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.group({a: 1, b: 2}), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$group: {a: 1, b: 2}}]);
+      assert.equal(aggregate.group({ a: 1, b: 2 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $group: { a: 1, b: 2 } }]);
 
-      aggregate.group({c: 3});
-      assert.deepEqual(aggregate._pipeline, [{$group: {a: 1, b: 2}}, {$group: {c: 3}}]);
+      aggregate.group({ c: 3 });
+      assert.deepEqual(aggregate._pipeline, [{ $group: { a: 1, b: 2 } }, { $group: { c: 3 } }]);
 
       done();
     });
@@ -186,10 +208,10 @@ describe('aggregate: ', function() {
       var aggregate = new Aggregate();
 
       assert.equal(aggregate.skip(42), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$skip: 42}]);
+      assert.deepEqual(aggregate._pipeline, [{ $skip: 42 }]);
 
       aggregate.skip(42);
-      assert.deepEqual(aggregate._pipeline, [{$skip: 42}, {$skip: 42}]);
+      assert.deepEqual(aggregate._pipeline, [{ $skip: 42 }, { $skip: 42 }]);
 
       done();
     });
@@ -200,10 +222,10 @@ describe('aggregate: ', function() {
       var aggregate = new Aggregate();
 
       assert.equal(aggregate.limit(42), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$limit: 42}]);
+      assert.deepEqual(aggregate._pipeline, [{ $limit: 42 }]);
 
       aggregate.limit(42);
-      assert.deepEqual(aggregate._pipeline, [{$limit: 42}, {$limit: 42}]);
+      assert.deepEqual(aggregate._pipeline, [{ $limit: 42 }, { $limit: 42 }]);
 
       done();
     });
@@ -214,14 +236,14 @@ describe('aggregate: ', function() {
       var aggregate = new Aggregate();
 
       assert.equal(aggregate.unwind('field'), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$unwind: '$field'}]);
+      assert.deepEqual(aggregate._pipeline, [{ $unwind: '$field' }]);
 
       aggregate.unwind('a', 'b', 'c');
       assert.deepEqual(aggregate._pipeline, [
-        {$unwind: '$field'},
-        {$unwind: '$a'},
-        {$unwind: '$b'},
-        {$unwind: '$c'}
+        { $unwind: '$field' },
+        { $unwind: '$a' },
+        { $unwind: '$b' },
+        { $unwind: '$c' }
       ]);
 
       done();
@@ -232,11 +254,11 @@ describe('aggregate: ', function() {
     it('works', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.match({a: 1}), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$match: {a: 1}}]);
+      assert.equal(aggregate.match({ a: 1 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $match: { a: 1 } }]);
 
-      aggregate.match({b: 2});
-      assert.deepEqual(aggregate._pipeline, [{$match: {a: 1}}, {$match: {b: 2}}]);
+      aggregate.match({ b: 2 });
+      assert.deepEqual(aggregate._pipeline, [{ $match: { a: 1 } }, { $match: { b: 2 } }]);
 
       done();
     });
@@ -246,11 +268,11 @@ describe('aggregate: ', function() {
     it('(object)', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.sort({a: 1, b: 'asc', c: 'descending'}), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$sort: {a: 1, b: 1, c: -1}}]);
+      assert.equal(aggregate.sort({ a: 1, b: 'asc', c: 'descending' }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }]);
 
-      aggregate.sort({b: 'desc'});
-      assert.deepEqual(aggregate._pipeline, [{$sort: {a: 1, b: 1, c: -1}}, {$sort: {b: -1}}]);
+      aggregate.sort({ b: 'desc' });
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: -1 } }]);
 
       done();
     });
@@ -259,10 +281,10 @@ describe('aggregate: ', function() {
       var aggregate = new Aggregate();
 
       aggregate.sort(' a b   -c  ');
-      assert.deepEqual(aggregate._pipeline, [{$sort: {a: 1, b: 1, c: -1}}]);
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }]);
 
       aggregate.sort('b');
-      assert.deepEqual(aggregate._pipeline, [{$sort: {a: 1, b: 1, c: -1}}, {$sort: {b: 1}}]);
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: 1 } }]);
 
       done();
     });
@@ -290,11 +312,11 @@ describe('aggregate: ', function() {
     it('works', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.near({a: 1}), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{$geoNear: {a: 1}}]);
+      assert.equal(aggregate.near({ a: 1 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }]);
 
-      aggregate.near({b: 2});
-      assert.deepEqual(aggregate._pipeline, [{$geoNear: {a: 1}}, {$geoNear: {b: 2}}]);
+      aggregate.near({ b: 2 });
+      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }, { $geoNear: { b: 2 } }]);
 
       done();
     });
@@ -313,23 +335,23 @@ describe('aggregate: ', function() {
 
       aggregate._model = stub;
 
-      assert.equal(aggregate.near({a: 1}), aggregate);
+      assert.equal(aggregate.near({ a: 1 }), aggregate);
       // Run exec so we apply discriminator pipeline
       assert.throws(function() {
         aggregate.exec();
       }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
       assert.deepEqual(aggregate._pipeline,
-          [{$geoNear: {a: 1, query: {__t: 'subschema'}}}]);
+        [{ $geoNear: { a: 1, query: { __t: 'subschema' } } }]);
 
       aggregate = new Aggregate();
       aggregate._model = stub;
 
-      aggregate.near({b: 2, query: {x: 1}});
+      aggregate.near({ b: 2, query: { x: 1 } });
       assert.throws(function() {
         aggregate.exec();
       }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
       assert.deepEqual(aggregate._pipeline,
-          [{$geoNear: {b: 2, query: {x: 1, __t: 'subschema'}}}]);
+        [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
 
       done();
     });
@@ -360,7 +382,7 @@ describe('aggregate: ', function() {
       aggregate.sample(3);
 
       assert.equal(aggregate._pipeline.length, 1);
-      assert.deepEqual(aggregate._pipeline[0].$sample, {size: 3});
+      assert.deepEqual(aggregate._pipeline[0].$sample, { size: 3 });
       done();
     });
   });
@@ -368,12 +390,109 @@ describe('aggregate: ', function() {
   describe('bind', function() {
     it('works', function(done) {
       var aggregate = new Aggregate();
-      var model = {foo: 42};
+      var model = { foo: 42 };
 
       assert.equal(aggregate.model(model), aggregate);
       assert.equal(aggregate._model, model);
 
       done();
+    });
+  });
+
+  describe('Mongo 3.4 operators', function() {
+    before(function(done) {
+      onlyTestMongo34(this, done);
+    });
+
+    describe('graphLookup', function() {
+      it('works', function(done) {
+        var aggregate = new Aggregate();
+        aggregate.graphLookup({
+          startWith: '$test',
+          from: 'sourceCollection',
+          connectFromField: 'testFromField',
+          connectToField: '_id'
+        });
+
+        assert.equal(aggregate._pipeline.length, 1);
+        assert.deepEqual(aggregate._pipeline[0].$graphLookup, {
+          startWith: '$test',
+          from: 'sourceCollection',
+          connectFromField: 'testFromField',
+          connectToField: '_id'
+        });
+        done();
+      });
+
+      it('automatically prepends $ to the startWith field', function(done) {
+        var aggregate = new Aggregate();
+        aggregate.graphLookup({
+          startWith: 'test'
+        });
+
+        assert.deepEqual(aggregate._pipeline[0].$graphLookup, {
+          startWith: '$test'
+        });
+        done();
+      });
+
+      it('Throws if no options are passed to graphLookup', function(done) {
+        var aggregate = new Aggregate();
+        try {
+          aggregate.graphLookup('invalid options');
+          done(new Error('Should have errored'));
+        } catch (error) {
+          assert.ok(error instanceof TypeError);
+          done();
+        }
+      });
+    });
+
+    describe('facet', function() {
+      it('works', function(done) {
+        var aggregate = new Aggregate();
+
+        aggregate.facet({
+          heights: [
+            // This will group documents by their `height` property
+            { $group: { _id: '$height', count: { $sum: 1 } } },
+            // This will sort by descending height
+            { $sort: { count: -1, _id: -1 } }
+          ],
+          players: [
+            // This will group documents by their `firstName` property
+            {
+              $group: { _id: '$firstName', count: { $sum: 1 } }
+            },
+            // This will sort documents by their firstName descending
+            { $sort: { count: -1, _id: -1 } }
+          ]
+        });
+
+        assert.equal(aggregate._pipeline.length, 1);
+        assert.deepEqual(aggregate._pipeline[0].$facet, {
+          heights: [
+            // This will group documents by their `height` property
+            { $group: { _id: '$height', count: { $sum: 1 } } },
+            // This will sort by descending height
+            { $sort: { count: -1, _id: -1 } }
+          ],
+          players: [
+            // This will group documents by their `firstName` property
+            {
+              $group: {
+                _id: '$firstName', count: { $sum: 1 }
+              }
+            },
+
+            // This will sort documents by their firstName descending
+            {
+              $sort: { count: -1, _id: -1 }
+            }
+          ]
+        });
+        done();
+      });
     });
   });
 
@@ -396,7 +515,7 @@ describe('aggregate: ', function() {
 
       aggregate.
         model(db.model('Employee')).
-        project({sal: 1, sal_k: {$divide: ['$sal', 1000]}}).
+        project({ sal: 1, sal_k: { $divide: ['$sal', 1000] } }).
         exec(function(err, docs) {
           assert.ifError(err);
           docs.forEach(function(doc) {
@@ -412,7 +531,7 @@ describe('aggregate: ', function() {
 
       aggregate.
         model(db.model('Employee')).
-        group({_id: '$dept'}).
+        group({ _id: '$dept' }).
         exec(function(err, docs) {
           var depts;
           assert.ifError(err);
@@ -503,7 +622,7 @@ describe('aggregate: ', function() {
 
       aggregate.
         model(db.model('Employee')).
-        match({sal: {$gt: 15000}}).
+        match({ sal: { $gt: 15000 } }).
         exec(function(err, docs) {
           assert.ifError(err);
           assert.equal(docs.length, 1);
@@ -526,14 +645,106 @@ describe('aggregate: ', function() {
         });
     });
 
+    it('graphLookup', function(done) {
+      var _this = this;
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          _this.skip();
+        }
+        test();
+      });
+
+      function test() {
+        var aggregate = new Aggregate();
+
+        aggregate.
+          model(db.model('Employee')).
+          graphLookup({
+            from: 'employees',
+            startWith: '$reportsTo',
+            connectFromField: 'reportsTo',
+            connectToField: 'name',
+            as: 'employeeHierarchy'
+          }).
+          exec(function(err, docs) {
+            if (err) {
+              return done(err);
+            }
+            var lowest = docs[3];
+            assert.equal(lowest.employeeHierarchy.length, 3);
+
+            // First result in array is max depth result
+            assert.equal(lowest.employeeHierarchy[0].name, 'Alice');
+            assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
+            done();
+          });
+      }
+    });
+
+    it('facet', function(done) {
+      var _this = this;
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          _this.skip();
+        }
+        test();
+      });
+
+      function test() {
+        var aggregate = new Aggregate();
+
+        aggregate.
+          model(db.model('Employee')).
+          facet({
+            departments: [
+              {
+                $group: { _id: '$dept', count: { $sum: 1 } }
+              }
+            ],
+            employeesPerCustomer: [
+              { $unwind: '$customers' },
+              { $sortByCount: '$customers' }
+            ]
+          }).
+          exec(function(error, docs) {
+            if (error) {
+              return done(error);
+            }
+            assert.deepEqual(docs[0].departments, [
+              { _id: 'r&d', count: 2 },
+              { _id: 'sales', count: 2 }
+            ]);
+
+            assert.deepEqual(docs[0].employeesPerCustomer, [
+              { _id: 'Herbert', count: 1 },
+              { _id: 'Gary', count: 1 },
+              { _id: 'Isaac', count: 1 },
+              { _id: 'Fred', count: 1 },
+              { _id: 'Eve', count: 1 }
+            ]);
+            done();
+          });
+      }
+    });
+
     it('complex pipeline', function(done) {
       var aggregate = new Aggregate();
 
       aggregate.
         model(db.model('Employee')).
-        match({sal: {$lt: 16000}}).
+        match({ sal: { $lt: 16000 } }).
         unwind('customers').
-        project({emp: '$name', cust: '$customers'}).
+        project({ emp: '$name', cust: '$customers' }).
         sort('-cust').
         skip(2).
         exec(function(err, docs) {
@@ -561,7 +772,7 @@ describe('aggregate: ', function() {
 
         aggregate.
           model(db.model('Employee')).
-          match({sal: {$lt: 16000}}).
+          match({ sal: { $lt: 16000 } }).
           explain(function(err1, output) {
             assert.ifError(err1);
             assert.ok(output);
@@ -623,7 +834,7 @@ describe('aggregate: ', function() {
         var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
 
         var m = db.model('Employee');
-        var match = {$match: {sal: {$gt: 15000}}};
+        var match = { $match: { sal: { $gt: 15000 } } };
         var pref = 'primaryPreferred';
         var aggregate = m.aggregate(match).read(pref);
         if (mongo26_or_greater) {
@@ -649,12 +860,12 @@ describe('aggregate: ', function() {
   it('cursor (gh-3160)', function(done) {
     var db = start();
 
-    var MyModel = db.model('gh3160', {name: String});
+    var MyModel = db.model('gh3160', { name: String });
 
     MyModel.create({ name: 'test' }, function(error) {
       assert.ifError(error);
       MyModel.
-        aggregate([{$match: {name: 'test'}}, {$project:{name:'$name'}}]).
+        aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
         allowDiskUse(true).
         cursor({ batchSize: 2500, async: true }).
         exec(function(error, cursor) {
@@ -671,16 +882,47 @@ describe('aggregate: ', function() {
   it('cursor() without options (gh-3855)', function(done) {
     var db = start();
 
-    var MyModel = db.model('gh3855', {name: String});
+    var MyModel = db.model('gh3855', { name: String });
 
     db.on('open', function() {
       var cursor = MyModel.
-        aggregate([{$match: {name: 'test'}}]).
+        aggregate([{ $match: { name: 'test' } }]).
         cursor().
         exec();
       assert.ok(cursor instanceof require('stream').Readable);
       done();
     });
+  });
+
+  it('cursor() eachAsync (gh-4300)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh4300', { name: String });
+
+    var cur = 0;
+    var expectedNames = ['Axl', 'Slash'];
+    MyModel.create([{ name: 'Axl' }, { name: 'Slash' }]).
+      then(function() {
+        return MyModel.aggregate([{ $sort: { name: 1 } }]).
+          cursor().
+          exec().
+          eachAsync(function(doc) {
+            var _cur = cur;
+            assert.equal(doc.name, expectedNames[cur]);
+            return {
+              then: function(onResolve) {
+                setTimeout(function() {
+                  assert.equal(_cur, cur++);
+                  onResolve();
+                }, 50);
+              }
+            };
+          }).
+          then(function() {
+            done();
+          });
+      }).
+      catch(done);
   });
 
   it('ability to add noCursorTimeout option (gh-4241)', function(done) {
@@ -691,7 +933,7 @@ describe('aggregate: ', function() {
     });
 
     MyModel.
-      aggregate([{ $match: {name: 'test' } }]).
+      aggregate([{ $match: { name: 'test' } }]).
       addCursorFlag('noCursorTimeout', true).
       cursor({ async: true }).
       exec(function(error, cursor) {

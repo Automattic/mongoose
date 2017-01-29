@@ -3851,27 +3851,18 @@ describe('Model', function() {
           title: String
         });
 
-        var ParentSchema = new Schema({
-          embeds: [EmbeddedSchema]
-        });
-
         EmbeddedSchema.post('save', function() {
           save = true;
         });
 
-        // Don't know how to test those on a embedded document.
-        // EmbeddedSchema.post('init', function () {
-        // init = true;
-        // });
-
-        // EmbeddedSchema.post('remove', function () {
-        // remove = true;
-        // });
+        var ParentSchema = new Schema({
+          embeds: [EmbeddedSchema]
+        });
 
         mongoose.model('Parent', ParentSchema);
 
-        var db = start(),
-            Parent = db.model('Parent');
+        var db = start();
+        var Parent = db.model('Parent');
 
         var parent = new Parent();
 
@@ -5229,6 +5220,48 @@ describe('Model', function() {
           done();
         });
       });
+    });
+
+    it('insertMany() ordered option (gh-3893)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: { type: String, unique: true }
+        });
+        var Movie = db.model('gh3893', schema);
+
+        var arr = [
+          { name: 'Star Wars' },
+          { name: 'Star Wars' },
+          { name: 'The Empire Strikes Back' }
+        ];
+        Movie.on('index', function(error) {
+          assert.ifError(error);
+          Movie.insertMany(arr, { ordered: false }, function(error) {
+            assert.equal(error.message.indexOf('E11000'), 0);
+            Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+              assert.ifError(error);
+              assert.equal(docs.length, 2);
+              assert.equal(docs[0].name, 'Star Wars');
+              assert.equal(docs[1].name, 'The Empire Strikes Back');
+              done();
+            });
+          });
+        });
+      }
     });
 
     it('insertMany() hooks (gh-3846)', function(done) {

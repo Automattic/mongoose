@@ -1251,10 +1251,9 @@ describe('Query', function() {
         query2.hint({indexAttributeA: 1, indexAttributeB: -1});
         assert.deepEqual(query2.options.hint, {indexAttributeA: 1, indexAttributeB: -1});
 
-        assert.throws(function() {
-          var query3 = new Query({}, {}, null, p1.collection);
-          query3.hint('indexAttributeA');
-        }, /Invalid hint./);
+        var query3 = new Query({}, {}, null, p1.collection);
+        query3.hint('indexAttributeA_1');
+        assert.deepEqual(query3.options.hint, 'indexAttributeA_1');
 
         done();
       });

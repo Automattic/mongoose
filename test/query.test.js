@@ -1883,6 +1883,24 @@ describe('Query', function() {
       });
     });
 
+    it('$exists for arrays and embedded docs (gh-4937)', function(done) {
+      var subSchema = new Schema({
+        name: String
+      });
+      var TestSchema = new Schema({
+        test: [String],
+        sub: subSchema
+      });
+
+      var Test = db.model('gh4937', TestSchema);
+
+      var q = { test: { $exists: true }, sub: { $exists: false } };
+      Test.findOne(q, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

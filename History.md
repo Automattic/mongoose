@@ -1,3 +1,8 @@
+4.8.1 / 2017-01-30
+==================
+ * fix(query): handle $exists for arrays and embedded docs #4937
+ * fix(query): handle passing string to hint() #4931
+
 4.8.0 / 2017-01-28
 ==================
  * feat(schema): add saveErrorIfNotFound option and $where property #4924 #4004

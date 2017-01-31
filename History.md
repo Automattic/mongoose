@@ -1,3 +1,8 @@
+4.8.1 / 2017-01-30
+==================
+ * fix(query): handle $exists for arrays and embedded docs #4937
+ * fix(query): handle passing string to hint() #4931
+
 4.8.0 / 2017-01-28
 ==================
  * feat(schema): add saveErrorIfNotFound option and $where property #4924 #4004
@@ -14,6 +19,7 @@
  * feat(model): use discriminator constructor based on discriminatorKey in create() #3624
  * feat: pass collection as context to debug function #3261
  * feat(query): support push and addToSet for update validators #2933
+ * perf(document): refactor registerHooksFromSchema so hooks are defined on doc prototype #2754
  * feat(types): add discriminator() function to doc arrays #2723 #1856
  * fix(populate): return an error if sorting underneath a doc array #2202
 

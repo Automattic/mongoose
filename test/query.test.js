@@ -1251,10 +1251,9 @@ describe('Query', function() {
         query2.hint({indexAttributeA: 1, indexAttributeB: -1});
         assert.deepEqual(query2.options.hint, {indexAttributeA: 1, indexAttributeB: -1});
 
-        assert.throws(function() {
-          var query3 = new Query({}, {}, null, p1.collection);
-          query3.hint('indexAttributeA');
-        }, /Invalid hint./);
+        var query3 = new Query({}, {}, null, p1.collection);
+        query3.hint('indexAttributeA_1');
+        assert.deepEqual(query3.options.hint, 'indexAttributeA_1');
 
         done();
       });
@@ -1879,6 +1878,24 @@ describe('Query', function() {
       var Test = db.model('gh4933', TestSchema);
 
       Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('$exists for arrays and embedded docs (gh-4937)', function(done) {
+      var subSchema = new Schema({
+        name: String
+      });
+      var TestSchema = new Schema({
+        test: [String],
+        sub: subSchema
+      });
+
+      var Test = db.model('gh4937', TestSchema);
+
+      var q = { test: { $exists: true }, sub: { $exists: false } };
+      Test.findOne(q, function(error) {
         assert.ifError(error);
         done();
       });

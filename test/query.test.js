@@ -725,6 +725,14 @@ describe('Query', function() {
       query = new Query({}, {}, null, p1.collection);
       query.sort({a: 1, c: -1, b: 'asc', e: 'descending', f: 'ascending'});
       assert.deepEqual(query.options.sort, {a: 1, c: -1, b: 1, e: -1, f: 1});
+
+      if (typeof global.Map !== 'undefined') {
+        query = new Query({}, {}, null, p1.collection);
+        query.sort(new global.Map().set('a', 1).set('b', 2));
+        assert.deepEqual(query.options.sort,
+          new global.Map().set('a', 1).set('b', 2));
+      }
+
       query = new Query({}, {}, null, p1.collection);
       var e;
 
@@ -735,7 +743,7 @@ describe('Query', function() {
       }
 
       assert.ok(e, 'uh oh. no error was thrown');
-      assert.equal(e.message, 'Invalid sort() argument.');
+      assert.equal(e.message, 'Invalid sort() argument, must be array of arrays');
 
       e = undefined;
       try {

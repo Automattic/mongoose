@@ -367,4 +367,31 @@ describe('query middleware', function() {
         done();
       });
   });
+
+  it('error handlers with error from pre hook (gh-4927)', function(done) {
+    var schema = new Schema({});
+    var called = false;
+
+    schema.pre('find', function(next) {
+      next(new Error('test'));
+    });
+
+    schema.post('find', function(res, next) {
+      called = true;
+      next();
+    });
+
+    schema.post('find', function(error, res, next) {
+      assert.equal(error.message, 'test');
+      next(new Error('test2'));
+    });
+
+    var Test = db.model('gh4927', schema);
+
+    Test.find().exec(function(error) {
+      assert.equal(error.message, 'test2');
+      assert.ok(!called);
+      done();
+    });
+  });
 });

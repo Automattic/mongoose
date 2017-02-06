@@ -386,10 +386,10 @@ describe('model', function() {
         }
 
         // Dirty hack to make eslint stop complaining
-        var Shape = eval('class Shape extends mongoose.Model { }');
-        var Circle = eval('class Circle extends Shape { }');
+        class Shape extends mongoose.Model { };
+        class Circle extends Shape { };
         mongoose.model(Shape, new Schema({ color: String }));
-        Shape.discriminator(Circle, new Schema({ radius: Number })); // <<< Throws here
+        Shape.discriminator(Circle, new Schema({ radius: Number }));
 
         var circle = new Circle();
 

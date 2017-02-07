@@ -2085,6 +2085,35 @@ describe('model: update:', function() {
       });
     });
 
+    it('addToSet (gh-4953)', function(done) {
+      var childSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        lastName: {
+          type: String,
+          required: true
+        }
+      });
+
+      var parentSchema = new mongoose.Schema({
+        children: [childSchema]
+      });
+
+      var Model = db.model('gh4953', parentSchema);
+
+      var update = {
+        $addToSet: { children: { name: 'Test' } }
+      };
+      var opts = { new: true, runValidators: true };
+      Model.findOneAndUpdate({}, update, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['children']);
+        done();
+      });
+    });
+
     it('overwrite with timestamps (gh-4054)', function(done) {
       var testSchema = new Schema({
         user: String,

@@ -380,6 +380,8 @@ describe('model', function() {
       });
 
       it('with loadClass (gh-4942)', function(done) {
+        'use strict';
+
         if (!global.Promise) {
           // Skip if not using node >= 4
           this.skip();

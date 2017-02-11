@@ -380,6 +380,7 @@ describe('model', function() {
       });
 
       it('with loadClass (gh-4942)', function(done) {
+
         if (!global.Promise) {
           // Skip if not using node >= 4
           this.skip();
@@ -387,6 +388,7 @@ describe('model', function() {
 
         // Dirty hack to make eslint and node stop complaining
         eval(
+          '"use strict";\n\n' +
           'class Shape extends mongoose.Model { };\n' +
           'class Circle extends Shape { };\n' +
           'mongoose.model(Shape, new Schema({ color: String }));\n' +

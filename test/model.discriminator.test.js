@@ -386,18 +386,18 @@ describe('model', function() {
         }
 
         // Dirty hack to make eslint and node stop complaining
-        eval(`
-          class Shape extends mongoose.Model { };
-          class Circle extends Shape { };
-          mongoose.model(Shape, new Schema({ color: String }));
-          Shape.discriminator(Circle, new Schema({ radius: Number }));
+        eval(
+          'class Shape extends mongoose.Model { };\n' +
+          'class Circle extends Shape { };\n' +
+          'mongoose.model(Shape, new Schema({ color: String }));\n' +
+          'Shape.discriminator(Circle, new Schema({ radius: Number }));\n\n' +
 
-          var circle = new Circle();
+          'var circle = new Circle();\n' +
 
-          assert.ok(circle instanceof Circle);
-          assert.ok(circle instanceof Shape);
-          done();
-        `);
+          'assert.ok(circle instanceof Circle);\n' +
+          'assert.ok(circle instanceof Shape);\n' +
+          'done();'
+        );
       });
 
       it('embedded in document arrays (gh-2723)', function(done) {

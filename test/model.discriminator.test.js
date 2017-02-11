@@ -379,29 +379,6 @@ describe('model', function() {
         });
       });
 
-      it('with loadClass (gh-4942)', function(done) {
-
-        if (!global.Promise) {
-          // Skip if not using node >= 4
-          this.skip();
-        }
-
-        // Dirty hack to make eslint and node stop complaining
-        eval(
-          '"use strict";\n\n' +
-          'class Shape extends mongoose.Model { };\n' +
-          'class Circle extends Shape { };\n' +
-          'mongoose.model(Shape, new Schema({ color: String }));\n' +
-          'Shape.discriminator(Circle, new Schema({ radius: Number }));\n\n' +
-
-          'var circle = new Circle();\n' +
-
-          'assert.ok(circle instanceof Circle);\n' +
-          'assert.ok(circle instanceof Shape);\n' +
-          'done();'
-        );
-      });
-
       it('embedded in document arrays (gh-2723)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

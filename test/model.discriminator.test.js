@@ -368,6 +368,25 @@ describe('model', function() {
         done();
       });
 
+      it('applyPluginsToDiscriminators (gh-4965)', function(done) {
+        var schema = new Schema({ test: String });
+        mongoose.set('applyPluginsToDiscriminators', true);
+        var called = 0;
+        mongoose.plugin(function() {
+          ++called;
+        });
+        var Model = mongoose.model('gh4965', schema);
+        var childSchema = new Schema({
+          test2: String
+        });
+        Model.discriminator('gh4965_0', childSchema);
+        assert.equal(called, 2);
+
+        mongoose.plugins = [];
+        mongoose.set('applyPluginsToDiscriminators', false);
+        done();
+      });
+
       it('cloning with discriminator key (gh-4387)', function(done) {
         var employee = new Employee({ name: { first: 'Val', last: 'Karpov' } });
         var clone = new employee.constructor(employee);

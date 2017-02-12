@@ -1592,6 +1592,27 @@ describe('model: findByIdAndUpdate:', function() {
         });
     });
 
+    it('passes raw result if rawResult specified (gh-4925)', function(done) {
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh4925', testSchema);
+      var options = { upsert: true, new: true, rawResult: true };
+      var update = { $set: { test: 'abc' } };
+
+      TestModel.findOneAndUpdate({}, update, options).
+        exec(function(error, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+          assert.equal(res.value.test, 'abc');
+          assert.ok(res.value.id);
+          assert.equal(res.lastErrorObject.n, 1);
+          done();
+        });
+    });
+
     it('raw result as 3rd param w/ no result (gh-4023)', function(done) {
       var testSchema = new mongoose.Schema({
         test: String

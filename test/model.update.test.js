@@ -2201,6 +2201,40 @@ describe('model: update:', function() {
       });
     });
 
+    it('single nested under doc array with runValidators (gh-4960)', function(done) {
+      var ProductSchema = new Schema({
+        name: String
+      });
+
+      var UserSchema = new Schema({
+        sell: [{
+          product: { type: ProductSchema, required: true }
+        }]
+      });
+
+      var User = db.model('gh4960', UserSchema);
+
+      User.create({}).
+        then(function(user) {
+          return User.update({
+            _id: user._id
+          }, {
+            sell: [{
+              product: {
+                name: 'Product 1'
+              }
+            }]
+          }, {
+            runValidators: true
+          });
+        }).
+        // Should not throw
+        then(function() {
+          done();
+        }).
+        catch(done);
+    });
+
     it('single nested schema with geo (gh-4465)', function(done) {
       var addressSchema = new Schema({
         geo: {type: [Number], index: '2dsphere'}

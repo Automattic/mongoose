@@ -2085,6 +2085,35 @@ describe('model: update:', function() {
       });
     });
 
+    it('addToSet (gh-4953)', function(done) {
+      var childSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        lastName: {
+          type: String,
+          required: true
+        }
+      });
+
+      var parentSchema = new mongoose.Schema({
+        children: [childSchema]
+      });
+
+      var Model = db.model('gh4953', parentSchema);
+
+      var update = {
+        $addToSet: { children: { name: 'Test' } }
+      };
+      var opts = { new: true, runValidators: true };
+      Model.findOneAndUpdate({}, update, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['children']);
+        done();
+      });
+    });
+
     it('overwrite with timestamps (gh-4054)', function(done) {
       var testSchema = new Schema({
         user: String,
@@ -2170,6 +2199,40 @@ describe('model: update:', function() {
           done();
         });
       });
+    });
+
+    it('single nested under doc array with runValidators (gh-4960)', function(done) {
+      var ProductSchema = new Schema({
+        name: String
+      });
+
+      var UserSchema = new Schema({
+        sell: [{
+          product: { type: ProductSchema, required: true }
+        }]
+      });
+
+      var User = db.model('gh4960', UserSchema);
+
+      User.create({}).
+        then(function(user) {
+          return User.update({
+            _id: user._id
+          }, {
+            sell: [{
+              product: {
+                name: 'Product 1'
+              }
+            }]
+          }, {
+            runValidators: true
+          });
+        }).
+        // Should not throw
+        then(function() {
+          done();
+        }).
+        catch(done);
     });
 
     it('single nested schema with geo (gh-4465)', function(done) {

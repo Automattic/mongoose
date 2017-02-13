@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.8.2-pre",
+  "version": "4.8.3-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -46,7 +46,7 @@
     "lodash": "4.16.6",
     "markdown": "0.3.1",
     "marked": "0.3.6",
-    "mocha": "3.1.2",
+    "mocha": "3.2.0",
     "mongoose-long": "0.1.1",
     "node-static": "0.7.7",
     "power-assert": "1.4.1",

@@ -1,3 +1,13 @@
+4.8.2 / 2017-02-10
+==================
+ * fix(update): actually run validators on addToSet #4953
+ * fix(update): improve buffer error handling #4944 [ValYouW](https://github.com/ValYouW)
+ * fix(discriminator): handle subclassing with loadClass correctly #4942
+ * fix(query): allow passing Map to sort() #4941
+ * fix(document): handle setting discriminator doc #4935
+ * fix(schema): return correct value from pre init hook #4928
+ * fix(query): ensure consistent params in error handlers if pre hook errors #4927
+
 4.8.1 / 2017-01-30
 ==================
  * fix(query): handle $exists for arrays and embedded docs #4937

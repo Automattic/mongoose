@@ -4985,6 +4985,43 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('select foreignField automatically (gh-4959)', function(done) {
+        var childSchema = new mongoose.Schema({
+          name: String,
+          parentId: mongoose.Schema.Types.ObjectId
+        });
+
+        var Child = db.model('gh4959', childSchema);
+
+        var parentSchema = new mongoose.Schema({
+          name: String
+        });
+
+        parentSchema.virtual('detail', {
+          ref: 'gh4959',
+          localField: '_id',
+          foreignField: 'parentId',
+          justOne: true
+        });
+
+        var Parent = db.model('gh4959_0', parentSchema);
+
+        Parent.create({ name: 'Test' }).
+          then(function(m) {
+            return Child.create({ name: 'test', parentId: m._id });
+          }).
+          then(function() {
+            return Parent.find().populate({ path: 'detail', select: 'name' });
+          }).
+          then(function(res) {
+            var m = res[0];
+            assert.equal(m.detail.name, 'test');
+            assert.ok(m.detail.parentId);
+            done();
+          }).
+          catch(done);
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

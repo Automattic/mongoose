@@ -3812,6 +3812,29 @@ describe('document', function() {
       done();
     });
 
+    it('handles errors in sync validators (gh-2185)', function(done) {
+      var schema = new Schema({
+        name: {
+          type: String,
+          validate: function() {
+            throw new Error('woops!');
+          }
+        }
+      });
+
+      var M = db.model('gh2185', schema);
+
+      var error = (new M({ name: 'test' })).validateSync();
+      assert.ok(error);
+      assert.equal(error.errors['name'].reason.message, 'woops!');
+
+      new M({ name: 'test'}).validate(function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['name'].reason.message, 'woops!');
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

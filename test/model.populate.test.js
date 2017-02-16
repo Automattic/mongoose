@@ -4116,6 +4116,46 @@ describe('model: populate:', function() {
         });
       });
 
+      it('in embedded array (gh-4928)', function(done) {
+        var PersonSchema = new Schema({
+          name: String,
+          authored: [Number]
+        });
+
+        var BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('author', {
+          ref: 'gh4928',
+          localField: '_id',
+          foreignField: 'authored',
+          justOne: true
+        });
+
+        var CollectionSchema = new Schema({
+          blogPosts: [BlogPostSchema]
+        });
+
+        var Person = db.model('gh4928', PersonSchema);
+        var Collection = db.model('gh4928_0', CollectionSchema);
+
+        Person.create({ name: 'Val', authored: 1 }).
+          then(function() {
+            return Collection.create({
+              blogPosts: [{ _id: 1, title: 'Test' }]
+            });
+          }).
+          then(function(c) {
+            return Collection.findById(c._id).populate('blogPosts.author');
+          }).
+          then(function(c) {
+            assert.equal(c.blogPosts[0].author.name, 'Val');
+            done();
+          }).
+          catch(done);
+      });
+
       it('justOne option (gh-4263)', function(done) {
         var PersonSchema = new Schema({
           name: String,
@@ -4940,6 +4980,43 @@ describe('model: populate:', function() {
           }).
           then(function(m) {
             assert.equal(m.obj.detail.name, 'test');
+            done();
+          }).
+          catch(done);
+      });
+
+      it('select foreignField automatically (gh-4959)', function(done) {
+        var childSchema = new mongoose.Schema({
+          name: String,
+          parentId: mongoose.Schema.Types.ObjectId
+        });
+
+        var Child = db.model('gh4959', childSchema);
+
+        var parentSchema = new mongoose.Schema({
+          name: String
+        });
+
+        parentSchema.virtual('detail', {
+          ref: 'gh4959',
+          localField: '_id',
+          foreignField: 'parentId',
+          justOne: true
+        });
+
+        var Parent = db.model('gh4959_0', parentSchema);
+
+        Parent.create({ name: 'Test' }).
+          then(function(m) {
+            return Child.create({ name: 'test', parentId: m._id });
+          }).
+          then(function() {
+            return Parent.find().populate({ path: 'detail', select: 'name' });
+          }).
+          then(function(res) {
+            var m = res[0];
+            assert.equal(m.detail.name, 'test');
+            assert.ok(m.detail.parentId);
             done();
           }).
           catch(done);

@@ -378,6 +378,21 @@ describe('types.buffer', function() {
     });
   });
 
+  it('can be updated to null', function(done) {
+    var db = start(),
+        User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var user = new User({array: [null], required: new Buffer(1), serial: new Buffer(1)});
+    user.save(function(err, doc) {
+      assert.ifError(err);
+      User.findOneAndUpdate({_id: doc.id}, {serial: null}, {new: true}, function(err, doc) {
+        db.close();
+        assert.ifError(err);
+        assert.equal(doc.serial, null);
+        done();
+      });
+    });
+  });
+
   describe('#toObject', function() {
     it('retains custom subtypes', function(done) {
       var buf = new MongooseBuffer(0);

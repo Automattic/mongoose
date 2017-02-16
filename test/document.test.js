@@ -3791,6 +3791,50 @@ describe('document', function() {
       done();
     });
 
+    it('setting to discriminator (gh-4935)', function(done) {
+      var Buyer = db.model('gh4935_0', new Schema({
+        name: String,
+        vehicle: { type: Schema.Types.ObjectId, ref: 'gh4935' }
+      }));
+      var Vehicle = db.model('gh4935', new Schema({ name: String }));
+      var Car = Vehicle.discriminator('gh4935_1', new Schema({
+        model: String
+      }));
+
+      var eleanor = new Car({ name: 'Eleanor', model: 'Shelby Mustang GT' });
+      var nick = new Buyer({ name: 'Nicolas', vehicle: eleanor });
+
+      assert.ok(!!nick.vehicle);
+      assert.ok(nick.vehicle === eleanor);
+      assert.ok(nick.vehicle instanceof Car);
+      assert.equal(nick.vehicle.name, 'Eleanor');
+
+      done();
+    });
+
+    it('handles errors in sync validators (gh-2185)', function(done) {
+      var schema = new Schema({
+        name: {
+          type: String,
+          validate: function() {
+            throw new Error('woops!');
+          }
+        }
+      });
+
+      var M = db.model('gh2185', schema);
+
+      var error = (new M({ name: 'test' })).validateSync();
+      assert.ok(error);
+      assert.equal(error.errors['name'].reason.message, 'woops!');
+
+      new M({ name: 'test'}).validate(function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['name'].reason.message, 'woops!');
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

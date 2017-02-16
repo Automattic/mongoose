@@ -91,7 +91,19 @@ block content
     // Good way to make sure mongoose never stops trying to reconnect
     mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
      
-
+  h3#callback Callback
+  :markdown
+    The `connect()` function also accepts a callback parameter and returns a [promise](http://mongoosejs.com/docs/promises.html).
+  :js
+    mongoose.connect(uri, options, function(error) {
+      // Check error in initial connection. There is no 2nd param to the callback.
+    });
+    
+    // Or using promises
+    mongoose.connect(uri, options).then(
+      () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
+      err => { /** handle initial connection error }
+    );
 
   h4#connection-string-options Connection String Options
   :markdown

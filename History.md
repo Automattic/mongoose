@@ -1,3 +1,14 @@
+4.8.3 / 2017-02-15
+==================
+ * chore: upgrade mongodb driver -> 2.2.24
+ * docs(connections): addd some details about callbacks #4986
+ * fix: ensure class is created with new keyword #4972 #4947 [benhjames](https://github.com/benhjames)
+ * fix(discriminator): add applyPluginsToDiscriminators option #4965
+ * fix(update): properly cast array subdocs when casting update #4960
+ * fix(populate): ensure foreign field is selected for virtual populate #4959
+ * docs(query): document some query callback params #4949
+ * fix(document): ensure errors in validators get caught #2185
+
 4.8.2 / 2017-02-10
 ==================
  * fix(update): actually run validators on addToSet #4953

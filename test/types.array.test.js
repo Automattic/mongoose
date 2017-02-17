@@ -7,7 +7,7 @@ var assert = require('power-assert');
 var mongoose = require('./common').mongoose;
 var Schema = mongoose.Schema;
 var random = require('../lib/utils').random;
-var mongodb = require('mongodb');
+var mongodb = require('@pass/mongodb');
 var MongooseArray = mongoose.Types.Array;
 var collection = 'avengers_' + random();
 

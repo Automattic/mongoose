@@ -4,7 +4,7 @@ var Benchmark = require('benchmark');
 var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
-var mongo = require('mongodb');
+var mongo = require('@pass/mongodb');
 var utils = require('../../lib/utils.js');
 var ObjectId = Schema.Types.ObjectId;
 

@@ -1,5 +1,5 @@
 {
-  "name": "mongoose",
+  "name": "@pass/mongoose",
   "description": "Mongoose MongoDB ODM",
   "version": "4.4.15",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
@@ -19,11 +19,11 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@pass/mongodb": "^2.0.5-5.p3",
     "async": "1.5.2",
     "bson": "~0.4.23",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
-    "mongodb": "2.1.18",
     "mpath": "0.2.1",
     "mpromise": "0.5.5",
     "mquery": "1.10.0",

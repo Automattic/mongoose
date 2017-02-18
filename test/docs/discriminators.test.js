@@ -242,7 +242,8 @@ describe('discriminator docs', function () {
   });
 
   /**
-   * When you use `Model.create()`, mongoose
+   * When you use `Model.create()`, mongoose will pull the correct type from
+   * the discriminator key for you.
    */
   it('Using discriminators with `Model.create()`', function(done) {
     var Schema = mongoose.Schema;

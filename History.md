@@ -1,3 +1,10 @@
+4.8.4 / 2017-02-19
+==================
+ * docs(discriminators): explain embedded discriminators #4997
+ * fix(query): fix TypeError when findOneAndUpdate errors #4990
+ * fix(update): handle nested single embedded in update validators correctly #4989
+ * fix(browser): make browser doc constructor not crash #4987
+
 4.8.3 / 2017-02-15
 ==================
  * chore: upgrade mongodb driver -> 2.2.24

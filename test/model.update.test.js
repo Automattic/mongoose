@@ -1924,6 +1924,37 @@ describe('model: update:', function() {
       });
     });
 
+    it('updates with timestamps with $set (gh-4989)', function(done) {
+      var TagSchema = new Schema({
+        name: String,
+        tags: [{
+          enum: ['test1', 'test2'],
+          type: String
+        }]
+      }, { timestamps: true });
+
+      var Tag = db.model('gh4989', TagSchema);
+      var tagId;
+
+      Tag.remove({}).
+        then(function() { return Tag.create({ name: 'test' }); }).
+        then(function() { return Tag.findOne(); }).
+        then(function(tag) {
+          tagId = tag._id;
+          return Tag.update({ _id: tagId }, {
+            $set: {
+              tags: ['test1']
+            }
+          });
+        }).
+        then(function() { return Tag.findById(tagId); }).
+        then(function(res) {
+          assert.deepEqual(res.tags.toObject(), ['test1']);
+          done();
+        }).
+        catch(done);
+    });
+
     it('update validators on single nested (gh-4332)', function(done) {
       var AreaSchema = new Schema({
         a: String

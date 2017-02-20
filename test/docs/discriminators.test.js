@@ -328,12 +328,9 @@ describe('discriminator docs', function () {
 
       assert.equal(doc.events[0].element, '#hero');
       assert.ok(doc.events[0] instanceof Clicked);
-      // The constructor name will match the discriminator name
-      assert.equal(doc.events[0].constructor.name, 'Clicked');
 
       assert.equal(doc.events[1].product, 'action-figure-1');
       assert.ok(doc.events[1] instanceof Purchased);
-      assert.equal(doc.events[1].constructor.name, 'Purchased');
       done();
     });
   });

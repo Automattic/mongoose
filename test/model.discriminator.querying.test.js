@@ -901,6 +901,37 @@ describe('model', function() {
           });
         });
 
+        it('hides fields when discriminated model has select (gh-4991)', function(done) {
+          var baseSchema = new mongoose.Schema({
+            internal: {
+              test: [{ type: String }]
+            }
+          });
+
+          var Base = db.model('gh4991', baseSchema);
+          var discriminatorSchema = new mongoose.Schema({
+            internal: {
+              password: { type: String, select: false }
+            }
+          });
+          var Discriminator = Base.discriminator('gh4991_0',
+            discriminatorSchema);
+
+          var obj = {
+            internal: {
+              test: ['abc'],
+              password: 'password'
+            }
+          };
+          Discriminator.create(obj).
+            then(function(doc) { return Base.findById(doc._id); }).
+            then(function(doc) {
+              assert.ok(!doc.internal.password);
+              done();
+            }).
+            catch(done);
+        });
+
         it('merges the first pipeline stages if applicable', function(done) {
           var aggregate = ImpressionEvent.aggregate([
             {$match: {name: 'Test Event'}}

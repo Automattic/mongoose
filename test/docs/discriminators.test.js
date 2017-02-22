@@ -323,15 +323,27 @@ describe('discriminator docs', function () {
       ]
     };
 
-    Batch.create(batch).then(function(doc) {
-      assert.equal(doc.events.length, 2);
+    Batch.create(batch).
+      then(function(doc) {
+        assert.equal(doc.events.length, 2);
 
-      assert.equal(doc.events[0].element, '#hero');
-      assert.ok(doc.events[0] instanceof Clicked);
+        assert.equal(doc.events[0].element, '#hero');
+        assert.ok(doc.events[0] instanceof Clicked);
 
-      assert.equal(doc.events[1].product, 'action-figure-1');
-      assert.ok(doc.events[1] instanceof Purchased);
-      done();
-    });
+        assert.equal(doc.events[1].product, 'action-figure-1');
+        assert.ok(doc.events[1] instanceof Purchased);
+
+        doc.events.push({ kind: 'Purchased', product: 'action-figure-2' });
+        return doc.save();
+      }).
+      then(function(doc) {
+        assert.equal(doc.events.length, 3);
+
+        assert.equal(doc.events[2].product, 'action-figure-2');
+        assert.ok(doc.events[2] instanceof Purchased);
+
+        done();
+      }).
+      catch(done);
   });
 });

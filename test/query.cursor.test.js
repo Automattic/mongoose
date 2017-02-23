@@ -341,4 +341,35 @@ describe('QueryCursor', function() {
       });
     });
   });
+
+  it('data before close (gh-4998)', function(done) {
+    var userSchema = new mongoose.Schema({
+      name:  String
+    });
+
+    var User = db.model('gh4998', userSchema);
+    var users = [];
+    for (var i = 0; i < 100; i++) {
+      users.push({
+        _id: mongoose.Types.ObjectId(),
+        name: 'Bob' + (i < 10 ? '0' : '') + i
+      });
+    }
+
+    User.insertMany(users, function(error) {
+      assert.ifError(error);
+
+      var stream = User.find({}).cursor();
+      var docs = [];
+
+      stream.on('data', function(doc) {
+        docs.push(doc);
+      });
+
+      stream.on('close', function() {
+        assert.equal(docs.length, 100);
+        done();
+      });
+    });
+  });
 });

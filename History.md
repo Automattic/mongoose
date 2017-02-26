@@ -1,3 +1,10 @@
+4.8.5 / 2017-02-25
+==================
+ * fix: check for empty schemaPath before accessing property $isMongooseDocumentArray #5017 [https://github.com/randyhoulahan](randyhoulahan)
+ * fix(discriminators): handle create() and push() for embedded discriminators #5001
+ * fix(querycursor): ensure close emitted after last data event #4998
+ * fix(discriminators): remove fields not selected in child when querying by base model #4991
+
 4.8.4 / 2017-02-19
 ==================
  * docs(discriminators): explain embedded discriminators #4997

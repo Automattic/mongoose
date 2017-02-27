@@ -156,6 +156,10 @@ describe('validation docs', function() {
       phone: {
         type: String,
         validate: {
+          // `isAsync` is not strictly necessary in mongoose 4.x, but relying
+          // on 2 argument validators being async is deprecated. Set the
+          // `isAsync` option to `true` to make deprecation warnings go away.
+          isAsync: true,
           validator: function(v, cb) {
             setTimeout(function() {
               cb(/\d{3}-\d{3}-\d{4}/.test(v));

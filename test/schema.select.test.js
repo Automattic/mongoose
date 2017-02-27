@@ -162,6 +162,7 @@ describe('schema select option', function() {
             assert.equal(s.isSelected('thin'), true);
             assert.equal(s.isSelected('docs.name'), false);
             assert.equal(s.isSelected('docs.bool'), true);
+            assert.ok(s.isSelected('docs'));
             assert.strictEqual(undefined, s.name);
             assert.strictEqual(undefined, s.docs[0].name);
             assert.equal(s.thin, true);

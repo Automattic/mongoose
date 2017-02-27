@@ -398,6 +398,57 @@ describe('model', function() {
         });
       });
 
+      it('embedded discriminators with create() (gh-5001)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Batch = db.model('EventBatch', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            var newDoc = doc.events.create({
+              kind: 'Purchased',
+              product: 'action-figure-1'
+            });
+            assert.equal(newDoc.kind, 'Purchased');
+            assert.equal(newDoc.product, 'action-figure-1');
+            assert.ok(newDoc instanceof Purchased);
+
+            doc.events.push(newDoc);
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[1].kind, 'Purchased');
+            assert.equal(doc.events[1].product, 'action-figure-1');
+            assert.ok(newDoc instanceof Purchased);
+            assert.ok(newDoc === doc.events[1]);
+
+            done();
+          }).
+          catch(done);
+      });
+
       it('embedded in document arrays (gh-2723)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

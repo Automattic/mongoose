@@ -715,9 +715,9 @@ describe('document: hooks:', function() {
         }
       });
 
-      mongoose.model('gh-3284', parentSchema);
-
       var db = start();
+      db.model('gh-3284', parentSchema);
+
       var Parent = db.model('gh-3284');
 
       var parent = new Parent({

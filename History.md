@@ -1,3 +1,9 @@
+4.8.6 / 2017-03-05
+==================
+ * docs(document): remove text that implies that transform is false by default #5023
+ * fix(applyHooks): dont wrap a function if it is already wrapped #5019
+ * fix(document): ensure nested docs' toObject() clones #5008
+
 4.8.5 / 2017-02-25
 ==================
  * fix: check for empty schemaPath before accessing property $isMongooseDocumentArray #5017 [https://github.com/randyhoulahan](randyhoulahan)

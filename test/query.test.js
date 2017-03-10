@@ -1078,6 +1078,48 @@ describe('Query', function() {
     });
   });
 
+  describe('deleteOne/deleteMany', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('handles deleteOne', function(done) {
+      var M = db.model('deleteOne', new Schema({ name: 'String' }));
+      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        M.deleteOne({ name: /Stark/ }, function(error) {
+          assert.ifError(error);
+          M.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 1);
+            done();
+          });
+        });
+      });
+    });
+
+    it('handles deleteMany', function(done) {
+      var M = db.model('deleteMany', new Schema({ name: 'String' }));
+      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        M.deleteMany({ name: /Stark/ }, function(error) {
+          assert.ifError(error);
+          M.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('remove', function() {
     it('handles cast errors async', function(done) {
       var db = start();

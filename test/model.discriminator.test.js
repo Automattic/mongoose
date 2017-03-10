@@ -484,7 +484,9 @@ describe('model', function() {
               $push: {
                 events: { kind: 'Clicked', element: '#button' }
               }
-            }).then(() => doc);
+            }).then(function() {
+              return doc;
+            });
           }).
           then(function(doc) {
             return Batch.findOne({ _id: doc._id });

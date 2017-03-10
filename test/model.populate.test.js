@@ -5022,6 +5022,56 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('works if foreignField parent is selected (gh-5037)', function(done) {
+        var childSchema = new mongoose.Schema({
+          name: String,
+          parent: {
+            id: mongoose.Schema.Types.ObjectId,
+            name: String
+          }
+        });
+
+        var Child = db.model('gh5037', childSchema);
+
+        var parentSchema = new mongoose.Schema({
+          name: String
+        });
+
+        parentSchema.virtual('detail', {
+          ref: 'gh5037',
+          localField: '_id',
+          foreignField: 'parent.id',
+          justOne: true
+        });
+
+        var Parent = db.model('gh5037_0', parentSchema);
+
+        Parent.create({ name: 'Test' }).
+          then(function(m) {
+            return Child.create({
+              name: 'test',
+              parent: {
+                id: m._id,
+                name: 'test2'
+              }
+            });
+          }).
+          then(function() {
+            return Parent.find().populate({
+              path: 'detail',
+              select: 'name parent'
+            });
+          }).
+          then(function(res) {
+            var m = res[0];
+            assert.equal(m.detail.name, 'test');
+            assert.ok(m.detail.parent.id);
+            assert.equal(m.detail.parent.name, 'test2');
+            done();
+          }).
+          catch(done);
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

@@ -2381,6 +2381,23 @@ describe('model: update:', function() {
       done();
     });
 
+    it('findOneAndUpdate with nested arrays (gh-5032)', function(done) {
+      var schema = Schema({
+        name: String,
+        inputs: [ [ String ] ] // Array of Arrays of Strings
+      });
+
+      var Activity = db.model('Test', schema);
+
+      var q = { name: 'Host Discovery' };
+      var u = { inputs: [['ipRange']] };
+      var o = { upsert: true };
+      Activity.findOneAndUpdate(q, u, o).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

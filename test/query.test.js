@@ -1139,6 +1139,24 @@ describe('Query', function() {
         });
       }, done).end();
     });
+
+    it('justOne option', function(done) {
+      var db = start();
+      var Test = db.model('Test_justOne', new Schema({ name: String }));
+
+      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        Test.remove({ name: /Stark/ }).setOptions({ justOne: false }).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.result.n, 2);
+          Test.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
   });
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {

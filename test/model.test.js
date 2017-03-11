@@ -5460,6 +5460,40 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite casting (gh-3998)', function(done) {
+      var schema = new Schema({
+        str: String,
+        num: Number
+      });
+
+      var M = db.model('gh3998', schema);
+
+      var ops = [
+        {
+          insertOne: {
+            document: { str: 1, num: '1' }
+          }
+        },
+        {
+          updateOne: {
+            filter: { str: 1 },
+            update: {
+              $set: { num: '2' }
+            }
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.str, '1');
+          assert.equal(doc.num, '2');
+          done();
+        });
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

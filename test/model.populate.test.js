@@ -4704,6 +4704,19 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('handles populate with 0 args (gh-5036)', function(done) {
+        var userSchema = new Schema({
+          name: String
+        });
+
+        var User = db.model('gh5036', userSchema);
+
+        User.findOne().populate().exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+
       it('handles populating with discriminators that may not have a ref (gh-4817)', function(done) {
         var imagesSchema = new mongoose.Schema({
           name: {
@@ -5017,6 +5030,56 @@ describe('model: populate:', function() {
             var m = res[0];
             assert.equal(m.detail.name, 'test');
             assert.ok(m.detail.parentId);
+            done();
+          }).
+          catch(done);
+      });
+
+      it('works if foreignField parent is selected (gh-5037)', function(done) {
+        var childSchema = new mongoose.Schema({
+          name: String,
+          parent: {
+            id: mongoose.Schema.Types.ObjectId,
+            name: String
+          }
+        });
+
+        var Child = db.model('gh5037', childSchema);
+
+        var parentSchema = new mongoose.Schema({
+          name: String
+        });
+
+        parentSchema.virtual('detail', {
+          ref: 'gh5037',
+          localField: '_id',
+          foreignField: 'parent.id',
+          justOne: true
+        });
+
+        var Parent = db.model('gh5037_0', parentSchema);
+
+        Parent.create({ name: 'Test' }).
+          then(function(m) {
+            return Child.create({
+              name: 'test',
+              parent: {
+                id: m._id,
+                name: 'test2'
+              }
+            });
+          }).
+          then(function() {
+            return Parent.find().populate({
+              path: 'detail',
+              select: 'name parent'
+            });
+          }).
+          then(function(res) {
+            var m = res[0];
+            assert.equal(m.detail.name, 'test');
+            assert.ok(m.detail.parent.id);
+            assert.equal(m.detail.parent.name, 'test2');
             done();
           }).
           catch(done);

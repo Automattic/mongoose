@@ -3835,6 +3835,20 @@ describe('document', function() {
       });
     });
 
+    it('allows hook as a schema key (gh-5047)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String,
+        hook: { type: String }
+      });
+
+      var Model = db.model('Model', schema);
+
+      Model.create({ hook: 'test '}, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('nested docs toObject() clones (gh-5008)', function(done) {
       var schema = new mongoose.Schema({
         sub: {

@@ -5487,8 +5487,8 @@ describe('Model', function() {
         assert.ifError(error);
         M.findOne({}, function(error, doc) {
           assert.ifError(error);
-          assert.equal(doc.str, '1');
-          assert.equal(doc.num, '2');
+          assert.strictEqual(doc.str, '1');
+          assert.strictEqual(doc.num, 2);
           done();
         });
       });

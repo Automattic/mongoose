@@ -4704,6 +4704,19 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('handles populate with 0 args (gh-5036)', function(done) {
+        var userSchema = new Schema({
+          name: String
+        });
+
+        var User = db.model('gh5036', userSchema);
+
+        User.findOne().populate().exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+
       it('handles populating with discriminators that may not have a ref (gh-4817)', function(done) {
         var imagesSchema = new mongoose.Schema({
           name: {

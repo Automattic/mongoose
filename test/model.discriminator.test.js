@@ -236,10 +236,9 @@ describe('model', function() {
         department: String
       }, { id: false });
 
-      assert.doesNotThrow(function() {
-        var Person = db.model('gh2821', PersonSchema);
-        Person.discriminator('gh2821-Boss', BossSchema);
-      });
+      // Should not throw
+      var Person = db.model('gh2821', PersonSchema);
+      Person.discriminator('gh2821-Boss', BossSchema);
       done();
     });
 
@@ -447,6 +446,50 @@ describe('model', function() {
             done();
           }).
           catch(done);
+      });
+
+      it('supports clone() (gh-4983)', function(done) {
+        var childSchema = new Schema({
+          name: String
+        });
+        var childCalls = 0;
+        childSchema.pre('save', function(next) {
+          ++childCalls;
+          next();
+        });
+
+        var personSchema = new Schema({
+          name: String
+        }, { discriminatorKey: 'kind' });
+
+        var parentSchema = new Schema({
+          children: [childSchema],
+          heir: childSchema
+        });
+        var parentCalls = 0;
+        parentSchema.pre('save', function(next) {
+          ++parentCalls;
+          next();
+        });
+
+        var Person = db.model('gh4983', personSchema);
+        var Parent = Person.discriminator('gh4983_0', parentSchema.clone());
+
+        var obj = {
+          name: 'Ned Stark',
+          heir: { name: 'Robb Stark' },
+          children: [{ name: 'Jon Snow' }]
+        };
+        Parent.create(obj, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Ned Stark');
+          assert.equal(doc.heir.name, 'Robb Stark');
+          assert.equal(doc.children.length, 1);
+          assert.equal(doc.children[0].name, 'Jon Snow');
+          assert.equal(childCalls, 2);
+          assert.equal(parentCalls, 1);
+          done();
+        });
       });
 
       it('embedded discriminators with $push (gh-5009)', function(done) {

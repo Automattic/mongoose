@@ -1658,6 +1658,28 @@ describe('model: update:', function() {
       });
     });
 
+    it('replaceOne', function(done) {
+      var schema = mongoose.Schema({ name: String, age: Number }, {
+        versionKey: false
+      });
+      var Model = db.model('gh3998_r1', schema);
+
+      Model.create({ name: 'abc', age: 1 }, function(error, m) {
+        assert.ifError(error);
+        Model.replaceOne({ name: 'abc' }, { name: 'test' }).exec(function(err) {
+          assert.ifError(err);
+          Model.findById(m._id).exec(function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.toObject({ virtuals: false }), {
+              _id: m._id,
+              name: 'test'
+            });
+            done();
+          });
+        });
+      });
+    });
+
     it('mixed nested type casting (gh-3337)', function(done) {
       var Schema = mongoose.Schema({attributes: {}}, {strict: true});
       var Model = db.model('gh3337', Schema);
@@ -2357,6 +2379,23 @@ describe('model: update:', function() {
         name: 'Bar'
       });
       done();
+    });
+
+    it('findOneAndUpdate with nested arrays (gh-5032)', function(done) {
+      var schema = Schema({
+        name: String,
+        inputs: [ [ String ] ] // Array of Arrays of Strings
+      });
+
+      var Activity = db.model('Test', schema);
+
+      var q = { name: 'Host Discovery' };
+      var u = { inputs: [['ipRange']] };
+      var o = { upsert: true };
+      Activity.findOneAndUpdate(q, u, o).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

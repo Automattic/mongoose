@@ -15,7 +15,7 @@ var start = require('./common'),
  */
 
 var schema = new Schema({
-  title: String
+  title: { type: String, required: true }
 });
 
 
@@ -185,6 +185,15 @@ describe('model', function() {
             done();
           }).end();
         }, done).end();
+      });
+
+      it('if callback is falsy, will ignore it (gh-5061)', function(done) {
+        B.create({ title: 'test' }, null).
+          then(function(doc) {
+            assert.equal(doc.title, 'test');
+            done();
+          }).
+          catch(done);
       });
     });
   });

@@ -3835,6 +3835,47 @@ describe('document', function() {
       });
     });
 
+    it('allows hook as a schema key (gh-5047)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String,
+        hook: { type: String }
+      });
+
+      var Model = db.model('Model', schema);
+
+      Model.create({ hook: 'test '}, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('nested docs toObject() clones (gh-5008)', function(done) {
+      var schema = new mongoose.Schema({
+        sub: {
+          height: Number
+        }
+      });
+
+      var Model = db.model('gh5008', schema);
+
+      var doc = new Model({
+        sub: {
+          height: 3
+        }
+      });
+
+      assert.equal(doc.sub.height, 3);
+
+      var leanDoc = doc.sub.toObject();
+      assert.equal(leanDoc.height, 3);
+
+      doc.sub.height = 55;
+      assert.equal(doc.sub.height, 55);
+      assert.equal(leanDoc.height, 3);
+
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

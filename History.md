@@ -1,3 +1,25 @@
+4.8.7 / 2017-03-12
+==================
+ * fix(model): if last arg in spread is falsy, treat it as a callback #5061
+ * fix(document): use $hook instead of hook to enable 'hook' as a path name #5047
+ * fix(populate): dont select foreign field if parent field is selected #5037
+ * fix(populate): handle passing no args to query.populate #5036
+ * fix(update): use correct method for casting nested arrays #5032
+ * fix(discriminator): handle array discriminators when casting $push #5009
+
+4.8.6 / 2017-03-05
+==================
+ * docs(document): remove text that implies that transform is false by default #5023
+ * fix(applyHooks): dont wrap a function if it is already wrapped #5019
+ * fix(document): ensure nested docs' toObject() clones #5008
+
+4.8.5 / 2017-02-25
+==================
+ * fix: check for empty schemaPath before accessing property $isMongooseDocumentArray #5017 [https://github.com/randyhoulahan](randyhoulahan)
+ * fix(discriminators): handle create() and push() for embedded discriminators #5001
+ * fix(querycursor): ensure close emitted after last data event #4998
+ * fix(discriminators): remove fields not selected in child when querying by base model #4991
+
 4.8.4 / 2017-02-19
 ==================
  * docs(discriminators): explain embedded discriminators #4997

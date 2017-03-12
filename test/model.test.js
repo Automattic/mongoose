@@ -5494,6 +5494,49 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
+      var schema = new Schema({
+        str: String,
+        num: Number
+      });
+
+      var M = db.model('gh3998_0', schema);
+
+      var ops = [
+        {
+          insertOne: {
+            document: { str: 1, num: '1' }
+          }
+        },
+        {
+          insertOne: {
+            document: { str: '1', num: '1' }
+          }
+        },
+        {
+          updateMany: {
+            filter: { str: 1 },
+            update: {
+              $set: { num: '2' }
+            }
+          }
+        },
+        {
+          deleteMany: {
+            filter: { str: 1 }
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.count({}, function(error, count) {
+          assert.ifError(error);
+          assert.equal(count, 0);
+          done();
+        });
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

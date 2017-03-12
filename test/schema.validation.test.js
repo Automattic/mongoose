@@ -628,6 +628,31 @@ describe('schema', function() {
           });
         });
 
+        it('custom validators with isAsync = false', function(done) {
+          var validate = function(v, opts) {
+            // Make eslint not complain about unused vars
+            return !!(v && opts && false);
+          };
+
+          var schema = new Schema({
+            x: {
+              type: String,
+              validate: {
+                isAsync: false,
+                validator: validate
+              }
+            }
+          });
+          var M = mongoose.model('custom-validator-async-' + random(), schema);
+
+          var m = new M({x: 'test'});
+
+          m.validate(function(err) {
+            assert.ok(err.errors['x']);
+            done();
+          });
+        });
+
         it('supports custom properties (gh-2132)', function(done) {
           var schema = new Schema({
             x: {

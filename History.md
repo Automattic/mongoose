@@ -1,3 +1,12 @@
+4.8.7 / 2017-03-12
+==================
+ * fix(model): if last arg in spread is falsy, treat it as a callback #5061
+ * fix(document): use $hook instead of hook to enable 'hook' as a path name #5047
+ * fix(populate): dont select foreign field if parent field is selected #5037
+ * fix(populate): handle passing no args to query.populate #5036
+ * fix(update): use correct method for casting nested arrays #5032
+ * fix(discriminator): handle array discriminators when casting $push #5009
+
 4.8.6 / 2017-03-05
 ==================
  * docs(document): remove text that implies that transform is false by default #5023

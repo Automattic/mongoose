@@ -5537,6 +5537,38 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite casting replaceOne (gh-3998)', function(done) {
+      var schema = new Schema({
+        str: String,
+        num: Number
+      });
+
+      var M = db.model('gh3998_1', schema);
+
+      var ops = [
+        {
+          insertOne: {
+            document: { str: 1, num: '1' }
+          }
+        },
+        {
+          replaceOne: {
+            filter: { str: 1 },
+            replacement: { str: 2, num: '2' }
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.str, '2');
+          assert.strictEqual(doc.num, 2);
+          done();
+        });
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

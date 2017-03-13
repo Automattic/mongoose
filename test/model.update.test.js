@@ -1658,6 +1658,28 @@ describe('model: update:', function() {
       });
     });
 
+    it('replaceOne', function(done) {
+      var schema = mongoose.Schema({ name: String, age: Number }, {
+        versionKey: false
+      });
+      var Model = db.model('gh3998_r1', schema);
+
+      Model.create({ name: 'abc', age: 1 }, function(error, m) {
+        assert.ifError(error);
+        Model.replaceOne({ name: 'abc' }, { name: 'test' }).exec(function(err) {
+          assert.ifError(err);
+          Model.findById(m._id).exec(function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.toObject({ virtuals: false }), {
+              _id: m._id,
+              name: 'test'
+            });
+            done();
+          });
+        });
+      });
+    });
+
     it('mixed nested type casting (gh-3337)', function(done) {
       var Schema = mongoose.Schema({attributes: {}}, {strict: true});
       var Model = db.model('gh3337', Schema);

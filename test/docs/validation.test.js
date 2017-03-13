@@ -1,6 +1,8 @@
 var assert = require('assert');
 var mongoose = require('../../');
 
+var Promise = global.Promise || require('bluebird');
+
 describe('validation docs', function() {
   var db;
   var Schema = mongoose.Schema;
@@ -156,6 +158,10 @@ describe('validation docs', function() {
       phone: {
         type: String,
         validate: {
+          // `isAsync` is not strictly necessary in mongoose 4.x, but relying
+          // on 2 argument validators being async is deprecated. Set the
+          // `isAsync` option to `true` to make deprecation warnings go away.
+          isAsync: true,
           validator: function(v, cb) {
             setTimeout(function() {
               cb(/\d{3}-\d{3}-\d{4}/.test(v));
@@ -164,6 +170,18 @@ describe('validation docs', function() {
           message: '{VALUE} is not a valid phone number!'
         },
         required: [true, 'User phone number required']
+      },
+      name: {
+        type: String,
+        // You can also make a validator async by returning a promise. If you
+        // return a promise, do **not** specify the `isAsync` option.
+        validate: function(v) {
+          return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+              resolve(false);
+            }, 5);
+          });
+        }
       }
     });
 
@@ -172,10 +190,13 @@ describe('validation docs', function() {
     var error;
 
     user.phone = '555.0123';
+    user.name = 'test';
     user.validate(function(error) {
       assert.ok(error);
       assert.equal(error.errors['phone'].message,
         '555.0123 is not a valid phone number!');
+      assert.equal(error.errors['name'].message,
+        'Validator failed for path `name` with value `test`');
       // acquit:ignore:start
       done();
       // acquit:ignore:end

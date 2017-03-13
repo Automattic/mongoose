@@ -1,3 +1,13 @@
+4.9.0 / 2017-03-13
+==================
+ * feat(document): return this from `depopulate()` #5027
+ * fix(drivers): stop emitting timeouts as errors #5026
+ * feat(schema): add a clone() function for schemas #4983
+ * feat(query): add rawResult option to replace passRawResult, deprecate passRawResult #4977 #4925
+ * feat(schematype): support isAsync validator option and handle returning promises from validators, deprecate implicit async validators #4290
+ * feat(query): add `replaceOne()`, `deleteOne()`, `deleteMany()` #3998
+ * feat(model): add `bulkWrite()` #3998
+
 4.8.7 / 2017-03-12
 ==================
  * fix(model): if last arg in spread is falsy, treat it as a callback #5061

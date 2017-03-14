@@ -5326,7 +5326,7 @@ describe('Model', function() {
 
         var arr = [
           { foo: 'Star Wars' },
-          { foo: 'The Fast and the Furious' },
+          { foo: 'The Fast and the Furious' }
         ];
         Movie.insertMany(arr, { ordered: false }, function(error) {
           assert.ifError(error);

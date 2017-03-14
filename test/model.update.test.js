@@ -2398,6 +2398,27 @@ describe('model: update:', function() {
       });
     });
 
+    it('findOneAndUpdate with timestamps (gh-5045)', function(done) {
+      var schema = new Schema({
+        username: String,
+        isDeleted: Boolean
+      }, { timestamps: true });
+      var User = db.model('gh5045', schema);
+
+      User.findOneAndUpdate(
+        { username: 'test', isDeleted: false },
+        { createdAt: '2017-03-06T14:08:59+00:00' },
+        { new: true, setDefaultsOnInsert: true, upsert: true },
+        function(error) {
+          assert.ifError(error);
+          User.updateOne({ username: 'test' }, { createdAt: new Date() }).
+            exec(function(error) {
+              assert.ifError(error);
+              done();
+            });
+        });
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

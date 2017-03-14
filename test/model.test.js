@@ -5303,6 +5303,41 @@ describe('Model', function() {
       }
     });
 
+    it('insertMany() ordered option for single validation error', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: { type: String, required: true }
+        });
+        var Movie = db.model('gh5068-2', schema);
+
+        var arr = [
+          { foo: 'Star Wars' },
+          { foo: 'The Fast and the Furious' },
+        ];
+        Movie.insertMany(arr, { ordered: false }, function(error) {
+          assert.ifError(error);
+          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+            assert.equal(docs.length, 0);
+            done();
+          });
+        });
+      }
+    });
+
     it('insertMany() hooks (gh-3846)', function(done) {
       var schema = new Schema({
         name: String

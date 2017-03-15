@@ -2440,7 +2440,7 @@ describe('model: update:', function() {
 
       var User = db.model('gh5041', UserSchema);
 
-      User.findOneAndUpdate({}, { foos: [ {foo: '13.57'} ] }, function(error) {
+      User.findOneAndUpdate({}, { foos: [{ foo: '13.57' }] }, function(error) {
         assert.ifError(error);
         assert.equal(called, 1);
         done();

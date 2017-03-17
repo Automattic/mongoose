@@ -543,6 +543,57 @@ describe('model', function() {
           catch(done);
       });
 
+      it('embedded discriminators with $push + $each (gh-5070)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Batch = db.model('gh5070', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id }, {
+              $push: {
+                events: { $each: [{ kind: 'Clicked', element: '#button' }] }
+              }
+            }).then(function() {
+              return doc;
+            });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[1].element, '#button');
+            assert.equal(doc.events[1].kind, 'Clicked');
+            done();
+          }).
+          catch(done);
+      });
+
       it('embedded in document arrays (gh-2723)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

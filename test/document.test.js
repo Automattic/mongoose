@@ -3652,6 +3652,27 @@ describe('document', function() {
       done();
     });
 
+    it('timestamps with nested paths (gh-5051)', function(done) {
+      var schema = new Schema({ props: Object }, {
+        timestamps: {
+          createdAt: 'props.createdAt',
+          updatedAt: 'props.updatedAt'
+        }
+      });
+
+      var M = db.model('gh5051', schema);
+      var now = Date.now();
+      M.create({}, function(error, doc) {
+        assert.ok(doc.props.createdAt);
+        assert.ok(doc.props.createdAt instanceof Date);
+        assert.ok(doc.props.createdAt.valueOf() >= now);
+        assert.ok(doc.props.updatedAt);
+        assert.ok(doc.props.updatedAt instanceof Date);
+        assert.ok(doc.props.updatedAt.valueOf() >= now);
+        done();
+      });
+    });
+
     it('supports $where in pre save hook (gh-4004)', function(done) {
       var Promise = global.Promise;
 

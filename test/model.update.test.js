@@ -2447,6 +2447,27 @@ describe('model: update:', function() {
       });
     });
 
+    it('overwrite doc with update validators (gh-3556)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        otherName: String
+      });
+      var Test = db.model('gh3556', testSchema);
+
+      var opts = { overwrite: true, runValidators: true };
+      Test.update({}, { otherName: 'test' }, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['name']);
+        Test.update({}, { $set: { otherName: 'test' } }, opts, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

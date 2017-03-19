@@ -151,7 +151,9 @@ describe('validation docs', function() {
    * Even if you don't want to use asynchronous validators, be careful,
    * because mongoose 4 will assume that **all** functions that take 2
    * arguments are asynchronous, like the
-   * [`validator.isEmail` function](https://www.npmjs.com/package/validator)
+   * [`validator.isEmail` function](https://www.npmjs.com/package/validator).
+   * This behavior is considered deprecated as of 4.9.0, and you can shut
+   * it off by specifying `isAsync: false` on your custom validator.
    */
   it('Async Custom Validators', function(done) {
     var userSchema = new Schema({

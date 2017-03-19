@@ -1,3 +1,14 @@
+4.9.1 / 2017-03-19
+==================
+ * fix(query): handle $type for arrays #5080 #5079 [zoellner](https://github.com/zoellner)
+ * fix(model): handle ordered param for `insertMany` validation errors #5072 [sjorssnoeren](https://github.com/sjorssnoeren)
+ * fix(populate): avoid duplicate ids in dynref queries #5054
+ * fix(timestamps): dont set timestamps in update if user set it #5045
+ * fix(update): dont double-call setters on arrays #5041
+ * fix: upgrade driver -> 2.2.25 for jest fix #5033
+ * fix(model): get promise each time save() is called rather than once #5030
+ * fix(connection): make connect return value consistent #5006
+
 4.9.0 / 2017-03-13
 ==================
  * feat(document): return this from `depopulate()` #5027

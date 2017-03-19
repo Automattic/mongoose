@@ -679,8 +679,11 @@ describe('aggregate: ', function() {
             assert.equal(lowest.employeeHierarchy.length, 3);
 
             // First result in array is max depth result
-            assert.equal(lowest.employeeHierarchy[0].name, 'Alice');
-            assert.equal(lowest.employeeHierarchy[2].name, 'Carol');
+            var names = lowest.employeeHierarchy.map(function(doc) {
+              return doc.name;
+            }).sort();
+            assert.equal(names[0], 'Alice');
+            assert.equal(names[2], 'Carol');
             done();
           });
       }

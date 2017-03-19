@@ -2398,6 +2398,55 @@ describe('model: update:', function() {
       });
     });
 
+    it('findOneAndUpdate with timestamps (gh-5045)', function(done) {
+      var schema = new Schema({
+        username: String,
+        isDeleted: Boolean
+      }, { timestamps: true });
+      var User = db.model('gh5045', schema);
+
+      User.findOneAndUpdate(
+        { username: 'test', isDeleted: false },
+        { createdAt: '2017-03-06T14:08:59+00:00' },
+        { new: true, setDefaultsOnInsert: true, upsert: true },
+        function(error) {
+          assert.ifError(error);
+          User.updateOne({ username: 'test' }, { createdAt: new Date() }).
+            exec(function(error) {
+              assert.ifError(error);
+              done();
+            });
+        });
+    });
+
+    it('doesnt double-call setters when updating an array (gh-5041)', function(done) {
+      var called = 0;
+      var UserSchema = new Schema({
+        name: String,
+        foos: [{
+          _id: false,
+          foo: {
+            type: Number,
+            get: function(val) {
+              return val.toString();
+            },
+            set: function(val) {
+              ++called;
+              return val;
+            }
+          }
+        }]
+      });
+
+      var User = db.model('gh5041', UserSchema);
+
+      User.findOneAndUpdate({}, { foos: [{ foo: '13.57' }] }, function(error) {
+        assert.ifError(error);
+        assert.equal(called, 1);
+        done();
+      });
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

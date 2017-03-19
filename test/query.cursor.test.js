@@ -291,6 +291,31 @@ describe('QueryCursor', function() {
         done();
       }).catch(done);
     });
+
+    it('parallelization', function(done) {
+      var cursor = Model.find().sort({ name: 1 }).cursor();
+
+      var names = [];
+      var startedAt = [];
+      var checkDoc = function(doc) {
+        names.push(doc.name);
+        startedAt.push(Date.now());
+        return {
+          then: function(onResolve) {
+            setTimeout(function() {
+              onResolve();
+            }, 100);
+          }
+        };
+      };
+      cursor.eachAsync(checkDoc, { parallel: 2 }).then(function() {
+        assert.ok(Date.now() - startedAt[1] > 100);
+        assert.equal(startedAt.length, 2);
+        assert.ok(startedAt[1] - startedAt[0] < 50);
+        assert.deepEqual(names.sort(), ['Axl', 'Slash']);
+        done();
+      }).catch(done);
+    });
   });
 
   describe('#lean()', function() {

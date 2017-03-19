@@ -3400,10 +3400,10 @@ query.exec(<span class="string">'find'</span>, callback);</code></pre></div><hr 
 
 <h4>Example</h4>
 
-<pre><code>query.$where(<span class="string">'this.comments.length &amp;gt; 10 || this.name.length &amp;gt; 5'</span>)
+<pre><code>query.$where(<span class="string">'this.comments.length > 10 || this.name.length > 5'</span>)
 
 query.$where(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-  <span class="keyword">return</span> <span class="keyword">this</span>.comments.length &amp;gt; <span class="number">10</span> || <span class="keyword">this</span>.name.length &amp;gt; <span class="number">5</span>;
+  <span class="keyword">return</span> <span class="keyword">this</span>.comments.length > <span class="number">10</span> || <span class="keyword">this</span>.name.length > <span class="number">5</span>;
 })</code></pre></div><hr class=""></div><div class="item method public"><h3 id="query_Query-where"><a href="#query_Query-where">Query#where(<code>[path]</code>, <code>[val]</code>)</a></h3><p>Specifies a <code>path</code> for use with chaining.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Query.prototype.where = <span class="function"><span class="keyword">function</span> <span class="params">(path, val)</span> {</span>
   <span class="keyword">if</span> (!arguments.length) <span class="keyword">return</span> <span class="keyword">this</span>;
 

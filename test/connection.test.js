@@ -127,6 +127,23 @@ describe('connections:', function() {
     done();
   });
 
+  it('should accept mongodb://aaron:p@sw@localhost:27000/fake with @ in password', function(done) {
+    var db = mongoose.createConnection('mongodb://aaron:p@sw@localhost:27000/fake');
+    db.on('error', function() {});
+    assert.equal('object', typeof db.options);
+    assert.equal('object', typeof db.options.server);
+    assert.equal(true, db.options.server.auto_reconnect);
+    assert.equal('object', typeof db.options.db);
+    assert.equal(false, db.options.db.forceServerObjectId);
+    assert.equal('p@sw', db.pass);
+    assert.equal('aaron', db.user);
+    assert.equal('fake', db.name);
+    assert.equal('localhost', db.host);
+    assert.equal(27000, db.port);
+    db.close();
+    done();
+  });
+
   describe('re-opening a closed connection', function() {
     var mongos = process.env.MONGOOSE_SHARD_TEST_URI;
     if (!mongos) return;

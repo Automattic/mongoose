@@ -2447,6 +2447,26 @@ describe('model: update:', function() {
       });
     });
 
+    it('does not fail if passing whole doc (gh-5088)', function(done) {
+      var schema = new Schema({
+        username: String,
+        x: String
+      }, { timestamps: true });
+      var User = db.model('gh5088', schema);
+
+      User.create({ username: 'test' }).
+        then(function(user) {
+          user.x = 'test2';
+          return User.findOneAndUpdate({ _id: user._id }, user,
+            { new: true });
+        }).
+        then(function(user) {
+          assert.equal(user.x, 'test2');
+          done();
+        }).
+        catch(done);
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

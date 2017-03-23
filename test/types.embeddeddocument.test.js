@@ -9,30 +9,32 @@ var assert = require('power-assert'),
     Schema = mongoose.Schema;
 
 /**
- * Schema.
- */
-
-var GrandChildSchema = new Schema({
-  name: String
-});
-
-var ChildSchema = new Schema({
-  name: String,
-  children: [GrandChildSchema]
-});
-
-var ParentSchema = new Schema({
-  name: String,
-  child: ChildSchema
-});
-
-mongoose.model('Parent-3589-Embedded', ParentSchema);
-
-/**
  * Test.
  */
 
 describe('types.embeddeddocument', function() {
+  var GrandChildSchema;
+  var ChildSchema;
+  var ParentSchema;
+
+  before(function() {
+    GrandChildSchema = new Schema({
+      name: String
+    });
+
+    ChildSchema = new Schema({
+      name: String,
+      children: [GrandChildSchema]
+    });
+
+    ParentSchema = new Schema({
+      name: String,
+      child: ChildSchema
+    });
+
+    mongoose.model('Parent-3589-Embedded', ParentSchema);
+  });
+
   it('returns a proper ownerDocument (gh-3589)', function(done) {
     var Parent = mongoose.model('Parent-3589-Embedded');
     var p = new Parent({

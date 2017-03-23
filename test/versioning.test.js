@@ -9,50 +9,48 @@ var start = require('./common'),
     Schema = mongoose.Schema,
     VersionError = mongoose.Error.VersionError;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema();
-
-Comments.add({
-  title: String,
-  date: Date,
-  comments: [Comments],
-  dontVersionMeEither: []
-});
-
-var BlogPost = new Schema(
-  {
-    title: String,
-    date: Date,
-    meta: {
-      date: Date,
-      visitors: Number,
-      nested: [Comments],
-      numbers: [Number]
-    },
-    mixed: {},
-    numbers: [Number],
-    comments: [Comments],
-    arr: [],
-    dontVersionMe: []
-  },
-  {
-    collection: 'versioning_' + random(),
-    skipVersioning: {
-      dontVersionMe: true,
-      'comments.dontVersionMeEither': true
-    }
-  });
-
-mongoose.model('Versioning', BlogPost);
-
 describe('versioning', function() {
   var db;
+  var Comments;
+  var BlogPost;
 
   before(function() {
     db = start();
+
+    Comments = new Schema();
+
+    Comments.add({
+      title: String,
+      date: Date,
+      comments: [Comments],
+      dontVersionMeEither: []
+    });
+
+    BlogPost = new Schema(
+      {
+        title: String,
+        date: Date,
+        meta: {
+          date: Date,
+          visitors: Number,
+          nested: [Comments],
+          numbers: [Number]
+        },
+        mixed: {},
+        numbers: [Number],
+        comments: [Comments],
+        arr: [],
+        dontVersionMe: []
+      },
+      {
+        collection: 'versioning_' + random(),
+        skipVersioning: {
+          dontVersionMe: true,
+          'comments.dontVersionMeEither': true
+        }
+      });
+
+    mongoose.model('Versioning', BlogPost);
   });
 
   after(function(done) {

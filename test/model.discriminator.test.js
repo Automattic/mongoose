@@ -492,6 +492,22 @@ describe('model', function() {
         });
       });
 
+      it('clone() allows reusing schemas (gh-5098)', function(done) {
+        var personSchema = new Schema({
+          name: String
+        }, { discriminatorKey: 'kind' });
+
+        var parentSchema = new Schema({
+          child: String
+        });
+
+        var Person = db.model('gh5098', personSchema);
+        var Parent = Person.discriminator('gh5098_0', parentSchema.clone());
+        // Should not throw
+        var Parent2 = Person.discriminator('gh5098_1', parentSchema.clone());
+        done();
+      });
+
       it('embedded discriminators with $push (gh-5009)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

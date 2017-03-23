@@ -12,50 +12,54 @@ var start = require('./common'),
     DocumentObjectId = mongoose.Types.ObjectId,
     Query = require('../lib/query');
 
-/**
- * Setup.
- */
-
-var Comments = new Schema;
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPostB = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  tags: [String],
-  sigs: [Buffer],
-  owners: [ObjectId],
-  comments: [Comments],
-  def: {type: String, default: 'kandinsky'}
-});
-
-mongoose.model('BlogPostB', BlogPostB);
-var collection = 'blogposts_' + random();
-
-var ModSchema = new Schema({
-  num: Number,
-  str: String
-});
-mongoose.model('Mod', ModSchema);
-
-var geoSchema = new Schema({loc: {type: [Number], index: '2d'}});
-
 describe('model: querying:', function() {
+  var Comments;
+  var BlogPostB;
+  var collection;
+  var ModSchema;
+  var geoSchema;
+
+  before(function() {
+    Comments = new Schema;
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPostB = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      tags: [String],
+      sigs: [Buffer],
+      owners: [ObjectId],
+      comments: [Comments],
+      def: {type: String, default: 'kandinsky'}
+    });
+
+    mongoose.model('BlogPostB', BlogPostB);
+    collection = 'blogposts_' + random();
+
+    ModSchema = new Schema({
+      num: Number,
+      str: String
+    });
+    mongoose.model('Mod', ModSchema);
+
+    geoSchema = new Schema({loc: {type: [Number], index: '2d'}});
+  });
+
   var mongo26_or_greater = false;
   before(function(done) {
     start.mongodVersion(function(err, version) {
@@ -1942,9 +1946,7 @@ describe('model: querying:', function() {
       });
     });
   });
-});
 
-describe('buffers', function() {
   it('works with different methods and query types', function(done) {
     var db = start(),
         BufSchema = new Schema({name: String, block: Buffer}),
@@ -2099,9 +2101,7 @@ describe('buffers', function() {
       }
     });
   });
-});
 
-describe('backwards compatibility', function() {
   it('with previously existing null values in the db', function(done) {
     var db = start(),
         BlogPostB = db.model('BlogPostB', collection),
@@ -2138,9 +2138,7 @@ describe('backwards compatibility', function() {
       });
     });
   });
-});
 
-describe('geo-spatial', function() {
   describe('2d', function() {
     it('$near (gh-309)', function(done) {
       var db = start(),
@@ -2311,17 +2309,22 @@ describe('geo-spatial', function() {
   });
 
   describe('2dsphere', function() {
+    var schema2dsphere;
+    var geoSchema;
+    var geoMultiSchema;
+
+    before(function() {
+      schema2dsphere = new Schema({loc: {type: [Number], index: '2dsphere'}});
+
+      geoSchema = new Schema({line: {type: {type: String}, coordinates: []}});
+      geoSchema.index({line: '2dsphere'});
+
+      geoMultiSchema = new Schema({geom: [{type: {type: String}, coordinates: []}]});
+      // see mongodb issue SERVER-8907
+      // geoMultiSchema.index({ geom: '2dsphere' });
+    });
+
     // mongodb 2.4
-
-    var schema2dsphere = new Schema({loc: {type: [Number], index: '2dsphere'}});
-
-    var geoSchema = new Schema({line: {type: {type: String}, coordinates: []}});
-    geoSchema.index({line: '2dsphere'});
-
-    var geoMultiSchema = new Schema({geom: [{type: {type: String}, coordinates: []}]});
-    // see mongodb issue SERVER-8907
-    // geoMultiSchema.index({ geom: '2dsphere' });
-
     var mongo24_or_greater = false;
     before(function(done) {
       start.mongodVersion(function(err, version) {
@@ -2614,139 +2617,139 @@ describe('geo-spatial', function() {
       }
     });
   });
-});
 
-describe('lean option:', function() {
-  it('find', function(done) {
-    var db = start(),
-        BlogPostB = db.model('BlogPostB', collection),
-        title = 'Wooooot ' + random();
+  describe('lean', function() {
+    it('find', function(done) {
+      var db = start(),
+          BlogPostB = db.model('BlogPostB', collection),
+          title = 'Wooooot ' + random();
 
-    var post = new BlogPostB();
-    post.set('title', title);
+      var post = new BlogPostB();
+      post.set('title', title);
 
-    post.save(function(err) {
-      assert.ifError(err);
-      BlogPostB.find({title: title}).lean().exec(function(err, docs) {
+      post.save(function(err) {
         assert.ifError(err);
-        assert.equal(docs.length, 1);
-        assert.strictEqual(docs[0] instanceof mongoose.Document, false);
-        BlogPostB.find({title: title}, null, {lean: true}, function(err, docs) {
+        BlogPostB.find({title: title}).lean().exec(function(err, docs) {
           assert.ifError(err);
           assert.equal(docs.length, 1);
           assert.strictEqual(docs[0] instanceof mongoose.Document, false);
+          BlogPostB.find({title: title}, null, {lean: true}, function(err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 1);
+            assert.strictEqual(docs[0] instanceof mongoose.Document, false);
+            db.close();
+            done();
+          });
+        });
+      });
+    });
+
+    it('findOne', function(done) {
+      var db = start(),
+          BlogPostB = db.model('BlogPostB', collection),
+          title = 'Wooooot ' + random();
+
+      var post = new BlogPostB();
+      post.set('title', title);
+
+      post.save(function(err) {
+        assert.ifError(err);
+        BlogPostB.findOne({title: title}, null, {lean: true}, function(err, doc) {
           db.close();
+          assert.ifError(err);
+          assert.ok(doc);
+          assert.strictEqual(false, doc instanceof mongoose.Document);
           done();
         });
       });
     });
-  });
-
-  it('findOne', function(done) {
-    var db = start(),
-        BlogPostB = db.model('BlogPostB', collection),
-        title = 'Wooooot ' + random();
-
-    var post = new BlogPostB();
-    post.set('title', title);
-
-    post.save(function(err) {
-      assert.ifError(err);
-      BlogPostB.findOne({title: title}, null, {lean: true}, function(err, doc) {
-        db.close();
-        assert.ifError(err);
-        assert.ok(doc);
-        assert.strictEqual(false, doc instanceof mongoose.Document);
-        done();
+    it('properly casts nested and/or queries (gh-676)', function(done) {
+      var sch = new Schema({
+        num: Number,
+        subdoc: {title: String, num: Number}
       });
+
+      var M = mongoose.model('andor' + random(), sch);
+
+      var cond = {
+        $and: [
+          {$or: [{num: '23'}, {'subdoc.num': '45'}]},
+          {$and: [{'subdoc.title': 233}, {num: '345'}]}
+        ]
+      };
+      var q = M.find(cond);
+      assert.equal(typeof q._conditions.$and[0].$or[0].num, 'number');
+      assert.equal(typeof q._conditions.$and[0].$or[1]['subdoc.num'], 'number');
+      assert.equal(typeof q._conditions.$and[1].$and[0]['subdoc.title'], 'string');
+      assert.equal(typeof q._conditions.$and[1].$and[1].num, 'number');
+      done();
     });
-  });
-  it('properly casts nested and/or queries (gh-676)', function(done) {
-    var sch = new Schema({
-      num: Number,
-      subdoc: {title: String, num: Number}
-    });
-
-    var M = mongoose.model('andor' + random(), sch);
-
-    var cond = {
-      $and: [
-        {$or: [{num: '23'}, {'subdoc.num': '45'}]},
-        {$and: [{'subdoc.title': 233}, {num: '345'}]}
-      ]
-    };
-    var q = M.find(cond);
-    assert.equal(typeof q._conditions.$and[0].$or[0].num, 'number');
-    assert.equal(typeof q._conditions.$and[0].$or[1]['subdoc.num'], 'number');
-    assert.equal(typeof q._conditions.$and[1].$and[0]['subdoc.title'], 'string');
-    assert.equal(typeof q._conditions.$and[1].$and[1].num, 'number');
-    done();
-  });
-  it('properly casts deeply nested and/or queries (gh-676)', function(done) {
-    var sch = new Schema({
-      num: Number,
-      subdoc: {title: String, num: Number}
-    });
-
-    var M = mongoose.model('andor' + random(), sch);
-
-    var cond = {
-      $and: [{$or: [{$and: [{$or: [{num: '12345'}, {'subdoc.num': '56789'}]}]}]}]
-    };
-    var q = M.find(cond);
-    assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num, 'number');
-    assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num'], 'number');
-    done();
-  });
-
-  it('casts $elemMatch (gh-2199)', function(done) {
-    var db = start();
-    var schema = new Schema({dates: [Date]});
-    var Dates = db.model('Date', schema, 'dates');
-
-    var array = ['2014-07-01T02:00:00.000Z', '2014-07-01T04:00:00.000Z'];
-    Dates.create({dates: array}, function(err) {
-      assert.ifError(err);
-      var elemMatch = {$gte: '2014-07-01T03:00:00.000Z'};
-      Dates.findOne({}, {dates: {$elemMatch: elemMatch}}, function(err, doc) {
-        assert.ifError(err);
-        assert.equal(doc.dates.length, 1);
-        assert.equal(doc.dates[0].getTime(),
-            new Date('2014-07-01T04:00:00.000Z').getTime());
-        db.close(done);
+    it('properly casts deeply nested and/or queries (gh-676)', function(done) {
+      var sch = new Schema({
+        num: Number,
+        subdoc: {title: String, num: Number}
       });
-    });
-  });
 
-  describe('$eq', function() {
-    var mongo26 = false;
+      var M = mongoose.model('andor' + random(), sch);
 
-    before(function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          return done(err);
-        }
-        mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        done();
-      });
+      var cond = {
+        $and: [{$or: [{$and: [{$or: [{num: '12345'}, {'subdoc.num': '56789'}]}]}]}]
+      };
+      var q = M.find(cond);
+      assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num, 'number');
+      assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num'], 'number');
+      done();
     });
 
-    it('casts $eq (gh-2752)', function(done) {
+    it('casts $elemMatch (gh-2199)', function(done) {
       var db = start();
-      var BlogPostB = db.model('BlogPostB', collection);
+      var schema = new Schema({dates: [Date]});
+      var Dates = db.model('Date', schema, 'dates');
 
-      BlogPostB.findOne(
-          {_id: {$eq: '000000000000000000000001'}, numbers: {$eq: [1, 2]}},
-          function(err, doc) {
-            if (mongo26) {
-              assert.ifError(err);
-            } else {
-              assert.ok(err.toString().indexOf('MongoError') !== -1);
-            }
+      var array = ['2014-07-01T02:00:00.000Z', '2014-07-01T04:00:00.000Z'];
+      Dates.create({dates: array}, function(err) {
+        assert.ifError(err);
+        var elemMatch = {$gte: '2014-07-01T03:00:00.000Z'};
+        Dates.findOne({}, {dates: {$elemMatch: elemMatch}}, function(err, doc) {
+          assert.ifError(err);
+          assert.equal(doc.dates.length, 1);
+          assert.equal(doc.dates[0].getTime(),
+              new Date('2014-07-01T04:00:00.000Z').getTime());
+          db.close(done);
+        });
+      });
+    });
 
-            assert.ok(!doc);
-            db.close(done);
-          });
+    describe('$eq', function() {
+      var mongo26 = false;
+
+      before(function(done) {
+        start.mongodVersion(function(err, version) {
+          if (err) {
+            return done(err);
+          }
+          mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+          done();
+        });
+      });
+
+      it('casts $eq (gh-2752)', function(done) {
+        var db = start();
+        var BlogPostB = db.model('BlogPostB', collection);
+
+        BlogPostB.findOne(
+            {_id: {$eq: '000000000000000000000001'}, numbers: {$eq: [1, 2]}},
+            function(err, doc) {
+              if (mongo26) {
+                assert.ifError(err);
+              } else {
+                assert.ok(err.toString().indexOf('MongoError') !== -1);
+              }
+
+              assert.ok(!doc);
+              db.close(done);
+            });
+      });
     });
   });
 });

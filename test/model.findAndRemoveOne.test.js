@@ -11,62 +11,66 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-/**
- * Setup.
- */
+describe('model: findOneAndRemove:', function() {
+  var Comments;
+  var BlogPost;
+  var modelname;
+  var collection;
+  var strictSchema;
 
-var Comments = new Schema;
+  before(function() {
+    Comments = new Schema;
 
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
 
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-});
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    });
 
-BlogPost.virtual('titleWithAuthor')
-  .get(function() {
-    return this.get('title') + ' by ' + this.get('author');
-  })
-  .set(function(val) {
-    var split = val.split(' by ');
-    this.set('title', split[0]);
-    this.set('author', split[1]);
+    BlogPost.virtual('titleWithAuthor')
+      .get(function() {
+        return this.get('title') + ' by ' + this.get('author');
+      })
+      .set(function(val) {
+        var split = val.split(' by ');
+        this.set('title', split[0]);
+        this.set('author', split[1]);
+      });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    modelname = 'RemoveOneBlogPost';
+    mongoose.model(modelname, BlogPost);
+
+    collection = 'removeoneblogposts_' + random();
+
+    strictSchema = new Schema({name: String}, {strict: true});
+    mongoose.model('RemoveOneStrictSchema', strictSchema);
   });
 
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-var modelname = 'RemoveOneBlogPost';
-mongoose.model(modelname, BlogPost);
-
-var collection = 'removeoneblogposts_' + random();
-
-var strictSchema = new Schema({name: String}, {strict: true});
-mongoose.model('RemoveOneStrictSchema', strictSchema);
-
-describe('model: findOneAndRemove:', function() {
   it('returns the original document', function(done) {
     var db = start(),
         M = db.model(modelname, collection),
@@ -162,9 +166,7 @@ describe('model: findOneAndRemove:', function() {
     assert.ok(/First argument must not be a function/.test(err));
     done();
   });
-});
 
-describe('model: findByIdAndRemove:', function() {
   it('executed with only a callback throws', function(done) {
     var db = start(),
         M = db.model(modelname, collection),
@@ -432,4 +434,3 @@ describe('model: findByIdAndRemove:', function() {
     });
   });
 });
-

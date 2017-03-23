@@ -14,56 +14,55 @@ var ObjectId = Schema.ObjectId;
 var DocObjectId = mongoose.Types.ObjectId;
 
 /**
- * Setup.
- */
-
-/**
- * User schema.
- */
-
-var User = new Schema({
-  name: String,
-  email: String,
-  gender: {type: String, enum: ['male', 'female'], default: 'male'},
-  age: {type: Number, default: 21},
-  blogposts: [{type: ObjectId, ref: 'RefBlogPost'}],
-  followers: [{type: ObjectId, ref: 'RefUser'}]
-});
-
-/**
- * Comment subdocument schema.
- */
-
-var Comment = new Schema({
-  asers: [{type: ObjectId, ref: 'RefUser'}],
-  _creator: {type: ObjectId, ref: 'RefUser'},
-  content: String
-});
-
-/**
- * Blog post schema.
- */
-
-var BlogPost = new Schema({
-  _creator: {type: ObjectId, ref: 'RefUser'},
-  title: String,
-  comments: [Comment],
-  fans: [{type: ObjectId, ref: 'RefUser'}]
-});
-
-var posts = 'blogposts_' + random(),
-    users = 'users_' + random();
-
-mongoose.model('RefBlogPost', BlogPost);
-mongoose.model('RefUser', User);
-mongoose.model('RefAlternateUser', User);
-
-
-/**
  * Tests.
  */
 
 describe('model: populate:', function() {
+  var User;
+  var Comment;
+  var BlogPost;
+  var posts;
+  var users;
+
+  before(function() {
+    User = new Schema({
+      name: String,
+      email: String,
+      gender: {type: String, enum: ['male', 'female'], default: 'male'},
+      age: {type: Number, default: 21},
+      blogposts: [{type: ObjectId, ref: 'RefBlogPost'}],
+      followers: [{type: ObjectId, ref: 'RefUser'}]
+    });
+
+    /**
+     * Comment subdocument schema.
+     */
+
+    Comment = new Schema({
+      asers: [{type: ObjectId, ref: 'RefUser'}],
+      _creator: {type: ObjectId, ref: 'RefUser'},
+      content: String
+    });
+
+    /**
+     * Blog post schema.
+     */
+
+    BlogPost = new Schema({
+      _creator: {type: ObjectId, ref: 'RefUser'},
+      title: String,
+      comments: [Comment],
+      fans: [{type: ObjectId, ref: 'RefUser'}]
+    });
+
+    posts = 'blogposts_' + random();
+    users = 'users_' + random();
+
+    mongoose.model('RefBlogPost', BlogPost);
+    mongoose.model('RefUser', User);
+    mongoose.model('RefAlternateUser', User);
+  });
+
   it('populating array of object', function(done) {
     var db = start(),
         BlogPost = db.model('RefBlogPost', posts),

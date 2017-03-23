@@ -13,65 +13,70 @@ var ObjectId = Schema.Types.ObjectId;
 var DocumentObjectId = mongoose.Types.ObjectId;
 var _ = require('lodash');
 
-/**
- * Setup.
- */
-
-var Comments = new Schema();
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-});
-
-BlogPost.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
-
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-var modelname = 'UpdateOneBlogPost';
-mongoose.model(modelname, BlogPost);
-
-var collection = 'updateoneblogposts_' + random();
-
-var strictSchema = new Schema({name: String}, {strict: true});
-mongoose.model('UpdateOneStrictSchema', strictSchema);
-
-var strictThrowSchema = new Schema({name: String}, {strict: 'throw'});
-mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
-
 describe('model: findOneAndUpdate:', function() {
+  var Comments;
+  var BlogPost;
+  var modelname;
+  var collection;
+  var strictSchema;
+  var strictThrowSchema;
+
+  before(function() {
+    Comments = new Schema();
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    });
+
+    BlogPost.virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    modelname = 'UpdateOneBlogPost';
+    mongoose.model(modelname, BlogPost);
+
+    collection = 'updateoneblogposts_' + random();
+
+    strictSchema = new Schema({name: String}, {strict: true});
+    mongoose.model('UpdateOneStrictSchema', strictSchema);
+
+    strictThrowSchema = new Schema({name: String}, {strict: 'throw'});
+    mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
+  });
+
   it('WWW returns the edited document', function(done) {
     var db = start(),
         M = db.model(modelname, collection),
@@ -535,9 +540,7 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
   });
-});
 
-describe('model: findByIdAndUpdate:', function() {
   it('executing with just a callback throws', function(done) {
     var db = start(),
         M = db.model(modelname, collection),

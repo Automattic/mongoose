@@ -5,22 +5,22 @@ var start = require('./common'),
     random = require('../lib/utils').random,
     Schema = mongoose.Schema;
 
-/**
- * Setup
- */
-
-var schema = new Schema({
-  pos: [Number],
-  complex: {},
-  type: String
-});
-schema.index({pos: 'geoHaystack', type: 1}, {bucketSize: 1});
-
-function getModel(db) {
-  return db.model('GeoSearch', schema, 'geosearch-' + random());
-}
-
 describe('model', function() {
+  var schema;
+
+  function getModel(db) {
+    return db.model('GeoSearch', schema, 'geosearch-' + random());
+  }
+
+  before(function() {
+    schema = new Schema({
+      pos: [Number],
+      complex: {},
+      type: String
+    });
+    schema.index({pos: 'geoHaystack', type: 1}, {bucketSize: 1});
+  });
+
   describe('geoSearch', function() {
     it('works', function(done) {
       var db = start();

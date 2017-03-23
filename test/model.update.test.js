@@ -10,71 +10,72 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema({});
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-}, {strict: false});
-
-BlogPost.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
-
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-mongoose.model('BlogPostForUpdates', BlogPost);
-
-var collection = 'blogposts_' + random();
-
-var strictSchema = new Schema({name: String, x: {nested: String}});
-strictSchema.virtual('foo').get(function() {
-  return 'i am a virtual FOO!';
-});
-mongoose.model('UpdateStrictSchema', strictSchema);
-
-
 describe('model: update:', function() {
-  var post,
-      title = 'Tobi ' + random(),
-      author = 'Brian ' + random(),
-      newTitle = 'Woot ' + random(),
-      id0,
-      id1;
+  var post;
+  var title = 'Tobi ' + random();
+  var author = 'Brian ' + random();
+  var newTitle = 'Woot ' + random();
+  var id0;
+  var id1;
+  var Comments;
+  var BlogPost;
+  var collection;
+  var strictSchema;
+
+  before(function() {
+    Comments = new Schema({});
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    }, {strict: false});
+
+    BlogPost.virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    mongoose.model('BlogPostForUpdates', BlogPost);
+
+    collection = 'blogposts_' + random();
+
+    strictSchema = new Schema({name: String, x: {nested: String}});
+    strictSchema.virtual('foo').get(function() {
+      return 'i am a virtual FOO!';
+    });
+    mongoose.model('UpdateStrictSchema', strictSchema);
+  });
 
   before(function(done) {
     var db = start(),

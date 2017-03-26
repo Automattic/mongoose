@@ -11,28 +11,33 @@ var PromiseProvider = require('../lib/promise_provider');
 var Schema = require('../lib/schema');
 
 var db;
-var testSchema = new Schema({test: {type: String, required: true}});
-testSchema.pre('save', function(next) {
-  if (this.$__saveSucceeds === false) {
-    return next(new Error('fail'));
-  }
-  next();
-});
-testSchema.pre('validate', function(next) {
-  if (this.$__validateSucceeds === false) {
-    return next(new Error('validation failed'));
-  }
-  next();
-});
-testSchema.pre('findOne', function(next) {
-  if (this.$__findOneSucceeds === false) {
-    return next(new Error('findOne failed'));
-  }
-  next();
-});
-var MyModel;
 
 describe('ES6 promises: ', function() {
+  var testSchema;
+  var MyModel;
+
+  before(function() {
+    testSchema = new Schema({test: {type: String, required: true}});
+    testSchema.pre('save', function(next) {
+      if (this.$__saveSucceeds === false) {
+        return next(new Error('fail'));
+      }
+      next();
+    });
+    testSchema.pre('validate', function(next) {
+      if (this.$__validateSucceeds === false) {
+        return next(new Error('validation failed'));
+      }
+      next();
+    });
+    testSchema.pre('findOne', function(next) {
+      if (this.$__findOneSucceeds === false) {
+        return next(new Error('findOne failed'));
+      }
+      next();
+    });
+  });
+
   describe('native: ', function() {
     if (!global.Promise) {
       return;

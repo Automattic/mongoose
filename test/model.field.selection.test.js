@@ -10,43 +10,46 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema;
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPostB = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  tags: [String],
-  sigs: [Buffer],
-  owners: [ObjectId],
-  comments: [Comments],
-  def: {type: String, default: 'kandinsky'}
-});
-
-var modelName = 'model.select.blogpost';
-mongoose.model(modelName, BlogPostB);
-var collection = 'blogposts_' + random();
-
 describe('model field selection', function() {
+  var Comments;
+  var BlogPostB;
+  var modelName;
+  var collection;
+
+  before(function() {
+    Comments = new Schema;
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPostB = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      tags: [String],
+      sigs: [Buffer],
+      owners: [ObjectId],
+      comments: [Comments],
+      def: {type: String, default: 'kandinsky'}
+    });
+
+    modelName = 'model.select.blogpost';
+    mongoose.model(modelName, BlogPostB);
+    collection = 'blogposts_' + random();
+  });
+
   it('excluded fields should be undefined', function(done) {
     var db = start(),
         BlogPostB = db.model(modelName, collection),

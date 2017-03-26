@@ -13,19 +13,6 @@ function valid(v) {
   return !v || v.length > 10;
 }
 
-var subBuf = new Schema({
-  name: String,
-  buf: {type: Buffer, validate: [valid, 'valid failed'], required: true}
-});
-
-var UserBuffer = new Schema({
-  name: String,
-  serial: Buffer,
-  array: [Buffer],
-  required: {type: Buffer, required: true, index: true},
-  sub: [subBuf]
-});
-
 // Dont put indexed models on the default connection, it
 // breaks index.test.js tests on a "pure" default conn.
 // mongoose.model('UserBuffer', UserBuffer);
@@ -35,6 +22,24 @@ var UserBuffer = new Schema({
  */
 
 describe('types.buffer', function() {
+  var subBuf;
+  var UserBuffer;
+
+  before(function() {
+    subBuf = new Schema({
+      name: String,
+      buf: {type: Buffer, validate: [valid, 'valid failed'], required: true}
+    });
+
+    UserBuffer = new Schema({
+      name: String,
+      serial: Buffer,
+      array: [Buffer],
+      required: {type: Buffer, required: true, index: true},
+      sub: [subBuf]
+    });
+  });
+
   it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
     var a = new MongooseBuffer;
 

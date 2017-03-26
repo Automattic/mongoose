@@ -14,6 +14,8 @@ if (!uri) {
       'Sharding must already be enabled on your database',
       '\033[39m'
   );
+
+  return;
 }
 
 var schema = new Schema({

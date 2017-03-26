@@ -1,3 +1,13 @@
+4.9.2 / 2017-03-26
+==================
+ * fix(discriminator): handle class names consistently #5104
+ * fix(schema): make clone() work with reusing discriminator schemas #5098
+ * fix(querycursor): run pre find hooks with .cursor() #5096
+ * fix(connection): throw error if username:password includes @ or : #5091
+ * fix(timestamps): handle overwriting createdAt+updatedAt consistently #5088
+ * fix(document): ensure subdoc post save runs after parent save #5085
+ * docs(model): improve update docs #5076 [bertolo1988](https://github.com/bertolo1988)
+
 4.9.1 / 2017-03-19
 ==================
  * fix(query): handle $type for arrays #5080 #5079 [zoellner](https://github.com/zoellner)

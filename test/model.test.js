@@ -5345,7 +5345,15 @@ describe('Model', function() {
       });
       var calledPre = 0;
       var calledPost = 0;
-      schema.pre('insertMany', function(next) {
+      schema.pre('insertMany', function(next, docs) {
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
+        ++calledPre;
+        next();
+      });
+      schema.pre('insertMany', function(next, docs) {
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
         ++calledPre;
         next();
       });
@@ -5358,7 +5366,7 @@ describe('Model', function() {
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
-        assert.equal(calledPre, 1);
+        assert.equal(calledPre, 2);
         assert.equal(calledPost, 1);
         done();
       });

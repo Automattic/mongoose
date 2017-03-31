@@ -231,6 +231,33 @@ block content
     var Empty2 = new Schema({ any: Array });
     var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
     var Empty4 = new Schema({ any: [{}] });
+  p
+    | Arrays implicitly have a default value of `[]` (empty array).
+  :js
+    var Toy = mongoose.model('Test', ToySchema);
+    console.log((new Toy()).toys); // []
+  p
+    | To overwrite this default, you need to set the default value to `undefined`
+  :js
+    var ToySchema = new Schema({
+      toys: {
+        type: [ToySchema],
+        default: undefined
+      }
+    });
+  p
+    | If an array is marked as `required`, it must have at least one element.
+  :js
+    var ToySchema = new Schema({
+      toys: {
+        type: [ToySchema],
+        required: true
+      }
+    });
+    var Toy = mongoose.model('Toy', ToySchema);
+    Toy.create({ toys: [] }, function(error) {
+      console.log(error.errors['toys'].message); // Path "toys" is required.
+    });
   h3#customtypes Creating Custom Types
   p
     | Mongoose can also be extended with custom SchemaTypes. Search the 

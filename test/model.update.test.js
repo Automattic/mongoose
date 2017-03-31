@@ -2468,6 +2468,33 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('does not fail if passing whole doc (gh-5111)', function(done) {
+      var schema = new Schema({
+        fieldOne: String
+      }, { strict: true });
+      var Test = db.model('gh5111', schema);
+
+      Test.create({ fieldOne: 'Test' }).
+        then(function() {
+          var data = { fieldOne: 'Test2', fieldTwo: 'Test3' };
+          var opts = {
+            upsert: true,
+            runValidators: false,
+            strict: false
+          };
+          return Test.update({}, data, opts);
+        }).
+        then(function() {
+          return Test.findOne();
+        }).
+        then(function(doc) {
+          assert.equal(doc.fieldOne, 'Test2');
+          assert.equal(doc.get('fieldTwo'), 'Test3');
+          done();
+        }).
+        catch(done);
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

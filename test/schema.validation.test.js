@@ -653,6 +653,34 @@ describe('schema', function() {
           });
         });
 
+        it('custom validators with isAsync and .validate() (gh-5125)', function(done) {
+          var validate = function(v, opts) {
+            // Make eslint not complain about unused vars
+            return !!(v && opts && false);
+          };
+
+          var schema = new Schema({
+            x: {
+              type: String
+            }
+          });
+
+          schema.path('x').validate({
+            isAsync: false,
+            validator: validate,
+            message: 'Custom error message!'
+          });
+          var M = mongoose.model('gh5125', schema);
+
+          var m = new M({x: 'test'});
+
+          m.validate(function(err) {
+            assert.ok(err.errors['x']);
+            assert.equal(err.errors['x'].message, 'Custom error message!');
+            done();
+          });
+        });
+
         it('supports custom properties (gh-2132)', function(done) {
           var schema = new Schema({
             x: {

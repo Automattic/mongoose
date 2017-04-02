@@ -331,4 +331,29 @@ describe('document', function() {
 
     done();
   });
+
+  it('isDirectSelected (gh-5063)', function(done) {
+    var selection = {
+      test: 1,
+      numbers: 1,
+      'nested.deep': 1,
+      oids: 1
+    };
+
+    var doc = new TestDocument(undefined, selection);
+
+    doc.init({
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        deep: {x: 'a string'}
+      }
+    });
+
+    assert.ok(doc.isDirectSelected('nested.deep'));
+    assert.ok(!doc.isDirectSelected('nested.cool'));
+    assert.ok(!doc.isDirectSelected('nested'));
+
+    done();
+  });
 });

@@ -318,8 +318,8 @@ describe('discriminator docs', function () {
     // Create a new batch of events with different kinds
     var batch = {
       events: [
-        { kind: 'Clicked', element: '#hero' },
-        { kind: 'Purchased', product: 'action-figure-1' }
+        { kind: 'Clicked', element: '#hero', message: 'hello' },
+        { kind: 'Purchased', product: 'action-figure-1', message: 'world' }
       ]
     };
 
@@ -328,9 +328,11 @@ describe('discriminator docs', function () {
         assert.equal(doc.events.length, 2);
 
         assert.equal(doc.events[0].element, '#hero');
+        assert.equal(doc.events[0].message, 'hello');
         assert.ok(doc.events[0] instanceof Clicked);
 
         assert.equal(doc.events[1].product, 'action-figure-1');
+        assert.equal(doc.events[1].message, 'world');
         assert.ok(doc.events[1] instanceof Purchased);
 
         doc.events.push({ kind: 'Purchased', product: 'action-figure-2' });

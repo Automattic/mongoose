@@ -1,3 +1,15 @@
+4.9.3 / 2017-04-02
+==================
+ * docs: document.js fixes for functions prepended with `$` #5131 [krmannix](https://github.com/krmannix)
+ * fix: Avoid exception on constructor check #5129 [monkbroc](https://github.com/monkbroc)
+ * docs(schematype): explain how to use `isAsync` with validate() #5125
+ * docs(schematype): explain custom message with required function #5123
+ * fix(populate): only apply refPath duplicate id optimization if not array #5114
+ * fix(document): copy non-objects to doc when init() #5111
+ * perf(populate): dont clone whole options every time #5103
+ * feat(document): add isDirectSelected() to minimize isSelected() changes #5063
+ * docs(schematypes): explain some subtleties with arrays #5059
+
 4.9.2 / 2017-03-26
 ==================
  * fix(discriminator): handle class names consistently #5104

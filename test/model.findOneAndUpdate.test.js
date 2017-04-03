@@ -1781,6 +1781,22 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('strict option (gh-5108)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+
+      var Model = db.model('gh5108', modelSchema);
+      Model.findOneAndUpdate({}, { field: 2, otherField: 3 }, {
+        upsert: true,
+        strict: false,
+        new: true
+      }).exec(function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.field, 2);
+        assert.equal(doc.get('otherField'), 3);
+        done();
+      });
+    });
+
     it('should not apply schema transforms (gh-4574)', function(done) {
       var options = {
         toObject: {

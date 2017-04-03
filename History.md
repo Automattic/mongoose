@@ -1,3 +1,36 @@
+4.9.3 / 2017-04-02
+==================
+ * docs: document.js fixes for functions prepended with `$` #5131 [krmannix](https://github.com/krmannix)
+ * fix: Avoid exception on constructor check #5129 [monkbroc](https://github.com/monkbroc)
+ * docs(schematype): explain how to use `isAsync` with validate() #5125
+ * docs(schematype): explain custom message with required function #5123
+ * fix(populate): only apply refPath duplicate id optimization if not array #5114
+ * fix(document): copy non-objects to doc when init() #5111
+ * perf(populate): dont clone whole options every time #5103
+ * feat(document): add isDirectSelected() to minimize isSelected() changes #5063
+ * docs(schematypes): explain some subtleties with arrays #5059
+
+4.9.2 / 2017-03-26
+==================
+ * fix(discriminator): handle class names consistently #5104
+ * fix(schema): make clone() work with reusing discriminator schemas #5098
+ * fix(querycursor): run pre find hooks with .cursor() #5096
+ * fix(connection): throw error if username:password includes @ or : #5091
+ * fix(timestamps): handle overwriting createdAt+updatedAt consistently #5088
+ * fix(document): ensure subdoc post save runs after parent save #5085
+ * docs(model): improve update docs #5076 [bertolo1988](https://github.com/bertolo1988)
+
+4.9.1 / 2017-03-19
+==================
+ * fix(query): handle $type for arrays #5080 #5079 [zoellner](https://github.com/zoellner)
+ * fix(model): handle ordered param for `insertMany` validation errors #5072 [sjorssnoeren](https://github.com/sjorssnoeren)
+ * fix(populate): avoid duplicate ids in dynref queries #5054
+ * fix(timestamps): dont set timestamps in update if user set it #5045
+ * fix(update): dont double-call setters on arrays #5041
+ * fix: upgrade driver -> 2.2.25 for jest fix #5033
+ * fix(model): get promise each time save() is called rather than once #5030
+ * fix(connection): make connect return value consistent #5006
+
 4.9.0 / 2017-03-13
 ==================
  * feat(document): return this from `depopulate()` #5027

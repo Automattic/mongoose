@@ -14,56 +14,55 @@ var ObjectId = Schema.ObjectId;
 var DocObjectId = mongoose.Types.ObjectId;
 
 /**
- * Setup.
- */
-
-/**
- * User schema.
- */
-
-var User = new Schema({
-  name: String,
-  email: String,
-  gender: {type: String, enum: ['male', 'female'], default: 'male'},
-  age: {type: Number, default: 21},
-  blogposts: [{type: ObjectId, ref: 'RefBlogPost'}],
-  followers: [{type: ObjectId, ref: 'RefUser'}]
-});
-
-/**
- * Comment subdocument schema.
- */
-
-var Comment = new Schema({
-  asers: [{type: ObjectId, ref: 'RefUser'}],
-  _creator: {type: ObjectId, ref: 'RefUser'},
-  content: String
-});
-
-/**
- * Blog post schema.
- */
-
-var BlogPost = new Schema({
-  _creator: {type: ObjectId, ref: 'RefUser'},
-  title: String,
-  comments: [Comment],
-  fans: [{type: ObjectId, ref: 'RefUser'}]
-});
-
-var posts = 'blogposts_' + random(),
-    users = 'users_' + random();
-
-mongoose.model('RefBlogPost', BlogPost);
-mongoose.model('RefUser', User);
-mongoose.model('RefAlternateUser', User);
-
-
-/**
  * Tests.
  */
 
 describe('model: populate:', function() {
+  var User;
+  var Comment;
+  var BlogPost;
+  var posts;
+  var users;
+
+  before(function() {
+    User = new Schema({
+      name: String,
+      email: String,
+      gender: {type: String, enum: ['male', 'female'], default: 'male'},
+      age: {type: Number, default: 21},
+      blogposts: [{type: ObjectId, ref: 'RefBlogPost'}],
+      followers: [{type: ObjectId, ref: 'RefUser'}]
+    });
+
+    /**
+     * Comment subdocument schema.
+     */
+
+    Comment = new Schema({
+      asers: [{type: ObjectId, ref: 'RefUser'}],
+      _creator: {type: ObjectId, ref: 'RefUser'},
+      content: String
+    });
+
+    /**
+     * Blog post schema.
+     */
+
+    BlogPost = new Schema({
+      _creator: {type: ObjectId, ref: 'RefUser'},
+      title: String,
+      comments: [Comment],
+      fans: [{type: ObjectId, ref: 'RefUser'}]
+    });
+
+    posts = 'blogposts_' + random();
+    users = 'users_' + random();
+
+    mongoose.model('RefBlogPost', BlogPost);
+    mongoose.model('RefUser', User);
+    mongoose.model('RefAlternateUser', User);
+  });
+
   it('populating array of object', function(done) {
     var db = start(),
         BlogPost = db.model('RefBlogPost', posts),
@@ -3045,6 +3044,61 @@ describe('model: populate:', function() {
           assert.equal(basket.balls[0].ball.seam, 'yarn');
           assert.ok(!basket.balls[1].kind);
           assert.ok(!basket.balls[1].ball);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('with non-arrays (gh-5114)', function(done) {
+      var LocationSchema = new Schema({
+        name: String
+      });
+      var UserSchema = new Schema({
+        name: String,
+        locationRef: String,
+        locationIds: {
+          type: [{
+            location: {
+              type: mongoose.Schema.Types.ObjectId,
+              refPath: 'locationRef'
+            }
+          }]
+        }
+      });
+
+      var Locations = db.model('gh5114', LocationSchema);
+      var Users = db.model('gh5114_0', UserSchema);
+
+      var location1Id = new mongoose.Types.ObjectId();
+      var location2Id = new mongoose.Types.ObjectId();
+
+      var location1 = {
+        _id: location1Id,
+        name: 'loc1'
+      };
+      var location2 = {
+        _id: location2Id,
+        name: 'loc2'
+      };
+      var user = {
+        locationRef: 'gh5114',
+        locationIds: [
+          { location: location1Id },
+          { location: location2Id }
+        ]
+      };
+
+      Locations.create([location1, location2]).
+        then(function() {
+          return Users.create(user);
+        }).
+        then(function() {
+          return Users.findOne().populate('locationIds.location');
+        }).
+        then(function(doc) {
+          assert.equal(doc.locationIds.length, 2);
+          assert.equal(doc.locationIds[0].location.name, 'loc1');
+          assert.equal(doc.locationIds[1].location.name, 'loc2');
           done();
         }).
         catch(done);

@@ -141,15 +141,17 @@ describe('schema options.timestamps', function() {
   });
 
   describe('auto update createdAt and updatedAt when create/save/update document', function() {
-    var CatSchema = new Schema({
-      name: String,
-      hobby: String
-    }, {timestamps: true});
-
-    var conn = start();
-    var Cat = conn.model('Cat', CatSchema);
+    var CatSchema;
+    var conn;
+    var Cat;
 
     before(function(done) {
+      CatSchema = new Schema({
+        name: String,
+        hobby: String
+      }, {timestamps: true});
+      conn = start();
+      Cat = conn.model('Cat', CatSchema);
       Cat.remove({}, done);
     });
 

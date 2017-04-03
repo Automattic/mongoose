@@ -13,20 +13,20 @@ var start = require('./common'),
 
 var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
 
-/**
- * Setup.
- */
-
-var Person = new Schema({
-  name: String
-});
-
-mongoose.model('PersonForStream', Person);
-var collection = 'personforstream_' + random();
-
 describe('query stream:', function() {
   var db = start();
-  var P = db.model('PersonForStream', collection);
+  var Person;
+  var collection = 'personforstream_' + random();
+  var P;
+
+  before(function() {
+    Person = new Schema({
+      name: String
+    });
+
+    mongoose.model('PersonForStream', Person);
+    P = db.model('PersonForStream', collection);
+  });
 
   before(function(done) {
     var people = names.map(function(name) {

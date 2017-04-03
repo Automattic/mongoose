@@ -11,24 +11,29 @@ var mongodb = require('mongodb');
 var MongooseArray = mongoose.Types.Array;
 var collection = 'avengers_' + random();
 
-var User = new Schema({
-  name: String,
-  pets: [Schema.ObjectId]
-});
-
-mongoose.model('User', User);
-
-var Pet = new Schema({
-  name: String
-});
-
-mongoose.model('Pet', Pet);
-
 /**
  * Test.
  */
 
 describe('types array', function() {
+  var User;
+  var Pet;
+
+  before(function() {
+    User = new Schema({
+      name: String,
+      pets: [Schema.ObjectId]
+    });
+
+    mongoose.model('User', User);
+
+    Pet = new Schema({
+      name: String
+    });
+
+    mongoose.model('Pet', Pet);
+  });
+
   it('behaves and quacks like an Array', function(done) {
     var a = new MongooseArray;
 

@@ -3870,6 +3870,32 @@ describe('document', function() {
       });
     });
 
+    it('post hooks on child subdocs run after save (gh-5085)', function(done) {
+      var ChildModelSchema = new mongoose.Schema({
+        text: {
+          type: String
+        }
+      });
+      ChildModelSchema.post('save', function(doc) {
+        doc.text = 'bar';
+      });
+      var ParentModelSchema = new mongoose.Schema({
+        children: [ChildModelSchema]
+      });
+
+      var Model = db.model('gh5085', ParentModelSchema);
+
+      Model.create({ children: [{ text: 'test' }] }, function(error) {
+        assert.ifError(error);
+        Model.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.children.length, 1);
+          assert.equal(doc.children[0].text, 'test');
+          done();
+        });
+      });
+    });
+
     it('nested docs toObject() clones (gh-5008)', function(done) {
       var schema = new mongoose.Schema({
         sub: {

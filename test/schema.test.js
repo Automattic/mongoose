@@ -30,18 +30,16 @@ function TestDocument() {
 TestDocument.prototype.__proto__ = Document.prototype;
 
 /**
- * Set a dummy schema to simulate compilation.
- */
-
-TestDocument.prototype.$__setSchema(new Schema({
-  test: String
-}));
-
-/**
  * Test.
  */
 
 describe('schema', function() {
+  before(function() {
+    TestDocument.prototype.$__setSchema(new Schema({
+      test: String
+    }));
+  });
+
   describe('nested fields with same name', function() {
     var db, NestedModel;
 

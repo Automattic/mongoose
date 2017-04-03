@@ -7,19 +7,23 @@ var start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema;
 
-var schema = new Schema({
-  a: String,
-  b: {
-    c: Number,
-    d: [{e: String}]
-  },
-  f: {g: Date},
-  h: {}
-});
+var schema;
 
 describe('is compatible with object created using Object.create(null) (gh-1484)', function() {
   var db;
   var M;
+
+  before(function() {
+    schema = new Schema({
+      a: String,
+      b: {
+        c: Number,
+        d: [{e: String}]
+      },
+      f: {g: Date},
+      h: {}
+    });
+  });
 
   before(function() {
     db = start();
@@ -133,4 +137,3 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     done();
   });
 });
-

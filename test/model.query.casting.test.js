@@ -15,47 +15,52 @@ var DocumentObjectId = mongoose.Types.ObjectId;
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Schema = mongoose.Schema;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema;
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPostB = new Schema({
-  title: {$type: String},
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [{$type: Number}],
-  tags: [String],
-  sigs: [Buffer],
-  owners: [ObjectId],
-  comments: [Comments],
-  def: {$type: String, default: 'kandinsky'}
-}, {typeKey: '$type'});
-
-var modelName = 'model.query.casting.blogpost';
-mongoose.model(modelName, BlogPostB);
-var collection = 'blogposts_' + random();
-
-var geoSchemaArray = new Schema({loc: {type: [Number], index: '2d'}});
-var geoSchemaObject = new Schema({loc: {long: Number, lat: Number}});
-geoSchemaObject.index({loc: '2d'});
-
 describe('model query casting', function() {
+  var Comments;
+  var BlogPostB;
+  var collection;
+  var geoSchemaArray;
+  var geoSchemaObject;
+  var modelName;
+
+  before(function() {
+    Comments = new Schema;
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPostB = new Schema({
+      title: {$type: String},
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [{$type: Number}],
+      tags: [String],
+      sigs: [Buffer],
+      owners: [ObjectId],
+      comments: [Comments],
+      def: {$type: String, default: 'kandinsky'}
+    }, {typeKey: '$type'});
+
+    modelName = 'model.query.casting.blogpost';
+    mongoose.model(modelName, BlogPostB);
+    collection = 'blogposts_' + random();
+
+    geoSchemaArray = new Schema({loc: {type: [Number], index: '2d'}});
+    geoSchemaObject = new Schema({loc: {long: Number, lat: Number}});
+    geoSchemaObject.index({loc: '2d'});
+  });
+
   it('works', function(done) {
     var db = start(),
         BlogPostB = db.model(modelName, collection),

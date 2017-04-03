@@ -168,6 +168,26 @@ describe('QueryCursor', function() {
         done();
       });
     });
+
+    it('with pre-find hooks (gh-5096)', function(done) {
+      var schema = new Schema({ name: String });
+      var called = 0;
+      schema.pre('find', function(next) {
+        ++called;
+        next();
+      });
+
+      var Model = db.model('gh5096', schema);
+      Model.create({ name: 'Test' }, function(error) {
+        assert.ifError(error);
+        Model.find().cursor().next(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(called, 1);
+          assert.equal(doc.name, 'Test');
+          done();
+        });
+      });
+    });
   });
 
   it('as readable stream', function(done) {

@@ -10,71 +10,72 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema({});
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-}, {strict: false});
-
-BlogPost.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
-
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-mongoose.model('BlogPostForUpdates', BlogPost);
-
-var collection = 'blogposts_' + random();
-
-var strictSchema = new Schema({name: String, x: {nested: String}});
-strictSchema.virtual('foo').get(function() {
-  return 'i am a virtual FOO!';
-});
-mongoose.model('UpdateStrictSchema', strictSchema);
-
-
 describe('model: update:', function() {
-  var post,
-      title = 'Tobi ' + random(),
-      author = 'Brian ' + random(),
-      newTitle = 'Woot ' + random(),
-      id0,
-      id1;
+  var post;
+  var title = 'Tobi ' + random();
+  var author = 'Brian ' + random();
+  var newTitle = 'Woot ' + random();
+  var id0;
+  var id1;
+  var Comments;
+  var BlogPost;
+  var collection;
+  var strictSchema;
+
+  before(function() {
+    Comments = new Schema({});
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    }, {strict: false});
+
+    BlogPost.virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    mongoose.model('BlogPostForUpdates', BlogPost);
+
+    collection = 'blogposts_' + random();
+
+    strictSchema = new Schema({name: String, x: {nested: String}});
+    strictSchema.virtual('foo').get(function() {
+      return 'i am a virtual FOO!';
+    });
+    mongoose.model('UpdateStrictSchema', strictSchema);
+  });
 
   before(function(done) {
     var db = start(),
@@ -2445,6 +2446,53 @@ describe('model: update:', function() {
         assert.equal(called, 1);
         done();
       });
+    });
+
+    it('does not fail if passing whole doc (gh-5088)', function(done) {
+      var schema = new Schema({
+        username: String,
+        x: String
+      }, { timestamps: true });
+      var User = db.model('gh5088', schema);
+
+      User.create({ username: 'test' }).
+        then(function(user) {
+          user.x = 'test2';
+          return User.findOneAndUpdate({ _id: user._id }, user,
+            { new: true });
+        }).
+        then(function(user) {
+          assert.equal(user.x, 'test2');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('does not fail if passing whole doc (gh-5111)', function(done) {
+      var schema = new Schema({
+        fieldOne: String
+      }, { strict: true });
+      var Test = db.model('gh5111', schema);
+
+      Test.create({ fieldOne: 'Test' }).
+        then(function() {
+          var data = { fieldOne: 'Test2', fieldTwo: 'Test3' };
+          var opts = {
+            upsert: true,
+            runValidators: false,
+            strict: false
+          };
+          return Test.update({}, data, opts);
+        }).
+        then(function() {
+          return Test.findOne();
+        }).
+        then(function(doc) {
+          assert.equal(doc.fieldOne, 'Test2');
+          assert.equal(doc.get('fieldTwo'), 'Test3');
+          done();
+        }).
+        catch(done);
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

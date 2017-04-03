@@ -1272,7 +1272,7 @@ describe('document', function() {
         var m = new M({name: 'gh1109-2', arr: [1]});
         assert.equal(called, false);
         m.save(function(err) {
-          assert.equal(String(err), 'ValidationError: BAM');
+          assert.equal(String(err), 'ValidationError: arr: BAM');
           assert.equal(called, true);
           m.arr.push(2);
           called = false;
@@ -1301,7 +1301,7 @@ describe('document', function() {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
           m.arr.push({nice: true});
           m.save(function(err) {
-            assert.equal(String(err), 'ValidationError: BAM');
+            assert.equal(String(err), 'ValidationError: arr: BAM');
             m.arr.push(95);
             m.save(function(err) {
               assert.ifError(err);

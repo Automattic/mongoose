@@ -610,6 +610,60 @@ describe('model', function() {
           catch(done);
       });
 
+      it('embedded discriminators with $set (gh-5130)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind' });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Batch = db.model('gh5130', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id, 'events._id': doc.events[0]._id }, {
+              $set: {
+                'events.$':  {
+                  message: 'updated',
+                  kind: 'Clicked',
+                  element: '#hero2'
+                }
+              }
+            }).then(function() { return doc; });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            assert.equal(doc.events[0].message, 'updated');
+            assert.equal(doc.events[0].element, '#hero2');    // <-- test failed
+            assert.equal(doc.events[0].kind, 'Clicked');      // <-- test failed
+            done();
+          }).
+          catch(done);
+      });
+
       it('embedded in document arrays (gh-2723)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

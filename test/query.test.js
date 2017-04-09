@@ -1722,8 +1722,8 @@ describe('Query', function() {
           {'answers._id': '507f1f77bcf86cd799439011'},
           {$set: {'answers.$': answersUpdate}});
 
-      assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
-          {votes: 1, count: 3});
+      assert.deepEqual(q.getUpdate().$set['answers.$'].stats.toObject(),
+        { votes: 1, count: 3 });
       done();
     });
 

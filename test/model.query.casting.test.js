@@ -981,6 +981,46 @@ describe('model query casting', function() {
     });
   });
 
+  it('setOnInsert with custom type (gh-5126)', function(done) {
+    var db = start();
+
+    function Point(key, options) {
+      mongoose.SchemaType.call(this, key, options, 'Point');
+    }
+
+    mongoose.Schema.Types.Point = Point;
+    Point.prototype = Object.create(mongoose.SchemaType.prototype);
+
+    var called = 0;
+    Point.prototype.cast = function(point) {
+      ++called;
+      if (point.type !== 'Point') {
+        throw new Error('Woops');
+      }
+
+      return point;
+    };
+
+    var testSchema = new mongoose.Schema({ name: String, test: Point });
+    var Test = db.model('gh5126', testSchema);
+
+    var u = {
+      $setOnInsert: {
+        name: 'a',
+        test: {
+          type: 'Point'
+        }
+      }
+    };
+    Test.findOneAndUpdate({ name: 'a' }, u).
+      exec(function(error) {
+        assert.ifError(error);
+        assert.equal(called, 1);
+        done();
+      }).
+      catch(done);
+  });
+
   it('_id = 0 (gh-4610)', function(done) {
     var db = start();
 

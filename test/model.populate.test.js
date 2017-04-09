@@ -4976,6 +4976,45 @@ describe('model: populate:', function() {
         }
       });
 
+      it('handles circular virtual -> regular (gh-5128)', function(done) {
+        var ASchema = new Schema({
+          title: { type: String, required: true, trim : true }
+        });
+
+        ASchema.virtual('brefs', {
+          ref: 'gh5128_0',
+          localField: '_id',
+          foreignField: 'arefs'
+        });
+
+        var BSchema = new Schema({
+          arefs: [{ type: ObjectId, required: true, ref: 'gh5128' }]
+        });
+
+        var a = db.model('gh5128', ASchema);
+        var b = db.model('gh5128_0', BSchema);
+
+        var id1 = new mongoose.Types.ObjectId();
+
+        a.create({ _id: id1, title: 'test' }).
+          then(function() { return b.create({ arefs: [id1] }); }).
+          then(function() {
+            return a.findOne({ _id: id1 }).populate([{
+              path: 'brefs', // this gets populated
+              model: 'gh5128_0',
+              populate: [{
+                path: 'arefs', // <---- this is returned as [ObjectId], not populated
+                model: 'gh5128'
+              }]
+            }]);
+          }).
+          then(function(doc) {
+            assert.equal(doc.brefs[0].arefs[0].title, 'test');
+            done();
+          }).
+          catch(done);
+      });
+
       it('handles nested virtuals (gh-4851)', function(done) {
         var AuthorSchema = new Schema({ name: String });
 

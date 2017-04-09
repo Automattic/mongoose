@@ -4978,7 +4978,7 @@ describe('model: populate:', function() {
 
       it('handles circular virtual -> regular (gh-5128)', function(done) {
         var ASchema = new Schema({
-          title: { type: String, required: true, trim : true },
+          title: { type: String, required: true, trim : true }
         });
 
         ASchema.virtual('brefs', {
@@ -4988,7 +4988,7 @@ describe('model: populate:', function() {
         });
 
         var BSchema = new Schema({
-          arefs: [{ type: ObjectId, required: true, ref: 'gh5128' }],
+          arefs: [{ type: ObjectId, required: true, ref: 'gh5128' }]
         });
 
         var a = db.model('gh5128', ASchema);

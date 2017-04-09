@@ -73,7 +73,10 @@ describe('validation docs', function() {
       },
       drink: {
         type: String,
-        enum: ['Coffee', 'Tea']
+        enum: ['Coffee', 'Tea'],
+        required: function() {
+          return this.bacon > 3;
+        }
       }
     });
     var Breakfast = db.model('Breakfast', breakfastSchema);
@@ -89,6 +92,12 @@ describe('validation docs', function() {
     assert.ok(!error.errors['bacon']);
     assert.equal(error.errors['drink'].message,
       '`Milk` is not a valid enum value for path `drink`.');
+
+    badBreakfast.bacon = 5;
+    badBreakfast.drink = null;
+
+    error = badBreakfast.validateSync();
+    assert.equal(error.errors['drink'].message, 'Path `drink` is required.');
 
     badBreakfast.bacon = null;
     error = badBreakfast.validateSync();

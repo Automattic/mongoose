@@ -394,4 +394,29 @@ describe('query middleware', function() {
       done();
     });
   });
+
+  it('with clone() (gh-5153)', function(done) {
+    var schema = new Schema({});
+    var calledPre = 0;
+    var calledPost = 0;
+
+    schema.pre('find', function(next) {
+      ++calledPre;
+      next();
+    });
+
+    schema.post('find', function(res, next) {
+      ++calledPost;
+      next();
+    });
+
+    var Test = db.model('gh5153', schema.clone());
+
+    Test.find().exec(function(error) {
+      assert.ifError(error);
+      assert.equal(calledPre, 1);
+      assert.equal(calledPost, 1);
+      done();
+    });
+  });
 });

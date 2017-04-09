@@ -1,3 +1,12 @@
+4.9.4 / 2017-04-09
+==================
+ * fix(schema): clone query middleware correctly #5153 #5141 [clozanosanchez](https://github.com/clozanosanchez)
+ * docs(aggregate): fix typo #5142
+ * fix(query): cast .$ update to underlying array type #5130
+ * fix(populate): don't mutate populate result in place #5128
+ * fix(query): handle $setOnInsert consistent with $set #5126
+ * docs(query): add strict mode option for findOneAndUpdate #5108
+
 4.9.3 / 2017-04-02
 ==================
  * docs: document.js fixes for functions prepended with `$` #5131 [krmannix](https://github.com/krmannix)

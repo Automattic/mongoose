@@ -3923,6 +3923,23 @@ describe('document', function() {
       done();
     });
 
+    it('toObject() with null (gh-5143)', function(done) {
+      var schema = new mongoose.Schema({
+        customer: {
+          name: { type: String, required: false }
+        }
+      });
+
+      var Model = db.model('gh5143', schema);
+
+      var model = new Model();
+      model.customer = null;
+      assert.strictEqual(model.toObject().customer, null);
+      assert.strictEqual(model.toObject({ getters: true }).customer, null);
+
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

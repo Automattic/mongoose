@@ -375,4 +375,27 @@ describe('model: mapreduce:', function() {
       db.close(done);
     });
   });
+
+  it('resolveToObject (gh-4945)', function(done) {
+    var db = start();
+    var MR = db.model('MapReduce', collection);
+
+    var o = {
+      map: function() {
+      },
+      reduce: function() {
+        return 'test';
+      },
+      verbose: false,
+      resolveToObject: true
+    };
+
+    MR.create({ title: 'test' }, function(error) {
+      assert.ifError(error);
+      MR.mapReduce(o).then(function(obj) {
+        assert.ok(obj.model);
+        db.close(done);
+      }).catch(done);
+    });
+  });
 });

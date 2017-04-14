@@ -1781,6 +1781,17 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('strictQuery option (gh-4136)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strictQuery: 'throw' });
+
+      var Model = db.model('gh4136', modelSchema);
+      Model.find({ nonexistingField: 1 }).exec(function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('strictQuery') !== -1, error.message);
+        done();
+      });
+    });
+
     it('strict option (gh-5108)', function(done) {
       var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 

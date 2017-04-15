@@ -10,7 +10,10 @@
 Person.findOne({ <span class="string">'name.last'</span>: <span class="string">'Ghost'</span> }, <span class="string">'name occupation'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(err, person)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
   console.log(<span class="string">'%s %s is a %s.'</span>, person.name.first, person.name.last, person.occupation) <span class="comment">// Space Ghost is a talk show host.</span>
-})</code></pre><p>Here we see that the query was executed immediately and the results passed to our callback.
+})</code></pre><p>Here we see that the query was executed immediately and the results passed to our callback. All callbacks in mongoose use the pattern:
+<code>callback(error, result)</code>. If an error occurs executing the query, the error parameter will contain an error document. If the query is successful, the error parameter will be null, 
+and the result will be populated with the results of the query.
+
 Now let&#39;s look at what happens when no <code>callback</code> is passed:</p><pre><code class="javascript"><span class="comment">// find each person with a last name matching 'Ghost'</span>
 <span class="keyword">var</span> query = Person.findOne({ <span class="string">'name.last'</span>: <span class="string">'Ghost'</span> });
 

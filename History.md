@@ -1,3 +1,10 @@
+4.9.5 / 2017-04-16
+==================
+ * fix(query): correct $pullAll casting of null #5164 [Sebmaster](https://github.com/Sebmaster)
+ * docs: add advanced schemas docs for loadClass #5157
+ * fix(document): handle null/undefined gracefully in applyGetters() #5143
+ * fix(model): add resolveToObject option for mapReduce with ES6 promises #4945
+
 4.9.4 / 2017-04-09
 ==================
  * fix(schema): clone query middleware correctly #5153 #5141 [clozanosanchez](https://github.com/clozanosanchez)

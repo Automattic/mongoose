@@ -2495,6 +2495,32 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('$pullAll with null (gh-5164)', function(done) {
+      var schema = new Schema({
+        name: String,
+        arr: [{ name: String }]
+      }, { strict: true });
+      var Test = db.model('gh5164', schema);
+
+      var doc = new Test({ name: 'Test', arr: [null, {name: 'abc'}] });
+
+      doc.save().
+        then(function(doc) {
+          return Test.update({ _id: doc._id }, {
+            $pullAll: { arr: [null] }
+          });
+        }).
+        then(function() {
+          return Test.findById(doc);
+        }).
+        then(function(doc) {
+          assert.equal(doc.arr.length, 1);
+          assert.equal(doc.arr[0].name, 'abc');
+          done();
+        }).
+        catch(done);
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

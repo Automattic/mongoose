@@ -35,11 +35,11 @@ aaron.save(<span class="function"><span class="keyword">function</span> <span cl
 .populate(<span class="string">'_creator'</span>)
 .exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, story)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-  console.log(<span class="string">'The creator is %s'</span>, story._creator.name); <span class="comment">// prints "The creator is Aaron"</span>
+  console.log(<span class="string">'The creator is %s'</span>, story._creator[0].name); <span class="comment">// prints "The creator is Aaron"</span>
 })
-</code></pre><p>Populated paths are no longer set to their original <code>ObjectId</code>s, their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.</p>
+</code></pre><p>Populated paths are no longer set to their original <code>ObjectId</code>s, their value is replaced with an array of mongoose documents returned from the database by performing a separate query before returning the results.</p>
 
-<p>Arrays of <code>ObjectId</code> refs work the same way. Just call the <a href="./api.html#query_Query-populate">populate</a> method on the query and an array of documents will be returned <em>in place</em> of the <code>ObjectIds</code>.</p><h3>Field selection</h3><p>What if we only want a few specific fields returned for the query? This can be accomplished by passing the usual <a href="./api.html#query_Query-select">field name syntax</a> as the second argument to the populate method:</p><pre><code class="javascript">Story
+<pre><code class="javascript">Story
 .findOne({ title: <span class="regexp">/timex/i</span> })
 .populate(<span class="string">'_creator'</span>, <span class="string">'name'</span>) <span class="comment">// only return the Persons name</span>
 .exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, story)</span> {</span>

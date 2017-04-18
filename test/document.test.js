@@ -2054,6 +2054,25 @@ describe('document', function() {
       done();
     });
 
+    it('single embedded parent() (gh-5134)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh5134', eventSchema);
+
+      var e = new Event({name: 'test', user: {}});
+      assert.strictEqual(e.user.parent(), e.user.ownerDocument());
+
+      done();
+    });
+
     it('single embedded schemas with markmodified (gh-2689)', function(done) {
       var userSchema = new mongoose.Schema({
         name: String,

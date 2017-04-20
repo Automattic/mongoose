@@ -3959,6 +3959,33 @@ describe('document', function() {
       done();
     });
 
+    it('handles array subdocs with single nested subdoc default (gh-5162)', function(done) {
+      var RatingsItemSchema = new mongoose.Schema({
+        value: Number
+      }, { versionKey: false, _id: false });
+
+      var RatingsSchema = new mongoose.Schema({
+        ratings: {
+          type: RatingsItemSchema,
+          default: { id: 1, value: 0 }
+        },
+        _id: false
+      });
+
+      var RestaurantSchema = new mongoose.Schema({
+        menu: {
+          type: [RatingsSchema]
+        }
+      });
+
+      var Restaurant = db.model('gh5162', RestaurantSchema);
+
+      // Should not throw
+      var r = new Restaurant();
+      assert.deepEqual(r.toObject().menu, []);
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

@@ -465,6 +465,28 @@ describe('document modified', function() {
 
         done();
       });
+
+      it('updates embedded doc parents upon direct assignment (gh-5189)', function(done) {
+        var db = start();
+        var familySchema = new Schema({
+          children: [{name: {type: String, required: true}}]
+        });
+        var Family = db.model('Family', familySchema);
+        Family.create({
+          children: [
+            {name: 'John'},
+            {name: 'Mary'}
+          ]
+        }, function(err, family) {
+          family.set({children: family.children.slice(1)});
+          family.children.forEach(function(child) {
+            child.set({name: 'Maryanne'});
+          });
+
+          assert.equal(family.validateSync(), undefined);
+          done();
+        });
+      });
     });
 
     it('should support setting mixed paths by string (gh-1418)', function(done) {

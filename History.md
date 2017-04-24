@@ -1,3 +1,14 @@
+4.9.6 / 2017-04-23
+==================
+ * fix: update `parentArray` references when directly assigning document arrays #5192 [jhob](https://github.com/jhob)
+ * docs: improve schematype validator docs #5178 [milesbarr](https://github.com/milesbarr)
+ * fix(model): modify discriminator() class in place #5175
+ * fix(model): handle bulkWrite updateMany casting #5172 [tzellman](https://github.com/tzellman)
+ * docs(model): fix replaceOne example for bulkWrite #5168
+ * fix(document): don't create a new array subdoc when creating schema array #5162
+ * fix(model): merge query hooks from discriminators #5147
+ * fix(document): add parent() function to subdocument to match array subdoc #5134
+
 4.9.5 / 2017-04-16
 ==================
  * fix(query): correct $pullAll casting of null #5164 [Sebmaster](https://github.com/Sebmaster)

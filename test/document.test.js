@@ -2054,6 +2054,25 @@ describe('document', function() {
       done();
     });
 
+    it('single embedded parent() (gh-5134)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh5134', eventSchema);
+
+      var e = new Event({name: 'test', user: {}});
+      assert.strictEqual(e.user.parent(), e.user.ownerDocument());
+
+      done();
+    });
+
     it('single embedded schemas with markmodified (gh-2689)', function(done) {
       var userSchema = new mongoose.Schema({
         name: String,
@@ -3937,6 +3956,33 @@ describe('document', function() {
       assert.strictEqual(model.toObject().customer, null);
       assert.strictEqual(model.toObject({ getters: true }).customer, null);
 
+      done();
+    });
+
+    it('handles array subdocs with single nested subdoc default (gh-5162)', function(done) {
+      var RatingsItemSchema = new mongoose.Schema({
+        value: Number
+      }, { versionKey: false, _id: false });
+
+      var RatingsSchema = new mongoose.Schema({
+        ratings: {
+          type: RatingsItemSchema,
+          default: { id: 1, value: 0 }
+        },
+        _id: false
+      });
+
+      var RestaurantSchema = new mongoose.Schema({
+        menu: {
+          type: [RatingsSchema]
+        }
+      });
+
+      var Restaurant = db.model('gh5162', RestaurantSchema);
+
+      // Should not throw
+      var r = new Restaurant();
+      assert.deepEqual(r.toObject().menu, []);
       done();
     });
 

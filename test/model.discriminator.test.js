@@ -508,6 +508,33 @@ describe('model', function() {
         done();
       });
 
+      it('copies query hooks (gh-5147)', function(done) {
+        var options = { discriminatorKey: 'kind' };
+
+        var eventSchema = new mongoose.Schema({ time: Date }, options);
+        var eventSchemaCalls = 0;
+        eventSchema.pre('findOneAndUpdate', function() {
+          ++eventSchemaCalls;
+        });
+
+        var Event = db.model('gh5147', eventSchema);
+
+        var clickedEventSchema = new mongoose.Schema({ url: String }, options);
+        var clickedEventSchemaCalls = 0;
+        clickedEventSchema.pre('findOneAndUpdate', function() {
+          ++clickedEventSchemaCalls;
+        });
+        var ClickedLinkEvent = Event.discriminator('gh5147_0', clickedEventSchema);
+
+        ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).
+          exec(function(error) {
+            assert.ifError(error);
+            assert.equal(eventSchemaCalls, 1);
+            assert.equal(clickedEventSchemaCalls, 1);
+            done();
+          });
+      });
+
       it('embedded discriminators with $push (gh-5009)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

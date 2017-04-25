@@ -7589,4 +7589,57 @@ describe('document', function() {
       assert.strictEqual(doc.nested.schema, 'test');
     });
   });
+
+  describe('immutable properties (gh-7671)', function() {
+    let Model;
+
+    before(function() {
+      const schema = new Schema({
+        createdAt: {
+          type: Date,
+          immutable: true,
+          default: new Date('6/1/2019')
+        },
+        name: String
+      });
+      Model = db.model('gh7671', schema);
+    });
+
+    it('with save()', function() {
+      let doc = new Model({ name: 'Foo' });
+      return co(function*() {
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+        yield doc.save();
+
+        doc = yield Model.findOne({ createdAt: new Date('6/1/2019') });
+        doc.createdAt = new Date('6/1/2017');
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+        yield doc.save();
+
+        doc = yield Model.findOne({ createdAt: new Date('6/1/2019') });
+        assert.ok(doc);
+      });
+    });
+
+    it('with update', function() {
+      let doc = new Model({ name: 'Foo' });
+      return co(function*() {
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+        yield doc.save();
+
+        const update = { createdAt: new Date('6/1/2020') };
+
+        yield Model.updateOne({}, update);
+
+        doc = yield Model.findOne();
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+
+        const err = yield Model.updateOne({}, update, { strict: 'throw' }).
+          then(() => null, err => err);
+        assert.equal(err.name, 'StrictModeError');
+        console.log(err)
+        assert.ok(err.message.indexOf('createdAt') !== -1, err.message);
+      });
+    });
+  });
 });

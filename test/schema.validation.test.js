@@ -2,16 +2,17 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    ValidatorError = mongoose.Error.ValidatorError,
-    SchemaTypes = Schema.Types,
-    ObjectId = SchemaTypes.ObjectId,
-    Mixed = SchemaTypes.Mixed,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    random = require('../lib/utils').random;
+var start = require('./common');
+var mongoose = start.mongoose;
+var assert = require('power-assert');
+var Schema = mongoose.Schema;
+var ValidatorError = mongoose.Error.ValidatorError;
+var SchemaTypes = Schema.Types;
+var ObjectId = SchemaTypes.ObjectId;
+var Mixed = SchemaTypes.Mixed;
+var DocumentObjectId = mongoose.Types.ObjectId;
+var random = require('../lib/utils').random;
+var Promise = require('bluebird');
 
 describe('schema', function() {
   describe('validation', function() {

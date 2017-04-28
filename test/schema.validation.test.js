@@ -681,6 +681,31 @@ describe('schema', function() {
           });
         });
 
+        it('custom validators with isAsync and promise (gh-5171)', function(done) {
+          var validate = function(v) {
+            return Promise.resolve(v === 'test');
+          };
+
+          var schema = new Schema({
+            x: {
+              type: String
+            }
+          });
+
+          schema.path('x').validate({
+            isAsync: true,
+            validator: validate
+          });
+          var M = mongoose.model('gh5171', schema);
+
+          var m = new M({x: 'not test'});
+
+          m.validate(function(err) {
+            assert.ok(err.errors['x']);
+            done();
+          });
+        });
+
         it('supports custom properties (gh-2132)', function(done) {
           var schema = new Schema({
             x: {

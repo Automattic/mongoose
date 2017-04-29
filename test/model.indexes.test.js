@@ -179,8 +179,6 @@ describe('model', function() {
     });
 
     it('nested embedded docs (gh-5199)', function(done) {
-      var db = start();
-
       var SubSubSchema = mongoose.Schema({
         nested2: String
       });

@@ -1,3 +1,13 @@
+4.9.7 / 2017-04-30
+==================
+ * docs: fix typo #5204 [phutchins](https://github.com/phutchins)
+ * fix(schema): ensure correct path for deeply nested schema indexes #5199
+ * fix(schema): make remove a reserved name #5197
+ * fix(model): handle Decimal type in insertMany correctly #5190
+ * fix: upgrade kareem to handle async pre hooks correctly #5188
+ * docs: add details about unique not being a validator #5179
+ * fix(validation): handle returning a promise with isAsync: true #5171
+
 4.9.6 / 2017-04-23
 ==================
  * fix: update `parentArray` references when directly assigning document arrays #5192 [jhob](https://github.com/jhob)

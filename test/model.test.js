@@ -5570,15 +5570,31 @@ describe('Model', function() {
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {
-      var schema = new mongoose.Schema({
-        amount : mongoose.Schema.Types.Decimal
-      });
-      var Money = db.model('gh5190', schema);
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
 
-      Money.insertMany([{ amount : '123.45' }], function(error) {
-        assert.ifError(error);
-        done();
+        test();
       });
+
+      function test() {
+        var schema = new mongoose.Schema({
+          amount : mongoose.Schema.Types.Decimal
+        });
+        var Money = db.model('gh5190', schema);
+
+        Money.insertMany([{ amount : '123.45' }], function(error) {
+          assert.ifError(error);
+          done();
+        });
+      }
     });
 
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {

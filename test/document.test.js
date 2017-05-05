@@ -4028,7 +4028,7 @@ describe('document', function() {
           email: 'john@gmail.com',
           additionalContacts: [
             {
-              contactName: 'skype',
+              contactName: 'skype'
               // Forgotten value
             }
           ]

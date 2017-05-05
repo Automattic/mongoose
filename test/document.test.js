@@ -3986,6 +3986,65 @@ describe('document', function() {
       done();
     });
 
+    it('JSON.stringify nested errors (gh-5208)', function(done) {
+      var AdditionalContactSchema = new Schema({
+        contactName: {
+          type: String,
+          required: true
+        },
+        contactValue: {
+          type: String,
+          required: true
+        }
+      });
+
+      var ContactSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        email: {
+          type: String,
+          required: true
+        },
+        additionalContacts: [AdditionalContactSchema]
+      });
+
+      var EmergencyContactSchema = new Schema({
+        contactName: {
+          type: String,
+          required: true
+        },
+        contact: ContactSchema
+      });
+
+      var EmergencyContact =
+        db.model('EmergencyContact', EmergencyContactSchema);
+
+      var contact = new EmergencyContact({
+        contactName: 'Electrical Service',
+        contact: {
+          name: 'John Smith',
+          email: 'john@gmail.com',
+          additionalContacts: [
+            {
+              contactName: 'skype',
+              // Forgotten value
+            }
+          ]
+        }
+      });
+      contact.validate(function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['contact']);
+        assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
+
+        // This `JSON.stringify()` should not throw
+        assert.ok(JSON.stringify(error).indexOf('contactValue') !== -1);
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

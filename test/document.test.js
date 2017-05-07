@@ -3367,6 +3367,36 @@ describe('document', function() {
       });
     });
 
+    it('setting a nested path retains nested modified paths (gh-5206)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String,
+        surnames: {
+          docarray: [{ name: String }]
+        }
+      });
+
+      var Cat = db.model('gh5206', testSchema);
+
+      var kitty = new Cat({
+        name: 'Test',
+        surnames: {
+          docarray: [{ name: 'test1' }, { name: 'test2' }]
+        }
+      });
+
+      kitty.save(function(error) {
+        assert.ifError(error);
+
+        kitty.surnames = {
+          docarray: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }]
+        };
+
+        assert.deepEqual(kitty.modifiedPaths(),
+          ['surnames', 'surnames.docarray']);
+        done();
+      });
+    });
+
     it('toObject() does not depopulate top level (gh-3057)', function(done) {
       var Cat = db.model('gh3057', { name: String });
       var Human = db.model('gh3057_0', {

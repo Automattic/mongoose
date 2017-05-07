@@ -3367,6 +3367,36 @@ describe('document', function() {
       });
     });
 
+    it('setting a nested path retains nested modified paths (gh-5206)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String,
+        surnames: {
+          docarray: [{ name: String }]
+        }
+      });
+
+      var Cat = db.model('gh5206', testSchema);
+
+      var kitty = new Cat({
+        name: 'Test',
+        surnames: {
+          docarray: [{ name: 'test1' }, { name: 'test2' }]
+        }
+      });
+
+      kitty.save(function(error) {
+        assert.ifError(error);
+
+        kitty.surnames = {
+          docarray: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }]
+        };
+
+        assert.deepEqual(kitty.modifiedPaths(),
+          ['surnames', 'surnames.docarray']);
+        done();
+      });
+    });
+
     it('toObject() does not depopulate top level (gh-3057)', function(done) {
       var Cat = db.model('gh3057', { name: String });
       var Human = db.model('gh3057_0', {
@@ -3984,6 +4014,65 @@ describe('document', function() {
       var r = new Restaurant();
       assert.deepEqual(r.toObject().menu, []);
       done();
+    });
+
+    it('JSON.stringify nested errors (gh-5208)', function(done) {
+      var AdditionalContactSchema = new Schema({
+        contactName: {
+          type: String,
+          required: true
+        },
+        contactValue: {
+          type: String,
+          required: true
+        }
+      });
+
+      var ContactSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        email: {
+          type: String,
+          required: true
+        },
+        additionalContacts: [AdditionalContactSchema]
+      });
+
+      var EmergencyContactSchema = new Schema({
+        contactName: {
+          type: String,
+          required: true
+        },
+        contact: ContactSchema
+      });
+
+      var EmergencyContact =
+        db.model('EmergencyContact', EmergencyContactSchema);
+
+      var contact = new EmergencyContact({
+        contactName: 'Electrical Service',
+        contact: {
+          name: 'John Smith',
+          email: 'john@gmail.com',
+          additionalContacts: [
+            {
+              contactName: 'skype'
+              // Forgotten value
+            }
+          ]
+        }
+      });
+      contact.validate(function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['contact']);
+        assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
+
+        // This `JSON.stringify()` should not throw
+        assert.ok(JSON.stringify(error).indexOf('contactValue') !== -1);
+        done();
+      });
     });
 
     it('modify multiple subdoc paths (gh-4405)', function(done) {

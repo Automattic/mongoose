@@ -1,3 +1,11 @@
+4.9.8 / 2017-05-07
+==================
+ * docs(subdocs): rewrite subdocs guide #5217
+ * fix(document): avoid circular JSON if error in doc array under single nested subdoc #5208
+ * fix(document): set intermediate empty objects for deeply nested undefined paths before path itself #5206
+ * fix(schema): throw error if first param to schema.plugin() is not a function #5201
+ * perf(document): major speedup in validating subdocs (50x in some cases) #5191
+
 4.9.7 / 2017-04-30
 ==================
  * docs: fix typo #5204 [phutchins](https://github.com/phutchins)

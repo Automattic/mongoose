@@ -29,5 +29,28 @@ describe('schematype', function() {
       assert.strictEqual(true, m3.b);
       done();
     });
+    it('strict mode (gh-5211)', function() {
+      var db = start(),
+          s1 = new Schema({b: {type: Boolean, strict: true}}),
+          M1 = db.model('BooleanStrictTrue', s1);
+      db.close();
+
+      var m1 = new M1;
+      var strictValues = [true, false, 'true', 'false', 0, 1, '0', '1'];
+      var validatePromises = strictValues.map(function(value) {
+        m1.b = value;
+        return m1.validate();
+      });
+
+      return Promise.all(validatePromises);
+    });
   });
+  // describe('boolean (strict mode) (gh-5211)', function() {
+  //   it('strict mode*', function(done) {
+  //     var db = start();
+  //     db.close();
+  //     console.log(db);
+  //     done();
+  //   });
+  // });
 });

@@ -45,12 +45,4 @@ describe('schematype', function() {
       return Promise.all(validatePromises);
     });
   });
-  // describe('boolean (strict mode) (gh-5211)', function() {
-  //   it('strict mode*', function(done) {
-  //     var db = start();
-  //     db.close();
-  //     console.log(db);
-  //     done();
-  //   });
-  // });
 });

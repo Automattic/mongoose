@@ -4075,6 +4075,27 @@ describe('document', function() {
       });
     });
 
+    it('handles errors in subdoc pre validate (gh-5215)', function(done) {
+      var childSchema = new mongoose.Schema({});
+
+      childSchema.pre('validate', function(next) {
+        next(new Error('child pre validate'))
+      });
+
+      var parentSchema = new mongoose.Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh5215', parentSchema);
+
+      Parent.create({ child: {} }, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['child']);
+        assert.equal(error.errors['child'].message, 'child pre validate');
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

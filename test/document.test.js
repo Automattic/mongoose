@@ -4100,7 +4100,7 @@ describe('document', function() {
       var childSchema = new mongoose.Schema({});
 
       childSchema.pre('validate', function(next) {
-        next(new Error('child pre validate'))
+        next(new Error('child pre validate'));
       });
 
       var parentSchema = new mongoose.Schema({

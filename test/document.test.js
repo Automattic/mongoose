@@ -3919,6 +3919,27 @@ describe('document', function() {
       });
     });
 
+    it('save errors with callback and promise work (gh-5216)', function(done) {
+      var schema = new mongoose.Schema({});
+
+      var Model = db.model('gh5216', schema);
+
+      var _id = new mongoose.Types.ObjectId();
+      var doc1 = new Model({ _id: _id });
+      var doc2 = new Model({ _id: _id });
+
+      Model.on('error', function(error) {
+        done(error);
+      });
+
+      doc1.save().
+        then(function() { return doc2.save(function() {}); }).
+        catch(function(error) {
+          assert.ok(error);
+          done();
+        });
+    });
+
     it('post hooks on child subdocs run after save (gh-5085)', function(done) {
       var ChildModelSchema = new mongoose.Schema({
         text: {

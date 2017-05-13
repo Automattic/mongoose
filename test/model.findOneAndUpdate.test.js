@@ -1828,6 +1828,27 @@ describe('model: findOneAndUpdate:', function() {
         });
     });
 
+    it('overwrite doc with update validators (gh-3556)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        otherName: String
+      });
+      var Test = db.model('gh3556', testSchema);
+
+      var opts = { overwrite: true, runValidators: true };
+      Test.findOneAndUpdate({}, { otherName: 'test' }, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['name']);
+        Test.findOneAndUpdate({}, { $set: { otherName: 'test' } }, opts, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('properly handles casting nested objects in update (gh-4724)', function(done) {
       var locationSchema = new Schema({
         _id: false,

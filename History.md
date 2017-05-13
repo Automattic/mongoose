@@ -1,3 +1,41 @@
+4.9.9 / 2017-05-13
+==================
+ * docs: correct value for Query#regex() #5230
+ * fix(connection): don't throw if .catch() on open() promise #5229
+ * fix(schema): allow update with $currentDate for updatedAt to succeed #5222
+ * fix(model): versioning doesn't fail if version key undefined #5221 [basileos](https://github.com/basileos)
+ * fix(document): don't emit model error if callback specified for consistency with docs #5216
+ * fix(document): handle errors in subdoc pre validate #5215
+
+4.9.8 / 2017-05-07
+==================
+ * docs(subdocs): rewrite subdocs guide #5217
+ * fix(document): avoid circular JSON if error in doc array under single nested subdoc #5208
+ * fix(document): set intermediate empty objects for deeply nested undefined paths before path itself #5206
+ * fix(schema): throw error if first param to schema.plugin() is not a function #5201
+ * perf(document): major speedup in validating subdocs (50x in some cases) #5191
+
+4.9.7 / 2017-04-30
+==================
+ * docs: fix typo #5204 [phutchins](https://github.com/phutchins)
+ * fix(schema): ensure correct path for deeply nested schema indexes #5199
+ * fix(schema): make remove a reserved name #5197
+ * fix(model): handle Decimal type in insertMany correctly #5190
+ * fix: upgrade kareem to handle async pre hooks correctly #5188
+ * docs: add details about unique not being a validator #5179
+ * fix(validation): handle returning a promise with isAsync: true #5171
+
+4.9.6 / 2017-04-23
+==================
+ * fix: update `parentArray` references when directly assigning document arrays #5192 [jhob](https://github.com/jhob)
+ * docs: improve schematype validator docs #5178 [milesbarr](https://github.com/milesbarr)
+ * fix(model): modify discriminator() class in place #5175
+ * fix(model): handle bulkWrite updateMany casting #5172 [tzellman](https://github.com/tzellman)
+ * docs(model): fix replaceOne example for bulkWrite #5168
+ * fix(document): don't create a new array subdoc when creating schema array #5162
+ * fix(model): merge query hooks from discriminators #5147
+ * fix(document): add parent() function to subdocument to match array subdoc #5134
+
 4.9.5 / 2017-04-16
 ==================
  * fix(query): correct $pullAll casting of null #5164 [Sebmaster](https://github.com/Sebmaster)

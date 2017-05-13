@@ -1978,6 +1978,23 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('lets $currentDate go through with updatedAt (gh-5222)', function(done) {
+      var testSchema = new Schema({
+        name: String
+      }, { timestamps: true });
+
+      var Test = db.model('gh5222', testSchema);
+
+      Test.create({ name: 'test' }, function(error) {
+        assert.ifError(error);
+        var u = { $currentDate: { updatedAt: true }, name: 'test2' };
+        Test.update({}, u, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('update validators on single nested (gh-4332)', function(done) {
       var AreaSchema = new Schema({
         a: String

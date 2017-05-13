@@ -10,71 +10,72 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema({});
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-}, {strict: false});
-
-BlogPost.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
-
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-mongoose.model('BlogPostForUpdates', BlogPost);
-
-var collection = 'blogposts_' + random();
-
-var strictSchema = new Schema({name: String, x: {nested: String}});
-strictSchema.virtual('foo').get(function() {
-  return 'i am a virtual FOO!';
-});
-mongoose.model('UpdateStrictSchema', strictSchema);
-
-
 describe('model: update:', function() {
-  var post,
-      title = 'Tobi ' + random(),
-      author = 'Brian ' + random(),
-      newTitle = 'Woot ' + random(),
-      id0,
-      id1;
+  var post;
+  var title = 'Tobi ' + random();
+  var author = 'Brian ' + random();
+  var newTitle = 'Woot ' + random();
+  var id0;
+  var id1;
+  var Comments;
+  var BlogPost;
+  var collection;
+  var strictSchema;
+
+  before(function() {
+    Comments = new Schema({});
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    }, {strict: false});
+
+    BlogPost.virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    mongoose.model('BlogPostForUpdates', BlogPost);
+
+    collection = 'blogposts_' + random();
+
+    strictSchema = new Schema({name: String, x: {nested: String}});
+    strictSchema.virtual('foo').get(function() {
+      return 'i am a virtual FOO!';
+    });
+    mongoose.model('UpdateStrictSchema', strictSchema);
+  });
 
   before(function(done) {
     var db = start(),
@@ -1977,6 +1978,23 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('lets $currentDate go through with updatedAt (gh-5222)', function(done) {
+      var testSchema = new Schema({
+        name: String
+      }, { timestamps: true });
+
+      var Test = db.model('gh5222', testSchema);
+
+      Test.create({ name: 'test' }, function(error) {
+        assert.ifError(error);
+        var u = { $currentDate: { updatedAt: true }, name: 'test2' };
+        Test.update({}, u, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('update validators on single nested (gh-4332)', function(done) {
       var AreaSchema = new Schema({
         a: String
@@ -2466,6 +2484,79 @@ describe('model: update:', function() {
           done();
         });
       });
+    });
+
+    it('does not fail if passing whole doc (gh-5088)', function(done) {
+      var schema = new Schema({
+        username: String,
+        x: String
+      }, { timestamps: true });
+      var User = db.model('gh5088', schema);
+
+      User.create({ username: 'test' }).
+        then(function(user) {
+          user.x = 'test2';
+          return User.findOneAndUpdate({ _id: user._id }, user,
+            { new: true });
+        }).
+        then(function(user) {
+          assert.equal(user.x, 'test2');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('does not fail if passing whole doc (gh-5111)', function(done) {
+      var schema = new Schema({
+        fieldOne: String
+      }, { strict: true });
+      var Test = db.model('gh5111', schema);
+
+      Test.create({ fieldOne: 'Test' }).
+        then(function() {
+          var data = { fieldOne: 'Test2', fieldTwo: 'Test3' };
+          var opts = {
+            upsert: true,
+            runValidators: false,
+            strict: false
+          };
+          return Test.update({}, data, opts);
+        }).
+        then(function() {
+          return Test.findOne();
+        }).
+        then(function(doc) {
+          assert.equal(doc.fieldOne, 'Test2');
+          assert.equal(doc.get('fieldTwo'), 'Test3');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('$pullAll with null (gh-5164)', function(done) {
+      var schema = new Schema({
+        name: String,
+        arr: [{ name: String }]
+      }, { strict: true });
+      var Test = db.model('gh5164', schema);
+
+      var doc = new Test({ name: 'Test', arr: [null, {name: 'abc'}] });
+
+      doc.save().
+        then(function(doc) {
+          return Test.update({ _id: doc._id }, {
+            $pullAll: { arr: [null] }
+          });
+        }).
+        then(function() {
+          return Test.findById(doc);
+        }).
+        then(function(doc) {
+          assert.equal(doc.arr.length, 1);
+          assert.equal(doc.arr[0].name, 'abc');
+          done();
+        }).
+        catch(done);
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

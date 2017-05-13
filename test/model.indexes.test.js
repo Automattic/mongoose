@@ -178,6 +178,36 @@ describe('model', function() {
       });
     });
 
+    it('nested embedded docs (gh-5199)', function(done) {
+      var SubSubSchema = mongoose.Schema({
+        nested2: String
+      });
+
+      SubSubSchema.index({ nested2: 1 });
+
+      var SubSchema = mongoose.Schema({
+        nested1: String,
+        subSub: SubSubSchema
+      });
+
+      SubSchema.index({ nested1: 1 });
+
+      var ContainerSchema = mongoose.Schema({
+        nested0: String,
+        sub: SubSchema
+      });
+
+      ContainerSchema.index({ nested0: 1 });
+
+      assert.deepEqual(ContainerSchema.indexes().map(function(v) { return v[0]; }), [
+        { 'sub.subSub.nested2': 1 },
+        { 'sub.nested1': 1 },
+        { 'nested0': 1 }
+      ]);
+
+      done();
+    });
+
     it('error should emit on the model', function(done) {
       var db = start(),
           schema = new Schema({name: {type: String}}),

@@ -15,47 +15,52 @@ var DocumentObjectId = mongoose.Types.ObjectId;
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var Schema = mongoose.Schema;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema;
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPostB = new Schema({
-  title: {$type: String},
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [{$type: Number}],
-  tags: [String],
-  sigs: [Buffer],
-  owners: [ObjectId],
-  comments: [Comments],
-  def: {$type: String, default: 'kandinsky'}
-}, {typeKey: '$type'});
-
-var modelName = 'model.query.casting.blogpost';
-mongoose.model(modelName, BlogPostB);
-var collection = 'blogposts_' + random();
-
-var geoSchemaArray = new Schema({loc: {type: [Number], index: '2d'}});
-var geoSchemaObject = new Schema({loc: {long: Number, lat: Number}});
-geoSchemaObject.index({loc: '2d'});
-
 describe('model query casting', function() {
+  var Comments;
+  var BlogPostB;
+  var collection;
+  var geoSchemaArray;
+  var geoSchemaObject;
+  var modelName;
+
+  before(function() {
+    Comments = new Schema;
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPostB = new Schema({
+      title: {$type: String},
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [{$type: Number}],
+      tags: [String],
+      sigs: [Buffer],
+      owners: [ObjectId],
+      comments: [Comments],
+      def: {$type: String, default: 'kandinsky'}
+    }, {typeKey: '$type'});
+
+    modelName = 'model.query.casting.blogpost';
+    mongoose.model(modelName, BlogPostB);
+    collection = 'blogposts_' + random();
+
+    geoSchemaArray = new Schema({loc: {type: [Number], index: '2d'}});
+    geoSchemaObject = new Schema({loc: {long: Number, lat: Number}});
+    geoSchemaObject.index({loc: '2d'});
+  });
+
   it('works', function(done) {
     var db = start(),
         BlogPostB = db.model(modelName, collection),
@@ -974,6 +979,46 @@ describe('model query casting', function() {
       assert.ifError(error);
       done();
     });
+  });
+
+  it('setOnInsert with custom type (gh-5126)', function(done) {
+    var db = start();
+
+    function Point(key, options) {
+      mongoose.SchemaType.call(this, key, options, 'Point');
+    }
+
+    mongoose.Schema.Types.Point = Point;
+    Point.prototype = Object.create(mongoose.SchemaType.prototype);
+
+    var called = 0;
+    Point.prototype.cast = function(point) {
+      ++called;
+      if (point.type !== 'Point') {
+        throw new Error('Woops');
+      }
+
+      return point;
+    };
+
+    var testSchema = new mongoose.Schema({ name: String, test: Point });
+    var Test = db.model('gh5126', testSchema);
+
+    var u = {
+      $setOnInsert: {
+        name: 'a',
+        test: {
+          type: 'Point'
+        }
+      }
+    };
+    Test.findOneAndUpdate({ name: 'a' }, u).
+      exec(function(error) {
+        assert.ifError(error);
+        assert.equal(called, 1);
+        done();
+      }).
+      catch(done);
   });
 
   it('_id = 0 (gh-4610)', function(done) {

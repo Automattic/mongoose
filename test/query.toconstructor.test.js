@@ -5,26 +5,32 @@ var start = require('./common'),
     random = require('../lib/utils').random,
     Query = require('../lib/query');
 
-
-var Comment = new Schema({
-  text: String
-});
-
-var Product = new Schema({
-  tags: {}, // mixed
-  array: Array,
-  ids: [Schema.ObjectId],
-  strings: [String],
-  numbers: [Number],
-  comments: [Comment],
-  title: String
-});
-var prodName = 'Product' + random();
-var cName = 'Comment' + random();
-mongoose.model(prodName, Product);
-mongoose.model(cName, Comment);
-
 describe('Query:', function() {
+  var Comment;
+  var Product;
+  var prodName;
+  var cName;
+
+  before(function() {
+    Comment = new Schema({
+      text: String
+    });
+
+    Product = new Schema({
+      tags: {}, // mixed
+      array: Array,
+      ids: [Schema.ObjectId],
+      strings: [String],
+      numbers: [Number],
+      comments: [Comment],
+      title: String
+    });
+    prodName = 'Product' + random();
+    mongoose.model(prodName, Product);
+    cName = 'Comment' + random();
+    mongoose.model(cName, Comment);
+  });
+
   describe('toConstructor', function() {
     var db;
 

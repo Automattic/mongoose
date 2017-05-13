@@ -13,63 +13,56 @@ var Schema = mongoose.Schema;
 var ValidationError = mongoose.Document.ValidationError;
 
 /**
- * Setup.
- */
-
-function Dummy() {
-  mongoose.Document.call(this, {});
-}
-Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype.$__setSchema(new Schema);
-
-function Subdocument() {
-  var arr = new DocumentArray;
-  arr._path = 'jsconf.ar';
-  arr._parent = new Dummy;
-  arr[0] = this;
-  EmbeddedDocument.call(this, {}, arr);
-}
-
-/**
- * Inherits from EmbeddedDocument.
- */
-
-Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
-
-for (var i in EventEmitter.prototype) {
-  Subdocument[i] = EventEmitter.prototype[i];
-}
-
-/**
- * Set schema.
- */
-
-Subdocument.prototype.$__setSchema(new Schema({
-  test: {type: String, required: true},
-  work: {type: String, validate: /^good/}
-}));
-
-/**
- * Schema.
- */
-
-var RatingSchema = new Schema({
-  stars: Number,
-  description: {source: {url: String, time: Date}}
-});
-
-var MovieSchema = new Schema({
-  title: String,
-  ratings: [RatingSchema]
-});
-
-mongoose.model('Movie', MovieSchema);
-
-/**
  * Test.
  */
 
 describe('types.document', function() {
+  var Dummy;
+  var Subdocument;
+  var RatingSchema;
+  var MovieSchema;
+
+  before(function() {
+    function _Dummy() {
+      mongoose.Document.call(this, {});
+    }
+    Dummy = _Dummy;
+    Dummy.prototype.__proto__ = mongoose.Document.prototype;
+    Dummy.prototype.$__setSchema(new Schema);
+
+    function _Subdocument() {
+      var arr = new DocumentArray;
+      arr._path = 'jsconf.ar';
+      arr._parent = new Dummy;
+      arr[0] = this;
+      EmbeddedDocument.call(this, {}, arr);
+    }
+    Subdocument = _Subdocument;
+
+    Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+
+    for (var i in EventEmitter.prototype) {
+      Subdocument[i] = EventEmitter.prototype[i];
+    }
+
+    Subdocument.prototype.$__setSchema(new Schema({
+      test: {type: String, required: true},
+      work: {type: String, validate: /^good/}
+    }));
+
+    RatingSchema = new Schema({
+      stars: Number,
+      description: {source: {url: String, time: Date}}
+    });
+
+    MovieSchema = new Schema({
+      title: String,
+      ratings: [RatingSchema]
+    });
+
+    mongoose.model('Movie', MovieSchema);
+  });
+
   it('test that validate sets errors', function(done) {
     var a = new Subdocument();
     a.set('test', '');

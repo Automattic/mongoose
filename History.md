@@ -1,3 +1,12 @@
+4.9.9 / 2017-05-13
+==================
+ * docs: correct value for Query#regex() #5230
+ * fix(connection): don't throw if .catch() on open() promise #5229
+ * fix(schema): allow update with $currentDate for updatedAt to succeed #5222
+ * fix(model): versioning doesn't fail if version key undefined #5221 [basileos](https://github.com/basileos)
+ * fix(document): don't emit model error if callback specified for consistency with docs #5216
+ * fix(document): handle errors in subdoc pre validate #5215
+
 4.9.8 / 2017-05-07
 ==================
  * docs(subdocs): rewrite subdocs guide #5217

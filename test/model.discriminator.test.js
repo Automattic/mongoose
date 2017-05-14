@@ -451,6 +451,11 @@ describe('model', function() {
           name: String
         });
         var childCalls = 0;
+        var childValidateCalls = 0;
+        childSchema.pre('validate', function(next) {
+          ++childValidateCalls;
+          next();
+        });
         childSchema.pre('save', function(next) {
           ++childCalls;
           next();
@@ -484,6 +489,7 @@ describe('model', function() {
           assert.equal(doc.heir.name, 'Robb Stark');
           assert.equal(doc.children.length, 1);
           assert.equal(doc.children[0].name, 'Jon Snow');
+          assert.equal(childValidateCalls, 2);
           assert.equal(childCalls, 2);
           assert.equal(parentCalls, 1);
           done();

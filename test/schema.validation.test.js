@@ -1057,7 +1057,7 @@ describe('schema', function() {
       bad.foods = 'waffles';
       bad.validate(function(error) {
         assert.ok(error);
-        var errorMessage = 'CastError: Cast to Object failed for value ' +
+        var errorMessage = 'foods: Cast to Object failed for value ' +
             '"waffles" at path "foods"';
         assert.ok(error.toString().indexOf(errorMessage) !== -1, error.toString());
         done();
@@ -1071,7 +1071,7 @@ describe('schema', function() {
       var bad = new Breakfast({});
       bad.validate(function(error) {
         assert.ok(error);
-        var errorMessage = 'ValidationError: Path `description` is required.';
+        var errorMessage = 'ValidationError: description: Path `description` is required.';
         assert.equal(errorMessage, error.toString());
         done();
       });
@@ -1085,7 +1085,7 @@ describe('schema', function() {
       var error = bad.validateSync();
 
       assert.ok(error);
-      var errorMessage = 'ValidationError: Path `description` is required.';
+      var errorMessage = 'ValidationError: description: Path `description` is required.';
       assert.equal(errorMessage, error.toString());
       done();
     });
@@ -1114,7 +1114,7 @@ describe('schema', function() {
       var bad = new Breakfast({});
       bad.validate(function(error) {
         assert.ok(error);
-        var errorMessage = 'ValidationError: Path `description` is required.';
+        var errorMessage = 'ValidationError: description: Path `description` is required.';
         assert.equal(errorMessage, error.toString());
         done();
       });
@@ -1132,7 +1132,7 @@ describe('schema', function() {
       var Breakfast = mongoose.model('gh2832', breakfast, 'gh2832');
       Breakfast.create({description: undefined}, function(error) {
         assert.ok(error);
-        var errorMessage = 'ValidationError: CastError: Cast to String failed for value "undefined" at path "description"';
+        var errorMessage = 'ValidationError: description: Cast to String failed for value "undefined" at path "description"';
         assert.equal(errorMessage, error.toString());
         assert.ok(error.errors.description);
         assert.equal(error.errors.description.reason.toString(), 'Error: oops');

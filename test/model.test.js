@@ -1139,7 +1139,7 @@ describe('Model', function() {
         db.close();
         assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
         assert.equal(err.name, 'ValidationError');
-        assert.equal(err.message, 'IntrospectionValidation validation failed');
+        assert.ok(err.message.indexOf('IntrospectionValidation validation failed') !== -1, err.message);
         done();
       });
     });

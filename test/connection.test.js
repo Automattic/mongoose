@@ -141,11 +141,6 @@ describe('connections:', function() {
 
     var mongod = 'mongodb://localhost:27017';
 
-    var repl1 = process.env.MONGOOSE_SET_TEST_URI;
-    var repl2 = repl1.replace('mongodb://', '').split(',');
-    repl2.push(repl2.shift());
-    repl2 = 'mongodb://' + repl2.join(',');
-
     describe('with different host/port', function() {
       it('non-replica set', function(done) {
         var db = mongoose.createConnection();
@@ -195,58 +190,16 @@ describe('connections:', function() {
           });
         });
       });
+    });
+  });
 
-      it('replica set', function(done) {
-        var db = mongoose.createConnection();
+  describe('errors', function() {
+    it('.catch() means error does not get thrown (gh-5229)', function(done) {
+      var db = mongoose.createConnection();
 
-        db.openSet(repl1, function(err) {
-          if (err) {
-            return done(err);
-          }
-
-          var hosts = db.hosts.slice();
-          var db1 = db.db;
-
-          db.close(function(err) {
-            if (err) {
-              return done(err);
-            }
-
-            db.openSet(repl2, function(err) {
-              if (err) {
-                return done(err);
-              }
-
-              db.hosts.forEach(function(host, i) {
-                assert.notEqual(host.port, hosts[i].port);
-              });
-              assert.ok(db1 !== db.db);
-
-              hosts = db.hosts.slice();
-              var db2 = db.db;
-
-              db.close(function(err) {
-                if (err) {
-                  return done(err);
-                }
-
-                db.openSet(repl1, function(err) {
-                  if (err) {
-                    return done(err);
-                  }
-
-                  db.hosts.forEach(function(host, i) {
-                    assert.notEqual(host.port, hosts[i].port);
-                  });
-                  assert.ok(db2 !== db.db);
-
-                  db.close();
-                  done();
-                });
-              });
-            });
-          });
-        });
+      db.open('fail connection').catch(function(error) {
+        assert.ok(error);
+        done();
       });
     });
   });

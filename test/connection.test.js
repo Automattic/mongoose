@@ -193,6 +193,17 @@ describe('connections:', function() {
     });
   });
 
+  describe('errors', function() {
+    it('.catch() means error does not get thrown (gh-5229)', function(done) {
+      var db = mongoose.createConnection();
+
+      db.open('fail connection').catch(function(error) {
+        assert.ok(error);
+        done();
+      });
+    });
+  });
+
   describe('should accept separated args with options', function() {
     it('works', function(done) {
       var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, {server: {auto_reconnect: true}});

@@ -3,3 +3,4 @@ bin/
 test/triage/
 test/model.discriminator.test.js
 tools/
+test/es6/

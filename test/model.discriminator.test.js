@@ -508,6 +508,33 @@ describe('model', function() {
         done();
       });
 
+      it('copies query hooks (gh-5147)', function(done) {
+        var options = { discriminatorKey: 'kind' };
+
+        var eventSchema = new mongoose.Schema({ time: Date }, options);
+        var eventSchemaCalls = 0;
+        eventSchema.pre('findOneAndUpdate', function() {
+          ++eventSchemaCalls;
+        });
+
+        var Event = db.model('gh5147', eventSchema);
+
+        var clickedEventSchema = new mongoose.Schema({ url: String }, options);
+        var clickedEventSchemaCalls = 0;
+        clickedEventSchema.pre('findOneAndUpdate', function() {
+          ++clickedEventSchemaCalls;
+        });
+        var ClickedLinkEvent = Event.discriminator('gh5147_0', clickedEventSchema);
+
+        ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).
+          exec(function(error) {
+            assert.ifError(error);
+            assert.equal(eventSchemaCalls, 1);
+            assert.equal(clickedEventSchemaCalls, 1);
+            done();
+          });
+      });
+
       it('embedded discriminators with $push (gh-5009)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });
@@ -605,6 +632,60 @@ describe('model', function() {
             assert.equal(doc.events.length, 2);
             assert.equal(doc.events[1].element, '#button');
             assert.equal(doc.events[1].kind, 'Clicked');
+            done();
+          }).
+          catch(done);
+      });
+
+      it('embedded discriminators with $set (gh-5130)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind' });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Batch = db.model('gh5130', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id, 'events._id': doc.events[0]._id }, {
+              $set: {
+                'events.$':  {
+                  message: 'updated',
+                  kind: 'Clicked',
+                  element: '#hero2'
+                }
+              }
+            }).then(function() { return doc; });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            assert.equal(doc.events[0].message, 'updated');
+            assert.equal(doc.events[0].element, '#hero2');    // <-- test failed
+            assert.equal(doc.events[0].kind, 'Clicked');      // <-- test failed
             done();
           }).
           catch(done);

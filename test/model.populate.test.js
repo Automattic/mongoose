@@ -3048,6 +3048,61 @@ describe('model: populate:', function() {
         }).
         catch(done);
     });
+
+    it('with non-arrays (gh-5114)', function(done) {
+      var LocationSchema = new Schema({
+        name: String
+      });
+      var UserSchema = new Schema({
+        name: String,
+        locationRef: String,
+        locationIds: {
+          type: [{
+            location: {
+              type: mongoose.Schema.Types.ObjectId,
+              refPath: 'locationRef'
+            }
+          }]
+        }
+      });
+
+      var Locations = db.model('gh5114', LocationSchema);
+      var Users = db.model('gh5114_0', UserSchema);
+
+      var location1Id = new mongoose.Types.ObjectId();
+      var location2Id = new mongoose.Types.ObjectId();
+
+      var location1 = {
+        _id: location1Id,
+        name: 'loc1'
+      };
+      var location2 = {
+        _id: location2Id,
+        name: 'loc2'
+      };
+      var user = {
+        locationRef: 'gh5114',
+        locationIds: [
+          { location: location1Id },
+          { location: location2Id }
+        ]
+      };
+
+      Locations.create([location1, location2]).
+        then(function() {
+          return Users.create(user);
+        }).
+        then(function() {
+          return Users.findOne().populate('locationIds.location');
+        }).
+        then(function(doc) {
+          assert.equal(doc.locationIds.length, 2);
+          assert.equal(doc.locationIds[0].location.name, 'loc1');
+          assert.equal(doc.locationIds[1].location.name, 'loc2');
+          done();
+        }).
+        catch(done);
+    });
   });
 
   describe('leaves Documents within Mixed properties alone (gh-1471)', function() {
@@ -4919,6 +4974,45 @@ describe('model: populate:', function() {
             }).
             catch(done);
         }
+      });
+
+      it('handles circular virtual -> regular (gh-5128)', function(done) {
+        var ASchema = new Schema({
+          title: { type: String, required: true, trim : true }
+        });
+
+        ASchema.virtual('brefs', {
+          ref: 'gh5128_0',
+          localField: '_id',
+          foreignField: 'arefs'
+        });
+
+        var BSchema = new Schema({
+          arefs: [{ type: ObjectId, required: true, ref: 'gh5128' }]
+        });
+
+        var a = db.model('gh5128', ASchema);
+        var b = db.model('gh5128_0', BSchema);
+
+        var id1 = new mongoose.Types.ObjectId();
+
+        a.create({ _id: id1, title: 'test' }).
+          then(function() { return b.create({ arefs: [id1] }); }).
+          then(function() {
+            return a.findOne({ _id: id1 }).populate([{
+              path: 'brefs', // this gets populated
+              model: 'gh5128_0',
+              populate: [{
+                path: 'arefs', // <---- this is returned as [ObjectId], not populated
+                model: 'gh5128'
+              }]
+            }]);
+          }).
+          then(function(doc) {
+            assert.equal(doc.brefs[0].arefs[0].title, 'test');
+            done();
+          }).
+          catch(done);
       });
 
       it('handles nested virtuals (gh-4851)', function(done) {

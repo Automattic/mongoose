@@ -2,16 +2,17 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    ValidatorError = mongoose.Error.ValidatorError,
-    SchemaTypes = Schema.Types,
-    ObjectId = SchemaTypes.ObjectId,
-    Mixed = SchemaTypes.Mixed,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    random = require('../lib/utils').random;
+var start = require('./common');
+var mongoose = start.mongoose;
+var assert = require('power-assert');
+var Schema = mongoose.Schema;
+var ValidatorError = mongoose.Error.ValidatorError;
+var SchemaTypes = Schema.Types;
+var ObjectId = SchemaTypes.ObjectId;
+var Mixed = SchemaTypes.Mixed;
+var DocumentObjectId = mongoose.Types.ObjectId;
+var random = require('../lib/utils').random;
+var Promise = require('bluebird');
 
 describe('schema', function() {
   describe('validation', function() {
@@ -646,6 +647,59 @@ describe('schema', function() {
           var M = mongoose.model('custom-validator-async-' + random(), schema);
 
           var m = new M({x: 'test'});
+
+          m.validate(function(err) {
+            assert.ok(err.errors['x']);
+            done();
+          });
+        });
+
+        it('custom validators with isAsync and .validate() (gh-5125)', function(done) {
+          var validate = function(v, opts) {
+            // Make eslint not complain about unused vars
+            return !!(v && opts && false);
+          };
+
+          var schema = new Schema({
+            x: {
+              type: String
+            }
+          });
+
+          schema.path('x').validate({
+            isAsync: false,
+            validator: validate,
+            message: 'Custom error message!'
+          });
+          var M = mongoose.model('gh5125', schema);
+
+          var m = new M({x: 'test'});
+
+          m.validate(function(err) {
+            assert.ok(err.errors['x']);
+            assert.equal(err.errors['x'].message, 'Custom error message!');
+            done();
+          });
+        });
+
+        it('custom validators with isAsync and promise (gh-5171)', function(done) {
+          var validate = function(v) {
+            return Promise.resolve(v === 'test');
+          };
+
+          var schema = new Schema({
+            x: {
+              type: String
+            }
+          });
+
+          schema.path('x').validate({
+            isAsync: true,
+            validator: validate
+          });
+          var M = mongoose.model('gh5171', schema);
+
+          var m = new M({x: 'not test'});
 
           m.validate(function(err) {
             assert.ok(err.errors['x']);

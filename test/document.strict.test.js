@@ -298,7 +298,7 @@ describe('document: strict mode:', function() {
     var doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insert(doc, {w: 1}, function(err) {
+    Strict.collection.insert(doc, function(err) {
       assert.ifError(err);
 
       Strict.findById(doc._id, function(err, doc) {
@@ -306,7 +306,7 @@ describe('document: strict mode:', function() {
         assert.equal(doc._doc.bool, true);
         assert.equal(doc._doc.notInSchema, true);
 
-        Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
+        Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false},
             function(err) {
               assert.ifError(err);
 

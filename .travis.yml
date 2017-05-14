@@ -13,3 +13,6 @@ before_script:
   - tar -zxvf mongodb-linux-x86_64-2.6.11.tgz
   - mkdir -p ./data/db
   - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --nopreallocj --dbpath ./data/db --syslog --port 27017
+script:
+  - npm test
+  - npm run lint

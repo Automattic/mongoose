@@ -315,9 +315,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 5);
-        // PersonSchema.post('save')
-        assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
+        assert.equal(Employee.schema.callQueue.length, 8);
 
         // EmployeeSchema.pre('save')
         var queueIndex = Employee.schema.callQueue.length - 1;
@@ -453,6 +451,11 @@ describe('model', function() {
           name: String
         });
         var childCalls = 0;
+        var childValidateCalls = 0;
+        childSchema.pre('validate', function(next) {
+          ++childValidateCalls;
+          next();
+        });
         childSchema.pre('save', function(next) {
           ++childCalls;
           next();
@@ -486,6 +489,7 @@ describe('model', function() {
           assert.equal(doc.heir.name, 'Robb Stark');
           assert.equal(doc.children.length, 1);
           assert.equal(doc.children[0].name, 'Jon Snow');
+          assert.equal(childValidateCalls, 2);
           assert.equal(childCalls, 2);
           assert.equal(parentCalls, 1);
           done();
@@ -506,6 +510,33 @@ describe('model', function() {
         // Should not throw
         var Parent2 = Person.discriminator('gh5098_1', parentSchema.clone());
         done();
+      });
+
+      it('copies query hooks (gh-5147)', function(done) {
+        var options = { discriminatorKey: 'kind' };
+
+        var eventSchema = new mongoose.Schema({ time: Date }, options);
+        var eventSchemaCalls = 0;
+        eventSchema.pre('findOneAndUpdate', function() {
+          ++eventSchemaCalls;
+        });
+
+        var Event = db.model('gh5147', eventSchema);
+
+        var clickedEventSchema = new mongoose.Schema({ url: String }, options);
+        var clickedEventSchemaCalls = 0;
+        clickedEventSchema.pre('findOneAndUpdate', function() {
+          ++clickedEventSchemaCalls;
+        });
+        var ClickedLinkEvent = Event.discriminator('gh5147_0', clickedEventSchema);
+
+        ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).
+          exec(function(error) {
+            assert.ifError(error);
+            assert.equal(eventSchemaCalls, 1);
+            assert.equal(clickedEventSchemaCalls, 1);
+            done();
+          });
       });
 
       it('embedded discriminators with $push (gh-5009)', function(done) {
@@ -605,6 +636,60 @@ describe('model', function() {
             assert.equal(doc.events.length, 2);
             assert.equal(doc.events[1].element, '#button');
             assert.equal(doc.events[1].kind, 'Clicked');
+            done();
+          }).
+          catch(done);
+      });
+
+      it('embedded discriminators with $set (gh-5130)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind' });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Batch = db.model('gh5130', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id, 'events._id': doc.events[0]._id }, {
+              $set: {
+                'events.$':  {
+                  message: 'updated',
+                  kind: 'Clicked',
+                  element: '#hero2'
+                }
+              }
+            }).then(function() { return doc; });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            assert.equal(doc.events[0].message, 'updated');
+            assert.equal(doc.events[0].element, '#hero2');    // <-- test failed
+            assert.equal(doc.events[0].kind, 'Clicked');      // <-- test failed
             done();
           }).
           catch(done);

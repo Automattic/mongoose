@@ -15,9 +15,6 @@ if (!uri) {
       '\033[39m'
   );
 
-  // let expresso shut down this test
-  exports.r = function expressoHack() {
-  };
   return;
 }
 
@@ -62,29 +59,17 @@ describe('shard', function() {
         cmd.shardcollection = db.name + '.' + collection;
         cmd.key = P.schema.options.shardkey;
 
-        P.db.db.executeDbAdminCommand(cmd, function(err, res) {
+        P.db.db.executeDbAdminCommand(cmd, function(err) {
           assert.ifError(err);
 
-          if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
-            err = new Error('could not shard test collection '
-                + collection + '\n'
-                + res.documents[0].errmsg + '\n'
-                + 'Make sure to use a different database than what '
-                + 'is used for the MULTI_MONGOS_TEST');
-            return done(err);
-          }
-
-          db.db.admin(function(err, admin) {
+          db.db.admin().serverStatus(function(err, info) {
+            db.close();
             assert.ifError(err);
-            admin.serverStatus(function(err, info) {
-              db.close();
-              assert.ifError(err);
-              version = info.version.split('.').map(function(n) {
-                return parseInt(n, 10);
-              });
-              greaterThan20x = version[0] > 2 || version[0] === 2 && version[0] > 0;
-              done();
+            version = info.version.split('.').map(function(n) {
+              return parseInt(n, 10);
             });
+            greaterThan20x = version[0] > 2 || version[0] === 2 && version[0] > 0;
+            done();
           });
         });
       });

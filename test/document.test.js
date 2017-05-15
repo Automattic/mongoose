@@ -4046,9 +4046,9 @@ describe('document', function() {
       }, { retainKeyOrder: true });
 
       schema.virtual('tests').get(function() {
-        return _.map(this.nested, function(v, key) {
+        return _.map(this.nested, function(v) {
           return v;
-        })
+        });
       });
 
       var M = db.model('gh5078', schema);

@@ -42,7 +42,7 @@ describe('schematype', function() {
         return m1.validate();
       });
 
-      return Promise.all(validatePromises);
+      return global.Promise.all(validatePromises);
     });
   });
 });

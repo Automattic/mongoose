@@ -208,6 +208,19 @@ describe('model', function() {
       done();
     });
 
+    it('primitive arrays (gh-3347)', function(done) {
+      var schema = new Schema({
+        arr: [{ type: String, unique: true }]
+      });
+
+      var indexes = schema.indexes();
+      assert.equal(indexes.length, 1);
+      assert.deepEqual(indexes[0][0], { arr: 1 });
+      assert.ok(indexes[0][1].unique);
+
+      done();
+    });
+
     it('error should emit on the model', function(done) {
       var db = start(),
           schema = new Schema({name: {type: String}}),

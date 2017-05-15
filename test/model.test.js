@@ -1139,7 +1139,7 @@ describe('Model', function() {
         db.close();
         assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
         assert.equal(err.name, 'ValidationError');
-        assert.equal(err.message, 'IntrospectionValidation validation failed');
+        assert.ok(err.message.indexOf('IntrospectionValidation validation failed') !== -1, err.message);
         done();
       });
     });
@@ -5345,7 +5345,15 @@ describe('Model', function() {
       });
       var calledPre = 0;
       var calledPost = 0;
-      schema.pre('insertMany', function(next) {
+      schema.pre('insertMany', function(next, docs) {
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
+        ++calledPre;
+        next();
+      });
+      schema.pre('insertMany', function(next, docs) {
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
         ++calledPre;
         next();
       });
@@ -5358,7 +5366,7 @@ describe('Model', function() {
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
-        assert.equal(calledPre, 1);
+        assert.equal(calledPre, 2);
         assert.equal(calledPost, 1);
         done();
       });
@@ -5567,6 +5575,34 @@ describe('Model', function() {
           done();
         });
       });
+    });
+
+    it('insertMany with Decimal (gh-5190)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new mongoose.Schema({
+          amount : mongoose.Schema.Types.Decimal
+        });
+        var Money = db.model('gh5190', schema);
+
+        Money.insertMany([{ amount : '123.45' }], function(error) {
+          assert.ifError(error);
+          done();
+        });
+      }
     });
 
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {

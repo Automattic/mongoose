@@ -1978,6 +1978,23 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('lets $currentDate go through with updatedAt (gh-5222)', function(done) {
+      var testSchema = new Schema({
+        name: String
+      }, { timestamps: true });
+
+      var Test = db.model('gh5222', testSchema);
+
+      Test.create({ name: 'test' }, function(error) {
+        assert.ifError(error);
+        var u = { $currentDate: { updatedAt: true }, name: 'test2' };
+        Test.update({}, u, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('update validators on single nested (gh-4332)', function(done) {
       var AreaSchema = new Schema({
         a: String
@@ -2448,6 +2465,27 @@ describe('model: update:', function() {
       });
     });
 
+    it('overwrite doc with update validators (gh-3556)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        otherName: String
+      });
+      var Test = db.model('gh3556', testSchema);
+
+      var opts = { overwrite: true, runValidators: true };
+      Test.update({}, { otherName: 'test' }, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['name']);
+        Test.update({}, { $set: { otherName: 'test' } }, opts, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('does not fail if passing whole doc (gh-5088)', function(done) {
       var schema = new Schema({
         username: String,
@@ -2490,6 +2528,32 @@ describe('model: update:', function() {
         then(function(doc) {
           assert.equal(doc.fieldOne, 'Test2');
           assert.equal(doc.get('fieldTwo'), 'Test3');
+          done();
+        }).
+        catch(done);
+    });
+
+    it('$pullAll with null (gh-5164)', function(done) {
+      var schema = new Schema({
+        name: String,
+        arr: [{ name: String }]
+      }, { strict: true });
+      var Test = db.model('gh5164', schema);
+
+      var doc = new Test({ name: 'Test', arr: [null, {name: 'abc'}] });
+
+      doc.save().
+        then(function(doc) {
+          return Test.update({ _id: doc._id }, {
+            $pullAll: { arr: [null] }
+          });
+        }).
+        then(function() {
+          return Test.findById(doc);
+        }).
+        then(function(doc) {
+          assert.equal(doc.arr.length, 1);
+          assert.equal(doc.arr[0].name, 'abc');
           done();
         }).
         catch(done);

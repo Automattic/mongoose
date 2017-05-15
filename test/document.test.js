@@ -4037,6 +4037,33 @@ describe('document', function() {
       done();
     });
 
+    it('iterating through nested doc keys (gh-5078)', function(done) {
+      var schema = new Schema({
+        nested: {
+          test1: String,
+          test2: String
+        }
+      }, { retainKeyOrder: true });
+
+      schema.virtual('tests').get(function() {
+        return _.map(this.nested, function(v, key) {
+          return v;
+        })
+      });
+
+      var M = db.model('gh5078', schema);
+
+      var doc = new M({ nested: { test1: 'a', test2: 'b' } });
+
+      assert.deepEqual(doc.toObject({ virtuals: true }).tests, ['a', 'b']);
+
+      // Should not throw
+      require('util').inspect(doc);
+      JSON.stringify(doc);
+
+      done();
+    });
+
     it('JSON.stringify nested errors (gh-5208)', function(done) {
       var AdditionalContactSchema = new Schema({
         contactName: {

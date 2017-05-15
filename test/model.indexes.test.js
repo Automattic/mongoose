@@ -226,16 +226,17 @@ describe('model', function() {
           schema = new Schema({name: {type: String}}),
           Test = db.model('IndexError', schema, 'x' + random());
 
-      Test.on('index', function(err) {
-        db.close();
-        assert.ok(/E11000 duplicate key error/.test(err.message), err);
-        done();
-      });
-
       Test.create({name: 'hi'}, {name: 'hi'}, function(err) {
         assert.strictEqual(err, null);
         Test.schema.index({name: 1}, {unique: true});
         Test.schema.index({other: 1});
+
+        Test.on('index', function(err) {
+          db.close();
+          assert.ok(/E11000 duplicate key error/.test(err.message), err);
+          done();
+        });
+
         Test.init();
       });
     });

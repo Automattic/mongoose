@@ -30,6 +30,11 @@ var files = [
     input: 'test/docs/validation.test.js',
     output: 'validation.html',
     title: 'Validation'
+  },
+  {
+    input: 'test/docs/schemas.test.es6.js',
+    output: 'advanced_schemas.html',
+    title: 'Advanced Schemas'
   }
 ];
 

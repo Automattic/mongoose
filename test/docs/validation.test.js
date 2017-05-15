@@ -108,6 +108,51 @@ describe('validation docs', function() {
   });
 
   /**
+   * A common gotcha for beginners is that the `unique` option for schemas
+   * is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
+   * See the [FAQ](/docs/faq.html) for more information.
+   */
+
+  it('The `unique` Option is Not a Validator', function(done) {
+    var uniqueUsernameSchema = new Schema({
+      username: {
+        type: String,
+        unique: true
+      }
+    });
+    var U1 = db.model('U1', uniqueUsernameSchema);
+    var U2 = db.model('U2', uniqueUsernameSchema);
+    // acquit:ignore:start
+    var remaining = 2;
+    // acquit:ignore:end
+
+    var dup = [{ username: 'Val' }, { username: 'Val' }];
+    U1.create(dup, function(error) {
+      // Will save successfully!
+      // acquit:ignore:start
+      assert.ifError(error);
+      --remaining || done();
+      // acquit:ignore:end
+    });
+
+    // Need to wait for the index to finish building before saving,
+    // otherwise unique constraints may be violated.
+    U2.on('index', function(error) {
+      assert.ifError(error);
+      U2.create(dup, function(error) {
+        // Will error, but will *not* be a mongoose validation error, but
+        // a duplicate key error.
+        assert.ok(error);
+        assert.ok(!error.errors);
+        assert.ok(error.message.indexOf('duplicate key error') !== -1);
+        // acquit:ignore:start
+        --remaining || done();
+        // acquit:ignore:end
+      });
+    });
+  });
+
+  /**
    * If the built-in validators aren't enough, you can define custom validators
    * to suit your needs.
    *

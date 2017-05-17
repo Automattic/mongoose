@@ -4037,6 +4037,23 @@ describe('document', function() {
       done();
     });
 
+    it('deeply nested virtual paths (gh-5250)', function(done) {
+      var TestSchema = new Schema({});
+      TestSchema.
+        virtual('a.b.c').
+        get(function() {
+          return this.v;
+        }).
+        set(function(value) {
+          this.v = value;
+        });
+
+      var TestModel = db.model('gh5250', TestSchema);
+      var t = new TestModel({'a.b.c': 5});
+      assert.equal(t.a.b.c, 5);
+      done();
+    });
+
     it('JSON.stringify nested errors (gh-5208)', function(done) {
       var AdditionalContactSchema = new Schema({
         contactName: {

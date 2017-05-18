@@ -1,3 +1,19 @@
+4.10.0 / 2017-05-18
+===================
+ * fix(schema): update clone method to include indexes #5268 [clozanosanchez](https://github.com/clozanosanchez)
+ * feat(schema): support aliases #5184 [rocketspacer](https://github.com/rocketspacer)
+ * feat(aggregate): add mongoose-specific aggregation cursor option #5145
+ * refactor(model): make sharding into a plugin instead of core #5105
+ * fix(document): make nested doc mongoose internals not enumerable again #5078
+ * feat(model): pass params to pre hooks #5064
+ * feat(timestamps): support already defined timestamp paths in schema #4868
+ * feat(query): add runSettersOnQuery option #4569
+ * fix(query): add strictQuery option that throws when not querying on field not in schema #4136
+ * fix(update): more complete handling for overwrite option with update validators #3556
+ * feat: support `unique: true` in arrays via the mongoose-unique-array plugin #3347
+ * feat(validation): include failed paths in error message and inspect output #3064 #2135
+ * fix(model): return saved docs when create() fails #2190
+
 4.9.10 / 2017-05-17
 ===================
  * fix(connection): ensure callback arg to openSet() is handled properly #5249

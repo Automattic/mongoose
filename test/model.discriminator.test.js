@@ -315,9 +315,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 5);
-        // PersonSchema.post('save')
-        assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
+        assert.equal(Employee.schema.callQueue.length, 8);
 
         // EmployeeSchema.pre('save')
         var queueIndex = Employee.schema.callQueue.length - 1;
@@ -453,6 +451,11 @@ describe('model', function() {
           name: String
         });
         var childCalls = 0;
+        var childValidateCalls = 0;
+        childSchema.pre('validate', function(next) {
+          ++childValidateCalls;
+          next();
+        });
         childSchema.pre('save', function(next) {
           ++childCalls;
           next();
@@ -486,6 +489,7 @@ describe('model', function() {
           assert.equal(doc.heir.name, 'Robb Stark');
           assert.equal(doc.children.length, 1);
           assert.equal(doc.children[0].name, 'Jon Snow');
+          assert.equal(childValidateCalls, 2);
           assert.equal(childCalls, 2);
           assert.equal(parentCalls, 1);
           done();

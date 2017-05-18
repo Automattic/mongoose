@@ -1781,6 +1781,17 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('strictQuery option (gh-4136)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strictQuery: 'throw' });
+
+      var Model = db.model('gh4136', modelSchema);
+      Model.find({ nonexistingField: 1 }).exec(function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('strictQuery') !== -1, error.message);
+        done();
+      });
+    });
+
     it('strict option (gh-5108)', function(done) {
       var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 
@@ -1826,6 +1837,27 @@ describe('model: findOneAndUpdate:', function() {
         then(function() {
           done();
         });
+    });
+
+    it('overwrite doc with update validators (gh-3556)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        otherName: String
+      });
+      var Test = db.model('gh3556', testSchema);
+
+      var opts = { overwrite: true, runValidators: true };
+      Test.findOneAndUpdate({}, { otherName: 'test' }, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['name']);
+        Test.findOneAndUpdate({}, { $set: { otherName: 'test' } }, opts, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
     });
 
     it('properly handles casting nested objects in update (gh-4724)', function(done) {

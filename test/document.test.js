@@ -1272,7 +1272,7 @@ describe('document', function() {
         var m = new M({name: 'gh1109-2', arr: [1]});
         assert.equal(called, false);
         m.save(function(err) {
-          assert.equal(String(err), 'ValidationError: BAM');
+          assert.equal(String(err), 'ValidationError: arr: BAM');
           assert.equal(called, true);
           m.arr.push(2);
           called = false;
@@ -1301,7 +1301,7 @@ describe('document', function() {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
           m.arr.push({nice: true});
           m.save(function(err) {
-            assert.equal(String(err), 'ValidationError: BAM');
+            assert.equal(String(err), 'ValidationError: arr: BAM');
             m.arr.push(95);
             m.save(function(err) {
               assert.ifError(err);
@@ -4037,6 +4037,33 @@ describe('document', function() {
       done();
     });
 
+    it('iterating through nested doc keys (gh-5078)', function(done) {
+      var schema = new Schema({
+        nested: {
+          test1: String,
+          test2: String
+        }
+      }, { retainKeyOrder: true });
+
+      schema.virtual('tests').get(function() {
+        return _.map(this.nested, function(v) {
+          return v;
+        });
+      });
+
+      var M = db.model('gh5078', schema);
+
+      var doc = new M({ nested: { test1: 'a', test2: 'b' } });
+
+      assert.deepEqual(doc.toObject({ virtuals: true }).tests, ['a', 'b']);
+
+      // Should not throw
+      require('util').inspect(doc);
+      JSON.stringify(doc);
+
+      done();
+    });
+
     it('deeply nested virtual paths (gh-5250)', function(done) {
       var TestSchema = new Schema({});
       TestSchema.
@@ -4051,6 +4078,7 @@ describe('document', function() {
       var TestModel = db.model('gh5250', TestSchema);
       var t = new TestModel({'a.b.c': 5});
       assert.equal(t.a.b.c, 5);
+
       done();
     });
 

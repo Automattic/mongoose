@@ -1021,6 +1021,34 @@ describe('model query casting', function() {
       catch(done);
   });
 
+  it('lowercase in query (gh-4569)', function(done) {
+    var db = start();
+
+    var testSchema = new Schema({
+      name: { type: String, lowercase: true },
+      num: { type: Number, set: function(v) { return Math.floor(v); } }
+    }, { runSettersOnQuery: true });
+
+    var Test = db.model('gh-4569', testSchema);
+    Test.create({ name: 'val', num: 3 }).
+      then(function() {
+        return Test.findOne({ name: 'VAL' });
+      }).
+      then(function(doc) {
+        assert.ok(doc);
+        assert.equal(doc.name, 'val');
+      }).
+      then(function() {
+        return Test.findOne({ num: 3.14 });
+      }).
+      then(function(doc) {
+        assert.ok(doc);
+        assert.equal(doc.name, 'val');
+      }).
+      then(function() { done(); }).
+      catch(done);
+  });
+
   it('_id = 0 (gh-4610)', function(done) {
     var db = start();
 

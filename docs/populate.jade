@@ -330,7 +330,10 @@ block content
     BandSchema.virtual('members', {
       ref: 'Person', // The model to use
       localField: 'name', // Find people where `localField`
-      foreignField: 'band' // is equal to `foreignField`
+      foreignField: 'band', // is equal to `foreignField`
+      // If `justOne` is false, 'members' will be a single doc as opposed to
+      // an array. `justOne` is false by default.
+      justOne: false
     });
     
     var Person = mongoose.model('Person', personSchema);

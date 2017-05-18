@@ -1,3 +1,9 @@
+4.9.10 / 2017-05-17
+===================
+ * fix(connection): ensure callback arg to openSet() is handled properly #5249
+ * docs: remove dead plugins repo and add content links #5247
+ * fix(model): skip index build if connecting after model init and autoIndex false #5176
+
 4.9.9 / 2017-05-13
 ==================
  * docs: correct value for Query#regex() #5230

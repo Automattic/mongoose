@@ -4162,6 +4162,16 @@ describe('document', function() {
       });
     });
 
+    it('null _id (gh-5236)', function(done) {
+      var childSchema = new mongoose.Schema({});
+
+      var M = db.model('gh5236', childSchema);
+
+      var m = new M({ _id: null });
+      assert.ok(m._id);
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

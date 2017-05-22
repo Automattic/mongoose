@@ -1,3 +1,9 @@
+4.10.1 / 2017-05-21
+===================
+ * fix(aggregate): handle sorting by text score correctly #5258
+ * fix(populate): handle doc.populate() with virtuals #5240
+ * fix(schema): enforce that `_id` is never null #5236
+
 4.10.0 / 2017-05-18
 ===================
  * fix(schema): update clone method to include indexes #5268 [clozanosanchez](https://github.com/clozanosanchez)

@@ -1,3 +1,9 @@
+4.10.1 / 2017-05-21
+===================
+ * fix(aggregate): handle sorting by text score correctly #5258
+ * fix(populate): handle doc.populate() with virtuals #5240
+ * fix(schema): enforce that `_id` is never null #5236
+
 4.10.0 / 2017-05-18
 ===================
  * fix(schema): update clone method to include indexes #5268 [clozanosanchez](https://github.com/clozanosanchez)
@@ -11,6 +17,8 @@
  * fix(query): add strictQuery option that throws when not querying on field not in schema #4136
  * fix(update): more complete handling for overwrite option with update validators #3556
  * feat: support `unique: true` in arrays via the mongoose-unique-array plugin #3347
+ * fix(model): always emit 'index', even if no indexes #3347
+ * fix(schema): set unique indexes on primitive arrays #3347
  * feat(validation): include failed paths in error message and inspect output #3064 #2135
  * fix(model): return saved docs when create() fails #2190
 

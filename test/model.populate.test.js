@@ -5053,6 +5053,40 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('nested virtuals + doc.populate() (gh-5240)', function(done) {
+        var parentSchema = new Schema({ name: String });
+        var childSchema = new Schema({
+          parentId: mongoose.Schema.Types.ObjectId
+        });
+        childSchema.virtual('parent', {
+          ref: 'gh5240',
+          localField: 'parentId',
+          foreignField: '_id',
+          justOne: true
+        });
+        var teamSchema = new Schema({ people: [childSchema] });
+
+        var Parent = db.model('gh5240', parentSchema);
+        var Team = db.model('gh5240_0', teamSchema);
+
+        Parent.create({ name: 'Darth Vader' }).
+          then(function(doc) {
+            return Team.create({ people: [{ parentId: doc._id }] });
+          }).
+          then(function(team) {
+            return Team.findById(team._id);
+          }).
+          then(function(team) {
+            return team.populate('people.parent').execPopulate();
+          }).
+          then(function(team) {
+            team = team.toObject({ virtuals: true });
+            assert.equal(team.people[0].parent.name, 'Darth Vader');
+            done();
+          }).
+          catch(done);
+      });
+
       it('virtual populate in single nested doc (gh-4715)', function(done) {
         var someModelSchema = new mongoose.Schema({
           name: String

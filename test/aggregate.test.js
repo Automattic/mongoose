@@ -974,4 +974,30 @@ describe('aggregate: ', function() {
       }).
       catch(done);
   });
+
+  it('sort by text score (gh-5258)', function(done) {
+    var db = start();
+
+    var mySchema = new Schema({ test: String });
+    mySchema.index({ test: 'text' });
+    var M = db.model('gh5258', mySchema);
+
+    M.on('index', function(error) {
+      assert.ifError(error);
+      M.create([{ test: 'test test' }, { test: 'a test' }], function(error) {
+        assert.ifError(error);
+        var aggregate = M.aggregate();
+        aggregate.match({ $text: { $search: 'test' } });
+        aggregate.sort({ score: { $meta: 'textScore' } });
+
+        aggregate.exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.length, 2);
+          assert.equal(res[0].test, 'test test');
+          assert.equal(res[1].test, 'a test');
+          done();
+        });
+      });
+    });
+  });
 });

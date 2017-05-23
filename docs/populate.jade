@@ -123,6 +123,7 @@ block content
     .populate({
       path: 'fans',
       match: { age: { $gte: 21 }},
+      // Explicitly exclude `_id`, see http://bit.ly/2aEfTdB
       select: 'name -_id',
       options: { limit: 5 }
     })

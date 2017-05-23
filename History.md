@@ -1,3 +1,7 @@
+4.10.2 / 2017-05-22
+===================
+ * fix: bump ms -> 2.0.0 and mquery -> 2.3.1 for minor security vulnerability #5275
+
 4.10.1 / 2017-05-21
 ===================
  * fix(aggregate): handle sorting by text score correctly #5258

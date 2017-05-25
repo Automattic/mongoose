@@ -4162,6 +4162,24 @@ describe('document', function() {
       });
     });
 
+    it('saving a doc with nested string array (gh-5282)', function(done) {
+      var testSchema = new mongoose.Schema({
+        strs: [[String]]
+      });
+
+      var Test = db.model('gh5282', testSchema);
+
+      var t = new Test({
+        strs: [['a', 'b']]
+      });
+
+      t.save(function(error, t) {
+        assert.ifError(error);
+        assert.deepEqual(t.toObject().strs, [['a', 'b']]);
+        done();
+      });
+    });
+
     it('null _id (gh-5236)', function(done) {
       var childSchema = new mongoose.Schema({});
 

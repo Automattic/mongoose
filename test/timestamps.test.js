@@ -43,6 +43,26 @@ describe('timestamps', function() {
     });
   });
 
+  it('nested paths (gh-4503)', function(done) {
+    var startTime = Date.now();
+    var schema = new mongoose.Schema({
+      name: String
+    }, { timestamps: { createdAt: 'ts.c', updatedAt: 'ts.a' } });
+    var M = db.model('gh4503', schema);
+
+    M.create({ name: 'Test' }, function(error) {
+      assert.ifError(error);
+      M.findOne({}, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(doc.ts.c);
+        assert.ok(doc.ts.c.valueOf() >= startTime);
+        assert.ok(doc.ts.a);
+        assert.ok(doc.ts.a.valueOf() >= startTime);
+        done();
+      });
+    });
+  });
+
   it('does not override nested timestamp params defined in schema (gh-4868)', function(done) {
     var startTime = Date.now();
     var schema = new mongoose.Schema({

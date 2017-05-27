@@ -8,34 +8,36 @@ var start = require('./common'),
     Schema = mongoose.Schema,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-/**
- * Setup
- */
-
-var schemaB = new Schema({
-  title: String,
-  type: String
-}, {discriminatorKey: 'type'});
-
-var schemaC = new Schema({
-  test: {
-    type: String,
-    default: 'test'
-  }
-}, {discriminatorKey: 'type'});
-
-
 describe('model', function() {
+  var schemaB;
+  var schemaC;
+
+  before(function() {
+    schemaB = new Schema({
+      title: String,
+      type: String
+    }, {discriminatorKey: 'type'});
+
+    schemaC = new Schema({
+      test: {
+        type: String,
+        default: 'test'
+      }
+    }, {discriminatorKey: 'type'});
+  });
+
   describe('hydrate()', function() {
     var db;
     var B;
     var Breakfast;
 
-    var breakfastSchema = new Schema({
-      food: {type: String, enum: ['bacon', 'eggs']}
-    });
+    var breakfastSchema;
 
     before(function() {
+      breakfastSchema = new Schema({
+        food: {type: String, enum: ['bacon', 'eggs']}
+      });
+
       db = start();
       B = db.model('model-create', schemaB, 'gh-2637-1');
       B.discriminator('C', schemaC);

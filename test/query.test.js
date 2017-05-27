@@ -10,32 +10,38 @@ var assert = require('power-assert');
 var random = require('../lib/utils').random;
 var Query = require('../lib/query');
 
-var Comment = new Schema({
-  text: String
-});
-
-var Product = new Schema({
-  tags: {}, // mixed
-  array: Array,
-  ids: [Schema.ObjectId],
-  strings: [String],
-  numbers: [Number],
-  comments: [Comment]
-});
-
-mongoose.model('Product', Product);
-mongoose.model('Comment', Comment);
-var p1;
-
 /**
  * Test.
  */
 
 describe('Query', function() {
+  var Comment;
+  var Product;
+  var p1;
+
+  before(function() {
+    Comment = new Schema({
+      text: String
+    });
+
+    Product = new Schema({
+      tags: {}, // mixed
+      array: Array,
+      ids: [Schema.ObjectId],
+      strings: [String],
+      numbers: [Number],
+      comments: [Comment]
+    });
+
+    mongoose.model('Product', Product);
+    mongoose.model('Comment', Comment);
+  });
+
   before(function() {
     var Prod = mongoose.model('Product');
     p1 = new Prod();
   });
+
   describe('constructor', function() {
     it('should not corrupt options', function(done) {
       var opts = {};
@@ -1716,8 +1722,8 @@ describe('Query', function() {
           {'answers._id': '507f1f77bcf86cd799439011'},
           {$set: {'answers.$': answersUpdate}});
 
-      assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
-          {votes: 1, count: 3});
+      assert.deepEqual(q.getUpdate().$set['answers.$'].stats.toObject(),
+        { votes: 1, count: 3 });
       done();
     });
 

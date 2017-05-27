@@ -108,7 +108,7 @@ block content
 
   .important
     :markdown
-      Overwriting a default mongoose document method may lead to unpredictible results. See [this](./api.html#schema_Schema.reserved) for more details.
+      Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema.reserved) for more details.
 
   h3#statics Statics
   :markdown
@@ -250,7 +250,29 @@ block content
   :markdown
     Virtual property setters are applied before other validation. So the example above would still work even if the `first` and `last` name fields were required.
 
-    Only non-virtual properties work as part of queries and for field selection.
+    Only non-virtual properties work as part of queries and for field selection. Since virtuals are not stored in MongoDB, you can't query with them.
+  
+  h5#aliases Aliases
+  :markdown
+    Aliases are a particular type of virtual where the getter and setter seamlessly get and set another property. This is handy for saving network bandwidth, so you can convert a short property name stored in the database into a longer name for code readability.
+  
+  :js
+    var personSchema = new Schema({
+      n: {
+        type: String,
+        // Now accessing `name` will get you the value of `n`, and setting `n` will set the value of `name`
+        alias: 'name'
+      }
+    });
+    
+    // Setting `name` will propagate to `n`
+    var person = new Person({ name: 'Val' });
+    console.log(person); // { n: 'Val' }
+    console.log(person.toObject({ virtuals: true })); // { n: 'Val', name: 'Val' }
+    console.log(person.name); // "Val"
+    
+    person.name = 'Not Val';
+    console.log(person); // { n: 'Not Val' }
 
   h3#options Options
   :markdown

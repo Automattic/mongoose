@@ -13,65 +13,70 @@ var ObjectId = Schema.Types.ObjectId;
 var DocumentObjectId = mongoose.Types.ObjectId;
 var _ = require('lodash');
 
-/**
- * Setup.
- */
-
-var Comments = new Schema();
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-});
-
-BlogPost.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
-
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-var modelname = 'UpdateOneBlogPost';
-mongoose.model(modelname, BlogPost);
-
-var collection = 'updateoneblogposts_' + random();
-
-var strictSchema = new Schema({name: String}, {strict: true});
-mongoose.model('UpdateOneStrictSchema', strictSchema);
-
-var strictThrowSchema = new Schema({name: String}, {strict: 'throw'});
-mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
-
 describe('model: findOneAndUpdate:', function() {
+  var Comments;
+  var BlogPost;
+  var modelname;
+  var collection;
+  var strictSchema;
+  var strictThrowSchema;
+
+  before(function() {
+    Comments = new Schema();
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    });
+
+    BlogPost.virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    modelname = 'UpdateOneBlogPost';
+    mongoose.model(modelname, BlogPost);
+
+    collection = 'updateoneblogposts_' + random();
+
+    strictSchema = new Schema({name: String}, {strict: true});
+    mongoose.model('UpdateOneStrictSchema', strictSchema);
+
+    strictThrowSchema = new Schema({name: String}, {strict: 'throw'});
+    mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
+  });
+
   it('WWW returns the edited document', function(done) {
     var db = start(),
         M = db.model(modelname, collection),
@@ -535,9 +540,7 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
   });
-});
 
-describe('model: findByIdAndUpdate:', function() {
   it('executing with just a callback throws', function(done) {
     var db = start(),
         M = db.model(modelname, collection),
@@ -1778,6 +1781,33 @@ describe('model: findByIdAndUpdate:', function() {
       });
     });
 
+    it('strictQuery option (gh-4136)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strictQuery: 'throw' });
+
+      var Model = db.model('gh4136', modelSchema);
+      Model.find({ nonexistingField: 1 }).exec(function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('strictQuery') !== -1, error.message);
+        done();
+      });
+    });
+
+    it('strict option (gh-5108)', function(done) {
+      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+
+      var Model = db.model('gh5108', modelSchema);
+      Model.findOneAndUpdate({}, { field: 2, otherField: 3 }, {
+        upsert: true,
+        strict: false,
+        new: true
+      }).exec(function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.field, 2);
+        assert.equal(doc.get('otherField'), 3);
+        done();
+      });
+    });
+
     it('should not apply schema transforms (gh-4574)', function(done) {
       var options = {
         toObject: {
@@ -1807,6 +1837,27 @@ describe('model: findByIdAndUpdate:', function() {
         then(function() {
           done();
         });
+    });
+
+    it('overwrite doc with update validators (gh-3556)', function(done) {
+      var testSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        otherName: String
+      });
+      var Test = db.model('gh3556', testSchema);
+
+      var opts = { overwrite: true, runValidators: true };
+      Test.findOneAndUpdate({}, { otherName: 'test' }, opts, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['name']);
+        Test.findOneAndUpdate({}, { $set: { otherName: 'test' } }, opts, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
     });
 
     it('properly handles casting nested objects in update (gh-4724)', function(done) {

@@ -10,40 +10,41 @@ var start = require('./common'),
     Schema = mongoose.Schema,
     ObjectId = Schema.Types.ObjectId;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema();
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments]
-});
-
-
-var collection = 'mapreduce_' + random();
-mongoose.model('MapReduce', BlogPost);
-
 describe('model: mapreduce:', function() {
+  var Comments;
+  var BlogPost;
+  var collection;
+
+  before(function() {
+    Comments = new Schema();
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments]
+    });
+
+    collection = 'mapreduce_' + random();
+    mongoose.model('MapReduce', BlogPost);
+  });
+
   it('works', function(done) {
     var db = start(),
         MR = db.model('MapReduce', collection);
@@ -374,5 +375,27 @@ describe('model: mapreduce:', function() {
       db.close(done);
     });
   });
-});
 
+  it('resolveToObject (gh-4945)', function(done) {
+    var db = start();
+    var MR = db.model('MapReduce', collection);
+
+    var o = {
+      map: function() {
+      },
+      reduce: function() {
+        return 'test';
+      },
+      verbose: false,
+      resolveToObject: true
+    };
+
+    MR.create({ title: 'test' }, function(error) {
+      assert.ifError(error);
+      MR.mapReduce(o).then(function(obj) {
+        assert.ok(obj.model);
+        db.close(done);
+      }).catch(done);
+    });
+  });
+});

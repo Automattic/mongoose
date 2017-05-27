@@ -10,7 +10,6 @@ benchmarks/v8.log
 .DS_Store
 docs/*.json
 docs/source/_docs
-docs/*.html
 tags
 test/triage/*.js
 /.idea
@@ -18,6 +17,8 @@ test/triage/*.js
 bin/mongoose.min.js
 coverage
 npm-debug.log
+
+tools/31*
 
 # Visual Studio
 # =========

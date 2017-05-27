@@ -30,18 +30,16 @@ function TestDocument() {
 TestDocument.prototype.__proto__ = Document.prototype;
 
 /**
- * Set a dummy schema to simulate compilation.
- */
-
-TestDocument.prototype.$__setSchema(new Schema({
-  test: String
-}));
-
-/**
  * Test.
  */
 
 describe('schema', function() {
+  before(function() {
+    TestDocument.prototype.$__setSchema(new Schema({
+      test: String
+    }));
+  });
+
   describe('nested fields with same name', function() {
     var db, NestedModel;
 
@@ -774,15 +772,15 @@ describe('schema', function() {
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 5);
+      assert.equal(Tobi.callQueue.length, 3);
 
       Tobi.post('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 6);
+      assert.equal(Tobi.callQueue.length, 4);
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 7);
+      assert.equal(Tobi.callQueue.length, 5);
       done();
     });
   });

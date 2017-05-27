@@ -5,19 +5,20 @@ var start = require('./common'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-/**
- * Setup.
- */
-
-var DecoratedSchema = new Schema({
-  title: String
-}, {strict: false});
-
-mongoose.model('Decorated', DecoratedSchema);
-
-var collection = 'decorated_' + random();
-
 describe('schema.onthefly', function() {
+  var DecoratedSchema;
+  var collection;
+
+  before(function() {
+    DecoratedSchema = new Schema({
+      title: String
+    }, {strict: false});
+
+    mongoose.model('Decorated', DecoratedSchema);
+
+    collection = 'decorated_' + random();
+  });
+
   it('setting should cache the schema type and cast values appropriately', function(done) {
     var db = start(),
         Decorated = db.model('Decorated', collection);

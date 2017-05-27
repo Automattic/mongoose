@@ -9,30 +9,32 @@ var assert = require('power-assert'),
     Schema = mongoose.Schema;
 
 /**
- * Schema.
- */
-
-var GrandChildSchema = new Schema({
-  name: String
-});
-
-var ChildSchema = new Schema({
-  name: String,
-  child: GrandChildSchema
-});
-
-var ParentSchema = new Schema({
-  name: String,
-  children: [ChildSchema]
-});
-
-mongoose.model('Parent-3589-Sub', ParentSchema);
-
-/**
  * Test.
  */
 
 describe('types.subdocument', function() {
+  var GrandChildSchema;
+  var ChildSchema;
+  var ParentSchema;
+
+  before(function() {
+    GrandChildSchema = new Schema({
+      name: String
+    });
+
+    ChildSchema = new Schema({
+      name: String,
+      child: GrandChildSchema
+    });
+
+    ParentSchema = new Schema({
+      name: String,
+      children: [ChildSchema]
+    });
+
+    mongoose.model('Parent-3589-Sub', ParentSchema);
+  });
+
   it('returns a proper ownerDocument (gh-3589)', function(done) {
     var Parent = mongoose.model('Parent-3589-Sub');
     var p = new Parent({

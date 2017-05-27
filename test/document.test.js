@@ -1272,7 +1272,7 @@ describe('document', function() {
         var m = new M({name: 'gh1109-2', arr: [1]});
         assert.equal(called, false);
         m.save(function(err) {
-          assert.equal(String(err), 'ValidationError: BAM');
+          assert.equal(String(err), 'ValidationError: arr: BAM');
           assert.equal(called, true);
           m.arr.push(2);
           called = false;
@@ -1301,7 +1301,7 @@ describe('document', function() {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
           m.arr.push({nice: true});
           m.save(function(err) {
-            assert.equal(String(err), 'ValidationError: BAM');
+            assert.equal(String(err), 'ValidationError: arr: BAM');
             m.arr.push(95);
             m.save(function(err) {
               assert.ifError(err);
@@ -2050,6 +2050,25 @@ describe('document', function() {
       assert.ok(error);
       assert.ok(error.errors['user.email']);
       assert.equal(error.errors['user.email'].kind, 'regexp');
+
+      done();
+    });
+
+    it('single embedded parent() (gh-5134)', function(done) {
+      var userSchema = new mongoose.Schema({
+        name: String,
+        email: {type: String, required: true, match: /.+@.+/}
+      }, {_id: false, id: false});
+
+      var eventSchema = new mongoose.Schema({
+        user: userSchema,
+        name: String
+      });
+
+      var Event = db.model('gh5134', eventSchema);
+
+      var e = new Event({name: 'test', user: {}});
+      assert.strictEqual(e.user.parent(), e.user.ownerDocument());
 
       done();
     });
@@ -3348,6 +3367,36 @@ describe('document', function() {
       });
     });
 
+    it('setting a nested path retains nested modified paths (gh-5206)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String,
+        surnames: {
+          docarray: [{ name: String }]
+        }
+      });
+
+      var Cat = db.model('gh5206', testSchema);
+
+      var kitty = new Cat({
+        name: 'Test',
+        surnames: {
+          docarray: [{ name: 'test1' }, { name: 'test2' }]
+        }
+      });
+
+      kitty.save(function(error) {
+        assert.ifError(error);
+
+        kitty.surnames = {
+          docarray: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }]
+        };
+
+        assert.deepEqual(kitty.modifiedPaths(),
+          ['surnames', 'surnames.docarray']);
+        done();
+      });
+    });
+
     it('toObject() does not depopulate top level (gh-3057)', function(done) {
       var Cat = db.model('gh3057', { name: String });
       var Human = db.model('gh3057_0', {
@@ -3870,6 +3919,53 @@ describe('document', function() {
       });
     });
 
+    it('save errors with callback and promise work (gh-5216)', function(done) {
+      var schema = new mongoose.Schema({});
+
+      var Model = db.model('gh5216', schema);
+
+      var _id = new mongoose.Types.ObjectId();
+      var doc1 = new Model({ _id: _id });
+      var doc2 = new Model({ _id: _id });
+
+      Model.on('error', function(error) {
+        done(error);
+      });
+
+      doc1.save().
+        then(function() { return doc2.save(function() {}); }).
+        catch(function(error) {
+          assert.ok(error);
+          done();
+        });
+    });
+
+    it('post hooks on child subdocs run after save (gh-5085)', function(done) {
+      var ChildModelSchema = new mongoose.Schema({
+        text: {
+          type: String
+        }
+      });
+      ChildModelSchema.post('save', function(doc) {
+        doc.text = 'bar';
+      });
+      var ParentModelSchema = new mongoose.Schema({
+        children: [ChildModelSchema]
+      });
+
+      var Model = db.model('gh5085', ParentModelSchema);
+
+      Model.create({ children: [{ text: 'test' }] }, function(error) {
+        assert.ifError(error);
+        Model.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.children.length, 1);
+          assert.equal(doc.children[0].text, 'test');
+          done();
+        });
+      });
+    });
+
     it('nested docs toObject() clones (gh-5008)', function(done) {
       var schema = new mongoose.Schema({
         sub: {
@@ -3894,6 +3990,203 @@ describe('document', function() {
       assert.equal(doc.sub.height, 55);
       assert.equal(leanDoc.height, 3);
 
+      done();
+    });
+
+    it('toObject() with null (gh-5143)', function(done) {
+      var schema = new mongoose.Schema({
+        customer: {
+          name: { type: String, required: false }
+        }
+      });
+
+      var Model = db.model('gh5143', schema);
+
+      var model = new Model();
+      model.customer = null;
+      assert.strictEqual(model.toObject().customer, null);
+      assert.strictEqual(model.toObject({ getters: true }).customer, null);
+
+      done();
+    });
+
+    it('handles array subdocs with single nested subdoc default (gh-5162)', function(done) {
+      var RatingsItemSchema = new mongoose.Schema({
+        value: Number
+      }, { versionKey: false, _id: false });
+
+      var RatingsSchema = new mongoose.Schema({
+        ratings: {
+          type: RatingsItemSchema,
+          default: { id: 1, value: 0 }
+        },
+        _id: false
+      });
+
+      var RestaurantSchema = new mongoose.Schema({
+        menu: {
+          type: [RatingsSchema]
+        }
+      });
+
+      var Restaurant = db.model('gh5162', RestaurantSchema);
+
+      // Should not throw
+      var r = new Restaurant();
+      assert.deepEqual(r.toObject().menu, []);
+      done();
+    });
+
+    it('iterating through nested doc keys (gh-5078)', function(done) {
+      var schema = new Schema({
+        nested: {
+          test1: String,
+          test2: String
+        }
+      }, { retainKeyOrder: true });
+
+      schema.virtual('tests').get(function() {
+        return _.map(this.nested, function(v) {
+          return v;
+        });
+      });
+
+      var M = db.model('gh5078', schema);
+
+      var doc = new M({ nested: { test1: 'a', test2: 'b' } });
+
+      assert.deepEqual(doc.toObject({ virtuals: true }).tests, ['a', 'b']);
+
+      // Should not throw
+      require('util').inspect(doc);
+      JSON.stringify(doc);
+
+      done();
+    });
+
+    it('deeply nested virtual paths (gh-5250)', function(done) {
+      var TestSchema = new Schema({});
+      TestSchema.
+        virtual('a.b.c').
+        get(function() {
+          return this.v;
+        }).
+        set(function(value) {
+          this.v = value;
+        });
+
+      var TestModel = db.model('gh5250', TestSchema);
+      var t = new TestModel({'a.b.c': 5});
+      assert.equal(t.a.b.c, 5);
+
+      done();
+    });
+
+    it('JSON.stringify nested errors (gh-5208)', function(done) {
+      var AdditionalContactSchema = new Schema({
+        contactName: {
+          type: String,
+          required: true
+        },
+        contactValue: {
+          type: String,
+          required: true
+        }
+      });
+
+      var ContactSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        },
+        email: {
+          type: String,
+          required: true
+        },
+        additionalContacts: [AdditionalContactSchema]
+      });
+
+      var EmergencyContactSchema = new Schema({
+        contactName: {
+          type: String,
+          required: true
+        },
+        contact: ContactSchema
+      });
+
+      var EmergencyContact =
+        db.model('EmergencyContact', EmergencyContactSchema);
+
+      var contact = new EmergencyContact({
+        contactName: 'Electrical Service',
+        contact: {
+          name: 'John Smith',
+          email: 'john@gmail.com',
+          additionalContacts: [
+            {
+              contactName: 'skype'
+              // Forgotten value
+            }
+          ]
+        }
+      });
+      contact.validate(function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['contact']);
+        assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
+
+        // This `JSON.stringify()` should not throw
+        assert.ok(JSON.stringify(error).indexOf('contactValue') !== -1);
+        done();
+      });
+    });
+
+    it('handles errors in subdoc pre validate (gh-5215)', function(done) {
+      var childSchema = new mongoose.Schema({});
+
+      childSchema.pre('validate', function(next) {
+        next(new Error('child pre validate'));
+      });
+
+      var parentSchema = new mongoose.Schema({
+        child: childSchema
+      });
+
+      var Parent = db.model('gh5215', parentSchema);
+
+      Parent.create({ child: {} }, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['child']);
+        assert.equal(error.errors['child'].message, 'child pre validate');
+        done();
+      });
+    });
+
+    it('saving a doc with nested string array (gh-5282)', function(done) {
+      var testSchema = new mongoose.Schema({
+        strs: [[String]]
+      });
+
+      var Test = db.model('gh5282', testSchema);
+
+      var t = new Test({
+        strs: [['a', 'b']]
+      });
+
+      t.save(function(error, t) {
+        assert.ifError(error);
+        assert.deepEqual(t.toObject().strs, [['a', 'b']]);
+        done();
+      });
+    });
+
+    it('null _id (gh-5236)', function(done) {
+      var childSchema = new mongoose.Schema({});
+
+      var M = db.model('gh5236', childSchema);
+
+      var m = new M({ _id: null });
+      assert.ok(m._id);
       done();
     });
 

@@ -1,3 +1,133 @@
+4.10.3 / 2017-05-27
+===================
+ * docs: correct inconsistent references to updateOne and replaceOne #5297 [dhritzkiv](https://github.com/dhritzkiv)
+ * docs: fix dropdowns in docs #5292 [nathanallen](https://github.com/nathanallen)
+ * docs: add description of alias option #5287
+ * fix(document): prevent infinite loop if validating nested array #5282
+ * fix(schema): correctly handle ref ObjectIds from different mongoose libs #5259
+ * fix(schema): load child class methods after base class methods to allow override #5227
+
+4.10.2 / 2017-05-22
+===================
+ * fix: bump ms -> 2.0.0 and mquery -> 2.3.1 for minor security vulnerability #5275
+
+4.10.1 / 2017-05-21
+===================
+ * fix(aggregate): handle sorting by text score correctly #5258
+ * fix(populate): handle doc.populate() with virtuals #5240
+ * fix(schema): enforce that `_id` is never null #5236
+
+4.10.0 / 2017-05-18
+===================
+ * fix(schema): update clone method to include indexes #5268 [clozanosanchez](https://github.com/clozanosanchez)
+ * feat(schema): support aliases #5184 [rocketspacer](https://github.com/rocketspacer)
+ * feat(aggregate): add mongoose-specific aggregation cursor option #5145
+ * refactor(model): make sharding into a plugin instead of core #5105
+ * fix(document): make nested doc mongoose internals not enumerable again #5078
+ * feat(model): pass params to pre hooks #5064
+ * feat(timestamps): support already defined timestamp paths in schema #4868
+ * feat(query): add runSettersOnQuery option #4569
+ * fix(query): add strictQuery option that throws when not querying on field not in schema #4136
+ * fix(update): more complete handling for overwrite option with update validators #3556
+ * feat: support `unique: true` in arrays via the mongoose-unique-array plugin #3347
+ * fix(model): always emit 'index', even if no indexes #3347
+ * fix(schema): set unique indexes on primitive arrays #3347
+ * feat(validation): include failed paths in error message and inspect output #3064 #2135
+ * fix(model): return saved docs when create() fails #2190
+
+4.9.10 / 2017-05-17
+===================
+ * fix(connection): ensure callback arg to openSet() is handled properly #5249
+ * docs: remove dead plugins repo and add content links #5247
+ * fix(model): skip index build if connecting after model init and autoIndex false #5176
+
+4.9.9 / 2017-05-13
+==================
+ * docs: correct value for Query#regex() #5230
+ * fix(connection): don't throw if .catch() on open() promise #5229
+ * fix(schema): allow update with $currentDate for updatedAt to succeed #5222
+ * fix(model): versioning doesn't fail if version key undefined #5221 [basileos](https://github.com/basileos)
+ * fix(document): don't emit model error if callback specified for consistency with docs #5216
+ * fix(document): handle errors in subdoc pre validate #5215
+
+4.9.8 / 2017-05-07
+==================
+ * docs(subdocs): rewrite subdocs guide #5217
+ * fix(document): avoid circular JSON if error in doc array under single nested subdoc #5208
+ * fix(document): set intermediate empty objects for deeply nested undefined paths before path itself #5206
+ * fix(schema): throw error if first param to schema.plugin() is not a function #5201
+ * perf(document): major speedup in validating subdocs (50x in some cases) #5191
+
+4.9.7 / 2017-04-30
+==================
+ * docs: fix typo #5204 [phutchins](https://github.com/phutchins)
+ * fix(schema): ensure correct path for deeply nested schema indexes #5199
+ * fix(schema): make remove a reserved name #5197
+ * fix(model): handle Decimal type in insertMany correctly #5190
+ * fix: upgrade kareem to handle async pre hooks correctly #5188
+ * docs: add details about unique not being a validator #5179
+ * fix(validation): handle returning a promise with isAsync: true #5171
+
+4.9.6 / 2017-04-23
+==================
+ * fix: update `parentArray` references when directly assigning document arrays #5192 [jhob](https://github.com/jhob)
+ * docs: improve schematype validator docs #5178 [milesbarr](https://github.com/milesbarr)
+ * fix(model): modify discriminator() class in place #5175
+ * fix(model): handle bulkWrite updateMany casting #5172 [tzellman](https://github.com/tzellman)
+ * docs(model): fix replaceOne example for bulkWrite #5168
+ * fix(document): don't create a new array subdoc when creating schema array #5162
+ * fix(model): merge query hooks from discriminators #5147
+ * fix(document): add parent() function to subdocument to match array subdoc #5134
+
+4.9.5 / 2017-04-16
+==================
+ * fix(query): correct $pullAll casting of null #5164 [Sebmaster](https://github.com/Sebmaster)
+ * docs: add advanced schemas docs for loadClass #5157
+ * fix(document): handle null/undefined gracefully in applyGetters() #5143
+ * fix(model): add resolveToObject option for mapReduce with ES6 promises #4945
+
+4.9.4 / 2017-04-09
+==================
+ * fix(schema): clone query middleware correctly #5153 #5141 [clozanosanchez](https://github.com/clozanosanchez)
+ * docs(aggregate): fix typo #5142
+ * fix(query): cast .$ update to underlying array type #5130
+ * fix(populate): don't mutate populate result in place #5128
+ * fix(query): handle $setOnInsert consistent with $set #5126
+ * docs(query): add strict mode option for findOneAndUpdate #5108
+
+4.9.3 / 2017-04-02
+==================
+ * docs: document.js fixes for functions prepended with `$` #5131 [krmannix](https://github.com/krmannix)
+ * fix: Avoid exception on constructor check #5129 [monkbroc](https://github.com/monkbroc)
+ * docs(schematype): explain how to use `isAsync` with validate() #5125
+ * docs(schematype): explain custom message with required function #5123
+ * fix(populate): only apply refPath duplicate id optimization if not array #5114
+ * fix(document): copy non-objects to doc when init() #5111
+ * perf(populate): dont clone whole options every time #5103
+ * feat(document): add isDirectSelected() to minimize isSelected() changes #5063
+ * docs(schematypes): explain some subtleties with arrays #5059
+
+4.9.2 / 2017-03-26
+==================
+ * fix(discriminator): handle class names consistently #5104
+ * fix(schema): make clone() work with reusing discriminator schemas #5098
+ * fix(querycursor): run pre find hooks with .cursor() #5096
+ * fix(connection): throw error if username:password includes @ or : #5091
+ * fix(timestamps): handle overwriting createdAt+updatedAt consistently #5088
+ * fix(document): ensure subdoc post save runs after parent save #5085
+ * docs(model): improve update docs #5076 [bertolo1988](https://github.com/bertolo1988)
+
+4.9.1 / 2017-03-19
+==================
+ * fix(query): handle $type for arrays #5080 #5079 [zoellner](https://github.com/zoellner)
+ * fix(model): handle ordered param for `insertMany` validation errors #5072 [sjorssnoeren](https://github.com/sjorssnoeren)
+ * fix(populate): avoid duplicate ids in dynref queries #5054
+ * fix(timestamps): dont set timestamps in update if user set it #5045
+ * fix(update): dont double-call setters on arrays #5041
+ * fix: upgrade driver -> 2.2.25 for jest fix #5033
+ * fix(model): get promise each time save() is called rather than once #5030
+ * fix(connection): make connect return value consistent #5006
+
 4.9.0 / 2017-03-13
 ==================
  * feat(document): return this from `depopulate()` #5027

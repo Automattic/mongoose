@@ -112,13 +112,15 @@ block content
     * `validate: function, adds a [validator function](http://mongoosejs.com/docs/validation.html#built-in-validators) for this property
     * `get`: function, defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
     * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
+    * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](http://mongoosejs.com/docs/guide.html#virtuals) with the given name that gets/sets this path.
     
   :js
     var numberSchema = new Schema({
       integerOnly: {
         type: Number,
         get: v => Math.round(v),
-        set: v => Math.round(v)
+        set: v => Math.round(v),
+        alias: 'i'
       }
     });
     
@@ -127,6 +129,10 @@ block content
     var doc = new Number();
     doc.integerOnly = 2.001;
     doc.integerOnly; // 2
+    doc.i; // 2
+    doc.i = 3.001;
+    doc.integerOnly; // 3
+    doc.i; // 3
   
   h5 Indexes
   p

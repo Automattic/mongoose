@@ -1,3 +1,12 @@
+4.10.3 / 2017-05-27
+===================
+ * docs: correct inconsistent references to updateOne and replaceOne #5297 [dhritzkiv](https://github.com/dhritzkiv)
+ * docs: fix dropdowns in docs #5292 [nathanallen](https://github.com/nathanallen)
+ * docs: add description of alias option #5287
+ * fix(document): prevent infinite loop if validating nested array #5282
+ * fix(schema): correctly handle ref ObjectIds from different mongoose libs #5259
+ * fix(schema): load child class methods after base class methods to allow override #5227
+
 4.10.2 / 2017-05-22
 ===================
  * fix: bump ms -> 2.0.0 and mquery -> 2.3.1 for minor security vulnerability #5275

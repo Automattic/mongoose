@@ -1,3 +1,9 @@
+4.10.4 / 2017-05-29
+===================
+ * chore: dont store test data in same directory #5303
+ * chore: add data dirs to npmignore #5301 [Starfox64](https://github.com/Starfox64)
+ * docs(query): add docs about runSettersOnQuery #5300
+
 4.10.3 / 2017-05-27
 ===================
  * docs: correct inconsistent references to updateOne and replaceOne #5297 [dhritzkiv](https://github.com/dhritzkiv)

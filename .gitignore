@@ -18,6 +18,8 @@ bin/mongoose.min.js
 coverage
 npm-debug.log
 
+tools/31*
+
 # Visual Studio
 # =========
 *.suo

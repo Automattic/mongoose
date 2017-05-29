@@ -79,6 +79,30 @@ block content
   :markdown
     A full list of [Query helper functions can be found in the API docs](http://mongoosejs.com/docs/api.html#query-js).
 
+  h3#setters
+  :markdown
+    Setters are not executed by default in 4.x. For example, if you lowercase emails in your schema:
+  
+  :js
+    var personSchema = new Schema({
+      email: {
+        type: String,
+        lowercase: true
+      }
+    });
+  
+  :markdown
+    Mongoose will **not** automatically lowercase the email in your queries, so `Person.find({ email: 'Val@karpov.io' })` would return no results.
+    Use the `runSettersOnQuery` option to turn on this behavior:
+  
+  :js
+    var personSchema = new Schema({
+      email: {
+        type: String,
+        lowercase: true
+      }
+    }, { runSettersOnQuery: true });
+
   h3#refs References to other documents
   :markdown
     There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [population](./populate.html) comes in. Read more about how to include documents from other collections in your query results [here](./api.html#query_Query-populate).

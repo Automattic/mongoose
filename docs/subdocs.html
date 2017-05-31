@@ -16,7 +16,7 @@ parent.save(callback);
 parent.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   console.log(err.message) <span class="comment">// #sadpanda</span>
 })
-</code></pre><h3>Finding a sub-document</h3><p>Each document has an <code>_id</code>. DocumentArrays have a special <a href="./api.html#types_documentarray_MongooseDocumentArray-id">id</a> method for looking up a document by its <code>_id</code>.</p><pre><code class="javascript"><span class="keyword">var</span> doc = parent.children.id(id);
+</code></pre><h3>Finding a sub-document</h3><p>Each document has an <code>_id</code>. DocumentArrays have a special <a href="./api.html#types_documentarray_MongooseDocumentArray-id">id</a> method for looking up a document by its <code>_id</code>.</p><pre><code class="javascript"><span class="keyword">var</span> doc = parent.children.id(_id);
 </code></pre><h3>Adding sub-docs</h3><p>MongooseArray methods such as <a href="./api.html#types_array_MongooseArray-push">push</a>, <a href="./api.html#types_array_MongooseArray-unshift">unshift</a>, <a href="./api.html#types_array_MongooseArray-addToSet">addToSet</a>, and others cast arguments to their proper types transparently:</p><pre><code class="javascript"><span class="keyword">var</span> Parent = db.model(<span class="string">'Parent'</span>);
 <span class="keyword">var</span> parent = <span class="keyword">new</span> Parent;
 
@@ -30,7 +30,7 @@ post.save(<span class="function"><span class="keyword">function</span> <span cla
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err)
   console.log(<span class="string">'Success!'</span>);
 });</code></pre><p>Sub-docs may also be created without adding them to the array by using the <a href="./api.html#types_documentarray_MongooseDocumentArray-create">create</a> method of MongooseArrays.</p><pre><code class="javascript"><span class="keyword">var</span> newdoc = post.children.create({ name: <span class="string">'Aaron'</span> });
-</code></pre><h3>Removing docs</h3><p>Each sub-document has it&#39;s own <a href="./api.html#types_embedded_EmbeddedDocument-remove">remove</a> method.</p><pre><code class="javascript"><span class="keyword">var</span> doc = parent.children.id(id).remove();
+</code></pre><h3>Removing docs</h3><p>Each sub-document has it&#39;s own <a href="./api.html#types_embedded_EmbeddedDocument-remove">remove</a> method.</p><pre><code class="javascript"><span class="keyword">var</span> doc = parent.children.id(_id).remove();
 parent.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
   console.log(<span class="string">'the sub-doc was removed'</span>)

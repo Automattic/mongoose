@@ -31,3 +31,5 @@ tools/31*
 .vscode
 
 *.key
+
+docs/*.html

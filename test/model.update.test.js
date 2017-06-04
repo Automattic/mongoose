@@ -2559,6 +2559,32 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('update validators with nested required (gh-5269)', function(done){
+      var childSchema = new mongoose.Schema({
+        d1: {
+          type: String,
+          required: true
+        },
+        d2: {
+          type: String
+        }
+      }, { _id: false });
+
+      var parentSchema = new mongoose.Schema({
+        d: childSchema
+      });
+
+      var Parent = db.model('gh5269', parentSchema);
+
+      Parent.update({}, { d: { d2: 'test' } }, { runValidators: true }, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['d']);
+        assert.ok(error.errors['d'].message.indexOf('Path `d1` is required') !== -1,
+          error.errors['d'].message);
+        done();
+      });
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

@@ -5092,7 +5092,7 @@ describe('model: populate:', function() {
         var childSchema = new Schema({
           parentId: mongoose.Schema.Types.ObjectId
         });
-        childSchema.virtual('parent2', {
+        childSchema.virtual('parent', {
           ref: 'gh5311',
           localField: 'parentId',
           foreignField: '_id',
@@ -5110,12 +5110,12 @@ describe('model: populate:', function() {
             return Child.findById(c._id);
           }).
           then(function(c) {
-            return c.populate('parent2').execPopulate();
+            return c.populate('parent').execPopulate();
           }).
           then(function(c) {
             c = c.toObject({ virtuals: true });
 
-            assert.equal(c.parent2.name, 'Darth Vader');
+            assert.equal(c.parent.name, 'Darth Vader');
             done();
           }).
           catch(done);

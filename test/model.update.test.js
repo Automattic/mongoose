@@ -2559,7 +2559,7 @@ describe('model: update:', function() {
         catch(done);
     });
 
-    it('update validators with nested required (gh-5269)', function(done){
+    it('update validators with nested required (gh-5269)', function(done) {
       var childSchema = new mongoose.Schema({
         d1: {
           type: String,

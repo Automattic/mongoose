@@ -671,11 +671,13 @@ describe('aggregate: ', function() {
             connectToField: 'name',
             as: 'employeeHierarchy'
           }).
+          sort({name: 1}).
           exec(function(err, docs) {
             if (err) {
               return done(err);
             }
             var lowest = docs[3];
+            assert.equal(lowest.name, 'Dave');
             assert.equal(lowest.employeeHierarchy.length, 3);
 
             // First result in array is max depth result
@@ -683,6 +685,7 @@ describe('aggregate: ', function() {
               return doc.name;
             }).sort();
             assert.equal(names[0], 'Alice');
+            assert.equal(names[1], 'Bob');
             assert.equal(names[2], 'Carol');
             done();
           });

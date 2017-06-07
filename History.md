@@ -1,3 +1,10 @@
+4.10.5 / 2017-06-06
+===================
+ * chore: improve contrib guide for building docs #5312
+ * fix(populate): handle init-ing nested virtuals properly #5311
+ * fix(update): report update validator error if required path under single nested doc not set
+ * fix(schema): remove default validate pre hook that was causing issues with jest #4943
+
 4.10.4 / 2017-05-29
 ===================
  * chore: dont store test data in same directory #5303

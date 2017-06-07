@@ -4190,6 +4190,36 @@ describe('document', function() {
       done();
     });
 
+    it('setting populated path with typeKey (gh-5313)', function(done) {
+      var personSchema = Schema(
+        {
+          name: {$type: String},
+          favorite: { $type: Schema.Types.ObjectId, ref: 'gh5313' },
+          books: [{ $type: Schema.Types.ObjectId, ref: 'gh5313' }]
+        }, { typeKey: '$type' });
+
+        var bookSchema = Schema({
+          title: String
+        });
+
+        var Book  = mongoose.model('gh5313', bookSchema);
+        var Person = mongoose.model('gh5313_0', personSchema);
+
+        var book1 = new Book({ title: 'The Jungle Book' });
+        var book2 = new Book({ title: '1984' });
+
+        var person = new Person({
+          name: 'Bob',
+          favorite: book1,
+          books: [book1, book2]
+        });
+
+        assert.equal(person.books[0].title, 'The Jungle Book');
+        assert.equal(person.books[1].title, '1984');
+
+        done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

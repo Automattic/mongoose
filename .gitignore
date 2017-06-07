@@ -29,3 +29,7 @@ tools/31*
 
 # Visual STudio Code
 .vscode
+
+*.key
+
+docs/*.html

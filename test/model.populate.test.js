@@ -4698,7 +4698,7 @@ describe('model: populate:', function() {
               exec(function(error, res) {
                 assert.ifError(error);
                 // Fails if this `.toObject()` is omitted, issue #4926
-                res = res.toObject();
+                res = res.toObject({ virtuals: true });
                 var compare = function(a, b) {
                   if (a.name < b.name) {
                     return -1;
@@ -5082,6 +5082,40 @@ describe('model: populate:', function() {
           then(function(team) {
             team = team.toObject({ virtuals: true });
             assert.equal(team.people[0].parent.name, 'Darth Vader');
+            done();
+          }).
+          catch(done);
+      });
+
+      it('virtuals + doc.populate() (gh-5311)', function(done) {
+        var parentSchema = new Schema({ name: String });
+        var childSchema = new Schema({
+          parentId: mongoose.Schema.Types.ObjectId
+        });
+        childSchema.virtual('parent', {
+          ref: 'gh5311',
+          localField: 'parentId',
+          foreignField: '_id',
+          justOne: true
+        });
+
+        var Parent = db.model('gh5311', parentSchema);
+        var Child = db.model('gh5311_0', childSchema);
+
+        Parent.create({ name: 'Darth Vader' }).
+          then(function(doc) {
+            return Child.create({ parentId: doc._id });
+          }).
+          then(function(c) {
+            return Child.findById(c._id);
+          }).
+          then(function(c) {
+            return c.populate('parent').execPopulate();
+          }).
+          then(function(c) {
+            c = c.toObject({ virtuals: true });
+
+            assert.equal(c.parent.name, 'Darth Vader');
             done();
           }).
           catch(done);

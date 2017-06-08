@@ -1030,20 +1030,22 @@ describe('model query casting', function() {
     }, { runSettersOnQuery: true });
 
     var Test = db.model('gh-4569', testSchema);
-    Test.create({ name: 'val', num: 3 }).
+    Test.create({ name: 'val', num: 2.02 }).
       then(function() {
         return Test.findOne({ name: 'VAL' });
       }).
       then(function(doc) {
         assert.ok(doc);
         assert.equal(doc.name, 'val');
+        assert.equal(doc.num, 2);
       }).
       then(function() {
-        return Test.findOne({ num: 3.14 });
+        return Test.findOneAndUpdate({}, { num: 3.14 }, { new: true });
       }).
       then(function(doc) {
         assert.ok(doc);
         assert.equal(doc.name, 'val');
+        assert.equal(doc.num, 3);
       }).
       then(function() { done(); }).
       catch(done);

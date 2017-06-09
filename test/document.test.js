@@ -4219,6 +4219,28 @@ describe('document', function() {
       done();
     });
 
+    it('save twice with write concern (gh-5294)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, {
+        safe: {
+          w: 'majority',
+          wtimeout: 1e4
+        }
+      });
+
+      var M = db.model('gh5294', schema);
+
+      M.create({ name: 'Test' }, function(error, doc) {
+        assert.ifError(error);
+        doc.name = 'test2';
+        doc.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

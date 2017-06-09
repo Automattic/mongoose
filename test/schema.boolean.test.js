@@ -29,5 +29,21 @@ describe('schematype', function() {
       assert.strictEqual(true, m3.b);
       done();
     });
+    it('strictBool option (gh-5211)', function() {
+      console.log('chekc');
+      var db = start(),
+          s1 = new Schema({b: {type: Boolean, strictBool: true}}),
+          M1 = db.model('StrictBoolTrue', s1);
+      db.close();
+
+      var m1 = new M1;
+      var strictValues = [true, false, 'true', 'false', 0, 1, '0', '1'];
+      var validatePromises = strictValues.map(function(value) {
+        m1.b = value;
+        return m1.validate();
+      });
+
+      return global.Promise.all(validatePromises);
+    });
   });
 });

@@ -4241,6 +4241,25 @@ describe('document', function() {
       });
     });
 
+    it('undefined field with conditional required (gh-5296)', function(done) {
+      var schema = Schema({
+        name: {
+          type: String,
+          maxlength: 63,
+          required: function() {
+            return false;
+          }
+        },
+      });
+
+      var Model = db.model('gh5296', schema);
+
+      Model.create({ name: undefined }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

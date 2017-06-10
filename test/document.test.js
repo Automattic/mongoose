@@ -4249,7 +4249,7 @@ describe('document', function() {
           required: function() {
             return false;
           }
-        },
+        }
       });
 
       var Model = db.model('gh5296', schema);

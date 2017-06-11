@@ -5121,6 +5121,35 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('empty virtual with Model.populate (gh-5331)', function(done) {
+        var myModelSchema = new Schema({
+          virtualRefKey: {type: String, ref: 'gh5331'}
+        });
+        myModelSchema.set('toJSON', {virtuals:true});
+        myModelSchema.virtual('populatedVirtualRef', {
+          ref: 'gh5331',
+          localField: 'virtualRefKey',
+          foreignField: 'handle'
+        });
+
+        var otherModelSchema = new Schema({
+          handle: String
+        });
+
+        var MyModel = db.model('gh5331_0', myModelSchema);
+        db.model('gh5331', otherModelSchema);
+
+        MyModel.create({ virtualRefKey: 'test' }, function(error, doc) {
+          assert.ifError(error);
+          MyModel.populate(doc, 'populatedVirtualRef', function(error, doc) {
+            assert.ifError(error);
+            assert.ok(doc.populatedVirtualRef);
+            assert.ok(Array.isArray(doc.populatedVirtualRef));
+            done();
+          });
+        });
+      });
+
       it('virtual populate in single nested doc (gh-4715)', function(done) {
         var someModelSchema = new mongoose.Schema({
           name: String

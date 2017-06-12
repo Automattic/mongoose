@@ -5087,6 +5087,31 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('no ref + cursor (gh-5334)', function(done) {
+        var parentSchema = new Schema({
+          name: String,
+          child: mongoose.Schema.Types.ObjectId
+        });
+        var childSchema = new Schema({
+          name: String
+        });
+
+        var Parent = db.model('gh5334_0', parentSchema);
+        var Child = db.model('gh5334', childSchema);
+
+        Child.create({ name: 'Luke' }, function(error, child) {
+          assert.ifError(error);
+          Parent.create({ name: 'Vader', child: child._id }, function(error) {
+            assert.ifError(error);
+            Parent.find().populate({ path: 'child', model: 'gh5334' }).cursor().next(function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.child.name, 'Luke');
+              done();
+            });
+          });
+        });
+      });
+
       it('virtuals + doc.populate() (gh-5311)', function(done) {
         var parentSchema = new Schema({ name: String });
         var childSchema = new Schema({

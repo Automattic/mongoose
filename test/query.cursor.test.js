@@ -362,6 +362,21 @@ describe('QueryCursor', function() {
     });
   });
 
+  it('addCursorFlag (gh-4814)', function(done) {
+    var userSchema = new mongoose.Schema({
+      name:  String
+    });
+
+    var User = db.model('gh4814', userSchema);
+
+    var cursor = User.find().cursor().addCursorFlag('noCursorTimeout', true);
+
+    cursor.on('cursor', function() {
+      assert.equal(cursor.cursor.s.cmd.noCursorTimeout, true);
+      done();
+    });
+  });
+
   it('data before close (gh-4998)', function(done) {
     var userSchema = new mongoose.Schema({
       name:  String

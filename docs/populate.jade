@@ -114,6 +114,18 @@ block content
     .populate('fans')
     .populate('_creator')
     .exec()
+  :markdown
+    If you call `populate()` multiple times with the same path, only the last
+    one will take effect.
+  :js
+    // The 2nd `populate()` call below overwrites the first because they
+    // both populate 'fans'.
+    Story.
+      find().
+      populate({ path: 'fans', select: 'name' }).
+      populate({ path: 'fans', select: 'email' });
+    // The above is equivalent to:
+    Story.find().populate({ path: 'fans', select: 'email' });
   h3 Query conditions and other options
   :markdown
     What if we wanted to populate our fans array based on their age, select just their names, and return at most, any 5 of them?
@@ -259,7 +271,7 @@ block content
       exec(function(error, docs) { /* ... */ });
   :markdown
     This is known as a "cross-database populate," because it enables you to
-    populate across MongoDB databases and even acrosss MongoDB instances.
+    populate across MongoDB databases and even across MongoDB instances.
 
   h3#dynamic-ref Dynamic References
   :markdown

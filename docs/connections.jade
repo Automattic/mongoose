@@ -3,15 +3,18 @@ extends layout
 block content
   h2 Connections
   :markdown
-    We may connect to MongoDB by utilizing the `mongoose.connect()` method.
+    You can connect to MongoDB with the `mongoose.connect()` method.
 
   :js
     mongoose.connect('mongodb://localhost/myapp');
 
   :markdown
-    This is the minimum needed to connect the `myapp` database running locally on the default port (27017). If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed.
+    This is the minimum needed to connect the `myapp` database running locally
+    on the default port (27017). If the local connection fails then try using
+    127.0.0.1 instead of localhost. Sometimes issues may arise when the local
+    hostname has been changed.
    
-    We may also specify several more parameters in the `uri` depending on your environment:
+    You can also specify several more parameters in the `uri`:
 
   :js
     mongoose.connect('mongodb://username:password@host:port/database?options...');
@@ -189,6 +192,25 @@ block content
     // passing the option in the URI works with single or replica sets
     var uri = 'mongodb://localhost/test?poolSize=4';
     mongoose.createConnection(uri);
+  
+  h3#use-mongoose-uri
+  :markdown
+    Mongoose's default connection logic is deprecated as of 4.11.0. Please opt
+    in to the new connection logic using the `useMongooseUri` option, but
+    make sure you test your connections first if you're upgrading an existing
+    codebase!
+  :js
+    // Using `mongoose.connect`...
+    var promise = mongoose.connect('mongodb://localhost/myapp', { useMongooseUri: true, /* other options */ });
+    // Or `createConnection`
+    var promise = mongoose.createConnection('mongodb://localhost/myapp', { useMongooseUri: true, /* other options */ });
+    // Or, if you already have a connection
+    connection.openUri('mongodb://localhost/myapp', { /* options */ });
+  :markdown
+    This deprecation is because the [MongoDB driver](https://www.npmjs.com/package/mongodb)
+    has deprecated an API that is critical to mongoose's connection logic to
+    support MongoDB 3.6, see [this github issue](https://github.com/Automattic/mongoose/issues/5304)
+    for more details.
 
   h3#next Next Up
   :markdown

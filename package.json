@@ -24,7 +24,7 @@
     "hooks-fixed": "2.0.0",
     "kareem": "1.4.1",
     "mongodb": "2.2.27",
-    "mpath": "0.2.1",
+    "mpath": "0.3.0",
     "mpromise": "0.5.5",
     "mquery": "2.3.1",
     "ms": "2.0.0",

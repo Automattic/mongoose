@@ -49,7 +49,13 @@ To contribute to the [API documentation](http://mongoosejs.com/docs/api.html) ju
 
 To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick start](http://mongoosejs.com/docs/index.html) docs, make your changes to the appropriate `.jade` files in the [docs](https://github.com/Automattic/mongoose/tree/master/docs) directory of the master branch and submit a pull request. Again, the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button might work for you here.
 
-If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute `make docs` from the project root, which switches to the gh-pages branch, merges from the master branch and builds all the static pages for you. Now execute `node static.js` from the project root which will launch a local webserver where you can browse the documentation site locally. If all looks good, submit a [pull request](https://help.github.com/articles/using-pull-requests/) to the master branch with your changes.
+If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
+
+* `make docclean`
+* `make gendocs`
+* `node static.js`
+
+Visit `http://localhost:8088` and you should see the docs with your local changes. Make sure you `git reset --hard` before commiting, because changes to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 

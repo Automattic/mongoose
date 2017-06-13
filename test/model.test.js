@@ -5354,6 +5354,7 @@ describe('Model', function() {
       schema.pre('insertMany', function(next, docs) {
         assert.equal(docs.length, 2);
         assert.equal(docs[0].name, 'Star Wars');
+        docs[0].name = 'A New Hope';
         ++calledPre;
         next();
       });
@@ -5368,7 +5369,12 @@ describe('Model', function() {
         assert.equal(docs.length, 2);
         assert.equal(calledPre, 2);
         assert.equal(calledPost, 1);
-        done();
+        Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs[0].name, 'A New Hope');
+          assert.equal(docs[1].name, 'The Empire Strikes Back');
+          done();
+        });
       });
     });
 

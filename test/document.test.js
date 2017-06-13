@@ -4190,6 +4190,76 @@ describe('document', function() {
       done();
     });
 
+    it('setting populated path with typeKey (gh-5313)', function(done) {
+      var personSchema = Schema({
+        name: {$type: String},
+        favorite: { $type: Schema.Types.ObjectId, ref: 'gh5313' },
+        books: [{ $type: Schema.Types.ObjectId, ref: 'gh5313' }]
+      }, { typeKey: '$type' });
+
+      var bookSchema = Schema({
+        title: String
+      });
+
+      var Book = mongoose.model('gh5313', bookSchema);
+      var Person = mongoose.model('gh5313_0', personSchema);
+
+      var book1 = new Book({ title: 'The Jungle Book' });
+      var book2 = new Book({ title: '1984' });
+
+      var person = new Person({
+        name: 'Bob',
+        favorite: book1,
+        books: [book1, book2]
+      });
+
+      assert.equal(person.books[0].title, 'The Jungle Book');
+      assert.equal(person.books[1].title, '1984');
+
+      done();
+    });
+
+    it('save twice with write concern (gh-5294)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, {
+        safe: {
+          w: 'majority',
+          wtimeout: 1e4
+        }
+      });
+
+      var M = db.model('gh5294', schema);
+
+      M.create({ name: 'Test' }, function(error, doc) {
+        assert.ifError(error);
+        doc.name = 'test2';
+        doc.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
+    it('undefined field with conditional required (gh-5296)', function(done) {
+      var schema = Schema({
+        name: {
+          type: String,
+          maxlength: 63,
+          required: function() {
+            return false;
+          }
+        }
+      });
+
+      var Model = db.model('gh5296', schema);
+
+      Model.create({ name: undefined }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

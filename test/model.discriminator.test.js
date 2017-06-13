@@ -315,7 +315,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 8);
+        assert.equal(Employee.schema.callQueue.length, 7);
 
         // EmployeeSchema.pre('save')
         var queueIndex = Employee.schema.callQueue.length - 1;

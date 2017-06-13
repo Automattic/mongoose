@@ -5087,6 +5087,31 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('no ref + cursor (gh-5334)', function(done) {
+        var parentSchema = new Schema({
+          name: String,
+          child: mongoose.Schema.Types.ObjectId
+        });
+        var childSchema = new Schema({
+          name: String
+        });
+
+        var Parent = db.model('gh5334_0', parentSchema);
+        var Child = db.model('gh5334', childSchema);
+
+        Child.create({ name: 'Luke' }, function(error, child) {
+          assert.ifError(error);
+          Parent.create({ name: 'Vader', child: child._id }, function(error) {
+            assert.ifError(error);
+            Parent.find().populate({ path: 'child', model: 'gh5334' }).cursor().next(function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.child.name, 'Luke');
+              done();
+            });
+          });
+        });
+      });
+
       it('virtuals + doc.populate() (gh-5311)', function(done) {
         var parentSchema = new Schema({ name: String });
         var childSchema = new Schema({
@@ -5119,6 +5144,35 @@ describe('model: populate:', function() {
             done();
           }).
           catch(done);
+      });
+
+      it('empty virtual with Model.populate (gh-5331)', function(done) {
+        var myModelSchema = new Schema({
+          virtualRefKey: {type: String, ref: 'gh5331'}
+        });
+        myModelSchema.set('toJSON', {virtuals:true});
+        myModelSchema.virtual('populatedVirtualRef', {
+          ref: 'gh5331',
+          localField: 'virtualRefKey',
+          foreignField: 'handle'
+        });
+
+        var otherModelSchema = new Schema({
+          handle: String
+        });
+
+        var MyModel = db.model('gh5331_0', myModelSchema);
+        db.model('gh5331', otherModelSchema);
+
+        MyModel.create({ virtualRefKey: 'test' }, function(error, doc) {
+          assert.ifError(error);
+          MyModel.populate(doc, 'populatedVirtualRef', function(error, doc) {
+            assert.ifError(error);
+            assert.ok(doc.populatedVirtualRef);
+            assert.ok(Array.isArray(doc.populatedVirtualRef));
+            done();
+          });
+        });
       });
 
       it('virtual populate in single nested doc (gh-4715)', function(done) {

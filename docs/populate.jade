@@ -53,14 +53,14 @@ block content
   :markdown
     So far we haven't done anything much different. We've merely created a `Person` and a `Story`. Now let's take a look at populating our story's `_creator` using the query builder:
   :js
-    Story
-    .findOne({ title: 'Once upon a timex.' })
-    .populate('_creator')
-    .exec(function (err, story) {
-      if (err) return handleError(err);
-      console.log('The creator is %s', story._creator.name);
-      // prints "The creator is Aaron"
-    });
+    Story.
+      findOne({ title: 'Once upon a timex.' }).
+      populate('_creator').
+      exec(function (err, story) {
+        if (err) return handleError(err);
+        console.log('The creator is %s', story._creator.name);
+        // prints "The creator is Aaron"
+      });
   :markdown
     Populated paths are no longer set to their original `_id` , their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
 
@@ -85,49 +85,61 @@ block content
   :markdown
     What if we only want a few specific fields returned for the populated documents? This can be accomplished by passing the usual [field name syntax](./api.html#query_Query-select) as the second argument to the populate method:
   :js
-    Story
-    .findOne({ title: /timex/i })
-    .populate('_creator', 'name') // only return the Persons name
-    .exec(function (err, story) {
-      if (err) return handleError(err);
+    Story.
+      findOne({ title: /timex/i }).
+      populate('_creator', 'name'). // only return the Persons name
+      exec(function (err, story) {
+        if (err) return handleError(err);
 
-      console.log('The creator is %s', story._creator.name);
-      // prints "The creator is Aaron"
+        console.log('The creator is %s', story._creator.name);
+        // prints "The creator is Aaron"
 
-      console.log('The creators age is %s', story._creator.age);
-      // prints "The creators age is null'
-    })
+        console.log('The creators age is %s', story._creator.age);
+        // prints "The creators age is null'
+      })
   h3 Populating multiple paths
   :markdown
     What if we wanted to populate multiple paths at the same time?
   :js
-    Story
-    .find(...)
-    .populate('fans _creator') // space delimited path names
-    .exec()
+    Story.
+      find(...).
+      populate('fans _creator'). // space delimited path names
+      exec()
   .important
     :markdown
       In **mongoose >= 3.6**, we can pass a space delimited string of path names to populate. Before 3.6 you must execute the `populate()` method multiple times.
   :js
-    Story
-    .find(...)
-    .populate('fans')
-    .populate('_creator')
-    .exec()
+    Story.
+      find(...).
+      populate('fans').
+      populate('_creator').
+      exec()
+  :markdown
+    If you call `populate()` multiple times with the same path, only the last
+    one will take effect.
+  :js
+    // The 2nd `populate()` call below overwrites the first because they
+    // both populate 'fans'.
+    Story.
+      find().
+      populate({ path: 'fans', select: 'name' }).
+      populate({ path: 'fans', select: 'email' });
+    // The above is equivalent to:
+    Story.find().populate({ path: 'fans', select: 'email' });
   h3 Query conditions and other options
   :markdown
     What if we wanted to populate our fans array based on their age, select just their names, and return at most, any 5 of them?
   :js
-    Story
-    .find(...)
-    .populate({
-      path: 'fans',
-      match: { age: { $gte: 21 }},
-      // Explicitly exclude `_id`, see http://bit.ly/2aEfTdB
-      select: 'name -_id',
-      options: { limit: 5 }
-    })
-    .exec()
+    Story.
+      find(...).
+      populate({
+        path: 'fans',
+        match: { age: { $gte: 21 }},
+        // Explicitly exclude `_id`, see http://bit.ly/2aEfTdB
+        select: 'name -_id',
+        options: { limit: 5 }
+      }).
+      exec()
   h3 Refs to children
   :markdown
     We may find however, if we use the `aaron` object, we are unable to get a list of the stories. This is because no `story` objects were ever 'pushed' onto `aaron.stories`.
@@ -139,23 +151,23 @@ block content
   :markdown
     This allows us to perform a `find` and `populate` combo:
   :js
-    Person
-    .findOne({ name: 'Aaron' })
-    .populate('stories') // only works if we pushed refs to children
-    .exec(function (err, person) {
-      if (err) return handleError(err);
-      console.log(person);
-    })
+    Person.
+      findOne({ name: 'Aaron' }).
+      populate('stories'). // only works if we pushed refs to children
+      exec(function (err, person) {
+        if (err) return handleError(err);
+        console.log(person);
+      });
   .important
     :markdown
       It is debatable that we really want two sets of pointers as they may get out of sync. Instead we could skip populating and directly `find()` the stories we are interested in.
   :js
-    Story
-    .find({ _creator: aaron._id })
-    .exec(function (err, stories) {
-      if (err) return handleError(err);
-      console.log('The stories are an array: ', stories);
-    })
+    Story.
+      find({ _creator: aaron._id }).
+      exec(function (err, stories) {
+        if (err) return handleError(err);
+        console.log('The stories are an array: ', stories);
+      });
 
   h3 Updating refs
   :markdown
@@ -173,15 +185,15 @@ block content
       story.save(function (err) {
         if (err) return handleError(err);
 
-        Story
-        .findOne({ title: /timex/i })
-        .populate({ path: '_creator', select: 'name' })
-        .exec(function (err, story) {
-          if (err) return handleError(err);
+        Story.
+          findOne({ title: /timex/i }).
+          populate({ path: '_creator', select: 'name' }).
+          exec(function (err, story) {
+            if (err) return handleError(err);
 
-          console.log('The creator is %s', story._creator.name)
-          // prints "The creator is Guillermo"
-        })
+            console.log('The creator is %s', story._creator.name)
+            // prints "The creator is Guillermo"
+          });
       })
     })
 
@@ -259,7 +271,7 @@ block content
       exec(function(error, docs) { /* ... */ });
   :markdown
     This is known as a "cross-database populate," because it enables you to
-    populate across MongoDB databases and even acrosss MongoDB instances.
+    populate across MongoDB databases and even across MongoDB instances.
 
   h3#dynamic-ref Dynamic References
   :markdown

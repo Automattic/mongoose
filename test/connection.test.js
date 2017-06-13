@@ -22,7 +22,7 @@ describe('connections:', function() {
       promise.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
 
-        return mongoose.disconnect().then(() => done());
+        return mongoose.disconnect().then(function() { done(); });
       }).catch(done);
     });
 
@@ -33,7 +33,7 @@ describe('connections:', function() {
       promise.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
 
-        return mongoose.disconnect().then(() => done());
+        return mongoose.disconnect().then(function() { done(); });
       }).catch(done);
     });
   });

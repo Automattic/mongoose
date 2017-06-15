@@ -21,7 +21,6 @@
   "dependencies": {
     "async": "2.1.4",
     "bson": "~1.0.4",
-    "clone": "^2.1.1",
     "hooks-fixed": "2.0.0",
     "kareem": "1.4.1",
     "mongodb": "2.2.27",
@@ -31,6 +30,7 @@
     "ms": "2.0.0",
     "muri": "1.2.1",
     "regexp-clone": "0.0.1",
+    "sinon": "~2.3.4",
     "sliced": "1.0.1"
   },
   "devDependencies": {

@@ -30,6 +30,7 @@
     "ms": "2.0.0",
     "muri": "1.2.1",
     "regexp-clone": "0.0.1",
+    "sinon": "~2.3.4",
     "sliced": "1.0.1"
   },
   "devDependencies": {

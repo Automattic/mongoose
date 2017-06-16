@@ -1,6 +1,5 @@
 var mongoose = require('../');
 var assert = require('power-assert');
-var sinon = require('sinon');
 var util = require('../lib/utils');
 
 describe('parseOptions', function() {
@@ -24,11 +23,8 @@ describe('parseOptions', function() {
     });
     var ultimateOptionsMap;
 
-    sinon.spy(util, 'clone');
-
     ultimateOptionsMap = db.parseOptions(userPassedOptionsMap);
 
-    assert.ok(util.clone.calledWith(userPassedOptionsMap));
     assert.notEqual(ultimateOptionsMap, userPassedOptionsMap);
     assert.deepStrictEqual(userPassedOptionsMap, Object.create(null, {
       auth: {
@@ -58,7 +54,5 @@ describe('parseOptions', function() {
         enumerable: true
       }
     }));
-
-    util.clone.restore();
   });
 });

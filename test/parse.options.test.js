@@ -1,6 +1,5 @@
 var mongoose = require('../');
 var assert = require('power-assert');
-var util = require('../lib/utils');
 
 describe('parseOptions', function() {
   it('should not mutate user passed options map', function() {

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.10.6",
+  "version": "4.10.7",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -36,7 +36,7 @@
     "acquit": "0.4.1",
     "acquit-ignore": "0.0.3",
     "benchmark": "2.1.2",
-    "bluebird": "3.4.6",
+    "bluebird": "3.5.0",
     "co": "4.6.0",
     "dox": "0.3.1",
     "eslint": "2.4.0",

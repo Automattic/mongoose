@@ -5611,6 +5611,32 @@ describe('Model', function() {
       }
     });
 
+    it('remove with cast error (gh-5323)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh5323', schema);
+      var arr = [
+        { name: 'test-1' },
+        { name: 'test-2' }
+      ];
+
+      Model.create(arr, function(error) {
+        assert.ifError(error);
+        Model.remove([], function(error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('Query filter must be an object') !== -1,
+            error.message);
+          Model.find({}, function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
+    });
+
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
       var schema = new Schema({
         str: String,

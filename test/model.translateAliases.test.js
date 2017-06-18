@@ -24,9 +24,7 @@ describe('model translate aliases', function() {
       // How translated aliases suppose to look like
       {
         name: 'Stark',
-        bio: {
-          age: 30
-        }
+        'bio.age': 30
       }
     );
   });

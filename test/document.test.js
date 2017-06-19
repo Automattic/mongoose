@@ -4162,6 +4162,35 @@ describe('document', function() {
       });
     });
 
+    it('custom error types (gh-4009)', function(done) {
+      var CustomError = function() {};
+
+      var testSchema = new mongoose.Schema({
+        num: {
+          type: Number,
+          required: {
+            ErrorConstructor: CustomError
+          },
+          min: 5
+        }
+      });
+
+      var Test = db.model('gh4009', testSchema);
+
+      Test.create({}, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['num']);
+        assert.ok(error.errors['num'] instanceof CustomError);
+        Test.create({ num: 1 }, function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['num']);
+          assert.ok(error.errors['num'].constructor.name, 'ValidatorError');
+          assert.ok(!(error.errors['num'] instanceof CustomError));
+          done();
+        });
+      });
+    });
+
     it('saving a doc with nested string array (gh-5282)', function(done) {
       var testSchema = new mongoose.Schema({
         strs: [[String]]

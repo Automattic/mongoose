@@ -4186,8 +4186,10 @@ describe('document', function() {
       var M = db.model('gh5236', childSchema);
 
       var m = new M({ _id: null });
-      assert.ok(m._id);
-      done();
+      m.save(function(error, doc) {
+        assert.equal(doc._id, null);
+        done();
+      });
     });
 
     it('setting populated path with typeKey (gh-5313)', function(done) {

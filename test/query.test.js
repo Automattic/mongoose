@@ -1944,6 +1944,31 @@ describe('Query', function() {
       });
     });
 
+    it('runSettersOnQuery works with _id field (gh-5351)', function(done) {
+      var testSchema = new Schema({
+        val: { type: String }
+      }, { runSettersOnQuery: true });
+
+      var Test = db.model('gh5351', testSchema);
+      Test.create({ val: 'A string' }).
+        then(function() {
+          return Test.findOne({});
+        }).
+        then(function(doc) {
+          return Test.findOneAndUpdate({_id: doc._id}, {
+            $set: {
+              val: 'another string'
+            }
+          }, { new: true });
+        }).
+        then(function(doc) {
+          assert.ok(doc);
+          assert.equal(doc.val, 'another string');
+        }).
+        then(done).
+        catch(done);
+    });
+
     it('$exists under $not (gh-4933)', function(done) {
       var TestSchema = new Schema({
         test: String

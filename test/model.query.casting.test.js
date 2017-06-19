@@ -1024,14 +1024,24 @@ describe('model query casting', function() {
   it('lowercase in query (gh-4569)', function(done) {
     var db = start();
 
+    var contexts = [];
+
     var testSchema = new Schema({
       name: { type: String, lowercase: true },
-      num: { type: Number, set: function(v) { return Math.floor(v); } }
+      num: {
+        type: Number,
+        set: function(v) {
+          contexts.push(this);
+          return Math.floor(v);
+        }
+      }
     }, { runSettersOnQuery: true });
 
     var Test = db.model('gh-4569', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
       then(function() {
+        assert.equal(contexts.length, 1);
+        assert.equal(contexts[0].constructor.name, 'model');
         return Test.findOne({ name: 'VAL' });
       }).
       then(function(doc) {
@@ -1046,6 +1056,8 @@ describe('model query casting', function() {
         assert.ok(doc);
         assert.equal(doc.name, 'val');
         assert.equal(doc.num, 3);
+        assert.equal(contexts.length, 2);
+        assert.equal(contexts[1].constructor.name, 'Query');
       }).
       then(function() { done(); }).
       catch(done);

@@ -5219,7 +5219,7 @@ describe('model: populate:', function() {
           bar: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Bar'
-          },
+          }
         }));
 
         Foo.create({ bar: new mongoose.Types.ObjectId() }, function(error) {

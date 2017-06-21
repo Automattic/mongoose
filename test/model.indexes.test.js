@@ -114,14 +114,28 @@ describe('model', function() {
           assert.ifError(err);
 
           function iter(index) {
-            ++assertions;
+            if (index[0] === 'name') {
+              ++assertions;
+            }
+            if (index[0] === 'blogposts._id') {
+              ++assertions;
+            }
+            if (index[0] === 'blogposts.title') {
+              ++assertions;
+            }
+            if (index[0] === 'featured._id') {
+              ++assertions;
+            }
+            if (index[0] === 'featured.title') {
+              ++assertions;
+            }
           }
 
           for (var i in indexes) {
             indexes[i].forEach(iter);
           }
 
-          assert.equal(assertions, 6);
+          assert.equal(assertions, 5);
           db.close(done);
         });
       });
@@ -259,9 +273,9 @@ describe('model', function() {
 
       assert.equal(indexes.length, 2);
 
-      if(indexes[0][0]['child.requiredNested1.requiredNested2']) {
+      if (indexes[0][0]['child.requiredNested1.requiredNested2']) {
         assert.ok(indexes[0][1].sparse);
-      } else if(indexes[1][0]['child.requiredNested1.requiredNested2']) {
+      } else if (indexes[1][0]['child.requiredNested1.requiredNested2']) {
         assert.ok(indexes[1][1].sparse);
       } else {
         done('requiredNested2 not indexed.');

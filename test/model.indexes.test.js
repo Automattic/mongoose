@@ -114,28 +114,14 @@ describe('model', function() {
           assert.ifError(err);
 
           function iter(index) {
-            if (index[0] === 'name') {
-              ++assertions;
-            }
-            if (index[0] === 'blogposts._id') {
-              ++assertions;
-            }
-            if (index[0] === 'blogposts.title') {
-              ++assertions;
-            }
-            if (index[0] === 'featured._id') {
-              ++assertions;
-            }
-            if (index[0] === 'featured.title') {
-              ++assertions;
-            }
+            ++assertions;
           }
 
           for (var i in indexes) {
             indexes[i].forEach(iter);
           }
 
-          assert.equal(assertions, 5);
+          assert.equal(assertions, 6);
           db.close(done);
         });
       });
@@ -208,12 +194,87 @@ describe('model', function() {
       done();
     });
 
+    it('made sparse for optional nested documents', function(done) {
+      var GrandchildSchema,
+          ChildSchema,
+          ParentSchema,
+          indexes;
+
+      GrandchildSchema = new Schema({
+        requiredNested2: {
+          type:           String,
+          required:       true,
+          unique:         true
+        },
+        optionalNested2: String
+      });
+
+      ChildSchema = new Schema({
+        requiredNested1:  {
+          type:             GrandchildSchema,
+          required:         true
+        },
+        optionalNested1:  Number
+      });
+
+      ParentSchema = new Schema({
+        child:  ChildSchema
+      });
+
+      indexes = ParentSchema.indexes();
+
+      assert.equal(indexes.length, 1);
+      assert.ok(indexes[0][1].sparse);
+
+      done();
+    });
+
+    it('not made sparse for required nested documents', function(done) {
+      var GrandchildSchema,
+          ChildSchema,
+          ParentSchema,
+          indexes;
+
+      GrandchildSchema = new Schema({
+        requiredNested2: {
+          type:           String,
+          required:       true,
+          unique:         true
+        },
+        optionalNested2: String
+      });
+
+      ChildSchema = new Schema({
+        requiredNested1:  {
+          type:             GrandchildSchema,
+          required:         true
+        },
+        optionalNested1:  Number
+      });
+
+      ParentSchema = new Schema({
+        child:  {
+          type:     ChildSchema,
+          required: true
+        }
+      });
+
+      indexes = ParentSchema.indexes();
+
+      assert.equal(indexes.length, 1);
+      assert.ok(!indexes[0][1].sparse);
+
+      done();
+    });
+
     it('primitive arrays (gh-3347)', function(done) {
+      var indexes;
       var schema = new Schema({
         arr: [{ type: String, unique: true }]
       });
 
-      var indexes = schema.indexes();
+      indexes = schema.indexes();
+
       assert.equal(indexes.length, 1);
       assert.deepEqual(indexes[0][0], { arr: 1 });
       assert.ok(indexes[0][1].unique);

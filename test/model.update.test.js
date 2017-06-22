@@ -2589,9 +2589,9 @@ describe('model: update:', function() {
       var schema = new mongoose.Schema({
         name: String,
         pricing: [{
-            _id: false,
-            program: String,
-            money: mongoose.Schema.Types.Decimal
+          _id: false,
+          program: String,
+          money: mongoose.Schema.Types.Decimal
         }]
       });
 
@@ -2600,13 +2600,13 @@ describe('model: update:', function() {
       var data = {
         name: 'Jack',
         pricing: [
-            { program: 'A', money: mongoose.Types.Decimal128.fromString('1.2') },
-            { program: 'B', money: mongoose.Types.Decimal128.fromString('3.4') }
+          { program: 'A', money: mongoose.Types.Decimal128.fromString('1.2') },
+          { program: 'B', money: mongoose.Types.Decimal128.fromString('3.4') }
         ]
       };
 
       Person.create(data).
-        then(function(data) {
+        then(function() {
           var newData = {
             name: 'Jack',
             pricing: [
@@ -2616,7 +2616,7 @@ describe('model: update:', function() {
           };
           return Person.update({ name: 'Jack' }, newData);
         }).
-        then(() => done(), done);
+        then(function() { done(); }, done);
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

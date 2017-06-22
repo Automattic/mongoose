@@ -5354,6 +5354,7 @@ describe('Model', function() {
       schema.pre('insertMany', function(next, docs) {
         assert.equal(docs.length, 2);
         assert.equal(docs[0].name, 'Star Wars');
+        docs[0].name = 'A New Hope';
         ++calledPre;
         next();
       });
@@ -5368,7 +5369,12 @@ describe('Model', function() {
         assert.equal(docs.length, 2);
         assert.equal(calledPre, 2);
         assert.equal(calledPost, 1);
-        done();
+        Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs[0].name, 'A New Hope');
+          assert.equal(docs[1].name, 'The Empire Strikes Back');
+          done();
+        });
       });
     });
 
@@ -5603,6 +5609,32 @@ describe('Model', function() {
           done();
         });
       }
+    });
+
+    it('remove with cast error (gh-5323)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh5323', schema);
+      var arr = [
+        { name: 'test-1' },
+        { name: 'test-2' }
+      ];
+
+      Model.create(arr, function(error) {
+        assert.ifError(error);
+        Model.remove([], function(error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('Query filter must be an object') !== -1,
+            error.message);
+          Model.find({}, function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
     });
 
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {

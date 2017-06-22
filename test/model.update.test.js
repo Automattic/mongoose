@@ -2559,6 +2559,82 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('update validators with nested required (gh-5269)', function(done) {
+      var childSchema = new mongoose.Schema({
+        d1: {
+          type: String,
+          required: true
+        },
+        d2: {
+          type: String
+        }
+      }, { _id: false });
+
+      var parentSchema = new mongoose.Schema({
+        d: childSchema
+      });
+
+      var Parent = db.model('gh5269', parentSchema);
+
+      Parent.update({}, { d: { d2: 'test' } }, { runValidators: true }, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['d']);
+        assert.ok(error.errors['d'].message.indexOf('Path `d1` is required') !== -1,
+          error.errors['d'].message);
+        done();
+      });
+    });
+
+    it('update with Decimal type (gh-5361)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new mongoose.Schema({
+          name: String,
+          pricing: [{
+            _id: false,
+            program: String,
+            money: mongoose.Schema.Types.Decimal
+          }]
+        });
+
+        var Person = db.model('gh5361', schema);
+
+        var data = {
+          name: 'Jack',
+          pricing: [
+            { program: 'A', money: mongoose.Types.Decimal128.fromString('1.2') },
+            { program: 'B', money: mongoose.Types.Decimal128.fromString('3.4') }
+          ]
+        };
+
+        Person.create(data).
+          then(function() {
+            var newData = {
+              name: 'Jack',
+              pricing: [
+                { program: 'A', money: mongoose.Types.Decimal128.fromString('5.6') },
+                { program: 'B', money: mongoose.Types.Decimal128.fromString('7.8') }
+              ]
+            };
+            return Person.update({ name: 'Jack' }, newData);
+          }).
+          then(function() { done(); }, done);
+      }
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

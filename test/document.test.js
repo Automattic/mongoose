@@ -4186,8 +4186,126 @@ describe('document', function() {
       var M = db.model('gh5236', childSchema);
 
       var m = new M({ _id: null });
-      assert.ok(m._id);
+      m.save(function(error, doc) {
+        assert.equal(doc._id, null);
+        done();
+      });
+    });
+
+    it('setting populated path with typeKey (gh-5313)', function(done) {
+      var personSchema = Schema({
+        name: {$type: String},
+        favorite: { $type: Schema.Types.ObjectId, ref: 'gh5313' },
+        books: [{ $type: Schema.Types.ObjectId, ref: 'gh5313' }]
+      }, { typeKey: '$type' });
+
+      var bookSchema = Schema({
+        title: String
+      });
+
+      var Book = mongoose.model('gh5313', bookSchema);
+      var Person = mongoose.model('gh5313_0', personSchema);
+
+      var book1 = new Book({ title: 'The Jungle Book' });
+      var book2 = new Book({ title: '1984' });
+
+      var person = new Person({
+        name: 'Bob',
+        favorite: book1,
+        books: [book1, book2]
+      });
+
+      assert.equal(person.books[0].title, 'The Jungle Book');
+      assert.equal(person.books[1].title, '1984');
+
       done();
+    });
+
+    it('save twice with write concern (gh-5294)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, {
+        safe: {
+          w: 'majority',
+          wtimeout: 1e4
+        }
+      });
+
+      var M = db.model('gh5294', schema);
+
+      M.create({ name: 'Test' }, function(error, doc) {
+        assert.ifError(error);
+        doc.name = 'test2';
+        doc.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
+    it('undefined field with conditional required (gh-5296)', function(done) {
+      var schema = Schema({
+        name: {
+          type: String,
+          maxlength: 63,
+          required: function() {
+            return false;
+          }
+        }
+      });
+
+      var Model = db.model('gh5296', schema);
+
+      Model.create({ name: undefined }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('consistent context for nested docs (gh-5347)', function(done) {
+      var contexts = [];
+      var childSchema = new mongoose.Schema({
+        phoneNumber: {
+          type: String,
+          required: function() {
+            contexts.push(this);
+            return this.notifications.isEnabled;
+          }
+        },
+        notifications: {
+          isEnabled: { type: Boolean, required: true }
+        }
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: String,
+        children: [childSchema]
+      });
+
+      var Parent = db.model('gh5347', parentSchema);
+
+      Parent.create({
+        name: 'test',
+        children: [
+          {
+            phoneNumber: '123',
+            notifications: {
+              isEnabled: true
+            }
+          }
+        ]
+      }, function(error, doc) {
+        assert.ifError(error);
+        var child = doc.children.id(doc.children[0]._id);
+        child.phoneNumber = '345';
+        doc.save(function(error) {
+          assert.ifError(error);
+          assert.equal(contexts.length, 2);
+          assert.ok(contexts[0].toObject().notifications.isEnabled);
+          assert.ok(contexts[1].toObject().notifications.isEnabled);
+          done();
+        });
+      });
     });
 
     it('modify multiple subdoc paths (gh-4405)', function(done) {

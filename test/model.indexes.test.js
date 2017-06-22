@@ -208,12 +208,128 @@ describe('model', function() {
       done();
     });
 
+    it('made sparse for optional nested documents', function(done) {
+      var GrandchildSchema,
+          ChildSchema,
+          ParentSchema,
+          indexes;
+
+      GrandchildSchema = new Schema({
+        requiredNested2: {
+          type:           String,
+          required:       true,
+          unique:         true
+        },
+        optionalNested2: String
+      });
+
+      ChildSchema = new Schema({
+        requiredNested1:  {
+          type:             GrandchildSchema,
+          required:         true
+        },
+        optionalNested1:  Number
+      });
+
+      ParentSchema = new Schema({
+        child:  ChildSchema
+      });
+
+      indexes = ParentSchema.indexes();
+
+      assert.equal(indexes.length, 1);
+      assert.ok(indexes[0][1].sparse);
+
+      done();
+    });
+
+    it('made sparse when the parent schema marks it as optional but the grandparent schema does not mark the parent as optional', function(done) {
+      var GrandchildSchema,
+          ChildSchema,
+          ParentSchema,
+          indexes;
+
+      GrandchildSchema = new Schema({
+        requiredNested2: {
+          type:           String,
+          required:       true,
+          unique:         true
+        },
+        optionalNested2: String
+      });
+
+      ChildSchema = new Schema({
+        requiredNested1:  GrandchildSchema,
+        optionalNested1:  Number
+      });
+
+      ParentSchema = new Schema({
+        child:  ChildSchema
+      });
+
+      ParentSchema.index({child: 1});
+
+      indexes = ParentSchema.indexes();
+
+      assert.equal(indexes.length, 2);
+
+      if (indexes[0][0]['child.requiredNested1.requiredNested2']) {
+        assert.ok(indexes[0][1].sparse);
+      } else if (indexes[1][0]['child.requiredNested1.requiredNested2']) {
+        assert.ok(indexes[1][1].sparse);
+      } else {
+        done('requiredNested2 not indexed.');
+      }
+
+      done();
+    });
+
+    it('not made sparse for required nested documents', function(done) {
+      var GrandchildSchema,
+          ChildSchema,
+          ParentSchema,
+          indexes;
+
+      GrandchildSchema = new Schema({
+        requiredNested2: {
+          type:           String,
+          required:       true,
+          unique:         true
+        },
+        optionalNested2: String
+      });
+
+      ChildSchema = new Schema({
+        requiredNested1:  {
+          type:             GrandchildSchema,
+          required:         true
+        },
+        optionalNested1:  Number
+      });
+
+      ParentSchema = new Schema({
+        child:  {
+          type:     ChildSchema,
+          required: true
+        }
+      });
+
+      indexes = ParentSchema.indexes();
+
+      assert.equal(indexes.length, 1);
+      assert.ok(!indexes[0][1].sparse);
+
+      done();
+    });
+
     it('primitive arrays (gh-3347)', function(done) {
+      var indexes;
       var schema = new Schema({
         arr: [{ type: String, unique: true }]
       });
 
-      var indexes = schema.indexes();
+      indexes = schema.indexes();
+
       assert.equal(indexes.length, 1);
       assert.deepEqual(indexes[0][0], { arr: 1 });
       assert.ok(indexes[0][1].unique);

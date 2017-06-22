@@ -4298,7 +4298,7 @@ describe('document', function() {
         assert.ifError(error);
         var child = doc.children.id(doc.children[0]._id);
         child.phoneNumber = '345';
-        doc.save(function(error, doc) {
+        doc.save(function(error) {
           assert.ifError(error);
           assert.equal(contexts.length, 2);
           assert.ok(contexts[0].toObject().notifications.isEnabled);

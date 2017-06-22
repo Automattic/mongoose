@@ -2595,7 +2595,7 @@ describe('model: update:', function() {
         }]
       });
 
-      var Person = db.model('Person', schema);
+      var Person = db.model('gh5361', schema);
 
       var data = {
         name: 'Jack',

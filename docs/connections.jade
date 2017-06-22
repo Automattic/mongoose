@@ -196,14 +196,14 @@ block content
   h3#use-mongoose-uri
   :markdown
     Mongoose's default connection logic is deprecated as of 4.11.0. Please opt
-    in to the new connection logic using the `useMongooseUri` option, but
+    in to the new connection logic using the `useMongoClient` option, but
     make sure you test your connections first if you're upgrading an existing
     codebase!
   :js
     // Using `mongoose.connect`...
-    var promise = mongoose.connect('mongodb://localhost/myapp', { useMongooseUri: true, /* other options */ });
+    var promise = mongoose.connect('mongodb://localhost/myapp', { useMongoClient: true, /* other options */ });
     // Or `createConnection`
-    var promise = mongoose.createConnection('mongodb://localhost/myapp', { useMongooseUri: true, /* other options */ });
+    var promise = mongoose.createConnection('mongodb://localhost/myapp', { useMongoClient: true, /* other options */ });
     // Or, if you already have a connection
     connection.openUri('mongodb://localhost/myapp', { /* options */ });
   :markdown

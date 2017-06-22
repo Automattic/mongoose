@@ -14,9 +14,9 @@ var muri = require('muri');
  */
 
 describe('connections:', function() {
-  describe('useMongooseUri/openUri (gh-5304)', function() {
+  describe('useMongoClient/openUri (gh-5304)', function() {
     it('with mongoose.connect()', function(done) {
-      var promise = mongoose.connect('mongodb://localhost:27017/mongoosetest', { useMongooseUri: true });
+      var promise = mongoose.connect('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
       assert.equal(promise.constructor.name, 'Promise');
 
       promise.then(function(conn) {
@@ -27,7 +27,7 @@ describe('connections:', function() {
     });
 
     it('with mongoose.createConnection()', function(done) {
-      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', { useMongooseUri: true });
+      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
       assert.equal(promise.constructor.name, 'Promise');
 
       promise.then(function(conn) {

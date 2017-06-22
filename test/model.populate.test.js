@@ -5214,6 +5214,116 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('populate with missing schema (gh-5364)', function(done) {
+        var Foo = db.model('gh5364', new mongoose.Schema({
+          bar: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Bar'
+          }
+        }));
+
+        Foo.create({ bar: new mongoose.Types.ObjectId() }, function(error) {
+          assert.ifError(error);
+          Foo.find().populate('bar').exec(function(error) {
+            assert.ok(error);
+            assert.equal(error.name, 'MissingSchemaError');
+            done();
+          });
+        });
+      });
+
+      it('virtuals with justOne false and foreign field not found (gh-5336)', function(done) {
+        var BandSchema = new mongoose.Schema({
+          name: String,
+          active: Boolean
+        });
+
+        var Band = db.model('gh5336', BandSchema);
+
+        var PersonSchema = new mongoose.Schema({
+          name: String,
+          bands: [String]
+        });
+
+        PersonSchema.virtual('bandDetails', {
+          ref: 'gh5336',
+          localField: 'bands',
+          foreignField: 'name',
+          justOne: false
+        });
+        var Person = db.model('gh5336_0', PersonSchema);
+
+        var band = new Band({name: 'The Beatles', active: false});
+        var person = new Person({
+          name: 'George Harrison',
+          bands: ['The Beatles']
+        });
+
+        person.save().
+          then(function() { return band.save(); }).
+          then(function() {
+            return Person.findOne({ name: 'George Harrison' });
+          }).
+          then(function(person) {
+            return person.populate({
+              path: 'bandDetails',
+              match: { active: { $eq: true } }
+            }).execPopulate();
+          }).
+          then(function(person) {
+            person = person.toObject({ virtuals: true });
+            assert.deepEqual(person.bandDetails, []);
+            done();
+          }).
+          catch(done);
+      });
+
+      it('virtuals with justOne true and foreign field not found (gh-5336)', function(done) {
+        var BandSchema = new mongoose.Schema({
+          name: String,
+          active: Boolean
+        });
+
+        var Band = db.model('gh5336_10', BandSchema);
+
+        var PersonSchema = new mongoose.Schema({
+          name: String,
+          bands: [String]
+        });
+
+        PersonSchema.virtual('bandDetails', {
+          ref: 'gh5336_10',
+          localField: 'bands',
+          foreignField: 'name',
+          justOne: true
+        });
+        var Person = db.model('gh5336_11', PersonSchema);
+
+        var band = new Band({name: 'The Beatles', active: false});
+        var person = new Person({
+          name: 'George Harrison',
+          bands: ['The Beatles']
+        });
+
+        person.save().
+          then(function() { return band.save(); }).
+          then(function() {
+            return Person.findOne({ name: 'George Harrison' });
+          }).
+          then(function(person) {
+            return person.populate({
+              path: 'bandDetails',
+              match: { active: { $eq: true } }
+            }).execPopulate();
+          }).
+          then(function(person) {
+            person = person.toObject({ virtuals: true });
+            assert.strictEqual(person.bandDetails, null);
+            done();
+          }).
+          catch(done);
+      });
+
       it('select foreignField automatically (gh-4959)', function(done) {
         var childSchema = new mongoose.Schema({
           name: String,

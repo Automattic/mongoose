@@ -1,3 +1,21 @@
+4.10.8 / 2017-06-21
+===================
+ * docs: fix small formatting typo on schematypes #5374 [gianpaj](https://github.com/gianpaj)
+ * fix(model): allow null as an _id #5370
+ * fix(populate): don't throw async uncaught exception if model not found in populate #5364
+ * fix: correctly cast decimals in update #5361
+ * fix(error): don't use custom getter for ValidationError message #5359
+ * fix(query): handle runSettersOnQuery in built-in _id setter #5351
+ * fix(document): ensure consistent context for nested doc custom validators #5347
+
+4.10.7 / 2017-06-18
+===================
+ * docs(validation): show overriding custom validator error with 2nd cb arg #5358
+ * fix: `parseOption` mutates user passed option map #5357 [igwejk](https://github.com/igwejk)
+ * docs: fix guide.jade typo #5356 [CalebAnderson2014](https://github.com/CalebAnderson2014)
+ * fix(populate): don't set populate virtual to ids when match fails #5336
+ * fix(query): callback with cast error if remove and delete* args have a cast error #5323
+
 4.10.6 / 2017-06-12
 ===================
  * fix(cursor): handle custom model option for populate #5334

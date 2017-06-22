@@ -4262,6 +4262,52 @@ describe('document', function() {
       });
     });
 
+    it('consistent context for nested docs (gh-5347)', function(done) {
+      var contexts = [];
+      var childSchema = new mongoose.Schema({
+        phoneNumber: {
+          type: String,
+          required: function() {
+            contexts.push(this);
+            return this.notifications.isEnabled;
+          }
+        },
+        notifications: {
+          isEnabled: { type: Boolean, required: true }
+        }
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: String,
+        children: [childSchema]
+      });
+
+      var Parent = db.model('gh5347', parentSchema);
+
+      Parent.create({
+        name: 'test',
+        children: [
+          {
+            phoneNumber: '123',
+            notifications: {
+              isEnabled: true
+            }
+          }
+        ]
+      }, function(error, doc) {
+        assert.ifError(error);
+        var child = doc.children.id(doc.children[0]._id);
+        child.phoneNumber = '345';
+        doc.save(function(error) {
+          assert.ifError(error);
+          assert.equal(contexts.length, 2);
+          assert.ok(contexts[0].toObject().notifications.isEnabled);
+          assert.ok(contexts[1].toObject().notifications.isEnabled);
+          done();
+        });
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

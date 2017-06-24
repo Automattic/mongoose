@@ -1188,18 +1188,54 @@ describe('Query', function() {
       }, done).end();
     });
 
-    it('justOne option', function(done) {
+    it('single option, default', function(done) {
       var db = start();
-      var Test = db.model('Test_justOne', new Schema({ name: String }));
+      var Test = db.model('Test_single', new Schema({ name: String }));
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ justOne: false }).exec(function(error, res) {
+        Test.remove({ name: /Stark/ }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.result.n, 2);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single option, false', function(done) {
+      var db = start();
+      var Test = db.model('Test_single', new Schema({ name: String }));
+
+      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.result.n, 2);
+          Test.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single option, true', function(done) {
+      var db = start();
+      var Test = db.model('Test_single', new Schema({ name: String }));
+
+      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.result.n, 1);
+          Test.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 1);
             done();
           });
         });

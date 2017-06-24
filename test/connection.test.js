@@ -14,6 +14,30 @@ var muri = require('muri');
  */
 
 describe('connections:', function() {
+  describe('useMongoClient/openUri (gh-5304)', function() {
+    it('with mongoose.connect()', function(done) {
+      var promise = mongoose.connect('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
+      assert.equal(promise.constructor.name, 'Promise');
+
+      promise.then(function(conn) {
+        assert.equal(conn.constructor.name, 'NativeConnection');
+
+        return mongoose.disconnect().then(function() { done(); });
+      }).catch(done);
+    });
+
+    it('with mongoose.createConnection()', function(done) {
+      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
+      assert.equal(promise.constructor.name, 'Promise');
+
+      promise.then(function(conn) {
+        assert.equal(conn.constructor.name, 'NativeConnection');
+
+        return mongoose.disconnect().then(function() { done(); });
+      }).catch(done);
+    });
+  });
+
   it('should allow closing a closed connection', function(done) {
     var db = mongoose.createConnection();
 

@@ -228,15 +228,14 @@ describe('ValidationError', function() {
     model.modelName = 'TestClass';
     var err = new ValidationError(new model());
 
-    err.errors = {
-      test: { message: 'Fail' }
-    };
+    err.addError('test', { message: 'Fail' });
 
     var obj = JSON.parse(JSON.stringify(err));
     assert.ok(obj.message.indexOf('TestClass validation failed') !== -1,
       obj.message);
     assert.ok(obj.message.indexOf('test: Fail') !== -1,
       obj.message);
+
     done();
 
     function model() {}

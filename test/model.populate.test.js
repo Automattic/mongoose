@@ -5214,6 +5214,24 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('populate with missing schema (gh-5364)', function(done) {
+        var Foo = db.model('gh5364', new mongoose.Schema({
+          bar: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Bar'
+          }
+        }));
+
+        Foo.create({ bar: new mongoose.Types.ObjectId() }, function(error) {
+          assert.ifError(error);
+          Foo.find().populate('bar').exec(function(error) {
+            assert.ok(error);
+            assert.equal(error.name, 'MissingSchemaError');
+            done();
+          });
+        });
+      });
+
       it('virtuals with justOne false and foreign field not found (gh-5336)', function(done) {
         var BandSchema = new mongoose.Schema({
           name: String,

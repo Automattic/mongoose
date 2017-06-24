@@ -4162,6 +4162,35 @@ describe('document', function() {
       });
     });
 
+    it('custom error types (gh-4009)', function(done) {
+      var CustomError = function() {};
+
+      var testSchema = new mongoose.Schema({
+        num: {
+          type: Number,
+          required: {
+            ErrorConstructor: CustomError
+          },
+          min: 5
+        }
+      });
+
+      var Test = db.model('gh4009', testSchema);
+
+      Test.create({}, function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['num']);
+        assert.ok(error.errors['num'] instanceof CustomError);
+        Test.create({ num: 1 }, function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['num']);
+          assert.ok(error.errors['num'].constructor.name, 'ValidatorError');
+          assert.ok(!(error.errors['num'] instanceof CustomError));
+          done();
+        });
+      });
+    });
+
     it('saving a doc with nested string array (gh-5282)', function(done) {
       var testSchema = new mongoose.Schema({
         strs: [[String]]
@@ -4186,8 +4215,10 @@ describe('document', function() {
       var M = db.model('gh5236', childSchema);
 
       var m = new M({ _id: null });
-      assert.ok(m._id);
-      done();
+      m.save(function(error, doc) {
+        assert.equal(doc._id, null);
+        done();
+      });
     });
 
     it('setting populated path with typeKey (gh-5313)', function(done) {
@@ -4257,6 +4288,52 @@ describe('document', function() {
       Model.create({ name: undefined }, function(error) {
         assert.ifError(error);
         done();
+      });
+    });
+
+    it('consistent context for nested docs (gh-5347)', function(done) {
+      var contexts = [];
+      var childSchema = new mongoose.Schema({
+        phoneNumber: {
+          type: String,
+          required: function() {
+            contexts.push(this);
+            return this.notifications.isEnabled;
+          }
+        },
+        notifications: {
+          isEnabled: { type: Boolean, required: true }
+        }
+      });
+
+      var parentSchema = new mongoose.Schema({
+        name: String,
+        children: [childSchema]
+      });
+
+      var Parent = db.model('gh5347', parentSchema);
+
+      Parent.create({
+        name: 'test',
+        children: [
+          {
+            phoneNumber: '123',
+            notifications: {
+              isEnabled: true
+            }
+          }
+        ]
+      }, function(error, doc) {
+        assert.ifError(error);
+        var child = doc.children.id(doc.children[0]._id);
+        child.phoneNumber = '345';
+        doc.save(function(error) {
+          assert.ifError(error);
+          assert.equal(contexts.length, 2);
+          assert.ok(contexts[0].toObject().notifications.isEnabled);
+          assert.ok(contexts[1].toObject().notifications.isEnabled);
+          done();
+        });
       });
     });
 

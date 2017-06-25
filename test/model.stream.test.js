@@ -14,18 +14,19 @@ var start = require('./common'),
 var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
 
 describe('query stream:', function() {
-  var db = start();
+  var db;
   var Person;
   var collection = 'personforstream_' + random();
   var P;
 
   before(function() {
+    db = start();
+
     Person = new Schema({
       name: String
     });
 
-    mongoose.model('PersonForStream', Person);
-    P = db.model('PersonForStream', collection);
+    P = db.model('PersonForStream', Person, collection);
   });
 
   before(function(done) {
@@ -165,45 +166,6 @@ describe('query stream:', function() {
     });
 
     stream.on('close', cb);
-    stream.on('error', cb);
-  });
-
-  it('errors', function(done) {
-    this.slow(300);
-
-    var db = start({server: {auto_reconnect: false}});
-    var P = db.model('PersonForStream', collection);
-
-    var finished = 0;
-    var closed = 0;
-    var i = 0;
-
-    var stream = P.find().batchSize(5).stream();
-
-    function cb(err) {
-      ++finished;
-      setTimeout(function() {
-        assert.ok(/destroyed/.test(err.message), err.message);
-        assert.equal(i, 5);
-        assert.equal(closed, 1);
-        assert.equal(finished, 1);
-        assert.equal(stream._destroyed, true);
-        assert.equal(stream.readable, false);
-        assert.equal(stream._cursor.isClosed(), true);
-        done();
-      }, 100);
-    }
-
-    stream.on('data', function() {
-      if (++i === 5) {
-        db.close();
-      }
-    });
-
-    stream.on('close', function() {
-      closed++;
-    });
-
     stream.on('error', cb);
   });
 

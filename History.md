@@ -1,3 +1,14 @@
+4.11.0 / 2017-06-25
+===================
+ * feat(query): execute setters with query as context for `runSettersOnQuery` #5339
+ * feat(model): add translateAliases function #5338 [rocketspacer](https://github.com/rocketspacer)
+ * feat(connection): add `useMongoClient` and `openUri` functions, deprecate current connect logic #5304
+ * refactor(schema): make id virtual not access doc internals #5279
+ * refactor: handle non-boolean lean #5279
+ * feat(cursor): add addCursorFlag() support to query and agg cursors #4814
+ * feat(cursor): add parallel option to eachAsync #4244
+ * feat(schema): allow setting custom error constructor for custom validators #4009
+
 4.10.8 / 2017-06-21
 ===================
  * docs: fix small formatting typo on schematypes #5374 [gianpaj](https://github.com/gianpaj)

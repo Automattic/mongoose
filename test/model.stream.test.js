@@ -169,45 +169,6 @@ describe('query stream:', function() {
     stream.on('error', cb);
   });
 
-  it('errors', function(done) {
-    this.slow(300);
-
-    var db = start({server: {auto_reconnect: false}});
-    var P = db.model('PersonForStream', collection);
-
-    var finished = 0;
-    var closed = 0;
-    var i = 0;
-
-    var stream = P.find().batchSize(5).stream();
-
-    function cb(err) {
-      ++finished;
-      setTimeout(function() {
-        assert.ok(/destroyed/.test(err.message), err.message);
-        assert.equal(i, 5);
-        assert.equal(closed, 1);
-        assert.equal(finished, 1);
-        assert.equal(stream._destroyed, true);
-        assert.equal(stream.readable, false);
-        assert.equal(stream._cursor.isClosed(), true);
-        done();
-      }, 100);
-    }
-
-    stream.on('data', function() {
-      if (++i === 5) {
-        db.close();
-      }
-    });
-
-    stream.on('close', function() {
-      closed++;
-    });
-
-    stream.on('error', cb);
-  });
-
   it('pipe', function(done) {
     var filename = '/tmp/_mongoose_stream_out.txt';
     var out = fs.createWriteStream(filename);

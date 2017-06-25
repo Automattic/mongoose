@@ -38,9 +38,6 @@ PersonSchema.virtual('name.full').set(function(name) {
 PersonSchema.path('gender').validate(function(value) {
   return /[A-Z]/.test(value);
 }, 'Invalid name');
-PersonSchema.post('save', function(next) {
-  next();
-});
 PersonSchema.set('toObject', {getters: true, virtuals: true});
 PersonSchema.set('toJSON', {getters: true, virtuals: true});
 
@@ -239,10 +236,9 @@ describe('model', function() {
         department: String
       }, { id: false });
 
-      assert.doesNotThrow(function() {
-        var Person = db.model('gh2821', PersonSchema);
-        Person.discriminator('gh2821-Boss', BossSchema);
-      });
+      // Should not throw
+      var Person = db.model('gh2821', PersonSchema);
+      Person.discriminator('gh2821-Boss', BossSchema);
       done();
     });
 
@@ -319,9 +315,7 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 5);
-        // PersonSchema.post('save')
-        assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
+        assert.equal(Employee.schema.callQueue.length, 7);
 
         // EmployeeSchema.pre('save')
         var queueIndex = Employee.schema.callQueue.length - 1;
@@ -353,7 +347,405 @@ describe('model', function() {
       it('does not allow setting discriminator key (gh-2041)', function(done) {
         var doc = new Employee({ __t: 'fake' });
         assert.equal(doc.__t, 'model-discriminator-employee');
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['__t'].reason.message,
+            'Can\'t set discriminator key "__t"');
+          done();
+        });
+      });
+
+      it('with typeKey (gh-4339)', function(done) {
+        var options = { typeKey: '$type', discriminatorKey: '_t' };
+        var schema = new Schema({ test: { $type: String } }, options);
+        var Model = mongoose.model('gh4339', schema);
+        Model.discriminator('gh4339_0', new Schema({
+          test2: String
+        }, { typeKey: '$type' }));
         done();
+      });
+
+      it('applyPluginsToDiscriminators (gh-4965)', function(done) {
+        var schema = new Schema({ test: String });
+        mongoose.set('applyPluginsToDiscriminators', true);
+        var called = 0;
+        mongoose.plugin(function() {
+          ++called;
+        });
+        var Model = mongoose.model('gh4965', schema);
+        var childSchema = new Schema({
+          test2: String
+        });
+        Model.discriminator('gh4965_0', childSchema);
+        assert.equal(called, 2);
+
+        mongoose.plugins = [];
+        mongoose.set('applyPluginsToDiscriminators', false);
+        done();
+      });
+
+      it('cloning with discriminator key (gh-4387)', function(done) {
+        var employee = new Employee({ name: { first: 'Val', last: 'Karpov' } });
+        var clone = new employee.constructor(employee);
+
+        // Should not error because we have the same discriminator key
+        clone.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+
+      it('embedded discriminators with create() (gh-5001)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Batch = db.model('EventBatch', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            var newDoc = doc.events.create({
+              kind: 'Purchased',
+              product: 'action-figure-1'
+            });
+            assert.equal(newDoc.kind, 'Purchased');
+            assert.equal(newDoc.product, 'action-figure-1');
+            assert.ok(newDoc instanceof Purchased);
+
+            doc.events.push(newDoc);
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[1].kind, 'Purchased');
+            assert.equal(doc.events[1].product, 'action-figure-1');
+            assert.ok(newDoc instanceof Purchased);
+            assert.ok(newDoc === doc.events[1]);
+
+            done();
+          }).
+          catch(done);
+      });
+
+      it('supports clone() (gh-4983)', function(done) {
+        var childSchema = new Schema({
+          name: String
+        });
+        var childCalls = 0;
+        var childValidateCalls = 0;
+        childSchema.pre('validate', function(next) {
+          ++childValidateCalls;
+          next();
+        });
+        childSchema.pre('save', function(next) {
+          ++childCalls;
+          next();
+        });
+
+        var personSchema = new Schema({
+          name: String
+        }, { discriminatorKey: 'kind' });
+
+        var parentSchema = new Schema({
+          children: [childSchema],
+          heir: childSchema
+        });
+        var parentCalls = 0;
+        parentSchema.pre('save', function(next) {
+          ++parentCalls;
+          next();
+        });
+
+        var Person = db.model('gh4983', personSchema);
+        var Parent = Person.discriminator('gh4983_0', parentSchema.clone());
+
+        var obj = {
+          name: 'Ned Stark',
+          heir: { name: 'Robb Stark' },
+          children: [{ name: 'Jon Snow' }]
+        };
+        Parent.create(obj, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Ned Stark');
+          assert.equal(doc.heir.name, 'Robb Stark');
+          assert.equal(doc.children.length, 1);
+          assert.equal(doc.children[0].name, 'Jon Snow');
+          assert.equal(childValidateCalls, 2);
+          assert.equal(childCalls, 2);
+          assert.equal(parentCalls, 1);
+          done();
+        });
+      });
+
+      it('clone() allows reusing schemas (gh-5098)', function(done) {
+        var personSchema = new Schema({
+          name: String
+        }, { discriminatorKey: 'kind' });
+
+        var parentSchema = new Schema({
+          child: String
+        });
+
+        var Person = db.model('gh5098', personSchema);
+        var Parent = Person.discriminator('gh5098_0', parentSchema.clone());
+        // Should not throw
+        var Parent2 = Person.discriminator('gh5098_1', parentSchema.clone());
+        done();
+      });
+
+      it('copies query hooks (gh-5147)', function(done) {
+        var options = { discriminatorKey: 'kind' };
+
+        var eventSchema = new mongoose.Schema({ time: Date }, options);
+        var eventSchemaCalls = 0;
+        eventSchema.pre('findOneAndUpdate', function() {
+          ++eventSchemaCalls;
+        });
+
+        var Event = db.model('gh5147', eventSchema);
+
+        var clickedEventSchema = new mongoose.Schema({ url: String }, options);
+        var clickedEventSchemaCalls = 0;
+        clickedEventSchema.pre('findOneAndUpdate', function() {
+          ++clickedEventSchemaCalls;
+        });
+        var ClickedLinkEvent = Event.discriminator('gh5147_0', clickedEventSchema);
+
+        ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).
+          exec(function(error) {
+            assert.ifError(error);
+            assert.equal(eventSchemaCalls, 1);
+            assert.equal(clickedEventSchemaCalls, 1);
+            done();
+          });
+      });
+
+      it('embedded discriminators with $push (gh-5009)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Batch = db.model('gh5009', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id }, {
+              $push: {
+                events: { kind: 'Clicked', element: '#button' }
+              }
+            }).then(function() {
+              return doc;
+            });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[1].element, '#button');
+            assert.equal(doc.events[1].kind, 'Clicked');
+            done();
+          }).
+          catch(done);
+      });
+
+      it('embedded discriminators with $push + $each (gh-5070)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }, { _id: false }));
+
+        var Batch = db.model('gh5070', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id }, {
+              $push: {
+                events: { $each: [{ kind: 'Clicked', element: '#button' }] }
+              }
+            }).then(function() {
+              return doc;
+            });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[1].element, '#button');
+            assert.equal(doc.events[1].kind, 'Clicked');
+            done();
+          }).
+          catch(done);
+      });
+
+      it('embedded discriminators with $set (gh-5130)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind' });
+        var batchSchema = new Schema({ events: [eventSchema] });
+        var docArray = batchSchema.path('events');
+
+        var Clicked = docArray.discriminator('Clicked', new Schema({
+          element: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Purchased = docArray.discriminator('Purchased', new Schema({
+          product: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var Batch = db.model('gh5130', batchSchema);
+
+        var batch = {
+          events: [
+            { kind: 'Clicked', element: '#hero' }
+          ]
+        };
+
+        Batch.create(batch).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            return Batch.updateOne({ _id: doc._id, 'events._id': doc.events[0]._id }, {
+              $set: {
+                'events.$':  {
+                  message: 'updated',
+                  kind: 'Clicked',
+                  element: '#hero2'
+                }
+              }
+            }).then(function() { return doc; });
+          }).
+          then(function(doc) {
+            return Batch.findOne({ _id: doc._id });
+          }).
+          then(function(doc) {
+            assert.equal(doc.events.length, 1);
+            assert.equal(doc.events[0].message, 'updated');
+            assert.equal(doc.events[0].element, '#hero2');    // <-- test failed
+            assert.equal(doc.events[0].kind, 'Clicked');      // <-- test failed
+            done();
+          }).
+          catch(done);
+      });
+
+      it('embedded in document arrays (gh-2723)', function(done) {
+        var eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+
+        var batchSchema = new Schema({ events: [eventSchema] });
+        batchSchema.path('events').discriminator('Clicked', new Schema({
+          element: String
+        }, { _id: false }));
+        batchSchema.path('events').discriminator('Purchased', new Schema({
+          product: String
+        }, { _id: false }));
+
+        var MyModel = db.model('gh2723', batchSchema);
+        var doc = {
+          events: [
+            { kind: 'Clicked', element: 'Test' },
+            { kind: 'Purchased', product: 'Test2' }
+          ]
+        };
+        MyModel.create(doc).
+          then(function(doc) {
+            assert.equal(doc.events.length, 2);
+            assert.equal(doc.events[0].element, 'Test');
+            assert.equal(doc.events[1].product, 'Test2');
+            var obj = doc.toObject({ virtuals: false });
+            delete obj._id;
+            assert.deepEqual(obj, {
+              __v: 0,
+              events: [
+                { kind: 'Clicked', element: 'Test' },
+                { kind: 'Purchased', product: 'Test2' }
+              ]
+            });
+            done();
+          }).
+          then(function() {
+            return MyModel.findOne({
+              events: {
+                $elemMatch: {
+                  kind: 'Clicked',
+                  element: 'Test'
+                }
+              }
+            }, { 'events.$': 1 });
+          }).
+          then(function(doc) {
+            assert.ok(doc);
+            assert.equal(doc.events.length, 1);
+            assert.equal(doc.events[0].element, 'Test');
+          }).
+          catch(done);
       });
     });
   });

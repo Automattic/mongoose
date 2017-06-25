@@ -54,7 +54,6 @@ describe('types.documentarray', function() {
     assert.ok(a.isMongooseDocumentArray);
     assert.ok(Array.isArray(a));
 
-    assert.deepEqual(Object.keys(a), Object.keys(a.toObject()));
     assert.deepEqual(a._atomics.constructor, Object);
 
     done();
@@ -216,7 +215,7 @@ describe('types.documentarray', function() {
       assert.ok(!threw);
       done();
     });
-    it('passes options to its documents (gh-1415)', function(done) {
+    it('passes options to its documents (gh-1415) (gh-4455)', function(done) {
       var subSchema = new Schema({
         title: {type: String}
       });
@@ -236,6 +235,15 @@ describe('types.documentarray', function() {
       m.docs.push({docs: [{title: 'hello'}]});
       var delta = m.$__delta()[1];
       assert.equal(delta.$pushAll.docs[0].changed, undefined);
+
+      M = db.model('gh-1415-1', new Schema({docs: [subSchema]}, {
+        usePushEach: true
+      }));
+      m = new M;
+      m.docs.push({docs: [{title: 'hello'}]});
+      delta = m.$__delta()[1];
+      assert.equal(delta.$push.docs.$each[0].changed, undefined);
+
       done();
     });
     it('uses the correct transform (gh-1412)', function(done) {
@@ -366,8 +374,8 @@ describe('types.documentarray', function() {
 
     var p = new Post({title: 'comment nesting'});
     var c1 = p.comments.create({title: 'c1'});
-    var c2 = p.comments.create({title: 'c2'});
-    var c3 = p.comments.create({title: 'c3'});
+    var c2 = c1.comments.create({title: 'c2'});
+    var c3 = c2.comments.create({title: 'c3'});
 
     p.comments.push(c1);
     c1.comments.push(c2);
@@ -379,8 +387,7 @@ describe('types.documentarray', function() {
       Post.findById(p._id, function(err, p) {
         assert.ifError(err);
 
-        var c4 = p.comments.create({title: 'c4'});
-        p.comments[0].comments[0].comments[0].comments.push(c4);
+        p.comments[0].comments[0].comments[0].comments.push({title: 'c4'});
         p.save(function(err) {
           assert.ifError(err);
 
@@ -410,7 +417,7 @@ describe('types.documentarray', function() {
       assert.throws(function() {
         // has no parent array
         subdoc.invalidate('name', 'junk', 47);
-      }, /^Error: Unable to invalidate a subdocument/);
+      });
       t.validate(function() {
         var e = t.errors['docs.0.name'];
         assert.ok(e);
@@ -458,4 +465,3 @@ describe('types.documentarray', function() {
     });
   });
 });
-

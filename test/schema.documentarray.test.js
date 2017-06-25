@@ -55,4 +55,19 @@ describe('schema.documentarray', function() {
     assert.deepEqual(dest.toObject().arr, [{a: 1}, {a: 2}]);
     done();
   });
+
+  it('sets $implicitlyCreated if created by interpretAsType (gh-4271)', function(done) {
+    var schema1 = new Schema({
+      arr: [{ name: String }]
+    });
+    var schema2 = new Schema({
+      arr: [new Schema({ name: String })]
+    });
+
+    assert.equal(schema1.childSchemas.length, 1);
+    assert.equal(schema2.childSchemas.length, 1);
+    assert.ok(schema1.childSchemas[0].$implicitlyCreated);
+    assert.ok(!schema2.childSchemas[0].$implicitlyCreated);
+    done();
+  });
 });

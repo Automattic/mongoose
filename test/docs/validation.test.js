@@ -1,6 +1,8 @@
 var assert = require('assert');
 var mongoose = require('../../');
 
+var Promise = global.Promise || require('bluebird');
+
 describe('validation docs', function() {
   var db;
   var Schema = mongoose.Schema;
@@ -71,7 +73,10 @@ describe('validation docs', function() {
       },
       drink: {
         type: String,
-        enum: ['Coffee', 'Tea']
+        enum: ['Coffee', 'Tea'],
+        required: function() {
+          return this.bacon > 3;
+        }
       }
     });
     var Breakfast = db.model('Breakfast', breakfastSchema);
@@ -88,12 +93,63 @@ describe('validation docs', function() {
     assert.equal(error.errors['drink'].message,
       '`Milk` is not a valid enum value for path `drink`.');
 
+    badBreakfast.bacon = 5;
+    badBreakfast.drink = null;
+
+    error = badBreakfast.validateSync();
+    assert.equal(error.errors['drink'].message, 'Path `drink` is required.');
+
     badBreakfast.bacon = null;
     error = badBreakfast.validateSync();
     assert.equal(error.errors['bacon'].message, 'Why no bacon?');
     // acquit:ignore:start
     done();
     // acquit:ignore:end
+  });
+
+  /**
+   * A common gotcha for beginners is that the `unique` option for schemas
+   * is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://docs.mongodb.com/manual/core/index-unique/).
+   * See the [FAQ](/docs/faq.html) for more information.
+   */
+
+  it('The `unique` Option is Not a Validator', function(done) {
+    var uniqueUsernameSchema = new Schema({
+      username: {
+        type: String,
+        unique: true
+      }
+    });
+    var U1 = db.model('U1', uniqueUsernameSchema);
+    var U2 = db.model('U2', uniqueUsernameSchema);
+    // acquit:ignore:start
+    var remaining = 2;
+    // acquit:ignore:end
+
+    var dup = [{ username: 'Val' }, { username: 'Val' }];
+    U1.create(dup, function(error) {
+      // Will save successfully!
+      // acquit:ignore:start
+      assert.ifError(error);
+      --remaining || done();
+      // acquit:ignore:end
+    });
+
+    // Need to wait for the index to finish building before saving,
+    // otherwise unique constraints may be violated.
+    U2.on('index', function(error) {
+      assert.ifError(error);
+      U2.create(dup, function(error) {
+        // Will error, but will *not* be a mongoose validation error, but
+        // a duplicate key error.
+        assert.ok(error);
+        assert.ok(!error.errors);
+        assert.ok(error.message.indexOf('duplicate key error') !== -1);
+        // acquit:ignore:start
+        --remaining || done();
+        // acquit:ignore:end
+      });
+    });
   });
 
   /**
@@ -149,21 +205,44 @@ describe('validation docs', function() {
    * Even if you don't want to use asynchronous validators, be careful,
    * because mongoose 4 will assume that **all** functions that take 2
    * arguments are asynchronous, like the
-   * [`validator.isEmail` function](https://www.npmjs.com/package/validator)
+   * [`validator.isEmail` function](https://www.npmjs.com/package/validator).
+   * This behavior is considered deprecated as of 4.9.0, and you can shut
+   * it off by specifying `isAsync: false` on your custom validator.
    */
   it('Async Custom Validators', function(done) {
     var userSchema = new Schema({
       phone: {
         type: String,
         validate: {
+          // `isAsync` is not strictly necessary in mongoose 4.x, but relying
+          // on 2 argument validators being async is deprecated. Set the
+          // `isAsync` option to `true` to make deprecation warnings go away.
+          isAsync: true,
           validator: function(v, cb) {
             setTimeout(function() {
-              cb(/\d{3}-\d{3}-\d{4}/.test(v));
+              var phoneRegex = /\d{3}-\d{3}-\d{4}/;
+              var msg = v + ' is not a valid phone number!';
+              // First argument is a boolean, whether validator succeeded
+              // 2nd argument is an optional error message override
+              cb(phoneRegex.test(v), msg);
             }, 5);
           },
-          message: '{VALUE} is not a valid phone number!'
+          // Default error message, overridden by 2nd argument to `cb()` above
+          message: 'Default error message'
         },
         required: [true, 'User phone number required']
+      },
+      name: {
+        type: String,
+        // You can also make a validator async by returning a promise. If you
+        // return a promise, do **not** specify the `isAsync` option.
+        validate: function(v) {
+          return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+              resolve(false);
+            }, 5);
+          });
+        }
       }
     });
 
@@ -172,10 +251,13 @@ describe('validation docs', function() {
     var error;
 
     user.phone = '555.0123';
+    user.name = 'test';
     user.validate(function(error) {
       assert.ok(error);
       assert.equal(error.errors['phone'].message,
         '555.0123 is not a valid phone number!');
+      assert.equal(error.errors['name'].message,
+        'Validator failed for path `name` with value `test`');
       // acquit:ignore:start
       done();
       // acquit:ignore:end
@@ -416,8 +498,9 @@ describe('validation docs', function() {
 
   /**
    * One final detail worth noting: update validators **only** run on `$set`
-   * and `$unset` operations. For instance, the below update will succeed,
-   * regardless of the value of `number`.
+   * and `$unset` operations (and `$push` and `$addToSet` in >= 4.8.0).
+   * For instance, the below update will succeed, regardless of the value of
+   * `number`, because update validators ignore `$inc`.
    */
 
   it('Update Validators Only Run On Specified Paths', function(done) {
@@ -433,6 +516,36 @@ describe('validation docs', function() {
       // There will never be a validation error here
       // acquit:ignore:start
       assert.ifError(error);
+      done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
+   * New in 4.8.0: update validators also run on `$push` and `$addToSet`
+   */
+
+  it('On $push and $addToSet', function(done) {
+    var testSchema = new Schema({
+      numbers: [{ type: Number, max: 0 }],
+      docs: [{
+        name: { type: String, required: true }
+      }]
+    });
+
+    var Test = db.model('TestPush', testSchema);
+
+    var update = {
+      $push: {
+        numbers: 1,
+        docs: { name: null }
+      }
+    };
+    var opts = { runValidators: true };
+    Test.update({}, update, opts, function(error) {
+      assert.ok(error.errors['numbers']);
+      assert.ok(error.errors['docs']);
+      // acquit:ignore:start
       done();
       // acquit:ignore:end
     });

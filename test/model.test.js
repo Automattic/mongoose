@@ -14,62 +14,65 @@ var start = require('./common'),
     EmbeddedDocument = mongoose.Types.Embedded,
     MongooseError = mongoose.Error;
 
-/**
- * Setup.
- */
-
-var Comments = new Schema;
-
-Comments.add({
-  title: String,
-  date: Date,
-  body: String,
-  comments: [Comments]
-});
-
-var BlogPost = new Schema({
-  title: String,
-  author: String,
-  slug: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number
-  },
-  published: Boolean,
-  mixed: {},
-  numbers: [Number],
-  owners: [ObjectId],
-  comments: [Comments],
-  nested: {array: [Number]}
-});
-
-BlogPost
-.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
-
-BlogPost.method('cool', function() {
-  return this;
-});
-
-BlogPost.static('woot', function() {
-  return this;
-});
-
-mongoose.model('BlogPost', BlogPost);
-var bpSchema = BlogPost;
-
-var collection = 'blogposts_' + random();
-
 describe('Model', function() {
-  var db, Test;
+  var db;
+  var Test;
+  var Comments;
+  var BlogPost;
+  var bpSchema;
+  var collection;
+
+  before(function() {
+    Comments = new Schema;
+
+    Comments.add({
+      title: String,
+      date: Date,
+      body: String,
+      comments: [Comments]
+    });
+
+    BlogPost = new Schema({
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      owners: [ObjectId],
+      comments: [Comments],
+      nested: {array: [Number]}
+    });
+
+    BlogPost
+    .virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
+
+    BlogPost.method('cool', function() {
+      return this;
+    });
+
+    BlogPost.static('woot', function() {
+      return this;
+    });
+
+    mongoose.model('BlogPost', BlogPost);
+    bpSchema = BlogPost;
+
+    collection = 'blogposts_' + random();
+  });
 
   before(function() {
     db = start();
@@ -122,9 +125,7 @@ describe('Model', function() {
       });
     });
   });
-});
 
-describe('Model', function() {
   describe('constructor', function() {
     it('works without "new" keyword', function(done) {
       var B = mongoose.model('BlogPost');
@@ -1138,7 +1139,7 @@ describe('Model', function() {
         db.close();
         assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
         assert.equal(err.name, 'ValidationError');
-        assert.equal(err.message, 'IntrospectionValidation validation failed');
+        assert.ok(err.message.indexOf('IntrospectionValidation validation failed') !== -1, err.message);
         done();
       });
     });
@@ -3851,27 +3852,18 @@ describe('Model', function() {
           title: String
         });
 
-        var ParentSchema = new Schema({
-          embeds: [EmbeddedSchema]
-        });
-
         EmbeddedSchema.post('save', function() {
           save = true;
         });
 
-        // Don't know how to test those on a embedded document.
-        // EmbeddedSchema.post('init', function () {
-        // init = true;
-        // });
-
-        // EmbeddedSchema.post('remove', function () {
-        // remove = true;
-        // });
+        var ParentSchema = new Schema({
+          embeds: [EmbeddedSchema]
+        });
 
         mongoose.model('Parent', ParentSchema);
 
-        var db = start(),
-            Parent = db.model('Parent');
+        var db = start();
+        var Parent = db.model('Parent');
 
         var parent = new Parent();
 
@@ -4111,7 +4103,7 @@ describe('Model', function() {
           promise.onResolve(function(err, found) {
             db.close();
             assert.ifError(err);
-            assert.equal(found._id.id, created._id.id);
+            assert.equal(found._id.toHexString(), created._id.toHexString());
             done();
           });
         });
@@ -5219,6 +5211,8 @@ describe('Model', function() {
         assert.ok(!docs[1].isNew);
         assert.ok(docs[0].createdAt);
         assert.ok(docs[1].createdAt);
+        assert.strictEqual(docs[0].__v, 0);
+        assert.strictEqual(docs[1].__v, 0);
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);
@@ -5229,13 +5223,138 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() ordered option for constraint errors (gh-3893)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: { type: String, unique: true }
+        });
+        var Movie = db.model('gh3893', schema);
+
+        var arr = [
+          { name: 'Star Wars' },
+          { name: 'Star Wars' },
+          { name: 'The Empire Strikes Back' }
+        ];
+        Movie.on('index', function(error) {
+          assert.ifError(error);
+          Movie.insertMany(arr, { ordered: false }, function(error) {
+            assert.equal(error.message.indexOf('E11000'), 0);
+            Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+              assert.ifError(error);
+              assert.equal(docs.length, 2);
+              assert.equal(docs[0].name, 'Star Wars');
+              assert.equal(docs[1].name, 'The Empire Strikes Back');
+              done();
+            });
+          });
+        });
+      }
+    });
+
+    it('insertMany() ordered option for validation errors (gh-5068)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: { type: String, required: true }
+        });
+        var Movie = db.model('gh5068', schema);
+
+        var arr = [
+          { name: 'Star Wars' },
+          { foo: 'Star Wars' },
+          { name: 'The Empire Strikes Back' }
+        ];
+        Movie.insertMany(arr, { ordered: false }, function(error) {
+          assert.ifError(error);
+          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 2);
+            assert.equal(docs[0].name, 'Star Wars');
+            assert.equal(docs[1].name, 'The Empire Strikes Back');
+            done();
+          });
+        });
+      }
+    });
+
+    it('insertMany() ordered option for single validation error', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: { type: String, required: true }
+        });
+        var Movie = db.model('gh5068-2', schema);
+
+        var arr = [
+          { foo: 'Star Wars' },
+          { foo: 'The Fast and the Furious' }
+        ];
+        Movie.insertMany(arr, { ordered: false }, function(error) {
+          assert.ifError(error);
+          Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+            assert.equal(docs.length, 0);
+            done();
+          });
+        });
+      }
+    });
+
     it('insertMany() hooks (gh-3846)', function(done) {
       var schema = new Schema({
         name: String
       });
       var calledPre = 0;
       var calledPost = 0;
-      schema.pre('insertMany', function(next) {
+      schema.pre('insertMany', function(next, docs) {
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
+        ++calledPre;
+        next();
+      });
+      schema.pre('insertMany', function(next, docs) {
+        assert.equal(docs.length, 2);
+        assert.equal(docs[0].name, 'Star Wars');
+        docs[0].name = 'A New Hope';
         ++calledPre;
         next();
       });
@@ -5248,9 +5367,14 @@ describe('Model', function() {
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
-        assert.equal(calledPre, 1);
+        assert.equal(calledPre, 2);
         assert.equal(calledPost, 1);
-        done();
+        Movie.find({}).sort({ name: 1 }).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs[0].name, 'A New Hope');
+          assert.equal(docs[1].name, 'The Empire Strikes Back');
+          done();
+        });
       });
     });
 
@@ -5269,6 +5393,34 @@ describe('Model', function() {
         Movie.find({}, function(error, docs) {
           assert.ifError(error);
           assert.equal(docs.length, 2);
+          done();
+        });
+      });
+    });
+
+    it('insertMany() depopulate (gh-4590)', function(done) {
+      var personSchema = new Schema({
+        name: String
+      });
+      var movieSchema = new Schema({
+        name: String,
+        leadActor: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh4590'
+        }
+      });
+
+      var Person = db.model('gh4590', personSchema);
+      var Movie = db.model('gh4590_0', movieSchema);
+
+      var arnold = new Person({ name: 'Arnold Schwarzenegger' });
+      var movies = [{ name: 'Predator', leadActor: arnold }];
+      Movie.insertMany(movies, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 1);
+        Movie.findOne({ name: 'Predator' }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.leadActor.toHexString(), arnold._id.toHexString());
           done();
         });
       });
@@ -5293,6 +5445,26 @@ describe('Model', function() {
       });
     });
 
+    it('method with same name as prop should throw (gh-4475)', function(done) {
+      var testSchema = new mongoose.Schema({
+        isPaid: Boolean
+      });
+      testSchema.methods.isPaid = function() {
+        return false;
+      };
+
+      var threw = false;
+      try {
+        db.model('gh4475', testSchema);
+      } catch (error) {
+        threw = true;
+        assert.equal(error.message, 'You have a method and a property in ' +
+          'your schema both named "isPaid"');
+      }
+      assert.ok(threw);
+      done();
+    });
+
     it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
       var schema = new Schema({ name: 'String' });
       var Movie = db.model('gh3222', schema);
@@ -5305,6 +5477,238 @@ describe('Model', function() {
       Movie.create({ name: 'Conan the Barbarian' }, function(error) {
         assert.ifError(error);
         throw new Error('fail!');
+      });
+    });
+
+    it('create() reuses existing doc if one passed in (gh-4449)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String
+      });
+      var Test = db.model('gh4449_0', testSchema);
+
+      var t = new Test();
+      Test.create(t, function(error, t2) {
+        assert.ifError(error);
+        assert.ok(t === t2);
+        done();
+      });
+    });
+
+    it('emits errors correctly from exec (gh-4500)', function(done) {
+      var someModel = db.model('gh4500', new Schema({}));
+
+      someModel.on('error', function(error) {
+        assert.equal(error.message, 'This error will not disappear');
+        assert.ok(cleared);
+        done();
+      });
+
+      var cleared = false;
+      someModel.findOne().exec(function() {
+        setImmediate(function() {
+          cleared = true;
+        });
+        throw new Error('This error will not disappear');
+      });
+    });
+
+    it('creates new array when initializing from existing doc (gh-4449)', function(done) {
+      var TodoSchema = new mongoose.Schema({
+        title: String
+      }, { _id: false });
+
+      var UserSchema = new mongoose.Schema({
+        name: String,
+        todos: [TodoSchema]
+      });
+      var User = db.model('User', UserSchema);
+
+      var val = new User({ name: 'Val' });
+      User.create(val, function(error, val) {
+        assert.ifError(error);
+        val.todos.push({ title: 'Groceries' });
+        val.save(function(error) {
+          assert.ifError(error);
+          User.findById(val, function(error, val) {
+            assert.ifError(error);
+            assert.deepEqual(val.toObject().todos, [{ title: 'Groceries' }]);
+            var u2 = new User();
+            val.todos = u2.todos;
+            val.todos.push({ title: 'Cook' });
+            val.save(function(error) {
+              assert.ifError(error);
+              User.findById(val, function(error, val) {
+                assert.ifError(error);
+                assert.equal(val.todos.length, 1);
+                assert.equal(val.todos[0].title, 'Cook');
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('bulkWrite casting (gh-3998)', function(done) {
+      var schema = new Schema({
+        str: String,
+        num: Number
+      });
+
+      var M = db.model('gh3998', schema);
+
+      var ops = [
+        {
+          insertOne: {
+            document: { str: 1, num: '1' }
+          }
+        },
+        {
+          updateOne: {
+            filter: { str: 1 },
+            update: {
+              $set: { num: '2' }
+            }
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.str, '1');
+          assert.strictEqual(doc.num, 2);
+          done();
+        });
+      });
+    });
+
+    it('insertMany with Decimal (gh-5190)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new mongoose.Schema({
+          amount : mongoose.Schema.Types.Decimal
+        });
+        var Money = db.model('gh5190', schema);
+
+        Money.insertMany([{ amount : '123.45' }], function(error) {
+          assert.ifError(error);
+          done();
+        });
+      }
+    });
+
+    it('remove with cast error (gh-5323)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh5323', schema);
+      var arr = [
+        { name: 'test-1' },
+        { name: 'test-2' }
+      ];
+
+      Model.create(arr, function(error) {
+        assert.ifError(error);
+        Model.remove([], function(error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('Query filter must be an object') !== -1,
+            error.message);
+          Model.find({}, function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
+    });
+
+    it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
+      var schema = new Schema({
+        str: String,
+        num: Number
+      });
+
+      var M = db.model('gh3998_0', schema);
+
+      var ops = [
+        {
+          insertOne: {
+            document: { str: 1, num: '1' }
+          }
+        },
+        {
+          insertOne: {
+            document: { str: '1', num: '1' }
+          }
+        },
+        {
+          updateMany: {
+            filter: { str: 1 },
+            update: {
+              $set: { num: '2' }
+            }
+          }
+        },
+        {
+          deleteMany: {
+            filter: { str: 1 }
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.count({}, function(error, count) {
+          assert.ifError(error);
+          assert.equal(count, 0);
+          done();
+        });
+      });
+    });
+
+    it('bulkWrite casting replaceOne (gh-3998)', function(done) {
+      var schema = new Schema({
+        str: String,
+        num: Number
+      });
+
+      var M = db.model('gh3998_1', schema);
+
+      var ops = [
+        {
+          insertOne: {
+            document: { str: 1, num: '1' }
+          }
+        },
+        {
+          replaceOne: {
+            filter: { str: 1 },
+            replacement: { str: 2, num: '2' }
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.str, '2');
+          assert.strictEqual(doc.num, 2);
+          done();
+        });
       });
     });
 

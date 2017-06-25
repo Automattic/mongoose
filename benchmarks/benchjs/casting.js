@@ -136,6 +136,6 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
       out.ops = item.hz;
       outObj[item.name.replace(/\s/g, '')] = out;
     });
-    console.log(JSON.stringify(outObj));
+    console.dir(outObj, {depth: null, colors: true});
   }
 }).run({async: true});

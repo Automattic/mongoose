@@ -9,15 +9,6 @@ var start = require('./common'),
  * Setup
  */
 
-var schema = new Schema({
-  coordinates: {type: [Number], index: '2dsphere'},
-  type: String
-});
-
-function getModel(db) {
-  return db.model('GeoNear', schema, 'geonear' + random());
-}
-
 var testLocations = {
   MONGODB_NYC_OFFICE: [-73.987732, 40.757471],
   BRYANT_PART_NY: [-73.983677, 40.753628],
@@ -32,6 +23,19 @@ function metersToRadians(m) {
 }
 
 describe('model', function() {
+  var schema;
+
+  function getModel(db) {
+    return db.model('GeoNear', schema, 'geonear' + random());
+  }
+
+  before(function() {
+    schema = new Schema({
+      coordinates: {type: [Number], index: '2dsphere'},
+      type: String
+    });
+  });
+
   var mongo24_or_greater = false;
   before(function(done) {
     start.mongodVersion(function(err, version) {

@@ -2,17 +2,42 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random;
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var Schema = mongoose.Schema;
+var random = require('../lib/utils').random;
+var muri = require('muri');
 
 /**
  * Test.
  */
 
 describe('connections:', function() {
+  describe('useMongoClient/openUri (gh-5304)', function() {
+    it('with mongoose.connect()', function(done) {
+      var promise = mongoose.connect('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
+      assert.equal(promise.constructor.name, 'Promise');
+
+      promise.then(function(conn) {
+        assert.equal(conn.constructor.name, 'NativeConnection');
+
+        return mongoose.disconnect().then(function() { done(); });
+      }).catch(done);
+    });
+
+    it('with mongoose.createConnection()', function(done) {
+      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
+      assert.equal(promise.constructor.name, 'Promise');
+
+      promise.then(function(conn) {
+        assert.equal(conn.constructor.name, 'NativeConnection');
+
+        return mongoose.disconnect().then(function() { done(); });
+      }).catch(done);
+    });
+  });
+
   it('should allow closing a closed connection', function(done) {
     var db = mongoose.createConnection();
 
@@ -140,11 +165,6 @@ describe('connections:', function() {
 
     var mongod = 'mongodb://localhost:27017';
 
-    var repl1 = process.env.MONGOOSE_SET_TEST_URI;
-    var repl2 = repl1.replace('mongodb://', '').split(',');
-    repl2.push(repl2.shift());
-    repl2 = 'mongodb://' + repl2.join(',');
-
     describe('with different host/port', function() {
       it('non-replica set', function(done) {
         var db = mongoose.createConnection();
@@ -194,58 +214,16 @@ describe('connections:', function() {
           });
         });
       });
+    });
+  });
 
-      it('replica set', function(done) {
-        var db = mongoose.createConnection();
+  describe('errors', function() {
+    it('.catch() means error does not get thrown (gh-5229)', function(done) {
+      var db = mongoose.createConnection();
 
-        db.openSet(repl1, function(err) {
-          if (err) {
-            return done(err);
-          }
-
-          var hosts = db.hosts.slice();
-          var db1 = db.db;
-
-          db.close(function(err) {
-            if (err) {
-              return done(err);
-            }
-
-            db.openSet(repl2, function(err) {
-              if (err) {
-                return done(err);
-              }
-
-              db.hosts.forEach(function(host, i) {
-                assert.notEqual(host.port, hosts[i].port);
-              });
-              assert.ok(db1 !== db.db);
-
-              hosts = db.hosts.slice();
-              var db2 = db.db;
-
-              db.close(function(err) {
-                if (err) {
-                  return done(err);
-                }
-
-                db.openSet(repl1, function(err) {
-                  if (err) {
-                    return done(err);
-                  }
-
-                  db.hosts.forEach(function(host, i) {
-                    assert.notEqual(host.port, hosts[i].port);
-                  });
-                  assert.ok(db2 !== db.db);
-
-                  db.close();
-                  done();
-                });
-              });
-            });
-          });
-        });
+      db.open('fail connection').catch(function(error) {
+        assert.ok(error);
+        done();
       });
     });
   });
@@ -563,9 +541,8 @@ describe('connections:', function() {
             + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true';
 
-        var db = mongoose.createConnection(conn, {mongos: true});
-        db.on('error', done);
-        db.close();
+        var db = new mongoose.Connection();
+        db.options = db.parseOptions({mongos: true}, muri(conn).options);
         assert.equal(typeof db.options, 'object');
         assert.equal(typeof db.options.server, 'object');
         assert.equal(typeof db.options.server.socketOptions, 'object');
@@ -610,9 +587,8 @@ describe('connections:', function() {
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true'
             + newQueryParam;
 
-        var db = mongoose.createConnection(conn);
-        db.on('error', done);
-        db.close();
+        var db = new mongoose.Connection();
+        db.options = db.parseOptions({}, muri(conn).options);
         assert.strictEqual(typeof db.options, 'object');
         assert.strictEqual(typeof db.options.server, 'object');
         assert.strictEqual(typeof db.options.server.socketOptions, 'object');
@@ -655,9 +631,8 @@ describe('connections:', function() {
             + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf&sslValidate=true';
 
-        var db = mongoose.createConnection(conn, {mongos: {w: 3, wtimeoutMS: 80}});
-        db.on('error', done);
-        db.close();
+        var db = new mongoose.Connection();
+        db.options = db.parseOptions({mongos: {w: 3,wtimeoutMS: 80}}, muri(conn).options);
         assert.equal(typeof db.options, 'object');
         assert.equal(typeof db.options.server, 'object');
         assert.equal(typeof db.options.server.socketOptions, 'object');
@@ -684,7 +659,6 @@ describe('connections:', function() {
         assert.equal(db.options.db.safe, true);
         assert.equal(db.options.db.fsync, true);
         assert.equal(db.options.db.journal, true);
-        assert.equal(db.options.db.wtimeoutMS, 80);
         assert.equal(db.options.db.readPreference, 'nearest');
         assert.deepEqual([{dc: 'ny', rack: 1}, {dc: 'sf'}], db.options.db.read_preference_tags);
         assert.equal(db.options.db.forceServerObjectId, false);
@@ -1057,7 +1031,9 @@ describe('connections:', function() {
   it('connecting to single mongos (gh-3537)', function(done) {
     var db = mongoose.createConnection('localhost:27017', {mongos: true});
     assert.ok(db.db.serverConfig instanceof mongoose.mongo.Mongos);
-    db.close(done);
+    db.on('error', function() {
+      done();
+    });
   });
 
   describe('connecting to multiple mongos nodes (gh-1037)', function() {

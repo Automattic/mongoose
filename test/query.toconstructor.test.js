@@ -5,39 +5,52 @@ var start = require('./common'),
     random = require('../lib/utils').random,
     Query = require('../lib/query');
 
-
-var Comment = new Schema({
-  text: String
-});
-
-var Product = new Schema({
-  tags: {}, // mixed
-  array: Array,
-  ids: [Schema.ObjectId],
-  strings: [String],
-  numbers: [Number],
-  comments: [Comment],
-  title: String
-});
-var prodName = 'Product' + random();
-var cName = 'Comment' + random();
-mongoose.model(prodName, Product);
-mongoose.model(cName, Comment);
-
 describe('Query:', function() {
+  var Comment;
+  var Product;
+  var prodName;
+  var cName;
+
+  before(function() {
+    Comment = new Schema({
+      text: String
+    });
+
+    Product = new Schema({
+      tags: {}, // mixed
+      array: Array,
+      ids: [Schema.ObjectId],
+      strings: [String],
+      numbers: [Number],
+      comments: [Comment],
+      title: String
+    });
+    prodName = 'Product' + random();
+    mongoose.model(prodName, Product);
+    cName = 'Comment' + random();
+    mongoose.model(cName, Comment);
+  });
+
   describe('toConstructor', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('creates a query', function(done) {
-      var db = start();
       var Product = db.model(prodName);
       var prodQ = Product.find({title: /test/}).toConstructor();
 
       assert.ok(prodQ() instanceof Query);
-
-      db.close(done);
+      done();
     });
 
     it('copies all the right values', function(done) {
-      var db = start();
       var Product = db.model(prodName);
 
       var prodQ = Product.update({title: /test/}, {title: 'blah'});
@@ -53,19 +66,16 @@ describe('Query:', function() {
       assert.deepEqual(prodQ.model, prodC().model);
       assert.deepEqual(prodQ.mongooseCollection, prodC().mongooseCollection);
       assert.deepEqual(prodQ._mongooseOptions, prodC()._mongooseOptions);
-
-      db.close(done);
+      done();
     });
 
     it('gets expected results', function(done) {
-      var db = start();
       var Product = db.model(prodName);
       Product.create({title: 'this is a test'}, function(err, p) {
         assert.ifError(err);
         var prodC = Product.find({title: /test/}).toConstructor();
 
         prodC().exec(function(err, results) {
-          db.close();
           assert.ifError(err);
           assert.equal(results.length, 1);
           assert.equal(p.title, results[0].title);
@@ -75,7 +85,6 @@ describe('Query:', function() {
     });
 
     it('can be re-used multiple times', function(done) {
-      var db = start();
       var Product = db.model(prodName);
 
       Product.create([{title: 'moar thing'}, {title: 'second thing'}], function(err, prods) {
@@ -93,7 +102,6 @@ describe('Query:', function() {
             assert.equal(res.length, 1);
 
             prodC().exec(function(err, res) {
-              db.close();
               assert.ifError(err);
               assert.equal(res.length, 2);
               done();
@@ -104,42 +112,37 @@ describe('Query:', function() {
     });
 
     it('options get merged properly', function(done) {
-      var db = start();
       var Product = db.model(prodName);
-      db.close();
 
       var prodC = Product.find({title: /blah/}).setOptions({sort: 'title', lean: true});
       prodC = prodC.toConstructor();
 
       var nq = prodC(null, {limit: 3});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
-      assert.deepEqual(nq.options, {sort: {title: 1}, limit: 3});
+      assert.deepEqual(nq.options, {sort: {title: 1}, limit: 3, retainKeyOrder: false});
       done();
     });
 
     it('options get cloned (gh-3176)', function(done) {
-      var db = start();
       var Product = db.model(prodName);
-      db.close();
 
       var prodC = Product.find({title: /blah/}).setOptions({sort: 'title', lean: true});
       prodC = prodC.toConstructor();
 
       var nq = prodC(null, {limit: 3});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
-      assert.deepEqual(nq.options, {sort: {title: 1}, limit: 3});
+      assert.deepEqual(nq.options, {sort: {title: 1}, limit: 3, retainKeyOrder: false});
       var nq2 = prodC(null, {limit: 5});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
       assert.deepEqual(nq2._mongooseOptions, {lean: true, limit: 5});
+
       done();
     });
 
     it('creates subclasses of mquery', function(done) {
-      var db = start();
       var Product = db.model(prodName);
-      db.close();
 
-      var opts = {safe: {w: 'majority'}, readPreference: 'p'};
+      var opts = {safe: {w: 'majority'}, readPreference: 'p', retainKeyOrder: true};
       var match = {title: 'test', count: {$gt: 101}};
       var select = {name: 1, count: 0};
       var update = {$set: {title: 'thing'}};
@@ -162,6 +165,22 @@ describe('Query:', function() {
       assert.equal(path, m._path);
       assert.equal('find', m.op);
       done();
+    });
+
+    it('with findOneAndUpdate (gh-4318)', function(done) {
+      var Product = db.model(prodName);
+
+      var Q = Product.where({ title: 'test' }).toConstructor();
+
+      var query = { 'tags.test': 1 };
+      var update = {
+        strings: ['123'],
+        numbers: [1, 2, 3]
+      };
+      Q().findOneAndUpdate(query, update, function(error) {
+        assert.ifError(error);
+        done();
+      });
     });
   });
 });

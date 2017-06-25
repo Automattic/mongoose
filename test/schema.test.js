@@ -30,18 +30,16 @@ function TestDocument() {
 TestDocument.prototype.__proto__ = Document.prototype;
 
 /**
- * Set a dummy schema to simulate compilation.
- */
-
-TestDocument.prototype.$__setSchema(new Schema({
-  test: String
-}));
-
-/**
  * Test.
  */
 
 describe('schema', function() {
+  before(function() {
+    TestDocument.prototype.$__setSchema(new Schema({
+      test: String
+    }));
+  });
+
   describe('nested fields with same name', function() {
     var db, NestedModel;
 
@@ -774,15 +772,15 @@ describe('schema', function() {
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 4);
+      assert.equal(Tobi.callQueue.length, 2);
 
       Tobi.post('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 5);
+      assert.equal(Tobi.callQueue.length, 3);
 
       Tobi.pre('save', function() {
       });
-      assert.equal(Tobi.callQueue.length, 6);
+      assert.equal(Tobi.callQueue.length, 4);
       done();
     });
   });
@@ -849,6 +847,12 @@ describe('schema', function() {
         assert.equal(i.unique, true);
         assert.equal(i.sparse, true);
         assert.equal(i.expireAfterSeconds, 60 * 60 * 24);
+
+        T = new Schema({
+          name: {type: String, index: false, unique: false}
+        });
+        assert.equal(T.path('name')._index, false);
+        assert.equal(T.indexes().length, 0);
 
         done();
       });
@@ -1226,6 +1230,16 @@ describe('schema', function() {
         });
       });
     });
+
+    it('prefix (gh-1730)', function(done) {
+      var s = new Schema({});
+
+      s.add({ n: Number }, 'prefix.');
+
+      assert.equal(s.pathType('prefix.n'), 'real');
+      assert.equal(s.pathType('prefix'), 'nested');
+      done();
+    });
   });
 
   it('debugging msgs', function(done) {
@@ -1564,6 +1578,19 @@ describe('schema', function() {
     done();
   });
 
+  it('arrays with typeKey (gh-4548)', function(done) {
+    var testSchema = new Schema({
+      test: [{ $type: String }]
+    }, { typeKey: '$type' });
+
+    assert.equal(testSchema.paths.test.caster.instance, 'String');
+
+    var Test = mongoose.model('gh4548', testSchema);
+    var test = new Test({ test: [123] });
+    assert.strictEqual(test.test[0], '123');
+    done();
+  });
+
   describe('remove()', function() {
     before(function() {
       this.schema = new Schema({
@@ -1607,6 +1634,38 @@ describe('schema', function() {
       var Test = mongoose.model('gh2398', this.schema);
       var t = new Test();
       assert.equal(t.a, 42);
+      done();
+    });
+
+    it('methods named toString (gh-4551)', function(done) {
+      this.schema.methods.toString = function() {
+        return 'test';
+      };
+      // should not throw
+      mongoose.model('gh4551', this.schema);
+      done();
+    });
+
+    it('handles default value = 0 (gh-4620)', function(done) {
+      var schema = new Schema({
+        tags: { type: [Number], default: 0 }
+      });
+      assert.deepEqual(schema.path('tags').getDefault().toObject(), [0]);
+      done();
+    });
+
+    it('Decimal128 type (gh-4759)', function(done) {
+      var Decimal128 = mongoose.Schema.Types.Decimal128;
+      var schema = new Schema({
+        num: Decimal128,
+        nums: ['Decimal128']
+      });
+      assert.ok(schema.path('num') instanceof Decimal128);
+      assert.ok(schema.path('nums').caster instanceof Decimal128);
+
+      var casted = schema.path('num').cast('6.2e+23');
+      assert.ok(casted instanceof mongoose.Types.Decimal128);
+      assert.equal(casted.toString(), '6.2E+23');
       done();
     });
   });

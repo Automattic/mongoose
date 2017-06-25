@@ -79,13 +79,49 @@ block content
   :markdown
     A full list of [Query helper functions can be found in the API docs](http://mongoosejs.com/docs/api.html#query-js).
 
+  h3#setters
+  :markdown
+    Setters are not executed by default in 4.x. For example, if you lowercase emails in your schema:
+  
+  :js
+    var personSchema = new Schema({
+      email: {
+        type: String,
+        lowercase: true
+      }
+    });
+  
+  :markdown
+    Mongoose will **not** automatically lowercase the email in your queries, so `Person.find({ email: 'Val@karpov.io' })` would return no results.
+    Use the `runSettersOnQuery` option to turn on this behavior:
+  
+  :js
+    var personSchema = new Schema({
+      email: {
+        type: String,
+        lowercase: true
+      }
+    }, { runSettersOnQuery: true });
+
   h3#refs References to other documents
   :markdown
     There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [population](./populate.html) comes in. Read more about how to include documents from other collections in your query results [here](./api.html#query_Query-populate).
 
   h3 Streaming
   :markdown
-    Queries can be [streamed](http://nodejs.org/api/stream.html) from MongoDB to your application as well. Simply call the query's [stream](./api.html#query_Query-stream) method instead of [exec](./api.html#query_Query-exec) to return an instance of [QueryStream](./api.html#querystream_QueryStream). Note: QueryStreams are Node.js 0.8 style read streams not Node.js 0.10 style.
+    You can [stream](http://nodejs.org/api/stream.html) query results from
+    MongoDB. You need to call the
+    [Query#cursor()](./api.html#query_Query-cursor) function instead of
+    [Query#exec](./api.html#query_Query-exec) to return an instance of
+    [QueryCursor](./api.html#querycursor-js).
+  :js
+    var cursor = Person.find({ occupation: /host/ }).cursor();
+    cursor.on('data', function(doc) {
+      // Called once for every document
+    });
+    cursor.on('close', function() {
+      // Called when done
+    });
 
   h3#next Next Up
   :markdown

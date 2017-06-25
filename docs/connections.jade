@@ -3,21 +3,55 @@ extends layout
 block content
   h2 Connections
   :markdown
-    We may connect to MongoDB by utilizing the `mongoose.connect()` method.
+    You can connect to MongoDB with the `mongoose.connect()` method.
 
   :js
     mongoose.connect('mongodb://localhost/myapp');
 
   :markdown
-    This is the minimum needed to connect the `myapp` database running locally on the default port (27017). If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed.
+    This is the minimum needed to connect the `myapp` database running locally
+    on the default port (27017). If the local connection fails then try using
+    127.0.0.1 instead of localhost. Sometimes issues may arise when the local
+    hostname has been changed.
    
-    We may also specify several more parameters in the `uri` depending on your environment:
+    You can also specify several more parameters in the `uri`:
 
   :js
     mongoose.connect('mongodb://username:password@host:port/database?options...');
 
   :markdown
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
+
+  h3#buffering Operation Buffering
+  :markdown
+    Mongoose lets you start using your models immediately, without waiting for
+    mongoose to establish a connection to MongoDB.
+  
+  :js
+    mongoose.connect('mongodb://localhost/myapp');
+    var MyModel = mongoose.model('Test', new Schema({ name: String }));
+    // Works
+    MyModel.findOne(function(error, result) { /* ... */ });
+  
+  :markdown
+    That's because mongoose buffers model function calls internally. This
+    buffering is convenient, but also a common source of confusion. Mongoose
+    will *not* throw any errors by default if you use a model without
+    connecting.
+  
+  :js
+    var MyModel = mongoose.model('Test', new Schema({ name: String }));
+    // Will just hang until mongoose successfully connects
+    MyModel.findOne(function(error, result) { /* ... */ });
+    
+    setTimeout(function() {
+      mongoose.connect('mongodb://localhost/myapp');
+    }, 60000);
+  
+  :markdown
+    To disable buffering, turn off the [`bufferCommands` option on your schema](http://mongoosejs.com/docs/guide.html#bufferCommands).
+    If you have `bufferCommands` on and your connection is hanging, try turning
+    `bufferCommands` off to see if you haven't opened a connection properly.
 
   h3#options Options
   :markdown
@@ -29,13 +63,14 @@ block content
   :markdown
     The following option keys are available:
 
-         db      - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-         server  - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-         replset - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-         user    - username for authentication (if not specified in uri)
-         pass    - password for authentication (if not specified in uri)
-         auth    - options for authentication
-         mongos  - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.0/api/Mongos.html)
+         db             - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
+         server         - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+         replset        - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
+         user           - username for authentication (if not specified in uri)
+         pass           - password for authentication (if not specified in uri)
+         auth           - options for authentication
+         mongos         - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.1/api/Mongos.html)
+         promiseLibrary - sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html)
     Example:
   :js
     var options = {
@@ -59,7 +94,19 @@ block content
     // Good way to make sure mongoose never stops trying to reconnect
     mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
      
-
+  h3#callback Callback
+  :markdown
+    The `connect()` function also accepts a callback parameter and returns a [promise](http://mongoosejs.com/docs/promises.html).
+  :js
+    mongoose.connect(uri, options, function(error) {
+      // Check error in initial connection. There is no 2nd param to the callback.
+    });
+    
+    // Or using promises
+    mongoose.connect(uri, options).then(
+      () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
+      err => { /** handle initial connection error }
+    );
 
   h4#connection-string-options Connection String Options
   :markdown
@@ -72,6 +119,7 @@ block content
     * [connectTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
     * [authSource](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
     * [retries](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    * [authMechanism](http://mongodb.github.io/node-mongodb-native/2.2/tutorials/connect/authenticating/)
     * [reconnectWait](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
     * [rs_name](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
     * [replicaSet](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
@@ -97,12 +145,19 @@ block content
     options.server.socketOptions = options.replset.socketOptions = { keepAlive: 120 };
     mongoose.connect(uri, options);
 
-  h3#replicaset_connections ReplicaSet Connections
+  h3#replicaset_connections Replica Set Connections
   :markdown
-    The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
+    To connect to a replica set you pass a comma delimited list of hosts to
+    connect to rather than a single host.
 
   :js
     mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
+
+  :markdown
+    To connect to a single node replica set, specify the `replicaSet` option.
+    
+  :js
+    mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
 
   h3#mongos_connections Multi-mongos support
   :markdown
@@ -137,6 +192,25 @@ block content
     // passing the option in the URI works with single or replica sets
     var uri = 'mongodb://localhost/test?poolSize=4';
     mongoose.createConnection(uri);
+  
+  h3#use-mongoose-uri
+  :markdown
+    Mongoose's default connection logic is deprecated as of 4.11.0. Please opt
+    in to the new connection logic using the `useMongoClient` option, but
+    make sure you test your connections first if you're upgrading an existing
+    codebase!
+  :js
+    // Using `mongoose.connect`...
+    var promise = mongoose.connect('mongodb://localhost/myapp', { useMongoClient: true, /* other options */ });
+    // Or `createConnection`
+    var promise = mongoose.createConnection('mongodb://localhost/myapp', { useMongoClient: true, /* other options */ });
+    // Or, if you already have a connection
+    connection.openUri('mongodb://localhost/myapp', { /* options */ });
+  :markdown
+    This deprecation is because the [MongoDB driver](https://www.npmjs.com/package/mongodb)
+    has deprecated an API that is critical to mongoose's connection logic to
+    support MongoDB 3.6, see [this github issue](https://github.com/Automattic/mongoose/issues/5304)
+    for more details.
 
   h3#next Next Up
   :markdown

@@ -3,47 +3,101 @@ extends layout
 block content
   h2 Sub Docs
   :markdown
-    [Sub-documents](./api.html#types-embedded-js) are docs with schemas of
-    their own which are elements of a parents document array:
+    Subdocuments are documents embedded in other documents. In Mongoose, this
+    means you can nest schemas in other schemas. Mongoose has two
+    distinct notions of subdocuments: arrays of subdocuments and single nested
+    subdocuments.
   :js
     var childSchema = new Schema({ name: 'string' });
 
     var parentSchema = new Schema({
-      children: [childSchema]
-    })
+      // Array of subdocuments
+      children: [childSchema],
+      // Single nested subdocuments. Caveat: single nested subdocs only work
+      // in mongoose >= 4.2.0
+      child: childSchema
+    });
 
   :markdown
-    Sub-documents enjoy all the same features as normal
-    [documents](./api.html#document-js). The only difference is that they are
+    Subdocuments are similar to normal documents. Nested schemas can have
+    [middleware](http://mongoosejs.com/docs/middleware.html), [custom validation logic](http://mongoosejs.com/docs/middleware.html),
+    virtuals, and any other feature top-level schemas can use. The major
+    difference is that subdocuments are
     not saved individually, they are saved whenever their top-level parent
     document is saved.
   :js
     var Parent = mongoose.model('Parent', parentSchema);
     var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
     parent.children[0].name = 'Matthew';
+    
+    // `parent.children[0].save()` is a no-op, it triggers middleware but
+    // does **not** actually save the subdocument. You need to save the parent
+    // doc.
     parent.save(callback);
 
   :markdown
-    If an error occurs in a sub-documents' middleware, it is bubbled up to the `save()` callback of the parent, so error handling is a snap!
+    Subdocuments have `save` and `validate` [middleware](http://mongoosejs.com/docs/middleware.html)
+    just like top-level documents. Calling `save()` on the parent document triggers
+    the `save()` middleware for all its subdocuments, and the same for `validate()`
+    middleware.
 
   :js
     childSchema.pre('save', function (next) {
-      if ('invalid' == this.name) return next(new Error('#sadpanda'));
+      if ('invalid' == this.name) {
+        return next(new Error('#sadpanda'));
+      }
       next();
     });
 
     var parent = new Parent({ children: [{ name: 'invalid' }] });
     parent.save(function (err) {
       console.log(err.message) // #sadpanda
-    })
+    });
+  
+  :markdown
+    Subdocuments' `pre('save')` and `pre('validate')` middleware execute
+    **before** the top-level document's `pre('save')` but **after** the
+    top-level document's `pre('validate')` middleware. This is because validating
+    before `save()` is actually a piece of built-in middleware.
+  
+  :js
+    // Below code will print out 1-4 in order
+    var childSchema = new mongoose.Schema({ name: 'string' });
+
+    childSchema.pre('validate', function(next) {
+      console.log('2');
+      next();
+    });
+
+    childSchema.pre('save', function(next) {
+      console.log('3');
+      next();
+    });
+
+    var parentSchema = new mongoose.Schema({
+      child: childSchema,
+        });
+
+    parentSchema.pre('validate', function(next) {
+      console.log('1');
+      next();
+    });
+
+    parentSchema.pre('save', function(next) {
+      console.log('4');
+      next();
+    });
+
 
   h3 Finding a sub-document
   :markdown
-    Each document has an `_id`. DocumentArrays have a special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method for looking up a document by its `_id`.
+    Each subdocument has an `_id` by default. Mongoose document arrays have a
+    special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
+    for searching a document array to find a document with a given `_id`.
   :js
-    var doc = parent.children.id(id);
+    var doc = parent.children.id(_id);
 
-  h3 Adding sub-docs
+  h3 Adding sub-docs to arrays
   :markdown
     MongooseArray methods such as
     [push](./api.html#types_array_MongooseArray.push),
@@ -71,50 +125,36 @@ block content
   :js
     var newdoc = parent.children.create({ name: 'Aaron' });
 
-  h3 Removing docs
+  h3 Removing subdocs
   :markdown
-    Each sub-document has it's own
-    [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
+    Each subdocument has it's own
+    [remove](./api.html#types_embedded_EmbeddedDocument-remove) method. For
+    an array subdocument, this is equivalent to calling `.pull()` on the
+    subdocument. For a single nested subdocument, `remove()` is equivalent
+    to setting the subdocument to `null`.
   :js
-    var doc = parent.children.id(id).remove();
+    // Equivalent to `parent.children.pull(_id)`
+    parent.children.id(_id).remove();
+    // Equivalent to `parent.child = null`
+    parent.child.remove();
     parent.save(function (err) {
       if (err) return handleError(err);
-      console.log('the sub-doc was removed')
+      console.log('the subdocs were removed');
     });
 
-  h4#altsyntax Alternate declaration syntax
+  h4#altsyntax Alternate declaration syntax for arrays
   :markdown
-    If you don't need access to the sub-document schema instance,
-    you may also declare sub-docs by simply passing an object literal:
+    If you create a schema with an array of objects, mongoose will automatically
+    convert the object to a schema for you:
   :js
     var parentSchema = new Schema({
       children: [{ name: 'string' }]
-    })
-  
-  h4#single-embedded Single Embedded Subdocs
-  :markdown
-    **New in 4.2.0**
-    
-    You can also embed schemas without using arrays.
-  :js
-    var childSchema = new Schema({ name: 'string' });
-
+    });
+    // Equivalent
     var parentSchema = new Schema({
-      child: childSchema
+      children: [new Schema({ name: 'string' })]
     });
-  :markdown
-    A single embedded sub-document behaves similarly to an embedded array.
-    It only gets saved when the parent document gets saved, and its pre/post
-    document middleware get executed.
-  :js
-    childSchema.pre('save', function(next) {
-      console.log(this.name); // prints 'Leia'
-    });
-    var Parent = mongoose.model('Parent', parentSchema);
-    var parent = new Parent({ child: { name: 'Luke' } })
-    parent.child.name = 'Leia';
-    parent.save(callback); // Triggers the pre middleware.
-
+  
   h3#next Next Up
   :markdown
     Now that we've covered `Sub-documents`, let's take a look at

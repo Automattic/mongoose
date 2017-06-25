@@ -62,13 +62,16 @@ describe('mongoose module:', function() {
   });
 
   it('declaring global plugins', function(done) {
-    var mong = new Mongoose(),
-        schema = new Schema(),
-        called = 0;
+    var mong = new Mongoose();
+    var subSchema = new Schema();
+    var schema = new Schema({
+      test: [subSchema]
+    });
+    var called = 0;
 
+    var calls = [];
     mong.plugin(function(s) {
-      assert.equal(s, schema);
-      called++;
+      calls.push(s);
     });
 
     schema.plugin(function(s) {
@@ -78,7 +81,10 @@ describe('mongoose module:', function() {
 
     mong.model('GlobalPlugins', schema);
 
-    assert.equal(called, 2);
+    assert.equal(called, 1);
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0], schema);
+    assert.equal(calls[1], subSchema);
     done();
   });
 
@@ -423,4 +429,3 @@ describe('mongoose module:', function() {
     });
   });
 });
-

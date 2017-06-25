@@ -9,6 +9,12 @@
  *  utilizes mongoose's Amazon [CloudFront](http://aws.amazon.com/cloudfront/)
  *  CDN.
  *
+ *  If you are using webpack to bundle your client-side code, you need to add the following plugin to webpack's `plugins` array
+ *  so that webpack does not attempt to resolve mongoose's server-side dependencies:
+ *
+ *  new webpack.DefinePlugin({
+ *    'typeof window': '\"object\"'
+ *  })
  *  ```
  *  <script type="text/javascript" src="//d1l4stvdmqmdzl.cloudfront.net/4.0.2/mongoose.js">
  *  </script>

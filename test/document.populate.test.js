@@ -526,7 +526,7 @@ describe('document.populate', function() {
   });
 
   describe('gh-2214', function() {
-    it('should return a real document array when populating', function(done) {
+    it('should return a real document array when populating', function() {
       var db = start();
 
       var Car = db.model('gh-2214-1', {
@@ -565,7 +565,6 @@ describe('document.populate', function() {
               joe.cars.push(car);
               assert.ok(joe.isModified('cars'));
               db.close();
-              done();
             });
           });
         });
@@ -613,6 +612,28 @@ describe('document.populate', function() {
         });
       });
     });
+  });
+
+  it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
+    var EmbeddedSchema = new Schema({
+      reference: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Reference'
+      }
+    });
+
+    var ModelSchema = new Schema({
+      embedded: EmbeddedSchema
+    });
+
+    var Model = db.model('gh4552', ModelSchema);
+
+    var m = new Model({});
+    m.embedded = {};
+    assert.throws(function() {
+      m.embedded.populate('reference');
+    }, /on nested docs/);
+    done();
   });
 
   it('handles pulling from populated array (gh-3579)', function(done) {

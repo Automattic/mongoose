@@ -8,8 +8,9 @@
 6.  git push origin BRANCH --tags && npm publish
 7.  update mongoosejs.com (see "updating the website" below)
 8.  tweet changelog link from [@mongoosejs](https://twitter.com/mongoosejs)
-9. change package.json version to next patch version suffixed with '-pre' and commit "now working on x.x.x"
-10. if this is a legacy release, `git merge` changes into master.
+9.  Announce on mongoosejsteam slack channel
+10. change package.json version to next patch version suffixed with '-pre' and commit "now working on x.x.x"
+11. if this is a legacy release, `git merge` changes into master.
 
 ## updating the website
 

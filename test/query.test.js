@@ -10,32 +10,38 @@ var assert = require('power-assert');
 var random = require('../lib/utils').random;
 var Query = require('../lib/query');
 
-var Comment = new Schema({
-  text: String
-});
-
-var Product = new Schema({
-  tags: {}, // mixed
-  array: Array,
-  ids: [Schema.ObjectId],
-  strings: [String],
-  numbers: [Number],
-  comments: [Comment]
-});
-
-mongoose.model('Product', Product);
-mongoose.model('Comment', Comment);
-var p1;
-
 /**
  * Test.
  */
 
 describe('Query', function() {
+  var Comment;
+  var Product;
+  var p1;
+
+  before(function() {
+    Comment = new Schema({
+      text: String
+    });
+
+    Product = new Schema({
+      tags: {}, // mixed
+      array: Array,
+      ids: [Schema.ObjectId],
+      strings: [String],
+      numbers: [Number],
+      comments: [Comment]
+    });
+
+    mongoose.model('Product', Product);
+    mongoose.model('Comment', Comment);
+  });
+
   before(function() {
     var Prod = mongoose.model('Product');
     p1 = new Prod();
   });
+
   describe('constructor', function() {
     it('should not corrupt options', function(done) {
       var opts = {};
@@ -64,14 +70,6 @@ describe('Query', function() {
       assert.throws(function() {
         var query = new Query({}, {}, null, p1.collection);
         query.select('a', 'b', 'c');
-      }, /Invalid select/);
-      done();
-    });
-
-    it('["a","b","c"]', function(done) {
-      assert.throws(function() {
-        var query = new Query({}, {}, null, p1.collection);
-        query.select(['a', 'b', 'c']);
       }, /Invalid select/);
       done();
     });
@@ -733,6 +731,14 @@ describe('Query', function() {
       query = new Query({}, {}, null, p1.collection);
       query.sort({a: 1, c: -1, b: 'asc', e: 'descending', f: 'ascending'});
       assert.deepEqual(query.options.sort, {a: 1, c: -1, b: 1, e: -1, f: 1});
+
+      if (typeof global.Map !== 'undefined') {
+        query = new Query({}, {}, null, p1.collection);
+        query.sort(new global.Map().set('a', 1).set('b', 2));
+        assert.deepEqual(query.options.sort,
+          new global.Map().set('a', 1).set('b', 2));
+      }
+
       query = new Query({}, {}, null, p1.collection);
       var e;
 
@@ -743,7 +749,7 @@ describe('Query', function() {
       }
 
       assert.ok(e, 'uh oh. no error was thrown');
-      assert.equal(e.message, 'Invalid sort() argument.');
+      assert.equal(e.message, 'Invalid sort() argument, must be array of arrays');
 
       e = undefined;
       try {
@@ -888,7 +894,7 @@ describe('Query', function() {
       assert.equal(params.array.$ne, 5);
       assert.equal(params.ids.$ne, id);
       params.comments.$ne._id.toHexString();
-      assert.deepEqual(params.comments.$ne, castedComment);
+      assert.deepEqual(params.comments.$ne.toObject(), castedComment);
       assert.equal(params.strings.$ne, 'Hi there');
       assert.equal(params.numbers.$ne, 10000);
 
@@ -903,7 +909,7 @@ describe('Query', function() {
       assert.ok(params.ids.$ne instanceof Array);
       assert.equal(params.ids.$ne[0].toString(), id.toString());
       assert.ok(params.comments.$ne instanceof Array);
-      assert.deepEqual(params.comments.$ne[0], castedComment);
+      assert.deepEqual(params.comments.$ne[0].toObject(), castedComment);
       assert.ok(params.strings.$ne instanceof Array);
       assert.equal(params.strings.$ne[0], 'Hi there');
       assert.ok(params.numbers.$ne instanceof Array);
@@ -945,7 +951,7 @@ describe('Query', function() {
       assert.equal(params.array, 5);
       assert.equal(params.ids, id);
       params.comments._id.toHexString();
-      assert.deepEqual(params.comments, castedComment);
+      assert.deepEqual(params.comments.toObject(), castedComment);
       assert.equal(params.strings, 'Hi there');
       assert.equal(params.numbers, 10000);
 
@@ -960,7 +966,7 @@ describe('Query', function() {
       assert.ok(params.ids instanceof Array);
       assert.equal(params.ids[0].toString(), id.toString());
       assert.ok(params.comments instanceof Array);
-      assert.deepEqual(params.comments[0], castedComment);
+      assert.deepEqual(params.comments[0].toObject(), castedComment);
       assert.ok(params.strings instanceof Array);
       assert.equal(params.strings[0], 'Hi there');
       assert.ok(params.numbers instanceof Array);
@@ -999,7 +1005,7 @@ describe('Query', function() {
 
       query.cast(Product, params);
       assert.equal(params.ids.$gt, id);
-      assert.deepEqual(params.comments.$gt, castedComment);
+      assert.deepEqual(params.comments.$gt.toObject(), castedComment);
       assert.equal(params.strings.$gt, 'Hi there');
       assert.equal(params.numbers.$gt, 10000);
       done();
@@ -1078,6 +1084,48 @@ describe('Query', function() {
     });
   });
 
+  describe('deleteOne/deleteMany', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('handles deleteOne', function(done) {
+      var M = db.model('deleteOne', new Schema({ name: 'String' }));
+      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        M.deleteOne({ name: /Stark/ }, function(error) {
+          assert.ifError(error);
+          M.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 1);
+            done();
+          });
+        });
+      });
+    });
+
+    it('handles deleteMany', function(done) {
+      var M = db.model('deleteMany', new Schema({ name: 'String' }));
+      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        M.deleteMany({ name: /Stark/ }, function(error) {
+          assert.ifError(error);
+          M.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('remove', function() {
     it('handles cast errors async', function(done) {
       var db = start();
@@ -1139,6 +1187,24 @@ describe('Query', function() {
         });
       }, done).end();
     });
+
+    it('justOne option', function(done) {
+      var db = start();
+      var Test = db.model('Test_justOne', new Schema({ name: String }));
+
+      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        Test.remove({ name: /Stark/ }).setOptions({ justOne: false }).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.result.n, 2);
+          Test.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
   });
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {
@@ -1153,12 +1219,12 @@ describe('Query', function() {
       prod.save(function(err) {
         assert.ifError(err);
 
-        Product.findOne(prod, function(err, product) {
+        Product.findOne({ _id: prod._id }, function(err, product) {
           assert.ifError(err);
           assert.equal(product.comments.length, 1);
           assert.equal(product.comments[0].text, 'hello');
 
-          Product.update(product, prod2doc, function(err) {
+          Product.update({ _id: prod._id }, prod2doc, function(err) {
             assert.ifError(err);
 
             Product.collection.findOne({_id: product._id}, function(err, doc) {
@@ -1259,10 +1325,9 @@ describe('Query', function() {
         query2.hint({indexAttributeA: 1, indexAttributeB: -1});
         assert.deepEqual(query2.options.hint, {indexAttributeA: 1, indexAttributeB: -1});
 
-        assert.throws(function() {
-          var query3 = new Query({}, {}, null, p1.collection);
-          query3.hint('indexAttributeA');
-        }, /Invalid hint./);
+        var query3 = new Query({}, {}, null, p1.collection);
+        query3.hint('indexAttributeA_1');
+        assert.deepEqual(query3.options.hint, 'indexAttributeA_1');
 
         done();
       });
@@ -1460,6 +1525,14 @@ describe('Query', function() {
             });
           });
     });
+
+    it('populate as array in options (gh-4446)', function(done) {
+      var q = new Query;
+      q.setOptions({ populate: [{ path: 'path1' }, { path: 'path2' }] });
+      assert.deepEqual(Object.keys(q._mongooseOptions.populate),
+        ['path1', 'path2']);
+      done();
+    });
   });
 
   describe('update', function() {
@@ -1479,6 +1552,56 @@ describe('Query', function() {
 
     after(function(done) {
       db.close(done);
+    });
+
+    it('collation support (gh-4839)', function(done) {
+      start.mongodVersion(function(err, version) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        if (!mongo34) {
+          done();
+          return;
+        }
+
+        test();
+      });
+
+      function test() {
+        var schema = new Schema({
+          name: String
+        });
+
+        var MyModel = db.model('gh4839', schema);
+        var collation = { locale: 'en_US', strength: 1 };
+
+        MyModel.create([{ name: 'a' }, { name: 'A' }]).
+          then(function() {
+            return MyModel.find({ name: 'a' }).collation(collation);
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            return MyModel.find({ name: 'a' }, null, { collation: collation });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            return MyModel.find({ name: 'a' }, null, { collation: collation }).
+              sort({ _id: -1 }).
+              cursor().
+              next();
+          }).
+          then(function(doc) {
+            assert.equal(doc.name, 'A');
+            return MyModel.find({ name: 'a' });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            done();
+          }).
+          catch(done);
+      }
     });
 
     describe('gh-1950', function() {
@@ -1540,6 +1663,24 @@ describe('Query', function() {
       done();
     });
 
+    it('timestamps with $each (gh-4805)', function(done) {
+      var nestedSchema = new Schema({ value: Number }, { timestamps: true });
+      var Test = db.model('gh4805', new Schema({
+        arr: [nestedSchema]
+      }, { timestamps: true }));
+
+      Test.update({}, {
+        $push: {
+          arr: {
+            $each: [{ value: 1 }]
+          }
+        }
+      }).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('allows sort with count (gh-3914)', function(done) {
       var Post = db.model('gh3914_0', {
         title: String
@@ -1581,8 +1722,8 @@ describe('Query', function() {
           {'answers._id': '507f1f77bcf86cd799439011'},
           {$set: {'answers.$': answersUpdate}});
 
-      assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
-          {votes: 1, count: 3});
+      assert.deepEqual(q.getUpdate().$set['answers.$'].stats.toObject(),
+        { votes: 1, count: 3 });
       done();
     });
 
@@ -1655,6 +1796,277 @@ describe('Query', function() {
           assert.equal(docs.length, 1);
           assert.equal(docs[0].name, 'Val');
           done();
+        });
+      });
+    });
+
+    it('string as input (gh-4378)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var MyModel = db.model('gh4378', schema);
+
+      assert.throws(function() {
+        MyModel.findOne('');
+      }, /Invalid argument to findOne()/);
+
+      done();
+    });
+
+    it('handles geoWithin with $center and mongoose object (gh-4419)', function(done) {
+      var areaSchema = new Schema({
+        name: String,
+        circle: Array
+      });
+      var Area = db.model('gh4419', areaSchema);
+
+      var placeSchema = new Schema({
+        name: String,
+        geometry: {
+          type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+          },
+          coordinates: { type: [Number] }
+        }
+      });
+      placeSchema.index({ geometry: '2dsphere' });
+      var Place = db.model('gh4419_0', placeSchema);
+
+      var tromso = new Area({
+        name: 'Tromso, Norway',
+        circle: [[18.89, 69.62], 10 / 3963.2]
+      });
+      tromso.save(function(error) {
+        assert.ifError(error);
+
+        var airport = {
+          name: 'Center',
+          geometry: {
+            type: 'Point',
+            coordinates: [18.895, 69.67]
+          }
+        };
+        Place.create(airport, function(error) {
+          assert.ifError(error);
+          var q = {
+            geometry: {
+              $geoWithin: {
+                $centerSphere: tromso.circle
+              }
+            }
+          };
+          Place.find(q).exec(function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].name, 'Center');
+            done();
+          });
+        });
+      });
+    });
+
+    it('$not with objects (gh-4495)', function(done) {
+      var schema = new Schema({
+        createdAt: Date
+      });
+
+      var M = db.model('gh4495', schema);
+      var q = M.find({
+        createdAt:{
+          $not:{
+            $gte: '2016/09/02 00:00:00',
+            $lte: '2016/09/02 23:59:59'
+          }
+        }
+      });
+
+      assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
+      assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);
+      done();
+    });
+
+    it('geoIntersects with mongoose doc as coords (gh-4408)', function(done) {
+      var lineStringSchema = new Schema({
+        name: String,
+        geo: {
+          type: { type: String, default: 'LineString' },
+          coordinates: [[Number]]
+        }
+      });
+
+      var LineString = db.model('gh4408', lineStringSchema);
+
+      var ls = {
+        name: 'test',
+        geo: {
+          coordinates: [ [14.59, 24.847], [28.477, 15.961] ]
+        }
+      };
+      var ls2 = {
+        name: 'test2',
+        geo: {
+          coordinates: [ [27.528, 25.006], [14.063, 15.591] ]
+        }
+      };
+      LineString.create(ls, ls2, function(error, ls1) {
+        assert.ifError(error);
+        var query = {
+          geo: {
+            $geoIntersects: {
+              $geometry: {
+                type: 'LineString',
+                coordinates: ls1.geo.coordinates
+              }
+            }
+          }
+        };
+        LineString.find(query, function(error, results) {
+          assert.ifError(error);
+          assert.equal(results.length, 2);
+          done();
+        });
+      });
+    });
+
+    it('string with $not (gh-4592)', function(done) {
+      var TestSchema = new Schema({
+        test: String
+      });
+
+      var Test = db.model('gh4592', TestSchema);
+
+      Test.findOne({ test: { $not: /test/ } }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('runSettersOnQuery works with _id field (gh-5351)', function(done) {
+      var testSchema = new Schema({
+        val: { type: String }
+      }, { runSettersOnQuery: true });
+
+      var Test = db.model('gh5351', testSchema);
+      Test.create({ val: 'A string' }).
+        then(function() {
+          return Test.findOne({});
+        }).
+        then(function(doc) {
+          return Test.findOneAndUpdate({_id: doc._id}, {
+            $set: {
+              val: 'another string'
+            }
+          }, { new: true });
+        }).
+        then(function(doc) {
+          assert.ok(doc);
+          assert.equal(doc.val, 'another string');
+        }).
+        then(done).
+        catch(done);
+    });
+
+    it('$exists under $not (gh-4933)', function(done) {
+      var TestSchema = new Schema({
+        test: String
+      });
+
+      var Test = db.model('gh4933', TestSchema);
+
+      Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('$exists for arrays and embedded docs (gh-4937)', function(done) {
+      var subSchema = new Schema({
+        name: String
+      });
+      var TestSchema = new Schema({
+        test: [String],
+        sub: subSchema
+      });
+
+      var Test = db.model('gh4937', TestSchema);
+
+      var q = { test: { $exists: true }, sub: { $exists: false } };
+      Test.findOne(q, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
+      var areaSchema = new Schema({
+        name: {type: String},
+        loc: {
+          type: {
+            type: String,
+            enum: ['Polygon'],
+            default: 'Polygon'
+          },
+          coordinates: [[[Number]]]
+        }
+      });
+
+      var Area = db.model('gh4392_0', areaSchema);
+
+      var observationSchema = new Schema({
+        geometry: {
+          type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+          },
+          coordinates: { type: [Number] }
+        },
+        properties: {
+          temperature: { type: Number }
+        }
+      });
+      observationSchema.index({ geometry: '2dsphere' });
+
+      var Observation = db.model('gh4392_1', observationSchema);
+
+      Observation.on('index', function(error) {
+        assert.ifError(error);
+        var tromso = new Area({
+          name: 'Tromso, Norway',
+          loc: {
+            type: 'Polygon',
+            coordinates: [[
+              [18.89, 69.62],
+              [18.89, 69.72],
+              [19.03, 69.72],
+              [19.03, 69.62],
+              [18.89, 69.62]
+            ]]
+          }
+        });
+        tromso.save(function(error) {
+          assert.ifError(error);
+          var observation = {
+            geometry: {
+              type: 'Point',
+              coordinates: [18.895, 69.67]
+            }
+          };
+          Observation.create(observation, function(error) {
+            assert.ifError(error);
+
+            Observation.
+              find().
+              where('geometry').within().geometry(tromso.loc).
+              exec(function(error, docs) {
+                assert.ifError(error);
+                assert.equal(docs.length, 1);
+                done();
+              });
+          });
         });
       });
     });

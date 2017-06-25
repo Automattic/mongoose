@@ -23,7 +23,7 @@ describe('document: strict mode:', function() {
         arrayMixed: []
       };
 
-      var lax = new Schema(raw, {strict: false});
+      var lax = new Schema(raw, {strict: false, minimize: false});
       var strict = new Schema(raw);
 
       Lax = db.model('Lax', lax);
@@ -34,8 +34,8 @@ describe('document: strict mode:', function() {
       db.close(done);
     });
 
-    it('when creating models with non-strict schemas', function(done) {
-      var l = new Lax({content: 'sample', rouge: 'data'});
+    it('when creating models with non-strict schemas (gh-4274)', function(done) {
+      var l = new Lax({ content: 'sample', rouge: 'data', items: {} });
       assert.equal(l.$__.strictMode, false);
 
       var lo = l.toObject();
@@ -45,7 +45,20 @@ describe('document: strict mode:', function() {
       assert.equal(lo.content, 'sample');
       assert.equal(l.rouge, 'data');
       assert.equal(lo.rouge, 'data');
-      done();
+      assert.deepEqual(l.items, {});
+      assert.deepEqual(lo.items, {});
+
+      l.save(function(error) {
+        assert.ifError(error);
+        Lax.findById(l).exec(function(error, doc) {
+          assert.ifError(error);
+          var lo = doc.toObject();
+          assert.equal(lo.content, 'sample');
+          assert.equal(lo.rouge, 'data');
+          assert.deepEqual(lo.items, {});
+          done();
+        });
+      });
     });
 
     it('when creating models with strict schemas', function(done) {
@@ -285,7 +298,7 @@ describe('document: strict mode:', function() {
     var doc = s.toObject();
     doc.notInSchema = true;
 
-    Strict.collection.insert(doc, {w: 1}, function(err) {
+    Strict.collection.insert(doc, function(err) {
       assert.ifError(err);
 
       Strict.findById(doc._id, function(err, doc) {
@@ -293,7 +306,7 @@ describe('document: strict mode:', function() {
         assert.equal(doc._doc.bool, true);
         assert.equal(doc._doc.notInSchema, true);
 
-        Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
+        Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false},
             function(err) {
               assert.ifError(err);
 
@@ -423,7 +436,7 @@ describe('document: strict mode:', function() {
       }, {strict: 'throw'});
 
       // Create the model
-      var Foo = mongoose.model('Foo', FooSchema);
+      var Foo = mongoose.model('gh2665', FooSchema);
 
       assert.doesNotThrow(function() {
         new Foo({name: mongoose.Types.ObjectId(), father: {name: {full: 'bacon'}}});
@@ -448,4 +461,3 @@ describe('document: strict mode:', function() {
     });
   });
 });
-

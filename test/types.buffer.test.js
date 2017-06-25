@@ -13,19 +13,6 @@ function valid(v) {
   return !v || v.length > 10;
 }
 
-var subBuf = new Schema({
-  name: String,
-  buf: {type: Buffer, validate: [valid, 'valid failed'], required: true}
-});
-
-var UserBuffer = new Schema({
-  name: String,
-  serial: Buffer,
-  array: [Buffer],
-  required: {type: Buffer, required: true, index: true},
-  sub: [subBuf]
-});
-
 // Dont put indexed models on the default connection, it
 // breaks index.test.js tests on a "pure" default conn.
 // mongoose.model('UserBuffer', UserBuffer);
@@ -35,6 +22,24 @@ var UserBuffer = new Schema({
  */
 
 describe('types.buffer', function() {
+  var subBuf;
+  var UserBuffer;
+
+  before(function() {
+    subBuf = new Schema({
+      name: String,
+      buf: {type: Buffer, validate: [valid, 'valid failed'], required: true}
+    });
+
+    UserBuffer = new Schema({
+      name: String,
+      serial: Buffer,
+      array: [Buffer],
+      required: {type: Buffer, required: true, index: true},
+      sub: [subBuf]
+    });
+  });
+
   it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
     var a = new MongooseBuffer;
 
@@ -64,7 +69,7 @@ describe('types.buffer', function() {
       });
 
       t.validate(function(err) {
-        assert.equal(err.message, 'UserBuffer validation failed');
+        assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
         assert.equal(err.errors.required.kind, 'required');
         t.required = {x: [20]};
         t.save(function(err) {
@@ -72,17 +77,17 @@ describe('types.buffer', function() {
           assert.equal(err.name, 'ValidationError');
           assert.equal(err.errors.required.name, 'CastError');
           assert.equal(err.errors.required.kind, 'Buffer');
-          assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "[object Object]" at path "required"');
+          assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "{ x: [ 20 ] }" at path "required"');
           assert.deepEqual(err.errors.required.value, {x: [20]});
           t.required = new Buffer('hello');
 
           t.sub.push({name: 'Friday Friday'});
           t.save(function(err) {
-            assert.equal(err.message, 'UserBuffer validation failed');
+            assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
             assert.equal(err.errors['sub.0.buf'].kind, 'required');
             t.sub[0].buf = new Buffer('well well');
             t.save(function(err) {
-              assert.equal(err.message, 'UserBuffer validation failed');
+              assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
               assert.equal(err.errors['sub.0.buf'].kind, 'user defined');
               assert.equal(err.errors['sub.0.buf'].message, 'valid failed');
 
@@ -373,6 +378,21 @@ describe('types.buffer', function() {
         assert.ifError(err);
         assert.equal(doc.array.length, 1);
         assert.equal(doc.array[0], null);
+        done();
+      });
+    });
+  });
+
+  it('can be updated to null', function(done) {
+    var db = start(),
+        User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var user = new User({array: [null], required: new Buffer(1), serial: new Buffer(1)});
+    user.save(function(err, doc) {
+      assert.ifError(err);
+      User.findOneAndUpdate({_id: doc.id}, {serial: null}, {new: true}, function(err, doc) {
+        db.close();
+        assert.ifError(err);
+        assert.equal(doc.serial, null);
         done();
       });
     });

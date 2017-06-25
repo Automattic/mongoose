@@ -2,13 +2,14 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    Document = require('../lib/document'),
-    DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common');
+var mongoose = start.mongoose;
+var assert = require('power-assert');
+var EventEmitter = require('events').EventEmitter;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
+var Document = require('../lib/document');
+var DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -23,6 +24,10 @@ function TestDocument() {
  */
 
 TestDocument.prototype.__proto__ = Document.prototype;
+
+for (var i in EventEmitter.prototype) {
+  TestDocument[i] = EventEmitter.prototype[i];
+}
 
 /**
  * Set a dummy schema to simulate compilation.
@@ -323,6 +328,31 @@ describe('document', function() {
     assert.ok(!doc.isSelected('nested'));
     assert.ok(!doc.isSelected('nested.age'));
     assert.ok(!doc.isSelected('numbers'));
+
+    done();
+  });
+
+  it('isDirectSelected (gh-5063)', function(done) {
+    var selection = {
+      test: 1,
+      numbers: 1,
+      'nested.deep': 1,
+      oids: 1
+    };
+
+    var doc = new TestDocument(undefined, selection);
+
+    doc.init({
+      test: 'test',
+      numbers: [4, 5, 6, 7],
+      nested: {
+        deep: {x: 'a string'}
+      }
+    });
+
+    assert.ok(doc.isDirectSelected('nested.deep'));
+    assert.ok(!doc.isDirectSelected('nested.cool'));
+    assert.ok(!doc.isDirectSelected('nested'));
 
     done();
   });

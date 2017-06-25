@@ -485,7 +485,7 @@ describe('document: hooks:', function() {
 
   it('pre save hooks should run in parallel', function(done) {
     // we set the time out to be double that of the validator - 1
-    // (so that running in serial will be greater then that)
+    // (so that running in serial will be greater than that)
     this.timeout(1000);
     var db = start(),
         count = 0;
@@ -715,9 +715,9 @@ describe('document: hooks:', function() {
         }
       });
 
-      mongoose.model('gh-3284', parentSchema);
-
       var db = start();
+      db.model('gh-3284', parentSchema);
+
       var Parent = db.model('gh-3284');
 
       var parent = new Parent({
@@ -768,18 +768,18 @@ describe('document: hooks:', function() {
       title: String
     });
 
+    var calls = 0;
+    L3Schema.pre('save', function(next) {
+      ++calls;
+      return next();
+    });
+
     var L2Schema = new Schema({
       items: [L3Schema]
     });
 
     var L1Schema = new Schema({
       items: [L2Schema]
-    });
-
-    var calls = 0;
-    L3Schema.pre('save', function(next) {
-      ++calls;
-      return next();
     });
 
     var db = start();

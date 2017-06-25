@@ -22,14 +22,16 @@ block content
     * [findOne](./api.html#query_Query-findOne)
     * [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
     * [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
+    * [insertMany](./api.html#model_Model.insertMany)
     * [update](./api.html#query_Query-update)
 
     Both document middleware and query middleware support pre and post hooks.
     How pre and post hooks work is described in more detail below.
-    
+
     **Note:** There is no query hook for `remove()`, only for documents.
     If you set a 'remove' hook, it will be fired when you call `myDoc.remove()`,
     not when you call `MyModel.remove()`.
+    **Note:** The `create()` function fires `save()` hooks.
 
   h3#pre Pre
   :markdown
@@ -48,7 +50,7 @@ block content
     | Parallel middleware offer more fine-grained flow control.
   :js
     var schema = new Schema(..);
-    
+
     // `true` means this is a parallel middleware. You **must** specify `true`
     // as the second parameter if you want to use parallel middleware.
     schema.pre('save', true, function(next, done) {
@@ -111,7 +113,7 @@ block content
     schema.post('remove', function(doc) {
       console.log('%s has been removed', doc._id);
     });
-  
+
   h3#post-async Asynchronous Post Hooks
   :markdown
     While post middleware doesn't receive flow control, you can still make
@@ -119,7 +121,7 @@ block content
     If your post hook function takes at least 2 parameters, mongoose will
     assume the second parameter is a `next()` function that you will call to
     trigger the next middleware in the sequence.
-  
+
   :js
     // Takes 2 parameters: this is an asynchronous post hook
     schema.post('save', function(doc, next) {
@@ -190,6 +192,67 @@ block content
   :js
     schema.pre('update', function() {
       this.update({},{ $set: { updatedAt: new Date() } });
+    });
+
+  h3#error-handling Error Handling Middleware
+  :markdown
+    _New in 4.5.0_
+
+    Middleware execution normally stops the first time a piece of middleware
+    calls `next()` with an error. However, there is a special kind of post
+    middleware called "error handling middleware" that executes specifically
+    when an error occurs.
+
+    Error handling middleware is defined as middleware that takes one extra
+    parameter: the 'error' that occurred as the first parameter to the function.
+    Error handling middleware can then transform the error however you want.
+
+  :js
+    var schema = new Schema({
+      name: {
+        type: String,
+        // Will trigger a MongoError with code 11000 when
+        // you save a duplicate
+        unique: true
+      }
+    });
+
+    // Handler **must** take 3 parameters: the error that occurred, the document
+    // in question, and the `next()` function
+    schema.post('save', function(error, doc, next) {
+      if (error.name === 'MongoError' && error.code === 11000) {
+        next(new Error('There was a duplicate key error'));
+      } else {
+        next(error);
+      }
+    });
+
+    // Will trigger the `post('save')` error handler
+    Person.create([{ name: 'Axl Rose' }, { name: 'Axl Rose' }]);
+
+  :markdown
+    Error handling middleware also works with query middleware. You can
+    also define a post `update()` hook that will catch MongoDB duplicate key
+    errors.
+
+  :js
+    // The same E11000 error can occur when you call `update()`
+    // This function **must** take 3 parameters. If you use the
+    // `passRawResult` function, this function **must** take 4
+    // parameters
+    schema.post('update', function(error, res, next) {
+      if (error.name === 'MongoError' && error.code === 11000) {
+        next(new Error('There was a duplicate key error'));
+      } else {
+        next(error);
+      }
+    });
+
+    var people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+    Person.create(people, function(error) {
+      Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } }, function(error) {
+        // `error.message` will be "There was a duplicate key error"
+      });
     });
 
   h3#next Next Up

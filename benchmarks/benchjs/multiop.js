@@ -126,7 +126,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         if (err) {
           throw err;
         }
-        dIds.push(res[0]._id);
+        dIds.push(res.insertedIds[0]);
         --count || next();
       });
       BlogPost.create(blogData, function(err, bp) {
@@ -142,7 +142,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         if (err) {
           throw err;
         }
-        bdIds.push(res[0]._id);
+        bdIds.push(res.insertedIds[0]);
         --count || next();
       });
     }
@@ -447,7 +447,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           out.ops = item.hz;
           outObj[item.name.replace(/\s/g, '')] = out;
         });
-        console.log(JSON.stringify(outObj));
+        console.dir(outObj, {depth: null, colors: true});
       }
     });
     function next() {

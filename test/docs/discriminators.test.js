@@ -1,6 +1,10 @@
+'use strict';
+
 var assert = require('power-assert');
 var async = require('async');
 var mongoose = require('../../');
+
+var Schema = mongoose.Schema;
 
 describe('discriminator docs', function () {
   var Event;
@@ -185,12 +189,12 @@ describe('discriminator docs', function () {
       clickedLinkSchema);
 
     var event1 = new ClickedLinkEvent();
-    event1.validate(function () {
+    event1.validate(function() {
       assert.equal(eventSchemaCalls, 1);
       assert.equal(clickedSchemaCalls, 1);
 
       var generic = new Event();
-      generic.validate(function () {
+      generic.validate(function() {
         assert.equal(eventSchemaCalls, 2);
         assert.equal(clickedSchemaCalls, 1);
         // acquit:ignore:start
@@ -239,5 +243,109 @@ describe('discriminator docs', function () {
     // acquit:ignore:start
     done();
     // acquit:ignore:end
+  });
+
+  /**
+   * When you use `Model.create()`, mongoose will pull the correct type from
+   * the discriminator key for you.
+   */
+  it('Using discriminators with `Model.create()`', function(done) {
+    var Schema = mongoose.Schema;
+    var shapeSchema = new Schema({
+      name: String
+    }, { discriminatorKey: 'kind' });
+
+    var Shape = db.model('Shape', shapeSchema);
+
+    var Circle = Shape.discriminator('Circle',
+      new Schema({ radius: Number }));
+    var Square = Shape.discriminator('Square',
+      new Schema({ side: Number }));
+
+    var shapes = [
+      { name: 'Test' },
+      { kind: 'Circle', radius: 5 },
+      { kind: 'Square', side: 10 }
+    ];
+    Shape.create(shapes, function(error, shapes) {
+      assert.ifError(error);
+      assert.ok(shapes[0] instanceof Shape);
+      assert.ok(shapes[1] instanceof Circle);
+      assert.equal(shapes[1].radius, 5);
+      assert.ok(shapes[2] instanceof Square);
+      assert.equal(shapes[2].side, 10);
+      // acquit:ignore:start
+      done();
+      // acquit:ignore:end
+    });
+  });
+
+  /**
+   * You can also define discriminators on embedded document arrays.
+   * Embedded discriminators are different because the different discriminator
+   * types are stored in the same document array (within a document) rather
+   * than the same collection. In other words, embedded discriminators let
+   * you store subdocuments matching different schemas in the same array.
+   */
+  it('Embedded discriminators in arrays', function(done) {
+    var eventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+
+    var batchSchema = new Schema({ events: [eventSchema] });
+
+    // `batchSchema.path('events')` gets the mongoose `DocumentArray`
+    var docArray = batchSchema.path('events');
+
+    // The `events` array can contain 2 different types of events, a
+    // 'clicked' event that requires an element id that was clicked...
+    var Clicked = docArray.discriminator('Clicked', new Schema({
+      element: {
+        type: String,
+        required: true
+      }
+    }, { _id: false }));
+
+    // ... and a 'purchased' event that requires the product that was purchased.
+    var Purchased = docArray.discriminator('Purchased', new Schema({
+      product: {
+        type: String,
+        required: true
+      }
+    }, { _id: false }));
+
+    var Batch = db.model('EventBatch', batchSchema);
+
+    // Create a new batch of events with different kinds
+    var batch = {
+      events: [
+        { kind: 'Clicked', element: '#hero', message: 'hello' },
+        { kind: 'Purchased', product: 'action-figure-1', message: 'world' }
+      ]
+    };
+
+    Batch.create(batch).
+      then(function(doc) {
+        assert.equal(doc.events.length, 2);
+
+        assert.equal(doc.events[0].element, '#hero');
+        assert.equal(doc.events[0].message, 'hello');
+        assert.ok(doc.events[0] instanceof Clicked);
+
+        assert.equal(doc.events[1].product, 'action-figure-1');
+        assert.equal(doc.events[1].message, 'world');
+        assert.ok(doc.events[1] instanceof Purchased);
+
+        doc.events.push({ kind: 'Purchased', product: 'action-figure-2' });
+        return doc.save();
+      }).
+      then(function(doc) {
+        assert.equal(doc.events.length, 3);
+
+        assert.equal(doc.events[2].product, 'action-figure-2');
+        assert.ok(doc.events[2] instanceof Purchased);
+
+        done();
+      }).
+      catch(done);
   });
 });

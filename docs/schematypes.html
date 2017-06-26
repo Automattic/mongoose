@@ -74,7 +74,7 @@ doc.i = <span class="number">3.001</span>;
 doc.integerOnly; <span class="comment">// 3</span>
 doc.i; <span class="comment">// 3</span>
 </code></pre><h5>Indexes</h5><p></p><p>You can also define <a href="https://docs.mongodb.com/manual/indexes/">MongoDB indexes</a>
-using schema type options.</p><ul><li><code>index</code>: boolean, whether to define an on this property.</li><li><code>unique</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-unique/">unique index</a> on this property.</li><li><code>sparse</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-sparse/">sparse index</a> on this property.</li></ul><pre><code class="javascript"><span class="keyword">var</span> schema2 = <span class="keyword">new</span> Schema({
+using schema type options.</p><ul><li><code>index</code>: boolean, whether to define an index on this property.</li><li><code>unique</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-unique/">unique index</a> on this property.</li><li><code>sparse</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-sparse/">sparse index</a> on this property.</li></ul><pre><code class="javascript"><span class="keyword">var</span> schema2 = <span class="keyword">new</span> Schema({
   test: {
     type: String,
     index: <span class="literal">true</span>,

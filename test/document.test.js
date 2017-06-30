@@ -4291,6 +4291,44 @@ describe('document', function() {
       });
     });
 
+    it('single nested subdoc post remove hooks (gh-5388)', function(done) {
+      var contentSchema = new Schema({
+         blocks: [{ type: String }],
+         summary: { type: String }
+      });
+
+      var called = 0;
+
+      contentSchema.post('remove', function() {
+        ++called;
+      });
+
+      var noteSchema = new Schema({
+         body: { type: contentSchema }
+      });
+
+      var Note = db.model('gh5388', noteSchema);
+
+      var note = new Note({
+         title: 'Lorem Ipsum Dolor',
+         body: {
+            summary: 'Summary Test',
+            blocks: ['html']
+         }
+      });
+
+      note.save(function(error) {
+        assert.ifError(error);
+        note.remove(function(error) {
+          assert.ifError(error);
+          setTimeout(function() {
+            assert.equal(called, 1);
+            done();
+          }, 50);
+        });
+      });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

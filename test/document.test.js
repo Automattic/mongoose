@@ -4293,8 +4293,8 @@ describe('document', function() {
 
     it('single nested subdoc post remove hooks (gh-5388)', function(done) {
       var contentSchema = new Schema({
-         blocks: [{ type: String }],
-         summary: { type: String }
+        blocks: [{ type: String }],
+        summary: { type: String }
       });
 
       var called = 0;
@@ -4304,17 +4304,17 @@ describe('document', function() {
       });
 
       var noteSchema = new Schema({
-         body: { type: contentSchema }
+        body: { type: contentSchema }
       });
 
       var Note = db.model('gh5388', noteSchema);
 
       var note = new Note({
-         title: 'Lorem Ipsum Dolor',
-         body: {
-            summary: 'Summary Test',
-            blocks: ['html']
-         }
+        title: 'Lorem Ipsum Dolor',
+        body: {
+          summary: 'Summary Test',
+          blocks: ['html']
+        }
       });
 
       note.save(function(error) {

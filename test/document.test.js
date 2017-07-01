@@ -4291,6 +4291,54 @@ describe('document', function() {
       });
     });
 
+    it('consistent setter context for single nested (gh-5363)', function(done) {
+      var contentSchema = new Schema({
+        blocks: [{ type: String }],
+        summary: { type: String }
+      });
+
+      // Subdocument setter
+      var contexts = [];
+      contentSchema.path('blocks').set(function(srcBlocks) {
+        if (!this.ownerDocument().isNew) {
+          contexts.push(this.toObject());
+        }
+
+        return srcBlocks;
+      });
+
+      var noteSchema = new Schema({
+        title: { type: String, required: true },
+        body: { type: contentSchema }
+      });
+
+      var Note = db.model('gh5363', noteSchema);
+
+      var note = new Note({
+        title: 'Lorem Ipsum Dolor',
+        body: {
+          summary: 'Summary Test',
+          blocks: ['html']
+        }
+      });
+
+      note.save().
+        then(function(note) {
+          assert.equal(contexts.length, 0);
+          note.set('body', {
+            summary: 'New Summary',
+            blocks: ['gallery', 'html']
+          });
+          return note.save();
+        }).
+        then(function() {
+          assert.equal(contexts.length, 1);
+          assert.deepEqual(contexts[0].blocks, ['html']);
+          done();
+        }).
+        catch(done);
+    });
+
     it('single nested subdoc post remove hooks (gh-5388)', function(done) {
       var contentSchema = new Schema({
         blocks: [{ type: String }],

@@ -216,6 +216,11 @@ block content
     // Or, if you already have a connection
     connection.openUri('mongodb://localhost/myapp', { /* options */ });
   :markdown
+    The parameters to `openUri()` are passed transparently to the
+    [underlying MongoDB driver's `MongoClient.connect()` function](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect).
+    Please see the [driver documentation for this function](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect) for options.
+    The same is true for `connect()` and `createConnection()` if `useMongoClient` is `true`.
+  :markdown
     This deprecation is because the [MongoDB driver](https://www.npmjs.com/package/mongodb)
     has deprecated an API that is critical to mongoose's connection logic to
     support MongoDB 3.6, see [this github issue](https://github.com/Automattic/mongoose/issues/5304)

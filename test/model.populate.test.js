@@ -3090,9 +3090,9 @@ describe('model: populate:', function() {
                 name: 'Child 1',
                 toy: { kind: 'gh5377_a', value: toyA._id }
               },
-               {
-                 name: 'Child 2'
-               },
+              {
+                name: 'Child 2'
+              },
               {
                 name: 'Child 3',
                 toy: { kind: 'gh5377_b', value: toyB._id }

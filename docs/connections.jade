@@ -193,7 +193,7 @@ block content
     var uri = 'mongodb://localhost/test?poolSize=4';
     mongoose.createConnection(uri);
   
-  h3#use-mongoose-uri
+  h3#use-mongo-client
   :markdown
     Mongoose's default connection logic is deprecated as of 4.11.0. Please opt
     in to the new connection logic using the `useMongoClient` option, but
@@ -201,9 +201,18 @@ block content
     codebase!
   :js
     // Using `mongoose.connect`...
-    var promise = mongoose.connect('mongodb://localhost/myapp', { useMongoClient: true, /* other options */ });
+    var promise = mongoose.connect('mongodb://localhost/myapp', {
+      useMongoClient: true,
+      /* other options */
+    });
     // Or `createConnection`
-    var promise = mongoose.createConnection('mongodb://localhost/myapp', { useMongoClient: true, /* other options */ });
+    var promise = mongoose.createConnection('mongodb://localhost/myapp', {
+      useMongoClient: true,
+      /* other options */
+    });
+    promise.then(function(db) {
+      /* Use `db`, for instance `db.model()`
+    });
     // Or, if you already have a connection
     connection.openUri('mongodb://localhost/myapp', { /* options */ });
   :markdown

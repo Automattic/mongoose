@@ -508,7 +508,9 @@ describe('document', function() {
   describe('toObject', function() {
     var db;
     before(function() {
-      db = start();
+      return start({ useMongoClient: true }).then(function(_db) {
+        db = _db;
+      });
     });
 
     after(function(done) {

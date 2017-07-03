@@ -1,3 +1,15 @@
+4.11.1 / 2017-07-02
+===================
+* docs: populate virtuals fix justOne description #5427 [fredericosilva](https://github.com/fredericosilva)
+ * fix(connection): make sure to call onOpen in openUri() #5404
+ * docs(query): justOne is actually single, and it default to false #5402 [zbjornson](https://github.com/zbjornson)
+ * docs: fix small typo in lib/schema.js #5398 #5396 [pjo336](https://github.com/pjo336)
+ * fix: emit remove on single nested subdocs when removing parent #5388
+ * fix(update): handle update with defaults and overwrite but no update validators #5384
+ * fix(populate): handle undefined refPath values in middle of array #5377
+ * fix(document): ensure consistent setter context for single nested #5363
+ * fix(query): support runSettersOnQuery as query option #5350
+
 4.11.0 / 2017-06-25
 ===================
  * feat(query): execute setters with query as context for `runSettersOnQuery` #5339

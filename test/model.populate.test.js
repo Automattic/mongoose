@@ -3050,6 +3050,74 @@ describe('model: populate:', function() {
         catch(done);
     });
 
+    it('array with empty refPath (gh-5377)', function(done) {
+      var modelASchema = new mongoose.Schema({
+        name: String
+      });
+      var ModelA = db.model('gh5377_a', modelASchema);
+
+      var modelBSchema = new mongoose.Schema({
+        name: String
+      });
+      var ModelB = db.model('gh5377_b', modelBSchema);
+
+      var ChildSchema = new mongoose.Schema({
+        name: String,
+        toy: {
+          kind: {
+            type: String,
+            enum: ['gh5377_a', 'gh5377_b']
+          },
+          value: {
+            type: ObjectId,
+            refPath: 'children.toy.kind'
+          }
+        }
+      });
+
+      var ParentSchema = new mongoose.Schema({
+        children: [ChildSchema]
+      });
+      var Parent = db.model('gh5377', ParentSchema);
+
+      ModelA.create({ name: 'model-A' }, function(error, toyA) {
+        assert.ifError(error);
+        ModelB.create({ name: 'model-B' }, function(error, toyB) {
+          assert.ifError(error);
+          Parent.create({
+            children: [
+              {
+                name: 'Child 1',
+                toy: { kind: 'gh5377_a', value: toyA._id }
+              },
+              {
+                name: 'Child 2'
+              },
+              {
+                name: 'Child 3',
+                toy: { kind: 'gh5377_b', value: toyB._id }
+              }
+            ]
+          }, function(error, doc) {
+            assert.ifError(error);
+            test(doc._id);
+          });
+        });
+      });
+
+      function test(id) {
+        Parent.findById(id, function(error, doc) {
+          assert.ifError(error);
+          doc.populate('children.toy.value').execPopulate().then(function(doc) {
+            assert.equal(doc.children[0].toy.value.name, 'model-A');
+            assert.equal(doc.children[1].toy.value, null);
+            assert.equal(doc.children[2].toy.value.name, 'model-B');
+            done();
+          }).catch(done);
+        });
+      }
+    });
+
     it('with non-arrays (gh-5114)', function(done) {
       var LocationSchema = new Schema({
         name: String

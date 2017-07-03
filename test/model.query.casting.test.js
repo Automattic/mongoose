@@ -1063,6 +1063,40 @@ describe('model query casting', function() {
       catch(done);
   });
 
+  it('runSettersOnQuery as query option (gh-5350)', function(done) {
+    var db = start();
+
+    var contexts = [];
+
+    var testSchema = new Schema({
+      name: { type: String, lowercase: true },
+      num: {
+        type: Number,
+        set: function(v) {
+          contexts.push(this);
+          return Math.floor(v);
+        }
+      }
+    }, { runSettersOnQuery: false });
+
+    var Test = db.model('gh5350', testSchema);
+    Test.create({ name: 'val', num: 2.02 }).
+      then(function() {
+        assert.equal(contexts.length, 1);
+        assert.equal(contexts[0].constructor.name, 'model');
+        return Test.findOne({ name: 'VAL' }, { _id: 0 }, {
+          runSettersOnQuery: true
+        });
+      }).
+      then(function(doc) {
+        assert.ok(doc);
+        assert.equal(doc.name, 'val');
+        assert.equal(doc.num, 2);
+      }).
+      then(function() { done(); }).
+      catch(done);
+  });
+
   it('_id = 0 (gh-4610)', function(done) {
     var db = start();
 

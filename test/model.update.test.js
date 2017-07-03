@@ -2559,6 +2559,30 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('defaults with overwrite and no update validators (gh-5384)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String,
+        something: { type: Number, default: 2 }
+      });
+
+      var TestModel = db.model('gh5384', testSchema);
+      var options = {
+        overwrite: true,
+        upsert: true,
+        setDefaultsOnInsert: true
+      };
+
+      var update = { name: 'test' };
+      TestModel.update({ name: 'a' }, update, options, function(error) {
+        assert.ifError(error);
+        TestModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.something, 2);
+          done();
+        });
+      });
+    });
+
     it('update validators with nested required (gh-5269)', function(done) {
       var childSchema = new mongoose.Schema({
         d1: {

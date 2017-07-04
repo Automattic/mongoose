@@ -2609,6 +2609,25 @@ describe('model: update:', function() {
       });
     });
 
+    it('with setOptions overwrite (gh-5413)', function(done) {
+      var schema = new mongoose.Schema({
+        _id: String,
+        data: String
+      }, { timestamps: true });
+
+      var Model = db.model('gh5413', schema);
+
+      Model.
+        where({ _id: 'test' }).
+        setOptions({ overwrite: true, upsert: true }).
+        update({ data: 'test2' }).
+        exec().
+        then(function() {
+          done();
+        }).
+        catch(done);
+    });
+
     it('update with Decimal type (gh-5361)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

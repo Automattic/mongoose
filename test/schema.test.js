@@ -1591,6 +1591,18 @@ describe('schema', function() {
     done();
   });
 
+  it('arrays of mixed arrays (gh-5416)', function(done) {
+    var testSchema = new Schema({
+      test: [Array]
+    });
+
+    assert.ok(testSchema.paths.test.casterConstructor !== Array);
+    assert.equal(testSchema.paths.test.casterConstructor,
+      mongoose.Schema.Types.Array);
+
+    done();
+  });
+
   describe('remove()', function() {
     before(function() {
       this.schema = new Schema({

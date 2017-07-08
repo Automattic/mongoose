@@ -2660,7 +2660,7 @@ describe('model: update:', function() {
         notifications: [notificationSchema]
       });
 
-      const User = db.model('gh5430', userSchema);
+      var User = db.model('gh5430', userSchema);
 
       User.update({}, {
         $push: {
@@ -2668,7 +2668,7 @@ describe('model: update:', function() {
             $each: [new Notification({ message: 'test' })]
           }
         }
-      }, { multi: true, runValidators: true }, function(error) {
+      }, { multi: true, runValidators: true }).exec(function(error) {
         assert.ifError(error);
         done();
       });

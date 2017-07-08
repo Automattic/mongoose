@@ -2649,6 +2649,31 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('$push with updateValidators and top-level doc (gh-5430)', function(done) {
+      var notificationSchema = new mongoose.Schema({
+        message: String
+      });
+
+      var Notification = db.model('gh5430_0', notificationSchema);
+
+      var userSchema = new mongoose.Schema({
+        notifications: [notificationSchema]
+      });
+
+      const User = db.model('gh5430', userSchema);
+
+      User.update({}, {
+        $push: {
+          notifications: {
+            $each: [new Notification({ message: 'test' })]
+          }
+        }
+      }, { multi: true, runValidators: true }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('update with Decimal type (gh-5361)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

@@ -2559,6 +2559,27 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('$set array (gh-5403)', function(done) {
+      var Schema = new mongoose.Schema({
+        colors: [{type: String}]
+      });
+
+      var Model = db.model('gh5403', Schema);
+
+      Model.create({ colors: ['green'] }).
+        then(function() {
+          return Model.update({}, { $set: { colors: 'red' } });
+        }).
+        then(function() {
+          return Model.collection.findOne();
+        }).
+        then(function(doc) {
+          assert.deepEqual(doc.colors, ['red']);
+          done();
+        }).
+        catch(done);
+    });
+
     it('defaults with overwrite and no update validators (gh-5384)', function(done) {
       var testSchema = new mongoose.Schema({
         name: String,

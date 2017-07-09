@@ -36,6 +36,19 @@ describe('connections:', function() {
         return mongoose.disconnect().then(function() { done(); });
       }).catch(done);
     });
+
+    it('with autoIndex (gh-5423)', function(done) {
+      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true,
+        config: { autoIndex: false }
+      });
+
+      promise.then(function(conn) {
+        assert.strictEqual(conn.config.autoIndex, false);
+        assert.deepEqual(conn._connectionOptions, {});
+        done();
+      }).catch(done);
+    });
   });
 
   it('should allow closing a closed connection', function(done) {

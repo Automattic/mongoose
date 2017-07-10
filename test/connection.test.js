@@ -16,10 +16,12 @@ var muri = require('muri');
 describe('connections:', function() {
   describe('useMongoClient/openUri (gh-5304)', function() {
     it('with mongoose.connect()', function(done) {
-      var promise = mongoose.connect('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
-      assert.equal(promise.constructor.name, 'Promise');
+      var conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+      assert.equal(conn.constructor.name, 'NativeConnection');
 
-      promise.then(function(conn) {
+      conn.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
 
         return mongoose.disconnect().then(function() { done(); });
@@ -27,14 +29,28 @@ describe('connections:', function() {
     });
 
     it('with mongoose.createConnection()', function(done) {
-      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
-      assert.equal(promise.constructor.name, 'Promise');
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+      assert.equal(conn.constructor.name, 'NativeConnection');
 
-      promise.then(function(conn) {
-        assert.equal(conn.constructor.name, 'NativeConnection');
+      var Test = conn.model('Test', new Schema({ name: String }));
+      assert.equal(Test.modelName, 'Test');
 
-        return mongoose.disconnect().then(function() { done(); });
-      }).catch(done);
+      var findPromise = Test.findOne();
+
+      assert.equal(typeof conn.catch, 'function');
+
+      conn.
+        then(function(conn) {
+          assert.equal(conn.constructor.name, 'NativeConnection');
+
+          return findPromise;
+        }).
+        then(function() {
+          return mongoose.disconnect().then(function() { done(); });
+        }).
+        catch(done);
     });
 
     it('with autoIndex (gh-5423)', function(done) {

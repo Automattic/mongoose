@@ -2870,6 +2870,39 @@ describe('document', function() {
       });
     });
 
+    it('validateSync works when setting array index nested (gh-5389)', function(done) {
+      var childSchema = new mongoose.Schema({
+        _id: false,
+        name: String,
+        age: Number
+      });
+
+      var schema = new mongoose.Schema({
+        name: String,
+        children: [childSchema]
+      });
+
+      var Model = db.model('gh5389', schema);
+
+      Model.
+        create({
+          name: 'test',
+          children: [
+            { name: 'test-child', age: 24 }
+          ]
+        }).
+        then(function(doc) {
+          return Model.findById(doc._id);
+        }).
+        then(function(doc) {
+          doc.children[0] = { name: 'updated-child', age: 53 };
+          var errors = doc.validateSync();
+          assert.ok(!errors);
+          done();
+        }).
+        catch(done);
+    });
+
     it('single embedded with defaults have $parent (gh-4115)', function(done) {
       var ChildSchema = new Schema({
         name: {

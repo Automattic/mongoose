@@ -4374,6 +4374,71 @@ describe('document', function() {
         catch(done);
     });
 
+    it('deeply nested subdocs and markModified (gh-5406)', function(done) {
+      var nestedValueSchema = new mongoose.Schema({
+        _id: false,
+        value: Number
+      });
+      var nestedPropertySchema = new mongoose.Schema({
+        _id: false,
+        active: Boolean,
+        nestedValue: nestedValueSchema
+      });
+      var nestedSchema = new mongoose.Schema({
+        _id: false,
+        nestedProperty: nestedPropertySchema,
+        nestedTwoProperty: nestedPropertySchema
+      });
+      var optionsSchema = new mongoose.Schema({
+        _id: false,
+        nestedField: nestedSchema
+      });
+      var TestSchema = new mongoose.Schema({
+        fieldOne: String,
+        options: optionsSchema
+      });
+
+      var Test = db.model('gh5406', TestSchema);
+
+      var doc = new Test({
+        fieldOne: 'Test One',
+        options: {
+          nestedField: {
+            nestedProperty: {
+              active: true,
+              nestedValue: {
+                value: 42
+              }
+            }
+          }
+        }
+      });
+
+      doc.
+        save().
+        then(function(doc) {
+          doc.options.nestedField.nestedTwoProperty = {
+            active: true,
+            nestedValue: {
+              value: 1337
+            }
+          };
+
+          assert.ok(doc.isModified('options'));
+
+          return doc.save();
+        }).
+        then(function(doc) {
+          return Test.findById(doc._id);
+        }).
+        then(function(doc) {
+          assert.equal(doc.options.nestedField.nestedTwoProperty.nestedValue.value,
+            1337);
+          done();
+        }).
+        catch(done);
+    });
+
     it('single nested subdoc post remove hooks (gh-5388)', function(done) {
       var contentSchema = new Schema({
         blocks: [{ type: String }],

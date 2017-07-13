@@ -2870,6 +2870,39 @@ describe('document', function() {
       });
     });
 
+    it('validateSync works when setting array index nested (gh-5389)', function(done) {
+      var childSchema = new mongoose.Schema({
+        _id: false,
+        name: String,
+        age: Number
+      });
+
+      var schema = new mongoose.Schema({
+        name: String,
+        children: [childSchema]
+      });
+
+      var Model = db.model('gh5389', schema);
+
+      Model.
+        create({
+          name: 'test',
+          children: [
+            { name: 'test-child', age: 24 }
+          ]
+        }).
+        then(function(doc) {
+          return Model.findById(doc._id);
+        }).
+        then(function(doc) {
+          doc.children[0] = { name: 'updated-child', age: 53 };
+          var errors = doc.validateSync();
+          assert.ok(!errors);
+          done();
+        }).
+        catch(done);
+    });
+
     it('single embedded with defaults have $parent (gh-4115)', function(done) {
       var ChildSchema = new Schema({
         name: {
@@ -4336,6 +4369,71 @@ describe('document', function() {
         then(function() {
           assert.equal(contexts.length, 1);
           assert.deepEqual(contexts[0].blocks, ['html']);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('deeply nested subdocs and markModified (gh-5406)', function(done) {
+      var nestedValueSchema = new mongoose.Schema({
+        _id: false,
+        value: Number
+      });
+      var nestedPropertySchema = new mongoose.Schema({
+        _id: false,
+        active: Boolean,
+        nestedValue: nestedValueSchema
+      });
+      var nestedSchema = new mongoose.Schema({
+        _id: false,
+        nestedProperty: nestedPropertySchema,
+        nestedTwoProperty: nestedPropertySchema
+      });
+      var optionsSchema = new mongoose.Schema({
+        _id: false,
+        nestedField: nestedSchema
+      });
+      var TestSchema = new mongoose.Schema({
+        fieldOne: String,
+        options: optionsSchema
+      });
+
+      var Test = db.model('gh5406', TestSchema);
+
+      var doc = new Test({
+        fieldOne: 'Test One',
+        options: {
+          nestedField: {
+            nestedProperty: {
+              active: true,
+              nestedValue: {
+                value: 42
+              }
+            }
+          }
+        }
+      });
+
+      doc.
+        save().
+        then(function(doc) {
+          doc.options.nestedField.nestedTwoProperty = {
+            active: true,
+            nestedValue: {
+              value: 1337
+            }
+          };
+
+          assert.ok(doc.isModified('options'));
+
+          return doc.save();
+        }).
+        then(function(doc) {
+          return Test.findById(doc._id);
+        }).
+        then(function(doc) {
+          assert.equal(doc.options.nestedField.nestedTwoProperty.nestedValue.value,
+            1337);
           done();
         }).
         catch(done);

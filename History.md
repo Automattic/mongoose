@@ -1,3 +1,19 @@
+4.11.2 / 2017-07-13
+===================
+ * docs: fix comment typo in connect example #5435 [ConnorMcF](https://github.com/ConnorMcF)
+ * fix(update): correctly cast document array in update validators with exec() #5430
+ * fix(connection): handle autoIndex with useMongoClient #5423
+ * fix(schema): handle `type: [Array]` in schemas #5416
+ * fix(timestamps): if overwrite is set and there's a $set, use $set instead of top-level update #5413
+ * fix(document): don't double-validate deeply nested doc array elements #5411
+ * fix(schematype): clone default objects so default not shared across object instances unless `shared` specified #5407
+ * fix(document): reset down the nested subdocs when resetting parent doc #5406
+ * fix: don't pass error arg twice to error handlers #5405
+ * fix(connection): make openUri() return connection decorated with then() and catch() #5404
+ * fix: enforce $set on an array must be an array #5403
+ * fix(document): don't crash if calling `validateSync()` after overwriting doc array index #5389
+ * fix(discriminator): ensure discriminator key doesn't count as user-selected field for projection #4629
+
 4.11.1 / 2017-07-02
 ===================
 * docs: populate virtuals fix justOne description #5427 [fredericosilva](https://github.com/fredericosilva)

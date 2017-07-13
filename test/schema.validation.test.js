@@ -930,6 +930,52 @@ describe('schema', function() {
       });
     });
 
+    it('doesnt do double validation on document arrays underneath nested (gh-5411)', function(done) {
+      var callScope = [];
+
+      function myValidator() {
+        callScope.push(this);
+      }
+
+      var TestSchema = new Schema({
+        nest1: {
+          nest2: {
+            nestarr: [new Schema({
+              value: {
+                type: Boolean,
+                required: false,
+                validate: {validator: myValidator}
+              }
+            })]
+          }
+        }
+      });
+
+      var Test = mongoose.model('gh5411', TestSchema);
+      var testInstance = new Test({
+        nest1: {
+          nest2: {
+            nestarr: [{
+              value: true
+            }]
+          }
+        }
+      });
+
+      testInstance.nest1 = {
+        nest2: {
+          nestarr: [{
+            value: false
+          }]
+        }
+      };
+
+      testInstance.validateSync();
+      assert.equal(callScope.length, 1);
+      assert.strictEqual(callScope[0], testInstance.nest1.nest2.nestarr[0]);
+      done();
+    });
+
     it('no double validation on set nested docarray (gh-4145)', function(done) {
       var calls = 0;
       var myValidator = function() {

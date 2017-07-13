@@ -2559,6 +2559,27 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('$set array (gh-5403)', function(done) {
+      var Schema = new mongoose.Schema({
+        colors: [{type: String}]
+      });
+
+      var Model = db.model('gh5403', Schema);
+
+      Model.create({ colors: ['green'] }).
+        then(function() {
+          return Model.update({}, { $set: { colors: 'red' } });
+        }).
+        then(function() {
+          return Model.collection.findOne();
+        }).
+        then(function(doc) {
+          assert.deepEqual(doc.colors, ['red']);
+          done();
+        }).
+        catch(done);
+    });
+
     it('defaults with overwrite and no update validators (gh-5384)', function(done) {
       var testSchema = new mongoose.Schema({
         name: String,
@@ -2605,6 +2626,50 @@ describe('model: update:', function() {
         assert.ok(error.errors['d']);
         assert.ok(error.errors['d'].message.indexOf('Path `d1` is required') !== -1,
           error.errors['d'].message);
+        done();
+      });
+    });
+
+    it('with setOptions overwrite (gh-5413)', function(done) {
+      var schema = new mongoose.Schema({
+        _id: String,
+        data: String
+      }, { timestamps: true });
+
+      var Model = db.model('gh5413', schema);
+
+      Model.
+        where({ _id: 'test' }).
+        setOptions({ overwrite: true, upsert: true }).
+        update({ data: 'test2' }).
+        exec().
+        then(function() {
+          done();
+        }).
+        catch(done);
+    });
+
+    it('$push with updateValidators and top-level doc (gh-5430)', function(done) {
+      var notificationSchema = new mongoose.Schema({
+        message: String
+      });
+
+      var Notification = db.model('gh5430_0', notificationSchema);
+
+      var userSchema = new mongoose.Schema({
+        notifications: [notificationSchema]
+      });
+
+      var User = db.model('gh5430', userSchema);
+
+      User.update({}, {
+        $push: {
+          notifications: {
+            $each: [new Notification({ message: 'test' })]
+          }
+        }
+      }, { multi: true, runValidators: true }).exec(function(error) {
+        assert.ifError(error);
         done();
       });
     });

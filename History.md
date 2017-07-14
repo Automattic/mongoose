@@ -1,3 +1,7 @@
+4.11.3 / 2017-07-14
+===================
+ * fix(connection): remove .then() before resolving to prevent infinite recursion #5471
+
 4.11.2 / 2017-07-13
 ===================
  * docs: fix comment typo in connect example #5435 [ConnorMcF](https://github.com/ConnorMcF)

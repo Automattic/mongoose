@@ -394,6 +394,37 @@ describe('model', function() {
         });
       });
 
+      it('select: false in base schema (gh-5448)', function(done) {
+        var schema = new mongoose.Schema({
+          foo: String,
+          hiddenColumn: {
+              type: String,
+              select: false,
+          }
+        });
+
+        var Foo = db.model('Foo', schema);
+        var Bar = Foo.discriminator('Bar', new mongoose.Schema({
+          bar: String
+        }));
+
+        var obj = {
+          foo: 'test',
+          hiddenColumn: 'Wanna see me?',
+          bar: 'test2'
+        };
+        Bar.create(obj).
+          then(function() { return Foo.find().select('+hiddenColumn'); }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].hiddenColumn, 'Wanna see me?');
+            assert.equal(docs[0].foo, 'test');
+            assert.equal(docs[0].bar, 'test2');
+            done();
+          }).
+          catch(done);
+      });
+
       it('hydrates correct model', function(done) {
         var baseEvent = new BaseEvent({name: 'Base event'});
         var impressionEvent = new ImpressionEvent({name: 'Impression event'});

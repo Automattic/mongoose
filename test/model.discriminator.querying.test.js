@@ -398,8 +398,8 @@ describe('model', function() {
         var schema = new mongoose.Schema({
           foo: String,
           hiddenColumn: {
-              type: String,
-              select: false,
+            type: String,
+            select: false
           }
         });
 

@@ -3,7 +3,7 @@ extends layout
 block content
   h2 Population
   :markdown
-    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where population comes in.
+    MongoDB introduced left outer join ([$lookup](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/)) in version 3.2. Mongoose offered population before that, which is still an alternative to joins due to its ease of use.
 
     Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, plain object, multiple plain objects, or all objects returned from a query. Let's look at some examples.
   :js

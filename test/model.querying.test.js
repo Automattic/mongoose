@@ -2678,6 +2678,7 @@ describe('model: querying:', function() {
         ]
       };
       var q = M.find(cond);
+      q._castConditions();
       assert.equal(typeof q._conditions.$and[0].$or[0].num, 'number');
       assert.equal(typeof q._conditions.$and[0].$or[1]['subdoc.num'], 'number');
       assert.equal(typeof q._conditions.$and[1].$and[0]['subdoc.title'], 'string');
@@ -2696,6 +2697,7 @@ describe('model: querying:', function() {
         $and: [{$or: [{$and: [{$or: [{num: '12345'}, {'subdoc.num': '56789'}]}]}]}]
       };
       var q = M.find(cond);
+      q._castConditions();
       assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num, 'number');
       assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num'], 'number');
       done();

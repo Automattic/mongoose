@@ -1918,6 +1918,7 @@ describe('Query', function() {
           }
         }
       });
+      q._castConditions();
 
       assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
       assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);

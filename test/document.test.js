@@ -2166,10 +2166,12 @@ describe('document', function() {
       });
 
       schema.post('save', function(error, doc, next) {
+        assert.ok(doc instanceof Model);
         next(new Error('Catch all'));
       });
 
       schema.post('save', function(error, doc, next) {
+        assert.ok(doc instanceof Model);
         next(new Error('Catch all #2'));
       });
 

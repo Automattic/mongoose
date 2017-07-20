@@ -283,6 +283,8 @@ describe('query middleware', function() {
     var testSchema = new Schema({ title: { type: String, unique: true } });
 
     testSchema.post('update', function(error, res, next) {
+      assert.ok(error);
+      assert.ok(!res);
       next(new Error('woops'));
     });
 

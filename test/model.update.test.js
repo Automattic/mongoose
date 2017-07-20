@@ -2729,13 +2729,47 @@ describe('model: update:', function() {
         date: { type: Date, required: true }
       }, { strict: true });
 
-      var Model = db.model('Model', schema);
+      var Model = db.model('gh5453', schema);
       var q = { $isolated: true };
       var u = { $set: { smth: 1 } };
       var o = { strict: false, upsert: true };
       Model.update(q, u, o).then(function() {
         done();
       }).catch(done);
+    });
+
+    it('cast error in update conditions (gh-5477)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, { strict: true });
+
+      var Model = db.model('gh5477', schema);
+      var q = { notAField: true };
+      var u = { $set: { name: 'Test' } };
+      var o = { upsert: true };
+
+      var outstanding = 3;
+
+      Model.update(q, u, o, function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
+        --outstanding || done();
+      });
+
+      Model.updateOne(q, u, o, function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
+        --outstanding || done();
+      });
+
+      Model.updateMany(q, u, o, function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
+        --outstanding || done();
+      });
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

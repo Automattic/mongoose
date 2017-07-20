@@ -2724,6 +2724,20 @@ describe('model: update:', function() {
       }
     });
 
+    it('strict false in query (gh-5453)', function(done) {
+      var schema = new mongoose.Schema({
+        date: { type: Date, required: true }
+      }, { strict: true });
+
+      var Model = db.model('Model', schema);
+      var q = { $isolated: true };
+      var u = { $set: { smth: 1 } };
+      var o = { strict: false, upsert: true };
+      Model.update(q, u, o).then(function() {
+        done();
+      }).catch(done);
+    });
+
     it('single embedded schema under document array (gh-4519)', function(done) {
       var PermissionSchema = new mongoose.Schema({
         read: { type: Boolean, required: true },

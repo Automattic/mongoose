@@ -70,8 +70,14 @@ describe('mongoose module:', function() {
     var called = 0;
 
     var calls = [];
+    var preSaveCalls = 0;
     mong.plugin(function(s) {
       calls.push(s);
+
+      s.pre('save', function(next) {
+        ++preSaveCalls;
+        next();
+      });
     });
 
     schema.plugin(function(s) {
@@ -79,13 +85,19 @@ describe('mongoose module:', function() {
       called++;
     });
 
-    mong.model('GlobalPlugins', schema);
+    var M = mong.model('GlobalPlugins', schema);
 
     assert.equal(called, 1);
     assert.equal(calls.length, 2);
     assert.equal(calls[0], schema);
     assert.equal(calls[1], subSchema);
-    done();
+
+    assert.equal(preSaveCalls, 0);
+    mong.connect(start.uri, { useMongoClient: true });
+    M.create({ test: {} }, function(error) {
+      assert.equal(preSaveCalls, 2);
+      done();
+    });
   });
 
   describe('disconnection of all connections', function() {

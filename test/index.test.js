@@ -63,7 +63,7 @@ describe('mongoose module:', function() {
 
   it('declaring global plugins', function(done) {
     var mong = new Mongoose();
-    var subSchema = new Schema();
+    var subSchema = new Schema({});
     var schema = new Schema({
       test: [subSchema]
     });
@@ -95,7 +95,9 @@ describe('mongoose module:', function() {
     assert.equal(preSaveCalls, 0);
     mong.connect(start.uri, { useMongoClient: true });
     M.create({ test: {} }, function(error) {
+      assert.ifError(error);
       assert.equal(preSaveCalls, 2);
+      mong.disconnect();
       done();
     });
   });

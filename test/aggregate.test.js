@@ -918,7 +918,7 @@ describe('aggregate: ', function() {
   it('cursor() with useMongooseAggCursor works (gh-5145) (gh-5394)', function(done) {
     var db = start();
 
-    var MyModel = db.model('gh5145', { name: String });
+    var MyModel = db.model('gh5394', { name: String });
 
     MyModel.create({ name: 'test' }, function(error) {
       assert.ifError(error);

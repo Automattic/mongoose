@@ -1173,19 +1173,21 @@ describe('model: findOneAndUpdate:', function() {
 
       var s = new Schema({
         topping: {type: String, default: 'bacon'},
+        numEggs: {type: Number, default: 3},
         base: String
-      });
+      }, { versionKey: null });
       var Breakfast = db.model('fam-gh-860-1', s);
 
       var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
-          {topping: 'sausage'},
+          {topping: 'sausage', numEggs: 4},
           {base: 'eggs'},
           updateOptions,
           function(error, breakfast) {
             assert.ifError(error);
             assert.equal(breakfast.base, 'eggs');
             assert.equal(breakfast.topping, 'sausage');
+            assert.equal(breakfast.numEggs, 4);
             db.close();
             done();
           });

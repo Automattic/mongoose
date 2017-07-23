@@ -2019,6 +2019,29 @@ describe('Query', function() {
       });
     });
 
+    it('slice respects schema projections (gh-5450)', function(done) {
+      var gameSchema = Schema({
+        name: String,
+        developer: {
+          type: String,
+          select: false
+        },
+        arr: [Number]
+      });
+      var Game = db.model('gh5450', gameSchema);
+
+      Game.create({ name: 'Mass Effect', developer: 'BioWare', arr: [1, 2, 3] }, function(error) {
+        assert.ifError(error);
+        Game.findOne({ name: 'Mass Effect' }).slice({ arr: 1 }).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Mass Effect');
+          assert.deepEqual(doc.toObject().arr, [1]);
+          assert.ok(!doc.developer);
+          done();
+        });
+      });
+    });
+
     it('$exists for arrays and embedded docs (gh-4937)', function(done) {
       var subSchema = new Schema({
         name: String

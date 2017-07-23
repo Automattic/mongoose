@@ -6,9 +6,10 @@ block content
     Middleware (also called pre and post *hooks*) are functions which are passed
     control during execution of asynchronous functions. Middleware is specified
     on the schema level and is useful for writing [plugins](./plugins.html).
-    Mongoose 4.0 has 2 types
-    of middleware: document middleware and query middleware.
+    Mongoose 4.x has 3 types
+    of middleware: document middleware, model middleware, and query middleware.
     Document middleware is supported for the following document functions.
+    In document middleware functions, `this` refers to the document. 
 
     * [init](./api.html#document_Document-init)
     * [validate](./api.html#document_Document-validate)
@@ -16,16 +17,21 @@ block content
     * [remove](./api.html#model_Model-remove)
 
     Query middleware is supported for the following Model and Query functions.
+    In query middleware functions, `this` refers to the query.
 
     * [count](./api.html#query_Query-count)
     * [find](./api.html#query_Query-find)
     * [findOne](./api.html#query_Query-findOne)
     * [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
     * [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
-    * [insertMany](./api.html#model_Model.insertMany)
     * [update](./api.html#query_Query-update)
+    
+    Model middleware is supported for the following model functions.
+    In model middleware functions, `this` refers to the model.
+    
+    * [insertMany](./api.html#model_Model.insertMany)
 
-    Both document middleware and query middleware support pre and post hooks.
+    All middleware types support pre and post hooks.
     How pre and post hooks work is described in more detail below.
 
     **Note:** There is no query hook for `remove()`, only for documents.

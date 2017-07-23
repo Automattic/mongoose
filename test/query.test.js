@@ -1918,6 +1918,7 @@ describe('Query', function() {
           }
         }
       });
+      q._castConditions();
 
       assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
       assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);
@@ -2015,6 +2016,29 @@ describe('Query', function() {
       Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
         assert.ifError(error);
         done();
+      });
+    });
+
+    it('slice respects schema projections (gh-5450)', function(done) {
+      var gameSchema = Schema({
+        name: String,
+        developer: {
+          type: String,
+          select: false
+        },
+        arr: [Number]
+      });
+      var Game = db.model('gh5450', gameSchema);
+
+      Game.create({ name: 'Mass Effect', developer: 'BioWare', arr: [1, 2, 3] }, function(error) {
+        assert.ifError(error);
+        Game.findOne({ name: 'Mass Effect' }).slice({ arr: 1 }).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Mass Effect');
+          assert.deepEqual(doc.toObject().arr, [1]);
+          assert.ok(!doc.developer);
+          done();
+        });
       });
     });
 

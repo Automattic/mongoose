@@ -243,6 +243,13 @@ block content
           keepAlive: true
         },
         reconnectTries: 30
+      },
+      mongos: {
+        socketOptions: {
+          socketTimeoutMS: 0,
+          keepAlive: true
+        },
+        reconnectTries: 30
       }
     });
   :markdown

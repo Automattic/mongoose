@@ -1,3 +1,22 @@
+4.11.4 / 2017-07-23
+===================
+ * fix: handle next() errors in `eachAsync()` #5486 [lchenay](https://github.com/lchenay)
+ * fix(schema): propagate runSettersOnQuery option to implicitly created schemas #5479 [https://github.com/ValYouW]
+ * fix(query): run castConditions() correctly in update ops #5477
+ * fix(query): ensure castConditions called for findOne and findOneAnd* #5477
+ * docs: clarify relationship between $lookup and populate #5475 [TalhaAwan](https://github.com/TalhaAwan)
+ * test: add coverage for arrays of arrays [zbjornson](https://github.com/zbjornson)
+ * fix(middleware): ensure that error handlers for save get doc as 2nd param #5466
+ * fix: handle strict: false correctly #5454 #5453 [wookieb](https://github.com/wookieb)
+ * fix(query): apply schema excluded paths if only projection is a $slice #5450
+ * fix(query): correct discriminator handling for schema `select: false` fields in schema #5448
+ * fix(cursor): call next() in series when parallel option used #5446
+ * chore: load bundled driver first to avoid packaging problem #5443 [prototypeme](https://github.com/prototypeme)
+ * fix(query): defer condition casting until final exec #5434
+ * fix(aggregate): don't rely on mongodb aggregate to put a cursor in the callback #5394
+ * docs(aggregate): add useMongooseAggCursor docs #5394
+ * docs(middleware): clarify context for document, query, and model middleware #5381
+
 4.11.3 / 2017-07-14
 ===================
  * fix(connection): remove .then() before resolving to prevent infinite recursion #5471

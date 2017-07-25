@@ -2039,8 +2039,8 @@ describe('Query', function() {
         'gallery.location': {
           $near: {
             $geometry: {
-               type: 'Point',
-               coordinates: [51.53377166666667, -0.1197471666666667]
+              type: 'Point',
+              coordinates: [51.53377166666667, -0.1197471666666667]
             },
             $maxDistance: 500
           }

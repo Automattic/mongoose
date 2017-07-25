@@ -21,6 +21,11 @@ describe('connections:', function() {
 
       promise.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
+        assert.equal(conn.host, 'localhost');
+        assert.equal(conn.port, 27017);
+        assert.equal(conn.hosts[0].host, 'localhost');
+        assert.equal(conn.hosts[0].port, 27017);
+        assert.equal(conn.name, 'mongoosetest');
 
         return mongoose.disconnect().then(function() { done(); });
       }).catch(done);
@@ -32,6 +37,11 @@ describe('connections:', function() {
 
       promise.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
+        assert.equal(conn.host, 'localhost');
+        assert.equal(conn.port, 27017);
+        assert.equal(conn.hosts[0].host, 'localhost');
+        assert.equal(conn.hosts[0].port, 27017);
+        assert.equal(conn.name, 'mongoosetest');
 
         return mongoose.disconnect().then(function() { done(); });
       }).catch(done);

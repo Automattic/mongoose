@@ -4328,6 +4328,33 @@ describe('document', function() {
       });
     });
 
+    it('dotted virtuals in toObject (gh-5473)', function(done) {
+      var schema = new mongoose.Schema({}, {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+      });
+      schema.virtual('test.a').get(function() {
+        return 1;
+      });
+      schema.virtual('test.b').get(function() {
+        return 2;
+      });
+
+      var Model = mongoose.model('gh5473', schema);
+
+      var m = new Model({});
+      assert.deepEqual(m.toJSON().test, {
+        a: 1,
+        b: 2
+      });
+      assert.deepEqual(m.toObject().test, {
+        a: 1,
+        b: 2
+      });
+      assert.equal(m.toObject({ virtuals: false }).test, void 0);
+      done();
+    });
+
     it('consistent setter context for single nested (gh-5363)', function(done) {
       var contentSchema = new Schema({
         blocks: [{ type: String }],

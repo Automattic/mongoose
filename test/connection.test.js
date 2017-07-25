@@ -43,7 +43,7 @@ describe('connections:', function() {
       assert.equal(conn.hosts[0].host, 'localhost');
       assert.equal(conn.hosts[0].port, 27017);
       assert.equal(conn.name, 'mongoosetest');
-      
+
       var Test = conn.model('Test', new Schema({ name: String }));
       assert.equal(Test.modelName, 'Test');
 

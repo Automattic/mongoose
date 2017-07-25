@@ -508,7 +508,9 @@ describe('document', function() {
   describe('toObject', function() {
     var db;
     before(function() {
-      db = start();
+      return start({ useMongoClient: true }).then(function(_db) {
+        db = _db;
+      });
     });
 
     after(function(done) {
@@ -2164,10 +2166,12 @@ describe('document', function() {
       });
 
       schema.post('save', function(error, doc, next) {
+        assert.ok(doc instanceof Model);
         next(new Error('Catch all'));
       });
 
       schema.post('save', function(error, doc, next) {
+        assert.ok(doc instanceof Model);
         next(new Error('Catch all #2'));
       });
 
@@ -2866,6 +2870,39 @@ describe('document', function() {
           });
         });
       });
+    });
+
+    it('validateSync works when setting array index nested (gh-5389)', function(done) {
+      var childSchema = new mongoose.Schema({
+        _id: false,
+        name: String,
+        age: Number
+      });
+
+      var schema = new mongoose.Schema({
+        name: String,
+        children: [childSchema]
+      });
+
+      var Model = db.model('gh5389', schema);
+
+      Model.
+        create({
+          name: 'test',
+          children: [
+            { name: 'test-child', age: 24 }
+          ]
+        }).
+        then(function(doc) {
+          return Model.findById(doc._id);
+        }).
+        then(function(doc) {
+          doc.children[0] = { name: 'updated-child', age: 53 };
+          var errors = doc.validateSync();
+          assert.ok(!errors);
+          done();
+        }).
+        catch(done);
     });
 
     it('single embedded with defaults have $parent (gh-4115)', function(done) {
@@ -4289,6 +4326,119 @@ describe('document', function() {
         assert.ifError(error);
         done();
       });
+    });
+
+    it('consistent setter context for single nested (gh-5363)', function(done) {
+      var contentSchema = new Schema({
+        blocks: [{ type: String }],
+        summary: { type: String }
+      });
+
+      // Subdocument setter
+      var contexts = [];
+      contentSchema.path('blocks').set(function(srcBlocks) {
+        if (!this.ownerDocument().isNew) {
+          contexts.push(this.toObject());
+        }
+
+        return srcBlocks;
+      });
+
+      var noteSchema = new Schema({
+        title: { type: String, required: true },
+        body: { type: contentSchema }
+      });
+
+      var Note = db.model('gh5363', noteSchema);
+
+      var note = new Note({
+        title: 'Lorem Ipsum Dolor',
+        body: {
+          summary: 'Summary Test',
+          blocks: ['html']
+        }
+      });
+
+      note.save().
+        then(function(note) {
+          assert.equal(contexts.length, 0);
+          note.set('body', {
+            summary: 'New Summary',
+            blocks: ['gallery', 'html']
+          });
+          return note.save();
+        }).
+        then(function() {
+          assert.equal(contexts.length, 1);
+          assert.deepEqual(contexts[0].blocks, ['html']);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('deeply nested subdocs and markModified (gh-5406)', function(done) {
+      var nestedValueSchema = new mongoose.Schema({
+        _id: false,
+        value: Number
+      });
+      var nestedPropertySchema = new mongoose.Schema({
+        _id: false,
+        active: Boolean,
+        nestedValue: nestedValueSchema
+      });
+      var nestedSchema = new mongoose.Schema({
+        _id: false,
+        nestedProperty: nestedPropertySchema,
+        nestedTwoProperty: nestedPropertySchema
+      });
+      var optionsSchema = new mongoose.Schema({
+        _id: false,
+        nestedField: nestedSchema
+      });
+      var TestSchema = new mongoose.Schema({
+        fieldOne: String,
+        options: optionsSchema
+      });
+
+      var Test = db.model('gh5406', TestSchema);
+
+      var doc = new Test({
+        fieldOne: 'Test One',
+        options: {
+          nestedField: {
+            nestedProperty: {
+              active: true,
+              nestedValue: {
+                value: 42
+              }
+            }
+          }
+        }
+      });
+
+      doc.
+        save().
+        then(function(doc) {
+          doc.options.nestedField.nestedTwoProperty = {
+            active: true,
+            nestedValue: {
+              value: 1337
+            }
+          };
+
+          assert.ok(doc.isModified('options'));
+
+          return doc.save();
+        }).
+        then(function(doc) {
+          return Test.findById(doc._id);
+        }).
+        then(function(doc) {
+          assert.equal(doc.options.nestedField.nestedTwoProperty.nestedValue.value,
+            1337);
+          done();
+        }).
+        catch(done);
     });
 
     it('single nested subdoc post remove hooks (gh-5388)', function(done) {

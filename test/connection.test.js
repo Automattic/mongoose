@@ -16,10 +16,12 @@ var muri = require('muri');
 describe('connections:', function() {
   describe('useMongoClient/openUri (gh-5304)', function() {
     it('with mongoose.connect()', function(done) {
-      var promise = mongoose.connect('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
-      assert.equal(promise.constructor.name, 'Promise');
+      var conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+      assert.equal(conn.constructor.name, 'NativeConnection');
 
-      promise.then(function(conn) {
+      conn.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
         assert.equal(conn.host, 'localhost');
         assert.equal(conn.port, 27017);
@@ -32,18 +34,45 @@ describe('connections:', function() {
     });
 
     it('with mongoose.createConnection()', function(done) {
-      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', { useMongoClient: true });
-      assert.equal(promise.constructor.name, 'Promise');
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+      assert.equal(conn.constructor.name, 'NativeConnection');
+      assert.equal(conn.host, 'localhost');
+      assert.equal(conn.port, 27017);
+      assert.equal(conn.hosts[0].host, 'localhost');
+      assert.equal(conn.hosts[0].port, 27017);
+      assert.equal(conn.name, 'mongoosetest');
+      
+      var Test = conn.model('Test', new Schema({ name: String }));
+      assert.equal(Test.modelName, 'Test');
+
+      var findPromise = Test.findOne();
+
+      assert.equal(typeof conn.catch, 'function');
+
+      conn.
+        then(function(conn) {
+          assert.equal(conn.constructor.name, 'NativeConnection');
+
+          return findPromise;
+        }).
+        then(function() {
+          return mongoose.disconnect().then(function() { done(); });
+        }).
+        catch(done);
+    });
+
+    it('with autoIndex (gh-5423)', function(done) {
+      var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true,
+        config: { autoIndex: false }
+      });
 
       promise.then(function(conn) {
-        assert.equal(conn.constructor.name, 'NativeConnection');
-        assert.equal(conn.host, 'localhost');
-        assert.equal(conn.port, 27017);
-        assert.equal(conn.hosts[0].host, 'localhost');
-        assert.equal(conn.hosts[0].port, 27017);
-        assert.equal(conn.name, 'mongoosetest');
-
-        return mongoose.disconnect().then(function() { done(); });
+        assert.strictEqual(conn.config.autoIndex, false);
+        assert.deepEqual(conn._connectionOptions, {});
+        done();
       }).catch(done);
     });
   });

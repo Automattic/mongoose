@@ -66,8 +66,8 @@ describe('schema.documentarray', function() {
 
     assert.equal(schema1.childSchemas.length, 1);
     assert.equal(schema2.childSchemas.length, 1);
-    assert.ok(schema1.childSchemas[0].$implicitlyCreated);
-    assert.ok(!schema2.childSchemas[0].$implicitlyCreated);
+    assert.ok(schema1.childSchemas[0].schema.$implicitlyCreated);
+    assert.ok(!schema2.childSchemas[0].schema.$implicitlyCreated);
     done();
   });
 });

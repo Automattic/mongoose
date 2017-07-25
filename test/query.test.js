@@ -1188,18 +1188,54 @@ describe('Query', function() {
       }, done).end();
     });
 
-    it('justOne option', function(done) {
+    it('single option, default', function(done) {
       var db = start();
-      var Test = db.model('Test_justOne', new Schema({ name: String }));
+      var Test = db.model('Test_single', new Schema({ name: String }));
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ justOne: false }).exec(function(error, res) {
+        Test.remove({ name: /Stark/ }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.result.n, 2);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single option, false', function(done) {
+      var db = start();
+      var Test = db.model('Test_single', new Schema({ name: String }));
+
+      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.result.n, 2);
+          Test.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 0);
+            done();
+          });
+        });
+      });
+    });
+
+    it('single option, true', function(done) {
+      var db = start();
+      var Test = db.model('Test_single', new Schema({ name: String }));
+
+      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
+        assert.ifError(error);
+        Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.result.n, 1);
+          Test.count({}, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 1);
             done();
           });
         });
@@ -1882,6 +1918,7 @@ describe('Query', function() {
           }
         }
       });
+      q._castConditions();
 
       assert.ok(q._conditions.createdAt.$not.$gte instanceof Date);
       assert.ok(q._conditions.createdAt.$not.$lte instanceof Date);
@@ -1979,6 +2016,65 @@ describe('Query', function() {
       Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
         assert.ifError(error);
         done();
+      });
+    });
+
+    it('geojson underneath array (gh-5467)', function(done) {
+      var storySchema = new Schema({
+        name: String,
+        gallery: [{
+          src: String,
+          location: {
+            type: { type: String, enum: ['Point'] },
+            coordinates: { type: [Number], default: void 0 }
+          },
+          timestamp: Date
+        }]
+      });
+      storySchema.index({ 'gallery.location': '2dsphere' });
+
+      var Story = db.model('gh5467', storySchema);
+
+      var q = {
+        'gallery.location': {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [51.53377166666667, -0.1197471666666667]
+            },
+            $maxDistance: 500
+          }
+        }
+      };
+      Story.once('index', function(error) {
+        assert.ifError(error);
+        Story.update(q, { name: 'test' }, { upsert: true }, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
+    it('slice respects schema projections (gh-5450)', function(done) {
+      var gameSchema = Schema({
+        name: String,
+        developer: {
+          type: String,
+          select: false
+        },
+        arr: [Number]
+      });
+      var Game = db.model('gh5450', gameSchema);
+
+      Game.create({ name: 'Mass Effect', developer: 'BioWare', arr: [1, 2, 3] }, function(error) {
+        assert.ifError(error);
+        Game.findOne({ name: 'Mass Effect' }).slice({ arr: 1 }).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Mass Effect');
+          assert.deepEqual(doc.toObject().arr, [1]);
+          assert.ok(!doc.developer);
+          done();
+        });
       });
     });
 

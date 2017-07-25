@@ -911,7 +911,32 @@ describe('aggregate: ', function() {
       cursor({ useMongooseAggCursor: true }).
       exec();
     assert.ok(cursor instanceof require('stream').Readable);
+
     done();
+  });
+
+  it('cursor() with useMongooseAggCursor works (gh-5145) (gh-5394)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh5394', { name: String });
+
+    MyModel.create({ name: 'test' }, function(error) {
+      assert.ifError(error);
+
+      var docs = [];
+      MyModel.
+        aggregate([{ $match: { name: 'test' } }]).
+        cursor({ useMongooseAggCursor: true }).
+        exec().
+        eachAsync(function(doc) {
+          docs.push(doc);
+        }).
+        then(function() {
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].name, 'test');
+          done();
+        });
+    });
   });
 
   it('cursor() eachAsync (gh-4300)', function(done) {

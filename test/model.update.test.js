@@ -2559,6 +2559,51 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('$set array (gh-5403)', function(done) {
+      var Schema = new mongoose.Schema({
+        colors: [{type: String}]
+      });
+
+      var Model = db.model('gh5403', Schema);
+
+      Model.create({ colors: ['green'] }).
+        then(function() {
+          return Model.update({}, { $set: { colors: 'red' } });
+        }).
+        then(function() {
+          return Model.collection.findOne();
+        }).
+        then(function(doc) {
+          assert.deepEqual(doc.colors, ['red']);
+          done();
+        }).
+        catch(done);
+    });
+
+    it('defaults with overwrite and no update validators (gh-5384)', function(done) {
+      var testSchema = new mongoose.Schema({
+        name: String,
+        something: { type: Number, default: 2 }
+      });
+
+      var TestModel = db.model('gh5384', testSchema);
+      var options = {
+        overwrite: true,
+        upsert: true,
+        setDefaultsOnInsert: true
+      };
+
+      var update = { name: 'test' };
+      TestModel.update({ name: 'a' }, update, options, function(error) {
+        assert.ifError(error);
+        TestModel.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.something, 2);
+          done();
+        });
+      });
+    });
+
     it('update validators with nested required (gh-5269)', function(done) {
       var childSchema = new mongoose.Schema({
         d1: {
@@ -2581,6 +2626,50 @@ describe('model: update:', function() {
         assert.ok(error.errors['d']);
         assert.ok(error.errors['d'].message.indexOf('Path `d1` is required') !== -1,
           error.errors['d'].message);
+        done();
+      });
+    });
+
+    it('with setOptions overwrite (gh-5413)', function(done) {
+      var schema = new mongoose.Schema({
+        _id: String,
+        data: String
+      }, { timestamps: true });
+
+      var Model = db.model('gh5413', schema);
+
+      Model.
+        where({ _id: 'test' }).
+        setOptions({ overwrite: true, upsert: true }).
+        update({ data: 'test2' }).
+        exec().
+        then(function() {
+          done();
+        }).
+        catch(done);
+    });
+
+    it('$push with updateValidators and top-level doc (gh-5430)', function(done) {
+      var notificationSchema = new mongoose.Schema({
+        message: String
+      });
+
+      var Notification = db.model('gh5430_0', notificationSchema);
+
+      var userSchema = new mongoose.Schema({
+        notifications: [notificationSchema]
+      });
+
+      var User = db.model('gh5430', userSchema);
+
+      User.update({}, {
+        $push: {
+          notifications: {
+            $each: [new Notification({ message: 'test' })]
+          }
+        }
+      }, { multi: true, runValidators: true }).exec(function(error) {
+        assert.ifError(error);
         done();
       });
     });
@@ -2633,6 +2722,54 @@ describe('model: update:', function() {
           }).
           then(function() { done(); }, done);
       }
+    });
+
+    it('strict false in query (gh-5453)', function(done) {
+      var schema = new mongoose.Schema({
+        date: { type: Date, required: true }
+      }, { strict: true });
+
+      var Model = db.model('gh5453', schema);
+      var q = { $isolated: true };
+      var u = { $set: { smth: 1 } };
+      var o = { strict: false, upsert: true };
+      Model.update(q, u, o).then(function() {
+        done();
+      }).catch(done);
+    });
+
+    it('cast error in update conditions (gh-5477)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, { strict: true });
+
+      var Model = db.model('gh5477', schema);
+      var q = { notAField: true };
+      var u = { $set: { name: 'Test' } };
+      var o = { upsert: true };
+
+      var outstanding = 3;
+
+      Model.update(q, u, o, function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
+        --outstanding || done();
+      });
+
+      Model.updateOne(q, u, o, function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
+        --outstanding || done();
+      });
+
+      Model.updateMany(q, u, o, function(error) {
+        assert.ok(error);
+        assert.ok(error.message.indexOf('notAField') !== -1, error.message);
+        assert.ok(error.message.indexOf('upsert') !== -1, error.message);
+        --outstanding || done();
+      });
     });
 
     it('single embedded schema under document array (gh-4519)', function(done) {

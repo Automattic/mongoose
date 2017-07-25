@@ -3,7 +3,7 @@ extends layout
 block content
   h2 Population
   :markdown
-    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where population comes in.
+    MongoDB has the join-like ([$lookup](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/)) aggregation operator in versions >= 3.2. Mongoose has a more powerful alternative called `populate()`, which lets you reference documents in other collections.
 
     Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, plain object, multiple plain objects, or all objects returned from a query. Let's look at some examples.
   :js
@@ -344,7 +344,7 @@ block content
       ref: 'Person', // The model to use
       localField: 'name', // Find people where `localField`
       foreignField: 'band', // is equal to `foreignField`
-      // If `justOne` is false, 'members' will be a single doc as opposed to
+      // If `justOne` is true, 'members' will be a single doc as opposed to
       // an array. `justOne` is false by default.
       justOne: false
     });

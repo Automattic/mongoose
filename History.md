@@ -1,3 +1,54 @@
+4.11.4 / 2017-07-23
+===================
+ * fix: handle next() errors in `eachAsync()` #5486 [lchenay](https://github.com/lchenay)
+ * fix(schema): propagate runSettersOnQuery option to implicitly created schemas #5479 [https://github.com/ValYouW]
+ * fix(query): run castConditions() correctly in update ops #5477
+ * fix(query): ensure castConditions called for findOne and findOneAnd* #5477
+ * docs: clarify relationship between $lookup and populate #5475 [TalhaAwan](https://github.com/TalhaAwan)
+ * test: add coverage for arrays of arrays [zbjornson](https://github.com/zbjornson)
+ * fix(middleware): ensure that error handlers for save get doc as 2nd param #5466
+ * fix: handle strict: false correctly #5454 #5453 [wookieb](https://github.com/wookieb)
+ * fix(query): apply schema excluded paths if only projection is a $slice #5450
+ * fix(query): correct discriminator handling for schema `select: false` fields in schema #5448
+ * fix(cursor): call next() in series when parallel option used #5446
+ * chore: load bundled driver first to avoid packaging problem #5443 [prototypeme](https://github.com/prototypeme)
+ * fix(query): defer condition casting until final exec #5434
+ * fix(aggregate): don't rely on mongodb aggregate to put a cursor in the callback #5394
+ * docs(aggregate): add useMongooseAggCursor docs #5394
+ * docs(middleware): clarify context for document, query, and model middleware #5381
+
+4.11.3 / 2017-07-14
+===================
+ * fix(connection): remove .then() before resolving to prevent infinite recursion #5471
+
+4.11.2 / 2017-07-13
+===================
+ * docs: fix comment typo in connect example #5435 [ConnorMcF](https://github.com/ConnorMcF)
+ * fix(update): correctly cast document array in update validators with exec() #5430
+ * fix(connection): handle autoIndex with useMongoClient #5423
+ * fix(schema): handle `type: [Array]` in schemas #5416
+ * fix(timestamps): if overwrite is set and there's a $set, use $set instead of top-level update #5413
+ * fix(document): don't double-validate deeply nested doc array elements #5411
+ * fix(schematype): clone default objects so default not shared across object instances unless `shared` specified #5407
+ * fix(document): reset down the nested subdocs when resetting parent doc #5406
+ * fix: don't pass error arg twice to error handlers #5405
+ * fix(connection): make openUri() return connection decorated with then() and catch() #5404
+ * fix: enforce $set on an array must be an array #5403
+ * fix(document): don't crash if calling `validateSync()` after overwriting doc array index #5389
+ * fix(discriminator): ensure discriminator key doesn't count as user-selected field for projection #4629
+
+4.11.1 / 2017-07-02
+===================
+* docs: populate virtuals fix justOne description #5427 [fredericosilva](https://github.com/fredericosilva)
+ * fix(connection): make sure to call onOpen in openUri() #5404
+ * docs(query): justOne is actually single, and it default to false #5402 [zbjornson](https://github.com/zbjornson)
+ * docs: fix small typo in lib/schema.js #5398 #5396 [pjo336](https://github.com/pjo336)
+ * fix: emit remove on single nested subdocs when removing parent #5388
+ * fix(update): handle update with defaults and overwrite but no update validators #5384
+ * fix(populate): handle undefined refPath values in middle of array #5377
+ * fix(document): ensure consistent setter context for single nested #5363
+ * fix(query): support runSettersOnQuery as query option #5350
+
 4.11.0 / 2017-06-25
 ===================
  * feat(query): execute setters with query as context for `runSettersOnQuery` #5339

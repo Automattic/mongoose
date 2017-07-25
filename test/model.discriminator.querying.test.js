@@ -27,16 +27,22 @@ util.inherits(BaseSchema, Schema);
 var EventSchema = new BaseSchema();
 var ImpressionEventSchema = new BaseSchema();
 var ConversionEventSchema = new BaseSchema({revenue: Number});
+var SecretEventSchema = new BaseSchema({ secret: { type: String, select: false } });
 
 describe('model', function() {
   describe('discriminator()', function() {
-    var db, BaseEvent, ImpressionEvent, ConversionEvent;
+    var db;
+    var BaseEvent;
+    var ImpressionEvent;
+    var ConversionEvent;
+    var SecretEvent;
 
     before(function() {
       db = start();
       BaseEvent = db.model('model-discriminator-querying-event', EventSchema, 'model-discriminator-querying-' + random());
       ImpressionEvent = BaseEvent.discriminator('model-discriminator-querying-impression', ImpressionEventSchema);
       ConversionEvent = BaseEvent.discriminator('model-discriminator-querying-conversion', ConversionEventSchema);
+      SecretEvent = BaseEvent.discriminator('model-discriminator-querying-secret', SecretEventSchema);
     });
 
     afterEach(function(done) {
@@ -375,6 +381,50 @@ describe('model', function() {
     });
 
     describe('findOne', function() {
+      it('when selecting `select: false` field (gh-4629)', function(done) {
+        var s = new SecretEvent({ name: 'test', secret: 'test2' });
+        s.save(function(error) {
+          assert.ifError(error);
+          SecretEvent.findById(s._id, '+secret', function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.name, 'test');
+            assert.equal(doc.secret, 'test2');
+            done();
+          });
+        });
+      });
+
+      it('select: false in base schema (gh-5448)', function(done) {
+        var schema = new mongoose.Schema({
+          foo: String,
+          hiddenColumn: {
+            type: String,
+            select: false
+          }
+        });
+
+        var Foo = db.model('Foo', schema);
+        var Bar = Foo.discriminator('Bar', new mongoose.Schema({
+          bar: String
+        }));
+
+        var obj = {
+          foo: 'test',
+          hiddenColumn: 'Wanna see me?',
+          bar: 'test2'
+        };
+        Bar.create(obj).
+          then(function() { return Foo.find().select('+hiddenColumn'); }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].hiddenColumn, 'Wanna see me?');
+            assert.equal(docs[0].foo, 'test');
+            assert.equal(docs[0].bar, 'test2');
+            done();
+          }).
+          catch(done);
+      });
+
       it('hydrates correct model', function(done) {
         var baseEvent = new BaseEvent({name: 'Base event'});
         var impressionEvent = new ImpressionEvent({name: 'Impression event'});

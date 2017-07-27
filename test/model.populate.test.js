@@ -5300,6 +5300,25 @@ describe('model: populate:', function() {
         });
       });
 
+      it('populate with missing schema (gh-5460)', function(done) {
+        var refSchema = new mongoose.Schema({
+          name: String
+        });
+
+        var Ref = db.model('gh5460', refSchema);
+
+        var schema = new mongoose.Schema({
+          ref: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5460' }
+        });
+
+        var Model = db.model('gh5460_0', schema);
+
+        var q = Model.find().read('secondaryPreferred').populate('ref');
+        assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
+          'secondaryPreferred');
+        done();
+      });
+
       it('virtuals with justOne false and foreign field not found (gh-5336)', function(done) {
         var BandSchema = new mongoose.Schema({
           name: String,

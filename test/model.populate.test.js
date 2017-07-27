@@ -5305,7 +5305,7 @@ describe('model: populate:', function() {
           name: String
         });
 
-        var Ref = db.model('gh5460', refSchema);
+        db.model('gh5460', refSchema);
 
         var schema = new mongoose.Schema({
           ref: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5460' }

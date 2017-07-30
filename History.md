@@ -1,3 +1,16 @@
+4.11.5 / 2017-07-30
+===================
+ * docs: fix link to $lookup #5516 [TalhaAwan](https://github.com/TalhaAwan)
+ * fix: better parallelization for eachAsync #5502 [lchenay](https://github.com/lchenay)
+ * docs(document): copy docs for save from model to doc #5493
+ * fix(document): handle dotted virtuals in toJSON output #5473
+ * fix(populate): restore user-provided limit after mutating so cursor() works with populate limit #5468
+ * fix(query): don't throw StrictModeError if geo query with upsert #5467
+ * fix(populate): propagate readPreference from query to populate queries by default #5460
+ * docs: warn not to use arrow functions for statics and methods #5458
+ * fix(query): iterate over all condition keys for setDefaultsOnInsert #5455
+ * docs(connection): clarify server/replset/mongos option deprecation with useMongoClient #5442
+
 4.11.4 / 2017-07-23
 ===================
  * fix: handle next() errors in `eachAsync()` #5486 [lchenay](https://github.com/lchenay)

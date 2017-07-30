@@ -2019,6 +2019,42 @@ describe('Query', function() {
       });
     });
 
+    it('geojson underneath array (gh-5467)', function(done) {
+      var storySchema = new Schema({
+        name: String,
+        gallery: [{
+          src: String,
+          location: {
+            type: { type: String, enum: ['Point'] },
+            coordinates: { type: [Number], default: void 0 }
+          },
+          timestamp: Date
+        }]
+      });
+      storySchema.index({ 'gallery.location': '2dsphere' });
+
+      var Story = db.model('gh5467', storySchema);
+
+      var q = {
+        'gallery.location': {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [51.53377166666667, -0.1197471666666667]
+            },
+            $maxDistance: 500
+          }
+        }
+      };
+      Story.once('index', function(error) {
+        assert.ifError(error);
+        Story.update(q, { name: 'test' }, { upsert: true }, function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('slice respects schema projections (gh-5450)', function(done) {
       var gameSchema = Schema({
         name: String,

@@ -5180,6 +5180,47 @@ describe('model: populate:', function() {
         });
       });
 
+      it('retains limit when using cursor (gh-5468)', function(done) {
+        var refSchema = new mongoose.Schema({
+          _id: Number,
+          name: String
+        }, { versionKey: null });
+        var Ref = db.model('gh5468', refSchema);
+
+        var testSchema = new mongoose.Schema({
+          _id: Number,
+          prevnxt: [{ type: Number, ref: 'gh5468' }]
+        });
+        var Test = db.model('gh5468_0', testSchema);
+
+        var docs = [1, 2, 3, 4, 5, 6].map(function(i) {
+          return { _id: i };
+        });
+        Ref.create(docs, function(error) {
+          assert.ifError(error);
+          var docs = [
+            { _id: 1, prevnxt: [1, 2, 3] },
+            { _id: 2, prevnxt: [4, 5, 6] }
+          ];
+          Test.create(docs, function(error) {
+            assert.ifError(error);
+
+            var cursor = Test.
+              find().
+              populate({ path: 'prevnxt', options: { limit: 2 } }).
+              cursor();
+
+            cursor.on('data', function(doc) {
+              assert.equal(doc.prevnxt.length, 2);
+            });
+            cursor.on('error', done);
+            cursor.on('end', function() {
+              done();
+            });
+          });
+        });
+      });
+
       it('virtuals + doc.populate() (gh-5311)', function(done) {
         var parentSchema = new Schema({ name: String });
         var childSchema = new Schema({
@@ -5298,6 +5339,25 @@ describe('model: populate:', function() {
             done();
           });
         });
+      });
+
+      it('populate with missing schema (gh-5460)', function(done) {
+        var refSchema = new mongoose.Schema({
+          name: String
+        });
+
+        db.model('gh5460', refSchema);
+
+        var schema = new mongoose.Schema({
+          ref: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5460' }
+        });
+
+        var Model = db.model('gh5460_0', schema);
+
+        var q = Model.find().read('secondaryPreferred').populate('ref');
+        assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
+          'secondaryPreferred');
+        done();
       });
 
       it('virtuals with justOne false and foreign field not found (gh-5336)', function(done) {

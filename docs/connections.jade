@@ -221,9 +221,52 @@ block content
     Please see the [driver documentation for this function](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect) for options.
     The same is true for `connect()` and `createConnection()` if `useMongoClient` is `true`.
   :markdown
+    You may see the following deprecation warning with `useMongoClient`:
+
+    ```
+    the server/replset/mongos options are deprecated, all their options are supported at the top level of the options object
+    ```
+
+    In older version of the MongoDB driver you had to specify distinct options for server connections, replica set connections, and mongos connections:
+  :js
+    mongoose.connect(myUri, {
+      server: {
+        socketOptions: {
+          socketTimeoutMS: 0,
+          keepAlive: true
+        },
+        reconnectTries: 30
+      },
+      replset: {
+        socketOptions: {
+          socketTimeoutMS: 0,
+          keepAlive: true
+        },
+        reconnectTries: 30
+      },
+      mongos: {
+        socketOptions: {
+          socketTimeoutMS: 0,
+          keepAlive: true
+        },
+        reconnectTries: 30
+      }
+    });
+  :markdown
+    With `useMongoClient` you can instead declare these options at the top level, without all that extra nesting. [Here's the list of all supported options](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html).
+  :js
+    // Equivalent to the above code
+    mongoose.connect(myUri, {
+      socketTimeoutMS: 0,
+      keepAlive: true,
+      reconnectTries: 30
+    });
+    
+  :markdown
     This deprecation is because the [MongoDB driver](https://www.npmjs.com/package/mongodb)
     has deprecated an API that is critical to mongoose's connection logic to
     support MongoDB 3.6, see [this github issue](https://github.com/Automattic/mongoose/issues/5304)
+    and [this blog post](http://thecodebarbarian.com/mongoose-4.11-use-mongo-client.html)
     for more details.
 
   h3#next Next Up

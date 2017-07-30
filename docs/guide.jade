@@ -109,6 +109,9 @@ block content
   .important
     :markdown
       Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema.reserved) for more details.
+  .important
+    :markdown
+      Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work.
 
   h3#statics Statics
   :markdown
@@ -124,6 +127,10 @@ block content
     Animal.findByName('fido', function(err, animals) {
       console.log(animals);
     });
+
+  .important
+    :markdown
+      Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.
 
   h3#query-helpers Query Helpers
   :markdown

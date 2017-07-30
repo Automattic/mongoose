@@ -23,6 +23,11 @@ describe('connections:', function() {
 
       conn.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
+        assert.equal(conn.host, 'localhost');
+        assert.equal(conn.port, 27017);
+        assert.equal(conn.hosts[0].host, 'localhost');
+        assert.equal(conn.hosts[0].port, 27017);
+        assert.equal(conn.name, 'mongoosetest');
 
         return mongoose.disconnect().then(function() { done(); });
       }).catch(done);
@@ -33,6 +38,11 @@ describe('connections:', function() {
         useMongoClient: true
       });
       assert.equal(conn.constructor.name, 'NativeConnection');
+      assert.equal(conn.host, 'localhost');
+      assert.equal(conn.port, 27017);
+      assert.equal(conn.hosts[0].host, 'localhost');
+      assert.equal(conn.hosts[0].port, 27017);
+      assert.equal(conn.name, 'mongoosetest');
 
       var Test = conn.model('Test', new Schema({ name: String }));
       assert.equal(Test.modelName, 'Test');

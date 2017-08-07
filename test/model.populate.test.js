@@ -5121,6 +5121,44 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('nested virtuals if top-level prop doesnt exist (gh-5431)', function(done) {
+        var personSchema = new mongoose.Schema({
+          name: String,
+          band: String
+        });
+        var bandSchema = new mongoose.Schema({
+          name: String,
+          data: {
+            field: String
+          }
+        });
+        bandSchema.virtual('data.members', {
+          ref: 'gh5431',
+          localField: 'name',
+          foreignField: 'band',
+          justOne: false
+        });
+
+        bandSchema.set('toObject', { virtuals: true });
+
+        var Person = db.model('gh5431', personSchema);
+        var Band = db.model('gh5431_0', bandSchema);
+
+        Band.create({ name: 'Motley Crue', data: {} }).
+          then(function() {
+            return Person.create({ name: 'Vince Neil', band: 'Motley Crue' });
+          }).
+          then(function() {
+            return Band.findOne({}).populate('data.members');
+          }).
+          then(function(band) {
+            assert.equal(band.data.members.length, 1);
+            assert.equal(band.data.members[0].name, 'Vince Neil');
+            done();
+          }).
+          catch(done);
+      });
+
       it('nested virtuals + doc.populate() (gh-5240)', function(done) {
         var parentSchema = new Schema({ name: String });
         var childSchema = new Schema({

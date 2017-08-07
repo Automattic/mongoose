@@ -4355,6 +4355,40 @@ describe('document', function() {
       done();
     });
 
+    it('dotted virtuals in toObject (gh-5506)', function(done) {
+      var childSchema = new Schema({
+        name: String,
+        _id: false
+      });
+      var parentSchema = new Schema({
+        child: {
+          type: childSchema,
+          default: {}
+        }
+      });
+
+      var Parent = db.model('gh5506', parentSchema);
+
+      var p = new Parent({ child: { name: 'myName' } });
+
+      p.save().
+        then(function() {
+          return Parent.findOne();
+        }).
+        then(function(doc) {
+          doc.child = {};
+          return doc.save();
+        }).
+        then(function() {
+          return Parent.findOne();
+        }).
+        then(function(doc) {
+          assert.deepEqual(doc.toObject().child, {});
+          done();
+        }).
+        catch(done);
+    });
+
     it('consistent setter context for single nested (gh-5363)', function(done) {
       var contentSchema = new Schema({
         blocks: [{ type: String }],

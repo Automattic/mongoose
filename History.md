@@ -1,3 +1,12 @@
+4.11.6 / 2017-08-07
+===================
+ * fix: limiting number of async operations per time in insertMany #5529 [andresattler](https://github.com/andresattler)
+ * fix: upgrade mongodb -> 2.2.30 #5517
+ * fix(browserDocument): prevent stack overflow caused by double-wrapping embedded doc save() in jest #5513
+ * fix(document): clear single nested doc when setting to empty object #5506
+ * fix(connection): emit reconnected and disconnected events correctly with useMongoClient #5498
+ * fix(populate): ensure nested virtual populate gets set even if top-level property is null #5431
+
 4.11.5 / 2017-07-30
 ===================
  * docs: fix link to $lookup #5516 [TalhaAwan](https://github.com/TalhaAwan)

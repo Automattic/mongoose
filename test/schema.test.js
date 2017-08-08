@@ -1666,6 +1666,22 @@ describe('schema', function() {
       done();
     });
 
+    it('type: childSchema (gh-5521)', function(done) {
+      var childSchema = new mongoose.Schema({
+        name: String
+      }, { _id: false });
+
+      var schema = new mongoose.Schema({
+        children: [{ type: childSchema }]
+      });
+
+      var Model = mongoose.model('gh5521', schema);
+
+      var doc = new Model({ children: [{ name: 'test' }] });
+      assert.deepEqual(doc.toObject().children, [{ name: 'test' }]);
+      done();
+    });
+
     it('Decimal128 type (gh-4759)', function(done) {
       var Decimal128 = mongoose.Schema.Types.Decimal128;
       var schema = new Schema({

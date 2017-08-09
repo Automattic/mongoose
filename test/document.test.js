@@ -4433,7 +4433,7 @@ describe('document', function() {
         assert.ifError(error);
         User.findOne({ _id: user._id }, function(error, doc) {
           assert.ifError(error);
-          assert.deepEqual(user.toObject().social.friends[0], {
+          assert.deepEqual(doc.toObject().social.friends[0], {
             _id: 'val',
             name: 'Val'
           });

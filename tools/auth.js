@@ -8,7 +8,7 @@ co(function*() {
   // Create new instance
   var server = new Server('mongod', {
     auth: null,
-    dbpath: '~/data/db/27017'
+    dbpath: '/data/db/27017'
   });
 
   // Purge the directory

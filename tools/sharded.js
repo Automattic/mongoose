@@ -13,13 +13,13 @@ co(function*() {
 
   yield topology.addShard([{
     options: {
-      bind_ip: 'localhost', port: 31000, dbpath: `~/data/db/31000`
+      bind_ip: 'localhost', port: 31000, dbpath: `/data/db/31000`
     }
   }], { replSet: 'rs1' });
 
   yield topology.addConfigurationServers([{
     options: {
-      bind_ip: 'localhost', port: 35000, dbpath: `~/data/db/35000`
+      bind_ip: 'localhost', port: 35000, dbpath: `/data/db/35000`
     }
   }], { replSet: 'rs0' });
 

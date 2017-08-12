@@ -5547,8 +5547,8 @@ describe('model: populate:', function() {
           justOne: true
         });
 
-        var Author = db.model('gh5542', AuthorSchema)
-        var Book = db.model('gh5542_0', BookSchema)
+        var Author = db.model('gh5542', AuthorSchema);
+        var Book = db.model('gh5542_0', BookSchema);
 
         var author = new Author({ name: 'Bob' });
         author.save().
@@ -5562,10 +5562,10 @@ describe('model: populate:', function() {
               .exec();
           }).
           then(function(author) {
-            const json = author.toJSON();
+            var json = author.toJSON();
             assert.deepEqual(Object.getOwnPropertyNames(json.books),
               ['_id', 'author']);
-              done();
+            done();
           }).
           catch(done);
       });

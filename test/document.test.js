@@ -4389,6 +4389,59 @@ describe('document', function() {
         catch(done);
     });
 
+    it('modifying array with existing ids (gh-5523)', function(done) {
+      var friendSchema = new mongoose.Schema(
+        {
+          _id: String,
+          name: String,
+          age: Number,
+          dob: Date
+        },
+        { _id: false });
+
+      var socialSchema = new mongoose.Schema(
+        {
+          friends: [friendSchema]
+        },
+        { _id: false });
+
+      var userSchema = new mongoose.Schema({
+        social: {
+          type: socialSchema,
+          required: true
+        }
+      });
+
+      var User = db.model('gh5523', userSchema);
+
+      var user = new User({
+        social: {
+          friends: [
+            { _id: 'val', age: 28 }
+          ]
+        }
+      });
+
+      user.social.friends = [{ _id: 'val', name: 'Val' }];
+
+      assert.deepEqual(user.toObject().social.friends[0], {
+        _id: 'val',
+        name: 'Val'
+      });
+
+      user.save(function(error) {
+        assert.ifError(error);
+        User.findOne({ _id: user._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.deepEqual(doc.toObject().social.friends[0], {
+            _id: 'val',
+            name: 'Val'
+          });
+          done();
+        });
+      });
+    });
+
     it('consistent setter context for single nested (gh-5363)', function(done) {
       var contentSchema = new Schema({
         blocks: [{ type: String }],

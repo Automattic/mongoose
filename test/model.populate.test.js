@@ -5527,6 +5527,49 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('virtual populate toJSON output (gh-5542)', function(done) {
+        var AuthorSchema = new mongoose.Schema({
+          name: String
+        }, {
+          toObject: { virtuals: true },
+          toJSON: { virtuals: true }
+        });
+
+        var BookSchema = new mongoose.Schema({
+          title: String,
+          author: { type: ObjectId, ref: 'gh5542' }
+        });
+
+        AuthorSchema.virtual('books', {
+          ref: 'gh5542_0',
+          localField: '_id',
+          foreignField: 'author',
+          justOne: true
+        });
+
+        var Author = db.model('gh5542', AuthorSchema);
+        var Book = db.model('gh5542_0', BookSchema);
+
+        var author = new Author({ name: 'Bob' });
+        author.save().
+          then(function(author) {
+            var book = new Book({ name: 'Book', author: author._id });
+            return book.save();
+          }).
+          then(function() {
+            return Author.findOne({})
+              .populate({ path: 'books', select: 'title' })
+              .exec();
+          }).
+          then(function(author) {
+            var json = author.toJSON();
+            assert.deepEqual(Object.getOwnPropertyNames(json.books),
+              ['_id', 'author']);
+            done();
+          }).
+          catch(done);
+      });
+
       it('works if foreignField parent is selected (gh-5037)', function(done) {
         var childSchema = new mongoose.Schema({
           name: String,

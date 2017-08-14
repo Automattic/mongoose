@@ -9,19 +9,19 @@ co(function*() {
   var topology = new ReplSet('mongod', [{
     // mongod process options
     options: {
-      bind_ip: 'localhost', port: 31000, dbpath: `~/data/db/31000`
+      bind_ip: 'localhost', port: 31000, dbpath: `/data/db/31000`
     }
   }, {
     // mongod process options
     options: {
-      bind_ip: 'localhost', port: 31001, dbpath: `~/data/db/31001`
+      bind_ip: 'localhost', port: 31001, dbpath: `/data/db/31001`
     }
   }, {
     // Type of node
     arbiterOnly: true,
     // mongod process options
     options: {
-      bind_ip: 'localhost', port: 31002, dbpath: `~/data/db/31002`
+      bind_ip: 'localhost', port: 31002, dbpath: `/data/db/31002`
     }
   }], {
     replSet: 'rs'

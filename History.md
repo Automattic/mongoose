@@ -1,3 +1,13 @@
+4.11.7 / 2017-08-14
+===================
+ * fix: correct properties when calling toJSON() on populated virtual #5544 #5442 [davidwu226](https://github.com/davidwu226)
+ * docs: fix spelling #5535 [et](https://github.com/et)
+ * fix(error): always set name before stack #5533
+ * fix: add warning about running jest in jsdom environment #5532 #5513 #4943
+ * fix(document): ensure overwriting a doc array cleans out individual docs #5523
+ * fix(schema): handle creating arrays of single nested using type key #5521
+ * fix: upgrade mongodb -> 2.2.31 to support user/pass options #5419
+
 4.11.6 / 2017-08-07
 ===================
  * fix: limiting number of async operations per time in insertMany #5529 [andresattler](https://github.com/andresattler)

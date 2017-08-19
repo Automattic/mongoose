@@ -868,6 +868,11 @@ describe('aggregate: ', function() {
       var M = db.model('gh5522', schema);
       var a = M.aggregate();
       assert.equal(a.options.readPreference.mode, 'secondary');
+
+      a.read('secondaryPreferred');
+
+      assert.equal(a.options.readPreference.mode, 'secondaryPreferred');
+
       done();
     });
   });

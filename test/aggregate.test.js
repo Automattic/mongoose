@@ -862,6 +862,14 @@ describe('aggregate: ', function() {
           });
       });
     });
+
+    it('readPref from schema (gh-5522)', function(done) {
+      var schema = new Schema({ name: String }, { read: 'secondary' });
+      var M = db.model('gh5522', schema);
+      var a = M.aggregate();
+      assert.equal(a.options.readPreference.mode, 'secondary');
+      done();
+    });
   });
 
   it('cursor (gh-3160)', function(done) {

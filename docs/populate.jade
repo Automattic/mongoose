@@ -11,30 +11,41 @@ block content
     var Schema = mongoose.Schema;
 
     var personSchema = Schema({
-      _id: Number,
+      _id: Schema.Types.ObjectId,
       name: String,
       age: Number,
       stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
     });
 
     var storySchema = Schema({
-      author: { type: Number, ref: 'Person' },
+      author: { type: Schema.Types.ObjectId, ref: 'Person' },
       title: String,
-      fans: [{ type: Number, ref: 'Person' }]
+      fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
     });
 
     var Story = mongoose.model('Story', storySchema);
     var Person = mongoose.model('Person', personSchema);
   :markdown
-    So far we've created two [Models](./models.html). Our `Person` model has its `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose which model to use during population, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also declared the `Story` `author` property as a `Number`, the same type as the `_id` used in the `personSchema`. It is important to match the type of `_id` to the type of ref.
+    So far we've created two [Models](./models.html). Our `Person` model has
+    its `stories` field set to an array of `ObjectId`s. The `ref` option is
+    what tells Mongoose which model to use during population, in our case
+    the `Story` model. All `_id`s we store here must be document `_id`s from
+    the `Story` model.
   .important
     :markdown
-      **Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use as refs.
+      **Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use
+      as refs. However, you should use `ObjectId` unless you are an advanced
+      user and have a good reason for doing so.
   h3 Saving refs
   :markdown
-    Saving refs to other documents works the same way you normally save properties, just assign the `_id` value:
+    Saving refs to other documents works the same way you normally save
+    properties, just assign the `_id` value:
   :js
-    var author = new Person({ _id: 0, name: 'Ian Fleming', age: 50 });
+    var author = new Person({
+      _id: new mongoose.Types.ObjectId(),
+      name: 'Ian Fleming',
+      age: 50
+    });
 
     author.save(function (err) {
       if (err) return handleError(err);
@@ -62,12 +73,18 @@ block content
         // prints "The author is Ian Fleming"
       });
   :markdown
-    Populated paths are no longer set to their original `_id` , their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
+    Populated paths are no longer set to their original `_id` , their value
+    is replaced with the mongoose document returned from the database by
+    performing a separate query before returning the results.
 
-    Arrays of refs work the same way. Just call the [populate](./api.html#query_Query-populate) method on the query and an array of documents will be returned _in place_ of the original `_id`s.
+    Arrays of refs work the same way. Just call the
+    [populate](./api.html#query_Query-populate) method on the query and an
+    array of documents will be returned _in place_ of the original `_id`s.
   .important
     :markdown
-      **Note**: mongoose >= 3.6 exposes the original `_ids` used during population through the [document#populated()](./api.html#document_Document-populated) method.
+      **Note**: mongoose >= 3.6 exposes the original `_ids` used during
+      population through the
+      [document#populated()](./api.html#document_Document-populated) method.
   h3 Setting Populated Fields
   :markdown
     In Mongoose >= 4.0, you can manually populate a field as well.
@@ -80,13 +97,17 @@ block content
       console.log(story.author.name); // prints "Ian Fleming"
     });
   :markdown
-    Note that this only works for single refs. You currently **can't** manually populate an array of refs.
+    Note that this only works for single refs. You currently **can't**
+    manually populate an array of refs.
   h3 Field selection
   :markdown
-    What if we only want a few specific fields returned for the populated documents? This can be accomplished by passing the usual [field name syntax](./api.html#query_Query-select) as the second argument to the populate method:
+    What if we only want a few specific fields returned for the populated
+    documents? This can be accomplished by passing the usual
+    [field name syntax](./api.html#query_Query-select) as the second argument
+    to the populate method:
   :js
     Story.
-      findOne({ title: /timex/i }).
+      findOne({ title: /casino royale/i }).
       populate('author', 'name'). // only return the Persons name
       exec(function (err, story) {
         if (err) return handleError(err);
@@ -100,14 +121,6 @@ block content
   h3 Populating multiple paths
   :markdown
     What if we wanted to populate multiple paths at the same time?
-  :js
-    Story.
-      find(...).
-      populate('fans author'). // space delimited path names
-      exec()
-  .important
-    :markdown
-      In **mongoose >= 3.6**, we can pass a space delimited string of path names to populate. Before 3.6 you must execute the `populate()` method multiple times.
   :js
     Story.
       find(...).
@@ -128,7 +141,8 @@ block content
     Story.find().populate({ path: 'fans', select: 'email' });
   h3 Query conditions and other options
   :markdown
-    What if we wanted to populate our fans array based on their age, select just their names, and return at most, any 5 of them?
+    What if we wanted to populate our fans array based on their age, select
+    just their names, and return at most, any 5 of them?
   :js
     Story.
       find(...).
@@ -142,9 +156,15 @@ block content
       exec()
   h3 Refs to children
   :markdown
-    We may find however, if we use the `author` object, we are unable to get a list of the stories. This is because no `story` objects were ever 'pushed' onto `author.stories`.
+    We may find however, if we use the `author` object, we are unable to get a
+    list of the stories. This is because no `story` objects were ever 'pushed'
+    onto `author.stories`.
 
-    There are two perspectives here. First, you may want the `author` know which stories are theirs. Usually, your schema should resolve one-to-many relationships by having a parent pointer in the 'many' side. But, if you have a good reason to want an array of child pointers, you can `push()` documents onto the array as shown below.
+    There are two perspectives here. First, you may want the `author` know
+    which stories are theirs. Usually, your schema should resolve
+    one-to-many relationships by having a parent pointer in the 'many' side.
+    But, if you have a good reason to want an array of child pointers, you
+    can `push()` documents onto the array as shown below.
   :js
     author.stories.push(story1);
     author.save(callback);
@@ -160,7 +180,9 @@ block content
       });
   .important
     :markdown
-      It is debatable that we really want two sets of pointers as they may get out of sync. Instead we could skip populating and directly `find()` the stories we are interested in.
+      It is debatable that we really want two sets of pointers as they may get
+      out of sync. Instead we could skip populating and directly `find()` the
+      stories we are interested in.
   :js
     Story.
       find({ author: author._id }).
@@ -171,7 +193,13 @@ block content
 
   .important
     :markdown
-      The documents returned from [query population](./api.html#query_Query-populate) become fully functional, `remove`able, `save`able documents unless the [lean](./api.html#query_Query-lean) option is specified. Do not confuse them with [sub docs](./subdocs.html). Take caution when calling its remove method because you'll be removing it from the database, not just the array.
+      The documents returned from
+      [query population](./api.html#query_Query-populate) become fully
+      functional, `remove`able, `save`able documents unless the
+      [lean](./api.html#query_Query-lean) option is specified. Do not confuse
+      them with [sub docs](./subdocs.html). Take caution when calling its
+      remove method because you'll be removing it from the database, not just
+      the array.
 
   h3#populate_an_existing_mongoose_document Populating an existing document
   :markdown

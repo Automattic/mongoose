@@ -735,8 +735,8 @@ describe('Query', function() {
       if (typeof global.Map !== 'undefined') {
         query = new Query({}, {}, null, p1.collection);
         query.sort(new global.Map().set('a', 1).set('b', 2));
-        assert.deepEqual(query.options.sort,
-          new global.Map().set('a', 1).set('b', 2));
+        assert.deepEqual(query.options.sort.toJSON(),
+          new global.Map().set('a', 1).set('b', 2).toJSON());
       }
 
       query = new Query({}, {}, null, p1.collection);

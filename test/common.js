@@ -160,12 +160,6 @@ function dropDBs(done) {
 
 if (process.env.START_MONGOD) {
   before(function() {
-    server = new Server('mongod', {
-      port: 27017,
-      dbpath: './data/db',
-      storageEngine: 'mmapv1'
-    });
-
     return server.purge().
       then(function() {
         return server.start();
@@ -182,4 +176,10 @@ if (process.env.START_MONGOD) {
 before(function(done) {
   this.timeout(10 * 1000);
   dropDBs(done);
+});
+
+module.exports.server = server = new Server('mongod', {
+  port: 27017,
+  dbpath: './data/db',
+  storageEngine: 'mmapv1'
 });

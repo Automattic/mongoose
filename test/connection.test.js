@@ -2,6 +2,7 @@
  * Module dependencies.
  */
 
+var Promise = require('bluebird');
 var assert = require('power-assert');
 var muri = require('muri');
 var random = require('../lib/utils').random;

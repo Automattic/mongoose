@@ -77,29 +77,30 @@ describe('connections:', function() {
 
     it('events (gh-5498) (gh-5524)', function(done) {
       this.timeout(25000);
-      if (!process.env.START_MONGOD) {
-        this.skip();
-      }
 
-      var conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
-        useMongoClient: true
-      });
-
+      var conn;
+      var stopped = false;
       var numConnected = 0;
       var numDisconnected = 0;
       var numReconnected = 0;
-      conn.on('connected', function() {
-        ++numConnected;
-      });
-      conn.on('disconnected', function() {
-        ++numDisconnected;
-      });
-      conn.on('reconnected', function() {
-        ++numReconnected;
-      });
+      server.start().
+        then(function() {
+          conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
+            useMongoClient: true
+          });
 
-      var stopped = false;
-      conn.
+          conn.on('connected', function() {
+            ++numConnected;
+          });
+          conn.on('disconnected', function() {
+            ++numDisconnected;
+          });
+          conn.on('reconnected', function() {
+            ++numReconnected;
+          });
+
+          return conn;
+        }).
         then(function() {
           assert.equal(numConnected, 1);
           return server.stop();

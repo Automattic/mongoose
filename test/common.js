@@ -158,20 +158,15 @@ function dropDBs(done) {
   });
 }
 
-if (process.env.START_MONGOD) {
-  before(function() {
-    return server.purge().
-      then(function() {
-        return server.start();
-      });
-  });
+before(function() {
+  return server.purge();
+});
 
-  after(function() {
-    this.timeout(15000);
+after(function() {
+  this.timeout(15000);
 
-    return server.stop();
-  });
-}
+  return server.stop();
+});
 
 before(function(done) {
   this.timeout(10 * 1000);
@@ -179,7 +174,7 @@ before(function(done) {
 });
 
 module.exports.server = server = new Server('mongod', {
-  port: 27017,
-  dbpath: './data/db',
+  port: 27000,
+  dbpath: './data/db/27000',
   storageEngine: 'mmapv1'
 });

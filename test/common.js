@@ -158,28 +158,23 @@ function dropDBs(done) {
   });
 }
 
-if (process.env.START_MONGOD) {
-  before(function() {
-    server = new Server('mongod', {
-      port: 27017,
-      dbpath: './data/db',
-      storageEngine: 'mmapv1'
-    });
+before(function() {
+  return server.purge();
+});
 
-    return server.purge().
-      then(function() {
-        return server.start();
-      });
-  });
+after(function() {
+  this.timeout(15000);
 
-  after(function() {
-    this.timeout(15000);
-
-    return server.stop();
-  });
-}
+  return server.stop();
+});
 
 before(function(done) {
   this.timeout(10 * 1000);
   dropDBs(done);
+});
+
+module.exports.server = server = new Server('mongod', {
+  port: 27000,
+  dbpath: './data/db/27000',
+  storageEngine: 'mmapv1'
 });

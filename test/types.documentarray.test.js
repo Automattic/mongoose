@@ -2,16 +2,18 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = require('./common').mongoose,
-    random = require('../lib/utils').random,
-    setValue = require('../lib/utils').setValue,
-    MongooseDocumentArray = mongoose.Types.DocumentArray,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray'),
-    Schema = mongoose.Schema,
-    assert = require('power-assert'),
-    collection = 'types.documentarray_' + random();
+var start = require('./common');
+var mongoose = require('./common').mongoose;
+var random = require('../lib/utils').random;
+var setValue = require('../lib/utils').setValue;
+var MongooseDocumentArray = mongoose.Types.DocumentArray;
+var EmbeddedDocument = require('../lib/types/embedded');
+var DocumentArray = require('../lib/types/documentarray');
+var Schema = mongoose.Schema;
+var assert = require('power-assert');
+var collection = 'types.documentarray_' + random();
+
+var idGetter = require('../lib/plugins/idGetter');
 
 /**
  * Setup.
@@ -35,6 +37,8 @@ function TestDoc(schema) {
   var SubSchema = new Schema({
     title: {type: String}
   });
+
+  (schema || SubSchema).plugin(idGetter);
 
   Subdocument.prototype.$__setSchema(schema || SubSchema);
 

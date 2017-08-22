@@ -19,6 +19,8 @@ var EmbeddedDocument = require('../lib/types/embedded');
 var Query = require('../lib/query');
 var validator = require('validator');
 
+var idGetter = require('../lib/plugins/idGetter');
+
 var _ = require('lodash');
 
 /**
@@ -69,6 +71,7 @@ var schema = new Schema({
   em: [em],
   date: Date
 });
+schema.plugin(idGetter);
 TestDocument.prototype.$__setSchema(schema);
 
 schema.virtual('nested.agePlus2').get(function() {

@@ -13,8 +13,6 @@ var Schema = mongoose.Schema;
 var assert = require('power-assert');
 var collection = 'types.documentarray_' + random();
 
-var idGetter = require('../lib/plugins/idGetter');
-
 /**
  * Setup.
  */
@@ -37,8 +35,6 @@ function TestDoc(schema) {
   var SubSchema = new Schema({
     title: {type: String}
   });
-
-  (schema || SubSchema).plugin(idGetter);
 
   Subdocument.prototype.$__setSchema(schema || SubSchema);
 

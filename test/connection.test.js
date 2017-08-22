@@ -2,12 +2,15 @@
  * Module dependencies.
  */
 
-var start = require('./common');
+var Promise = require('bluebird');
 var assert = require('power-assert');
+var muri = require('muri');
+var random = require('../lib/utils').random;
+var server = require('./common').server;
+var start = require('./common');
+
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
-var random = require('../lib/utils').random;
-var muri = require('muri');
 
 /**
  * Test.
@@ -70,6 +73,73 @@ describe('connections:', function() {
         assert.deepEqual(conn._connectionOptions, {});
         done();
       }).catch(done);
+    });
+
+    it('events (gh-5498) (gh-5524)', function(done) {
+      this.timeout(25000);
+
+      var conn;
+      var stopped = false;
+      var numConnected = 0;
+      var numDisconnected = 0;
+      var numReconnected = 0;
+      server.start().
+        then(function() {
+          conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
+            useMongoClient: true
+          });
+
+          conn.on('connected', function() {
+            ++numConnected;
+          });
+          conn.on('disconnected', function() {
+            ++numDisconnected;
+          });
+          conn.on('reconnected', function() {
+            ++numReconnected;
+          });
+
+          return conn;
+        }).
+        then(function() {
+          assert.equal(numConnected, 1);
+          return server.stop();
+        }).
+        then(function() {
+          stopped = true;
+          return new Promise(function(resolve) {
+            setTimeout(function() { resolve(); }, 50);
+          });
+        }).
+        then(function() {
+          assert.equal(numDisconnected, 1);
+          assert.equal(numReconnected, 0);
+        }).
+        then(function() {
+          return server.start();
+        }).
+        then(function() {
+          stopped = false;
+          return new Promise(function(resolve) {
+            setTimeout(function() { resolve(); }, 2000);
+          });
+        }).
+        then(function() {
+          assert.equal(numDisconnected, 1);
+          assert.equal(numReconnected, 1);
+          done();
+        }).
+        catch(finish);
+
+      function finish(err) {
+        if (stopped) {
+          server.start().
+            then(function() { done(err); }).
+            catch(done);
+        } else {
+          done(err);
+        }
+      }
     });
   });
 

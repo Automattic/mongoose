@@ -69,6 +69,7 @@ var schema = new Schema({
   em: [em],
   date: Date
 });
+
 TestDocument.prototype.$__setSchema(schema);
 
 schema.virtual('nested.agePlus2').get(function() {

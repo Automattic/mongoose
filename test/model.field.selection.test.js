@@ -177,7 +177,7 @@ describe('model field selection', function() {
         assert.equal(found[0].comments[0].title, ':)');
         assert.strictEqual(undefined, found[0].comments[0]._id);
         // gh-590
-        assert.strictEqual(null, found[0].comments[0].id);
+        assert.ok(!found[0].comments[0].id);
         done();
       });
     });

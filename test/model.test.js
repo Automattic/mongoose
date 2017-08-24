@@ -5512,6 +5512,34 @@ describe('Model', function() {
       });
     });
 
+    it('disabling id getter with .set() (gh-5548)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        name: String,
+        _id: false
+      });
+
+      ChildSchema.set('id', false);
+
+      var ParentSchema = new mongoose.Schema({
+        child: {
+          type: ChildSchema,
+          default: {}
+        }
+      }, { id: false });
+
+      var Parent = db.model('gh5548', ParentSchema);
+
+      var doc = new Parent({ child: { name: 'test' } });
+      assert.ok(!doc.id);
+      assert.ok(!doc.child.id);
+
+      var obj = doc.toObject({ virtuals: true });
+      assert.ok(!('id' in obj));
+      assert.ok(!('id' in obj.child));
+
+      done();
+    });
+
     it('creates new array when initializing from existing doc (gh-4449)', function(done) {
       var TodoSchema = new mongoose.Schema({
         title: String

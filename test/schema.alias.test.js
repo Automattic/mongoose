@@ -31,7 +31,7 @@ describe('schema alias option', function() {
       buffer: new Buffer('World'),
       boolean: false,
       mixed: [1, [], 'three', { four: 5 }],
-      objectId: new Schema.Types.ObjectId(),
+      objectId: new mongoose.Types.ObjectId(),
       array: ['a', 'b', 'c', 'd']
     }, function(err, s) {
       assert.ifError(err);
@@ -76,7 +76,7 @@ describe('schema alias option', function() {
         buffer: new Buffer('World'),
         boolean: false,
         mixed: [1, [], 'three', { four: 5 }],
-        objectId: new Schema.Types.ObjectId(),
+        objectId: new mongoose.Types.ObjectId(),
         array: ['a', 'b', 'c', 'd']
       }
     }, function(err, s) {

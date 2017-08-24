@@ -1,3 +1,13 @@
+4.11.8 / 2017-08-23
+===================
+ * feat: add warning about using schema ObjectId as type ObjectId #5571 [efkan](https://github.com/efkan)
+ * fix(schema): allow setting `id` property after schema was created #5570 #5548
+ * docs(populate): remove confusing _ from populate docs #5560
+ * fix(connection): expose parsed uri fields (host, port, dbname) when using openUri() #5556
+ * docs: added type boolean to options documentation #5547 [ndabAP](https://github.com/ndabAP)
+ * test: add test coverage for stopping/starting server #5524
+ * fix(aggregate): pull read preference from schema by default #5522
+
 4.11.7 / 2017-08-14
 ===================
  * fix: correct properties when calling toJSON() on populated virtual #5544 #5442 [davidwu226](https://github.com/davidwu226)

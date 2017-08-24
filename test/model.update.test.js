@@ -466,14 +466,15 @@ describe('model: update:', function() {
   });
 
   it('handles $pull with obj literal (gh-542)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start();
+    var BlogPost = db.model('BlogPostForUpdates', collection);
 
-    BlogPost.findById(post, function(err, last) {
+
+    BlogPost.findById(post, function(err, doc) {
       assert.ifError(err);
 
       var update = {
-        $pull: {comments: {_id: last.comments[0].id}}
+        $pull: {comments: {_id: doc.comments[0].id}}
       };
 
       BlogPost.update({_id: post._id}, update, function(err) {

@@ -735,35 +735,6 @@ describe('schema', function() {
       assert.equal(schema.path('_id'), undefined);
       done();
     });
-
-    it('auto id', function(done) {
-      var schema = new Schema({
-        name: String
-      });
-      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
-
-      schema = new Schema({
-        name: String
-      }, {id: true});
-      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
-
-      schema = new Schema({
-        name: String
-      }, {id: false});
-      assert.equal(schema.virtualpath('id'), undefined);
-
-      // old options
-      schema = new Schema({
-        name: String
-      }, {noVirtualId: false});
-      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
-
-      schema = new Schema({
-        name: String
-      }, {noVirtualId: true});
-      assert.equal(schema.virtualpath('id'), undefined);
-      done();
-    });
   });
 
   describe('hooks', function() {
@@ -1455,6 +1426,7 @@ describe('schema', function() {
         docs: [{x: [{y: String}]}],
         mixed: {}
       });
+      schema.virtual('myVirtual').get(function() { return 42; });
     });
 
     describe('when called on an explicit real path', function() {
@@ -1470,7 +1442,7 @@ describe('schema', function() {
     });
     describe('when called on a virtual', function() {
       it('returns virtual', function(done) {
-        assert.equal(schema.pathType('id'), 'virtual');
+        assert.equal(schema.pathType('myVirtual'), 'virtual');
         done();
       });
     });

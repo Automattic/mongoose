@@ -1884,7 +1884,7 @@ describe('model: findOneAndUpdate:', function() {
 
       var User = db.model('gh5551', UserSchema);
 
-      user = {name: 'upsert', foo: uuid.v4()};
+      var user = { name: 'upsert', foo: uuid.v4() };
       var opts = {
         upsert: true,
         setDefaultsOnInsert: true,

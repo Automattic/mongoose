@@ -12,6 +12,8 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 var DocumentObjectId = mongoose.Types.ObjectId;
 var _ = require('lodash');
+var uuid = require('uuid');
+var uuidParse = require('uuid-parse');
 
 describe('model: findOneAndUpdate:', function() {
   var Comments;
@@ -1857,6 +1859,43 @@ describe('model: findOneAndUpdate:', function() {
         assert.ok(error.errors['name']);
         Test.findOneAndUpdate({}, { $set: { otherName: 'test' } }, opts, function(error) {
           assert.ifError(error);
+          done();
+        });
+      });
+    });
+
+    it('setting subtype when saving (gh-5551)', function(done) {
+      function toUUID(string) {
+        if (!string) {return null;}
+        if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
+          return string;
+        }
+        var buffer = uuidParse.parse(string);
+        return new mongoose.Types.Buffer(buffer).toObject(0x04);
+      }
+
+      var UserSchema = new mongoose.Schema({
+        name: String,
+        foo: {
+          type: mongoose.Schema.Types.Buffer,
+          set: toUUID
+        }
+      });
+
+      var User = db.model('gh5551', UserSchema);
+
+      user = {name: 'upsert', foo: uuid.v4()};
+      var opts = {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runSettersOnQuery: true,
+        new: true
+      };
+      User.findOneAndUpdate({}, user, opts).exec(function(error, doc) {
+        assert.ifError(error);
+        User.collection.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.foo.sub_type, 4);
           done();
         });
       });

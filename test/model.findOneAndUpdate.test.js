@@ -13,7 +13,6 @@ var ObjectId = Schema.Types.ObjectId;
 var DocumentObjectId = mongoose.Types.ObjectId;
 var _ = require('lodash');
 var uuid = require('uuid');
-var uuidParse = require('uuid-parse');
 
 describe('model: findOneAndUpdate:', function() {
   var Comments;
@@ -1865,8 +1864,16 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('setting subtype when saving (gh-5551)', function(done) {
+      if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
+        // Don't run on node 0.x because of `const` issues
+        this.skip();
+      }
+
+      var uuidParse = require('uuid-parse');
       function toUUID(string) {
-        if (!string) {return null;}
+        if (!string) {
+          return null;
+        }
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }

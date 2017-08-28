@@ -1,3 +1,11 @@
+4.11.9 / 2017-08-27
+===================
+ * fix(error): avoid using arguments.callee because that breaks strict mode #5572
+ * docs(schematypes): fix spacing #5567
+ * fix(query): enforce binary subtype always propagates to mongodb #5551
+ * fix(query): only skip castForQuery for mongoose arrays #5536
+ * fix(browser): rely on browser entrypoint to decide whether to use BrowserDocument or NodeDocument #5480
+
 4.11.8 / 2017-08-23
 ===================
  * feat: add warning about using schema ObjectId as type ObjectId #5571 [efkan](https://github.com/efkan)

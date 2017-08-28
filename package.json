@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.11.8",
+  "version": "4.11.9",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -55,6 +55,7 @@
     "tbd": "0.6.4",
     "uglify-js": "2.7.0",
     "uuid": "2.0.3",
+    "uuid-parse": "1.0.0",
     "validator": "5.4.0"
   },
   "browserDependencies": {

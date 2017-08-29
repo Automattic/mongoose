@@ -2611,13 +2611,13 @@ A.findOneAndUpdate()                             <span class="comment">// return
 
 <h4>Example:</h4>
 
-<pre><code><span class="keyword">var</span> query = { name: <span class="string">'borne'</span> };
-Model.findOneAndUpdate(query, { name: <span class="string">'jason borne'</span> }, options, callback)
+<pre><code><span class="keyword">var</span> query = { name: <span class="string">'bourne'</span> };
+Model.findOneAndUpdate(query, { name: <span class="string">'jason bourne'</span> }, options, callback)
 
 <span class="comment">// is sent as</span>
-Model.findOneAndUpdate(query, { $set: { name: <span class="string">'jason borne'</span> }}, options, callback)</code></pre>
+Model.findOneAndUpdate(query, { $set: { name: <span class="string">'jason bourne'</span> }}, options, callback)</code></pre>
 
-<p>This helps prevent accidentally overwriting your document with <code>{ name: 'jason borne' }</code>.</p>
+<p>This helps prevent accidentally overwriting your document with <code>{ name: 'jason bourne' }</code>.</p>
 
 <h4>Note:</h4>
 
@@ -2632,9 +2632,9 @@ Model.findOneAndUpdate(query, { $set: { name: <span class="string">'jason borne'
 
 <p>If you need those features, use the traditional approach of first retrieving the document.</p>
 
-<pre><code>Model.findOne({ name: <span class="string">'borne'</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+<pre><code>Model.findOne({ name: <span class="string">'bourne'</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
   <span class="keyword">if</span> (err) ..
-  doc.name = <span class="string">'jason borne'</span>;
+  doc.name = <span class="string">'jason bourne'</span>;
   doc.save(callback);
 })</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-findByIdAndUpdate"><a href="#model_Model-findByIdAndUpdate">Model.findByIdAndUpdate(<code>id</code>, <code>[update]</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issues a mongodb findAndModify update command by a documents id.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findByIdAndUpdate = function (id, update, options, callback) {
   var args;
@@ -2693,12 +2693,12 @@ A.findByIdAndUpdate()                     <span class="comment">// returns Query
 
 <h4>Example:</h4>
 
-<pre><code>Model.findByIdAndUpdate(id, { name: <span class="string">'jason borne'</span> }, options, callback)
+<pre><code>Model.findByIdAndUpdate(id, { name: <span class="string">'jason bourne'</span> }, options, callback)
 
 <span class="comment">// is sent as</span>
-Model.findByIdAndUpdate(id, { $set: { name: <span class="string">'jason borne'</span> }}, options, callback)</code></pre>
+Model.findByIdAndUpdate(id, { $set: { name: <span class="string">'jason bourne'</span> }}, options, callback)</code></pre>
 
-<p>This helps prevent accidentally overwriting your document with <code>{ name: 'jason borne' }</code>.</p>
+<p>This helps prevent accidentally overwriting your document with <code>{ name: 'jason bourne' }</code>.</p>
 
 <h4>Note:</h4>
 
@@ -2715,7 +2715,7 @@ Model.findByIdAndUpdate(id, { $set: { name: <span class="string">'jason borne'</
 
 <pre><code>Model.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
   <span class="keyword">if</span> (err) ..
-  doc.name = <span class="string">'jason borne'</span>;
+  doc.name = <span class="string">'jason bourne'</span>;
   doc.save(callback);
 })</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-findOneAndRemove"><a href="#model_Model-findOneAndRemove">Model.findOneAndRemove(<code>conditions</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issue a mongodb findAndModify remove command.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findOneAndRemove = function (conditions, options, callback) {
   if (1 === arguments.length &amp;&amp; 'function' == typeof conditions) {
@@ -2899,13 +2899,13 @@ MyModel.update({ name: <span class="string">'Tobi'</span> }, { ferret: <span cla
 
 <h4>Example:</h4>
 
-<pre><code><span class="keyword">var</span> query = { name: <span class="string">'borne'</span> };
-Model.update(query, { name: <span class="string">'jason borne'</span> }, options, callback)
+<pre><code><span class="keyword">var</span> query = { name: <span class="string">'bourne'</span> };
+Model.update(query, { name: <span class="string">'jason bourne'</span> }, options, callback)
 
 <span class="comment">// is sent as</span>
-Model.update(query, { $set: { name: <span class="string">'jason borne'</span> }}, options, callback)</code></pre>
+Model.update(query, { $set: { name: <span class="string">'jason bourne'</span> }}, options, callback)</code></pre>
 
-<p>This helps prevent accidentally overwriting all documents in your collection with <code>{ name: 'jason borne' }</code>.</p>
+<p>This helps prevent accidentally overwriting all documents in your collection with <code>{ name: 'jason bourne' }</code>.</p>
 
 <h4>Note:</h4>
 
@@ -2926,9 +2926,9 @@ Model.update(query, { $set: { name: <span class="string">'jason borne'</span> }}
 
 <p>If you need those features, use the traditional approach of first retrieving the document.</p>
 
-<pre><code>Model.findOne({ name: <span class="string">'borne'</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+<pre><code>Model.findOne({ name: <span class="string">'bourne'</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
   <span class="keyword">if</span> (err) ..
-  doc.name = <span class="string">'jason borne'</span>;
+  doc.name = <span class="string">'jason bourne'</span>;
   doc.save(callback);
 })</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-mapReduce"><a href="#model_Model-mapReduce">Model.mapReduce(<code>o</code>, <code>callback</code>)</a></h3><p>Executes a mapReduce command.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.mapReduce = <span class="function"><span class="keyword">function</span> <span class="title">mapReduce</span> <span class="params">(o, callback)</span> {</span>
   <span class="keyword">if</span> (<span class="string">'function'</span> != <span class="keyword">typeof</span> callback) <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'missing callback'</span>);

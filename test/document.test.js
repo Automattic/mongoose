@@ -4594,6 +4594,44 @@ describe('document', function() {
       });
     });
 
+    it('single nested conditional required scope (gh-5569)', function(done) {
+      var scopes = [];
+
+      var ThingSchema = new mongoose.Schema({
+        undefinedDisallowed: {
+          type: String,
+          required: function() {
+            scopes.push(this);
+            return this.undefinedDisallowed === undefined;
+          },
+          default: null
+        }
+      });
+
+      var SuperDocumentSchema = new mongoose.Schema({
+        thing: {
+          type: ThingSchema,
+          default: function() { return {}; }
+        }
+      });
+
+      var SuperDocument = db.model('gh5569', SuperDocumentSchema);
+
+      var doc = new SuperDocument();
+      doc.thing.undefinedDisallowed = null;
+
+      doc.save(function(error) {
+        assert.ifError(error);
+        doc = new SuperDocument();
+        doc.thing.undefinedDisallowed = undefined;
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['thing.undefinedDisallowed']);
+          done();
+        });
+      });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

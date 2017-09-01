@@ -1668,5 +1668,21 @@ describe('schema', function() {
       assert.equal(casted.toString(), '6.2E+23');
       done();
     });
+
+    it('clone() copies validators declared with validate() (gh-5607)', function(done) {
+      var schema = new Schema({
+        num: Number
+      });
+
+      schema.path('num').validate(function(v) {
+        return v === 42;
+      });
+
+      var clone = schema.clone();
+      assert.equal(clone.path('num').validators.length, 1);
+      assert.ok(clone.path('num').validators[0].validator(42));
+      assert.ok(!clone.path('num').validators[0].validator(41));
+      done();
+    });
   });
 });

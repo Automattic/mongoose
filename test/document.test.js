@@ -4607,8 +4607,8 @@ describe('document', function() {
       var referenceA = new Referrer();
       var referenceB = new Referrer();
 
-      referrerA = new Referrer({reference: [referenceA]});
-      referrerB = new Referrer();
+      var referrerA = new Referrer({reference: [referenceA]});
+      var referrerB = new Referrer();
 
       referrerA.reference.push(referenceB);
       assert.ok(referrerA.reference[0] instanceof Referrer);

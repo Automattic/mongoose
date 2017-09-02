@@ -4594,6 +4594,32 @@ describe('document', function() {
       });
     });
 
+    it('push populated doc onto empty array triggers manual population (gh-5504)', function(done) {
+      var ReferringSchema = new Schema({
+        reference: [{
+          type: Schema.Types.ObjectId,
+          ref: 'gh5504'
+        }]
+      });
+
+      var Referrer = db.model('gh5504', ReferringSchema);
+
+      var referenceA = new Referrer();
+      var referenceB = new Referrer();
+
+      referrerA = new Referrer({reference: [referenceA]});
+      referrerB = new Referrer();
+
+      referrerA.reference.push(referenceB);
+      assert.ok(referrerA.reference[0] instanceof Referrer);
+      assert.ok(referrerA.reference[1] instanceof Referrer);
+
+      referrerB.reference.push(referenceB);
+      assert.ok(referrerB.reference[0] instanceof Referrer);
+
+      done();
+    });
+
     it('single nested conditional required scope (gh-5569)', function(done) {
       var scopes = [];
 

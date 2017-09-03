@@ -89,7 +89,6 @@ describe('connections:', function() {
         this.timeout(25000);
 
         var conn;
-        var stopped = false;
         var numConnected = 0;
         var numDisconnected = 0;
         var numReconnected = 0;
@@ -113,7 +112,6 @@ describe('connections:', function() {
             return server.stop();
           }).
           then(function() {
-            stopped = true;
             return new Promise(function(resolve) {
               setTimeout(function() { resolve(); }, 50);
             });
@@ -126,7 +124,6 @@ describe('connections:', function() {
             return server.start();
           }).
           then(function() {
-            stopped = false;
             return new Promise(function(resolve) {
               setTimeout(function() { resolve(); }, 2000);
             });
@@ -143,7 +140,6 @@ describe('connections:', function() {
         this.timeout(25000);
 
         var conn;
-        var stopped = false;
         var numTimeout = 0;
         var numDisconnected = 0;
         conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {

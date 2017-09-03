@@ -75,71 +75,111 @@ describe('connections:', function() {
       }).catch(done);
     });
 
-    it('events (gh-5498) (gh-5524)', function(done) {
-      this.timeout(25000);
+    describe('connection events', function() {
+      beforeEach(function() {
+        return server.start().
+          then(function() { return server.purge(); });
+      });
 
-      var conn;
-      var stopped = false;
-      var numConnected = 0;
-      var numDisconnected = 0;
-      var numReconnected = 0;
-      server.start().
-        then(function() {
-          conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
-            useMongoClient: true
-          });
+      afterEach(function() {
+        return server.stop();
+      });
 
-          conn.on('connected', function() {
-            ++numConnected;
-          });
-          conn.on('disconnected', function() {
-            ++numDisconnected;
-          });
-          conn.on('reconnected', function() {
-            ++numReconnected;
-          });
+      it('disconnected (gh-5498) (gh-5524)', function(done) {
+        this.timeout(25000);
 
-          return conn;
-        }).
-        then(function() {
-          assert.equal(numConnected, 1);
-          return server.stop();
-        }).
-        then(function() {
-          stopped = true;
-          return new Promise(function(resolve) {
-            setTimeout(function() { resolve(); }, 50);
-          });
-        }).
-        then(function() {
-          assert.equal(numDisconnected, 1);
-          assert.equal(numReconnected, 0);
-        }).
-        then(function() {
-          return server.start();
-        }).
-        then(function() {
-          stopped = false;
-          return new Promise(function(resolve) {
-            setTimeout(function() { resolve(); }, 2000);
-          });
-        }).
-        then(function() {
-          assert.equal(numDisconnected, 1);
-          assert.equal(numReconnected, 1);
-          done();
-        }).
-        catch(finish);
+        var conn;
+        var stopped = false;
+        var numConnected = 0;
+        var numDisconnected = 0;
+        var numReconnected = 0;
+        conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
+          useMongoClient: true
+        });
 
-      function finish(err) {
-        if (stopped) {
-          server.start().
-            then(function() { done(err); }).
-            catch(done);
-        } else {
-          done(err);
-        }
-      }
+        conn.on('connected', function() {
+          ++numConnected;
+        });
+        conn.on('disconnected', function() {
+          ++numDisconnected;
+        });
+        conn.on('reconnected', function() {
+          ++numReconnected;
+        });
+
+        conn.
+          then(function() {
+            assert.equal(numConnected, 1);
+            return server.stop();
+          }).
+          then(function() {
+            stopped = true;
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 50);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+          }).
+          then(function() {
+            return server.start();
+          }).
+          then(function() {
+            stopped = false;
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 2000);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 1);
+            done();
+          }).
+          catch(done);
+      });
+
+      it('timeout (gh-4513)', function(done) {
+        this.timeout(25000);
+
+        var conn;
+        var stopped = false;
+        var numTimeout = 0;
+        var numDisconnected = 0;
+        conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
+          useMongoClient: true,
+          socketTimeoutMS: 100,
+          poolSize: 1
+        });
+
+        conn.on('timeout', function() {
+          ++numTimeout;
+        });
+
+        conn.on('disconnected', function() {
+          ++numDisconnected;
+        });
+
+        var Model = conn.model('gh4513', new Schema());
+
+        conn.
+          then(function() {
+            return Model.create({});
+          }).
+          then(function() {
+            return Model.find({ $where: 'sleep(250) || true' });
+          }).
+          then(function() {
+            done(new Error('expected timeout'));
+          }).
+          catch(function(error) {
+            assert.ok(error);
+            assert.ok(error.message.indexOf('timed out'), error.message);
+            assert.equal(numTimeout, 1);
+            assert.equal(numDisconnected, 0);
+            done();
+          });
+      });
     });
   });
 

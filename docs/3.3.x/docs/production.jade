@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h2
+    | Mongoose In The Wild 
+    a(href='mailto:aaronheckmann+github@gmail.com?subject=Please add my project to mongoosejs.com', title='add/remove your project') (add your project)
+  ul.inthewild
+    each img in images
+      li
+        a(href=img.url, title=img.title + ' ' + img.desc)
+          img(src="images/apps/" + img.src + ".png", alt=img.title + ' ' + img.desc)

@@ -1,0 +1,80 @@
+extends layout
+
+block content
+  h2 Sub Docs
+  :markdown
+    [Sub-documents](./api.html#types-embedded-js) are docs with schemas of their own which are elements of a parents document array:
+  :js
+    var childSchema = new Schema({ name: 'string' });
+
+    var parentSchema = new Schema({
+      children: [childSchema]
+    })
+
+  :markdown
+    Sub-documents enjoy all the same features as normal [documents](./api.html#document-js). The only difference is that they are not saved individually, they are saved whenever their top-level parent document is saved.
+  :js
+    var Parent = db.model('Parent', parentSchema);
+    var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+    parent.children[0].name = 'Matthew';
+    parent.save(callback);
+
+  :markdown
+    If an error occurs in a sub-documents' middleware, it is bubbled up to the `save()` callback of the parent, so error handling is a snap!
+
+  :js
+    childSchema.pre('save', function (next) {
+      if ('invalid' == this.name) return next(new Error('#sadpanda'));
+      next();
+    });
+
+    var parent = new Parent({ children: [{ name: 'invalid' }] });
+    parent.save(function (err) {
+      console.log(err.message) // #sadpanda
+    })
+
+  h3 Finding a sub-document
+  :markdown
+    Each document has an `_id`. DocumentArrays have a special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method for looking up a document by its `_id`.
+  :js
+    var doc = parent.children.id(id);
+
+  h3 Adding sub-docs
+  :markdown
+    MongooseArray methods such as [push](./api.html#types_array_MongooseArray-push), [unshift](./api.html#types_array_MongooseArray-unshift), [addToSet](./api.html#types_array_MongooseArray-addToSet), and others cast arguments to their proper types transparently:
+  :js
+    var Parent = db.model('Parent');
+    var parent = new Parent;
+
+    // create a comment
+    post.children.push({ name: 'Liesl' });
+    var doc = post.children[0];
+    console.log(doc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+    doc.isNew; // true
+
+    post.save(function (err) {
+      if (err) return handleError(err)
+      console.log('Success!');
+    });
+  :markdown
+    Sub-docs may also be created without adding them to the array by using the [create](./api.html#types_documentarray_MongooseDocumentArray-create) method of MongooseArrays.
+  :js
+    var newdoc = post.children.create({ name: 'Aaron' });
+
+  h3 Removing docs
+  :markdown
+    Each sub-document has it's own [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
+  :js
+    var doc = parent.children.id(id).remove();
+    parent.save(function (err) {
+      if (err) return handleError(err);
+      console.log('the sub-doc was removed')
+    });
+
+  h4#altsyntax Alternate declaration syntax
+  :markdown
+    _New in v3_ If you don't need access to the sub-document schema instance, you may also declare sub-docs by simply passing an object literal:
+  :js
+    var parentSchema = new Schema({
+      children: [{ name: 'string' }]
+    })

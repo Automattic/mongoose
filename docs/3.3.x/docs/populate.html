@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Query Population v3.3.1</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./migration.html">migrating from 2.x</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>Query Population</h2><p>There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where <a href="./api.html#query_Query-populate">query#populate</a> comes in.</p>
+
+<p><code>ObjectIds</code> can refer to another document in a collection within our database and be <code>populate()</code>d when querying:</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>)
+  , Schema = mongoose.Schema
+  
+<span class="keyword">var</span> PersonSchema = <span class="keyword">new</span> Schema({
+  name    : String,
+  age     : Number,
+  stories : [{ type: Schema.Types.ObjectId, ref: <span class="string">'Story'</span> }]
+});
+
+<span class="keyword">var</span> StorySchema = <span class="keyword">new</span> Schema({
+  _creator : { type: Schema.Types.ObjectId, ref: <span class="string">'Person'</span> },
+  title    : String,
+  fans     : [{ type: Schema.Types.ObjectId, ref: <span class="string">'Person'</span> }]
+});
+
+<span class="keyword">var</span> Story  = mongoose.model(<span class="string">'Story'</span>, StorySchema);
+<span class="keyword">var</span> Person = mongoose.model(<span class="string">'Person'</span>, PersonSchema);</code></pre><p>So far we&#39;ve created two <code>models</code>. Our <code>Person</code> model has it&#39;s <code>stories</code> field set to an array of <code>ObjectId</code>s. The <code>ref</code> option is what tells Mongoose in which model to look, in our case the <code>Story</code> model. All <code>_id</code>s we store here must be document _ids from the <code>Story</code> model. We also added a <code>_creator</code> <code>ObjectId</code> to our <code>Story</code> schema which refers to a single <code>Person</code>.</p><h3>Saving refs</h3><p>Saving refs to other documents works the same way you normally save objectids, just assign an <code>ObjectId</code>:</p><pre><code class="javascript"><span class="keyword">var</span> aaron = <span class="keyword">new</span> Person({ name: <span class="string">'Aaron'</span>, age: <span class="number">100</span> });
+
+aaron.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  
+  <span class="keyword">var</span> story1 = <span class="keyword">new</span> Story({
+    title: <span class="string">"Once upon a timex."</span>,
+    _creator: aaron._id    <span class="comment">// assign an ObjectId</span>
+  });
+  
+  story1.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+    <span class="comment">// thats it!</span>
+  });
+})</code></pre><h3>Population</h3><p>So far we haven&#39;t done anything special. We&#39;ve merely created a <code>Person</code> and a <code>Story</code>. Now let&#39;s take a look at populating our story&#39;s <code>_creator</code>:</p><pre><code class="javascript">Story
+.findOne({ title: <span class="regexp">/timex/</span> })
+.populate(<span class="string">'_creator'</span>)
+.exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, story)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  console.log(<span class="string">'The creator is %s'</span>, story._creator.name); <span class="comment">// prints "The creator is Aaron"</span>
+})
+</code></pre><p>Populated paths are no longer set to their original <code>ObjectId</code>s, their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.</p>
+
+<p>Arrays of <code>ObjectId</code> refs work the same way. Just call the <a href="./api.html#query_Query-populate">populate</a> method on the query and an array of documents will be returned <em>in place</em> of the <code>ObjectIds</code>.</p><h3>Field selection</h3><p>What if we only want a few specific fields returned for the query? This can be accomplished by passing the usual <a href="./api.html#query_Query-select">field name syntax</a> as the second argument to the populate method:</p><pre><code class="javascript">Story
+.findOne({ title: <span class="regexp">/timex/i</span> })
+.populate(<span class="string">'_creator'</span>, <span class="string">'name'</span>) <span class="comment">// only return the Persons name</span>
+.exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, story)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  
+  console.log(<span class="string">'The creator is %s'</span>, story._creator.name);
+  <span class="comment">// prints "The creator is Aaron"</span>
+  
+  console.log(<span class="string">'The creators age is %s'</span>, story._creator.age);
+  <span class="comment">// prints "The creators age is null'</span>
+})</code></pre><h3>Query conditions for populate</h3><p>What if we wanted to populate our fans array based on their age, and return, at most, any 5 of them?</p><pre><code class="javascript">Story
+.find(...)
+.populate(<span class="string">'fans'</span>, <span class="literal">null</span>, { age: { $gte: <span class="number">21</span> }}, { limit: <span class="number">5</span> })</code></pre><p>Done. <code>Conditions</code> and <code>options</code> for populate queries are passed as the third and fourth arguments respectively.</p><h3>Refs to children</h3><p>We may find however, if we use the <code>aaron</code> object, we are unable to get a list of the stories. This is because no <code>story</code> objects were ever &#39;pushed&#39; on to <code>aaron.stories</code>.</p>
+
+<p>There are two perspectives to this story. First, it&#39;s nice to have <code>aaron</code> know which are his stories.</p><pre><code class="javascript">aaron.stories.push(story1);
+aaron.save();</code></pre><p>This allows us to perform a <code>find</code> and <code>populate</code> combo:</p><pre><code class="javascript">Person
+.findOne({ name: <span class="string">'Aaron'</span> })
+.populate(<span class="string">'stories'</span>) <span class="comment">// only works if we pushed refs to children</span>
+.exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, person)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  console.log(person);
+})</code></pre><p>However, it is debatable that we really want two sets of pointers as they may get out of sync. So we could instead merely <code>find()</code> the documents we are interested in.</p><pre><code class="javascript">Story
+.find({ _creator: aaron._id })
+.populate(<span class="string">'_creator'</span>) <span class="comment">// not really necessary</span>
+.exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, stories)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  console.log(<span class="string">'The stories are an array: '</span>, stories);
+})
+</code></pre><h3>Updating refs</h3><p>Now that we have a <code>story</code> we realized that the <code>_creator</code> was incorrect. We can update <code>ObjectId</code> refs the same as any other property through the magic of Mongooses internal casting:</p><pre><code class="javascript"><span class="keyword">var</span> guille = <span class="keyword">new</span> Person({ name: <span class="string">'Guillermo'</span> });
+guille.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  
+  story._creator = guille; <span class="comment">// or guille._id</span>
+  
+  story.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+    
+    Story
+    .findOne({ title: <span class="regexp">/timex/i</span> })
+    .populate(<span class="string">'_creator'</span>, <span class="string">'name'</span>)
+    .exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, story)</span> {</span>
+      <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+      
+      console.log(<span class="string">'The creator is %s'</span>, story._creator.name)
+      <span class="comment">// prints "The creator is Guillermo"</span>
+    })
+  })
+})
+</code></pre><h4>NOTE:</h4><p>The documents returned from calling <a href="./api.html#query_Query-populate">populate</a> become fully functional, <code>remove</code>able, <code>save</code>able documents. Do not confuse them with <a href="./subdocs.html">sub docs</a>. Take caution when calling its remove method because you&#39;ll be removing it from the database, not just the array.</p><h4>NOTE:</h4><p><em>Field selection</em> in v3 is slightly different than v2. Arrays of fields are no longer accepted.</p><pre><code class="javascript"><span class="comment">// this works</span>
+Story.findOne(..).populate(<span class="string">'_creator'</span>, <span class="string">'name age'</span>).exec(..);
+
+<span class="comment">// this doesn't</span>
+Story.findOne(..).populate(<span class="string">'_creator'</span>, [<span class="string">'name'</span>, <span class="string">'age'</span>]).exec(..);
+</code></pre><p>See the <a href="./migration.html#fields">migration guide</a> for more detail.</p><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered query population, let&#39;s take a look at <a href="/docs/connections.html">connections</a>.</p></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

@@ -1,0 +1,517 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Mongoose API v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    style.
+      body {
+        background: #d8e2d8 url(/docs/images/square_bg.png) fixed;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #333;
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: 100%;
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+        line-height: 22px;
+      }
+      a {
+        color: #800;
+        -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
+        -webkit-transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+      }
+      a:hover {
+        opacity: 0.8;
+      }
+      #wrap {
+      }
+      h1 {
+        font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
+        text-rendering: geometricPrecision;
+      }
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #bbb;
+        padding:5px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+      code {
+        background: rgba(255,255,255,.8);
+        color: #333;
+        border-radius: 3px;
+        font-size: 13px;
+        font-family: Monaco;
+      }
+      pre code {
+        border: 0 none;
+        padding: 1.2em;
+        overflow-x: auto;
+      }
+      h3 {
+        padding: 20px 15px;
+        margin-left: -15px;
+      }
+      h3 code {
+        font-weight: normal;
+      }
+      hr {
+        height: 1px;
+        border: 0 none;
+        padding: 0;
+        margin: 60px 0;
+        background: -webkit-gradient(linear, left top, right top, from(rgba(57, 172, 57, 0.0)), color-stop(0.5, rgba(57, 172, 57, 0.33)), to(rgba(57, 172, 57, 0.0)))
+      }
+      .doclinks hr {
+        margin: 10px 0;
+      }
+      li {
+        list-style: square;
+      }
+      #header {
+        padding-top: 22px;
+        padding-bottom: 25px;
+        text-transform: lowercase;
+      }
+      #header h1 {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      #header h1 a {
+        text-decoration: none;
+      }
+      #header .mongoose {
+        font-size: 48px;
+        font-weight: 100;
+        color: #fff;
+        letter-spacing: -5px;
+      }
+      #links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 210px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 15px 0 30px 20px;
+        border-right: 1px solid #ddd;
+        background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+      }
+      #links hr {
+        margin: 32px 0;
+      }
+      #content {
+        padding: 0;
+        margin: 0 0 30px 230px;
+        overflow-x: hidden;
+      }
+      #content .controls {
+        padding: 5px 15px 5px 10px;
+        position: fixed;
+        background: #fff;
+        border: 3px solid #eee;
+        border-radius: 0 0 12px 0;
+        border-width: 0 3px 3px 10px;
+        width: 100%;
+        bottom: 0;
+        opacity: 0.75;
+        -webkit-transition-property: opacity;
+        -webkit-transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+      }
+      #content .controls:hover {
+        opacity: .9;
+      }
+      #content p {
+        word-wrap: break-word;
+      }
+      #content > ul {
+        margin: 0;
+        padding: 0;
+      }
+      .private {
+        display: none;
+      }
+      .section {
+        font-size: 15px;
+      }
+      .doclinks li.private a:before,
+      .doclinks .module.private a:before,
+      .doclinks item.private a:before {
+        content: "p";
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        line-height: 15px;
+        font-weight: normal;
+        padding: 0 2px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      #content .private h3:after {
+        content: "private";
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        line-height: 15px;
+        font-weight: normal;
+        padding: 0 2px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        display: inline-block;
+        margin-left: 5px;
+      }
+      .module {
+        list-style: none;
+        padding: 30px 0 30px 30px;
+        border-color: #eee;
+        border-width: 9px 10px;
+        border-style: solid;
+        background-color: #fff;
+      }
+      .module > * {
+        max-width: 700px;
+      }
+      .item:last-child {
+        margin-bottom: 90px;
+      }
+      .item:last-child > hr {
+        display: none;
+      }
+      .item h3 a {
+        color: #333;
+        text-decoration: none;
+      }
+      .property h3 span {
+        color: #444;
+      }
+      .description {
+        margin-top: 25px;
+      }
+      .sourcecode {
+        display: none;
+      }
+      .showcode {
+        font-size: 12px;
+        cursor: pointer;
+        display: none;
+      }
+      .load .showcode {
+        display: block;
+      }
+      .types a {
+        text-decoration: none;
+      }
+      @media only screen and (device-width: 768px) {
+
+      }
+      @media only screen and (max-width: 480px) {
+        #forkbanner { display: none }
+        #header .mongoose {
+          font-size: 65px;
+          text-align: center;
+        }
+        #links {
+          position: static;
+          width: auto;
+          border: 0 none;
+          border-right: 0 none;
+          border-bottom: 1px solid #ddd;
+          background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+          padding: 15px 0;
+        }
+        #links hr {
+          display: none;
+        }
+        #links, #links ul, #links li { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+        #links ul { padding: 0 10px 0 0; }
+        #links li {
+          list-style: none;
+          display: inline-block;
+          width: 25%;
+          text-align: center;
+        }
+        #links .home, #links .support, #links .fork {
+          display: none;
+        }
+        .doclinks {
+          display: none;
+        }
+        #content { margin-left: 0; }
+        .module {
+          padding-left: 5px;
+          border-width: 3px;
+        }
+        .controls { display: none; }
+      }
+  body.api
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #links
+      #header
+        h1
+          a(href="../index.html")
+            .mongoose Mongoose
+      include includes/nav
+      hr
+      .doclinks
+        each item in docs
+          .file(class=item.hasPublic ? '' : 'private')
+            a.section(href='#' + item.title.replace(/[\.\/#]/g, '-'))= item.title
+            ul
+              each method in item.methods
+                if method.ctx && !method.ignore
+                  li(class= method.isPrivate ? 'private' : '')
+                    case method.ctx.type
+                      when 'method'
+                        id = method.ctx.constructor + '-' + method.ctx.name
+                      when 'function'
+                        id = method.ctx.name
+                      default
+                        id = ''
+                    url = href(klass(item.title) + '_' + id)
+                    a(href='#' + url)= method.ctx.name
+              each stat in item.statics
+                if stat.ctx && !stat.ignore
+                  li(class= stat.isPrivate ? 'private' : '')
+                    case stat.ctx.type
+                      when 'method'
+                        id = stat.ctx.receiver + '-' + stat.ctx.name
+                      when 'property'
+                        id = stat.ctx.receiver + '-' + stat.ctx.name
+                      when 'function'
+                        id = stat.ctx.name
+                    url = href(klass(item.title) + '_' + id)
+                    a(href='#' + url)= stat.ctx.name
+              each property in item.props
+                if property.ctx && !property.ignore
+                  li(class= property.isPrivate ? 'private' : '')
+                    construct = property.ctx.receiver || property.ctx.constructor
+                    link = href(construct) + '-' + href(property.ctx.name)
+                    url = href(klass(item.title) + '_' + link)
+                    a(href='#' + url)= property.ctx.name
+    #content
+      .controls
+        label
+          input(type='checkbox')
+          | private
+      ul
+        each item in docs
+          li.module(class=item.hasPublic ? '' : 'private')
+            a(href=github + package.version + '/' + item.title, id=item.title.replace(/[\.\/#]/g, '-'))= item.title
+            each method in item.methods
+              div.item.method(class= method.isPrivate ? 'private' : 'public')
+                if method.ctx
+                  case method.ctx.type
+                    when 'method'
+                      id = method.ctx.constructor + '-' + method.ctx.name
+                      text = method.ctx.constructor + '#' + method.ctx.name
+                    when 'function'
+                      id = method.ctx.name
+                      text = method.ctx.name
+                    default
+                      text = ''
+                  url = href(klass(item.title) + '_' + text)
+                  h3(id= url)
+                    a(href= '#' + url)
+                      = text
+                      | (
+                      each tag, i in method.params
+                        code= tag.name
+                        if i+1 < method.params.length
+                          | , 
+                      | )
+                else
+                  - // console.log('\nmissing method name', method);
+                  h3 MISSING method name
+                != method.description.summary
+                if method.code
+                  span.showcode show code
+                  .sourcecode
+                    != hl(method.code)
+                if method.params.length
+                  .params
+                    h4 Parameters:
+                    ul
+                      each tag in method.params
+                        li
+                          code= tag.name
+                          if tag.types && tag.types.length
+                            span.types
+                              |  &lt;
+                              each type, i in tag.types
+                                != linktype(type)
+                                if i+1 < tag.types.length
+                                  | , 
+                              | &gt; 
+                          span= tag.description
+                if method.return
+                  .returns
+                    h4 Returns:
+                    ul
+                      li
+                        span.types
+                          |  &lt;
+                          each type, i in method.return.types
+                            != linktype(type)
+                            if i+1 < method.return.types.length
+                              | , 
+                          | &gt; 
+                        span= method.return.description
+                if method.inherits
+                  .inherits
+                    h4 Inherits:
+                    ul
+                      li
+                        != method.inherits
+                if method.events && method.events.length
+                  .events
+                    h4 Events:
+                    ul
+                      each event in method.events
+                        li
+                          != event.string
+                if method.see.length
+                  .see
+                    h4 See:
+                    ul.see
+                      each see in method.see
+                        li
+                          url = see.url || see.local
+                          a(href=url, title=see.title || see.local)= see.title || see.url || see.local
+                div.description
+                  != method.description.body
+                hr(class= method.isPrivate ? 'private' : '')
+            each stat in item.statics
+              div.item.static(class= stat.isPrivate ? 'private' : 'public')
+                if stat.ctx
+                  case stat.ctx.type
+                    when 'method'
+                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                      text = stat.ctx.receiver + '.' + stat.ctx.name
+                    when 'property'
+                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                      text = stat.ctx.receiver + '.' + stat.ctx.name
+                    when 'function'
+                      id = stat.ctx.name
+                      text = stat.ctx.name
+                    default
+                      text = ''
+                  url = href(klass(item.title) + '_' + id)
+                  h3(id= url)
+                    a(href= '#' + url)
+                      = text
+                      if 'property' != stat.ctx.type
+                        | (
+                        each tag, i in stat.params
+                          code= tag.name
+                          if i+1 < stat.params.length
+                            | , 
+                        | )
+                else
+                  - // console.log('\nmissing static name', stat);
+                  h3 MISSING stat name
+                != stat.description.summary
+                if stat.code
+                  span.showcode show code
+                  .sourcecode
+                    != hl(stat.code)
+                if stat.params.length
+                  .params
+                    h4 Parameters:
+                    ul
+                      each tag in stat.params
+                        li
+                          - if (!tag.name)
+                            - // console.log(tag)
+                          code= tag.name
+                          if tag.types && tag.types.length
+                            span.types
+                              |  &lt;
+                              each type, i in tag.types
+                                != linktype(type)
+                                if i+1 < tag.types.length
+                                  | , 
+                              | &gt; 
+                          span= tag.description
+                if stat.return
+                  .returns
+                    h4 Returns:
+                    ul
+                      li
+                        span.types
+                          |  &lt;
+                          each type, i in stat.return.types
+                            != linktype(type)
+                            if i+1 < stat.return.types.length
+                              | , 
+                          | &gt; 
+                        span= stat.return.description
+                if stat.inherits
+                  .inherits
+                    h4 Inherits:
+                    ul
+                      li
+                        != stat.inherits
+                if stat.see.length
+                  .see
+                    h4 See:
+                    ul.see
+                      each see in stat.see
+                        li
+                          url = see.url || see.local
+                          a(href=url, title=see.title || see.local)= see.title || see.url || see.local
+                != stat.description.body
+                hr(class= stat.isPrivate ? 'private' : '')
+            each property in item.props
+              div.item.property(class= property.ignore || property.isPrivate ? 'private' : 'public')
+                construct = property.ctx.receiver || property.ctx.constructor
+                link = href(construct) + '-' + href(property.ctx.name)
+                url = href(klass(item.title) + '_' + link)
+                h3(id = url)
+                  a(href= '#' + url)
+                    = construct + '#'
+                    span= property.ctx.name
+                != property.description.full
+                if property.return
+                  .returns
+                    h4 Returns:
+                    ul
+                      li
+                        span.types
+                          |  &lt;
+                          each type, i in property.return.types
+                            != linktype(type)
+                            if i+1 < property.return.types.length
+                              | , 
+                          | &gt; 
+                        span= property.return.description
+                hr(class= property.isPrivate ? 'private' : '')
+    script.
+      document.body.className = 'load';
+    include includes/keen
+    script(src="/docs/js/zepto.min.js")
+    script(src="/docs/js/cookies.min.js")
+    script.
+      $(".module").on("click", ".showcode", function (e) {
+        $(this).closest(".item").find(".sourcecode").first().toggle();
+      });
+      $("#content .controls input").on("click", function (e) {
+        $(".private").toggle()
+        var checked = $(this).prop('checked');
+        Cookies.set('prv', checked);
+      });
+      ;(function(){
+        var checked = 'true' === Cookies.get('prv');
+        if (checked) {
+          $("#content .controls input").prop('checked', 'checked');
+          $(".private").show()
+        }
+      })()

@@ -1,0 +1,53 @@
+ul
+  li.home
+    a(href="../index.html") home
+  li.faq
+    a(href="./faq.html") FAQ
+  li.plugins
+    a(href="http://plugins.mongoosejs.com") plugins
+  li.changelog
+    a(href="http://github.com/learnboost/mongoose/tree/master/History.md") change log
+  li.support
+    a(href="../index.html#support") support
+  li.fork
+    a(href="http://github.com/learnboost/mongoose") fork
+  li.guide
+    a(href="./guide.html") guide
+    if (locals.guide)
+      ul
+        li.double
+          a(href="./guide.html") schemas
+          ul
+            li.schematypes
+              a(href="./schematypes.html")
+                span schema
+                | types
+        li.double
+          a(href="./documents.html") documents
+          ul
+            li.subdocs
+              a(href="./subdocs.html") sub docs
+        li
+          a(href="./models.html") models
+        li
+          a(href="./queries.html") queries
+        li
+          a(href="./plugins.html") plugins
+        li
+          a(href="./middleware.html") middleware
+        li
+          a(href="./validation.html") validation
+        li
+          a(href="./populate.html") populate
+        li
+          a(href="./migration.html") migrating from 2.x
+        li
+          a(href="./contributing.html") contributing
+  li.api
+    a(href="./api.html") api docs
+  li.quickstart
+    a(href="./index.html") quick start
+  li.contrib
+    a(href="http://github.com/learnboost/mongoose/contributors") contributors
+  li.prior
+    a(href="./prior.html") prior releases

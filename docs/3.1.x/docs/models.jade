@@ -1,0 +1,61 @@
+extends layout
+
+block content
+  h2 Models
+  :markdown
+    [Models](./api.html#model-js) are fancy constructors compiled from our `Schema` definitions. Instances of these models represent [documents](./documents.html) which can be saved and retreived from our database. All document creation and retreival from the database is handled by these models.
+
+  h3 Compiling your first model
+  :js
+    var schema = new Schema({ name: 'string', size: 'string' });
+    var Tank = mongoose.model('Tank', schema);
+
+    // or, if you are using separate connections
+    var db = mongoose.createConnection(..);
+    var Tank = db.model('Tank', schema);
+
+  h3 Constructing documents
+  :markdown
+    [Documents](./documents.html) are instances of our model. Creating them and saving to the database is easy:
+  :js
+    var Tank = db.model('Tank', yourSchema);
+
+    var small = new Tank({ size: 'small' });
+    small.save(function (err) {
+      if (err) return handleError(err);
+      // saved!
+    })
+
+    // or
+
+    Tank.create({ size: 'small' }, function (err) {
+      if (err) return handleError(err);
+      // saved!
+    })
+
+  h3 Querying
+  :markdown
+    Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retreived using each `models` [find](./api.html#model_Model-find), [findById](./api.html#model_Model-findById), [findOne](./api.html#model_Model-findOne), or [where](./api.html#model_Model-where) static methods.
+
+  :js
+    Tank.find({ type: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
+  :markdown
+    See the chapter on [querying](./queries.html) for more details on how to use the [Query](./api.html#query-js) api.
+  h3 Removing
+  :markdown
+    Models have a static `remove` method available for removing all documents matching `conditions`.
+  :js
+    Tank.remove({ size: 'large' }, function (err) {
+      if (err) return handleError(err);
+      // removed!
+    });
+  h3 Updating
+  :markdown
+    Each `model` has its own `update` method for modifying documents in the database without returning them to your application. See the [API](./api.html#model_Model-update) docs for more detail.
+  h3 Yet more
+  :markdown
+    The [API docs](./api.html#model_Model) cover many additional methods available like [count](./api.html#model_Model-count), [mapReduce](./api.html#model_Model-mapReduce), [aggregate](./api.html#model_Model-aggregate), and more.
+
+  h3#next Next Up
+  :markdown
+    Now that we've covered `Models`, let's take a look at [querying](/docs/queries.html).

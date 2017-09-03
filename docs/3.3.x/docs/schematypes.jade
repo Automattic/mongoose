@@ -1,0 +1,146 @@
+extends layout
+
+block content
+  h2 SchemaTypes
+  p
+    | SchemaTypes handle definition of path 
+    a(href="./api.html#schematype_SchemaType-default") defaults
+    |, 
+    a(href="./api.html#schematype_SchemaType-validate") validation
+    |, 
+    a(href="./api.html#schematype_SchemaType-get") getters
+    |, 
+    a(href="./api.html#schematype_SchemaType-set") setters
+    |, 
+    a(href="./api.html#schematype_SchemaType-select") field selection defaults
+    |  for 
+    a(href="./api.html#query-js") queries
+    |  and other general characteristics for 
+    a(href="./api.html#schema-string-js") Strings
+    |  and 
+    a(href="./api.html#schema-number-js") Numbers
+    |. Check out their respective API documentation for more detail.
+  p
+    | Following are all valid 
+    a(href="./api.html#schema_Schema-Types") Schema Types
+    |.
+  ul
+    li String
+    li Number
+    li Date
+    li Buffer
+    li Boolean
+    li Mixed
+    li ObjectId
+    li Array
+  h4 Example
+  :js
+    var schema = new Schema({
+      name:    String,
+      binary:  Buffer,
+      living:  Boolean,
+      updated: { type: Date, default: Date.now },
+      age:     { type: Number, min: 18, max: 65 },
+      mixed:   Schema.Types.Mixed,
+      _someId: Schema.Types.ObjectId,
+      array:      [],
+      ofString:   [String],
+      ofNumber:   [Number],
+      ofDates:    [Date],
+      ofBuffer:   [Buffer],
+      ofBoolean:  [Boolean],
+      ofMixed:    [Schema.Types.Mixed],
+      ofObjectId: [Schema.Types.ObjectId],
+      nested: {
+        stuff: { type: String, lowercase: true, trim: true }
+      }
+    })
+
+    // example use
+
+    var Thing = mongoose.model('Thing', schema);
+
+    var m = new Thing;
+    m.name = 'Statue of Liberty';
+    m.age = 125;
+    m.updated = new Date;
+    m.binary = new Buffer(0);
+    m.living = false;
+    m.mixed = {[ any: { thing: 'i want' } ]};
+    m.markModified('mixed');
+    m._someId = new mongoose.Types.ObjectId;
+    m.array.push(1);
+    m.ofString.push("strings!");
+    m.ofNumber.unshift(1,2,3,4);
+    m.ofDates.addToSet(new Date);
+    m.ofBuffer.pop();
+    m.ofMixed = [1, [], 'three', { four: 5 }];
+    m.nested.stuff = 'good';
+    m.save(callback);
+
+  h3 Usage notes:
+  h4#mixed Mixed
+  p An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
+  :js
+    var Any = new Schema({ any: {} });
+    var Any = new Schema({ any: Schema.Types.Mixed });
+  p
+    | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the 
+    code .markModified(path)
+    |  method of the document passing the path to the Mixed type you just changed.
+  :js
+    person.anything = { x: [3, 4, { y: "changed" }] };
+    person.markModified('anything');
+    person.save(); // anything will now get saved
+  h4#objectids ObjectIds
+  p
+    | To specify a type of ObjectId, use 
+    code Schema.Types.ObjectId
+    |  in your declaration.
+  :js
+    var mongoose = require('mongoose');
+    var ObjectId = mongoose.Schema.Types.ObjectId;
+    var Car = new Schema({ driver: ObjectId });
+    // or just Schema.ObjectId for backwards compatibility with v2
+  h4#arrays Arrays
+  p
+    | Provide creation of arrays of 
+    a(href="./api.html#schema_Schema-Types") SchemaTypes
+    |  or 
+    a(href="./subdocs.html") Sub-Documents
+    |.
+  :js
+    var ToySchema = new Schema({ name: String });
+    var ToyBox = new Schema({
+      toys: [ToySchema],
+      buffers: [Buffer],
+      string:  [String],
+      numbers: [Number]
+      // ... etc
+    });
+  p
+    | Note: specifying an empty array is equivalent to 
+    code Mixed
+    |. The following all create arrays of 
+    code Mixed
+    |:
+  :js
+    var Empty1 = new Schema({ any: [] });
+    var Empty2 = new Schema({ any: Array });
+    var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
+    var Empty4 = new Schema({ any: [{}] });
+  h3#customtypes Creating Custom Types
+  p
+    | Mongoose can also be extended with custom SchemaTypes. Search the 
+    a(href="http://plugins.mongoosejs.com") plugins
+    |  site for compatible types like 
+    a(href="https://github.com/aheckmann/mongoose-long") mongoose-long
+    |  and 
+    a(href="https://github.com/aheckmann/mongoose-number") other
+    | 
+    a(href="https://github.com/bnoguchi/mongoose-types") types
+    |.
+
+  h3#next Next Up
+  :markdown
+    Now that we've covered `SchemaTypes`, let's take a look at [Models](/docs/models.html).

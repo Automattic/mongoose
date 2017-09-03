@@ -1,0 +1,63 @@
+extends layout
+
+block append style
+  style.
+    hr {
+      display: block;
+      margin: 30px 0;
+    }
+
+block content
+  h2 FAQ
+  :markdown
+    **Q**. Why don't my changes to arrays get saved when I update an element directly?
+  :js
+    doc.array[3] = 'changed';
+    doc.save();
+  :markdown
+    **A**. Mongoose doesn't create getters/setters for array indexes; without them mongoose never gets notified of the change and so doesn't know to persist the new value. The work-around is to first mark the path of the array modified before saving.
+  :js
+    doc.markModified('array');
+    doc.save();
+  hr
+  :markdown
+    **Q**. Why doesn't mongoose allow me to directly assign schemas to paths?
+  :js
+    var userSchema = new Schema({ name: String });
+    new Schema({ user: userSchema })
+  :markdown
+    **A**. Schemas have a one-to-one mapping with documents. Documents have `save` and `remove` methods along with their own `pre` and `post` hooks which would lead to code like the following:
+  :js
+    doc.user.save();  // ?
+    doc.user.remove();// ?
+    doc.save()
+  :markdown
+    We've felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling `save` on a sub-document is a no-op and exists only to support `pre` save hooks). In the future this is likely to be revisited.
+  hr
+  :markdown
+    **Q**. How can I enable debugging?
+
+    **A**. Set the `debug` option to `true`:
+  :js
+    mongoose.set('debug', true)
+  hr
+  :markdown
+    **Q**. My `save()` callback never executes. What am I doing wrong?
+
+    **A**. All `collection` actions (insert, remove, queries, etc) are queued until the `connection` opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.
+  :js
+    // if connecting on the default mongoose connection
+    mongoose.connect(..);
+    mongoose.connection.on('error', handleError);
+
+    // if connecting on a separate connection
+    var conn = mongoose.createConnection(..);
+    conn.on('error', handleError);
+
+  hr
+  :markdown
+    **Something to add?**
+
+    If you'd like to contribute to this page, please [visit it](https://github.com/learnboost/mongoose/tree/master/docs/faq.jade) on github and use the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button to send a pull request.
+  br
+

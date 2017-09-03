@@ -1,0 +1,54 @@
+extends layout
+
+block content
+  h2 Validation
+  :markdown
+    Before we get into the specifics of validation syntax, please keep the following rules in mind:
+
+    - Validation is defined in the [SchemaType](./schematypes.html)
+    - Validation is an internal piece of [middleware](./middleware.html)
+    - Validation occurs when a document attempts to be [saved](./api.html#model_Model-save), after defaults have been applied
+    - Validation is asynchronously recursive: when you call [Model#save](./api.html#model_Model-save), sub-document validation is executed. If an error happens, your Model#save callback receives it
+    - Mongoose doesn't care about complex error message construction. Errors have type identifiers. For example, `"min"` is the identifier for the error triggered when a number doesn't meet the [minimum value](./api.html#schema_number_SchemaNumber-min). The path and value that triggered the error can be accessed in the `ValidationError` object
+  h3 Built in validators
+  :markdown
+    Mongoose has several built in validators.
+
+    - All [SchemaTypes](./schematypes.html) have the built in [required](./api.html#schematype_SchemaType-required) validator.
+    - [Numbers](./api.html#schema-number-js) have [min](./api.html#schema_number_SchemaNumber-min) and [max](./api.html#schema_number_SchemaNumber-max) validators.
+    - [Strings](./api.html#schema-string-js) have [enum](./api.html#schema_string_SchemaString-enum) and [match](./api.html#schema_string_SchemaString-match) validators.
+  h3 Custom validators
+  :markdown
+    Custom validation is declared by passing a validation `function` and an error type to your `SchemaType`s validate method. Read the [API](./api.html#schematype_SchemaType-validate) docs for details on custom validators, async validators, and more.
+  h3 Validation errors
+  :markdown
+    Errors returned after failed validation contain an `errors` object holding the actual `ValidatorErrors`. Each [ValidatorError](./api.html#errors-validation-js) has a `type` and `path` property providing us with a little more error handling flexibility.
+  :js
+    var toySchema = new Schema({
+      color: String,
+      name: String
+    });
+
+    var Toy = db.model('Toy', toySchema);
+
+    Toy.schema.path('color').validate(function (value) {
+      return /blue|green|white|red|orange|periwinkel/i.test(value);
+    }, 'Invalid color');
+
+    var toy = new Toy({ color: 'grease'});
+
+    toy.save(function (err) {
+      // err.errors.color is a ValidatorError object
+
+      console.log(err.errors.color.message) // prints 'Validator "Invalid color" failed for path color'
+      console.log(String(err.errors.color)) // prints 'Validator "Invalid color" failed for path color'
+      console.log(err.errors.color.type) // prints "Invalid color"
+      console.log(err.errors.color.path) // prints "color"
+      console.log(err.name) // prints "ValidationError"
+      console.log(err.message) // prints "Validation failed"
+    });
+
+  :markdown
+    After a validation error, the document will also have the same `errors` property available:
+  :js
+    toy.errors.color.message === err.errors.color.message

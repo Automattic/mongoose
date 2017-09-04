@@ -4594,6 +4594,70 @@ describe('document', function() {
       });
     });
 
+    it('push populated doc onto empty array triggers manual population (gh-5504)', function(done) {
+      var ReferringSchema = new Schema({
+        reference: [{
+          type: Schema.Types.ObjectId,
+          ref: 'gh5504'
+        }]
+      });
+
+      var Referrer = db.model('gh5504', ReferringSchema);
+
+      var referenceA = new Referrer();
+      var referenceB = new Referrer();
+
+      var referrerA = new Referrer({reference: [referenceA]});
+      var referrerB = new Referrer();
+
+      referrerA.reference.push(referenceB);
+      assert.ok(referrerA.reference[0] instanceof Referrer);
+      assert.ok(referrerA.reference[1] instanceof Referrer);
+
+      referrerB.reference.push(referenceB);
+      assert.ok(referrerB.reference[0] instanceof Referrer);
+
+      done();
+    });
+
+    it('single nested conditional required scope (gh-5569)', function(done) {
+      var scopes = [];
+
+      var ThingSchema = new mongoose.Schema({
+        undefinedDisallowed: {
+          type: String,
+          required: function() {
+            scopes.push(this);
+            return this.undefinedDisallowed === undefined;
+          },
+          default: null
+        }
+      });
+
+      var SuperDocumentSchema = new mongoose.Schema({
+        thing: {
+          type: ThingSchema,
+          default: function() { return {}; }
+        }
+      });
+
+      var SuperDocument = db.model('gh5569', SuperDocumentSchema);
+
+      var doc = new SuperDocument();
+      doc.thing.undefinedDisallowed = null;
+
+      doc.save(function(error) {
+        assert.ifError(error);
+        doc = new SuperDocument();
+        doc.thing.undefinedDisallowed = undefined;
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['thing.undefinedDisallowed']);
+          done();
+        });
+      });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

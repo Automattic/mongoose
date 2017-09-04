@@ -5527,6 +5527,35 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('does not set `populated()` until populate is done (gh-5564)', function() {
+        var userSchema = new mongoose.Schema({});
+        var User = db.model('gh5564', userSchema);
+
+        var testSchema = new mongoose.Schema({
+          users: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh5564'
+          }]
+        });
+        var Test = db.model('gh5564_0', testSchema);
+
+        return User.create({}).
+          then(function(user) {
+            return Test.create({ users: [user._id] });
+          }).
+          then(function(test) {
+            var promise = test.populate('users').execPopulate();
+            assert.ok(!test.populated('users'));
+            return promise;
+          }).
+          then(function(test) {
+            assert.ok(test.populated('users'));
+            assert.ok(test.users[0]._id);
+            assert.equal(test.users.length, 1);
+            assert.equal(test.populated('users').length, 1);
+          });
+      });
+
       it('virtual populate toJSON output (gh-5542)', function(done) {
         var AuthorSchema = new mongoose.Schema({
           name: String

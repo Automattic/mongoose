@@ -1,3 +1,17 @@
+4.11.10 / 2017-09-03
+====================
+ * docs: add KeenIO tracking #5612
+ * fix(schema): ensure validators declared with `.validate()` get copied with clone() #5607
+ * fix: remove unnecessary jest warning #5480
+ * fix(discriminator): prevent implicit discriminator schema id from clobbering base schema custom id #5591
+ * fix(schema): hide schema objectid warning for non-hex strings of length 24 #5587
+ * docs(populate): use story schema defined key author instead of creator #5578 [dmric](https://github.com/dmric)
+ * docs(document): describe usage of `.set()` #5576
+ * fix(document): ensure correct scope in single nested validators #5569
+ * fix(populate): don't mark path as populated until populate() is done #5564
+ * fix(document): make push()-ing a doc onto an empty array act as manual population #5504
+ * fix(connection): emit timeout event on socket timeout #4513
+
 4.11.9 / 2017-08-27
 ===================
  * fix(error): avoid using arguments.callee because that breaks strict mode #5572

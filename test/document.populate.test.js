@@ -526,7 +526,7 @@ describe('document.populate', function() {
   });
 
   describe('gh-2214', function() {
-    it('should return a real document array when populating', function() {
+    it('should return a real document array when populating', function(done) {
       var db = start();
 
       var Car = db.model('gh-2214-1', {
@@ -554,16 +554,21 @@ describe('document.populate', function() {
       });
       joe.cars.push(car);
 
-      return joe.save(function() {
-        return car.save(function() {
-          return Person.findById(joe.id, function(err, joe) {
-            return joe.populate('cars', function() {
+      joe.save(function(error) {
+        assert.ifError(error);
+        car.save(function(error) {
+          assert.ifError(error);
+          Person.findById(joe.id, function(error, joe) {
+            assert.ifError(error);
+            joe.populate('cars', function(error) {
+              assert.ifError(error);
               car = new Car({
                 model: 'BMW',
                 color: 'black'
               });
               joe.cars.push(car);
               assert.ok(joe.isModified('cars'));
+              done();
               db.close();
             });
           });

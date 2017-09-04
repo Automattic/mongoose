@@ -94,7 +94,7 @@ describe('connections:', function() {
         var numConnected = 0;
         var numDisconnected = 0;
         var numReconnected = 0;
-        conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           useMongoClient: true
         });
 
@@ -133,6 +133,8 @@ describe('connections:', function() {
           then(function() {
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
+
+            conn.close();
             done();
           }).
           catch(done);
@@ -144,7 +146,7 @@ describe('connections:', function() {
         var conn;
         var numTimeout = 0;
         var numDisconnected = 0;
-        conn = mongoose.connect('mongodb://localhost:27000/mongoosetest', {
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           useMongoClient: true,
           socketTimeoutMS: 100,
           poolSize: 1
@@ -175,6 +177,8 @@ describe('connections:', function() {
             assert.ok(error.message.indexOf('timed out'), error.message);
             assert.equal(numTimeout, 1);
             assert.equal(numDisconnected, 0);
+
+            conn.close();
             done();
           });
       });

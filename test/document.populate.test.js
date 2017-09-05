@@ -544,7 +544,8 @@ describe('document.populate', function() {
         ]
       });
 
-      var car, joe;
+      var car;
+      var joe;
       joe = new Person({
         name: 'Joe'
       });

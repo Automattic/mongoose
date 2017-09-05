@@ -9,7 +9,8 @@ block content
     There are many ways to retrieve documents from MongoDB. We won't cover that in this section. See the chapter on [querying](./queries.html) for detail.
   h3 Updating
   :markdown
-    There are a number of ways to update documents. We'll first look at a traditional approach using [findById](./api.html#model_Model.findById):
+    There are a number of ways to update documents. We'll first look at a
+    traditional approach using [findById](./api.html#model_Model.findById):
   :js
     Tank.findById(id, function (err, tank) {
       if (err) return handleError(err);
@@ -21,7 +22,24 @@ block content
       });
     });
   :markdown
-    This approach involves first retrieving the document from Mongo, then issuing an update command (triggered by calling `save`). However, if we don't need the document returned in our application and merely want to update a property in the database directly, [Model#update](./api.html#model_Model.update) is right for us:
+    You can also use [`.set()`](http://mongoosejs.com/docs/api.html#document_Document-set)
+    to modify documents. Under the hood, `tank.size = 'large';` becomes `tank.set({ size: 'large' })`.
+  :js
+    Tank.findById(id, function (err, tank) {
+      if (err) return handleError(err);
+
+      tank.set({ size: 'large' });
+      tank.save(function (err, updatedTank) {
+        if (err) return handleError(err);
+        res.send(updatedTank);
+      });
+    });
+  :markdown
+    This approach involves first retrieving the document from Mongo, then
+    issuing an update command (triggered by calling `save`). However, if we
+    don't need the document returned in our application and merely want to
+    update a property in the database directly,
+    [Model#update](./api.html#model_Model.update) is right for us:
   :js
     Tank.update({ _id: id }, { $set: { size: 'large' }}, callback);
   :markdown
@@ -39,6 +57,17 @@ block content
   h3 Validating
   :markdown
     Documents are validated before they are saved. Read the [api](./api.html#document_Document-validate) docs or the [validation](./validation.html) chapter for detail.
+
+  h3 Overwriting
+  :markdown
+    You can overwrite an entire document using `.set()`. This is handy if you
+    want to change what document is being saved in [middleware](http://mongoosejs.com/docs/middleware.html).
+  :js
+    Tank.findById(id, function (err, tank) {
+      if (err) return handleError(err);
+      // Now `otherTank` is a copy of `tank`
+      otherTank.set(tank);
+    });
 
   h3#next Next Up
   :markdown

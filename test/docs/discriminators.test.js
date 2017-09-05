@@ -207,10 +207,7 @@ describe('discriminator docs', function () {
   /**
    * A discriminator's fields are the union of the base schema's fields and
    * the discriminator schema's fields, and the discriminator schema's fields
-   * take precedence. This behavior gets quirky when you have a custom `_id`
-   * field. A schema gets an `_id` field by default, so the base schema's
-   * `_id` field will get overridden by the discriminator schema's default
-   * `_id` field.
+   * take precedence. There is one exception: the default `_id` field.
    *
    * You can work around this by setting the `_id` option to false in the
    * discriminator schema as shown below.
@@ -218,28 +215,28 @@ describe('discriminator docs', function () {
   it('Handling custom _id fields', function (done) {
     var options = {discriminatorKey: 'kind'};
 
-    // Base schema has a String _id...
+    // Base schema has a String `_id` and a Date `time`...
     var eventSchema = new mongoose.Schema({_id: String, time: Date},
       options);
     var Event = mongoose.model('BaseEvent', eventSchema);
 
-    var clickedLinkSchema = new mongoose.Schema({url: String}, options);
+    var clickedLinkSchema = new mongoose.Schema({
+      url: String,
+      time: String
+    }, options);
+    // But the discriminator schema has a String `time`, and an implicitly added
+    // ObjectId `_id`.
+    assert.ok(clickedLinkSchema.path('_id'));
+    assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectID');
     var ClickedLinkEvent = Event.discriminator('ChildEventBad',
       clickedLinkSchema);
 
-    var event1 = new ClickedLinkEvent();
-    // Woops, clickedLinkSchema overwrote the custom _id
-    assert.ok(event1._id instanceof mongoose.Types.ObjectId);
+    var event1 = new ClickedLinkEvent({ _id: 'custom id', time: '4pm' });
+    // Woops, clickedLinkSchema overwrites the `time` path, but **not**
+    // the `_id` path because that was implicitly added.
+    assert.ok(typeof event1._id === 'string');
+    assert.ok(typeof event1.time === 'string');
 
-    // But if you set `_id` option to false...
-    clickedLinkSchema = new mongoose.Schema({url: String},
-      {discriminatorKey: 'kind', _id: false});
-    ClickedLinkEvent = Event.discriminator('ChildEventGood',
-      clickedLinkSchema);
-
-    // The custom _id from the base schema comes through
-    var event2 = new ClickedLinkEvent({_id: 'test'});
-    assert.ok(event2._id.toString() === event2._id);
     // acquit:ignore:start
     done();
     // acquit:ignore:end

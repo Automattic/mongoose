@@ -211,7 +211,7 @@
 
 <p>Updates all documents matching <code>conditions</code> using the <code>update</code> clause. All <code>update</code> values are casted to their appropriate types before being sent.</p>
 
-<pre><code>var conditions = { name: 'borne' }
+<pre><code>var conditions = { name: 'bourne' }
   , update = { $inc: { visits: 1 }}
   , options = { multi: true };
 
@@ -226,15 +226,15 @@ function callback (err, numAffected) {
 
 <p>Note: for backwards compatibility, all top-level <code>update</code> keys that are not $atomic operation names are treated as <code>$set</code> operations. Example:</p>
 
-<pre><code>var query = { name: 'borne' };
-Model.update(query, { name: 'jason borne' }, options, callback)
+<pre><code>var query = { name: 'bourne' };
+Model.update(query, { name: 'jason bourne' }, options, callback)
 
 // is sent as
 
-Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
+Model.update(query, { $set: { name: 'jason bourne' }}, options, callback)
 </code></pre>
 
-<p>This helps prevent accidentally overwriting all of your document(s) with <code>{ name: 'jason borne' }</code>.</p>
+<p>This helps prevent accidentally overwriting all of your document(s) with <code>{ name: 'jason bourne' }</code>.</p>
 
 <p>Also note: although values are casted to their appropriate types when using <code>update</code>, the following are <strong>not</strong> applied:</p>
 
@@ -247,8 +247,8 @@ Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
 
 <p>If you want those features, please use the following convention rather than <code>update</code>:</p>
 
-<pre><code>Model.findOne({ name: 'borne' }, function (err, doc){
-  doc.name = 'jason borne';
+<pre><code>Model.findOne({ name: 'bourne' }, function (err, doc){
+  doc.name = 'jason bourne';
   doc.visits.$inc();
   doc.save();
 });

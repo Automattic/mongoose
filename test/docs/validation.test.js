@@ -140,7 +140,7 @@ describe('validation docs', function() {
     U2.on('index', function(error) {
       assert.ifError(error);
       U2.create(dup, function(error) {
-        // Will error, but will *not* be a mongoose validation error, but
+        // Will error, but will *not* be a mongoose validation error, it will be
         // a duplicate key error.
         assert.ok(error);
         assert.ok(!error.errors);

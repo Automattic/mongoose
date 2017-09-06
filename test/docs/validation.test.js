@@ -8,7 +8,10 @@ describe('validation docs', function() {
   var Schema = mongoose.Schema;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
+      useMongoClient: true,
+      poolSize: 1
+    });
   });
 
   after(function(done) {

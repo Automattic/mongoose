@@ -48,7 +48,7 @@ describe('timestamps', function() {
     var schema = new mongoose.Schema({
       name: String
     }, { timestamps: { createdAt: null, updatedAt: true } });
-    var M = db.model('gh4868', schema);
+    var M = db.model('gh5598', schema);
 
     M.create({ name: 'Test' }, function(error) {
       assert.ifError(error);
@@ -57,6 +57,28 @@ describe('timestamps', function() {
         assert.ok(!doc.createdAt);
         assert.ok(doc.updatedAt);
         assert.ok(doc.updatedAt.valueOf() >= startTime);
+        done();
+      });
+    });
+  });
+
+  it('updatedAt without createdAt for nested (gh-5598)', function(done) {
+    var startTime = Date.now();
+    var schema = new mongoose.Schema({
+      name: String
+    }, { timestamps: { createdAt: null, updatedAt: true } });
+    var parentSchema = new mongoose.Schema({
+      child: schema
+    });
+    var M = db.model('gh5598_0', parentSchema);
+
+    M.create({ child: { name: 'test' } }, function(error) {
+      assert.ifError(error);
+      M.findOne({}, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.child.createdAt);
+        assert.ok(doc.child.updatedAt);
+        assert.ok(doc.child.updatedAt.valueOf() >= startTime);
         done();
       });
     });

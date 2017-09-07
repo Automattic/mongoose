@@ -4658,6 +4658,35 @@ describe('document', function() {
       });
     });
 
+    it('single nested setters only get called once (gh-5601)', function(done) {
+      var vals = [];
+      var ChildSchema = new mongoose.Schema({
+        number: {
+          type: String,
+          set: function(v) {
+            vals.push(v);
+            return v;
+          }
+        },
+        _id: false
+      });
+      ChildSchema.set('toObject', { getters: true, minimize: false });
+
+      var ParentSchema = new mongoose.Schema({
+        child: {
+          type: ChildSchema,
+          default: {},
+        }
+      });
+
+      var Parent = db.model('gh5601', ParentSchema);
+      var p = new Parent();
+      p.child = { number: '555.555.0123' };
+      assert.equal(vals.length, 1);
+      assert.equal(vals[0], '555.555.0123');
+      done();
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

@@ -4675,7 +4675,7 @@ describe('document', function() {
       var ParentSchema = new mongoose.Schema({
         child: {
           type: ChildSchema,
-          default: {},
+          default: {}
         }
       });
 

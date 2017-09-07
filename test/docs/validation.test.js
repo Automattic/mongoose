@@ -18,10 +18,6 @@ describe('validation docs', function() {
     db.close(done);
   });
 
-  afterEach(function() {
-    mongoose.set('debug', false);
-  });
-
   /**
    * Before we get into the specifics of validation syntax, please keep the following rules in mind:
    *
@@ -121,8 +117,6 @@ describe('validation docs', function() {
    */
 
   it('The `unique` Option is Not a Validator', function(done) {
-    mongoose.set('debug', true);
-
     var uniqueUsernameSchema = new Schema({
       username: {
         type: String,

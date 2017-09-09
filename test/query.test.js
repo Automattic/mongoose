@@ -2096,6 +2096,32 @@ describe('Query', function() {
       });
     });
 
+    it('errors in post init (gh-5592)', function(done) {
+      var TestSchema = new Schema();
+
+      var count = 0;
+      TestSchema.post('init', function(model, next) {
+        return next(new Error('Failed! ' + (count++)));
+      });
+
+      var TestModel = db.model('gh5592', TestSchema);
+
+      var docs = [];
+      for (var i = 0; i < 10; ++i) {
+        docs.push({});
+      }
+
+      TestModel.create(docs, function(error) {
+        assert.ifError(error);
+        TestModel.find({}, function(error, docs) {
+          assert.ok(error);
+          assert.equal(error.message, 'Failed! 0');
+          assert.equal(count, 10);
+          done();
+        });
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

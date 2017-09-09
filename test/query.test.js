@@ -2113,7 +2113,7 @@ describe('Query', function() {
 
       TestModel.create(docs, function(error) {
         assert.ifError(error);
-        TestModel.find({}, function(error, docs) {
+        TestModel.find({}, function(error) {
           assert.ok(error);
           assert.equal(error.message, 'Failed! 0');
           assert.equal(count, 10);

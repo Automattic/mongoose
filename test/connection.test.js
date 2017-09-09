@@ -110,6 +110,7 @@ describe('connections:', function() {
 
         conn.
           then(function() {
+            assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numConnected, 1);
             return server.stop();
           }).
@@ -119,6 +120,7 @@ describe('connections:', function() {
             });
           }).
           then(function() {
+            assert.equal(conn.readyState, conn.states.disconnected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 0);
           }).
@@ -131,6 +133,7 @@ describe('connections:', function() {
             });
           }).
           then(function() {
+            assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
 
@@ -164,6 +167,7 @@ describe('connections:', function() {
 
         conn.
           then(function() {
+            assert.equal(conn.readyState, conn.states.connected);
             return Model.create({});
           }).
           then(function() {
@@ -175,6 +179,9 @@ describe('connections:', function() {
           catch(function(error) {
             assert.ok(error);
             assert.ok(error.message.indexOf('timed out'), error.message);
+            // TODO: if autoReconnect is false, we might not actually be
+            // connected. See gh-5634
+            assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numTimeout, 1);
             assert.equal(numDisconnected, 0);
 

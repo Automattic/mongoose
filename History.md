@@ -1,3 +1,11 @@
+4.11.11 / 2017-09-10
+====================
+ * fix(connection): properly set readyState in response to driver 'close' and 'reconnect' events #5604
+ * fix(document): ensure single embedded doc setters only get called once, with correct value #5601
+ * fix(timestamps): allow enabling updatedAt without createdAt #5598
+ * test: improve unique validator test by making create run before ensureIndex #5595 #5562
+ * fix(query): ensure find callback only gets called once when post init hook throws error #5592
+
 4.11.10 / 2017-09-03
 ====================
  * docs: add KeenIO tracking #5612

@@ -8,7 +8,10 @@ describe('validation docs', function() {
   var Schema = mongoose.Schema;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
+      useMongoClient: true,
+      poolSize: 1
+    });
   });
 
   after(function(done) {
@@ -140,7 +143,7 @@ describe('validation docs', function() {
     U2.on('index', function(error) {
       assert.ifError(error);
       U2.create(dup, function(error) {
-        // Will error, but will *not* be a mongoose validation error, but
+        // Will error, but will *not* be a mongoose validation error, it will be
         // a duplicate key error.
         assert.ok(error);
         assert.ok(!error.errors);

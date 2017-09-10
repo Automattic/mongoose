@@ -268,6 +268,37 @@ describe('connections:', function() {
     });
   });
 
+  describe('helpers', function() {
+    var conn;
+
+    before(function() {
+      conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+      return conn;
+    });
+
+    it('dropDatabase()', function(done) {
+      conn.dropDatabase(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('dropCollection()', function() {
+      return conn.db.collection('test').insertOne({ x: 1 }).
+        then(function() {
+          return conn.dropCollection('test');
+        }).
+        then(function() {
+          return conn.db.collection('test').findOne();
+        }).
+        then(function(doc) {
+          assert.ok(!doc);
+        });
+    });
+  });
+
   it('should allow closing a closed connection', function(done) {
     var db = mongoose.createConnection();
 

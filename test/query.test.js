@@ -2096,6 +2096,43 @@ describe('Query', function() {
       });
     });
 
+    it('report error in pre hook (gh-5520)', function(done) {
+      var TestSchema = new Schema({ name: String });
+      var i;
+
+      var ops = [
+        'count',
+        'find',
+        'findOne',
+        'findOneAndRemove',
+        'findOneAndUpdate',
+        'replaceOne',
+        'update',
+        'updateOne',
+        'updateMany'
+      ];
+
+      ops.forEach(function(op) {
+        TestSchema.pre(op, function(next) {
+          this.error(new Error(op + ' error'));
+          next();
+        });
+      });
+
+      var TestModel = db.model('gh5520', TestSchema);
+
+      var numOps = ops.length;
+
+      ops.forEach(function(op) {
+        TestModel.find({}).update({ name: 'test' })[op](function(error) {
+          assert.ok(error);
+          assert.equal(error.message, op + ' error');
+          --numOps || done();
+        });
+      })
+    });
+
+
     it('errors in post init (gh-5592)', function(done) {
       var TestSchema = new Schema();
 

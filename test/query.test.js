@@ -2098,7 +2098,6 @@ describe('Query', function() {
 
     it('report error in pre hook (gh-5520)', function(done) {
       var TestSchema = new Schema({ name: String });
-      var i;
 
       var ops = [
         'count',
@@ -2129,7 +2128,7 @@ describe('Query', function() {
           assert.equal(error.message, op + ' error');
           --numOps || done();
         });
-      })
+      });
     });
 
 
@@ -2150,7 +2149,7 @@ describe('Query', function() {
 
       TestModel.create(docs, function(error) {
         assert.ifError(error);
-        TestModel.find({}, function(error, docs) {
+        TestModel.find({}, function(error) {
           assert.ok(error);
           assert.equal(error.message, 'Failed! 0');
           assert.equal(count, 10);

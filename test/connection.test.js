@@ -272,7 +272,7 @@ describe('connections:', function() {
     var conn;
 
     before(function() {
-      conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
+      conn = mongoose.connect('mongodb://localhost:27017/mongoosetest_2', {
         useMongoClient: true
       });
       return conn;

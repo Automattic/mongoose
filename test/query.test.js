@@ -1590,22 +1590,23 @@ describe('Query', function() {
       db.close(done);
     });
 
-    it('collation support (gh-4839)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    describe('collations', function() {
+      before(function(done) {
+        var _this = this;
+        start.mongodVersion(function(err, version) {
+          if (err) {
+            return done(err);
+          }
+          var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+          if (!mongo34) {
+            return _this.skip();
+          }
 
-        test();
+          done();
+        });
       });
 
-      function test() {
+      it('collation support (gh-4839)', function(done) {
         var schema = new Schema({
           name: String
         });
@@ -1637,7 +1638,7 @@ describe('Query', function() {
             done();
           }).
           catch(done);
-      }
+      });
     });
 
     describe('gh-1950', function() {

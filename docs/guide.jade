@@ -311,6 +311,7 @@ block content
     - [typeKey](#typeKey)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
+    - [collation](#collation)
     - [skipVersioning](#skipVersioning)
     - [timestamps](#timestamps)
     - [retainKeyOrder](#retainKeyOrder)
@@ -662,6 +663,25 @@ block content
     var Thing = mongoose.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
+
+  h4#collation option: collation
+  :markdown
+    Sets a default [collation](https://docs.mongodb.com/manual/reference/collation/) for every query and aggregation. [Here's a beginner-friendly overview of collations](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations).
+  :js
+    var schema = new Schema({
+      name: String
+    }, { collation: { locale: 'en_US', strength: 1 } });
+    
+    var MyModel = db.model('MyModel', schema);
+
+    MyModel.create([{ name: 'val' }, { name: 'Val' }]).
+      then(function() {
+        return MyModel.find({ name: 'val' });
+      }).
+      then(function(docs) {
+        // `docs` will contain both docs, because `strength: 1` means
+        // MongoDB will ignore case when matching.
+      });
 
   h4#skipVersioning option: skipVersioning
   :markdown

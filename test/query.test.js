@@ -1639,6 +1639,24 @@ describe('Query', function() {
           }).
           catch(done);
       });
+
+      it('set on schema (gh-5295)', function(done) {
+        var schema = new Schema({
+          name: String
+        }, { collation: { locale: 'en_US', strength: 1 } });
+
+        var MyModel = db.model('gh5295', schema);
+
+        MyModel.create([{ name: 'a' }, { name: 'A' }]).
+          then(function() {
+            return MyModel.find({ name: 'a' });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            done();
+          }).
+          catch(done);
+      });
     });
 
     describe('gh-1950', function() {

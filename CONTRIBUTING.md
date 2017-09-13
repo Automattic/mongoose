@@ -59,4 +59,4 @@ Visit `http://localhost:8088` and you should see the docs with your local change
 
 ### Plugins website
 
-The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+The [plugins](http://plugins.mongoosejs.com/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!

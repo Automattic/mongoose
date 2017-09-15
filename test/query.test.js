@@ -2107,7 +2107,7 @@ describe('Query', function() {
 
       var ParentSchema = new mongoose.Schema({
         child: ChildSchema,
-        child2: ChildSchema,
+        child2: ChildSchema
       });
       var Parent = db.model('gh5603', ParentSchema);
       var ogParent = new Parent();

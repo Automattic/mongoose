@@ -2150,6 +2150,37 @@ describe('Query', function() {
       });
     });
 
+    it('change deleteOne to updateOne for soft deletes using $isDeleted (gh-4428)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String,
+        isDeleted: Boolean
+      });
+
+      schema.pre('remove', function(next) {
+        var _this = this;
+        this.update({ isDeleted: true }, function(error) {
+          // Force mongoose to consider this doc as deleted.
+          _this.$isDeleted(true);
+          next(error);
+        });
+      });
+
+      var M = db.model('gh4428', schema);
+
+      M.create({ name: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        doc.remove(function(error) {
+          assert.ifError(error);
+          M.findById(doc._id, function(error, doc) {
+            assert.ifError(error);
+            assert.ok(doc);
+            assert.equal(doc.isDeleted, true);
+            done();
+          });
+        });
+      });
+    });
+
     it('child schema with select: false in multiple paths (gh-5603)', function(done) {
       var ChildSchema = new mongoose.Schema({
         field: {

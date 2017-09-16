@@ -829,6 +829,34 @@ describe('model', function() {
         });
       });
 
+      it('updating type key (gh-5613)', function(done) {
+        function BaseSchema() {
+          Schema.apply(this, arguments);
+
+          this.add({
+            name: {type: String, required: true}
+          });
+        }
+
+        util.inherits(BaseSchema, Schema);
+
+        var orgSchema = new BaseSchema({});
+        var schoolSchema = new BaseSchema({ principal: String });
+
+        var Org = db.model('gh5613', orgSchema);
+        var School = Org.discriminator('gh5613_0', schoolSchema);
+
+        Org.create({ name: 'test' }, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!doc.__t);
+          Org.findByIdAndUpdate(doc._id, { __t: 'gh5613_0' }, { new: true }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.__t, 'gh5613_0');
+            done();
+          });
+        });
+      });
+
       it('reference in child schemas (gh-2719-2)', function(done) {
         var EventSchema, Event, TalkSchema, Talk, Survey;
 

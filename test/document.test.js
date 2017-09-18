@@ -4687,6 +4687,47 @@ describe('document', function() {
       done();
     });
 
+    it('doc array: set then remove (gh-3511)', function(done) {
+      var ItemChildSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      });
+
+      var ItemParentSchema = new mongoose.Schema({
+        children: [ItemChildSchema]
+      });
+
+      var ItemParent = db.model('gh3511', ItemParentSchema);
+
+      var p = new ItemParent({
+        children: [{ name: 'test1' }, { name: 'test2' }]
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        ItemParent.findById(p._id, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(doc.children.length, 2);
+
+          doc.children[1].name = 'test3';
+          doc.children.remove(doc.children[0]);
+
+          doc.save(function(error) {
+            assert.ifError(error);
+            ItemParent.findById(doc._id, function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.children.length, 1);
+              assert.equal(doc.children[0].name, 'test3');
+              done();
+            });
+          });
+        });
+      });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

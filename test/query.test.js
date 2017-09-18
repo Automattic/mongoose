@@ -2096,6 +2096,34 @@ describe('Query', function() {
       });
     });
 
+    it('child schema with select: false in multiple paths (gh-5603)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        field: {
+          type: String,
+          select: false
+        },
+        _id: false
+      }, { id: false });
+
+      var ParentSchema = new mongoose.Schema({
+        child: ChildSchema,
+        child2: ChildSchema
+      });
+      var Parent = db.model('gh5603', ParentSchema);
+      var ogParent = new Parent();
+      ogParent.child = { field: 'test' };
+      ogParent.child2 = { field: 'test' };
+      ogParent.save(function(error) {
+        assert.ifError(error);
+        Parent.findById(ogParent._id).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!doc.child.field);
+          assert.ok(!doc.child2.field);
+          done();
+        });
+      });
+    });
+
     it('errors in post init (gh-5592)', function(done) {
       var TestSchema = new Schema();
 

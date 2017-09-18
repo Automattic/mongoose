@@ -1,3 +1,11 @@
+4.11.12 / 2017-09-18
+====================
+ * docs(model): asterisk should not render as markdown bullet #5644 [timkinnane](https://github.com/timkinnane)
+ * docs: use useMongoClient in connection example #5627 [GabrielNicolasAvellaneda](https://github.com/GabrielNicolasAvellaneda)
+ * fix(connection): call callback when initial connection failed #5626
+ * fix(query): apply select correctly if a given nested schema is used for 2 different paths #5603
+ * fix(document): add graceful fallback for setting a doc array value and `pull()`-ing a doc #3511
+
 4.11.11 / 2017-09-10
 ====================
  * fix(connection): properly set readyState in response to driver 'close' and 'reconnect' events #5604

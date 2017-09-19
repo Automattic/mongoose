@@ -25,8 +25,12 @@ PersonSchema.methods.toJSonConfig = {
   include: ['prop1', 'prop2'],
   exclude: ['prop3', 'prop4']
 };
+
+var findByGenderResult = Math.random();
 PersonSchema.statics.findByGender = function() {
+  return findByGenderResult;
 };
+
 PersonSchema.virtual('name.full').get(function() {
   return this.name.first + ' ' + this.name.last;
 });
@@ -46,8 +50,12 @@ EmployeeSchema.index({department: 1});
 EmployeeSchema.methods.getDepartment = function() {
   return this.department;
 };
+
+var findByDepartmentResult = Math.random();
 EmployeeSchema.statics.findByDepartment = function() {
+  return findByDepartmentResult;
 };
+
 EmployeeSchema.path('department').validate(function(value) {
   return /[a-zA-Z]/.test(value);
 }, 'Invalid name');
@@ -301,8 +309,11 @@ describe('model', function() {
       });
 
       it('inherits statics', function(done) {
-        assert.strictEqual(Employee.findByGender, EmployeeSchema.statics.findByGender);
-        assert.strictEqual(Employee.findByDepartment, EmployeeSchema.statics.findByDepartment);
+        // Equal modulo `bind()`
+        assert.equal(Employee.findByGender(),
+          EmployeeSchema.statics.findByGender());
+        assert.equal(Employee.findByDepartment(),
+          EmployeeSchema.statics.findByDepartment());
         assert.equal(Person.findByDepartment, undefined);
         done();
       });

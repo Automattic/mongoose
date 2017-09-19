@@ -766,12 +766,21 @@ describe('Model', function() {
   });
 
   describe('statics', function() {
-    it('can be defined', function(done) {
-      var db = start(),
-          BlogPost = db.model('BlogPost', collection);
+    var BlogPost;
 
-      db.close();
+    before(function() {
+      BlogPost = mongoose.model('BlogPost');
+    });
+
+    it('can be defined', function(done) {
       assert.equal(BlogPost.woot(), BlogPost);
+      done();
+    });
+
+    it('are bound to the model', function(done) {
+      var fn = BlogPost.woot;
+      assert.equal(fn(), BlogPost);
+
       done();
     });
   });

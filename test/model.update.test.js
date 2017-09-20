@@ -2382,21 +2382,30 @@ describe('model: update:', function() {
       });
     });
 
-    it('with overwrite and upsert (gh-4749)', function(done) {
+    it('with overwrite and upsert (gh-4749) (gh-5631)', function(done) {
       var schema = new Schema({
         name: String,
         meta: { age: { type: Number } }
       });
       var User = db.model('gh4749', schema);
 
+      var filter = { name: 'Bar' };
       var update = { name: 'Bar', meta: { age: 33 } };
       var options = { overwrite: true, upsert: true };
-      var q2 = User.update({ name: 'Bar' }, update, options);
+      var q2 = User.update(filter, update, options);
       assert.deepEqual(q2.getUpdate(), {
         __v: 0,
         meta: { age: 33 },
         name: 'Bar'
       });
+
+      var q3 = User.findOneAndUpdate(filter, update, options);
+      assert.deepEqual(q3.getUpdate(), {
+        __v: 0,
+        meta: { age: 33 },
+        name: 'Bar'
+      });
+
       done();
     });
 

@@ -4687,6 +4687,32 @@ describe('document', function() {
       done();
     });
 
+    it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
+      var MainSchema = new Schema({
+        name: { type: String },
+        children: [{
+          name: { type: String }
+        }]
+      });
+      var RelatedSchema = new Schema({ name: { type: String } });
+      var Model = db.model('gh5632', MainSchema);
+      var RelatedModel = db.model('gh5632_0', RelatedSchema);
+
+      RelatedModel.create({ name: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        Model.create({ name: 'test1', children: [doc] }, function(error, m) {
+          assert.ifError(error);
+          m.children = [doc];
+          m.save(function(error) {
+            assert.ifError(error);
+            assert.equal(m.children.length, 1);
+            assert.equal(m.children[0].name, 'test');
+            done();
+          });
+        });
+      });
+    });
+
     it('doc array: set then remove (gh-3511)', function(done) {
       var ItemChildSchema = new mongoose.Schema({
         name: {

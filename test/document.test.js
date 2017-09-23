@@ -4609,6 +4609,8 @@ describe('document', function() {
 
       var referrerA = new Referrer({reference: [referenceA]});
       var referrerB = new Referrer();
+      var referrerC = new Referrer();
+      var referrerD = new Referrer();
 
       referrerA.reference.push(referenceB);
       assert.ok(referrerA.reference[0] instanceof Referrer);
@@ -4616,6 +4618,12 @@ describe('document', function() {
 
       referrerB.reference.push(referenceB);
       assert.ok(referrerB.reference[0] instanceof Referrer);
+
+      referrerC.reference.unshift(referenceB);
+      assert.ok(referrerC.reference[0] instanceof Referrer);
+
+      referrerD.reference.splice(0, 0, referenceB);
+      assert.ok(referrerD.reference[0] instanceof Referrer);
 
       done();
     });

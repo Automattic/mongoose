@@ -2748,6 +2748,41 @@ describe('model: update:', function() {
       }).catch(done);
     });
 
+    it('update with nested id (gh-5640)', function(done) {
+      var testSchema = new mongoose.Schema({
+        _id: {
+          a: String,
+          b: String
+        },
+        foo: String
+      }, {
+        strict: true
+      });
+
+      var Test = db.model('gh5640', testSchema);
+
+      var doc = {
+        _id: {
+          a: 'a',
+          b: 'b'
+        },
+        foo: 'bar'
+      };
+
+      Test.create(doc, function(error, doc) {
+        assert.ifError(error);
+        doc.foo = 'baz';
+        Test.update({_id: doc._id}, doc, {upsert: true}, function(error) {
+          assert.ifError(error);
+          Test.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.foo, 'baz');
+            done();
+          });
+        });
+      });
+    });
+
     it('cast error in update conditions (gh-5477)', function(done) {
       var schema = new mongoose.Schema({
         name: String

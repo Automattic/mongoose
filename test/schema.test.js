@@ -1684,5 +1684,21 @@ describe('schema', function() {
       assert.ok(!clone.path('num').validators[0].validator(41));
       done();
     });
+
+    it('TTL index with timestamps (gh-5656)', function(done) {
+      var testSchema = new mongoose.Schema({
+        foo: String,
+        updatedAt: {
+          type: Date,
+          expires: '2h'
+        }
+      }, { timestamps: true });
+
+      var indexes = testSchema.indexes();
+      assert.deepEqual(indexes, [
+        [{ updatedAt: 1 }, { background: true, expireAfterSeconds: 7200 }]
+      ]);
+      done();
+    });
   });
 });

@@ -2382,21 +2382,30 @@ describe('model: update:', function() {
       });
     });
 
-    it('with overwrite and upsert (gh-4749)', function(done) {
+    it('with overwrite and upsert (gh-4749) (gh-5631)', function(done) {
       var schema = new Schema({
         name: String,
         meta: { age: { type: Number } }
       });
       var User = db.model('gh4749', schema);
 
+      var filter = { name: 'Bar' };
       var update = { name: 'Bar', meta: { age: 33 } };
       var options = { overwrite: true, upsert: true };
-      var q2 = User.update({ name: 'Bar' }, update, options);
+      var q2 = User.update(filter, update, options);
       assert.deepEqual(q2.getUpdate(), {
         __v: 0,
         meta: { age: 33 },
         name: 'Bar'
       });
+
+      var q3 = User.findOneAndUpdate(filter, update, options);
+      assert.deepEqual(q3.getUpdate(), {
+        __v: 0,
+        meta: { age: 33 },
+        name: 'Bar'
+      });
+
       done();
     });
 
@@ -2737,6 +2746,41 @@ describe('model: update:', function() {
       Model.update(q, u, o).then(function() {
         done();
       }).catch(done);
+    });
+
+    it('update with nested id (gh-5640)', function(done) {
+      var testSchema = new mongoose.Schema({
+        _id: {
+          a: String,
+          b: String
+        },
+        foo: String
+      }, {
+        strict: true
+      });
+
+      var Test = db.model('gh5640', testSchema);
+
+      var doc = {
+        _id: {
+          a: 'a',
+          b: 'b'
+        },
+        foo: 'bar'
+      };
+
+      Test.create(doc, function(error, doc) {
+        assert.ifError(error);
+        doc.foo = 'baz';
+        Test.update({_id: doc._id}, doc, {upsert: true}, function(error) {
+          assert.ifError(error);
+          Test.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.foo, 'baz');
+            done();
+          });
+        });
+      });
     });
 
     it('cast error in update conditions (gh-5477)', function(done) {

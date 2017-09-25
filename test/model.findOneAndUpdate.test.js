@@ -1863,6 +1863,27 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('update using $ (gh-5628)', function(done) {
+      var schema = new mongoose.Schema({
+        elems: [String]
+      });
+
+      var Model = db.model('gh5628', schema);
+      Model.create({ elems: ['a', 'b'] }, function(error, doc) {
+        assert.ifError(error);
+        var query = { _id: doc._id, elems: 'a' };
+        var update = { $set: { 'elems.$': 'c' } };
+        Model.findOneAndUpdate(query, update, { new: true }, function(error) {
+          assert.ifError(error);
+          Model.collection.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.elems, ['c', 'b']);
+            done();
+          });
+        });
+      });
+    });
+
     it('setting subtype when saving (gh-5551)', function(done) {
       if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
         // Don't run on node 0.x because of `const` issues

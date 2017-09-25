@@ -4609,6 +4609,8 @@ describe('document', function() {
 
       var referrerA = new Referrer({reference: [referenceA]});
       var referrerB = new Referrer();
+      var referrerC = new Referrer();
+      var referrerD = new Referrer();
 
       referrerA.reference.push(referenceB);
       assert.ok(referrerA.reference[0] instanceof Referrer);
@@ -4616,6 +4618,12 @@ describe('document', function() {
 
       referrerB.reference.push(referenceB);
       assert.ok(referrerB.reference[0] instanceof Referrer);
+
+      referrerC.reference.unshift(referenceB);
+      assert.ok(referrerC.reference[0] instanceof Referrer);
+
+      referrerD.reference.splice(0, 0, referenceB);
+      assert.ok(referrerD.reference[0] instanceof Referrer);
 
       done();
     });
@@ -4685,6 +4693,73 @@ describe('document', function() {
       assert.equal(vals.length, 1);
       assert.equal(vals[0], '555.555.0123');
       done();
+    });
+
+    it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
+      var MainSchema = new Schema({
+        name: { type: String },
+        children: [{
+          name: { type: String }
+        }]
+      });
+      var RelatedSchema = new Schema({ name: { type: String } });
+      var Model = db.model('gh5632', MainSchema);
+      var RelatedModel = db.model('gh5632_0', RelatedSchema);
+
+      RelatedModel.create({ name: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        Model.create({ name: 'test1', children: [doc] }, function(error, m) {
+          assert.ifError(error);
+          m.children = [doc];
+          m.save(function(error) {
+            assert.ifError(error);
+            assert.equal(m.children.length, 1);
+            assert.equal(m.children[0].name, 'test');
+            done();
+          });
+        });
+      });
+    });
+
+    it('doc array: set then remove (gh-3511)', function(done) {
+      var ItemChildSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      });
+
+      var ItemParentSchema = new mongoose.Schema({
+        children: [ItemChildSchema]
+      });
+
+      var ItemParent = db.model('gh3511', ItemParentSchema);
+
+      var p = new ItemParent({
+        children: [{ name: 'test1' }, { name: 'test2' }]
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        ItemParent.findById(p._id, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(doc.children.length, 2);
+
+          doc.children[1].name = 'test3';
+          doc.children.remove(doc.children[0]);
+
+          doc.save(function(error) {
+            assert.ifError(error);
+            ItemParent.findById(doc._id, function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.children.length, 1);
+              assert.equal(doc.children[0].name, 'test3');
+              done();
+            });
+          });
+        });
+      });
     });
 
     it('consistent context for nested docs (gh-5347)', function(done) {

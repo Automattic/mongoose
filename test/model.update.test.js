@@ -2748,6 +2748,21 @@ describe('model: update:', function() {
       }).catch(done);
     });
 
+    it('returns error if passing array as conditions (gh-3677)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh3677', schema);
+      Model.updateMany(['foo'], { name: 'bar' }, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        var expected = 'Parameter "filter" to updateMany() must be an object';
+        assert.ok(error.message.indexOf(expected) !== -1, error.message);
+        done();
+      });
+    });
+
     it('update with nested id (gh-5640)', function(done) {
       var testSchema = new mongoose.Schema({
         _id: {

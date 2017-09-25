@@ -1911,7 +1911,7 @@ describe('Model', function() {
           assert.ifError(error);
           doc.remove(function(err) {
             assert.ok(err);
-            assert.equal(err.toString(), 'Error: No _id found on document!');
+            assert.equal(err.message, 'No _id found on document!');
             db.close(done);
           });
         });

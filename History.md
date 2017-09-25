@@ -1,3 +1,14 @@
+4.11.13 / 2017-09-24
+====================
+ * fix(query): correctly run replaceOne with update validators #5665 [sime1](https://github.com/sime1)
+ * fix(schema): replace mistype in setupTimestamp method #5656 [zipp3r](https://github.com/zipp3r)
+ * fix(query): avoid throwing cast error for strict: throw with nested id in query #5640
+ * fix(model): ensure class gets combined schema when using class syntax with discriminators #5635
+ * fix(document): handle setting doc array to array of top-level docs #5632
+ * fix(model): handle casting findOneAndUpdate() with overwrite and upsert #5631
+ * fix(update): correctly handle $ in updates #5628
+ * fix(types): handle manual population consistently for unshift() and splice() #5504
+
 4.11.12 / 2017-09-18
 ====================
  * docs(model): asterisk should not render as markdown bullet #5644 [timkinnane](https://github.com/timkinnane)

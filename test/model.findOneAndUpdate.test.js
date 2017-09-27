@@ -1892,7 +1892,7 @@ describe('model: findOneAndUpdate:', function() {
 
       var Model = db.model('gh5661', schema);
       var doc = { arr: [{ tag: 't1' }, { tag: 't2' }] };
-      Model.create(doc, function(error, doc) {
+      Model.create(doc, function(error) {
         assert.ifError(error);
         var query = {};
         var update = { $set: { name: 'test2' } };

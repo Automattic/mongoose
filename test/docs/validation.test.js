@@ -126,7 +126,7 @@ describe('validation docs', function() {
     var U1 = db.model('U1', uniqueUsernameSchema);
     var U2 = db.model('U2', uniqueUsernameSchema);
     // acquit:ignore:start
-    var remaining = 2;
+    var remaining = 3;
     // acquit:ignore:end
 
     var dup = [{ username: 'Val' }, { username: 'Val' }];
@@ -142,6 +142,22 @@ describe('validation docs', function() {
     // otherwise unique constraints may be violated.
     U2.on('index', function(error) {
       assert.ifError(error);
+      U2.create(dup, function(error) {
+        // Will error, but will *not* be a mongoose validation error, it will be
+        // a duplicate key error.
+        assert.ok(error);
+        assert.ok(!error.errors);
+        assert.ok(error.message.indexOf('duplicate key error') !== -1);
+        // acquit:ignore:start
+        --remaining || done();
+        // acquit:ignore:end
+      });
+    });
+
+    // There's also a promise-based equivalent to the event emitter API.
+    // The `init()` function is idempotent and returns a promise that
+    // will resolve once indexes are done building;
+    U2.init().then(function() {
       U2.create(dup, function(error) {
         // Will error, but will *not* be a mongoose validation error, it will be
         // a duplicate key error.

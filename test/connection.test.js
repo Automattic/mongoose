@@ -1190,6 +1190,54 @@ describe('connections:', function() {
     });
   });
 
+  it('force close (gh-5664)', function(done) {
+    var opts = { useMongoClient: true };
+    var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    var coll = db.collection('Test');
+    db.then(function() {
+      setTimeout(function() {
+        coll.insertOne({x:1}, function(error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
+          done();
+        });
+      }, 100);
+
+      // Force close
+      db.close(true);
+    });
+  });
+
+  it('force close with connection created after close (gh-5664)', function(done) {
+    var opts = { useMongoClient: true };
+    var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    db.then(function() {
+      setTimeout(function() {
+        // TODO: enforce error.message, right now get a confusing error
+        /*db.collection('Test').insertOne({x:1}, function(error) {
+          assert.ok(error);
+
+          //assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
+          done();
+        });*/
+
+        var threw = false;
+        try {
+          db.collection('Test').insertOne({x:1}, function() {});
+        } catch (error) {
+          threw = true;
+          assert.ok(error);
+        }
+
+        assert.ok(threw);
+        done();
+      }, 100);
+
+      // Force close
+      db.close(true);
+    });
+  });
+
   describe('connecting to multiple mongos nodes (gh-1037)', function() {
     var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
     if (!mongos) {

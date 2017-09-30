@@ -1884,6 +1884,32 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('projection with $elemMatch (gh-5661)', function(done) {
+      var schema = new mongoose.Schema({
+        name: { type: String, default: 'test' },
+        arr: [{ tag: String }]
+      });
+
+      var Model = db.model('gh5661', schema);
+      var doc = { arr: [{ tag: 't1' }, { tag: 't2' }] };
+      Model.create(doc, function(error) {
+        assert.ifError(error);
+        var query = {};
+        var update = { $set: { name: 'test2' } };
+        var opts = {
+          new: true,
+          fields: { arr: { $elemMatch: { tag: 't1' } } }
+        };
+        Model.findOneAndUpdate(query, update, opts, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!doc.name);
+          assert.equal(doc.arr.length, 1);
+          assert.equal(doc.arr[0].tag, 't1');
+          done();
+        });
+      });
+    });
+
     it('setting subtype when saving (gh-5551)', function(done) {
       if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
         // Don't run on node 0.x because of `const` issues

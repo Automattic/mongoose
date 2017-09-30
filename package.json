@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.11.13",
+  "version": "4.11.14",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -26,7 +26,7 @@
     "mongodb": "2.2.31",
     "mpath": "0.3.0",
     "mpromise": "0.5.5",
-    "mquery": "2.3.1",
+    "mquery": "2.3.2",
     "ms": "2.0.0",
     "muri": "1.2.2",
     "regexp-clone": "0.0.1",
@@ -50,6 +50,7 @@
     "mongoose-long": "0.1.1",
     "mongodb-topology-manager": "1.0.11",
     "node-static": "0.7.7",
+    "nsp": "~2.8.1",
     "power-assert": "1.4.1",
     "q": "1.4.1",
     "tbd": "0.6.4",
@@ -74,6 +75,7 @@
     "fix-lint": "eslint . --fix",
     "install-browser": "npm install `node format_deps.js`",
     "lint": "eslint . --quiet",
+    "nsp": "nsp check",
     "test": "mocha test/*.test.js test/**/*.test.js",
     "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
   },

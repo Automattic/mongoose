@@ -1,3 +1,13 @@
+4.11.14 / 2017-09-30
+====================
+ * chore: add nsp check to the CI build #5679 [hairyhenderson](https://github.com/hairyhenderson)
+ * fix: bump mquery because of security issue with debug package #5677 #5675 [jonathanprl](https://github.com/jonathanprl)
+ * fix(populate): automatically select() populated()-ed fields #5669
+ * fix(connection): make force close work as expected #5664
+ * fix(document): treat $elemMatch as inclusive projection #5661
+ * docs(model/query): clarify which functions fire which middleware #5654
+ * fix(model): make `init()` public and return a promise that resolves when indexes are done building #5563
+
 4.11.13 / 2017-09-24
 ====================
  * fix(query): correctly run replaceOne with update validators #5665 [sime1](https://github.com/sime1)

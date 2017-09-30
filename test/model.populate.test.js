@@ -4840,6 +4840,46 @@ describe('model: populate:', function() {
         });
       });
 
+      it('auto select populated fields (gh-5669)', function(done) {
+        var ProductSchema = new mongoose.Schema({
+          name: {
+            type: String
+          },
+          categories: {
+            type: [{
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'gh5669'
+            }],
+            select: false
+          }
+        });
+
+        var CategorySchema = new Schema({ name: String });
+        var Product = db.model('gh5669_0', ProductSchema);
+        var Category = db.model('gh5669', CategorySchema);
+
+        Category.create({ name: 'Books' }, function(error, doc) {
+          assert.ifError(error);
+          var product = {
+            name: 'Professional AngularJS',
+            categories: [doc._id]
+          };
+          Product.create(product, function(error, product) {
+            assert.ifError(error);
+            Product.findById(product._id).populate('categories').exec(function(error, product) {
+              assert.ifError(error);
+              assert.equal(product.categories.length, 1);
+              assert.equal(product.categories[0].name, 'Books');
+              Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
+                assert.ifError(error);
+                assert.ok(!product.categories);
+                done();
+              });
+            });
+          });
+        });
+      });
+
       it('handles populating with discriminators that may not have a ref (gh-4817)', function(done) {
         var imagesSchema = new mongoose.Schema({
           name: {

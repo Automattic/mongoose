@@ -222,9 +222,9 @@ describe('model', function() {
     });
 
     it('error should emit on the model', function(done) {
-      var db = start(),
-          schema = new Schema({name: {type: String}}),
-          Test = db.model('IndexError', schema, 'x' + random());
+      var db = start();
+      var schema = new Schema({name: {type: String}});
+      var Test = db.model('IndexError', schema, 'x' + random());
 
       Test.create({name: 'hi'}, {name: 'hi'}, function(err) {
         assert.strictEqual(err, null);
@@ -237,6 +237,7 @@ describe('model', function() {
           done();
         });
 
+        delete Test.$init;
         Test.init();
       });
     });

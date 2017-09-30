@@ -2150,6 +2150,22 @@ describe('Query', function() {
       });
     });
 
+    it('cast error with custom error (gh-5520)', function(done) {
+      var TestSchema = new Schema({ name: Number });
+
+      var TestModel = db.model('gh5520_0', TestSchema);
+
+      TestModel.
+        find({ name: 'not a number' }).
+        error(new Error('woops')).
+        exec(function(error) {
+          assert.ok(error);
+          // CastError check happens **after** `.error()`
+          assert.equal(error.name, 'CastError');
+          done();
+        });
+    });
+
     it('change deleteOne to updateOne for soft deletes using $isDeleted (gh-4428)', function(done) {
       var schema = new mongoose.Schema({
         name: String,

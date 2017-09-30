@@ -844,7 +844,7 @@ describe('model', function() {
         var schoolSchema = new BaseSchema({ principal: String });
 
         var Org = db.model('gh5613', orgSchema);
-        var School = Org.discriminator('gh5613_0', schoolSchema);
+        Org.discriminator('gh5613_0', schoolSchema);
 
         Org.create({ name: 'test' }, function(error, doc) {
           assert.ifError(error);

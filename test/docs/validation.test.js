@@ -516,15 +516,32 @@ describe('validation docs', function() {
   });
 
   /**
-   * One final detail worth noting: update validators **only** run on `$set`
-   * and `$unset` operations (and `$push` and `$addToSet` in >= 4.8.0).
+   * One final detail worth noting: update validators **only** run on the
+   * following update operators:
+   *
+   * \* `$set`
+   * \* `$unset`
+   * \* `$push` (>= 4.8.0)
+   * \* `$addToSet` (>= 4.8.0)
+   * \* `$pull` (>= 4.12.0)
+   * \* `$pullAll` (>= 4.12.0)
+   *
    * For instance, the below update will succeed, regardless of the value of
-   * `number`, because update validators ignore `$inc`.
+   * `number`, because update validators ignore `$inc`. Also, `$push`,
+   * `$addToSet`, `$pull`, and `$pullAll` validation does **not** run any
+   * validation on the array itself, only individual elements of the array.
    */
 
   it('Update Validators Only Run On Specified Paths', function(done) {
     var testSchema = new Schema({
       number: { type: Number, max: 0 },
+      arr: [{ message: { type: String, maxLength: 10 } }]
+    });
+
+    // Update validators won't check this, so you can still `$push` 2 elements
+    // onto the array, so long as they don't have a `message` that's too long.
+    testSchema.path('arr').validate(function(v) {
+      return v.length < 2;
     });
 
     var Test = db.model('Test', testSchema);
@@ -533,10 +550,15 @@ describe('validation docs', function() {
     var opts = { runValidators: true };
     Test.update({}, update, opts, function(error) {
       // There will never be a validation error here
-      // acquit:ignore:start
-      assert.ifError(error);
-      done();
-      // acquit:ignore:end
+      update = { $push: [{ message: 'hello' }, { message: 'world' }] };
+      Test.update({}, update, opts, function(error) {
+        // This will never error either even though the array will have at
+        // least 2 elements.
+        // acquit:ignore:start
+        assert.ifError(error);
+        done();
+        // acquit:ignore:end
+      });
     });
   });
 

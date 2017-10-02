@@ -285,9 +285,12 @@ describe('validation docs', function() {
 
   /**
    * Errors returned after failed validation contain an `errors` object
-   * holding the actual `ValidatorError` objects. Each
+   * whose values are `ValidatorError` objects. Each
    * [ValidatorError](./api.html#error-validation-js) has `kind`, `path`,
    * `value`, and `message` properties.
+   * A ValidatorError also may have a `reason` property. If an error was
+   * thrown in the validator, this property will contain the error that was
+   * thrown.
    */
 
   it('Validation Errors', function(done) {
@@ -296,23 +299,35 @@ describe('validation docs', function() {
       name: String
     });
 
+    var validator = function(value) {
+      return /red|white|gold/i.test(value);
+    };
+    toySchema.path('color').validate(validator,
+      'Color `{VALUE}` not valid', 'Invalid color');
+    toySchema.path('name').validate(function(v) {
+      if (v !== 'Turbo Man') {
+        throw new Error('Need to get a Turbo Man for Christmas');
+      }
+      return true;
+    }, 'Name `{VALUE}` is not valid');
+
     var Toy = db.model('Toy', toySchema);
 
-    var validator = function (value) {
-      return /blue|green|white|red|orange|periwinkle/i.test(value);
-    };
-    Toy.schema.path('color').validate(validator,
-      'Color `{VALUE}` not valid', 'Invalid color');
-
-    var toy = new Toy({ color: 'grease'});
+    var toy = new Toy({ color: 'Green', name: 'Power Ranger' });
 
     toy.save(function (err) {
-      // err is our ValidationError object
-      // err.errors.color is a ValidatorError object
-      assert.equal(err.errors.color.message, 'Color `grease` not valid');
+      // `err` is a ValidationError object
+      // `err.errors.color` is a ValidatorError object
+      assert.equal(err.errors.color.message, 'Color `Green` not valid');
       assert.equal(err.errors.color.kind, 'Invalid color');
       assert.equal(err.errors.color.path, 'color');
-      assert.equal(err.errors.color.value, 'grease');
+      assert.equal(err.errors.color.value, 'Green');
+
+      assert.equal(err.errors.name.message, 'Name `Power Ranger` is not valid');
+      assert.equal(err.errors.name.value, 'Power Ranger');
+      assert.equal(err.errors.name.reason.message,
+        'Need to get a Turbo Man for Christmas');
+
       assert.equal(err.name, 'ValidationError');
       // acquit:ignore:start
       done();

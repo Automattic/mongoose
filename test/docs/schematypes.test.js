@@ -52,7 +52,7 @@ describe('schemaTypes', function () {
     mongoose.Schema.Types.Int8 = Int8;
 
     var testSchema = new Schema({ test: Int8 });
-    var Test = mongoose.model('Test', testSchema);
+    var Test = mongoose.model('CustomTypeExample', testSchema);
 
     var t = new Test();
     t.test = 'abc';

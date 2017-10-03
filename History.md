@@ -1,3 +1,18 @@
+4.12.0 / 2017-10-02
+===================
+ * docs(validation): add docs coverage for ValidatorError.reason #5681
+ * feat(discriminator): always add discriminatorKey to base schema to allow updating #5613
+ * fix(document): make nested docs no longer inherit parent doc's schema props #5586 #5546 #5470
+ * feat(query): run update validators on $pull and $pullAll #5555
+ * feat(query): add .error() helper to query to error out in pre hooks #5520
+ * feat(connection): add dropCollection() helper #5393
+ * feat(schema): add schema-level collation option #5295
+ * feat(types): add `discriminator()` function for single nested subdocs #5244
+ * feat(document): add $isDeleted() getter/setter for better support for soft deletes #4428
+ * feat(connection): bubble up reconnectFailed event when driver gives up reconnecting #4027
+ * fix(query): report error if passing array or other non-object as filter to update query #3677
+ * fix(collection): use createIndex() instead of deprecated ensureIndex() #3280
+
 4.11.14 / 2017-09-30
 ====================
  * chore: add nsp check to the CI build #5679 [hairyhenderson](https://github.com/hairyhenderson)

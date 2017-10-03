@@ -2684,6 +2684,48 @@ describe('model: update:', function() {
       });
     });
 
+    it('$pull with updateValidators (gh-5555)', function(done) {
+      var notificationSchema = new mongoose.Schema({
+        message: {
+          type: String,
+          maxlength: 12
+        }
+      });
+
+      var userSchema = new mongoose.Schema({
+        notifications: [notificationSchema]
+      });
+
+      var User = db.model('gh5555', userSchema);
+
+      var opts = { multi: true, runValidators: true };
+      var update = {
+        $pull: {
+          notifications: {
+            message: 'This message is wayyyyyyyyyy too long'
+          }
+        }
+      };
+      User.create({ notifications: [{ message: 'test' }] }, function(error, doc) {
+        assert.ifError(error);
+
+        User.update({}, update, opts).exec(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['notifications']);
+
+          update.$pull.notifications.message = 'test';
+          User.update({ _id: doc._id }, update, opts).exec(function(error) {
+            assert.ifError(error);
+            User.findById(doc._id, function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.notifications.length, 0);
+              done();
+            });
+          });
+        });
+      });
+    });
+
     it('update with Decimal type (gh-5361)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {
@@ -2746,6 +2788,21 @@ describe('model: update:', function() {
       Model.update(q, u, o).then(function() {
         done();
       }).catch(done);
+    });
+
+    it('returns error if passing array as conditions (gh-3677)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh3677', schema);
+      Model.updateMany(['foo'], { name: 'bar' }, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        var expected = 'Parameter "filter" to updateMany() must be an object';
+        assert.ok(error.message.indexOf(expected) !== -1, error.message);
+        done();
+      });
     });
 
     it('update with nested id (gh-5640)', function(done) {

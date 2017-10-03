@@ -94,6 +94,7 @@ describe('connections:', function() {
         var numConnected = 0;
         var numDisconnected = 0;
         var numReconnected = 0;
+        var numClose = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           useMongoClient: true
         });
@@ -106,6 +107,9 @@ describe('connections:', function() {
         });
         conn.on('reconnected', function() {
           ++numReconnected;
+        });
+        conn.on('close', function() {
+          ++numClose;
         });
 
         conn.
@@ -136,6 +140,78 @@ describe('connections:', function() {
             assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
+            assert.equal(numClose, 0);
+
+            conn.close();
+            done();
+          }).
+          catch(done);
+      });
+
+      it('reconnectFailed (gh-4027)', function(done) {
+        this.timeout(25000);
+
+        var conn;
+        var numReconnectFailed = 0;
+        var numConnected = 0;
+        var numDisconnected = 0;
+        var numReconnected = 0;
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          useMongoClient: true,
+          reconnectTries: 3,
+          reconnectInterval: 100
+        });
+
+        conn.on('connected', function() {
+          ++numConnected;
+        });
+        conn.on('disconnected', function() {
+          ++numDisconnected;
+        });
+        conn.on('reconnected', function() {
+          ++numReconnected;
+        });
+        conn.on('reconnectFailed', function() {
+          ++numReconnectFailed;
+        });
+
+        conn.
+          then(function() {
+            assert.equal(numConnected, 1);
+            return server.stop();
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 100);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+            assert.equal(numReconnectFailed, 0);
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 400);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+            assert.equal(numReconnectFailed, 1);
+          }).
+          then(function() {
+            return server.start();
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 2000);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+            assert.equal(numReconnectFailed, 1);
 
             conn.close();
             done();
@@ -189,6 +265,37 @@ describe('connections:', function() {
             done();
           });
       });
+    });
+  });
+
+  describe('helpers', function() {
+    var conn;
+
+    before(function() {
+      conn = mongoose.connect('mongodb://localhost:27017/mongoosetest_2', {
+        useMongoClient: true
+      });
+      return conn;
+    });
+
+    it('dropDatabase()', function(done) {
+      conn.dropDatabase(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('dropCollection()', function() {
+      return conn.db.collection('test').insertOne({ x: 1 }).
+        then(function() {
+          return conn.dropCollection('test');
+        }).
+        then(function() {
+          return conn.db.collection('test').findOne();
+        }).
+        then(function(doc) {
+          assert.ok(!doc);
+        });
     });
   });
 

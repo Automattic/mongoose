@@ -539,6 +539,36 @@ describe('model', function() {
           });
       });
 
+      it('reusing schema for discriminators (gh-5684)', function(done) {
+        var ParentSchema = new Schema({});
+        var ChildSchema = new Schema({ name: String });
+
+        var FirstContainerSchema = new Schema({
+          stuff: [ParentSchema]
+        });
+
+        FirstContainerSchema.path('stuff').discriminator('Child', ChildSchema);
+
+        var SecondContainerSchema = new Schema({
+          things: [ParentSchema]
+        });
+
+        SecondContainerSchema.path('things').discriminator('Child', ChildSchema);
+
+        var M1 = db.model('gh5684_0', FirstContainerSchema);
+        var M2 = db.model('gh5684_1', SecondContainerSchema);
+
+        var doc1 = new M1({ stuff: [{ __t: 'Child', name: 'test' }] });
+        var doc2 = new M2({ things: [{ __t: 'Child', name: 'test' }] });
+
+        assert.equal(doc1.stuff.length, 1);
+        assert.equal(doc1.stuff[0].name, 'test');
+        assert.equal(doc2.things.length, 1);
+        assert.equal(doc2.things[0].name, 'test');
+
+        done();
+      });
+
       it('embedded discriminators with $push (gh-5009)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

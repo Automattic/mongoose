@@ -4390,6 +4390,31 @@ describe('document', function() {
         catch(done);
     });
 
+    it('parent props not in child (gh-5470)', function(done) {
+      var employeeSchema = new mongoose.Schema({
+        name: {
+          first: String,
+          last: String
+        },
+        department: String
+      });
+      var Employee = mongoose.model('Test', employeeSchema);
+
+      var employee = new Employee({
+        name: {
+          first: 'Ron',
+          last: 'Swanson'
+        },
+        department: 'Parks and Recreation'
+      });
+      var ownPropertyNames = Object.getOwnPropertyNames(employee.name);
+
+      assert.ok(ownPropertyNames.indexOf('department') === -1, ownPropertyNames.join(','));
+      assert.ok(ownPropertyNames.indexOf('first') !== -1, ownPropertyNames.join(','));
+      assert.ok(ownPropertyNames.indexOf('last') !== -1, ownPropertyNames.join(','));
+      done();
+    });
+
     it('modifying array with existing ids (gh-5523)', function(done) {
       var friendSchema = new mongoose.Schema(
         {

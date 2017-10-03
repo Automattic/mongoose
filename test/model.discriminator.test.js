@@ -748,5 +748,47 @@ describe('model', function() {
           catch(done);
       });
     });
+
+    it('embedded with single nested subdocs (gh-5244)', function(done) {
+      var eventSchema = new Schema({ message: String },
+        { discriminatorKey: 'kind', _id: false });
+
+      var trackSchema = new Schema({ event: eventSchema });
+      trackSchema.path('event').discriminator('Clicked', new Schema({
+        element: String
+      }, { _id: false }));
+      trackSchema.path('event').discriminator('Purchased', new Schema({
+        product: String
+      }, { _id: false }));
+
+      var MyModel = db.model('gh5244', trackSchema);
+      var doc1 = {
+        event: {
+          kind: 'Clicked',
+          element: 'Amazon Link'
+        }
+      };
+      var doc2 = {
+        event: {
+          kind: 'Purchased',
+          product: 'Professional AngularJS'
+        }
+      };
+      MyModel.create([doc1, doc2]).
+        then(function(docs) {
+          var doc1 = docs[0];
+          var doc2 = docs[1];
+
+          assert.equal(doc1.event.kind, 'Clicked');
+          assert.equal(doc1.event.element, 'Amazon Link');
+          assert.ok(!doc1.event.product);
+
+          assert.equal(doc2.event.kind, 'Purchased');
+          assert.equal(doc2.event.product, 'Professional AngularJS');
+          assert.ok(!doc2.event.element);
+          done();
+        }).
+        catch(done);
+    });
   });
 });

@@ -22,6 +22,7 @@ if (process.env.D === '1') {
  */
 
 [
+  'createIndex',
   'ensureIndex',
   'findAndModify',
   'findOne',

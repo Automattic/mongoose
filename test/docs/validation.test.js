@@ -285,9 +285,12 @@ describe('validation docs', function() {
 
   /**
    * Errors returned after failed validation contain an `errors` object
-   * holding the actual `ValidatorError` objects. Each
+   * whose values are `ValidatorError` objects. Each
    * [ValidatorError](./api.html#error-validation-js) has `kind`, `path`,
    * `value`, and `message` properties.
+   * A ValidatorError also may have a `reason` property. If an error was
+   * thrown in the validator, this property will contain the error that was
+   * thrown.
    */
 
   it('Validation Errors', function(done) {
@@ -296,23 +299,35 @@ describe('validation docs', function() {
       name: String
     });
 
+    var validator = function(value) {
+      return /red|white|gold/i.test(value);
+    };
+    toySchema.path('color').validate(validator,
+      'Color `{VALUE}` not valid', 'Invalid color');
+    toySchema.path('name').validate(function(v) {
+      if (v !== 'Turbo Man') {
+        throw new Error('Need to get a Turbo Man for Christmas');
+      }
+      return true;
+    }, 'Name `{VALUE}` is not valid');
+
     var Toy = db.model('Toy', toySchema);
 
-    var validator = function (value) {
-      return /blue|green|white|red|orange|periwinkle/i.test(value);
-    };
-    Toy.schema.path('color').validate(validator,
-      'Color `{VALUE}` not valid', 'Invalid color');
-
-    var toy = new Toy({ color: 'grease'});
+    var toy = new Toy({ color: 'Green', name: 'Power Ranger' });
 
     toy.save(function (err) {
-      // err is our ValidationError object
-      // err.errors.color is a ValidatorError object
-      assert.equal(err.errors.color.message, 'Color `grease` not valid');
+      // `err` is a ValidationError object
+      // `err.errors.color` is a ValidatorError object
+      assert.equal(err.errors.color.message, 'Color `Green` not valid');
       assert.equal(err.errors.color.kind, 'Invalid color');
       assert.equal(err.errors.color.path, 'color');
-      assert.equal(err.errors.color.value, 'grease');
+      assert.equal(err.errors.color.value, 'Green');
+
+      assert.equal(err.errors.name.message, 'Name `Power Ranger` is not valid');
+      assert.equal(err.errors.name.value, 'Power Ranger');
+      assert.equal(err.errors.name.reason.message,
+        'Need to get a Turbo Man for Christmas');
+
       assert.equal(err.name, 'ValidationError');
       // acquit:ignore:start
       done();
@@ -516,15 +531,32 @@ describe('validation docs', function() {
   });
 
   /**
-   * One final detail worth noting: update validators **only** run on `$set`
-   * and `$unset` operations (and `$push` and `$addToSet` in >= 4.8.0).
+   * One final detail worth noting: update validators **only** run on the
+   * following update operators:
+   *
+   * \* `$set`
+   * \* `$unset`
+   * \* `$push` (>= 4.8.0)
+   * \* `$addToSet` (>= 4.8.0)
+   * \* `$pull` (>= 4.12.0)
+   * \* `$pullAll` (>= 4.12.0)
+   *
    * For instance, the below update will succeed, regardless of the value of
-   * `number`, because update validators ignore `$inc`.
+   * `number`, because update validators ignore `$inc`. Also, `$push`,
+   * `$addToSet`, `$pull`, and `$pullAll` validation does **not** run any
+   * validation on the array itself, only individual elements of the array.
    */
 
   it('Update Validators Only Run On Specified Paths', function(done) {
     var testSchema = new Schema({
       number: { type: Number, max: 0 },
+      arr: [{ message: { type: String, maxLength: 10 } }]
+    });
+
+    // Update validators won't check this, so you can still `$push` 2 elements
+    // onto the array, so long as they don't have a `message` that's too long.
+    testSchema.path('arr').validate(function(v) {
+      return v.length < 2;
     });
 
     var Test = db.model('Test', testSchema);
@@ -533,10 +565,15 @@ describe('validation docs', function() {
     var opts = { runValidators: true };
     Test.update({}, update, opts, function(error) {
       // There will never be a validation error here
-      // acquit:ignore:start
-      assert.ifError(error);
-      done();
-      // acquit:ignore:end
+      update = { $push: [{ message: 'hello' }, { message: 'world' }] };
+      Test.update({}, update, opts, function(error) {
+        // This will never error either even though the array will have at
+        // least 2 elements.
+        // acquit:ignore:start
+        assert.ifError(error);
+        done();
+        // acquit:ignore:end
+      });
     });
   });
 

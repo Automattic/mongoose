@@ -1,3 +1,82 @@
+4.11.14 / 2017-09-30
+====================
+ * chore: add nsp check to the CI build #5679 [hairyhenderson](https://github.com/hairyhenderson)
+ * fix: bump mquery because of security issue with debug package #5677 #5675 [jonathanprl](https://github.com/jonathanprl)
+ * fix(populate): automatically select() populated()-ed fields #5669
+ * fix(connection): make force close work as expected #5664
+ * fix(document): treat $elemMatch as inclusive projection #5661
+ * docs(model/query): clarify which functions fire which middleware #5654
+ * fix(model): make `init()` public and return a promise that resolves when indexes are done building #5563
+
+4.11.13 / 2017-09-24
+====================
+ * fix(query): correctly run replaceOne with update validators #5665 [sime1](https://github.com/sime1)
+ * fix(schema): replace mistype in setupTimestamp method #5656 [zipp3r](https://github.com/zipp3r)
+ * fix(query): avoid throwing cast error for strict: throw with nested id in query #5640
+ * fix(model): ensure class gets combined schema when using class syntax with discriminators #5635
+ * fix(document): handle setting doc array to array of top-level docs #5632
+ * fix(model): handle casting findOneAndUpdate() with overwrite and upsert #5631
+ * fix(update): correctly handle $ in updates #5628
+ * fix(types): handle manual population consistently for unshift() and splice() #5504
+
+4.11.12 / 2017-09-18
+====================
+ * docs(model): asterisk should not render as markdown bullet #5644 [timkinnane](https://github.com/timkinnane)
+ * docs: use useMongoClient in connection example #5627 [GabrielNicolasAvellaneda](https://github.com/GabrielNicolasAvellaneda)
+ * fix(connection): call callback when initial connection failed #5626
+ * fix(query): apply select correctly if a given nested schema is used for 2 different paths #5603
+ * fix(document): add graceful fallback for setting a doc array value and `pull()`-ing a doc #3511
+
+4.11.11 / 2017-09-10
+====================
+ * fix(connection): properly set readyState in response to driver 'close' and 'reconnect' events #5604
+ * fix(document): ensure single embedded doc setters only get called once, with correct value #5601
+ * fix(timestamps): allow enabling updatedAt without createdAt #5598
+ * test: improve unique validator test by making create run before ensureIndex #5595 #5562
+ * fix(query): ensure find callback only gets called once when post init hook throws error #5592
+
+4.11.10 / 2017-09-03
+====================
+ * docs: add KeenIO tracking #5612
+ * fix(schema): ensure validators declared with `.validate()` get copied with clone() #5607
+ * fix: remove unnecessary jest warning #5480
+ * fix(discriminator): prevent implicit discriminator schema id from clobbering base schema custom id #5591
+ * fix(schema): hide schema objectid warning for non-hex strings of length 24 #5587
+ * docs(populate): use story schema defined key author instead of creator #5578 [dmric](https://github.com/dmric)
+ * docs(document): describe usage of `.set()` #5576
+ * fix(document): ensure correct scope in single nested validators #5569
+ * fix(populate): don't mark path as populated until populate() is done #5564
+ * fix(document): make push()-ing a doc onto an empty array act as manual population #5504
+ * fix(connection): emit timeout event on socket timeout #4513
+
+4.11.9 / 2017-08-27
+===================
+ * fix(error): avoid using arguments.callee because that breaks strict mode #5572
+ * docs(schematypes): fix spacing #5567
+ * fix(query): enforce binary subtype always propagates to mongodb #5551
+ * fix(query): only skip castForQuery for mongoose arrays #5536
+ * fix(browser): rely on browser entrypoint to decide whether to use BrowserDocument or NodeDocument #5480
+
+4.11.8 / 2017-08-23
+===================
+ * feat: add warning about using schema ObjectId as type ObjectId #5571 [efkan](https://github.com/efkan)
+ * fix(schema): allow setting `id` property after schema was created #5570 #5548
+ * docs(populate): remove confusing _ from populate docs #5560
+ * fix(connection): expose parsed uri fields (host, port, dbname) when using openUri() #5556
+ * docs: added type boolean to options documentation #5547 [ndabAP](https://github.com/ndabAP)
+ * test: add test coverage for stopping/starting server #5524
+ * fix(aggregate): pull read preference from schema by default #5522
+
+4.11.7 / 2017-08-14
+===================
+ * fix: correct properties when calling toJSON() on populated virtual #5544 #5442 [davidwu226](https://github.com/davidwu226)
+ * docs: fix spelling #5535 [et](https://github.com/et)
+ * fix(error): always set name before stack #5533
+ * fix: add warning about running jest in jsdom environment #5532 #5513 #4943
+ * fix(document): ensure overwriting a doc array cleans out individual docs #5523
+ * fix(schema): handle creating arrays of single nested using type key #5521
+ * fix: upgrade mongodb -> 2.2.31 to support user/pass options #5419
+
 4.11.6 / 2017-08-07
 ===================
  * fix: limiting number of async operations per time in insertMany #5529 [andresattler](https://github.com/andresattler)

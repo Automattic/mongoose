@@ -1,37 +1,451 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v3.3.1</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="/docs/css/default.css" rel="stylesheet" type="text/css"><link href="/docs/css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./migration.html">migrating from 2.x</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>Validation</h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.11.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="validation"><p>Validation</p>
+</h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
+<ul>
+<li>Validation is defined in the <a href="./schematypes.html">SchemaType</a></li>
+<li>Validation is <a href="./middleware.html">middleware</a>. Mongoose registers validation as a <code>pre(&#39;save&#39;)</code> hook on every schema by default.</li>
+<li>You can manually run validation using <code>doc.validate(callback)</code> or <code>doc.validateSync()</code></li>
+<li>Validators are not run on undefined values. The only exception is the <a href="./api.html#schematype_SchemaType-required"><code>required</code> validator</a>.</li>
+<li>Validation is asynchronously recursive; when you call <a href="./api.html#model_Model-save">Model#save</a>, sub-document validation is executed as well. If an error occurs, your <a href="./api.html#model_Model-save">Model#save</a> callback receives it</li>
+<li>Validation is customizable</li>
+</ul>
+<pre><code class="javascript">
+    <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({
+      name: {
+        type: String,
+        required: <span class="literal">true</span>
+      }
+    });
+    <span class="keyword">var</span> Cat = db.model(<span class="string">'Cat'</span>, schema);
 
-<ul><li>Validation is defined in the <a href="./schematypes.html">SchemaType</a></li><li>Validation is an internal piece of <a href="./middleware.html">middleware</a></li><li>Validation occurs when a document attempts to be <a href="./api.html#model_Model-save">saved</a>, after defaults have been applied</li><li>Validation is asynchronously recursive: when you call <a href="./api.html#model_Model-save">Model#save</a>, sub-document validation is executed. If an error happens, your Model#save callback receives it</li><li>Mongoose doesn&#39;t care about complex error message construction. Errors have type identifiers. For example, <code>&quot;min&quot;</code> is the identifier for the error triggered when a number doesn&#39;t meet the <a href="./api.html#schema_number_SchemaNumber-min">minimum value</a>. The path and value that triggered the error can be accessed in the <code>ValidationError</code> object</li></ul><h3>Built in validators</h3><p>Mongoose has several built in validators.</p>
+    <span class="comment">// This cat has no name :(</span>
+    <span class="keyword">var</span> cat = <span class="keyword">new</span> Cat();
+    cat.save(<span class="keyword">function</span>(error) {
+      assert.equal(error.errors[<span class="string">'name'</span>].message,
+        <span class="string">'Path `name` is required.'</span>);
 
-<ul><li>All <a href="./schematypes.html">SchemaTypes</a> have the built in <a href="./api.html#schematype_SchemaType-required">required</a> validator.</li><li><a href="./api.html#schema-number-js">Numbers</a> have <a href="./api.html#schema_number_SchemaNumber-min">min</a> and <a href="./api.html#schema_number_SchemaNumber-max">max</a> validators.</li><li><a href="./api.html#schema-string-js">Strings</a> have <a href="./api.html#schema_string_SchemaString-enum">enum</a> and <a href="./api.html#schema_string_SchemaString-match">match</a> validators.</li></ul><h3>Custom validators</h3><p>Custom validation is declared by passing a validation <code>function</code> and an error type to your <code>SchemaType</code>s validate method. Read the <a href="./api.html#schematype_SchemaType-validate">API</a> docs for details on custom validators, async validators, and more.</p><h3>Validation errors</h3><p>Errors returned after failed validation contain an <code>errors</code> object holding the actual <code>ValidatorErrors</code>. Each <a href="./api.html#errors-validation-js">ValidatorError</a> has a <code>type</code> and <code>path</code> property providing us with a little more error handling flexibility.</p><pre><code class="javascript"><span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
-  color: String,
-  name: String
-});
+      error = cat.validateSync();
+      assert.equal(error.errors[<span class="string">'name'</span>].message,
+        <span class="string">'Path `name` is required.'</span>);
+    });
+  </code></pre><h2 id="built-in-validators"><p>Built-in Validators</p>
+</h2><p>Mongoose has several built-in validators.</p>
+<ul>
+<li>All <a href="./schematypes.html">SchemaTypes</a> have the built-in <a href="./api.html#schematype_SchemaType-required">required</a> validator. The required validator uses the <a href="./api.html#schematype_SchemaType-checkRequired">SchemaType&#39;s <code>checkRequired()</code> function</a> to determine if the value satisfies the required validator.</li>
+<li><a href="./api.html#schema-number-js">Numbers</a> have <a href="./api.html#schema_number_SchemaNumber-min">min</a> and <a href="./api.html#schema_number_SchemaNumber-max">max</a> validators.</li>
+<li><a href="./api.html#schema-string-js">Strings</a> have <a href="./api.html#schema_string_SchemaString-enum">enum</a>, <a href="./api.html#schema_string_SchemaString-match">match</a>, <a href="./api.html#schema_string_SchemaString-maxlength">maxlength</a> and <a href="./api.html#schema_string_SchemaString-minlength">minlength</a> validators.</li>
+</ul>
+<p>Each of the validator links above provide more information about how to enable them and customize their error messages.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> breakfastSchema = <span class="keyword">new</span> Schema({
+      eggs: {
+        type: Number,
+        min: [<span class="number">6</span>, <span class="string">'Too few eggs'</span>],
+        max: <span class="number">12</span>
+      },
+      bacon: {
+        type: Number,
+        required: [<span class="literal">true</span>, <span class="string">'Why no bacon?'</span>]
+      },
+      drink: {
+        type: String,
+        enum: [<span class="string">'Coffee'</span>, <span class="string">'Tea'</span>],
+        required: <span class="keyword">function</span>() {
+          <span class="keyword">return</span> <span class="keyword">this</span>.bacon > <span class="number">3</span>;
+        }
+      }
+    });
+    <span class="keyword">var</span> Breakfast = db.model(<span class="string">'Breakfast'</span>, breakfastSchema);
 
-<span class="keyword">var</span> Toy = db.model(<span class="string">'Toy'</span>, toySchema);
+    <span class="keyword">var</span> badBreakfast = <span class="keyword">new</span> Breakfast({
+      eggs: <span class="number">2</span>,
+      bacon: <span class="number">0</span>,
+      drink: <span class="string">'Milk'</span>
+    });
+    <span class="keyword">var</span> error = badBreakfast.validateSync();
+    assert.equal(error.errors[<span class="string">'eggs'</span>].message,
+      <span class="string">'Too few eggs'</span>);
+    assert.ok(!error.errors[<span class="string">'bacon'</span>]);
+    assert.equal(error.errors[<span class="string">'drink'</span>].message,
+      <span class="string">'`Milk` is not a valid enum value for path `drink`.'</span>);
 
-Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-  <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkel/i</span>.test(value);
-}, <span class="string">'Invalid color'</span>);
+    badBreakfast.bacon = <span class="number">5</span>;
+    badBreakfast.drink = <span class="literal">null</span>;
 
-<span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'grease'</span>});
+    error = badBreakfast.validateSync();
+    assert.equal(error.errors[<span class="string">'drink'</span>].message, <span class="string">'Path `drink` is required.'</span>);
 
-toy.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-  <span class="comment">// err.errors.color is a ValidatorError object</span>
+    badBreakfast.bacon = <span class="literal">null</span>;
+    error = badBreakfast.validateSync();
+    assert.equal(error.errors[<span class="string">'bacon'</span>].message, <span class="string">'Why no bacon?'</span>);
+  </code></pre><h2 id="the-unique-option-is-not-a-validator"><p>The <code>unique</code> Option is Not a Validator</p>
+</h2><p>A common gotcha for beginners is that the <code>unique</code> option for schemas
+is <em>not</em> a validator. It&#39;s a convenient helper for building <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique indexes</a>.
+See the <a href="/docs/faq.html">FAQ</a> for more information.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> uniqueUsernameSchema = <span class="keyword">new</span> Schema({
+      username: {
+        type: String,
+        unique: <span class="literal">true</span>
+      }
+    });
+    <span class="keyword">var</span> U1 = db.model(<span class="string">'U1'</span>, uniqueUsernameSchema);
+    <span class="keyword">var</span> U2 = db.model(<span class="string">'U2'</span>, uniqueUsernameSchema);
+
+    <span class="keyword">var</span> dup = [{ username: <span class="string">'Val'</span> }, { username: <span class="string">'Val'</span> }];
+    U1.create(dup, <span class="keyword">function</span>(error) {
+      <span class="comment">// Will save successfully!</span>
+    });
+
+    <span class="comment">// Need to wait for the index to finish building before saving,</span>
+    <span class="comment">// otherwise unique constraints may be violated.</span>
+    U2.on(<span class="string">'index'</span>, <span class="keyword">function</span>(error) {
+      assert.ifError(error);
+      U2.create(dup, <span class="keyword">function</span>(error) {
+        <span class="comment">// Will error, but will *not* be a mongoose validation error, but</span>
+        <span class="comment">// a duplicate key error.</span>
+        assert.ok(error);
+        assert.ok(!error.errors);
+        assert.ok(error.message.indexOf(<span class="string">'duplicate key error'</span>) !== -<span class="number">1</span>);
+      });
+    });
+  </code></pre><h2 id="custom-validators"><p>Custom Validators</p>
+</h2><p>If the built-in validators aren&#39;t enough, you can define custom validators
+to suit your needs.</p>
+<p>Custom validation is declared by passing a validation function.
+You can find detailed instructions on how to do this in the
+<a href="./api.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({
+      phone: {
+        type: String,
+        validate: {
+          validator: <span class="keyword">function</span>(v) {
+            <span class="keyword">return</span> <span class="regexp">/\d{3}-\d{3}-\d{4}/</span>.test(v);
+          },
+          message: <span class="string">'{VALUE} is not a valid phone number!'</span>
+        },
+        required: [<span class="literal">true</span>, <span class="string">'User phone number required'</span>]
+      }
+    });
+
+    <span class="keyword">var</span> User = db.model(<span class="string">'user'</span>, userSchema);
+    <span class="keyword">var</span> user = <span class="keyword">new</span> User();
+    <span class="keyword">var</span> error;
+
+    user.phone = <span class="string">'555.0123'</span>;
+    error = user.validateSync();
+    assert.equal(error.errors[<span class="string">'phone'</span>].message,
+      <span class="string">'555.0123 is not a valid phone number!'</span>);
+
+    user.phone = <span class="string">''</span>;
+    error = user.validateSync();
+    assert.equal(error.errors[<span class="string">'phone'</span>].message,
+      <span class="string">'User phone number required'</span>);
+
+    user.phone = <span class="string">'201-555-0123'</span>;
+    <span class="comment">// Validation succeeds! Phone number is defined</span>
+    <span class="comment">// and fits `DDD-DDD-DDDD`</span>
+    error = user.validateSync();
+    assert.equal(error, <span class="literal">null</span>);
+  </code></pre><h2 id="async-custom-validators"><p>Async Custom Validators</p>
+</h2><p>Custom validators can also be asynchronous. If your validator function
+takes 2 arguments, mongoose will assume the 2nd argument is a callback.</p>
+<p>Even if you don&#39;t want to use asynchronous validators, be careful,
+because mongoose 4 will assume that <strong>all</strong> functions that take 2
+arguments are asynchronous, like the
+<a href="https://www.npmjs.com/package/validator"><code>validator.isEmail</code> function</a>.
+This behavior is considered deprecated as of 4.9.0, and you can shut
+it off by specifying <code>isAsync: false</code> on your custom validator.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({
+      phone: {
+        type: String,
+        validate: {
+          <span class="comment">// `isAsync` is not strictly necessary in mongoose 4.x, but relying</span>
+          <span class="comment">// on 2 argument validators being async is deprecated. Set the</span>
+          <span class="comment">// `isAsync` option to `true` to make deprecation warnings go away.</span>
+          isAsync: <span class="literal">true</span>,
+          validator: <span class="keyword">function</span>(v, cb) {
+            setTimeout(<span class="keyword">function</span>() {
+              <span class="keyword">var</span> phoneRegex = <span class="regexp">/\d{3}-\d{3}-\d{4}/</span>;
+              <span class="keyword">var</span> msg = v + <span class="string">' is not a valid phone number!'</span>;
+              <span class="comment">// First argument is a boolean, whether validator succeeded</span>
+              <span class="comment">// 2nd argument is an optional error message override</span>
+              cb(phoneRegex.test(v), msg);
+            }, <span class="number">5</span>);
+          },
+          <span class="comment">// Default error message, overridden by 2nd argument to `cb()` above</span>
+          message: <span class="string">'Default error message'</span>
+        },
+        required: [<span class="literal">true</span>, <span class="string">'User phone number required'</span>]
+      },
+      name: {
+        type: String,
+        <span class="comment">// You can also make a validator async by returning a promise. If you</span>
+        <span class="comment">// return a promise, do **not** specify the `isAsync` option.</span>
+        validate: <span class="keyword">function</span>(v) {
+          <span class="keyword">return</span> <span class="keyword">new</span> Promise(<span class="keyword">function</span>(resolve, reject) {
+            setTimeout(<span class="keyword">function</span>() {
+              resolve(<span class="literal">false</span>);
+            }, <span class="number">5</span>);
+          });
+        }
+      }
+    });
+
+    <span class="keyword">var</span> User = db.model(<span class="string">'User'</span>, userSchema);
+    <span class="keyword">var</span> user = <span class="keyword">new</span> User();
+    <span class="keyword">var</span> error;
+
+    user.phone = <span class="string">'555.0123'</span>;
+    user.name = <span class="string">'test'</span>;
+    user.validate(<span class="keyword">function</span>(error) {
+      assert.ok(error);
+      assert.equal(error.errors[<span class="string">'phone'</span>].message,
+        <span class="string">'555.0123 is not a valid phone number!'</span>);
+      assert.equal(error.errors[<span class="string">'name'</span>].message,
+        <span class="string">'Validator failed for path `name` with value `test`'</span>);
+    });
+  </code></pre><h2 id="validation-errors"><p>Validation Errors</p>
+</h2><p>Errors returned after failed validation contain an <code>errors</code> object
+holding the actual <code>ValidatorError</code> objects. Each
+<a href="./api.html#error-validation-js">ValidatorError</a> has <code>kind</code>, <code>path</code>,
+<code>value</code>, and <code>message</code> properties.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
+      color: String,
+      name: String
+    });
+
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'Toy'</span>, toySchema);
+
+    <span class="keyword">var</span> validator = <span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
+      <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+    };
+    Toy.schema.path(<span class="string">'color'</span>).validate(validator,
+      <span class="string">'Color `{VALUE}` not valid'</span>, <span class="string">'Invalid color'</span>);
+
+    <span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'grease'</span>});
+
+    toy.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+      <span class="comment">// err is our ValidationError object</span>
+      <span class="comment">// err.errors.color is a ValidatorError object</span>
+      assert.equal(err.errors.color.message, <span class="string">'Color `grease` not valid'</span>);
+      assert.equal(err.errors.color.kind, <span class="string">'Invalid color'</span>);
+      assert.equal(err.errors.color.path, <span class="string">'color'</span>);
+      assert.equal(err.errors.color.value, <span class="string">'grease'</span>);
+      assert.equal(err.name, <span class="string">'ValidationError'</span>);
+    });
+  </code></pre><h2 id="required-validators-on-nested-objects"><p>Required Validators On Nested Objects</p>
+</h2><p>Defining validators on nested objects in mongoose is tricky, because
+nested objects are not fully fledged paths.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> personSchema = <span class="keyword">new</span> Schema({
+      name: {
+        first: String,
+        last: String
+      }
+    });
+
+    assert.throws(<span class="keyword">function</span>() {
+      <span class="comment">// This throws an error, because 'name' isn't a full fledged path</span>
+      personSchema.path(<span class="string">'name'</span>).required(<span class="literal">true</span>);
+    }, <span class="regexp">/Cannot.*'required'/</span>);
+
+    <span class="comment">// To make a nested object required, use a single nested schema</span>
+    <span class="keyword">var</span> nameSchema = <span class="keyword">new</span> Schema({
+      first: String,
+      last: String
+    });
+
+    personSchema = <span class="keyword">new</span> Schema({
+      name: {
+        type: nameSchema,
+        required: <span class="literal">true</span>
+      }
+    });
+
+    <span class="keyword">var</span> Person = db.model(<span class="string">'Person'</span>, personSchema);
+
+    <span class="keyword">var</span> person = <span class="keyword">new</span> Person();
+    <span class="keyword">var</span> error = person.validateSync();
+    assert.ok(error.errors[<span class="string">'name'</span>]);
+  </code></pre><h2 id="update-validators"><p>Update Validators</p>
+</h2><p>In the above examples, you learned about document validation. Mongoose also
+supports validation for <code>update()</code> and <code>findOneAndUpdate()</code> operations.
+In Mongoose 4.x, update validators are off by default - you need to specify
+the <code>runValidators</code> option.</p>
+<p>To turn on update validators, set the <code>runValidators</code> option for
+<code>update()</code> or <code>findOneAndUpdate()</code>. Be careful: update validators
+are off by default because they have several caveats.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
+      color: String,
+      name: String
+    });
+
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'Toys'</span>, toySchema);
+
+    Toy.schema.path(<span class="string">'color'</span>).validate(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
+      <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
+    }, <span class="string">'Invalid color'</span>);
+
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Toy.update({}, { color: <span class="string">'bacon'</span> }, opts, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+      assert.equal(err.errors.color.message,
+        <span class="string">'Invalid color'</span>);
+    });
+  </code></pre><h2 id="update-validators-and-this"><p>Update Validators and <code>this</code></p>
+</h2><p>There are a couple of key differences between update validators and
+document validators. In the color validation function above, <code>this</code> refers
+to the document being validated when using document validation.
+However, when running update validators, the document being updated
+may not be in the server&#39;s memory, so by default the value of <code>this</code> is
+not defined.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
+      color: String,
+      name: String
+    });
+
+    toySchema.path(<span class="string">'color'</span>).validate(<span class="keyword">function</span>(value) {
+      <span class="comment">// When running in `validate()` or `validateSync()`, the</span>
+      <span class="comment">// validator can access the document using `this`.</span>
+      <span class="comment">// Does **not** work with update validators.</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.name.toLowerCase().indexOf(<span class="string">'red'</span>) !== -<span class="number">1</span>) {
+        <span class="keyword">return</span> value !== <span class="string">'red'</span>;
+      }
+      <span class="keyword">return</span> <span class="literal">true</span>;
+    });
+
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'ActionFigure'</span>, toySchema);
+
+    <span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'red'</span>, name: <span class="string">'Red Power Ranger'</span> });
+    <span class="keyword">var</span> error = toy.validateSync();
+    assert.ok(error.errors[<span class="string">'color'</span>]);
+
+    <span class="keyword">var</span> update = { color: <span class="string">'red'</span>, name: <span class="string">'Red Power Ranger'</span> };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+
+    Toy.update({}, update, opts, <span class="keyword">function</span>(error) {
+      <span class="comment">// The update validator throws an error:</span>
+      <span class="comment">// "TypeError: Cannot read property 'toLowerCase' of undefined",</span>
+      <span class="comment">// because `this` is **not** the document being updated when using</span>
+      <span class="comment">// update validators</span>
+      assert.ok(error);
+    });
+  </code></pre><h2 id="the-context-option"><p>The <code>context</code> option</p>
+</h2><p>The <code>context</code> option lets you set the value of <code>this</code> in update validators
+to the underlying query.</p>
+<pre><code class="javascript">
+    toySchema.path(<span class="string">'color'</span>).validate(<span class="keyword">function</span>(value) {
+      <span class="comment">// When running update validators with the `context` option set to</span>
+      <span class="comment">// 'query', `this` refers to the query object.</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.getUpdate().$set.name.toLowerCase().indexOf(<span class="string">'red'</span>) !== -<span class="number">1</span>) {
+        <span class="keyword">return</span> value === <span class="string">'red'</span>;
+      }
+      <span class="keyword">return</span> <span class="literal">true</span>;
+    });
+
+    <span class="keyword">var</span> Toy = db.model(<span class="string">'Figure'</span>, toySchema);
+
+    <span class="keyword">var</span> update = { color: <span class="string">'blue'</span>, name: <span class="string">'Red Power Ranger'</span> };
+    <span class="comment">// Note the context option</span>
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span>, context: <span class="string">'query'</span> };
+
+    Toy.update({}, update, opts, <span class="keyword">function</span>(error) {
+      assert.ok(error.errors[<span class="string">'color'</span>]);
+    });
+  </code></pre><h2 id="update-validator-paths"><p>Update Validator Paths</p>
+</h2><p>The other key difference that update validators only run on the paths
+specified in the update. For instance, in the below example, because
+&#39;name&#39; is not specified in the update operation, update validation will
+succeed.</p>
+<p>When using update validators, <code>required</code> validators <strong>only</strong> fail when
+you try to explicitly <code>$unset</code> the key.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> kittenSchema = <span class="keyword">new</span> Schema({
+      name: { type: String, required: <span class="literal">true</span> },
+      age: Number
+    });
+
+    <span class="keyword">var</span> Kitten = db.model(<span class="string">'Kitten'</span>, kittenSchema);
+
+    <span class="keyword">var</span> update = { color: <span class="string">'blue'</span> };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Kitten.update({}, update, opts, <span class="keyword">function</span>(err) {
+      <span class="comment">// Operation succeeds despite the fact that 'name' is not specified</span>
+    });
+
+    <span class="keyword">var</span> unset = { $unset: { name: <span class="number">1</span> } };
+    Kitten.update({}, unset, opts, <span class="keyword">function</span>(err) {
+      <span class="comment">// Operation fails because 'name' is required</span>
+      assert.ok(err);
+      assert.ok(err.errors[<span class="string">'name'</span>]);
+    });
+  </code></pre><h2 id="update-validators-only-run-on-specified-paths"><p>Update Validators Only Run On Specified Paths</p>
+</h2><p>One final detail worth noting: update validators <strong>only</strong> run on <code>$set</code>
+and <code>$unset</code> operations (and <code>$push</code> and <code>$addToSet</code> in &gt;= 4.8.0).
+For instance, the below update will succeed, regardless of the value of
+<code>number</code>, because update validators ignore <code>$inc</code>.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> testSchema = <span class="keyword">new</span> Schema({
+      number: { type: Number, max: <span class="number">0</span> },
+    });
+
+    <span class="keyword">var</span> Test = db.model(<span class="string">'Test'</span>, testSchema);
+
+    <span class="keyword">var</span> update = { $inc: { number: <span class="number">1</span> } };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Test.update({}, update, opts, <span class="keyword">function</span>(error) {
+      <span class="comment">// There will never be a validation error here</span>
+    });
+  </code></pre><h2 id="on-$push-and-$addtoset"><p>On $push and $addToSet</p>
+</h2><p>New in 4.8.0: update validators also run on <code>$push</code> and <code>$addToSet</code></p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> testSchema = <span class="keyword">new</span> Schema({
+      numbers: [{ type: Number, max: <span class="number">0</span> }],
+      docs: [{
+        name: { type: String, required: <span class="literal">true</span> }
+      }]
+    });
+
+    <span class="keyword">var</span> Test = db.model(<span class="string">'TestPush'</span>, testSchema);
+
+    <span class="keyword">var</span> update = {
+      $push: {
+        numbers: <span class="number">1</span>,
+        docs: { name: <span class="literal">null</span> }
+      }
+    };
+    <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
+    Test.update({}, update, opts, <span class="keyword">function</span>(error) {
+      assert.ok(error.errors[<span class="string">'numbers'</span>]);
+      assert.ok(error.errors[<span class="string">'docs'</span>]);
+    });
+  </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
+  var cx = '012173159455227967368:uvscsuqjovs';
+  var gcse = document.createElement('script');
+  gcse.type = 'text/javascript';
+  gcse.async = true;
+  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
+      '//www.google.com/cse/cse.js?cx=' + cx;
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(gcse, s);
+})();</script><script type="text/javascript">!function(name,path,ctx){
+  var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
+}('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
+
+KeenAsync.ready(function(){
+  // Configure a client instance
+  var client = new KeenAsync({
+    projectId: '59aad9cbc9e77c0001ce1b32',
+    writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
+  });
   
-  console.log(err.errors.color.message) <span class="comment">// prints 'Validator "Invalid color" failed for path color'</span>
-  console.log(String(err.errors.color)) <span class="comment">// prints 'Validator "Invalid color" failed for path color'</span>
-  console.log(err.errors.color.type) <span class="comment">// prints "Invalid color"</span>
-  console.log(err.errors.color.path) <span class="comment">// prints "color"</span>
-  console.log(err.name) <span class="comment">// prints "ValidationError"</span>
-  console.log(err.message) <span class="comment">// prints "Validation failed"</span>
-});
-</code></pre><p>After a validation error, the document will also have the same <code>errors</code> property available:</p><pre><code class="javascript">toy.errors.color.message === err.errors.color.message
-</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>validation</code>, let&#39;s take a look at how you might handle advanced validation with Mongooses <a href="/docs/middleware.html">middleware</a>.</p></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-1122274-9']);
-_gaq.push(['_trackPageview']);
-
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();</script></body></html>
+  client.recordEvent('pageView', {
+    host: window.location.host,
+    pathname: window.location.pathname,
+    hash: window.location.hash
+  });
+});</script></body></html>

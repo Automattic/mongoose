@@ -69,6 +69,7 @@ var schema = new Schema({
   em: [em],
   date: Date
 });
+
 TestDocument.prototype.$__setSchema(schema);
 
 schema.virtual('nested.agePlus2').get(function() {
@@ -4614,6 +4615,174 @@ describe('document', function() {
             assert.equal(called, 1);
             done();
           }, 50);
+        });
+      });
+    });
+
+    it('push populated doc onto empty array triggers manual population (gh-5504)', function(done) {
+      var ReferringSchema = new Schema({
+        reference: [{
+          type: Schema.Types.ObjectId,
+          ref: 'gh5504'
+        }]
+      });
+
+      var Referrer = db.model('gh5504', ReferringSchema);
+
+      var referenceA = new Referrer();
+      var referenceB = new Referrer();
+
+      var referrerA = new Referrer({reference: [referenceA]});
+      var referrerB = new Referrer();
+      var referrerC = new Referrer();
+      var referrerD = new Referrer();
+
+      referrerA.reference.push(referenceB);
+      assert.ok(referrerA.reference[0] instanceof Referrer);
+      assert.ok(referrerA.reference[1] instanceof Referrer);
+
+      referrerB.reference.push(referenceB);
+      assert.ok(referrerB.reference[0] instanceof Referrer);
+
+      referrerC.reference.unshift(referenceB);
+      assert.ok(referrerC.reference[0] instanceof Referrer);
+
+      referrerD.reference.splice(0, 0, referenceB);
+      assert.ok(referrerD.reference[0] instanceof Referrer);
+
+      done();
+    });
+
+    it('single nested conditional required scope (gh-5569)', function(done) {
+      var scopes = [];
+
+      var ThingSchema = new mongoose.Schema({
+        undefinedDisallowed: {
+          type: String,
+          required: function() {
+            scopes.push(this);
+            return this.undefinedDisallowed === undefined;
+          },
+          default: null
+        }
+      });
+
+      var SuperDocumentSchema = new mongoose.Schema({
+        thing: {
+          type: ThingSchema,
+          default: function() { return {}; }
+        }
+      });
+
+      var SuperDocument = db.model('gh5569', SuperDocumentSchema);
+
+      var doc = new SuperDocument();
+      doc.thing.undefinedDisallowed = null;
+
+      doc.save(function(error) {
+        assert.ifError(error);
+        doc = new SuperDocument();
+        doc.thing.undefinedDisallowed = undefined;
+        doc.save(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['thing.undefinedDisallowed']);
+          done();
+        });
+      });
+    });
+
+    it('single nested setters only get called once (gh-5601)', function(done) {
+      var vals = [];
+      var ChildSchema = new mongoose.Schema({
+        number: {
+          type: String,
+          set: function(v) {
+            vals.push(v);
+            return v;
+          }
+        },
+        _id: false
+      });
+      ChildSchema.set('toObject', { getters: true, minimize: false });
+
+      var ParentSchema = new mongoose.Schema({
+        child: {
+          type: ChildSchema,
+          default: {}
+        }
+      });
+
+      var Parent = db.model('gh5601', ParentSchema);
+      var p = new Parent();
+      p.child = { number: '555.555.0123' };
+      assert.equal(vals.length, 1);
+      assert.equal(vals[0], '555.555.0123');
+      done();
+    });
+
+    it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
+      var MainSchema = new Schema({
+        name: { type: String },
+        children: [{
+          name: { type: String }
+        }]
+      });
+      var RelatedSchema = new Schema({ name: { type: String } });
+      var Model = db.model('gh5632', MainSchema);
+      var RelatedModel = db.model('gh5632_0', RelatedSchema);
+
+      RelatedModel.create({ name: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        Model.create({ name: 'test1', children: [doc] }, function(error, m) {
+          assert.ifError(error);
+          m.children = [doc];
+          m.save(function(error) {
+            assert.ifError(error);
+            assert.equal(m.children.length, 1);
+            assert.equal(m.children[0].name, 'test');
+            done();
+          });
+        });
+      });
+    });
+
+    it('doc array: set then remove (gh-3511)', function(done) {
+      var ItemChildSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      });
+
+      var ItemParentSchema = new mongoose.Schema({
+        children: [ItemChildSchema]
+      });
+
+      var ItemParent = db.model('gh3511', ItemParentSchema);
+
+      var p = new ItemParent({
+        children: [{ name: 'test1' }, { name: 'test2' }]
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+        ItemParent.findById(p._id, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+          assert.equal(doc.children.length, 2);
+
+          doc.children[1].name = 'test3';
+          doc.children.remove(doc.children[0]);
+
+          doc.save(function(error) {
+            assert.ifError(error);
+            ItemParent.findById(doc._id, function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.children.length, 1);
+              assert.equal(doc.children[0].name, 'test3');
+              done();
+            });
+          });
         });
       });
     });

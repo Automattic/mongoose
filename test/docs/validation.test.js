@@ -8,7 +8,10 @@ describe('validation docs', function() {
   var Schema = mongoose.Schema;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
+      useMongoClient: true,
+      poolSize: 1
+    });
   });
 
   after(function(done) {
@@ -123,7 +126,7 @@ describe('validation docs', function() {
     var U1 = db.model('U1', uniqueUsernameSchema);
     var U2 = db.model('U2', uniqueUsernameSchema);
     // acquit:ignore:start
-    var remaining = 2;
+    var remaining = 3;
     // acquit:ignore:end
 
     var dup = [{ username: 'Val' }, { username: 'Val' }];
@@ -140,7 +143,23 @@ describe('validation docs', function() {
     U2.on('index', function(error) {
       assert.ifError(error);
       U2.create(dup, function(error) {
-        // Will error, but will *not* be a mongoose validation error, but
+        // Will error, but will *not* be a mongoose validation error, it will be
+        // a duplicate key error.
+        assert.ok(error);
+        assert.ok(!error.errors);
+        assert.ok(error.message.indexOf('duplicate key error') !== -1);
+        // acquit:ignore:start
+        --remaining || done();
+        // acquit:ignore:end
+      });
+    });
+
+    // There's also a promise-based equivalent to the event emitter API.
+    // The `init()` function is idempotent and returns a promise that
+    // will resolve once indexes are done building;
+    U2.init().then(function() {
+      U2.create(dup, function(error) {
+        // Will error, but will *not* be a mongoose validation error, it will be
         // a duplicate key error.
         assert.ok(error);
         assert.ok(!error.errors);
@@ -497,15 +516,32 @@ describe('validation docs', function() {
   });
 
   /**
-   * One final detail worth noting: update validators **only** run on `$set`
-   * and `$unset` operations (and `$push` and `$addToSet` in >= 4.8.0).
+   * One final detail worth noting: update validators **only** run on the
+   * following update operators:
+   *
+   * \* `$set`
+   * \* `$unset`
+   * \* `$push` (>= 4.8.0)
+   * \* `$addToSet` (>= 4.8.0)
+   * \* `$pull` (>= 4.12.0)
+   * \* `$pullAll` (>= 4.12.0)
+   *
    * For instance, the below update will succeed, regardless of the value of
-   * `number`, because update validators ignore `$inc`.
+   * `number`, because update validators ignore `$inc`. Also, `$push`,
+   * `$addToSet`, `$pull`, and `$pullAll` validation does **not** run any
+   * validation on the array itself, only individual elements of the array.
    */
 
   it('Update Validators Only Run On Specified Paths', function(done) {
     var testSchema = new Schema({
       number: { type: Number, max: 0 },
+      arr: [{ message: { type: String, maxLength: 10 } }]
+    });
+
+    // Update validators won't check this, so you can still `$push` 2 elements
+    // onto the array, so long as they don't have a `message` that's too long.
+    testSchema.path('arr').validate(function(v) {
+      return v.length < 2;
     });
 
     var Test = db.model('Test', testSchema);
@@ -514,10 +550,15 @@ describe('validation docs', function() {
     var opts = { runValidators: true };
     Test.update({}, update, opts, function(error) {
       // There will never be a validation error here
-      // acquit:ignore:start
-      assert.ifError(error);
-      done();
-      // acquit:ignore:end
+      update = { $push: [{ message: 'hello' }, { message: 'world' }] };
+      Test.update({}, update, opts, function(error) {
+        // This will never error either even though the array will have at
+        // least 2 elements.
+        // acquit:ignore:start
+        assert.ifError(error);
+        done();
+        // acquit:ignore:end
+      });
     });
   });
 

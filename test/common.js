@@ -4,12 +4,14 @@
 
 Error.stackTraceLimit = 10;
 
-var mongoose = require('../'),
-    Collection = mongoose.Collection,
-    assert = require('power-assert'),
-    queryCount = 0,
-    opened = 0,
-    closed = 0;
+var Server = require('mongodb-topology-manager').Server;
+var mongoose = require('../');
+var Collection = mongoose.Collection;
+var assert = require('power-assert');
+var queryCount = 0;
+var opened = 0;
+var closed = 0;
+var server;
 
 if (process.env.D === '1') {
   mongoose.set('debug', true);
@@ -20,6 +22,7 @@ if (process.env.D === '1') {
  */
 
 [
+  'createIndex',
   'ensureIndex',
   'findAndModify',
   'findOne',
@@ -156,13 +159,23 @@ function dropDBs(done) {
   });
 }
 
+before(function() {
+  return server.purge();
+});
+
+after(function() {
+  this.timeout(15000);
+
+  return server.stop();
+});
+
 before(function(done) {
   this.timeout(10 * 1000);
   dropDBs(done);
 });
-after(function(done) {
-  // DropDBs can be extraordinarily slow on 3.2
-  //this.timeout(120 * 1000);
-  //dropDBs(done);
-  done();
+
+module.exports.server = server = new Server('mongod', {
+  port: 27000,
+  dbpath: './data/db/27000',
+  storageEngine: 'mmapv1'
 });

@@ -735,35 +735,6 @@ describe('schema', function() {
       assert.equal(schema.path('_id'), undefined);
       done();
     });
-
-    it('auto id', function(done) {
-      var schema = new Schema({
-        name: String
-      });
-      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
-
-      schema = new Schema({
-        name: String
-      }, {id: true});
-      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
-
-      schema = new Schema({
-        name: String
-      }, {id: false});
-      assert.equal(schema.virtualpath('id'), undefined);
-
-      // old options
-      schema = new Schema({
-        name: String
-      }, {noVirtualId: false});
-      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
-
-      schema = new Schema({
-        name: String
-      }, {noVirtualId: true});
-      assert.equal(schema.virtualpath('id'), undefined);
-      done();
-    });
   });
 
   describe('hooks', function() {
@@ -1455,6 +1426,7 @@ describe('schema', function() {
         docs: [{x: [{y: String}]}],
         mixed: {}
       });
+      schema.virtual('myVirtual').get(function() { return 42; });
     });
 
     describe('when called on an explicit real path', function() {
@@ -1470,7 +1442,7 @@ describe('schema', function() {
     });
     describe('when called on a virtual', function() {
       it('returns virtual', function(done) {
-        assert.equal(schema.pathType('id'), 'virtual');
+        assert.equal(schema.pathType('myVirtual'), 'virtual');
         done();
       });
     });
@@ -1694,6 +1666,38 @@ describe('schema', function() {
       var casted = schema.path('num').cast('6.2e+23');
       assert.ok(casted instanceof mongoose.Types.Decimal128);
       assert.equal(casted.toString(), '6.2E+23');
+      done();
+    });
+
+    it('clone() copies validators declared with validate() (gh-5607)', function(done) {
+      var schema = new Schema({
+        num: Number
+      });
+
+      schema.path('num').validate(function(v) {
+        return v === 42;
+      });
+
+      var clone = schema.clone();
+      assert.equal(clone.path('num').validators.length, 1);
+      assert.ok(clone.path('num').validators[0].validator(42));
+      assert.ok(!clone.path('num').validators[0].validator(41));
+      done();
+    });
+
+    it('TTL index with timestamps (gh-5656)', function(done) {
+      var testSchema = new mongoose.Schema({
+        foo: String,
+        updatedAt: {
+          type: Date,
+          expires: '2h'
+        }
+      }, { timestamps: true });
+
+      var indexes = testSchema.indexes();
+      assert.deepEqual(indexes, [
+        [{ updatedAt: 1 }, { background: true, expireAfterSeconds: 7200 }]
+      ]);
       done();
     });
   });

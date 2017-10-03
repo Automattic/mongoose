@@ -735,8 +735,8 @@ describe('Query', function() {
       if (typeof global.Map !== 'undefined') {
         query = new Query({}, {}, null, p1.collection);
         query.sort(new global.Map().set('a', 1).set('b', 2));
-        assert.deepEqual(query.options.sort,
-          new global.Map().set('a', 1).set('b', 2));
+        assert.equal(query.options.sort.get('a'), 1);
+        assert.equal(query.options.sort.get('b'), 2);
       }
 
       query = new Query({}, {}, null, p1.collection);
@@ -1590,22 +1590,23 @@ describe('Query', function() {
       db.close(done);
     });
 
-    it('collation support (gh-4839)', function(done) {
-      start.mongodVersion(function(err, version) {
-        if (err) {
-          done(err);
-          return;
-        }
-        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-        if (!mongo34) {
-          done();
-          return;
-        }
+    describe('collations', function() {
+      before(function(done) {
+        var _this = this;
+        start.mongodVersion(function(err, version) {
+          if (err) {
+            return done(err);
+          }
+          var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+          if (!mongo34) {
+            return _this.skip();
+          }
 
-        test();
+          done();
+        });
       });
 
-      function test() {
+      it('collation support (gh-4839)', function(done) {
         var schema = new Schema({
           name: String
         });
@@ -1637,7 +1638,25 @@ describe('Query', function() {
             done();
           }).
           catch(done);
-      }
+      });
+
+      it('set on schema (gh-5295)', function(done) {
+        var schema = new Schema({
+          name: String
+        }, { collation: { locale: 'en_US', strength: 1 } });
+
+        var MyModel = db.model('gh5295', schema);
+
+        MyModel.create([{ name: 'a' }, { name: 'A' }]).
+          then(function() {
+            return MyModel.find({ name: 'a' });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 2);
+            done();
+          }).
+          catch(done);
+      });
     });
 
     describe('gh-1950', function() {
@@ -2093,6 +2112,142 @@ describe('Query', function() {
       Test.findOne(q, function(error) {
         assert.ifError(error);
         done();
+      });
+    });
+
+    it('report error in pre hook (gh-5520)', function(done) {
+      var TestSchema = new Schema({ name: String });
+
+      var ops = [
+        'count',
+        'find',
+        'findOne',
+        'findOneAndRemove',
+        'findOneAndUpdate',
+        'replaceOne',
+        'update',
+        'updateOne',
+        'updateMany'
+      ];
+
+      ops.forEach(function(op) {
+        TestSchema.pre(op, function(next) {
+          this.error(new Error(op + ' error'));
+          next();
+        });
+      });
+
+      var TestModel = db.model('gh5520', TestSchema);
+
+      var numOps = ops.length;
+
+      ops.forEach(function(op) {
+        TestModel.find({}).update({ name: 'test' })[op](function(error) {
+          assert.ok(error);
+          assert.equal(error.message, op + ' error');
+          --numOps || done();
+        });
+      });
+    });
+
+    it('cast error with custom error (gh-5520)', function(done) {
+      var TestSchema = new Schema({ name: Number });
+
+      var TestModel = db.model('gh5520_0', TestSchema);
+
+      TestModel.
+        find({ name: 'not a number' }).
+        error(new Error('woops')).
+        exec(function(error) {
+          assert.ok(error);
+          // CastError check happens **after** `.error()`
+          assert.equal(error.name, 'CastError');
+          done();
+        });
+    });
+
+    it('change deleteOne to updateOne for soft deletes using $isDeleted (gh-4428)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String,
+        isDeleted: Boolean
+      });
+
+      schema.pre('remove', function(next) {
+        var _this = this;
+        this.update({ isDeleted: true }, function(error) {
+          // Force mongoose to consider this doc as deleted.
+          _this.$isDeleted(true);
+          next(error);
+        });
+      });
+
+      var M = db.model('gh4428', schema);
+
+      M.create({ name: 'test' }, function(error, doc) {
+        assert.ifError(error);
+        doc.remove(function(error) {
+          assert.ifError(error);
+          M.findById(doc._id, function(error, doc) {
+            assert.ifError(error);
+            assert.ok(doc);
+            assert.equal(doc.isDeleted, true);
+            done();
+          });
+        });
+      });
+    });
+
+    it('child schema with select: false in multiple paths (gh-5603)', function(done) {
+      var ChildSchema = new mongoose.Schema({
+        field: {
+          type: String,
+          select: false
+        },
+        _id: false
+      }, { id: false });
+
+      var ParentSchema = new mongoose.Schema({
+        child: ChildSchema,
+        child2: ChildSchema
+      });
+      var Parent = db.model('gh5603', ParentSchema);
+      var ogParent = new Parent();
+      ogParent.child = { field: 'test' };
+      ogParent.child2 = { field: 'test' };
+      ogParent.save(function(error) {
+        assert.ifError(error);
+        Parent.findById(ogParent._id).exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!doc.child.field);
+          assert.ok(!doc.child2.field);
+          done();
+        });
+      });
+    });
+
+    it('errors in post init (gh-5592)', function(done) {
+      var TestSchema = new Schema();
+
+      var count = 0;
+      TestSchema.post('init', function(model, next) {
+        return next(new Error('Failed! ' + (count++)));
+      });
+
+      var TestModel = db.model('gh5592', TestSchema);
+
+      var docs = [];
+      for (var i = 0; i < 10; ++i) {
+        docs.push({});
+      }
+
+      TestModel.create(docs, function(error) {
+        assert.ifError(error);
+        TestModel.find({}, function(error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Failed! 0');
+          assert.equal(count, 10);
+          done();
+        });
       });
     });
 

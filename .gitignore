@@ -17,6 +17,7 @@ test/triage/*.js
 bin/mongoose.min.js
 coverage
 npm-debug.log
+data/
 
 tools/31*
 

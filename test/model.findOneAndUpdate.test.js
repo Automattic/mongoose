@@ -12,6 +12,7 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 var DocumentObjectId = mongoose.Types.ObjectId;
 var _ = require('lodash');
+var uuid = require('uuid');
 
 describe('model: findOneAndUpdate:', function() {
   var Comments;
@@ -1857,6 +1858,98 @@ describe('model: findOneAndUpdate:', function() {
         assert.ok(error.errors['name']);
         Test.findOneAndUpdate({}, { $set: { otherName: 'test' } }, opts, function(error) {
           assert.ifError(error);
+          done();
+        });
+      });
+    });
+
+    it('update using $ (gh-5628)', function(done) {
+      var schema = new mongoose.Schema({
+        elems: [String]
+      });
+
+      var Model = db.model('gh5628', schema);
+      Model.create({ elems: ['a', 'b'] }, function(error, doc) {
+        assert.ifError(error);
+        var query = { _id: doc._id, elems: 'a' };
+        var update = { $set: { 'elems.$': 'c' } };
+        Model.findOneAndUpdate(query, update, { new: true }, function(error) {
+          assert.ifError(error);
+          Model.collection.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.deepEqual(doc.elems, ['c', 'b']);
+            done();
+          });
+        });
+      });
+    });
+
+    it('projection with $elemMatch (gh-5661)', function(done) {
+      var schema = new mongoose.Schema({
+        name: { type: String, default: 'test' },
+        arr: [{ tag: String }]
+      });
+
+      var Model = db.model('gh5661', schema);
+      var doc = { arr: [{ tag: 't1' }, { tag: 't2' }] };
+      Model.create(doc, function(error) {
+        assert.ifError(error);
+        var query = {};
+        var update = { $set: { name: 'test2' } };
+        var opts = {
+          new: true,
+          fields: { arr: { $elemMatch: { tag: 't1' } } }
+        };
+        Model.findOneAndUpdate(query, update, opts, function(error, doc) {
+          assert.ifError(error);
+          assert.ok(!doc.name);
+          assert.equal(doc.arr.length, 1);
+          assert.equal(doc.arr[0].tag, 't1');
+          done();
+        });
+      });
+    });
+
+    it('setting subtype when saving (gh-5551)', function(done) {
+      if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
+        // Don't run on node 0.x because of `const` issues
+        this.skip();
+      }
+
+      var uuidParse = require('uuid-parse');
+      function toUUID(string) {
+        if (!string) {
+          return null;
+        }
+        if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
+          return string;
+        }
+        var buffer = uuidParse.parse(string);
+        return new mongoose.Types.Buffer(buffer).toObject(0x04);
+      }
+
+      var UserSchema = new mongoose.Schema({
+        name: String,
+        foo: {
+          type: mongoose.Schema.Types.Buffer,
+          set: toUUID
+        }
+      });
+
+      var User = db.model('gh5551', UserSchema);
+
+      var user = { name: 'upsert', foo: uuid.v4() };
+      var opts = {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runSettersOnQuery: true,
+        new: true
+      };
+      User.findOneAndUpdate({}, user, opts).exec(function(error, doc) {
+        assert.ifError(error);
+        User.collection.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.foo.sub_type, 4);
           done();
         });
       });

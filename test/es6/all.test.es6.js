@@ -47,4 +47,23 @@ describe('bug fixes', function() {
 
     done();
   });
+
+  it('supports adding properties (gh-5104) (gh-5635)', function(done) {
+    class Shape extends mongoose.Model { };
+    class Circle extends Shape { };
+
+    const ShapeModel = mongoose.model(Shape, new mongoose.Schema({
+      color: String
+    }));
+
+    const CircleModel = ShapeModel.discriminator(Circle, new mongoose.Schema({
+      radius: Number
+    }));
+
+    const circle = new Circle({ color: 'blue', radius: 3 });
+    assert.equal(circle.color, 'blue');
+    assert.equal(circle.radius, 3);
+
+    done();
+  });
 });

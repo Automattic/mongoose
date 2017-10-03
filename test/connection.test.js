@@ -2,12 +2,15 @@
  * Module dependencies.
  */
 
-var start = require('./common');
+var Promise = require('bluebird');
 var assert = require('power-assert');
+var muri = require('muri');
+var random = require('../lib/utils').random;
+var server = require('./common').server;
+var start = require('./common');
+
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
-var random = require('../lib/utils').random;
-var muri = require('muri');
 
 /**
  * Test.
@@ -23,6 +26,9 @@ describe('connections:', function() {
 
       conn.then(function(conn) {
         assert.equal(conn.constructor.name, 'NativeConnection');
+        assert.equal(conn.host, 'localhost');
+        assert.equal(conn.port, 27017);
+        assert.equal(conn.name, 'mongoosetest');
 
         return mongoose.disconnect().then(function() { done(); });
       }).catch(done);
@@ -44,6 +50,9 @@ describe('connections:', function() {
       conn.
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
+          assert.equal(conn.host, 'localhost');
+          assert.equal(conn.port, 27017);
+          assert.equal(conn.name, 'mongoosetest');
 
           return findPromise;
         }).
@@ -64,6 +73,229 @@ describe('connections:', function() {
         assert.deepEqual(conn._connectionOptions, {});
         done();
       }).catch(done);
+    });
+
+    describe('connection events', function() {
+      beforeEach(function() {
+        this.timeout(10000);
+        return server.start().
+          then(function() { return server.purge(); });
+      });
+
+      afterEach(function() {
+        this.timeout(10000);
+        return server.stop();
+      });
+
+      it('disconnected (gh-5498) (gh-5524)', function(done) {
+        this.timeout(25000);
+
+        var conn;
+        var numConnected = 0;
+        var numDisconnected = 0;
+        var numReconnected = 0;
+        var numClose = 0;
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          useMongoClient: true
+        });
+
+        conn.on('connected', function() {
+          ++numConnected;
+        });
+        conn.on('disconnected', function() {
+          ++numDisconnected;
+        });
+        conn.on('reconnected', function() {
+          ++numReconnected;
+        });
+        conn.on('close', function() {
+          ++numClose;
+        });
+
+        conn.
+          then(function() {
+            assert.equal(conn.readyState, conn.states.connected);
+            assert.equal(numConnected, 1);
+            return server.stop();
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 50);
+            });
+          }).
+          then(function() {
+            assert.equal(conn.readyState, conn.states.disconnected);
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+          }).
+          then(function() {
+            return server.start();
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 2000);
+            });
+          }).
+          then(function() {
+            assert.equal(conn.readyState, conn.states.connected);
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 1);
+            assert.equal(numClose, 0);
+
+            conn.close();
+            done();
+          }).
+          catch(done);
+      });
+
+      it('reconnectFailed (gh-4027)', function(done) {
+        this.timeout(25000);
+
+        var conn;
+        var numReconnectFailed = 0;
+        var numConnected = 0;
+        var numDisconnected = 0;
+        var numReconnected = 0;
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          useMongoClient: true,
+          reconnectTries: 3,
+          reconnectInterval: 100
+        });
+
+        conn.on('connected', function() {
+          ++numConnected;
+        });
+        conn.on('disconnected', function() {
+          ++numDisconnected;
+        });
+        conn.on('reconnected', function() {
+          ++numReconnected;
+        });
+        conn.on('reconnectFailed', function() {
+          ++numReconnectFailed;
+        });
+
+        conn.
+          then(function() {
+            assert.equal(numConnected, 1);
+            return server.stop();
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 100);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+            assert.equal(numReconnectFailed, 0);
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 400);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+            assert.equal(numReconnectFailed, 1);
+          }).
+          then(function() {
+            return server.start();
+          }).
+          then(function() {
+            return new Promise(function(resolve) {
+              setTimeout(function() { resolve(); }, 2000);
+            });
+          }).
+          then(function() {
+            assert.equal(numDisconnected, 1);
+            assert.equal(numReconnected, 0);
+            assert.equal(numReconnectFailed, 1);
+
+            conn.close();
+            done();
+          }).
+          catch(done);
+      });
+
+      it('timeout (gh-4513)', function(done) {
+        this.timeout(25000);
+
+        var conn;
+        var numTimeout = 0;
+        var numDisconnected = 0;
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          useMongoClient: true,
+          socketTimeoutMS: 100,
+          poolSize: 1
+        });
+
+        conn.on('timeout', function() {
+          ++numTimeout;
+        });
+
+        conn.on('disconnected', function() {
+          ++numDisconnected;
+        });
+
+        var Model = conn.model('gh4513', new Schema());
+
+        conn.
+          then(function() {
+            assert.equal(conn.readyState, conn.states.connected);
+            return Model.create({});
+          }).
+          then(function() {
+            return Model.find({ $where: 'sleep(250) || true' });
+          }).
+          then(function() {
+            done(new Error('expected timeout'));
+          }).
+          catch(function(error) {
+            assert.ok(error);
+            assert.ok(error.message.indexOf('timed out'), error.message);
+            // TODO: if autoReconnect is false, we might not actually be
+            // connected. See gh-5634
+            assert.equal(conn.readyState, conn.states.connected);
+            assert.equal(numTimeout, 1);
+            assert.equal(numDisconnected, 0);
+
+            conn.close();
+            done();
+          });
+      });
+    });
+  });
+
+  describe('helpers', function() {
+    var conn;
+
+    before(function() {
+      conn = mongoose.connect('mongodb://localhost:27017/mongoosetest_2', {
+        useMongoClient: true
+      });
+      return conn;
+    });
+
+    it('dropDatabase()', function(done) {
+      conn.dropDatabase(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
+    it('dropCollection()', function() {
+      return conn.db.collection('test').insertOne({ x: 1 }).
+        then(function() {
+          return conn.dropCollection('test');
+        }).
+        then(function() {
+          return conn.db.collection('test').findOne();
+        }).
+        then(function(doc) {
+          assert.ok(!doc);
+        });
     });
   });
 
@@ -1062,6 +1294,54 @@ describe('connections:', function() {
     assert.ok(db.db.serverConfig instanceof mongoose.mongo.Mongos);
     db.on('error', function() {
       done();
+    });
+  });
+
+  it('force close (gh-5664)', function(done) {
+    var opts = { useMongoClient: true };
+    var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    var coll = db.collection('Test');
+    db.then(function() {
+      setTimeout(function() {
+        coll.insertOne({x:1}, function(error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
+          done();
+        });
+      }, 100);
+
+      // Force close
+      db.close(true);
+    });
+  });
+
+  it('force close with connection created after close (gh-5664)', function(done) {
+    var opts = { useMongoClient: true };
+    var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    db.then(function() {
+      setTimeout(function() {
+        // TODO: enforce error.message, right now get a confusing error
+        /*db.collection('Test').insertOne({x:1}, function(error) {
+          assert.ok(error);
+
+          //assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
+          done();
+        });*/
+
+        var threw = false;
+        try {
+          db.collection('Test').insertOne({x:1}, function() {});
+        } catch (error) {
+          threw = true;
+          assert.ok(error);
+        }
+
+        assert.ok(threw);
+        done();
+      }, 100);
+
+      // Force close
+      db.close(true);
     });
   });
 

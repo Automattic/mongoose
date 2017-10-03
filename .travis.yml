@@ -11,8 +11,10 @@ node_js:
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.6.11.tgz
   - tar -zxvf mongodb-linux-x86_64-2.6.11.tgz
-  - mkdir -p ./data/db
-  - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --nopreallocj --dbpath ./data/db --syslog --port 27017
+  - mkdir -p ./data/db/27017
+  - mkdir -p ./data/db/27000
+  - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --nopreallocj --dbpath ./data/db/27017 --syslog --port 27017
 script:
   - npm test
   - npm run lint
+  - npm run nsp

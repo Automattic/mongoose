@@ -4840,6 +4840,46 @@ describe('model: populate:', function() {
         });
       });
 
+      it('auto select populated fields (gh-5669)', function(done) {
+        var ProductSchema = new mongoose.Schema({
+          name: {
+            type: String
+          },
+          categories: {
+            type: [{
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'gh5669'
+            }],
+            select: false
+          }
+        });
+
+        var CategorySchema = new Schema({ name: String });
+        var Product = db.model('gh5669_0', ProductSchema);
+        var Category = db.model('gh5669', CategorySchema);
+
+        Category.create({ name: 'Books' }, function(error, doc) {
+          assert.ifError(error);
+          var product = {
+            name: 'Professional AngularJS',
+            categories: [doc._id]
+          };
+          Product.create(product, function(error, product) {
+            assert.ifError(error);
+            Product.findById(product._id).populate('categories').exec(function(error, product) {
+              assert.ifError(error);
+              assert.equal(product.categories.length, 1);
+              assert.equal(product.categories[0].name, 'Books');
+              Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
+                assert.ifError(error);
+                assert.ok(!product.categories);
+                done();
+              });
+            });
+          });
+        });
+      });
+
       it('handles populating with discriminators that may not have a ref (gh-4817)', function(done) {
         var imagesSchema = new mongoose.Schema({
           name: {
@@ -5522,6 +5562,78 @@ describe('model: populate:', function() {
             var m = res[0];
             assert.equal(m.detail.name, 'test');
             assert.ok(m.detail.parentId);
+            done();
+          }).
+          catch(done);
+      });
+
+      it('does not set `populated()` until populate is done (gh-5564)', function() {
+        var userSchema = new mongoose.Schema({});
+        var User = db.model('gh5564', userSchema);
+
+        var testSchema = new mongoose.Schema({
+          users: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh5564'
+          }]
+        });
+        var Test = db.model('gh5564_0', testSchema);
+
+        return User.create({}).
+          then(function(user) {
+            return Test.create({ users: [user._id] });
+          }).
+          then(function(test) {
+            var promise = test.populate('users').execPopulate();
+            assert.ok(!test.populated('users'));
+            return promise;
+          }).
+          then(function(test) {
+            assert.ok(test.populated('users'));
+            assert.ok(test.users[0]._id);
+            assert.equal(test.users.length, 1);
+            assert.equal(test.populated('users').length, 1);
+          });
+      });
+
+      it('virtual populate toJSON output (gh-5542)', function(done) {
+        var AuthorSchema = new mongoose.Schema({
+          name: String
+        }, {
+          toObject: { virtuals: true },
+          toJSON: { virtuals: true }
+        });
+
+        var BookSchema = new mongoose.Schema({
+          title: String,
+          author: { type: ObjectId, ref: 'gh5542' }
+        });
+
+        AuthorSchema.virtual('books', {
+          ref: 'gh5542_0',
+          localField: '_id',
+          foreignField: 'author',
+          justOne: true
+        });
+
+        var Author = db.model('gh5542', AuthorSchema);
+        var Book = db.model('gh5542_0', BookSchema);
+
+        var author = new Author({ name: 'Bob' });
+        author.save().
+          then(function(author) {
+            var book = new Book({ name: 'Book', author: author._id });
+            return book.save();
+          }).
+          then(function() {
+            return Author.findOne({})
+              .populate({ path: 'books', select: 'title' })
+              .exec();
+          }).
+          then(function(author) {
+            var json = author.toJSON();
+            assert.deepEqual(Object.getOwnPropertyNames(json.books),
+              ['_id', 'author']);
             done();
           }).
           catch(done);

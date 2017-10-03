@@ -44,7 +44,7 @@ html(lang='en')
         #example
           :js
             var mongoose = require('mongoose');
-            mongoose.connect('mongodb://localhost/test');
+            mongoose.connect('mongodb://localhost/test', { useMongoClient: true, promiseLibrary: global.Promise });
 
             var Cat = mongoose.model('Cat', { name: String });
 
@@ -127,4 +127,4 @@ html(lang='en')
     p#footer Licensed under MIT. Copyright 2011 <a href="http://learnboost.com">LearnBoost</a>.
     script.
       document.body.className = 'load';
-    include docs/includes/googleanalytics
+    include docs/includes/keen

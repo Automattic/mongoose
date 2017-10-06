@@ -4840,7 +4840,7 @@ describe('model: populate:', function() {
         });
       });
 
-      it('auto select populated fields (gh-5669)', function(done) {
+      it('auto select populated fields (gh-5669) (gh-5685)', function(done) {
         var ProductSchema = new mongoose.Schema({
           name: {
             type: String
@@ -4873,7 +4873,13 @@ describe('model: populate:', function() {
               Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
                 assert.ifError(error);
                 assert.ok(!product.categories);
-                done();
+                Product.findById(product._id).select({ name: 0 }).populate('categories').exec(function(error, product) {
+                  assert.ifError(error);
+                  assert.equal(product.categories.length, 1);
+                  assert.equal(product.categories[0].name, 'Books');
+                  assert.ok(!product.name);
+                  done();
+                });
               });
             });
           });

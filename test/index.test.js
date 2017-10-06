@@ -61,9 +61,9 @@ describe('mongoose module:', function() {
     done();
   });
 
-  it('declaring global plugins', function(done) {
+  it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
-    var subSchema = new Schema({});
+    var subSchema = new Schema({ name: String });
     var schema = new Schema({
       test: [subSchema]
     });
@@ -78,6 +78,8 @@ describe('mongoose module:', function() {
         ++preSaveCalls;
         next();
       });
+
+      s.methods.testMethod = function() { return 42; };
     });
 
     schema.plugin(function(s) {
@@ -94,9 +96,11 @@ describe('mongoose module:', function() {
 
     assert.equal(preSaveCalls, 0);
     mong.connect(start.uri, { useMongoClient: true });
-    M.create({ test: {} }, function(error) {
+    M.create({ test: [{ name: 'Val' }] }, function(error, doc) {
       assert.ifError(error);
       assert.equal(preSaveCalls, 2);
+      assert.equal(doc.testMethod(), 42);
+      assert.equal(doc.test[0].testMethod(), 42);
       mong.disconnect();
       done();
     });

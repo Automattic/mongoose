@@ -4636,6 +4636,7 @@ describe('document', function() {
       var referrerB = new Referrer();
       var referrerC = new Referrer();
       var referrerD = new Referrer();
+      var referrerE = new Referrer();
 
       referrerA.reference.push(referenceB);
       assert.ok(referrerA.reference[0] instanceof Referrer);
@@ -4649,6 +4650,9 @@ describe('document', function() {
 
       referrerD.reference.splice(0, 0, referenceB);
       assert.ok(referrerD.reference[0] instanceof Referrer);
+
+      referrerE.reference.addToSet(referenceB);
+      assert.ok(referrerE.reference[0] instanceof Referrer);
 
       done();
     });

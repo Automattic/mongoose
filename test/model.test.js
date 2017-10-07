@@ -5223,6 +5223,24 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() multiple errors (gh-5337)', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
+      var Movie = db.model('gh5337', schema);
+      var arr = [
+        { foo: 'Star Wars' },
+        { name: 'Star Wars'},
+        { name: 'The Empire Strikes Back' },
+        { foo: 'The Empire Strikes Back' }
+      ];
+      Movie.insertMany(arr, function(error, docs) {
+        assert.equal(Object.keys(error.errors).length, 2);
+        assert.equal(docs, null);
+        done();
+      });
+    });
+
     it('insertMany() ordered option for constraint errors (gh-3893)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

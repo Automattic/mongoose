@@ -4750,6 +4750,54 @@ describe('document', function() {
       });
     });
 
+    it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
+      var eventSchema = new Schema({ message: String }, {
+        discriminatorKey: 'kind',
+        _id: false
+      });
+
+      var trackSchema = new Schema({ event: eventSchema });
+
+      trackSchema.path('event').discriminator('Clicked', new Schema({
+        element: String
+      }, { _id: false }));
+
+      trackSchema.path('event').discriminator('Purchased', new Schema({
+        product: String
+      }, { _id: false }));
+
+      var MyModel = db.model('gh5693', trackSchema);
+
+      var doc = new MyModel({
+        event: {
+          message: 'Test',
+          kind: 'Clicked',
+          element: 'Amazon Link'
+        }
+      });
+
+      doc.save(function(error) {
+        assert.ifError(error);
+        assert.equal(doc.event.message, 'Test');
+        assert.equal(doc.event.kind, 'Clicked');
+        assert.equal(doc.event.element, 'Amazon Link');
+
+        doc.set('event', {
+          kind: 'Purchased',
+          product: 'Professional AngularJS'
+        });
+
+        doc.save(function(error) {
+          assert.ifError(error);
+          assert.equal(doc.event.kind, 'Purchased');
+          assert.equal(doc.event.product, 'Professional AngularJS');
+          assert.ok(!doc.event.element);
+          assert.ok(!doc.event.message);
+          done();
+        });
+      });
+    });
+
     it('doc array: set then remove (gh-3511)', function(done) {
       var ItemChildSchema = new mongoose.Schema({
         name: {

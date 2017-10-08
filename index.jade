@@ -44,7 +44,8 @@ html(lang='en')
         #example
           :js
             var mongoose = require('mongoose');
-            mongoose.connect('mongodb://localhost/test', { useMongoClient: true, promiseLibrary: global.Promise });
+            mongoose.connect('mongodb://localhost/test', { useMongoClient: true });
+            mongoose.Promise = global.Promise;
 
             var Cat = mongoose.model('Cat', { name: String });
 

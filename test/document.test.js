@@ -4636,6 +4636,7 @@ describe('document', function() {
       var referrerB = new Referrer();
       var referrerC = new Referrer();
       var referrerD = new Referrer();
+      var referrerE = new Referrer();
 
       referrerA.reference.push(referenceB);
       assert.ok(referrerA.reference[0] instanceof Referrer);
@@ -4649,6 +4650,9 @@ describe('document', function() {
 
       referrerD.reference.splice(0, 0, referenceB);
       assert.ok(referrerD.reference[0] instanceof Referrer);
+
+      referrerE.reference.addToSet(referenceB);
+      assert.ok(referrerE.reference[0] instanceof Referrer);
 
       done();
     });
@@ -4742,6 +4746,54 @@ describe('document', function() {
             assert.equal(m.children[0].name, 'test');
             done();
           });
+        });
+      });
+    });
+
+    it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
+      var eventSchema = new Schema({ message: String }, {
+        discriminatorKey: 'kind',
+        _id: false
+      });
+
+      var trackSchema = new Schema({ event: eventSchema });
+
+      trackSchema.path('event').discriminator('Clicked', new Schema({
+        element: String
+      }, { _id: false }));
+
+      trackSchema.path('event').discriminator('Purchased', new Schema({
+        product: String
+      }, { _id: false }));
+
+      var MyModel = db.model('gh5693', trackSchema);
+
+      var doc = new MyModel({
+        event: {
+          message: 'Test',
+          kind: 'Clicked',
+          element: 'Amazon Link'
+        }
+      });
+
+      doc.save(function(error) {
+        assert.ifError(error);
+        assert.equal(doc.event.message, 'Test');
+        assert.equal(doc.event.kind, 'Clicked');
+        assert.equal(doc.event.element, 'Amazon Link');
+
+        doc.set('event', {
+          kind: 'Purchased',
+          product: 'Professional AngularJS'
+        });
+
+        doc.save(function(error) {
+          assert.ifError(error);
+          assert.equal(doc.event.kind, 'Purchased');
+          assert.equal(doc.event.product, 'Professional AngularJS');
+          assert.ok(!doc.event.element);
+          assert.ok(!doc.event.message);
+          done();
         });
       });
     });

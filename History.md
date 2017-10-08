@@ -1,3 +1,12 @@
+4.12.1 / 2017-10-08
+===================
+ * fix(document): create new doc when setting single nested, no more set() on copy of priorVal #5693
+ * fix(model): recursively call applyMethods on child schemas for global plugins #5690
+ * docs: fix bad promise lib example on home page #5686
+ * fix(query): handle false when checking for inclusive/exclusive projection #5685
+ * fix(discriminator): allow reusing child schema #5684
+ * fix: make addToSet() on empty array with subdoc trigger manual population #5504
+
 4.12.0 / 2017-10-02
 ===================
  * docs(validation): add docs coverage for ValidatorError.reason #5681

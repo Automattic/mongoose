@@ -100,6 +100,40 @@ describe('model', function() {
       });
     });
 
+    it('of embedded documents unless excludeIndexes (gh-5575)', function(done) {
+      var BlogPost = new Schema({
+        _id: {type: ObjectId},
+        title: {type: String, index: true},
+        desc: String
+      });
+
+      var User = new Schema({
+        name: {type: String, index: true},
+        blogposts: {
+          type: [BlogPost],
+          excludeIndexes: true
+        },
+        otherblogposts: [{ type: BlogPost, excludeIndexes: true }],
+        blogpost: {
+          type: BlogPost,
+          excludeIndexes: true
+        }
+      });
+
+      var UserModel = db.model('gh5575', User);
+
+      UserModel.on('index', function() {
+        UserModel.collection.getIndexes(function(err, indexes) {
+          assert.ifError(err);
+
+          // Should only have _id and name indexes
+          var indexNames = Object.keys(indexes);
+          assert.deepEqual(indexNames.sort(), ['_id_', 'name_1']);
+          done();
+        });
+      });
+    });
+
     it('of multiple embedded documents with same schema', function(done) {
       var BlogPosts = new Schema({
         _id: {type: ObjectId, index: true},

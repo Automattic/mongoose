@@ -10,6 +10,16 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId;
 
 describe('model', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('indexes', function() {
     it('are created when model is compiled', function(done) {
       var Indexed = new Schema({
@@ -22,9 +32,8 @@ describe('model', function() {
       Indexed.index({last: 1, email: 1}, {unique: true});
       Indexed.index({date: 1}, {expires: 10});
 
-      var db = start(),
-          IndexedModel = db.model('IndexedModel', Indexed, 'indexedmodel' + random()),
-          assertions = 0;
+      var IndexedModel = db.model('IndexedModel1', Indexed, 'indexedmodel' + random());
+      var assertions = 0;
 
       IndexedModel.on('index', function() {
         IndexedModel.collection.getIndexes({full: true}, function(err, indexes) {
@@ -45,7 +54,7 @@ describe('model', function() {
           });
 
           assert.equal(assertions, 4);
-          db.close(done);
+          done();
         });
       });
     });
@@ -62,9 +71,8 @@ describe('model', function() {
         blogposts: [BlogPosts]
       });
 
-      var db = start(),
-          UserModel = db.model('DeepIndexedModel', User, 'deepindexedmodel' + random()),
-          assertions = 0;
+      var UserModel = db.model('DeepIndexedModel2', User, 'deepindexedmodel' + random());
+      var assertions = 0;
 
       UserModel.on('index', function() {
         UserModel.collection.getIndexes(function(err, indexes) {
@@ -87,7 +95,7 @@ describe('model', function() {
           }
 
           assert.equal(assertions, 3);
-          db.close(done);
+          done();
         });
       });
     });
@@ -105,8 +113,7 @@ describe('model', function() {
         featured: [BlogPosts]
       });
 
-      var db = start();
-      var UserModel = db.model('DeepIndexedModel', User, 'gh-2322');
+      var UserModel = db.model('DeepIndexedModelMulti3', User, 'gh2322');
       var assertions = 0;
 
       UserModel.on('index', function() {
@@ -136,7 +143,7 @@ describe('model', function() {
           }
 
           assert.equal(assertions, 5);
-          db.close(done);
+          done();
         });
       });
     });
@@ -154,9 +161,8 @@ describe('model', function() {
         blogposts: [BlogPosts]
       });
 
-      var db = start(),
-          UserModel = db.model('DeepCompoundIndexModel', User, 'deepcompoundindexmodel' + random()),
-          found = 0;
+      var UserModel = db.model('DeepCompoundIndexModel4', User, 'deepcompoundindexmodel' + random());
+      var found = 0;
 
       UserModel.on('index', function() {
         UserModel.collection.getIndexes(function(err, indexes) {
@@ -171,7 +177,6 @@ describe('model', function() {
             }
           }
 
-          db.close();
           assert.equal(found, 2);
           done();
         });
@@ -222,9 +227,8 @@ describe('model', function() {
     });
 
     it('error should emit on the model', function(done) {
-      var db = start();
       var schema = new Schema({name: {type: String}});
-      var Test = db.model('IndexError', schema, 'x' + random());
+      var Test = db.model('IndexError5', schema, 'x' + random());
 
       Test.create({name: 'hi'}, {name: 'hi'}, function(err) {
         assert.strictEqual(err, null);
@@ -232,7 +236,6 @@ describe('model', function() {
         Test.schema.index({other: 1});
 
         Test.on('index', function(err) {
-          db.close();
           assert.ok(/E11000 duplicate key error/.test(err.message), err);
           done();
         });
@@ -244,11 +247,10 @@ describe('model', function() {
 
     describe('auto creation', function() {
       it('can be disabled', function(done) {
-        var db = start();
         var schema = new Schema({name: {type: String, index: true}});
         schema.set('autoIndex', false);
 
-        var Test = db.model('AutoIndexing', schema, 'autoindexing-disable');
+        var Test = db.model('AutoIndexing6', schema, 'autoindexing-disable');
         Test.on('index', function() {
           assert.ok(false, 'Model.ensureIndexes() was called');
         });
@@ -262,7 +264,7 @@ describe('model', function() {
               assert.ifError(err);
               // Only default _id index should exist
               assert.deepEqual(['_id_'], Object.keys(indexes));
-              db.close(done);
+              done();
             });
           }, 100);
         });
@@ -270,16 +272,15 @@ describe('model', function() {
 
       describe('global autoIndexes (gh-1875)', function() {
         it('will create indexes as a default', function(done) {
-          var db = start();
           var schema = new Schema({name: {type: String, index: true}});
-          var Test = db.model('GlobalAutoIndex', schema, 'gh-1875-1');
+          var Test = db.model('GlobalAutoIndex7', schema, 'gh-1875-1');
           Test.on('index', function(error) {
             assert.ifError(error);
             assert.ok(true, 'Model.ensureIndexes() was called');
             Test.collection.getIndexes(function(err, indexes) {
               assert.ifError(err);
               assert.equal(Object.keys(indexes).length, 2);
-              db.close(done);
+              done();
             });
           });
         });
@@ -287,7 +288,7 @@ describe('model', function() {
         it('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done) {
           var db = start({config: {autoIndex: false}});
           var schema = new Schema({name: {type: String, index: true}});
-          var Test = db.model('GlobalAutoIndex', schema, 'x' + random());
+          var Test = db.model('GlobalAutoIndex8', schema, 'x' + random());
           Test.on('index', function() {
             assert.ok(false, 'Model.ensureIndexes() was called');
           });
@@ -306,61 +307,6 @@ describe('model', function() {
       });
     });
 
-    it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done) {
-      this.timeout(90000);
-
-      var db = start({uri: 'mongodb://localhost/mongoose_test_indexing'});
-
-      var schema = new Schema({
-        name: {type: String, index: true},
-        furryness: {type: Number, index: true}
-      }, {autoIndex: false});
-
-      schema.index({name: 1, furryness: 1});
-
-      var K = db.model('Kitten', schema);
-      K.on('index', function(err) {
-        assert.ifError(err);
-        db.close(done);
-      });
-
-      var neededKittens = 30000;
-
-      db.on('open', function() {
-        K.count({}, function(err, n) {
-          assert.ifError(err);
-          if (n >= neededKittens) {
-            return index();
-          }
-          var pending = neededKittens - n;
-
-          function callback(err) {
-            assert.ifError(err);
-            if (--pending) {
-              return;
-            }
-            index();
-          }
-
-          function iter(i) {
-            K.create({name: 'kitten' + i, furryness: i}, callback);
-          }
-
-          for (var i = n; i < neededKittens; ++i) {
-            iter(i);
-          }
-        });
-
-        function index() {
-          K.collection.dropAllIndexes(function(err) {
-            assert.ifError(err);
-            K.ensureIndexes();
-          });
-        }
-      });
-    });
-
-
     describe('model.ensureIndexes()', function() {
       it('is a function', function(done) {
         var schema = mongoose.Schema({x: 'string'});
@@ -378,9 +324,8 @@ describe('model', function() {
       });
 
       it('creates indexes', function(done) {
-        var db = start();
-        var schema = new Schema({name: {type: String}}),
-            Test = db.model('ManualIndexing', schema, 'x' + random());
+        var schema = new Schema({name: {type: String}});
+        var Test = db.model('ManualIndexing' + random(), schema, 'x' + random());
 
         Test.schema.index({name: 1}, {sparse: true});
 
@@ -392,7 +337,7 @@ describe('model', function() {
         Test.ensureIndexes(function(err) {
           assert.ifError(err);
           assert.ok(called);
-          db.close(done);
+          done();
         });
       });
     });

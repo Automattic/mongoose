@@ -13,7 +13,7 @@ block content
     on the default port (27017). If the local connection fails then try using
     127.0.0.1 instead of localhost. Sometimes issues may arise when the local
     hostname has been changed.
-   
+
     You can also specify several more parameters in the `uri`:
 
   :js
@@ -26,28 +26,28 @@ block content
   :markdown
     Mongoose lets you start using your models immediately, without waiting for
     mongoose to establish a connection to MongoDB.
-  
+
   :js
     mongoose.connect('mongodb://localhost/myapp');
     var MyModel = mongoose.model('Test', new Schema({ name: String }));
     // Works
     MyModel.findOne(function(error, result) { /* ... */ });
-  
+
   :markdown
     That's because mongoose buffers model function calls internally. This
     buffering is convenient, but also a common source of confusion. Mongoose
     will *not* throw any errors by default if you use a model without
     connecting.
-  
+
   :js
     var MyModel = mongoose.model('Test', new Schema({ name: String }));
     // Will just hang until mongoose successfully connects
     MyModel.findOne(function(error, result) { /* ... */ });
-    
+
     setTimeout(function() {
       mongoose.connect('mongodb://localhost/myapp');
     }, 60000);
-  
+
   :markdown
     To disable buffering, turn off the [`bufferCommands` option on your schema](http://mongoosejs.com/docs/guide.html#bufferCommands).
     If you have `bufferCommands` on and your connection is hanging, try turning
@@ -93,7 +93,7 @@ block content
   :js
     // Good way to make sure mongoose never stops trying to reconnect
     mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
-     
+
   h3#callback Callback
   :markdown
     The `connect()` function also accepts a callback parameter and returns a [promise](http://mongoosejs.com/docs/promises.html).
@@ -101,7 +101,7 @@ block content
     mongoose.connect(uri, options, function(error) {
       // Check error in initial connection. There is no 2nd param to the callback.
     });
-    
+
     // Or using promises
     mongoose.connect(uri, options).then(
       () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
@@ -111,7 +111,7 @@ block content
   h4#connection-string-options Connection String Options
   :markdown
     Mongoose supports the following options in the connection string.
-    
+
     * [ssl](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
     * [poolSize](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
     * [autoReconnect](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
@@ -155,7 +155,7 @@ block content
 
   :markdown
     To connect to a single node replica set, specify the `replicaSet` option.
-    
+
   :js
     mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
 
@@ -179,7 +179,7 @@ block content
 
   h3#connection_pools Connection pools
   :markdown
-    Each `connection`, whether created with `mongoose.connect` or `mongoose.createConnection` are all backed by an internal configurable connection pool defaulting to a size of 5. Adjust the pool size using your connection options:
+    Each `connection`, whether created with `mongoose.connect` or `mongoose.createConnection` are all backed by an internal configurable connection pool defaulting to a maximum size of 5. Adjust the pool size using your connection options:
 
   :js
     // single server
@@ -192,7 +192,7 @@ block content
     // passing the option in the URI works with single or replica sets
     var uri = 'mongodb://localhost/test?poolSize=4';
     mongoose.createConnection(uri);
-  
+
   h3#use-mongo-client The `useMongoClient` Option
   :markdown
     Mongoose's default connection logic is deprecated as of 4.11.0. Please opt
@@ -261,7 +261,7 @@ block content
       keepAlive: true,
       reconnectTries: 30
     });
-    
+
   :markdown
     This deprecation is because the [MongoDB driver](https://www.npmjs.com/package/mongodb)
     has deprecated an API that is critical to mongoose's connection logic to

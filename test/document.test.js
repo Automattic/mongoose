@@ -4931,5 +4931,19 @@ describe('document', function() {
         });
       });
     });
+
+    it('test methods in properties', function(done) {
+      var PropMethodSchema = new Schema({
+        nested: {
+          a: { type: String }
+        }
+      });
+      PropMethodSchema.methods.func = function() {};
+      var PropMethod = db.model('propertiesMethod', PropMethodSchema);
+      var doc = new PropMethod;
+      doc.init({nested: {a: 'test'}});
+      assert.strictEqual(doc.nested.func, doc.func);
+      done();
+    });
   });
 });

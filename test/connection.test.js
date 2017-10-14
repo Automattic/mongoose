@@ -65,7 +65,7 @@ describe('connections:', function() {
     it('with autoIndex (gh-5423)', function(done) {
       var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         useMongoClient: true,
-        config: { autoIndex: false }
+        autoIndex: false
       });
 
       promise.then(function(conn) {

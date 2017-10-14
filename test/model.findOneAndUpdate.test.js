@@ -1914,14 +1914,14 @@ describe('model: findOneAndUpdate:', function() {
       var uuidParse = require('uuid-parse');
 
       function toUUID(string) {
-      	if (!string) {
+        if (!string) {
           return null;
         }
-      	if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
+        if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-      	var buffer = uuidParse.parse(string);
-      	return new mongoose.Types.Buffer(buffer).toObject(0x04);
+        var buffer = uuidParse.parse(string);
+        return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 
       function fromUUID(buffer) {
@@ -1932,17 +1932,17 @@ describe('model: findOneAndUpdate:', function() {
       }
 
       var UserSchema = new mongoose.Schema({
-      	name: String,
-      	lastUpdate: {type: Date},
-      	friends: [{
-      		_id: false,
-      		status: {type: String, required: true},
-      		id: {
-      			type: mongoose.Schema.Types.Buffer,
-      			get: fromUUID,
-      			set: toUUID
-      		}
-      	}]
+        name: String,
+        lastUpdate: {type: Date},
+        friends: [{
+          _id: false,
+          status: {type: String, required: true},
+          id: {
+            type: mongoose.Schema.Types.Buffer,
+            get: fromUUID,
+            set: toUUID
+          }
+        }]
       }, { collection: 'users', runSettersOnQuery: true });
 
       UserSchema.pre('findOneAndUpdate', function() {

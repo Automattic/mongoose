@@ -1910,6 +1910,65 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
+      var uuidParse = require('uuid-parse');
+
+      function toUUID(string) {
+      	if (!string) {
+          return null;
+        }
+      	if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
+          return string;
+        }
+      	var buffer = uuidParse.parse(string);
+      	return new mongoose.Types.Buffer(buffer).toObject(0x04);
+      }
+
+      function fromUUID(buffer) {
+        if (!buffer || buffer.length !== 16) {
+          return null;
+        }
+        return uuidParse.unparse(buffer);
+      }
+
+      var UserSchema = new mongoose.Schema({
+      	name: String,
+      	lastUpdate: {type: Date},
+      	friends: [{
+      		_id: false,
+      		status: {type: String, required: true},
+      		id: {
+      			type: mongoose.Schema.Types.Buffer,
+      			get: fromUUID,
+      			set: toUUID
+      		}
+      	}]
+      }, { collection: 'users', runSettersOnQuery: true });
+
+      UserSchema.pre('findOneAndUpdate', function() {
+        this.update({},{ $set: {lastUpdate: new Date()} });
+      });
+
+      var User = db.model('gh5702', UserSchema);
+
+      var friendId = uuid.v4();
+      var user = {
+        name: 'Sean',
+        friends: [{status: 'New', id: friendId}]
+      };
+
+      User.create(user, function(error, user) {
+        assert.ifError(error);
+
+        var q = { _id: user._id, 'friends.id': friendId };
+        var upd = {'friends.$.status': 'Active'};
+        User.findOneAndUpdate(q, upd, {new: true}).lean().exec(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
+
     it('setting subtype when saving (gh-5551)', function(done) {
       if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
         // Don't run on node 0.x because of `const` issues

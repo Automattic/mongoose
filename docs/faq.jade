@@ -30,11 +30,11 @@ block content
     doc.array[3] = 'changed';
     doc.markModified('array');
     doc.save();
-    
+
   hr#unique-doesnt-work
   :markdown
     **Q**. I declared a schema property as `unique` but I can still save duplicates. What gives?
-    
+
     **A**. Mongoose doesn't handle `unique` on it's own, `{ name: { type: String, unique: true } }`
     just a shorthand for creating a [MongoDB unique index on `name`](https://docs.mongodb.com/manual/core/index-unique/).
     For example, if MongoDB doesn't already have a unique index on `name`, the below code will not error despite the fact that `unique` is true.
@@ -61,7 +61,7 @@ block content
         console.log(err);
       });
     });
-    
+
     // Promise based alternative. `init()` returns a promise that resolves
     // when the indexes have finished building successfully. The `init()`
     // function is idempotent, so don't worry about triggering an index rebuild.
@@ -77,7 +77,7 @@ block content
     you should [create your indexes using the MongoDB shell])(https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/)
     rather than relying on mongoose to do it for you. The `unique` option for schemas is
     convenient for development and documentation, but mongoose is *not* an index management solution.
-  
+
   hr#nested-properties
   :markdown
     **Q**. When I have a nested property in a schema, mongoose adds empty objects by default. Why?
@@ -88,7 +88,7 @@ block content
       }
     });
     var Model = db.model('Test', schema);
-    
+
     // The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns
     // `nested` to an empty object `{}` by default.
     console.log(new Model());
@@ -96,7 +96,7 @@ block content
     **A**. This is a performance optimization. These empty objects are not saved
     to the database, nor are they in the result `toObject()`, nor do they show
     up in `JSON.stringify()` output unless you turn off the [`minimize` option](http://mongoosejs.com/docs/guide.html#minimize).
-    
+
     The reason for this behavior is that Mongoose's change detection
     and getters/setters are based on [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
     In order to support change detection on nested properties without incurring
@@ -105,7 +105,35 @@ block content
     Because mongoose needs to define getters and setters for `nested.prop`, `nested`
     must always be defined as an object on a mongoose document, even if `nested`
     is undefined on the underlying [POJO](http://mongoosejs.com/docs/guide.html#minimize).
-  
+
+  hr#arrow-functions
+  :markdown
+    **Q**. I'm using an arrow function for a [virtual](http://mongoosejs.com/docs/guide.html#virtuals), getter/setter, or [method](http://mongoosejs.com/docs/guide.html#methods) and the value of `this` is wrong.
+
+    **A**. Arrow functions [handle the `this` keyword much differently than conventional functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this).
+    Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.
+  :js
+    // Do **NOT** use arrow functions as shown below unless you're certain
+    // that's what you want. If you're reading this FAQ, odds are you should
+    // just be using a conventional function.
+    var schema = new mongoose.Schema({
+      propWithGetter: {
+        type: String,
+        get: v => {
+          // Will **not** be the doc, do **not** use arrow functions for getters/setters
+          console.log(this);
+          return v;
+        }
+      }
+    });
+
+    // `this` will **not** be the doc, do **not** use arrow functions for methods
+    schema.method.arrowMethod = () => this;
+    schema.virtual('virtualWithArrow').get(() => {
+      // `this` will **not** be the doc, do **not** use arrow functions for virtuals
+      console.log(this);
+    });
+
   hr#date_changes
   :markdown
     **Q**. Why don't in-place modifications to date objects
@@ -125,11 +153,11 @@ block content
   :js
     doc.createdAt = new Date(2011, 5, 1).setHours(4);
     doc.save(); // Works
-  
+
   hr#populate_sort_order
   :markdown
     **Q**. I'm populating a nested property under an array like the below code:
-    
+
     ```
       new Schema({
         arr: [{
@@ -137,21 +165,21 @@ block content
         }]
       });
     ```
-    
+
     `.populate({ path: 'arr.child', options: { sort: 'name' } })` won't sort
     by `arr.child.name`?
-  
+
   :markdown
     **A**. See [this GitHub issue](https://github.com/Automattic/mongoose/issues/2202). It's a known issue but one that's exceptionally difficult to fix.
-  
+
   hr#model_functions_hanging
   :markdown
     **Q**. All function calls on my models hang, what am I doing wrong?
-    
+
     **A**. By default, mongoose will buffer your function calls until it can
     connect to MongoDB. Read the [buffering section of the connection docs](http://mongoosejs.com/docs/connections.html#buffering)
     for more information.
-  
+
   hr#enable_debugging
   :markdown
     **Q**. How can I enable debugging?
@@ -183,7 +211,7 @@ block content
   :markdown
     **Q**. Why do I get "OverwriteModelError: Cannot overwrite .. model once
     compiled" when I use nodemon / a testing framework?
-    
+
     **A**. `mongoose.model('ModelName', schema)` requires 'ModelName' to be
     unique, so you can access the model by using `mongoose.model('ModelName')`.
     If you put `mongoose.model('ModelName', schema);` in a
@@ -198,7 +226,7 @@ block content
 
     // use mongoose.Schema
     var kittySchema = mongoose.Schema({ name: String });
-    
+
     // use connection.model
     var Kitten = connection.model('Kitten', kittySchema);
 

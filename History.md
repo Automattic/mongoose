@@ -1,3 +1,10 @@
+4.12.2 / 2017-10-13
+===================
+ * docs(faq): add FAQ about using arrow functions for getters/setters, virtuals, and methods #5700
+ * docs(schema): document the childSchemas property and add to public API #5695
+ * fix(query): don't project in populated field if parent field is already projected in #5669
+ * fix: bump mongodb -> 2.2.33 for issue with autoReconnect #4513
+
 4.12.1 / 2017-10-08
 ===================
  * fix(document): create new doc when setting single nested, no more set() on copy of priorVal #5693

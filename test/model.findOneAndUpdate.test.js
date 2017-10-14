@@ -1910,6 +1910,21 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('update validators with pushing null (gh-5710)', function(done) {
+      var schema = new mongoose.Schema({
+        arr: [String]
+      });
+
+      var Model = db.model('gh5710', schema);
+
+      var update = { $addToSet: { arr: null } };
+      var options = { runValidators: true };
+      Model.findOneAndUpdate({}, update, options, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
       var uuidParse = require('uuid-parse');
 

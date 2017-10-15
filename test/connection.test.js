@@ -297,6 +297,32 @@ describe('connections:', function() {
           assert.ok(!doc);
         });
     });
+
+    it('createCollection()', function() {
+      return conn.dropDatabase().
+        then(function() {
+          return conn.createCollection('gh5712', {
+            capped: true,
+            size: 1024
+          });
+        }).
+        then(function() {
+          return conn.db.listCollections().toArray();
+        }).
+        then(function(collections) {
+          var names = collections.map(function(c) { return c.name; });
+          assert.ok(names.indexOf('gh5712') !== -1);
+          assert.ok(collections[names.indexOf('gh5712')].options.capped);
+          return conn.createCollection('gh5712_0');
+        }).
+        then(function() {
+          return conn.db.listCollections().toArray();
+        }).
+        then(function(collections) {
+          var names = collections.map(function(c) { return c.name; });
+          assert.ok(names.indexOf('gh5712') !== -1);
+        });
+    });
   });
 
   it('should allow closing a closed connection', function(done) {

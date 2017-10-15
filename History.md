@@ -1,4 +1,4 @@
-4.12.2 / 2017-10-13
+4.12.2 / 2017-10-14
 ===================
  * docs(faq): add FAQ about using arrow functions for getters/setters, virtuals, and methods #5700
  * docs(schema): document the childSchemas property and add to public API #5695

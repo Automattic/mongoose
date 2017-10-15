@@ -1926,6 +1926,11 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
+      if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
+        // Don't run on node 0.x because of `const` issues
+        this.skip();
+      }
+
       var uuidParse = require('uuid-parse');
 
       function toUUID(string) {

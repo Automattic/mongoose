@@ -1700,5 +1700,25 @@ describe('schema', function() {
       ]);
       done();
     });
+
+    it('childSchemas prop (gh-5695)', function(done) {
+      var schema1 = new Schema({ name: String });
+      var schema2 = new Schema({ test: String });
+      var schema = new Schema({
+        arr: [schema1],
+        single: schema2
+      });
+
+      assert.equal(schema.childSchemas.length, 2);
+      assert.equal(schema.childSchemas[0].schema, schema1);
+      assert.equal(schema.childSchemas[1].schema, schema2);
+
+      schema = schema.clone();
+      assert.equal(schema.childSchemas.length, 2);
+      assert.equal(schema.childSchemas[0].schema, schema1);
+      assert.equal(schema.childSchemas[1].schema, schema2);
+
+      done();
+    });
   });
 });

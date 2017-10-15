@@ -5611,6 +5611,37 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite with setDefaultsOnInsert (gh-5708)', function(done) {
+      var schema = new Schema({
+        str: { type: String, default: 'test' },
+        num: Number
+      });
+
+      var M = db.model('gh5708', schema);
+
+      var ops = [
+        {
+          updateOne: {
+            filter: { num: 0 },
+            update: {
+              $inc: { num: 1 }
+            },
+            upsert: true,
+            setDefaultsOnInsert: true
+          }
+        }
+      ];
+      M.bulkWrite(ops, function(error) {
+        assert.ifError(error);
+        M.findOne({}).lean().exec(function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.str, 'test');
+          assert.strictEqual(doc.num, 1);
+          done();
+        });
+      });
+    });
+
     it('insertMany with Decimal (gh-5190)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

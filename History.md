@@ -1,4 +1,14 @@
-4.12.2 / 2017-10-13
+4.12.3 / 2017-10-16
+===================
+ * fix(connection): emit 'reconnect' event as well as 'reconnected' for consistency with driver #5719
+ * fix: correctly bubble up left/joined events for replica set #5718
+ * fix(connection): allow passing in `autoIndex` as top-level option rather than requiring `config.autoIndex` #5711
+ * docs(connection): improve docs regarding reconnectTries, autoReconnect, and bufferMaxEntries #5711
+ * fix(query): handle null with addToSet/push/pull/pullAll update validators #5710
+ * fix(model): handle setDefaultsOnInsert option for bulkWrite updateOne and updateMany #5708
+ * fix(query): avoid infinite recursion edge case when cloning a buffer #5702
+
+4.12.2 / 2017-10-14
 ===================
  * docs(faq): add FAQ about using arrow functions for getters/setters, virtuals, and methods #5700
  * docs(schema): document the childSchemas property and add to public API #5695

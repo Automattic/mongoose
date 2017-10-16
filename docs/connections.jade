@@ -55,44 +55,40 @@ block content
 
   h3#options Options
   :markdown
-    The `connect` method also accepts an `options` object which will be passed on to the underlying driver. All options included here take precedence over options passed in the connection string.
+    The `connect` method also accepts an `options` object which will be passed on to the underlying MongoDB driver.
 
   :js
     mongoose.connect(uri, options);
 
   :markdown
-    The following option keys are available:
+    A full list of options can be found on the [MongoDB Node.js driver docs for `connect()`](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect).
+    Mongoose passes options to the driver without modification, modulo three exceptions that are explained below.
 
-         db             - passed to the [underlying driver's db instance](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-         server         - passed to the [underlying driver's server instance(s)](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-         replset        - passed to the [underlying driver's ReplSet instance](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-         user           - username for authentication (if not specified in uri)
-         pass           - password for authentication (if not specified in uri)
-         auth           - options for authentication
-         mongos         - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.1/api/Mongos.html)
-         promiseLibrary - sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html)
+    * `useMongoClient`    - This is a mongoose-specific option (not passed to the MongoDB driver) that opts in to mongoose 4.11's new connection logic. If you are writing a new application, you **should** set this to `true`.
+    * `user`/`pass`       - The username and password for authentication. These options are mongoose-specific, they are equivalent to the MongoDB driver's `auth.user` and `auth.password` options.
+    * `autoIndex`         - By default, mongoose will automatically build indexes defined in your schema when it connects. This is great for development, but not ideal for large production deployments, because index builds can cause performance degradation. If you set `autoIndex` to false, mongoose will not automatically build indexes for **any** model associated with this connection.
+
+    Below are some of the options that are important for tuning mongoose.
+
+    * `autoReconnect`     - The underlying MongoDB driver will automatically try to reconnect when it loses connection to MongoDB. Unless you are an extremely advanced user that wants to manage their own connection pool, do **not** set this option to `false`.
+    * `reconnectTries`    - If you're connected to a single server or mongos proxy (as opposed to a replica set), the MongoDB driver will try to reconnect every `reconnectInterval` milliseconds for `reconnectTries` times, and give up afterward. When the driver gives up, the mongoose connection emits a `reconnectFailed` event. This option does nothing for replica set connections.
+    * `reconnectInterval` - See `reconnectTries`
+    * `promiseLibrary`    - sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html)
+    * `poolSize`          - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `poolSize` is 5. Keep in mind that, as of MongoDB 3.4, MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding.
+    * `bufferMaxEntries`  - The MongoDB driver also has its own buffering mechanism that kicks in when the driver is disconnected. Set this option to 0 and set `bufferCommands` to `false` on your schemas if you want your database operations to fail immediately when the driver is not connected, as opposed to waiting for reconnection.
+
     Example:
   :js
     var options = {
-      db: { native_parser: true },
-      server: { poolSize: 5 },
-      replset: { rs_name: 'myReplicaSetName' },
-      user: 'myUserName',
-      pass: 'myPassword'
-    }
+      useMongoClient: true,
+      autoIndex: false, // Don't build indexes
+      reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+      reconnectInterval: 500, // Reconnect every 500ms
+      poolSize: 10, // Maintain up to 10 socket connections
+      // If not connected, return errors immediately rather than waiting for reconnect
+      bufferMaxEntries: 0
+    };
     mongoose.connect(uri, options);
-  :markdown
-    **Note:**
-    The server option `auto_reconnect` is defaulted to true which _can_ be overridden.
-    The db option `forceServerObjectId` is set to false which _cannot_ be overridden.
-
-    See the [driver](https://github.com/mongodb/node-mongodb-native) for more information about available options.
-  :markdown
-    **Note:**
-    If `auto_reconnect` is on, mongoose will give up trying to reconnect after a certain number of failures. Set the [`server.reconnectTries` and `server.reconnectInterval` options](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html) to increase the number of times mongoose will try to reconnect.
-  :js
-    // Good way to make sure mongoose never stops trying to reconnect
-    mongoose.connect(uri, { server: { reconnectTries: Number.MAX_VALUE } });
 
   h3#callback Callback
   :markdown

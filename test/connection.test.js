@@ -94,6 +94,7 @@ describe('connections:', function() {
         var numConnected = 0;
         var numDisconnected = 0;
         var numReconnected = 0;
+        var numReconnect = 0;
         var numClose = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           useMongoClient: true
@@ -105,6 +106,10 @@ describe('connections:', function() {
         conn.on('disconnected', function() {
           ++numDisconnected;
         });
+        conn.on('reconnect', function() {
+          ++numReconnect;
+        });
+        // Same as `reconnect`, just for backwards compat
         conn.on('reconnected', function() {
           ++numReconnected;
         });
@@ -127,6 +132,7 @@ describe('connections:', function() {
             assert.equal(conn.readyState, conn.states.disconnected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 0);
+            assert.equal(numReconnect, 0);
           }).
           then(function() {
             return server.start();
@@ -140,6 +146,7 @@ describe('connections:', function() {
             assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
+            assert.equal(numReconnect, 1);
             assert.equal(numClose, 0);
 
             conn.close();

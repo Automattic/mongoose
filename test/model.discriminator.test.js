@@ -512,6 +512,28 @@ describe('model', function() {
         done();
       });
 
+      it('clone() allows reusing with different models (gh-5721)', function(done) {
+        var schema = new mongoose.Schema({
+          name: String
+        });
+
+        var schemaExt = new mongoose.Schema({
+          nameExt: String
+        });
+
+        var ModelA = db.model('gh5721_a0', schema);
+        ModelA.discriminator('gh5721_a1', schemaExt);
+
+        ModelA.findOneAndUpdate({}, { $set: { name: 'test' } }, function(error) {
+          assert.ifError(error);
+
+          var ModelB = db.model('gh5721_b0', schema.clone());
+          ModelB.discriminator('gh5721_b1', schemaExt.clone());
+
+          done();
+        });
+      });
+
       it('copies query hooks (gh-5147)', function(done) {
         var options = { discriminatorKey: 'kind' };
 

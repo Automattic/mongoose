@@ -922,8 +922,8 @@ describe('aggregate: ', function() {
 
         M.aggregate([{ $fakeStage: { name: 'test' } }], function(error, res) {
           assert.ok(error);
-          assert.equal(error.message,
-            'Unrecognized pipeline stage name: \'$fakeStage\'');
+          assert.ok(error.message.indexOf('Unrecognized pipeline stage') !== -1,
+            error.message);
           assert.equal(res, null);
           assert.equal(calledWith.length, 1);
           assert.equal(calledWith[0], error);

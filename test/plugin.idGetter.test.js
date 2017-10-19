@@ -17,7 +17,8 @@ describe('id virtual getter', function() {
     var S = db.model('Basic', schema);
     S.create({}, function(err, s) {
       assert.ifError(err);
-      // Comparing with aliases
+
+      // Comparing with virtual getter
       assert.equal(s._id.toString(), s.id);
       done();
     });
@@ -32,7 +33,7 @@ describe('id virtual getter', function() {
     S.create({}, function(err, s) {
       assert.ifError(err);
 
-      // Comparing with aliases
+      // Comparing with virtual getter
       assert.equal(s.id, undefined);
       done();
     });
@@ -50,7 +51,7 @@ describe('id virtual getter', function() {
     S.create({ id: 'test'}, function(err, s) {
       assert.ifError(err);
 
-      // Comparing with aliases
+      // Comparing with expected value
       assert.equal(s.id, 'test');
       done();
     });

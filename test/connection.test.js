@@ -1378,6 +1378,27 @@ describe('connections:', function() {
     });
   });
 
+  it('bufferCommands (gh-5720)', function(done) {
+    var opts = { useMongoClient: true, bufferCommands: false };
+    var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+
+    var M = db.model('gh5720', new Schema({}));
+    assert.ok(!M.collection.buffer);
+    db.close();
+
+    opts = { useMongoClient: true, bufferCommands: true };
+    db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    M = db.model('gh5720', new Schema({}, { bufferCommands: false }));
+    assert.ok(!M.collection.buffer);
+    db.close();
+
+    opts = { useMongoClient: true, bufferCommands: true };
+    db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    M = db.model('gh5720', new Schema({}));
+    assert.ok(M.collection.buffer);
+    db.close(done);
+  });
+
   describe('connecting to multiple mongos nodes (gh-1037)', function() {
     var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
     if (!mongos) {

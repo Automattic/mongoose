@@ -4490,7 +4490,7 @@ describe('model: populate:', function() {
               }
             ]);
           }).
-          then(function(b) {
+          then(function() {
             return B.find().populate('a').sort([['name', 1]]).exec();
           }).
           then(function(bs) {

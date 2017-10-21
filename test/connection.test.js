@@ -3,6 +3,7 @@
  */
 
 var Promise = require('bluebird');
+var Q = require('q');
 var assert = require('power-assert');
 var muri = require('muri');
 var random = require('../lib/utils').random;
@@ -71,6 +72,23 @@ describe('connections:', function() {
       promise.then(function(conn) {
         assert.strictEqual(conn.config.autoIndex, false);
         assert.deepEqual(conn._connectionOptions, {});
+        done();
+      }).catch(done);
+    });
+
+    it('resolving with q (gh-5714)', function(done) {
+      var bootMongo = Q.defer();
+
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+
+      conn.on('connected', function() {
+        bootMongo.resolve(this);
+      });
+
+      bootMongo.promise.then(function(_conn) {
+        assert.equal(_conn, conn);
         done();
       }).catch(done);
     });

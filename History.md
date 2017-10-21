@@ -1,3 +1,11 @@
+4.12.4 / 2017-10-21
+===================
+ * test(plugins): add coverage for idGetter with id as a schema property #5713 [wlingke](https://github.com/wlingke)
+ * fix(model): avoid copying recursive $$context object when creating discriminator after querying #5721
+ * fix(connection): ensure connection promise helpers are removed before emitting 'connected' #5714
+ * docs(schema): add notes about runSettersOnQuery to schema setters #5705
+ * fix(collection): ensure queued operations run on the next tick #5562
+
 4.12.3 / 2017-10-16
 ===================
  * fix(connection): emit 'reconnect' event as well as 'reconnected' for consistency with driver #5719

@@ -4501,6 +4501,51 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('with functions for ref (gh-5602)', function(done) {
+        var ASchema = new Schema({
+          name: String
+        });
+
+        var BSchema = new Schema({
+          referencedModel: String,
+          aId: ObjectId
+        });
+
+        BSchema.virtual('a', {
+          ref: function() { return this.referencedModel; },
+          localField: 'aId',
+          foreignField: '_id',
+          justOne: true
+        });
+
+        var A1 = db.model('gh5602_1', ASchema);
+        var A2 = db.model('gh5602_2', ASchema);
+        var B = db.model('gh5602_0', BSchema);
+
+        A1.create({ name: 'a1' }).
+          then(function(a1) {
+            return A2.create({ name: 'a2' }).then(function(res) {
+              return [a1].concat(res);
+            });
+          }).
+          then(function(as) {
+            return B.create([
+              { name: 'test1', referencedModel: 'gh5602_1', aId: as[0]._id },
+              { name: 'test2', referencedModel: 'gh5602_2', aId: as[1]._id }
+            ]);
+          }).
+          then(function() {
+            return B.find().populate('a').sort([['name', 1]]);
+          }).
+          then(function(bs) {
+            assert.equal(bs.length, 2);
+            assert.equal(bs[0].a.name, 'a1');
+            assert.equal(bs[1].a.name, 'a2');
+            done();
+          }).
+          catch(done);
+      });
+
       it('with no results (gh-4284)', function(done) {
         var PersonSchema = new Schema({
           name: String,

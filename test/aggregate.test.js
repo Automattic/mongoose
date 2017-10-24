@@ -448,7 +448,7 @@ describe('aggregate: ', function() {
       });
     });
 
-    describe('project', function() {
+    describe('addFields', function() {
       it('(object)', function(done) {
         var aggregate = new Aggregate();
   

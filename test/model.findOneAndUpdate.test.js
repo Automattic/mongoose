@@ -1910,6 +1910,26 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('multi cast error (gh-5609)', function(done) {
+      var schema = new mongoose.Schema({
+        num1: Number,
+        num2: Number
+      });
+
+      var Model = db.model('gh5609', schema);
+
+      var opts = { multipleCastError: true };
+      Model.findOneAndUpdate({}, { num1: 'fail', num2: 'fail' }, opts, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ValidationError');
+        assert.ok(error.errors['num1']);
+        assert.equal(error.errors['num1'].name, 'CastError');
+        assert.ok(error.errors['num2']);
+        assert.equal(error.errors['num2'].name, 'CastError');
+        done();
+      });
+    });
+
     it('update validators with pushing null (gh-5710)', function(done) {
       var schema = new mongoose.Schema({
         arr: [String]

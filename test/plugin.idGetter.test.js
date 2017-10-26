@@ -44,7 +44,7 @@ describe('id virtual getter', function() {
     var db = start();
 
     var schema = new Schema({
-      id: String,
+      id: String
     });
 
     var S = db.model('NoIdGetter', schema);

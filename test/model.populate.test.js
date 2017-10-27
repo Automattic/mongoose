@@ -3251,6 +3251,42 @@ describe('model: populate:', function() {
       db.close(done);
     });
 
+    it('populating an array of refs, slicing, and fetching many (gh-5737)', function(done) {
+      var BlogPost = db.model('gh5737_0', new Schema({
+        title: String,
+        fans: [{ type: ObjectId, ref: 'gh5737' }]
+      }));
+      var User = db.model('gh5737', new Schema({ name: String }));
+
+      User.create([{ name: 'Fan 1' }, { name: 'Fan 2' }], function(error, fans) {
+        assert.ifError(error);
+        var posts = [
+          { title: 'Test 1', fans: [fans[0]._id, fans[1]._id] },
+          { title: 'Test 2', fans: [fans[1]._id, fans[0]._id] }
+        ];
+        BlogPost.create(posts, function(error) {
+          assert.ifError(error);
+          BlogPost.
+            find({}).
+            slice('fans', [0, 5]).
+            populate('fans').
+            exec(function(err, blogposts) {
+              assert.ifError(error);
+
+              assert.equal(blogposts[0].title, 'Test 1');
+              assert.equal(blogposts[1].title, 'Test 2');
+
+              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
+              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+
+              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+              done();
+            });
+        });
+      });
+    });
+
     it('maps results back to correct document (gh-1444)', function(done) {
       var articleSchema = new Schema({
         body: String,

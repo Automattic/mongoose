@@ -773,9 +773,7 @@ describe('document: hooks:', function() {
 
     var Book = mongoose.model('gh5738', bookSchema);
 
-    var book = new Book({});
-
-    book.title = 'Professional AngularJS';
+    var book = new Book({ title: 'Professional AngularJS' });
     book.save(function(error) {
       assert.ok(error);
       assert.equal(error.message, 'woops!');

@@ -857,21 +857,21 @@ describe('model', function() {
         { message: String },
         { discriminatorKey: 'kind', _id: false }
       );
-      eventSchema.pre('validate', (next) => {
+      eventSchema.pre('validate', function(next) {
         counters.eventPreValidate++;
         next();
       });
 
-      eventSchema.post('validate', (doc) => {
+      eventSchema.post('validate', function(doc) {
         counters.eventPostValidate++;
       });
 
-      eventSchema.pre('save', (next) => {
+      eventSchema.pre('save', function(next) {
         counters.eventPreSave++;
         next();
       });
 
-      eventSchema.post('save', (doc) => {
+      eventSchema.post('save', function(doc) {
         counters.eventPostSave++;
       });
 
@@ -879,28 +879,28 @@ describe('model', function() {
         product: String,
       }, { _id: false });
 
-      purchasedSchema.pre('validate', (next) => {
+      purchasedSchema.pre('validate', function(next) {
         counters.purchasePreValidate++;
         next();
       });
 
-      purchasedSchema.post('validate', (doc) => {
+      purchasedSchema.post('validate', function(doc) {
         counters.purchasePostValidate++;
       });
 
-      purchasedSchema.pre('save', (next) => {
+      purchasedSchema.pre('save', function(next) {
         counters.purchasePreSave++;
         next();
       });
 
-      purchasedSchema.post('save', (doc) => {
+      purchasedSchema.post('save', function(doc) {
         counters.purchasePostSave++;
       });
 
       beforeEach(function() {
-        Object.keys(counters).forEach(function(i){
-          counters[i]=0;
-        })
+        Object.keys(counters).forEach(function(i) {
+          counters[i] = 0;
+        });
       });
 
       it('should call the hooks on the embedded document defined by both the parent and discriminated schemas', function(done){
@@ -909,7 +909,7 @@ describe('model', function() {
         });
 
         var embeddedEventSchema = trackSchema.path('event');
-        embeddedEventSchema.discriminator('Purchased', purchasedSchema)
+        embeddedEventSchema.discriminator('Purchased', purchasedSchema.clone());
 
         var TrackModel = db.model('Track', trackSchema);
         var doc = new TrackModel({
@@ -922,7 +922,7 @@ describe('model', function() {
           assert.ok(!err);
           assert.equal(doc.event.message, 'Test')
           assert.equal(doc.event.kind, 'Purchased')
-          Object.keys(counters).forEach(function(i){
+          Object.keys(counters).forEach(function(i) {
             assert.equal(counters[i], 1);
           });
           done();
@@ -935,7 +935,7 @@ describe('model', function() {
         });
 
         var embeddedEventSchema = trackSchema.path('events');
-        embeddedEventSchema.discriminator('Purchased', purchasedSchema)
+        embeddedEventSchema.discriminator('Purchased', purchasedSchema.clone());
 
         var TrackModel = db.model('Track2', trackSchema);
         var doc = new TrackModel({
@@ -956,7 +956,7 @@ describe('model', function() {
           assert.equal(doc.events[0].message, 'Test');
           assert.equal(doc.events[1].kind, 'Purchased');
           assert.equal(doc.events[1].message, 'TestAgain');
-          Object.keys(counters).forEach(function(i){
+          Object.keys(counters).forEach(function(i) {
             assert.equal(counters[i], 2);
           });
           done();

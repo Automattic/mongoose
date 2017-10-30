@@ -1669,6 +1669,20 @@ describe('schema', function() {
       done();
     });
 
+    it('clone() copies methods, statics, and query helpers (gh-5752)', function(done) {
+      var schema = new Schema({});
+
+      schema.methods.fakeMethod = function() { return 'fakeMethod'; };
+      schema.statics.fakeStatic = function() { return 'fakeStatic'; };
+      schema.query.fakeQueryHelper = function() { return 'fakeQueryHelper'; };
+
+      var clone = schema.clone();
+      assert.equal(clone.methods.fakeMethod, schema.methods.fakeMethod);
+      assert.equal(clone.statics.fakeStatic, schema.statics.fakeStatic);
+      assert.equal(clone.query.fakeQueryHelper, schema.query.fakeQueryHelper);
+      done();
+    });
+
     it('clone() copies validators declared with validate() (gh-5607)', function(done) {
       var schema = new Schema({
         num: Number
@@ -1698,6 +1712,26 @@ describe('schema', function() {
       assert.deepEqual(indexes, [
         [{ updatedAt: 1 }, { background: true, expireAfterSeconds: 7200 }]
       ]);
+      done();
+    });
+
+    it('childSchemas prop (gh-5695)', function(done) {
+      var schema1 = new Schema({ name: String });
+      var schema2 = new Schema({ test: String });
+      var schema = new Schema({
+        arr: [schema1],
+        single: schema2
+      });
+
+      assert.equal(schema.childSchemas.length, 2);
+      assert.equal(schema.childSchemas[0].schema, schema1);
+      assert.equal(schema.childSchemas[1].schema, schema2);
+
+      schema = schema.clone();
+      assert.equal(schema.childSchemas.length, 2);
+      assert.equal(schema.childSchemas[0].schema, schema1);
+      assert.equal(schema.childSchemas[1].schema, schema2);
+
       done();
     });
   });

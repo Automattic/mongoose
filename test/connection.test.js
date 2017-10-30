@@ -3,6 +3,7 @@
  */
 
 var Promise = require('bluebird');
+var Q = require('q');
 var assert = require('power-assert');
 var muri = require('muri');
 var random = require('../lib/utils').random;
@@ -65,12 +66,29 @@ describe('connections:', function() {
     it('with autoIndex (gh-5423)', function(done) {
       var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         useMongoClient: true,
-        config: { autoIndex: false }
+        autoIndex: false
       });
 
       promise.then(function(conn) {
         assert.strictEqual(conn.config.autoIndex, false);
         assert.deepEqual(conn._connectionOptions, {});
+        done();
+      }).catch(done);
+    });
+
+    it('resolving with q (gh-5714)', function(done) {
+      var bootMongo = Q.defer();
+
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useMongoClient: true
+      });
+
+      conn.on('connected', function() {
+        bootMongo.resolve(this);
+      });
+
+      bootMongo.promise.then(function(_conn) {
+        assert.equal(_conn, conn);
         done();
       }).catch(done);
     });
@@ -94,6 +112,7 @@ describe('connections:', function() {
         var numConnected = 0;
         var numDisconnected = 0;
         var numReconnected = 0;
+        var numReconnect = 0;
         var numClose = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           useMongoClient: true
@@ -105,6 +124,10 @@ describe('connections:', function() {
         conn.on('disconnected', function() {
           ++numDisconnected;
         });
+        conn.on('reconnect', function() {
+          ++numReconnect;
+        });
+        // Same as `reconnect`, just for backwards compat
         conn.on('reconnected', function() {
           ++numReconnected;
         });
@@ -127,6 +150,7 @@ describe('connections:', function() {
             assert.equal(conn.readyState, conn.states.disconnected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 0);
+            assert.equal(numReconnect, 0);
           }).
           then(function() {
             return server.start();
@@ -140,6 +164,7 @@ describe('connections:', function() {
             assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
+            assert.equal(numReconnect, 1);
             assert.equal(numClose, 0);
 
             conn.close();
@@ -295,6 +320,32 @@ describe('connections:', function() {
         }).
         then(function(doc) {
           assert.ok(!doc);
+        });
+    });
+
+    it('createCollection()', function() {
+      return conn.dropDatabase().
+        then(function() {
+          return conn.createCollection('gh5712', {
+            capped: true,
+            size: 1024
+          });
+        }).
+        then(function() {
+          return conn.db.listCollections().toArray();
+        }).
+        then(function(collections) {
+          var names = collections.map(function(c) { return c.name; });
+          assert.ok(names.indexOf('gh5712') !== -1);
+          assert.ok(collections[names.indexOf('gh5712')].options.capped);
+          return conn.createCollection('gh5712_0');
+        }).
+        then(function() {
+          return conn.db.listCollections().toArray();
+        }).
+        then(function(collections) {
+          var names = collections.map(function(c) { return c.name; });
+          assert.ok(names.indexOf('gh5712') !== -1);
         });
     });
   });
@@ -1343,6 +1394,27 @@ describe('connections:', function() {
       // Force close
       db.close(true);
     });
+  });
+
+  it('bufferCommands (gh-5720)', function(done) {
+    var opts = { useMongoClient: true, bufferCommands: false };
+    var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+
+    var M = db.model('gh5720', new Schema({}));
+    assert.ok(!M.collection.buffer);
+    db.close();
+
+    opts = { useMongoClient: true, bufferCommands: true };
+    db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    M = db.model('gh5720', new Schema({}, { bufferCommands: false }));
+    assert.ok(!M.collection.buffer);
+    db.close();
+
+    opts = { useMongoClient: true, bufferCommands: true };
+    db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
+    M = db.model('gh5720', new Schema({}));
+    assert.ok(M.collection.buffer);
+    db.close(done);
   });
 
   describe('connecting to multiple mongos nodes (gh-1037)', function() {

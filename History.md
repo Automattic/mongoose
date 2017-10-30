@@ -1,3 +1,46 @@
+4.12.5 / 2017-10-29
+===================
+ * fix(query): correctly handle `$in` and required for $pull and update validators #5744
+ * feat(aggegate): add $addFields pipeline operator #5740 [AyushG3112](https://github.com/AyushG3112)
+ * fix(document): catch sync errors in document pre hooks and report as error #5738
+ * fix(populate): handle slice projections correctly when automatically selecting populated fields #5737
+ * fix(discriminator): fix hooks for embedded discriminators #5706 [wlingke](https://github.com/wlingke)
+ * fix(model): throw sane error when customer calls `mongoose.Model()` over `mongoose.model()` #2005
+
+4.12.4 / 2017-10-21
+===================
+ * test(plugins): add coverage for idGetter with id as a schema property #5713 [wlingke](https://github.com/wlingke)
+ * fix(model): avoid copying recursive $$context object when creating discriminator after querying #5721
+ * fix(connection): ensure connection promise helpers are removed before emitting 'connected' #5714
+ * docs(schema): add notes about runSettersOnQuery to schema setters #5705
+ * fix(collection): ensure queued operations run on the next tick #5562
+
+4.12.3 / 2017-10-16
+===================
+ * fix(connection): emit 'reconnect' event as well as 'reconnected' for consistency with driver #5719
+ * fix: correctly bubble up left/joined events for replica set #5718
+ * fix(connection): allow passing in `autoIndex` as top-level option rather than requiring `config.autoIndex` #5711
+ * docs(connection): improve docs regarding reconnectTries, autoReconnect, and bufferMaxEntries #5711
+ * fix(query): handle null with addToSet/push/pull/pullAll update validators #5710
+ * fix(model): handle setDefaultsOnInsert option for bulkWrite updateOne and updateMany #5708
+ * fix(query): avoid infinite recursion edge case when cloning a buffer #5702
+
+4.12.2 / 2017-10-14
+===================
+ * docs(faq): add FAQ about using arrow functions for getters/setters, virtuals, and methods #5700
+ * docs(schema): document the childSchemas property and add to public API #5695
+ * fix(query): don't project in populated field if parent field is already projected in #5669
+ * fix: bump mongodb -> 2.2.33 for issue with autoReconnect #4513
+
+4.12.1 / 2017-10-08
+===================
+ * fix(document): create new doc when setting single nested, no more set() on copy of priorVal #5693
+ * fix(model): recursively call applyMethods on child schemas for global plugins #5690
+ * docs: fix bad promise lib example on home page #5686
+ * fix(query): handle false when checking for inclusive/exclusive projection #5685
+ * fix(discriminator): allow reusing child schema #5684
+ * fix: make addToSet() on empty array with subdoc trigger manual population #5504
+
 4.12.0 / 2017-10-02
 ===================
  * docs(validation): add docs coverage for ValidatorError.reason #5681

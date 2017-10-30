@@ -2711,7 +2711,7 @@ describe('model: update:', function() {
 
         User.update({}, update, opts).exec(function(error) {
           assert.ok(error);
-          assert.ok(error.errors['notifications']);
+          assert.ok(error.errors['notifications.message']);
 
           update.$pull.notifications.message = 'test';
           User.update({ _id: doc._id }, update, opts).exec(function(error) {
@@ -2721,6 +2721,36 @@ describe('model: update:', function() {
               assert.equal(doc.notifications.length, 0);
               done();
             });
+          });
+        });
+      });
+    });
+
+    it('$pull with updateValidators and $in (gh-5744)', function(done) {
+      var exampleSchema = mongoose.Schema({
+        subdocuments: [{
+          name: String
+        }]
+      });
+      var ExampleModel = db.model('gh5744', exampleSchema);
+      var exampleDocument = {
+        subdocuments: [{ name: 'First' }, { name: 'Second' }]
+      };
+
+      ExampleModel.create(exampleDocument, function(error, doc) {
+        assert.ifError(error);
+        ExampleModel.updateOne({ _id: doc._id }, {
+          $pull: {
+            subdocuments: {
+              _id: { $in: [doc.subdocuments[0]._id] }
+            }
+          }
+        }, { runValidators: true }, function(error) {
+          assert.ifError(error);
+          ExampleModel.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.subdocuments.length, 1);
+            done();
           });
         });
       });

@@ -763,6 +763,24 @@ describe('document: hooks:', function() {
     done();
   });
 
+  it('sync exceptions get passed as errors (gh-5738)', function(done) {
+    var bookSchema = new Schema({ title: String });
+
+    /* eslint-disable no-unused-vars */
+    bookSchema.pre('save', function(next) {
+      throw new Error('woops!');
+    });
+
+    var Book = mongoose.model('gh5738', bookSchema);
+
+    var book = new Book({ title: 'Professional AngularJS' });
+    book.save(function(error) {
+      assert.ok(error);
+      assert.equal(error.message, 'woops!');
+      done();
+    });
+  });
+
   it('nested subdocs only fire once (gh-3281)', function(done) {
     var L3Schema = new Schema({
       title: String

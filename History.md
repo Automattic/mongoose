@@ -1,3 +1,12 @@
+4.12.5 / 2017-10-28
+===================
+ * fix(query): correctly handle `$in` and required for $pull and update validators #5744
+ * feat(aggegate): add $addFields pipeline operator #5740 [AyushG3112](https://github.com/AyushG3112)
+ * fix(document): catch sync errors in document pre hooks and report as error #5738
+ * fix(populate): handle slice projections correctly when automatically selecting populated fields #5737
+ * fix(discriminator): fix hooks for embedded discriminators #5706 [wlingke](https://github.com/wlingke)
+ * fix(model): throw sane error when customer calls `mongoose.Model()` over `mongoose.model()` #2005
+
 4.12.4 / 2017-10-21
 ===================
  * test(plugins): add coverage for idGetter with id as a schema property #5713 [wlingke](https://github.com/wlingke)

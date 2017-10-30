@@ -1,4 +1,4 @@
-4.12.5 / 2017-10-28
+4.12.5 / 2017-10-29
 ===================
  * fix(query): correctly handle `$in` and required for $pull and update validators #5744
  * feat(aggegate): add $addFields pipeline operator #5740 [AyushG3112](https://github.com/AyushG3112)

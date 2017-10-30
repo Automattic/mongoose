@@ -842,5 +842,126 @@ describe('model', function() {
         }).
         catch(done);
     });
+    describe('embedded discriminators + hooks (gh-5706)', function(){
+      var counters = {
+        eventPreSave: 0,
+        eventPostSave: 0,
+        purchasePreSave: 0,
+        purchasePostSave: 0,
+        eventPreValidate: 0,
+        eventPostValidate: 0,
+        purchasePreValidate: 0,
+        purchasePostValidate: 0,
+      };
+      var eventSchema = new Schema(
+        { message: String },
+        { discriminatorKey: 'kind', _id: false }
+      );
+      eventSchema.pre('validate', function(next) {
+        counters.eventPreValidate++;
+        next();
+      });
+
+      eventSchema.post('validate', function(doc) {
+        counters.eventPostValidate++;
+      });
+
+      eventSchema.pre('save', function(next) {
+        counters.eventPreSave++;
+        next();
+      });
+
+      eventSchema.post('save', function(doc) {
+        counters.eventPostSave++;
+      });
+
+      var purchasedSchema = new Schema({
+        product: String,
+      }, { _id: false });
+
+      purchasedSchema.pre('validate', function(next) {
+        counters.purchasePreValidate++;
+        next();
+      });
+
+      purchasedSchema.post('validate', function(doc) {
+        counters.purchasePostValidate++;
+      });
+
+      purchasedSchema.pre('save', function(next) {
+        counters.purchasePreSave++;
+        next();
+      });
+
+      purchasedSchema.post('save', function(doc) {
+        counters.purchasePostSave++;
+      });
+
+      beforeEach(function() {
+        Object.keys(counters).forEach(function(i) {
+          counters[i] = 0;
+        });
+      });
+
+      it('should call the hooks on the embedded document defined by both the parent and discriminated schemas', function(done){
+        var trackSchema = new Schema({
+          event: eventSchema,
+        });
+
+        var embeddedEventSchema = trackSchema.path('event');
+        embeddedEventSchema.discriminator('Purchased', purchasedSchema.clone());
+
+        var TrackModel = db.model('Track', trackSchema);
+        var doc = new TrackModel({
+          event: {
+            message: 'Test',
+            kind: 'Purchased'
+          }
+        });
+        doc.save(function(err){
+          assert.ok(!err);
+          assert.equal(doc.event.message, 'Test')
+          assert.equal(doc.event.kind, 'Purchased')
+          Object.keys(counters).forEach(function(i) {
+            assert.equal(counters[i], 1);
+          });
+          done();
+        })
+      })
+
+      it('should call the hooks on the embedded document in an embedded array defined by both the parent and discriminated schemas', function(done){
+        var trackSchema = new Schema({
+          events: [eventSchema],
+        });
+
+        var embeddedEventSchema = trackSchema.path('events');
+        embeddedEventSchema.discriminator('Purchased', purchasedSchema.clone());
+
+        var TrackModel = db.model('Track2', trackSchema);
+        var doc = new TrackModel({
+          events: [
+            {
+              message: 'Test',
+              kind: 'Purchased'
+            },
+            {
+              message: 'TestAgain',
+              kind: 'Purchased'
+            }
+          ]
+        });
+        doc.save(function(err){
+          assert.ok(!err);
+          assert.equal(doc.events[0].kind, 'Purchased');
+          assert.equal(doc.events[0].message, 'Test');
+          assert.equal(doc.events[1].kind, 'Purchased');
+          assert.equal(doc.events[1].message, 'TestAgain');
+          Object.keys(counters).forEach(function(i) {
+            assert.equal(counters[i], 2);
+          });
+          done();
+        })
+      })
+    })
   });
 });

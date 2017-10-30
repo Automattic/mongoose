@@ -1669,6 +1669,20 @@ describe('schema', function() {
       done();
     });
 
+    it('clone() copies methods, statics, and query helpers (gh-5752)', function(done) {
+      var schema = new Schema({});
+
+      schema.methods.fakeMethod = function() { return 'fakeMethod'; };
+      schema.statics.fakeStatic = function() { return 'fakeStatic'; };
+      schema.query.fakeQueryHelper = function() { return 'fakeQueryHelper'; };
+
+      var clone = schema.clone();
+      assert.equal(clone.methods.fakeMethod, schema.methods.fakeMethod);
+      assert.equal(clone.statics.fakeStatic, schema.statics.fakeStatic);
+      assert.equal(clone.query.fakeQueryHelper, schema.query.fakeQueryHelper);
+      done();
+    });
+
     it('clone() copies validators declared with validate() (gh-5607)', function(done) {
       var schema = new Schema({
         num: Number

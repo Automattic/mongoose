@@ -4750,6 +4750,24 @@ describe('document', function() {
       });
     });
 
+    it('Using set as a schema path (gh-1939)', function(done) {
+      var testSchema = new Schema({ set: String });
+
+      var Test = db.model('gh1939', testSchema);
+
+      var t = new Test({ set: 'test 1' });
+      assert.equal(t.set, 'test 1');
+      t.save(function(error) {
+        assert.ifError(error);
+        t.set = 'test 2';
+        t.save(function(error) {
+          assert.ifError(error);
+          assert.equal(t.set, 'test 2');
+          done();
+        });
+      });
+    });
+
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
       var eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',

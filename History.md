@@ -1,3 +1,8 @@
+4.12.6 / 2017-11-01
+===================
+ * fix(schema): make clone() copy query helpers correctly #5752
+ * fix: undeprecate `ensureIndex()` and use it by default #3280
+
 4.12.5 / 2017-10-29
 ===================
  * fix(query): correctly handle `$in` and required for $pull and update validators #5744

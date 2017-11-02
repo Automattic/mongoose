@@ -5398,6 +5398,28 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() multi validation error with ordered false (gh-5337)', function(done) {
+      var schema = new Schema({
+        name: { type: String, required: true }
+      });
+      var Movie = db.model('gh5337', schema);
+
+      var arr = [
+        { foo: 'The Phantom Menace' },
+        { name: 'Star Wars' },
+        { name: 'The Empire Strikes Back' },
+        { foobar: 'The Force Awakens' }
+      ];
+      var opts = { ordered: false, rawResult: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ifError(error);
+        assert.equal(res.mongoose.validationErrors.length, 2);
+        assert.equal(res.mongoose.validationErrors[0].name, 'ValidationError');
+        assert.equal(res.mongoose.validationErrors[1].name, 'ValidationError');
+        done();
+      });
+    });
+
     it('insertMany() depopulate (gh-4590)', function(done) {
       var personSchema = new Schema({
         name: String

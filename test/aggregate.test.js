@@ -337,9 +337,7 @@ describe('aggregate: ', function() {
 
       assert.equal(aggregate.near({ a: 1 }), aggregate);
       // Run exec so we apply discriminator pipeline
-      assert.throws(function() {
-        aggregate.exec();
-      }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
+      Aggregate._prepareDiscriminatorPipeline(aggregate);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { a: 1, query: { __t: 'subschema' } } }]);
 
@@ -347,9 +345,7 @@ describe('aggregate: ', function() {
       aggregate._model = stub;
 
       aggregate.near({ b: 2, query: { x: 1 } });
-      assert.throws(function() {
-        aggregate.exec();
-      }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
+      Aggregate._prepareDiscriminatorPipeline(aggregate);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
 
@@ -445,6 +441,19 @@ describe('aggregate: ', function() {
           assert.ok(error instanceof TypeError);
           done();
         }
+      });
+    });
+
+    describe('addFields', function() {
+      it('(object)', function(done) {
+        var aggregate = new Aggregate();
+
+        assert.equal(aggregate.addFields({ a: 1, b: 1, c: 0 }), aggregate);
+        assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }]);
+
+        aggregate.addFields({ d: {$add: ['$a','$b']} });
+        assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }, { $addFields: { d: {$add: ['$a','$b']} } }]);
+        done();
       });
     });
 
@@ -858,6 +867,135 @@ describe('aggregate: ', function() {
             assert.ifError(err);
             assert.equal(1, docs.length);
             assert.equal(docs[0].sal, 18000);
+            done();
+          });
+      });
+    });
+
+    describe('middleware (gh-5251)', function() {
+      var db;
+
+      before(function() {
+        db = start();
+      });
+
+      after(function(done) {
+        db.close(done);
+      });
+
+      it('pre', function(done) {
+        var s = new Schema({ name: String });
+
+        var called = 0;
+        s.pre('aggregate', function(next) {
+          ++called;
+          next();
+        });
+
+        var M = db.model('gh5251', s);
+
+        M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
+          assert.ifError(error);
+          assert.deepEqual(res, []);
+          assert.equal(called, 1);
+          done();
+        });
+      });
+
+      it('post', function(done) {
+        var s = new Schema({ name: String });
+
+        var calledWith = [];
+        s.post('aggregate', function(res, next) {
+          calledWith.push(res);
+          next();
+        });
+
+        var M = db.model('gh5251_post', s);
+
+        M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
+          assert.ifError(error);
+          assert.deepEqual(res, []);
+          assert.equal(calledWith.length, 1);
+          assert.deepEqual(calledWith[0], []);
+          done();
+        });
+      });
+
+      it('error handler with agg error', function(done) {
+        var s = new Schema({ name: String });
+
+        var calledWith = [];
+        s.post('aggregate', function(error, res, next) {
+          calledWith.push(error);
+          next();
+        });
+
+        var M = db.model('gh5251_error_agg', s);
+
+        M.aggregate([{ $fakeStage: { name: 'test' } }], function(error, res) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('Unrecognized pipeline stage') !== -1,
+            error.message);
+          assert.equal(res, null);
+          assert.equal(calledWith.length, 1);
+          assert.equal(calledWith[0], error);
+          done();
+        });
+      });
+
+      it('error handler with pre error', function(done) {
+        var s = new Schema({ name: String });
+
+        var calledWith = [];
+        s.pre('aggregate', function(next) {
+          next(new Error('woops'));
+        });
+        s.post('aggregate', function(error, res, next) {
+          calledWith.push(error);
+          next();
+        });
+
+        var M = db.model('gh5251_error', s);
+
+        M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
+          assert.ok(error);
+          assert.equal(error.message, 'woops');
+          assert.equal(res, null);
+          assert.equal(calledWith.length, 1);
+          assert.equal(calledWith[0], error);
+          done();
+        });
+      });
+
+      it('with agg cursor', function(done) {
+        var s = new Schema({ name: String });
+
+        var calledPre = 0;
+        var calledPost = 0;
+        s.pre('aggregate', function(next) {
+          ++calledPre;
+          next();
+        });
+        s.post('aggregate', function(res, next) {
+          ++calledPost;
+          next();
+        });
+
+        var M = db.model('gh5251_cursor', s);
+
+        var numDocs = 0;
+        M.
+          aggregate([{ $match: { name: 'test' } }]).
+          cursor({ useMongooseAggCursor: true }).
+          exec().
+          eachAsync(function() {
+            ++numDocs;
+          }).
+          then(function() {
+            assert.equal(numDocs, 0);
+            assert.equal(calledPre, 1);
+            assert.equal(calledPost, 0);
             done();
           });
       });

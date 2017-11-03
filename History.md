@@ -1,3 +1,16 @@
+4.13.0 / 2017-11-02
+===================
+ * feat(aggregate): add $addFields helper #5740 [AyushG3112](https://github.com/AyushG3112)
+ * feat(connection): add connection-level bufferCommands #5720
+ * feat(connection): add createCollection() helper #5712
+ * feat(populate): support setting localField and foreignField to functions #5704 #5602
+ * feat(query): add multipleCastError option for aggregating cast errors when casting update #5609
+ * feat(populate): allow passing a function to virtual ref #5602
+ * feat(schema): add excludeIndexes option to optionally prevent collecting indexes from nested schemas #5575
+ * feat(model): report validation errors from `insertMany()` if using `ordered: false` and `rawResult: true` #5337
+ * feat(aggregate): add pre/post aggregate middleware #5251
+ * feat(schema): allow using `set` as a schema path #1939
+
 4.12.6 / 2017-11-01
 ===================
  * fix(schema): make clone() copy query helpers correctly #5752

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.12.6",
+  "version": "4.13.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -23,6 +23,7 @@
     "bson": "~1.0.4",
     "hooks-fixed": "2.0.2",
     "kareem": "1.5.0",
+    "lodash.get": "4.4.2",
     "mongodb": "2.2.33",
     "mpath": "0.3.0",
     "mpromise": "0.5.5",

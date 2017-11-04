@@ -4768,6 +4768,26 @@ describe('document', function() {
       });
     });
 
+    it('handles array defaults correctly (gh-5780)', function(done) {
+      var testSchema = new Schema({
+        nestedArr: {
+          type: [[Number]],
+          default: [[0, 1]]
+        }
+      });
+
+      var Test = db.model('gh5780', testSchema);
+
+      var t = new Test({});
+      assert.deepEqual(t.toObject().nestedArr, [[0, 1]]);
+
+      t.nestedArr.push([1, 2]);
+      var t2 = new Test({});
+      assert.deepEqual(t2.toObject().nestedArr, [[0, 1]]);
+
+      done();
+    });
+
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
       var eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',

@@ -1,9 +1,9 @@
+'use strict';
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema;
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var Schema = mongoose.Schema;
 
 /**
  * Setup
@@ -23,18 +23,27 @@ function metersToRadians(m) {
 }
 
 describe('model', function() {
-  var schema;
-
-  function getModel(db) {
-    return db.model('GeoNear', schema, 'geonear' + random());
-  }
+  var schema = new Schema({
+    coordinates: {type: [Number]},
+    type: String,
+    priority: Number
+  });
+  schema.index({ coordinates: '2dsphere' }, { background: false });
+  var db;
 
   before(function() {
-    schema = new Schema({
-      coordinates: {type: [Number], index: '2dsphere'},
-      type: String
-    });
+    db = start();
   });
+
+  after(function(done) {
+    db.close(done);
+  });
+
+  var count = 0;
+  function getModel(db) {
+    ++count;
+    return db.model('GeoNear' + count, schema, 'geonear' + count);
+  }
 
   var mongo24_or_greater = false;
   before(function(done) {
@@ -45,16 +54,14 @@ describe('model', function() {
       done();
     });
   });
+
   describe('geoNear', function() {
     it('works with legacy coordinate points', function(done) {
       if (!mongo24_or_greater) return done();
-      var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
-      Geo.on('index', function(err) {
-        assert.ifError(err);
-
+      Geo.init().then(function() {
         var geos = [];
         geos[0] = new Geo({
           coordinates: testLocations.MONGODB_NYC_OFFICE,
@@ -93,7 +100,7 @@ describe('model', function() {
             assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj.id, geos[0].id);
             assert.ok(results[0].obj instanceof Geo);
-            db.close(done);
+            done();
           });
         }
       });
@@ -101,13 +108,10 @@ describe('model', function() {
 
     it('works with GeoJSON coordinate points', function(done) {
       if (!mongo24_or_greater) return done();
-      var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
-      Geo.on('index', function(err) {
-        assert.ifError(err);
-
+      Geo.init().then(function() {
         var geos = [];
         geos[0] = new Geo({
           coordinates: testLocations.MONGODB_NYC_OFFICE,
@@ -146,21 +150,18 @@ describe('model', function() {
             assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj.id, geos[0].id);
             assert.ok(results[0].obj instanceof Geo);
-            db.close(done);
+            done();
           });
         }
-      });
+      }).catch(done);
     });
 
     it('works with lean', function(done) {
       if (!mongo24_or_greater) return done();
-      var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
-      Geo.on('index', function(err) {
-        assert.ifError(err);
-
+      Geo.init().then(function() {
         var geos = [];
         geos[0] = new Geo({
           coordinates: testLocations.MONGODB_NYC_OFFICE,
@@ -199,7 +200,7 @@ describe('model', function() {
             assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj._id, geos[0].id);
             assert.ok(!(results[0].obj instanceof Geo));
-            db.close(done);
+            done();
           });
         }
       });
@@ -208,12 +209,9 @@ describe('model', function() {
     it('throws the correct error messages', function(done) {
       if (!mongo24_or_greater) return done();
 
-      var db = start();
       var Geo = getModel(db);
 
-      Geo.on('index', function(err) {
-        assert.ifError(err);
-
+      Geo.init().then(function() {
         var g = new Geo({coordinates: [10, 10], type: 'place'});
         g.save(function() {
           Geo.geoNear('1,2', {}, function(e) {
@@ -232,7 +230,7 @@ describe('model', function() {
                   assert.ok(e);
                   assert.equal(e.message, 'Must pass either a legacy coordinate array or GeoJSON Point to geoNear');
 
-                  db.close(done);
+                  done();
                 });
               });
             });
@@ -240,25 +238,22 @@ describe('model', function() {
         });
       });
     });
+
     it('returns a promise (gh-1614)', function(done) {
       if (!mongo24_or_greater) return done();
-      var db = start();
       var Geo = getModel(db);
 
       var pnt = {type: 'Point', coordinates: testLocations.PORT_AUTHORITY_STATION};
       // using GeoJSON point
       var prom = Geo.geoNear(pnt, {spherical: true, maxDistance: 300}, function() {});
       assert.ok(prom instanceof mongoose.Promise);
-      db.close();
       done();
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {
       if (!mongo24_or_greater) return done();
-      var db = start();
       var Geo = getModel(db);
-      Geo.on('index', function(err) {
-        assert.ifError(err);
+      Geo.init().then(function() {
         var g = new Geo({coordinates: testLocations.MONGODB_NYC_OFFICE, type: 'Point'});
         g.save(function(err) {
           assert.ifError(err);
@@ -277,19 +272,18 @@ describe('model', function() {
           }
 
           function finish() {
-            db.close(done);
+            done();
           }
 
           promise.then(validate, assert.ifError).then(finish).end();
         });
       });
     });
+
     it('promise fulfill even when no results returned', function(done) {
       if (!mongo24_or_greater) return done();
-      var db = start();
       var Geo = getModel(db);
-      Geo.on('index', function(err) {
-        assert.ifError(err);
+      Geo.init().then(function() {
         var g = new Geo({coordinates: [1, 1], type: 'Point'});
         g.save(function(err) {
           assert.ifError(err);
@@ -301,10 +295,28 @@ describe('model', function() {
           });
 
           function finish() {
-            db.close(done);
+            done();
           }
 
           promise.then(finish).end();
+        });
+      });
+    });
+
+    it('casts (gh-5765)', function() {
+      if (!mongo24_or_greater) return done();
+      var Geo = getModel(db);
+      Geo.init().then(function() {
+        var g = new Geo({coordinates: [1, 1], type: 'Point', priority: 1});
+        g.save(function(error) {
+          assert.ifError(error);
+          var opts = { maxDistance: 1000, query: { priority: '1' } };
+          Geo.geoNear([1, 1], opts, function(error, res) {
+            assert.ifError(error);
+            assert.equal(res.length, 1);
+            assert.equal(res[0].priority, 1);
+            done();
+          });
         });
       });
     });

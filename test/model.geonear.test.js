@@ -56,8 +56,13 @@ describe('model', function() {
   });
 
   describe('geoNear', function() {
+    beforeEach(function() {
+      if (!mongo24_or_greater) {
+        this.skip();
+      }
+    });
+
     it('works with legacy coordinate points', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
@@ -107,7 +112,6 @@ describe('model', function() {
     });
 
     it('works with GeoJSON coordinate points', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
@@ -157,7 +161,6 @@ describe('model', function() {
     });
 
     it('works with lean', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
@@ -207,8 +210,6 @@ describe('model', function() {
     });
 
     it('throws the correct error messages', function(done) {
-      if (!mongo24_or_greater) return done();
-
       var Geo = getModel(db);
 
       Geo.init().then(function() {
@@ -240,7 +241,6 @@ describe('model', function() {
     });
 
     it('returns a promise (gh-1614)', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
 
       var pnt = {type: 'Point', coordinates: testLocations.PORT_AUTHORITY_STATION};
@@ -251,7 +251,6 @@ describe('model', function() {
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       Geo.init().then(function() {
         var g = new Geo({coordinates: testLocations.MONGODB_NYC_OFFICE, type: 'Point'});
@@ -281,7 +280,6 @@ describe('model', function() {
     });
 
     it('promise fulfill even when no results returned', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       Geo.init().then(function() {
         var g = new Geo({coordinates: [1, 1], type: 'Point'});
@@ -304,7 +302,6 @@ describe('model', function() {
     });
 
     it('casts (gh-5765)', function(done) {
-      if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       Geo.init().then(function() {
         var g = new Geo({coordinates: [1, 1], type: 'Point', priority: 1});

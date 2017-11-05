@@ -303,18 +303,22 @@ describe('model', function() {
       });
     });
 
-    it('casts (gh-5765)', function() {
+    it('casts (gh-5765)', function(done) {
       if (!mongo24_or_greater) return done();
       var Geo = getModel(db);
       Geo.init().then(function() {
         var g = new Geo({coordinates: [1, 1], type: 'Point', priority: 1});
         g.save(function(error) {
           assert.ifError(error);
-          var opts = { maxDistance: 1000, query: { priority: '1' } };
+          var opts = {
+            maxDistance: 1000,
+            query: { priority: '1' },
+            spherical: true
+          };
           Geo.geoNear([1, 1], opts, function(error, res) {
             assert.ifError(error);
             assert.equal(res.length, 1);
-            assert.equal(res[0].priority, 1);
+            assert.equal(res[0].obj.priority, 1);
             done();
           });
         });

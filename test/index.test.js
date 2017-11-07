@@ -29,7 +29,7 @@ describe('mongoose module:', function() {
       var db = goose.connection,
           uri = 'mongodb://localhost/mongoose_test';
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {db: {safe: false}});
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
 
       db.on('open', function() {
         db.close(function() {
@@ -286,25 +286,12 @@ describe('mongoose module:', function() {
     });
   });
 
-  it('connecting with a signature of host, database, function', function(done) {
-    var mong = new Mongoose(),
-        uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
-
-    uri = url.parse(uri);
-
-    mong.connect(uri.hostname, uri.pathname.substr(1), function(err) {
-      assert.ifError(err);
-      mong.connection.close();
-      done();
-    });
-  });
-
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
       var mong = new Mongoose(),
           uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
 
-      mong.connect(uri, {db: {safe: false}}, function(err) {
+      mong.connect(uri, {}, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -317,7 +304,7 @@ describe('mongoose module:', function() {
 
       if (!uri) return done();
 
-      mong.connect(uri, {db: {safe: false}}, function(err) {
+      mong.connect(uri, {}, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -441,9 +428,11 @@ describe('mongoose module:', function() {
 
     it('of result from .connect() (gh-3940)', function(done) {
       var m = new mongoose.Mongoose;
-      test(m.connect('mongodb://localhost:27017'));
-      m.disconnect();
-      done();
+      m.connect('mongodb://localhost:27017').then(function(m) {
+        test(m);
+        m.disconnect();
+        done();
+      });
     });
   });
 });

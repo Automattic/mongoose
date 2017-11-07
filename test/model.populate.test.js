@@ -3287,6 +3287,36 @@ describe('model: populate:', function() {
       });
     });
 
+    it('populate + slice (gh-5737a)', function(done) {
+      var BlogPost = db.model('gh5737b', new Schema({
+        title: String,
+        user: { type: ObjectId, ref: 'gh5737a' },
+        fans: [{ type: ObjectId}]
+      }));
+      var User = db.model('gh5737a', new Schema({ name: String }));
+
+      User.create([{ name: 'Fan 1' }], function(error, fans) {
+        assert.ifError(error);
+        var posts = [
+          { title: 'Test 1', user: fans[0]._id, fans: [fans[0]._id] }
+        ];
+        BlogPost.create(posts, function(error) {
+          assert.ifError(error);
+          BlogPost.
+            find({}).
+            slice('fans', [0, 2]).
+            populate('user').
+            exec(function(err, blogposts) {
+              assert.ifError(error);
+
+              assert.equal(blogposts[0].user.name, 'Fan 1');
+              assert.equal(blogposts[0].title, 'Test 1');
+              done();
+            });
+        });
+      });
+    });
+
     it('maps results back to correct document (gh-1444)', function(done) {
       var articleSchema = new Schema({
         body: String,

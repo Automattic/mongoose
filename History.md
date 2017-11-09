@@ -1,3 +1,14 @@
+4.13.1 / 2017-11-08
+===================
+ * fix: accept multiple paths or array of paths to depopulate #5798 #5797 [adamreisnz](https://github.com/adamreisnz)
+ * fix(document): pass default array as actual array rather than taking first element #5780
+ * fix(model): increment version when $set-ing it in a save() that requires a version bump #5779
+ * fix(query): don't explicitly project in discriminator key if user projected in parent path #5775 #5754
+ * fix(model): cast query option to geoNear() #5765
+ * fix(query): don't treat projection with just $slice as inclusive #5737
+ * fix(discriminator): defer applying embedded discriminator hooks until top-level model is compiled #5706
+ * docs(discriminator): add warning to always attach hooks before calling discriminator() #5706
+
 4.13.0 / 2017-11-02
 ===================
  * feat(aggregate): add $addFields helper #5740 [AyushG3112](https://github.com/AyushG3112)

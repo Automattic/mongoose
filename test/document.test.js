@@ -3830,6 +3830,21 @@ describe('document', function() {
         catch(done);
     });
 
+    it('buffer subtype prop (gh-5530)', function(done) {
+      var TestSchema = new mongoose.Schema({
+        uuid: {
+          type: Buffer,
+          subtype: 4
+        }
+      });
+
+      var Test = db.model('gh5530', TestSchema);
+
+      var doc = new Test({ uuid: 'test1' });
+      assert.equal(doc.uuid._subtype, 4);
+      done();
+    });
+
     it('runs validate hooks on single nested subdocs if not directly modified (gh-3884)', function(done) {
       var childSchema = new Schema({
         name: { type: String },

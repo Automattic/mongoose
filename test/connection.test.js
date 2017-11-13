@@ -5,8 +5,6 @@
 var Promise = require('bluebird');
 var Q = require('q');
 var assert = require('power-assert');
-var muri = require('muri');
-var random = require('../lib/utils').random;
 var server = require('./common').server;
 var start = require('./common');
 

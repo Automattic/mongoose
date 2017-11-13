@@ -1,12 +1,12 @@
+'use strict';
 
-var url = require('url'),
-    start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Mongoose = mongoose.Mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
-    collection = 'blogposts_' + random();
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var Mongoose = mongoose.Mongoose;
+var Schema = mongoose.Schema;
+var random = require('../lib/utils').random;
+var collection = 'blogposts_' + random();
 
 describe('mongoose module:', function() {
   describe('default connection works', function() {
@@ -310,90 +310,6 @@ describe('mongoose module:', function() {
         done();
       });
     });
-  });
-
-  it('goose.connect() to a replica set', function(done) {
-    var uri = process.env.MONGOOSE_SET_TEST_URI;
-
-    if (!uri) {
-      console.log('\033[31m', '\n', 'You\'re not testing replica sets!'
-                , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
-                , 'e.g: `mongodb://localhost:27017/db,localhost…`', '\n'
-                , '\033[39m');
-      return done();
-    }
-
-    var mong = new Mongoose();
-
-    mong.connect(uri, function(err) {
-      assert.ifError(err);
-
-      mong.model('Test', new mongoose.Schema({
-        test: String
-      }));
-
-      var Test = mong.model('Test'),
-          test = new Test();
-
-      test.test = 'aa';
-      test.save(function(err) {
-        assert.ifError(err);
-
-        Test.findById(test._id, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc.test, 'aa');
-          mong.connection.close();
-          complete();
-        });
-      });
-    });
-
-    mong.connection.on('fullsetup', complete);
-
-    var pending = 2;
-    function complete() {
-      if (--pending) return;
-      done();
-    }
-  });
-
-  it('goose.createConnection() to a replica set', function(done) {
-    var uri = process.env.MONGOOSE_SET_TEST_URI;
-
-    if (!uri) return done();
-
-    var mong = new Mongoose();
-
-    var conn = mong.createConnection(uri, function(err) {
-      assert.ifError(err);
-
-      mong.model('ReplSetTwo', new mongoose.Schema({
-        test: String
-      }));
-
-      var Test = conn.model('ReplSetTwo'),
-          test = new Test();
-
-      test.test = 'aa';
-      test.save(function(err) {
-        assert.ifError(err);
-
-        Test.findById(test._id, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc.test, 'aa');
-          conn.close();
-          complete();
-        });
-      });
-    });
-
-    conn.on('fullsetup', complete);
-
-    var pending = 2;
-    function complete() {
-      if (--pending) return;
-      done();
-    }
   });
 
   describe('exports', function() {

@@ -283,6 +283,10 @@ describe('discriminator docs', function () {
    * types are stored in the same document array (within a document) rather
    * than the same collection. In other words, embedded discriminators let
    * you store subdocuments matching different schemas in the same array.
+   *
+   * As a general best practice, make sure you declare any hooks on your
+   * schemas **before** you use them. You should **not** call `pre()` or
+   * `post()` after calling `discriminator()`
    */
   it('Embedded discriminators in arrays', function(done) {
     var eventSchema = new Schema({ message: String },
@@ -295,12 +299,15 @@ describe('discriminator docs', function () {
 
     // The `events` array can contain 2 different types of events, a
     // 'clicked' event that requires an element id that was clicked...
-    var Clicked = docArray.discriminator('Clicked', new Schema({
+    var clickedSchema = new Schema({
       element: {
         type: String,
         required: true
       }
-    }, { _id: false }));
+    }, { _id: false });
+    // Make sure to attach any hooks to `eventSchema` and `clickedSchema`
+    // **before** calling `discriminator()`.
+    var Clicked = docArray.discriminator('Clicked', clickedSchema);
 
     // ... and a 'purchased' event that requires the product that was purchased.
     var Purchased = docArray.discriminator('Purchased', new Schema({

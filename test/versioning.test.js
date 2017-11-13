@@ -526,4 +526,31 @@ describe('versioning', function() {
       done();
     });
   });
+
+  it('copying doc works (gh-5779)', function(done) {
+    var schema = new Schema({ subdocs: [{ a: Number }] });
+    var M = db.model('gh5779', schema, 'gh5779');
+    var m = new M({ subdocs: [] });
+    var m2;
+
+    m.save().
+      then(function() {
+        m2 = new M(m);
+        m2.subdocs.push({ a: 2 });
+        return m2.save();
+      }).
+      then(function() {
+        m2.subdocs[0].a = 3;
+        return m2.save();
+      }).
+      then(function() {
+        assert.equal(m2.subdocs[0].a, 3);
+        return M.findById(m._id);
+      }).
+      then(function(doc) {
+        assert.equal(doc.subdocs[0].a, 3);
+        done();
+      }).
+      catch(done);
+  });
 });

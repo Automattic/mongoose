@@ -1155,7 +1155,7 @@ describe('connections:', function() {
       var db = start();
       var db2 = db.useDb('mongoose-test-2');
 
-      db.on('close', function() {
+      db.on('disconnected', function() {
         done();
       });
       db2.close();

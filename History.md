@@ -1,3 +1,7 @@
+4.13.2 / 2017-11-11
+===================
+ * feat(buffer): add support for subtype prop #5530
+
 4.13.1 / 2017-11-08
 ===================
  * fix: accept multiple paths or array of paths to depopulate #5798 #5797 [adamreisnz](https://github.com/adamreisnz)

@@ -72,7 +72,9 @@ describe('model: mapreduce:', function() {
         }
       };
 
-      MR.mapReduce(o, function(err, ret, stats) {
+      MR.mapReduce(o, function(err, res) {
+        var ret = res.results;
+        var stats = res.stats;
         assert.ifError(err);
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
@@ -101,7 +103,9 @@ describe('model: mapreduce:', function() {
           query: {author: 'aaron', published: 1, owners: id}
         };
 
-        MR.mapReduce(o, function(err, ret, stats) {
+        MR.mapReduce(o, function(err, res) {
+          var ret = res.results;
+          var stats = res.stats;
           assert.ifError(err);
 
           assert.ok(Array.isArray(ret));
@@ -126,16 +130,16 @@ describe('model: mapreduce:', function() {
           out: {replace: '_mapreduce_test_' + random()}
         };
 
-        MR.mapReduce(o, function(err, ret) {
+        MR.mapReduce(o, function(err, res) {
           assert.ifError(err);
+          var model = res.model;
 
           // ret is a model
-          assert.ok(!Array.isArray(ret));
-          assert.equal(typeof ret.findOne, 'function');
-          assert.equal(typeof ret.mapReduce, 'function');
+          assert.equal(typeof model.findOne, 'function');
+          assert.equal(typeof model.mapReduce, 'function');
 
           // queries work
-          ret.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
+          model.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs[0]._id, 'aaron');
             assert.equal(docs[1]._id, 'brian');
@@ -143,14 +147,14 @@ describe('model: mapreduce:', function() {
             assert.equal(docs[3]._id, 'nathan');
 
             // update casting works
-            ret.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function(err, doc) {
+            model.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function(err, doc) {
               assert.ifError(err);
               assert.ok(doc);
               assert.equal(doc._id, 'aaron');
               assert.equal(doc.published, true);
 
               // ad-hoc population works
-              ret
+              model
               .findOne({_id: 'aaron'})
               .populate({path: 'value.own', model: 'MapReduce'})
               .exec(function(err, doc) {
@@ -242,9 +246,6 @@ describe('model: mapreduce:', function() {
   });
 
   it('works using then', function(done) {
-    var db = start(),
-        MR = db.model('MapReduce', collection);
-
     var magicID;
     var id = new mongoose.Types.ObjectId;
     var authors = 'aaron guillermo brian nathan'.split(' ');
@@ -269,9 +270,9 @@ describe('model: mapreduce:', function() {
         }
       };
 
-      MR.mapReduce(o).then(function(ret, stats) {
+      MR.mapReduce(o).then(function(res) {
+        var ret = res.results;
         assert.ok(Array.isArray(ret));
-        assert.ok(stats);
         ret.forEach(function(res) {
           if (res._id === 'aaron') {
             assert.equal(res.value, 6);
@@ -297,14 +298,14 @@ describe('model: mapreduce:', function() {
           query: {author: 'aaron', published: 1, owners: id}
         };
 
-        MR.mapReduce(o).then(function(ret, stats) {
+        MR.mapReduce(o).then(function(res) {
+          var ret = res.results;
           assert.ok(Array.isArray(ret));
           assert.equal(ret.length, 1);
           assert.equal(ret[0]._id, 'aaron');
           assert.equal(ret[0].value, 3);
-          assert.ok(stats);
           modeling();
-        });
+        }).catch(done);
       });
 
       function modeling() {
@@ -319,7 +320,8 @@ describe('model: mapreduce:', function() {
           out: {replace: '_mapreduce_test_' + random()}
         };
 
-        MR.mapReduce(o).then(function(ret) {
+        MR.mapReduce(o).then(function(res) {
+          var ret = res.model;
           // ret is a model
           assert.ok(!Array.isArray(ret));
           assert.equal(typeof ret.findOne, 'function');
@@ -352,7 +354,7 @@ describe('model: mapreduce:', function() {
               });
             });
           });
-        });
+        }).catch(done);
       }
     });
   });

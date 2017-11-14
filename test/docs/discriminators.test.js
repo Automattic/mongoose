@@ -352,4 +352,55 @@ describe('discriminator docs', function () {
       }).
       catch(done);
   });
+
+  /**
+   * Recursive embedded discriminators
+   */
+  it('Recursive embedded discriminators in arrays', function(done) {
+    var eventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+
+    var batchSchema = new Schema({ events: [eventSchema] });
+
+    var subEventSchema = new Schema({
+       sub_events: [eventSchema]
+    }, { _id: false });
+
+    var SubEvent = subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema)
+    batchSchema.path('events').discriminator('SubEvent', subEventSchema);
+
+
+    // Create a new batch of events with different kinds
+    var batch = {
+      events: [
+        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[], message:'test1'}], message: 'hello' },
+        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test3'}], message:'test2'}], message: 'world' }
+      ]
+    };
+
+    Batch.create(batch).
+      then(function(doc) {
+        assert.equal(doc.events.length, 2);
+
+        assert.equal(doc.events[0].sub_events[0].message, 'test1');
+        assert.equal(doc.events[0].message, 'hello');
+        assert.ok(doc.events[0] instanceof SubEvent);
+
+        assert.equal(doc.events[1].sub_events[0].sub_events[0].message, 'test3');
+        assert.equal(doc.events[1].message, 'world');
+        assert.ok(doc.events[1] instanceof SubEvent);
+
+        doc.events.push({kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test4'}], message:'pushed'});
+        return doc.save();
+      }).
+      then(function(doc) {
+        assert.equal(doc.events.length, 3);
+
+        assert.equal(doc.events[2].message, 'pushed');
+        assert.ok(doc.events[2].sub_events[0] instanceof SubEvent);
+
+        done();
+      }).
+      catch(done);
+  });
 });

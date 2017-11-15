@@ -18,9 +18,8 @@ var Schema = mongoose.Schema;
 describe('connections:', function() {
   describe('useMongoClient/openUri (gh-5304)', function() {
     it('with mongoose.connect()', function(done) {
-      var conn = mongoose.connect('mongodb://localhost:27017/mongoosetest', {
-        useMongoClient: true
-      });
+      mongoose.connect('mongodb://localhost:27017/mongoosetest');
+      const conn = mongoose.connection;
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       conn.then(function(conn) {
@@ -295,10 +294,12 @@ describe('connections:', function() {
     var conn;
 
     before(function() {
-      conn = mongoose.connect('mongodb://localhost:27017/mongoosetest_2', {
-        useMongoClient: true
-      });
+      conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest_2');
       return conn;
+    });
+
+    after(function() {
+      return conn.close();
     });
 
     it('dropDatabase()', function(done) {
@@ -360,61 +361,16 @@ describe('connections:', function() {
     db.on('error', function() {
     });
     assert.ok(db instanceof mongoose.Connection);
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, true);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.options.db.forceServerObjectId, false);
-    assert.equal(db.pass, undefined);
-    assert.equal(db.user, undefined);
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
     assert.equal(db.port, 27017);
     db.close(done);
   });
 
-  it('should accept replicaSet query param', function(done) {
-    var db = mongoose.createConnection('mongodb://localhost/fake?replicaSet=rs0');
-    db.on('error', function() {
-    });
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, true);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.options.db.forceServerObjectId, false);
-    assert.equal(db.pass, void 0);
-    assert.equal(db.user, void 0);
-    assert.equal('fake', db.name);
-    assert.deepEqual(db.hosts, [{host: 'localhost', port: 27017}]);
-
-    // Should be a replica set
-    assert.ok(db.replica);
-    db.close();
-    done();
-  });
-
-  it('should accept mongodb://localhost:27000/fake', function(done) {
-    var db = mongoose.createConnection('mongodb://localhost:27000/fake');
-    db.on('error', function() {
-    });
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, true);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.port, 27000);
-    db.close();
-    done();
-  });
-
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
     db.on('error', function() {
     });
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, true);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.options.db.forceServerObjectId, false);
     assert.equal(db.pass, 'psw');
     assert.equal(db.user, 'aaron');
     assert.equal(db.name, 'fake');
@@ -424,41 +380,11 @@ describe('connections:', function() {
     done();
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27000/fake with db options', function(done) {
-    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {db: {forceServerObjectId: true}});
-    db.on('error', function() {
-    });
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, true);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.options.db.forceServerObjectId, false);
-    db.close();
-    done();
-  });
-
-  it('should accept mongodb://aaron:psw@localhost:27000/fake with server options', function(done) {
-    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {server: {auto_reconnect: false}});
-    db.on('error', function() {
-    });
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, false);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.options.db.forceServerObjectId, false);
-    db.close();
-    done();
-  });
-
   it('should accept unix domain sockets', function(done) {
-    var db = mongoose.createConnection('mongodb://aaron:psw@/tmp/mongodb-27017.sock/fake', {server: {auto_reconnect: false}});
+    const host = encodeURIComponent('/tmp/mongodb-27017.sock');
+    var db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
     db.on('error', function() {
     });
-    assert.equal(typeof db.options, 'object');
-    assert.equal(typeof db.options.server, 'object');
-    assert.equal(db.options.server.auto_reconnect, false);
-    assert.equal(typeof db.options.db, 'object');
-    assert.equal(db.options.db.forceServerObjectId, false);
     assert.equal(db.name, 'fake');
     assert.equal(db.host, '/tmp/mongodb-27017.sock');
     assert.equal(db.pass, 'psw');
@@ -471,7 +397,7 @@ describe('connections:', function() {
     it('.catch() means error does not get thrown (gh-5229)', function(done) {
       var db = mongoose.createConnection();
 
-      db.open('fail connection').catch(function(error) {
+      db.openUri('fail connection').catch(function(error) {
         assert.ok(error);
         done();
       });
@@ -480,17 +406,12 @@ describe('connections:', function() {
 
   describe('connect callbacks', function() {
     it('execute with user:pwd connection strings', function(done) {
-      var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {server: {auto_reconnect: true}}, function() {
+      var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', function() {
         done();
       });
       db.on('error', function(err) {
         assert.ok(err);
       });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, true);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
       db.close();
     });
     it('execute without user:pwd connection strings', function(done) {
@@ -500,10 +421,6 @@ describe('connections:', function() {
         assert.ok(err);
       });
       assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, true);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
       assert.equal(db.user, undefined);
       assert.equal(db.name, 'fake');
       assert.equal(db.host, 'localhost');
@@ -524,52 +441,8 @@ describe('connections:', function() {
         done();
       });
       assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, true);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
       assert.equal(db.name, 'admin');
       assert.equal(db.host, 'localhost');
-      assert.equal(db.port, 27017);
-      db.close();
-    });
-    it('should fire when individual args are passed', function(done) {
-      var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, {server: {auto_reconnect: false}}, function() {
-        done();
-      });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, false);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
-      assert.equal(db.name, 'faker');
-      assert.equal(db.host, '127.0.0.1');
-      assert.equal(db.port, 28000);
-      db.close();
-    });
-    it('should fire when no options are passed', function(done) {
-      var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, function() {
-        done();
-      });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, true);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
-      assert.equal(db.name, 'faker');
-      assert.equal(db.host, '127.0.0.1');
-      assert.equal(db.port, 28000);
-      db.close();
-    });
-    it('should fire when default port utilized', function(done) {
-      var db = mongoose.createConnection('127.0.0.1', 'faker', done);
-      assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, true);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
-      assert.equal(db.name, 'faker');
-      assert.equal(db.host, '127.0.0.1');
       assert.equal(db.port, 27017);
       db.close();
     });
@@ -587,10 +460,8 @@ describe('connections:', function() {
     });
 
     it('should occur without hanging when password with special chars is used (gh-460)', function(done) {
-      this.timeout(1000);
       var db = mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function(err) {
         assert.ok(err);
-        db.close();
         done();
       });
     });
@@ -784,19 +655,15 @@ describe('connections:', function() {
     });
 
     it('handles unix domain sockets', function(done) {
-      var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake?replicaSet=bacon';
-      var db = mongoose.createConnection(url, {server: {auto_reconnect: false}});
+      const host1 = encodeURIComponent('/tmp/mongodb-27018.sock');
+      const host2 = encodeURIComponent('/tmp/mongodb-27019.sock');
+      const url = `mongodb://aaron:psw@${host1},${host2}/fake?replicaSet=bacon`;
+      const db = mongoose.createConnection(url);
       db.on('error', function() {
       });
       assert.equal(typeof db.options, 'object');
-      assert.equal(typeof db.options.server, 'object');
-      assert.equal(db.options.server.auto_reconnect, false);
-      assert.equal(typeof db.options.db, 'object');
-      assert.equal(db.options.db.forceServerObjectId, false);
       assert.equal(db.name, 'fake');
-      assert.ok(Array.isArray(db.hosts));
-      assert.equal(db.hosts[0].ipc, '/tmp/mongodb-27018.sock');
-      assert.equal(db.hosts[1].ipc, '/tmp/mongodb-27019.sock');
+      assert.equal(db.host, '/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock');
       assert.equal(db.pass, 'psw');
       assert.equal(db.user, 'aaron');
       db.close();
@@ -832,14 +699,6 @@ describe('connections:', function() {
       } catch (err) {
         done(err);
       }
-    });
-  });
-
-  it('connecting to single mongos (gh-3537)', function(done) {
-    var db = mongoose.createConnection('localhost:27017', {mongos: true});
-    assert.ok(db.db.serverConfig instanceof mongoose.mongo.Mongos);
-    db.on('error', function() {
-      done();
     });
   });
 
@@ -1190,21 +1049,21 @@ describe('connections:', function() {
         });
       });
       describe('when only username is defined', function() {
-        it('should return false', function(done) {
+        it('should return true', function(done) {
           var db = mongoose.createConnection('mongodb://localhost:27017/fake', {
             user: 'user'
           });
           db.on('error', function() {
           });
 
-          assert.equal(db.shouldAuthenticate(), false);
+          assert.equal(db.shouldAuthenticate(), true);
 
           db.close();
           done();
         });
       });
       describe('when both username and password are defined', function() {
-        it('should return false', function(done) {
+        it('should return true', function(done) {
           var db = mongoose.createConnection('mongodb://localhost:27017/fake', {
             user: 'user',
             pass: 'pass'

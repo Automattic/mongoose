@@ -385,11 +385,11 @@ describe('discriminator docs', function () {
 
         assert.equal(doc.events[0].sub_events[0].message, 'test1');
         assert.equal(doc.events[0].message, 'hello');
-        assert.ok(doc.events[0] instanceof SubEvent);
+        assert.ok(doc.events[0].sub_events[0] instanceof SubEvent);
 
         assert.equal(doc.events[1].sub_events[0].sub_events[0].message, 'test3');
         assert.equal(doc.events[1].message, 'world');
-        assert.ok(doc.events[1] instanceof SubEvent);
+        assert.ok(doc.events[1].sub_events[0].sub_events[0] instanceof SubEvent);
 
         doc.events.push({kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test4'}], message:'pushed'});
         return doc.save();

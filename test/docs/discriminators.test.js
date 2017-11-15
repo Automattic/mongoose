@@ -367,9 +367,9 @@ describe('discriminator docs', function () {
     }, { _id: false });
 
     var SubEvent = subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema)
-    eventList.path('events').discriminator('SubEvent', subEventSchema);
+    eventListSchema.path('events').discriminator('SubEvent', subEventSchema);
 
-    var Eventlist = db.model('EventList', eventList);
+    var Eventlist = db.model('EventList', eventListSchema);
 
     // Create a new batch of events with different kinds
     var list = {

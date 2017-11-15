@@ -357,29 +357,29 @@ describe('discriminator docs', function () {
    * Recursive embedded discriminators
    */
   it('Recursive embedded discriminators in arrays', function(done) {
-    var eventSchema = new Schema({ message: String },
+    var singleEventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
 
-    var batchSchema = new Schema({ events: [eventSchema] });
+    var eventListSchema = new Schema({ events: [singleEventSchema] });
 
     var subEventSchema = new Schema({
-       sub_events: [eventSchema]
+       sub_events: [singleEventSchema]
     }, { _id: false });
 
     var SubEvent = subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema)
-    batchSchema.path('events').discriminator('SubEvent', subEventSchema);
+    eventList.path('events').discriminator('SubEvent', subEventSchema);
 
-    var Batch = db.model('EventBatch', batchSchema);
+    var Eventlist = db.model('EventList', eventList);
 
     // Create a new batch of events with different kinds
-    var batch = {
+    var list = {
       events: [
         { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[], message:'test1'}], message: 'hello' },
         { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test3'}], message:'test2'}], message: 'world' }
       ]
     };
 
-    Batch.create(batch).
+    Eventlist.create(list).
       then(function(doc) {
         assert.equal(doc.events.length, 2);
 

@@ -1,6 +1,7 @@
 language: node_js
 sudo: false
 node_js:
+  - "9"
   - "8"
   - "7"
   - "6"
@@ -9,6 +10,9 @@ node_js:
   - "0.12"
   - "0.10"
   - "iojs"
+matrix:
+  allow_failures:
+    - node_js: "9"
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.6.11.tgz
   - tar -zxvf mongodb-linux-x86_64-2.6.11.tgz

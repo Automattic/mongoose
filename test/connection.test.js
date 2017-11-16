@@ -16,26 +16,9 @@ var Schema = mongoose.Schema;
  */
 
 describe('connections:', function() {
-  describe('useMongoClient/openUri (gh-5304)', function() {
-    it('with mongoose.connect()', function(done) {
-      mongoose.connect('mongodb://localhost:27017/mongoosetest');
-      const conn = mongoose.connection;
-      assert.equal(conn.constructor.name, 'NativeConnection');
-
-      conn.then(function(conn) {
-        assert.equal(conn.constructor.name, 'NativeConnection');
-        assert.equal(conn.host, 'localhost');
-        assert.equal(conn.port, 27017);
-        assert.equal(conn.name, 'mongoosetest');
-
-        return mongoose.disconnect().then(function() { done(); });
-      }).catch(done);
-    });
-
-    it('with mongoose.createConnection()', function(done) {
-      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useMongoClient: true
-      });
+  describe('openUri (gh-5304)', function() {
+    it('with mongoose.createConnection()', function() {
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       var Test = conn.model('Test', new Schema({ name: String }));
@@ -45,7 +28,7 @@ describe('connections:', function() {
 
       assert.equal(typeof conn.catch, 'function');
 
-      conn.
+      return conn.
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
           assert.equal(conn.host, 'localhost');
@@ -55,14 +38,12 @@ describe('connections:', function() {
           return findPromise;
         }).
         then(function() {
-          return mongoose.disconnect().then(function() { done(); });
-        }).
-        catch(done);
+          return conn.close();
+        });
     });
 
     it('with autoIndex (gh-5423)', function(done) {
       var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useMongoClient: true,
         autoIndex: false
       });
 
@@ -111,9 +92,7 @@ describe('connections:', function() {
         var numReconnected = 0;
         var numReconnect = 0;
         var numClose = 0;
-        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          useMongoClient: true
-        });
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest');
 
         conn.on('connected', function() {
           ++numConnected;
@@ -179,7 +158,6 @@ describe('connections:', function() {
         var numDisconnected = 0;
         var numReconnected = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          useMongoClient: true,
           reconnectTries: 3,
           reconnectInterval: 100
         });
@@ -248,7 +226,6 @@ describe('connections:', function() {
         var numTimeout = 0;
         var numDisconnected = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          useMongoClient: true,
           socketTimeoutMS: 100,
           poolSize: 1
         });
@@ -428,9 +405,10 @@ describe('connections:', function() {
       db.close();
       setTimeout(done, 10);
     });
+
     it('should return an error if malformed uri passed', function(done) {
       var db = mongoose.createConnection('mongodb:///fake', function(err) {
-        assert.ok(/Missing hostname/.test(err.message));
+        assert.ok(/no hostname/.test(err.message));
         done();
       });
       db.close();
@@ -451,7 +429,7 @@ describe('connections:', function() {
   describe('errors', function() {
     it('event fires with one listener', function(done) {
       this.timeout(1000);
-      var db = start({uri: 'mongodb://whatever23939.localhost/fakeeee?connectTimeoutMS=500', noErrorListener: 1});
+      var db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100');
       db.on('error', function() {
         // this callback has no params which triggered the bug #759
         db.close();
@@ -703,7 +681,7 @@ describe('connections:', function() {
   });
 
   it('force close (gh-5664)', function(done) {
-    var opts = { useMongoClient: true };
+    var opts = {};
     var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     var coll = db.collection('Test');
     db.then(function() {
@@ -721,7 +699,7 @@ describe('connections:', function() {
   });
 
   it('force close with connection created after close (gh-5664)', function(done) {
-    var opts = { useMongoClient: true };
+    var opts = {};
     var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     db.then(function() {
       setTimeout(function() {
@@ -751,20 +729,20 @@ describe('connections:', function() {
   });
 
   it('bufferCommands (gh-5720)', function(done) {
-    var opts = { useMongoClient: true, bufferCommands: false };
+    var opts = { bufferCommands: false };
     var db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
 
     var M = db.model('gh5720', new Schema({}));
     assert.ok(!M.collection.buffer);
     db.close();
 
-    opts = { useMongoClient: true, bufferCommands: true };
+    opts = { bufferCommands: true };
     db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     M = db.model('gh5720', new Schema({}, { bufferCommands: false }));
     assert.ok(!M.collection.buffer);
     db.close();
 
-    opts = { useMongoClient: true, bufferCommands: true };
+    opts = { bufferCommands: true };
     db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     M = db.model('gh5720', new Schema({}));
     assert.ok(M.collection.buffer);

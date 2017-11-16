@@ -95,7 +95,7 @@ describe('mongoose module:', function() {
     assert.equal(calls[1], subSchema);
 
     assert.equal(preSaveCalls, 0);
-    mong.connect(start.uri, { useMongoClient: true });
+    mong.connect(start.uri);
     M.create({ test: [{ name: 'Val' }] }, function(error, doc) {
       assert.ifError(error);
       assert.equal(preSaveCalls, 2);

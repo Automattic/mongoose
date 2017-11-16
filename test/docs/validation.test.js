@@ -9,7 +9,6 @@ describe('validation docs', function() {
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
-      useMongoClient: true,
       poolSize: 1
     });
   });

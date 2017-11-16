@@ -57,9 +57,7 @@ describe('connections:', function() {
     it('resolving with q (gh-5714)', function(done) {
       var bootMongo = Q.defer();
 
-      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useMongoClient: true
-      });
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
 
       conn.on('connected', function() {
         bootMongo.resolve(this);

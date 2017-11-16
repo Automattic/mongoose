@@ -35,8 +35,8 @@ block content
   :markdown
     **Q**. I declared a schema property as `unique` but I can still save duplicates. What gives?
 
-    **A**. Mongoose doesn't handle `unique` on it's own, `{ name: { type: String, unique: true } }`
-    just a shorthand for creating a [MongoDB unique index on `name`](https://docs.mongodb.com/manual/core/index-unique/).
+    **A**. Mongoose doesn't handle `unique` on its own: `{ name: { type: String, unique: true } }`
+    is just a shorthand for creating a [MongoDB unique index on `name`](https://docs.mongodb.com/manual/core/index-unique/).
     For example, if MongoDB doesn't already have a unique index on `name`, the below code will not error despite the fact that `unique` is true.
   :js
     var schema = new mongoose.Schema({

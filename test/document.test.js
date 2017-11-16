@@ -1908,6 +1908,38 @@ describe('document', function() {
       });
     });
 
+    it('single nested schema transform with save() (gh-5807)', function() {
+      var embeddedSchema = new Schema({
+        test: String
+      });
+
+      var called = false;
+      embeddedSchema.options.toObject = {
+        transform: function(doc, ret) {
+          called = true;
+          delete ret.test;
+          return ret;
+        }
+      };
+      var topLevelSchema = new Schema({
+        embedded: embeddedSchema
+      });
+      var MyModel = db.model('gh5807', topLevelSchema);
+
+      return MyModel.create({}).
+        then(function(doc) {
+          doc.embedded = { test: '123' };
+          return doc.save();
+        }).
+        then(function(doc) {
+          return MyModel.findById(doc._id);
+        }).
+        then(function(doc) {
+          assert.equal(doc.embedded.test, '123');
+          assert.ok(!called);
+        });
+    });
+
     it('setters firing with objects on real paths (gh-2943)', function(done) {
       var M = mongoose.model('gh2943', {
         myStr: {

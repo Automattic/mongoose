@@ -11,7 +11,7 @@ const host = encodeURIComponent('/tmp/mongodb-27017.sock');
 mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
 ```
 
-* `mongoose.connect()` now returns a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
+* `mongoose.connect()` and `mongoose.disconnect()` now return a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
 
 ```javascript
 // Worked in mongoose 4. Does **not** work in mongoose 5, `mongoose.connect()`

@@ -149,26 +149,6 @@ describe('mongoose module:', function() {
 
         mong.disconnect();
       });
-
-      it('properly handles errors', function(done) {
-        var mong = new Mongoose(),
-            uri = 'mongodb://localhost/mongoose_test';
-
-        mong.connect(process.env.MONGOOSE_TEST_URI || uri);
-        var db = mong.connection;
-
-        // forced failure
-        db.close = function(cb) {
-          cb(new Error('bam'));
-        };
-
-        mong.disconnect().connection.
-          on('error', function(error) {
-            assert.equal(error.message, 'bam');
-          });
-
-        done();
-      });
     });
 
     it('with callback', function(done) {

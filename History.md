@@ -1,3 +1,8 @@
+4.13.3 / 2017-11-15
+===================
+ * chore: add node 8 to travis #5818 [superheri](https://github.com/superheri)
+ * fix(document): don't apply transforms to nested docs when updating already saved doc #5807
+
 4.13.2 / 2017-11-11
 ===================
  * feat(buffer): add support for subtype prop #5530

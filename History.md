@@ -1,3 +1,11 @@
+4.13.4 / 2017-11-17
+===================
+ * fix(aggregate): add chainable .option() helper for setting arbitrary options #5829
+ * fix(aggregate): add `.pipeline()` helper to get the current pipeline #5825
+ * docs: grammar fixes for `unique` FAQ #5823 [mfluehr](https://github.com/mfluehr)
+ * chore: add node 9 to travis #5822 [superheri](https://github.com/superheri)
+ * fix(model): fix infinite recursion with recursive embedded discriminators #5821 [Faibk](https://github.com/Faibk)
+
 4.13.3 / 2017-11-15
 ===================
  * chore: add node 8 to travis #5818 [superheri](https://github.com/superheri)

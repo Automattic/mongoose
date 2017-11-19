@@ -2251,6 +2251,31 @@ describe('Query', function() {
       });
     });
 
+    it('queries with BSON overflow (gh-5812)', function(done) {
+      this.timeout(10000);
+
+      var schema = new mongoose.Schema({
+        email: String
+      });
+
+      var model = db.model('gh5812', schema);
+      var bigData = new Array(800000);
+
+      for (var i = 0; i < bigData.length; ++i) {
+        bigData[i] = 'test1234567890';
+      }
+
+      model.find({email: {$in: bigData}}).lean().
+        then(function() {
+          done(new Error('Expected an error'));
+        }).
+        catch(function(error) {
+          assert.ok(error);
+          assert.ok(error.message !== 'Expected error');
+          done();
+        });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

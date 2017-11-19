@@ -913,6 +913,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('populate on nested path (gh-5703)', function() {
+      var toySchema = new mongoose.Schema({ color: String });
+      var Toy = db.model('gh5703', toySchema);
+
+      var childSchema = new mongoose.Schema({
+        name: String,
+        values: {
+          toy: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5703' }
+        }
+      });
+      var Child = db.model('gh5703_0', childSchema);
+
+      return Toy.create({ color: 'blue' }).
+        then(function(toy) {
+          return Child.create({ values: { toy: toy._id } });
+        }).
+        then(function(child) {
+          return Child.findById(child._id);
+        }).
+        then(function(child) {
+          return child.values.populate('toy').execPopulate().then(function() {
+            return child;
+          });
+        }).
+        then(function(child) {
+          assert.equal(child.values.toy.color, 'blue');
+        });
+    });
   });
 
   describe('#update', function() {

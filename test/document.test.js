@@ -1390,9 +1390,12 @@ describe('document', function() {
         preference: {
           type: String,
           required: true,
-          validate: function validator(value, done) {
-            count++;
-            setTimeout(done.bind(null, true), 500);
+          validate: {
+            validator: function validator(value, done) {
+              count++;
+              setTimeout(done.bind(null, true), 500);
+            },
+            isAsync: true
           }
         }
       });

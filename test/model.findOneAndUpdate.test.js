@@ -2096,10 +2096,10 @@ describe('model: findOneAndUpdate:', function() {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});
       var validateCalls = 0;
-      B.path('a').validate(function(val, next) {
+      B.path('a').validate(function(val) {
         ++validateCalls;
         assert(Array.isArray(val));
-        next();
+        return true;
       });
 
       B = db.model('b', B);

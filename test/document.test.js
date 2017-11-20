@@ -4953,6 +4953,45 @@ describe('document', function() {
       });
     });
 
+    it('modifying unselected nested object (gh-5800)', function() {
+      var MainSchema = new mongoose.Schema({
+        a: {
+          b: {type: String, default: 'some default'},
+          c: {type: Number, default: 0},
+          d: {type: String}
+        },
+        e: {type: String}
+      });
+
+      MainSchema.pre('save', function(next) {
+        if (this.isModified()) {
+          this.set('a.c', 100, Number);
+        }
+        next();
+      });
+
+      var Main = db.model('gh5800', MainSchema);
+
+      var doc = { a: { b: 'not the default', d: 'some value' }, e: 'e' };
+      return Main.create(doc).
+        then(function(doc) {
+          assert.equal(doc.a.b, 'not the default');
+          assert.equal(doc.a.d, 'some value');
+          return Main.findOne().select('e');
+        }).
+        then(function(doc) {
+          doc.e = 'e modified';
+          return doc.save();
+        }).
+        then(function() {
+          return Main.findOne();
+        }).
+        then(function(doc) {
+          assert.equal(doc.a.b, 'not the default');
+          assert.equal(doc.a.d, 'some value');
+        });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

@@ -352,4 +352,56 @@ describe('discriminator docs', function () {
       }).
       catch(done);
   });
+
+  /**
+   * Recursive embedded discriminators
+   */
+  it('Recursive embedded discriminators in arrays', function(done) {
+    var singleEventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+
+    var eventListSchema = new Schema({ events: [singleEventSchema] });
+
+    var subEventSchema = new Schema({
+       sub_events: [singleEventSchema]
+    }, { _id: false });
+
+    var SubEvent = subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema)
+    eventListSchema.path('events').discriminator('SubEvent', subEventSchema);
+
+    var Eventlist = db.model('EventList', eventListSchema);
+
+    // Create a new batch of events with different kinds
+    var list = {
+      events: [
+        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[], message:'test1'}], message: 'hello' },
+        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test3'}], message:'test2'}], message: 'world' }
+      ]
+    };
+
+    Eventlist.create(list).
+      then(function(doc) {
+        assert.equal(doc.events.length, 2);
+
+        assert.equal(doc.events[0].sub_events[0].message, 'test1');
+        assert.equal(doc.events[0].message, 'hello');
+        assert.ok(doc.events[0].sub_events[0] instanceof SubEvent);
+
+        assert.equal(doc.events[1].sub_events[0].sub_events[0].message, 'test3');
+        assert.equal(doc.events[1].message, 'world');
+        assert.ok(doc.events[1].sub_events[0].sub_events[0] instanceof SubEvent);
+
+        doc.events.push({kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test4'}], message:'pushed'});
+        return doc.save();
+      }).
+      then(function(doc) {
+        assert.equal(doc.events.length, 3);
+
+        assert.equal(doc.events[2].message, 'pushed');
+        assert.ok(doc.events[2].sub_events[0] instanceof SubEvent);
+
+        done();
+      }).
+      catch(done);
+  });
 });

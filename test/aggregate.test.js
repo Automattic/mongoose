@@ -773,6 +773,18 @@ describe('aggregate: ', function() {
         });
     });
 
+    it('pipeline() (gh-5825)', function(done) {
+      var aggregate = new Aggregate();
+
+      var pipeline = aggregate.
+        model(db.model('Employee')).
+        match({ sal: { $lt: 16000 } }).
+        pipeline();
+
+      assert.deepEqual(pipeline, [{ $match: { sal: { $lt: 16000 } } }]);
+      done();
+    });
+
     it('explain()', function(done) {
       var aggregate = new Aggregate();
       start.mongodVersion(function(err, version) {

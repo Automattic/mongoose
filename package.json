@@ -27,7 +27,7 @@
     "mongodb": "https://github.com/mongodb/node-mongodb-native/archive/3.0.0.tar.gz",
     "mpath": "0.3.0",
     "mpromise": "0.5.5",
-    "mquery": "2.3.2",
+    "mquery": "2.3.3",
     "ms": "2.0.0",
     "regexp-clone": "0.0.1",
     "sliced": "1.0.1"

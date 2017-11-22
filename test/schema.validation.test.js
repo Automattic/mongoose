@@ -445,7 +445,7 @@ describe('schema', function() {
         var executed = 0;
 
         function validator(value) {
-          return new Promise(resolve => {
+          return new global.Promise(function(resolve) {
             setTimeout(function() {
               executed++;
               resolve(value === true);
@@ -496,7 +496,7 @@ describe('schema', function() {
             validate: [
               { validator: validator1, msg: 'validator1' },
               { validator: validator2, msg: 'validator2' }
-            ].map(v => Object.assign(v, { isAsync: true }))
+            ].map(function(v) { return Object.assign(v, { isAsync: true }); })
           }
         });
 
@@ -508,8 +508,8 @@ describe('schema', function() {
       it('scope', function(done) {
         var called = false;
 
-        function validator(value) {
-          return new Promise((resolve) => {
+        function validator() {
+          return new global.Promise(function(resolve) {
             assert.equal(this.a, 'b');
             setTimeout(function() {
               called = true;
@@ -707,7 +707,7 @@ describe('schema', function() {
             x: {
               type: String,
               validate: [{
-                validator: function(value) {
+                validator: function() {
                   throw new Error('Custom message');
                 },
                 msg: 'Does not matter'
@@ -886,7 +886,7 @@ describe('schema', function() {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});
       var validateCalls = 0;
-      B.path('a').validate(function(val) {
+      B.path('a').validate(function() {
         ++validateCalls;
         return true;
       });

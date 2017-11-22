@@ -2326,7 +2326,7 @@ describe('model: update:', function() {
 
       var A = new Schema({ str: {} });
       var validateCalls = 0;
-      A.path('str').validate(function(val) {
+      A.path('str').validate(function() {
         ++validateCalls;
         return true;
       });

@@ -1060,9 +1060,9 @@ describe('Model', function() {
         return true;
       }
 
-      function dovalidateAsync(val) {
+      function dovalidateAsync() {
         assert.equal(this.scope, 'correct');
-        return Promise.resolve(true);
+        return global.Promise.resolve(true);
       }
 
       mongoose.model('TestValidation', new Schema({

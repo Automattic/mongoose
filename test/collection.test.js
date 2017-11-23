@@ -5,11 +5,11 @@ var start = require('./common'),
 
 describe('collections:', function() {
   it('should buffer commands until connection is established', function(done) {
-    var db = mongoose.createConnection(),
-        collection = db.collection('test-buffering-collection'),
-        connected = false,
-        inserted = false,
-        pending = 2;
+    var db = mongoose.createConnection();
+    var collection = db.collection('test-buffering-collection');
+    var connected = false;
+    var inserted = false;
+    var pending = 2;
 
     function finish() {
       if (--pending) {
@@ -20,7 +20,7 @@ describe('collections:', function() {
       done();
     }
 
-    collection.insert({}, {safe: true}, function() {
+    collection.insert({}, {}, function() {
       assert.ok(connected);
       inserted = true;
       db.close();
@@ -28,7 +28,7 @@ describe('collections:', function() {
     });
 
     var uri = 'mongodb://localhost/mongoose_test';
-    db.open(process.env.MONGOOSE_TEST_URI || uri, function(err) {
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
       connected = !err;
       finish();
     });

@@ -4070,34 +4070,6 @@ describe('Model', function() {
     });
   });
 
-  describe('auto_reconnect', function() {
-    describe('if disabled', function() {
-      describe('with mongo down', function() {
-        it('and no command buffering should pass an error', function(done) {
-          var db = start({db: {bufferMaxEntries: 0}});
-          var schema = new Schema({type: String}, {bufferCommands: false});
-          var T = db.model('Thing', schema);
-          db.on('open', function() {
-            var t = new T({type: 'monster'});
-            var worked = false;
-
-            t.save(function(err) {
-              assert.ok(/(operation|destroyed)/.test(err.message));
-              worked = true;
-            });
-
-            db.db.close();
-
-            setTimeout(function() {
-              assert.ok(worked);
-              done();
-            }, 100);
-          });
-        });
-      });
-    });
-  });
-
   it('subdocuments with changed values should persist the values', function(done) {
     var db = start();
     var Subdoc = new Schema({name: String, mixed: Schema.Types.Mixed});

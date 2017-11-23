@@ -509,7 +509,7 @@ describe('document', function() {
   describe('toObject', function() {
     var db;
     before(function() {
-      return start({ useMongoClient: true }).then(function(_db) {
+      return start().then(function(_db) {
         db = _db;
       });
     });

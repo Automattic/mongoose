@@ -1060,11 +1060,9 @@ describe('Model', function() {
         return true;
       }
 
-      function dovalidateAsync(val, callback) {
+      function dovalidateAsync() {
         assert.equal(this.scope, 'correct');
-        process.nextTick(function() {
-          callback(true);
-        });
+        return global.Promise.resolve(true);
       }
 
       mongoose.model('TestValidation', new Schema({
@@ -1346,138 +1344,6 @@ describe('Model', function() {
             db.close();
             assert.ok(!post.errors);
             assert.ifError(err);
-            done();
-          });
-        });
-      });
-    });
-
-    describe('async', function() {
-      it('works', function(done) {
-        var executed = false;
-
-        function validator(v, fn) {
-          setTimeout(function() {
-            executed = true;
-            fn(v !== 'test');
-          }, 5);
-        }
-
-        mongoose.model('TestAsyncValidation', new Schema({
-          async: {type: String, validate: [validator, 'async validator failed for `{PATH}`']}
-        }));
-
-        var db = start(),
-            TestAsyncValidation = db.model('TestAsyncValidation');
-
-        var post = new TestAsyncValidation();
-        post.set('async', 'test');
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.ok(err.errors.async instanceof ValidatorError);
-          assert.equal(err.errors.async.message, 'async validator failed for `async`');
-          assert.equal(executed, true);
-          executed = false;
-
-          post.set('async', 'woot');
-          post.save(function(err) {
-            db.close();
-            assert.equal(executed, true);
-            assert.strictEqual(err, null);
-            done();
-          });
-        });
-      });
-
-      it('nested', function(done) {
-        var executed = false;
-
-        function validator(v, fn) {
-          setTimeout(function() {
-            executed = true;
-            fn(v !== 'test');
-          }, 5);
-        }
-
-        mongoose.model('TestNestedAsyncValidation', new Schema({
-          nested: {
-            async: {type: String, validate: [validator, 'async validator']}
-          }
-        }));
-
-        var db = start(),
-            TestNestedAsyncValidation = db.model('TestNestedAsyncValidation');
-
-        var post = new TestNestedAsyncValidation();
-        post.set('nested.async', 'test');
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.ok(executed);
-          executed = false;
-
-          post.validate(function(err) {
-            assert.ok(err instanceof MongooseError);
-            assert.ok(err instanceof ValidationError);
-            assert.ok(executed);
-            executed = false;
-
-            post.set('nested.async', 'woot');
-            post.validate(function(err) {
-              assert.ok(executed);
-              assert.equal(err, null);
-              executed = false;
-
-              post.save(function(err) {
-                db.close();
-                assert.ok(executed);
-                assert.strictEqual(err, null);
-                done();
-              });
-            });
-          });
-        });
-      });
-
-      it('subdocuments', function(done) {
-        var executed = false;
-
-        function validator(v, fn) {
-          setTimeout(function() {
-            executed = true;
-            fn(v !== '');
-          }, 5);
-        }
-
-        var Subdocs = new Schema({
-          required: {type: String, validate: [validator, 'async in subdocs']}
-        });
-
-        mongoose.model('TestSubdocumentsAsyncValidation', new Schema({
-          items: [Subdocs]
-        }));
-
-        var db = start(),
-            Test = db.model('TestSubdocumentsAsyncValidation');
-
-        var post = new Test();
-
-        post.get('items').push({required: ''});
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.ok(executed);
-          executed = false;
-
-          post.get('items')[0].set({required: 'here'});
-          post.save(function(err) {
-            db.close();
-            assert.ok(executed);
-            assert.strictEqual(err, null);
             done();
           });
         });

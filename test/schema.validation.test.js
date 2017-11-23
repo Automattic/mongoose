@@ -1,4 +1,4 @@
-/**
+  /**
  * Module dependencies.
  */
 
@@ -444,14 +444,16 @@ describe('schema', function() {
       it('works', function(done) {
         var executed = 0;
 
-        function validator(value, fn) {
-          setTimeout(function() {
-            executed++;
-            fn(value === true);
-            if (executed === 2) {
-              done();
-            }
-          }, 5);
+        function validator(value) {
+          return new global.Promise(function(resolve) {
+            setTimeout(function() {
+              executed++;
+              resolve(value === true);
+              if (executed === 2) {
+                done();
+              }
+            }, 5);
+          });
         }
 
         var Animal = new Schema({
@@ -464,37 +466,6 @@ describe('schema', function() {
 
         Animal.path('ferret').doValidate(false, function(err) {
           assert.ok(err instanceof Error);
-        });
-      });
-
-      it('multiple', function(done) {
-        var executed = 0;
-
-        function validator(value, fn) {
-          setTimeout(function() {
-            executed++;
-            fn(value === true);
-            if (executed === 2) {
-              done();
-            }
-          }, 5);
-        }
-
-        var Animal = new Schema({
-          ferret: {
-            type: Boolean,
-            validate: [{
-              validator: validator,
-              msg: 'validator1'
-            }, {
-              validator: validator,
-              msg: 'validator2'
-            }]
-          }
-        });
-
-        Animal.path('ferret').doValidate(true, function(err) {
-          assert.ifError(err);
         });
       });
 
@@ -522,13 +493,10 @@ describe('schema', function() {
         var Animal = new Schema({
           ferret: {
             type: Boolean,
-            validate: [{
-              validator: validator1,
-              msg: 'validator1'
-            }, {
-              validator: validator2,
-              msg: 'validator2'
-            }]
+            validate: [
+              { validator: validator1, msg: 'validator1' },
+              { validator: validator2, msg: 'validator2' }
+            ].map(function(v) { return Object.assign(v, { isAsync: true }); })
           }
         });
 
@@ -540,17 +508,21 @@ describe('schema', function() {
       it('scope', function(done) {
         var called = false;
 
-        function validator(value, fn) {
-          assert.equal(this.a, 'b');
-
-          setTimeout(function() {
-            called = true;
-            fn(true);
-          }, 5);
+        function validator() {
+          return new global.Promise(resolve => {
+            assert.equal(this.a, 'b');
+            setTimeout(function() {
+              called = true;
+              resolve(true);
+            }, 5);
+          });
         }
 
         var Animal = new Schema({
-          ferret: {type: Boolean, validate: validator}
+          ferret: {
+            type: Boolean,
+            validate: validator
+          }
         });
 
         Animal.path('ferret').doValidate(true, function(err) {
@@ -735,8 +707,8 @@ describe('schema', function() {
             x: {
               type: String,
               validate: [{
-                validator: function(value, fn) {
-                  fn(false, 'Custom message');
+                validator: function() {
+                  throw new Error('Custom message');
                 },
                 msg: 'Does not matter'
               }]
@@ -914,9 +886,9 @@ describe('schema', function() {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});
       var validateCalls = 0;
-      B.path('a').validate(function(val, next) {
+      B.path('a').validate(function() {
         ++validateCalls;
-        next();
+        return true;
       });
 
       B = mongoose.model('b', B);

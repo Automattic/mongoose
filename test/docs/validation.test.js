@@ -322,8 +322,14 @@ describe('validation docs', function() {
       assert.equal(err.errors.color.path, 'color');
       assert.equal(err.errors.color.value, 'Green');
 
-      assert.equal(err.errors.name.message, 'Name `Power Ranger` is not valid');
+      // This is new in mongoose 5. If your validator throws an exception,
+      // mongoose will use that message. If your validator returns `false`,
+      // mongoose will use the 'Name `Power Ranger` is not valid' message.
+      assert.equal(err.errors.name.message,
+        'Need to get a Turbo Man for Christmas');
       assert.equal(err.errors.name.value, 'Power Ranger');
+      // If your validator threw an error, the `reason` property will contain
+      // the original error thrown, including the original stack trace.
       assert.equal(err.errors.name.reason.message,
         'Need to get a Turbo Man for Christmas');
 

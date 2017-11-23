@@ -509,7 +509,7 @@ describe('schema', function() {
         var called = false;
 
         function validator() {
-          return new global.Promise(function(resolve) {
+          return new global.Promise(resolve => {
             assert.equal(this.a, 'b');
             setTimeout(function() {
               called = true;

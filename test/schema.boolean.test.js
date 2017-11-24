@@ -38,16 +38,16 @@ describe('schematype', function() {
       var strictValues = [true, false, 'true', 'false', 0, 1, '0', '1'];
 
       var testsRemaining = strictValues.length;
-      strictValues.forEach(function (value) {
+      strictValues.forEach(function(value) {
         var doc = new M1;
         doc.b = value;
-        doc.validate(function (error) {
+        doc.validate(function(error) {
           if (error) {
             // test fails as soon as one value fails
-            return done(error)
+            return done(error);
           }
           if (!--testsRemaining) {
-            return done()
+            return done();
           }
         });
       });

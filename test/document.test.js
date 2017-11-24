@@ -913,6 +913,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('populate on nested path (gh-5703)', function() {
+      var toySchema = new mongoose.Schema({ color: String });
+      var Toy = db.model('gh5703', toySchema);
+
+      var childSchema = new mongoose.Schema({
+        name: String,
+        values: {
+          toy: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5703' }
+        }
+      });
+      var Child = db.model('gh5703_0', childSchema);
+
+      return Toy.create({ color: 'blue' }).
+        then(function(toy) {
+          return Child.create({ values: { toy: toy._id } });
+        }).
+        then(function(child) {
+          return Child.findById(child._id);
+        }).
+        then(function(child) {
+          return child.values.populate('toy').execPopulate().then(function() {
+            return child;
+          });
+        }).
+        then(function(child) {
+          assert.equal(child.values.toy.color, 'blue');
+        });
+    });
   });
 
   describe('#update', function() {
@@ -4922,6 +4951,45 @@ describe('document', function() {
           });
         });
       });
+    });
+
+    it('modifying unselected nested object (gh-5800)', function() {
+      var MainSchema = new mongoose.Schema({
+        a: {
+          b: {type: String, default: 'some default'},
+          c: {type: Number, default: 0},
+          d: {type: String}
+        },
+        e: {type: String}
+      });
+
+      MainSchema.pre('save', function(next) {
+        if (this.isModified()) {
+          this.set('a.c', 100, Number);
+        }
+        next();
+      });
+
+      var Main = db.model('gh5800', MainSchema);
+
+      var doc = { a: { b: 'not the default', d: 'some value' }, e: 'e' };
+      return Main.create(doc).
+        then(function(doc) {
+          assert.equal(doc.a.b, 'not the default');
+          assert.equal(doc.a.d, 'some value');
+          return Main.findOne().select('e');
+        }).
+        then(function(doc) {
+          doc.e = 'e modified';
+          return doc.save();
+        }).
+        then(function() {
+          return Main.findOne();
+        }).
+        then(function(doc) {
+          assert.equal(doc.a.b, 'not the default');
+          assert.equal(doc.a.d, 'some value');
+        });
     });
 
     it('consistent context for nested docs (gh-5347)', function(done) {

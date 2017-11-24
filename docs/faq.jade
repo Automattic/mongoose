@@ -134,6 +134,44 @@ block content
       console.log(this);
     });
 
+  hr#type-key
+  :markdown
+    **Q**. I have an embedded property named `type` like this:
+  :js
+    const holdingSchema = new Schema({
+      // You might expect `asset` to be an object that has 2 properties,
+      // but unfortunately `type` is special in mongoose so mongoose
+      // interprets this schema to mean that `asset` is a string
+      asset: {
+        type: String,
+        ticker: String
+      }
+    });
+  :markdown
+    But mongoose gives me a CastError telling me that it can't cast an object
+    to a string when I try to save a `Holding` with an `asset` object. Why
+    is this?
+  :js
+    Holding.create({ asset: { type: 'stock', ticker: 'MDB' } }).catch(error => {
+      // Cast to String failed for value "{ type: 'stock', ticker: 'MDB' }" at path "asset"
+      console.error(error);
+    });
+  :markdown
+    **A**. The `type` property is special in mongoose, so when you say
+    `type: String`, mongoose interprets it as a type declaration. In the
+    above schema, mongoose thinks `asset` is a string, not an object. Do
+    this instead:
+  :js
+    const holdingSchema = new Schema({
+      // This is how you tell mongoose you mean `asset` is an object with
+      // a string property `type`, as opposed to telling mongoose that `asset`
+      // is a string.
+      asset: {
+        type: { type: String },
+        ticker: String
+      }
+    });
+
   hr#date_changes
   :markdown
     **Q**. Why don't in-place modifications to date objects

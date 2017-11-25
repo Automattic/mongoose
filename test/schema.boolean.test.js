@@ -31,11 +31,11 @@ describe('schematype', function() {
     });
     it('strictBool option (gh-5211)', function(done) {
       var db = start(),
-          s1 = new Schema({b: {type: Boolean, strictBool: true}}),
+          s1 = new Schema({b: {type: Boolean}}),
           M1 = db.model('StrictBoolTrue', s1);
       db.close();
 
-      var strictValues = [true, false, 'true', 'false', 0, 1, '0', '1'];
+      var strictValues = [true, false, 'true', 'false', 0, 1, '0', '1', 'no', 'yes'];
 
       var testsRemaining = strictValues.length;
       strictValues.forEach(function(value) {

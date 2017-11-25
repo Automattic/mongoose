@@ -433,12 +433,12 @@ describe('schema', function() {
       });
 
       assert.strictEqual(Animal.path('isFerret').cast(null), null);
-      assert.equal(Animal.path('isFerret').cast(undefined), false);
+      assert.strictEqual(Animal.path('isFerret').cast(undefined), undefined);
+
       assert.equal(Animal.path('isFerret').cast(false), false);
       assert.equal(Animal.path('isFerret').cast(0), false);
       assert.equal(Animal.path('isFerret').cast('0'), false);
       assert.equal(Animal.path('isFerret').cast('false'), false);
-      assert.equal(Animal.path('isFerret').cast({}), true);
       assert.equal(Animal.path('isFerret').cast(true), true);
       assert.equal(Animal.path('isFerret').cast(1), true);
       assert.equal(Animal.path('isFerret').cast('1'), true);

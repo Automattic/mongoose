@@ -1,3 +1,15 @@
+4.13.5 / 2017-11-24
+===================
+ * fix(model): handle update cast errors correctly with bulkWrite #5845 [Michael77](https://github.com/Michael77)
+ * docs: add link to bufferCommands option #5844 [ralphite](https://github.com/ralphite)
+ * fix(model): allow virtual ref function to return arrays #5834 [brunohcastro](https://github.com/brunohcastro)
+ * fix(query): don't throw uncaught error if query filter too big #5812
+ * fix(document): if setting unselected nested path, don't overwrite nested path #5800
+ * fix(document): support calling `populate()` on nested document props #5703
+ * fix: add `strictBool` option for schema type boolean #5344 #5211 #4245
+ * docs(faq): add faq re: typeKey #1886
+ * docs(query): add more detailed docs re: options #1702
+
 4.13.4 / 2017-11-17
 ===================
  * fix(aggregate): add chainable .option() helper for setting arbitrary options #5829

@@ -23,3 +23,21 @@ mongoose.connect('mongodb://localhost:27017/test').model('Test', new Schema({}))
 mongoose.connect('mongodb://localhost:27017/test');
 mongoose.model('Test', new Schema({}));
 ```
+
+* Setters run in reverse order in 4.x:
+
+```javascript
+const schema = new Schema({ name: String });
+schema.path('name').
+  get(() => console.log('This will print 2nd')).
+  get(() => console.log('This will print first'));
+```
+
+In 5.x, setters run in the order they're declared.
+
+```javascript
+const schema = new Schema({ name: String });
+schema.path('name').
+  get(() => console.log('This will print first')).
+  get(() => console.log('This will print 2nd'));
+```

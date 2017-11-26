@@ -678,10 +678,10 @@ describe('schema', function() {
       }
 
       var Tobi = new Schema({
-        name: {type: String, get: last}
+        name: { type: String, get: first }
       });
 
-      Tobi.path('name').get(first);
+      Tobi.path('name').get(last);
       assert.equal(Tobi.path('name').applyGetters('woot'), 'last');
       done();
     });

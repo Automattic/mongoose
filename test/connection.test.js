@@ -71,13 +71,13 @@ describe('connections:', function() {
 
     describe('connection events', function() {
       beforeEach(function() {
-        this.timeout(10000);
+        this.timeout(25000);
         return server.start().
           then(function() { return server.purge(); });
       });
 
       afterEach(function() {
-        this.timeout(10000);
+        this.timeout(25000);
         return server.stop();
       });
 

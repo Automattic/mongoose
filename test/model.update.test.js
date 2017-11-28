@@ -2840,7 +2840,7 @@ describe('model: update:', function() {
         name: String
       });
 
-      var Model = db.model('gh3677', schema);
+      var Model = db.model('gh5839', schema);
 
       var opts = { upsert: 1 };
       Model.update({ name: 'Test' }, { name: 'Test2' }, opts, function(error) {

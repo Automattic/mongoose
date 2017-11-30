@@ -2822,6 +2822,24 @@ describe('model: update:', function() {
       });
     });
 
+    it('upsert: 1 (gh-5839)', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      });
+
+      var Model = db.model('gh5839', schema);
+
+      var opts = { upsert: 1 };
+      Model.update({ name: 'Test' }, { name: 'Test2' }, opts, function(error) {
+        assert.ifError(error);
+        Model.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Test2');
+          done();
+        });
+      });
+    });
+
     it('update with nested id (gh-5640)', function(done) {
       var testSchema = new mongoose.Schema({
         _id: {

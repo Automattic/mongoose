@@ -137,12 +137,6 @@ describe('aggregate: ', function() {
 
       done();
     });
-
-    it('called from constructor', function(done) {
-      var aggregate = new Aggregate({ $a: 1 }, { $b: 2 }, { $c: 3 });
-      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
-      done();
-    });
   });
 
   describe('project', function() {
@@ -864,7 +858,7 @@ describe('aggregate: ', function() {
         var m = db.model('Employee');
         var match = { $match: { sal: { $gt: 15000 } } };
         var pref = 'primaryPreferred';
-        var aggregate = m.aggregate(match).read(pref);
+        var aggregate = m.aggregate([match]).read(pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);
         }

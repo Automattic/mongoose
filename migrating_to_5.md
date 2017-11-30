@@ -41,3 +41,15 @@ schema.path('name').
   get(() => console.log('This will print first')).
   get(() => console.log('This will print 2nd'));
 ```
+
+* `aggregate()` no longer accepts a spread, you **must** pass your aggregation pipeline as an array. The below code worked in 4.x:
+
+```javascript
+MyModel.aggregate({ $match: { isDeleted: false } }, { $skip: 10 }).exec(cb);
+```
+
+The above code does **not** work in 5.x, you **must** wrap the `$match` and `$skip` stages in an array.
+
+```javascript
+MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
+```

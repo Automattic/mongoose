@@ -1,3 +1,11 @@
+4.13.6 / 2017-12-02
+===================
+ * fix(schema): support strictBool option in schema #5856 [ekulabuhov](https://github.com/ekulabuhov)
+ * fix(update): make upsert option consistently handle truthy values, not just booleans, for updateOne() #5839
+ * refactor: remove unnecessary constructor check #2057
+ * docs(query): correct function signature for .mod() helper #1806
+ * fix(query): report ObjectParameterError when passing non-object as filter to find() and findOne() #1698
+
 4.13.5 / 2017-11-24
 ===================
  * fix(model): handle update cast errors correctly with bulkWrite #5845 [Michael77](https://github.com/Michael77)

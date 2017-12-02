@@ -29,6 +29,7 @@ describe('schematype', function() {
       assert.strictEqual(true, m3.b);
       done();
     });
+
     it('strictBool option (gh-5211)', function(done) {
       var db = start(),
           s1 = new Schema({b: {type: Boolean, strictBool: true}}),
@@ -51,7 +52,37 @@ describe('schematype', function() {
           }
         });
       });
-
     });
+
+    it('strictBool schema option', function(done) {
+      var db = start(),
+          s1 = new Schema({b: {type: Boolean}}, {strictBool: true}),
+          M1 = db.model('StrictBoolTrue', s1);
+      db.close();
+
+      var strictValues = [true, false, 'true', 'false', 0, 1, '0', '1'];
+
+      strictValues.forEach(function(value) {
+        var doc = new M1;
+        doc.b = value;
+        doc.validate(function(error) {
+          if (error) {
+            // test fails as soon as one value fails
+            return done(error);
+          }
+        });
+      });
+
+      var doc = new M1;
+      doc.b = 'Not a boolean';
+      doc.validate(function(error) {
+        if (error) {
+          done();
+        } else {
+          done(new Error('ValidationError expected'));
+        }
+      });
+    });
+
   });
 });

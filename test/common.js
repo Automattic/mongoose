@@ -166,3 +166,7 @@ module.exports.server = server = new Server('mongod', {
   dbpath: './data/db/27000',
   storageEngine: 'mmapv1'
 });
+
+process.on('unhandledRejection', function(error) {
+  console.error(error.stack);
+});

@@ -406,7 +406,7 @@ describe('connections:', function() {
 
     it('should return an error if malformed uri passed', function(done) {
       var db = mongoose.createConnection('mongodb:///fake', function(err) {
-        assert.ok(/no hostname/.test(err.message));
+        assert.ok(/hostname/.test(err.message));
         done();
       });
       db.close();

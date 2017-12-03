@@ -547,6 +547,7 @@ describe('Query', function() {
       assert.ok(!threw);
       done();
     });
+
     it('works with overwriting previous object args (1176)', function(done) {
       var q = new Query({}, {}, null, p1.collection);
       assert.doesNotThrow(function() {
@@ -1862,11 +1863,11 @@ describe('Query', function() {
 
       var MyModel = db.model('gh4378', schema);
 
-      assert.throws(function() {
-        MyModel.findOne('');
-      }, /Invalid argument to findOne()/);
-
-      done();
+      MyModel.findOne('', function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
+      });
     });
 
     it('handles geoWithin with $center and mongoose object (gh-4419)', function(done) {
@@ -2248,6 +2249,19 @@ describe('Query', function() {
           assert.equal(count, 10);
           done();
         });
+      });
+    });
+
+    it('with non-object args (gh-1698)', function(done) {
+      var schema = new mongoose.Schema({
+        email: String
+      });
+      var M = db.model('gh1698', schema);
+
+      M.find(42, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
       });
     });
 

@@ -5359,15 +5359,10 @@ describe('Model', function() {
 
       someModel.on('error', function(error) {
         assert.equal(error.message, 'This error will not disappear');
-        assert.ok(cleared);
         done();
       });
 
-      var cleared = false;
       someModel.findOne().exec(function() {
-        setImmediate(function() {
-          cleared = true;
-        });
         throw new Error('This error will not disappear');
       });
     });

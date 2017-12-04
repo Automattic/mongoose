@@ -1580,24 +1580,6 @@ describe('model: findOneAndUpdate:', function() {
       db.close(done);
     });
 
-    it('passes raw result as 3rd param (gh-3173)', function(done) {
-      var testSchema = new mongoose.Schema({
-        test: String
-      });
-
-      var TestModel = db.model('gh3173', testSchema);
-      var options = { upsert: true, new: true, passRawResult: true };
-      var update = { $set: { test: 'abc' } };
-
-      TestModel.findOneAndUpdate({}, update, options).
-        exec(function(error, doc, res) {
-          assert.ifError(error);
-          assert.ok(res);
-          assert.ok(res.ok);
-          done();
-        });
-    });
-
     it('passes raw result if rawResult specified (gh-4925)', function(done) {
       var testSchema = new mongoose.Schema({
         test: String
@@ -1615,44 +1597,6 @@ describe('model: findOneAndUpdate:', function() {
           assert.equal(res.value.test, 'abc');
           assert.ok(res.value.id);
           assert.equal(res.lastErrorObject.n, 1);
-          done();
-        });
-    });
-
-    it('raw result as 3rd param w/ no result (gh-4023)', function(done) {
-      var testSchema = new mongoose.Schema({
-        test: String
-      });
-
-      var TestModel = db.model('gh4023', testSchema);
-      var options = { upsert: true, new: false, passRawResult: true };
-      var update = { $set: { test: 'abc' } };
-
-      TestModel.findOneAndUpdate({}, update, options).
-        exec(function(error, doc, res) {
-          assert.ifError(error);
-          assert.ok(res);
-          assert.ok(res.ok);
-
-          done();
-        });
-    });
-
-    it('raw result as 3rd param w/ lean (gh-4761)', function(done) {
-      var testSchema = new mongoose.Schema({
-        test: String
-      });
-
-      var TestModel = db.model('gh4761', testSchema);
-      var options = { upsert: true, new: true, passRawResult: true };
-      var update = { $set: { test: 'abc' } };
-
-      TestModel.findOneAndUpdate({}, update, options).lean().
-        exec(function(error, doc, res) {
-          assert.ifError(error);
-          assert.ok(res);
-          assert.ok(res.ok);
-
           done();
         });
     });

@@ -53,3 +53,5 @@ The above code does **not** work in 5.x, you **must** wrap the `$match` and `$sk
 ```javascript
 MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
+
+* `$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://docs.mongodb.com/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.

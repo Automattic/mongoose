@@ -2553,7 +2553,7 @@ describe('Model', function() {
     });
   });
 
-  it('updating multiple Number $pushes as a single $pushAll', function(done) {
+  it('multiple number push() calls', function(done) {
     var db = start(),
         schema = new Schema({
           nested: {
@@ -2584,7 +2584,7 @@ describe('Model', function() {
     });
   });
 
-  it('updating at least a single $push and $pushAll as a single $pushAll', function(done) {
+  it('multiple push() calls', function(done) {
     var db = start(),
         schema = new Schema({
           nested: {

@@ -234,7 +234,7 @@ describe('types.documentarray', function() {
       var m = new M;
       m.docs.push({docs: [{title: 'hello'}]});
       var delta = m.$__delta()[1];
-      assert.equal(delta.$pushAll.docs[0].changed, undefined);
+      assert.equal(delta.$push.docs.$each[0].changed, undefined);
 
       M = db.model('gh-1415-1', new Schema({docs: [subSchema]}, {
         usePushEach: true

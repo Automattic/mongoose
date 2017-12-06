@@ -23,14 +23,6 @@ var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
  */
 
 describe('utils', function() {
-  describe('toCollectionName', function() {
-    it('works (gh-3490)', function(done) {
-      assert.equal(utils.toCollectionName('stations'), 'stations');
-      assert.equal(utils.toCollectionName('category'), 'categories');
-      done();
-    });
-  });
-
   describe('ActiveRoster', function() {
     it('should detect a path as required if it has been required', function(done) {
       var ar = new ActiveRoster();
@@ -303,98 +295,6 @@ describe('utils', function() {
       assert.equal(to.fomMethod, From.prototype.fomMethod);
 
       done();
-    });
-  });
-
-  describe('pluralize', function() {
-    var db;
-
-    before(function() {
-      db = start();
-    });
-
-    after(function(done) {
-      db.close(done);
-    });
-
-    it('should not pluralize _temp_ (gh-1703)', function(done) {
-      var ASchema = new Schema({
-        value: {type: Schema.Types.Mixed}
-      });
-
-      var collectionName = '_temp_';
-      var A = db.model(collectionName, ASchema);
-      assert.equal(A.collection.name, collectionName);
-      done();
-    });
-    it('should pluralize _temp (gh-1703)', function(done) {
-      var ASchema = new Schema({
-        value: {type: Schema.Types.Mixed}
-      });
-
-      var collectionName = '_temp';
-      var A = db.model(collectionName, ASchema);
-      assert.equal(A.collection.name, collectionName + 's');
-      done();
-    });
-    describe('option (gh-1707)', function() {
-      it('should pluralize by default', function(done) {
-        var ASchema = new Schema({value: String});
-
-        var collectionName = 'singular';
-        var A = db.model(collectionName, ASchema);
-        assert.equal(A.collection.name, collectionName + 's');
-        done();
-      });
-      it('should pluralize when global option set to true', function(done) {
-        db.base.set('pluralization', true);
-
-        var ASchema = new Schema({value: String});
-
-        var collectionName = 'one';
-        var A = db.model(collectionName, ASchema);
-        assert.equal(A.collection.name, collectionName + 's');
-        done();
-      });
-      it('should not pluralize when global option set to false', function(done) {
-        db.base.set('pluralization', false);
-
-        var ASchema = new Schema({value: String});
-
-        var collectionName = 'two';
-        var A = db.model(collectionName, ASchema);
-        assert.equal(A.collection.name, collectionName);
-        done();
-      });
-      it('should pluralize when local option set to true', function(done) {
-        db.base.set('pluralization', false);
-
-        // override
-        var ASchema = new Schema({value: String}, {pluralization: true});
-
-        var collectionName = 'three';
-        var A = db.model(collectionName, ASchema);
-        assert.equal(A.collection.name, collectionName + 's');
-        done();
-      });
-      it('should not pluralize when local option set to false and global is true', function(done) {
-        db.base.set('pluralization', true);
-
-        var ASchema = new Schema({value: String}, {pluralization: false});
-
-        var collectionName = 'four';
-        var A = db.model(collectionName, ASchema);
-        assert.equal(A.collection.name, collectionName);
-        done();
-      });
-      it('should not pluralize when local option set to false and global not set', function(done) {
-        var ASchema = new Schema({value: String}, {pluralization: false});
-
-        var collectionName = 'five';
-        var A = db.model(collectionName, ASchema);
-        assert.equal(A.collection.name, collectionName);
-        done();
-      });
     });
   });
 });

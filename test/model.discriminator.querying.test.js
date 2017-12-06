@@ -1023,13 +1023,13 @@ describe('model', function() {
           var Discriminator = Base.discriminator('gh4991_A1', discriminatorSchema);
 
           var obj = { propA: 'Hi', propB: 'test', array: ['a', 'b'] };
-          Discriminator.create(obj, function(error, doc) {
+          Discriminator.create(obj, function(error) {
             assert.ifError(error);
             Base.find().slice('array', 1).exec(function(error, docs) {
               assert.equal(docs.length, 1);
               assert.equal(docs[0].propA, 'Hi');
               done();
-            })
+            });
           });
         });
 

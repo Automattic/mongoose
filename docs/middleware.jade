@@ -61,7 +61,7 @@ block content
   :markdown
     The `next()` call does **not** stop the rest of the code in your middleware function from executing. Use
     [the early `return` pattern](https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm)
-    if you want to stop execution when you call `next()`.
+    to prevent the rest of your middleware function from running when you call `next()`.
   :js
     var schema = new Schema(..);
     schema.pre('save', function(next) {

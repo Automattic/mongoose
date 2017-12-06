@@ -106,26 +106,24 @@ block content
 
   h4#connection-string-options Connection String Options
   :markdown
-    Mongoose supports the following options in the connection string.
+    You can also specify options in your connection string as [parameters in the query string](https://en.wikipedia.org/wiki/Query_string) portion of the URI.
+  :js
+    mongoose.connect('mongodb://localhost:27017/test?connectTimeoutMS=1000', { useMongoClient: true });
+    // The above is equivalent to:
+    mongoose.connect('mongodb://localhost:27017/test', {
+      useMongoClient: true,
+      connectTimeoutMS: 1000
+    });
+  :markdown
+    The disadvantage of putting options in the query string is that query
+    string options are harder to read. The advantage is that you only need a
+    single configuration option, the URI, rather than separate options for
+    `socketTimeoutMS`, `connectTimeoutMS`, etc. Best practice is to put options
+    that likely differ between development and production, like `replicaSet`
+    or `ssl`, in the connection string, and options that should remain constant,
+    like `connectTimeoutMS` or `poolSize`, in the options object.
 
-    * [ssl](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [poolSize](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [autoReconnect](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [socketTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [connectTimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [authSource](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [retries](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [authMechanism](http://mongodb.github.io/node-mongodb-native/2.2/tutorials/connect/authenticating/)
-    * [reconnectWait](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
-    * [rs_name](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-    * [replicaSet](http://mongodb.github.io/node-mongodb-native/2.1/api/ReplSet.html)
-    * [nativeParser](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [w](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [journal](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [wtimeoutMS](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [readPreference](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [readPreferenceTags](http://mongodb.github.io/node-mongodb-native/2.1/api/Db.html)
-    * [sslValidate](http://mongodb.github.io/node-mongodb-native/2.1/api/Server.html)
+    The MongoDB docs have a full list of [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/)
 
   h4#keepAlive A note about keepAlive
   .important

@@ -55,3 +55,5 @@ MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
 
 * `$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://docs.mongodb.com/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
+
+* The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects.

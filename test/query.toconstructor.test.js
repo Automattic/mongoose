@@ -119,7 +119,11 @@ describe('Query:', function() {
 
       var nq = prodC(null, {limit: 3});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
-      assert.deepEqual(nq.options, {sort: {title: 1}, limit: 3, retainKeyOrder: false});
+      assert.deepEqual(nq.options, {
+        sort: {title: 1},
+        limit: 3,
+        retainKeyOrder: true
+      });
       done();
     });
 
@@ -131,7 +135,11 @@ describe('Query:', function() {
 
       var nq = prodC(null, {limit: 3});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
-      assert.deepEqual(nq.options, {sort: {title: 1}, limit: 3, retainKeyOrder: false});
+      assert.deepEqual(nq.options, {
+        sort: {title: 1},
+        limit: 3,
+        retainKeyOrder: true
+      });
       var nq2 = prodC(null, {limit: 5});
       assert.deepEqual(nq._mongooseOptions, {lean: true, limit: 3});
       assert.deepEqual(nq2._mongooseOptions, {lean: true, limit: 5});

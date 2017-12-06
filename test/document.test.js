@@ -2075,20 +2075,16 @@ describe('document', function() {
         assert.equal(eventHookCount, 1);
         assert.equal(userHookCount, 1);
 
-        Event.findOne(
-            {user: {name: '123', email: 'val'}},
-            function(error, doc) {
-              assert.ifError(error);
-              assert.ok(doc);
+        Event.findOne({user: {name: '123', email: 'val'}}, function(err, doc) {
+          assert.ifError(err);
+          assert.ok(doc);
 
-              Event.findOne(
-                  {user: {$in: [{name: '123', email: 'val'}]}},
-                  function(error, doc) {
-                    assert.ifError(error);
-                    assert.ok(doc);
-                    done();
-                  });
-            });
+          Event.findOne({user: {$in: [{name: '123', email: 'val'}]}}, function(err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            done();
+          });
+        });
       });
     });
 
@@ -3377,7 +3373,7 @@ describe('document', function() {
           key2: String
         },
         content: String
-      }, { retainKeyOrder: true });
+      });
 
       var Model = db.model('gh4542', schema);
 
@@ -4160,7 +4156,7 @@ describe('document', function() {
           test1: String,
           test2: String
         }
-      }, { retainKeyOrder: true });
+      });
 
       schema.virtual('tests').get(function() {
         return _.map(this.nested, function(v) {

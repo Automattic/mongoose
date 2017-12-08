@@ -621,6 +621,36 @@ describe('model', function() {
         });
       });
 
+      it('with $meta projection (gh-5859)', function() {
+        var eventSchema = new Schema({ eventField: String }, { id: false });
+        var Event = db.model('gh5859', eventSchema);
+
+        var trackSchema = new Schema({ trackField: String });
+        var Track = Event.discriminator('gh5859_0', trackSchema);
+
+        var trackedItem = new Track({
+          trackField: 'trackField',
+          eventField: 'eventField',
+        });
+
+        return trackedItem.save().
+          then(function() {
+            return Event.find({}).select({ score: { $meta: 'textScore' } });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].trackField, 'trackField');
+          }).
+          then(function() {
+            return Track.find({}).select({ score: { $meta: 'textScore' } });
+          }).
+          then(function(docs) {
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].trackField, 'trackField');
+            assert.equal(docs[0].eventField, 'eventField');
+          });
+      });
+
       it('embedded discriminators with $push (gh-5009)', function(done) {
         var eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });

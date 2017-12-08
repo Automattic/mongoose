@@ -1,8 +1,7 @@
 var start = require('./common'),
     mongoose = start.mongoose,
     assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    CastError = require('../lib/schematype').CastError;
+    Schema = mongoose.Schema;
 
 /**
  * Test.

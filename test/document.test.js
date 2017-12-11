@@ -4073,23 +4073,25 @@ describe('document', function() {
     });
 
     it('save errors with callback and promise work (gh-5216)', function(done) {
-      var schema = new mongoose.Schema({});
+      const schema = new mongoose.Schema({});
 
-      var Model = db.model('gh5216', schema);
+      const Model = db.model('gh5216', schema);
 
-      var _id = new mongoose.Types.ObjectId();
-      var doc1 = new Model({ _id: _id });
-      var doc2 = new Model({ _id: _id });
+      const _id = new mongoose.Types.ObjectId();
+      const doc1 = new Model({ _id: _id });
+      const doc2 = new Model({ _id: _id });
 
+      let remaining = 2;
       Model.on('error', function(error) {
-        done(error);
+        assert.ok(error);
+        --remaining || done();
       });
 
       doc1.save().
-        then(function() { return doc2.save(function() {}); }).
+        then(function() { return doc2.save(); }).
         catch(function(error) {
           assert.ok(error);
-          done();
+          --remaining || done();
         });
     });
 

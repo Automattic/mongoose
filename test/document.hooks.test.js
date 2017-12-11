@@ -601,24 +601,6 @@ describe('document: hooks:', function() {
     });
   });
 
-  it('post save handles multiple args (gh-3155)', function(done) {
-    var schema = new Schema({});
-
-    schema.post('save', function(item, next) {
-      next();
-    });
-
-    var db = start();
-    var Test = db.model('gh3155', schema);
-
-    var t = new Test();
-    t.save(function(error, doc, numAffected) {
-      assert.strictEqual(numAffected, 1);
-
-      db.close(done);
-    });
-  });
-
   it('pre-init hooks on subdocuments work', function(done) {
     var childSchema = new Schema({age: Number});
 

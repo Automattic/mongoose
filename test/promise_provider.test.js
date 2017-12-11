@@ -203,10 +203,9 @@ describe('ES6 promises: ', function() {
       promise.then(function(doc) {
         assert.equal(m, doc);
         m.test = '456';
-        m.save(function(error, doc, numAffected) {
+        m.save(function(error, doc) {
           assert.ifError(error);
           assert.ok(doc);
-          assert.equal(numAffected, 1);
           done();
         });
       });

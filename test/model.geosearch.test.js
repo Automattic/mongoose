@@ -141,7 +141,7 @@ describe('model', function() {
       var db = start();
       var Geo = getModel(db);
 
-      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function() {});
+      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
@@ -160,11 +160,10 @@ describe('model', function() {
           assert.doesNotThrow(function() {
             promise = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
           });
-          function validate(ret, stat) {
+          function validate(ret) {
             assert.equal(ret.length, 1);
             assert.equal(ret[0].pos[0], 10);
             assert.equal(ret[0].pos[1], 10);
-            assert.ok(stat);
           }
 
           function finish() {

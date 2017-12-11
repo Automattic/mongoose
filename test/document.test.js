@@ -243,31 +243,6 @@ describe('document', function() {
     done();
   });
 
-  it('test toObject clone', function(done) {
-    var doc = new TestDocument();
-    doc.init({
-      test: 'test',
-      oids: [],
-      nested: {
-        age: 5,
-        cool: new DocumentObjectId
-      }
-    });
-
-    var copy = doc.toObject();
-
-    copy.test._marked = true;
-    copy.nested._marked = true;
-    copy.nested.age._marked = true;
-    copy.nested.cool._marked = true;
-
-    assert.equal(doc._doc.test._marked, undefined);
-    assert.equal(doc._doc.nested._marked, undefined);
-    assert.equal(doc._doc.nested.age._marked, undefined);
-    assert.equal(doc._doc.nested.cool._marked, undefined);
-    done();
-  });
-
   it('toObject options', function(done) {
     var doc = new TestDocument();
 

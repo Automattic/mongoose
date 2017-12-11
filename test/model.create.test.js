@@ -2,13 +2,12 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    PromiseProvider = require('../lib/promise_provider');
+const start = require('./common');
+const assert = require('power-assert');
+const mongoose = start.mongoose;
+const random = require('../lib/utils').random;
+const Schema = mongoose.Schema;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup
@@ -67,35 +66,10 @@ describe('model', function() {
       });
     });
 
-    it('should not cause unhandled reject promise', function(done) {
-      mongoose.Promise = global.Promise;
-      mongoose.Promise = require('bluebird');
-
-      B.create({title: 'reject promise'}, function(err, b) {
-        assert.ifError(err);
-
-        var perr = null;
-        var p = B.create({_id: b._id}, function(err) {
-          assert(err);
-          setTimeout(function() {
-            PromiseProvider.reset();
-            // perr should be null
-            done(perr);
-          }, 100);
-        });
-
-        p.catch(function(err) {
-          // should not go here
-          perr = err;
-        });
-      });
-    });
-
     it('returns a promise', function(done) {
-      var p = B.create({title: 'returns promise'}, function() {
-        assert.ok(p instanceof mongoose.Promise);
-        done();
-      });
+      var p = B.create({title: 'returns promise'});
+      assert.ok(p instanceof mongoose.Promise);
+      done();
     });
 
     it('creates in parallel', function(done) {
@@ -154,7 +128,10 @@ describe('model', function() {
 
       it('with more than one doc', function(done) {
         var p = B.create({title: 'optional callback 2'}, {title: 'orient expressions'});
-        p.then(function(doc1, doc2) {
+        p.then(function(docs) {
+          assert.equal(docs.length, 2);
+          const doc1 = docs[0];
+          const doc2 = docs[1];
           assert.equal(doc1.title, 'optional callback 2');
           assert.equal(doc2.title, 'orient expressions');
           done();

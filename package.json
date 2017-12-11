@@ -59,21 +59,11 @@
     "uuid-parse": "1.0.0",
     "validator": "5.4.0"
   },
-  "browserDependencies": {
-    "browserify": "4.1.10",
-    "chai": "3.5.0",
-    "karma": "0.12.16",
-    "karma-chai": "0.1.0",
-    "karma-mocha": "0.1.4",
-    "karma-chrome-launcher": "0.1.4",
-    "karma-sauce-launcher": "0.2.8"
-  },
   "directories": {
     "lib": "./lib/mongoose"
   },
   "scripts": {
     "fix-lint": "eslint . --fix",
-    "install-browser": "npm install `node format_deps.js`",
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
     "test": "mocha test/*.test.js test/**/*.test.js",

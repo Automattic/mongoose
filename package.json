@@ -54,7 +54,6 @@
     "power-assert": "1.4.1",
     "q": "1.5.1",
     "tbd": "0.6.4",
-    "uglify-js": "2.7.0",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "5.4.0"

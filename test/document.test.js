@@ -3803,7 +3803,7 @@ describe('document', function() {
 
       var schema = new Schema({
         name: String
-      }, { timestamps: true, versionKey: null, saveErrorIfNotFound: true });
+      }, { timestamps: true, versionKey: null });
 
       schema.pre('save', function(next) {
         this.$where = { updatedAt: this.updatedAt };

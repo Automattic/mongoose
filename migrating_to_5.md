@@ -60,6 +60,8 @@ MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 
 * We no longer have a pre-compiled version of mongoose for the browser. If you want to use mongoose schemas in the browser, you need to build your own bundle with browserify/webpack.
 
+* The `saveErrorIfNotFound` option was removed, mongoose will now always error out from `save()` if the underlying document was not found
+
 * `doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
 
 * `doc.remove()` no longer debounces

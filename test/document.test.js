@@ -1248,12 +1248,13 @@ describe('document', function() {
           arr: {type: [], required: true}
         });
         var M = db.model('validateSchema-array1', schema, collection);
-        var m = new M({name: 'gh1109-1'});
+        var m = new M({name: 'gh1109-1', arr: null});
         m.save(function(err) {
           assert.ok(/Path `arr` is required/.test(err));
-          m.arr = [];
+          m.arr = null;
           m.save(function(err) {
             assert.ok(/Path `arr` is required/.test(err));
+            m.arr = [];
             m.arr.push('works');
             m.save(function(err) {
               assert.ifError(err);
@@ -1305,10 +1306,10 @@ describe('document', function() {
         });
 
         var M = db.model('validateSchema-array3', schema, collection);
-        var m = new M({name: 'gh1109-3'});
+        var m = new M({name: 'gh1109-3', arr: null});
         m.save(function(err) {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
-          m.arr.push({nice: true});
+          m.arr = [{nice: true}];
           m.save(function(err) {
             assert.equal(String(err), 'ValidationError: arr: BAM');
             m.arr.push(95);

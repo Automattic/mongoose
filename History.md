@@ -1,3 +1,16 @@
+4.13.7 / 2017-12-11
+===================
+ * docs(schematypes): fix typo #5889 [gokaygurcan](https://github.com/gokaygurcan)
+ * fix(cursor): handle `reject(null)` with eachAsync callback #5875 #5874 [ZacharyRSmith](https://github.com/ZacharyRSmith)
+ * fix: disallow setting `mongoose.connection` to invalid values #5871 [jinasonlin](https://github.com/jinasonlin)
+ * docs(middleware): suggest using `return next()` to stop middleware execution #5866
+ * docs(connection): improve connection string query param docs #5864
+ * fix(document): run validate hooks on array subdocs even if not directly modified #5861
+ * fix(discriminator): don't treat $meta as defining projection when querying #5859
+ * fix(types): handle Decimal128 when using bson-ext on server side #5850
+ * fix(document): ensure projection with only $slice isn't treated as inclusive for discriminators #4991
+ * fix(model): throw error when passing non-object to create() #2037
+
 4.13.6 / 2017-12-02
 ===================
  * fix(schema): support strictBool option in schema #5856 [ekulabuhov](https://github.com/ekulabuhov)

@@ -3946,6 +3946,46 @@ describe('document', function() {
         catch(done);
     });
 
+    it('runs validate hooks on arrays subdocs if not directly modified (gh-5861)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+      var count = 0;
+
+      childSchema.pre('validate', function(next) {
+        ++count;
+        next();
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        children: [childSchema]
+      });
+
+      var Parent = db.model('gh5861', parentSchema);
+
+      var p = new Parent({
+        name: 'Mufasa',
+        children: [{
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }]
+      });
+
+      p.save().
+        then(function(p) {
+          assert.equal(count, 1);
+          p.children[0].friends.push('Rafiki');
+          return p.save();
+        }).
+        then(function() {
+          assert.equal(count, 2);
+          done();
+        }).
+        catch(done);
+    });
+
     it('does not overwrite when setting nested (gh-4793)', function(done) {
       var grandchildSchema = new mongoose.Schema();
       grandchildSchema.method({
@@ -5028,6 +5068,7 @@ describe('document', function() {
         assert.ifError(error);
         var child = doc.children.id(doc.children[0]._id);
         child.phoneNumber = '345';
+        assert.equal(contexts.length, 1);
         doc.save(function(error) {
           assert.ifError(error);
           assert.equal(contexts.length, 2);

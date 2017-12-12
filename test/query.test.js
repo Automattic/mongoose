@@ -2412,8 +2412,7 @@ describe('Query', function() {
     });
 
     it('slice projection', function(done) {
-      MyModel.findOne({name: 'John'}, {dependents: {$slice: 1}}).
-      exec(function(error, person) {
+      MyModel.findOne({name: 'John'}, {dependents: {$slice: 1}}).exec(function(error, person) {
         assert.ifError(error);
         assert.equal(person.salary, 25000);
         done();

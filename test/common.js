@@ -168,5 +168,5 @@ module.exports.server = server = new Server('mongod', {
 });
 
 process.on('unhandledRejection', function(error) {
-  console.error(error.stack);
+  console.error('unhandledRejection:', error.stack);
 });

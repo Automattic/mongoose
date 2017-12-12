@@ -1154,7 +1154,7 @@ describe('document', function() {
       var promise = m.validate();
       promise.then(function() {
         var promise2 = mBad.validate();
-        promise2.onReject(function(err) {
+        promise2.catch(function(err) {
           assert.ok(!!err);
           clearTimeout(timeout);
           db.close(done);

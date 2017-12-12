@@ -1323,9 +1323,7 @@ describe('model: update:', function() {
         assert.equal(data.n, 0);
         db.close(done);
       }).
-      onReject(function(error) {
-        return done(error);
-      });
+      catch(done);
     });
   });
 

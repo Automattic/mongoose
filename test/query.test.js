@@ -1150,7 +1150,7 @@ describe('Query', function() {
         var q = Product.where().remove({strings: 'remove-single-condition'});
         assert.ok(q instanceof mongoose.Query);
         done();
-      }, done).end();
+      }, done);
     });
 
     it('supports a single callback arg', function(done) {
@@ -1168,7 +1168,7 @@ describe('Query', function() {
             done();
           });
         });
-      }, done).end();
+      }, done);
     });
 
     it('supports conditions and callback args', function(done) {
@@ -1186,7 +1186,7 @@ describe('Query', function() {
             done();
           });
         });
-      }, done).end();
+      }, done);
     });
 
     it('single option, default', function(done) {

@@ -169,7 +169,7 @@ describe('model', function() {
           function finish() {
             db.close(done);
           }
-          promise.then(validate, assert.ifError).then(finish).end();
+          promise.then(validate, assert.ifError).then(finish);
         });
       });
     });

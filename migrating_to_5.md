@@ -63,3 +63,5 @@ MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 * `doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
 
 * `doc.remove()` no longer debounces
+
+* `getPromiseConstructor()` is gone, just use `mongoose.Promise`.

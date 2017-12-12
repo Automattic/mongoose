@@ -116,7 +116,7 @@ describe('model aggregate', function() {
         assert.ok('maxAge' in res[0]);
         assert.equal(maxAge, res[0].maxAge);
         done();
-      }).end();
+      });
     });
 
     it('when returning Aggregate', function(done) {

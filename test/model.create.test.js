@@ -123,7 +123,7 @@ describe('model', function() {
         p.then(function(doc) {
           assert.equal(doc.title, 'optional callback');
           done();
-        }, done).end();
+        }, done);
       });
 
       it('with more than one doc', function(done) {
@@ -135,7 +135,7 @@ describe('model', function() {
           assert.equal(doc1.title, 'optional callback 2');
           assert.equal(doc2.title, 'orient expressions');
           done();
-        }, done).end();
+        }, done);
       });
 
       it('with array of docs', function(done) {
@@ -148,7 +148,7 @@ describe('model', function() {
           assert.equal(doc1.title, 'optional callback3');
           assert.equal(doc2.title, '3');
           done();
-        }, done).end();
+        }, done);
       });
 
       it('and should reject promise on error', function(done) {
@@ -160,8 +160,8 @@ describe('model', function() {
           }, function(err) {
             assert(err);
             done();
-          }).end();
-        }, done).end();
+          });
+        }, done);
       });
 
       it('if callback is falsy, will ignore it (gh-5061)', function(done) {

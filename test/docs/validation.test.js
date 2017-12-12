@@ -139,7 +139,7 @@ describe('validation docs', function() {
 
     // Need to wait for the index to finish building before saving,
     // otherwise unique constraints may be violated.
-    U2.on('index', function(error) {
+    U2.once('index', function(error) {
       assert.ifError(error);
       U2.create(dup, function(error) {
         // Will error, but will *not* be a mongoose validation error, it will be

@@ -365,34 +365,6 @@ describe('Model', function() {
       });
     });
 
-
-    it('when saved using the promise not the callback', function(done) {
-      var db = start(),
-          BlogPost = db.model('BlogPost', collection);
-
-      var post = new BlogPost();
-      var p = post.save();
-      p.onResolve(function(err, post) {
-        assert.ifError(err);
-        assert.ok(post.get('_id') instanceof DocumentObjectId);
-
-        assert.equal(post.get('title'), undefined);
-        assert.equal(post.get('slug'), undefined);
-        assert.equal(post.get('date'), undefined);
-        assert.equal(post.get('published'), undefined);
-
-        assert.equal(typeof post.get('meta'), 'object');
-        assert.deepEqual(post.get('meta'), {});
-        assert.equal(post.get('meta.date'), undefined);
-        assert.equal(post.get('meta.visitors'), undefined);
-
-        assert.ok(post.get('owners').isMongooseArray);
-        assert.ok(post.get('comments').isMongooseDocumentArray);
-        db.close(done);
-      });
-    });
-
-
     describe('init', function() {
       it('works', function(done) {
         var db = start(),
@@ -1840,12 +1812,11 @@ describe('Model', function() {
         B.findById(post, function(err, found) {
           assert.ifError(err);
 
-          found.remove().onResolve(function(err, doc) {
-            assert.ifError(err);
+          found.remove().then(function(doc) {
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          });
+          }).catch(done);
         });
       });
     });
@@ -1869,13 +1840,13 @@ describe('Model', function() {
           assert.ifError(err);
           assert.ok(found);
 
-          found.remove().onResolve(function(err, doc) {
+          found.remove().then(function(doc) {
             assert.ifError(err);
             assert.equal(called, 1);
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          });
+          }).catch(done);
         });
       });
     });
@@ -2626,14 +2597,13 @@ describe('Model', function() {
     var Temp = db.model('NestedPushes', schema, collection);
 
     var p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
-    p1.onResolve(function(err, t) {
-      assert.ifError(err);
+    p1.then(function(t) {
       t.nested.nums.pull(1);
       t.nested.nums.pull(2);
       assert.equal(t.$__.activePaths.paths['nested.nums'], 'modify');
       db.close();
       done();
-    });
+    }).catch(done);
   });
 
   it('$pull should affect what you see in an array before a save', function(done) {
@@ -3512,12 +3482,11 @@ describe('Model', function() {
         var s = new S({name: 'zupa'});
 
         var p = s.save();
-        p.onResolve(function(err) {
+        p.then(function() {
           db.close();
-          assert.ifError(err);
           assert.equal(called, 2);
           done();
-        });
+        }).catch(done);
       });
 
 
@@ -3612,29 +3581,6 @@ describe('Model', function() {
             });
           });
         });
-      });
-
-      it('should not work when calling next() after a thrown error', function(done) {
-        var db = start();
-
-        var s = new Schema({});
-        s.methods.funky = function() {
-          assert.strictEqual(false, true, 'reached unreachable code');
-        };
-
-        s.pre('funky', function(next) {
-          db.close();
-          try {
-            next(new Error);
-          } catch (error) {
-            // throws b/c nothing is listening to the db error event
-            assert.ok(error instanceof Error);
-            next();
-          }
-        });
-        var Kaboom = db.model('wowNext2xAndThrow', s, 'next2xAndThrow' + random());
-        new Kaboom().funky();
-        done();
       });
     });
 
@@ -3849,12 +3795,11 @@ describe('Model', function() {
           assert.ifError(err);
           var query = BlogPost.count({title: 'interoperable count as promise 2'});
           var promise = query.exec();
-          promise.onResolve(function(err, count) {
+          promise.then(function(count) {
             db.close();
-            assert.ifError(err);
             assert.equal(count, 1);
             done();
-          });
+          }).catch(done);
         });
       });
 
@@ -3867,8 +3812,7 @@ describe('Model', function() {
           assert.ifError(err);
           var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
           var promise = query.exec();
-          promise.onResolve(function(err) {
-            assert.ifError(err);
+          promise.then(function() {
             BlogPost.count({title: 'interoperable update as promise delta 2'}, function(err, count) {
               db.close();
               assert.ifError(err);
@@ -3879,21 +3823,21 @@ describe('Model', function() {
         });
       });
 
-      it('findOne()', function(done) {
-        var db = start(),
-            BlogPost = db.model('BlogPost' + random(), bpSchema);
+      it('findOne()', function() {
+        const db = start();
+        const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
-        BlogPost.create({title: 'interoperable findOne as promise 2'}, function(err, created) {
-          assert.ifError(err);
-          var query = BlogPost.findOne({title: 'interoperable findOne as promise 2'});
-          var promise = query.exec();
-          promise.onResolve(function(err, found) {
-            db.close();
-            assert.ifError(err);
+        let created;
+        return BlogPost.create({title: 'interoperable findOne as promise 2'}).
+          then(doc => {
+            created = doc;
+            return BlogPost.
+              findOne({title: 'interoperable findOne as promise 2'}).
+              exec();
+          }).
+          then(found => {
             assert.equal(found.id, created.id);
-            done();
           });
-        });
       });
 
       it('find()', function(done) {
@@ -3907,53 +3851,31 @@ describe('Model', function() {
               assert.ifError(err);
               var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
               var promise = query.exec();
-              promise.onResolve(function(err, found) {
+              promise.then(function(found) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(found.length, 2);
                 assert.equal(found[0].id, createdOne.id);
                 assert.equal(found[1].id, createdTwo.id);
                 done();
-              });
+              }).catch(done);
             });
       });
 
-      it('remove()', function(done) {
-        var db = start(),
-            BlogPost = db.model('BlogPost' + random(), bpSchema);
+      it('remove()', function() {
+        const db = start();
+        const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
-        BlogPost.create(
-            {title: 'interoperable remove as promise 2'},
-            function(err) {
-              assert.ifError(err);
-              var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
-              var promise = query.exec();
-              promise.onResolve(function(err) {
-                assert.ifError(err);
-                BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
-                  db.close();
-                  assert.equal(count, 0);
-                  done();
-                });
-              });
-            });
-      });
-
-      it('are compatible with op modification on the fly', function(done) {
-        var db = start(),
-            BlogPost = db.model('BlogPost' + random(), bpSchema);
-
-        BlogPost.create({title: 'interoperable ad-hoc as promise 2'}, function(err, created) {
-          assert.ifError(err);
-          var query = BlogPost.count({title: 'interoperable ad-hoc as promise 2'});
-          var promise = query.exec('findOne');
-          promise.onResolve(function(err, found) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(found._id.toHexString(), created._id.toHexString());
-            done();
+        return BlogPost.create({title: 'interoperable remove as promise 2'}).
+          then(() => {
+            return BlogPost.remove({title: 'interoperable remove as promise 2'});
+          }).
+          then(() => {
+            return BlogPost.count({title: 'interoperable remove as promise 2'});
+          }).
+          then(count => {
+            assert.equal(count, 0);
           });
-        });
       });
 
       it('are thenable', function(done) {
@@ -4156,9 +4078,9 @@ describe('Model', function() {
   describe('save()', function() {
     describe('when no callback is passed', function() {
       it('should emit error on its Model when there are listeners', function(done) {
-        var db = start();
+        const db = start();
 
-        var DefaultErrSchema = new Schema({});
+        const DefaultErrSchema = new Schema({});
         DefaultErrSchema.pre('save', function(next) {
           next(new Error);
         });
@@ -4171,7 +4093,7 @@ describe('Model', function() {
           done();
         });
 
-        new DefaultErr().save();
+        new DefaultErr().save().catch(() => {});
       });
     });
 

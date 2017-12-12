@@ -26,7 +26,6 @@
     "lodash.get": "4.4.2",
     "mongodb": "3.0.0-rc0",
     "mpath": "0.3.0",
-    "mpromise": "0.5.5",
     "mquery": "3.0.0-rc0",
     "ms": "2.0.0",
     "regexp-clone": "0.0.1",

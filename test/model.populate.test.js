@@ -2487,7 +2487,7 @@ describe('model: populate:', function() {
       it('a promise', function(done) {
         var p = B.populate(post1, '_creator');
         assert.ok(p instanceof mongoose.Promise);
-        p.then(success, done).end();
+        p.then(success, done);
         function success(doc) {
           assert.ok(doc);
           done();

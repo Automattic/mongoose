@@ -273,7 +273,7 @@ describe('model', function() {
             done();
           }
 
-          promise.then(validate, assert.ifError).then(finish).end();
+          promise.then(validate, assert.ifError).then(finish);
         });
       });
     });
@@ -295,7 +295,7 @@ describe('model', function() {
             done();
           }
 
-          promise.then(finish).end();
+          promise.then(finish);
         });
       });
     });

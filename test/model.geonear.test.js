@@ -247,6 +247,7 @@ describe('model', function() {
       // using GeoJSON point
       var prom = Geo.geoNear(pnt, {spherical: true, maxDistance: 300});
       assert.ok(prom instanceof mongoose.Promise);
+      prom.catch(() => {});
       done();
     });
 

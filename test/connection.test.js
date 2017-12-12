@@ -344,8 +344,7 @@ describe('connections:', function() {
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
-    db.on('error', function() {
-    });
+    db.catch(() => {});
     assert.equal(db.pass, 'psw');
     assert.equal(db.user, 'aaron');
     assert.equal(db.name, 'fake');
@@ -358,8 +357,7 @@ describe('connections:', function() {
   it('should accept unix domain sockets', function(done) {
     const host = encodeURIComponent('/tmp/mongodb-27017.sock');
     var db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
-    db.on('error', function() {
-    });
+    db.catch(() => {});
     assert.equal(db.name, 'fake');
     assert.equal(db.host, '/tmp/mongodb-27017.sock');
     assert.equal(db.pass, 'psw');
@@ -384,6 +382,7 @@ describe('connections:', function() {
       var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', function() {
         done();
       });
+      db.catch(() => {});
       db.on('error', function(err) {
         assert.ok(err);
       });
@@ -428,6 +427,7 @@ describe('connections:', function() {
     it('event fires with one listener', function(done) {
       this.timeout(1000);
       var db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100');
+      db.catch(() => {});
       db.on('error', function() {
         // this callback has no params which triggered the bug #759
         db.close();
@@ -606,25 +606,9 @@ describe('connections:', function() {
 
         var db = mongoose.createConnection();
         db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {server: {auto_reconnect: false}});
-        db.on('error', function() {
-        });
+        db.catch(() => {});
         assert.equal(db.user, 'aaron');
         assert.equal(db.pass, 'psw');
-        db.close();
-        done();
-      });
-      it('form options', function(done) {
-        var uris = process.env.MONGOOSE_SET_TEST_URI;
-        if (!uris) {
-          return done();
-        }
-
-        var db = mongoose.createConnection();
-        db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {user: 'tester', pass: 'testpsw'});
-        db.on('error', function() {
-        });
-        assert.equal(db.user, 'tester');
-        assert.equal(db.pass, 'testpsw');
         db.close();
         done();
       });
@@ -635,8 +619,7 @@ describe('connections:', function() {
       const host2 = encodeURIComponent('/tmp/mongodb-27019.sock');
       const url = `mongodb://aaron:psw@${host1},${host2}/fake?replicaSet=bacon`;
       const db = mongoose.createConnection(url);
-      db.on('error', function() {
-      });
+      db.catch(() => {});
       assert.equal(typeof db.options, 'object');
       assert.equal(db.name, 'fake');
       assert.equal(db.host, '/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock');
@@ -1000,8 +983,6 @@ describe('connections:', function() {
       describe('when username and password are undefined', function() {
         it('should return false', function(done) {
           var db = mongoose.createConnection('mongodb://localhost:27017/fake', {});
-          db.on('error', function() {
-          });
 
           assert.equal(db.shouldAuthenticate(), false);
 
@@ -1029,8 +1010,7 @@ describe('connections:', function() {
           var db = mongoose.createConnection('mongodb://localhost:27017/fake', {
             user: 'user'
           });
-          db.on('error', function() {
-          });
+          db.catch(() => {});
 
           assert.equal(db.shouldAuthenticate(), true);
 
@@ -1044,8 +1024,7 @@ describe('connections:', function() {
             user: 'user',
             pass: 'pass'
           });
-          db.on('error', function() {
-          });
+          db.catch(() => {});
 
           assert.equal(db.shouldAuthenticate(), true);
 
@@ -1073,8 +1052,7 @@ describe('connections:', function() {
             user: 'user',
             auth: {authMechanism: 'MONGODB-X509'}
           });
-          db.on('error', function() {
-          });
+          db.catch(() => {});
           assert.equal(db.shouldAuthenticate(), true);
 
           db.close();
@@ -1088,8 +1066,7 @@ describe('connections:', function() {
             pass: 'pass',
             auth: {authMechanism: 'MONGODB-X509'}
           });
-          db.on('error', function() {
-          });
+          db.catch(() => {});
 
           assert.equal(db.shouldAuthenticate(), true);
 

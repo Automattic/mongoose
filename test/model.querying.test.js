@@ -2275,7 +2275,7 @@ describe('model: querying:', function() {
 
     it('$maxDistance with arrays', function(done) {
       var db = start(),
-          Test = db.model('Geo4', geoSchema, 'x' + random());
+          Test = db.model('Geo4', geoSchema, 'geo4');
 
       var pending = 2;
 

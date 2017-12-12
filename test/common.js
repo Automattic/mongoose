@@ -167,6 +167,14 @@ module.exports.server = server = new Server('mongod', {
   storageEngine: 'mmapv1'
 });
 
+beforeEach(function() {
+  if (this.currentTest) {
+    global.CURRENT_TEST = this.currentTest.title;
+  } else {
+    global.CURRENT_TEST = 'N/A';
+  }
+});
+
 process.on('unhandledRejection', function(error) {
-  console.error('unhandledRejection:', error.stack);
+  console.error(`unhandledRejection in "${global.CURRENT_TEST}":`, error.stack);
 });

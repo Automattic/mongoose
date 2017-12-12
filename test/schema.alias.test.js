@@ -48,7 +48,7 @@ describe('schema alias option', function() {
     });
   });
 
-  it('works with nested schema types', function() {
+  it('works with nested schema types', function(done) {
     var db = start();
 
     var schema = new Schema({
@@ -92,6 +92,7 @@ describe('schema alias option', function() {
       assert.equal(s.nested.mixed, s.MixedAlias);
       assert.equal(s.nested.objectId, s.ObjectIdAlias);
       assert.equal(s.nested.array, s.ArrayAlias);
+      done();
     });
   });
 

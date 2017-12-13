@@ -1,3 +1,5 @@
+* Mongoose now requires node.js >= 4.0.0 and MongoDB >= 3.0.0. [MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and [Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016. 
+
 * Domain sockets must be URI encoded. For example:
 
 ```javascript

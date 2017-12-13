@@ -840,7 +840,6 @@ describe('model', function() {
                 { kind: 'Purchased', product: 'Test2' }
               ]
             });
-            done();
           }).
           then(function() {
             return MyModel.findOne({
@@ -856,6 +855,7 @@ describe('model', function() {
             assert.ok(doc);
             assert.equal(doc.events.length, 1);
             assert.equal(doc.events[0].element, 'Test');
+            done();
           }).
           catch(done);
       });

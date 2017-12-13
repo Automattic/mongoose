@@ -848,15 +848,14 @@ describe('schema', function() {
         done();
       });
       it('errors if unique index on _id', function(done) {
-        console.log('running the test')
         try {
-          var Tobi = new Schema({});
-          Tobi.path('_id').index({ unique: true });
+          var schema = new Schema({ _id: { type: mongoose.Schema.Types.ObjectId, unique: true } });
+
+          schema.path('_id').index({ unique: true });
           console.log('got to this point');
           done(new Error('Should not have reached this point!'));
         } catch (error) {
-          console.log('in error');
-          console.log('ERROR', error);
+          assert.equal(error.message, 'Cannot put unique index on _id');
           done();
         }
       });

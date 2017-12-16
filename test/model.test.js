@@ -1631,7 +1631,7 @@ describe('Model', function() {
       done();
     });
 
-    it('should not be saved to the db', function(done) {
+    it('should not be saved to the db AZZ', function(done) {
       var db = start(),
           BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
@@ -1849,22 +1849,6 @@ describe('Model', function() {
             assert.ok(doc.equals(found));
             done();
           }).catch(done);
-        });
-      });
-    });
-
-    it('passes the removed document (gh-1419)', function(done) {
-      B.create({}, function(err, post) {
-        assert.ifError(err);
-        B.findById(post, function(err, found) {
-          assert.ifError(err);
-
-          found.remove(function(err, doc) {
-            assert.ifError(err);
-            assert.ok(doc);
-            assert.ok(doc.equals(found));
-            done();
-          });
         });
       });
     });

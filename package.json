@@ -72,8 +72,7 @@
     "node": ">=4.0.0"
   },
   "bugs": {
-    "url": "https://github.com/Automattic/mongoose/issues/new",
-    "email": "mongoose-orm@googlegroups.com"
+    "url": "https://github.com/Automattic/mongoose/issues/new"
   },
   "repository": {
     "type": "git",

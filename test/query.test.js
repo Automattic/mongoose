@@ -2230,8 +2230,8 @@ describe('Query', function() {
       var TestSchema = new Schema();
 
       var count = 0;
-      TestSchema.post('init', function(model, next) {
-        return next(new Error('Failed! ' + (count++)));
+      TestSchema.post('init', function(model) {
+        throw new Error('Failed! ' + (count++));
       });
 
       var TestModel = db.model('gh5592', TestSchema);

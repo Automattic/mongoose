@@ -1,4 +1,4 @@
-* Mongoose now requires node.js >= 4.0.0 and MongoDB >= 3.0.0. [MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and [Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016. 
+* Mongoose now requires node.js >= 4.0.0 and MongoDB >= 3.0.0. [MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and [Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016.
 
 * Domain sockets must be URI encoded. For example:
 
@@ -63,6 +63,11 @@ MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 * We no longer have a pre-compiled version of mongoose for the browser. If you want to use mongoose schemas in the browser, you need to build your own bundle with browserify/webpack.
 
 * The `saveErrorIfNotFound` option was removed, mongoose will now always error out from `save()` if the underlying document was not found
+
+* `init` hooks are now fully synchronous and do not receive `next()` as a parameter.
+
+* `Document.prototype.init()` no longer takes a callback as a parameter. It
+was always synchronous, just had a callback for legacy reasons.
 
 * `doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
 

@@ -737,25 +737,6 @@ describe('schema', function() {
     });
   });
 
-  describe('hooks', function() {
-    it('registration', function(done) {
-      var Tobi = new Schema();
-
-      Tobi.pre('save', function() {
-      });
-      assert.equal(Tobi.callQueue.length, 2);
-
-      Tobi.post('save', function() {
-      });
-      assert.equal(Tobi.callQueue.length, 3);
-
-      Tobi.pre('save', function() {
-      });
-      assert.equal(Tobi.callQueue.length, 4);
-      done();
-    });
-  });
-
   describe('indexes', function() {
     describe('definition', function() {
       it('basic', function(done) {

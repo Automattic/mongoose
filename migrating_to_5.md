@@ -56,6 +56,31 @@ The above code does **not** work in 5.x, you **must** wrap the `$match` and `$sk
 MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
 
+* Post hooks now get flow control, which means async post save hooks and child document post save hooks execute **before** your `save()` callback.
+
+```javsscript
+const ChildModelSchema = new mongoose.Schema({
+  text: {
+    type: String
+  }
+});
+ChildModelSchema.post('save', function(doc) {
+  // In mongoose 5.x this will print **before** the `console.log()`
+  // in the `save()` callback. In mongoose 4.x this was reversed.
+  console.log('Child post save');
+});
+const ParentModelSchema = new mongoose.Schema({
+  children: [ChildModelSchema]
+});
+
+const Model = mongoose.model('Parent', ParentModelSchema);
+const m = new Model({ children: [{ text: 'test' }] });
+m.save(function() {
+  // In mongoose 5.xm this prints **after** the "Child post save" message.
+  console.log('Save callback');
+});
+```
+
 * `$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://docs.mongodb.com/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
 
 * The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects. If you have queries or indexes that rely on reverse key order, you will have to change them.
@@ -74,3 +99,6 @@ was always synchronous, just had a callback for legacy reasons.
 * `doc.remove()` no longer debounces
 
 * `getPromiseConstructor()` is gone, just use `mongoose.Promise`.
+
+* You cannot pass parameters to the next pre middleware in the chain using `next()` in mongoose 5.x. In mongoose 4, `next('Test')` in pre middleware would call the
+next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for this.

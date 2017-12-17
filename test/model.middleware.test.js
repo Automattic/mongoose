@@ -105,6 +105,7 @@ describe('model middleware', function() {
     var test = new TestMiddleware();
 
     test.init({ title: 'Test' }, function(err) {
+      assert.ifError(err);
       assert.equal(called, 1);
 
       test.save(function(err) {
@@ -130,9 +131,8 @@ describe('model middleware', function() {
     var preinit = 0,
         postinit = 0;
 
-    schema.pre('init', function(next) {
+    schema.pre('init', function() {
       ++preinit;
-      next();
     });
 
     schema.post('init', function(doc) {

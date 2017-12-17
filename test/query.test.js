@@ -2230,7 +2230,7 @@ describe('Query', function() {
       var TestSchema = new Schema();
 
       var count = 0;
-      TestSchema.post('init', function(model) {
+      TestSchema.post('init', function() {
         throw new Error('Failed! ' + (count++));
       });
 

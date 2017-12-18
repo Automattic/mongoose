@@ -1631,7 +1631,7 @@ describe('Model', function() {
       done();
     });
 
-    it('should not be saved to the db', function(done) {
+    it('should not be saved to the db AZZ', function(done) {
       var db = start(),
           BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
@@ -1849,22 +1849,6 @@ describe('Model', function() {
             assert.ok(doc.equals(found));
             done();
           }).catch(done);
-        });
-      });
-    });
-
-    it('passes the removed document (gh-1419)', function(done) {
-      B.create({}, function(err, post) {
-        assert.ifError(err);
-        B.findById(post, function(err, found) {
-          assert.ifError(err);
-
-          found.remove(function(err, doc) {
-            assert.ifError(err);
-            assert.ok(doc);
-            assert.ok(doc.equals(found));
-            done();
-          });
         });
       });
     });
@@ -3315,35 +3299,6 @@ describe('Model', function() {
 
   describe('hooks', function() {
     describe('pre', function() {
-      it('can pass non-error values to the next middleware', function(done) {
-        var db = start();
-        var schema = new Schema({name: String});
-
-        schema.pre('save', function(next) {
-          next('hey there');
-        }).pre('save', function(next, message) {
-          assert.ok(message);
-          assert.equal(message, 'hey there');
-          next();
-        }).pre('save', function(next) {
-          // just throw error
-          next(new Error('error string'));
-        }).pre('save', function(next) {
-          // don't call since error thrown in previous save
-          assert.ok(false);
-          next('don\'t call me');
-        });
-        var S = db.model('S', schema, collection);
-        var s = new S({name: 'angelina'});
-
-        s.save(function(err) {
-          db.close();
-          assert.ok(err);
-          assert.equal(err.message, 'error string');
-          done();
-        });
-      });
-
       it('with undefined and null', function(done) {
         var db = start();
         var schema = new Schema({name: String});
@@ -3474,9 +3429,8 @@ describe('Model', function() {
               PreInitSchema = new Schema({}),
               preId = null;
 
-          PreInitSchema.pre('init', function(next) {
+          PreInitSchema.pre('init', function() {
             preId = this._id;
-            next();
           });
 
           var PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());

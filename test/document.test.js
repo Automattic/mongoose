@@ -4093,7 +4093,7 @@ describe('document', function() {
         Model.findOne({}, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.children.length, 1);
-          assert.equal(doc.children[0].text, 'test');
+          assert.equal(doc.children[0].text, 'bar');
           done();
         });
       });

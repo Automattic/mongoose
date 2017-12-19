@@ -852,7 +852,6 @@ describe('schema', function() {
           var schema = new Schema({ _id: { type: mongoose.Schema.Types.ObjectId, unique: true } });
 
           schema.path('_id').index({ unique: true });
-          console.log('got to this point');
           done(new Error('Should not have reached this point!'));
         } catch (error) {
           assert.equal(error.message, 'Cannot put unique index on _id');

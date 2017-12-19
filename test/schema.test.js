@@ -2,18 +2,18 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-  mongoose = start.mongoose,
-  assert = require('power-assert'),
-  Schema = mongoose.Schema,
-  Document = mongoose.Document,
-  VirtualType = mongoose.VirtualType,
-  SchemaTypes = Schema.Types,
-  ObjectId = SchemaTypes.ObjectId,
-  Mixed = SchemaTypes.Mixed,
-  DocumentObjectId = mongoose.Types.ObjectId,
-  ReadPref = mongoose.mongo.ReadPreference,
-  vm = require('vm');
+const start = require('./common');
+const mongoose = start.mongoose;
+const assert = require('power-assert');
+const Schema = mongoose.Schema;
+const Document = mongoose.Document;
+const VirtualType = mongoose.VirtualType;
+const SchemaTypes = Schema.Types;
+const ObjectId = SchemaTypes.ObjectId;
+const Mixed = SchemaTypes.Mixed;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const ReadPref = mongoose.mongo.ReadPreference;
+const vm = require('vm');
 
 /**
  * Test Document constructor.
@@ -325,12 +325,12 @@ describe('schema', function() {
     });
 
     it('objectid', function(done) {
-      var Loki = new Schema({
+      const Loki = new Schema({
         owner: { type: ObjectId }
       });
 
-      var doc = new TestDocument(),
-        id = doc._id.toString();
+      const doc = new TestDocument();
+      const id = doc._id.toString();
 
       assert.ok(Loki.path('owner').cast('4c54f3453e688c000000001a') instanceof DocumentObjectId);
 
@@ -511,9 +511,9 @@ describe('schema', function() {
         name: { type: Schema.ObjectId, set: extract }
       });
 
-      var id = new DocumentObjectId,
-        sid = id.toString(),
-        _id = { _id: id };
+      const id = new DocumentObjectId;
+      const sid = id.toString();
+      const _id = { _id: id };
 
       assert.equal(Tobi.path('name').applySetters(sid, { a: 'b' }).toString(), sid);
       assert.equal(Tobi.path('name').applySetters(_id, { a: 'b' }).toString(), sid);
@@ -864,8 +864,8 @@ describe('schema', function() {
 
   describe('plugins', function() {
     it('work', function(done) {
-      var Tobi = new Schema,
-        called = false;
+      const Tobi = new Schema;
+      let called = false;
 
       Tobi.plugin(function(schema) {
         assert.equal(schema, Tobi);

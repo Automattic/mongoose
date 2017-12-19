@@ -386,9 +386,9 @@ describe('schema', function() {
         });
 
         Loki.path('likes').doValidate([], function(err) {
-          assert.ok(err instanceof ValidatorError);
+          assert.ifError(err);
+          done();
         });
-        done();
       });
 
       it('boolean required', function(done) {

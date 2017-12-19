@@ -245,8 +245,9 @@ describe('model', function() {
 
       var pnt = {type: 'Point', coordinates: testLocations.PORT_AUTHORITY_STATION};
       // using GeoJSON point
-      var prom = Geo.geoNear(pnt, {spherical: true, maxDistance: 300}, function() {});
+      var prom = Geo.geoNear(pnt, {spherical: true, maxDistance: 300});
       assert.ok(prom instanceof mongoose.Promise);
+      prom.catch(() => {});
       done();
     });
 
@@ -263,18 +264,17 @@ describe('model', function() {
             promise = Geo.geoNear(pnt, {spherical: true, maxDistance: 300});
           });
 
-          function validate(ret, stat) {
+          function validate(ret) {
             assert.equal(ret.length, 1);
             assert.equal(ret[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
             assert.equal(ret[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
-            assert.ok(stat);
           }
 
           function finish() {
             done();
           }
 
-          promise.then(validate, assert.ifError).then(finish).end();
+          promise.then(validate, assert.ifError).then(finish);
         });
       });
     });
@@ -296,7 +296,7 @@ describe('model', function() {
             done();
           }
 
-          promise.then(finish).end();
+          promise.then(finish);
         });
       });
     });

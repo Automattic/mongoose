@@ -202,8 +202,7 @@ describe('model: mapreduce:', function() {
         }
       };
 
-      var promise = MR.mapReduce(o, function() {
-      });
+      var promise = MR.mapReduce(o);
       assert.ok(promise instanceof mongoose.Promise);
 
       db.close(done);

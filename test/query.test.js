@@ -1150,7 +1150,7 @@ describe('Query', function() {
         var q = Product.where().remove({strings: 'remove-single-condition'});
         assert.ok(q instanceof mongoose.Query);
         done();
-      }, done).end();
+      }, done);
     });
 
     it('supports a single callback arg', function(done) {
@@ -1168,7 +1168,7 @@ describe('Query', function() {
             done();
           });
         });
-      }, done).end();
+      }, done);
     });
 
     it('supports conditions and callback args', function(done) {
@@ -1186,7 +1186,7 @@ describe('Query', function() {
             done();
           });
         });
-      }, done).end();
+      }, done);
     });
 
     it('single option, default', function(done) {
@@ -2230,8 +2230,8 @@ describe('Query', function() {
       var TestSchema = new Schema();
 
       var count = 0;
-      TestSchema.post('init', function(model, next) {
-        return next(new Error('Failed! ' + (count++)));
+      TestSchema.post('init', function() {
+        throw new Error('Failed! ' + (count++));
       });
 
       var TestModel = db.model('gh5592', TestSchema);
@@ -2412,8 +2412,7 @@ describe('Query', function() {
     });
 
     it('slice projection', function(done) {
-      MyModel.findOne({name: 'John'}, {dependents: {$slice: 1}}).
-      exec(function(error, person) {
+      MyModel.findOne({name: 'John'}, {dependents: {$slice: 1}}).exec(function(error, person) {
         assert.ifError(error);
         assert.equal(person.salary, 25000);
         done();

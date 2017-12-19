@@ -3624,7 +3624,6 @@ describe('document', function() {
           default: function() {
             return mongoose.Types.Buffer(uuid.parse(uuid.v4())).toObject(4);
           },
-          unique: true,
           required: true
         },
         email: {

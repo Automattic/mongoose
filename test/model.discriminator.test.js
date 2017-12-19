@@ -314,17 +314,6 @@ describe('model', function() {
         done();
       });
 
-      it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 7);
-
-        // EmployeeSchema.pre('save')
-        var queueIndex = Employee.schema.callQueue.length - 1;
-        assert.strictEqual(Employee.schema.callQueue[queueIndex][0], 'pre');
-        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['0'], 'save');
-        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['1'], employeeSchemaPreSaveFn);
-        done();
-      });
-
       it('does not inherit indexes', function(done) {
         assert.deepEqual(Person.schema.indexes(), [[{name: 1}, {background: true}]]);
         assert.deepEqual(Employee.schema.indexes(), [[{department: 1}, {background: true}]]);
@@ -840,7 +829,6 @@ describe('model', function() {
                 { kind: 'Purchased', product: 'Test2' }
               ]
             });
-            done();
           }).
           then(function() {
             return MyModel.findOne({
@@ -856,6 +844,7 @@ describe('model', function() {
             assert.ok(doc);
             assert.equal(doc.events.length, 1);
             assert.equal(doc.events[0].element, 'Test');
+            done();
           }).
           catch(done);
       });

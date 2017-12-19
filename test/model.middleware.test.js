@@ -83,9 +83,8 @@ describe('model middleware', function() {
 
     var called = 0;
 
-    schema.pre('init', function(next) {
+    schema.pre('init', function() {
       called++;
-      next();
     });
 
     schema.pre('save', function(next) {
@@ -105,22 +104,21 @@ describe('model middleware', function() {
 
     var test = new TestMiddleware();
 
-    test.init({
-      title: 'Test'
-    });
+    test.init({ title: 'Test' }, function(err) {
+      assert.ifError(err);
+      assert.equal(called, 1);
 
-    assert.equal(called, 1);
+      test.save(function(err) {
+        assert.ok(err instanceof Error);
+        assert.equal(err.message, 'Error 101');
+        assert.equal(called, 2);
 
-    test.save(function(err) {
-      assert.ok(err instanceof Error);
-      assert.equal(err.message, 'Error 101');
-      assert.equal(called, 2);
-
-      test.remove(function(err) {
-        db.close();
-        assert.ifError(err);
-        assert.equal(called, 3);
-        done();
+        test.remove(function(err) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(called, 3);
+          done();
+        });
       });
     });
   });
@@ -133,9 +131,8 @@ describe('model middleware', function() {
     var preinit = 0,
         postinit = 0;
 
-    schema.pre('init', function(next) {
+    schema.pre('init', function() {
       ++preinit;
-      next();
     });
 
     schema.post('init', function(doc) {
@@ -276,4 +273,3 @@ describe('model middleware', function() {
     });
   });
 });
-

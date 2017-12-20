@@ -298,10 +298,10 @@ describe('QueryCursor', function() {
         var _cur = cur;
         assert.equal(doc.name, expectedNames[cur]);
         return {
-          then: function(onResolve) {
+          then: function(resolve) {
             setTimeout(function() {
               assert.equal(_cur, cur++);
-              onResolve();
+              resolve();
             }, 50);
           }
         };
@@ -321,9 +321,9 @@ describe('QueryCursor', function() {
         names.push(doc.name);
         startedAt.push(Date.now());
         return {
-          then: function(onResolve) {
+          then: function(resolve) {
             setTimeout(function() {
-              onResolve();
+              resolve();
             }, 100);
           }
         };

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
@@ -238,31 +240,6 @@ describe('document', function() {
   it('test shortcut of id hexString', function(done) {
     var doc = new TestDocument();
     assert.equal(typeof doc.id, 'string');
-    done();
-  });
-
-  it('test toObject clone', function(done) {
-    var doc = new TestDocument();
-    doc.init({
-      test: 'test',
-      oids: [],
-      nested: {
-        age: 5,
-        cool: new DocumentObjectId
-      }
-    });
-
-    var copy = doc.toObject();
-
-    copy.test._marked = true;
-    copy.nested._marked = true;
-    copy.nested.age._marked = true;
-    copy.nested.cool._marked = true;
-
-    assert.equal(doc._doc.test._marked, undefined);
-    assert.equal(doc._doc.nested._marked, undefined);
-    assert.equal(doc._doc.nested.age._marked, undefined);
-    assert.equal(doc._doc.nested.cool._marked, undefined);
     done();
   });
 
@@ -1177,7 +1154,7 @@ describe('document', function() {
       var promise = m.validate();
       promise.then(function() {
         var promise2 = mBad.validate();
-        promise2.onReject(function(err) {
+        promise2.catch(function(err) {
           assert.ok(!!err);
           clearTimeout(timeout);
           db.close(done);
@@ -1271,12 +1248,13 @@ describe('document', function() {
           arr: {type: [], required: true}
         });
         var M = db.model('validateSchema-array1', schema, collection);
-        var m = new M({name: 'gh1109-1'});
+        var m = new M({name: 'gh1109-1', arr: null});
         m.save(function(err) {
           assert.ok(/Path `arr` is required/.test(err));
-          m.arr = [];
+          m.arr = null;
           m.save(function(err) {
             assert.ok(/Path `arr` is required/.test(err));
+            m.arr = [];
             m.arr.push('works');
             m.save(function(err) {
               assert.ifError(err);
@@ -1328,10 +1306,10 @@ describe('document', function() {
         });
 
         var M = db.model('validateSchema-array3', schema, collection);
-        var m = new M({name: 'gh1109-3'});
+        var m = new M({name: 'gh1109-3', arr: null});
         m.save(function(err) {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
-          m.arr.push({nice: true});
+          m.arr = [{nice: true}];
           m.save(function(err) {
             assert.equal(String(err), 'ValidationError: arr: BAM');
             m.arr.push(95);
@@ -3825,7 +3803,7 @@ describe('document', function() {
 
       var schema = new Schema({
         name: String
-      }, { timestamps: true, versionKey: null, saveErrorIfNotFound: true });
+      }, { timestamps: true, versionKey: null });
 
       schema.pre('save', function(next) {
         this.$where = { updatedAt: this.updatedAt };
@@ -3945,6 +3923,46 @@ describe('document', function() {
         catch(done);
     });
 
+    it('runs validate hooks on arrays subdocs if not directly modified (gh-5861)', function(done) {
+      var childSchema = new Schema({
+        name: { type: String },
+        friends: [{ type: String }]
+      });
+      var count = 0;
+
+      childSchema.pre('validate', function(next) {
+        ++count;
+        next();
+      });
+
+      var parentSchema = new Schema({
+        name: { type: String },
+        children: [childSchema]
+      });
+
+      var Parent = db.model('gh5861', parentSchema);
+
+      var p = new Parent({
+        name: 'Mufasa',
+        children: [{
+          name: 'Simba',
+          friends: ['Pumbaa', 'Timon', 'Nala']
+        }]
+      });
+
+      p.save().
+        then(function(p) {
+          assert.equal(count, 1);
+          p.children[0].friends.push('Rafiki');
+          return p.save();
+        }).
+        then(function() {
+          assert.equal(count, 2);
+          done();
+        }).
+        catch(done);
+    });
+
     it('does not overwrite when setting nested (gh-4793)', function(done) {
       var grandchildSchema = new mongoose.Schema();
       grandchildSchema.method({
@@ -4033,23 +4051,25 @@ describe('document', function() {
     });
 
     it('save errors with callback and promise work (gh-5216)', function(done) {
-      var schema = new mongoose.Schema({});
+      const schema = new mongoose.Schema({});
 
-      var Model = db.model('gh5216', schema);
+      const Model = db.model('gh5216', schema);
 
-      var _id = new mongoose.Types.ObjectId();
-      var doc1 = new Model({ _id: _id });
-      var doc2 = new Model({ _id: _id });
+      const _id = new mongoose.Types.ObjectId();
+      const doc1 = new Model({ _id: _id });
+      const doc2 = new Model({ _id: _id });
 
+      let remaining = 2;
       Model.on('error', function(error) {
-        done(error);
+        assert.ok(error);
+        --remaining || done();
       });
 
       doc1.save().
-        then(function() { return doc2.save(function() {}); }).
+        then(function() { return doc2.save(); }).
         catch(function(error) {
           assert.ok(error);
-          done();
+          --remaining || done();
         });
     });
 
@@ -4073,7 +4093,7 @@ describe('document', function() {
         Model.findOne({}, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.children.length, 1);
-          assert.equal(doc.children[0].text, 'test');
+          assert.equal(doc.children[0].text, 'bar');
           done();
         });
       });
@@ -5027,6 +5047,7 @@ describe('document', function() {
         assert.ifError(error);
         var child = doc.children.id(doc.children[0]._id);
         child.phoneNumber = '345';
+        assert.equal(contexts.length, 1);
         doc.save(function(error) {
           assert.ifError(error);
           assert.equal(contexts.length, 2);

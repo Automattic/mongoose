@@ -807,16 +807,16 @@ describe('aggregate: ', function() {
     });
 
     describe('error when empty pipeline', function() {
-      it('without a callback', function(done) {
+      it('without a callback', function() {
         var agg = new Aggregate;
 
         agg.model(db.model('Employee'));
         var promise = agg.exec();
         assert.ok(promise instanceof mongoose.Promise);
-        promise.onResolve(function(err) {
-          assert.ok(err);
-          assert.equal(err.message, 'Aggregate has empty pipeline');
-          done();
+
+        return promise.catch(error => {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('empty pipeline') !== -1, error.message);
         });
       });
 
@@ -1112,10 +1112,10 @@ describe('aggregate: ', function() {
             var _cur = cur;
             assert.equal(doc.name, expectedNames[cur]);
             return {
-              then: function(onResolve) {
+              then: function(resolve) {
                 setTimeout(function() {
                   assert.equal(_cur, cur++);
-                  onResolve();
+                  resolve();
                 }, 50);
               }
             };

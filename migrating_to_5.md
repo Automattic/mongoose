@@ -44,6 +44,16 @@ schema.path('name').
   get(() => console.log('This will print 2nd'));
 ```
 
+* `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object
+rather than the full [driver `WriteOpResult` object](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#~writeOpCallback).
+
+```javascript
+// In 4.x, this is how you got the number of documents deleted
+MyModel.deleteMany().then(res => console.log(res.result.n));
+// In 5.x this is how you get the number of documents deleted
+MyModel.deleteMany().then(res => res.n);
+```
+
 * `aggregate()` no longer accepts a spread, you **must** pass your aggregation pipeline as an array. The below code worked in 4.x:
 
 ```javascript

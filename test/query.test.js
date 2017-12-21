@@ -1197,7 +1197,7 @@ describe('Query', function() {
         assert.ifError(error);
         Test.remove({ name: /Stark/ }).exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.result.n, 2);
+          assert.equal(res.n, 2);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
@@ -1215,7 +1215,7 @@ describe('Query', function() {
         assert.ifError(error);
         Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.result.n, 2);
+          assert.equal(res.n, 2);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
@@ -1233,7 +1233,7 @@ describe('Query', function() {
         assert.ifError(error);
         Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.result.n, 1);
+          assert.equal(res.n, 1);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 1);

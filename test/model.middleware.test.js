@@ -3,12 +3,23 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+const start = require('./common');
+const assert = require('power-assert');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('model middleware', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   it('post save', function(done) {
     var schema = new Schema({
       title: String
@@ -37,16 +48,36 @@ describe('model middleware', function() {
       next();
     });
 
-    var db = start(),
-        TestMiddleware = db.model('TestPostSaveMiddleware', schema);
+    const db = start();
+    const TestMiddleware = db.model('TestPostSaveMiddleware', schema);
 
-    var test = new TestMiddleware({title: 'Little Green Running Hood'});
+    const test = new TestMiddleware({title: 'Little Green Running Hood'});
 
     test.save(function(err) {
       assert.ifError(err);
       assert.equal(test.title, 'Little Green Running Hood');
       assert.equal(called, 3);
       db.close();
+      done();
+    });
+  });
+
+  it('sync error in post save (gh-3483)', function(done) {
+    var schema = new Schema({
+      title: String
+    });
+
+    schema.post('save', function() {
+      throw new Error('woops!');
+    });
+
+    const TestMiddleware = db.model('gh3483_post', schema);
+
+    const test = new TestMiddleware({ title: 'Test' });
+
+    test.save(function(err) {
+      assert.ok(err);
+      assert.equal(err.message, 'woops!');
       done();
     });
   });
@@ -217,6 +248,55 @@ describe('model middleware', function() {
         db.close();
         done();
       });
+    });
+  });
+
+  it('sync error in pre save (gh-3483)', function(done) {
+    var schema = new Schema({
+      title: String
+    });
+
+    schema.post('save', function() {
+      throw new Error('woops!');
+    });
+
+    const TestMiddleware = db.model('gh3483_pre', schema);
+
+    const test = new TestMiddleware({ title: 'Test' });
+
+    test.save(function(err) {
+      assert.ok(err);
+      assert.equal(err.message, 'woops!');
+      done();
+    });
+  });
+
+  it('sync error in pre save after next() (gh-3483)', function(done) {
+    var schema = new Schema({
+      title: String
+    });
+
+    var called = 0;
+
+    schema.pre('save', function(next) {
+      next();
+      // This error will not get reported, because you already called next()
+      throw new Error('woops!');
+    });
+
+    schema.pre('save', function(next) {
+      ++called;
+      next();
+    });
+
+    const TestMiddleware = db.model('gh3483_pre_2', schema);
+
+    const test = new TestMiddleware({ title: 'Test' });
+
+    test.save(function(error) {
+      assert.ifError(error);
+      assert.equal(called, 1);
+      done();
     });
   });
 

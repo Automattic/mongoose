@@ -344,6 +344,37 @@ describe('model', function() {
         });
       });
 
+      it('deduplicates hooks (gh-2945)', function() {
+        let called = 0;
+        function middleware(next) {
+          ++called;
+          next();
+        }
+
+        function ActivityBaseSchema() {
+          mongoose.Schema.apply(this, arguments);
+          this.options.discriminatorKey = 'type';
+          this.add({ name: String });
+          this.pre('validate', middleware);
+        }
+        util.inherits(ActivityBaseSchema, mongoose.Schema);
+
+        const parentSchema = new ActivityBaseSchema();
+
+        const model = db.model('gh2945', parentSchema);
+
+        const commentSchema = new ActivityBaseSchema({
+          text: { type: String, required: true }
+        });
+
+        const D = model.discriminator('gh2945_0', commentSchema);
+
+        return new D({ text: 'test' }).validate().
+          then(() => {
+            assert.equal(called, 1);
+          })
+      });
+
       it('with typeKey (gh-4339)', function(done) {
         var options = { typeKey: '$type', discriminatorKey: '_t' };
         var schema = new Schema({ test: { $type: String } }, options);

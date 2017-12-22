@@ -82,6 +82,57 @@ describe('model middleware', function() {
     });
   });
 
+  it('pre hook promises (gh-3779)', function(done) {
+    const schema = new Schema({
+      title: String
+    });
+
+    let calledPre = 0;
+    schema.pre('save', function() {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          ++calledPre;
+          resolve();
+        }, 100);
+      })
+    });
+
+    const TestMiddleware = db.model('gh3779_pre', schema);
+
+    const test = new TestMiddleware({ title: 'Test' });
+
+    test.save(function(err) {
+      assert.ifError(err);
+      assert.equal(calledPre, 1);
+      done();
+    });
+  });
+
+  it('post hook promises (gh-3779)', function(done) {
+    const schema = new Schema({
+      title: String
+    });
+
+    schema.post('save', function(doc) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          doc.title = 'From Post Save';
+          resolve();
+        }, 100);
+      })
+    });
+
+    const TestMiddleware = db.model('gh3779_post', schema);
+
+    const test = new TestMiddleware({ title: 'Test' });
+
+    test.save(function(err, doc) {
+      assert.ifError(err);
+      assert.equal(doc.title, 'From Post Save');
+      done();
+    });
+  });
+
   it('validate middleware runs before save middleware (gh-2462)', function(done) {
     var schema = new Schema({
       title: String

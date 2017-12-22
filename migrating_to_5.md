@@ -54,6 +54,22 @@ MyModel.deleteMany().then(res => console.log(res.result.n));
 MyModel.deleteMany().then(res => res.n);
 ```
 
+* The `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.
+
+```javascript
+// Note the `toObject` option below
+const schema = new Schema({ name: String }, { toObject: { virtuals: true } });
+schema.virtual('answer').get(() => 42);
+const MyModel = db.model('MyModel', schema);
+
+const doc = new MyModel({ name: 'test' });
+// In mongoose 4.x this prints "undefined", because `{ minimize: false }`
+// overwrites the entire schema-defined options object.
+// In mongoose 5.x this prints "42", because `{ minimize: false }` gets
+// merged with the schema-defined options.
+console.log(doc.toJSON({ minimize: false }).answer);
+```
+
 * `aggregate()` no longer accepts a spread, you **must** pass your aggregation pipeline as an array. The below code worked in 4.x:
 
 ```javascript

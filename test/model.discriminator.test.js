@@ -1,19 +1,21 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var start = require('./common');
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
-var util = require('util');
-var clone = require('../lib/utils').clone;
-var random = require('../lib/utils').random;
+const start = require('./common');
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const assert = require('power-assert');
+const util = require('util');
+const clone = require('../lib/utils').clone;
+const random = require('../lib/utils').random;
 
 /**
  * Setup
  */
-var PersonSchema = new Schema({
+const PersonSchema = new Schema({
   name: {first: String, last: String},
   gender: String
 }, {collection: 'model-discriminator-' + random()});

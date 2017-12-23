@@ -401,7 +401,6 @@ describe('model', function() {
         Model.discriminator('gh4965_0', childSchema);
         assert.equal(called, 2);
 
-        mongoose.plugins = [];
         mongoose.set('applyPluginsToDiscriminators', false);
         done();
       });

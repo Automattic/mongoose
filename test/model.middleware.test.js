@@ -94,7 +94,7 @@ describe('model middleware', function() {
           ++calledPre;
           resolve();
         }, 100);
-      })
+      });
     });
 
     const TestMiddleware = db.model('gh3779_pre', schema);
@@ -119,7 +119,7 @@ describe('model middleware', function() {
           doc.title = 'From Post Save';
           resolve();
         }, 100);
-      })
+      });
     });
 
     const TestMiddleware = db.model('gh3779_post', schema);

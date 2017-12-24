@@ -377,18 +377,22 @@ describe('schema', function() {
           likes: {type: Array, required: true}
         });
 
+        var remaining = 3;
+
         Loki.path('likes').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Loki.path('likes').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Loki.path('likes').doValidate([], function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
-        done();
       });
 
       it('boolean required', function(done) {
@@ -396,22 +400,27 @@ describe('schema', function() {
           isFerret: {type: Boolean, required: true}
         });
 
+        var remaining = 4;
+
         Animal.path('isFerret').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Animal.path('isFerret').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Animal.path('isFerret').doValidate(true, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Animal.path('isFerret').doValidate(false, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
-        done();
       });
 
       it('mixed required', function(done) {
@@ -419,24 +428,29 @@ describe('schema', function() {
           characteristics: {type: Mixed, required: true}
         });
 
+        var remaining = 4;
+
         Animal.path('characteristics').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Animal.path('characteristics').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
+          --remaining || done();
         });
 
         Animal.path('characteristics').doValidate({
           aggresive: true
         }, function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
 
         Animal.path('characteristics').doValidate('none available', function(err) {
           assert.ifError(err);
+          --remaining || done();
         });
-        done();
       });
     });
 

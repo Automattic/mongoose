@@ -54,6 +54,8 @@ MyModel.deleteMany().then(res => console.log(res.result.n));
 MyModel.deleteMany().then(res => res.n);
 ```
 
+* `Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/3.0.0/CHANGES_3.0.0.md#geonear-command-helper)
+
 * The `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.
 
 ```javascript

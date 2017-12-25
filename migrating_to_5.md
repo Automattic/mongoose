@@ -82,6 +82,20 @@ The above code does **not** work in 5.x, you **must** wrap the `$match` and `$sk
 MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
 
+* Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,
+`remove()`, `deleteOne()`, and `deleteMany()` doesn't happen until `exec()`.
+This makes it easier for hooks and custom query helpers to modify data, because
+mongoose won't restructure the data you passed in until after your hooks and
+query helpers you ran. It also makes it possible to set the `overwrite` option
+_after_ passing in an update.
+
+```javascript
+// In mongoose 4.x, this becomes `{ $set: { name: 'Baz' } }` despite the `overwrite`
+// In mongoose 5.x, this overwrite is respected and the first document with
+// `name = 'Bar'` will be replaced with `{ name: 'Baz' }`
+User.where({ name: 'Bar' }).update({ name: 'Baz' }).setOptions({ overwrite: true });
+```
+
 * Post hooks now get flow control, which means async post save hooks and child document post save hooks execute **before** your `save()` callback.
 
 ```javsscript

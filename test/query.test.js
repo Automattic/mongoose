@@ -1,14 +1,17 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
 
-var start = require('./common');
-var mongoose = start.mongoose;
-var DocumentObjectId = mongoose.Types.ObjectId;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
-var random = require('../lib/utils').random;
-var Query = require('../lib/query');
+const start = require('./common');
+const mongoose = start.mongoose;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const Query = require('../lib/query');
+const Schema = mongoose.Schema;
+const assert = require('power-assert');
+const co = require('co');
+const random = require('../lib/utils').random;
 
 /**
  * Test.
@@ -2262,6 +2265,23 @@ describe('Query', function() {
         assert.ok(error);
         assert.equal(error.name, 'ObjectParameterError');
         done();
+      });
+    });
+
+    it('set overwrite after update() (gh-4740)', function() {
+      const schema = new Schema({ name: String, age: Number });
+      const User = db.model('4740', schema);
+
+      return co(function*() {
+        yield User.create({ name: 'Bar', age: 29 });
+
+        yield User.where({ name: 'Bar' }).
+          update({ name: 'Baz' }).
+          setOptions({ overwrite: true });
+
+        const doc = yield User.findOne();
+        assert.equal(doc.name, 'Baz');
+        assert.ok(!doc.age);
       });
     });
 

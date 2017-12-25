@@ -377,7 +377,7 @@ describe('schema', function() {
           likes: {type: Array, required: true}
         });
 
-        var remaining = 3;
+        var remaining = 2;
 
         Loki.path('likes').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
@@ -385,11 +385,6 @@ describe('schema', function() {
         });
 
         Loki.path('likes').doValidate(undefined, function(err) {
-          assert.ok(err instanceof ValidatorError);
-          --remaining || done();
-        });
-
-        Loki.path('likes').doValidate([], function(err) {
           assert.ok(err instanceof ValidatorError);
           --remaining || done();
         });

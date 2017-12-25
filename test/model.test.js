@@ -5268,7 +5268,7 @@ describe('Model', function() {
         assert.ifError(error);
         Model.remove([], function(error) {
           assert.ok(error);
-          assert.ok(error.message.indexOf('Query filter must be an object') !== -1,
+          assert.ok(error.message.indexOf('must be an object') !== -1,
             error.message);
           Model.find({}, function(error, docs) {
             assert.ifError(error);

@@ -2487,7 +2487,7 @@ describe('model: populate:', function() {
       it('a promise', function(done) {
         var p = B.populate(post1, '_creator');
         assert.ok(p instanceof mongoose.Promise);
-        p.then(success, done).end();
+        p.then(success, done);
         function success(doc) {
           assert.ok(doc);
           done();
@@ -5857,6 +5857,70 @@ describe('model: populate:', function() {
             done();
           }).
           catch(done);
+      });
+
+      it('subPopulate under discriminators race condition (gh-5858)', function() {
+        var options = { discriminatorKey: 'kind' };
+        var activitySchema = new Schema({ title: { type: String } }, options);
+
+        var dateActivitySchema = new Schema({
+          postedBy: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh5858',
+            required: true
+          }
+        }, options);
+
+        var eventActivitySchema = new Schema({ test: String }, options);
+
+        var logSchema = new Schema({
+          seq: Number,
+          activity: {
+            type: Schema.Types.ObjectId,
+            refPath: 'kind',
+            required: true
+          },
+          kind: String
+        }, options);
+
+        var User = db.model('gh5858', { name: String });
+        var Activity = db.model('gh5858_0', activitySchema);
+        var DateActivity = Activity.discriminator('gh5858_1', dateActivitySchema);
+        var EventActivity = Activity.discriminator('gh5858_2', eventActivitySchema);
+        var Log = db.model('gh5858_3', logSchema);
+
+        var dateActivity;
+        var eventActivity;
+        return User.create({ name: 'val' }).
+          then(function(user) {
+            return DateActivity.create({ title: 'test', postedBy: user._id });
+          }).
+          then(function(_dateActivity) {
+            dateActivity = _dateActivity;
+            return EventActivity.create({ title: 'test' });
+          }).
+          then(function(_eventActivity) {
+            eventActivity = _eventActivity;
+            return Log.create([
+              { seq: 1, activity: eventActivity._id, kind: 'gh5858_2' },
+              { seq: 2, activity: dateActivity._id, kind: 'gh5858_1' }
+            ]);
+          }).
+          then(function() {
+            return Log.find({}).
+              populate({
+                path: 'activity',
+                populate: { path: 'postedBy' }
+              }).
+              sort({ seq:-1 });
+          }).
+          then(function(results) {
+            assert.equal(results.length, 2);
+            assert.equal(results[0].activity.kind, 'gh5858_1' );
+            assert.equal(results[0].activity.postedBy.name, 'val');
+            assert.equal(results[1].activity.kind, 'gh5858_2' );
+            assert.equal(results[1].activity.postedBy, null);
+          });
       });
 
       it('specify model in populate (gh-4264)', function(done) {

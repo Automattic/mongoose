@@ -21,13 +21,11 @@
   "dependencies": {
     "async": "2.1.4",
     "bson": "~1.0.4",
-    "hooks-fixed": "2.0.2",
-    "kareem": "1.5.0",
+    "kareem": "2.0.0-rc5",
     "lodash.get": "4.4.2",
-    "mongodb": "https://github.com/mongodb/node-mongodb-native/archive/3.0.0.tar.gz",
+    "mongodb": "3.0.1",
     "mpath": "0.3.0",
-    "mpromise": "0.5.5",
-    "mquery": "2.3.3",
+    "mquery": "3.0.0-rc0",
     "ms": "2.0.0",
     "regexp-clone": "0.0.1",
     "sliced": "1.0.1"
@@ -54,26 +52,15 @@
     "power-assert": "1.4.1",
     "q": "1.5.1",
     "tbd": "0.6.4",
-    "uglify-js": "2.7.0",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "5.4.0"
-  },
-  "browserDependencies": {
-    "browserify": "4.1.10",
-    "chai": "3.5.0",
-    "karma": "0.12.16",
-    "karma-chai": "0.1.0",
-    "karma-mocha": "0.1.4",
-    "karma-chrome-launcher": "0.1.4",
-    "karma-sauce-launcher": "0.2.8"
   },
   "directories": {
     "lib": "./lib/mongoose"
   },
   "scripts": {
     "fix-lint": "eslint . --fix",
-    "install-browser": "npm install `node format_deps.js`",
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
     "test": "mocha test/*.test.js test/**/*.test.js",
@@ -81,11 +68,10 @@
   },
   "main": "./index.js",
   "engines": {
-    "node": ">=0.6.19"
+    "node": ">=4.0.0"
   },
   "bugs": {
-    "url": "https://github.com/Automattic/mongoose/issues/new",
-    "email": "mongoose-orm@googlegroups.com"
+    "url": "https://github.com/Automattic/mongoose/issues/new"
   },
   "repository": {
     "type": "git",

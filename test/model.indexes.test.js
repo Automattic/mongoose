@@ -275,7 +275,7 @@ describe('model', function() {
         });
 
         delete Test.$init;
-        Test.init();
+        Test.init().catch(() => {});
       });
     });
 

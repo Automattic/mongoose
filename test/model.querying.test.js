@@ -318,19 +318,24 @@ describe('model: querying:', function() {
       assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof Query);
     });
 
-    it('can handle minimize option (gh-3381)', function(done) {
+    it('can handle minimize option (gh-3381)', function() {
       var db = start();
       var Model = db.model('gh3381', {
         name: String,
         mixed: Schema.Types.Mixed
       });
 
-      var query = Model.update({}, {mixed: {}, name: 'abc'},
-          {minimize: true});
-
-      assert.ok(!query._update.$set.mixed);
-
-      db.close(done);
+      return Model.create({}).
+        then(() => Model.update({}, {mixed: {}, name: 'abc'}, {minimize: true})).
+        then(() => Model.collection.findOne()).
+        then(doc => {
+          assert.ok(doc.mixed == null);
+          db.close();
+        }).
+        catch(err => {
+          db.close();
+          throw err;
+        });
     });
   });
 
@@ -2275,7 +2280,7 @@ describe('model: querying:', function() {
 
     it('$maxDistance with arrays', function(done) {
       var db = start(),
-          Test = db.model('Geo4', geoSchema, 'x' + random());
+          Test = db.model('Geo4', geoSchema, 'geo4');
 
       var pending = 2;
 

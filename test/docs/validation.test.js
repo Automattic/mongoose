@@ -130,16 +130,18 @@ describe('validation docs', function() {
 
     var dup = [{ username: 'Val' }, { username: 'Val' }];
     U1.create(dup, function(error) {
-      // Will save successfully!
+      // Race condition! This may save successfully, depending on whether
+      // MongoDB built the index before writing the 2 docs.
       // acquit:ignore:start
-      assert.ifError(error);
+      // Avoid ESLint errors
+      error;
       --remaining || done();
       // acquit:ignore:end
     });
 
     // Need to wait for the index to finish building before saving,
     // otherwise unique constraints may be violated.
-    U2.on('index', function(error) {
+    U2.once('index', function(error) {
       assert.ifError(error);
       U2.create(dup, function(error) {
         // Will error, but will *not* be a mongoose validation error, it will be

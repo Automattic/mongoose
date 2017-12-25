@@ -901,7 +901,7 @@ describe('model: update:', function() {
   describe('{overwrite: true}', function() {
     it('overwrite works', function(done) {
       var db = start();
-      var schema = new Schema({mixed: {}});
+      var schema = new Schema({mixed: {}}, { minimize: false });
       var M = db.model('updatesmixed-' + random(), schema);
 
       M.create({mixed: 'something'}, function(err, created) {
@@ -1314,18 +1314,13 @@ describe('model: update:', function() {
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
-      M.update(
-          {_id: doc._id},
-          {notInSchema: 1}).
-      exec().
-      then(function(data) {
-        assert.equal(data.ok, 0);
-        assert.equal(data.n, 0);
-        db.close(done);
-      }).
-      onReject(function(error) {
-        return done(error);
-      });
+      M.update({_id: doc._id}, {notInSchema: 1}).exec().
+        then(function(data) {
+          assert.equal(data.ok, 0);
+          assert.equal(data.n, 0);
+          db.close(done);
+        }).
+        catch(done);
     });
   });
 
@@ -1726,17 +1721,21 @@ describe('model: update:', function() {
       });
     });
 
-    it('.update(doc) (gh-3221)', function(done) {
-      var Schema = mongoose.Schema({name: String});
-      var Model = db.model('gh3221', Schema);
+    it('.update(doc) (gh-3221)', function() {
+      const Schema = mongoose.Schema({name: String});
+      const Model = db.model('gh3221', Schema);
 
-      var query = Model.update({name: 'Val'});
-      assert.equal(query.getUpdate().$set.name, 'Val');
+      let query = Model.update({name: 'Val'});
+      assert.equal(query.getUpdate().name, 'Val');
 
       query = Model.find().update({name: 'Val'});
-      assert.equal(query.getUpdate().$set.name, 'Val');
+      assert.equal(query.getUpdate().name, 'Val');
 
-      done();
+      return query.setOptions({ upsert: true }).
+        then(() => Model.findOne()).
+        then(doc => {
+          assert.equal(doc.name, 'Val');
+        });
     });
 
     it('nested schemas with strict false (gh-3883)', function(done) {

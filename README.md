@@ -20,6 +20,16 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
   - [Help Forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB Support](https://docs.mongodb.org/manual/support/)
 
+## Importing
+
+```javascript
+// Using Node.js `require()`
+const mongoose = require('mongoose');
+
+// Using ES6 imports
+import mongoose from 'mongoose';
+```
+
 ## Plugins
 
 Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundreds of related modules from the community. Next, learn how to write your own plugin from the [docs](http://mongoosejs.com/docs/plugins.html) or [this blog post](http://thecodebarbarian.com/2015/03/06/guide-to-mongoose-plugins).

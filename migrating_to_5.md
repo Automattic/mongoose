@@ -65,6 +65,24 @@ MyModel.deleteMany().then(res => console.log(res.result.n));
 MyModel.deleteMany().then(res => res.n);
 ```
 
+### Aggregation Cursors
+
+The `useMongooseAggCursor` option from 4.x is now always on. This is the new syntax for aggregation cursors in mongoose 5:
+
+```javascript
+// When you call `.cursor()`, `.exec()` will now return a mongoose aggregation
+// cursor.
+const cursor = MyModel.aggregate([{ $match: { name: 'Val' } }]).cursor().exec();
+// No need to `await` on the cursor or wait for a promise to resolve
+cursor.each(doc => console.log(doc));
+
+// Can also pass options to `cursor()`
+const cursorWithOptions = MyModel.
+  aggregate([{ $match: { name: 'Val' } }]).
+  cursor({ batchSize: 10 }).
+  exec();
+```
+
 ### geoNear
 
 `Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/3.0.0/CHANGES_3.0.0.md#geonear-command-helper)

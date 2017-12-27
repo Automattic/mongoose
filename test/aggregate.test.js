@@ -1,12 +1,16 @@
+'use strict';
+
 /**
  * Module dependencies
  */
 
-var start = require('./common');
-var Aggregate = require('../lib/aggregate');
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
+const co = require('co');
+const start = require('./common');
+const assert = require('power-assert');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const Aggregate = require('../lib/aggregate');
 
 /**
  * Test data
@@ -1021,25 +1025,21 @@ describe('aggregate: ', function() {
     });
   });
 
-  it('cursor (gh-3160)', function(done) {
-    var db = start();
+  it('cursor (gh-3160)', function() {
+    const db = start();
 
-    var MyModel = db.model('gh3160', { name: String });
+    const MyModel = db.model('gh3160', { name: String });
 
-    MyModel.create({ name: 'test' }, function(error) {
-      assert.ifError(error);
-      MyModel.
+    return co(function * () {
+      yield MyModel.create({ name: 'test' });
+
+      const cursor = MyModel.
         aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
         allowDiskUse(true).
-        cursor({ batchSize: 2500, async: true }).
-        exec(function(error, cursor) {
-          assert.ifError(error);
-          assert.ok(cursor);
-          cursor.toArray(function(error) {
-            assert.ifError(error);
-            db.close(done);
-          });
-        });
+        cursor({ batchSize: 2500 }).
+        exec();
+
+      assert.ok(cursor.eachAsync);
     });
   });
 
@@ -1134,15 +1134,16 @@ describe('aggregate: ', function() {
       name: String
     });
 
-    MyModel.
+    const cursor = MyModel.
       aggregate([{ $match: { name: 'test' } }]).
       addCursorFlag('noCursorTimeout', true).
-      cursor({ async: true }).
-      exec(function(error, cursor) {
-        assert.ifError(error);
-        assert.ok(cursor.s.cmd.noCursorTimeout);
-        done();
-      });
+      cursor().
+      exec();
+
+    cursor.once('cursor', cursor => {
+      assert.ok(cursor.s.cmd.noCursorTimeout);
+      done();
+    });
   });
 
   it('query by document (gh-4866)', function(done) {

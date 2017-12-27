@@ -1,3 +1,10 @@
+4.13.8 / 2017-12-27
+===================
+ * docs(guide): use more up-to-date syntax for autoIndex example #5933
+ * docs: fix grammar #5927 [abagh0703](https://github.com/abagh0703)
+ * fix: propagate lean options to child schemas #5914
+ * fix(populate): use correct model with discriminators + nested populate #5858
+
 4.13.7 / 2017-12-11
 ===================
  * docs(schematypes): fix typo #5889 [gokaygurcan](https://github.com/gokaygurcan)

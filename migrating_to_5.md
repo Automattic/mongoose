@@ -13,6 +13,20 @@ const host = encodeURIComponent('/tmp/mongodb-27017.sock');
 mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
 ```
 
+* Query middleware is now compiled when you call `mongoose.model()` or `db.model()`. If you add query middleware after calling `mongoose.model()`, that middleware will **not** get called.
+
+```javascript
+const schema = new Schema({ name: String });
+const MyModel = mongoose.model('Test', schema);
+schema.pre('find', () => { console.log('find!'); });
+
+MyModel.find().exec(function() {
+  // In mongoose 4.x, the above `.find()` will print "find!"
+  // In mongoose 5.x, "find!" will **not** be printed.
+  // Call `pre('find')` **before** calling `mongoose.model()` to make the middleware apply.
+});
+```
+
 * `mongoose.connect()` and `mongoose.disconnect()` now return a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
 
 ```javascript

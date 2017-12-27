@@ -230,7 +230,7 @@ var Story  = mongoose.model('Story', StorySchema);
 var Person = mongoose.model('Person', PersonSchema);
 </code></pre>
 
-<p>So far we've created two models. Our <code>Person</code> model has it's <code>stories</code> field set to an array of <code>ObjectId</code>s. The <code>ref</code> option is what tells Mongoose in which model to look, in our case the <code>Story</code> model. All <code>_id</code>s we store here must be document <code>_id</code>s from the <code>Story</code> model. We also added a <code>_creator</code> <code>ObjectId</code> to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
+<p>So far we've created two models. Our <code>Person</code> model has its <code>stories</code> field set to an array of <code>ObjectId</code>s. The <code>ref</code> option is what tells Mongoose in which model to look, in our case the <code>Story</code> model. All <code>_id</code>s we store here must be document <code>_id</code>s from the <code>Story</code> model. We also added a <code>_creator</code> <code>ObjectId</code> to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
 
 <h2>Saving a ref (to the parent)</h2>
 

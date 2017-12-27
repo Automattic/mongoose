@@ -1,19 +1,10 @@
-* Mongoose now requires node.js >= 4.0.0 and MongoDB >= 3.0.0. [MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and [Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016.
+### Version Requirements
 
-* Domain sockets must be URI encoded. For example:
+Mongoose now requires node.js >= 4.0.0 and MongoDB >= 3.0.0. [MongoDB 2.6](https://www.mongodb.com/blog/post/mongodb-2-6-end-of-life) and [Node.js < 4](https://github.com/nodejs/Release) where both EOL-ed in 2016.
 
-```javascript
-// Works in mongoose 4. Does **not** work in mongoose 5 because of more
-// stringent URI parsing.
-const host = '/tmp/mongodb-27017.sock';
-mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
+### Query Middleware
 
-// Do this instead
-const host = encodeURIComponent('/tmp/mongodb-27017.sock');
-mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
-```
-
-* Query middleware is now compiled when you call `mongoose.model()` or `db.model()`. If you add query middleware after calling `mongoose.model()`, that middleware will **not** get called.
+Query middleware is now compiled when you call `mongoose.model()` or `db.model()`. If you add query middleware after calling `mongoose.model()`, that middleware will **not** get called.
 
 ```javascript
 const schema = new Schema({ name: String });
@@ -27,7 +18,9 @@ MyModel.find().exec(function() {
 });
 ```
 
-* `mongoose.connect()` and `mongoose.disconnect()` now return a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
+### Promises and Callbacks for `mongoose.connect()`
+
+`mongoose.connect()` and `mongoose.disconnect()` now return a promise if no callback specified, or `null` otherwise. It does **not** return the mongoose singleton.
 
 ```javascript
 // Worked in mongoose 4. Does **not** work in mongoose 5, `mongoose.connect()`
@@ -40,7 +33,9 @@ mongoose.connect('mongodb://localhost:27017/test');
 mongoose.model('Test', new Schema({}));
 ```
 
-* Setters run in reverse order in 4.x:
+### Setter Order
+
+Setters run in reverse order in 4.x:
 
 ```javascript
 const schema = new Schema({ name: String });
@@ -58,7 +53,9 @@ schema.path('name').
   get(() => console.log('This will print 2nd'));
 ```
 
-* `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object
+### Return Values for `remove()` and `deleteX()`
+
+`deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object
 rather than the full [driver `WriteOpResult` object](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#~writeOpCallback).
 
 ```javascript
@@ -68,9 +65,28 @@ MyModel.deleteMany().then(res => console.log(res.result.n));
 MyModel.deleteMany().then(res => res.n);
 ```
 
-* `Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/3.0.0/CHANGES_3.0.0.md#geonear-command-helper)
+### geoNear
 
-* The `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.
+`Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/3.0.0/CHANGES_3.0.0.md#geonear-command-helper)
+
+### Domain sockets
+
+Domain sockets must be URI encoded. For example:
+
+```javascript
+// Works in mongoose 4. Does **not** work in mongoose 5 because of more
+// stringent URI parsing.
+const host = '/tmp/mongodb-27017.sock';
+mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
+
+// Do this instead
+const host = encodeURIComponent('/tmp/mongodb-27017.sock');
+mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
+```
+
+### `toObject()` Options
+
+The `options` parameter to `toObject()` and `toJSON()` merge defaults rather than overwriting them.
 
 ```javascript
 // Note the `toObject` option below
@@ -86,7 +102,9 @@ const doc = new MyModel({ name: 'test' });
 console.log(doc.toJSON({ minimize: false }).answer);
 ```
 
-* `aggregate()` no longer accepts a spread, you **must** pass your aggregation pipeline as an array. The below code worked in 4.x:
+### Aggregate Parameters
+
+`aggregate()` no longer accepts a spread, you **must** pass your aggregation pipeline as an array. The below code worked in 4.x:
 
 ```javascript
 MyModel.aggregate({ $match: { isDeleted: false } }, { $skip: 10 }).exec(cb);
@@ -98,7 +116,9 @@ The above code does **not** work in 5.x, you **must** wrap the `$match` and `$sk
 MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
 
-* Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,
+### Query Casting
+
+Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,
 `remove()`, `deleteOne()`, and `deleteMany()` doesn't happen until `exec()`.
 This makes it easier for hooks and custom query helpers to modify data, because
 mongoose won't restructure the data you passed in until after your hooks and
@@ -112,7 +132,9 @@ _after_ passing in an update.
 User.where({ name: 'Bar' }).update({ name: 'Baz' }).setOptions({ overwrite: true });
 ```
 
-* Post hooks now get flow control, which means async post save hooks and child document post save hooks execute **before** your `save()` callback.
+### Post Save Hooks Get Flow Control
+
+Post hooks now get flow control, which means async post save hooks and child document post save hooks execute **before** your `save()` callback.
 
 ```javsscript
 const ChildModelSchema = new mongoose.Schema({
@@ -137,24 +159,42 @@ m.save(function() {
 });
 ```
 
-* `$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://docs.mongodb.com/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
+### The `$pushAll` Operator
 
-* The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects. If you have queries or indexes that rely on reverse key order, you will have to change them.
+`$pushAll` is no longer supported and no longer used internally for `save()`, since it has been [deprecated since MongoDB 2.4](https://docs.mongodb.com/manual/reference/operator/update/pushAll/). Use `$push` with `$each` instead.
 
-* We no longer have a pre-compiled version of mongoose for the browser. If you want to use mongoose schemas in the browser, you need to build your own bundle with browserify/webpack.
+### Always Use Forward Key Order
 
-* The `saveErrorIfNotFound` option was removed, mongoose will now always error out from `save()` if the underlying document was not found
+The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects. If you have queries or indexes that rely on reverse key order, you will have to change them.
 
-* `init` hooks are now fully synchronous and do not receive `next()` as a parameter.
+### Pre-compiled Browser Bundle
 
-* `Document.prototype.init()` no longer takes a callback as a parameter. It
+We no longer have a pre-compiled version of mongoose for the browser. If you want to use mongoose schemas in the browser, you need to build your own bundle with browserify/webpack.
+
+### Save Errors
+
+The `saveErrorIfNotFound` option was removed, mongoose will now always error out from `save()` if the underlying document was not found
+
+### Init hook signatures
+
+`init` hooks are now fully synchronous and do not receive `next()` as a parameter.
+
+`Document.prototype.init()` no longer takes a callback as a parameter. It
 was always synchronous, just had a callback for legacy reasons.
 
-* `doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
+### `numAffected` and `save()`
 
-* `doc.remove()` no longer debounces
+`doc.save()` no longer passes `numAffected` as a 3rd param to its callback.
 
-* `getPromiseConstructor()` is gone, just use `mongoose.Promise`.
+### `remove()` and debouncing
 
-* You cannot pass parameters to the next pre middleware in the chain using `next()` in mongoose 5.x. In mongoose 4, `next('Test')` in pre middleware would call the
+`doc.remove()` no longer debounces
+
+### `getPromiseConstructor()`
+
+`getPromiseConstructor()` is gone, just use `mongoose.Promise`.
+
+### Passing Parameters from Pre Hooks
+
+You cannot pass parameters to the next pre middleware in the chain using `next()` in mongoose 5.x. In mongoose 4, `next('Test')` in pre middleware would call the
 next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for this.

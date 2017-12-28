@@ -1,14 +1,17 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
 
-var start = require('./common');
-var mongoose = start.mongoose;
-var DocumentObjectId = mongoose.Types.ObjectId;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
-var random = require('../lib/utils').random;
-var Query = require('../lib/query');
+const start = require('./common');
+const mongoose = start.mongoose;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const Query = require('../lib/query');
+const Schema = mongoose.Schema;
+const assert = require('power-assert');
+const co = require('co');
+const random = require('../lib/utils').random;
 
 /**
  * Test.
@@ -1150,7 +1153,7 @@ describe('Query', function() {
         var q = Product.where().remove({strings: 'remove-single-condition'});
         assert.ok(q instanceof mongoose.Query);
         done();
-      }, done).end();
+      }, done);
     });
 
     it('supports a single callback arg', function(done) {
@@ -1168,7 +1171,7 @@ describe('Query', function() {
             done();
           });
         });
-      }, done).end();
+      }, done);
     });
 
     it('supports conditions and callback args', function(done) {
@@ -1186,7 +1189,7 @@ describe('Query', function() {
             done();
           });
         });
-      }, done).end();
+      }, done);
     });
 
     it('single option, default', function(done) {
@@ -1197,7 +1200,7 @@ describe('Query', function() {
         assert.ifError(error);
         Test.remove({ name: /Stark/ }).exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.result.n, 2);
+          assert.equal(res.n, 2);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
@@ -1215,7 +1218,7 @@ describe('Query', function() {
         assert.ifError(error);
         Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.result.n, 2);
+          assert.equal(res.n, 2);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
@@ -1233,7 +1236,7 @@ describe('Query', function() {
         assert.ifError(error);
         Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.result.n, 1);
+          assert.equal(res.n, 1);
           Test.count({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 1);
@@ -1778,7 +1781,7 @@ describe('Query', function() {
           {'answers._id': '507f1f77bcf86cd799439011'},
           {$set: {'answers.$': answersUpdate}});
 
-      assert.deepEqual(q.getUpdate().$set['answers.$'].stats.toObject(),
+      assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
         { votes: 1, count: 3 });
       done();
     });
@@ -2230,8 +2233,8 @@ describe('Query', function() {
       var TestSchema = new Schema();
 
       var count = 0;
-      TestSchema.post('init', function(model, next) {
-        return next(new Error('Failed! ' + (count++)));
+      TestSchema.post('init', function() {
+        throw new Error('Failed! ' + (count++));
       });
 
       var TestModel = db.model('gh5592', TestSchema);
@@ -2262,6 +2265,23 @@ describe('Query', function() {
         assert.ok(error);
         assert.equal(error.name, 'ObjectParameterError');
         done();
+      });
+    });
+
+    it('set overwrite after update() (gh-4740)', function() {
+      const schema = new Schema({ name: String, age: Number });
+      const User = db.model('4740', schema);
+
+      return co(function*() {
+        yield User.create({ name: 'Bar', age: 29 });
+
+        yield User.where({ name: 'Bar' }).
+          update({ name: 'Baz' }).
+          setOptions({ overwrite: true });
+
+        const doc = yield User.findOne();
+        assert.equal(doc.name, 'Baz');
+        assert.ok(!doc.age);
       });
     });
 

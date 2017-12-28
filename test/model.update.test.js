@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
@@ -12,9 +14,9 @@ var start = require('./common'),
 
 describe('model: update:', function() {
   var post;
-  var title = 'Tobi ' + random();
-  var author = 'Brian ' + random();
-  var newTitle = 'Woot ' + random();
+  var title = 'Tobi';
+  var author = 'Brian';
+  var newTitle = 'Woot';
   var id0;
   var id1;
   var Comments;
@@ -77,9 +79,9 @@ describe('model: update:', function() {
     mongoose.model('UpdateStrictSchema', strictSchema);
   });
 
-  before(function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+  beforeEach(function(done) {
+    var db = start();
+    var BlogPost = db.model('BlogPostForUpdates', collection);
 
     id0 = new DocumentObjectId;
     id1 = new DocumentObjectId;
@@ -236,60 +238,7 @@ describe('model: update:', function() {
         assert.equal(up.comments.length, 1);
         assert.equal(up.comments[0].body, 'worked great');
         assert.strictEqual(true, !!doc.comments[0]._id);
-        assert.equal(up.meta.visitors.valueOf(), 2);
-        assert.equal(up.mixed.x, 'ECKS');
-        assert.deepEqual(up.numbers.toObject(), [5, 100]);
-        assert.strictEqual(up.numbers[1].valueOf(), 100);
 
-        assert.equal(doc.idontexist, 2);
-        assert.equal(doc.numbers[1], 100);
-
-        db.close(done);
-      });
-    });
-  });
-
-  it('handles $pushAll array of docs', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
-
-    var update = {
-      $pushAll: {comments: [{body: 'i am number 2'}, {body: 'i am number 3'}]}
-    };
-
-    BlogPost.update({_id: post._id}, update, function(err) {
-      assert.ifError(err);
-      BlogPost.findById(post, function(err, ret) {
-        assert.ifError(err);
-        assert.equal(ret.comments.length, 3);
-        assert.equal(ret.comments[1].body, 'i am number 2');
-        assert.strictEqual(true, !!ret.comments[1]._id);
-        assert.ok(ret.comments[1]._id instanceof DocumentObjectId);
-        assert.equal(ret.comments[2].body, 'i am number 3');
-        assert.strictEqual(true, !!ret.comments[2]._id);
-        assert.ok(ret.comments[2]._id instanceof DocumentObjectId);
-        db.close(done);
-      });
-    });
-  });
-
-  it('handles $pull of object literal array of docs (gh-542)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
-
-    var update = {
-      $pull: {comments: {body: 'i am number 2'}}
-    };
-
-    BlogPost.update({_id: post._id}, update, function(err) {
-      assert.ifError(err);
-      BlogPost.findById(post, function(err, ret) {
-        assert.ifError(err);
-        assert.equal(ret.comments.length, 2);
-        assert.equal(ret.comments[0].body, 'worked great');
-        assert.ok(ret.comments[0]._id instanceof DocumentObjectId);
-        assert.equal(ret.comments[1].body, 'i am number 3');
-        assert.ok(ret.comments[1]._id instanceof DocumentObjectId);
         db.close(done);
       });
     });
@@ -308,9 +257,9 @@ describe('model: update:', function() {
     });
   });
 
-  it('handles weird casting (gh-479)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+  it('$addToSet with $ (gh-479)', function(done) {
+    const db = start();
+    const BlogPost = db.model('BlogPostForUpdates', collection);
 
     function a() {
     }
@@ -325,126 +274,129 @@ describe('model: update:', function() {
       $set: {'comments.$.title': crazy}
     };
 
-    BlogPost.update({_id: post._id, 'comments.body': 'worked great'}, update, function(err) {
+    BlogPost.update({_id: post._id, 'comments.body': 'been there'}, update, function(err) {
       assert.ifError(err);
       BlogPost.findById(post, function(err, ret) {
         assert.ifError(err);
         assert.equal(ret.comments.length, 2);
-        assert.equal(ret.comments[0].body, 'worked great');
+        assert.equal(ret.comments[0].body, 'been there');
         assert.equal(ret.comments[0].title, 'MongoDB++');
         assert.strictEqual(true, !!ret.comments[0].comments);
         assert.equal(ret.comments[0].comments.length, 1);
         assert.strictEqual(ret.comments[0].comments[0].body, 'The Ring Of Power');
-        assert.ok(ret.comments[0]._id instanceof DocumentObjectId);
-        assert.ok(ret.comments[0].comments[0]._id instanceof DocumentObjectId);
-        assert.equal(ret.comments[1].body, 'i am number 3');
-        assert.strictEqual(undefined, ret.comments[1].title);
-        assert.ok(ret.comments[1]._id instanceof DocumentObjectId);
         db.close(done);
       });
     });
   });
 
-  var last;
-  it('handles date casting (gh-479)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+  describe('using last', function() {
+    let BlogPost;
+    let db;
+    let last;
 
-    var update = {
-      $inc: {'comments.$.newprop': '1'},
-      $set: {date: (new Date).getTime()} // check for single val casting
-    };
+    before(function() {
+      db = start();
+      BlogPost = db.model('BlogPostForUpdates', collection);
+    });
 
-    BlogPost.update({_id: post._id, 'comments.body': 'worked great'}, update, function(err) {
-      assert.ifError(err);
-      BlogPost.findById(post, function(err, ret) {
-        assert.ifError(err);
-        assert.equal(ret._doc.comments[0]._doc.newprop, 1);
-        assert.strictEqual(undefined, ret._doc.comments[1]._doc.newprop);
-        assert.ok(ret.date instanceof Date);
-        assert.equal(ret.date.toString(), new Date(update.$set.date).toString());
+    after(function(done) {
+      db.close(done);
+    });
 
-        last = ret;
-        db.close(done);
+    beforeEach(function(done) {
+      BlogPost.findOne({}, function(error, doc) {
+        assert.ifError(error);
+        last = doc;
+        done();
       });
     });
-  });
 
-  it('handles $addToSet (gh-545)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    it('handles date casting (gh-479)', function(done) {
+      var update = {
+        $inc: {'comments.$.newprop': '1'},
+        $set: {date: (new Date).getTime()} // check for single val casting
+      };
 
-    var owner = last.owners[0];
-
-    var update = {
-      $addToSet: {owners: owner}
-    };
-
-    BlogPost.update({_id: post._id}, update, function(err) {
-      assert.ifError(err);
-      BlogPost.findById(post, function(err, ret) {
+      BlogPost.update({_id: post._id, 'comments.body': 'been there'}, update, function(err) {
         assert.ifError(err);
-        assert.equal(ret.owners.length, 1);
-        assert.equal(ret.owners[0].toString(), owner.toString());
+        BlogPost.findById(post, function(err, ret) {
+          assert.ifError(err);
+          assert.equal(ret._doc.comments[0]._doc.newprop, 1);
+          assert.strictEqual(undefined, ret._doc.comments[1]._doc.newprop);
+          assert.ok(ret.date instanceof Date);
+          assert.equal(ret.date.toString(), new Date(update.$set.date).toString());
 
-        last = ret;
-        db.close(done);
+          done();
+        });
       });
     });
-  });
 
-  it('handles $addToSet with $each (gh-545)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    it('handles $addToSet (gh-545)', function(done) {
+      const owner = last.owners[0];
+      const numOwners = last.owners.length;
+      const update = {
+        $addToSet: {owners: owner}
+      };
 
-    var owner = last.owners[0],
-        newowner = new DocumentObjectId;
-
-    var update = {
-      $addToSet: {owners: {$each: [owner, newowner]}}
-    };
-
-    BlogPost.update({_id: post._id}, update, function(err) {
-      assert.ifError(err);
-      BlogPost.findById(post, function(err, ret) {
+      BlogPost.update({_id: last._id}, update, function(err) {
         assert.ifError(err);
-        assert.equal(ret.owners.length, 2);
-        assert.equal(ret.owners[0].toString(), owner.toString());
-        assert.equal(ret.owners[1].toString(), newowner.toString());
+        BlogPost.findById(last, function(err, ret) {
+          assert.ifError(err);
+          assert.equal(ret.owners.length, numOwners);
+          assert.equal(ret.owners[0].toString(), owner.toString());
 
-        last = newowner;
-        db.close(done);
+          done();
+        });
       });
     });
-  });
 
-  it('handles $pop and $unset (gh-574)', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    it('handles $addToSet with $each (gh-545)', function(done) {
+      const owner = post.owners[0];
+      const newowner = new DocumentObjectId;
+      const numOwners = post.owners.length;
 
-    var update = {
-      $pop: {owners: -1},
-      $unset: {title: 1}
-    };
+      var update = {
+        $addToSet: {owners: {$each: [owner, newowner]}}
+      };
 
-
-    BlogPost.update({_id: post._id}, update, function(err) {
-      assert.ifError(err);
-      BlogPost.findById(post, function(err, ret) {
+      BlogPost.update({_id: post._id}, update, function(err) {
         assert.ifError(err);
-        assert.equal(ret.owners.length, 1);
-        assert.equal(ret.owners[0].toString(), last.toString());
-        assert.strictEqual(undefined, ret.title);
-        db.close(done);
+        BlogPost.findById(post, function(err, ret) {
+          assert.ifError(err);
+          assert.equal(ret.owners.length, numOwners + 1);
+          assert.equal(ret.owners[0].toString(), owner.toString());
+          assert.equal(ret.owners[2].toString(), newowner.toString());
+
+          done();
+        });
+      });
+    });
+
+    it('handles $pop and $unset (gh-574)', function(done) {
+      const update = {
+        $pop: {owners: -1},
+        $unset: {title: 1}
+      };
+
+      BlogPost.update({_id: post._id}, update, function(err) {
+        assert.ifError(err);
+        BlogPost.findById(post, function(err, ret) {
+          assert.ifError(err);
+          assert.equal(ret.owners.length, 1);
+          assert.equal(ret.owners[0].toString(), post.owners[1].toString());
+          assert.strictEqual(ret.title, undefined);
+
+          done();
+        });
       });
     });
   });
 
   it('works with nested positional notation', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    const db = start();
+    const BlogPost = db.model('BlogPostForUpdates', collection);
 
-    var update = {
+    const update = {
       $set: {
         'comments.0.comments.0.date': '11/5/2011',
         'comments.1.body': 9000
@@ -455,8 +407,8 @@ describe('model: update:', function() {
       assert.ifError(err);
       BlogPost.findById(post, function(err, ret) {
         assert.ifError(err);
-        assert.equal(ret.comments.length, 2, 2);
-        assert.equal(ret.comments[0].body, 'worked great');
+        assert.equal(ret.comments.length, 2);
+        assert.equal(ret.comments[0].body, 'been there');
         assert.equal(ret.comments[1].body, '9000');
         assert.equal(ret.comments[0].comments[0].date.toString(), new Date('11/5/2011').toString());
         assert.equal(ret.comments[1].comments.length, 0);
@@ -468,7 +420,6 @@ describe('model: update:', function() {
   it('handles $pull with obj literal (gh-542)', function(done) {
     var db = start();
     var BlogPost = db.model('BlogPostForUpdates', collection);
-
 
     BlogPost.findById(post, function(err, doc) {
       assert.ifError(err);
@@ -482,7 +433,7 @@ describe('model: update:', function() {
         BlogPost.findById(post, function(err, ret) {
           assert.ifError(err);
           assert.equal(ret.comments.length, 1);
-          assert.equal(ret.comments[0].body, '9000');
+          assert.equal(ret.comments[0].body, 'done that');
           db.close(done);
         });
       });
@@ -490,41 +441,38 @@ describe('model: update:', function() {
   });
 
   it('handles $pull of obj literal and nested $in', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    const db = start();
+    const BlogPost = db.model('BlogPostForUpdates', collection);
 
-    BlogPost.findById(post, function(err, last) {
+    const update = {
+      $pull: {comments: {body: {$in: ['been there']}}}
+    };
+
+    BlogPost.update({_id: post._id}, update, function(err) {
       assert.ifError(err);
-      var update = {
-        $pull: {comments: {body: {$in: [last.comments[0].body]}}}
-      };
-
-      BlogPost.update({_id: post._id}, update, function(err) {
+      BlogPost.findById(post, function(err, ret) {
         assert.ifError(err);
-        BlogPost.findById(post, function(err, ret) {
-          assert.ifError(err);
-          assert.equal(ret.comments.length, 0);
+        assert.equal(ret.comments.length, 1);
+        assert.equal(ret.comments[0].body, 'done that');
 
-          last = ret;
-          db.close(done);
-        });
+        db.close(done);
       });
     });
   });
 
   it('handles $pull and nested $nin', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    const db = start();
+    const BlogPost = db.model('BlogPostForUpdates', collection);
 
-    BlogPost.findById(post, function(err, last) {
+    BlogPost.findById(post, function(err, doc) {
       assert.ifError(err);
 
-      last.comments.push({body: 'hi'}, {body: 'there'});
-      last.save(function(err) {
+      doc.comments.push({body: 'hi'}, {body: 'there'});
+      doc.save(function(err) {
         assert.ifError(err);
-        BlogPost.findById(post, function(err, ret) {
+        BlogPost.findById(doc, function(err, ret) {
           assert.ifError(err);
-          assert.equal(ret.comments.length, 2);
+          assert.equal(ret.comments.length, 4);
 
           var update = {
             $pull: {comments: {body: {$nin: ['there']}}}
@@ -535,6 +483,7 @@ describe('model: update:', function() {
             BlogPost.findById(post, function(err, ret) {
               assert.ifError(err);
               assert.equal(ret.comments.length, 1);
+              assert.equal(ret.comments[0].body, 'there');
               db.close(done);
             });
           });
@@ -952,7 +901,7 @@ describe('model: update:', function() {
   describe('{overwrite: true}', function() {
     it('overwrite works', function(done) {
       var db = start();
-      var schema = new Schema({mixed: {}});
+      var schema = new Schema({mixed: {}}, { minimize: false });
       var M = db.model('updatesmixed-' + random(), schema);
 
       M.create({mixed: 'something'}, function(err, created) {
@@ -1365,18 +1314,13 @@ describe('model: update:', function() {
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
-      M.update(
-          {_id: doc._id},
-          {notInSchema: 1}).
-      exec().
-      then(function(data) {
-        assert.equal(data.ok, 0);
-        assert.equal(data.n, 0);
-        db.close(done);
-      }).
-      onReject(function(error) {
-        return done(error);
-      });
+      M.update({_id: doc._id}, {notInSchema: 1}).exec().
+        then(function(data) {
+          assert.equal(data.ok, 0);
+          assert.equal(data.n, 0);
+          db.close(done);
+        }).
+        catch(done);
     });
   });
 
@@ -1777,30 +1721,21 @@ describe('model: update:', function() {
       });
     });
 
-    it('dontThrowCastError option (gh-3512)', function(done) {
-      var Schema = mongoose.Schema({name: String});
-      var Model = db.model('gh3412', Schema);
+    it('.update(doc) (gh-3221)', function() {
+      const Schema = mongoose.Schema({name: String});
+      const Model = db.model('gh3221', Schema);
 
-      var badQuery = {_id: 'foo'};
-      var update = {name: 'test'};
-      var options = {dontThrowCastError: true};
-      Model.update(badQuery, update, options).then(null, function(error) {
-        assert.ok(error);
-        done();
-      });
-    });
-
-    it('.update(doc) (gh-3221)', function(done) {
-      var Schema = mongoose.Schema({name: String});
-      var Model = db.model('gh3221', Schema);
-
-      var query = Model.update({name: 'Val'});
-      assert.equal(query.getUpdate().$set.name, 'Val');
+      let query = Model.update({name: 'Val'});
+      assert.equal(query.getUpdate().name, 'Val');
 
       query = Model.find().update({name: 'Val'});
-      assert.equal(query.getUpdate().$set.name, 'Val');
+      assert.equal(query.getUpdate().name, 'Val');
 
-      done();
+      return query.setOptions({ upsert: true }).
+        then(() => Model.findOne()).
+        then(doc => {
+          assert.equal(doc.name, 'Val');
+        });
     });
 
     it('nested schemas with strict false (gh-3883)', function(done) {
@@ -2326,9 +2261,9 @@ describe('model: update:', function() {
 
       var A = new Schema({ str: {} });
       var validateCalls = 0;
-      A.path('str').validate(function(val, next) {
+      A.path('str').validate(function() {
         ++validateCalls;
-        next();
+        return true;
       });
 
       var B = new Schema({a: [A]});

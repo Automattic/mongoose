@@ -52,9 +52,9 @@ describe('toObject()', function() {
     done();
   });
 
-  it('can overwrite by passing an option', function(done) {
+  it('can overwrite schema-set default options', function(done) {
     var d = new Stub();
-    assert.deepEqual(d.toObject({minimize: true}), {});
+    assert.deepEqual(d.toObject({minimize: true, virtuals: false}), {});
     done();
   });
 

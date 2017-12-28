@@ -104,7 +104,7 @@ module.exports = function(options) {
  * testing uri
  */
 
-module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+module.exports.uri = 'mongodb://localhost:27017/mongoose_test';
 
 /**
  * expose mongoose
@@ -141,20 +141,7 @@ function dropDBs(done) {
   db.once('open', function() {
     // drop the default test database
     db.db.dropDatabase(function() {
-      var db2 = db.useDb('mongoose-test-2');
-      db2.db.dropDatabase(function() {
-        // drop mongos test db if exists
-        var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
-        if (!mongos) {
-          return done();
-        }
-
-
-        var db = mongoose.connect(mongos, {mongos: true});
-        db.once('open', function() {
-          db.db.dropDatabase(done);
-        });
-      });
+      done();
     });
   });
 }
@@ -178,4 +165,16 @@ module.exports.server = server = new Server('mongod', {
   port: 27000,
   dbpath: './data/db/27000',
   storageEngine: 'mmapv1'
+});
+
+beforeEach(function() {
+  if (this.currentTest) {
+    global.CURRENT_TEST = this.currentTest.title;
+  } else {
+    global.CURRENT_TEST = 'N/A';
+  }
+});
+
+process.on('unhandledRejection', function(error) {
+  console.error(`unhandledRejection in "${global.CURRENT_TEST}":`, error.stack);
 });

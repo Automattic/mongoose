@@ -3,7 +3,7 @@ DOCS_ = $(shell find lib/ -name '*.js')
 DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 STABLE_BRANCH = master
-LEGACY_BRANCH = 3.8.x
+LEGACY_BRANCH = 4.x
 
 test:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/*.test.js
@@ -60,8 +60,3 @@ copylegacy:
 	rm -rf ./tmp
 
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable
-
-browser:
-	npm install `node format_deps.js`
-	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js
-	./node_modules/uglify-js/bin/uglifyjs ./bin/mongoose.js -o ./bin/mongoose.min.js --screw-ie8 -c -m

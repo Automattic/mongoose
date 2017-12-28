@@ -1017,8 +1017,7 @@ describe('model query casting', function() {
         assert.ifError(error);
         assert.equal(called, 1);
         done();
-      }).
-      catch(done);
+      });
   });
 
   it('lowercase in query (gh-4569)', function(done) {

@@ -53,7 +53,8 @@ describe('types.subdocument', function() {
     done();
   });
   it('not setting timestamps in subdocuments', function() {
-    var Thing = mongoose.model('Thing', new Schema({
+    var db = start();
+    var Thing = db.model('Thing', new Schema({
       subArray: [{
         testString: String
       }]
@@ -67,24 +68,19 @@ describe('types.subdocument', function() {
       }]
     });
     var id;
-    thingy.save(function(err, item) {
-      assert(!err);
-      id = item._id;
-    })
-    .then(function() {
-      var thingy2 = {
-        subArray: [{
-          testString: 'Test 2'
-        }]
-      };
-      return Thing.update({
-        _id: id
-      }, {$set: thingy2});
-    })
-    .then(function() {
-      mongoose.connection.close();
-    }, function(reason) {
-      assert(!reason);
-    });
+    thingy.save().
+      then(function() {
+        id = thingy._id;
+      }).
+      then(function() {
+        var thingy2 = {
+          subArray: [{
+            testString: 'Test 2'
+          }]
+        };
+        return Thing.update({
+          _id: id
+        }, {$set: thingy2});
+      });
   });
 });

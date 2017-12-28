@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
@@ -238,31 +240,6 @@ describe('document', function() {
   it('test shortcut of id hexString', function(done) {
     var doc = new TestDocument();
     assert.equal(typeof doc.id, 'string');
-    done();
-  });
-
-  it('test toObject clone', function(done) {
-    var doc = new TestDocument();
-    doc.init({
-      test: 'test',
-      oids: [],
-      nested: {
-        age: 5,
-        cool: new DocumentObjectId
-      }
-    });
-
-    var copy = doc.toObject();
-
-    copy.test._marked = true;
-    copy.nested._marked = true;
-    copy.nested.age._marked = true;
-    copy.nested.cool._marked = true;
-
-    assert.equal(doc._doc.test._marked, undefined);
-    assert.equal(doc._doc.nested._marked, undefined);
-    assert.equal(doc._doc.nested.age._marked, undefined);
-    assert.equal(doc._doc.nested.cool._marked, undefined);
     done();
   });
 
@@ -509,7 +486,7 @@ describe('document', function() {
   describe('toObject', function() {
     var db;
     before(function() {
-      return start({ useMongoClient: true }).then(function(_db) {
+      return start().then(function(_db) {
         db = _db;
       });
     });
@@ -1177,7 +1154,7 @@ describe('document', function() {
       var promise = m.validate();
       promise.then(function() {
         var promise2 = mBad.validate();
-        promise2.onReject(function(err) {
+        promise2.catch(function(err) {
           assert.ok(!!err);
           clearTimeout(timeout);
           db.close(done);
@@ -1271,12 +1248,13 @@ describe('document', function() {
           arr: {type: [], required: true}
         });
         var M = db.model('validateSchema-array1', schema, collection);
-        var m = new M({name: 'gh1109-1'});
+        var m = new M({name: 'gh1109-1', arr: null});
         m.save(function(err) {
           assert.ok(/Path `arr` is required/.test(err));
-          m.arr = [];
+          m.arr = null;
           m.save(function(err) {
             assert.ok(/Path `arr` is required/.test(err));
+            m.arr = [];
             m.arr.push('works');
             m.save(function(err) {
               assert.ifError(err);
@@ -1328,10 +1306,10 @@ describe('document', function() {
         });
 
         var M = db.model('validateSchema-array3', schema, collection);
-        var m = new M({name: 'gh1109-3'});
+        var m = new M({name: 'gh1109-3', arr: null});
         m.save(function(err) {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
-          m.arr.push({nice: true});
+          m.arr = [{nice: true}];
           m.save(function(err) {
             assert.equal(String(err), 'ValidationError: arr: BAM');
             m.arr.push(95);
@@ -1419,9 +1397,12 @@ describe('document', function() {
         preference: {
           type: String,
           required: true,
-          validate: function validator(value, done) {
-            count++;
-            setTimeout(done.bind(null, true), 500);
+          validate: {
+            validator: function validator(value, done) {
+              count++;
+              setTimeout(done.bind(null, true), 500);
+            },
+            isAsync: true
           }
         }
       });
@@ -2072,20 +2053,16 @@ describe('document', function() {
         assert.equal(eventHookCount, 1);
         assert.equal(userHookCount, 1);
 
-        Event.findOne(
-            {user: {name: '123', email: 'val'}},
-            function(error, doc) {
-              assert.ifError(error);
-              assert.ok(doc);
+        Event.findOne({user: {name: '123', email: 'val'}}, function(err, doc) {
+          assert.ifError(err);
+          assert.ok(doc);
 
-              Event.findOne(
-                  {user: {$in: [{name: '123', email: 'val'}]}},
-                  function(error, doc) {
-                    assert.ifError(error);
-                    assert.ok(doc);
-                    done();
-                  });
-            });
+          Event.findOne({user: {$in: [{name: '123', email: 'val'}]}}, function(err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            done();
+          });
+        });
       });
     });
 
@@ -3374,7 +3351,7 @@ describe('document', function() {
           key2: String
         },
         content: String
-      }, { retainKeyOrder: true });
+      });
 
       var Model = db.model('gh4542', schema);
 
@@ -3625,7 +3602,6 @@ describe('document', function() {
           default: function() {
             return mongoose.Types.Buffer(uuid.parse(uuid.v4())).toObject(4);
           },
-          unique: true,
           required: true
         },
         email: {
@@ -3826,7 +3802,7 @@ describe('document', function() {
 
       var schema = new Schema({
         name: String
-      }, { timestamps: true, versionKey: null, saveErrorIfNotFound: true });
+      }, { timestamps: true, versionKey: null });
 
       schema.pre('save', function(next) {
         this.$where = { updatedAt: this.updatedAt };
@@ -4074,23 +4050,25 @@ describe('document', function() {
     });
 
     it('save errors with callback and promise work (gh-5216)', function(done) {
-      var schema = new mongoose.Schema({});
+      const schema = new mongoose.Schema({});
 
-      var Model = db.model('gh5216', schema);
+      const Model = db.model('gh5216', schema);
 
-      var _id = new mongoose.Types.ObjectId();
-      var doc1 = new Model({ _id: _id });
-      var doc2 = new Model({ _id: _id });
+      const _id = new mongoose.Types.ObjectId();
+      const doc1 = new Model({ _id: _id });
+      const doc2 = new Model({ _id: _id });
 
+      let remaining = 2;
       Model.on('error', function(error) {
-        done(error);
+        assert.ok(error);
+        --remaining || done();
       });
 
       doc1.save().
-        then(function() { return doc2.save(function() {}); }).
+        then(function() { return doc2.save(); }).
         catch(function(error) {
           assert.ok(error);
-          done();
+          --remaining || done();
         });
     });
 
@@ -4114,7 +4092,7 @@ describe('document', function() {
         Model.findOne({}, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.children.length, 1);
-          assert.equal(doc.children[0].text, 'test');
+          assert.equal(doc.children[0].text, 'bar');
           done();
         });
       });
@@ -4197,7 +4175,7 @@ describe('document', function() {
           test1: String,
           test2: String
         }
-      }, { retainKeyOrder: true });
+      });
 
       schema.virtual('tests').get(function() {
         return _.map(this.nested, function(v) {

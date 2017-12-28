@@ -1,12 +1,12 @@
+'use strict';
 
-var url = require('url'),
-    start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Mongoose = mongoose.Mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
-    collection = 'blogposts_' + random();
+var start = require('./common');
+var assert = require('power-assert');
+var mongoose = start.mongoose;
+var Mongoose = mongoose.Mongoose;
+var Schema = mongoose.Schema;
+var random = require('../lib/utils').random;
+var collection = 'blogposts_' + random();
 
 describe('mongoose module:', function() {
   describe('default connection works', function() {
@@ -29,7 +29,7 @@ describe('mongoose module:', function() {
       var db = goose.connection,
           uri = 'mongodb://localhost/mongoose_test';
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {db: {safe: false}});
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
 
       db.on('open', function() {
         db.close(function() {
@@ -95,7 +95,7 @@ describe('mongoose module:', function() {
     assert.equal(calls[1], subSchema);
 
     assert.equal(preSaveCalls, 0);
-    mong.connect(start.uri, { useMongoClient: true });
+    mong.connect(start.uri);
     M.create({ test: [{ name: 'Val' }] }, function(error, doc) {
       assert.ifError(error);
       assert.equal(preSaveCalls, 2);
@@ -148,26 +148,6 @@ describe('mongoose module:', function() {
         });
 
         mong.disconnect();
-      });
-
-      it('properly handles errors', function(done) {
-        var mong = new Mongoose(),
-            uri = 'mongodb://localhost/mongoose_test';
-
-        mong.connect(process.env.MONGOOSE_TEST_URI || uri);
-        var db = mong.connection;
-
-        // forced failure
-        db.close = function(cb) {
-          cb(new Error('bam'));
-        };
-
-        mong.disconnect().connection.
-          on('error', function(error) {
-            assert.equal(error.message, 'bam');
-          });
-
-        done();
       });
     });
 
@@ -286,25 +266,12 @@ describe('mongoose module:', function() {
     });
   });
 
-  it('connecting with a signature of host, database, function', function(done) {
-    var mong = new Mongoose(),
-        uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
-
-    uri = url.parse(uri);
-
-    mong.connect(uri.hostname, uri.pathname.substr(1), function(err) {
-      assert.ifError(err);
-      mong.connection.close();
-      done();
-    });
-  });
-
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
       var mong = new Mongoose(),
           uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
 
-      mong.connect(uri, {db: {safe: false}}, function(err) {
+      mong.connect(uri, {}, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -317,96 +284,12 @@ describe('mongoose module:', function() {
 
       if (!uri) return done();
 
-      mong.connect(uri, {db: {safe: false}}, function(err) {
+      mong.connect(uri, {}, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
       });
     });
-  });
-
-  it('goose.connect() to a replica set', function(done) {
-    var uri = process.env.MONGOOSE_SET_TEST_URI;
-
-    if (!uri) {
-      console.log('\033[31m', '\n', 'You\'re not testing replica sets!'
-                , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
-                , 'e.g: `mongodb://localhost:27017/db,localhost…`', '\n'
-                , '\033[39m');
-      return done();
-    }
-
-    var mong = new Mongoose();
-
-    mong.connect(uri, function(err) {
-      assert.ifError(err);
-
-      mong.model('Test', new mongoose.Schema({
-        test: String
-      }));
-
-      var Test = mong.model('Test'),
-          test = new Test();
-
-      test.test = 'aa';
-      test.save(function(err) {
-        assert.ifError(err);
-
-        Test.findById(test._id, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc.test, 'aa');
-          mong.connection.close();
-          complete();
-        });
-      });
-    });
-
-    mong.connection.on('fullsetup', complete);
-
-    var pending = 2;
-    function complete() {
-      if (--pending) return;
-      done();
-    }
-  });
-
-  it('goose.createConnection() to a replica set', function(done) {
-    var uri = process.env.MONGOOSE_SET_TEST_URI;
-
-    if (!uri) return done();
-
-    var mong = new Mongoose();
-
-    var conn = mong.createConnection(uri, function(err) {
-      assert.ifError(err);
-
-      mong.model('ReplSetTwo', new mongoose.Schema({
-        test: String
-      }));
-
-      var Test = conn.model('ReplSetTwo'),
-          test = new Test();
-
-      test.test = 'aa';
-      test.save(function(err) {
-        assert.ifError(err);
-
-        Test.findById(test._id, function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc.test, 'aa');
-          conn.close();
-          complete();
-        });
-      });
-    });
-
-    conn.on('fullsetup', complete);
-
-    var pending = 2;
-    function complete() {
-      if (--pending) return;
-      done();
-    }
   });
 
   describe('exports', function() {
@@ -441,9 +324,11 @@ describe('mongoose module:', function() {
 
     it('of result from .connect() (gh-3940)', function(done) {
       var m = new mongoose.Mongoose;
-      test(m.connect('mongodb://localhost:27017'));
-      m.disconnect();
-      done();
+      m.connect('mongodb://localhost:27017').then(function(m) {
+        test(m);
+        m.disconnect();
+        done();
+      });
     });
   });
 });

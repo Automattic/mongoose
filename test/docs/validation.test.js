@@ -9,7 +9,6 @@ describe('validation docs', function() {
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
-      useMongoClient: true,
       poolSize: 1
     });
   });
@@ -131,16 +130,18 @@ describe('validation docs', function() {
 
     var dup = [{ username: 'Val' }, { username: 'Val' }];
     U1.create(dup, function(error) {
-      // Will save successfully!
+      // Race condition! This may save successfully, depending on whether
+      // MongoDB built the index before writing the 2 docs.
       // acquit:ignore:start
-      assert.ifError(error);
+      // Avoid ESLint errors
+      error;
       --remaining || done();
       // acquit:ignore:end
     });
 
     // Need to wait for the index to finish building before saving,
     // otherwise unique constraints may be violated.
-    U2.on('index', function(error) {
+    U2.once('index', function(error) {
       assert.ifError(error);
       U2.create(dup, function(error) {
         // Will error, but will *not* be a mongoose validation error, it will be
@@ -323,8 +324,14 @@ describe('validation docs', function() {
       assert.equal(err.errors.color.path, 'color');
       assert.equal(err.errors.color.value, 'Green');
 
-      assert.equal(err.errors.name.message, 'Name `Power Ranger` is not valid');
+      // This is new in mongoose 5. If your validator throws an exception,
+      // mongoose will use that message. If your validator returns `false`,
+      // mongoose will use the 'Name `Power Ranger` is not valid' message.
+      assert.equal(err.errors.name.message,
+        'Need to get a Turbo Man for Christmas');
       assert.equal(err.errors.name.value, 'Power Ranger');
+      // If your validator threw an error, the `reason` property will contain
+      // the original error thrown, including the original stack trace.
       assert.equal(err.errors.name.reason.message,
         'Need to get a Turbo Man for Christmas');
 

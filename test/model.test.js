@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
@@ -364,34 +366,6 @@ describe('Model', function() {
         cb();
       });
     });
-
-
-    it('when saved using the promise not the callback', function(done) {
-      var db = start(),
-          BlogPost = db.model('BlogPost', collection);
-
-      var post = new BlogPost();
-      var p = post.save();
-      p.onResolve(function(err, post) {
-        assert.ifError(err);
-        assert.ok(post.get('_id') instanceof DocumentObjectId);
-
-        assert.equal(post.get('title'), undefined);
-        assert.equal(post.get('slug'), undefined);
-        assert.equal(post.get('date'), undefined);
-        assert.equal(post.get('published'), undefined);
-
-        assert.equal(typeof post.get('meta'), 'object');
-        assert.deepEqual(post.get('meta'), {});
-        assert.equal(post.get('meta.date'), undefined);
-        assert.equal(post.get('meta.visitors'), undefined);
-
-        assert.ok(post.get('owners').isMongooseArray);
-        assert.ok(post.get('comments').isMongooseDocumentArray);
-        db.close(done);
-      });
-    });
-
 
     describe('init', function() {
       it('works', function(done) {
@@ -1060,11 +1034,9 @@ describe('Model', function() {
         return true;
       }
 
-      function dovalidateAsync(val, callback) {
+      function dovalidateAsync() {
         assert.equal(this.scope, 'correct');
-        process.nextTick(function() {
-          callback(true);
-        });
+        return global.Promise.resolve(true);
       }
 
       mongoose.model('TestValidation', new Schema({
@@ -1352,138 +1324,6 @@ describe('Model', function() {
       });
     });
 
-    describe('async', function() {
-      it('works', function(done) {
-        var executed = false;
-
-        function validator(v, fn) {
-          setTimeout(function() {
-            executed = true;
-            fn(v !== 'test');
-          }, 5);
-        }
-
-        mongoose.model('TestAsyncValidation', new Schema({
-          async: {type: String, validate: [validator, 'async validator failed for `{PATH}`']}
-        }));
-
-        var db = start(),
-            TestAsyncValidation = db.model('TestAsyncValidation');
-
-        var post = new TestAsyncValidation();
-        post.set('async', 'test');
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.ok(err.errors.async instanceof ValidatorError);
-          assert.equal(err.errors.async.message, 'async validator failed for `async`');
-          assert.equal(executed, true);
-          executed = false;
-
-          post.set('async', 'woot');
-          post.save(function(err) {
-            db.close();
-            assert.equal(executed, true);
-            assert.strictEqual(err, null);
-            done();
-          });
-        });
-      });
-
-      it('nested', function(done) {
-        var executed = false;
-
-        function validator(v, fn) {
-          setTimeout(function() {
-            executed = true;
-            fn(v !== 'test');
-          }, 5);
-        }
-
-        mongoose.model('TestNestedAsyncValidation', new Schema({
-          nested: {
-            async: {type: String, validate: [validator, 'async validator']}
-          }
-        }));
-
-        var db = start(),
-            TestNestedAsyncValidation = db.model('TestNestedAsyncValidation');
-
-        var post = new TestNestedAsyncValidation();
-        post.set('nested.async', 'test');
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.ok(executed);
-          executed = false;
-
-          post.validate(function(err) {
-            assert.ok(err instanceof MongooseError);
-            assert.ok(err instanceof ValidationError);
-            assert.ok(executed);
-            executed = false;
-
-            post.set('nested.async', 'woot');
-            post.validate(function(err) {
-              assert.ok(executed);
-              assert.equal(err, null);
-              executed = false;
-
-              post.save(function(err) {
-                db.close();
-                assert.ok(executed);
-                assert.strictEqual(err, null);
-                done();
-              });
-            });
-          });
-        });
-      });
-
-      it('subdocuments', function(done) {
-        var executed = false;
-
-        function validator(v, fn) {
-          setTimeout(function() {
-            executed = true;
-            fn(v !== '');
-          }, 5);
-        }
-
-        var Subdocs = new Schema({
-          required: {type: String, validate: [validator, 'async in subdocs']}
-        });
-
-        mongoose.model('TestSubdocumentsAsyncValidation', new Schema({
-          items: [Subdocs]
-        }));
-
-        var db = start(),
-            Test = db.model('TestSubdocumentsAsyncValidation');
-
-        var post = new Test();
-
-        post.get('items').push({required: ''});
-
-        post.save(function(err) {
-          assert.ok(err instanceof MongooseError);
-          assert.ok(err instanceof ValidationError);
-          assert.ok(executed);
-          executed = false;
-
-          post.get('items')[0].set({required: 'here'});
-          post.save(function(err) {
-            db.close();
-            assert.ok(executed);
-            assert.strictEqual(err, null);
-            done();
-          });
-        });
-      });
-    });
-
     it('without saving', function(done) {
       mongoose.model('TestCallingValidation', new Schema({
         item: {type: String, required: true}
@@ -1762,25 +1602,6 @@ describe('Model', function() {
         });
       });
     });
-
-    it('do not cause the document to stay dirty after save', function(done) {
-      var db = start(),
-          Model = db.model('SavingDefault', new Schema({name: {type: String, default: 'saving'}}), collection),
-          doc = new Model();
-
-      doc.save(function(err, doc, numberAffected) {
-        assert.ifError(err);
-        assert.strictEqual(1, numberAffected);
-
-        doc.save(function(err, doc, numberAffected) {
-          db.close();
-          assert.ifError(err);
-          // should not have saved a second time
-          assert.strictEqual(0, numberAffected);
-          done();
-        });
-      });
-    });
   });
 
   describe('virtuals', function() {
@@ -1810,7 +1631,7 @@ describe('Model', function() {
       done();
     });
 
-    it('should not be saved to the db', function(done) {
+    it('should not be saved to the db AZZ', function(done) {
       var db = start(),
           BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
@@ -1993,12 +1814,11 @@ describe('Model', function() {
         B.findById(post, function(err, found) {
           assert.ifError(err);
 
-          found.remove().onResolve(function(err, doc) {
-            assert.ifError(err);
+          found.remove().then(function(doc) {
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          });
+          }).catch(done);
         });
       });
     });
@@ -2022,29 +1842,13 @@ describe('Model', function() {
           assert.ifError(err);
           assert.ok(found);
 
-          found.remove().onResolve(function(err, doc) {
+          found.remove().then(function(doc) {
             assert.ifError(err);
             assert.equal(called, 1);
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          });
-        });
-      });
-    });
-
-    it('passes the removed document (gh-1419)', function(done) {
-      B.create({}, function(err, post) {
-        assert.ifError(err);
-        B.findById(post, function(err, found) {
-          assert.ifError(err);
-
-          found.remove(function(err, doc) {
-            assert.ifError(err);
-            assert.ok(doc);
-            assert.ok(doc.equals(found));
-            done();
-          });
+          }).catch(done);
         });
       });
     });
@@ -2687,7 +2491,7 @@ describe('Model', function() {
     });
   });
 
-  it('updating multiple Number $pushes as a single $pushAll', function(done) {
+  it('multiple number push() calls', function(done) {
     var db = start(),
         schema = new Schema({
           nested: {
@@ -2718,7 +2522,7 @@ describe('Model', function() {
     });
   });
 
-  it('updating at least a single $push and $pushAll as a single $pushAll', function(done) {
+  it('multiple push() calls', function(done) {
     var db = start(),
         schema = new Schema({
           nested: {
@@ -2779,14 +2583,13 @@ describe('Model', function() {
     var Temp = db.model('NestedPushes', schema, collection);
 
     var p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
-    p1.onResolve(function(err, t) {
-      assert.ifError(err);
+    p1.then(function(t) {
       t.nested.nums.pull(1);
       t.nested.nums.pull(2);
       assert.equal(t.$__.activePaths.paths['nested.nums'], 'modify');
       db.close();
       done();
-    });
+    }).catch(done);
   });
 
   it('$pull should affect what you see in an array before a save', function(done) {
@@ -3494,128 +3297,8 @@ describe('Model', function() {
     });
   });
 
-  describe('safe mode', function() {
-    it('works', function(done) {
-      var Human = new Schema({
-        name: String,
-        email: {type: String, index: {unique: true, background: false}}
-      });
-
-      mongoose.model('SafeHuman', Human, true);
-
-      var db = start();
-      Human = db.model('SafeHuman', 'safehuman' + random());
-
-      Human.on('index', function(err) {
-        assert.ifError(err);
-        var me = new Human({
-          name: 'Guillermo Rauch',
-          email: 'rauchg@gmail.com'
-        });
-
-        me.save(function(err) {
-          assert.ifError(err);
-
-          Human.findById(me._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.email, 'rauchg@gmail.com');
-
-            var copycat = new Human({
-              name: 'Lionel Messi',
-              email: 'rauchg@gmail.com'
-            });
-
-            copycat.save(function(err) {
-              db.close();
-              assert.ok(/duplicate/.test(err.message));
-              assert.ok(err instanceof Error);
-              done();
-            });
-          });
-        });
-      });
-    });
-
-    it('can be disabled', function(done) {
-      var Human = new Schema({
-        name: String,
-        email: {type: String, index: {unique: true, background: false}}
-      });
-
-      // turn it off
-      Human.set('safe', false);
-
-      mongoose.model('UnsafeHuman', Human, true);
-
-      var db = start();
-      Human = db.model('UnsafeHuman', 'unsafehuman' + random());
-
-      Human.on('index', function(err) {
-        assert.ifError(err);
-      });
-
-      var me = new Human({
-        name: 'Guillermo Rauch',
-        email: 'rauchg@gmail.com'
-      });
-
-      me.save(function(err) {
-        assert.ifError(err);
-
-        // no confirmation the write occured b/c we disabled safe.
-        // wait a little bit to ensure the doc exists in the db
-        setTimeout(function() {
-          Human.findById(me._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.email, 'rauchg@gmail.com');
-
-            var copycat = new Human({
-              name: 'Lionel Messi',
-              email: 'rauchg@gmail.com'
-            });
-
-            copycat.save(function(err) {
-              db.close();
-              assert.ifError(err);
-              done();
-            });
-          });
-        }, 100);
-      });
-    });
-  });
-
   describe('hooks', function() {
     describe('pre', function() {
-      it('can pass non-error values to the next middleware', function(done) {
-        var db = start();
-        var schema = new Schema({name: String});
-
-        schema.pre('save', function(next) {
-          next('hey there');
-        }).pre('save', function(next, message) {
-          assert.ok(message);
-          assert.equal(message, 'hey there');
-          next();
-        }).pre('save', function(next) {
-          // just throw error
-          next(new Error('error string'));
-        }).pre('save', function(next) {
-          // don't call since error thrown in previous save
-          assert.ok(false);
-          next('don\'t call me');
-        });
-        var S = db.model('S', schema, collection);
-        var s = new S({name: 'angelina'});
-
-        s.save(function(err) {
-          db.close();
-          assert.ok(err);
-          assert.equal(err.message, 'error string');
-          done();
-        });
-      });
-
       it('with undefined and null', function(done) {
         var db = start();
         var schema = new Schema({name: String});
@@ -3665,12 +3348,11 @@ describe('Model', function() {
         var s = new S({name: 'zupa'});
 
         var p = s.save();
-        p.onResolve(function(err) {
+        p.then(function() {
           db.close();
-          assert.ifError(err);
           assert.equal(called, 2);
           done();
-        });
+        }).catch(done);
       });
 
 
@@ -3747,9 +3429,8 @@ describe('Model', function() {
               PreInitSchema = new Schema({}),
               preId = null;
 
-          PreInitSchema.pre('init', function(next) {
+          PreInitSchema.pre('init', function() {
             preId = this._id;
-            next();
           });
 
           var PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());
@@ -3765,29 +3446,6 @@ describe('Model', function() {
             });
           });
         });
-      });
-
-      it('should not work when calling next() after a thrown error', function(done) {
-        var db = start();
-
-        var s = new Schema({});
-        s.methods.funky = function() {
-          assert.strictEqual(false, true, 'reached unreachable code');
-        };
-
-        s.pre('funky', function(next) {
-          db.close();
-          try {
-            next(new Error);
-          } catch (error) {
-            // throws b/c nothing is listening to the db error event
-            assert.ok(error instanceof Error);
-            next();
-          }
-        });
-        var Kaboom = db.model('wowNext2xAndThrow', s, 'next2xAndThrow' + random());
-        new Kaboom().funky();
-        done();
       });
     });
 
@@ -4002,12 +3660,11 @@ describe('Model', function() {
           assert.ifError(err);
           var query = BlogPost.count({title: 'interoperable count as promise 2'});
           var promise = query.exec();
-          promise.onResolve(function(err, count) {
+          promise.then(function(count) {
             db.close();
-            assert.ifError(err);
             assert.equal(count, 1);
             done();
-          });
+          }).catch(done);
         });
       });
 
@@ -4020,8 +3677,7 @@ describe('Model', function() {
           assert.ifError(err);
           var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
           var promise = query.exec();
-          promise.onResolve(function(err) {
-            assert.ifError(err);
+          promise.then(function() {
             BlogPost.count({title: 'interoperable update as promise delta 2'}, function(err, count) {
               db.close();
               assert.ifError(err);
@@ -4032,21 +3688,21 @@ describe('Model', function() {
         });
       });
 
-      it('findOne()', function(done) {
-        var db = start(),
-            BlogPost = db.model('BlogPost' + random(), bpSchema);
+      it('findOne()', function() {
+        const db = start();
+        const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
-        BlogPost.create({title: 'interoperable findOne as promise 2'}, function(err, created) {
-          assert.ifError(err);
-          var query = BlogPost.findOne({title: 'interoperable findOne as promise 2'});
-          var promise = query.exec();
-          promise.onResolve(function(err, found) {
-            db.close();
-            assert.ifError(err);
+        let created;
+        return BlogPost.create({title: 'interoperable findOne as promise 2'}).
+          then(doc => {
+            created = doc;
+            return BlogPost.
+              findOne({title: 'interoperable findOne as promise 2'}).
+              exec();
+          }).
+          then(found => {
             assert.equal(found.id, created.id);
-            done();
           });
-        });
       });
 
       it('find()', function(done) {
@@ -4060,53 +3716,31 @@ describe('Model', function() {
               assert.ifError(err);
               var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
               var promise = query.exec();
-              promise.onResolve(function(err, found) {
+              promise.then(function(found) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(found.length, 2);
                 assert.equal(found[0].id, createdOne.id);
                 assert.equal(found[1].id, createdTwo.id);
                 done();
-              });
+              }).catch(done);
             });
       });
 
-      it('remove()', function(done) {
-        var db = start(),
-            BlogPost = db.model('BlogPost' + random(), bpSchema);
+      it('remove()', function() {
+        const db = start();
+        const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
-        BlogPost.create(
-            {title: 'interoperable remove as promise 2'},
-            function(err) {
-              assert.ifError(err);
-              var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
-              var promise = query.exec();
-              promise.onResolve(function(err) {
-                assert.ifError(err);
-                BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
-                  db.close();
-                  assert.equal(count, 0);
-                  done();
-                });
-              });
-            });
-      });
-
-      it('are compatible with op modification on the fly', function(done) {
-        var db = start(),
-            BlogPost = db.model('BlogPost' + random(), bpSchema);
-
-        BlogPost.create({title: 'interoperable ad-hoc as promise 2'}, function(err, created) {
-          assert.ifError(err);
-          var query = BlogPost.count({title: 'interoperable ad-hoc as promise 2'});
-          var promise = query.exec('findOne');
-          promise.onResolve(function(err, found) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(found._id.toHexString(), created._id.toHexString());
-            done();
+        return BlogPost.create({title: 'interoperable remove as promise 2'}).
+          then(() => {
+            return BlogPost.remove({title: 'interoperable remove as promise 2'});
+          }).
+          then(() => {
+            return BlogPost.count({title: 'interoperable remove as promise 2'});
+          }).
+          then(count => {
+            assert.equal(count, 0);
           });
-        });
       });
 
       it('are thenable', function(done) {
@@ -4201,34 +3835,6 @@ describe('Model', function() {
 
       assert.ok(!threw);
       done();
-    });
-  });
-
-  describe('auto_reconnect', function() {
-    describe('if disabled', function() {
-      describe('with mongo down', function() {
-        it('and no command buffering should pass an error', function(done) {
-          var db = start({db: {bufferMaxEntries: 0}});
-          var schema = new Schema({type: String}, {bufferCommands: false});
-          var T = db.model('Thing', schema);
-          db.on('open', function() {
-            var t = new T({type: 'monster'});
-            var worked = false;
-
-            t.save(function(err) {
-              assert.ok(/(operation|destroyed)/.test(err.message));
-              worked = true;
-            });
-
-            db.db.close();
-
-            setTimeout(function() {
-              assert.ok(worked);
-              done();
-            }, 100);
-          });
-        });
-      });
     });
   });
 
@@ -4337,9 +3943,9 @@ describe('Model', function() {
   describe('save()', function() {
     describe('when no callback is passed', function() {
       it('should emit error on its Model when there are listeners', function(done) {
-        var db = start();
+        const db = start();
 
-        var DefaultErrSchema = new Schema({});
+        const DefaultErrSchema = new Schema({});
         DefaultErrSchema.pre('save', function(next) {
           next(new Error);
         });
@@ -4352,46 +3958,7 @@ describe('Model', function() {
           done();
         });
 
-        new DefaultErr().save();
-      });
-    });
-
-    it('returns number of affected docs', function(done) {
-      var db = start();
-      var schema = new Schema({name: String});
-      var S = db.model('AffectedDocsAreReturned', schema);
-      var s = new S({name: 'aaron'});
-      s.save(function(err, doc, affected) {
-        assert.ifError(err);
-        assert.equal(affected, 1);
-        s.name = 'heckmanananananana';
-        s.save(function(err, doc, affected) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(affected, 1);
-          done();
-        });
-      });
-    });
-
-    it('returns 0 as the number of affected docs if doc was not modified', function(done) {
-      var db = start(),
-          schema = new Schema({name: String}),
-          Model = db.model('AffectedDocsAreReturned', schema),
-          doc = new Model({name: 'aaron'});
-
-      doc.save(function(err, doc, affected) {
-        assert.ifError(err);
-        assert.equal(affected, 1);
-
-        Model.findById(doc.id).then(function(doc) {
-          doc.save(function(err, doc, affected) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(affected, 0);
-            done();
-          });
-        });
+        new DefaultErr().save().catch(() => {});
       });
     });
 
@@ -4642,11 +4209,10 @@ describe('Model', function() {
               assert.ifError(err);
 
               doc.score = 55;
-              doc.save(function(err, doc, count) {
+              doc.save(function(err, doc) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(doc.score, 55);
-                assert.equal(count, 1);
                 done();
               });
             });
@@ -5521,15 +5087,10 @@ describe('Model', function() {
 
       someModel.on('error', function(error) {
         assert.equal(error.message, 'This error will not disappear');
-        assert.ok(cleared);
         done();
       });
 
-      var cleared = false;
       someModel.findOne().exec(function() {
-        setImmediate(function() {
-          cleared = true;
-        });
         throw new Error('This error will not disappear');
       });
     });
@@ -5707,7 +5268,7 @@ describe('Model', function() {
         assert.ifError(error);
         Model.remove([], function(error) {
           assert.ok(error);
-          assert.ok(error.message.indexOf('Query filter must be an object') !== -1,
+          assert.ok(error.message.indexOf('must be an object') !== -1,
             error.message);
           Model.find({}, function(error, docs) {
             assert.ifError(error);

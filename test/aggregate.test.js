@@ -1,12 +1,16 @@
+'use strict';
+
 /**
  * Module dependencies
  */
 
-var start = require('./common');
-var Aggregate = require('../lib/aggregate');
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
+const co = require('co');
+const start = require('./common');
+const assert = require('power-assert');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const Aggregate = require('../lib/aggregate');
 
 /**
  * Test data
@@ -135,12 +139,6 @@ describe('aggregate: ', function() {
         aggregate.append([]);
       });
 
-      done();
-    });
-
-    it('called from constructor', function(done) {
-      var aggregate = new Aggregate({ $a: 1 }, { $b: 2 }, { $c: 3 });
-      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
       done();
     });
   });
@@ -813,16 +811,16 @@ describe('aggregate: ', function() {
     });
 
     describe('error when empty pipeline', function() {
-      it('without a callback', function(done) {
+      it('without a callback', function() {
         var agg = new Aggregate;
 
         agg.model(db.model('Employee'));
         var promise = agg.exec();
         assert.ok(promise instanceof mongoose.Promise);
-        promise.onResolve(function(err) {
-          assert.ok(err);
-          assert.equal(err.message, 'Aggregate has empty pipeline');
-          done();
+
+        return promise.catch(error => {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('empty pipeline') !== -1, error.message);
         });
       });
 
@@ -864,7 +862,7 @@ describe('aggregate: ', function() {
         var m = db.model('Employee');
         var match = { $match: { sal: { $gt: 15000 } } };
         var pref = 'primaryPreferred';
-        var aggregate = m.aggregate(match).read(pref);
+        var aggregate = m.aggregate([match]).read(pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);
         }
@@ -1027,25 +1025,21 @@ describe('aggregate: ', function() {
     });
   });
 
-  it('cursor (gh-3160)', function(done) {
-    var db = start();
+  it('cursor (gh-3160)', function() {
+    const db = start();
 
-    var MyModel = db.model('gh3160', { name: String });
+    const MyModel = db.model('gh3160', { name: String });
 
-    MyModel.create({ name: 'test' }, function(error) {
-      assert.ifError(error);
-      MyModel.
+    return co(function * () {
+      yield MyModel.create({ name: 'test' });
+
+      const cursor = MyModel.
         aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
         allowDiskUse(true).
-        cursor({ batchSize: 2500, async: true }).
-        exec(function(error, cursor) {
-          assert.ifError(error);
-          assert.ok(cursor);
-          cursor.toArray(function(error) {
-            assert.ifError(error);
-            db.close(done);
-          });
-        });
+        cursor({ batchSize: 2500 }).
+        exec();
+
+      assert.ok(cursor.eachAsync);
     });
   });
 
@@ -1118,10 +1112,10 @@ describe('aggregate: ', function() {
             var _cur = cur;
             assert.equal(doc.name, expectedNames[cur]);
             return {
-              then: function(onResolve) {
+              then: function(resolve) {
                 setTimeout(function() {
                   assert.equal(_cur, cur++);
-                  onResolve();
+                  resolve();
                 }, 50);
               }
             };
@@ -1140,15 +1134,16 @@ describe('aggregate: ', function() {
       name: String
     });
 
-    MyModel.
+    const cursor = MyModel.
       aggregate([{ $match: { name: 'test' } }]).
       addCursorFlag('noCursorTimeout', true).
-      cursor({ async: true }).
-      exec(function(error, cursor) {
-        assert.ifError(error);
-        assert.ok(cursor.s.cmd.noCursorTimeout);
-        done();
-      });
+      cursor().
+      exec();
+
+    cursor.once('cursor', cursor => {
+      assert.ok(cursor.s.cmd.noCursorTimeout);
+      done();
+    });
   });
 
   it('query by document (gh-4866)', function(done) {

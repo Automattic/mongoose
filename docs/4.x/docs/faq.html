@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose FAQ v4.13.8</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>hr {
+  display: block;
+  margin: 30px 0;
+}
+</style></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>FAQ</h2><p><strong>Q</strong>. Why don&#39;t my changes to arrays get saved when I update an element
+directly?</p><pre><code class="javascript">doc.array[<span class="number">3</span>] = <span class="string">'changed'</span>;
+doc.save();</code></pre><p><strong>A</strong>. Mongoose doesn&#39;t create getters/setters for array indexes; without
+them mongoose never gets notified of the change and so doesn&#39;t know to
+persist the new value. The work-around is to use
+<a href="./api.html#types_array_MongooseArray.set">MongooseArray#set</a> available
+in <strong>Mongoose &gt;= 3.2.0</strong>.</p><pre><code class="javascript"><span class="comment">// 3.2.0</span>
+doc.array.set(<span class="number">3</span>, <span class="string">'changed'</span>);
+doc.save();
+
+<span class="comment">// if running a version less than 3.2.0, you must mark the array modified before saving.</span>
+doc.array[<span class="number">3</span>] = <span class="string">'changed'</span>;
+doc.markModified(<span class="string">'array'</span>);
+doc.save();
+</code></pre><hr id="unique-doesnt-work"><p><strong>Q</strong>. I declared a schema property as <code>unique</code> but I can still save duplicates. What gives?</p>
+
+<p><strong>A</strong>. Mongoose doesn&#39;t handle <code>unique</code> on its own: <code>{ name: { type: String, unique: true } }</code>
+is just a shorthand for creating a <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique index on <code>name</code></a>.
+For example, if MongoDB doesn&#39;t already have a unique index on <code>name</code>, the below code will not error despite the fact that <code>unique</code> is true.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> mongoose.Schema({
+  name: { type: String, unique: <span class="literal">true</span> }
+});
+<span class="keyword">var</span> Model = db.model(<span class="string">'Test'</span>, schema);
+
+Model.create([{ name: <span class="string">'Val'</span> }, { name: <span class="string">'Val'</span> }], <span class="keyword">function</span>(err) {
+  console.log(err); <span class="comment">// No error, unless index was already built</span>
+});</code></pre><p>However, if you wait for the index to build using the <code>Model.on(&#39;index&#39;)</code> event, attempts to save duplicates will correctly error.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> mongoose.Schema({
+  name: { type: String, unique: <span class="literal">true</span> }
+});
+<span class="keyword">var</span> Model = db.model(<span class="string">'Test'</span>, schema);
+
+Model.on(<span class="string">'index'</span>, <span class="keyword">function</span>(err) { <span class="comment">// &lt;-- Wait for model's indexes to finish</span>
+  assert.ifError(err);
+  Model.create([{ name: <span class="string">'Val'</span> }, { name: <span class="string">'Val'</span> }], <span class="keyword">function</span>(err) {
+    console.log(err);
+  });
+});
+
+<span class="comment">// Promise based alternative. `init()` returns a promise that resolves</span>
+<span class="comment">// when the indexes have finished building successfully. The `init()`</span>
+<span class="comment">// function is idempotent, so don't worry about triggering an index rebuild.</span>
+Model.init().then(<span class="keyword">function</span>() {
+  assert.ifError(err);
+  Model.create([{ name: <span class="string">'Val'</span> }, { name: <span class="string">'Val'</span> }], <span class="keyword">function</span>(err) {
+    console.log(err);
+  });
+});</code></pre><p>MongoDB persists indexes, so you only need to rebuild indexes if you&#39;re starting
+with a fresh database or you ran <code>db.dropDatabase()</code>. In a production environment,
+you should [create your indexes using the MongoDB shell])(https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/)
+rather than relying on mongoose to do it for you. The <code>unique</code> option for schemas is
+convenient for development and documentation, but mongoose is <em>not</em> an index management solution.</p><hr id="nested-properties"><p><strong>Q</strong>. When I have a nested property in a schema, mongoose adds empty objects by default. Why?</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> mongoose.Schema({
+  nested: {
+    prop: String
+  }
+});
+<span class="keyword">var</span> Model = db.model(<span class="string">'Test'</span>, schema);
+
+<span class="comment">// The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns</span>
+<span class="comment">// `nested` to an empty object `{}` by default.</span>
+console.log(<span class="keyword">new</span> Model());</code></pre><p><strong>A</strong>. This is a performance optimization. These empty objects are not saved
+to the database, nor are they in the result <code>toObject()</code>, nor do they show
+up in <code>JSON.stringify()</code> output unless you turn off the <a href="http://mongoosejs.com/docs/guide.html#minimize"><code>minimize</code> option</a>.</p>
+
+<p>The reason for this behavior is that Mongoose&#39;s change detection
+and getters/setters are based on <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.
+In order to support change detection on nested properties without incurring
+the overhead of running <code>Object.defineProperty()</code> every time a document is created,
+mongoose defines properties on the <code>Model</code> prototype when the model is compiled.
+Because mongoose needs to define getters and setters for <code>nested.prop</code>, <code>nested</code>
+must always be defined as an object on a mongoose document, even if <code>nested</code>
+is undefined on the underlying <a href="http://mongoosejs.com/docs/guide.html#minimize">POJO</a>.</p><hr id="arrow-functions"><p><strong>Q</strong>. I&#39;m using an arrow function for a <a href="http://mongoosejs.com/docs/guide.html#virtuals">virtual</a>, getter/setter, or <a href="http://mongoosejs.com/docs/guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
+
+<p><strong>A</strong>. Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">handle the <code>this</code> keyword much differently than conventional functions</a>.
+Mongoose getters/setters depend on <code>this</code> to give you access to the document that you&#39;re writing to, but this functionality does not work with arrow functions. Do <strong>not</strong> use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.</p><pre><code class="javascript"><span class="comment">// Do **NOT** use arrow functions as shown below unless you're certain</span>
+<span class="comment">// that's what you want. If you're reading this FAQ, odds are you should</span>
+<span class="comment">// just be using a conventional function.</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> mongoose.Schema({
+  propWithGetter: {
+    type: String,
+    get: v => {
+      <span class="comment">// Will **not** be the doc, do **not** use arrow functions for getters/setters</span>
+      console.log(<span class="keyword">this</span>);
+      <span class="keyword">return</span> v;
+    }
+  }
+});
+
+<span class="comment">// `this` will **not** be the doc, do **not** use arrow functions for methods</span>
+schema.method.arrowMethod = () => <span class="keyword">this</span>;
+schema.virtual(<span class="string">'virtualWithArrow'</span>).get(() => {
+  <span class="comment">// `this` will **not** be the doc, do **not** use arrow functions for virtuals</span>
+  console.log(<span class="keyword">this</span>);
+});
+</code></pre><hr id="type-key"><p><strong>Q</strong>. I have an embedded property named <code>type</code> like this:</p><pre><code class="javascript">const holdingSchema = <span class="keyword">new</span> Schema({
+  <span class="comment">// You might expect `asset` to be an object that has 2 properties,</span>
+  <span class="comment">// but unfortunately `type` is special in mongoose so mongoose</span>
+  <span class="comment">// interprets this schema to mean that `asset` is a string</span>
+  asset: {
+    type: String,
+    ticker: String
+  }
+});</code></pre><p>But mongoose gives me a CastError telling me that it can&#39;t cast an object
+to a string when I try to save a <code>Holding</code> with an <code>asset</code> object. Why
+is this?</p><pre><code class="javascript">Holding.create({ asset: { type: <span class="string">'stock'</span>, ticker: <span class="string">'MDB'</span> } }).<span class="keyword">catch</span>(error => {
+  <span class="comment">// Cast to String failed for value "{ type: 'stock', ticker: 'MDB' }" at path "asset"</span>
+  console.error(error);
+});</code></pre><p><strong>A</strong>. The <code>type</code> property is special in mongoose, so when you say
+<code>type: String</code>, mongoose interprets it as a type declaration. In the
+above schema, mongoose thinks <code>asset</code> is a string, not an object. Do
+this instead:</p><pre><code class="javascript">const holdingSchema = <span class="keyword">new</span> Schema({
+  <span class="comment">// This is how you tell mongoose you mean `asset` is an object with</span>
+  <span class="comment">// a string property `type`, as opposed to telling mongoose that `asset`</span>
+  <span class="comment">// is a string.</span>
+  asset: {
+    type: { type: String },
+    ticker: String
+  }
+});
+</code></pre><hr id="date_changes"><p><strong>Q</strong>. Why don&#39;t in-place modifications to date objects
+(e.g. <code>date.setMonth(1);</code>) get saved?</p><pre><code class="javascript">doc.createdAt.setDate(<span class="number">2011</span>, <span class="number">5</span>, <span class="number">1</span>);
+doc.save(); <span class="comment">// createdAt changes won't get saved!</span></code></pre><p><strong>A</strong>. Mongoose currently doesn&#39;t watch for in-place updates to date
+objects. If you have need for this feature, feel free to discuss on
+<a href="https://github.com/Automattic/mongoose/issues/3738">this GitHub issue</a>.
+There are several workarounds:</p><pre><code class="javascript">doc.createdAt.setDate(<span class="number">2011</span>, <span class="number">5</span>, <span class="number">1</span>);
+doc.markModified(<span class="string">'createdAt'</span>);
+doc.save(); <span class="comment">// Works</span></code></pre><pre><code class="javascript">doc.createdAt = <span class="keyword">new</span> Date(<span class="number">2011</span>, <span class="number">5</span>, <span class="number">1</span>).setHours(<span class="number">4</span>);
+doc.save(); <span class="comment">// Works</span>
+</code></pre><hr id="populate_sort_order"><p><strong>Q</strong>. I&#39;m populating a nested property under an array like the below code:</p>
+
+<p><code>
+  new Schema({
+    arr: [{
+      child: { ref: &#39;OtherModel&#39;, type: Schema.Types.ObjectId }
+    }]
+  });
+</code></p>
+
+<p><code>.populate({ path: &#39;arr.child&#39;, options: { sort: &#39;name&#39; } })</code> won&#39;t sort
+by <code>arr.child.name</code>?</p><p><strong>A</strong>. See <a href="https://github.com/Automattic/mongoose/issues/2202">this GitHub issue</a>. It&#39;s a known issue but one that&#39;s exceptionally difficult to fix.</p><hr id="model_functions_hanging"><p><strong>Q</strong>. All function calls on my models hang, what am I doing wrong?</p>
+
+<p><strong>A</strong>. By default, mongoose will buffer your function calls until it can
+connect to MongoDB. Read the <a href="http://mongoosejs.com/docs/connections.html#buffering">buffering section of the connection docs</a>
+for more information.</p><hr id="enable_debugging"><p><strong>Q</strong>. How can I enable debugging?</p>
+
+<p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p><pre><code class="javascript">mongoose.set(<span class="string">'debug'</span>, <span class="literal">true</span>)</code></pre><p>All executed collection methods will log output of their arguments to your console.</p><hr id="callback_never_executes"><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
+
+<p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc.) are queued until the <code>connection</code> opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.</p><pre><code class="javascript"><span class="comment">// if connecting on the default mongoose connection</span>
+mongoose.connect(..);
+mongoose.connection.on(<span class="string">'error'</span>, handleError);
+
+<span class="comment">// if connecting on a separate connection</span>
+<span class="keyword">var</span> conn = mongoose.createConnection(..);
+conn.on(<span class="string">'error'</span>, handleError);</code></pre><hr id="creating_connections"><p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
+
+<p><strong>A</strong>. No. Open your connection when your application starts up and leave it open until the application shuts down.</p><hr id="overwrite-model-error"><p><strong>Q</strong>. Why do I get &quot;OverwriteModelError: Cannot overwrite .. model once
+compiled&quot; when I use nodemon / a testing framework?</p>
+
+<p><strong>A</strong>. <code>mongoose.model(&#39;ModelName&#39;, schema)</code> requires &#39;ModelName&#39; to be
+unique, so you can access the model by using <code>mongoose.model(&#39;ModelName&#39;)</code>.
+If you put <code>mongoose.model(&#39;ModelName&#39;, schema);</code> in a
+<a href="https://mochajs.org/#hooks">mocha <code>beforeEach()</code> hook</a>, this code will
+attempt to create a new model named &#39;ModelName&#39; before <strong>every</strong> test,
+and so you will get an error. Make sure you only create a new model with
+a given name <strong>once</strong>. If you need to create multiple models with the
+same name, create a new connection and bind the model to the connection.</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
+<span class="keyword">var</span> connection = mongoose.createConnection(..);
+
+<span class="comment">// use mongoose.Schema</span>
+<span class="keyword">var</span> kittySchema = mongoose.Schema({ name: String });
+
+<span class="comment">// use connection.model</span>
+<span class="keyword">var</span> Kitten = connection.model(<span class="string">'Kitten'</span>, kittySchema);
+</code></pre><hr><p><strong>Something to add?</strong></p>
+
+<p>If you&#39;d like to contribute to this page, please <a href="https://github.com/Automattic/mongoose/tree/master/docs/faq.jade">visit it</a> on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p><br></div></div><script>document.body.className = 'load';</script><script>;(function() {
+  var cx = '012173159455227967368:uvscsuqjovs';
+  var gcse = document.createElement('script');
+  gcse.type = 'text/javascript';
+  gcse.async = true;
+  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
+      '//www.google.com/cse/cse.js?cx=' + cx;
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(gcse, s);
+})();</script><script type="text/javascript">!function(name,path,ctx){
+  var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
+}('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
+
+KeenAsync.ready(function(){
+  // Configure a client instance
+  var client = new KeenAsync({
+    projectId: '59aad9cbc9e77c0001ce1b32',
+    writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
+  });
+  
+  client.recordEvent('pageView', {
+    host: window.location.host,
+    pathname: window.location.pathname,
+    hash: window.location.hash
+  });
+});</script></body></html>

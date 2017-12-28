@@ -1,0 +1,330 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Discriminators v4.13.8</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="the-model-discriminator-function"><p>The <code>model.discriminator()</code> function</p>
+</h2><p>Discriminators are a schema inheritance mechanism. They enable
+you to have multiple models with overlapping schemas on top of the
+same underlying MongoDB collection.</p>
+<p>Suppose you wanted to track different types of events in a single
+collection. Every event will have a timestamp, but events that
+represent clicked links should have a URL. You can achieve this
+using the <code>model.discriminator()</code> function. This function takes
+2 parameters, a model name and a discriminator schema. It returns a
+model whose schema is the union of the base schema and the
+discriminator schema.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> options = {discriminatorKey: <span class="string">'kind'</span>};
+
+    <span class="keyword">var</span> eventSchema = <span class="keyword">new</span> mongoose.Schema({time: Date}, options);
+    <span class="keyword">var</span> Event = mongoose.model(<span class="string">'Event'</span>, eventSchema);
+
+    <span class="comment">// ClickedLinkEvent is a special type of Event that has</span>
+    <span class="comment">// a URL.</span>
+    <span class="keyword">var</span> ClickedLinkEvent = Event.discriminator(<span class="string">'ClickedLink'</span>,
+      <span class="keyword">new</span> mongoose.Schema({url: String}, options));
+
+    <span class="comment">// When you create a generic event, it can't have a URL field...</span>
+    <span class="keyword">var</span> genericEvent = <span class="keyword">new</span> Event({time: Date.now(), url: <span class="string">'google.com'</span>});
+    assert.ok(!genericEvent.url);
+
+    <span class="comment">// But a ClickedLinkEvent can</span>
+    <span class="keyword">var</span> clickedEvent =
+      <span class="keyword">new</span> ClickedLinkEvent({time: Date.now(), url: <span class="string">'google.com'</span>});
+    assert.ok(clickedEvent.url);
+  </code></pre><h2 id="discriminators-save-to-the-event-models-collection"><p>Discriminators save to the Event model&#39;s collection</p>
+</h2><p>Suppose you created another discriminator to track events where
+a new user registered. These <code>SignedUpEvent</code> instances will be
+stored in the same collection as generic events and <code>ClickedLinkEvent</code>
+instances.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> event1 = <span class="keyword">new</span> Event({time: Date.now()});
+    <span class="keyword">var</span> event2 = <span class="keyword">new</span> ClickedLinkEvent({time: Date.now(), url: <span class="string">'google.com'</span>});
+    <span class="keyword">var</span> event3 = <span class="keyword">new</span> SignedUpEvent({time: Date.now(), user: <span class="string">'testuser'</span>});
+
+    <span class="keyword">var</span> save = <span class="function"><span class="keyword">function</span> <span class="params">(doc, callback)</span> {</span>
+      doc.save(<span class="function"><span class="keyword">function</span> <span class="params">(error, doc)</span> {</span>
+        callback(error, doc);
+      });
+    };
+
+    async.map([event1, event2, event3], save, <span class="function"><span class="keyword">function</span> <span class="params">(error)</span> {</span>
+
+      Event.count({}, <span class="function"><span class="keyword">function</span> <span class="params">(error, count)</span> {</span>
+        assert.equal(count, <span class="number">3</span>);
+      });
+    });
+  </code></pre><h2 id="discriminator-keys"><p>Discriminator keys</p>
+</h2><p>The way mongoose tells the difference between the different
+discriminator models is by the &#39;discriminator key&#39;, which is
+<code>__t</code> by default. Mongoose adds a String path called <code>__t</code>
+to your schemas that it uses to track which discriminator
+this document is an instance of.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> event1 = <span class="keyword">new</span> Event({time: Date.now()});
+    <span class="keyword">var</span> event2 = <span class="keyword">new</span> ClickedLinkEvent({time: Date.now(), url: <span class="string">'google.com'</span>});
+    <span class="keyword">var</span> event3 = <span class="keyword">new</span> SignedUpEvent({time: Date.now(), user: <span class="string">'testuser'</span>});
+
+    assert.ok(!event1.__t);
+    assert.equal(event2.__t, <span class="string">'ClickedLink'</span>);
+    assert.equal(event3.__t, <span class="string">'SignedUp'</span>);
+  </code></pre><h2 id="discriminators-add-the-discriminator-key-to-queries"><p>Discriminators add the discriminator key to queries</p>
+</h2><p>Discriminator models are special; they attach the discriminator key
+to queries. In other words, <code>find()</code>, <code>count()</code>, <code>aggregate()</code>, etc.
+are smart enough to account for discriminators.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> event1 = <span class="keyword">new</span> Event({time: Date.now()});
+    <span class="keyword">var</span> event2 = <span class="keyword">new</span> ClickedLinkEvent({time: Date.now(), url: <span class="string">'google.com'</span>});
+    <span class="keyword">var</span> event3 = <span class="keyword">new</span> SignedUpEvent({time: Date.now(), user: <span class="string">'testuser'</span>});
+
+    <span class="keyword">var</span> save = <span class="function"><span class="keyword">function</span> <span class="params">(doc, callback)</span> {</span>
+      doc.save(<span class="function"><span class="keyword">function</span> <span class="params">(error, doc)</span> {</span>
+        callback(error, doc);
+      });
+    };
+
+    async.map([event1, event2, event3], save, <span class="function"><span class="keyword">function</span> <span class="params">(error)</span> {</span>
+
+      ClickedLinkEvent.find({}, <span class="function"><span class="keyword">function</span> <span class="params">(error, docs)</span> {</span>
+        assert.equal(docs.length, <span class="number">1</span>);
+        assert.equal(docs[<span class="number">0</span>]._id.toString(), event2._id.toString());
+        assert.equal(docs[<span class="number">0</span>].url, <span class="string">'google.com'</span>);
+      });
+    });
+  </code></pre><h2 id="discriminators-copy-pre-and-post-hooks"><p>Discriminators copy pre and post hooks</p>
+</h2><p>Discriminators also take their base schema&#39;s pre and post middleware.
+However, you can also attach middleware to the discriminator schema
+without affecting the base schema.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> options = {discriminatorKey: <span class="string">'kind'</span>};
+
+    <span class="keyword">var</span> eventSchema = <span class="keyword">new</span> mongoose.Schema({time: Date}, options);
+    <span class="keyword">var</span> eventSchemaCalls = <span class="number">0</span>;
+    eventSchema.pre(<span class="string">'validate'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      ++eventSchemaCalls;
+      next();
+    });
+    <span class="keyword">var</span> Event = mongoose.model(<span class="string">'GenericEvent'</span>, eventSchema);
+
+    <span class="keyword">var</span> clickedLinkSchema = <span class="keyword">new</span> mongoose.Schema({url: String}, options);
+    <span class="keyword">var</span> clickedSchemaCalls = <span class="number">0</span>;
+    clickedLinkSchema.pre(<span class="string">'validate'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      ++clickedSchemaCalls;
+      next();
+    });
+    <span class="keyword">var</span> ClickedLinkEvent = Event.discriminator(<span class="string">'ClickedLinkEvent'</span>,
+      clickedLinkSchema);
+
+    <span class="keyword">var</span> event1 = <span class="keyword">new</span> ClickedLinkEvent();
+    event1.validate(<span class="keyword">function</span>() {
+      assert.equal(eventSchemaCalls, <span class="number">1</span>);
+      assert.equal(clickedSchemaCalls, <span class="number">1</span>);
+
+      <span class="keyword">var</span> generic = <span class="keyword">new</span> Event();
+      generic.validate(<span class="keyword">function</span>() {
+        assert.equal(eventSchemaCalls, <span class="number">2</span>);
+        assert.equal(clickedSchemaCalls, <span class="number">1</span>);
+      });
+    });
+  </code></pre><h2 id="handling-custom-_id-fields"><p>Handling custom _id fields</p>
+</h2><p>A discriminator&#39;s fields are the union of the base schema&#39;s fields and
+the discriminator schema&#39;s fields, and the discriminator schema&#39;s fields
+take precedence. There is one exception: the default <code>_id</code> field.</p>
+<p>You can work around this by setting the <code>_id</code> option to false in the
+discriminator schema as shown below.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> options = {discriminatorKey: <span class="string">'kind'</span>};
+
+    <span class="comment">// Base schema has a String `_id` and a Date `time`...</span>
+    <span class="keyword">var</span> eventSchema = <span class="keyword">new</span> mongoose.Schema({_id: String, time: Date},
+      options);
+    <span class="keyword">var</span> Event = mongoose.model(<span class="string">'BaseEvent'</span>, eventSchema);
+
+    <span class="keyword">var</span> clickedLinkSchema = <span class="keyword">new</span> mongoose.Schema({
+      url: String,
+      time: String
+    }, options);
+    <span class="comment">// But the discriminator schema has a String `time`, and an implicitly added</span>
+    <span class="comment">// ObjectId `_id`.</span>
+    assert.ok(clickedLinkSchema.path(<span class="string">'_id'</span>));
+    assert.equal(clickedLinkSchema.path(<span class="string">'_id'</span>).instance, <span class="string">'ObjectID'</span>);
+    <span class="keyword">var</span> ClickedLinkEvent = Event.discriminator(<span class="string">'ChildEventBad'</span>,
+      clickedLinkSchema);
+
+    <span class="keyword">var</span> event1 = <span class="keyword">new</span> ClickedLinkEvent({ _id: <span class="string">'custom id'</span>, time: <span class="string">'4pm'</span> });
+    <span class="comment">// Woops, clickedLinkSchema overwrites the `time` path, but **not**</span>
+    <span class="comment">// the `_id` path because that was implicitly added.</span>
+    assert.ok(<span class="keyword">typeof</span> event1._id === <span class="string">'string'</span>);
+    assert.ok(<span class="keyword">typeof</span> event1.time === <span class="string">'string'</span>);
+  </code></pre><h2 id="using-discriminators-with-model-create"><p>Using discriminators with <code>Model.create()</code></p>
+</h2><p>When you use <code>Model.create()</code>, mongoose will pull the correct type from
+the discriminator key for you.</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> Schema = mongoose.Schema;
+    <span class="keyword">var</span> shapeSchema = <span class="keyword">new</span> Schema({
+      name: String
+    }, { discriminatorKey: <span class="string">'kind'</span> });
+
+    <span class="keyword">var</span> Shape = db.model(<span class="string">'Shape'</span>, shapeSchema);
+
+    <span class="keyword">var</span> Circle = Shape.discriminator(<span class="string">'Circle'</span>,
+      <span class="keyword">new</span> Schema({ radius: Number }));
+    <span class="keyword">var</span> Square = Shape.discriminator(<span class="string">'Square'</span>,
+      <span class="keyword">new</span> Schema({ side: Number }));
+
+    <span class="keyword">var</span> shapes = [
+      { name: <span class="string">'Test'</span> },
+      { kind: <span class="string">'Circle'</span>, radius: <span class="number">5</span> },
+      { kind: <span class="string">'Square'</span>, side: <span class="number">10</span> }
+    ];
+    Shape.create(shapes, <span class="keyword">function</span>(error, shapes) {
+      assert.ifError(error);
+      assert.ok(shapes[<span class="number">0</span>] <span class="keyword">instanceof</span> Shape);
+      assert.ok(shapes[<span class="number">1</span>] <span class="keyword">instanceof</span> Circle);
+      assert.equal(shapes[<span class="number">1</span>].radius, <span class="number">5</span>);
+      assert.ok(shapes[<span class="number">2</span>] <span class="keyword">instanceof</span> Square);
+      assert.equal(shapes[<span class="number">2</span>].side, <span class="number">10</span>);
+    });
+  </code></pre><h2 id="embedded-discriminators-in-arrays"><p>Embedded discriminators in arrays</p>
+</h2><p>You can also define discriminators on embedded document arrays.
+Embedded discriminators are different because the different discriminator
+types are stored in the same document array (within a document) rather
+than the same collection. In other words, embedded discriminators let
+you store subdocuments matching different schemas in the same array.</p>
+<p>As a general best practice, make sure you declare any hooks on your
+schemas <strong>before</strong> you use them. You should <strong>not</strong> call <code>pre()</code> or
+<code>post()</code> after calling <code>discriminator()</code></p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> eventSchema = <span class="keyword">new</span> Schema({ message: String },
+      { discriminatorKey: <span class="string">'kind'</span>, _id: <span class="literal">false</span> });
+
+    <span class="keyword">var</span> batchSchema = <span class="keyword">new</span> Schema({ events: [eventSchema] });
+
+    <span class="comment">// `batchSchema.path('events')` gets the mongoose `DocumentArray`</span>
+    <span class="keyword">var</span> docArray = batchSchema.path(<span class="string">'events'</span>);
+
+    <span class="comment">// The `events` array can contain 2 different types of events, a</span>
+    <span class="comment">// 'clicked' event that requires an element id that was clicked...</span>
+    <span class="keyword">var</span> clickedSchema = <span class="keyword">new</span> Schema({
+      element: {
+        type: String,
+        required: <span class="literal">true</span>
+      }
+    }, { _id: <span class="literal">false</span> });
+    <span class="comment">// Make sure to attach any hooks to `eventSchema` and `clickedSchema`</span>
+    <span class="comment">// **before** calling `discriminator()`.</span>
+    <span class="keyword">var</span> Clicked = docArray.discriminator(<span class="string">'Clicked'</span>, clickedSchema);
+
+    <span class="comment">// ... and a 'purchased' event that requires the product that was purchased.</span>
+    <span class="keyword">var</span> Purchased = docArray.discriminator(<span class="string">'Purchased'</span>, <span class="keyword">new</span> Schema({
+      product: {
+        type: String,
+        required: <span class="literal">true</span>
+      }
+    }, { _id: <span class="literal">false</span> }));
+
+    <span class="keyword">var</span> Batch = db.model(<span class="string">'EventBatch'</span>, batchSchema);
+
+    <span class="comment">// Create a new batch of events with different kinds</span>
+    <span class="keyword">var</span> batch = {
+      events: [
+        { kind: <span class="string">'Clicked'</span>, element: <span class="string">'#hero'</span>, message: <span class="string">'hello'</span> },
+        { kind: <span class="string">'Purchased'</span>, product: <span class="string">'action-figure-1'</span>, message: <span class="string">'world'</span> }
+      ]
+    };
+
+    Batch.create(batch).
+      then(<span class="keyword">function</span>(doc) {
+        assert.equal(doc.events.length, <span class="number">2</span>);
+
+        assert.equal(doc.events[<span class="number">0</span>].element, <span class="string">'#hero'</span>);
+        assert.equal(doc.events[<span class="number">0</span>].message, <span class="string">'hello'</span>);
+        assert.ok(doc.events[<span class="number">0</span>] <span class="keyword">instanceof</span> Clicked);
+
+        assert.equal(doc.events[<span class="number">1</span>].product, <span class="string">'action-figure-1'</span>);
+        assert.equal(doc.events[<span class="number">1</span>].message, <span class="string">'world'</span>);
+        assert.ok(doc.events[<span class="number">1</span>] <span class="keyword">instanceof</span> Purchased);
+
+        doc.events.push({ kind: <span class="string">'Purchased'</span>, product: <span class="string">'action-figure-2'</span> });
+        <span class="keyword">return</span> doc.save();
+      }).
+      then(<span class="keyword">function</span>(doc) {
+        assert.equal(doc.events.length, <span class="number">3</span>);
+
+        assert.equal(doc.events[<span class="number">2</span>].product, <span class="string">'action-figure-2'</span>);
+        assert.ok(doc.events[<span class="number">2</span>] <span class="keyword">instanceof</span> Purchased);
+
+        done();
+      }).
+      <span class="keyword">catch</span>(done);
+  </code></pre><h2 id="recursive-embedded-discriminators-in-arrays"><p>Recursive embedded discriminators in arrays</p>
+</h2><p>Recursive embedded discriminators</p>
+<pre><code class="javascript">
+    <span class="keyword">var</span> singleEventSchema = <span class="keyword">new</span> Schema({ message: String },
+      { discriminatorKey: <span class="string">'kind'</span>, _id: <span class="literal">false</span> });
+
+    <span class="keyword">var</span> eventListSchema = <span class="keyword">new</span> Schema({ events: [singleEventSchema] });
+
+    <span class="keyword">var</span> subEventSchema = <span class="keyword">new</span> Schema({
+       sub_events: [singleEventSchema]
+    }, { _id: <span class="literal">false</span> });
+
+    <span class="keyword">var</span> SubEvent = subEventSchema.path(<span class="string">'sub_events'</span>).discriminator(<span class="string">'SubEvent'</span>, subEventSchema)
+    eventListSchema.path(<span class="string">'events'</span>).discriminator(<span class="string">'SubEvent'</span>, subEventSchema);
+
+    <span class="keyword">var</span> Eventlist = db.model(<span class="string">'EventList'</span>, eventListSchema);
+
+    <span class="comment">// Create a new batch of events with different kinds</span>
+    <span class="keyword">var</span> list = {
+      events: [
+        { kind: <span class="string">'SubEvent'</span>, sub_events: [{kind:<span class="string">'SubEvent'</span>, sub_events:[], message:<span class="string">'test1'</span>}], message: <span class="string">'hello'</span> },
+        { kind: <span class="string">'SubEvent'</span>, sub_events: [{kind:<span class="string">'SubEvent'</span>, sub_events:[{kind:<span class="string">'SubEvent'</span>, sub_events:[], message:<span class="string">'test3'</span>}], message:<span class="string">'test2'</span>}], message: <span class="string">'world'</span> }
+      ]
+    };
+
+    Eventlist.create(list).
+      then(<span class="keyword">function</span>(doc) {
+        assert.equal(doc.events.length, <span class="number">2</span>);
+
+        assert.equal(doc.events[<span class="number">0</span>].sub_events[<span class="number">0</span>].message, <span class="string">'test1'</span>);
+        assert.equal(doc.events[<span class="number">0</span>].message, <span class="string">'hello'</span>);
+        assert.ok(doc.events[<span class="number">0</span>].sub_events[<span class="number">0</span>] <span class="keyword">instanceof</span> SubEvent);
+
+        assert.equal(doc.events[<span class="number">1</span>].sub_events[<span class="number">0</span>].sub_events[<span class="number">0</span>].message, <span class="string">'test3'</span>);
+        assert.equal(doc.events[<span class="number">1</span>].message, <span class="string">'world'</span>);
+        assert.ok(doc.events[<span class="number">1</span>].sub_events[<span class="number">0</span>].sub_events[<span class="number">0</span>] <span class="keyword">instanceof</span> SubEvent);
+
+        doc.events.push({kind:<span class="string">'SubEvent'</span>, sub_events:[{kind:<span class="string">'SubEvent'</span>, sub_events:[], message:<span class="string">'test4'</span>}], message:<span class="string">'pushed'</span>});
+        <span class="keyword">return</span> doc.save();
+      }).
+      then(<span class="keyword">function</span>(doc) {
+        assert.equal(doc.events.length, <span class="number">3</span>);
+
+        assert.equal(doc.events[<span class="number">2</span>].message, <span class="string">'pushed'</span>);
+        assert.ok(doc.events[<span class="number">2</span>].sub_events[<span class="number">0</span>] <span class="keyword">instanceof</span> SubEvent);
+
+        done();
+      }).
+      <span class="keyword">catch</span>(done);
+  </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
+  var cx = '012173159455227967368:uvscsuqjovs';
+  var gcse = document.createElement('script');
+  gcse.type = 'text/javascript';
+  gcse.async = true;
+  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
+      '//www.google.com/cse/cse.js?cx=' + cx;
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(gcse, s);
+})();</script><script type="text/javascript">!function(name,path,ctx){
+  var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
+}('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
+
+KeenAsync.ready(function(){
+  // Configure a client instance
+  var client = new KeenAsync({
+    projectId: '59aad9cbc9e77c0001ce1b32',
+    writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
+  });
+  
+  client.recordEvent('pageView', {
+    host: window.location.host,
+    pathname: window.location.pathname,
+    hash: window.location.hash
+  });
+});</script></body></html>

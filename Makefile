@@ -3,7 +3,7 @@ DOCS_ = $(shell find lib/ -name '*.js')
 DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 STABLE_BRANCH = master
-LEGACY_BRANCH = 3.8.x
+LEGACY_BRANCH = 4.x
 
 test:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/*.test.js

@@ -1,17 +1,21 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
 
 Error.stackTraceLimit = 10;
 
-var Server = require('mongodb-topology-manager').Server;
-var mongoose = require('../');
-var Collection = mongoose.Collection;
-var assert = require('power-assert');
-var queryCount = 0;
-var opened = 0;
-var closed = 0;
-var server;
+const ReplSet = require('mongodb-topology-manager').ReplSet;
+const Server = require('mongodb-topology-manager').Server;
+const mongoose = require('../');
+const Collection = mongoose.Collection;
+const assert = require('power-assert');
+
+let queryCount = 0;
+let opened = 0;
+let closed = 0;
+let server;
 
 if (process.env.D === '1') {
   mongoose.set('debug', true);
@@ -166,6 +170,16 @@ module.exports.server = server = new Server('mongod', {
   dbpath: './data/db/27000',
   storageEngine: 'mmapv1'
 });
+
+module.exports.replSet = new ReplSet('mongod', [{
+  // mongod process options
+  options: {
+    bind_ip: 'localhost',
+    port: 31000,
+    dbpath: './data/db/31000',
+    storageEngine: 'mmapv1'
+  }
+}], { replSet: 'mongoose5' });
 
 beforeEach(function() {
   if (this.currentTest) {

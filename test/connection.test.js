@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 const Q = require('q');
 const _ = require('lodash');
 const assert = require('power-assert');
+const co = require('co');
 const server = require('./common').server;
 const start = require('./common');
 
@@ -68,6 +69,43 @@ describe('connections:', function() {
         assert.equal(_conn, conn);
         done();
       }).catch(done);
+    });
+
+    describe('replica set events', function() {
+      beforeEach(function() {
+        this.timeout(100000);
+        return co(function*() {
+          yield start.replSet.discover();
+          yield start.replSet.purge();
+          yield start.replSet.start();
+        });
+      });
+
+      it('joined + left (gh-5944)', function() {
+        this.timeout(60000);
+
+        const conn = mongoose.createConnection('mongodb://localhost:31000/test', {
+          replicaSet: 'mongoose5'
+        });
+
+        let leftEmitted = 0;
+        let left = new global.Promise(resolve => {
+          conn.once('left', () => {
+            ++leftEmitted;
+            resolve();
+          });
+        });
+
+        return co(function*() {
+          yield conn;
+
+          yield start.replSet.stop();
+
+          yield left;
+
+          assert.equal(leftEmitted, 1);
+        });
+      });
     });
 
     describe('connection events', function() {

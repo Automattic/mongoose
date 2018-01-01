@@ -51,14 +51,14 @@ describe('model: update:', function() {
     }, {strict: false});
 
     BlogPost.virtual('titleWithAuthor')
-    .get(function() {
-      return this.get('title') + ' by ' + this.get('author');
-    })
-    .set(function(val) {
-      var split = val.split(' by ');
-      this.set('title', split[0]);
-      this.set('author', split[1]);
-    });
+      .get(function() {
+        return this.get('title') + ' by ' + this.get('author');
+      })
+      .set(function(val) {
+        var split = val.split(' by ');
+        this.set('title', split[0]);
+        this.set('author', split[1]);
+      });
 
     BlogPost.method('cool', function() {
       return this;
@@ -517,7 +517,7 @@ describe('model: update:', function() {
       }
       for (var i = 0; i < 4; ++i) {
         BlogPost
-        .update({_id: post._id}, {$inc: {'meta.visitors': 1}}, callback);
+          .update({_id: post._id}, {$inc: {'meta.visitors': 1}}, callback);
       }
     });
   });
@@ -852,19 +852,19 @@ describe('model: update:', function() {
         assert.ifError(error);
         assert.equal(m.n.length, 1);
         M.update(
-            {name: '2.6'},
-            {$push: {n: {$each: [{x: 2}, {x: 1}], $position: 0}}},
-            function(error) {
+          {name: '2.6'},
+          {$push: {n: {$each: [{x: 2}, {x: 1}], $position: 0}}},
+          function(error) {
+            assert.ifError(error);
+            M.findOne({name: '2.6'}, function(error, m) {
               assert.ifError(error);
-              M.findOne({name: '2.6'}, function(error, m) {
-                assert.ifError(error);
-                assert.equal(m.n.length, 3);
-                assert.equal(m.n[0].x, 2);
-                assert.equal(m.n[1].x, 1);
-                assert.equal(m.n[2].x, 0);
-                db.close(done);
-              });
+              assert.equal(m.n.length, 3);
+              assert.equal(m.n[0].x, 2);
+              assert.equal(m.n[1].x, 1);
+              assert.equal(m.n[2].x, 0);
+              db.close(done);
             });
+          });
       });
     });
 
@@ -882,18 +882,18 @@ describe('model: update:', function() {
         assert.ifError(error);
         var before = Date.now();
         M.update(
-            {name: '2.6'},
-            {$currentDate: {lastModified: true, lastModifiedTS: {$type: 'timestamp'}}},
-            function(error) {
+          {name: '2.6'},
+          {$currentDate: {lastModified: true, lastModifiedTS: {$type: 'timestamp'}}},
+          function(error) {
+            assert.ifError(error);
+            M.findOne({name: '2.6'}, function(error, m) {
+              var after = Date.now();
               assert.ifError(error);
-              M.findOne({name: '2.6'}, function(error, m) {
-                var after = Date.now();
-                assert.ifError(error);
-                assert.ok(m.lastModified.getTime() >= before);
-                assert.ok(m.lastModified.getTime() <= after);
-                db.close(done);
-              });
+              assert.ok(m.lastModified.getTime() >= before);
+              assert.ok(m.lastModified.getTime() <= after);
+              db.close(done);
             });
+          });
       });
     });
   });
@@ -1225,14 +1225,14 @@ describe('model: update:', function() {
 
       var updateOptions = {runValidators: true};
       Breakfast.update(
-          {'toppings.name': 'bacon'},
-          {'toppings.$.name': 'tofu'},
-          updateOptions,
-          function(error) {
-            assert.ok(error);
-            assert.ok(error.errors['toppings.0.name']);
-            done();
-          });
+        {'toppings.name': 'bacon'},
+        {'toppings.$.name': 'tofu'},
+        updateOptions,
+        function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['toppings.0.name']);
+          done();
+        });
     });
 
     it('required and single nested (gh-4479)', function(done) {
@@ -1268,17 +1268,17 @@ describe('model: update:', function() {
     M.create({breakfast: 'bacon'}, function(error, doc) {
       assert.ifError(error);
       M.update(
-          {_id: doc._id},
-          {$set: {breakfast: 'eggs'}},
-          {overwrite: true},
-          function(error) {
+        {_id: doc._id},
+        {$set: {breakfast: 'eggs'}},
+        {overwrite: true},
+        function(error) {
+          assert.ifError(error);
+          M.findOne({_id: doc._id}, function(error, doc) {
             assert.ifError(error);
-            M.findOne({_id: doc._id}, function(error, doc) {
-              assert.ifError(error);
-              assert.equal(doc.breakfast, 'eggs');
-              db.close(done);
-            });
+            assert.equal(doc.breakfast, 'eggs');
+            db.close(done);
           });
+        });
     });
   });
 
@@ -1291,18 +1291,18 @@ describe('model: update:', function() {
     M.create({}, function(error, doc) {
       assert.ifError(error);
       M.update(
-          {_id: doc._id},
-          {breakfast: {eggs: 2, bacon: 3}},
-          function(error, result) {
+        {_id: doc._id},
+        {breakfast: {eggs: 2, bacon: 3}},
+        function(error, result) {
+          assert.ifError(error);
+          assert.ok(result.ok);
+          assert.equal(result.n, 1);
+          M.findOne({_id: doc._id}, function(error, doc) {
             assert.ifError(error);
-            assert.ok(result.ok);
-            assert.equal(result.n, 1);
-            M.findOne({_id: doc._id}, function(error, doc) {
-              assert.ifError(error);
-              assert.equal(doc.breakfast.eggs, 2);
-              db.close(done);
-            });
+            assert.equal(doc.breakfast.eggs, 2);
+            db.close(done);
           });
+        });
     });
   });
 
@@ -1346,19 +1346,19 @@ describe('model: update:', function() {
         assert.equal(numPres, 0);
         assert.equal(numPosts, 0);
         Band.update(
-            {_id: gnr._id},
-            {$pull: {members: 'Adler'}},
-            function(error) {
+          {_id: gnr._id},
+          {$pull: {members: 'Adler'}},
+          function(error) {
+            assert.ifError(error);
+            assert.equal(numPres, 1);
+            assert.equal(numPosts, 1);
+            Band.findOne({_id: gnr._id}, function(error, doc) {
               assert.ifError(error);
-              assert.equal(numPres, 1);
-              assert.equal(numPosts, 1);
-              Band.findOne({_id: gnr._id}, function(error, doc) {
-                assert.ifError(error);
-                assert.deepEqual(['Axl', 'Slash', 'Izzy', 'Duff'],
-                    doc.toObject().members);
-                db.close(done);
-              });
+              assert.deepEqual(['Axl', 'Slash', 'Izzy', 'Duff'],
+                doc.toObject().members);
+              db.close(done);
             });
+          });
       });
     });
 
@@ -1422,13 +1422,13 @@ describe('model: update:', function() {
         ];
 
         Band.findOneAndUpdate(
-            {name: 'Guns N\' Roses'},
-            {$set: {members: members}},
-            {runValidators: true},
-            function(err) {
-              assert.ok(err);
-              done();
-            });
+          {name: 'Guns N\' Roses'},
+          {$set: {members: members}},
+          {runValidators: true},
+          function(err) {
+            assert.ok(err);
+            done();
+          });
       });
 
       it('validators on arrays (gh-3724)', function(done) {
@@ -1473,16 +1473,16 @@ describe('model: update:', function() {
     };
 
     Book.update({}, jsonObject, {upsert: true, overwrite: true},
-        function(error) {
+      function(error) {
+        assert.ifError(error);
+        Book.findOne({id: 0}, function(error, book) {
           assert.ifError(error);
-          Book.findOne({id: 0}, function(error, book) {
-            assert.ifError(error);
-            assert.equal(book.chapters.length, 2);
-            assert.ok(book.chapters[0]._id);
-            assert.ok(book.chapters[1]._id);
-            db.close(done);
-          });
+          assert.equal(book.chapters.length, 2);
+          assert.ok(book.chapters[0]._id);
+          assert.ok(book.chapters[1]._id);
+          db.close(done);
         });
+      });
   });
 
   it('works with undefined date (gh-2833)', function(done) {
@@ -1577,14 +1577,14 @@ describe('model: update:', function() {
       MyModel.create({children: [{_id: 1}]}, function(error, doc) {
         assert.ifError(error);
         MyModel.findOneAndUpdate(
-            {_id: doc._id, 'children._id': 1},
-            {$set: {'children.$': {_id: 2}}},
-            {new: true},
-            function(error, doc) {
-              assert.ifError(error);
-              assert.equal(doc.children[0]._id, 2);
-              done();
-            });
+          {_id: doc._id, 'children._id': 1},
+          {$set: {'children.$': {_id: 2}}},
+          {new: true},
+          function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.children[0]._id, 2);
+            done();
+          });
       });
     });
 
@@ -1595,12 +1595,12 @@ describe('model: update:', function() {
       Model.create({}, function(error, m) {
         assert.ifError(error);
         Model.
-        update({_id: m._id}, {$push: {myArr: {key: 'Value'}}}).
-        exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 1);
-          done();
-        });
+          update({_id: m._id}, {$push: {myArr: {key: 'Value'}}}).
+          exec(function(error, res) {
+            assert.ifError(error);
+            assert.equal(res.n, 1);
+            done();
+          });
       });
     });
 
@@ -1634,16 +1634,16 @@ describe('model: update:', function() {
         assert.ifError(error);
         var update = {$push: {'attributes.scores.bar': {a: 1}}};
         Model.
-        update({_id: m._id}, update).
-        exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 1);
-          Model.findById(m._id, function(error, doc) {
+          update({_id: m._id}, update).
+          exec(function(error, res) {
             assert.ifError(error);
-            assert.equal(doc.attributes.scores.bar.length, 1);
-            done();
+            assert.equal(res.n, 1);
+            Model.findById(m._id, function(error, doc) {
+              assert.ifError(error);
+              assert.equal(doc.attributes.scores.bar.length, 1);
+              done();
+            });
           });
-        });
       });
     });
 

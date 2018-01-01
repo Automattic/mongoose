@@ -126,9 +126,9 @@ describe('types.buffer', function() {
           var user = users[0];
           var base64 = sampleBuffer.toString('base64');
           assert.equal(base64,
-              user.serial.toString('base64'), 'buffer mismatch');
+            user.serial.toString('base64'), 'buffer mismatch');
           assert.equal(base64,
-              user.required.toString('base64'), 'buffer mismatch');
+            user.required.toString('base64'), 'buffer mismatch');
           done();
         });
       });
@@ -164,7 +164,7 @@ describe('types.buffer', function() {
             var expectedBuffer = new Buffer([123, 97, 97, 42, 11]);
 
             assert.equal(expectedBuffer.toString('base64'),
-                user.serial.toString('base64'), 'buffer mismatch');
+              user.serial.toString('base64'), 'buffer mismatch');
 
             assert.equal(false, tj.isModified('required'));
             tj.serial.copy(tj.required, 1);

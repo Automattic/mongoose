@@ -101,27 +101,27 @@ function createData() {
 
 function example() {
   Game
-  .find({})
-  .populate({
-    path: 'consoles',
-    match: {manufacturer: 'Nintendo'},
-    select: 'name',
-    options: {comment: 'population'}
-  })
-  .exec(function(err, games) {
-    if (err) return done(err);
+    .find({})
+    .populate({
+      path: 'consoles',
+      match: {manufacturer: 'Nintendo'},
+      select: 'name',
+      options: {comment: 'population'}
+    })
+    .exec(function(err, games) {
+      if (err) return done(err);
 
-    games.forEach(function(game) {
-      console.log(
-        '"%s" was released for the %s on %s',
-        game.name,
-        game.consoles.length ? game.consoles[0].name : '??',
-        game.released.toLocaleDateString()
-      );
+      games.forEach(function(game) {
+        console.log(
+          '"%s" was released for the %s on %s',
+          game.name,
+          game.consoles.length ? game.consoles[0].name : '??',
+          game.released.toLocaleDateString()
+        );
+      });
+
+      return done();
     });
-
-    return done();
-  });
 }
 
 /**

@@ -98,30 +98,30 @@ mongoose.connection.on('open', function() {
        */
 
       BlogPost
-      .find({tags: 'fun'})
-      .lean()
-      .populate('author')
-      .exec(function(err, docs) {
-        assert.ifError(err);
+        .find({tags: 'fun'})
+        .lean()
+        .populate('author')
+        .exec(function(err, docs) {
+          assert.ifError(err);
 
-        /**
+          /**
          * Populate the populated documents
          */
 
-        var opts = {
-          path: 'author.friends',
-          select: 'name',
-          options: {limit: 2}
-        };
+          var opts = {
+            path: 'author.friends',
+            select: 'name',
+            options: {limit: 2}
+          };
 
-        BlogPost.populate(docs, opts, function(err, docs) {
-          assert.ifError(err);
-          console.log('populated');
-          var s = require('util').inspect(docs, {depth: null, colors: true});
-          console.log(s);
-          done();
+          BlogPost.populate(docs, opts, function(err, docs) {
+            assert.ifError(err);
+            console.log('populated');
+            var s = require('util').inspect(docs, {depth: null, colors: true});
+            console.log(s);
+            done();
+          });
         });
-      });
     });
   });
 });

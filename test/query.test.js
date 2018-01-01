@@ -204,8 +204,8 @@ describe('Query', function() {
     it('works', function(done) {
       var query = new Query({}, {}, null, p1.collection);
       query
-      .where('age').lt(66)
-      .where('height').gt(5);
+        .where('age').lt(66)
+        .where('height').gt(5);
       assert.deepEqual(query._conditions, {age: {$lt: 66}, height: {$gt: 5}});
       done();
     });
@@ -1553,17 +1553,17 @@ describe('Query', function() {
       var db = start();
       var Product = db.model('Product', 'Product_setOptions_test');
       Product.create(
-          {numbers: [3, 4, 5]},
-          {strings: 'hi there'.split(' ')}, function(err, doc1, doc2) {
+        {numbers: [3, 4, 5]},
+        {strings: 'hi there'.split(' ')}, function(err, doc1, doc2) {
+          assert.ifError(err);
+          Product.find().setOptions({limit: 1, sort: {_id: -1}, read: 'n'}).exec(function(err, docs) {
+            db.close();
             assert.ifError(err);
-            Product.find().setOptions({limit: 1, sort: {_id: -1}, read: 'n'}).exec(function(err, docs) {
-              db.close();
-              assert.ifError(err);
-              assert.equal(docs.length, 1);
-              assert.equal(docs[0].id, doc2.id);
-              done();
-            });
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].id, doc2.id);
+            done();
           });
+        });
     });
 
     it('populate as array in options (gh-4446)', function(done) {
@@ -1718,7 +1718,7 @@ describe('Query', function() {
       });
 
       assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
-          ['value', 'date']);
+        ['value', 'date']);
       done();
     });
 
@@ -1778,8 +1778,8 @@ describe('Query', function() {
 
       var answersUpdate = {details: 'blah', stats: {votes: 1, count: '3'}};
       var q = Post.update(
-          {'answers._id': '507f1f77bcf86cd799439011'},
-          {$set: {'answers.$': answersUpdate}});
+        {'answers._id': '507f1f77bcf86cd799439011'},
+        {$set: {'answers.$': answersUpdate}});
 
       assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
         { votes: 1, count: 3 });
@@ -2424,11 +2424,11 @@ describe('Query', function() {
 
     it('falsy projection', function(done) {
       MyModel.findOne({name: 'John'}, {lastName: false}).
-      exec(function(error, person) {
-        assert.ifError(error);
-        assert.equal(person.salary, 25000);
-        done();
-      });
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
     });
 
     it('slice projection', function(done) {
@@ -2441,11 +2441,11 @@ describe('Query', function() {
 
     it('empty projection', function(done) {
       MyModel.findOne({name: 'John'}, {}).
-      exec(function(error, person) {
-        assert.ifError(error);
-        assert.equal(person.salary, 25000);
-        done();
-      });
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
     });
   });
 });

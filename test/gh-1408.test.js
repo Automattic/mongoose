@@ -52,7 +52,7 @@ describe('documents should not be converted to _id (gh-1408)', function() {
                {preference: 'hide_from_buyers', value: false},
                {preference: 'nozoom', value: false},
                {preference: 'no_orders', value: false}
-            ]
+             ]
           }
         };
 

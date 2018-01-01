@@ -78,27 +78,27 @@ describe('debug: colors', function() {
     }], function(err) {
       assert.ifError(err);
       Test
-          .find()
-          .lean(false)
-          .exec(function(err, docs) {
-            assert.ifError(err);
+        .find()
+        .lean(false)
+        .exec(function(err, docs) {
+          assert.ifError(err);
 
-            var colorfull = require('util').inspect(docs, {
-              depth: null,
-              colors: true
-            });
-
-            var colorless = require('util').inspect(docs, {
-              depth: null,
-              colors: false
-            });
-
-            // console.log(colorfull, colorless);
-
-            assert.notEqual(colorfull, colorless);
-
-            done();
+          var colorfull = require('util').inspect(docs, {
+            depth: null,
+            colors: true
           });
+
+          var colorless = require('util').inspect(docs, {
+            depth: null,
+            colors: false
+          });
+
+          // console.log(colorfull, colorless);
+
+          assert.notEqual(colorfull, colorless);
+
+          done();
+        });
     });
   });
 

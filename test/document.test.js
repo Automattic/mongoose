@@ -441,7 +441,7 @@ describe('document', function() {
     var db = start();
 
     var MyModel = db.model('gh2981',
-        {name: {type: String, required: true}});
+      {name: {type: String, required: true}});
 
     var doc = new MyModel();
     doc.save({validateBeforeSave: false}, function(error) {
@@ -1435,7 +1435,7 @@ describe('document', function() {
     var post = null;
 
     InvalidateSchema = new Schema({prop: {type: String}},
-        {strict: false});
+      {strict: false});
 
     mongoose.model('InvalidateSchema', InvalidateSchema);
 
@@ -2300,12 +2300,12 @@ describe('document', function() {
         P.create(obj, function(error, doc) {
           assert.ifError(error);
           P.
-          findById(doc._id).
-          populate('singleNested.populateMeArray').
-          exec(function(error, doc) {
-            assert.ok(doc.singleNested.populateMeArray[0]._id);
-            done();
-          });
+            findById(doc._id).
+            populate('singleNested.populateMeArray').
+            exec(function(error, doc) {
+              assert.ok(doc.singleNested.populateMeArray[0]._id);
+              done();
+            });
         });
       });
     });

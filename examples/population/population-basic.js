@@ -77,20 +77,20 @@ function createData() {
 
 function example() {
   Game
-  .findOne({name: /^Legend of Zelda/})
-  .populate('consoles')
-  .exec(function(err, ocinara) {
-    if (err) return done(err);
+    .findOne({name: /^Legend of Zelda/})
+    .populate('consoles')
+    .exec(function(err, ocinara) {
+      if (err) return done(err);
 
-    console.log(
-      '"%s" was released for the %s on %s',
-      ocinara.name,
-      ocinara.consoles[0].name,
-      ocinara.released.toLocaleDateString()
-    );
+      console.log(
+        '"%s" was released for the %s on %s',
+        ocinara.name,
+        ocinara.consoles[0].name,
+        ocinara.released.toLocaleDateString()
+      );
 
-    done();
-  });
+      done();
+    });
 }
 
 function done(err) {

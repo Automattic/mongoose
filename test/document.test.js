@@ -3397,7 +3397,6 @@ describe('document', function() {
     });
 
     it('conditional required on single nested (gh-4663)', function(done) {
-      var called = 0;
       var childSchema = new Schema({
         name: String
       });
@@ -3406,7 +3405,6 @@ describe('document', function() {
           type: childSchema,
           required: function() {
             assert.equal(this.child.name, 'test');
-            ++called;
           }
         }
       });

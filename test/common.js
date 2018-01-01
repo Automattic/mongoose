@@ -6,7 +6,6 @@
 
 Error.stackTraceLimit = 10;
 
-const ReplSet = require('mongodb-topology-manager').ReplSet;
 const Server = require('mongodb-topology-manager').Server;
 const mongoose = require('../');
 const Collection = mongoose.Collection;
@@ -170,16 +169,6 @@ module.exports.server = server = new Server('mongod', {
   dbpath: './data/db/27000',
   storageEngine: 'mmapv1'
 });
-
-module.exports.replSet = new ReplSet('mongod', [{
-  // mongod process options
-  options: {
-    bind_ip: 'localhost',
-    port: 31000,
-    dbpath: './data/db/31000',
-    storageEngine: 'mmapv1'
-  }
-}], { replSet: 'mongoose5' });
 
 beforeEach(function() {
   if (this.currentTest) {

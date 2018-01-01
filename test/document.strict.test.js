@@ -366,7 +366,7 @@ describe('document: strict mode:', function() {
       var M = mongoose.model('throwStrictSet', schema, 'tss_' + random());
       var m = new M;
 
-      var badField = /Field `[\w\.]+` is not in schema/;
+      var badField = /Field `[\w.]+` is not in schema/;
 
       assert.throws(function() {
         m.set('unknown.stuff.is.here', 3);

@@ -89,7 +89,7 @@ var commentData = {
   body: 'this be some crazzzyyyyy text that would go in a comment',
   comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
 };
-BlogPost = mongoose.model('BlogPost', BlogPost);
+mongoose.model('BlogPost', BlogPost);
 
 suite.add('Casting - Embedded Docs - 0 Docs', {
   fn: function() {

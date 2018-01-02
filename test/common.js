@@ -1,17 +1,20 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
 
 Error.stackTraceLimit = 10;
 
-var Server = require('mongodb-topology-manager').Server;
-var mongoose = require('../');
-var Collection = mongoose.Collection;
-var assert = require('power-assert');
-var queryCount = 0;
-var opened = 0;
-var closed = 0;
-var server;
+const Server = require('mongodb-topology-manager').Server;
+const mongoose = require('../');
+const Collection = mongoose.Collection;
+const assert = require('power-assert');
+
+let queryCount = 0;
+let opened = 0;
+let closed = 0;
+let server;
 
 if (process.env.D === '1') {
   mongoose.set('debug', true);

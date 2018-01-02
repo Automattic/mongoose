@@ -1,15 +1,18 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
 
-var Promise = require('bluebird');
-var Q = require('q');
-var assert = require('power-assert');
-var server = require('./common').server;
-var start = require('./common');
+const Promise = require('bluebird');
+const Q = require('q');
+const _ = require('lodash');
+const assert = require('power-assert');
+const server = require('./common').server;
+const start = require('./common');
 
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Test.
@@ -49,7 +52,7 @@ describe('connections:', function() {
 
       promise.then(function(conn) {
         assert.strictEqual(conn.config.autoIndex, false);
-        assert.deepEqual(conn._connectionOptions, {});
+        assert.deepEqual(_.omit(conn._connectionOptions, 'promiseLibrary'), {});
         done();
       }).catch(done);
     });

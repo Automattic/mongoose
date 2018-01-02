@@ -49,6 +49,15 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('legacy pluralize by default (gh-9999)', function(done) {
+    var mongoose = new Mongoose();
+
+    mongoose.model('User', new Schema({}));
+
+    assert.equal(mongoose.model('User').collection.name, 'users');
+    done();
+  });
+
   it('{g,s}etting options', function(done) {
     var mongoose = new Mongoose();
 

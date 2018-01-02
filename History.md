@@ -1,3 +1,9 @@
+5.0.0-rc1 / 2017-01-02
+======================
+ * fix(index): use pluralize correctly for `mongoose.model()` #5958
+ * fix: make mquery use native promises by default #5945
+ * fix(connection): ensure 'joined' and 'left' events get bubbled up #5944
+
 5.0.0-rc0 / 2017-12-28
 ======================
  * BREAKING CHANGE: always use mongoose aggregation cursor when using `.aggregate().cursor()` #5941

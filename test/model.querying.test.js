@@ -505,7 +505,7 @@ describe('model: querying:', function() {
         BlogPostB.findOne({'meta.visitors': 5678}, function(err, found) {
           assert.ifError(err);
           assert.equal(found.get('meta.visitors')
-          .valueOf(), post.get('meta.visitors').valueOf());
+            .valueOf(), post.get('meta.visitors').valueOf());
           assert.equal(found.get('_id').toString(), post.get('_id'));
           db.close();
           done();
@@ -1319,16 +1319,16 @@ describe('model: querying:', function() {
           BlogPostB = db.model('BlogPostB', collection + random());
 
       BlogPostB.create(
-          {title: 'A', author: null},
-          {title: 'B'}, function(err) {
+        {title: 'A', author: null},
+        {title: 'B'}, function(err) {
+          assert.ifError(err);
+          BlogPostB.find({author: null}, function(err, found) {
+            db.close();
             assert.ifError(err);
-            BlogPostB.find({author: null}, function(err, found) {
-              db.close();
-              assert.ifError(err);
-              assert.equal(found.length, 2);
-              done();
-            });
+            assert.equal(found.length, 2);
+            done();
           });
+        });
     });
 
     it('a document whose arrays contain at least $all string values', function(done) {
@@ -1569,20 +1569,20 @@ describe('model: querying:', function() {
             b.save(function(error) {
               assert.ifError(error);
               blogPost.
-              find({$text: {$search: 'text search'}}, {score: {$meta: 'textScore'}}).
-              limit(2).
-              exec(function(error, documents) {
-                assert.ifError(error);
-                assert.equal(documents.length, 1);
-                assert.equal(documents[0].title, 'text search in mongoose');
-                a.remove(function(error) {
+                find({$text: {$search: 'text search'}}, {score: {$meta: 'textScore'}}).
+                limit(2).
+                exec(function(error, documents) {
                   assert.ifError(error);
-                  b.remove(function(error) {
+                  assert.equal(documents.length, 1);
+                  assert.equal(documents[0].title, 'text search in mongoose');
+                  a.remove(function(error) {
                     assert.ifError(error);
-                    db.close(done);
+                    b.remove(function(error) {
+                      assert.ifError(error);
+                      db.close(done);
+                    });
                   });
                 });
-              });
             });
           });
         });
@@ -1676,17 +1676,17 @@ describe('model: querying:', function() {
           BlogPostB.create({meta: {visitors: 200}}, function(err, middle) {
             assert.ifError(err);
             BlogPostB
-            .where('meta.visitors').gt(99).lt(301)
-            .sort('-meta.visitors')
-            .find(function(err, found) {
-              assert.ifError(err);
-              assert.equal(found.length, 3);
-              assert.equal(found[0].id, largest._id);
-              assert.equal(found[1].id, middle._id);
-              assert.equal(found[2].id, least._id);
-              db.close();
-              done();
-            });
+              .where('meta.visitors').gt(99).lt(301)
+              .sort('-meta.visitors')
+              .find(function(err, found) {
+                assert.ifError(err);
+                assert.equal(found.length, 3);
+                assert.equal(found[0].id, largest._id);
+                assert.equal(found[1].id, middle._id);
+                assert.equal(found[2].id, least._id);
+                db.close();
+                done();
+              });
           });
         });
       });
@@ -1708,17 +1708,17 @@ describe('model: querying:', function() {
           b.save(function(error) {
             assert.ifError(error);
             blogPost.
-            find({$text: {$search: 'text search'}}, {score: {$meta: 'textScore'}}).
-            sort({score: {$meta: 'textScore'}}).
-            limit(2).
-            exec(function(error, documents) {
-              assert.ifError(error);
-              assert.equal(documents.length, 2);
-              assert.equal(documents[0].title, 'text search in mongoose');
-              assert.equal(documents[1].title, 'searching in mongoose');
-              db.close();
-              done();
-            });
+              find({$text: {$search: 'text search'}}, {score: {$meta: 'textScore'}}).
+              sort({score: {$meta: 'textScore'}}).
+              limit(2).
+              exec(function(error, documents) {
+                assert.ifError(error);
+                assert.equal(documents.length, 2);
+                assert.equal(documents[0].title, 'text search in mongoose');
+                assert.equal(documents[1].title, 'searching in mongoose');
+                db.close();
+                done();
+              });
           });
         });
       });
@@ -2255,9 +2255,9 @@ describe('model: querying:', function() {
 
       Test.on('index', complete);
       Test.create(
-          {loc: {coordinates: [30, 41]}},
-          {loc: {coordinates: [31, 40]}},
-          complete);
+        {loc: {coordinates: [30, 41]}},
+        {loc: {coordinates: [31, 40]}},
+        complete);
 
       var test = function() {
         var q = new Query({}, {}, null, Test.collection);
@@ -2721,7 +2721,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           assert.equal(doc.dates.length, 1);
           assert.equal(doc.dates[0].getTime(),
-              new Date('2014-07-01T04:00:00.000Z').getTime());
+            new Date('2014-07-01T04:00:00.000Z').getTime());
           db.close(done);
         });
       });
@@ -2745,17 +2745,17 @@ describe('model: querying:', function() {
         var BlogPostB = db.model('BlogPostB', collection);
 
         BlogPostB.findOne(
-            {_id: {$eq: '000000000000000000000001'}, numbers: {$eq: [1, 2]}},
-            function(err, doc) {
-              if (mongo26) {
-                assert.ifError(err);
-              } else {
-                assert.ok(err.toString().indexOf('MongoError') !== -1);
-              }
+          {_id: {$eq: '000000000000000000000001'}, numbers: {$eq: [1, 2]}},
+          function(err, doc) {
+            if (mongo26) {
+              assert.ifError(err);
+            } else {
+              assert.ok(err.toString().indexOf('MongoError') !== -1);
+            }
 
-              assert.ok(!doc);
-              db.close(done);
-            });
+            assert.ok(!doc);
+            db.close(done);
+          });
       });
     });
   });

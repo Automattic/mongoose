@@ -90,28 +90,28 @@ function createData() {
 
 function example() {
   Game
-  .find({})
-  .exec(function(err, games) {
-    if (err) return done(err);
-
-    console.log('found %d games', games.length);
-
-    var options = {path: 'consoles', select: 'name released -_id'};
-    Game.populate(games, options, function(err, games) {
+    .find({})
+    .exec(function(err, games) {
       if (err) return done(err);
 
-      games.forEach(function(game) {
-        console.log(
-          '"%s" was released for the %s on %s',
-          game.name,
-          game.consoles[0].name,
-          game.released.toLocaleDateString()
-        );
-      });
+      console.log('found %d games', games.length);
 
-      done();
+      var options = {path: 'consoles', select: 'name released -_id'};
+      Game.populate(games, options, function(err, games) {
+        if (err) return done(err);
+
+        games.forEach(function(game) {
+          console.log(
+            '"%s" was released for the %s on %s',
+            game.name,
+            game.consoles[0].name,
+            game.released.toLocaleDateString()
+          );
+        });
+
+        done();
+      });
     });
-  });
 }
 
 function done(err) {

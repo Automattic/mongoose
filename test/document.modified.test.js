@@ -41,24 +41,24 @@ var BlogPost = new Schema({
 });
 
 BlogPost
-    .path('title')
-    .get(function(v) {
-      if (v) {
-        return v.toUpperCase();
-      }
-      return v;
-    });
+  .path('title')
+  .get(function(v) {
+    if (v) {
+      return v.toUpperCase();
+    }
+    return v;
+  });
 
 BlogPost
-    .virtual('titleWithAuthor')
-    .get(function() {
-      return this.get('title') + ' by ' + this.get('author');
-    })
-    .set(function(val) {
-      var split = val.split(' by ');
-      this.set('title', split[0]);
-      this.set('author', split[1]);
-    });
+  .virtual('titleWithAuthor')
+  .get(function() {
+    return this.get('title') + ' by ' + this.get('author');
+  })
+  .set(function(val) {
+    var split = val.split(' by ');
+    this.set('title', split[0]);
+    this.set('author', split[1]);
+  });
 
 BlogPost.method('cool', function() {
   return this;
@@ -122,7 +122,7 @@ describe('document modified', function() {
       var db = start();
 
       var MyModel = db.model('test',
-          {name: {type: String, default: 'Val '}});
+        {name: {type: String, default: 'Val '}});
       var m = new MyModel();
       assert.ok(m.$isDefault('name'));
       db.close(done);
@@ -548,20 +548,20 @@ describe('document modified', function() {
 
       var Parent = db.model('gh-1754', parentSchema);
       Parent.create(
-          {child: [{name: 'Brian', grandChild: [{name: 'Jake'}]}]},
-          function(error, p) {
-            assert.ifError(error);
-            assert.ok(p);
-            assert.equal(p.child.length, 1);
-            assert.equal(p.child[0].grandChild.length, 1);
-            p.child[0].grandChild[0].name = 'Jason';
-            assert.ok(p.isModified('child.0.grandChild.0.name'));
-            p.save(function(error1, inDb) {
-              assert.ifError(error1);
-              assert.equal(inDb.child[0].grandChild[0].name, 'Jason');
-              db.close(done);
-            });
+        {child: [{name: 'Brian', grandChild: [{name: 'Jake'}]}]},
+        function(error, p) {
+          assert.ifError(error);
+          assert.ok(p);
+          assert.equal(p.child.length, 1);
+          assert.equal(p.child[0].grandChild.length, 1);
+          p.child[0].grandChild[0].name = 'Jason';
+          assert.ok(p.isModified('child.0.grandChild.0.name'));
+          p.save(function(error1, inDb) {
+            assert.ifError(error1);
+            assert.equal(inDb.child[0].grandChild[0].name, 'Jason');
+            db.close(done);
           });
+        });
     });
 
     it('should reset the modified state after calling unmarkModified', function(done) {

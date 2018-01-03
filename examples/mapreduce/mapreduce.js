@@ -83,8 +83,8 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     // o.jsMode = true; // default is false, force execution to stay in JS
     o.verbose = true; // default is false, provide stats on the job
     // o.out = {}; // objects to specify where output goes, by default is
-                   // returned, but can also be stored in a new collection
-                   // see: http://mongoosejs.com/docs/api.html#model_Model.mapReduce
+    // returned, but can also be stored in a new collection
+    // see: http://mongoosejs.com/docs/api.html#model_Model.mapReduce
     Person.mapReduce(o, function(err, results, stats) {
       console.log('map reduce took %d ms', stats.processtime);
       console.log(results);

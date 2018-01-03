@@ -308,50 +308,50 @@ describe('schema select option', function() {
         assert.ifError(err);
 
         M.findById(d)
-        .select('+name +docs.name')
-        .exec(function(err, doc) {
-          assert.ifError(err);
-          assert.equal(doc.thin, false);
-          assert.equal(doc.name, '1 meter');
-          assert.equal(doc.docs[0].bool, false);
-          assert.equal(doc.docs[0].name, 'test');
-          assert.equal(d.id, doc.id);
-
-          M.findById(d)
-          .select('+name -thin +docs.name -docs.bool')
+          .select('+name +docs.name')
           .exec(function(err, doc) {
             assert.ifError(err);
-            assert.equal(doc.thin, undefined);
+            assert.equal(doc.thin, false);
             assert.equal(doc.name, '1 meter');
-            assert.equal(doc.docs[0].bool, undefined);
+            assert.equal(doc.docs[0].bool, false);
             assert.equal(doc.docs[0].name, 'test');
             assert.equal(d.id, doc.id);
 
             M.findById(d)
-            .select('-thin +name -docs.bool +docs.name')
-            .exec(function(err, doc) {
-              assert.ifError(err);
-              assert.equal(doc.thin, undefined);
-              assert.equal(doc.name, '1 meter');
-              assert.equal(doc.docs[0].bool, undefined);
-              assert.equal(doc.docs[0].name, 'test');
-              assert.equal(d.id, doc.id);
-
-              M.findById(d)
-              .select('-thin -docs.bool')
+              .select('+name -thin +docs.name -docs.bool')
               .exec(function(err, doc) {
-                db.close();
                 assert.ifError(err);
                 assert.equal(doc.thin, undefined);
-                assert.equal(doc.name, undefined);
+                assert.equal(doc.name, '1 meter');
                 assert.equal(doc.docs[0].bool, undefined);
-                assert.equal(doc.docs[0].name, undefined);
+                assert.equal(doc.docs[0].name, 'test');
                 assert.equal(d.id, doc.id);
-                done();
+
+                M.findById(d)
+                  .select('-thin +name -docs.bool +docs.name')
+                  .exec(function(err, doc) {
+                    assert.ifError(err);
+                    assert.equal(doc.thin, undefined);
+                    assert.equal(doc.name, '1 meter');
+                    assert.equal(doc.docs[0].bool, undefined);
+                    assert.equal(doc.docs[0].name, 'test');
+                    assert.equal(d.id, doc.id);
+
+                    M.findById(d)
+                      .select('-thin -docs.bool')
+                      .exec(function(err, doc) {
+                        db.close();
+                        assert.ifError(err);
+                        assert.equal(doc.thin, undefined);
+                        assert.equal(doc.name, undefined);
+                        assert.equal(doc.docs[0].bool, undefined);
+                        assert.equal(doc.docs[0].name, undefined);
+                        assert.equal(d.id, doc.id);
+                        done();
+                      });
+                  });
               });
-            });
           });
-        });
       });
     });
 

@@ -404,8 +404,8 @@ describe('versioning', function() {
 
   it('versionKey is configurable', function(done) {
     var schema = new Schema(
-        {configured: 'bool'},
-        {versionKey: 'lolwat', collection: 'configuredversion' + random()});
+      {configured: 'bool'},
+      {versionKey: 'lolwat', collection: 'configuredversion' + random()});
     var V = db.model('ConfiguredVersionKey', schema);
     var v = new V({configured: true});
     v.save(function(err) {

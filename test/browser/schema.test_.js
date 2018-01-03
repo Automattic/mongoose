@@ -411,8 +411,8 @@ describe('schema', function() {
     it('order', function(done) {
       function extract(v) {
         return (v && v._id)
-            ? v._id
-            : v;
+          ? v._id
+          : v;
       }
 
       var Tobi = new Schema({
@@ -549,8 +549,8 @@ describe('schema', function() {
     it('order', function(done) {
       function format(v) {
         return v
-            ? '$' + v
-            : v;
+          ? '$' + v
+          : v;
       }
 
       var Tobi = new Schema({
@@ -747,15 +747,15 @@ describe('schema', function() {
       });
 
       Contact
-      .virtual('fullName')
-      .get(function() {
-        return this.get('firstName') + ' ' + this.get('lastName');
-      })
-      .set(function(fullName) {
-        var split = fullName.split(' ');
-        this.set('firstName', split[0]);
-        this.set('lastName', split[1]);
-      });
+        .virtual('fullName')
+        .get(function() {
+          return this.get('firstName') + ' ' + this.get('lastName');
+        })
+        .set(function(fullName) {
+          var split = fullName.split(' ');
+          this.set('firstName', split[0]);
+          this.set('lastName', split[1]);
+        });
 
       assert.ok(Contact.virtualpath('fullName') instanceof VirtualType);
       done();

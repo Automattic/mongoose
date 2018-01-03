@@ -336,15 +336,15 @@ describe('model: findOneAndRemove:', function() {
         if (err) return done(err);
 
         N.findOneAndRemove({_id: b._id}, {select: 'a -_id'})
-        .populate('a')
-        .exec(function(err, doc) {
-          if (err) return done(err);
-          assert.ok(doc);
-          assert.equal(doc._id, undefined);
-          assert.ok(doc.a);
-          assert.equal('i am an A', doc.a.name);
-          db.close(done);
-        });
+          .populate('a')
+          .exec(function(err, doc) {
+            if (err) return done(err);
+            assert.ok(doc);
+            assert.equal(doc._id, undefined);
+            assert.ok(doc.a);
+            assert.equal('i am an A', doc.a.name);
+            db.close(done);
+          });
       });
     });
   });

@@ -60,12 +60,12 @@ var Person = new Schema({
  */
 
 BlogPost.path('date')
-.default(function() {
-  return new Date();
-})
-.set(function(v) {
-  return v === 'now' ? new Date() : v;
-});
+  .default(function() {
+    return new Date();
+  })
+  .set(function(v) {
+    return v === 'now' ? new Date() : v;
+  });
 
 /**
  * Pre hook.

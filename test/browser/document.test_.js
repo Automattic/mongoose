@@ -77,7 +77,7 @@ describe('browser:document', function() {
           deep: {x: 'yay'}
         }
       },
-        schema);
+      schema);
 
     assert.equal('toop', doc2.get('test'));
     assert.ok(doc2.get('oids') instanceof Array);

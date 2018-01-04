@@ -40,16 +40,16 @@
     "dox": "0.3.1",
     "eslint": "4.14.0",
     "highlight.js": "7.0.1",
-    "istanbul": "0.4.4",
     "jade": "0.26.3",
     "lodash": "4.16.6",
     "markdown": "0.5.0",
     "marked": "0.3.9",
     "mocha": "4.1.0",
-    "mongoose-long": "0.1.1",
     "mongodb-topology-manager": "1.0.11",
+    "mongoose-long": "0.1.1",
     "node-static": "0.7.7",
     "nsp": "~2.8.1",
+    "nyc": "11.4.1",
     "power-assert": "1.4.1",
     "q": "1.5.1",
     "tbd": "0.6.4",
@@ -65,7 +65,7 @@
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
-    "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
+    "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
   "engines": {

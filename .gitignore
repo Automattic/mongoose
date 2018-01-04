@@ -18,6 +18,7 @@ bin/mongoose.min.js
 coverage
 npm-debug.log
 data/
+.nyc_output/
 
 tools/31*
 

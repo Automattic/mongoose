@@ -32,13 +32,13 @@
     "sliced": "1.0.1"
   },
   "devDependencies": {
-    "acquit": "0.4.1",
+    "acquit": "0.5.1",
     "acquit-ignore": "0.0.3",
     "benchmark": "2.1.2",
     "bluebird": "3.5.0",
     "co": "4.6.0",
     "dox": "0.3.1",
-    "eslint": "2.4.0",
+    "eslint": "4.14.0",
     "highlight.js": "7.0.1",
     "istanbul": "0.4.4",
     "jade": "0.26.3",
@@ -79,5 +79,50 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "http://mongoosejs.com",
-  "browser": "lib/browser.js"
+  "browser": "lib/browser.js",
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2015
+    },
+    "env": {
+      "node": true,
+      "mocha": true,
+      "es6": true
+    },
+    "rules": {
+      "comma-style": "error",
+      "consistent-this": [
+        "error",
+        "_this"
+      ],
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1,
+          "VariableDeclarator": 2
+        }
+      ],
+      "keyword-spacing": "error",
+      "no-console": "off",
+      "no-multi-spaces": "error",
+      "func-call-spacing": "error",
+      "no-trailing-spaces": "error",
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": "error",
+      "space-before-blocks": "error",
+      "space-before-function-paren": [
+        "error",
+        "never"
+      ],
+      "space-infix-ops": "error",
+      "space-unary-ops": "error"
+    }
+  }
 }

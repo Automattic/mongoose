@@ -155,14 +155,14 @@ describe('model: mapreduce:', function() {
 
               // ad-hoc population works
               model
-              .findOne({_id: 'aaron'})
-              .populate({path: 'value.own', model: 'MapReduce'})
-              .exec(function(err, doc) {
-                db.close();
-                assert.ifError(err);
-                assert.equal(doc.value.own.author, 'guillermo');
-                done();
-              });
+                .findOne({_id: 'aaron'})
+                .populate({path: 'value.own', model: 'MapReduce'})
+                .exec(function(err, doc) {
+                  db.close();
+                  assert.ifError(err);
+                  assert.equal(doc.value.own.author, 'guillermo');
+                  done();
+                });
             });
           });
         });

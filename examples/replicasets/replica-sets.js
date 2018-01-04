@@ -52,10 +52,10 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
     Person.create(item, cb);
   }, function(err) {
     if (err) {
-        // handle error
+      // handle error
     }
 
-      // create and delete some data
+    // create and delete some data
     var prom = Person.find({age: {$lt: 1000}}).exec();
 
     prom.then(function(people) {

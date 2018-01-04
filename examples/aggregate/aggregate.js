@@ -77,7 +77,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
       function(err, result) {
         if (err) throw err;
         console.log(result);
-         /* [
+        /* [
          { _id: { likes: 'the night' }, likers: [ 'alucard' ] },
          { _id: { likes: 'wine' }, likers: [ 'alucard' ] },
          { _id: { likes: 'books' }, likers: [ 'lilly' ] },

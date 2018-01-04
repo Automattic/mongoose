@@ -218,15 +218,15 @@ describe('document: strict mode:', function() {
     });
 
     strictSchema
-    .virtual('myvirtual')
-    .get(function() {
-      getCount++;
-      return 'ok';
-    })
-    .set(function(v) {
-      setCount++;
-      this.prop = v;
-    });
+      .virtual('myvirtual')
+      .get(function() {
+        getCount++;
+        return 'ok';
+      })
+      .set(function(v) {
+        setCount++;
+        this.prop = v;
+      });
 
     var StrictModel = db.model('StrictVirtual', strictSchema);
 
@@ -307,17 +307,17 @@ describe('document: strict mode:', function() {
         assert.equal(doc._doc.notInSchema, true);
 
         Strict.update({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false},
-            function(err) {
-              assert.ifError(err);
+          function(err) {
+            assert.ifError(err);
 
-              Strict.findById(doc._id, function(err, doc) {
-                db.close();
-                assert.ifError(err);
-                assert.equal(doc._doc.bool, undefined);
-                assert.equal(doc._doc.notInSchema, undefined);
-                done();
-              });
+            Strict.findById(doc._id, function(err, doc) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(doc._doc.bool, undefined);
+              assert.equal(doc._doc.notInSchema, undefined);
+              done();
             });
+          });
       });
     });
   });
@@ -345,16 +345,16 @@ describe('document: strict mode:', function() {
         assert.equal(doc._doc.notInSchema, true);
 
         Strict.findOneAndUpdate({_id: doc._id}, {$unset: {bool: 1, notInSchema: 1}}, {strict: false, w: 1},
-            function(err) {
-              assert.ifError(err);
+          function(err) {
+            assert.ifError(err);
 
-              Strict.findById(doc._id, function(err, doc) {
-                assert.ifError(err);
-                assert.equal(doc._doc.bool, undefined);
-                assert.equal(doc._doc.notInSchema, undefined);
-                db.close(done);
-              });
+            Strict.findById(doc._id, function(err, doc) {
+              assert.ifError(err);
+              assert.equal(doc._doc.bool, undefined);
+              assert.equal(doc._doc.notInSchema, undefined);
+              db.close(done);
             });
+          });
       });
     });
   });
@@ -366,7 +366,7 @@ describe('document: strict mode:', function() {
       var M = mongoose.model('throwStrictSet', schema, 'tss_' + random());
       var m = new M;
 
-      var badField = /Field `[\w\.]+` is not in schema/;
+      var badField = /Field `[\w.]+` is not in schema/;
 
       assert.throws(function() {
         m.set('unknown.stuff.is.here', 3);

@@ -189,22 +189,22 @@ describe('model field selection', function() {
         id = new DocumentObjectId;
 
     BlogPostB.collection.insert(
-        {_id: id, title: 'issue 870'}, {safe: true}, function(err) {
-          assert.ifError(err);
+      {_id: id, title: 'issue 870'}, {safe: true}, function(err) {
+        assert.ifError(err);
 
-          BlogPostB.findById(id, 'def comments', function(err, found) {
-            db.close();
-            assert.ifError(err);
-            assert.ok(found);
-            assert.equal(found._id.toString(), id);
-            assert.strictEqual(undefined, found.title);
-            assert.strictEqual('kandinsky', found.def);
-            assert.strictEqual(undefined, found.author);
-            assert.strictEqual(true, Array.isArray(found.comments));
-            assert.equal(found.comments.length, 0);
-            done();
-          });
+        BlogPostB.findById(id, 'def comments', function(err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.ok(found);
+          assert.equal(found._id.toString(), id);
+          assert.strictEqual(undefined, found.title);
+          assert.strictEqual('kandinsky', found.def);
+          assert.strictEqual(undefined, found.author);
+          assert.strictEqual(true, Array.isArray(found.comments));
+          assert.equal(found.comments.length, 0);
+          done();
         });
+      });
   });
 
   it('including subdoc field excludes other subdoc fields (gh-1027)', function(done) {
@@ -282,28 +282,28 @@ describe('model field selection', function() {
         assert.ifError(err);
 
         B
-        .findById(doc._id)
-        .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
-        .exec(function(err, found) {
-          assert.ifError(err);
-          assert.ok(found);
-          assert.equal(found.id, doc.id);
-          assert.equal(found.ids.length, 1);
-          assert.equal(found.ids[0].toString(), _id2.toString());
-
-          B
-          .find({_id: doc._id})
+          .findById(doc._id)
           .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
           .exec(function(err, found) {
             assert.ifError(err);
-            assert.ok(found.length);
-            found = found[0];
+            assert.ok(found);
             assert.equal(found.id, doc.id);
             assert.equal(found.ids.length, 1);
             assert.equal(found.ids[0].toString(), _id2.toString());
-            db.close(done);
+
+            B
+              .find({_id: doc._id})
+              .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
+              .exec(function(err, found) {
+                assert.ifError(err);
+                assert.ok(found.length);
+                found = found[0];
+                assert.equal(found.id, doc.id);
+                assert.equal(found.ids.length, 1);
+                assert.equal(found.ids[0].toString(), _id2.toString());
+                db.close(done);
+              });
           });
-        });
       });
     });
 
@@ -323,35 +323,35 @@ describe('model field selection', function() {
         assert.ifError(err);
 
         B
-        .findById(doc._id)
-        .select({ids2: {$elemMatch: {$in: [_id1.toString()]}}})
-        .exec(function(err, found) {
-          assert.ifError(err);
-          assert.equal(found.ids2.length, 1);
-          found.ids2.set(0, _id2);
-
-          found.save(function(err) {
+          .findById(doc._id)
+          .select({ids2: {$elemMatch: {$in: [_id1.toString()]}}})
+          .exec(function(err, found) {
             assert.ifError(err);
+            assert.equal(found.ids2.length, 1);
+            found.ids2.set(0, _id2);
 
-            B
-            .findById(doc._id)
-            .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
-            .select('ids2')
-            .exec(function(err, found) {
-              assert.equal(2, found.ids2.length);
-              assert.equal(_id2.toHexString(), found.ids2[0].toHexString());
-              assert.equal(_id2.toHexString(), found.ids2[1].toHexString());
+            found.save(function(err) {
+              assert.ifError(err);
 
-              found.ids.pull(_id2);
+              B
+                .findById(doc._id)
+                .select({ids: {$elemMatch: {$in: [_id2.toString()]}}})
+                .select('ids2')
+                .exec(function(err, found) {
+                  assert.equal(2, found.ids2.length);
+                  assert.equal(_id2.toHexString(), found.ids2[0].toHexString());
+                  assert.equal(_id2.toHexString(), found.ids2[1].toHexString());
 
-              found.save(function(err) {
-                assert.ok(err);
+                  found.ids.pull(_id2);
 
-                db.close(done);
-              });
+                  found.save(function(err) {
+                    assert.ok(err);
+
+                    db.close(done);
+                  });
+                });
             });
           });
-        });
       });
     });
 

@@ -11,9 +11,6 @@ const mongoose = require('../');
 const Collection = mongoose.Collection;
 const assert = require('power-assert');
 
-let queryCount = 0;
-let opened = 0;
-let closed = 0;
 let server;
 
 if (process.env.D === '1') {
@@ -42,7 +39,6 @@ if (process.env.D === '1') {
   var oldMethod = Collection.prototype[method];
 
   Collection.prototype[method] = function() {
-    queryCount++;
     return oldMethod.apply(this, arguments);
   };
 });
@@ -54,7 +50,6 @@ if (process.env.D === '1') {
 var oldOnOpen = Collection.prototype.onOpen;
 
 Collection.prototype.onOpen = function() {
-  opened++;
   return oldOnOpen.apply(this, arguments);
 };
 
@@ -65,7 +60,6 @@ Collection.prototype.onOpen = function() {
 var oldOnClose = Collection.prototype.onClose;
 
 Collection.prototype.onClose = function() {
-  closed++;
   return oldOnClose.apply(this, arguments);
 };
 

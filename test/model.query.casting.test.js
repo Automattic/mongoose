@@ -106,15 +106,15 @@ describe('model query casting', function() {
       assert.ifError(err);
 
       BlogPostB.find({'meta.visitors': {$gt: '-100', $lt: -50}},
-          function(err, found) {
-            assert.ifError(err);
+        function(err, found) {
+          assert.ifError(err);
 
-            assert.ok(found);
-            assert.equal(found.length, 1);
-            assert.equal(found[0].get('_id').toString(), post.get('_id'));
-            assert.equal(found[0].get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
-            db.close(done);
-          });
+          assert.ok(found);
+          assert.equal(found.length, 1);
+          assert.equal(found[0].get('_id').toString(), post.get('_id'));
+          assert.equal(found[0].get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
+          db.close(done);
+        });
     });
   });
 
@@ -361,9 +361,9 @@ describe('model query casting', function() {
 
       Test.once('index', complete);
       Test.create(
-          {loc: {nested: {long: 10, lat: 20}}},
-          {loc: {nested: {long: 40, lat: 90}}},
-          complete);
+        {loc: {nested: {long: 10, lat: 20}}},
+        {loc: {nested: {long: 40, lat: 90}}},
+        complete);
     });
   });
 

@@ -1,3 +1,12 @@
+5.0.0-rc2 / 2017-01-04
+======================
+ * fix: add cleaner warning about no longer needing `useMongoClient` in 5.x #5961
+ * chore: update acquit -> 0.5.1 for minor security patch #5961 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs: add docs for mongoose 4.x at http://mongoosejs.com/docs/4.x #5959
+ * docs: add link to migration guide #5957
+ * chore: update eslint to version 4.14.0 #5955 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * chore: update mocha to version 4.1.0 [ChristianMurphy](https://github.com/ChristianMurphy)
+
 5.0.0-rc1 / 2017-01-02
 ======================
  * fix(index): use pluralize correctly for `mongoose.model()` #5958

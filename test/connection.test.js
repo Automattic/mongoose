@@ -74,18 +74,20 @@ describe('connections:', function() {
 
     describe('connection events', function() {
       beforeEach(function() {
-        this.timeout(25000);
-        return server.start().
-          then(function() { return server.purge(); });
+        this.timeout(60000);
+        return server.start();
       });
 
       afterEach(function() {
-        this.timeout(25000);
-        return server.stop();
+        this.timeout(60000);
+        return server.stop().
+          then(function() {
+            return server.purge();
+          });
       });
 
       it('disconnected (gh-5498) (gh-5524)', function(done) {
-        this.timeout(25000);
+        this.timeout(60000);
 
         var conn;
         var numConnected = 0;
@@ -151,7 +153,7 @@ describe('connections:', function() {
       });
 
       it('reconnectFailed (gh-4027)', function(done) {
-        this.timeout(25000);
+        this.timeout(60000);
 
         var conn;
         var numReconnectFailed = 0;
@@ -221,7 +223,7 @@ describe('connections:', function() {
       });
 
       it('timeout (gh-4513)', function(done) {
-        this.timeout(25000);
+        this.timeout(60000);
 
         var conn;
         var numTimeout = 0;

@@ -4,17 +4,19 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ValidatorError = mongoose.Error.ValidatorError,
-    ValidationError = mongoose.Error.ValidationError,
-    ObjectId = Schema.Types.ObjectId,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    EmbeddedDocument = mongoose.Types.Embedded,
-    MongooseError = mongoose.Error;
+const assert = require('power-assert');
+const co = require('co');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ValidatorError = mongoose.Error.ValidatorError;
+const ValidationError = mongoose.Error.ValidationError;
+const ObjectId = Schema.Types.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const EmbeddedDocument = mongoose.Types.Embedded;
+const MongooseError = mongoose.Error;
 
 describe('Model', function() {
   var db;
@@ -5029,6 +5031,62 @@ describe('Model', function() {
           assert.ifError(error);
           assert.equal(docs.length, 2);
           done();
+        });
+      });
+    });
+
+    describe('watch() (gh-5964)', function() {
+      before(function(done) {
+        start.mongodVersion((err, version) => {
+          if (err) {
+            done(err);
+            return;
+          }
+          var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+          if (!mongo36) {
+            this.skip();
+          }
+
+          done();
+        });
+      });
+
+      it('works', function() {
+        return co(function*() {
+          const MyModel = db.model('gh5964', new Schema({ name: String }));
+
+          const doc = yield MyModel.create({ name: 'Ned Stark' });
+
+          const changed = new global.Promise(resolve => {
+            MyModel.watch().once('change', data => resolve(data));
+          });
+
+          yield doc.remove();
+
+          const changeData = yield changed;
+          assert.equal(changeData.operationType, 'delete');
+          assert.equal(changeData.documentKey._id.toHexString(),
+            doc._id.toHexString());
+        });
+      });
+
+      it('before connecting', function() {
+        return co(function*() {
+          const db = start();
+
+          const MyModel = db.model('gh5964', new Schema({ name: String }));
+
+          // Synchronous, before connection happens
+          const changeStream = MyModel.watch();
+          const changed = new global.Promise(resolve => {
+            changeStream.once('change', data => resolve(data));
+          });
+
+          yield MyModel.create({ name: 'Ned Stark' });
+
+          const changeData = yield changed;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument.name, 'Ned Stark');
         });
       });
     });

@@ -1,3 +1,9 @@
+4.13.9 / 2017-01-07
+===================
+ * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: upgrade mongodb -> 2.2.34 for ipv6 and autoReconnect fixes #5794 #5760
+ * docs: use useMongooseAggCursor for aggregate docs #2955
+
 4.13.8 / 2017-12-27
 ===================
  * docs(guide): use more up-to-date syntax for autoIndex example #5933

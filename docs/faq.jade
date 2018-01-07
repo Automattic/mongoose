@@ -240,6 +240,10 @@ block content
     // if connecting on a separate connection
     var conn = mongoose.createConnection(..);
     conn.on('error', handleError);
+  :markdown
+    If you want to opt out of mongoose's buffering mechanism across your entire application, set the global `bufferCommands` option to false:
+  :js
+    mongoose.set('bufferCommands', false);
   hr#creating_connections
   :markdown
     **Q**. Should I create/destroy a new connection for each database operation?

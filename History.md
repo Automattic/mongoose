@@ -1,3 +1,9 @@
+4.13.9 / 2017-01-07
+===================
+ * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: upgrade mongodb -> 2.2.34 for ipv6 and autoReconnect fixes #5794 #5760
+ * docs: use useMongooseAggCursor for aggregate docs #2955
+
 5.0.0-rc2 / 2017-01-04
 ======================
  * fix: add cleaner warning about no longer needing `useMongoClient` in 5.x #5961

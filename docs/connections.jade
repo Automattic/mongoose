@@ -64,7 +64,7 @@ block content
     A full list of options can be found on the [MongoDB Node.js driver docs for `connect()`](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect).
     Mongoose passes options to the driver without modification, modulo three exceptions that are explained below.
 
-    * `useMongoClient`    - This is a mongoose-specific option (not passed to the MongoDB driver) that opts in to mongoose 4.11's new connection logic. If you are writing a new application, you **should** set this to `true`.
+    * `bufferCommands`    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables [mongoose's buffering mechanism](http://mongoosejs.com/docs/faq.html#callback_never_executes)
     * `user`/`pass`       - The username and password for authentication. These options are mongoose-specific, they are equivalent to the MongoDB driver's `auth.user` and `auth.password` options.
     * `autoIndex`         - By default, mongoose will automatically build indexes defined in your schema when it connects. This is great for development, but not ideal for large production deployments, because index builds can cause performance degradation. If you set `autoIndex` to false, mongoose will not automatically build indexes for **any** model associated with this connection.
 

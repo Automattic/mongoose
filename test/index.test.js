@@ -70,6 +70,18 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('bufferCommands option (gh-5879)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('bufferCommands', false);
+
+    const M = mongoose.model('Test', new Schema({}));
+
+    assert.ok(!M.collection.buffer);
+
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });

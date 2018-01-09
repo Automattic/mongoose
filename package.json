@@ -47,7 +47,7 @@
     "mocha": "4.1.0",
     "mongodb-topology-manager": "1.0.11",
     "mongoose-long": "0.1.1",
-    "node-static": "0.7.7",
+    "node-static": "0.7.10",
     "nsp": "~2.8.1",
     "nyc": "11.4.1",
     "power-assert": "1.4.1",

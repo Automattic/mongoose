@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose FAQ v4.11.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>hr {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose FAQ v4.13.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>hr {
   display: block;
   margin: 30px 0;
 }
@@ -18,8 +18,8 @@ doc.markModified(<span class="string">'array'</span>);
 doc.save();
 </code></pre><hr id="unique-doesnt-work"><p><strong>Q</strong>. I declared a schema property as <code>unique</code> but I can still save duplicates. What gives?</p>
 
-<p><strong>A</strong>. Mongoose doesn&#39;t handle <code>unique</code> on it&#39;s own, <code>{ name: { type: String, unique: true } }</code>
-just a shorthand for creating a <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique index on <code>name</code></a>.
+<p><strong>A</strong>. Mongoose doesn&#39;t handle <code>unique</code> on its own: <code>{ name: { type: String, unique: true } }</code>
+is just a shorthand for creating a <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique index on <code>name</code></a>.
 For example, if MongoDB doesn&#39;t already have a unique index on <code>name</code>, the below code will not error despite the fact that <code>unique</code> is true.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> mongoose.Schema({
   name: { type: String, unique: <span class="literal">true</span> }
 });
@@ -33,6 +33,16 @@ Model.create([{ name: <span class="string">'Val'</span> }, { name: <span class="
 <span class="keyword">var</span> Model = db.model(<span class="string">'Test'</span>, schema);
 
 Model.on(<span class="string">'index'</span>, <span class="keyword">function</span>(err) { <span class="comment">// &lt;-- Wait for model's indexes to finish</span>
+  assert.ifError(err);
+  Model.create([{ name: <span class="string">'Val'</span> }, { name: <span class="string">'Val'</span> }], <span class="keyword">function</span>(err) {
+    console.log(err);
+  });
+});
+
+<span class="comment">// Promise based alternative. `init()` returns a promise that resolves</span>
+<span class="comment">// when the indexes have finished building successfully. The `init()`</span>
+<span class="comment">// function is idempotent, so don't worry about triggering an index rebuild.</span>
+Model.init().then(<span class="keyword">function</span>() {
   assert.ifError(err);
   Model.create([{ name: <span class="string">'Val'</span> }, { name: <span class="string">'Val'</span> }], <span class="keyword">function</span>(err) {
     console.log(err);
@@ -61,7 +71,55 @@ the overhead of running <code>Object.defineProperty()</code> every time a docume
 mongoose defines properties on the <code>Model</code> prototype when the model is compiled.
 Because mongoose needs to define getters and setters for <code>nested.prop</code>, <code>nested</code>
 must always be defined as an object on a mongoose document, even if <code>nested</code>
-is undefined on the underlying <a href="http://mongoosejs.com/docs/guide.html#minimize">POJO</a>.</p><hr id="date_changes"><p><strong>Q</strong>. Why don&#39;t in-place modifications to date objects
+is undefined on the underlying <a href="http://mongoosejs.com/docs/guide.html#minimize">POJO</a>.</p><hr id="arrow-functions"><p><strong>Q</strong>. I&#39;m using an arrow function for a <a href="http://mongoosejs.com/docs/guide.html#virtuals">virtual</a>, getter/setter, or <a href="http://mongoosejs.com/docs/guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
+
+<p><strong>A</strong>. Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">handle the <code>this</code> keyword much differently than conventional functions</a>.
+Mongoose getters/setters depend on <code>this</code> to give you access to the document that you&#39;re writing to, but this functionality does not work with arrow functions. Do <strong>not</strong> use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.</p><pre><code class="javascript"><span class="comment">// Do **NOT** use arrow functions as shown below unless you're certain</span>
+<span class="comment">// that's what you want. If you're reading this FAQ, odds are you should</span>
+<span class="comment">// just be using a conventional function.</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> mongoose.Schema({
+  propWithGetter: {
+    type: String,
+    get: v => {
+      <span class="comment">// Will **not** be the doc, do **not** use arrow functions for getters/setters</span>
+      console.log(<span class="keyword">this</span>);
+      <span class="keyword">return</span> v;
+    }
+  }
+});
+
+<span class="comment">// `this` will **not** be the doc, do **not** use arrow functions for methods</span>
+schema.method.arrowMethod = () => <span class="keyword">this</span>;
+schema.virtual(<span class="string">'virtualWithArrow'</span>).get(() => {
+  <span class="comment">// `this` will **not** be the doc, do **not** use arrow functions for virtuals</span>
+  console.log(<span class="keyword">this</span>);
+});
+</code></pre><hr id="type-key"><p><strong>Q</strong>. I have an embedded property named <code>type</code> like this:</p><pre><code class="javascript">const holdingSchema = <span class="keyword">new</span> Schema({
+  <span class="comment">// You might expect `asset` to be an object that has 2 properties,</span>
+  <span class="comment">// but unfortunately `type` is special in mongoose so mongoose</span>
+  <span class="comment">// interprets this schema to mean that `asset` is a string</span>
+  asset: {
+    type: String,
+    ticker: String
+  }
+});</code></pre><p>But mongoose gives me a CastError telling me that it can&#39;t cast an object
+to a string when I try to save a <code>Holding</code> with an <code>asset</code> object. Why
+is this?</p><pre><code class="javascript">Holding.create({ asset: { type: <span class="string">'stock'</span>, ticker: <span class="string">'MDB'</span> } }).<span class="keyword">catch</span>(error => {
+  <span class="comment">// Cast to String failed for value "{ type: 'stock', ticker: 'MDB' }" at path "asset"</span>
+  console.error(error);
+});</code></pre><p><strong>A</strong>. The <code>type</code> property is special in mongoose, so when you say
+<code>type: String</code>, mongoose interprets it as a type declaration. In the
+above schema, mongoose thinks <code>asset</code> is a string, not an object. Do
+this instead:</p><pre><code class="javascript">const holdingSchema = <span class="keyword">new</span> Schema({
+  <span class="comment">// This is how you tell mongoose you mean `asset` is an object with</span>
+  <span class="comment">// a string property `type`, as opposed to telling mongoose that `asset`</span>
+  <span class="comment">// is a string.</span>
+  asset: {
+    type: { type: String },
+    ticker: String
+  }
+});
+</code></pre><hr id="date_changes"><p><strong>Q</strong>. Why don&#39;t in-place modifications to date objects
 (e.g. <code>date.setMonth(1);</code>) get saved?</p><pre><code class="javascript">doc.createdAt.setDate(<span class="number">2011</span>, <span class="number">5</span>, <span class="number">1</span>);
 doc.save(); <span class="comment">// createdAt changes won't get saved!</span></code></pre><p><strong>A</strong>. Mongoose currently doesn&#39;t watch for in-place updates to date
 objects. If you have need for this feature, feel free to discuss on
@@ -95,7 +153,7 @@ mongoose.connection.on(<span class="string">'error'</span>, handleError);
 
 <span class="comment">// if connecting on a separate connection</span>
 <span class="keyword">var</span> conn = mongoose.createConnection(..);
-conn.on(<span class="string">'error'</span>, handleError);</code></pre><hr id="creating_connections"><p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
+conn.on(<span class="string">'error'</span>, handleError);</code></pre><p>If you want to opt out of mongoose&#39;s buffering mechanism across your entire application, set the global <code>bufferCommands</code> option to false:</p><pre><code class="javascript">mongoose.set(<span class="string">'bufferCommands'</span>, <span class="literal">false</span>);</code></pre><hr id="creating_connections"><p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
 
 <p><strong>A</strong>. No. Open your connection when your application starts up and leave it open until the application shuts down.</p><hr id="overwrite-model-error"><p><strong>Q</strong>. Why do I get &quot;OverwriteModelError: Cannot overwrite .. model once
 compiled&quot; when I use nodemon / a testing framework?</p>

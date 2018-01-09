@@ -5035,7 +5035,7 @@ describe('Model', function() {
       });
     });
 
-    describe('watch() (gh-5964)', function() {
+    describe('3.6 features', function() {
       before(function(done) {
         start.mongodVersion((err, version) => {
           if (err) {
@@ -5051,7 +5051,31 @@ describe('Model', function() {
         });
       });
 
-      it('works', function() {
+      it('arrayFilter (gh-5965)', function() {
+        return co(function*() {
+          const MyModel = db.model('gh5965', new Schema({
+            _id: Number,
+            grades: [Number]
+          }));
+
+          yield MyModel.create([
+            { _id: 1, grades: [95, 92, 90] },
+            { _id: 2, grades: [98, 100, 102] },
+            { _id: 3, grades: [95, 110, 100] }
+          ]);
+
+          yield MyModel.updateMany({}, { $set: { 'grades.$[element]': 100 } }, {
+            arrayFilters: [ { element: { $gte: 100 } } ]
+          });
+
+          const docs = yield MyModel.find().sort({ _id: 1 });
+          assert.deepEqual(docs[0].toObject().grades, [95, 92, 90]);
+          assert.deepEqual(docs[1].toObject().grades, [98, 100, 100]);
+          assert.deepEqual(docs[2].toObject().grades, [95, 100, 100]);
+        });
+      });
+
+      it('watch() (gh-5964)', function() {
         return co(function*() {
           const MyModel = db.model('gh5964', new Schema({ name: String }));
 
@@ -5070,7 +5094,7 @@ describe('Model', function() {
         });
       });
 
-      it('before connecting', function() {
+      it('watch() before connecting (gh-5964)', function() {
         return co(function*() {
           const db = start();
 
@@ -5082,6 +5106,7 @@ describe('Model', function() {
             changeStream.once('change', data => resolve(data));
           });
 
+          yield db;
           yield MyModel.create({ name: 'Ned Stark' });
 
           const changeData = yield changed;

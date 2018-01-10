@@ -11,6 +11,51 @@ a {
   color: #0971B2;
 }
 
+h2 a {
+  color: #000;
+}
+
+h2:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
+h3 a {
+  color: #000;
+}
+
+h3:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
+h4 a {
+  color: #000;
+}
+
+h4:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
 code {
   background-color: #eee;
   padding: 2px 4px;
@@ -202,7 +247,7 @@ pre {
 }
 </style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Schemas</h2><div class="important"><p>If you haven&#39;t yet done so, please take a minute to read the <a href="./index.html">quickstart</a> to get an idea of how Mongoose works.
 If you are migrating from 4.x to 5.x please take a moment to read the <a href="https://github.com/Automattic/mongoose/blob/master/migrating_to_5.md">migration guide</a>.</p>
-</div><h3 id="definition">Defining your schema</h3>
+</div><h3 id="definition"><a href="#definition">Defining your schema</a></h3>
 
 <p>Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB
 collection and defines the shape of the documents within that collection.</p>
@@ -247,7 +292,7 @@ the <code>meta</code> property above.</p>
 properties, they also define document <a href="#methods">instance methods</a>,
 <a href="#statics">static Model methods</a>, <a href="#indexes">compound indexes</a>,
 and document lifecycle hooks called <a href="./middleware.html">middleware</a></p>
-<h3 id="models">Creating a model</h3>
+<h3 id="models"><a href="#models">Creating a model</a></h3>
 
 <p>To use our schema definition, we need to convert our <code>blogSchema</code> into a
 <a href="./models.html">Model</a> we can work with.
@@ -255,7 +300,7 @@ To do so, we pass it into <code>mongoose.model(modelName, schema)</code>:</p>
 <pre><code class="lang-javascript">  <span class="hljs-keyword">var</span> Blog = mongoose.model(<span class="hljs-string">'Blog'</span>, blogSchema);
   <span class="hljs-comment">// ready to go!</span>
 </code></pre>
-<h3 id="methods">Instance methods</h3>
+<h3 id="methods"><a href="#methods">Instance methods</a></h3>
 
 <p>Instances of <code>Models</code> are <a href="./documents.html">documents</a>. Documents have
 many of their own <a href="./api.html#document-js">built-in instance methods</a>.
@@ -281,7 +326,7 @@ to them.</p>
 <li>Overwriting a default mongoose document method may lead to unpredictable results. See <a href="./api.html#schema_Schema.reserved">this</a> for more details.</li>
 <li>Do <strong>not</strong> declare methods using ES6 arrow functions (<code>=&gt;</code>). Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">explicitly prevent binding <code>this</code></a>, so your method will <strong>not</strong> have access to the document and the above examples will not work.</li>
 </ul>
-<h3 id="statics">Statics</h3>
+<h3 id="statics"><a href="#statics">Statics</a></h3>
 
 <p>Adding static methods to a <code>Model</code> is simple as well. Continuing with our
 <code>animalSchema</code>:</p>
@@ -296,7 +341,7 @@ to them.</p>
   });
 </code></pre>
 <p>_Do <strong>not</strong> declare statics using ES6 arrow functions (<code>=&gt;</code>). Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">explicitly prevent binding <code>this</code></a>, so the above examples will not work because of the value of <code>this</code>._</p>
-<h3 id="query-helpers">Query Helpers</h3>
+<h3 id="query-helpers"><a href="#query-helpers">Query Helpers</a></h3>
 
 <p>You can also add query helper functions, which are like instance methods
 but for mongoose queries. Query helper methods let you extend mongoose&#39;s
@@ -310,7 +355,7 @@ but for mongoose queries. Query helper methods let you extend mongoose&#39;s
     <span class="hljs-built_in">console</span>.log(animals);
   });
 </code></pre>
-<h3 id="indexes">Indexes</h3>
+<h3 id="indexes"><a href="#indexes">Indexes</a></h3>
 
 <p>MongoDB supports <a href="http://docs.mongodb.org/manual/indexes/">secondary indexes</a>.
 With mongoose, we define these indexes within our <code>Schema</code> <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schema_date_SchemaDate-expires">level</a> or the <code>schema</code> level.
@@ -348,7 +393,7 @@ building or an error occurred.</p>
   });
 </code></pre>
 <p>See also the <a href="./api.html#model_Model.ensureIndexes">Model#ensureIndexes</a> method.</p>
-<h3 id="virtuals">Virtuals</h3>
+<h3 id="virtuals"><a href="#virtuals">Virtuals</a></h3>
 
 <p><a href="./api.html#schema_Schema-virtual">Virtuals</a> are document properties that
 you can get and set but that do not get persisted to MongoDB. The getters
@@ -406,7 +451,7 @@ above would still work even if the <code>first</code> and <code>last</code> name
 required.</p>
 <p>Only non-virtual properties work as part of queries and for field selection.
 Since virtuals are not stored in MongoDB, you can&#39;t query with them.</p>
-<h5 id="aliases">Aliases</h5>
+<h5 id="aliases"><a href="#aliases">Aliases</a></h5>
 
 <p>Aliases are a particular type of virtual where the getter and setter
 seamlessly get and set another property. This is handy for saving network
@@ -429,7 +474,7 @@ into a longer name for code readability.</p>
 person.name = <span class="hljs-string">'Not Val'</span>;
 <span class="hljs-built_in">console</span>.log(person); <span class="hljs-comment">// { n: 'Not Val' }</span>
 </code></pre>
-<h3 id="options">Options</h3>
+<h3 id="options"><a href="#options">Options</a></h3>
 
 <p>Schemas have a few configurable options which can be passed to the
 constructor or <code>set</code> directly:</p>
@@ -462,14 +507,14 @@ schema.set(option, value);
 <li><a href="#skipVersioning">skipVersioning</a></li>
 <li><a href="#timestamps">timestamps</a></li>
 </ul>
-<h4 id="autoIndex">option: autoIndex</h4>
+<h4 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h4>
 
 <p>At application startup, Mongoose sends a <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code> command</a> for each index declared in your <code>Schema</code>. As of Mongoose v3, indexes are created in the <code>background</code> by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your <code>Schema</code>s <code>autoIndex</code> option to <code>false</code> and use the <a href="./api.html#model_Model.ensureIndexes">ensureIndexes</a> method on your model.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { autoIndex: <span class="hljs-literal">false</span> });
 <span class="hljs-keyword">var</span> Clock = mongoose.model(<span class="hljs-string">'Clock'</span>, schema);
 Clock.ensureIndexes(callback);
 </code></pre>
-<h4 id="bufferCommands">option: bufferCommands</h4>
+<h4 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h4>
 
 <p>By default, mongoose buffers commands when the connection goes down until
 the driver manages to reconnect. To disable buffering, set <code>bufferCommands</code>
@@ -481,7 +526,7 @@ to false.</p>
 <span class="hljs-comment">// Schema option below overrides the above, if the schema option is set.</span>
 <span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });
 </code></pre>
-<h4 id="capped">option: capped</h4>
+<h4 id="capped"><a href="#capped">option: capped</a></h4>
 
 <p>Mongoose supports MongoDBs <a href="http://www.mongodb.org/display/DOCS/Capped+Collections">capped</a>
 collections. To specify the underlying MongoDB collection be <code>capped</code>, set
@@ -495,7 +540,7 @@ or <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollect
 In this case you must explicitly pass the <code>size</code> option, which is required.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, { capped: { size: <span class="hljs-number">1024</span>, max: <span class="hljs-number">1000</span>, autoIndexId: <span class="hljs-literal">true</span> } });
 </code></pre>
-<h4 id="collection">option: collection</h4>
+<h4 id="collection"><a href="#collection">option: collection</a></h4>
 
 <p>Mongoose by default produces a collection name by passing the model name to
 the <a href="./api.html#utils_exports.toCollectionName">utils.toCollectionName</a> method.
@@ -503,7 +548,7 @@ This method pluralizes the name. Set this option if you need a different name
 for your collection.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> dataSchema = <span class="hljs-keyword">new</span> Schema({..}, { collection: <span class="hljs-string">'data'</span> });
 </code></pre>
-<h4 id="id">option: id</h4>
+<h4 id="id"><a href="#id">option: id</a></h4>
 
 <p>Mongoose assigns each of your schemas an <code>id</code> virtual getter by default
 which returns the documents <code>_id</code> field cast to a string, or in the case of
@@ -521,7 +566,7 @@ schema, you may disable it passing this option at schema construction time.</p>
 <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
 <span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// undefined</span>
 </code></pre>
-<h4 id="_id">option: _id</h4>
+<h4 id="_id"><a href="#_id">option: _id</a></h4>
 
 <p>Mongoose assigns each of your schemas an <code>_id</code> field by default if one
 is not passed into the <a href="/docs/api.html#schema-js">Schema</a> constructor.
@@ -547,7 +592,7 @@ Model.create({ children: [{ name: <span class="hljs-string">'Luke'</span> }] }, 
   <span class="hljs-comment">// doc.children[0]._id will be undefined</span>
 });
 </code></pre>
-<h4 id="minimize">option: minimize</h4>
+<h4 id="minimize"><a href="#minimize">option: minimize</a></h4>
 
 <p>Mongoose will, by default, &quot;minimize&quot; schemas by removing empty objects.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, inventory: {} });
@@ -576,7 +621,7 @@ Character.findOne({ name: <span class="hljs-string">'Sam'</span> }, <span class=
   <span class="hljs-built_in">console</span>.log(character); <span class="hljs-comment">// { name: 'Sam', inventory: {}}</span>
 });
 </code></pre>
-<h4 id="read">option: read</h4>
+<h4 id="read"><a href="#read">option: read</a></h4>
 
 <p>Allows setting <a href="/docs/api.html#query_Query-read">query#read</a> options at the
 schema level, providing us a way to apply default
@@ -604,7 +649,7 @@ mongoose.connect(uri, options);
 <span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: [<span class="hljs-string">'nearest'</span>, { disk: <span class="hljs-string">'ssd'</span> }] });
 mongoose.model(<span class="hljs-string">'JellyBean'</span>, schema);
 </code></pre>
-<h4 id="shardKey">option: shardKey</h4>
+<h4 id="shardKey"><a href="#shardKey">option: shardKey</a></h4>
 
 <p>The <code>shardKey</code> option is used when we have a <a href="http://www.mongodb.org/display/DOCS/Sharding+Introduction">sharded MongoDB architecture</a>.
 Each sharded collection is given a shard key which must be present in all
@@ -651,7 +696,7 @@ to be produced instead of dropping the bad data.</p>
 thing.iAmNotInTheSchema = <span class="hljs-literal">true</span>;
 thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is never saved to the db</span>
 </code></pre>
-<h4 id="toJSON">option: toJSON</h4>
+<h4 id="toJSON"><a href="#toJSON">option: toJSON</a></h4>
 
 <p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when
 the documents <code>toJSON</code> method is called.</p>
@@ -668,7 +713,7 @@ schema.set(<span class="hljs-string">'toJSON'</span>, { getters: <span class="hl
 <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(m)); <span class="hljs-comment">// { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }</span>
 </code></pre>
 <p>To see all available <code>toJSON/toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
-<h4 id="toObject">option: toObject</h4>
+<h4 id="toObject"><a href="#toObject">option: toObject</a></h4>
 
 <p>Documents have a <a href="/docs/api.html#document_Document-toObject">toObject</a> method
 which converts the mongoose document into a plain javascript object. This
@@ -687,7 +732,7 @@ schema.set(<span class="hljs-string">'toObject'</span>, { getters: <span class="
 <span class="hljs-built_in">console</span>.log(m); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
 </code></pre>
 <p>To see all available <code>toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
-<h4 id="typeKey">option: typeKey</h4>
+<h4 id="typeKey"><a href="#typeKey">option: typeKey</a></h4>
 
 <p>By default, if you have an object with key &#39;type&#39; in your schema, mongoose
 will interpret it as a type declaration.</p>
@@ -704,7 +749,7 @@ uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
   name: { $type: <span class="hljs-built_in">String</span> }
 }, { typeKey: <span class="hljs-string">'$type'</span> }); <span class="hljs-comment">// A '$type' key means this object is a type declaration</span>
 </code></pre>
-<h4 id="validateBeforeSave">option: validateBeforeSave</h4>
+<h4 id="validateBeforeSave"><a href="#validateBeforeSave">option: validateBeforeSave</a></h4>
 
 <p>By default, documents are automatically validated before they are saved to
 the database. This is to prevent saving an invalid document. If you want to
@@ -722,7 +767,7 @@ m.validate(<span class="hljs-function"><span class="hljs-keyword">function</span
 });
 m.save(); <span class="hljs-comment">// Succeeds despite being invalid</span>
 </code></pre>
-<h4 id="versionKey">option: versionKey</h4>
+<h4 id="versionKey"><a href="#versionKey">option: versionKey</a></h4>
 
 <p>The <code>versionKey</code> is a property set on each document when first created by
 Mongoose. This keys value contains the internal
@@ -749,7 +794,7 @@ thing.save(); <span class="hljs-comment">// { _somethingElse: 0, name: 'mongoose
 <span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ name: <span class="hljs-string">'no versioning please'</span> });
 thing.save(); <span class="hljs-comment">// { name: 'no versioning please' }</span>
 </code></pre>
-<h4 id="collation">option: collation</h4>
+<h4 id="collation"><a href="#collation">option: collation</a></h4>
 
 <p>Sets a default <a href="https://docs.mongodb.com/manual/reference/collation/">collation</a>
 for every query and aggregation. <a href="http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">Here&#39;s a beginner-friendly overview of collations</a>.</p>
@@ -768,7 +813,7 @@ MyModel.create([{ name: <span class="hljs-string">'val'</span> }, { name: <span 
     <span class="hljs-comment">// MongoDB will ignore case when matching.</span>
   });
 </code></pre>
-<h4 id="skipVersioning">option: skipVersioning</h4>
+<h4 id="skipVersioning"><a href="#skipVersioning">option: skipVersioning</a></h4>
 
 <p><code>skipVersioning</code> allows excluding paths from versioning (i.e., the internal
 revision will not be incremented even if these paths are updated). DO NOT
@@ -778,7 +823,7 @@ on the parent document using the fully qualified path.</p>
 thing.dontVersionMe.push(<span class="hljs-string">'hey'</span>);
 thing.save(); <span class="hljs-comment">// version is not incremented</span>
 </code></pre>
-<h4 id="timestamps">option: timestamps</h4>
+<h4 id="timestamps"><a href="#timestamps">option: timestamps</a></h4>
 
 <p>If set <code>timestamps</code>, mongoose assigns <code>createdAt</code> and <code>updatedAt</code> fields to
 your schema, the type assigned is <a href="http://mongoosejs.com/docs/api.html#schema-date-js">Date</a>.</p>
@@ -789,7 +834,7 @@ the field name by setting <code>timestamps.createdAt</code> and <code>timestamps
 <span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing();
 thing.save(); <span class="hljs-comment">// `created_at` &amp; `updatedAt` will be included</span>
 </code></pre>
-<h4 id="useNestedStrict">option: useNestedStrict</h4>
+<h4 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h4>
 
 <p>In mongoose 4, <code>update()</code> and <code>findOneAndUpdate()</code> only check the top-level
 schema&#39;s strict mode setting.</p>
@@ -818,7 +863,7 @@ Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="
   <span class="hljs-comment">// Works!</span>
 });
 </code></pre>
-<h3 id="plugins">Pluggable</h3>
+<h3 id="plugins"><a href="#plugins">Pluggable</a></h3>
 
 <p>Schemas are also <a href="./plugins.html">pluggable</a> which allows us to package up reusable features into
 plugins that can be shared with the community or just between your projects.</p>

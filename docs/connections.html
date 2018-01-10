@@ -11,6 +11,51 @@ a {
   color: #0971B2;
 }
 
+h2 a {
+  color: #000;
+}
+
+h2:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
+h3 a {
+  color: #000;
+}
+
+h3:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
+h4 a {
+  color: #000;
+}
+
+h4:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
 code {
   background-color: #eee;
   padding: 2px 4px;
@@ -200,7 +245,7 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Connections</h2>
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2><a href="#connections">Connections</a></h2>
 
 <p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p>
 <pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost/myapp'</span>);
@@ -213,7 +258,7 @@ hostname has been changed.</p>
 <pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://username:password@host:port/database?options...'</span>);
 </code></pre>
 <p>See the <a href="http://docs.mongodb.org/manual/reference/connection-string/">mongodb connection string spec</a> for more detail.</p>
-<h3 id="buffering">Operation Buffering</h3>
+<h3 id="buffering"><a href="#buffering">Operation Buffering</a></h3>
 
 <p>Mongoose lets you start using your models immediately, without waiting for
 mongoose to establish a connection to MongoDB.</p>
@@ -240,7 +285,7 @@ If you have <code>bufferCommands</code> on and your connection is hanging, try t
 You can also disable <code>bufferCommands</code> globally:</p>
 <pre><code class="lang-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">false</span>);
 </code></pre>
-<h3 id="options">Options</h3>
+<h3 id="options"><a href="#options">Options</a></h3>
 
 <p>The <code>connect</code> method also accepts an <code>options</code> object which will be passed
 on to the underlying MongoDB driver.</p>
@@ -275,7 +320,7 @@ exceptions that are explained below.</p>
 };
 mongoose.connect(uri, options);
 </code></pre>
-<h3 id="callback">Callback</h3>
+<h3 id="callback"><a href="#callback">Callback</a></h3>
 
 <p>The <code>connect()</code> function also accepts a callback parameter and returns a
 <a href="http://mongoosejs.com/docs/promises.html">promise</a>.</p>
@@ -289,7 +334,7 @@ mongoose.connect(uri, options).then(
   err =&gt; { <span class="hljs-comment">/** handle initial connection error */</span> }
 );
 </code></pre>
-<h4 id="connection-string-options">Connection String Options</h4>
+<h4 id="connection-string-options"><a href="#connection-string-options">Connection String Options</a></h4>
 
 <p>You can also specify driver options in your connection string as
 <a href="https://en.wikipedia.org/wiki/Query_string">parameters in the query string</a>
@@ -312,7 +357,7 @@ or <code>ssl</code>, in the connection string, and options that should remain co
 like <code>connectTimeoutMS</code> or <code>poolSize</code>, in the options object.</p>
 <p>The MongoDB docs have a full list of
 <a href="https://docs.mongodb.com/manual/reference/connection-string/">supported connection string options</a></p>
-<h4 id="keepAlive">A note about keepAlive</h4>
+<h4 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h4>
 
 <p>For long running applications, it is often prudent to enable <code>keepAlive</code>
 with a number of milliseconds. Without it, after some period of time
@@ -322,7 +367,7 @@ no reason. If so, after
 you may decide to enable <code>keepAlive</code>:</p>
 <pre><code class="lang-javascript">mongoose.connect(uri, { keepAlive: <span class="hljs-number">120</span> });
 </code></pre>
-<h3 id="replicaset_connections">Replica Set Connections</h3>
+<h3 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h3>
 
 <p>To connect to a replica set you pass a comma delimited list of hosts to
 connect to rather than a single host.</p>
@@ -331,14 +376,14 @@ connect to rather than a single host.</p>
 <p>To connect to a single node replica set, specify the <code>replicaSet</code> option.</p>
 <pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://host1:port1/?replicaSet=rsName'</span>);
 </code></pre>
-<h3 id="mongos_connections">Multi-mongos support</h3>
+<h3 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h3>
 
 <p>High availability over multiple <code>mongos</code> instances is also supported.
 Pass a connection string for your <code>mongos</code> instances and set the <code>mongos</code>
 option to <code>true</code>:</p>
 <pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://mongosA:27501,mongosB:27501'</span>, { mongos: <span class="hljs-literal">true</span> }, cb);
 </code></pre>
-<h3 id="multiple_connections">Multiple connections</h3>
+<h3 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h3>
 
 <p>So far we&#39;ve seen how to connect to MongoDB using Mongoose&#39;s default
 connection. At times we may need multiple connections open to Mongo, each
@@ -353,7 +398,7 @@ create and retrieve <a href="./api.html#model_Model">models</a>. Models are
 <strong>always</strong> scoped to a single connection.</p>
 <p>Mongoose creates a <em>default connection</em> when you call <code>mongoose.connect()</code>.
 You can access the default connection using <code>mongoose.connection</code>.</p>
-<h3 id="connection_pools">Connection pools</h3>
+<h3 id="connection_pools"><a href="connection_pools">Connection pools</a></h3>
 
 <p>Each <code>connection</code>, whether created with <code>mongoose.connect</code> or
 <code>mongoose.createConnection</code> are all backed by an internal configurable
@@ -365,7 +410,7 @@ mongoose.createConnection(uri, { poolSize: <span class="hljs-number">4</span> })
 <span class="hljs-keyword">const</span> uri = <span class="hljs-string">'mongodb://localhost/test?poolSize=4'</span>;
 mongoose.createConnection(uri);
 </code></pre>
-<h3>Option Changes in v5.x</h3>
+<h3 id="v5-changes"><a href="#v5-changes">Option Changes in v5.x</a></h3>
 
 <p>You may see the following deprecation warning if upgrading from 4.x to 5.x
 and you didn&#39;t use the <code>useMongoClient</code> option in 4.x:</p>

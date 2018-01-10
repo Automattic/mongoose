@@ -2,7 +2,7 @@ extends layout
 
 block content
   :markdown
-    <h2>Connections</h2>
+    <h2><a href="#connections">Connections</a></h2>
 
     You can connect to MongoDB with the `mongoose.connect()` method.
 
@@ -23,7 +23,7 @@ block content
 
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
 
-    <h3 id="buffering">Operation Buffering</h3>
+    <h3 id="buffering"><a href="#buffering">Operation Buffering</a></h3>
 
     Mongoose lets you start using your models immediately, without waiting for
     mongoose to establish a connection to MongoDB.
@@ -59,7 +59,7 @@ block content
     mongoose.set('bufferCommands', false);
     ```
 
-    <h3 id="options">Options</h3>
+    <h3 id="options"><a href="#options">Options</a></h3>
 
     The `connect` method also accepts an `options` object which will be passed
     on to the underlying MongoDB driver.
@@ -100,7 +100,7 @@ block content
     mongoose.connect(uri, options);
     ```
 
-    <h3 id="callback">Callback</h3>
+    <h3 id="callback"><a href="#callback">Callback</a></h3>
 
     The `connect()` function also accepts a callback parameter and returns a
     [promise](http://mongoosejs.com/docs/promises.html).
@@ -117,7 +117,7 @@ block content
     );
     ```
 
-    <h4 id="connection-string-options">Connection String Options</h4>
+    <h4 id="connection-string-options"><a href="#connection-string-options">Connection String Options</a></h4>
 
     You can also specify driver options in your connection string as
     [parameters in the query string](https://en.wikipedia.org/wiki/Query_string)
@@ -145,7 +145,7 @@ block content
     The MongoDB docs have a full list of
     [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/)
 
-    <h4 id="keepAlive">A note about keepAlive</h4>
+    <h4 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h4>
 
     For long running applications, it is often prudent to enable `keepAlive`
     with a number of milliseconds. Without it, after some period of time
@@ -158,7 +158,7 @@ block content
     mongoose.connect(uri, { keepAlive: 120 });
     ```
 
-    <h3 id="replicaset_connections">Replica Set Connections</h3>
+    <h3 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h3>
 
     To connect to a replica set you pass a comma delimited list of hosts to
     connect to rather than a single host.
@@ -173,7 +173,7 @@ block content
     mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
     ```
 
-    <h3 id="mongos_connections">Multi-mongos support</h3>
+    <h3 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h3>
 
     High availability over multiple `mongos` instances is also supported.
     Pass a connection string for your `mongos` instances and set the `mongos`
@@ -183,7 +183,7 @@ block content
     mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { mongos: true }, cb);
     ```
 
-    <h3 id="multiple_connections">Multiple connections</h3>
+    <h3 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h3>
 
     So far we've seen how to connect to MongoDB using Mongoose's default
     connection. At times we may need multiple connections open to Mongo, each
@@ -203,7 +203,7 @@ block content
     Mongoose creates a _default connection_ when you call `mongoose.connect()`.
     You can access the default connection using `mongoose.connection`.
 
-    <h3 id="connection_pools">Connection pools</h3>
+    <h3 id="connection_pools"><a href="connection_pools">Connection pools</a></h3>
 
     Each `connection`, whether created with `mongoose.connect` or
     `mongoose.createConnection` are all backed by an internal configurable
@@ -218,7 +218,7 @@ block content
     mongoose.createConnection(uri);
     ```
 
-    <h3>Option Changes in v5.x</h3>
+    <h3 id="v5-changes"><a href="#v5-changes">Option Changes in v5.x</a></h3>
 
     You may see the following deprecation warning if upgrading from 4.x to 5.x
     and you didn't use the `useMongoClient` option in 4.x:

@@ -209,25 +209,83 @@ pre {
 </ul>
 <div class="important"><p>In mongoose 4, a <a href="./api.html#query-js">Query</a> has a <code>.then()</code> function, and thus can be used as a promise.</p>
 </div><p>When executing a query with a <code>callback</code> function, you specify your query as a JSON document. The JSON document&#39;s syntax is the same as the <a href="http://docs.mongodb.org/manual/tutorial/query-documents/">MongoDB shell</a>.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, yourSchema);\n\n<span class="hljs-comment">// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields</span>\nPerson.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> }, <span class="hljs-string">'name occupation'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) </span>{\n  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s %s is a %s.'</span>, person.name.first, person.name.last, person.occupation) <span class="hljs-comment">// Space Ghost is a talk show host.</span>\n})</code></pre><p>Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
+var Person = mongoose.model('Person', yourSchema);
+
+// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
+Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
+  if (err) return handleError(err);
+  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+})<p>Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
 <code>callback(error, result)</code>. If an error occurs executing the query, the <code>error</code> parameter will contain an error document, and <code>result</code> 
 will be null. If the query is successful, the <code>error</code> parameter will be null, and the <code>result</code> will be populated with the results of the query.</p>
 <div class="important"><p>Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern <code>callback(error, results)</code>. What <code>results</code> is depends on the operation: For <code>findOne()</code> it is a <a href="./api.html#model_Model.findOne">potentially-null single document</a>, <code>find()</code> a <a href="./api.html#model_Model.find">list of documents</a>, <code>count()</code> <a href="./api.html#model_Model.count">the number of documents</a>, <code>update()</code> the <a href="./api.html#model_Model.update">number of documents affected</a>, etc. The <a href="./api.html#model-js">API docs for Models</a> provide more detail on what is passed to the callbacks.</p>
 </div><p>Now let&#39;s look at what happens when no <code>callback</code> is passed:</p>
-<pre><code class="javascript"><span class="hljs-comment">// find each person with a last name matching 'Ghost'</span>\n<span class="hljs-keyword">var</span> query = Person.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> });\n\n<span class="hljs-comment">// selecting the `name` and `occupation` fields</span>\nquery.select(<span class="hljs-string">'name occupation'</span>);\n\n<span class="hljs-comment">// execute the query at a later time</span>\nquery.exec(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) </span>{\n  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s %s is a %s.'</span>, person.name.first, person.name.last, person.occupation) <span class="hljs-comment">// Space Ghost is a talk show host.</span>\n})</code></pre><p>In the above code, the <code>query</code> variable is of type <a href="./api.html#query-js">Query</a>.
+// find each person with a last name matching 'Ghost'
+var query = Person.findOne({ 'name.last': 'Ghost' });
+
+// selecting the `name` and `occupation` fields
+query.select('name occupation');
+
+// execute the query at a later time
+query.exec(function (err, person) {
+  if (err) return handleError(err);
+  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+})<p>In the above code, the <code>query</code> variable is of type <a href="./api.html#query-js">Query</a>.
 A <code>Query</code> enables you to build up a query using chaining syntax, rather than specifying a JSON object.
 The below 2 examples are equivalent.</p>
-<pre><code class="javascript"><span class="hljs-comment">// With a JSON doc</span>\nPerson.\n  find({\n    occupation: <span class="hljs-regexp">/host/</span>,\n    <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span>,\n    age: { $gt: <span class="hljs-number">17</span>, $lt: <span class="hljs-number">66</span> },\n    likes: { $<span class="hljs-keyword">in</span>: [<span class="hljs-string">'vaporizing'</span>, <span class="hljs-string">'talking'</span>] }\n  }).\n  limit(<span class="hljs-number">10</span>).\n  sort({ occupation: <span class="hljs-number">-1</span> }).\n  select({ name: <span class="hljs-number">1</span>, occupation: <span class="hljs-number">1</span> }).\n  exec(callback);\n\n<span class="hljs-comment">// Using query builder</span>\nPerson.\n  find({ occupation: <span class="hljs-regexp">/host/</span> }).\n  where(<span class="hljs-string">'name.last'</span>).equals(<span class="hljs-string">'Ghost'</span>).\n  where(<span class="hljs-string">'age'</span>).gt(<span class="hljs-number">17</span>).lt(<span class="hljs-number">66</span>).\n  where(<span class="hljs-string">'likes'</span>).in([<span class="hljs-string">'vaporizing'</span>, <span class="hljs-string">'talking'</span>]).\n  limit(<span class="hljs-number">10</span>).\n  sort(<span class="hljs-string">'-occupation'</span>).\n  select(<span class="hljs-string">'name occupation'</span>).\n  exec(callback);\n</code></pre><p>A full list of <a href="http://mongoosejs.com/docs/api.html#query-js">Query helper functions can be found in the API docs</a>.</p>
+// With a JSON doc
+Person.
+  find({
+    occupation: /host/,
+    'name.last': 'Ghost',
+    age: { $gt: 17, $lt: 66 },
+    likes: { $in: ['vaporizing', 'talking'] }
+  }).
+  limit(10).
+  sort({ occupation: -1 }).
+  select({ name: 1, occupation: 1 }).
+  exec(callback);
+
+// Using query builder
+Person.
+  find({ occupation: /host/ }).
+  where('name.last').equals('Ghost').
+  where('age').gt(17).lt(66).
+  where('likes').in(['vaporizing', 'talking']).
+  limit(10).
+  sort('-occupation').
+  select('name occupation').
+  exec(callback);
+<p>A full list of <a href="http://mongoosejs.com/docs/api.html#query-js">Query helper functions can be found in the API docs</a>.</p>
 <h3 id="setters"></h3><p>Setters are not executed by default in 4.x. For example, if you lowercase emails in your schema:</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({\n  email: {\n    type: <span class="hljs-built_in">String</span>,\n    lowercase: <span class="hljs-literal">true</span>\n  }\n});\n</code></pre><p>Mongoose will <strong>not</strong> automatically lowercase the email in your queries, so <code>Person.find({ email: &#39;Val@karpov.io&#39; })</code> would return no results.
+var personSchema = new Schema({
+  email: {
+    type: String,
+    lowercase: true
+  }
+});
+<p>Mongoose will <strong>not</strong> automatically lowercase the email in your queries, so <code>Person.find({ email: &#39;Val@karpov.io&#39; })</code> would return no results.
 Use the <code>runSettersOnQuery</code> option to turn on this behavior:</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({\n  email: {\n    type: <span class="hljs-built_in">String</span>,\n    lowercase: <span class="hljs-literal">true</span>\n  }\n}, { runSettersOnQuery: <span class="hljs-literal">true</span> });\n</code></pre><h3 id="refs">References to other documents</h3><p>There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where <a href="./populate.html">population</a> comes in. Read more about how to include documents from other collections in your query results <a href="./api.html#query_Query-populate">here</a>.</p>
+var personSchema = new Schema({
+  email: {
+    type: String,
+    lowercase: true
+  }
+}, { runSettersOnQuery: true });
+<h3 id="refs">References to other documents</h3><p>There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where <a href="./populate.html">population</a> comes in. Read more about how to include documents from other collections in your query results <a href="./api.html#query_Query-populate">here</a>.</p>
 <h3>Streaming</h3><p>You can <a href="http://nodejs.org/api/stream.html">stream</a> query results from
 MongoDB. You need to call the
 <a href="./api.html#query_Query-cursor">Query#cursor()</a> function instead of
 <a href="./api.html#query_Query-exec">Query#exec</a> to return an instance of
 <a href="./api.html#querycursor-js">QueryCursor</a>.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> cursor = Person.find({ occupation: <span class="hljs-regexp">/host/</span> }).cursor();\ncursor.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{\n  <span class="hljs-comment">// Called once for every document</span>\n});\ncursor.on(<span class="hljs-string">'close'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{\n  <span class="hljs-comment">// Called when done</span>\n});\n</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Queries</code>, let&#39;s take a look at <a href="/docs/validation.html">validation</a>.</p>
+var cursor = Person.find({ occupation: /host/ }).cursor();
+cursor.on('data', function(doc) {
+  // Called once for every document
+});
+cursor.on('close', function() {
+  // Called when done
+});
+<h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Queries</code>, let&#39;s take a look at <a href="/docs/validation.html">validation</a>.</p>
 </div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);

@@ -204,39 +204,123 @@ pre {
 means you can nest schemas in other schemas. Mongoose has two
 distinct notions of subdocuments: arrays of subdocuments and single nested
 subdocuments.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });\n\n<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({\n  <span class="hljs-comment">// Array of subdocuments</span>\n  children: [childSchema],\n  <span class="hljs-comment">// Single nested subdocuments. Caveat: single nested subdocs only work</span>\n  <span class="hljs-comment">// in mongoose &gt;= 4.2.0</span>\n  child: childSchema\n});\n</code></pre><p>Subdocuments are similar to normal documents. Nested schemas can have
+var childSchema = new Schema({ name: 'string' });
+
+var parentSchema = new Schema({
+  // Array of subdocuments
+  children: [childSchema],
+  // Single nested subdocuments. Caveat: single nested subdocs only work
+  // in mongoose >= 4.2.0
+  child: childSchema
+});
+<p>Subdocuments are similar to normal documents. Nested schemas can have
 <a href="http://mongoosejs.com/docs/middleware.html">middleware</a>, <a href="http://mongoosejs.com/docs/middleware.html">custom validation logic</a>,
 virtuals, and any other feature top-level schemas can use. The major
 difference is that subdocuments are
 not saved individually, they are saved whenever their top-level parent
 document is saved.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);\n<span class="hljs-keyword">var</span> parent = <span class="hljs-keyword">new</span> Parent({ children: [{ name: <span class="hljs-string">'Matt'</span> }, { name: <span class="hljs-string">'Sarah'</span> }] })\nparent.children[<span class="hljs-number">0</span>].name = <span class="hljs-string">'Matthew'</span>;\n\n<span class="hljs-comment">// `parent.children[0].save()` is a no-op, it triggers middleware but</span>\n<span class="hljs-comment">// does **not** actually save the subdocument. You need to save the parent</span>\n<span class="hljs-comment">// doc.</span>\nparent.save(callback);\n</code></pre><p>Subdocuments have <code>save</code> and <code>validate</code> <a href="http://mongoosejs.com/docs/middleware.html">middleware</a>
+var Parent = mongoose.model('Parent', parentSchema);
+var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+parent.children[0].name = 'Matthew';
+
+// `parent.children[0].save()` is a no-op, it triggers middleware but
+// does **not** actually save the subdocument. You need to save the parent
+// doc.
+parent.save(callback);
+<p>Subdocuments have <code>save</code> and <code>validate</code> <a href="http://mongoosejs.com/docs/middleware.html">middleware</a>
 just like top-level documents. Calling <code>save()</code> on the parent document triggers
 the <code>save()</code> middleware for all its subdocuments, and the same for <code>validate()</code>
 middleware.</p>
-<pre><code class="javascript">childSchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{\n  <span class="hljs-keyword">if</span> (<span class="hljs-string">'invalid'</span> == <span class="hljs-keyword">this</span>.name) {\n    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'#sadpanda'</span>));\n  }\n  next();\n});\n\n<span class="hljs-keyword">var</span> parent = <span class="hljs-keyword">new</span> Parent({ children: [{ name: <span class="hljs-string">'invalid'</span> }] });\nparent.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{\n  <span class="hljs-built_in">console</span>.log(err.message) <span class="hljs-comment">// #sadpanda</span>\n});\n</code></pre><p>Subdocuments&#39; <code>pre(&#39;save&#39;)</code> and <code>pre(&#39;validate&#39;)</code> middleware execute
+childSchema.pre('save', function (next) {
+  if ('invalid' == this.name) {
+    return next(new Error('#sadpanda'));
+  }
+  next();
+});
+
+var parent = new Parent({ children: [{ name: 'invalid' }] });
+parent.save(function (err) {
+  console.log(err.message) // #sadpanda
+});
+<p>Subdocuments&#39; <code>pre(&#39;save&#39;)</code> and <code>pre(&#39;validate&#39;)</code> middleware execute
 <strong>before</strong> the top-level document&#39;s <code>pre(&#39;save&#39;)</code> but <strong>after</strong> the
 top-level document&#39;s <code>pre(&#39;validate&#39;)</code> middleware. This is because validating
 before <code>save()</code> is actually a piece of built-in middleware.</p>
-<pre><code class="javascript"><span class="hljs-comment">// Below code will print out 1-4 in order</span>\n<span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> mongoose.Schema({ name: <span class="hljs-string">'string'</span> });\n\nchildSchema.pre(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'2'</span>);\n  next();\n});\n\nchildSchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'3'</span>);\n  next();\n});\n\n<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> mongoose.Schema({\n  child: childSchema,\n    });\n\nparentSchema.pre(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'1'</span>);\n  next();\n});\n\nparentSchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'4'</span>);\n  next();\n});\n\n</code></pre><h3>Finding a sub-document</h3><p>Each subdocument has an <code>_id</code> by default. Mongoose document arrays have a
+// Below code will print out 1-4 in order
+var childSchema = new mongoose.Schema({ name: 'string' });
+
+childSchema.pre('validate', function(next) {
+  console.log('2');
+  next();
+});
+
+childSchema.pre('save', function(next) {
+  console.log('3');
+  next();
+});
+
+var parentSchema = new mongoose.Schema({
+  child: childSchema,
+    });
+
+parentSchema.pre('validate', function(next) {
+  console.log('1');
+  next();
+});
+
+parentSchema.pre('save', function(next) {
+  console.log('4');
+  next();
+});
+
+<h3>Finding a sub-document</h3><p>Each subdocument has an <code>_id</code> by default. Mongoose document arrays have a
 special <a href="./api.html#types_documentarray_MongooseDocumentArray-id">id</a> method
 for searching a document array to find a document with a given <code>_id</code>.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> doc = parent.children.id(_id);\n</code></pre><h3>Adding sub-docs to arrays</h3><p>MongooseArray methods such as
+var doc = parent.children.id(_id);
+<h3>Adding sub-docs to arrays</h3><p>MongooseArray methods such as
 <a href="./api.html#types_array_MongooseArray.push">push</a>,
 <a href="./api.html#types_array_MongooseArray.unshift">unshift</a>,
 <a href="./api.html#types_array_MongooseArray.addToSet">addToSet</a>,
 and others cast arguments to their proper types transparently:</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>);\n<span class="hljs-keyword">var</span> parent = <span class="hljs-keyword">new</span> Parent;\n\n<span class="hljs-comment">// create a comment</span>\nparent.children.push({ name: <span class="hljs-string">'Liesl'</span> });\n<span class="hljs-keyword">var</span> subdoc = parent.children[<span class="hljs-number">0</span>];\n<span class="hljs-built_in">console</span>.log(subdoc) <span class="hljs-comment">// { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }</span>\nsubdoc.isNew; <span class="hljs-comment">// true</span>\n\nparent.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{\n  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err)\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Success!'</span>);\n});</code></pre><p>Sub-docs may also be created without adding them to the array by using the
+var Parent = mongoose.model('Parent');
+var parent = new Parent;
+
+// create a comment
+parent.children.push({ name: 'Liesl' });
+var subdoc = parent.children[0];
+console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+subdoc.isNew; // true
+
+parent.save(function (err) {
+  if (err) return handleError(err)
+  console.log('Success!');
+});<p>Sub-docs may also be created without adding them to the array by using the
 <a href="./api.html#types_documentarray_MongooseDocumentArray.create">create</a>
 method of MongooseArrays.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> newdoc = parent.children.create({ name: <span class="hljs-string">'Aaron'</span> });\n</code></pre><h3>Removing subdocs</h3><p>Each subdocument has it&#39;s own
+var newdoc = parent.children.create({ name: 'Aaron' });
+<h3>Removing subdocs</h3><p>Each subdocument has it&#39;s own
 <a href="./api.html#types_embedded_EmbeddedDocument-remove">remove</a> method. For
 an array subdocument, this is equivalent to calling <code>.pull()</code> on the
 subdocument. For a single nested subdocument, <code>remove()</code> is equivalent
 to setting the subdocument to <code>null</code>.</p>
-<pre><code class="javascript"><span class="hljs-comment">// Equivalent to `parent.children.pull(_id)`</span>\nparent.children.id(_id).remove();\n<span class="hljs-comment">// Equivalent to `parent.child = null`</span>\nparent.child.remove();\nparent.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{\n  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);\n  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'the subdocs were removed'</span>);\n});\n</code></pre><h4 id="altsyntax">Alternate declaration syntax for arrays</h4><p>If you create a schema with an array of objects, mongoose will automatically
+// Equivalent to `parent.children.pull(_id)`
+parent.children.id(_id).remove();
+// Equivalent to `parent.child = null`
+parent.child.remove();
+parent.save(function (err) {
+  if (err) return handleError(err);
+  console.log('the subdocs were removed');
+});
+<h4 id="altsyntax">Alternate declaration syntax for arrays</h4><p>If you create a schema with an array of objects, mongoose will automatically
 convert the object to a schema for you:</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({\n  children: [{ name: <span class="hljs-string">'string'</span> }]\n});\n<span class="hljs-comment">// Equivalent</span>\n<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({\n  children: [<span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> })]\n});\n</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Sub-documents</code>, let&#39;s take a look at
+var parentSchema = new Schema({
+  children: [{ name: 'string' }]
+});
+// Equivalent
+var parentSchema = new Schema({
+  children: [new Schema({ name: 'string' })]
+});
+<h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Sub-documents</code>, let&#39;s take a look at
 <a href="/docs/queries.html">querying</a>.</p>
 </div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}

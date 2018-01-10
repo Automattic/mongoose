@@ -206,19 +206,19 @@ If you are migrating from 4.x to 5.x please take a moment to read the <a href="h
 
 <p>Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB
 collection and defines the shape of the documents within that collection.</p>
-<pre><code class="lang-javascript">  var mongoose = require(&#39;mongoose&#39;);
-  var Schema = mongoose.Schema;
+<pre><code class="lang-javascript">  <span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+  <span class="hljs-keyword">var</span> Schema = mongoose.Schema;
 
-  var blogSchema = new Schema({
-    title:  String,
-    author: String,
-    body:   String,
-    comments: [{ body: String, date: Date }],
-    date: { type: Date, default: Date.now },
-    hidden: Boolean,
+  <span class="hljs-keyword">var</span> blogSchema = <span class="hljs-keyword">new</span> Schema({
+    title:  <span class="hljs-built_in">String</span>,
+    author: <span class="hljs-built_in">String</span>,
+    body:   <span class="hljs-built_in">String</span>,
+    comments: [{ body: <span class="hljs-built_in">String</span>, date: <span class="hljs-built_in">Date</span> }],
+    date: { type: <span class="hljs-built_in">Date</span>, <span class="hljs-keyword">default</span>: <span class="hljs-built_in">Date</span>.now },
+    hidden: <span class="hljs-built_in">Boolean</span>,
     meta: {
-      votes: Number,
-      favs:  Number
+      votes: <span class="hljs-built_in">Number</span>,
+      favs:  <span class="hljs-built_in">Number</span>
     }
   });
 </code></pre>
@@ -252,29 +252,29 @@ and document lifecycle hooks called <a href="./middleware.html">middleware</a></
 <p>To use our schema definition, we need to convert our <code>blogSchema</code> into a
 <a href="./models.html">Model</a> we can work with.
 To do so, we pass it into <code>mongoose.model(modelName, schema)</code>:</p>
-<pre><code class="lang-javascript">  var Blog = mongoose.model(&#39;Blog&#39;, blogSchema);
-  // ready to go!
+<pre><code class="lang-javascript">  <span class="hljs-keyword">var</span> Blog = mongoose.model(<span class="hljs-string">'Blog'</span>, blogSchema);
+  <span class="hljs-comment">// ready to go!</span>
 </code></pre>
 <h3 id="methods">Instance methods</h3>
 
 <p>Instances of <code>Models</code> are <a href="./documents.html">documents</a>. Documents have
 many of their own <a href="./api.html#document-js">built-in instance methods</a>.
 We may also define our own custom document instance methods too.</p>
-<pre><code class="lang-javascript">  // define a schema
-  var animalSchema = new Schema({ name: String, type: String });
+<pre><code class="lang-javascript">  <span class="hljs-comment">// define a schema</span>
+  <span class="hljs-keyword">var</span> animalSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, type: <span class="hljs-built_in">String</span> });
 
-  // assign a function to the &quot;methods&quot; object of our animalSchema
-  animalSchema.methods.findSimilarTypes = function(cb) {
-    return this.model(&#39;Animal&#39;).find({ type: this.type }, cb);
+  <span class="hljs-comment">// assign a function to the "methods" object of our animalSchema</span>
+  animalSchema.methods.findSimilarTypes = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cb</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.model(<span class="hljs-string">'Animal'</span>).find({ type: <span class="hljs-keyword">this</span>.type }, cb);
   };
 </code></pre>
 <p>Now all of our <code>animal</code> instances have a <code>findSimilarTypes</code> method available
 to them.</p>
-<pre><code class="lang-javascript">  var Animal = mongoose.model(&#39;Animal&#39;, animalSchema);
-  var dog = new Animal({ type: &#39;dog&#39; });
+<pre><code class="lang-javascript">  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
+  <span class="hljs-keyword">var</span> dog = <span class="hljs-keyword">new</span> Animal({ type: <span class="hljs-string">'dog'</span> });
 
-  dog.findSimilarTypes(function(err, dogs) {
-    console.log(dogs); // woof
+  dog.findSimilarTypes(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, dogs</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(dogs); <span class="hljs-comment">// woof</span>
   });
 </code></pre>
 <ul>
@@ -285,14 +285,14 @@ to them.</p>
 
 <p>Adding static methods to a <code>Model</code> is simple as well. Continuing with our
 <code>animalSchema</code>:</p>
-<pre><code class="lang-javascript">  // assign a function to the &quot;statics&quot; object of our animalSchema
-  animalSchema.statics.findByName = function(name, cb) {
-    return this.find({ name: new RegExp(name, &#39;i&#39;) }, cb);
+<pre><code class="lang-javascript">  <span class="hljs-comment">// assign a function to the "statics" object of our animalSchema</span>
+  animalSchema.statics.findByName = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, cb</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.find({ name: <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(name, <span class="hljs-string">'i'</span>) }, cb);
   };
 
-  var Animal = mongoose.model(&#39;Animal&#39;, animalSchema);
-  Animal.findByName(&#39;fido&#39;, function(err, animals) {
-    console.log(animals);
+  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
+  Animal.findByName(<span class="hljs-string">'fido'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, animals</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(animals);
   });
 </code></pre>
 <p>_Do <strong>not</strong> declare statics using ES6 arrow functions (<code>=&gt;</code>). Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">explicitly prevent binding <code>this</code></a>, so the above examples will not work because of the value of <code>this</code>._</p>
@@ -301,13 +301,13 @@ to them.</p>
 <p>You can also add query helper functions, which are like instance methods
 but for mongoose queries. Query helper methods let you extend mongoose&#39;s
 <a href="./queries.html">chainable query builder API</a>.</p>
-<pre><code class="lang-javascript">  animalSchema.query.byName = function(name) {
-    return this.find({ name: new RegExp(name, &#39;i&#39;) });
+<pre><code class="lang-javascript">  animalSchema.query.byName = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.find({ name: <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(name, <span class="hljs-string">'i'</span>) });
   };
 
-  var Animal = mongoose.model(&#39;Animal&#39;, animalSchema);
-  Animal.find().byName(&#39;fido&#39;).exec(function(err, animals) {
-    console.log(animals);
+  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
+  Animal.find().byName(<span class="hljs-string">'fido'</span>).exec(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, animals</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(animals);
   });
 </code></pre>
 <h3 id="indexes">Indexes</h3>
@@ -316,35 +316,35 @@ but for mongoose queries. Query helper methods let you extend mongoose&#39;s
 With mongoose, we define these indexes within our <code>Schema</code> <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schema_date_SchemaDate-expires">level</a> or the <code>schema</code> level.
 Defining indexes at the schema level is necessary when creating
 <a href="http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeys">compound indexes</a>.</p>
-<pre><code class="lang-javascript">  var animalSchema = new Schema({
-    name: String,
-    type: String,
-    tags: { type: [String], index: true } // field level
+<pre><code class="lang-javascript">  <span class="hljs-keyword">var</span> animalSchema = <span class="hljs-keyword">new</span> Schema({
+    name: <span class="hljs-built_in">String</span>,
+    type: <span class="hljs-built_in">String</span>,
+    tags: { type: [<span class="hljs-built_in">String</span>], index: <span class="hljs-literal">true</span> } <span class="hljs-comment">// field level</span>
   });
 
-  animalSchema.index({ name: 1, type: -1 }); // schema level
+  animalSchema.index({ name: <span class="hljs-number">1</span>, type: <span class="hljs-number">-1</span> }); <span class="hljs-comment">// schema level</span>
 </code></pre>
 <p>When your application starts up, Mongoose automatically calls <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code></a> for each defined index in your schema.
 Mongoose will call <code>createIndex</code> for each index sequentially, and emit an &#39;index&#39; event on the model when all the <code>createIndex</code> calls succeeded or when there was an error.
 While nice for development, it is recommended this behavior be disabled in production since index creation can cause a <a href="http://docs.mongodb.org/manual/core/indexes/#index-creation-operations">significant performance impact</a>. Disable the behavior by setting the <code>autoIndex</code> option of your schema to <code>false</code>, or globally on the connection by setting the option <code>autoIndex</code> to <code>false</code>.</p>
-<pre><code class="lang-javascript">  mongoose.connect(&#39;mongodb://user:pass@localhost:port/database&#39;, { autoIndex: false });
-  // or
-  mongoose.createConnection(&#39;mongodb://user:pass@localhost:port/database&#39;, { autoIndex: false });
-  // or
-  animalSchema.set(&#39;autoIndex&#39;, false);
-  // or
-  new Schema({..}, { autoIndex: false });
+<pre><code class="lang-javascript">  mongoose.connect(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>, { autoIndex: <span class="hljs-literal">false</span> });
+  <span class="hljs-comment">// or</span>
+  mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>, { autoIndex: <span class="hljs-literal">false</span> });
+  <span class="hljs-comment">// or</span>
+  animalSchema.set(<span class="hljs-string">'autoIndex'</span>, <span class="hljs-literal">false</span>);
+  <span class="hljs-comment">// or</span>
+  <span class="hljs-keyword">new</span> Schema({..}, { autoIndex: <span class="hljs-literal">false</span> });
 </code></pre>
 <p>Mongoose will emit an <code>index</code> event on the model when indexes are done
 building or an error occurred.</p>
-<pre><code class="lang-javascript">  // Will cause an error because mongodb has an _id index by default that
-  // is not sparse
-  animalSchema.index({ _id: 1 }, { sparse: true });
-  var Animal = mongoose.model(&#39;Animal&#39;, animalSchema);
+<pre><code class="lang-javascript">  <span class="hljs-comment">// Will cause an error because mongodb has an _id index by default that</span>
+  <span class="hljs-comment">// is not sparse</span>
+  animalSchema.index({ _id: <span class="hljs-number">1</span> }, { sparse: <span class="hljs-literal">true</span> });
+  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
 
-  Animal.on(&#39;index&#39;, function(error) {
-    // &quot;_id index cannot be sparse&quot;
-    console.log(error.message);
+  Animal.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+    <span class="hljs-comment">// "_id index cannot be sparse"</span>
+    <span class="hljs-built_in">console</span>.log(error.message);
   });
 </code></pre>
 <p>See also the <a href="./api.html#model_Model.ensureIndexes">Model#ensureIndexes</a> method.</p>
@@ -354,37 +354,37 @@ building or an error occurred.</p>
 you can get and set but that do not get persisted to MongoDB. The getters
 are useful for formatting or combining fields, while setters are useful for
 de-composing a single value into multiple values for storage.</p>
-<pre><code class="lang-javascript">  // define a schema
-  var personSchema = new Schema({
+<pre><code class="lang-javascript">  <span class="hljs-comment">// define a schema</span>
+  <span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({
     name: {
-      first: String,
-      last: String
+      first: <span class="hljs-built_in">String</span>,
+      last: <span class="hljs-built_in">String</span>
     }
   });
 
-  // compile our model
-  var Person = mongoose.model(&#39;Person&#39;, personSchema);
+  <span class="hljs-comment">// compile our model</span>
+  <span class="hljs-keyword">var</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, personSchema);
 
-  // create a document
-  var axl = new Person({
-    name: { first: &#39;Axl&#39;, last: &#39;Rose&#39; }
+  <span class="hljs-comment">// create a document</span>
+  <span class="hljs-keyword">var</span> axl = <span class="hljs-keyword">new</span> Person({
+    name: { first: <span class="hljs-string">'Axl'</span>, last: <span class="hljs-string">'Rose'</span> }
   });
 </code></pre>
 <p>Suppose you want to print out the person&#39;s full name. You could do it yourself:</p>
-<pre><code class="lang-javascript">console.log(axl.name.first + &#39; &#39; + axl.name.last); // Axl Rose
+<pre><code class="lang-javascript"><span class="hljs-built_in">console</span>.log(axl.name.first + <span class="hljs-string">' '</span> + axl.name.last); <span class="hljs-comment">// Axl Rose</span>
 </code></pre>
 <p>But concatenating the first and last name every time can get cumbersome.
 And what if you want to do some extra processing on the name, like
 <a href="https://www.npmjs.com/package/diacritics">removing diacritics?</a>. A
 <a href="./api.html#virtualtype_VirtualType-get">virtual property getter</a> lets you</p>
 <p>define a <code>fullName</code> property that won&#39;t get persisted to MongoDB.</p>
-<pre><code class="lang-javascript">personSchema.virtual(&#39;fullName&#39;).get(function () {
-  return this.name.first + &#39; &#39; + this.name.last;
+<pre><code class="lang-javascript">personSchema.virtual(<span class="hljs-string">'fullName'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last;
 });
 </code></pre>
 <p>Now, mongoose will call your getter function every time you access the
 <code>fullName</code> property:</p>
-<pre><code class="lang-javascript">console.log(axl.fullName); // Axl Rose
+<pre><code class="lang-javascript"><span class="hljs-built_in">console</span>.log(axl.fullName); <span class="hljs-comment">// Axl Rose</span>
 </code></pre>
 <p>If you use <code>toJSON()</code> or <code>toObject()</code> (or use <code>JSON.stringify()</code> on a
 mongoose document) mongoose will <em>not</em> include virtuals by default.
@@ -392,14 +392,14 @@ Pass <code>{ virtuals: true }</code> to either
 <a href="./api.html#document_Document-toObject">toObject()</a> or <code>toJSON()</code>.</p>
 <p>You can also add a custom setter to your virtual that will let you set both
 first name and last name via the <code>fullName</code> virtual.</p>
-<pre><code class="lang-javascript">personSchema.virtual(&#39;fullName&#39;).
-  get(function() { return this.name.first + &#39; &#39; + this.name.last; }).
-  set(function(v) {
-    this.name.first = v.substr(0, v.indexOf(&#39; &#39;));
-    this.name.last = v.substr(v.indexOf(&#39; &#39;) + 1);
+<pre><code class="lang-javascript">personSchema.virtual(<span class="hljs-string">'fullName'</span>).
+  get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last; }).
+  set(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) </span>{
+    <span class="hljs-keyword">this</span>.name.first = v.substr(<span class="hljs-number">0</span>, v.indexOf(<span class="hljs-string">' '</span>));
+    <span class="hljs-keyword">this</span>.name.last = v.substr(v.indexOf(<span class="hljs-string">' '</span>) + <span class="hljs-number">1</span>);
   });
 
-axl.fullName = &#39;William Rose&#39;; // Now `axl.name.first` is &quot;William&quot;
+axl.fullName = <span class="hljs-string">'William Rose'</span>; <span class="hljs-comment">// Now `axl.name.first` is "William"</span>
 </code></pre>
 <p>Virtual property setters are applied before other validation. So the example
 above would still work even if the <code>first</code> and <code>last</code> name fields were
@@ -412,32 +412,32 @@ Since virtuals are not stored in MongoDB, you can&#39;t query with them.</p>
 seamlessly get and set another property. This is handy for saving network
 bandwidth, so you can convert a short property name stored in the database
 into a longer name for code readability.</p>
-<pre><code class="lang-javascript">var personSchema = new Schema({
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({
   n: {
-    type: String,
-    // Now accessing `name` will get you the value of `n`, and setting `n` will set the value of `name`
-    alias: &#39;name&#39;
+    type: <span class="hljs-built_in">String</span>,
+    <span class="hljs-comment">// Now accessing `name` will get you the value of `n`, and setting `n` will set the value of `name`</span>
+    alias: <span class="hljs-string">'name'</span>
   }
 });
 
-// Setting `name` will propagate to `n`
-var person = new Person({ name: &#39;Val&#39; });
-console.log(person); // { n: &#39;Val&#39; }
-console.log(person.toObject({ virtuals: true })); // { n: &#39;Val&#39;, name: &#39;Val&#39; }
-console.log(person.name); // &quot;Val&quot;
+<span class="hljs-comment">// Setting `name` will propagate to `n`</span>
+<span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Val'</span> });
+<span class="hljs-built_in">console</span>.log(person); <span class="hljs-comment">// { n: 'Val' }</span>
+<span class="hljs-built_in">console</span>.log(person.toObject({ virtuals: <span class="hljs-literal">true</span> })); <span class="hljs-comment">// { n: 'Val', name: 'Val' }</span>
+<span class="hljs-built_in">console</span>.log(person.name); <span class="hljs-comment">// "Val"</span>
 
-person.name = &#39;Not Val&#39;;
-console.log(person); // { n: &#39;Not Val&#39; }
+person.name = <span class="hljs-string">'Not Val'</span>;
+<span class="hljs-built_in">console</span>.log(person); <span class="hljs-comment">// { n: 'Not Val' }</span>
 </code></pre>
 <h3 id="options">Options</h3>
 
 <p>Schemas have a few configurable options which can be passed to the
 constructor or <code>set</code> directly:</p>
-<pre><code class="lang-javascript">new Schema({..}, options);
+<pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, options);
 
-// or
+<span class="hljs-comment">// or</span>
 
-var schema = new Schema({..});
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..});
 schema.set(option, value);
 </code></pre>
 <p>Valid options:</p>
@@ -465,8 +465,8 @@ schema.set(option, value);
 <h4 id="autoIndex">option: autoIndex</h4>
 
 <p>At application startup, Mongoose sends a <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code> command</a> for each index declared in your <code>Schema</code>. As of Mongoose v3, indexes are created in the <code>background</code> by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your <code>Schema</code>s <code>autoIndex</code> option to <code>false</code> and use the <a href="./api.html#model_Model.ensureIndexes">ensureIndexes</a> method on your model.</p>
-<pre><code class="lang-javascript">var schema = new Schema({..}, { autoIndex: false });
-var Clock = mongoose.model(&#39;Clock&#39;, schema);
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { autoIndex: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> Clock = mongoose.model(<span class="hljs-string">'Clock'</span>, schema);
 Clock.ensureIndexes(callback);
 </code></pre>
 <h4 id="bufferCommands">option: bufferCommands</h4>
@@ -474,12 +474,12 @@ Clock.ensureIndexes(callback);
 <p>By default, mongoose buffers commands when the connection goes down until
 the driver manages to reconnect. To disable buffering, set <code>bufferCommands</code>
 to false.</p>
-<pre><code class="lang-javascript">var schema = new Schema({..}, { bufferCommands: false });
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });
 </code></pre>
 <p>The schema <code>bufferCommands</code> option overrides the global <code>bufferCommands</code> option.</p>
-<pre><code class="lang-javascript">mongoose.set(&#39;bufferCommands&#39;, true);
-// Schema option below overrides the above, if the schema option is set.
-var schema = new Schema({..}, { bufferCommands: false });
+<pre><code class="lang-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">true</span>);
+<span class="hljs-comment">// Schema option below overrides the above, if the schema option is set.</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });
 </code></pre>
 <h4 id="capped">option: capped</h4>
 
@@ -487,13 +487,13 @@ var schema = new Schema({..}, { bufferCommands: false });
 collections. To specify the underlying MongoDB collection be <code>capped</code>, set
 the <code>capped</code> option to the maximum size of the collection in
 <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.">bytes</a>.</p>
-<pre><code class="lang-javascript">new Schema({..}, { capped: 1024 });
+<pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, { capped: <span class="hljs-number">1024</span> });
 </code></pre>
 <p>The <code>capped</code> option may also be set to an object if you want to pass
 additional options like <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max">max</a>
 or <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId">autoIndexId</a>.
 In this case you must explicitly pass the <code>size</code> option, which is required.</p>
-<pre><code class="lang-javascript">new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
+<pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, { capped: { size: <span class="hljs-number">1024</span>, max: <span class="hljs-number">1000</span>, autoIndexId: <span class="hljs-literal">true</span> } });
 </code></pre>
 <h4 id="collection">option: collection</h4>
 
@@ -501,7 +501,7 @@ In this case you must explicitly pass the <code>size</code> option, which is req
 the <a href="./api.html#utils_exports.toCollectionName">utils.toCollectionName</a> method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.</p>
-<pre><code class="lang-javascript">var dataSchema = new Schema({..}, { collection: &#39;data&#39; });
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> dataSchema = <span class="hljs-keyword">new</span> Schema({..}, { collection: <span class="hljs-string">'data'</span> });
 </code></pre>
 <h4 id="id">option: id</h4>
 
@@ -509,17 +509,17 @@ for your collection.</p>
 which returns the documents <code>_id</code> field cast to a string, or in the case of
 ObjectIds, its hexString. If you don&#39;t want an <code>id</code> getter added to your
 schema, you may disable it passing this option at schema construction time.</p>
-<pre><code class="lang-javascript">// default behavior
-var schema = new Schema({ name: String });
-var Page = mongoose.model(&#39;Page&#39;, schema);
-var p = new Page({ name: &#39;mongodb.org&#39; });
-console.log(p.id); // &#39;50341373e894ad16347efe01&#39;
+<pre><code class="lang-javascript"><span class="hljs-comment">// default behavior</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
+<span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
+<span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// '50341373e894ad16347efe01'</span>
 
-// disabled id
-var schema = new Schema({ name: String }, { id: false });
-var Page = mongoose.model(&#39;Page&#39;, schema);
-var p = new Page({ name: &#39;mongodb.org&#39; });
-console.log(p.id); // undefined
+<span class="hljs-comment">// disabled id</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { id: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
+<span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
+<span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// undefined</span>
 </code></pre>
 <h4 id="_id">option: _id</h4>
 
@@ -531,49 +531,49 @@ added to your schema at all, you may disable it using this option.</p>
 <p>You can <strong>only</strong> use this option on sub-documents. Mongoose can&#39;t
 save a document without knowing its id, so you will get an error if
 you try to save a document without an <code>_id</code>.</p>
-<pre><code class="lang-javascript">// default behavior
-var schema = new Schema({ name: String });
-var Page = mongoose.model(&#39;Page&#39;, schema);
-var p = new Page({ name: &#39;mongodb.org&#39; });
-console.log(p); // { _id: &#39;50341373e894ad16347efe01&#39;, name: &#39;mongodb.org&#39; }
+<pre><code class="lang-javascript"><span class="hljs-comment">// default behavior</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
+<span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
+<span class="hljs-built_in">console</span>.log(p); <span class="hljs-comment">// { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }</span>
 
-// disabled _id
-var childSchema = new Schema({ name: String }, { _id: false });
-var parentSchema = new Schema({ children: [childSchema] });
+<span class="hljs-comment">// disabled _id</span>
+<span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { _id: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ children: [childSchema] });
 
-var Model = mongoose.model(&#39;Model&#39;, parentSchema);
+<span class="hljs-keyword">var</span> Model = mongoose.model(<span class="hljs-string">'Model'</span>, parentSchema);
 
-Model.create({ children: [{ name: &#39;Luke&#39; }] }, function(error, doc) {
-  // doc.children[0]._id will be undefined
+Model.create({ children: [{ name: <span class="hljs-string">'Luke'</span> }] }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) </span>{
+  <span class="hljs-comment">// doc.children[0]._id will be undefined</span>
 });
 </code></pre>
 <h4 id="minimize">option: minimize</h4>
 
 <p>Mongoose will, by default, &quot;minimize&quot; schemas by removing empty objects.</p>
-<pre><code class="lang-javascript">var schema = new Schema({ name: String, inventory: {} });
-var Character = mongoose.model(&#39;Character&#39;, schema);
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, inventory: {} });
+<span class="hljs-keyword">var</span> Character = mongoose.model(<span class="hljs-string">'Character'</span>, schema);
 
-// will store `inventory` field if it is not empty
-var frodo = new Character({ name: &#39;Frodo&#39;, inventory: { ringOfPower: 1 }});
-Character.findOne({ name: &#39;Frodo&#39; }, function(err, character) {
-  console.log(character); // { name: &#39;Frodo&#39;, inventory: { ringOfPower: 1 }}
+<span class="hljs-comment">// will store `inventory` field if it is not empty</span>
+<span class="hljs-keyword">var</span> frodo = <span class="hljs-keyword">new</span> Character({ name: <span class="hljs-string">'Frodo'</span>, inventory: { ringOfPower: <span class="hljs-number">1</span> }});
+Character.findOne({ name: <span class="hljs-string">'Frodo'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, character</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(character); <span class="hljs-comment">// { name: 'Frodo', inventory: { ringOfPower: 1 }}</span>
 });
 
-// will not store `inventory` field if it is empty
-var sam = new Character({ name: &#39;Sam&#39;, inventory: {}});
-Character.findOne({ name: &#39;Sam&#39; }, function(err, character) {
-  console.log(character); // { name: &#39;Sam&#39; }
+<span class="hljs-comment">// will not store `inventory` field if it is empty</span>
+<span class="hljs-keyword">var</span> sam = <span class="hljs-keyword">new</span> Character({ name: <span class="hljs-string">'Sam'</span>, inventory: {}});
+Character.findOne({ name: <span class="hljs-string">'Sam'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, character</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(character); <span class="hljs-comment">// { name: 'Sam' }</span>
 });
 </code></pre>
 <p>This behavior can be overridden by setting <code>minimize</code> option to <code>false</code>. It
 will then store empty objects.</p>
-<pre><code class="lang-javascript">var schema = new Schema({ name: String, inventory: {} }, { minimize: false });
-var Character = mongoose.model(&#39;Character&#39;, schema);
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, inventory: {} }, { minimize: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> Character = mongoose.model(<span class="hljs-string">'Character'</span>, schema);
 
-// will store `inventory` if empty
-var sam = new Character({ name: &#39;Sam&#39;, inventory: {}});
-Character.findOne({ name: &#39;Sam&#39; }, function(err, character) {
-  console.log(character); // { name: &#39;Sam&#39;, inventory: {}}
+<span class="hljs-comment">// will store `inventory` if empty</span>
+<span class="hljs-keyword">var</span> sam = <span class="hljs-keyword">new</span> Character({ name: <span class="hljs-string">'Sam'</span>, inventory: {}});
+Character.findOne({ name: <span class="hljs-string">'Sam'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, character</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(character); <span class="hljs-comment">// { name: 'Sam', inventory: {}}</span>
 });
 </code></pre>
 <h4 id="read">option: read</h4>
@@ -582,11 +582,11 @@ Character.findOne({ name: &#39;Sam&#39; }, function(err, character) {
 schema level, providing us a way to apply default
 <a href="http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference">ReadPreferences</a>
 to all queries derived from a model.</p>
-<pre><code class="lang-javascript">var schema = new Schema({..}, { read: &#39;primary&#39; });            // also aliased as &#39;p&#39;
-var schema = new Schema({..}, { read: &#39;primaryPreferred&#39; });   // aliased as &#39;pp&#39;
-var schema = new Schema({..}, { read: &#39;secondary&#39; });          // aliased as &#39;s&#39;
-var schema = new Schema({..}, { read: &#39;secondaryPreferred&#39; }); // aliased as &#39;sp&#39;
-var schema = new Schema({..}, { read: &#39;nearest&#39; });            // aliased as &#39;n&#39;
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'primary'</span> });            <span class="hljs-comment">// also aliased as 'p'</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'primaryPreferred'</span> });   <span class="hljs-comment">// aliased as 'pp'</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'secondary'</span> });          <span class="hljs-comment">// aliased as 's'</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'secondaryPreferred'</span> }); <span class="hljs-comment">// aliased as 'sp'</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'nearest'</span> });            <span class="hljs-comment">// aliased as 'n'</span>
 </code></pre>
 <p>The alias of each pref is also permitted so instead of having to type out
 &#39;secondaryPreferred&#39; and getting the spelling wrong, we can simply pass &#39;sp&#39;.</p>
@@ -597,12 +597,12 @@ of the replica-set it should attempt to read. Read more about tag sets
 <a href="http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences">here</a>.</p>
 <p><em>NOTE: you may also specify the driver read pref <a href="http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy">strategy</a>
 option when connecting:</em></p>
-<pre><code class="lang-javascript">// pings the replset members periodically to track network latency
-var options = { replset: { strategy: &#39;ping&#39; }};
+<pre><code class="lang-javascript"><span class="hljs-comment">// pings the replset members periodically to track network latency</span>
+<span class="hljs-keyword">var</span> options = { replset: { strategy: <span class="hljs-string">'ping'</span> }};
 mongoose.connect(uri, options);
 
-var schema = new Schema({..}, { read: [&#39;nearest&#39;, { disk: &#39;ssd&#39; }] });
-mongoose.model(&#39;JellyBean&#39;, schema);
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: [<span class="hljs-string">'nearest'</span>, { disk: <span class="hljs-string">'ssd'</span> }] });
+mongoose.model(<span class="hljs-string">'JellyBean'</span>, schema);
 </code></pre>
 <h4 id="shardKey">option: shardKey</h4>
 
@@ -610,7 +610,7 @@ mongoose.model(&#39;JellyBean&#39;, schema);
 Each sharded collection is given a shard key which must be present in all
 insert/update operations. We just need to set this schema option to the same
 shard key and we’ll be all set.</p>
-<pre><code class="lang-javascript">new Schema({ .. }, { shardKey: { tag: 1, name: 1 }})
+<pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({ .. }, { shardKey: { tag: <span class="hljs-number">1</span>, name: <span class="hljs-number">1</span> }})
 </code></pre>
 <p><em>Note that Mongoose does not send the <code>shardcollection</code> command for you. You
 must configure your shards yourself.</em></p>
@@ -619,53 +619,53 @@ must configure your shards yourself.</em></p>
 <p>The strict option, (enabled by default), ensures that values passed to our
 model constructor that were not specified in our schema do not get saved to
 the db.</p>
-<pre><code class="lang-javascript">var thingSchema = new Schema({..})
-var Thing = mongoose.model(&#39;Thing&#39;, thingSchema);
-var thing = new Thing({ iAmNotInTheSchema: true });
-thing.save(); // iAmNotInTheSchema is not saved to the db
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ iAmNotInTheSchema: <span class="hljs-literal">true</span> });
+thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is not saved to the db</span>
 
-// set to false..
-var thingSchema = new Schema({..}, { strict: false });
-var thing = new Thing({ iAmNotInTheSchema: true });
-thing.save(); // iAmNotInTheSchema is now saved to the db!!
+<span class="hljs-comment">// set to false..</span>
+<span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..}, { strict: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ iAmNotInTheSchema: <span class="hljs-literal">true</span> });
+thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is now saved to the db!!</span>
 </code></pre>
 <p>This also affects the use of <code>doc.set()</code> to set a property value.</p>
-<pre><code class="lang-javascript">var thingSchema = new Schema({..})
-var Thing = mongoose.model(&#39;Thing&#39;, thingSchema);
-var thing = new Thing;
-thing.set(&#39;iAmNotInTheSchema&#39;, true);
-thing.save(); // iAmNotInTheSchema is not saved to the db
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing;
+thing.set(<span class="hljs-string">'iAmNotInTheSchema'</span>, <span class="hljs-literal">true</span>);
+thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is not saved to the db</span>
 </code></pre>
 <p>This value can be overridden at the model instance level by passing a second
 boolean argument:</p>
-<pre><code class="lang-javascript">var Thing = mongoose.model(&#39;Thing&#39;);
-var thing = new Thing(doc, true);  // enables strict mode
-var thing = new Thing(doc, false); // disables strict mode
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing(doc, <span class="hljs-literal">true</span>);  <span class="hljs-comment">// enables strict mode</span>
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing(doc, <span class="hljs-literal">false</span>); <span class="hljs-comment">// disables strict mode</span>
 </code></pre>
 <p>The <code>strict</code> option may also be set to <code>&quot;throw&quot;</code> which will cause errors
 to be produced instead of dropping the bad data.</p>
 <p><em>NOTE: Any key/val set on the instance that does not exist in your schema is always ignored, regardless of schema option.</em></p>
-<pre><code class="lang-javascript">var thingSchema = new Schema({..})
-var Thing = mongoose.model(&#39;Thing&#39;, thingSchema);
-var thing = new Thing;
-thing.iAmNotInTheSchema = true;
-thing.save(); // iAmNotInTheSchema is never saved to the db
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing;
+thing.iAmNotInTheSchema = <span class="hljs-literal">true</span>;
+thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is never saved to the db</span>
 </code></pre>
 <h4 id="toJSON">option: toJSON</h4>
 
 <p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when
 the documents <code>toJSON</code> method is called.</p>
-<pre><code class="lang-javascript">var schema = new Schema({ name: String });
-schema.path(&#39;name&#39;).get(function (v) {
-  return v + &#39; is my name&#39;;
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+schema.path(<span class="hljs-string">'name'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">v</span>) </span>{
+  <span class="hljs-keyword">return</span> v + <span class="hljs-string">' is my name'</span>;
 });
-schema.set(&#39;toJSON&#39;, { getters: true, virtuals: false });
-var M = mongoose.model(&#39;Person&#39;, schema);
-var m = new M({ name: &#39;Max Headroom&#39; });
-console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: &#39;Max Headroom&#39; }
-console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: &#39;Max Headroom is my name&#39; }
-// since we know toJSON is called whenever a js object is stringified:
-console.log(JSON.stringify(m)); // { &quot;_id&quot;: &quot;504e0cd7dd992d9be2f20b6f&quot;, &quot;name&quot;: &quot;Max Headroom is my name&quot; }
+schema.set(<span class="hljs-string">'toJSON'</span>, { getters: <span class="hljs-literal">true</span>, virtuals: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-string">'Max Headroom'</span> });
+<span class="hljs-built_in">console</span>.log(m.toObject()); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }</span>
+<span class="hljs-built_in">console</span>.log(m.toJSON()); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
+<span class="hljs-comment">// since we know toJSON is called whenever a js object is stringified:</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(m)); <span class="hljs-comment">// { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }</span>
 </code></pre>
 <p>To see all available <code>toJSON/toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
 <h4 id="toObject">option: toObject</h4>
@@ -677,32 +677,32 @@ per-document basis we may declare the options here and have it applied to
 all of this schemas documents by default.</p>
 <p>To have all virtuals show up in your <code>console.log</code> output, set the
 <code>toObject</code> option to <code>{ getters: true }</code>:</p>
-<pre><code class="lang-javascript">var schema = new Schema({ name: String });
-schema.path(&#39;name&#39;).get(function (v) {
-  return v + &#39; is my name&#39;;
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+schema.path(<span class="hljs-string">'name'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">v</span>) </span>{
+  <span class="hljs-keyword">return</span> v + <span class="hljs-string">' is my name'</span>;
 });
-schema.set(&#39;toObject&#39;, { getters: true });
-var M = mongoose.model(&#39;Person&#39;, schema);
-var m = new M({ name: &#39;Max Headroom&#39; });
-console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: &#39;Max Headroom is my name&#39; }
+schema.set(<span class="hljs-string">'toObject'</span>, { getters: <span class="hljs-literal">true</span> });
+<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-string">'Max Headroom'</span> });
+<span class="hljs-built_in">console</span>.log(m); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
 </code></pre>
 <p>To see all available <code>toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
 <h4 id="typeKey">option: typeKey</h4>
 
 <p>By default, if you have an object with key &#39;type&#39; in your schema, mongoose
 will interpret it as a type declaration.</p>
-<pre><code class="lang-javascript">// Mongoose interprets this as &#39;loc is a String&#39;
-var schema = new Schema({ loc: { type: String, coordinates: [Number] } });
+<pre><code class="lang-javascript"><span class="hljs-comment">// Mongoose interprets this as 'loc is a String'</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ loc: { type: <span class="hljs-built_in">String</span>, coordinates: [<span class="hljs-built_in">Number</span>] } });
 </code></pre>
 <p>However, for applications like <a href="http://docs.mongodb.org/manual/reference/geojson/">geoJSON</a>,
 the &#39;type&#39; property is important. If you want to control which key mongoose
 uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
-<pre><code class="lang-javascript">var schema = new Schema({
-  // Mongoose interpets this as &#39;loc is an object with 2 keys, type and coordinates&#39;
-  loc: { type: String, coordinates: [Number] },
-  // Mongoose interprets this as &#39;name is a String&#39;
-  name: { $type: String }
-}, { typeKey: &#39;$type&#39; }); // A &#39;$type&#39; key means this object is a type declaration
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'</span>
+  loc: { type: <span class="hljs-built_in">String</span>, coordinates: [<span class="hljs-built_in">Number</span>] },
+  <span class="hljs-comment">// Mongoose interprets this as 'name is a String'</span>
+  name: { $type: <span class="hljs-built_in">String</span> }
+}, { typeKey: <span class="hljs-string">'$type'</span> }); <span class="hljs-comment">// A '$type' key means this object is a type declaration</span>
 </code></pre>
 <h4 id="validateBeforeSave">option: validateBeforeSave</h4>
 
@@ -710,17 +710,17 @@ uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
 the database. This is to prevent saving an invalid document. If you want to
 handle validation manually, and be able to save objects which don&#39;t pass
 validation, you can set <code>validateBeforeSave</code> to false.</p>
-<pre><code class="lang-javascript">var schema = new Schema({ name: String });
-schema.set(&#39;validateBeforeSave&#39;, false);
-schema.path(&#39;name&#39;).validate(function (value) {
-    return v != null;
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+schema.set(<span class="hljs-string">'validateBeforeSave'</span>, <span class="hljs-literal">false</span>);
+schema.path(<span class="hljs-string">'name'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+    <span class="hljs-keyword">return</span> v != <span class="hljs-literal">null</span>;
 });
-var M = mongoose.model(&#39;Person&#39;, schema);
-var m = new M({ name: null });
-m.validate(function(err) {
-    console.log(err); // Will tell you that null is not allowed.
+<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-literal">null</span> });
+m.validate(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(err); <span class="hljs-comment">// Will tell you that null is not allowed.</span>
 });
-m.save(); // Succeeds despite being invalid
+m.save(); <span class="hljs-comment">// Succeeds despite being invalid</span>
 </code></pre>
 <h4 id="versionKey">option: versionKey</h4>
 
@@ -730,42 +730,42 @@ Mongoose. This keys value contains the internal
 of the document. The <code>versionKey</code> option is a string that represents the
 path to use for versioning. The default is <code>__v</code>. If this conflicts with
 your application you can configure as such:</p>
-<pre><code class="lang-javascript">var schema = new Schema({ name: &#39;string&#39; });
-var Thing = mongoose.model(&#39;Thing&#39;, schema);
-var thing = new Thing({ name: &#39;mongoose v3&#39; });
-thing.save(); // { __v: 0, name: &#39;mongoose v3&#39; }
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, schema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ name: <span class="hljs-string">'mongoose v3'</span> });
+thing.save(); <span class="hljs-comment">// { __v: 0, name: 'mongoose v3' }</span>
 
-// customized versionKey
-new Schema({..}, { versionKey: &#39;_somethingElse&#39; })
-var Thing = mongoose.model(&#39;Thing&#39;, schema);
-var thing = new Thing({ name: &#39;mongoose v3&#39; });
-thing.save(); // { _somethingElse: 0, name: &#39;mongoose v3&#39; }
+<span class="hljs-comment">// customized versionKey</span>
+<span class="hljs-keyword">new</span> Schema({..}, { versionKey: <span class="hljs-string">'_somethingElse'</span> })
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, schema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ name: <span class="hljs-string">'mongoose v3'</span> });
+thing.save(); <span class="hljs-comment">// { _somethingElse: 0, name: 'mongoose v3' }</span>
 </code></pre>
 <p>Document versioning can also be disabled by setting the <code>versionKey</code> to
 <code>false</code>.
 <em>DO NOT disable versioning unless you <a href="http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning">know what you are doing</a>.</em></p>
-<pre><code class="lang-javascript">new Schema({..}, { versionKey: false });
-var Thing = mongoose.model(&#39;Thing&#39;, schema);
-var thing = new Thing({ name: &#39;no versioning please&#39; });
-thing.save(); // { name: &#39;no versioning please&#39; }
+<pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, { versionKey: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, schema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ name: <span class="hljs-string">'no versioning please'</span> });
+thing.save(); <span class="hljs-comment">// { name: 'no versioning please' }</span>
 </code></pre>
 <h4 id="collation">option: collation</h4>
 
 <p>Sets a default <a href="https://docs.mongodb.com/manual/reference/collation/">collation</a>
 for every query and aggregation. <a href="http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">Here&#39;s a beginner-friendly overview of collations</a>.</p>
-<pre><code class="lang-javascript">var schema = new Schema({
-  name: String
-}, { collation: { locale: &#39;en_US&#39;, strength: 1 } });
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+  name: <span class="hljs-built_in">String</span>
+}, { collation: { locale: <span class="hljs-string">'en_US'</span>, strength: <span class="hljs-number">1</span> } });
 
-var MyModel = db.model(&#39;MyModel&#39;, schema);
+<span class="hljs-keyword">var</span> MyModel = db.model(<span class="hljs-string">'MyModel'</span>, schema);
 
-MyModel.create([{ name: &#39;val&#39; }, { name: &#39;Val&#39; }]).
-  then(function() {
-    return MyModel.find({ name: &#39;val&#39; });
+MyModel.create([{ name: <span class="hljs-string">'val'</span> }, { name: <span class="hljs-string">'Val'</span> }]).
+  then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> MyModel.find({ name: <span class="hljs-string">'val'</span> });
   }).
-  then(function(docs) {
-    // `docs` will contain both docs, because `strength: 1` means
-    // MongoDB will ignore case when matching.
+  then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">docs</span>) </span>{
+    <span class="hljs-comment">// `docs` will contain both docs, because `strength: 1` means</span>
+    <span class="hljs-comment">// MongoDB will ignore case when matching.</span>
   });
 </code></pre>
 <h4 id="skipVersioning">option: skipVersioning</h4>
@@ -774,9 +774,9 @@ MyModel.create([{ name: &#39;val&#39; }, { name: &#39;Val&#39; }]).
 revision will not be incremented even if these paths are updated). DO NOT
 do this unless you know what you&#39;re doing. For sub-documents, include this
 on the parent document using the fully qualified path.</p>
-<pre><code class="lang-javascript">new Schema({..}, { skipVersioning: { dontVersionMe: true } });
-thing.dontVersionMe.push(&#39;hey&#39;);
-thing.save(); // version is not incremented
+<pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, { skipVersioning: { dontVersionMe: <span class="hljs-literal">true</span> } });
+thing.dontVersionMe.push(<span class="hljs-string">'hey'</span>);
+thing.save(); <span class="hljs-comment">// version is not incremented</span>
 </code></pre>
 <h4 id="timestamps">option: timestamps</h4>
 
@@ -784,38 +784,38 @@ thing.save(); // version is not incremented
 your schema, the type assigned is <a href="http://mongoosejs.com/docs/api.html#schema-date-js">Date</a>.</p>
 <p>By default, the name of two fields are <code>createdAt</code> and <code>updatedAt</code>, customize
 the field name by setting <code>timestamps.createdAt</code> and <code>timestamps.updatedAt</code>.</p>
-<pre><code class="lang-javascript">var thingSchema = new Schema({..}, { timestamps: { createdAt: &#39;created_at&#39; } });
-var Thing = mongoose.model(&#39;Thing&#39;, thingSchema);
-var thing = new Thing();
-thing.save(); // `created_at` &amp; `updatedAt` will be included
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..}, { timestamps: { createdAt: <span class="hljs-string">'created_at'</span> } });
+<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing();
+thing.save(); <span class="hljs-comment">// `created_at` &amp; `updatedAt` will be included</span>
 </code></pre>
 <h4 id="useNestedStrict">option: useNestedStrict</h4>
 
 <p>In mongoose 4, <code>update()</code> and <code>findOneAndUpdate()</code> only check the top-level
 schema&#39;s strict mode setting.</p>
-<pre><code class="lang-javascript">var childSchema = new Schema({}, { strict: false });
-var parentSchema = new Schema({ child: childSchema }, { strict: &#39;throw&#39; });
-var Parent = mongoose.model(&#39;Parent&#39;, parentSchema);
-Parent.update({}, { &#39;child.name&#39;: &#39;Luke Skywalker&#39; }, function(error) {
-  // Error because parentSchema has `strict: throw`, even though
-  // `childSchema` has `strict: false`
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema }, { strict: <span class="hljs-string">'throw'</span> });
+<span class="hljs-keyword">var</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
+Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+  <span class="hljs-comment">// Error because parentSchema has `strict: throw`, even though</span>
+  <span class="hljs-comment">// `childSchema` has `strict: false`</span>
 });
 
-var update = { &#39;child.name&#39;: &#39;Luke Skywalker&#39; };
-var opts = { strict: false };
-Parent.update({}, update, opts, function(error) {
-  // This works because passing `strict: false` to `update()` overwrites
-  // the parent schema.
+<span class="hljs-keyword">var</span> update = { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> };
+<span class="hljs-keyword">var</span> opts = { strict: <span class="hljs-literal">false</span> };
+Parent.update({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+  <span class="hljs-comment">// This works because passing `strict: false` to `update()` overwrites</span>
+  <span class="hljs-comment">// the parent schema.</span>
 });
 </code></pre>
 <p>If you set <code>useNestedStrict</code> to true, mongoose will use the child schema&#39;s
 <code>strict</code> option for casting updates.</p>
-<pre><code class="lang-javascript">var childSchema = new Schema({}, { strict: false });
-var parentSchema = new Schema({ child: childSchema },
-  { strict: &#39;throw&#39;, useNestedStrict: true });
-var Parent = mongoose.model(&#39;Parent&#39;, parentSchema);
-Parent.update({}, { &#39;child.name&#39;: &#39;Luke Skywalker&#39; }, function(error) {
-  // Works!
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema },
+  { strict: <span class="hljs-string">'throw'</span>, useNestedStrict: <span class="hljs-literal">true</span> });
+<span class="hljs-keyword">var</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
+Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+  <span class="hljs-comment">// Works!</span>
 });
 </code></pre>
 <h3 id="plugins">Pluggable</h3>

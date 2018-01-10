@@ -1,13 +1,19 @@
 var fs = require('fs');
 var jade = require('jade');
 var package = require('./package');
-var hl = require('./docs/helpers/highlight');
 var linktype = require('./docs/helpers/linktype');
 var href = require('./docs/helpers/href');
 var klass = require('./docs/helpers/klass');
 
-// add custom jade filters
-require('./docs/helpers/filters')(jade);
+const markdown = require('marked');
+const highlight = require('highlight.js');
+markdown.setOptions({
+  highlight: function(code) {
+    return highlight.highlight('JavaScript', code).value;
+  }
+});
+
+jade.filters.markdown = markdown;
 
 function getVersion() {
   var hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
@@ -45,7 +51,6 @@ var files = Object.keys(filemap);
 function jadeify(filename, options, newfile) {
   options = options || {};
   options.package = package;
-  options.hl = hl;
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;

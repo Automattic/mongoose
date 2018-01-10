@@ -1,14 +1,10 @@
 
-var fs= require('fs')
+var fs = require('fs')
 var jade = require('jade')
 var package = require('./package')
-var hl = require('./docs/helpers/highlight')
 var linktype = require('./docs/helpers/linktype')
 var href = require('./docs/helpers/href')
 var klass = require('./docs/helpers/klass')
-
-// add custom jade filters
-require('./docs/helpers/filters')(jade);
 
 // clean up version for ui
 package.version = package.version.replace(/-pre$/, '');
@@ -32,7 +28,6 @@ files.forEach(function (file) {
 function jadeify (filename, options) {
   options || (options = {});
   options.package = package;
-  options.hl = hl;
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;

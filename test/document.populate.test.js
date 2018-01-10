@@ -360,8 +360,6 @@ describe('document.populate', function() {
   });
 
   it('String _ids', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: String,
       name: String
@@ -382,7 +380,6 @@ describe('document.populate', function() {
 
       var note = new Note({author: 'alice', body: 'Buy Milk'});
       note.populate('author', function(err) {
-        db.close();
         assert.ifError(err);
         assert.ok(note.author);
         assert.equal(note.author._id, 'alice');
@@ -393,8 +390,6 @@ describe('document.populate', function() {
   });
 
   it('Buffer _ids', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: Buffer,
       name: String
@@ -421,7 +416,6 @@ describe('document.populate', function() {
           assert.ifError(err);
           assert.equal(note.author, 'alice');
           note.populate('author', function(err, note) {
-            db.close();
             assert.ifError(err);
             assert.equal(note.body, 'Buy Milk');
             assert.ok(note.author);
@@ -434,8 +428,6 @@ describe('document.populate', function() {
   });
 
   it('Number _ids', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: Number,
       name: String
@@ -456,7 +448,6 @@ describe('document.populate', function() {
 
       var note = new Note({author: 2359, body: 'Buy Milk'});
       note.populate('author').populate(function(err, note) {
-        db.close();
         assert.ifError(err);
         assert.ok(note.author);
         assert.equal(note.author._id, 2359);
@@ -501,8 +492,6 @@ describe('document.populate', function() {
   });
 
   it('gh-3308', function(done) {
-    var db = start();
-
     var Person = db.model('gh3308', {
       name: String
     });
@@ -522,13 +511,11 @@ describe('document.populate', function() {
     gnr.guitarist = buckethead._id;
     assert.ok(!gnr.populated('guitarist'));
 
-    db.close(done);
+    done();
   });
 
   describe('gh-2214', function() {
     it('should return a real document array when populating', function(done) {
-      var db = start();
-
       var Car = db.model('gh-2214-1', {
         color: String,
         model: String
@@ -570,7 +557,6 @@ describe('document.populate', function() {
               joe.cars.push(car);
               assert.ok(joe.isModified('cars'));
               done();
-              db.close();
             });
           });
         });
@@ -579,8 +565,6 @@ describe('document.populate', function() {
   });
 
   it('can depopulate (gh-2509)', function(done) {
-    var db = start();
-
     var Person = db.model('gh2509_1', {
       name: String
     });
@@ -613,7 +597,7 @@ describe('document.populate', function() {
             band.depopulate('lead');
             assert.ok(!band.lead.name);
             assert.equal(band.lead.toString(), docs[0]._id.toString());
-            db.close(done);
+            done();
           });
         });
       });
@@ -643,7 +627,6 @@ describe('document.populate', function() {
   });
 
   it('handles pulling from populated array (gh-3579)', function(done) {
-    var db = start();
     var barSchema = new Schema({name: String});
 
     var Bar = db.model('gh3579', barSchema);
@@ -667,7 +650,7 @@ describe('document.populate', function() {
           assert.ifError(error);
           assert.equal(foo.bars.length, 1);
           assert.equal(foo.bars[0].toString(), docs[1]._id.toString());
-          db.close(done);
+          done();
         });
       });
     });

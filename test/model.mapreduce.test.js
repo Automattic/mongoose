@@ -14,6 +14,7 @@ describe('model: mapreduce:', function() {
   var Comments;
   var BlogPost;
   var collection;
+  var db;
 
   before(function() {
     Comments = new Schema();
@@ -43,11 +44,15 @@ describe('model: mapreduce:', function() {
 
     collection = 'mapreduce_' + random();
     mongoose.model('MapReduce', BlogPost);
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   it('works', function(done) {
-    var db = start(),
-        MR = db.model('MapReduce', collection);
+    var MR = db.model('MapReduce', collection);
 
     var magicID;
     var id = new mongoose.Types.ObjectId;
@@ -158,7 +163,6 @@ describe('model: mapreduce:', function() {
                 .findOne({_id: 'aaron'})
                 .populate({path: 'value.own', model: 'MapReduce'})
                 .exec(function(err, doc) {
-                  db.close();
                   assert.ifError(err);
                   assert.equal(doc.value.own.author, 'guillermo');
                   done();
@@ -171,8 +175,7 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity', function(done) {
-    var db = start(),
-        MR = db.model('MapReduce', collection);
+    var MR = db.model('MapReduce', collection);
 
     var o = {
       map: function() {
@@ -185,14 +188,13 @@ describe('model: mapreduce:', function() {
 
     MR.mapReduce(o, function(err, results, stats) {
       assert.equal(typeof stats, 'undefined');
-      db.close(done);
+      done();
     });
   });
 
   describe('promises (gh-1628)', function() {
     it('are returned', function(done) {
-      var db = start(),
-          MR = db.model('MapReduce', collection);
+      var MR = db.model('MapReduce', collection);
 
       var o = {
         map: function() {
@@ -205,7 +207,7 @@ describe('model: mapreduce:', function() {
       var promise = MR.mapReduce(o);
       assert.ok(promise instanceof mongoose.Promise);
 
-      db.close(done);
+      done();
     });
   });
 
@@ -303,8 +305,7 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity using then', function(done) {
-    var db = start(),
-        MR = db.model('MapReduce', collection);
+    var MR = db.model('MapReduce', collection);
 
     var o = {
       map: function() {
@@ -317,7 +318,7 @@ describe('model: mapreduce:', function() {
 
     MR.mapReduce(o).then(function(results, stats) {
       assert.equal(typeof stats, 'undefined');
-      db.close(done);
+      done();
     });
   });
 });

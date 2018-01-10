@@ -93,11 +93,11 @@ pre {
     left: 0px;
     margin: auto;
   }
-  
+
   #content {
     margin: 10px;
   }
-  
+
   #menu {
     display: none;
     position: absolute;
@@ -107,23 +107,23 @@ pre {
     border-bottom: 1px solid #ddd;
     left: 0px;
   }
-  
+
   pre {
     margin: 0px;
     margin-top: 10px;
   }
-  
+
   #mobile-menu {
     display: block;
     height: 45px;
     background-color: #eee;
     border-bottom: 1px solid #ddd;
   }
-  
+
   #logo {
     border: 0;
   }
-  
+
   #mobile-logo-container {
     padding: 0;
     border: 0px;
@@ -133,11 +133,11 @@ pre {
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   #logo-container {
     display: none;
   }
-  
+
   .menu-link {
     position: absolute;
     display: block;
@@ -150,17 +150,17 @@ pre {
     height: 3px;
     padding: 2.1em 1.6em;
   }
-  
+
   .menu-link:hover,
   .menu-link:focus {
     background: #ddd;
   }
-  
+
   .menu-link span {
     position: relative;
     display: block;
   }
-  
+
   .menu-link span,
   .menu-link span:before,
   .menu-link span:after {
@@ -168,56 +168,41 @@ pre {
     width: 100%;
     height: 0.2em;
   }
-  
+
   .menu-link span:before,
   .menu-link span:after {
     position: absolute;
     margin-top: -0.6em;
     content: " ";
   }
-  
+
   .menu-link span:after {
     margin-top: 0.6em;
   }
-  
+
   .active {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Population</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item"><a class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2>Documents</h2><p>Mongoose <a href="./api.html#document-js">documents</a> represent a one-to-one mapping to documents as stored in MongoDB. Each document is an instance of its <a href="./models.html">Model</a>.</p><h3>Retrieving</h3><p>There are many ways to retrieve documents from MongoDB. We won&#39;t cover that in this section. See the chapter on <a href="./queries.html">querying</a> for detail.</p><h3>Updating</h3><p>There are a number of ways to update documents. We&#39;ll first look at a
-traditional approach using <a href="./api.html#model_Model.findById">findById</a>:</p><pre><code class="javascript">Tank.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>
-  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-  
-  tank.size = <span class="string">'large'</span>;
-  tank.save(<span class="function"><span class="keyword">function</span> <span class="params">(err, updatedTank)</span> {</span>
-    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-    res.send(updatedTank);
-  });
-});</code></pre><p>You can also use <a href="http://mongoosejs.com/docs/api.html#document_Document-set"><code>.set()</code></a>
-to modify documents. Under the hood, <code>tank.size = &#39;large&#39;;</code> becomes <code>tank.set({ size: &#39;large&#39; })</code>.</p><pre><code class="javascript">Tank.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>
-  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-  
-  tank.set({ size: <span class="string">'large'</span> });
-  tank.save(<span class="function"><span class="keyword">function</span> <span class="params">(err, updatedTank)</span> {</span>
-    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-    res.send(updatedTank);
-  });
-});</code></pre><p>This approach involves first retrieving the document from Mongo, then
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Population</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item"><a class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2>Documents</h2><p>Mongoose <a href="./api.html#document-js">documents</a> represent a one-to-one mapping to documents as stored in MongoDB. Each document is an instance of its <a href="./models.html">Model</a>.</p>
+<h3>Retrieving</h3><p>There are many ways to retrieve documents from MongoDB. We won&#39;t cover that in this section. See the chapter on <a href="./queries.html">querying</a> for detail.</p>
+<h3>Updating</h3><p>There are a number of ways to update documents. We&#39;ll first look at a
+traditional approach using <a href="./api.html#model_Model.findById">findById</a>:</p>
+<pre><code class="javascript">Tank.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>\n  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);\n\n  tank.size = <span class="string">'large'</span>;\n  tank.save(<span class="function"><span class="keyword">function</span> <span class="params">(err, updatedTank)</span> {</span>\n    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);\n    res.send(updatedTank);\n  });\n});</code></pre><p>You can also use <a href="http://mongoosejs.com/docs/api.html#document_Document-set"><code>.set()</code></a>
+to modify documents. Under the hood, <code>tank.size = &#39;large&#39;;</code> becomes <code>tank.set({ size: &#39;large&#39; })</code>.</p>
+<pre><code class="javascript">Tank.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>\n  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);\n\n  tank.set({ size: <span class="string">'large'</span> });\n  tank.save(<span class="function"><span class="keyword">function</span> <span class="params">(err, updatedTank)</span> {</span>\n    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);\n    res.send(updatedTank);\n  });\n});</code></pre><p>This approach involves first retrieving the document from Mongo, then
 issuing an update command (triggered by calling <code>save</code>). However, if we
 don&#39;t need the document returned in our application and merely want to
 update a property in the database directly,
-<a href="./api.html#model_Model.update">Model#update</a> is right for us:</p><pre><code class="javascript">Tank.update({ _id: id }, { $set: { size: <span class="string">'large'</span> }}, callback);</code></pre><p>If we do need the document returned in our application there is another, often <a href="./api.html#model_Model.findByIdAndUpdate">better</a>, option:</p><pre><code class="javascript">Tank.findByIdAndUpdate(id, { $set: { size: <span class="string">'large'</span> }}, { <span class="keyword">new</span>: <span class="literal">true</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>
-  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-  res.send(tank);
-});</code></pre><p>The <code>findAndUpdate/Remove</code> static methods all make a change to at most one document, and return it with just one call to the database. There <a href="./api.html#model_Model.findByIdAndRemove">are</a> <a href="./api.html#model_Model.findOneAndUpdate">several</a> <a href="./api.html#model_Model.findOneAndRemove">variations</a> on the <a href="http://www.mongodb.org/display/DOCS/findAndModify+Command">findAndModify</a> theme. Read the <a href="./api.html">API</a> docs for more detail.</p>
-
-<p>_Note that <code>findAndUpdate/Remove</code> do <em>not</em> execute any hooks or validation before making the change in the database. You can use the <a href="/docs/validation.html#update-validators"><code>runValidators</code> option</a> to access a limited subset of document validation. However, if you need hooks and full document validation, first query for the document and then <code>save()</code> it._</p><h3>Validating</h3><p>Documents are validated before they are saved. Read the <a href="./api.html#document_Document-validate">api</a> docs or the <a href="./validation.html">validation</a> chapter for detail.</p><h3>Overwriting</h3><p>You can overwrite an entire document using <code>.set()</code>. This is handy if you
-want to change what document is being saved in <a href="http://mongoosejs.com/docs/middleware.html">middleware</a>.</p><pre><code class="javascript">Tank.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>
-  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
-  <span class="comment">// Now `otherTank` is a copy of `tank`</span>
-  otherTank.set(tank);
-});
-</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Documents</code>, let&#39;s take a look at <a href="/docs/subdocs.html">Sub-documents</a>.</p></div></div><script type="text/javascript">!function(name,path,ctx){
+<a href="./api.html#model_Model.update">Model#update</a> is right for us:</p>
+<pre><code class="javascript">Tank.update({ _id: id }, { $set: { size: <span class="string">'large'</span> }}, callback);</code></pre><p>If we do need the document returned in our application there is another, often <a href="./api.html#model_Model.findByIdAndUpdate">better</a>, option:</p>
+<pre><code class="javascript">Tank.findByIdAndUpdate(id, { $set: { size: <span class="string">'large'</span> }}, { <span class="keyword">new</span>: <span class="literal">true</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>\n  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);\n  res.send(tank);\n});</code></pre><p>The <code>findAndUpdate/Remove</code> static methods all make a change to at most one document, and return it with just one call to the database. There <a href="./api.html#model_Model.findByIdAndRemove">are</a> <a href="./api.html#model_Model.findOneAndUpdate">several</a> <a href="./api.html#model_Model.findOneAndRemove">variations</a> on the <a href="http://www.mongodb.org/display/DOCS/findAndModify+Command">findAndModify</a> theme. Read the <a href="./api.html">API</a> docs for more detail.</p>
+<p><em>Note that <code>findAndUpdate/Remove</code> do <em>not</em> execute any hooks or validation before making the change in the database. You can use the <a href="/docs/validation.html#update-validators"><code>runValidators</code> option</a> to access a limited subset of document validation. However, if you need hooks and full document validation, first query for the document and then <code>save()</code> it.</em></p>
+<h3>Validating</h3><p>Documents are validated before they are saved. Read the <a href="./api.html#document_Document-validate">api</a> docs or the <a href="./validation.html">validation</a> chapter for detail.</p>
+<h3>Overwriting</h3><p>You can overwrite an entire document using <code>.set()</code>. This is handy if you
+want to change what document is being saved in <a href="http://mongoosejs.com/docs/middleware.html">middleware</a>.</p>
+<pre><code class="javascript">Tank.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, tank)</span> {</span>\n  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);\n  <span class="comment">// Now `otherTank` is a copy of `tank`</span>\n  otherTank.set(tank);\n});\n</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Documents</code>, let&#39;s take a look at <a href="/docs/subdocs.html">Sub-documents</a>.</p>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -227,7 +212,7 @@ KeenAsync.ready(function(){
     projectId: '59aad9cbc9e77c0001ce1b32',
     writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
   });
-  
+
   client.recordEvent('pageView', {
     host: window.location.host,
     pathname: window.location.pathname,
@@ -238,12 +223,12 @@ KeenAsync.ready(function(){
       menu     = document.getElementById('menu'),
       menuLink = document.getElementById('menuLink'),
       content  = document.getElementById('content');
-      
+
   function toggleClass(element, className) {
       var classes = element.className.split(/\s+/),
           length = classes.length,
           i = 0;
-          
+
       for(; i < length; i++) {
         if (classes[i] === className) {
           classes.splice(i, 1);
@@ -254,27 +239,27 @@ KeenAsync.ready(function(){
       if (length === classes.length) {
           classes.push(className);
       }
-      
+
       element.className = classes.join(' ');
   }
-  
+
   function toggleAll(e) {
       var active = 'active';
-      
+
       e.preventDefault();
       toggleClass(layout, active);
       toggleClass(menu, active);
       toggleClass(menuLink, active);
   }
-  
+
   menuLink.onclick = function (e) {
       toggleAll(e);
   };
-  
+
   content.onclick = function(e) {
       if (menu.className.indexOf('active') !== -1) {
           toggleAll(e);
       }
   };
-  
+
 }(this, this.document));</script></div></body></html>

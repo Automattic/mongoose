@@ -93,11 +93,11 @@ pre {
     left: 0px;
     margin: auto;
   }
-  
+
   #content {
     margin: 10px;
   }
-  
+
   #menu {
     display: none;
     position: absolute;
@@ -107,23 +107,23 @@ pre {
     border-bottom: 1px solid #ddd;
     left: 0px;
   }
-  
+
   pre {
     margin: 0px;
     margin-top: 10px;
   }
-  
+
   #mobile-menu {
     display: block;
     height: 45px;
     background-color: #eee;
     border-bottom: 1px solid #ddd;
   }
-  
+
   #logo {
     border: 0;
   }
-  
+
   #mobile-logo-container {
     padding: 0;
     border: 0px;
@@ -133,11 +133,11 @@ pre {
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   #logo-container {
     display: none;
   }
-  
+
   .menu-link {
     position: absolute;
     display: block;
@@ -150,17 +150,17 @@ pre {
     height: 3px;
     padding: 2.1em 1.6em;
   }
-  
+
   .menu-link:hover,
   .menu-link:focus {
     background: #ddd;
   }
-  
+
   .menu-link span {
     position: relative;
     display: block;
   }
-  
+
   .menu-link span,
   .menu-link span:before,
   .menu-link span:after {
@@ -168,18 +168,18 @@ pre {
     width: 100%;
     height: 0.2em;
   }
-  
+
   .menu-link span:before,
   .menu-link span:after {
     position: absolute;
     margin-top: -0.6em;
     content: " ";
   }
-  
+
   .menu-link span:after {
     margin-top: 0.6em;
   }
-  
+
   .active {
     display: block !important;
   }
@@ -191,194 +191,87 @@ Mongoose 4.x has 4 types
 of middleware: document middleware, model middleware, aggregate middleware, and query middleware.
 Document middleware is supported for the following document functions.
 In document middleware functions, <code>this</code> refers to the document.</p>
-
-<ul><li><a href="./api.html#document_Document-init">init</a></li><li><a href="./api.html#document_Document-validate">validate</a></li><li><a href="./api.html#model_Model-save">save</a></li><li><a href="./api.html#model_Model-remove">remove</a></li></ul>
-
+<ul>
+<li><a href="./api.html#document_Document-init">init</a></li>
+<li><a href="./api.html#document_Document-validate">validate</a></li>
+<li><a href="./api.html#model_Model-save">save</a></li>
+<li><a href="./api.html#model_Model-remove">remove</a></li>
+</ul>
 <p>Query middleware is supported for the following Model and Query functions.
 In query middleware functions, <code>this</code> refers to the query.</p>
-
-<ul><li><a href="./api.html#query_Query-count">count</a></li><li><a href="./api.html#query_Query-find">find</a></li><li><a href="./api.html#query_Query-findOne">findOne</a></li><li><a href="./api.html#query_Query-findOneAndRemove">findOneAndRemove</a></li><li><a href="./api.html#query_Query-findOneAndUpdate">findOneAndUpdate</a></li><li><a href="./api.html#query_Query-update">update</a></li></ul>
-
+<ul>
+<li><a href="./api.html#query_Query-count">count</a></li>
+<li><a href="./api.html#query_Query-find">find</a></li>
+<li><a href="./api.html#query_Query-findOne">findOne</a></li>
+<li><a href="./api.html#query_Query-findOneAndRemove">findOneAndRemove</a></li>
+<li><a href="./api.html#query_Query-findOneAndUpdate">findOneAndUpdate</a></li>
+<li><a href="./api.html#query_Query-update">update</a></li>
+</ul>
 <p>Aggregate middleware is for <code>MyModel.aggregate()</code>. Aggregate middleware
 executes when you call <code>exec()</code> on an aggregate object.
 In aggregate middleware, <code>this</code> refers to the <a href="http://mongoosejs.com/docs/api.html#model_Model.aggregate">aggregation object</a>.</p>
-
-<ul><li><a href="http://mongoosejs.com/docs/api.html#model_Model.aggregate">aggregate</a></li></ul>
-
+<ul>
+<li><a href="http://mongoosejs.com/docs/api.html#model_Model.aggregate">aggregate</a></li>
+</ul>
 <p>Model middleware is supported for the following model functions.
 In model middleware functions, <code>this</code> refers to the model.</p>
-
-<ul><li><a href="./api.html#model_Model.insertMany">insertMany</a></li></ul>
-
+<ul>
+<li><a href="./api.html#model_Model.insertMany">insertMany</a></li>
+</ul>
 <p>All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.</p>
-
 <p><strong>Note:</strong> There is no query hook for <code>remove()</code>, only for documents.
 If you set a &#39;remove&#39; hook, it will be fired when you call <code>myDoc.remove()</code>,
 not when you call <code>MyModel.remove()</code>.
-<strong>Note:</strong> The <code>create()</code> function fires <code>save()</code> hooks.</p><h3 id="pre">Pre</h3><p>There are two types of <code>pre</code> hooks, serial and parallel.</p><h4 id="serial">Serial</h4><p>Serial middleware functions are executed one after another, when each
-middleware calls <code>next</code>.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
-schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {
-  <span class="comment">// do stuff</span>
-  next();
-});</code></pre><p>The <code>next()</code> call does <strong>not</strong> stop the rest of the code in your middleware function from executing. Use
+<strong>Note:</strong> The <code>create()</code> function fires <code>save()</code> hooks.</p>
+<h3 id="pre">Pre</h3><p>There are two types of <code>pre</code> hooks, serial and parallel.</p>
+<h4 id="serial">Serial</h4><p>Serial middleware functions are executed one after another, when each
+middleware calls <code>next</code>.</p>
+<pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);\nschema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {\n  <span class="comment">// do stuff</span>\n  next();\n});</code></pre><p>The <code>next()</code> call does <strong>not</strong> stop the rest of the code in your middleware function from executing. Use
 <a href="https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm">the early <code>return</code> pattern</a>
-to prevent the rest of your middleware function from running when you call <code>next()</code>.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
-schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {
-  <span class="keyword">if</span> (foo()) {
-    console.log(<span class="string">'calling next!'</span>);
-    <span class="comment">// `return next();` will make sure the rest of this function doesn't run</span>
-    <span class="comment">/*return*/</span> next();
-  }
-  <span class="comment">// Unless you comment out the `return` above, 'after next' will print</span>
-  console.log(<span class="string">'after next'</span>);
-});</code></pre><h4 id="parallel">Parallel</h4><p>Parallel middleware offer more fine-grained flow control.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
-
-<span class="comment">// `true` means this is a parallel middleware. You **must** specify `true`</span>
-<span class="comment">// as the second parameter if you want to use parallel middleware.</span>
-schema.pre(<span class="string">'save'</span>, <span class="literal">true</span>, <span class="keyword">function</span>(next, done) {
-  <span class="comment">// calling next kicks off the next middleware in parallel</span>
-  next();
-  setTimeout(done, <span class="number">100</span>);
-});</code></pre><p>The hooked method, in this case <code>save</code>, will not be executed until <code>done</code> is called by each middleware.</p><h4 id="use-cases">Use Cases</h4><p>Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:<ul><li>complex validation</li><li>removing dependent documents<ul><li>(removing a user removes all his blogposts)</li></ul></li><li>asynchronous defaults</li><li>asynchronous tasks that a certain action triggers<ul><li>triggering custom events</li><li>notifications</li></ul></li></ul></p><h4 id="error-handling">Error handling</h4><p>If any middleware calls <code>next</code> or <code>done</code> with a parameter of type <code>Error</code>,
-the flow is interrupted, and the error is passed to the callback.</p><pre><code class="javascript">schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {
-  <span class="comment">// You **must** do `new Error()`. `next('something went wrong')` will</span>
-  <span class="comment">// **not** work</span>
-  <span class="keyword">var</span> err = <span class="keyword">new</span> Error(<span class="string">'something went wrong'</span>);
-  next(err);
-});
-
-<span class="comment">// later...</span>
-
-myDoc.save(<span class="keyword">function</span>(err) {
-  console.log(err.message) <span class="comment">// something went wrong</span>
-});
-</code></pre><h3 id="post">Post middleware</h3><p><a href="/docs/api.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
+to prevent the rest of your middleware function from running when you call <code>next()</code>.</p>
+<pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);\nschema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {\n  <span class="keyword">if</span> (foo()) {\n    console.log(<span class="string">'calling next!'</span>);\n    <span class="comment">// `return next();` will make sure the rest of this function doesn't run</span>\n    <span class="comment">/*return*/</span> next();\n  }\n  <span class="comment">// Unless you comment out the `return` above, 'after next' will print</span>\n  console.log(<span class="string">'after next'</span>);\n});</code></pre><h4 id="parallel">Parallel</h4><p>Parallel middleware offer more fine-grained flow control.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);\n\n<span class="comment">// `true` means this is a parallel middleware. You **must** specify `true`</span>\n<span class="comment">// as the second parameter if you want to use parallel middleware.</span>\nschema.pre(<span class="string">'save'</span>, <span class="literal">true</span>, <span class="keyword">function</span>(next, done) {\n  <span class="comment">// calling next kicks off the next middleware in parallel</span>\n  next();\n  setTimeout(done, <span class="number">100</span>);\n});</code></pre><p>The hooked method, in this case <code>save</code>, will not be executed until <code>done</code> is called by each middleware.</p>
+<h4 id="use-cases">Use Cases</h4><p>Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:<ul><li>complex validation</li><li>removing dependent documents<ul><li>(removing a user removes all his blogposts)</li></ul></li><li>asynchronous defaults</li><li>asynchronous tasks that a certain action triggers<ul><li>triggering custom events</li><li>notifications</li></ul></li></ul></p><h4 id="error-handling">Error handling</h4><p>If any middleware calls <code>next</code> or <code>done</code> with a parameter of type <code>Error</code>,
+the flow is interrupted, and the error is passed to the callback.</p>
+<pre><code class="javascript">schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>(next) {\n  <span class="comment">// You **must** do `new Error()`. `next('something went wrong')` will</span>\n  <span class="comment">// **not** work</span>\n  <span class="keyword">var</span> err = <span class="keyword">new</span> Error(<span class="string">'something went wrong'</span>);\n  next(err);\n});\n\n<span class="comment">// later...</span>\n\nmyDoc.save(<span class="keyword">function</span>(err) {\n  console.log(err.message) <span class="comment">// something went wrong</span>\n});\n</code></pre><h3 id="post">Post middleware</h3><p><a href="/docs/api.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
 the hooked method and all of its <code>pre</code> middleware have completed.
 <code>post</code> middleware do not directly receive flow control, e.g. no <code>next</code> or
 <code>done</code> callbacks are passed to it. <code>post</code> hooks are a way to register
-traditional event listeners for these methods.</p><pre><code class="javascript">schema.post(<span class="string">'init'</span>, <span class="keyword">function</span>(doc) {
-  console.log(<span class="string">'%s has been initialized from the db'</span>, doc._id);
-});
-schema.post(<span class="string">'validate'</span>, <span class="keyword">function</span>(doc) {
-  console.log(<span class="string">'%s has been validated (but not saved yet)'</span>, doc._id);
-});
-schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc) {
-  console.log(<span class="string">'%s has been saved'</span>, doc._id);
-});
-schema.post(<span class="string">'remove'</span>, <span class="keyword">function</span>(doc) {
-  console.log(<span class="string">'%s has been removed'</span>, doc._id);
-});
-</code></pre><h3 id="post-async">Asynchronous Post Hooks</h3><p>While post middleware doesn&#39;t receive flow control, you can still make
+traditional event listeners for these methods.</p>
+<pre><code class="javascript">schema.post(<span class="string">'init'</span>, <span class="keyword">function</span>(doc) {\n  console.log(<span class="string">'%s has been initialized from the db'</span>, doc._id);\n});\nschema.post(<span class="string">'validate'</span>, <span class="keyword">function</span>(doc) {\n  console.log(<span class="string">'%s has been validated (but not saved yet)'</span>, doc._id);\n});\nschema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc) {\n  console.log(<span class="string">'%s has been saved'</span>, doc._id);\n});\nschema.post(<span class="string">'remove'</span>, <span class="keyword">function</span>(doc) {\n  console.log(<span class="string">'%s has been removed'</span>, doc._id);\n});\n</code></pre><h3 id="post-async">Asynchronous Post Hooks</h3><p>While post middleware doesn&#39;t receive flow control, you can still make
 sure that asynchronous post hooks are executed in a pre-defined order.
 If your post hook function takes at least 2 parameters, mongoose will
 assume the second parameter is a <code>next()</code> function that you will call to
-trigger the next middleware in the sequence.</p><pre><code class="javascript"><span class="comment">// Takes 2 parameters: this is an asynchronous post hook</span>
-schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc, next) {
-  setTimeout(<span class="keyword">function</span>() {
-    console.log(<span class="string">'post1'</span>);
-    <span class="comment">// Kick off the second post hook</span>
-    next();
-  }, <span class="number">10</span>);
-});
-
-<span class="comment">// Will not execute until the first middleware calls `next()`</span>
-schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc, next) {
-  console.log(<span class="string">'post2'</span>);
-  next();
-});
-</code></pre><h3 id="order">Save/Validate Hooks</h3><p>The <code>save()</code> function triggers <code>validate()</code> hooks, because mongoose
+trigger the next middleware in the sequence.</p>
+<pre><code class="javascript"><span class="comment">// Takes 2 parameters: this is an asynchronous post hook</span>\nschema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc, next) {\n  setTimeout(<span class="keyword">function</span>() {\n    console.log(<span class="string">'post1'</span>);\n    <span class="comment">// Kick off the second post hook</span>\n    next();\n  }, <span class="number">10</span>);\n});\n\n<span class="comment">// Will not execute until the first middleware calls `next()`</span>\nschema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(doc, next) {\n  console.log(<span class="string">'post2'</span>);\n  next();\n});\n</code></pre><h3 id="order">Save/Validate Hooks</h3><p>The <code>save()</code> function triggers <code>validate()</code> hooks, because mongoose
 has a built-in <code>pre(&#39;save&#39;)</code> hook that calls <code>validate()</code>. This means
 that all <code>pre(&#39;validate&#39;)</code> and <code>post(&#39;validate&#39;)</code> hooks get called
-<strong>before</strong> any <code>pre(&#39;save&#39;)</code> hooks.</p><pre><code class="javascript">schema.pre(<span class="string">'validate'</span>, <span class="keyword">function</span>() {
-  console.log(<span class="string">'this gets printed first'</span>);
-});
-schema.post(<span class="string">'validate'</span>, <span class="keyword">function</span>() {
-  console.log(<span class="string">'this gets printed second'</span>);
-});
-schema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>() {
-  console.log(<span class="string">'this gets printed third'</span>);
-});
-schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>() {
-  console.log(<span class="string">'this gets printed fourth'</span>);
-});
-</code></pre><h3 id="notes">Notes on findAndUpdate() and Query Middleware</h3><p>Pre and post <code>save()</code> hooks are <strong>not</strong> executed on <code>update()</code>,
+<strong>before</strong> any <code>pre(&#39;save&#39;)</code> hooks.</p>
+<pre><code class="javascript">schema.pre(<span class="string">'validate'</span>, <span class="keyword">function</span>() {\n  console.log(<span class="string">'this gets printed first'</span>);\n});\nschema.post(<span class="string">'validate'</span>, <span class="keyword">function</span>() {\n  console.log(<span class="string">'this gets printed second'</span>);\n});\nschema.pre(<span class="string">'save'</span>, <span class="keyword">function</span>() {\n  console.log(<span class="string">'this gets printed third'</span>);\n});\nschema.post(<span class="string">'save'</span>, <span class="keyword">function</span>() {\n  console.log(<span class="string">'this gets printed fourth'</span>);\n});\n</code></pre><h3 id="notes">Notes on findAndUpdate() and Query Middleware</h3><p>Pre and post <code>save()</code> hooks are <strong>not</strong> executed on <code>update()</code>,
 <code>findOneAndUpdate()</code>, etc. You can see a more detailed discussion why in
 <a href="http://github.com/Automattic/mongoose/issues/964">this GitHub issue</a>.
-Mongoose 4.0 has distinct hooks for these functions.</p><pre><code class="javascript">schema.pre(<span class="string">'find'</span>, <span class="keyword">function</span>() {
-  console.log(<span class="keyword">this</span> <span class="keyword">instanceof</span> mongoose.Query); <span class="comment">// true</span>
-  <span class="keyword">this</span>.start = Date.now();
-});
-
-schema.post(<span class="string">'find'</span>, <span class="keyword">function</span>(result) {
-  console.log(<span class="keyword">this</span> <span class="keyword">instanceof</span> mongoose.Query); <span class="comment">// true</span>
-  <span class="comment">// prints returned documents</span>
-  console.log(<span class="string">'find() returned '</span> + JSON.stringify(result));
-  <span class="comment">// prints number of milliseconds the query took</span>
-  console.log(<span class="string">'find() took '</span> + (Date.now() - <span class="keyword">this</span>.start) + <span class="string">' millis'</span>);
-});
-</code></pre><p>Query middleware differs from document middleware in a subtle but
+Mongoose 4.0 has distinct hooks for these functions.</p>
+<pre><code class="javascript">schema.pre(<span class="string">'find'</span>, <span class="keyword">function</span>() {\n  console.log(<span class="keyword">this</span> <span class="keyword">instanceof</span> mongoose.Query); <span class="comment">// true</span>\n  <span class="keyword">this</span>.start = Date.now();\n});\n\nschema.post(<span class="string">'find'</span>, <span class="keyword">function</span>(result) {\n  console.log(<span class="keyword">this</span> <span class="keyword">instanceof</span> mongoose.Query); <span class="comment">// true</span>\n  <span class="comment">// prints returned documents</span>\n  console.log(<span class="string">'find() returned '</span> + JSON.stringify(result));\n  <span class="comment">// prints number of milliseconds the query took</span>\n  console.log(<span class="string">'find() took '</span> + (Date.now() - <span class="keyword">this</span>.start) + <span class="string">' millis'</span>);\n});\n</code></pre><p>Query middleware differs from document middleware in a subtle but
 important way: in document middleware, <code>this</code> refers to the document
 being updated. In query middleware, mongoose doesn&#39;t necessarily have
 a reference to the document being updated, so <code>this</code> refers to the
 <strong>query</strong> object rather than the document being updated.</p>
-
 <p>For instance, if you wanted to add an <code>updatedAt</code> timestamp to every
-<code>update()</code> call, you would use the following pre hook.</p><pre><code class="javascript">schema.pre(<span class="string">'update'</span>, <span class="keyword">function</span>() {
-  <span class="keyword">this</span>.update({},{ $set: { updatedAt: <span class="keyword">new</span> Date() } });
-});
-</code></pre><h3 id="error-handling">Error Handling Middleware</h3><p><em>New in 4.5.0</em></p>
-
+<code>update()</code> call, you would use the following pre hook.</p>
+<pre><code class="javascript">schema.pre(<span class="string">'update'</span>, <span class="keyword">function</span>() {\n  <span class="keyword">this</span>.update({},{ $set: { updatedAt: <span class="keyword">new</span> Date() } });\n});\n</code></pre><h3 id="error-handling">Error Handling Middleware</h3><p><em>New in 4.5.0</em></p>
 <p>Middleware execution normally stops the first time a piece of middleware
 calls <code>next()</code> with an error. However, there is a special kind of post
 middleware called &quot;error handling middleware&quot; that executes specifically
 when an error occurs.</p>
-
 <p>Error handling middleware is defined as middleware that takes one extra
 parameter: the &#39;error&#39; that occurred as the first parameter to the function.
-Error handling middleware can then transform the error however you want.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({
-  name: {
-    type: String,
-    <span class="comment">// Will trigger a MongoError with code 11000 when</span>
-    <span class="comment">// you save a duplicate</span>
-    unique: <span class="literal">true</span>
-  }
-});
-
-<span class="comment">// Handler **must** take 3 parameters: the error that occurred, the document</span>
-<span class="comment">// in question, and the `next()` function</span>
-schema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(error, doc, next) {
-  <span class="keyword">if</span> (error.name === <span class="string">'MongoError'</span> &amp;&amp; error.code === <span class="number">11000</span>) {
-    next(<span class="keyword">new</span> Error(<span class="string">'There was a duplicate key error'</span>));
-  } <span class="keyword">else</span> {
-    next(error);
-  }
-});
-
-<span class="comment">// Will trigger the `post('save')` error handler</span>
-Person.create([{ name: <span class="string">'Axl Rose'</span> }, { name: <span class="string">'Axl Rose'</span> }]);
-</code></pre><p>Error handling middleware also works with query middleware. You can
+Error handling middleware can then transform the error however you want.</p>
+<pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({\n  name: {\n    type: String,\n    <span class="comment">// Will trigger a MongoError with code 11000 when</span>\n    <span class="comment">// you save a duplicate</span>\n    unique: <span class="literal">true</span>\n  }\n});\n\n<span class="comment">// Handler **must** take 3 parameters: the error that occurred, the document</span>\n<span class="comment">// in question, and the `next()` function</span>\nschema.post(<span class="string">'save'</span>, <span class="keyword">function</span>(error, doc, next) {\n  <span class="keyword">if</span> (error.name === <span class="string">'MongoError'</span> &amp;&amp; error.code === <span class="number">11000</span>) {\n    next(<span class="keyword">new</span> Error(<span class="string">'There was a duplicate key error'</span>));\n  } <span class="keyword">else</span> {\n    next(error);\n  }\n});\n\n<span class="comment">// Will trigger the `post('save')` error handler</span>\nPerson.create([{ name: <span class="string">'Axl Rose'</span> }, { name: <span class="string">'Axl Rose'</span> }]);\n</code></pre><p>Error handling middleware also works with query middleware. You can
 also define a post <code>update()</code> hook that will catch MongoDB duplicate key
-errors.</p><pre><code class="javascript"><span class="comment">// The same E11000 error can occur when you call `update()`</span>
-<span class="comment">// This function **must** take 3 parameters. If you use the</span>
-<span class="comment">// `passRawResult` function, this function **must** take 4</span>
-<span class="comment">// parameters</span>
-schema.post(<span class="string">'update'</span>, <span class="keyword">function</span>(error, res, next) {
-  <span class="keyword">if</span> (error.name === <span class="string">'MongoError'</span> &amp;&amp; error.code === <span class="number">11000</span>) {
-    next(<span class="keyword">new</span> Error(<span class="string">'There was a duplicate key error'</span>));
-  } <span class="keyword">else</span> {
-    next(error);
-  }
-});
-
-<span class="keyword">var</span> people = [{ name: <span class="string">'Axl Rose'</span> }, { name: <span class="string">'Slash'</span> }];
-Person.create(people, <span class="keyword">function</span>(error) {
-  Person.update({ name: <span class="string">'Slash'</span> }, { $set: { name: <span class="string">'Axl Rose'</span> } }, <span class="keyword">function</span>(error) {
-    <span class="comment">// `error.message` will be "There was a duplicate key error"</span>
-  });
-});
-</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered middleware, let&#39;s take a look at Mongoose&#39;s approach
-to faking JOINs with its query <a href="/docs/populate.html">population</a> helper.</p></div></div><script type="text/javascript">!function(name,path,ctx){
+errors.</p>
+<pre><code class="javascript"><span class="comment">// The same E11000 error can occur when you call `update()`</span>\n<span class="comment">// This function **must** take 3 parameters. If you use the</span>\n<span class="comment">// `passRawResult` function, this function **must** take 4</span>\n<span class="comment">// parameters</span>\nschema.post(<span class="string">'update'</span>, <span class="keyword">function</span>(error, res, next) {\n  <span class="keyword">if</span> (error.name === <span class="string">'MongoError'</span> &amp;&amp; error.code === <span class="number">11000</span>) {\n    next(<span class="keyword">new</span> Error(<span class="string">'There was a duplicate key error'</span>));\n  } <span class="keyword">else</span> {\n    next(error);\n  }\n});\n\n<span class="keyword">var</span> people = [{ name: <span class="string">'Axl Rose'</span> }, { name: <span class="string">'Slash'</span> }];\nPerson.create(people, <span class="keyword">function</span>(error) {\n  Person.update({ name: <span class="string">'Slash'</span> }, { $set: { name: <span class="string">'Axl Rose'</span> } }, <span class="keyword">function</span>(error) {\n    <span class="comment">// `error.message` will be "There was a duplicate key error"</span>\n  });\n});\n</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered middleware, let&#39;s take a look at Mongoose&#39;s approach
+to faking JOINs with its query <a href="/docs/populate.html">population</a> helper.</p>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -388,7 +281,7 @@ KeenAsync.ready(function(){
     projectId: '59aad9cbc9e77c0001ce1b32',
     writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
   });
-  
+
   client.recordEvent('pageView', {
     host: window.location.host,
     pathname: window.location.pathname,
@@ -399,12 +292,12 @@ KeenAsync.ready(function(){
       menu     = document.getElementById('menu'),
       menuLink = document.getElementById('menuLink'),
       content  = document.getElementById('content');
-      
+
   function toggleClass(element, className) {
       var classes = element.className.split(/\s+/),
           length = classes.length,
           i = 0;
-          
+
       for(; i < length; i++) {
         if (classes[i] === className) {
           classes.splice(i, 1);
@@ -415,27 +308,27 @@ KeenAsync.ready(function(){
       if (length === classes.length) {
           classes.push(className);
       }
-      
+
       element.className = classes.join(' ');
   }
-  
+
   function toggleAll(e) {
       var active = 'active';
-      
+
       e.preventDefault();
       toggleClass(layout, active);
       toggleClass(menu, active);
       toggleClass(menuLink, active);
   }
-  
+
   menuLink.onclick = function (e) {
       toggleAll(e);
   };
-  
+
   content.onclick = function(e) {
       if (menu.className.indexOf('active') !== -1) {
           toggleAll(e);
       }
   };
-  
+
 }(this, this.document));</script></div></body></html>

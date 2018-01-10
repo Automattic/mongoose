@@ -93,11 +93,11 @@ pre {
     left: 0px;
     margin: auto;
   }
-  
+
   #content {
     margin: 10px;
   }
-  
+
   #menu {
     display: none;
     position: absolute;
@@ -107,23 +107,23 @@ pre {
     border-bottom: 1px solid #ddd;
     left: 0px;
   }
-  
+
   pre {
     margin: 0px;
     margin-top: 10px;
   }
-  
+
   #mobile-menu {
     display: block;
     height: 45px;
     background-color: #eee;
     border-bottom: 1px solid #ddd;
   }
-  
+
   #logo {
     border: 0;
   }
-  
+
   #mobile-logo-container {
     padding: 0;
     border: 0px;
@@ -133,11 +133,11 @@ pre {
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   #logo-container {
     display: none;
   }
-  
+
   .menu-link {
     position: absolute;
     display: block;
@@ -150,17 +150,17 @@ pre {
     height: 3px;
     padding: 2.1em 1.6em;
   }
-  
+
   .menu-link:hover,
   .menu-link:focus {
     background: #ddd;
   }
-  
+
   .menu-link span {
     position: relative;
     display: block;
   }
-  
+
   .menu-link span,
   .menu-link span:before,
   .menu-link span:after {
@@ -168,18 +168,18 @@ pre {
     width: 100%;
     height: 0.2em;
   }
-  
+
   .menu-link span:before,
   .menu-link span:after {
     position: absolute;
     margin-top: -0.6em;
     content: " ";
   }
-  
+
   .menu-link span:after {
     margin-top: 0.6em;
   }
-  
+
   .active {
     display: block !important;
   }
@@ -187,7 +187,8 @@ pre {
 </style><style>table td {
   padding-right: 15px;
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Population</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item"><a class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2>Migrating from 3.x to 4.x</h2><p>There are several <a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">backwards-breaking changes</a> to be aware of when migrating from Mongoose 3 to Mongoose 4.</p><h3 id="findandmodify-new">`findOneAndUpdate()` new field is now `false` by default</h3><p>Mongoose&#39;s <code>findOneAndUpdate()</code>, <code>findOneAndRemove()</code>,
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Population</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item"><a class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2>Migrating from 3.x to 4.x</h2><p>There are several <a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">backwards-breaking changes</a> to be aware of when migrating from Mongoose 3 to Mongoose 4.</p>
+<h3 id="findandmodify-new">`findOneAndUpdate()` new field is now `false` by default</h3><p>Mongoose&#39;s <code>findOneAndUpdate()</code>, <code>findOneAndRemove()</code>,
 <code>findByIdAndUpdate()</code>, and <code>findByIdAndRemove()</code> functions are just
 wrappers around MongoDB&#39;s
 <a href="http://docs.mongodb.org/manual/reference/method/db.collection.findAndModify/"><code>findAndModify</code> command</a>.
@@ -197,11 +198,14 @@ more consistent with the MongoDB server&#39;s documentation, mongoose will
 use false by default. That is,
 <code>findOneAndUpdate({}, { $set: { test: 1 } }, callback);</code> will return the
 document as it was <em>before</em> the <code>$set</code> operation was applied.</p>
-
-<p>To return the document with modifications made on the update, use the <code>new: true</code> option.</p><pre><code class="javascript">MyModel.findOneAndUpdate({}, { $set: { test: <span class="number">1</span> } }, { <span class="keyword">new</span>: <span class="literal">true</span> }, callback);
-</code></pre><h3>CastError and ValidationError now use `kind` instead of `type` to report error types</h3><p>In Mongoose 3, CastError and ValidationError had a <code>type</code> field. For instance, user defined validation errors would have a <code>type</code> property that contained the string &#39;user defined&#39;. In Mongoose 4, this property has been renamed to <code>kind</code> due to <a href="https://code.google.com/p/v8/issues/detail?id=2397">the V8 JavaScript engine using the Error.type property internally</a>.</p><h3 id="promises">Query now has a `.then()` function</h3><p>In mongoose 3, you needed to call <code>.exec()</code> on a query chain to get a promise back, like <code>MyModel.find().exec().then();</code>. Mongoose 4 queries are promises, so you can do <code>MyModel.find().then()</code> instead. Be careful if you&#39;re using functions like <a href="https://github.com/kriskowal/q#adapting-node">q&#39;s <code>Q.ninvoke()</code></a> or otherwise returning a mongoose query from a promise.</p><h3 id="moreinfo">More Info</h3><p>Related blog posts:</p>
-
-<ul><li><a href="http://www.mongodb.com/blog/post/introducing-version-40-mongoose-nodejs-odm">Introducting Version 4.0 of the Mongoose NodeJS ODM</a></li></ul></div></div><script type="text/javascript">!function(name,path,ctx){
+<p>To return the document with modifications made on the update, use the <code>new: true</code> option.</p>
+<pre><code class="javascript">MyModel.findOneAndUpdate({}, { $set: { test: <span class="number">1</span> } }, { <span class="keyword">new</span>: <span class="literal">true</span> }, callback);\n</code></pre><h3>CastError and ValidationError now use `kind` instead of `type` to report error types</h3><p>In Mongoose 3, CastError and ValidationError had a <code>type</code> field. For instance, user defined validation errors would have a <code>type</code> property that contained the string &#39;user defined&#39;. In Mongoose 4, this property has been renamed to <code>kind</code> due to <a href="https://code.google.com/p/v8/issues/detail?id=2397">the V8 JavaScript engine using the Error.type property internally</a>.</p>
+<h3 id="promises">Query now has a `.then()` function</h3><p>In mongoose 3, you needed to call <code>.exec()</code> on a query chain to get a promise back, like <code>MyModel.find().exec().then();</code>. Mongoose 4 queries are promises, so you can do <code>MyModel.find().then()</code> instead. Be careful if you&#39;re using functions like <a href="https://github.com/kriskowal/q#adapting-node">q&#39;s <code>Q.ninvoke()</code></a> or otherwise returning a mongoose query from a promise.</p>
+<h3 id="moreinfo">More Info</h3><p>Related blog posts:</p>
+<ul>
+<li><a href="http://www.mongodb.com/blog/post/introducing-version-40-mongoose-nodejs-odm">Introducting Version 4.0 of the Mongoose NodeJS ODM</a></li>
+</ul>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -211,7 +215,7 @@ KeenAsync.ready(function(){
     projectId: '59aad9cbc9e77c0001ce1b32',
     writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
   });
-  
+
   client.recordEvent('pageView', {
     host: window.location.host,
     pathname: window.location.pathname,
@@ -222,12 +226,12 @@ KeenAsync.ready(function(){
       menu     = document.getElementById('menu'),
       menuLink = document.getElementById('menuLink'),
       content  = document.getElementById('content');
-      
+
   function toggleClass(element, className) {
       var classes = element.className.split(/\s+/),
           length = classes.length,
           i = 0;
-          
+
       for(; i < length; i++) {
         if (classes[i] === className) {
           classes.splice(i, 1);
@@ -238,27 +242,27 @@ KeenAsync.ready(function(){
       if (length === classes.length) {
           classes.push(className);
       }
-      
+
       element.className = classes.join(' ');
   }
-  
+
   function toggleAll(e) {
       var active = 'active';
-      
+
       e.preventDefault();
       toggleClass(layout, active);
       toggleClass(menu, active);
       toggleClass(menuLink, active);
   }
-  
+
   menuLink.onclick = function (e) {
       toggleAll(e);
   };
-  
+
   content.onclick = function(e) {
       if (menu.className.indexOf('active') !== -1) {
           toggleAll(e);
       }
   };
-  
+
 }(this, this.document));</script></div></body></html>

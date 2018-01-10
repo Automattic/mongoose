@@ -1,16 +1,15 @@
-
-var fs = require('fs')
-var jade = require('jade')
-var package = require('./package')
-var linktype = require('./docs/helpers/linktype')
-var href = require('./docs/helpers/href')
-var klass = require('./docs/helpers/klass')
+const fs = require('fs');
+const jade = require('jade');
+const package = require('./package');
+const linktype = require('./docs/helpers/linktype');
+const href = require('./docs/helpers/href');
+const klass = require('./docs/helpers/klass');
 
 // clean up version for ui
 package.version = package.version.replace(/-pre$/, '');
 
-var filemap = require('./docs/source');
-var files = Object.keys(filemap);
+const filemap = require('./docs/source');
+const files = Object.keys(filemap);
 
 files.forEach(function (file) {
   var filename = __dirname + '/' + file;

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Connecting to MongoDB v4.13.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="http://thecodebarbarian.com/style/github.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>html {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v4.13.9: Connecting to MongoDB</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="http://thecodebarbarian.com/style/github.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>html {
   font-family: 'Open Sans';
 }
 
@@ -200,25 +200,55 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Connections</h2><p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost/myapp'</span>);\n</code></pre><p>This is the minimum needed to connect the <code>myapp</code> database running locally
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Connections</h2>
+
+<p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p>
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://localhost/myapp&#39;);
+</code></pre>
+<p>This is the minimum needed to connect the <code>myapp</code> database running locally
 on the default port (27017). If the local connection fails then try using
 127.0.0.1 instead of localhost. Sometimes issues may arise when the local
 hostname has been changed.</p>
 <p>You can also specify several more parameters in the <code>uri</code>:</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://username:password@host:port/database?options...'</span>);\n</code></pre><p>See the <a href="http://docs.mongodb.org/manual/reference/connection-string/">mongodb connection string spec</a> for more detail.</p>
-<h3 id="buffering">Operation Buffering</h3><p>Mongoose lets you start using your models immediately, without waiting for
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://username:password@host:port/database?options...&#39;);
+</code></pre>
+<p>See the <a href="http://docs.mongodb.org/manual/reference/connection-string/">mongodb connection string spec</a> for more detail.</p>
+<h3 id="buffering">Operation Buffering</h3>
+
+<p>Mongoose lets you start using your models immediately, without waiting for
 mongoose to establish a connection to MongoDB.</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost/myapp'</span>);\n<span class="hljs-keyword">var</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));\n<span class="hljs-comment">// Works</span>\nMyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });\n</code></pre><p>That&#39;s because mongoose buffers model function calls internally. This
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://localhost/myapp&#39;);
+var MyModel = mongoose.model(&#39;Test&#39;, new Schema({ name: String }));
+// Works
+MyModel.findOne(function(error, result) { /* ... */ });
+</code></pre>
+<p>That&#39;s because mongoose buffers model function calls internally. This
 buffering is convenient, but also a common source of confusion. Mongoose
 will <em>not</em> throw any errors by default if you use a model without
 connecting.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));\n<span class="hljs-comment">// Will just hang until mongoose successfully connects</span>\nMyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });\n\nsetTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{\n  mongoose.connect(<span class="hljs-string">'mongodb://localhost/myapp'</span>);\n}, <span class="hljs-number">60000</span>);\n</code></pre><p>To disable buffering, turn off the <a href="http://mongoosejs.com/docs/guide.html#bufferCommands"><code>bufferCommands</code> option on your schema</a>.
+<pre><code class="lang-javascript">var MyModel = mongoose.model(&#39;Test&#39;, new Schema({ name: String }));
+// Will just hang until mongoose successfully connects
+MyModel.findOne(function(error, result) { /* ... */ });
+
+setTimeout(function() {
+  mongoose.connect(&#39;mongodb://localhost/myapp&#39;);
+}, 60000);
+</code></pre>
+<p>To disable buffering, turn off the <a href="http://mongoosejs.com/docs/guide.html#bufferCommands"><code>bufferCommands</code> option on your schema</a>.
 If you have <code>bufferCommands</code> on and your connection is hanging, try turning
-<code>bufferCommands</code> off to see if you haven&#39;t opened a connection properly.</p>
-<h3 id="options">Options</h3><p>The <code>connect</code> method also accepts an <code>options</code> object which will be passed on to the underlying MongoDB driver.</p>
-<pre><code class="javascript">mongoose.connect(uri, options);\n</code></pre><p>A full list of options can be found on the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect">MongoDB Node.js driver docs for <code>connect()</code></a>.
-Mongoose passes options to the driver without modification, modulo three exceptions that are explained below.</p>
+<code>bufferCommands</code> off to see if you haven&#39;t opened a connection properly.
+You can also disable <code>bufferCommands</code> globally:</p>
+<pre><code class="lang-javascript">mongoose.set(&#39;bufferCommands&#39;, false);
+</code></pre>
+<h3 id="options">Options</h3>
+
+<p>The <code>connect</code> method also accepts an <code>options</code> object which will be passed
+on to the underlying MongoDB driver.</p>
+<pre><code class="lang-javascript">mongoose.connect(uri, options);
+</code></pre>
+<p>A full list of options can be found on the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect">MongoDB Node.js driver docs for <code>connect()</code></a>.
+Mongoose passes options to the driver without modification, modulo three
+exceptions that are explained below.</p>
 <ul>
 <li><code>bufferCommands</code>    - This is a mongoose-specific option (not passed to the MongoDB driver) that disables <a href="http://mongoosejs.com/docs/faq.html#callback_never_executes">mongoose&#39;s buffering mechanism</a></li>
 <li><code>user</code>/<code>pass</code>       - The username and password for authentication. These options are mongoose-specific, they are equivalent to the MongoDB driver&#39;s <code>auth.user</code> and <code>auth.password</code> options.</li>
@@ -234,49 +264,151 @@ Mongoose passes options to the driver without modification, modulo three excepti
 <li><code>bufferMaxEntries</code>  - The MongoDB driver also has its own buffering mechanism that kicks in when the driver is disconnected. Set this option to 0 and set <code>bufferCommands</code> to <code>false</code> on your schemas if you want your database operations to fail immediately when the driver is not connected, as opposed to waiting for reconnection.</li>
 </ul>
 <p>Example:</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> options = {\n  useMongoClient: <span class="hljs-literal">true</span>,\n  autoIndex: <span class="hljs-literal">false</span>, <span class="hljs-comment">// Don't build indexes</span>\n  reconnectTries: <span class="hljs-built_in">Number</span>.MAX_VALUE, <span class="hljs-comment">// Never stop trying to reconnect</span>\n  reconnectInterval: <span class="hljs-number">500</span>, <span class="hljs-comment">// Reconnect every 500ms</span>\n  poolSize: <span class="hljs-number">10</span>, <span class="hljs-comment">// Maintain up to 10 socket connections</span>\n  <span class="hljs-comment">// If not connected, return errors immediately rather than waiting for reconnect</span>\n  bufferMaxEntries: <span class="hljs-number">0</span>\n};\nmongoose.connect(uri, options);\n</code></pre><h3 id="callback">Callback</h3><p>The <code>connect()</code> function also accepts a callback parameter and returns a <a href="http://mongoosejs.com/docs/promises.html">promise</a>.</p>
-<pre><code class="javascript">mongoose.connect(uri, options, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{\n  <span class="hljs-comment">// Check error in initial connection. There is no 2nd param to the callback.</span>\n});\n\n<span class="hljs-comment">// Or using promises</span>\nmongoose.connect(uri, options).then(\n  () =&gt; { <span class="hljs-comment">/** ready to use. The `mongoose.connect()` promise resolves to undefined. */</span> },\n  err =&gt; { <span class="hljs-comment">/** handle initial connection error */</span> }\n);\n</code></pre><h4 id="connection-string-options">Connection String Options</h4><p>You can also specify options in your connection string as <a href="https://en.wikipedia.org/wiki/Query_string">parameters in the query string</a> portion of the URI.</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test?connectTimeoutMS=1000'</span>, { useMongoClient: <span class="hljs-literal">true</span> });\n<span class="hljs-comment">// The above is equivalent to:</span>\nmongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>, {\n  useMongoClient: <span class="hljs-literal">true</span>,\n  connectTimeoutMS: <span class="hljs-number">1000</span>\n});</code></pre><p>The disadvantage of putting options in the query string is that query
+<pre><code class="lang-javascript">const options = {
+  useMongoClient: true,
+  autoIndex: false, // Don&#39;t build indexes
+  reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+  reconnectInterval: 500, // Reconnect every 500ms
+  poolSize: 10, // Maintain up to 10 socket connections
+  // If not connected, return errors immediately rather than waiting for reconnect
+  bufferMaxEntries: 0
+};
+mongoose.connect(uri, options);
+</code></pre>
+<h3 id="callback">Callback</h3>
+
+<p>The <code>connect()</code> function also accepts a callback parameter and returns a
+<a href="http://mongoosejs.com/docs/promises.html">promise</a>.</p>
+<pre><code class="lang-javascript">mongoose.connect(uri, options, function(error) {
+  // Check error in initial connection. There is no 2nd param to the callback.
+});
+
+// Or using promises
+mongoose.connect(uri, options).then(
+  () =&gt; { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
+  err =&gt; { /** handle initial connection error */ }
+);
+</code></pre>
+<h4 id="connection-string-options">Connection String Options</h4>
+
+<p>You can also specify driver options in your connection string as
+<a href="https://en.wikipedia.org/wiki/Query_string">parameters in the query string</a>
+portion of the URI. This only applies to options passed to the MongoDB
+driver. You <strong>can&#39;t</strong> set Mongoose-specific options like <code>bufferCommands</code>
+in the query string.</p>
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://localhost:27017/test?connectTimeoutMS=1000&amp;bufferCommands=false&#39;);
+// The above is equivalent to:
+mongoose.connect(&#39;mongodb://localhost:27017/test&#39;, {
+  connectTimeoutMS: 1000
+  // Note that mongoose will **not** pull `bufferCommands` from the query string
+});
+</code></pre>
+<p>The disadvantage of putting options in the query string is that query
 string options are harder to read. The advantage is that you only need a
 single configuration option, the URI, rather than separate options for
 <code>socketTimeoutMS</code>, <code>connectTimeoutMS</code>, etc. Best practice is to put options
 that likely differ between development and production, like <code>replicaSet</code>
 or <code>ssl</code>, in the connection string, and options that should remain constant,
 like <code>connectTimeoutMS</code> or <code>poolSize</code>, in the options object.</p>
-<p>The MongoDB docs have a full list of <a href="https://docs.mongodb.com/manual/reference/connection-string/">supported connection string options</a></p>
-<h4 id="keepAlive">A note about keepAlive</h4><div class="important"><p>For long running applications, it is often prudent to enable <code>keepAlive</code>
+<p>The MongoDB docs have a full list of
+<a href="https://docs.mongodb.com/manual/reference/connection-string/">supported connection string options</a></p>
+<h4 id="keepAlive">A note about keepAlive</h4>
+
+<p>For long running applications, it is often prudent to enable <code>keepAlive</code>
 with a number of milliseconds. Without it, after some period of time
 you may start to see <code>&quot;connection closed&quot;</code> errors for what seems like
 no reason. If so, after
 <a href="http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html">reading this</a>,
 you may decide to enable <code>keepAlive</code>:</p>
-</div><pre><code class="javascript">options.server.socketOptions = options.replset.socketOptions = { keepAlive: <span class="hljs-number">120</span> };\nmongoose.connect(uri, options);\n</code></pre><h3 id="replicaset_connections">Replica Set Connections</h3><p>To connect to a replica set you pass a comma delimited list of hosts to
+<pre><code class="lang-javascript">mongoose.connect(uri, { keepAlive: 120 });
+</code></pre>
+<h3 id="replicaset_connections">Replica Set Connections</h3>
+
+<p>To connect to a replica set you pass a comma delimited list of hosts to
 connect to rather than a single host.</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]'</span> [, options]);\n</code></pre><p>To connect to a single node replica set, specify the <code>replicaSet</code> option.</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://host1:port1/?replicaSet=rsName'</span>);\n</code></pre><h3 id="mongos_connections">Multi-mongos support</h3><p>High availability over multiple <code>mongos</code> instances is also supported. Pass a connection string for your <code>mongos</code> instances and set the <code>mongos</code> option to true:</p>
-<pre><code class="javascript">mongoose.connect(<span class="hljs-string">'mongodb://mongosA:27501,mongosB:27501'</span>, { mongos: <span class="hljs-literal">true</span> }, cb);\n</code></pre><h3 id="multiple_connections">Multiple connections</h3><p>So far we&#39;ve seen how to connect to MongoDB using Mongoose&#39;s default connection. At times we may need multiple connections open to Mongo, each with different read/write settings, or maybe just to different databases for example. In these cases we can utilize <code>mongoose.createConnection()</code> which accepts all the arguments already discussed and returns a fresh connection for you.</p>
-<pre><code class="javascript"><span class="hljs-keyword">var</span> conn = mongoose.createConnection(<span class="hljs-string">'mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]'</span>, options);\n</code></pre><p>This <a href="./api.html#connection_Connection">connection</a> object is then used to
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]&#39; [, options]);
+</code></pre>
+<p>To connect to a single node replica set, specify the <code>replicaSet</code> option.</p>
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://host1:port1/?replicaSet=rsName&#39;);
+</code></pre>
+<h3 id="mongos_connections">Multi-mongos support</h3>
+
+<p>High availability over multiple <code>mongos</code> instances is also supported.
+Pass a connection string for your <code>mongos</code> instances and set the <code>mongos</code>
+option to <code>true</code>:</p>
+<pre><code class="lang-javascript">mongoose.connect(&#39;mongodb://mongosA:27501,mongosB:27501&#39;, { mongos: true }, cb);
+</code></pre>
+<h3 id="multiple_connections">Multiple connections</h3>
+
+<p>So far we&#39;ve seen how to connect to MongoDB using Mongoose&#39;s default
+connection. At times we may need multiple connections open to Mongo, each
+with different read/write settings, or maybe just to different databases for
+example. In these cases we can utilize <code>mongoose.createConnection()</code> which
+accepts all the arguments already discussed and returns a fresh connection
+for you.</p>
+<pre><code class="lang-javascript">const conn = mongoose.createConnection(&#39;mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]&#39;, options);
+</code></pre>
+<p>This <a href="./api.html#connection_Connection">connection</a> object is then used to
 create and retrieve <a href="./api.html#model_Model">models</a>. Models are
 <strong>always</strong> scoped to a single connection.</p>
-<h3 id="connection_pools">Connection pools</h3><p>Each <code>connection</code>, whether created with <code>mongoose.connect</code> or <code>mongoose.createConnection</code> are all backed by an internal configurable connection pool defaulting to a maximum size of 5. Adjust the pool size using your connection options:</p>
-<pre><code class="javascript"><span class="hljs-comment">// single server</span>\n<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://localhost/test'</span>;\nmongoose.createConnection(uri, { server: { poolSize: <span class="hljs-number">4</span> }});\n\n<span class="hljs-comment">// for a replica set</span>\nmongoose.createConnection(uri, { replset: { poolSize: <span class="hljs-number">4</span> }});\n\n<span class="hljs-comment">// passing the option in the URI works with single or replica sets</span>\n<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://localhost/test?poolSize=4'</span>;\nmongoose.createConnection(uri);\n</code></pre><h3 id="use-mongo-client">The `useMongoClient` Option</h3><p>Mongoose&#39;s default connection logic is deprecated as of 4.11.0. Please opt
-in to the new connection logic using the <code>useMongoClient</code> option, but
-make sure you test your connections first if you&#39;re upgrading an existing
-codebase!</p>
-<pre><code class="javascript"><span class="hljs-comment">// Using `mongoose.connect`...</span>\n<span class="hljs-keyword">var</span> promise = mongoose.connect(<span class="hljs-string">'mongodb://localhost/myapp'</span>, {\n  useMongoClient: <span class="hljs-literal">true</span>,\n  <span class="hljs-comment">/* other options */</span>\n});\n<span class="hljs-comment">// Or `createConnection`</span>\n<span class="hljs-keyword">var</span> promise = mongoose.createConnection(<span class="hljs-string">'mongodb://localhost/myapp'</span>, {\n  useMongoClient: <span class="hljs-literal">true</span>,\n  <span class="hljs-comment">/* other options */</span>\n});\npromise.then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">db</span>) </span>{\n  <span class="hljs-comment">/* Use `db`, for instance `db.model()`\n});\n// Or, if you already have a connection\nconnection.openUri('mongodb://localhost/myapp', { <span class="hljs-comment">/* options */</span> });</span></code></pre><p>The parameters to <code>openUri()</code> are passed transparently to the
-<a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect">underlying MongoDB driver&#39;s <code>MongoClient.connect()</code> function</a>.
-Please see the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html#connect">driver documentation for this function</a> for options.
-The same is true for <code>connect()</code> and <code>createConnection()</code> if <code>useMongoClient</code> is <code>true</code>.</p>
-<p>You may see the following deprecation warning with <code>useMongoClient</code>:</p>
+<p>Mongoose creates a <em>default connection</em> when you call <code>mongoose.connect()</code>.
+You can access the default connection using <code>mongoose.connection</code>.</p>
+<h3 id="connection_pools">Connection pools</h3>
+
+<p>Each <code>connection</code>, whether created with <code>mongoose.connect</code> or
+<code>mongoose.createConnection</code> are all backed by an internal configurable
+connection pool defaulting to a maximum size of 5. Adjust the pool size
+using your connection options:</p>
+<pre><code class="lang-javascript">// With object options
+mongoose.createConnection(uri, { poolSize: 4 });
+
+const uri = &#39;mongodb://localhost/test?poolSize=4&#39;;
+mongoose.createConnection(uri);
+</code></pre>
+<h3>Option Changes in v5.x</h3>
+
+<p>You may see the following deprecation warning if upgrading from 4.x to 5.x
+and you didn&#39;t use the <code>useMongoClient</code> option in 4.x:</p>
 <pre><code>the server/replset/mongos options are deprecated, all their options are supported at the top level of the options object
-</code></pre><p>In older version of the MongoDB driver you had to specify distinct options for server connections, replica set connections, and mongos connections:</p>
-<pre><code class="javascript">mongoose.connect(myUri, {\n  server: {\n    socketOptions: {\n      socketTimeoutMS: <span class="hljs-number">0</span>,\n      keepAlive: <span class="hljs-literal">true</span>\n    },\n    reconnectTries: <span class="hljs-number">30</span>\n  },\n  replset: {\n    socketOptions: {\n      socketTimeoutMS: <span class="hljs-number">0</span>,\n      keepAlive: <span class="hljs-literal">true</span>\n    },\n    reconnectTries: <span class="hljs-number">30</span>\n  },\n  mongos: {\n    socketOptions: {\n      socketTimeoutMS: <span class="hljs-number">0</span>,\n      keepAlive: <span class="hljs-literal">true</span>\n    },\n    reconnectTries: <span class="hljs-number">30</span>\n  }\n});</code></pre><p>With <code>useMongoClient</code> you can instead declare these options at the top level, without all that extra nesting. <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html">Here&#39;s the list of all supported options</a>.</p>
-<pre><code class="javascript"><span class="hljs-comment">// Equivalent to the above code</span>\nmongoose.connect(myUri, {\n  socketTimeoutMS: <span class="hljs-number">0</span>,\n  keepAlive: <span class="hljs-literal">true</span>,\n  reconnectTries: <span class="hljs-number">30</span>\n});\n</code></pre><p>This deprecation is because the <a href="https://www.npmjs.com/package/mongodb">MongoDB driver</a>
-has deprecated an API that is critical to mongoose&#39;s connection logic to
-support MongoDB 3.6, see <a href="https://github.com/Automattic/mongoose/issues/5304">this github issue</a>
-and <a href="http://thecodebarbarian.com/mongoose-4.11-use-mongo-client.html">this blog post</a>
-for more details.</p>
-<h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>connections</code>, let&#39;s take a look at how we can break pieces of our functionality out into reusable and shareable <a href="/docs/plugins.html">plugins</a>.</p>
+</code></pre><p>In older version of the MongoDB driver you had to specify distinct options
+for server connections, replica set connections, and mongos connections:</p>
+<pre><code class="lang-javascript">mongoose.connect(myUri, {
+  server: {
+    socketOptions: {
+      socketTimeoutMS: 0,
+      keepAlive: true
+    },
+    reconnectTries: 30
+  },
+  replset: {
+    socketOptions: {
+      socketTimeoutMS: 0,
+      keepAlive: true
+    },
+    reconnectTries: 30
+  },
+  mongos: {
+    socketOptions: {
+      socketTimeoutMS: 0,
+      keepAlive: true
+    },
+    reconnectTries: 30
+  }
+});
+</code></pre>
+<p>In mongoose v5.x you can instead declare these options at the top level,
+without all that extra nesting.
+<a href="http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html">Here&#39;s the list of all supported options</a>.</p>
+<pre><code class="lang-javascript">// Equivalent to the above code
+mongoose.connect(myUri, {
+  socketTimeoutMS: 0,
+  keepAlive: true,
+  reconnectTries: 30
+});
+</code></pre>
+<h3 id="next">Next Up</h3>
+
+<p>Now that we&#39;ve covered connections, let&#39;s take a look at <a href="/docs/models.html">models</a>.</p>
 </div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);

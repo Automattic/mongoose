@@ -11,6 +11,21 @@ a {
   color: #0971B2;
 }
 
+code {
+  background-color: #eee;
+  padding: 2px 4px;
+  font-size: 0.9em;
+  color: #800;
+  border-radius: 4px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 1em;
+  color: #222;
+}
+
 #logo {
   width: 62px;
   height: 30px;
@@ -185,54 +200,54 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2 id="creating-from-es6-classes-using-loadclass"><p>Creating from ES6 Classes Using <code>loadClass()</code></p>
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="creating-from-es6-classes-using-loadclass"><p>Creating from ES6 Classes Using <code>loadClass()</code></p>
 </h2><p>Mongoose allows creating schemas from <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">ES6 classes</a>.
 The <code>loadClass()</code> function lets you pull in methods,
 statics, and virtuals from an ES6 class. A class method maps to a schema
 method, a static method maps to a schema static, and getters/setters map
 to virtuals.</p>
 <pre><code class="javascript">
-    const schema = <span class="keyword">new</span> Schema({ firstName: String, lastName: String });
+    <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ firstName: <span class="hljs-built_in">String</span>, lastName: <span class="hljs-built_in">String</span> });
 
-    class PersonClass {
-      <span class="comment">// `fullName` becomes a virtual</span>
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PersonClass</span> </span>{
+      <span class="hljs-comment">// `fullName` becomes a virtual</span>
       get fullName() {
-        <span class="keyword">return</span> `${<span class="keyword">this</span>.firstName} ${<span class="keyword">this</span>.lastName}`;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.firstName}</span> <span class="hljs-subst">${this.lastName}</span>`</span>;
       }
 
       set fullName(v) {
-        const firstSpace = v.indexOf(<span class="string">' '</span>);
-        <span class="keyword">this</span>.firstName = v.split(<span class="string">' '</span>)[<span class="number">0</span>];
-        <span class="keyword">this</span>.lastName = firstSpace === -<span class="number">1</span> ? <span class="string">''</span> : v.substr(firstSpace + <span class="number">1</span>);
+        <span class="hljs-keyword">const</span> firstSpace = v.indexOf(<span class="hljs-string">' '</span>);
+        <span class="hljs-keyword">this</span>.firstName = v.split(<span class="hljs-string">' '</span>)[<span class="hljs-number">0</span>];
+        <span class="hljs-keyword">this</span>.lastName = firstSpace === <span class="hljs-number">-1</span> ? <span class="hljs-string">''</span> : v.substr(firstSpace + <span class="hljs-number">1</span>);
       }
 
-      <span class="comment">// `getFullName()` becomes a document method</span>
+      <span class="hljs-comment">// `getFullName()` becomes a document method</span>
       getFullName() {
-        <span class="keyword">return</span> `${<span class="keyword">this</span>.firstName} ${<span class="keyword">this</span>.lastName}`;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.firstName}</span> <span class="hljs-subst">${this.lastName}</span>`</span>;
       }
 
-      <span class="comment">// `findByFullName()` becomes a static</span>
+      <span class="hljs-comment">// `findByFullName()` becomes a static</span>
       static findByFullName(name) {
-        const firstSpace = name.indexOf(<span class="string">' '</span>);
-        const firstName = name.split(<span class="string">' '</span>)[<span class="number">0</span>];
-        const lastName = firstSpace === -<span class="number">1</span> ? <span class="string">''</span> : name.substr(firstSpace + <span class="number">1</span>);
-        <span class="keyword">return</span> <span class="keyword">this</span>.findOne({ firstName, lastName });
+        <span class="hljs-keyword">const</span> firstSpace = name.indexOf(<span class="hljs-string">' '</span>);
+        <span class="hljs-keyword">const</span> firstName = name.split(<span class="hljs-string">' '</span>)[<span class="hljs-number">0</span>];
+        <span class="hljs-keyword">const</span> lastName = firstSpace === <span class="hljs-number">-1</span> ? <span class="hljs-string">''</span> : name.substr(firstSpace + <span class="hljs-number">1</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.findOne({ firstName, lastName });
       }
     }
 
     schema.loadClass(PersonClass);
-    <span class="keyword">var</span> Person = db.model(<span class="string">'Person'</span>, schema);
+    <span class="hljs-keyword">var</span> Person = db.model(<span class="hljs-string">'Person'</span>, schema);
 
-    Person.create({ firstName: <span class="string">'Jon'</span>, lastName: <span class="string">'Snow'</span> }).
-      then(doc => {
-        assert.equal(doc.fullName, <span class="string">'Jon Snow'</span>);
-        doc.fullName = <span class="string">'Jon Stark'</span>;
-        assert.equal(doc.firstName, <span class="string">'Jon'</span>);
-        assert.equal(doc.lastName, <span class="string">'Stark'</span>);
-        <span class="keyword">return</span> Person.findByFullName(<span class="string">'Jon Snow'</span>);
+    Person.create({ firstName: <span class="hljs-string">'Jon'</span>, lastName: <span class="hljs-string">'Snow'</span> }).
+      then(doc =&gt; {
+        assert.equal(doc.fullName, <span class="hljs-string">'Jon Snow'</span>);
+        doc.fullName = <span class="hljs-string">'Jon Stark'</span>;
+        assert.equal(doc.firstName, <span class="hljs-string">'Jon'</span>);
+        assert.equal(doc.lastName, <span class="hljs-string">'Stark'</span>);
+        <span class="hljs-keyword">return</span> Person.findByFullName(<span class="hljs-string">'Jon Snow'</span>);
       }).
-      then(doc => {
-        assert.equal(doc.fullName, <span class="string">'Jon Snow'</span>);
+      then(doc =&gt; {
+        assert.equal(doc.fullName, <span class="hljs-string">'Jon Snow'</span>);
       });
   </code></pre></div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}

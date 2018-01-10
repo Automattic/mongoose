@@ -11,6 +11,21 @@ a {
   color: #0971B2;
 }
 
+code {
+  background-color: #eee;
+  padding: 2px 4px;
+  font-size: 0.9em;
+  color: #800;
+  border-radius: 4px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 1em;
+  color: #222;
+}
+
 #logo {
   width: 62px;
   height: 30px;
@@ -185,42 +200,42 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2 id="built-in-promises"><p>Built-in Promises</p>
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="built-in-promises"><p>Built-in Promises</p>
 </h2><p>Mongoose async operations, like <code>.save()</code> and queries, return
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">ES6 promises</a>.
 This means that you can do things like <code>MyModel.findOne({}).then()</code> and
 <code>await MyModel.findOne({}).exec()</code> (if you&#39;re using <a href="http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html">async/await</a>.</p>
 <pre><code class="javascript">
-    <span class="keyword">var</span> gnr = <span class="keyword">new</span> Band({
-      name: <span class="string">"Guns N' Roses"</span>,
-      members: [<span class="string">'Axl'</span>, <span class="string">'Slash'</span>]
+    <span class="hljs-keyword">var</span> gnr = <span class="hljs-keyword">new</span> Band({
+      name: <span class="hljs-string">"Guns N' Roses"</span>,
+      members: [<span class="hljs-string">'Axl'</span>, <span class="hljs-string">'Slash'</span>]
     });
 
-    <span class="keyword">var</span> promise = gnr.save();
-    assert.ok(promise <span class="keyword">instanceof</span> Promise);
+    <span class="hljs-keyword">var</span> promise = gnr.save();
+    assert.ok(promise <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Promise</span>);
 
-    promise.then(<span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
-      assert.equal(doc.name, <span class="string">"Guns N' Roses"</span>);
+    promise.then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
+      assert.equal(doc.name, <span class="hljs-string">"Guns N' Roses"</span>);
     });
   </code></pre><h2 id="queries-are-not-promises"><p>Queries are not promises</p>
 </h2><p>Mongoose queries are <strong>not</strong> promises. However, they do have a <code>.then()</code>
 function for <code>yield</code> and async/await. If you need
 a fully-fledged promise, use the <code>.exec()</code> function.</p>
 <pre><code class="javascript">
-    <span class="keyword">var</span> query = Band.findOne({name: <span class="string">"Guns N' Roses"</span>});
-    assert.ok(!(query <span class="keyword">instanceof</span> Promise));
+    <span class="hljs-keyword">var</span> query = Band.findOne({name: <span class="hljs-string">"Guns N' Roses"</span>});
+    assert.ok(!(query <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Promise</span>));
 
-    <span class="comment">// A query is not a fully-fledged promise, but it does have a `.then()`.</span>
-    query.then(<span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
-      <span class="comment">// use doc</span>
+    <span class="hljs-comment">// A query is not a fully-fledged promise, but it does have a `.then()`.</span>
+    query.then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
+      <span class="hljs-comment">// use doc</span>
     });
 
-    <span class="comment">// `.exec()` gives you a fully-fledged promise</span>
-    <span class="keyword">var</span> promise = query.exec();
-    assert.ok(promise <span class="keyword">instanceof</span> Promise);
+    <span class="hljs-comment">// `.exec()` gives you a fully-fledged promise</span>
+    <span class="hljs-keyword">var</span> promise = query.exec();
+    assert.ok(promise <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Promise</span>);
 
-    promise.then(<span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
-      <span class="comment">// use doc</span>
+    promise.then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
+      <span class="hljs-comment">// use doc</span>
     });
   </code></pre><h2 id="plugging-in-your-own-promises-library"><p>Plugging in your own Promises Library</p>
 </h2><p>If you&#39;re an advanced user, you may want to plug in your own promise
@@ -228,15 +243,15 @@ library like <a href="https://www.npmjs.com/package/bluebird">bluebird</a>. Just
 <code>mongoose.Promise</code> to your favorite
 ES6-style promise constructor and mongoose will use it.</p>
 <pre><code class="javascript">
-    <span class="keyword">var</span> query = Band.findOne({name: <span class="string">"Guns N' Roses"</span>});
+    <span class="hljs-keyword">var</span> query = Band.findOne({name: <span class="hljs-string">"Guns N' Roses"</span>});
 
-    <span class="comment">// Use bluebird</span>
-    mongoose.Promise = require(<span class="string">'bluebird'</span>);
-    assert.equal(query.exec().constructor, require(<span class="string">'bluebird'</span>));
+    <span class="hljs-comment">// Use bluebird</span>
+    mongoose.Promise = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bluebird'</span>);
+    assert.equal(query.exec().constructor, <span class="hljs-built_in">require</span>(<span class="hljs-string">'bluebird'</span>));
 
-    <span class="comment">// Use q. Note that you **must** use `require('q').Promise`.</span>
-    mongoose.Promise = require(<span class="string">'q'</span>).Promise;
-    assert.ok(query.exec() <span class="keyword">instanceof</span> require(<span class="string">'q'</span>).makePromise);
+    <span class="hljs-comment">// Use q. Note that you **must** use `require('q').Promise`.</span>
+    mongoose.Promise = <span class="hljs-built_in">require</span>(<span class="hljs-string">'q'</span>).Promise;
+    assert.ok(query.exec() <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">'q'</span>).makePromise);
   </code></pre><h2 id="promises-for-the-mongodb-driver"><p>Promises for the MongoDB Driver</p>
 </h2><p>The <code>mongoose.Promise</code> property sets the promises mongoose uses. However,
 this does <strong>not</strong> affect the underlying MongoDB driver. If you use the
@@ -244,15 +259,15 @@ underlying driver, for instance <code>Model.collection.db.insert()</code>, you
 need to do a little extra work to change the underlying promises library.
 Note that the below code assumes mongoose &gt;= 4.4.4.</p>
 <pre><code class="javascript">
-    <span class="keyword">var</span> uri = <span class="string">'mongodb://localhost:27017/mongoose_test'</span>;
-    <span class="comment">// Use bluebird</span>
-    <span class="keyword">var</span> options = { promiseLibrary: require(<span class="string">'bluebird'</span>) };
-    <span class="keyword">var</span> db = mongoose.createConnection(uri, options);
+    <span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://localhost:27017/mongoose_test'</span>;
+    <span class="hljs-comment">// Use bluebird</span>
+    <span class="hljs-keyword">var</span> options = { promiseLibrary: <span class="hljs-built_in">require</span>(<span class="hljs-string">'bluebird'</span>) };
+    <span class="hljs-keyword">var</span> db = mongoose.createConnection(uri, options);
 
-    Band = db.model(<span class="string">'band-promises'</span>, { name: String });
+    Band = db.model(<span class="hljs-string">'band-promises'</span>, { name: <span class="hljs-built_in">String</span> });
 
-    db.on(<span class="string">'open'</span>, <span class="keyword">function</span>() {
-      assert.equal(Band.collection.findOne().constructor, require(<span class="string">'bluebird'</span>));
+    db.on(<span class="hljs-string">'open'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+      assert.equal(Band.collection.findOne().constructor, <span class="hljs-built_in">require</span>(<span class="hljs-string">'bluebird'</span>));
     });
   </code></pre></div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}

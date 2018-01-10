@@ -44,6 +44,21 @@ html(lang='en')
           color: #0971B2;
         }
 
+        code {
+          background-color: #eee;
+          padding: 2px 4px;
+          font-size: 0.9em;
+          color: #800;
+          border-radius: 4px;
+        }
+
+        pre code {
+          background-color: transparent;
+          padding: 0;
+          font-size: 1em;
+          color: #222;
+        }
+
         #logo {
           width: 62px;
           height: 30px;
@@ -281,6 +296,8 @@ html(lang='en')
               a.pure-menu-link(href="/docs/compatibility.html") Version Compatibility
             li.pure-menu-item
               a.pure-menu-link(href="/docs/faq.html") FAQ
+            li.pure-menu-item
+              a.pure-menu-link(href="/docs/prior.html") Prior Releases
       .container
         #content
           block content

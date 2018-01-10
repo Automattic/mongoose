@@ -9,12 +9,20 @@ var start = require('./common'),
     Schema = mongoose.Schema;
 
 describe('document: strict mode:', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('should work', function() {
-    var db, Lax, Strict;
+    var Lax, Strict;
 
     before(function() {
-      db = start();
-
       var raw = {
         ts: {type: Date, default: Date.now},
         content: String,
@@ -121,8 +129,6 @@ describe('document: strict mode:', function() {
   });
 
   it('nested doc', function(done) {
-    var db = start();
-
     var lax = new Schema({
       name: {last: String}
     }, {strict: false});
@@ -155,12 +161,10 @@ describe('document: strict mode:', function() {
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
-    db.close(done);
+    done();
   });
 
   it('sub doc', function(done) {
-    var db = start();
-
     var lax = new Schema({
       ts: {type: Date, default: Date.now},
       content: String
@@ -202,13 +206,11 @@ describe('document: strict mode:', function() {
       assert.equal(doc.dox[0].content, 'sample2');
       assert.ok(!('rouge' in doc.dox[0]));
       assert.ok(!doc.dox[0].rouge);
-      db.close(done);
+      done();
     });
   });
 
   it('virtuals', function(done) {
-    var db = start();
-
     var getCount = 0,
         setCount = 0;
 
@@ -247,7 +249,7 @@ describe('document: strict mode:', function() {
     assert.equal(getCount, 1);
     assert.equal(setCount, 2);
 
-    db.close(done);
+    done();
   });
 
   it('can be overridden during set()', function(done) {

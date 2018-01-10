@@ -16,6 +16,10 @@ describe('bug fixes', function() {
     db = start();
   });
 
+  after(function(done) {
+    db.close(done);
+  });
+
   it('discriminators with classes modifies class in place (gh-5175)', function(done) {
     class Vehicle extends mongoose.Model { }
     var V = mongoose.model(Vehicle, new mongoose.Schema());

@@ -1,4 +1,190 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Connecting to MongoDB v4.13.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>Connections</h2><p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p><pre><code class="javascript">mongoose.connect(<span class="string">'mongodb://localhost/myapp'</span>);
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Connecting to MongoDB v4.13.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="http://thecodebarbarian.com/style/github.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>html {
+  font-family: 'Open Sans';
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+#logo {
+  width: 62px;
+  height: 30px;
+  position: relative;
+  top: 5px;
+}
+
+.logo-text {
+  color: #800;
+  font-size: 20pt;
+  position: relative;
+  top: 0px;
+  left: 10px;
+  text-transform: none;
+}
+
+.pure-menu-item {
+  height: 30px;
+  font-size: 13pt;
+  padding-top: 0px;
+}
+
+.pure-menu-link {
+  padding-top: 2px;
+}
+
+li.sub-item {
+  height: 25px;
+  font-size: 11pt;
+  margin-left: 20px;
+}
+
+#logo-container {
+  position: relative;
+  top: -4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+#menu {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #eee;
+  width: 250px;
+  border-right: 1px solid #ddd;
+}
+
+.container {
+  position: relative;
+  left: 250px;
+  padding-left: 50px;
+  width: 850px;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 10px 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
+#mobile-menu {
+  display: none;
+}
+
+@media (max-width: 1160px) {
+  .container {
+    width: 100%;
+    padding: 0px;
+    left: 0px;
+    margin: auto;
+  }
+  
+  #content {
+    margin: 10px;
+  }
+  
+  #menu {
+    display: none;
+    position: absolute;
+    top: 45px;
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    left: 0px;
+  }
+  
+  pre {
+    margin: 0px;
+    margin-top: 10px;
+  }
+  
+  #mobile-menu {
+    display: block;
+    height: 45px;
+    background-color: #eee;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #logo {
+    border: 0;
+  }
+  
+  #mobile-logo-container {
+    padding: 0;
+    border: 0px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width: 215px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  #logo-container {
+    display: none;
+  }
+  
+  .menu-link {
+    position: absolute;
+    display: block;
+    top: 0px;
+    left: 0;
+    background-color: #eee;
+    font-size: 10px; /* change this value to increase/decrease button size */
+    z-index: 10;
+    width: 2em;
+    height: 3px;
+    padding: 2.1em 1.6em;
+  }
+  
+  .menu-link:hover,
+  .menu-link:focus {
+    background: #ddd;
+  }
+  
+  .menu-link span {
+    position: relative;
+    display: block;
+  }
+  
+  .menu-link span,
+  .menu-link span:before,
+  .menu-link span:after {
+    background-color: #333;
+    width: 100%;
+    height: 0.2em;
+  }
+  
+  .menu-link span:before,
+  .menu-link span:after {
+    position: absolute;
+    margin-top: -0.6em;
+    content: " ";
+  }
+  
+  .menu-link span:after {
+    margin-top: 0.6em;
+  }
+  
+  .active {
+    display: block !important;
+  }
+}
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="./mongoose5_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Population</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item"><a class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link">FAQ</a></li></ul></div></div><div class="container"><div id="content"><h2>Connections</h2><p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p><pre><code class="javascript">mongoose.connect(<span class="string">'mongodb://localhost/myapp'</span>);
 </code></pre><p>This is the minimum needed to connect the <code>myapp</code> database running locally
 on the default port (27017). If the local connection fails then try using
 127.0.0.1 instead of localhost. Sometimes issues may arise when the local
@@ -146,16 +332,7 @@ mongoose.connect(myUri, {
 has deprecated an API that is critical to mongoose&#39;s connection logic to
 support MongoDB 3.6, see <a href="https://github.com/Automattic/mongoose/issues/5304">this github issue</a>
 and <a href="http://thecodebarbarian.com/mongoose-4.11-use-mongo-client.html">this blog post</a>
-for more details.</p><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>connections</code>, let&#39;s take a look at how we can break pieces of our functionality out into reusable and shareable <a href="/docs/plugins.html">plugins</a>.</p></div></div><script>document.body.className = 'load';</script><script>;(function() {
-  var cx = '012173159455227967368:uvscsuqjovs';
-  var gcse = document.createElement('script');
-  gcse.type = 'text/javascript';
-  gcse.async = true;
-  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
-      '//www.google.com/cse/cse.js?cx=' + cx;
-  var s = document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(gcse, s);
-})();</script><script type="text/javascript">!function(name,path,ctx){
+for more details.</p><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>connections</code>, let&#39;s take a look at how we can break pieces of our functionality out into reusable and shareable <a href="/docs/plugins.html">plugins</a>.</p></div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -171,4 +348,48 @@ KeenAsync.ready(function(){
     pathname: window.location.pathname,
     hash: window.location.hash
   });
-});</script></body></html>
+});</script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+      
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+          
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+      
+      element.className = classes.join(' ');
+  }
+  
+  function toggleAll(e) {
+      var active = 'active';
+      
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+  
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+  
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+  
+}(this, this.document));</script></div></body></html>

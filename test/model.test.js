@@ -152,8 +152,8 @@ describe('Model', function() {
   });
   describe('isNew', function() {
     it('is true on instantiation', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
-        post = new BlogPost;
+      var BlogPost = db.model('BlogPost', collection);
+      var post = new BlogPost;
       assert.equal(post.isNew, true);
       done();
     });
@@ -253,9 +253,9 @@ describe('Model', function() {
       describe('defaults', function() {
         it('to a non-empty array', function(done) {
           var DefaultArraySchema = new Schema({
-                arr: {type: Array, cast: String, default: ['a', 'b', 'c']},
-                single: {type: Array, cast: String, default: ['a']}
-              });
+            arr: {type: Array, cast: String, default: ['a', 'b', 'c']},
+            single: {type: Array, cast: String, default: ['a']}
+          });
           mongoose.model('DefaultArray', DefaultArraySchema);
           var DefaultArray = db.model('DefaultArray', collection);
           var arr = new DefaultArray;
@@ -270,9 +270,9 @@ describe('Model', function() {
 
         it('empty', function(done) {
           var DefaultZeroCardArraySchema = new Schema({
-                arr: {type: Array, cast: String, default: []},
-                auto: [Number]
-              });
+            arr: {type: Array, cast: String, default: []},
+            auto: [Number]
+          });
           mongoose.model('DefaultZeroCardArray', DefaultZeroCardArraySchema);
           var DefaultZeroCardArray = db.model('DefaultZeroCardArray', collection);
           var arr = new DefaultZeroCardArray();
@@ -1537,11 +1537,11 @@ describe('Model', function() {
 
     it('nested', function(done) {
       var PersonSchema = new Schema({
-            name: {
-              first: String,
-              last: String
-            }
-          });
+        name: {
+          first: String,
+          last: String
+        }
+      });
 
       PersonSchema
         .virtual('name.full')
@@ -2323,10 +2323,10 @@ describe('Model', function() {
 
   it('multiple number push() calls', function(done) {
     var schema = new Schema({
-          nested: {
-            nums: [Number]
-          }
-        });
+      nested: {
+        nums: [Number]
+      }
+    });
 
     mongoose.model('NestedPushes', schema);
     var Temp = db.model('NestedPushes', collection);
@@ -2352,10 +2352,10 @@ describe('Model', function() {
 
   it('multiple push() calls', function(done) {
     var schema = new Schema({
-          nested: {
-            nums: [Number]
-          }
-        });
+      nested: {
+        nums: [Number]
+      }
+    });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2379,10 +2379,10 @@ describe('Model', function() {
 
   it('activePaths should be updated for nested modifieds', function(done) {
     var schema = new Schema({
-          nested: {
-            nums: [Number]
-          }
-        });
+      nested: {
+        nums: [Number]
+      }
+    });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2398,10 +2398,10 @@ describe('Model', function() {
 
   it('activePaths should be updated for nested modifieds as promise', function(done) {
     var schema = new Schema({
-          nested: {
-            nums: [Number]
-          }
-        });
+      nested: {
+        nums: [Number]
+      }
+    });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2416,10 +2416,10 @@ describe('Model', function() {
 
   it('$pull should affect what you see in an array before a save', function(done) {
     var schema = new Schema({
-          nested: {
-            nums: [Number]
-          }
-        });
+      nested: {
+        nums: [Number]
+      }
+    });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2433,10 +2433,10 @@ describe('Model', function() {
 
   it('$shift', function(done) {
     var schema = new Schema({
-          nested: {
-            nums: [Number]
-          }
-        });
+      nested: {
+        nums: [Number]
+      }
+    });
 
     mongoose.model('TestingShift', schema);
     var Temp = db.model('TestingShift', collection);
@@ -2761,9 +2761,9 @@ describe('Model', function() {
 
   it('updating an embedded array document to an Object value (gh-334)', function(done) {
     var SubSchema = new Schema({
-          name: String,
-          subObj: {subName: String}
-        });
+      name: String,
+      subObj: {subName: String}
+    });
     var GH334Schema = new Schema({name: String, arrData: [SubSchema]});
 
     mongoose.model('GH334', GH334Schema);

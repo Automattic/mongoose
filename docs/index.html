@@ -1,50 +1,323 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Quick Start v4.13.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="/docs/css/default.css" rel="stylesheet" type="text/css"><link href="/docs/css/guide.css" rel="stylesheet" type="text/css"><style></style></head><body class="api"><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>Getting Started</h2><p><em>First be sure you have <a href="http://www.mongodb.org/downloads">MongoDB</a> and <a href="http://nodejs.org/">Node.js</a> installed.</em></p>
-<p>Next install Mongoose from the command line using <code>npm</code>:</p>
-<pre><code>$ npm install mongoose
-</code></pre><p>Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
-The first thing we need to do is include mongoose in our project and open a connection to the <code>test</code> database on our locally running instance of MongoDB.</p>
-// getting-started.js
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');<p>We have a pending connection to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:</p>
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  // we're connected!
-});<p>Once our connection opens, our callback will be called. For brevity, let&#39;s assume that all following code is within this callback.</p>
-<p>With Mongoose, everything is derived from a <a href="/docs/guide.html">Schema</a>. Let&#39;s get a reference to it and define our kittens.</p>
-var kittySchema = mongoose.Schema({
-    name: String
-});<p>So far so good. We&#39;ve got a schema with one property, <code>name</code>, which will be a  <code>String</code>. The next step is compiling our schema into a <a href="/docs/models.html">Model</a>.</p>
-var Kitten = mongoose.model('Kitten', kittySchema);<p>A model is a class with which we construct documents.
-In this case, each document will be a kitten with properties and behaviors as declared in our schema.
-Let&#39;s create a kitten document representing the little guy we just met on the sidewalk outside:</p>
-var silence = new Kitten({ name: 'Silence' });
-console.log(silence.name); // 'Silence'<p>Kittens can meow, so let&#39;s take a look at how to add &quot;speak&quot; functionality to our documents:</p>
-// NOTE: methods must be added to the schema before compiling it with mongoose.model()
-kittySchema.methods.speak = function () {
-  var greeting = this.name
-    ? "Meow name is " + this.name
-    : "I don't have a name";
-  console.log(greeting);
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v4.13.9: Getting Started</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="http://thecodebarbarian.com/style/github.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><style>html {
+  font-family: 'Open Sans';
 }
 
-var Kitten = mongoose.model('Kitten', kittySchema);<p>Functions added to the <code>methods</code> property of a schema get compiled into the <code>Model</code> prototype and exposed on each document instance:</p>
-var fluffy = new Kitten({ name: 'fluffy' });
-fluffy.speak(); // "Meow name is fluffy"<p>We have talking kittens! But we still haven&#39;t saved anything to MongoDB.
+body {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #0971B2;
+}
+
+h2 a {
+  color: #000;
+}
+
+h2:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
+h3 a {
+  color: #000;
+}
+
+h3:hover::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  height: 1em;
+  width: 1em;
+  content: ' ';
+}
+
+code {
+  background-color: #eee;
+  padding: 2px 4px;
+  font-size: 0.9em;
+  color: #800;
+  border-radius: 4px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 1em;
+  color: #222;
+}
+
+#logo {
+  width: 62px;
+  height: 30px;
+  position: relative;
+  top: 5px;
+}
+
+.logo-text {
+  color: #800;
+  font-size: 20pt;
+  position: relative;
+  top: 0px;
+  left: 10px;
+  text-transform: none;
+}
+
+.pure-menu-item {
+  height: 30px;
+  font-size: 13pt;
+  padding-top: 0px;
+}
+
+.pure-menu-link {
+  padding-top: 2px;
+}
+
+li.sub-item {
+  height: 25px;
+  font-size: 11pt;
+  margin-left: 20px;
+}
+
+#logo-container {
+  position: relative;
+  top: -4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+#menu {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #eee;
+  width: 250px;
+  border-right: 1px solid #ddd;
+}
+
+.container {
+  position: relative;
+  left: 250px;
+  padding-left: 50px;
+  width: 850px;
+  margin-bottom: 250px;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 10px 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
+#mobile-menu {
+  display: none;
+}
+
+@media (max-width: 1160px) {
+  .container {
+    width: 100%;
+    padding: 0px;
+    left: 0px;
+    margin: auto;
+  }
+
+  #content {
+    margin: 10px;
+  }
+
+  #menu {
+    display: none;
+    position: absolute;
+    top: 45px;
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    left: 0px;
+  }
+
+  pre {
+    margin: 0px;
+    margin-top: 10px;
+  }
+
+  #mobile-menu {
+    display: block;
+    height: 45px;
+    background-color: #eee;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #logo {
+    border: 0;
+  }
+
+  #mobile-logo-container {
+    padding: 0;
+    border: 0px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width: 215px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #logo-container {
+    display: none;
+  }
+
+  .menu-link {
+    position: absolute;
+    display: block;
+    top: 0px;
+    left: 0;
+    background-color: #eee;
+    font-size: 10px; /* change this value to increase/decrease button size */
+    z-index: 10;
+    width: 2em;
+    height: 3px;
+    padding: 2.1em 1.6em;
+  }
+
+  .menu-link:hover,
+  .menu-link:focus {
+    background: #ddd;
+  }
+
+  .menu-link span {
+    position: relative;
+    display: block;
+  }
+
+  .menu-link span,
+  .menu-link span:before,
+  .menu-link span:after {
+    background-color: #333;
+    width: 100%;
+    height: 0.2em;
+  }
+
+  .menu-link span:before,
+  .menu-link span:after {
+    position: absolute;
+    margin-top: -0.6em;
+    content: " ";
+  }
+
+  .menu-link span:after {
+    margin-top: 0.6em;
+  }
+
+  .active {
+    display: block !important;
+  }
+}
+</style><style>hr {
+  display: block;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border: 0px;
+  height: 1px;
+  background-color: #232323;
+  width: 100%;
+}
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="getting-started">Getting Started</h2>
+<p><em>First be sure you have <a href="http://www.mongodb.org/downloads">MongoDB</a> and <a href="http://nodejs.org/">Node.js</a> installed.</em></p>
+<p>Next install Mongoose from the command line using <code>npm</code>:</p>
+<pre><code>$ npm install mongoose
+</code></pre><p>Now say we like fuzzy kittens and want to record every kitten we ever meet
+in MongoDB.
+The first thing we need to do is include mongoose in our project and open a
+connection to the <code>test</code> database on our locally running instance of MongoDB.</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// getting-started.js</span>
+<span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+mongoose.connect(<span class="hljs-string">'mongodb://localhost/test'</span>);
+</code></pre>
+<p>We have a pending connection to the test database running on localhost.
+We now need to get notified if we connect successfully or if a connection
+error occurs:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> db = mongoose.connection;
+db.on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.error.bind(<span class="hljs-built_in">console</span>, <span class="hljs-string">'connection error:'</span>));
+db.once(<span class="hljs-string">'open'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-comment">// we're connected!</span>
+});
+</code></pre>
+<p>Once our connection opens, our callback will be called. For brevity,
+let&#39;s assume that all following code is within this callback.</p>
+<p>With Mongoose, everything is derived from a <a href="/docs/guide.html">Schema</a>.
+Let&#39;s get a reference to it and define our kittens.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> kittySchema = mongoose.Schema({
+  name: <span class="hljs-built_in">String</span>
+});
+</code></pre>
+<p>So far so good. We&#39;ve got a schema with one property, <code>name</code>, which will be a  <code>String</code>. The next step is compiling our schema into a <a href="/docs/models.html">Model</a>.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Kitten = mongoose.model(<span class="hljs-string">'Kitten'</span>, kittySchema);
+</code></pre>
+<p>A model is a class with which we construct documents.
+In this case, each document will be a kitten with properties and behaviors as declared in our schema.
+Let&#39;s create a kitten document representing the little guy we just met on the sidewalk outside:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> silence = <span class="hljs-keyword">new</span> Kitten({ name: <span class="hljs-string">'Silence'</span> });
+<span class="hljs-built_in">console</span>.log(silence.name); <span class="hljs-comment">// 'Silence'</span>
+</code></pre>
+<p>Kittens can meow, so let&#39;s take a look at how to add &quot;speak&quot; functionality
+to our documents:</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> methods must be added to the schema before compiling it with mongoose.model()</span>
+kittySchema.methods.speak = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">var</span> greeting = <span class="hljs-keyword">this</span>.name
+    ? <span class="hljs-string">"Meow name is "</span> + <span class="hljs-keyword">this</span>.name
+    : <span class="hljs-string">"I don't have a name"</span>;
+  <span class="hljs-built_in">console</span>.log(greeting);
+}
+
+<span class="hljs-keyword">var</span> Kitten = mongoose.model(<span class="hljs-string">'Kitten'</span>, kittySchema);
+</code></pre>
+<p>Functions added to the <code>methods</code> property of a schema get compiled into
+the <code>Model</code> prototype and exposed on each document instance:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> fluffy = <span class="hljs-keyword">new</span> Kitten({ name: <span class="hljs-string">'fluffy'</span> });
+fluffy.speak(); <span class="hljs-comment">// "Meow name is fluffy"</span>
+</code></pre>
+<p>We have talking kittens! But we still haven&#39;t saved anything to MongoDB.
 Each document can be saved to the database by calling its <a href="/docs/api.html#model_Model-save">save</a> method. The first argument to the callback will be an error if any occured.</p>
-fluffy.save(function (err, fluffy) {
-  if (err) return console.error(err);
-  fluffy.speak();
-});<p>Say time goes by and we want to display all the kittens we&#39;ve seen.
+<pre><code class="lang-javascript">  fluffy.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, fluffy</span>) </span>{
+    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-built_in">console</span>.error(err);
+    fluffy.speak();
+  });
+</code></pre>
+<p>Say time goes by and we want to display all the kittens we&#39;ve seen.
 We can access all of the kitten documents through our Kitten <a href="/docs/models.html">model</a>.</p>
-Kitten.find(function (err, kittens) {
-  if (err) return console.error(err);
-  console.log(kittens);
-})<p>We just logged all of the kittens in our db to the console.
+<pre><code class="lang-javascript">Kitten.find(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, kittens</span>) </span>{
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-built_in">console</span>.error(err);
+  <span class="hljs-built_in">console</span>.log(kittens);
+})
+</code></pre>
+<p>We just logged all of the kittens in our db to the console.
 If we want to filter our kittens by name, Mongoose supports MongoDBs rich <a href="/docs/queries.html">querying</a> syntax.</p>
-Kitten.find({ name: /^fluff/ }, callback);<p>This performs a search for all documents with a name property that begins with &quot;Fluff&quot; and returns the result as an array of kittens to the callback.</p>
-<h3>Congratulations</h3><p>That&#39;s the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the <a href="guide.html">guide</a>, or <a href="api.html">API docs</a> for more.</p>
-</div></div><script>document.body.className = 'load';</script><script type="text/javascript">!function(name,path,ctx){
+<pre><code class="lang-javascript">Kitten.find({ name: <span class="hljs-regexp">/^fluff/</span> }, callback);
+</code></pre>
+<p>This performs a search for all documents with a name property that begins
+with &quot;Fluff&quot; and returns the result as an array of kittens to the callback.</p>
+<h3 id="congratulations">Congratulations</h3>
+<p>That&#39;s the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the <a href="guide.html">guide</a>, or <a href="api.html">API docs</a> for more.</p>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -60,4 +333,48 @@ KeenAsync.ready(function(){
     pathname: window.location.pathname,
     hash: window.location.hash
   });
-});</script></body></html>
+});</script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

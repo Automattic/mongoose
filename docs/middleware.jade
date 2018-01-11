@@ -1,8 +1,9 @@
 extends layout
 
 block content
-  h2 Middleware
   :markdown
+    ## Middleware
+
     Middleware (also called pre and post *hooks*) are functions which are passed
     control during execution of asynchronous functions. Middleware is specified
     on the schema level and is useful for writing [plugins](./plugins.html).
@@ -45,24 +46,28 @@ block content
     not when you call `MyModel.remove()`.
     **Note:** The `create()` function fires `save()` hooks.
 
-  h3#pre Pre
-  :markdown
+    <h3 id="pre">Pre</h3>
+
     There are two types of `pre` hooks, serial and parallel.
-  h4#serial Serial
-  :markdown
+
+    <h4 id="serial">Serial</h4>
+
     Serial middleware functions are executed one after another, when each
     middleware calls `next`.
-  :js
+
+    ```javascript
     var schema = new Schema(..);
     schema.pre('save', function(next) {
       // do stuff
       next();
     });
-  :markdown
+    ```
+
     The `next()` call does **not** stop the rest of the code in your middleware function from executing. Use
     [the early `return` pattern](https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm)
     to prevent the rest of your middleware function from running when you call `next()`.
-  :js
+
+    ```javascript
     var schema = new Schema(..);
     schema.pre('save', function(next) {
       if (foo()) {
@@ -73,10 +78,13 @@ block content
       // Unless you comment out the `return` above, 'after next' will print
       console.log('after next');
     });
-  h4#parallel Parallel
-  p
-    | Parallel middleware offer more fine-grained flow control.
-  :js
+    ```
+
+    <h4 id="parallel">Parallel</h4>
+
+    Parallel middleware offer more fine-grained flow control.
+
+    ```javascript
     var schema = new Schema(..);
 
     // `true` means this is a parallel middleware. You **must** specify `true`
@@ -86,30 +94,27 @@ block content
       next();
       setTimeout(done, 100);
     });
-  :markdown
-    The hooked method, in this case `save`, will not be executed until `done` is called by each middleware.
-  h4#use-cases Use Cases
-  p
-    | Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:
-    ul
-      li complex validation
-      li
-        | removing dependent documents
-        ul
-          li (removing a user removes all his blogposts)
-      li asynchronous defaults
-      li asynchronous tasks that a certain action triggers
-        ul
-          li triggering custom events
-          li notifications
-  h4#error-handling Error handling
-  :markdown
+    ```
+
+    The hooked method, in this case `save`, will not be executed until `done`
+    is called by each middleware.
+
+    <h4 id="use-cases">Use Cases</h4>
+
+    Middleware are useful for atomizing model logic. Here are some other ideas:
+
+    * complex validation
+    * removing dependent documents (removing a user removes all his blogposts)
+    * asynchronous defaults
+    * asynchronous tasks that a certain action triggers
+
+    <h4 id="error-handling">Error handling</h4>
+
     If any middleware calls `next` or `done` with a parameter of type `Error`,
     the flow is interrupted, and the error is passed to the callback.
-  :js
+
+    ```javascript
     schema.pre('save', function(next) {
-      // You **must** do `new Error()`. `next('something went wrong')` will
-      // **not** work
       var err = new Error('something went wrong');
       next(err);
     });
@@ -119,16 +124,14 @@ block content
     myDoc.save(function(err) {
       console.log(err.message) // something went wrong
     });
+    ```
 
-  h3#post Post middleware
-  :markdown
+    <h3 id="post">Post middleware</h3>
+
     [post](/docs/api.html#schema_Schema-post) middleware are executed _after_
     the hooked method and all of its `pre` middleware have completed.
-    `post` middleware do not directly receive flow control, e.g. no `next` or
-    `done` callbacks are passed to it. `post` hooks are a way to register
-    traditional event listeners for these methods.
 
-  :js
+    ```javascript
     schema.post('init', function(doc) {
       console.log('%s has been initialized from the db', doc._id);
     });
@@ -141,16 +144,15 @@ block content
     schema.post('remove', function(doc) {
       console.log('%s has been removed', doc._id);
     });
+    ```
 
-  h3#post-async Asynchronous Post Hooks
-  :markdown
-    While post middleware doesn't receive flow control, you can still make
-    sure that asynchronous post hooks are executed in a pre-defined order.
+    <h3 id="post-async">Asynchronous Post Hooks</h3>
+
     If your post hook function takes at least 2 parameters, mongoose will
     assume the second parameter is a `next()` function that you will call to
     trigger the next middleware in the sequence.
 
-  :js
+    ```javascript
     // Takes 2 parameters: this is an asynchronous post hook
     schema.post('save', function(doc, next) {
       setTimeout(function() {
@@ -165,14 +167,16 @@ block content
       console.log('post2');
       next();
     });
+    ```
 
-  h3#order Save/Validate Hooks
-  :markdown
+    <h3 id="order">Save/Validate Hooks</h3>
+
     The `save()` function triggers `validate()` hooks, because mongoose
     has a built-in `pre('save')` hook that calls `validate()`. This means
     that all `pre('validate')` and `post('validate')` hooks get called
     **before** any `pre('save')` hooks.
-  :js
+
+    ```javascript
     schema.pre('validate', function() {
       console.log('this gets printed first');
     });
@@ -185,15 +189,16 @@ block content
     schema.post('save', function() {
       console.log('this gets printed fourth');
     });
+    ```
 
-  h3#notes Notes on findAndUpdate() and Query Middleware
-  :markdown
+    <h3 id="notes">Notes on findAndUpdate() and Query Middleware</h3>
+
     Pre and post `save()` hooks are **not** executed on `update()`,
     `findOneAndUpdate()`, etc. You can see a more detailed discussion why in
     [this GitHub issue](http://github.com/Automattic/mongoose/issues/964).
-    Mongoose 4.0 has distinct hooks for these functions.
+    Mongoose 4.0 introduced distinct hooks for these functions.
 
-  :js
+    ```javascript
     schema.pre('find', function() {
       console.log(this instanceof mongoose.Query); // true
       this.start = Date.now();
@@ -206,8 +211,8 @@ block content
       // prints number of milliseconds the query took
       console.log('find() took ' + (Date.now() - this.start) + ' millis');
     });
+    ```
 
-  :markdown
     Query middleware differs from document middleware in a subtle but
     important way: in document middleware, `this` refers to the document
     being updated. In query middleware, mongoose doesn't necessarily have
@@ -217,13 +222,14 @@ block content
     For instance, if you wanted to add an `updatedAt` timestamp to every
     `update()` call, you would use the following pre hook.
 
-  :js
+    ```javascript
     schema.pre('update', function() {
       this.update({},{ $set: { updatedAt: new Date() } });
     });
+    ```
 
-  h3#error-handling Error Handling Middleware
-  :markdown
+    <h3 id="error-handling">Error Handling Middleware</h3>
+
     _New in 4.5.0_
 
     Middleware execution normally stops the first time a piece of middleware
@@ -235,7 +241,7 @@ block content
     parameter: the 'error' that occurred as the first parameter to the function.
     Error handling middleware can then transform the error however you want.
 
-  :js
+    ```javascript
     var schema = new Schema({
       name: {
         type: String,
@@ -257,13 +263,13 @@ block content
 
     // Will trigger the `post('save')` error handler
     Person.create([{ name: 'Axl Rose' }, { name: 'Axl Rose' }]);
+    ```
 
-  :markdown
     Error handling middleware also works with query middleware. You can
     also define a post `update()` hook that will catch MongoDB duplicate key
     errors.
 
-  :js
+    ```javascript
     // The same E11000 error can occur when you call `update()`
     // This function **must** take 3 parameters. If you use the
     // `passRawResult` function, this function **must** take 4
@@ -282,8 +288,9 @@ block content
         // `error.message` will be "There was a duplicate key error"
       });
     });
+    ```
 
-  h3#next Next Up
-  :markdown
+    <h3 id="next">Next Up</h3>
+
     Now that we've covered middleware, let's take a look at Mongoose's approach
     to faking JOINs with its query [population](/docs/populate.html) helper.

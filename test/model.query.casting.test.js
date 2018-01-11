@@ -160,8 +160,8 @@ describe('model query casting', function() {
 
   it('casts $nin values of arrays (gh-232)', function(done) {
     var NinSchema = new Schema({
-          num: Number
-        });
+      num: Number
+    });
 
     mongoose.model('Nin', NinSchema);
 

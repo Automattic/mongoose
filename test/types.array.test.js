@@ -603,10 +603,10 @@ describe('types array', function() {
   describe('pop()', function() {
     it('works', function(done) {
       var schema = new Schema({
-            types: [new Schema({type: String})],
-            nums: [Number],
-            strs: [String]
-          });
+        types: [new Schema({type: String})],
+        nums: [Number],
+        strs: [String]
+      });
 
       var A = db.model('pop', schema, 'pop' + random());
 
@@ -1733,9 +1733,9 @@ describe('types array', function() {
   describe('default type', function() {
     it('casts to Mixed', function(done) {
       var DefaultArraySchema = new Schema({
-            num1: Array,
-            num2: []
-          });
+        num1: Array,
+        num2: []
+      });
 
       mongoose.model('DefaultArraySchema', DefaultArraySchema);
       var DefaultArray = db.model('DefaultArraySchema', collection);

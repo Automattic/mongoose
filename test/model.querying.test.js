@@ -985,8 +985,8 @@ describe('model: querying:', function() {
 
     it('where $exists', function(done) {
       var ExistsSchema = new Schema({
-          a: Number,
-          b: String
+        a: Number,
+        b: String
       });
       mongoose.model('Exists', ExistsSchema);
       var Exists = db.model('Exists', 'exists_' + random());

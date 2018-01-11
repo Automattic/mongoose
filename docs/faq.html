@@ -233,72 +233,92 @@ pre {
 }
 </style><style>hr {
   display: block;
-  margin: 30px 0;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border: 0px;
+  height: 1px;
+  background-color: #232323;
+  width: 100%;
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>FAQ</h2><p><strong>Q</strong>. Why don&#39;t my changes to arrays get saved when I update an element
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="faq">FAQ</h2>
+<p><strong>Q</strong>. Why don&#39;t my changes to arrays get saved when I update an element
 directly?</p>
-doc.array[3] = 'changed';
-doc.save();<p><strong>A</strong>. Mongoose doesn&#39;t create getters/setters for array indexes; without
+<pre><code class="lang-javascript">doc.array[<span class="hljs-number">3</span>] = <span class="hljs-string">'changed'</span>;
+doc.save();
+</code></pre>
+<p><strong>A</strong>. Mongoose doesn&#39;t create getters/setters for array indexes; without
 them mongoose never gets notified of the change and so doesn&#39;t know to
 persist the new value. The work-around is to use
 <a href="./api.html#types_array_MongooseArray.set">MongooseArray#set</a> available
 in <strong>Mongoose &gt;= 3.2.0</strong>.</p>
-// 3.2.0
-doc.array.set(3, 'changed');
+<pre><code class="lang-javascript"><span class="hljs-comment">// 3.2.0</span>
+doc.array.set(<span class="hljs-number">3</span>, <span class="hljs-string">'changed'</span>);
 doc.save();
 
-// if running a version less than 3.2.0, you must mark the array modified before saving.
-doc.array[3] = 'changed';
-doc.markModified('array');
+<span class="hljs-comment">// if running a version less than 3.2.0, you must mark the array modified before saving.</span>
+doc.array[<span class="hljs-number">3</span>] = <span class="hljs-string">'changed'</span>;
+doc.markModified(<span class="hljs-string">'array'</span>);
 doc.save();
-<hr id="unique-doesnt-work"><p><strong>Q</strong>. I declared a schema property as <code>unique</code> but I can still save duplicates. What gives?</p>
+</code></pre>
+<hr id="unique-doesnt-work" />
+
+<p><strong>Q</strong>. I declared a schema property as <code>unique</code> but I can still save
+duplicates. What gives?</p>
 <p><strong>A</strong>. Mongoose doesn&#39;t handle <code>unique</code> on its own: <code>{ name: { type: String, unique: true } }</code>
 is just a shorthand for creating a <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique index on <code>name</code></a>.
 For example, if MongoDB doesn&#39;t already have a unique index on <code>name</code>, the below code will not error despite the fact that <code>unique</code> is true.</p>
-var schema = new mongoose.Schema({
-  name: { type: String, unique: true }
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }
 });
-var Model = db.model('Test', schema);
+<span class="hljs-keyword">var</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
 
-Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
-  console.log(err); // No error, unless index was already built
-});<p>However, if you wait for the index to build using the <code>Model.on(&#39;index&#39;)</code> event, attempts to save duplicates will correctly error.</p>
-var schema = new mongoose.Schema({
-  name: { type: String, unique: true }
+Model.create([{ name: <span class="hljs-string">'Val'</span> }, { name: <span class="hljs-string">'Val'</span> }], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(err); <span class="hljs-comment">// No error, unless index was already built</span>
 });
-var Model = db.model('Test', schema);
+</code></pre>
+<p>However, if you wait for the index to build using the <code>Model.on(&#39;index&#39;)</code> event, attempts to save duplicates will correctly error.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }
+});
+<span class="hljs-keyword">var</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
 
-Model.on('index', function(err) { // <-- Wait for model's indexes to finish
+Model.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{ <span class="hljs-comment">// &lt;-- Wait for model's indexes to finish</span>
   assert.ifError(err);
-  Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
-    console.log(err);
+  Model.create([{ name: <span class="hljs-string">'Val'</span> }, { name: <span class="hljs-string">'Val'</span> }], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(err);
   });
 });
 
-// Promise based alternative. `init()` returns a promise that resolves
-// when the indexes have finished building successfully. The `init()`
-// function is idempotent, so don't worry about triggering an index rebuild.
-Model.init().then(function() {
+<span class="hljs-comment">// Promise based alternative. `init()` returns a promise that resolves</span>
+<span class="hljs-comment">// when the indexes have finished building successfully. The `init()`</span>
+<span class="hljs-comment">// function is idempotent, so don't worry about triggering an index rebuild.</span>
+Model.init().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
   assert.ifError(err);
-  Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
-    console.log(err);
+  Model.create([{ name: <span class="hljs-string">'Val'</span> }, { name: <span class="hljs-string">'Val'</span> }], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(err);
   });
-});<p>MongoDB persists indexes, so you only need to rebuild indexes if you&#39;re starting
+});
+</code></pre>
+<p>MongoDB persists indexes, so you only need to rebuild indexes if you&#39;re starting
 with a fresh database or you ran <code>db.dropDatabase()</code>. In a production environment,
 you should [create your indexes using the MongoDB shell])(<a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/">https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/</a>)
 rather than relying on mongoose to do it for you. The <code>unique</code> option for schemas is
 convenient for development and documentation, but mongoose is <em>not</em> an index management solution.</p>
-<hr id="nested-properties"><p><strong>Q</strong>. When I have a nested property in a schema, mongoose adds empty objects by default. Why?</p>
-var schema = new mongoose.Schema({
+<hr id="nested-properties" />
+
+<p><strong>Q</strong>. When I have a nested property in a schema, mongoose adds empty objects by default. Why?</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   nested: {
-    prop: String
+    prop: <span class="hljs-built_in">String</span>
   }
 });
-var Model = db.model('Test', schema);
+<span class="hljs-keyword">var</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
 
-// The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns
-// `nested` to an empty object `{}` by default.
-console.log(new Model());<p><strong>A</strong>. This is a performance optimization. These empty objects are not saved
+<span class="hljs-comment">// The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns</span>
+<span class="hljs-comment">// `nested` to an empty object `{}` by default.</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> Model());
+</code></pre>
+<p><strong>A</strong>. This is a performance optimization. These empty objects are not saved
 to the database, nor are they in the result <code>toObject()</code>, nor do they show
 up in <code>JSON.stringify()</code> output unless you turn off the <a href="http://mongoosejs.com/docs/guide.html#minimize"><code>minimize</code> option</a>.</p>
 <p>The reason for this behavior is that Mongoose&#39;s change detection
@@ -309,96 +329,137 @@ mongoose defines properties on the <code>Model</code> prototype when the model i
 Because mongoose needs to define getters and setters for <code>nested.prop</code>, <code>nested</code>
 must always be defined as an object on a mongoose document, even if <code>nested</code>
 is undefined on the underlying <a href="http://mongoosejs.com/docs/guide.html#minimize">POJO</a>.</p>
-<hr id="arrow-functions"><p><strong>Q</strong>. I&#39;m using an arrow function for a <a href="http://mongoosejs.com/docs/guide.html#virtuals">virtual</a>, getter/setter, or <a href="http://mongoosejs.com/docs/guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
+<hr id="arrow-functions" />
+
+<p><strong>Q</strong>. I&#39;m using an arrow function for a <a href="http://mongoosejs.com/docs/guide.html#virtuals">virtual</a>, getter/setter, or <a href="http://mongoosejs.com/docs/guide.html#methods">method</a> and the value of <code>this</code> is wrong.</p>
 <p><strong>A</strong>. Arrow functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this">handle the <code>this</code> keyword much differently than conventional functions</a>.
 Mongoose getters/setters depend on <code>this</code> to give you access to the document that you&#39;re writing to, but this functionality does not work with arrow functions. Do <strong>not</strong> use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.</p>
-// Do **NOT** use arrow functions as shown below unless you're certain
-// that's what you want. If you're reading this FAQ, odds are you should
-// just be using a conventional function.
-var schema = new mongoose.Schema({
+<pre><code class="lang-javascript"><span class="hljs-comment">// Do **NOT** use arrow functions as shown below unless you're certain</span>
+<span class="hljs-comment">// that's what you want. If you're reading this FAQ, odds are you should</span>
+<span class="hljs-comment">// just be using a conventional function.</span>
+<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   propWithGetter: {
-    type: String,
-    get: v => {
-      // Will **not** be the doc, do **not** use arrow functions for getters/setters
-      console.log(this);
-      return v;
+    type: <span class="hljs-built_in">String</span>,
+    get: v =&gt; {
+      <span class="hljs-comment">// Will **not** be the doc, do **not** use arrow functions for getters/setters</span>
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">return</span> v;
     }
   }
 });
 
-// `this` will **not** be the doc, do **not** use arrow functions for methods
-schema.method.arrowMethod = () => this;
-schema.virtual('virtualWithArrow').get(() => {
-  // `this` will **not** be the doc, do **not** use arrow functions for virtuals
-  console.log(this);
+<span class="hljs-comment">// `this` will **not** be the doc, do **not** use arrow functions for methods</span>
+schema.method.arrowMethod = () =&gt; <span class="hljs-keyword">this</span>;
+schema.virtual(<span class="hljs-string">'virtualWithArrow'</span>).get(() =&gt; {
+  <span class="hljs-comment">// `this` will **not** be the doc, do **not** use arrow functions for virtuals</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>);
 });
-<hr id="type-key"><p><strong>Q</strong>. I have an embedded property named <code>type</code> like this:</p>
-const holdingSchema = new Schema({
-  // You might expect `asset` to be an object that has 2 properties,
-  // but unfortunately `type` is special in mongoose so mongoose
-  // interprets this schema to mean that `asset` is a string
+</code></pre>
+<hr id="type-key">
+
+<p><strong>Q</strong>. I have an embedded property named <code>type</code> like this:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> holdingSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// You might expect `asset` to be an object that has 2 properties,</span>
+  <span class="hljs-comment">// but unfortunately `type` is special in mongoose so mongoose</span>
+  <span class="hljs-comment">// interprets this schema to mean that `asset` is a string</span>
   asset: {
-    type: String,
-    ticker: String
+    type: <span class="hljs-built_in">String</span>,
+    ticker: <span class="hljs-built_in">String</span>
   }
-});<p>But mongoose gives me a CastError telling me that it can&#39;t cast an object
+});
+</code></pre>
+<p>But mongoose gives me a CastError telling me that it can&#39;t cast an object
 to a string when I try to save a <code>Holding</code> with an <code>asset</code> object. Why
 is this?</p>
-Holding.create({ asset: { type: 'stock', ticker: 'MDB' } }).catch(error => {
-  // Cast to String failed for value "{ type: 'stock', ticker: 'MDB' }" at path "asset"
-  console.error(error);
-});<p><strong>A</strong>. The <code>type</code> property is special in mongoose, so when you say
+<pre><code class="lang-javascript">Holding.create({ asset: { type: <span class="hljs-string">'stock'</span>, ticker: <span class="hljs-string">'MDB'</span> } }).catch(error =&gt; {
+  <span class="hljs-comment">// Cast to String failed for value "{ type: 'stock', ticker: 'MDB' }" at path "asset"</span>
+  <span class="hljs-built_in">console</span>.error(error);
+});
+</code></pre>
+<p><strong>A</strong>. The <code>type</code> property is special in mongoose, so when you say
 <code>type: String</code>, mongoose interprets it as a type declaration. In the
 above schema, mongoose thinks <code>asset</code> is a string, not an object. Do
 this instead:</p>
-const holdingSchema = new Schema({
-  // This is how you tell mongoose you mean `asset` is an object with
-  // a string property `type`, as opposed to telling mongoose that `asset`
-  // is a string.
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> holdingSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// This is how you tell mongoose you mean `asset` is an object with</span>
+  <span class="hljs-comment">// a string property `type`, as opposed to telling mongoose that `asset`</span>
+  <span class="hljs-comment">// is a string.</span>
   asset: {
-    type: { type: String },
-    ticker: String
+    type: { type: <span class="hljs-built_in">String</span> },
+    ticker: <span class="hljs-built_in">String</span>
   }
 });
-<hr id="date_changes"><p><strong>Q</strong>. Why don&#39;t in-place modifications to date objects
+</code></pre>
+<hr id="date_changes" />
+
+<p><strong>Q</strong>. Why don&#39;t in-place modifications to date objects
 (e.g. <code>date.setMonth(1);</code>) get saved?</p>
-doc.createdAt.setDate(2011, 5, 1);
-doc.save(); // createdAt changes won't get saved!<p><strong>A</strong>. Mongoose currently doesn&#39;t watch for in-place updates to date
+<pre><code class="lang-javascript">doc.createdAt.setDate(<span class="hljs-number">2011</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>);
+doc.save(); <span class="hljs-comment">// createdAt changes won't get saved!</span>
+</code></pre>
+<p><strong>A</strong>. Mongoose currently doesn&#39;t watch for in-place updates to date
 objects. If you have need for this feature, feel free to discuss on
 <a href="https://github.com/Automattic/mongoose/issues/3738">this GitHub issue</a>.
 There are several workarounds:</p>
-doc.createdAt.setDate(2011, 5, 1);
-doc.markModified('createdAt');
-doc.save(); // Worksdoc.createdAt = new Date(2011, 5, 1).setHours(4);
-doc.save(); // Works
-<hr id="populate_sort_order"><p><strong>Q</strong>. I&#39;m populating a nested property under an array like the below code:</p>
-<pre><code>  <span class="hljs-keyword">new</span> Schema({
+<pre><code class="lang-javascript">doc.createdAt.setDate(<span class="hljs-number">2011</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>);
+doc.markModified(<span class="hljs-string">'createdAt'</span>);
+doc.save(); <span class="hljs-comment">// Works</span>
+
+doc.createdAt = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(<span class="hljs-number">2011</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>).setHours(<span class="hljs-number">4</span>);
+doc.save(); <span class="hljs-comment">// Works</span>
+</code></pre>
+<hr id="populate_sort_order" />
+
+<p><strong>Q</strong>. I&#39;m populating a nested property under an array like the below code:</p>
+<pre><code class="lang-javascript">  <span class="hljs-keyword">new</span> Schema({
     arr: [{
       child: { ref: <span class="hljs-string">'OtherModel'</span>, type: Schema.Types.ObjectId }
     }]
   });
-</code></pre><p><code>.populate({ path: &#39;arr.child&#39;, options: { sort: &#39;name&#39; } })</code> won&#39;t sort
+</code></pre>
+<p><code>.populate({ path: &#39;arr.child&#39;, options: { sort: &#39;name&#39; } })</code> won&#39;t sort
 by <code>arr.child.name</code>?</p>
 <p><strong>A</strong>. See <a href="https://github.com/Automattic/mongoose/issues/2202">this GitHub issue</a>. It&#39;s a known issue but one that&#39;s exceptionally difficult to fix.</p>
-<hr id="model_functions_hanging"><p><strong>Q</strong>. All function calls on my models hang, what am I doing wrong?</p>
+<hr id="model_functions_hanging" />
+
+<p><strong>Q</strong>. All function calls on my models hang, what am I doing wrong?</p>
 <p><strong>A</strong>. By default, mongoose will buffer your function calls until it can
 connect to MongoDB. Read the <a href="http://mongoosejs.com/docs/connections.html#buffering">buffering section of the connection docs</a>
 for more information.</p>
-<hr id="enable_debugging"><p><strong>Q</strong>. How can I enable debugging?</p>
-<p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p>
-mongoose.set('debug', true)<p>All executed collection methods will log output of their arguments to your console.</p>
-<hr id="callback_never_executes"><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
-<p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc.) are queued until the <code>connection</code> opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.</p>
-// if connecting on the default mongoose connection
-mongoose.connect(..);
-mongoose.connection.on('error', handleError);
+<hr id="enable_debugging" />
 
-// if connecting on a separate connection
-var conn = mongoose.createConnection(..);
-conn.on('error', handleError);<p>If you want to opt out of mongoose&#39;s buffering mechanism across your entire application, set the global <code>bufferCommands</code> option to false:</p>
-mongoose.set('bufferCommands', false);<hr id="creating_connections"><p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
-<p><strong>A</strong>. No. Open your connection when your application starts up and leave it open until the application shuts down.</p>
-<hr id="overwrite-model-error"><p><strong>Q</strong>. Why do I get &quot;OverwriteModelError: Cannot overwrite .. model once
+<p><strong>Q</strong>. How can I enable debugging?</p>
+<p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p>
+<pre><code class="lang-javascript">mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-literal">true</span>)
+</code></pre>
+<p>All executed collection methods will log output of their arguments to your
+console.</p>
+<hr id="callback_never_executes" />
+
+<p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
+<p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc.) are queued
+until the <code>connection</code> opens. It is likely that an error occurred while
+attempting to connect. Try adding an error handler to your connection.</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// if connecting on the default mongoose connection</span>
+mongoose.connect(..);
+mongoose.connection.on(<span class="hljs-string">'error'</span>, handleError);
+
+<span class="hljs-comment">// if connecting on a separate connection</span>
+<span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+conn.on(<span class="hljs-string">'error'</span>, handleError);
+</code></pre>
+<p>If you want to opt out of mongoose&#39;s buffering mechanism across your entire
+application, set the global <code>bufferCommands</code> option to false:</p>
+<pre><code class="lang-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">false</span>);
+</code></pre>
+<hr id="creating_connections" />
+
+<p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
+<p><strong>A</strong>. No. Open your connection when your application starts up and leave
+it open until the application shuts down.</p>
+<hr id="overwrite-model-error" />
+
+<p><strong>Q</strong>. Why do I get &quot;OverwriteModelError: Cannot overwrite .. model once
 compiled&quot; when I use nodemon / a testing framework?</p>
 <p><strong>A</strong>. <code>mongoose.model(&#39;ModelName&#39;, schema)</code> requires &#39;ModelName&#39; to be
 unique, so you can access the model by using <code>mongoose.model(&#39;ModelName&#39;)</code>.
@@ -408,17 +469,20 @@ attempt to create a new model named &#39;ModelName&#39; before <strong>every</st
 and so you will get an error. Make sure you only create a new model with
 a given name <strong>once</strong>. If you need to create multiple models with the
 same name, create a new connection and bind the model to the connection.</p>
-var mongoose = require('mongoose');
-var connection = mongoose.createConnection(..);
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">var</span> connection = mongoose.createConnection(..);
 
-// use mongoose.Schema
-var kittySchema = mongoose.Schema({ name: String });
+<span class="hljs-comment">// use mongoose.Schema</span>
+<span class="hljs-keyword">var</span> kittySchema = mongoose.Schema({ name: <span class="hljs-built_in">String</span> });
 
-// use connection.model
-var Kitten = connection.model('Kitten', kittySchema);
-<hr><p><strong>Something to add?</strong></p>
-<p>If you&#39;d like to contribute to this page, please <a href="https://github.com/Automattic/mongoose/tree/master/docs/faq.jade">visit it</a> on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p>
-<br></div></div><script type="text/javascript">!function(name,path,ctx){
+<span class="hljs-comment">// use connection.model</span>
+<span class="hljs-keyword">var</span> Kitten = connection.model(<span class="hljs-string">'Kitten'</span>, kittySchema);
+</code></pre>
+<p><strong>Something to add?</strong></p>
+<p>If you&#39;d like to contribute to this page, please
+<a href="https://github.com/Automattic/mongoose/tree/master/docs/faq.jade">visit it</a>
+on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 

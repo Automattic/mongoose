@@ -49,7 +49,6 @@ describe('model middleware', function() {
       next();
     });
 
-    const db = start();
     const TestMiddleware = db.model('TestPostSaveMiddleware', schema);
 
     const test = new TestMiddleware({title: 'Little Green Running Hood'});
@@ -58,7 +57,6 @@ describe('model middleware', function() {
       assert.ifError(err);
       assert.equal(test.title, 'Little Green Running Hood');
       assert.equal(called, 3);
-      db.close();
       done();
     });
   });
@@ -150,12 +148,11 @@ describe('model middleware', function() {
       next();
     });
 
-    var db = start();
     var Book = db.model('gh2462', schema);
 
     Book.create({}, function() {
       assert.equal(count, 2);
-      db.close(done);
+      done();
     });
   });
 
@@ -182,8 +179,7 @@ describe('model middleware', function() {
 
     mongoose.model('TestMiddleware', schema);
 
-    var db = start(),
-        TestMiddleware = db.model('TestMiddleware');
+    var TestMiddleware = db.model('TestMiddleware');
 
     var test = new TestMiddleware();
 
@@ -197,7 +193,6 @@ describe('model middleware', function() {
         assert.equal(called, 2);
 
         test.remove(function(err) {
-          db.close();
           assert.ifError(err);
           assert.equal(called, 3);
           done();
@@ -225,8 +220,7 @@ describe('model middleware', function() {
 
     mongoose.model('TestPostInitMiddleware', schema);
 
-    var db = start(),
-        Test = db.model('TestPostInitMiddleware');
+    var Test = db.model('TestPostInitMiddleware');
 
     var test = new Test({title: 'banana'});
 
@@ -238,7 +232,6 @@ describe('model middleware', function() {
         assert.equal(preinit, 1);
         assert.equal(postinit, 1);
         test.remove(function() {
-          db.close();
           done();
         });
       });
@@ -271,7 +264,6 @@ describe('model middleware', function() {
       next();
     });
 
-    var db = start();
     var Parent = db.model('gh-1829', parentSchema, 'gh-1829');
 
     var parent = new Parent({
@@ -297,7 +289,6 @@ describe('model middleware', function() {
         assert.equal(childPreCallsByName.Jacen, 2);
 
         assert.equal(parentPreCalls, 2);
-        db.close();
         done();
       });
     });
@@ -382,8 +373,7 @@ describe('model middleware', function() {
       ++postRemove;
     });
 
-    var db = start(),
-        Test = db.model('TestPostValidateMiddleware', schema);
+    var Test = db.model('TestPostValidateMiddleware', schema);
 
     var test = new Test({title: 'banana'});
 
@@ -394,7 +384,6 @@ describe('model middleware', function() {
       assert.equal(preRemove, 0);
       assert.equal(postRemove, 0);
       test.remove(function(err) {
-        db.close();
         assert.ifError(err);
         assert.equal(preValidate, 1);
         assert.equal(postValidate, 1);

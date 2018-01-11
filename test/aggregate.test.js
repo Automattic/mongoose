@@ -26,7 +26,7 @@ var EmployeeSchema = new Schema({
 
 mongoose.model('Employee', EmployeeSchema);
 
-function setupData(callback) {
+function setupData(db, callback) {
   var saved = 0;
   var emps = [
     { name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred'] },
@@ -34,7 +34,6 @@ function setupData(callback) {
     { name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob' },
     { name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol' }
   ];
-  var db = start();
   var Employee = db.model('Employee');
 
   emps.forEach(function(data) {
@@ -42,7 +41,7 @@ function setupData(callback) {
 
     emp.save(function() {
       if (++saved === emps.length) {
-        callback(db);
+        callback();
       }
     });
   });
@@ -74,6 +73,16 @@ function onlyTestMongo34(ctx, done) {
  */
 
 describe('aggregate: ', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('append', function() {
     it('(pipeline)', function(done) {
       var aggregate = new Aggregate();
@@ -504,17 +513,8 @@ describe('aggregate: ', function() {
   });
 
   describe('exec', function() {
-    var db;
-
     before(function(done) {
-      setupData(function(_db) {
-        db = _db;
-        done();
-      });
-    });
-
-    after(function(done) {
-      db.close(done);
+      setupData(db, done);
     });
 
     it('project', function(done) {
@@ -883,16 +883,6 @@ describe('aggregate: ', function() {
     });
 
     describe('middleware (gh-5251)', function() {
-      var db;
-
-      before(function() {
-        db = start();
-      });
-
-      after(function(done) {
-        db.close(done);
-      });
-
       it('pre', function(done) {
         var s = new Schema({ name: String });
 
@@ -1026,8 +1016,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor (gh-3160)', function() {
-    const db = start();
-
     const MyModel = db.model('gh3160', { name: String });
 
     return co(function * () {
@@ -1059,8 +1047,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() with useMongooseAggCursor (gh-5145)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh5145', { name: String });
 
     var cursor = MyModel.
@@ -1073,8 +1059,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() with useMongooseAggCursor works (gh-5145) (gh-5394)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh5394', { name: String });
 
     MyModel.create({ name: 'test' }, function(error) {
@@ -1097,8 +1081,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() eachAsync (gh-4300)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh4300', { name: String });
 
     var cur = 0;
@@ -1128,8 +1110,6 @@ describe('aggregate: ', function() {
   });
 
   it('ability to add noCursorTimeout option (gh-4241)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh4241', {
       name: String
     });
@@ -1147,8 +1127,6 @@ describe('aggregate: ', function() {
   });
 
   it('query by document (gh-4866)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh4866', {
       name: String
     });
@@ -1162,8 +1140,6 @@ describe('aggregate: ', function() {
   });
 
   it('sort by text score (gh-5258)', function(done) {
-    var db = start();
-
     var mySchema = new Schema({ test: String });
     mySchema.index({ test: 'text' });
     var M = db.model('gh5258', mySchema);

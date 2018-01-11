@@ -23,6 +23,7 @@ describe('model: update:', function() {
   var BlogPost;
   var collection;
   var strictSchema;
+  var db;
 
   before(function() {
     Comments = new Schema({});
@@ -77,6 +78,12 @@ describe('model: update:', function() {
       return 'i am a virtual FOO!';
     });
     mongoose.model('UpdateStrictSchema', strictSchema);
+
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   beforeEach(function(done) {
@@ -104,8 +111,7 @@ describe('model: update:', function() {
   });
 
   it('works', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    var BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post._id, function(err, cf) {
       assert.ifError(err);
@@ -205,7 +211,7 @@ describe('model: update:', function() {
                     // non-schema data was still stored in mongodb
                     assert.strictEqual(1, up._doc.idontexist);
 
-                    db.close(done);
+                    done();
                   });
                 });
               });
@@ -217,8 +223,7 @@ describe('model: update:', function() {
   });
 
   it('casts doc arrays', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    var BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
       comments: [{body: 'worked great'}],
@@ -239,26 +244,24 @@ describe('model: update:', function() {
         assert.equal(up.comments[0].body, 'worked great');
         assert.strictEqual(true, !!doc.comments[0]._id);
 
-        db.close(done);
+        done();
       });
     });
   });
 
   it('makes copy of conditions and update options', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection);
+    var BlogPost = db.model('BlogPostForUpdates', collection);
 
     var conditions = {'_id': post._id.toString()};
     var update = {'$set': {'some_attrib': post._id.toString()}};
     BlogPost.update(conditions, update, function(err) {
       assert.ifError(err);
       assert.equal(typeof conditions._id, 'string');
-      db.close(done);
+      done();
     });
   });
 
   it('$addToSet with $ (gh-479)', function(done) {
-    const db = start();
     const BlogPost = db.model('BlogPostForUpdates', collection);
 
     function a() {
@@ -284,23 +287,17 @@ describe('model: update:', function() {
         assert.strictEqual(true, !!ret.comments[0].comments);
         assert.equal(ret.comments[0].comments.length, 1);
         assert.strictEqual(ret.comments[0].comments[0].body, 'The Ring Of Power');
-        db.close(done);
+        done();
       });
     });
   });
 
   describe('using last', function() {
     let BlogPost;
-    let db;
     let last;
 
     before(function() {
-      db = start();
       BlogPost = db.model('BlogPostForUpdates', collection);
-    });
-
-    after(function(done) {
-      db.close(done);
     });
 
     beforeEach(function(done) {
@@ -393,7 +390,6 @@ describe('model: update:', function() {
   });
 
   it('works with nested positional notation', function(done) {
-    const db = start();
     const BlogPost = db.model('BlogPostForUpdates', collection);
 
     const update = {
@@ -412,13 +408,12 @@ describe('model: update:', function() {
         assert.equal(ret.comments[1].body, '9000');
         assert.equal(ret.comments[0].comments[0].date.toString(), new Date('11/5/2011').toString());
         assert.equal(ret.comments[1].comments.length, 0);
-        db.close(done);
+        done();
       });
     });
   });
 
   it('handles $pull with obj literal (gh-542)', function(done) {
-    var db = start();
     var BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function(err, doc) {
@@ -434,14 +429,13 @@ describe('model: update:', function() {
           assert.ifError(err);
           assert.equal(ret.comments.length, 1);
           assert.equal(ret.comments[0].body, 'done that');
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   it('handles $pull of obj literal and nested $in', function(done) {
-    const db = start();
     const BlogPost = db.model('BlogPostForUpdates', collection);
 
     const update = {
@@ -455,13 +449,12 @@ describe('model: update:', function() {
         assert.equal(ret.comments.length, 1);
         assert.equal(ret.comments[0].body, 'done that');
 
-        db.close(done);
+        done();
       });
     });
   });
 
   it('handles $pull and nested $nin', function(done) {
-    const db = start();
     const BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function(err, doc) {
@@ -484,7 +477,7 @@ describe('model: update:', function() {
               assert.ifError(err);
               assert.equal(ret.comments.length, 1);
               assert.equal(ret.comments[0].body, 'there');
-              db.close(done);
+              done();
             });
           });
         });
@@ -493,8 +486,7 @@ describe('model: update:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    var db = start(),
-        BlogPost = db.model('BlogPostForUpdates', collection),
+    var BlogPost = db.model('BlogPostForUpdates', collection),
         totalDocs = 4;
 
     var post = new BlogPost;
@@ -502,7 +494,6 @@ describe('model: update:', function() {
 
     function complete() {
       BlogPost.findOne({_id: post.get('_id')}, function(err, doc) {
-        db.close();
         assert.ifError(err);
         assert.equal(doc.get('meta.visitors'), 9);
         done();
@@ -524,18 +515,16 @@ describe('model: update:', function() {
 
   describe('honors strict schemas', function() {
     it('(gh-699)', function(done) {
-      var db = start();
       var S = db.model('UpdateStrictSchema');
 
       var doc = S.find()._castUpdate({ignore: true});
       assert.equal(doc, false);
       doc = S.find()._castUpdate({$unset: {x: 1}});
       assert.equal(Object.keys(doc.$unset).length, 1);
-      db.close(done);
+      done();
     });
 
     it('works', function(done) {
-      var db = start();
       var S = db.model('UpdateStrictSchema');
       var s = new S({name: 'orange crush'});
 
@@ -556,7 +545,6 @@ describe('model: update:', function() {
               assert.equal(affected.n, 1);
 
               S.findById(s._id, function(err, doc) {
-                db.close();
                 assert.ifError(err);
                 assert.ok(!doc._doc.foo);
                 done();
@@ -569,13 +557,11 @@ describe('model: update:', function() {
   });
 
   it('passes number of affected docs', function(done) {
-    var db = start(),
-        B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
+    var B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
 
     B.create({title: 'one'}, {title: 'two'}, {title: 'three'}, function(err) {
       assert.ifError(err);
       B.update({}, {title: 'newtitle'}, {multi: true}, function(err, affected) {
-        db.close();
         assert.ifError(err);
         assert.equal(affected.n, 3);
         done();
@@ -584,7 +570,6 @@ describe('model: update:', function() {
   });
 
   it('updates a number to null (gh-640)', function(done) {
-    var db = start();
     var B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
     var b = new B({meta: {visitors: null}});
     b.save(function(err) {
@@ -594,7 +579,6 @@ describe('model: update:', function() {
         assert.strictEqual(b.meta.visitors, null);
 
         B.update({_id: b._id}, {meta: {visitors: null}}, function(err) {
-          db.close();
           assert.strictEqual(null, err);
           done();
         });
@@ -603,7 +587,6 @@ describe('model: update:', function() {
   });
 
   it('handles $pull from Mixed arrays (gh-735)', function(done) {
-    var db = start();
     var schema = new Schema({comments: []});
     var M = db.model('gh-735', schema, 'gh-735_' + random());
     M.create({comments: [{name: 'node 0.8'}]}, function(err, doc) {
@@ -611,15 +594,12 @@ describe('model: update:', function() {
       M.update({_id: doc._id}, {$pull: {comments: {name: 'node 0.8'}}}, function(err, affected) {
         assert.ifError(err);
         assert.equal(affected.n, 1);
-        db.close();
         done();
       });
     });
   });
 
   it('handles $push with $ positionals (gh-1057)', function(done) {
-    var db = start();
-
     var taskSchema = new Schema({
       name: String
     });
@@ -654,7 +634,7 @@ describe('model: update:', function() {
             assert.equal(proj.components[0].tasks.length, 1);
             assert.equal(proj.components[0].tasks[0].name, 'my task');
             assert.equal(task.id, proj.components[0].tasks[0].id);
-            db.close(done);
+            done();
           });
         });
       });
@@ -662,7 +642,6 @@ describe('model: update:', function() {
   });
 
   it('handles nested paths starting with numbers (gh-1062)', function(done) {
-    var db = start();
     var schema = new Schema({counts: Schema.Types.Mixed});
     var M = db.model('gh-1062', schema, '1062-' + random());
     M.create({counts: {}}, function(err, m) {
@@ -673,15 +652,13 @@ describe('model: update:', function() {
           assert.ifError(err);
           assert.equal(doc.counts['1'], 1);
           assert.equal(doc.counts['1a'], 10);
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   it('handles positional operators with referenced docs (gh-1572)', function(done) {
-    var db = start();
-
     var so = new Schema({title: String, obj: [String]});
     var Some = db.model('Some' + random(), so);
 
@@ -695,14 +672,13 @@ describe('model: update:', function() {
           assert.ifError(err);
 
           assert.strictEqual(ss.obj[1], '2');
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   it('use .where for update condition (gh-2170)', function(done) {
-    var db = start();
     var so = new Schema({num: Number});
     var Some = db.model('gh-2170' + random(), so);
 
@@ -722,7 +698,7 @@ describe('model: update:', function() {
           Some.findById(sId1, function(err, doc1_1) {
             assert.ifError(err);
             assert.equal(doc1_1.num, 1);
-            db.close(done);
+            done();
           });
         });
       });
@@ -746,7 +722,6 @@ describe('model: update:', function() {
         return done();
       }
 
-      var db = start();
       var schema = new Schema({name: String, age: Number, x: String});
       var M = db.model('setoninsert-' + random(), schema);
 
@@ -767,7 +742,7 @@ describe('model: update:', function() {
             M.findOne(function(err, doc) {
               assert.equal(doc.age, 47);
               assert.equal(doc.name, 'changed');
-              db.close(done);
+              done();
             });
           });
         });
@@ -780,7 +755,6 @@ describe('model: update:', function() {
         return done();
       }
 
-      var db = start();
       var schema = new Schema({name: String, n: [{x: Number}]});
       var M = db.model('setoninsert-' + random(), schema);
 
@@ -818,7 +792,7 @@ describe('model: update:', function() {
               M.findById(created._id, function(error, doc) {
                 assert.ifError(error);
                 assert.equal(doc.n.length, 0);
-                db.close(done);
+                done();
               });
             });
           });
@@ -843,7 +817,6 @@ describe('model: update:', function() {
         return done();
       }
 
-      var db = start();
       var schema = new Schema({name: String, n: [{x: Number}]});
       var M = db.model('setoninsert-' + random(), schema);
 
@@ -862,7 +835,7 @@ describe('model: update:', function() {
               assert.equal(m.n[0].x, 2);
               assert.equal(m.n[1].x, 1);
               assert.equal(m.n[2].x, 0);
-              db.close(done);
+              done();
             });
           });
       });
@@ -873,7 +846,6 @@ describe('model: update:', function() {
         return done();
       }
 
-      var db = start();
       var schema = new Schema({name: String, lastModified: Date, lastModifiedTS: Date});
       var M = db.model('gh-2019', schema);
 
@@ -891,7 +863,7 @@ describe('model: update:', function() {
               assert.ifError(error);
               assert.ok(m.lastModified.getTime() >= before);
               assert.ok(m.lastModified.getTime() <= after);
-              db.close(done);
+              done();
             });
           });
       });
@@ -900,7 +872,6 @@ describe('model: update:', function() {
 
   describe('{overwrite: true}', function() {
     it('overwrite works', function(done) {
-      var db = start();
       var schema = new Schema({mixed: {}}, { minimize: false });
       var M = db.model('updatesmixed-' + random(), schema);
 
@@ -914,14 +885,13 @@ describe('model: update:', function() {
             assert.equal(created.id, doc.id);
             assert.equal(typeof doc.mixed, 'object');
             assert.equal(Object.keys(doc.mixed).length, 0);
-            db.close(done);
+            done();
           });
         });
       });
     });
 
     it('overwrites all properties', function(done) {
-      var db = start();
       var sch = new Schema({title: String, subdoc: {name: String, num: Number}});
 
       var M = db.model('updateover' + random(), sch);
@@ -936,14 +906,13 @@ describe('model: update:', function() {
             assert.equal(doc.title, 'something!');
             assert.equal(doc.subdoc.name, undefined);
             assert.equal(doc.subdoc.num, undefined);
-            db.close(done);
+            done();
           });
         });
       });
     });
 
     it('allows users to blow it up', function(done) {
-      var db = start();
       var sch = new Schema({title: String, subdoc: {name: String, num: Number}});
 
       var M = db.model('updateover' + random(), sch);
@@ -958,7 +927,7 @@ describe('model: update:', function() {
             assert.equal(doc.title, undefined);
             assert.equal(doc.subdoc.name, undefined);
             assert.equal(doc.subdoc.num, undefined);
-            db.close(done);
+            done();
           });
         });
       });
@@ -966,8 +935,6 @@ describe('model: update:', function() {
   });
 
   it('casts empty arrays', function(done) {
-    var db = start();
-
     var so = new Schema({arr: []});
     var Some = db.model('1838-' + random(), so);
 
@@ -986,23 +953,13 @@ describe('model: update:', function() {
           }
           assert.ok(Array.isArray(doc.arr));
           assert.strictEqual(0, doc.arr.length);
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   describe('defaults and validators (gh-860)', function() {
-    var db;
-
-    before(function() {
-      db = start();
-    });
-
-    after(function(done) {
-      db.close(done);
-    });
-
     it('applies defaults on upsert', function(done) {
       var s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
       var Breakfast = db.model('gh-860-0', s);
@@ -1260,8 +1217,6 @@ describe('model: update:', function() {
   });
 
   it('works with $set and overwrite (gh-2515)', function(done) {
-    var db = start();
-
     var schema = new Schema({breakfast: String});
     var M = db.model('gh-2515', schema);
 
@@ -1276,15 +1231,13 @@ describe('model: update:', function() {
           M.findOne({_id: doc._id}, function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.breakfast, 'eggs');
-            db.close(done);
+            done();
           });
         });
     });
   });
 
   it('successfully casts set with nested mixed objects (gh-2796)', function(done) {
-    var db = start();
-
     var schema = new Schema({breakfast: {}});
     var M = db.model('gh-2796', schema);
 
@@ -1300,17 +1253,15 @@ describe('model: update:', function() {
           M.findOne({_id: doc._id}, function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.breakfast.eggs, 2);
-            db.close(done);
+            done();
           });
         });
     });
   });
 
   it('handles empty update with promises (gh-2796)', function(done) {
-    var db = start();
-
     var schema = new Schema({eggs: Number});
-    var M = db.model('gh-2796', schema);
+    var M = db.model('Breakfast', schema);
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
@@ -1318,7 +1269,7 @@ describe('model: update:', function() {
         then(function(data) {
           assert.equal(data.ok, 0);
           assert.equal(data.n, 0);
-          db.close(done);
+          done();
         }).
         catch(done);
     });
@@ -1326,8 +1277,6 @@ describe('model: update:', function() {
 
   describe('middleware', function() {
     it('can specify pre and post hooks', function(done) {
-      var db = start();
-
       var numPres = 0;
       var numPosts = 0;
       var band = new Schema({members: [String]});
@@ -1356,15 +1305,13 @@ describe('model: update:', function() {
               assert.ifError(error);
               assert.deepEqual(['Axl', 'Slash', 'Izzy', 'Duff'],
                 doc.toObject().members);
-              db.close(done);
+              done();
             });
           });
       });
     });
 
     it('runs before validators (gh-2706)', function(done) {
-      var db = start();
-
       var bandSchema = new Schema({
         lead: {type: String, enum: ['Axl Rose']}
       });
@@ -1375,21 +1322,11 @@ describe('model: update:', function() {
 
       Band.update({}, {$set: {lead: 'Not Axl'}}, function(err) {
         assert.ok(err);
-        db.close(done);
+        done();
       });
     });
 
     describe('objects and arrays', function() {
-      var db;
-
-      before(function() {
-        db = start();
-      });
-
-      after(function(done) {
-        db.close(done);
-      });
-
       it('embedded objects (gh-2706)', function(done) {
         var bandSchema = new Schema({
           singer: {
@@ -1452,8 +1389,6 @@ describe('model: update:', function() {
   });
 
   it('works with overwrite but no $set (gh-2568)', function(done) {
-    var db = start();
-
     var chapterSchema = {
       name: String
     };
@@ -1480,14 +1415,12 @@ describe('model: update:', function() {
           assert.equal(book.chapters.length, 2);
           assert.ok(book.chapters[0]._id);
           assert.ok(book.chapters[1]._id);
-          db.close(done);
+          done();
         });
       });
   });
 
   it('works with undefined date (gh-2833)', function(done) {
-    var db = start();
-
     var dateSchema = {
       d: Date
     };
@@ -1495,14 +1428,12 @@ describe('model: update:', function() {
 
     assert.doesNotThrow(function() {
       D.update({}, {d: undefined}, function() {
-        db.close(done);
+        done();
       });
     });
   });
 
   it('does not add virtuals to update (gh-2046)', function(done) {
-    var db = start();
-
     var childSchema = new Schema({foo: String}, {toObject: {getters: true}});
     var parentSchema = new Schema({children: [childSchema]});
 
@@ -1521,13 +1452,12 @@ describe('model: update:', function() {
         assert.ifError(error);
         assert.equal(doc.children.length, 1);
         assert.ok(!doc.children[0].bar);
-        db.close(done);
+        done();
       });
     });
   });
 
   it('doesnt modify original argument doc (gh-3008)', function(done) {
-    var db = start();
     var FooSchema = new mongoose.Schema({
       key: Number,
       value: String
@@ -1537,24 +1467,12 @@ describe('model: update:', function() {
     var update = {$set: {values: 2, value: 2}};
     Model.update({key: 1}, update, function() {
       assert.equal(update.$set.values, 2);
-      db.close(done);
+      done();
     });
   });
 
   describe('bug fixes', function() {
-    var db;
-
-    before(function() {
-      db = start();
-    });
-
-    after(function(done) {
-      db.close(done);
-    });
-
     it('can $rename (gh-1845)', function(done) {
-      var db = start();
-
       var schema = new Schema({ foo: Date, bar: Date });
       var Model = db.model('gh1845', schema, 'gh1845');
 
@@ -1565,7 +1483,7 @@ describe('model: update:', function() {
           assert.ifError(error);
           assert.ok(res.ok);
           assert.equal(res.nModified, 1);
-          db.close(done);
+          done();
         });
       });
     });
@@ -2257,8 +2175,6 @@ describe('model: update:', function() {
     });
 
     it('runs validation on Mixed properties of embedded arrays during updates (gh-4441)', function(done) {
-      var db = start();
-
       var A = new Schema({ str: {} });
       var validateCalls = 0;
       A.path('str').validate(function() {
@@ -2277,7 +2193,7 @@ describe('model: update:', function() {
         function(err) {
           assert.ifError(err);
           assert.equal(validateCalls, 1);
-          db.close(done);
+          done();
         }
       );
     });

@@ -9,6 +9,16 @@ var start = require('./common'),
     Schema = mongoose.Schema;
 
 describe('schema options.timestamps', function() {
+  var conn;
+
+  before(function() {
+    conn = start();
+  });
+
+  after(function(done) {
+    conn.close(done);
+  });
+
   describe('create schema with options.timestamps', function() {
     it('should have createdAt and updatedAt fields', function(done) {
       var TestSchema = new Schema({
@@ -99,7 +109,6 @@ describe('schema options.timestamps', function() {
         timestamps: true
       });
 
-      var conn = start();
       var Test = conn.model('Test', TestSchema);
 
       Test.create({
@@ -142,7 +151,6 @@ describe('schema options.timestamps', function() {
 
   describe('auto update createdAt and updatedAt when create/save/update document', function() {
     var CatSchema;
-    var conn;
     var Cat;
 
     before(function(done) {
@@ -150,7 +158,6 @@ describe('schema options.timestamps', function() {
         name: String,
         hobby: String
       }, {timestamps: true});
-      conn = start();
       Cat = conn.model('Cat', CatSchema);
       Cat.remove({}, done);
     });
@@ -258,9 +265,7 @@ describe('schema options.timestamps', function() {
     });
 
     after(function(done) {
-      Cat.remove({}, function() {
-        conn.close(done);
-      });
+      Cat.remove({}, done);
     });
   });
 });

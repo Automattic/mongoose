@@ -36,6 +36,16 @@ TestDocument.prototype.__proto__ = Document.prototype;
  */
 
 describe('schema', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   before(function() {
     TestDocument.prototype.$__setSchema(new Schema({
       test: String
@@ -43,10 +53,9 @@ describe('schema', function() {
   });
 
   describe('nested fields with same name', function() {
-    var db, NestedModel;
+    var NestedModel;
 
     before(function() {
-      db = start();
       var NestedSchema = new Schema({
         a: {
           b: {
@@ -57,10 +66,6 @@ describe('schema', function() {
         b: { $type: String }
       }, { typeKey: '$type' });
       NestedModel = db.model('Nested', NestedSchema);
-    });
-
-    after(function() {
-      db.close();
     });
 
     it('don\'t disappear', function(done) {
@@ -1155,8 +1160,6 @@ describe('schema', function() {
     });
 
     it('merging nested objects (gh-662)', function(done) {
-      var db = start();
-
       var MergedSchema = new Schema({
         a: {
           foo: String
@@ -1187,7 +1190,6 @@ describe('schema', function() {
       merged.save(function(err) {
         assert.ifError(err);
         Merged.findById(merged.id, function(err, found) {
-          db.close();
           assert.ifError(err);
           assert.equal(found.a.foo, 'baz');
           assert.equal(found.a.b.bar, 'qux');
@@ -1278,7 +1280,6 @@ describe('schema', function() {
     });
 
     it('properly gets value of plain objects when dealing with refs (gh-1606)', function(done) {
-      var db = start();
       var el = new Schema({ title: String });
       var so = new Schema({
         title: String,
@@ -1298,7 +1299,7 @@ describe('schema', function() {
           Some.findOne({ _id: s.id }, function(err, ss) {
             assert.ifError(err);
             assert.equal(ss.obj, ele.id);
-            db.close(done);
+            done();
           });
         });
       });
@@ -1392,7 +1393,6 @@ describe('schema', function() {
     });
 
     it('permit _scope to be used (gh-1184)', function(done) {
-      var db = start();
       var child = new Schema({ _scope: Schema.ObjectId });
       var C = db.model('scope', child);
       var c = new C;
@@ -1405,7 +1405,7 @@ describe('schema', function() {
           err = e;
         }
         assert.ifError(err);
-        db.close(done);
+        done();
       });
     });
   });

@@ -21,6 +21,7 @@ describe('types.document', function() {
   var Subdocument;
   var RatingSchema;
   var MovieSchema;
+  var db;
 
   before(function() {
     function _Dummy() {
@@ -61,6 +62,11 @@ describe('types.document', function() {
     });
 
     mongoose.model('Movie', MovieSchema);
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   it('test that validate sets errors', function(done) {
@@ -97,7 +103,6 @@ describe('types.document', function() {
   });
 
   it('cached _ids', function(done) {
-    var db = start();
     var Movie = db.model('Movie');
     var m = new Movie;
 
@@ -114,11 +119,10 @@ describe('types.document', function() {
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
-    db.close(done);
+    done();
   });
 
   it('Subdocument#remove (gh-531)', function(done) {
-    var db = start();
     var Movie = db.model('Movie');
 
     var super8 = new Movie({title: 'Super 8'});
@@ -179,7 +183,7 @@ describe('types.document', function() {
                 Movie.findById(super8._id, function(err, movie) {
                   assert.ifError(err);
                   assert.equal(movie.ratings.length, 0);
-                  db.close(done);
+                  done();
                 });
               });
             });
@@ -191,7 +195,6 @@ describe('types.document', function() {
 
   describe('setting nested objects', function() {
     it('works (gh-1394)', function(done) {
-      var db = start();
       var Movie = db.model('Movie');
 
       Movie.create({
@@ -234,7 +237,7 @@ describe('types.document', function() {
                   assert.equal(String(newDate), movie.ratings[0].description.source.time);
                   // url not overwritten using merge
                   assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
-                  db.close(done);
+                  done();
                 });
               });
             });

@@ -1,11 +1,59 @@
 extends layout
 
 block content
+  style.
+    .method-type {
+      color: #1485CC;
+      margin-left: 0.25em;
+      margin-right: 0.25em;
+    }
+
+    ul {
+      margin-top: -10px;
+    }
+
+    li {
+      margin-bottom: 0.5em;
+    }
+
+    hr.separate-api-elements {
+      border: 0;
+      height: 1px;
+      background: -webkit-gradient(linear, left top, right top, from(rgba(221, 221, 221, 0.0)), color-stop(0.5, rgba(221, 221, 221, 0.33)), to(rgba(221, 221, 221, 0.0)));
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 45px;
+      margin-bottom: 35px;
+    }
+
+    hr.separate-api {
+      margin-top: 55px;
+      margin-bottom: 45px;
+      border: 0;
+      height: 3px;
+      background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.0)), color-stop(0.5, rgba(0, 0, 0, 0.33)), to(rgba(0, 0, 0, 0.0)));
+    }
+
+  h1 API Docs
+
   each item in docs
+    hr.separate-api
     h2(id="#{item.name}")
       a(href="##{item.name}")
         | #{item.name}
     each prop in item.props
+      hr.separate-api-elements
       h3(id="#{prop.anchorId}")
         a(href="##{prop.anchorId}")
           | #{prop.string}
+      if prop.param != null
+        h5 Parameters
+        ul.params
+          each param in prop.param
+            li.param #{param.name} <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
+      if prop.return != null
+        h5 Returns:
+        ul
+          li <span class="method-type">&laquo;#{prop.return.types}&raquo;</span> #{prop.return.description}
+      div
+        | !{prop.description}

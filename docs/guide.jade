@@ -323,7 +323,7 @@ block content
     - [skipVersioning](#skipVersioning)
     - [timestamps](#timestamps)
 
-    <h4 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h4>
+    <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
     At application startup, Mongoose sends a [`createIndex` command](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model.ensureIndexes) method on your model.
 
@@ -333,7 +333,7 @@ block content
     Clock.ensureIndexes(callback);
     ```
 
-    <h4 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h4>
+    <h3 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h3>
 
     By default, mongoose buffers commands when the connection goes down until
     the driver manages to reconnect. To disable buffering, set `bufferCommands`
@@ -351,7 +351,7 @@ block content
     var schema = new Schema({..}, { bufferCommands: false });
     ```
 
-    <h4 id="capped"><a href="#capped">option: capped</a></h4>
+    <h3 id="capped"><a href="#capped">option: capped</a></h3>
 
     Mongoose supports MongoDBs [capped](http://www.mongodb.org/display/DOCS/Capped+Collections)
     collections. To specify the underlying MongoDB collection be `capped`, set
@@ -371,7 +371,7 @@ block content
     new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
     ```
 
-    <h4 id="collection"><a href="#collection">option: collection</a></h4>
+    <h3 id="collection"><a href="#collection">option: collection</a></h3>
 
     Mongoose by default produces a collection name by passing the model name to
     the [utils.toCollectionName](./api.html#utils_exports.toCollectionName) method.
@@ -382,7 +382,7 @@ block content
     var dataSchema = new Schema({..}, { collection: 'data' });
     ```
 
-    <h4 id="id"><a href="#id">option: id</a></h4>
+    <h3 id="id"><a href="#id">option: id</a></h3>
 
     Mongoose assigns each of your schemas an `id` virtual getter by default
     which returns the documents `_id` field cast to a string, or in the case of
@@ -403,7 +403,7 @@ block content
     console.log(p.id); // undefined
     ```
 
-    <h4 id="_id"><a href="#_id">option: _id</a></h4>
+    <h3 id="_id"><a href="#_id">option: _id</a></h3>
 
     Mongoose assigns each of your schemas an `_id` field by default if one
     is not passed into the [Schema](/docs/api.html#schema-js) constructor.
@@ -433,7 +433,7 @@ block content
     });
     ```
 
-    <h4 id="minimize"><a href="#minimize">option: minimize</a></h4>
+    <h3 id="minimize"><a href="#minimize">option: minimize</a></h3>
 
     Mongoose will, by default, "minimize" schemas by removing empty objects.
 
@@ -468,7 +468,7 @@ block content
     });
     ```
 
-    <h4 id="read"><a href="#read">option: read</a></h4>
+    <h3 id="read"><a href="#read">option: read</a></h3>
 
     Allows setting [query#read](/docs/api.html#query_Query-read) options at the
     schema level, providing us a way to apply default
@@ -504,7 +504,7 @@ block content
     mongoose.model('JellyBean', schema);
     ```
 
-    <h4 id="shardKey"><a href="#shardKey">option: shardKey</a></h4>
+    <h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 
     The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction).
     Each sharded collection is given a shard key which must be present in all
@@ -518,7 +518,7 @@ block content
     _Note that Mongoose does not send the `shardcollection` command for you. You
     must configure your shards yourself._
 
-    <h4 id="strict">option: strict</h4>
+    <h3 id="strict">option: strict</h3>
 
     The strict option, (enabled by default), ensures that values passed to our
     model constructor that were not specified in our schema do not get saved to
@@ -568,7 +568,7 @@ block content
     thing.save(); // iAmNotInTheSchema is never saved to the db
     ```
 
-    <h4 id="toJSON"><a href="#toJSON">option: toJSON</a></h4>
+    <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
     Exactly the same as the [toObject](#toObject) option but only applies when
     the documents `toJSON` method is called.
@@ -589,7 +589,7 @@ block content
 
     To see all available `toJSON/toObject` options, read [this](/docs/api.html#document_Document-toObject).
 
-    <h4 id="toObject"><a href="#toObject">option: toObject</a></h4>
+    <h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
     Documents have a [toObject](/docs/api.html#document_Document-toObject) method
     which converts the mongoose document into a plain javascript object. This
@@ -613,7 +613,7 @@ block content
 
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
 
-    <h4 id="typeKey"><a href="#typeKey">option: typeKey</a></h4>
+    <h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
 
     By default, if you have an object with key 'type' in your schema, mongoose
     will interpret it as a type declaration.
@@ -636,7 +636,7 @@ block content
     }, { typeKey: '$type' }); // A '$type' key means this object is a type declaration
     ```
 
-    <h4 id="validateBeforeSave"><a href="#validateBeforeSave">option: validateBeforeSave</a></h4>
+    <h3 id="validateBeforeSave"><a href="#validateBeforeSave">option: validateBeforeSave</a></h3>
 
     By default, documents are automatically validated before they are saved to
     the database. This is to prevent saving an invalid document. If you want to
@@ -657,7 +657,7 @@ block content
     m.save(); // Succeeds despite being invalid
     ```
 
-    <h4 id="versionKey"><a href="#versionKey">option: versionKey</a></h4>
+    <h3 id="versionKey"><a href="#versionKey">option: versionKey</a></h3>
 
     The `versionKey` is a property set on each document when first created by
     Mongoose. This keys value contains the internal
@@ -690,7 +690,7 @@ block content
     thing.save(); // { name: 'no versioning please' }
     ```
 
-    <h4 id="collation"><a href="#collation">option: collation</a></h4>
+    <h3 id="collation"><a href="#collation">option: collation</a></h3>
 
     Sets a default [collation](https://docs.mongodb.com/manual/reference/collation/)
     for every query and aggregation. [Here's a beginner-friendly overview of collations](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations).
@@ -712,7 +712,7 @@ block content
       });
     ```
 
-    <h4 id="skipVersioning"><a href="#skipVersioning">option: skipVersioning</a></h4>
+    <h3 id="skipVersioning"><a href="#skipVersioning">option: skipVersioning</a></h3>
 
     `skipVersioning` allows excluding paths from versioning (i.e., the internal
     revision will not be incremented even if these paths are updated). DO NOT
@@ -725,7 +725,7 @@ block content
     thing.save(); // version is not incremented
     ```
 
-    <h4 id="timestamps"><a href="#timestamps">option: timestamps</a></h4>
+    <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
     If set `timestamps`, mongoose assigns `createdAt` and `updatedAt` fields to
     your schema, the type assigned is [Date](http://mongoosejs.com/docs/api.html#schema-date-js).
@@ -740,7 +740,7 @@ block content
     thing.save(); // `created_at` & `updatedAt` will be included
     ```
 
-    <h4 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h4>
+    <h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
 
     In mongoose 4, `update()` and `findOneAndUpdate()` only check the top-level
     schema's strict mode setting.

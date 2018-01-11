@@ -4,6 +4,7 @@
  * Module dependencies
  */
 
+const _ = require('lodash');
 const dox = require('dox');
 const fs = require('fs');
 const link = require('../helpers/linktype');
@@ -11,7 +12,10 @@ const hl = require('highlight.js');
 const md = require('markdown');
 
 const files = [
-  'lib/connection.js'
+  'lib/schema.js',
+  'lib/connection.js',
+  'lib/document.js',
+  'lib/model.js'
 ];
 
 module.exports = {
@@ -24,7 +28,9 @@ const out = module.exports.docs;
 
 let combinedFiles = [];
 for (const file of files) {
-  combinedFiles.push(dox.parseComments(fs.readFileSync(`./${file}`, 'utf8')));
+  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'));
+  comments.file = file;
+  combinedFiles.push(comments);
 }
 
 parse();
@@ -32,7 +38,7 @@ parse();
 function parse() {
   for (const props of combinedFiles) {
     const data = {
-      name: 'Connection',
+      name: _.capitalize(props.file.replace('lib/', '').replace('.js', '')),
       props: []
     };
 
@@ -49,20 +55,31 @@ function parse() {
             ctx.name = tag.string;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
             break;
+          case 'return':
+            ctx.return = tag;
+            break;
           case 'inherits':
             ctx[tag.type] = tag.string;
             break;
           case 'event':
+          case 'param':
             ctx[tag.type] = (ctx[tag] || []);
-            ctx[tag.type].push(tag.string);
+            ctx[tag.type].push(tag);
+            tag.description = tag.description ?
+              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
+              '';
             break;
           case 'method':
             ctx.type = 'method';
+            ctx.name = tag.string;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}()`;
             break;
           case 'memberOf':
             ctx.constructor = tag.parent;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+            if (ctx.type === 'method') {
+              ctx.string += '()';
+            }
             break;
         }
       }
@@ -76,9 +93,23 @@ function parse() {
         ctx.anchorId = `${ctx.name.toLowerCase()}_${ctx.name}`;
       }
 
+      ctx.description = highlight(prop.description.full.replace(/<br \/>/ig, ' '));
+
       data.props.push(ctx);
     }
 
     out.push(data);
   }
+}
+
+function highlight(str) {
+  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function (_, $1, $2, $3) {
+    const code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
+
+    if ('js' === code[1] || !code[1]) {
+      code[1] = 'javascript';
+    }
+
+    return $1 + hl.highlight(code[1], code[2]).value.trim() + $3;
+  });
 }

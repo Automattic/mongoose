@@ -41,21 +41,6 @@ h3:hover::before {
   content: ' ';
 }
 
-h4 a {
-  color: #000;
-}
-
-h4:hover::before {
-  position: absolute;
-  left: 22px;
-  margin-top: 4px;
-  background-image: url('/docs/images/link_64x64.png');
-  background-size: contain;
-  height: 1em;
-  width: 1em;
-  content: ' ';
-}
-
 code {
   background-color: #eee;
   padding: 2px 4px;
@@ -126,6 +111,7 @@ li.sub-item {
   left: 250px;
   padding-left: 50px;
   width: 850px;
+  margin-bottom: 250px;
 }
 
 pre {
@@ -245,7 +231,7 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Schemas</h2><div class="important"><p>If you haven&#39;t yet done so, please take a minute to read the <a href="./index.html">quickstart</a> to get an idea of how Mongoose works.
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Schemas</h2><div class="important"><p>If you haven&#39;t yet done so, please take a minute to read the <a href="./index.html">quickstart</a> to get an idea of how Mongoose works.
 If you are migrating from 4.x to 5.x please take a moment to read the <a href="https://github.com/Automattic/mongoose/blob/master/migrating_to_5.md">migration guide</a>.</p>
 </div><h3 id="definition"><a href="#definition">Defining your schema</a></h3>
 
@@ -507,14 +493,14 @@ schema.set(option, value);
 <li><a href="#skipVersioning">skipVersioning</a></li>
 <li><a href="#timestamps">timestamps</a></li>
 </ul>
-<h4 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h4>
+<h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
 <p>At application startup, Mongoose sends a <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"><code>createIndex</code> command</a> for each index declared in your <code>Schema</code>. As of Mongoose v3, indexes are created in the <code>background</code> by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your <code>Schema</code>s <code>autoIndex</code> option to <code>false</code> and use the <a href="./api.html#model_Model.ensureIndexes">ensureIndexes</a> method on your model.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { autoIndex: <span class="hljs-literal">false</span> });
 <span class="hljs-keyword">var</span> Clock = mongoose.model(<span class="hljs-string">'Clock'</span>, schema);
 Clock.ensureIndexes(callback);
 </code></pre>
-<h4 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h4>
+<h3 id="bufferCommands"><a href="#bufferCommands">option: bufferCommands</a></h3>
 
 <p>By default, mongoose buffers commands when the connection goes down until
 the driver manages to reconnect. To disable buffering, set <code>bufferCommands</code>
@@ -526,7 +512,7 @@ to false.</p>
 <span class="hljs-comment">// Schema option below overrides the above, if the schema option is set.</span>
 <span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });
 </code></pre>
-<h4 id="capped"><a href="#capped">option: capped</a></h4>
+<h3 id="capped"><a href="#capped">option: capped</a></h3>
 
 <p>Mongoose supports MongoDBs <a href="http://www.mongodb.org/display/DOCS/Capped+Collections">capped</a>
 collections. To specify the underlying MongoDB collection be <code>capped</code>, set
@@ -540,7 +526,7 @@ or <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollect
 In this case you must explicitly pass the <code>size</code> option, which is required.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">new</span> Schema({..}, { capped: { size: <span class="hljs-number">1024</span>, max: <span class="hljs-number">1000</span>, autoIndexId: <span class="hljs-literal">true</span> } });
 </code></pre>
-<h4 id="collection"><a href="#collection">option: collection</a></h4>
+<h3 id="collection"><a href="#collection">option: collection</a></h3>
 
 <p>Mongoose by default produces a collection name by passing the model name to
 the <a href="./api.html#utils_exports.toCollectionName">utils.toCollectionName</a> method.
@@ -548,7 +534,7 @@ This method pluralizes the name. Set this option if you need a different name
 for your collection.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> dataSchema = <span class="hljs-keyword">new</span> Schema({..}, { collection: <span class="hljs-string">'data'</span> });
 </code></pre>
-<h4 id="id"><a href="#id">option: id</a></h4>
+<h3 id="id"><a href="#id">option: id</a></h3>
 
 <p>Mongoose assigns each of your schemas an <code>id</code> virtual getter by default
 which returns the documents <code>_id</code> field cast to a string, or in the case of
@@ -566,7 +552,7 @@ schema, you may disable it passing this option at schema construction time.</p>
 <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
 <span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// undefined</span>
 </code></pre>
-<h4 id="_id"><a href="#_id">option: _id</a></h4>
+<h3 id="_id"><a href="#_id">option: _id</a></h3>
 
 <p>Mongoose assigns each of your schemas an <code>_id</code> field by default if one
 is not passed into the <a href="/docs/api.html#schema-js">Schema</a> constructor.
@@ -592,7 +578,7 @@ Model.create({ children: [{ name: <span class="hljs-string">'Luke'</span> }] }, 
   <span class="hljs-comment">// doc.children[0]._id will be undefined</span>
 });
 </code></pre>
-<h4 id="minimize"><a href="#minimize">option: minimize</a></h4>
+<h3 id="minimize"><a href="#minimize">option: minimize</a></h3>
 
 <p>Mongoose will, by default, &quot;minimize&quot; schemas by removing empty objects.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, inventory: {} });
@@ -621,7 +607,7 @@ Character.findOne({ name: <span class="hljs-string">'Sam'</span> }, <span class=
   <span class="hljs-built_in">console</span>.log(character); <span class="hljs-comment">// { name: 'Sam', inventory: {}}</span>
 });
 </code></pre>
-<h4 id="read"><a href="#read">option: read</a></h4>
+<h3 id="read"><a href="#read">option: read</a></h3>
 
 <p>Allows setting <a href="/docs/api.html#query_Query-read">query#read</a> options at the
 schema level, providing us a way to apply default
@@ -649,7 +635,7 @@ mongoose.connect(uri, options);
 <span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: [<span class="hljs-string">'nearest'</span>, { disk: <span class="hljs-string">'ssd'</span> }] });
 mongoose.model(<span class="hljs-string">'JellyBean'</span>, schema);
 </code></pre>
-<h4 id="shardKey"><a href="#shardKey">option: shardKey</a></h4>
+<h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 
 <p>The <code>shardKey</code> option is used when we have a <a href="http://www.mongodb.org/display/DOCS/Sharding+Introduction">sharded MongoDB architecture</a>.
 Each sharded collection is given a shard key which must be present in all
@@ -659,7 +645,7 @@ shard key and we’ll be all set.</p>
 </code></pre>
 <p><em>Note that Mongoose does not send the <code>shardcollection</code> command for you. You
 must configure your shards yourself.</em></p>
-<h4 id="strict">option: strict</h4>
+<h3 id="strict">option: strict</h3>
 
 <p>The strict option, (enabled by default), ensures that values passed to our
 model constructor that were not specified in our schema do not get saved to
@@ -696,7 +682,7 @@ to be produced instead of dropping the bad data.</p>
 thing.iAmNotInTheSchema = <span class="hljs-literal">true</span>;
 thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is never saved to the db</span>
 </code></pre>
-<h4 id="toJSON"><a href="#toJSON">option: toJSON</a></h4>
+<h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
 <p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when
 the documents <code>toJSON</code> method is called.</p>
@@ -713,7 +699,7 @@ schema.set(<span class="hljs-string">'toJSON'</span>, { getters: <span class="hl
 <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(m)); <span class="hljs-comment">// { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }</span>
 </code></pre>
 <p>To see all available <code>toJSON/toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
-<h4 id="toObject"><a href="#toObject">option: toObject</a></h4>
+<h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
 <p>Documents have a <a href="/docs/api.html#document_Document-toObject">toObject</a> method
 which converts the mongoose document into a plain javascript object. This
@@ -732,7 +718,7 @@ schema.set(<span class="hljs-string">'toObject'</span>, { getters: <span class="
 <span class="hljs-built_in">console</span>.log(m); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
 </code></pre>
 <p>To see all available <code>toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
-<h4 id="typeKey"><a href="#typeKey">option: typeKey</a></h4>
+<h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
 
 <p>By default, if you have an object with key &#39;type&#39; in your schema, mongoose
 will interpret it as a type declaration.</p>
@@ -749,7 +735,7 @@ uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
   name: { $type: <span class="hljs-built_in">String</span> }
 }, { typeKey: <span class="hljs-string">'$type'</span> }); <span class="hljs-comment">// A '$type' key means this object is a type declaration</span>
 </code></pre>
-<h4 id="validateBeforeSave"><a href="#validateBeforeSave">option: validateBeforeSave</a></h4>
+<h3 id="validateBeforeSave"><a href="#validateBeforeSave">option: validateBeforeSave</a></h3>
 
 <p>By default, documents are automatically validated before they are saved to
 the database. This is to prevent saving an invalid document. If you want to
@@ -767,7 +753,7 @@ m.validate(<span class="hljs-function"><span class="hljs-keyword">function</span
 });
 m.save(); <span class="hljs-comment">// Succeeds despite being invalid</span>
 </code></pre>
-<h4 id="versionKey"><a href="#versionKey">option: versionKey</a></h4>
+<h3 id="versionKey"><a href="#versionKey">option: versionKey</a></h3>
 
 <p>The <code>versionKey</code> is a property set on each document when first created by
 Mongoose. This keys value contains the internal
@@ -794,7 +780,7 @@ thing.save(); <span class="hljs-comment">// { _somethingElse: 0, name: 'mongoose
 <span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ name: <span class="hljs-string">'no versioning please'</span> });
 thing.save(); <span class="hljs-comment">// { name: 'no versioning please' }</span>
 </code></pre>
-<h4 id="collation"><a href="#collation">option: collation</a></h4>
+<h3 id="collation"><a href="#collation">option: collation</a></h3>
 
 <p>Sets a default <a href="https://docs.mongodb.com/manual/reference/collation/">collation</a>
 for every query and aggregation. <a href="http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">Here&#39;s a beginner-friendly overview of collations</a>.</p>
@@ -813,7 +799,7 @@ MyModel.create([{ name: <span class="hljs-string">'val'</span> }, { name: <span 
     <span class="hljs-comment">// MongoDB will ignore case when matching.</span>
   });
 </code></pre>
-<h4 id="skipVersioning"><a href="#skipVersioning">option: skipVersioning</a></h4>
+<h3 id="skipVersioning"><a href="#skipVersioning">option: skipVersioning</a></h3>
 
 <p><code>skipVersioning</code> allows excluding paths from versioning (i.e., the internal
 revision will not be incremented even if these paths are updated). DO NOT
@@ -823,7 +809,7 @@ on the parent document using the fully qualified path.</p>
 thing.dontVersionMe.push(<span class="hljs-string">'hey'</span>);
 thing.save(); <span class="hljs-comment">// version is not incremented</span>
 </code></pre>
-<h4 id="timestamps"><a href="#timestamps">option: timestamps</a></h4>
+<h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
 <p>If set <code>timestamps</code>, mongoose assigns <code>createdAt</code> and <code>updatedAt</code> fields to
 your schema, the type assigned is <a href="http://mongoosejs.com/docs/api.html#schema-date-js">Date</a>.</p>
@@ -834,7 +820,7 @@ the field name by setting <code>timestamps.createdAt</code> and <code>timestamps
 <span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing();
 thing.save(); <span class="hljs-comment">// `created_at` &amp; `updatedAt` will be included</span>
 </code></pre>
-<h4 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h4>
+<h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
 
 <p>In mongoose 4, <code>update()</code> and <code>findOneAndUpdate()</code> only check the top-level
 schema&#39;s strict mode setting.</p>

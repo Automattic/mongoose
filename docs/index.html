@@ -5,6 +5,7 @@
 <pre><code>$ npm install mongoose</code></pre><p>Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
 The first thing we need to do is include mongoose in our project and open a connection to the <code>test</code> database on our locally running instance of MongoDB.</p><pre><code class="javascript"><span class="comment">// getting-started.js</span>
 <span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
+mongoose.Promise = global.Promise;
 mongoose.connect(<span class="string">'mongodb://localhost/test'</span>);</code></pre><p>We have a pending connection to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:</p><pre><code class="javascript"><span class="keyword">var</span> db = mongoose.connection;
 db.on(<span class="string">'error'</span>, console.error.bind(console, <span class="string">'connection error:'</span>));
 db.once(<span class="string">'open'</span>, <span class="keyword">function</span>() {
@@ -31,7 +32,7 @@ Each document can be saved to the database by calling its <a href="/docs/api.htm
 We can access all of the kitten documents through our Kitten <a href="/docs/models.html">model</a>.</p><pre><code class="javascript">Kitten.find(<span class="function"><span class="keyword">function</span> <span class="params">(err, kittens)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> console.error(err);
   console.log(kittens);
-})</code></pre><p>We just logged all of the kittens in our db to the console.
+});</code></pre><p>We just logged all of the kittens in our db to the console.
 If we want to filter our kittens by name, Mongoose supports MongoDBs rich <a href="/docs/queries.html">querying</a> syntax.</p><pre><code class="javascript">Kitten.find({ name: <span class="regexp">/^fluff/</span> }, callback);</code></pre><p>This performs a search for all documents with a name property that begins with &quot;Fluff&quot; and returns the result as an array of kittens to the callback.</p><h3>Congratulations</h3><p>That&#39;s the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the <a href="guide.html">guide</a>, or <a href="api.html">API docs</a> for more.</p></div></div><script>document.body.className = 'load';</script><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);

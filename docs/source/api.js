@@ -17,7 +17,10 @@ const files = [
   'lib/document.js',
   'lib/model.js',
   'lib/query.js',
-  'lib/aggregate.js'
+  'lib/aggregate.js',
+  'lib/schematype.js',
+  'lib/virtualtype.js',
+  'lib/error/index.js'
 ];
 
 module.exports = {
@@ -40,7 +43,7 @@ parse();
 function parse() {
   for (const props of combinedFiles) {
     const data = {
-      name: _.capitalize(props.file.replace('lib/', '').replace('.js', '')),
+      name: _.capitalize(props.file.replace('lib/', '').replace('.js', '').replace('/index', '')),
       props: []
     };
 

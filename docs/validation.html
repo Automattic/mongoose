@@ -231,8 +231,8 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="validation"><p>Validation</p>
-</h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="#" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="validation"><p>Validation</p>
+</h2><p><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
 <ul>
 <li>Validation is defined in the <a href="./schematypes.html">SchemaType</a></li>
 <li>Validation is <a href="./middleware.html">middleware</a>. Mongoose registers validation as a <code>pre(&#39;save&#39;)</code> hook on every schema by default.</li>
@@ -241,7 +241,8 @@ pre {
 <li>Validation is asynchronously recursive; when you call <a href="./api.html#model_Model-save">Model#save</a>, sub-document validation is executed as well. If an error occurs, your <a href="./api.html#model_Model-save">Model#save</a> callback receives it</li>
 <li>Validation is customizable</li>
 </ul>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
       name: {
         type: <span class="hljs-built_in">String</span>,
@@ -260,15 +261,18 @@ pre {
       assert.equal(error.errors[<span class="hljs-string">'name'</span>].message,
         <span class="hljs-string">'Path `name` is required.'</span>);
     });
-  <h2 id="built-in-validators"><p>Built-in Validators</p>
-</h2><p>Mongoose has several built-in validators.</p>
+  
+</code></pre>
+<h2 id="built-in-validators"><p>Built-in Validators</p>
+</h2><p><p>Mongoose has several built-in validators.</p>
 <ul>
 <li>All <a href="./schematypes.html">SchemaTypes</a> have the built-in <a href="./api.html#schematype_SchemaType-required">required</a> validator. The required validator uses the <a href="./api.html#schematype_SchemaType-checkRequired">SchemaType&#39;s <code>checkRequired()</code> function</a> to determine if the value satisfies the required validator.</li>
 <li><a href="./api.html#schema-number-js">Numbers</a> have <a href="./api.html#schema_number_SchemaNumber-min">min</a> and <a href="./api.html#schema_number_SchemaNumber-max">max</a> validators.</li>
 <li><a href="./api.html#schema-string-js">Strings</a> have <a href="./api.html#schema_string_SchemaString-enum">enum</a>, <a href="./api.html#schema_string_SchemaString-match">match</a>, <a href="./api.html#schema_string_SchemaString-maxlength">maxlength</a> and <a href="./api.html#schema_string_SchemaString-minlength">minlength</a> validators.</li>
 </ul>
 <p>Each of the validator links above provide more information about how to enable them and customize their error messages.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> breakfastSchema = <span class="hljs-keyword">new</span> Schema({
       eggs: {
         type: <span class="hljs-built_in">Number</span>,
@@ -310,11 +314,14 @@ pre {
     badBreakfast.bacon = <span class="hljs-literal">null</span>;
     error = badBreakfast.validateSync();
     assert.equal(error.errors[<span class="hljs-string">'bacon'</span>].message, <span class="hljs-string">'Why no bacon?'</span>);
-  <h2 id="the-unique-option-is-not-a-validator"><p>The <code>unique</code> Option is Not a Validator</p>
-</h2><p>A common gotcha for beginners is that the <code>unique</code> option for schemas
+  
+</code></pre>
+<h2 id="the-unique-option-is-not-a-validator"><p>The <code>unique</code> Option is Not a Validator</p>
+</h2><p><p>A common gotcha for beginners is that the <code>unique</code> option for schemas
 is <em>not</em> a validator. It&#39;s a convenient helper for building <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique indexes</a>.
 See the <a href="/docs/faq.html">FAQ</a> for more information.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> uniqueUsernameSchema = <span class="hljs-keyword">new</span> Schema({
       username: {
         type: <span class="hljs-built_in">String</span>,
@@ -355,13 +362,16 @@ See the <a href="/docs/faq.html">FAQ</a> for more information.</p>
         assert.ok(error.message.indexOf(<span class="hljs-string">'duplicate key error'</span>) !== <span class="hljs-number">-1</span>);
       });
     });
-  <h2 id="custom-validators"><p>Custom Validators</p>
-</h2><p>If the built-in validators aren&#39;t enough, you can define custom validators
+  
+</code></pre>
+<h2 id="custom-validators"><p>Custom Validators</p>
+</h2><p><p>If the built-in validators aren&#39;t enough, you can define custom validators
 to suit your needs.</p>
 <p>Custom validation is declared by passing a validation function.
 You can find detailed instructions on how to do this in the
 <a href="./api.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> userSchema = <span class="hljs-keyword">new</span> Schema({
       phone: {
         type: <span class="hljs-built_in">String</span>,
@@ -394,8 +404,10 @@ You can find detailed instructions on how to do this in the
     <span class="hljs-comment">// and fits `DDD-DDD-DDDD`</span>
     error = user.validateSync();
     assert.equal(error, <span class="hljs-literal">null</span>);
-  <h2 id="async-custom-validators"><p>Async Custom Validators</p>
-</h2><p>Custom validators can also be asynchronous. If your validator function
+  
+</code></pre>
+<h2 id="async-custom-validators"><p>Async Custom Validators</p>
+</h2><p><p>Custom validators can also be asynchronous. If your validator function
 takes 2 arguments, mongoose will assume the 2nd argument is a callback.</p>
 <p>Even if you don&#39;t want to use asynchronous validators, be careful,
 because mongoose 4 will assume that <strong>all</strong> functions that take 2
@@ -403,7 +415,8 @@ arguments are asynchronous, like the
 <a href="https://www.npmjs.com/package/validator"><code>validator.isEmail</code> function</a>.
 This behavior is considered deprecated as of 4.9.0, and you can shut
 it off by specifying <code>isAsync: false</code> on your custom validator.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> userSchema = <span class="hljs-keyword">new</span> Schema({
       phone: {
         type: <span class="hljs-built_in">String</span>,
@@ -453,15 +466,18 @@ it off by specifying <code>isAsync: false</code> on your custom validator.</p>
       assert.equal(error.errors[<span class="hljs-string">'name'</span>].message,
         <span class="hljs-string">'Validator failed for path `name` with value `test`'</span>);
     });
-  <h2 id="validation-errors"><p>Validation Errors</p>
-</h2><p>Errors returned after failed validation contain an <code>errors</code> object
+  
+</code></pre>
+<h2 id="validation-errors"><p>Validation Errors</p>
+</h2><p><p>Errors returned after failed validation contain an <code>errors</code> object
 whose values are <code>ValidatorError</code> objects. Each
 <a href="./api.html#error-validation-js">ValidatorError</a> has <code>kind</code>, <code>path</code>,
 <code>value</code>, and <code>message</code> properties.
 A ValidatorError also may have a <code>reason</code> property. If an error was
 thrown in the validator, this property will contain the error that was
 thrown.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
       color: <span class="hljs-built_in">String</span>,
       name: <span class="hljs-built_in">String</span>
@@ -504,10 +520,13 @@ thrown.</p>
 
       assert.equal(err.name, <span class="hljs-string">'ValidationError'</span>);
     });
-  <h2 id="required-validators-on-nested-objects"><p>Required Validators On Nested Objects</p>
-</h2><p>Defining validators on nested objects in mongoose is tricky, because
+  
+</code></pre>
+<h2 id="required-validators-on-nested-objects"><p>Required Validators On Nested Objects</p>
+</h2><p><p>Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({
       name: {
         first: <span class="hljs-built_in">String</span>,
@@ -538,15 +557,18 @@ nested objects are not fully fledged paths.</p>
     <span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> Person();
     <span class="hljs-keyword">var</span> error = person.validateSync();
     assert.ok(error.errors[<span class="hljs-string">'name'</span>]);
-  <h2 id="update-validators"><p>Update Validators</p>
-</h2><p>In the above examples, you learned about document validation. Mongoose also
+  
+</code></pre>
+<h2 id="update-validators"><p>Update Validators</p>
+</h2><p><p>In the above examples, you learned about document validation. Mongoose also
 supports validation for <code>update()</code> and <code>findOneAndUpdate()</code> operations.
 In Mongoose 4.x, update validators are off by default - you need to specify
 the <code>runValidators</code> option.</p>
 <p>To turn on update validators, set the <code>runValidators</code> option for
 <code>update()</code> or <code>findOneAndUpdate()</code>. Be careful: update validators
 are off by default because they have several caveats.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
       color: <span class="hljs-built_in">String</span>,
       name: <span class="hljs-built_in">String</span>
@@ -563,14 +585,17 @@ are off by default because they have several caveats.</p>
       assert.equal(err.errors.color.message,
         <span class="hljs-string">'Invalid color'</span>);
     });
-  <h2 id="update-validators-and-this"><p>Update Validators and <code>this</code></p>
-</h2><p>There are a couple of key differences between update validators and
+  
+</code></pre>
+<h2 id="update-validators-and-this"><p>Update Validators and <code>this</code></p>
+</h2><p><p>There are a couple of key differences between update validators and
 document validators. In the color validation function above, <code>this</code> refers
 to the document being validated when using document validation.
 However, when running update validators, the document being updated
 may not be in the server&#39;s memory, so by default the value of <code>this</code> is
 not defined.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
       color: <span class="hljs-built_in">String</span>,
       name: <span class="hljs-built_in">String</span>
@@ -602,10 +627,13 @@ not defined.</p>
       <span class="hljs-comment">// update validators</span>
       assert.ok(error);
     });
-  <h2 id="the-context-option"><p>The <code>context</code> option</p>
-</h2><p>The <code>context</code> option lets you set the value of <code>this</code> in update validators
+  
+</code></pre>
+<h2 id="the-context-option"><p>The <code>context</code> option</p>
+</h2><p><p>The <code>context</code> option lets you set the value of <code>this</code> in update validators
 to the underlying query.</p>
-
+</p>
+<pre><code class="lang-javscript">
     toySchema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
       <span class="hljs-comment">// When running update validators with the `context` option set to</span>
       <span class="hljs-comment">// 'query', `this` refers to the query object.</span>
@@ -624,14 +652,17 @@ to the underlying query.</p>
     Toy.update({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
       assert.ok(error.errors[<span class="hljs-string">'color'</span>]);
     });
-  <h2 id="update-validator-paths"><p>Update Validator Paths</p>
-</h2><p>The other key difference that update validators only run on the paths
+  
+</code></pre>
+<h2 id="update-validator-paths"><p>Update Validator Paths</p>
+</h2><p><p>The other key difference that update validators only run on the paths
 specified in the update. For instance, in the below example, because
 &#39;name&#39; is not specified in the update operation, update validation will
 succeed.</p>
 <p>When using update validators, <code>required</code> validators <strong>only</strong> fail when
 you try to explicitly <code>$unset</code> the key.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> kittenSchema = <span class="hljs-keyword">new</span> Schema({
       name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> },
       age: <span class="hljs-built_in">Number</span>
@@ -651,8 +682,10 @@ you try to explicitly <code>$unset</code> the key.</p>
       assert.ok(err);
       assert.ok(err.errors[<span class="hljs-string">'name'</span>]);
     });
-  <h2 id="update-validators-only-run-on-specified-paths"><p>Update Validators Only Run On Specified Paths</p>
-</h2><p>One final detail worth noting: update validators <strong>only</strong> run on the
+  
+</code></pre>
+<h2 id="update-validators-only-run-on-specified-paths"><p>Update Validators Only Run On Specified Paths</p>
+</h2><p><p>One final detail worth noting: update validators <strong>only</strong> run on the
 following update operators:</p>
 <p>* <code>$set</code>
 * <code>$unset</code>
@@ -664,7 +697,8 @@ following update operators:</p>
 <code>number</code>, because update validators ignore <code>$inc</code>. Also, <code>$push</code>,
 <code>$addToSet</code>, <code>$pull</code>, and <code>$pullAll</code> validation does <strong>not</strong> run any
 validation on the array itself, only individual elements of the array.</p>
-
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> testSchema = <span class="hljs-keyword">new</span> Schema({
       number: { type: <span class="hljs-built_in">Number</span>, max: <span class="hljs-number">0</span> },
       arr: [{ message: { type: <span class="hljs-built_in">String</span>, maxLength: <span class="hljs-number">10</span> } }]
@@ -688,9 +722,12 @@ validation on the array itself, only individual elements of the array.</p>
         <span class="hljs-comment">// least 2 elements.</span>
       });
     });
-  <h2 id="on-$push-and-$addtoset"><p>On $push and $addToSet</p>
-</h2><p>New in 4.8.0: update validators also run on <code>$push</code> and <code>$addToSet</code></p>
-
+  
+</code></pre>
+<h2 id="on-$push-and-$addtoset"><p>On $push and $addToSet</p>
+</h2><p><p>New in 4.8.0: update validators also run on <code>$push</code> and <code>$addToSet</code></p>
+</p>
+<pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> testSchema = <span class="hljs-keyword">new</span> Schema({
       numbers: [{ type: <span class="hljs-built_in">Number</span>, max: <span class="hljs-number">0</span> }],
       docs: [{
@@ -711,7 +748,9 @@ validation on the array itself, only individual elements of the array.</p>
       assert.ok(error.errors[<span class="hljs-string">'numbers'</span>]);
       assert.ok(error.errors[<span class="hljs-string">'docs'</span>]);
     });
-  </div></div><script type="text/javascript">!function(name,path,ctx){
+  
+</code></pre>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 

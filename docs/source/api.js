@@ -15,7 +15,9 @@ const files = [
   'lib/schema.js',
   'lib/connection.js',
   'lib/document.js',
-  'lib/model.js'
+  'lib/model.js',
+  'lib/query.js',
+  'lib/aggregate.js'
 ];
 
 module.exports = {

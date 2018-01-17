@@ -1,15 +1,25 @@
 var fs = require('fs');
 var jade = require('jade');
 var package = require('./package');
-var hl = require('./docs/helpers/highlight');
 var linktype = require('./docs/helpers/linktype');
 var href = require('./docs/helpers/href');
 var klass = require('./docs/helpers/klass');
 
-// add custom jade filters
-require('./docs/helpers/filters')(jade);
+const markdown = require('marked');
+const highlight = require('highlight.js');
+markdown.setOptions({
+  highlight: function(code) {
+    return highlight.highlight('JavaScript', code).value;
+  }
+});
+
+jade.filters.markdown = markdown;
 
 function getVersion() {
+  return require('./package.json').version;
+}
+
+function getLatestLegacyVersion(startsWith) {
   var hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
   for (var i = 0; i < hist.length; ++i) {
     var line = (hist[i] || '').trim();
@@ -17,27 +27,17 @@ function getVersion() {
       continue;
     }
     var match = /^\s*([^\s]+)\s/.exec(line);
-    if (match && match[1]) {
+    if (match && match[1] && match[1].startsWith(startsWith)) {
       return match[1];
     }
   }
   throw new Error('no match found');
 }
 
-function getUnstable(ver) {
-  ver = ver.replace('-pre');
-  var spl = ver.split('.');
-  spl = spl.map(function(i) {
-    return parseInt(i, 10);
-  });
-  spl[1]++;
-  spl[2] = 'x';
-  return spl.join('.');
-}
-
 // use last release
 package.version = getVersion();
-package.unstable = getUnstable(package.version);
+package.latest4x = getLatestLegacyVersion('4.');
+package.latest38x = getLatestLegacyVersion('3.8');
 
 var filemap = require('./docs/source');
 var files = Object.keys(filemap);
@@ -45,7 +45,6 @@ var files = Object.keys(filemap);
 function jadeify(filename, options, newfile) {
   options = options || {};
   options.package = package;
-  options.hl = hl;
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;

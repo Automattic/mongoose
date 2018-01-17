@@ -1,9 +1,19 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose SchemaTypes v4.11.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2>SchemaTypes</h2><p>SchemaTypes handle definition of path&nbsp;<a href="./api.html#schematype_SchemaType-default">defaults</a>,&nbsp;<a href="./api.html#schematype_SchemaType-validate">validation</a>,&nbsp;<a href="./api.html#schematype_SchemaType-get">getters</a>,&nbsp;<a href="./api.html#schematype_SchemaType-set">setters</a>,&nbsp;<a href="./api.html#schematype_SchemaType-select">field selection defaults</a> for&nbsp;<a href="./api.html#query-js">queries</a> and other general characteristics for&nbsp;<a href="./api.html#schema-string-js">Strings</a> and <a href="./api.html#schema-number-js">Numbers</a>. Check out their respective API documentation for more detail.</p><p>Following are all valid&nbsp;<a href="./api.html#schema_Schema.Types">Schema Types</a>.</p><ul><li><a href="./api.html#schema-string-js">String</a></li><li><a href="./api.html#schema-number-js">Number</a></li><li><a href="./api.html#schema-date-js">Date</a></li><li><a href="./api.html#schema-buffer-js">Buffer</a></li><li>Boolean</li><li>Mixed</li><li><a href="./api.html#schema-objectid-js">Objectid</a></li><li>Array</li></ul><h4>Example</h4><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.0.0-rc2: SchemaTypes</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.0.0-rc2</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.9</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></li></ul></div></div><div class="container"><div id="content"><h2>SchemaTypes</h2><p>SchemaTypes handle definition of path&nbsp;<a href="./api.html#schematype_SchemaType-default">defaults</a>,&nbsp;<a href="./api.html#schematype_SchemaType-validate">validation</a>,&nbsp;<a href="./api.html#schematype_SchemaType-get">getters</a>,&nbsp;<a href="./api.html#schematype_SchemaType-set">setters</a>,&nbsp;<a href="./api.html#schematype_SchemaType-select">field selection defaults</a> for&nbsp;<a href="./api.html#query-js">queries</a> and other general characteristics for&nbsp;<a href="./api.html#schema-string-js">Strings</a> and <a href="./api.html#schema-number-js">Numbers</a>. Check out their respective API documentation for more detail.</p><p>Following are all valid&nbsp;<a href="./api.html#schema_Schema.Types">Schema Types</a>.</p><ul>
+<li><a href="./api.html#schema-string-js">String</a></li>
+<li><a href="./api.html#schema-number-js">Number</a></li>
+<li><a href="./api.html#schema-date-js">Date</a></li>
+<li><a href="./api.html#schema-buffer-js">Buffer</a></li>
+<li>Boolean</li>
+<li>Mixed</li>
+<li><a href="./api.html#schema-objectid-js">Objectid</a></li>
+<li>Array</li>
+</ul>
+<h4>Example</h4>var schema = new Schema({
   name:    String,
   binary:  Buffer,
   living:  Boolean,
-  updated: { type: Date, <span class="keyword">default</span>: Date.now },
-  age:     { type: Number, min: <span class="number">18</span>, max: <span class="number">65</span> },
+  updated: { type: Date, default: Date.now },
+  age:     { type: Number, min: 18, max: 65 },
   mixed:   Schema.Types.Mixed,
   _someId: Schema.Types.ObjectId,
   array:      [],
@@ -14,137 +24,165 @@
   ofBoolean:  [Boolean],
   ofMixed:    [Schema.Types.Mixed],
   ofObjectId: [Schema.Types.ObjectId],
-  ofArrays:   [[]]
-  ofArrayOfNumbers: [[Number]]
+  ofArrays:   [[]],
+  ofArrayOfNumbers: [[Number]],
   nested: {
-    stuff: { type: String, lowercase: <span class="literal">true</span>, trim: <span class="literal">true</span> }
+    stuff: { type: String, lowercase: true, trim: true }
   }
 })
 
-<span class="comment">// example use</span>
+// example use
 
-<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schema);
+var Thing = mongoose.model('Thing', schema);
 
-<span class="keyword">var</span> m = <span class="keyword">new</span> Thing;
-m.name = <span class="string">'Statue of Liberty'</span>;
-m.age = <span class="number">125</span>;
-m.updated = <span class="keyword">new</span> Date;
-m.binary = <span class="keyword">new</span> Buffer(<span class="number">0</span>);
-m.living = <span class="literal">false</span>;
-m.mixed = { any: { thing: <span class="string">'i want'</span> } };
-m.markModified(<span class="string">'mixed'</span>);
-m._someId = <span class="keyword">new</span> mongoose.Types.ObjectId;
-m.array.push(<span class="number">1</span>);
-m.ofString.push(<span class="string">"strings!"</span>);
-m.ofNumber.unshift(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>);
-m.ofDates.addToSet(<span class="keyword">new</span> Date);
+var m = new Thing;
+m.name = 'Statue of Liberty';
+m.age = 125;
+m.updated = new Date;
+m.binary = new Buffer(0);
+m.living = false;
+m.mixed = { any: { thing: 'i want' } };
+m.markModified('mixed');
+m._someId = new mongoose.Types.ObjectId;
+m.array.push(1);
+m.ofString.push("strings!");
+m.ofNumber.unshift(1,2,3,4);
+m.ofDates.addToSet(new Date);
 m.ofBuffer.pop();
-m.ofMixed = [<span class="number">1</span>, [], <span class="string">'three'</span>, { four: <span class="number">5</span> }];
-m.nested.stuff = <span class="string">'good'</span>;
+m.ofMixed = [1, [], 'three', { four: 5 }];
+m.nested.stuff = 'good';
 m.save(callback);
-</code></pre><h3>SchemaType Options</h3><p>You can declare a schema type using the type directly, or an object with
-a <code>type</code> property.</p><pre><code class="javascript"><span class="keyword">var</span> schema1 = <span class="keyword">new</span> Schema({
-  test: String <span class="comment">// `test` is a path of type String</span>
+<h3>SchemaType Options</h3><p>You can declare a schema type using the type directly, or an object with
+a <code>type</code> property.</p>
+var schema1 = new Schema({
+  test: String // `test` is a path of type String
 });
 
-<span class="keyword">var</span> schema2 = <span class="keyword">new</span> Schema({
-  test: { type: String } <span class="comment">// `test` is a path of type string</span>
-});</code></pre><p>In addition to the type property, you can specify additional properties
-for a path. For example, if you want to lowercase a string before saving:</p><pre><code class="javascript"><span class="keyword">var</span> schema2 = <span class="keyword">new</span> Schema({
+var schema2 = new Schema({
+  test: { type: String } // `test` is a path of type string
+});<p>In addition to the type property, you can specify additional properties
+for a path. For example, if you want to lowercase a string before saving:</p>
+var schema2 = new Schema({
   test: {
     type: String,
-    lowercase: <span class="literal">true</span> <span class="comment">// Always convert `test` to lowercase</span>
+    lowercase: true // Always convert `test` to lowercase
   }
-});</code></pre><p>The <code>lowercase</code> property only works for strings. There are certain options
+});<p>The <code>lowercase</code> property only works for strings. There are certain options
 which apply for all schema types, and some that apply for specific schema
-types.</p><h5>All Schema Types</h5><ul><li><code>required</code>: boolean or function, if true adds a <a href="http://mongoosejs.com/docs/validation.html#built-in-validators">required validator</a> for this property</li><li><code>default</code>: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.</li><li><code>select</code>: boolean, specifies default <a href="https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/">projections</a> for queries</li><li><code>validate</code>: function, adds a <a href="http://mongoosejs.com/docs/validation.html#built-in-validators">validator function</a> for this property</li><li><code>get</code>: function, defines a custom getter for this property using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.</li><li><code>set</code>: function, defines a custom setter for this property using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.</li><li><code>alias</code>: string, mongoose &gt;= 4.10.0 only. Defines a <a href="http://mongoosejs.com/docs/guide.html#virtuals">virtual</a> with the given name that gets/sets this path.</li></ul><pre><code class="javascript"><span class="keyword">var</span> numberSchema = <span class="keyword">new</span> Schema({
+types.</p>
+<h5>All Schema Types</h5><ul>
+<li><code>required</code>: boolean or function, if true adds a <a href="http://mongoosejs.com/docs/validation.html#built-in-validators">required validator</a> for this property</li>
+<li><code>default</code>: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.</li>
+<li><code>select</code>: boolean, specifies default <a href="https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/">projections</a> for queries</li>
+<li><code>validate</code>: function, adds a <a href="http://mongoosejs.com/docs/validation.html#built-in-validators">validator function</a> for this property</li>
+<li><code>get</code>: function, defines a custom getter for this property using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.</li>
+<li><code>set</code>: function, defines a custom setter for this property using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a>.</li>
+<li><code>alias</code>: string, mongoose &gt;= 4.10.0 only. Defines a <a href="http://mongoosejs.com/docs/guide.html#virtuals">virtual</a> with the given name that gets/sets this path.</li>
+</ul>
+var numberSchema = new Schema({
   integerOnly: {
     type: Number,
     get: v => Math.round(v),
     set: v => Math.round(v),
-    alias: <span class="string">'i'</span>
+    alias: 'i'
   }
 });
 
-<span class="keyword">var</span> Number = mongoose.model(<span class="string">'Number'</span>, numberSchema);
+var Number = mongoose.model('Number', numberSchema);
 
-<span class="keyword">var</span> doc = <span class="keyword">new</span> Number();
-doc.integerOnly = <span class="number">2.001</span>;
-doc.integerOnly; <span class="comment">// 2</span>
-doc.i; <span class="comment">// 2</span>
-doc.i = <span class="number">3.001</span>;
-doc.integerOnly; <span class="comment">// 3</span>
-doc.i; <span class="comment">// 3</span>
-</code></pre><h5>Indexes</h5><p></p><p>You can also define <a href="https://docs.mongodb.com/manual/indexes/">MongoDB indexes</a>
-using schema type options.</p><ul><li><code>index</code>: boolean, whether to define an on this property.</li><li><code>unique</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-unique/">unique index</a> on this property.</li><li><code>sparse</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-sparse/">sparse index</a> on this property.</li></ul><pre><code class="javascript"><span class="keyword">var</span> schema2 = <span class="keyword">new</span> Schema({
+var doc = new Number();
+doc.integerOnly = 2.001;
+doc.integerOnly; // 2
+doc.i; // 2
+doc.i = 3.001;
+doc.integerOnly; // 3
+doc.i; // 3
+<h5>Indexes</h5><p></p><p>You can also define <a href="https://docs.mongodb.com/manual/indexes/">MongoDB indexes</a>
+using schema type options.</p>
+<ul>
+<li><code>index</code>: boolean, whether to define an <a href="https://docs.mongodb.com/manual/indexes/">index</a> on this property.</li>
+<li><code>unique</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-unique/">unique index</a> on this property.</li>
+<li><code>sparse</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-sparse/">sparse index</a> on this property.</li>
+</ul>
+var schema2 = new Schema({
   test: {
     type: String,
-    index: <span class="literal">true</span>,
-    unique: <span class="literal">true</span> <span class="comment">// Unique index. If you specify `unique: true`</span>
-    <span class="comment">// specifying `index: true` is optional if you do `unique: true`</span>
+    index: true,
+    unique: true // Unique index. If you specify `unique: true`
+    // specifying `index: true` is optional if you do `unique: true`
   }
-});</code></pre><h5>String</h5><ul><li><code>lowercase</code>: boolean, whether to always call <code>.toLowerCase()</code> on the value</li><li><code>uppercase</code>: boolean, whether to always call <code>.toUpperCase()</code> on the value</li><li><code>trim</code>: boolean, whether to always call <code>.trim()</code> on the value</li><li><code>match</code>: RegExp, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value matches the given regular expression</li><li><code>enum</code>: Array, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value is in the given array.</li></ul><h5>Number</h5><ul><li><code>min</code>: Number, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value is greater than or equal to the given minimum.</li><li><code>max</code>: Number, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value is less than or equal to the given maximum.</li></ul><h5>Date</h5><ul><li><code>min</code>: Date</li><li><code>max</code>: Date</li></ul><h3>Usage notes:</h3><h4 id="Dates">Dates</h4><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Built-in <code>Date</code> methods</a> are <a href="https://github.com/Automattic/mongoose/issues/1598"><strong>not</strong> hooked into</a> the mongoose change tracking logic which in English means that if you use a <code>Date</code> in your document and modify it with a method like <code>setMonth()</code>, mongoose will be unaware of this change and <code>doc.save()</code> will not persist this modification. If you must modify <code>Date</code> types using built-in methods, tell mongoose about the change with <code>doc.markModified(&#39;pathToYourDate&#39;)</code> before saving.</p><pre><code class="javascript"><span class="keyword">var</span> Assignment = mongoose.model(<span class="string">'Assignment'</span>, { dueDate: Date });
-Assignment.findOne(<span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
-  doc.dueDate.setMonth(<span class="number">3</span>);
-  doc.save(callback); <span class="comment">// THIS DOES NOT SAVE YOUR CHANGE</span>
-  
-  doc.markModified(<span class="string">'dueDate'</span>);
-  doc.save(callback); <span class="comment">// works</span>
+});<h5>String</h5><ul>
+<li><code>lowercase</code>: boolean, whether to always call <code>.toLowerCase()</code> on the value</li>
+<li><code>uppercase</code>: boolean, whether to always call <code>.toUpperCase()</code> on the value</li>
+<li><code>trim</code>: boolean, whether to always call <code>.trim()</code> on the value</li>
+<li><code>match</code>: RegExp, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value matches the given regular expression</li>
+<li><code>enum</code>: Array, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value is in the given array.</li>
+</ul>
+<h5>Number</h5><ul>
+<li><code>min</code>: Number, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value is greater than or equal to the given minimum.</li>
+<li><code>max</code>: Number, creates a <a href="http://mongoosejs.com/docs/validation.html">validator</a> that checks if the value is less than or equal to the given maximum.</li>
+</ul>
+<h5>Date</h5><ul>
+<li><code>min</code>: Date</li>
+<li><code>max</code>: Date</li>
+</ul>
+<h3>Usage notes:</h3><h4 id="Dates">Dates</h4><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Built-in <code>Date</code> methods</a> are <a href="https://github.com/Automattic/mongoose/issues/1598"><strong>not</strong> hooked into</a> the mongoose change tracking logic which in English means that if you use a <code>Date</code> in your document and modify it with a method like <code>setMonth()</code>, mongoose will be unaware of this change and <code>doc.save()</code> will not persist this modification. If you must modify <code>Date</code> types using built-in methods, tell mongoose about the change with <code>doc.markModified(&#39;pathToYourDate&#39;)</code> before saving.</p>
+var Assignment = mongoose.model('Assignment', { dueDate: Date });
+Assignment.findOne(function (err, doc) {
+  doc.dueDate.setMonth(3);
+  doc.save(callback); // THIS DOES NOT SAVE YOUR CHANGE
+
+  doc.markModified('dueDate');
+  doc.save(callback); // works
 })
-</code></pre><h4 id="mixed">Mixed</h4><p>An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:</p><pre><code class="javascript"><span class="keyword">var</span> Any = <span class="keyword">new</span> Schema({ any: {} });
-<span class="keyword">var</span> Any = <span class="keyword">new</span> Schema({ any: Object });
-<span class="keyword">var</span> Any = <span class="keyword">new</span> Schema({ any: Schema.Types.Mixed });</code></pre><p>Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the <code>.markModified(path)</code> method of the document passing the path to the Mixed type you just changed.</p><pre><code class="javascript">person.anything = { x: [<span class="number">3</span>, <span class="number">4</span>, { y: <span class="string">"changed"</span> }] };
-person.markModified(<span class="string">'anything'</span>);
-person.save(); <span class="comment">// anything will now get saved</span></code></pre><h4 id="objectids">ObjectIds</h4><p>To specify a type of ObjectId, use <code>Schema.Types.ObjectId</code> in your declaration.</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
-<span class="keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;
-<span class="keyword">var</span> Car = <span class="keyword">new</span> Schema({ driver: ObjectId });
-<span class="comment">// or just Schema.ObjectId for backwards compatibility with v2</span></code></pre><h4 id="arrays">Arrays</h4><p>Provide creation of arrays of <a href="./api.html#schema_Schema.Types">SchemaTypes</a> or <a href="./subdocs.html">Sub-Documents</a>.</p><pre><code class="javascript"><span class="keyword">var</span> ToySchema = <span class="keyword">new</span> Schema({ name: String });
-<span class="keyword">var</span> ToyBox = <span class="keyword">new</span> Schema({
+<h4 id="mixed">Mixed</h4><p>An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:</p>var Any = new Schema({ any: {} });
+var Any = new Schema({ any: Object });
+var Any = new Schema({ any: Schema.Types.Mixed });<p>Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the <code>.markModified(path)</code> method of the document passing the path to the Mixed type you just changed.</p>person.anything = { x: [3, 4, { y: "changed" }] };
+person.markModified('anything');
+person.save(); // anything will now get saved<h4 id="objectids">ObjectIds</h4><p>To specify a type of ObjectId, use <code>Schema.Types.ObjectId</code> in your declaration.</p>var mongoose = require('mongoose');
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Car = new Schema({ driver: ObjectId });
+// or just Schema.ObjectId for backwards compatibility with v2<h4 id="arrays">Arrays</h4><p>Provide creation of arrays of <a href="./api.html#schema_Schema.Types">SchemaTypes</a> or <a href="./subdocs.html">Sub-Documents</a>.</p>var ToySchema = new Schema({ name: String });
+var ToyBox = new Schema({
   toys: [ToySchema],
   buffers: [Buffer],
   string:  [String],
   numbers: [Number]
-  <span class="comment">// ... etc</span>
-});</code></pre><p>Note: specifying an empty array is equivalent to <code>Mixed</code>. The following all create arrays of <code>Mixed</code>:</p><pre><code class="javascript"><span class="keyword">var</span> Empty1 = <span class="keyword">new</span> Schema({ any: [] });
-<span class="keyword">var</span> Empty2 = <span class="keyword">new</span> Schema({ any: Array });
-<span class="keyword">var</span> Empty3 = <span class="keyword">new</span> Schema({ any: [Schema.Types.Mixed] });
-<span class="keyword">var</span> Empty4 = <span class="keyword">new</span> Schema({ any: [{}] });</code></pre><p>Arrays implicitly have a default value of `[]` (empty array).</p><pre><code class="javascript"><span class="keyword">var</span> Toy = mongoose.model(<span class="string">'Test'</span>, ToySchema);
-console.log((<span class="keyword">new</span> Toy()).toys); <span class="comment">// []</span></code></pre><p>To overwrite this default, you need to set the default value to `undefined`</p><pre><code class="javascript"><span class="keyword">var</span> ToySchema = <span class="keyword">new</span> Schema({
+  // ... etc
+});<p>Note: specifying an empty array is equivalent to <code>Mixed</code>. The following all create arrays of <code>Mixed</code>:</p>var Empty1 = new Schema({ any: [] });
+var Empty2 = new Schema({ any: Array });
+var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
+var Empty4 = new Schema({ any: [{}] });<p>Arrays implicitly have a default value of `[]` (empty array).</p>var Toy = mongoose.model('Test', ToySchema);
+console.log((new Toy()).toys); // []<p>To overwrite this default, you need to set the default value to `undefined`</p>var ToySchema = new Schema({
   toys: {
     type: [ToySchema],
-    <span class="keyword">default</span>: <span class="literal">undefined</span>
+    default: undefined
   }
-});</code></pre><p>If an array is marked as `required`, it must have at least one element.</p><pre><code class="javascript"><span class="keyword">var</span> ToySchema = <span class="keyword">new</span> Schema({
+});<p>If an array is marked as `required`, it must have at least one element.</p>var ToySchema = new Schema({
   toys: {
     type: [ToySchema],
-    required: <span class="literal">true</span>
+    required: true
   }
 });
-<span class="keyword">var</span> Toy = mongoose.model(<span class="string">'Toy'</span>, ToySchema);
-Toy.create({ toys: [] }, <span class="keyword">function</span>(error) {
-  console.log(error.errors[<span class="string">'toys'</span>].message); <span class="comment">// Path "toys" is required.</span>
-});</code></pre><h3 id="customtypes">Creating Custom Types</h3><p>Mongoose can also be extended with custom SchemaTypes. Search the <a href="http://plugins.mongoosejs.com">plugins</a> site for compatible types like <a href="https://github.com/aheckmann/mongoose-long">mongoose-long</a>,&nbsp;<a href="https://github.com/vkarpov15/mongoose-int32">mongoose-int32</a> and <a href="https://github.com/aheckmann/mongoose-function">other</a> <a href="https://github.com/OpenifyIt/mongoose-types">types</a>.</p><h3 id="path">The `schema.path()` Function</h3><p>The <code>schema.path()</code> function returns the instantiated schema type for a
-given path.</p><pre><code class="javascript"><span class="keyword">var</span> sampleSchema = <span class="keyword">new</span> Schema({ name: { type: String, required: <span class="literal">true</span> } });
-console.log(sampleSchema.path(<span class="string">'name'</span>));
-<span class="comment">// Output looks like:</span>
-<span class="comment">/**
+var Toy = mongoose.model('Toy', ToySchema);
+Toy.create({ toys: [] }, function(error) {
+  console.log(error.errors['toys'].message); // Path "toys" is required.
+});<h3 id="customtypes">Creating Custom Types</h3><p>Mongoose can also be extended with custom SchemaTypes. Search the <a href="http://plugins.mongoosejs.com">plugins</a> site for compatible types like <a href="https://github.com/aheckmann/mongoose-long">mongoose-long</a>,&nbsp;<a href="https://github.com/vkarpov15/mongoose-int32">mongoose-int32</a> and <a href="https://github.com/aheckmann/mongoose-function">other</a> <a href="https://github.com/OpenifyIt/mongoose-types">types</a>.</p><h3 id="path">The `schema.path()` Function</h3><p>The <code>schema.path()</code> function returns the instantiated schema type for a
+given path.</p>
+var sampleSchema = new Schema({ name: { type: String, required: true } });
+console.log(sampleSchema.path('name'));
+// Output looks like:
+/**
  * SchemaString {
  *   enumValues: [],
  *   regExp: null,
  *   path: 'name',
  *   instance: 'String',
  *   validators: ...
- */</span></code></pre><p>You can use this function to inspect the schema type for a given path,
-including what validators it has and what the type is.</p><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>SchemaTypes</code>, let&#39;s take a look at <a href="/docs/models.html">Models</a>.</p></div></div><script>document.body.className = 'load';</script><script>;(function() {
-  var cx = '012173159455227967368:uvscsuqjovs';
-  var gcse = document.createElement('script');
-  gcse.type = 'text/javascript';
-  gcse.async = true;
-  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
-      '//www.google.com/cse/cse.js?cx=' + cx;
-  var s = document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(gcse, s);
-})();</script><script type="text/javascript">!function(name,path,ctx){
+ */<p>You can use this function to inspect the schema type for a given path,
+including what validators it has and what the type is.</p>
+<h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>SchemaTypes</code>, let&#39;s take a look at <a href="/docs/models.html">Models</a>.</p>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -154,10 +192,54 @@ KeenAsync.ready(function(){
     projectId: '59aad9cbc9e77c0001ce1b32',
     writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
   });
-  
+
   client.recordEvent('pageView', {
     host: window.location.host,
     pathname: window.location.pathname,
     hash: window.location.hash
   });
-});</script></body></html>
+});</script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

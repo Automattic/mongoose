@@ -4,9 +4,25 @@ html(lang='en')
     meta(charset='utf-8')
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose ODM v#{package.version}
-    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
-    link(href='docs/css/default.css', rel='stylesheet')
-    link(href='docs/css/style.css', rel='stylesheet')
+    link(href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700", rel="stylesheet", type="text/css")
+    link(href="docs/css/default.css", rel="stylesheet")
+    link(href="docs/css/style.css", rel="stylesheet")
+    link(href="/docs/css/github.css", rel="stylesheet")
+
+    style.
+      code {
+        font-size: 1em;
+      }
+
+      .sponsor {
+        margin-bottom: 40px;
+        font-size: 0.66em;
+        color: #666;
+      }
+
+      .sponsors {
+        margin-bottom: 40px;
+      }
   body
     a#forkbanner(href="http://github.com/learnboost/mongoose")
       img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
@@ -15,11 +31,10 @@ html(lang='en')
         h1
           a(href="https://github.com/learnboost/mongoose", target="blank")
             .mongoose Mongoose
-      p.tagline
-       | Elegant 
-       a(href="http://www.mongodb.org/", target="blank") MongoDB
-       |  object modeling for 
-       a(href="http://nodejs.org/", target="blank") Node.js
+      div.tagline
+        :markdown
+          Elegant [MongoDB](https://www.mongodb.com/) object modeling for
+          [Node.js](https://nodejs.org/en/)
       #links
         ul
           li
@@ -38,93 +53,57 @@ html(lang='en')
       #inner
         #what
           p.what
-            | Let's face it, 
+            | Let's face it,
             strong writing MongoDB validation, casting and business logic boilerplate is a drag
-            | . That's why we wrote Mongoose. 
-        #example
-          :js
-            var mongoose = require('mongoose');
-            mongoose.connect('mongodb://localhost/test', { useMongoClient: true });
-            mongoose.Promise = global.Promise;
+            | . That's why we wrote Mongoose.
+        :markdown
+          ```javascript
+          const mongoose = require('mongoose');
+          mongoose.connect('mongodb://localhost/test');
 
-            var Cat = mongoose.model('Cat', { name: String });
+          const Cat = mongoose.model('Cat', { name: String });
 
-            var kitty = new Cat({ name: 'Zildjian' });
-            kitty.save(function (err) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log('meow');
-              }
-            });
-        p.what Mongoose provides a straight-forward, schema-based solution to model your application data. It includes built-in type casting, validation, query building, business logic hooks and more, out of the box.
-        #getstarted
-          h2 Getting Started
-          ul
-            li
-              a(href="docs/index.html") quick start guide
-        #support
-          h2 Support
-          ul
-            li
-              a(href="http://stackoverflow.com/questions/tagged/mongoose") Stack Overflow
-            li
-              a(href="https://github.com/Automattic/mongoose/issues/") bug reports
-            li
-              a(href="http://groups.google.com/group/mongoose-orm") Google Group
-            li
-              a(href="https://gitter.im/Automattic/mongoose") Gitter chat
-            li
-              a(href="http://www.mongodb.org/about/support/") MongoDB support
-        #announcements
-          h2 News
-          ul
-            li
-              a(href="https://twitter.com/mongoosejs") @mongoosejs
-            li
-              a(href="http://groups.google.com/group/mongoose-orm") Google Group
-        #changelog
-          h2 Changelog
-          ul
-            li
-              a(href="https://github.com/Automattic/mongoose/blob/master/History.md") Changelog
-        #production
-          h2
-            | Production
-            | 
-            a(href='http://mongoosejs.tumblr.com/', target='_blank', title='More production examples') View More
-          ul
-            li
-              a(href="http://www.mongodb.com/presentations/building-linkedins-learning-platform-mongodb")
-                img(src="http://upload.wikimedia.org/wikipedia/commons/thumb/8/80/LinkedIn_Logo_2013.svg/568px-LinkedIn_Logo_2013.svg.png", alt="LinkedIn")
-            li
-              a(href="https://prezi.com/pa1ub5unrapt/trello-architecture-2013/")
-                img(src="http://upload.wikimedia.org/wikipedia/en/3/3e/Trello_Logo.png", alt="Trello")
-            li
-              a(href="http://waffle.io", alt="Waffle.io")
-                img(src="http://i.imgur.com/nqzTvft.png", alt="Waffle.io")
-            li
-              a(href="http://storify.com/", alt="Storify")
-                img(src="docs/images/apps/h_storify.jpg", alt="Storify")
-            li
-              a(href="http://geekli.st", alt="GeekList")
-                img(src="docs/images/apps/h_geeklist.png", alt="GeekList")
-            li
-              a(href="http://bookalokal.com")
-                img(src="http://s3.amazonaws.com/bookalokal-assets/images/bookalokal.svg", alt="BookaLokal")
-            li
-              a(href="http://www.elevenjames.com")
-                img(src="http://i.imgur.com/vx8KH9Z.jpg", alt="Eleven James")
-            li
-              a(href="http://www.datafox.com/", alt="DataFox")
-                img(src="http://i.imgur.com/VxHJfAJ.png", alt="DataFox")
-            li
-              a(href="https://sixplus.com")
-                img(src="https://s3.amazonaws.com/bookalokal-assets/sixplus/sixplus-logo-horizontal-dark.png", alt="SixPlus")
-            li
-              a(href="http://www.softbox.com.br/en/produtos/detalhe/cat/dashbox/")
-                img(src="http://www.softbox.com.br/public/upload/categoriasprodutos/logo/logo-dashbox.png", alt="Dashbox")
-                
+          const kitty = new Cat({ name: 'Zildjian' });
+          kitty.save().then(() => console.log('meow'));
+          ```
+
+          Mongoose provides a straight-forward, schema-based solution to model
+          your application data. It includes built-in type casting, validation,
+          query building, business logic hooks and more, out of the box.
+
+          ## Getting Started
+
+          * [quick start guide](/docs/index.html)
+
+          ## Support
+
+          * [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
+          * [GitHub Issues](https://github.com/Automattic/mongoose/issues)
+          * [Gitter Chat](https://gitter.im/Automattic/mongoose)
+          * [MongoDB Support](http://www.mongodb.org/about/support/)
+
+          ## News
+
+          * [Twitter](https://twitter.com/mongoosejs)
+
+          ## Changelog
+
+          * [Changelog](https://github.com/Automattic/mongoose/blob/master/History.md)
+
+          ## Sponsors
+
+          <div class="sponsors">
+            <div>
+              <a href="https://mixmax.com">
+                <img src="/docs/images/mixmax.png" alt="MixMax.com">
+              </a>
+            </div>
+          </div>
+
+          <div class="sponsor">
+            Sponsor [Mongoose on OpenCollective](https://opencollective.com/mongoose) to get your company's logo above!
+          </div>
+
     p#footer Licensed under MIT. Copyright 2011 <a href="http://learnboost.com">LearnBoost</a>.
     script.
       document.body.className = 'load';

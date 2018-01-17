@@ -143,6 +143,31 @@ pre {
   display: none;
 }
 
+.carbon-ad {
+  width: 100%;
+  border-top: 1px solid #ddd;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+#carbonads {
+  width: 200px;
+  margin-left: 1em;
+}
+
+.carbon-text {
+	color: #428bca;
+	display: block;
+	width: 130px;
+	font-size: 0.8em;
+}
+
+.carbon-poweredby {
+	font-size: 0.66em;
+	display: block;
+	color: rgb(102, 102, 102);
+}
+
 @media (max-width: 1160px) {
   .container {
     width: 100%;

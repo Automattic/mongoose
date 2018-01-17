@@ -1,39 +1,9 @@
 extends layout
 
+append style
+  link(rel="stylesheet", href="/docs/css/api.css")
+
 block content
-  style.
-    .method-type {
-      color: #1485CC;
-      margin-left: 0.25em;
-      margin-right: 0.25em;
-    }
-
-    ul {
-      margin-top: -10px;
-    }
-
-    li {
-      margin-bottom: 0.5em;
-    }
-
-    hr.separate-api-elements {
-      border: 0;
-      height: 1px;
-      background: -webkit-gradient(linear, left top, right top, from(rgba(221, 221, 221, 0.0)), color-stop(0.5, rgba(221, 221, 221, 0.33)), to(rgba(221, 221, 221, 0.0)));
-      margin-left: auto;
-      margin-right: auto;
-      margin-top: 45px;
-      margin-bottom: 35px;
-    }
-
-    hr.separate-api {
-      margin-top: 55px;
-      margin-bottom: 45px;
-      border: 0;
-      height: 3px;
-      background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.0)), color-stop(0.5, rgba(0, 0, 0, 0.33)), to(rgba(0, 0, 0, 0.0)));
-    }
-
   h1 API Docs
 
   each item in docs

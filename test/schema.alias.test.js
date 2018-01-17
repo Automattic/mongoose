@@ -9,9 +9,17 @@ var start = require('./common'),
     Schema = mongoose.Schema;
 
 describe('schema alias option', function() {
-  it('works with all basic schema types', function(done) {
-    var db = start();
+  var db;
 
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
+  it('works with all basic schema types', function(done) {
     var schema = new Schema({
       string:   { type: String, alias: 'StringAlias' },
       number:   { type: Number, alias: 'NumberAlias' },
@@ -50,8 +58,6 @@ describe('schema alias option', function() {
   });
 
   it('works with nested schema types', function(done) {
-    var db = start();
-
     var schema = new Schema({
       nested: {
         string:   { type: String, alias: 'StringAlias' },

@@ -32,7 +32,7 @@ describe('model: populate: divergent arrays', function() {
     M = db.model('Parent', {array: {type: [{type: Number, ref: 'Child'}]}}, 'parent-' + random());
 
     C.create(
-        {_id: 0, name: 'zero'}
+      {_id: 0, name: 'zero'}
       , {_id: 1, name: 'one'}
       , {_id: 2, name: 'two'}, function(err) {
         assert.ifError(err);

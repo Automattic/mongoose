@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.0.0-rc1",
+  "version": "5.0.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -21,7 +21,7 @@
   "dependencies": {
     "async": "2.1.4",
     "bson": "~1.0.4",
-    "kareem": "2.0.0-rc5",
+    "kareem": "2.0.1",
     "lodash.get": "4.4.2",
     "mongodb": "3.0.1",
     "mongoose-legacy-pluralize": "1.0.1",
@@ -32,24 +32,24 @@
     "sliced": "1.0.1"
   },
   "devDependencies": {
-    "acquit": "0.4.1",
+    "acquit": "0.5.1",
     "acquit-ignore": "0.0.3",
     "benchmark": "2.1.2",
     "bluebird": "3.5.0",
     "co": "4.6.0",
     "dox": "0.3.1",
-    "eslint": "2.4.0",
-    "highlight.js": "7.0.1",
-    "istanbul": "0.4.4",
-    "jade": "0.26.3",
+    "eslint": "4.14.0",
+    "highlight.js": "9.1.0",
+    "jade": "1.11.0",
     "lodash": "4.16.6",
     "markdown": "0.5.0",
     "marked": "0.3.9",
-    "mocha": "3.2.0",
-    "mongoose-long": "0.1.1",
+    "mocha": "4.1.0",
     "mongodb-topology-manager": "1.0.11",
-    "node-static": "0.7.7",
+    "mongoose-long": "0.1.1",
+    "node-static": "0.7.10",
     "nsp": "~2.8.1",
+    "nyc": "11.4.1",
     "power-assert": "1.4.1",
     "q": "1.5.1",
     "tbd": "0.6.4",
@@ -64,8 +64,8 @@
     "fix-lint": "eslint . --fix",
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
-    "test": "mocha test/*.test.js test/**/*.test.js",
-    "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
+    "test": "mocha --exit test/*.test.js test/**/*.test.js",
+    "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
   "engines": {
@@ -79,5 +79,50 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "http://mongoosejs.com",
-  "browser": "lib/browser.js"
+  "browser": "lib/browser.js",
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2015
+    },
+    "env": {
+      "node": true,
+      "mocha": true,
+      "es6": true
+    },
+    "rules": {
+      "comma-style": "error",
+      "consistent-this": [
+        "error",
+        "_this"
+      ],
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1,
+          "VariableDeclarator": 2
+        }
+      ],
+      "keyword-spacing": "error",
+      "no-console": "off",
+      "no-multi-spaces": "error",
+      "func-call-spacing": "error",
+      "no-trailing-spaces": "error",
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": "error",
+      "space-before-blocks": "error",
+      "space-before-function-paren": [
+        "error",
+        "never"
+      ],
+      "space-infix-ops": "error",
+      "space-unary-ops": "error"
+    }
+  }
 }

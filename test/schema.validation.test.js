@@ -1,4 +1,4 @@
-  /**
+/**
  * Module dependencies.
  */
 
@@ -87,7 +87,7 @@ describe('schema', function() {
       Test.path('state').doValidate('x', function(err) {
         assert.ok(err instanceof ValidatorError);
         assert.equal(err.message,
-            'enum validator failed for path `state`: test');
+          'enum validator failed for path `state`: test');
       });
 
       Test.path('state').doValidate('opening', function(err) {
@@ -811,10 +811,10 @@ describe('schema', function() {
           assert.ok(error);
           assert.ok(error.errors['foods.0']);
           assert.equal(error.errors['foods.0'].message,
-              '`tofu` is not a valid enum value for path `foods`.');
+            '`tofu` is not a valid enum value for path `foods`.');
           assert.ok(error.errors['foods.1']);
           assert.equal(error.errors['foods.1'].message,
-              '`waffles` is not a valid enum value for path `foods`.');
+            '`waffles` is not a valid enum value for path `foods`.');
           assert.ok(!error.errors['foods.2']);
 
           done();
@@ -846,7 +846,7 @@ describe('schema', function() {
           assert.ok(error);
           assert.ok(error.errors['votes.0.vote']);
           assert.equal(error.errors['votes.0.vote'].message,
-              '`terrible` is not a valid enum value for path `vote`.');
+            '`terrible` is not a valid enum value for path `vote`.');
 
           done();
         });

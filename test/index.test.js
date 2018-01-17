@@ -49,7 +49,7 @@ describe('mongoose module:', function() {
     });
   });
 
-  it('legacy pluralize by default (gh-9999)', function(done) {
+  it('legacy pluralize by default (gh-5958)', function(done) {
     var mongoose = new Mongoose();
 
     mongoose.model('User', new Schema({}));
@@ -67,6 +67,18 @@ describe('mongoose module:', function() {
     assert.equal(mongoose.get('a'), 'b');
     assert.equal(mongoose.set('a'), 'b');
     assert.equal(mongoose.get('long option'), 'c');
+    done();
+  });
+
+  it('bufferCommands option (gh-5879)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('bufferCommands', false);
+
+    const M = mongoose.model('Test', new Schema({}));
+
+    assert.ok(!M.collection.buffer);
+
     done();
   });
 

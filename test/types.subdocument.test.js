@@ -16,6 +16,7 @@ describe('types.subdocument', function() {
   var GrandChildSchema;
   var ChildSchema;
   var ParentSchema;
+  var db;
 
   before(function() {
     GrandChildSchema = new Schema({
@@ -33,6 +34,11 @@ describe('types.subdocument', function() {
     });
 
     mongoose.model('Parent-3589-Sub', ParentSchema);
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   it('returns a proper ownerDocument (gh-3589)', function(done) {
@@ -53,7 +59,6 @@ describe('types.subdocument', function() {
     done();
   });
   it('not setting timestamps in subdocuments', function() {
-    var db = start();
     var Thing = db.model('Thing', new Schema({
       subArray: [{
         testString: String

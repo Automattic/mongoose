@@ -1,4 +1,29 @@
-5.0.0-rc1 / 2017-01-02
+5.0.0 / 2018-01-17
+==================
+ * test: refactor tests to use start fewer connections #5985 [fenanquin](https://github.com/fenanquin)
+ * feat: add global bufferCommands option #5879
+ * docs: new docs site and build system #5976
+ * test: increase timeout on slow test cases #5968 [fenanquin](https://github.com/fenanquin)
+ * fix: avoid casting out array filter elements #5965
+ * feat: add Model.watch() wrapper #5964
+ * chore: replace istanbul with nyc #5962 [ChristianMurphy](https://github.com/ChristianMurphy)
+
+4.13.9 / 2018-01-07
+===================
+ * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: upgrade mongodb -> 2.2.34 for ipv6 and autoReconnect fixes #5794 #5760
+ * docs: use useMongooseAggCursor for aggregate docs #2955
+
+5.0.0-rc2 / 2018-01-04
+======================
+ * fix: add cleaner warning about no longer needing `useMongoClient` in 5.x #5961
+ * chore: update acquit -> 0.5.1 for minor security patch #5961 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs: add docs for mongoose 4.x at http://mongoosejs.com/docs/4.x #5959
+ * docs: add link to migration guide #5957
+ * chore: update eslint to version 4.14.0 #5955 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * chore: update mocha to version 4.1.0 [ChristianMurphy](https://github.com/ChristianMurphy)
+
+5.0.0-rc1 / 2018-01-02
 ======================
  * fix(index): use pluralize correctly for `mongoose.model()` #5958
  * fix: make mquery use native promises by default #5945

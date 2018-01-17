@@ -74,18 +74,20 @@ describe('connections:', function() {
 
     describe('connection events', function() {
       beforeEach(function() {
-        this.timeout(25000);
-        return server.start().
-          then(function() { return server.purge(); });
+        this.timeout(60000);
+        return server.start();
       });
 
       afterEach(function() {
-        this.timeout(25000);
-        return server.stop();
+        this.timeout(60000);
+        return server.stop().
+          then(function() {
+            return server.purge();
+          });
       });
 
       it('disconnected (gh-5498) (gh-5524)', function(done) {
-        this.timeout(25000);
+        this.timeout(60000);
 
         var conn;
         var numConnected = 0;
@@ -151,7 +153,7 @@ describe('connections:', function() {
       });
 
       it('reconnectFailed (gh-4027)', function(done) {
-        this.timeout(25000);
+        this.timeout(60000);
 
         var conn;
         var numReconnectFailed = 0;
@@ -221,7 +223,7 @@ describe('connections:', function() {
       });
 
       it('timeout (gh-4513)', function(done) {
-        this.timeout(25000);
+        this.timeout(60000);
 
         var conn;
         var numTimeout = 0;
@@ -447,12 +449,20 @@ describe('connections:', function() {
   });
 
   describe('.model()', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('allows passing a schema', function(done) {
-      var db = start();
       var MyModel = db.model('MyModelasdf', new Schema({
         name: String
       }));
-      db.close();
 
       assert.ok(MyModel.schema instanceof Schema);
       assert.ok(MyModel.prototype.schema instanceof Schema);
@@ -471,7 +481,6 @@ describe('connections:', function() {
     });
 
     it('prevents overwriting pre-existing models', function(done) {
-      var db = start();
       var name = 'gh-1209-a';
       db.model(name, new Schema);
 
@@ -479,12 +488,10 @@ describe('connections:', function() {
         db.model(name, new Schema);
       }, /Cannot overwrite `gh-1209-a` model/);
 
-      db.close();
       done();
     });
 
     it('allows passing identical name + schema args', function(done) {
-      var db = start();
       var name = 'gh-1209-b';
       var schema = new Schema;
 
@@ -493,17 +500,14 @@ describe('connections:', function() {
         db.model(name, schema);
       });
 
-      db.close();
       done();
     });
 
     it('throws on unknown model name', function(done) {
-      var db = start();
       assert.throws(function() {
         db.model('iDoNotExist!');
       }, /Schema hasn't been registered/);
 
-      db.close();
       done();
     });
 
@@ -534,11 +538,9 @@ describe('connections:', function() {
     describe('get existing model with not existing collection in db', function() {
       it('must return exiting collection with all collection options', function(done) {
         mongoose.model('some-th-1458', new Schema({test: String}, {capped: {size: 1000, max: 10}}));
-        var db = start();
         var m = db.model('some-th-1458');
         assert.equal(1000, m.collection.opts.capped.size);
         assert.equal(10, m.collection.opts.capped.max);
-        db.close();
         done();
       });
     });
@@ -546,7 +548,6 @@ describe('connections:', function() {
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {
-          var db = start();
           var s1 = new Schema({a: []});
           var name = 'non-cached-collection-name';
           var A = db.model(name, s1);
@@ -556,7 +557,6 @@ describe('connections:', function() {
           assert.ok(A.collection.name !== C.collection.name);
           assert.ok(db.models[name].collection.name !== C.collection.name);
           assert.ok(db.models[name].collection.name === A.collection.name);
-          db.close();
           done();
         });
       });
@@ -564,14 +564,12 @@ describe('connections:', function() {
 
     describe('passing object literal schemas', function() {
       it('works', function(done) {
-        var db = start();
         var A = db.model('A', {n: [{age: 'number'}]});
         var a = new A({n: [{age: '47'}]});
         assert.strictEqual(47, a.n[0].age);
         a.save(function(err) {
           assert.ifError(err);
           A.findById(a, function(err) {
-            db.close();
             assert.ifError(err);
             assert.strictEqual(47, a.n[0].age);
             done();

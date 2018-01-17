@@ -74,9 +74,9 @@ describe('model', function() {
           personName: Number
         });
         BaseCustomEvent = db.model('base-custom-event',
-                                   BaseCustomEventSchema);
+          BaseCustomEventSchema);
         DiscCustomEvent = BaseCustomEvent.discriminator('disc-custom-event',
-                                                        DiscCustomEventSchema);
+          DiscCustomEventSchema);
         var ContainerSchema = new Schema({
           title: String,
           events: [{type: Schema.Types.ObjectId, ref: 'base-custom-event'}]

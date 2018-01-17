@@ -6,19 +6,13 @@ STABLE_BRANCH = master
 LEGACY_BRANCH = 4.x
 
 test:
-	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/*.test.js
+	./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
 docs: ghpages merge_stable docclean gendocs
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
 
-gendocs: $(DOCFILE)
-
-$(DOCFILE): $(DOCS)
+gendocs:
 	node website.js
-
-%.json: %.js
-	@echo "\n### $(patsubst lib//%,lib/%, $^)" >> $(DOCFILE)
-	./node_modules/dox/bin/dox < $^ >> $(DOCFILE)
 
 site:
 	node website.js && node static.js

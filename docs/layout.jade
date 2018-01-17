@@ -47,6 +47,13 @@ html(lang='en')
               img#logo(src="/docs/images/mongoose5_62x30_transparent.png")
               span.logo-text mongoose
           ul.pure-menu-list
+            li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
+              a(href="#").pure-menu-link Version #{package.version}
+              ul.pure-menu-children
+                li.pure-menu-item
+                  a.pure-menu-link(href="/docs/4.x") Version #{package.latest4x}
+                li.pure-menu-item
+                  a.pure-menu-link(href="/docs/3.8.x") Version #{package.latest38x}
             li.pure-menu-item
               a.pure-menu-link(href="/docs/index.html") Quick Start
             li.pure-menu-item
@@ -95,8 +102,6 @@ html(lang='en')
               a.pure-menu-link(href="/docs/compatibility.html") Version Compatibility
             li.pure-menu-item
               a.pure-menu-link(href="/docs/faq.html") FAQ
-            li.pure-menu-item
-              a.pure-menu-link(href="/docs/prior.html") Prior Releases
       .container
         #content
           block content

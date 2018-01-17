@@ -88,6 +88,15 @@ li.sub-item {
   margin-left: 20px;
 }
 
+li.version {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+}
+
+li.version ul.pure-menu-children {
+  border: 1px solid #ddd;
+}
+
 #logo-container {
   position: relative;
   top: -4px;
@@ -104,6 +113,7 @@ li.sub-item {
   background-color: #eee;
   width: 250px;
   border-right: 1px solid #ddd;
+  overflow-y: auto;
 }
 
 .container {

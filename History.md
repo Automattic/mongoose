@@ -1,3 +1,13 @@
+5.0.0 / 2018-01-17
+==================
+ * test: refactor tests to use start fewer connections #5985 [fenanquin](https://github.com/fenanquin)
+ * feat: add global bufferCommands option #5879
+ * docs: new docs site and build system #5976
+ * test: increase timeout on slow test cases #5968 [fenanquin](https://github.com/fenanquin)
+ * fix: avoid casting out array filter elements #5965
+ * feat: add Model.watch() wrapper #5964
+ * chore: replace istanbul with nyc #5962 [ChristianMurphy](https://github.com/ChristianMurphy)
+
 4.13.9 / 2018-01-07
 ===================
  * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)

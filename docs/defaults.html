@@ -73,8 +73,8 @@ pre code {
 }
 
 .pure-menu-item {
-  height: 30px;
-  font-size: 13pt;
+  height: 28px;
+  font-size: 12pt;
   padding-top: 0px;
 }
 
@@ -83,7 +83,7 @@ pre code {
 }
 
 li.sub-item {
-  height: 25px;
+  height: 23px;
   font-size: 11pt;
   margin-left: 20px;
 }
@@ -231,8 +231,8 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="declaring-defaults-in-your-schema"><p>Declaring defaults in your schema</p>
-</h2><p><p>Your schemas can define default values for certain paths. If you create
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="declaring-defaults-in-your-schema"><a href="#declaring-defaults-in-your-schema"><p>Declaring defaults in your schema</p>
+</a></h2><p><p>Your schemas can define default values for certain paths. If you create
 a new document without that path set, the default will kick in.</p>
 </p>
 <pre><code class="lang-javscript">
@@ -262,8 +262,8 @@ a new document without that path set, the default will kick in.</p>
     });
   
 </code></pre>
-<h2 id="default-functions"><p>Default functions</p>
-</h2><p><p>You can also set the <code>default</code> schema option to a function. Mongoose will
+<h2 id="default-functions"><a href="#default-functions"><p>Default functions</p>
+</a></h2><p><p>You can also set the <code>default</code> schema option to a function. Mongoose will
 execute that function and use the return value as the default.</p>
 </p>
 <pre><code class="lang-javscript">
@@ -285,8 +285,8 @@ execute that function and use the return value as the default.</p>
     assert.ok(post.date.getTime() &lt;= <span class="hljs-built_in">Date</span>.now());
   
 </code></pre>
-<h2 id="the-setdefaultsoninsert-option"><p>The <code>setDefaultsOnInsert</code> option</p>
-</h2><p><p>By default, mongoose only applies defaults when you create a new document.
+<h2 id="the-setdefaultsoninsert-option"><a href="#the-setdefaultsoninsert-option"><p>The <code>setDefaultsOnInsert</code> option</p>
+</a></h2><p><p>By default, mongoose only applies defaults when you create a new document.
 It will <strong>not</strong> set defaults if you use <code>update()</code> and
 <code>findOneAndUpdate()</code>. However, mongoose 4.x lets you opt-in to this
 behavior using the <code>setDefaultsOnInsert</code> option.</p>

@@ -73,8 +73,8 @@ pre code {
 }
 
 .pure-menu-item {
-  height: 30px;
-  font-size: 13pt;
+  height: 28px;
+  font-size: 12pt;
   padding-top: 0px;
 }
 
@@ -83,7 +83,7 @@ pre code {
 }
 
 li.sub-item {
-  height: 25px;
+  height: 23px;
   font-size: 11pt;
   margin-left: 20px;
 }
@@ -231,43 +231,50 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2>Plugins</h2><p>Schemas are pluggable, that is, they allow for applying pre-packaged capabilities to extend their functionality. This is a very powerful feature.</p>
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="plugins">Plugins</h2>
+<p>Schemas are pluggable, that is, they allow for applying pre-packaged capabilities to extend their functionality. This is a very powerful feature.</p>
 <p>Suppose that we have several collections in our database and want to add last-modified functionality to each one. With plugins this is easy. Just create a plugin once and apply it to each <code>Schema</code>:</p>
-// lastMod.js
-module.exports = exports = function lastModifiedPlugin (schema, options) {
-  schema.add({ lastMod: Date })
+<pre><code class="lang-javascript"><span class="hljs-comment">// lastMod.js</span>
+<span class="hljs-built_in">module</span>.exports = exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">lastModifiedPlugin</span> (<span class="hljs-params">schema, options</span>) </span>{
+  schema.add({ lastMod: <span class="hljs-built_in">Date</span> });
 
-  schema.pre('save', function (next) {
-    this.lastMod = new Date
-    next()
-  })
+  schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    <span class="hljs-keyword">this</span>.lastMod = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+    next();
+  });
 
-  if (options && options.index) {
-    schema.path('lastMod').index(options.index)
+  <span class="hljs-keyword">if</span> (options &amp;&amp; options.index) {
+    schema.path(<span class="hljs-string">'lastMod'</span>).index(options.index);
   }
 }
 
-// game-schema.js
-var lastMod = require('./lastMod');
-var Game = new Schema({ ... });
-Game.plugin(lastMod, { index: true });
+<span class="hljs-comment">// game-schema.js</span>
+<span class="hljs-keyword">var</span> lastMod = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./lastMod'</span>);
+<span class="hljs-keyword">var</span> Game = <span class="hljs-keyword">new</span> Schema({ ... });
+Game.plugin(lastMod, { index: <span class="hljs-literal">true</span> });
 
-// player-schema.js
-var lastMod = require('./lastMod');
-var Player = new Schema({ ... });
-Player.plugin(lastMod);<p>We just added last-modified behavior to both our <code>Game</code> and <code>Player</code> schemas and declared an index on the <code>lastMod</code> path of our Games to boot. Not bad for a few lines of code.</p>
-<h3 id="global">Global Plugins</h3><p>Want to register a plugin for all schemas? The mongoose singleton has a
+<span class="hljs-comment">// player-schema.js</span>
+<span class="hljs-keyword">var</span> lastMod = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./lastMod'</span>);
+<span class="hljs-keyword">var</span> Player = <span class="hljs-keyword">new</span> Schema({ ... });
+Player.plugin(lastMod);
+</code></pre>
+<p>We just added last-modified behavior to both our <code>Game</code> and <code>Player</code> schemas and declared an index on the <code>lastMod</code> path of our Games to boot. Not bad for a few lines of code.</p>
+<h3 id="global"><a href="#global">Global Plugins</a></h3>
+
+<p>Want to register a plugin for all schemas? The mongoose singleton has a
 <code>.plugin()</code> function that registers a plugin for every schema. For
 example:</p>
-var mongoose = require('mongoose');
-mongoose.plugin(require('./lastMod'));
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+mongoose.plugin(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./lastMod'</span>));
 
-var gameSchema = new Schema({ ... });
-var playerSchema = new Schema({ ... });
-// `lastModifiedPlugin` gets attached to both schemas
-var Game = mongoose.model('Game', gameSchema);
-var Player = mongoose.model('Player', playerSchema);<h3>Community!</h3><p>Not only can you re-use schema functionality in your own projects but you also reap the benefits of the Mongoose community as well. Any plugin published to <a href="https://npmjs.org/">npm</a> and <a href="https://npmjs.org/doc/tag.html">tagged</a> with <code>mongoose</code> will show up on our <a href="http://plugins.mongoosejs.io">search results</a> page.</p>
-<h3 id="next">Next Up</h3><p>Now that we&#39;ve covered plugins and how to get involved in the great community growing around them, let&#39;s take a look how you can help <a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contribute</a> to the continuing development of Mongoose itself.</p>
+<span class="hljs-keyword">var</span> gameSchema = <span class="hljs-keyword">new</span> Schema({ ... });
+<span class="hljs-keyword">var</span> playerSchema = <span class="hljs-keyword">new</span> Schema({ ... });
+<span class="hljs-comment">// `lastModifiedPlugin` gets attached to both schemas</span>
+<span class="hljs-keyword">var</span> Game = mongoose.model(<span class="hljs-string">'Game'</span>, gameSchema);
+<span class="hljs-keyword">var</span> Player = mongoose.model(<span class="hljs-string">'Player'</span>, playerSchema);
+</code></pre>
+<h3 id="community-">Community!</h3>
+<p>Not only can you re-use schema functionality in your own projects but you also reap the benefits of the Mongoose community as well. Any plugin published to <a href="https://npmjs.org/">npm</a> and <a href="https://npmjs.org/doc/tag.html">tagged</a> with <code>mongoose</code> will show up on our <a href="http://plugins.mongoosejs.io">search results</a> page.</p>
 </div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);

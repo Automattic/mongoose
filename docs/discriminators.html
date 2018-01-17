@@ -73,8 +73,8 @@ pre code {
 }
 
 .pure-menu-item {
-  height: 30px;
-  font-size: 13pt;
+  height: 28px;
+  font-size: 12pt;
   padding-top: 0px;
 }
 
@@ -83,7 +83,7 @@ pre code {
 }
 
 li.sub-item {
-  height: 25px;
+  height: 23px;
   font-size: 11pt;
   margin-left: 20px;
 }
@@ -231,8 +231,8 @@ pre {
     display: block !important;
   }
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="the-model-discriminator-function"><p>The <code>model.discriminator()</code> function</p>
-</h2><p><p>Discriminators are a schema inheritance mechanism. They enable
+</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="#"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/prior.html" class="pure-menu-link">Prior Releases</a></li></ul></div></div><div class="container"><div id="content"><h2 id="the-model-discriminator-function"><a href="#the-model-discriminator-function"><p>The <code>model.discriminator()</code> function</p>
+</a></h2><p><p>Discriminators are a schema inheritance mechanism. They enable
 you to have multiple models with overlapping schemas on top of the
 same underlying MongoDB collection.</p>
 <p>Suppose you wanted to track different types of events in a single
@@ -264,8 +264,8 @@ discriminator schema.</p>
     assert.ok(clickedEvent.url);
   
 </code></pre>
-<h2 id="discriminators-save-to-the-event-models-collection"><p>Discriminators save to the Event model&#39;s collection</p>
-</h2><p><p>Suppose you created another discriminator to track events where
+<h2 id="discriminators-save-to-the-event-models-collection"><a href="#discriminators-save-to-the-event-models-collection"><p>Discriminators save to the Event model&#39;s collection</p>
+</a></h2><p><p>Suppose you created another discriminator to track events where
 a new user registered. These <code>SignedUpEvent</code> instances will be
 stored in the same collection as generic events and <code>ClickedLinkEvent</code>
 instances.</p>
@@ -289,8 +289,8 @@ instances.</p>
     });
   
 </code></pre>
-<h2 id="discriminator-keys"><p>Discriminator keys</p>
-</h2><p><p>The way mongoose tells the difference between the different
+<h2 id="discriminator-keys"><a href="#discriminator-keys"><p>Discriminator keys</p>
+</a></h2><p><p>The way mongoose tells the difference between the different
 discriminator models is by the &#39;discriminator key&#39;, which is
 <code>__t</code> by default. Mongoose adds a String path called <code>__t</code>
 to your schemas that it uses to track which discriminator
@@ -306,8 +306,8 @@ this document is an instance of.</p>
     assert.equal(event3.__t, <span class="hljs-string">'SignedUp'</span>);
   
 </code></pre>
-<h2 id="discriminators-add-the-discriminator-key-to-queries"><p>Discriminators add the discriminator key to queries</p>
-</h2><p><p>Discriminator models are special; they attach the discriminator key
+<h2 id="discriminators-add-the-discriminator-key-to-queries"><a href="#discriminators-add-the-discriminator-key-to-queries"><p>Discriminators add the discriminator key to queries</p>
+</a></h2><p><p>Discriminator models are special; they attach the discriminator key
 to queries. In other words, <code>find()</code>, <code>count()</code>, <code>aggregate()</code>, etc.
 are smart enough to account for discriminators.</p>
 </p>
@@ -332,8 +332,8 @@ are smart enough to account for discriminators.</p>
     });
   
 </code></pre>
-<h2 id="discriminators-copy-pre-and-post-hooks"><p>Discriminators copy pre and post hooks</p>
-</h2><p><p>Discriminators also take their base schema&#39;s pre and post middleware.
+<h2 id="discriminators-copy-pre-and-post-hooks"><a href="#discriminators-copy-pre-and-post-hooks"><p>Discriminators copy pre and post hooks</p>
+</a></h2><p><p>Discriminators also take their base schema&#39;s pre and post middleware.
 However, you can also attach middleware to the discriminator schema
 without affecting the base schema.</p>
 </p>
@@ -370,8 +370,8 @@ without affecting the base schema.</p>
     });
   
 </code></pre>
-<h2 id="handling-custom-_id-fields"><p>Handling custom _id fields</p>
-</h2><p><p>A discriminator&#39;s fields are the union of the base schema&#39;s fields and
+<h2 id="handling-custom-_id-fields"><a href="#handling-custom-_id-fields"><p>Handling custom _id fields</p>
+</a></h2><p><p>A discriminator&#39;s fields are the union of the base schema&#39;s fields and
 the discriminator schema&#39;s fields, and the discriminator schema&#39;s fields
 take precedence. There is one exception: the default <code>_id</code> field.</p>
 <p>You can work around this by setting the <code>_id</code> option to false in the
@@ -403,8 +403,8 @@ discriminator schema as shown below.</p>
     assert.ok(<span class="hljs-keyword">typeof</span> event1.time === <span class="hljs-string">'string'</span>);
   
 </code></pre>
-<h2 id="using-discriminators-with-model-create"><p>Using discriminators with <code>Model.create()</code></p>
-</h2><p><p>When you use <code>Model.create()</code>, mongoose will pull the correct type from
+<h2 id="using-discriminators-with-model-create"><a href="#using-discriminators-with-model-create"><p>Using discriminators with <code>Model.create()</code></p>
+</a></h2><p><p>When you use <code>Model.create()</code>, mongoose will pull the correct type from
 the discriminator key for you.</p>
 </p>
 <pre><code class="lang-javscript">
@@ -435,8 +435,8 @@ the discriminator key for you.</p>
     });
   
 </code></pre>
-<h2 id="embedded-discriminators-in-arrays"><p>Embedded discriminators in arrays</p>
-</h2><p><p>You can also define discriminators on embedded document arrays.
+<h2 id="embedded-discriminators-in-arrays"><a href="#embedded-discriminators-in-arrays"><p>Embedded discriminators in arrays</p>
+</a></h2><p><p>You can also define discriminators on embedded document arrays.
 Embedded discriminators are different because the different discriminator
 types are stored in the same document array (within a document) rather
 than the same collection. In other words, embedded discriminators let
@@ -510,8 +510,8 @@ schemas <strong>before</strong> you use them. You should <strong>not</strong> ca
       <span class="hljs-keyword">catch</span>(done);
   
 </code></pre>
-<h2 id="recursive-embedded-discriminators-in-arrays"><p>Recursive embedded discriminators in arrays</p>
-</h2><p><p>Recursive embedded discriminators</p>
+<h2 id="recursive-embedded-discriminators-in-arrays"><a href="#recursive-embedded-discriminators-in-arrays"><p>Recursive embedded discriminators in arrays</p>
+</a></h2><p><p>Recursive embedded discriminators</p>
 </p>
 <pre><code class="lang-javscript">
     <span class="hljs-keyword">var</span> singleEventSchema = <span class="hljs-keyword">new</span> Schema({ message: <span class="hljs-built_in">String</span> },

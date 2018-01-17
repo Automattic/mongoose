@@ -2,7 +2,8 @@ extends layout
 
 block content
   each block in acquitBlocks[0].blocks
-    h2(id="#{block.identifier}") !{block.contents}
+    h2(id="#{block.identifier}")
+      a(href="##{block.identifier}") !{block.contents}
     if block.comments && block.comments.length
       :markdown
         !{block.comments[block.comments.length - 1]}

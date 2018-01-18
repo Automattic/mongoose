@@ -1,89 +1,91 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.0.0-rc2: Queries</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.0.0-rc2</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.9</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></li></ul></div></div><div class="container"><div id="content"><h2>Queries</h2><p>Documents can be retrieved through several static helper methods of <a href="./models.html">models</a>.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.0.1-pre: Queries</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.0.1-pre</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.9</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></li></ul></div></div><div class="container"><div id="content"><h2 id="queries">Queries</h2>
+<p>Documents can be retrieved through several static helper methods of <a href="./models.html">models</a>.</p>
 <p>Any <a href="./api.html#model_Model">model</a> method which <a href="./api.html#model_Model.find">involves</a> <a href="./api.html#model_Model.findById">specifying</a> <a href="./api.html#model_Model.count">query</a> <a href="./api.html#model_Model.update">conditions</a> can be executed two ways:</p>
 <p>When a <code>callback</code> function:</p>
 <ul>
 <li>is passed, the operation will be executed immediately with the results passed to the callback.</li>
 <li>is not passed, an instance of <a href="./api.html#query-js">Query</a> is returned, which provides a special query builder interface.</li>
 </ul>
-<div class="important"><p>In mongoose 4, a <a href="./api.html#query-js">Query</a> has a <code>.then()</code> function, and thus can be used as a promise.</p>
-</div><p>When executing a query with a <code>callback</code> function, you specify your query as a JSON document. The JSON document&#39;s syntax is the same as the <a href="http://docs.mongodb.org/manual/tutorial/query-documents/">MongoDB shell</a>.</p>
-var Person = mongoose.model('Person', yourSchema);
+<p>A <a href="./api.html#query-js">Query</a> has a <code>.then()</code> function, and
+thus can be used as a promise.</p>
+<p>When executing a query with a <code>callback</code> function, you specify your query as a JSON document. The JSON document&#39;s syntax is the same as the <a href="http://docs.mongodb.org/manual/tutorial/query-documents/">MongoDB shell</a>.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, yourSchema);
 
-// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
-Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
-  if (err) return handleError(err);
-  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
-})<p>Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
-<code>callback(error, result)</code>. If an error occurs executing the query, the <code>error</code> parameter will contain an error document, and <code>result</code> 
+<span class="hljs-comment">// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields</span>
+Person.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> }, <span class="hljs-string">'name occupation'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) </span>{
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
+  <span class="hljs-comment">// Prints "Space Ghost is a talk show host".</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s %s is a %s.'</span>, person.name.first, person.name.last,
+    person.occupation);
+});
+</code></pre>
+<p>Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
+<code>callback(error, result)</code>. If an error occurs executing the query, the <code>error</code> parameter will contain an error document, and <code>result</code>
 will be null. If the query is successful, the <code>error</code> parameter will be null, and the <code>result</code> will be populated with the results of the query.</p>
-<div class="important"><p>Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern <code>callback(error, results)</code>. What <code>results</code> is depends on the operation: For <code>findOne()</code> it is a <a href="./api.html#model_Model.findOne">potentially-null single document</a>, <code>find()</code> a <a href="./api.html#model_Model.find">list of documents</a>, <code>count()</code> <a href="./api.html#model_Model.count">the number of documents</a>, <code>update()</code> the <a href="./api.html#model_Model.update">number of documents affected</a>, etc. The <a href="./api.html#model-js">API docs for Models</a> provide more detail on what is passed to the callbacks.</p>
-</div><p>Now let&#39;s look at what happens when no <code>callback</code> is passed:</p>
-// find each person with a last name matching 'Ghost'
-var query = Person.findOne({ 'name.last': 'Ghost' });
+<p>Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern <code>callback(error, results)</code>. What <code>results</code> is depends on the operation: For <code>findOne()</code> it is a <a href="./api.html#model_Model.findOne">potentially-null single document</a>, <code>find()</code> a <a href="./api.html#model_Model.find">list of documents</a>, <code>count()</code> <a href="./api.html#model_Model.count">the number of documents</a>, <code>update()</code> the <a href="./api.html#model_Model.update">number of documents affected</a>, etc. The <a href="./api.html#model-js">API docs for Models</a> provide more detail on what is passed to the callbacks.</p>
+<p>Now let&#39;s look at what happens when no <code>callback</code> is passed:</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// find each person with a last name matching 'Ghost'</span>
+<span class="hljs-keyword">var</span> query = Person.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> });
 
-// selecting the `name` and `occupation` fields
-query.select('name occupation');
+<span class="hljs-comment">// selecting the `name` and `occupation` fields</span>
+query.select(<span class="hljs-string">'name occupation'</span>);
 
-// execute the query at a later time
-query.exec(function (err, person) {
-  if (err) return handleError(err);
-  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
-})<p>In the above code, the <code>query</code> variable is of type <a href="./api.html#query-js">Query</a>.
+<span class="hljs-comment">// execute the query at a later time</span>
+query.exec(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) </span>{
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
+  <span class="hljs-comment">// Prints "Space Ghost is a talk show host."</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s %s is a %s.'</span>, person.name.first, person.name.last,
+    person.occupation);
+});
+</code></pre>
+<p>In the above code, the <code>query</code> variable is of type <a href="./api.html#query-js">Query</a>.
 A <code>Query</code> enables you to build up a query using chaining syntax, rather than specifying a JSON object.
 The below 2 examples are equivalent.</p>
-// With a JSON doc
+<pre><code class="lang-javascript"><span class="hljs-comment">// With a JSON doc</span>
 Person.
   find({
-    occupation: /host/,
-    'name.last': 'Ghost',
-    age: { $gt: 17, $lt: 66 },
-    likes: { $in: ['vaporizing', 'talking'] }
+    occupation: <span class="hljs-regexp">/host/</span>,
+    <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span>,
+    age: { $gt: <span class="hljs-number">17</span>, $lt: <span class="hljs-number">66</span> },
+    likes: { $<span class="hljs-keyword">in</span>: [<span class="hljs-string">'vaporizing'</span>, <span class="hljs-string">'talking'</span>] }
   }).
-  limit(10).
-  sort({ occupation: -1 }).
-  select({ name: 1, occupation: 1 }).
+  limit(<span class="hljs-number">10</span>).
+  sort({ occupation: <span class="hljs-number">-1</span> }).
+  select({ name: <span class="hljs-number">1</span>, occupation: <span class="hljs-number">1</span> }).
   exec(callback);
 
-// Using query builder
+<span class="hljs-comment">// Using query builder</span>
 Person.
-  find({ occupation: /host/ }).
-  where('name.last').equals('Ghost').
-  where('age').gt(17).lt(66).
-  where('likes').in(['vaporizing', 'talking']).
-  limit(10).
-  sort('-occupation').
-  select('name occupation').
+  find({ occupation: <span class="hljs-regexp">/host/</span> }).
+  where(<span class="hljs-string">'name.last'</span>).equals(<span class="hljs-string">'Ghost'</span>).
+  where(<span class="hljs-string">'age'</span>).gt(<span class="hljs-number">17</span>).lt(<span class="hljs-number">66</span>).
+  where(<span class="hljs-string">'likes'</span>).in([<span class="hljs-string">'vaporizing'</span>, <span class="hljs-string">'talking'</span>]).
+  limit(<span class="hljs-number">10</span>).
+  sort(<span class="hljs-string">'-occupation'</span>).
+  select(<span class="hljs-string">'name occupation'</span>).
   exec(callback);
+</code></pre>
 <p>A full list of <a href="http://mongoosejs.com/docs/api.html#query-js">Query helper functions can be found in the API docs</a>.</p>
-<h3 id="setters"></h3><p>Setters are not executed by default in 4.x. For example, if you lowercase emails in your schema:</p>
-var personSchema = new Schema({
-  email: {
-    type: String,
-    lowercase: true
-  }
-});
-<p>Mongoose will <strong>not</strong> automatically lowercase the email in your queries, so <code>Person.find({ email: &#39;Val@karpov.io&#39; })</code> would return no results.
-Use the <code>runSettersOnQuery</code> option to turn on this behavior:</p>
-var personSchema = new Schema({
-  email: {
-    type: String,
-    lowercase: true
-  }
-}, { runSettersOnQuery: true });
-<h3 id="refs">References to other documents</h3><p>There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where <a href="./populate.html">population</a> comes in. Read more about how to include documents from other collections in your query results <a href="./api.html#query_Query-populate">here</a>.</p>
-<h3>Streaming</h3><p>You can <a href="http://nodejs.org/api/stream.html">stream</a> query results from
+<h3 id="refs"><a href="#refs">References to other documents</a></h3>
+
+<p>There are no joins in MongoDB but sometimes we still want references to
+documents in other collections. This is where <a href="./populate.html">population</a>
+comes in. Read more about how to include documents from other collections in
+your query results <a href="./api.html#query_Query-populate">here</a>.</p>
+<h3 id="streaming"><a href="#streaming">Streaming</a></h3>
+
+<p>You can <a href="http://nodejs.org/api/stream.html">stream</a> query results from
 MongoDB. You need to call the
-<a href="./api.html#query_Query-cursor">Query#cursor()</a> function instead of
-<a href="./api.html#query_Query-exec">Query#exec</a> to return an instance of
+<a href="./api.html#query_Query-cursor">Query#cursor()</a> function to return an instance of
 <a href="./api.html#querycursor-js">QueryCursor</a>.</p>
-var cursor = Person.find({ occupation: /host/ }).cursor();
-cursor.on('data', function(doc) {
-  // Called once for every document
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> cursor = Person.find({ occupation: <span class="hljs-regexp">/host/</span> }).cursor();
+cursor.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{
+  <span class="hljs-comment">// Called once for every document</span>
 });
-cursor.on('close', function() {
-  // Called when done
+cursor.on(<span class="hljs-string">'close'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-comment">// Called when done</span>
 });
-<h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Queries</code>, let&#39;s take a look at <a href="/docs/validation.html">validation</a>.</p>
+</code></pre>
 </div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);

@@ -852,7 +852,7 @@ describe('aggregate: ', function() {
       });
     });
 
-    it('handles aggregation options allowDiskUse', function(done) {
+    it('handles aggregation options', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {
           throw err;

@@ -854,7 +854,7 @@ describe('aggregate: ', function() {
       });
     });
 
-    it('handles aggregation options', function(done) {
+    it('handles aggregation options allowDiskUse', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {
           throw err;
@@ -867,11 +867,13 @@ describe('aggregate: ', function() {
         var aggregate = m.aggregate(match).read(pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);
+          aggregate.option({maxTimeMS: 1000});
         }
 
         assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {
           assert.equal(aggregate.options.allowDiskUse, true);
+          assert.equal(aggregate.options.maxTimeMS, 1000);
         }
 
         aggregate.

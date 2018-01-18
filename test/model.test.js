@@ -5080,6 +5080,23 @@ describe('Model', function() {
       });
     });
 
+    it('save() with unacknowledged writes (gh-6012)', function() {
+      var schema = new mongoose.Schema({ name: String }, { safe: false });
+
+      const Model = db.model('gh6012', schema);
+
+      return Model.create({});
+    });
+
+    it('save() with unacknowledged writes in options (gh-6012)', function() {
+      var schema = new mongoose.Schema({ name: String });
+
+      const Model = db.model('gh6012_1', schema);
+      const doc = new Model();
+
+      return doc.save({ safe: { w: 0 } });
+    });
+
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
       var schema = new Schema({
         str: String,

@@ -175,12 +175,13 @@ block content
 
     <h3 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h3>
 
-    High availability over multiple `mongos` instances is also supported.
-    Pass a connection string for your `mongos` instances and set the `mongos`
-    option to `true`:
+    You can also connect to multiple [mongos](https://docs.mongodb.com/manual/reference/program/mongos/) instances
+    for high availability in a sharded cluster. You do
+    [not need to pass any special options to connect to multiple mongos](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/connect/#connect-to-sharded-cluster) in mongoose 5.x.
 
     ```javascript
-    mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { mongos: true }, cb);
+    // Connect to 2 mongos servers
+    mongoose.connect('mongodb://mongosA:27501,mongosB:27501', cb);
     ```
 
     <h3 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h3>

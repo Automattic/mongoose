@@ -1,3 +1,10 @@
+5.0.1 / 2018-01-19
+==================
+ * fix(document): make validate() not resolve to document #6014
+ * fix(model): make save() not return DocumentNotFoundError if using fire-and-forget writes #6012
+ * fix(aggregate): make options() work as advertised #6011 [spederiva](https://github.com/spederiva)
+ * docs(queries): fix code samples #6008
+
 5.0.0 / 2018-01-17
 ==================
  * test: refactor tests to use start fewer connections #5985 [fenanquin](https://github.com/fenanquin)

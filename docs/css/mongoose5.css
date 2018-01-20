@@ -144,28 +144,48 @@ pre {
 }
 
 .carbon-ad {
-  width: 100%;
-  border-top: 1px solid #ddd;
   margin-top: 10px;
-  padding-top: 10px;
+  padding-top: 0 !important;
+  border-bottom: solid 1px #dddddd;
 }
 
 #carbonads {
-  width: 200px;
-  margin-left: 1em;
+  display: block;
+  overflow: hidden;
+  padding: 20px 10px;
+  max-width: 230px;
+  background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) #eeeeee;;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#carbonads a:hover {
+  color: inherit;
+}
+
+#carbonads span {
+  display: block;
+  overflow: hidden;
+}
+
+.carbon-img {
+  display: block;
+  margin: 0 auto 8px;
+  line-height: 1;
 }
 
 .carbon-text {
-	color: #428bca;
-	display: block;
-	width: 130px;
-	font-size: 0.8em;
+  display: block;
+  margin-bottom: 8px;
 }
 
 .carbon-poweredby {
-	font-size: 0.66em;
-	display: block;
-	color: rgb(102, 102, 102);
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+  line-height: 1;
 }
 
 @media (max-width: 1160px) {

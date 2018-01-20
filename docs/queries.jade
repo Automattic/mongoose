@@ -1,10 +1,11 @@
 extends layout
 
 block content
-  h2 Queries
   :markdown
+    ## Queries
+
     Documents can be retrieved through several static helper methods of [models](./models.html).
-  :markdown
+
     Any [model](./api.html#model_Model) method which [involves](./api.html#model_Model.find) [specifying](./api.html#model_Model.findById) [query](./api.html#model_Model.count) [conditions](./api.html#model_Model.update) can be executed two ways:
 
     When a `callback` function:
@@ -12,30 +13,32 @@ block content
     - is passed, the operation will be executed immediately with the results passed to the callback.
     - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special query builder interface.
 
-  .important
-    :markdown
-      In mongoose 4, a [Query](./api.html#query-js) has a `.then()` function, and thus can be used as a promise.
+    A [Query](./api.html#query-js) has a `.then()` function, and
+    thus can be used as a promise.
 
-  :markdown
     When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
-  :js
+
+    ```javascript
     var Person = mongoose.model('Person', yourSchema);
 
     // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
     Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
       if (err) return handleError(err);
-      console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
-    })
-  :markdown
+      // Prints "Space Ghost is a talk show host".
+      console.log('%s %s is a %s.', person.name.first, person.name.last,
+        person.occupation);
+    });
+    ```
+
     Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
-    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result` 
+    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
     will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
-  .important
-    :markdown
-      Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](./api.html#model_Model.findOne), `find()` a [list of documents](./api.html#model_Model.find), `count()` [the number of documents](./api.html#model_Model.count), `update()` the [number of documents affected](./api.html#model_Model.update), etc. The [API docs for Models](./api.html#model-js) provide more detail on what is passed to the callbacks.
-  :markdown
+
+    Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern `callback(error, results)`. What `results` is depends on the operation: For `findOne()` it is a [potentially-null single document](./api.html#model_Model.findOne), `find()` a [list of documents](./api.html#model_Model.find), `count()` [the number of documents](./api.html#model_Model.count), `update()` the [number of documents affected](./api.html#model_Model.update), etc. The [API docs for Models](./api.html#model-js) provide more detail on what is passed to the callbacks.
+
     Now let's look at what happens when no `callback` is passed:
-  :js
+
+    ```javascript
     // find each person with a last name matching 'Ghost'
     var query = Person.findOne({ 'name.last': 'Ghost' });
 
@@ -45,13 +48,17 @@ block content
     // execute the query at a later time
     query.exec(function (err, person) {
       if (err) return handleError(err);
-      console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
-    })
-  :markdown
+      // Prints "Space Ghost is a talk show host."
+      console.log('%s %s is a %s.', person.name.first, person.name.last,
+        person.occupation);
+    });
+    ```
+
     In the above code, the `query` variable is of type [Query](./api.html#query-js).
     A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
     The below 2 examples are equivalent.
-  :js
+
+    ```javascript
     // With a JSON doc
     Person.
       find({
@@ -75,46 +82,25 @@ block content
       sort('-occupation').
       select('name occupation').
       exec(callback);
+    ```
 
-  :markdown
     A full list of [Query helper functions can be found in the API docs](http://mongoosejs.com/docs/api.html#query-js).
 
-  h3#setters
-  :markdown
-    Setters are not executed by default in 4.x. For example, if you lowercase emails in your schema:
-  
-  :js
-    var personSchema = new Schema({
-      email: {
-        type: String,
-        lowercase: true
-      }
-    });
-  
-  :markdown
-    Mongoose will **not** automatically lowercase the email in your queries, so `Person.find({ email: 'Val@karpov.io' })` would return no results.
-    Use the `runSettersOnQuery` option to turn on this behavior:
-  
-  :js
-    var personSchema = new Schema({
-      email: {
-        type: String,
-        lowercase: true
-      }
-    }, { runSettersOnQuery: true });
+    <h3 id="refs"><a href="#refs">References to other documents</a></h3>
 
-  h3#refs References to other documents
-  :markdown
-    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [population](./populate.html) comes in. Read more about how to include documents from other collections in your query results [here](./api.html#query_Query-populate).
+    There are no joins in MongoDB but sometimes we still want references to
+    documents in other collections. This is where [population](./populate.html)
+    comes in. Read more about how to include documents from other collections in
+    your query results [here](./api.html#query_Query-populate).
 
-  h3 Streaming
-  :markdown
+    <h3 id="streaming"><a href="#streaming">Streaming</a></h3>
+
     You can [stream](http://nodejs.org/api/stream.html) query results from
     MongoDB. You need to call the
-    [Query#cursor()](./api.html#query_Query-cursor) function instead of
-    [Query#exec](./api.html#query_Query-exec) to return an instance of
+    [Query#cursor()](./api.html#query_Query-cursor) function to return an instance of
     [QueryCursor](./api.html#querycursor-js).
-  :js
+
+    ```javascript
     var cursor = Person.find({ occupation: /host/ }).cursor();
     cursor.on('data', function(doc) {
       // Called once for every document
@@ -122,7 +108,4 @@ block content
     cursor.on('close', function() {
       // Called when done
     });
-
-  h3#next Next Up
-  :markdown
-    Now that we've covered `Queries`, let's take a look at [validation](/docs/validation.html).
+    ```

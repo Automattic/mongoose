@@ -155,9 +155,16 @@ block content
 
   h3#mongos_connections Multi-mongos support
   :markdown
-    High availability over multiple `mongos` instances is also supported. Pass a connection string for your `mongos` instances and set the `mongos` option to true:
+    High availability over multiple `mongos` instances is also supported.
+    Pass a connection string for your `mongos` instances. If you are not using
+    the `useMongoClient` option, you must also set the `mongos` option:
   :js
     mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { mongos: true }, cb);
+  :markdown
+    With `useMongoClient`, you do not need to set the `mongos` option. You also
+    do **not** need to use `mongos` or `useMongoClient` in mongoose 5.x.
+  :js
+    mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { useMongoClient: true }, cb);
 
   h3#multiple_connections Multiple connections
   :markdown

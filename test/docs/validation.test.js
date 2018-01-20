@@ -534,12 +534,12 @@ describe('validation docs', function() {
    * One final detail worth noting: update validators **only** run on the
    * following update operators:
    *
-   * \* `$set`
-   * \* `$unset`
-   * \* `$push` (>= 4.8.0)
-   * \* `$addToSet` (>= 4.8.0)
-   * \* `$pull` (>= 4.12.0)
-   * \* `$pullAll` (>= 4.12.0)
+   * - `$set`
+   * - `$unset`
+   * - `$push` (>= 4.8.0)
+   * - `$addToSet` (>= 4.8.0)
+   * - `$pull` (>= 4.12.0)
+   * - `$pullAll` (>= 4.12.0)
    *
    * For instance, the below update will succeed, regardless of the value of
    * `number`, because update validators ignore `$inc`. Also, `$push`,

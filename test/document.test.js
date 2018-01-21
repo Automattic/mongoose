@@ -3801,7 +3801,7 @@ describe('document', function() {
     });
 
     it('timestamps with nested paths (gh-5051)', function(done) {
-      var schema = new Schema({ props: Object }, {
+      var schema = new Schema({ props: {} }, {
         timestamps: {
           createdAt: 'props.createdAt',
           updatedAt: 'props.updatedAt'

@@ -47,24 +47,6 @@ describe('defaults docs', function () {
     });
   });
 
-  it('Declaring defaults in your schema with timestamps defined', function(done) {
-
-    var schemaDefinition = {
-      name: String,
-      misc: {
-          hometown: String,
-          isAlive: { type: Boolean, default: true }
-      }
-    };
-
-    var schemaWithTimestamps = new Schema(schemaDefinition, {timestamps: {createdAt: 'misc.createdAt'}});
-    var PersonWithTimestamps = db.model('Person_timestamps', schemaWithTimestamps);
-    var dude = new PersonWithTimestamps({ name: 'Keanu', misc: {hometown: 'Beirut'} });
-    assert.equal(dude.misc.isAlive, true);
-
-    done();
-  });
-
   /**
    * You can also set the `default` schema option to a function. Mongoose will
    * execute that function and use the return value as the default.

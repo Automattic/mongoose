@@ -44,9 +44,10 @@ describe('getSchemaTypes', function() {
       items: [
         { type: 'Book', author: 'test 1' },
         { type: 'EBook', author: 'test 2' },
-        { type: 'Other' },
+        { type: 'Other' }
       ]
-    }
+    };
+
     var schemaTypes = getSchemaTypes(BundleSchema, doc, 'items.author');
 
     assert.ok(Array.isArray(schemaTypes));

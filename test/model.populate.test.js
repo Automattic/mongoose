@@ -5923,6 +5923,81 @@ describe('model: populate:', function() {
           });
       });
 
+      it('populating nested discriminator path (gh-5970)', function() {
+        var Author = db.model('gh5970', new mongoose.Schema({
+          firstName: {
+            type: String,
+            required: true
+          },
+          lastName: {
+            type: String,
+            required: true
+          }
+        }));
+
+        var ItemSchema = new mongoose.Schema({
+          title: {
+            type: String,
+            required: true
+          }
+        }, {discriminatorKey: 'type'});
+
+        var ItemBookSchema = new mongoose.Schema({
+          author: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'gh5970'
+          }
+        });
+
+        var ItemEBookSchema = new mongoose.Schema({
+          author: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'gh5970'
+          },
+          url: {
+            type: String
+          }
+        });
+
+        var BundleSchema = new mongoose.Schema({
+          name: {
+            type: String,
+            required: true
+          },
+          items: [{
+            type: ItemSchema,
+            required: false
+          }]
+        });
+
+        BundleSchema.path('items').discriminator('Book', ItemBookSchema);
+        BundleSchema.path('items').discriminator('EBook', ItemEBookSchema);
+
+        var Bundle = db.model('gh5970_0', BundleSchema);
+
+        return Author.create({firstName: 'David', lastName: 'Flanagan'}).
+          then(function(author) {
+            return Bundle.create({
+              name: 'Javascript Book Collection', items: [
+                {type: 'Book', title: 'JavaScript: The Definitive Guide', author: author},
+                {
+                  type: 'EBook',
+                  title: 'JavaScript: The Definitive Guide Ebook',
+                  url: 'https://google.com',
+                  author: author
+                }
+              ]
+            });
+          }).
+          then(function(bundle) {
+            return Bundle.findById(bundle._id).populate('items.author').lean();
+          }).
+          then(function(bundle) {
+            assert.equal(bundle.items[0].author.firstName, 'David');
+            assert.equal(bundle.items[1].author.firstName, 'David');
+          });
+      });
+
       it('specify model in populate (gh-4264)', function(done) {
         var PersonSchema = new Schema({
           name: String,

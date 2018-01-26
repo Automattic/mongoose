@@ -2,7 +2,7 @@
 
 Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
-[![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
+[![Backers on Open Collective](https://opencollective.com/mongoose/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/mongoose/sponsors/badge.svg)](#sponsors) [![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
 
@@ -34,7 +34,10 @@ Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundre
 
 ## Contributors
 
-View all 300+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
+This project exists thanks to all the people who contribute. View all 300+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
+
+<a href="graphs/contributors"><img src="https://opencollective.com/mongoose/contributors.svg?width=890" /></a>
+
 
 ## Installation
 
@@ -300,6 +303,32 @@ return a cursor.
 
 Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](https://github.com/tj/dox)
 and [acquit](https://github.com/vkarpov15/acquit).
+
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/mongoose#backer)]
+
+<a href="https://opencollective.com/mongoose#backers" target="_blank"><img src="https://opencollective.com/mongoose/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/mongoose#sponsor)]
+
+<a href="https://opencollective.com/mongoose/sponsor/0/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/1/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/2/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/3/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/4/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/5/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/6/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/7/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/8/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/mongoose/sponsor/9/website" target="_blank"><img src="https://opencollective.com/mongoose/sponsor/9/avatar.svg"></a>
+
+
 
 ## License
 

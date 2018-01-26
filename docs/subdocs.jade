@@ -7,7 +7,7 @@ block content
     means you can nest schemas in other schemas. Mongoose has two
     distinct notions of subdocuments: arrays of subdocuments and single nested
     subdocuments.
-  :js
+  ```
     var childSchema = new Schema({ name: 'string' });
 
     var parentSchema = new Schema({
@@ -17,7 +17,7 @@ block content
       // in mongoose >= 4.2.0
       child: childSchema
     });
-
+  ```
   :markdown
     Subdocuments are similar to normal documents. Nested schemas can have
     [middleware](http://mongoosejs.com/docs/middleware.html), [custom validation logic](http://mongoosejs.com/docs/middleware.html),
@@ -25,7 +25,7 @@ block content
     difference is that subdocuments are
     not saved individually, they are saved whenever their top-level parent
     document is saved.
-  :js
+  ```
     var Parent = mongoose.model('Parent', parentSchema);
     var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
     parent.children[0].name = 'Matthew';
@@ -34,14 +34,14 @@ block content
     // does **not** actually save the subdocument. You need to save the parent
     // doc.
     parent.save(callback);
-
+  ```
   :markdown
     Subdocuments have `save` and `validate` [middleware](http://mongoosejs.com/docs/middleware.html)
     just like top-level documents. Calling `save()` on the parent document triggers
     the `save()` middleware for all its subdocuments, and the same for `validate()`
     middleware.
 
-  :js
+  ```
     childSchema.pre('save', function (next) {
       if ('invalid' == this.name) {
         return next(new Error('#sadpanda'));
@@ -53,14 +53,14 @@ block content
     parent.save(function (err) {
       console.log(err.message) // #sadpanda
     });
-  
+  ```
   :markdown
     Subdocuments' `pre('save')` and `pre('validate')` middleware execute
     **before** the top-level document's `pre('save')` but **after** the
     top-level document's `pre('validate')` middleware. This is because validating
     before `save()` is actually a piece of built-in middleware.
   
-  :js
+  ```
     // Below code will print out 1-4 in order
     var childSchema = new mongoose.Schema({ name: 'string' });
 
@@ -87,16 +87,16 @@ block content
       console.log('4');
       next();
     });
-
+  ```
 
   h3 Finding a sub-document
   :markdown
     Each subdocument has an `_id` by default. Mongoose document arrays have a
     special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
     for searching a document array to find a document with a given `_id`.
-  :js
+  ```
     var doc = parent.children.id(_id);
-
+  ```
   h3 Adding sub-docs to arrays
   :markdown
     MongooseArray methods such as
@@ -104,7 +104,7 @@ block content
     [unshift](./api.html#types_array_MongooseArray.unshift),
     [addToSet](./api.html#types_array_MongooseArray.addToSet),
     and others cast arguments to their proper types transparently:
-  :js
+  ```
     var Parent = mongoose.model('Parent');
     var parent = new Parent;
 
@@ -118,13 +118,14 @@ block content
       if (err) return handleError(err)
       console.log('Success!');
     });
+  ```
   :markdown
     Sub-docs may also be created without adding them to the array by using the
     [create](./api.html#types_documentarray_MongooseDocumentArray.create)
     method of MongooseArrays.
-  :js
+  ```
     var newdoc = parent.children.create({ name: 'Aaron' });
-
+  ```
   h3 Removing subdocs
   :markdown
     Each subdocument has it's own
@@ -132,7 +133,7 @@ block content
     an array subdocument, this is equivalent to calling `.pull()` on the
     subdocument. For a single nested subdocument, `remove()` is equivalent
     to setting the subdocument to `null`.
-  :js
+  ```
     // Equivalent to `parent.children.pull(_id)`
     parent.children.id(_id).remove();
     // Equivalent to `parent.child = null`
@@ -141,12 +142,12 @@ block content
       if (err) return handleError(err);
       console.log('the subdocs were removed');
     });
-
+  ```
   h4#altsyntax Alternate declaration syntax for arrays
   :markdown
     If you create a schema with an array of objects, mongoose will automatically
     convert the object to a schema for you:
-  :js
+  ```
     var parentSchema = new Schema({
       children: [{ name: 'string' }]
     });
@@ -154,7 +155,7 @@ block content
     var parentSchema = new Schema({
       children: [new Schema({ name: 'string' })]
     });
-  
+  ```
   h3#next Next Up
   :markdown
     Now that we've covered `Sub-documents`, let's take a look at

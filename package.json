@@ -28,6 +28,7 @@
     "mpath": "0.3.0",
     "mquery": "3.0.0",
     "ms": "2.0.0",
+    "opencollective": "^1.0.3",
     "regexp-clone": "0.0.1",
     "sliced": "1.0.1"
   },
@@ -65,7 +66,8 @@
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
-    "test-cov": "nyc --reporter=html --reporter=text npm test"
+    "test-cov": "nyc --reporter=html --reporter=text npm test",
+    "postinstall": "opencollective postinstall"
   },
   "main": "./index.js",
   "engines": {
@@ -124,5 +126,10 @@
       "space-infix-ops": "error",
       "space-unary-ops": "error"
     }
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/mongoose",
+    "logo": "https://opencollective.com/mongoose/logo.txt"
   }
 }

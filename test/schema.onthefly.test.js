@@ -8,6 +8,7 @@ var start = require('./common'),
 describe('schema.onthefly', function() {
   var DecoratedSchema;
   var collection;
+  var db;
 
   before(function() {
     DecoratedSchema = new Schema({
@@ -15,15 +16,18 @@ describe('schema.onthefly', function() {
     }, {strict: false});
 
     mongoose.model('Decorated', DecoratedSchema);
+    db = start();
 
     collection = 'decorated_' + random();
   });
 
-  it('setting should cache the schema type and cast values appropriately', function(done) {
-    var db = start(),
-        Decorated = db.model('Decorated', collection);
+  after(function(done) {
+    db.close(done);
+  });
 
-    db.close();
+  it('setting should cache the schema type and cast values appropriately', function(done) {
+    var Decorated = db.model('Decorated', collection);
+
     var post = new Decorated();
     post.set('adhoc', '9', Number);
     assert.equal(post.get('adhoc').valueOf(), 9);
@@ -31,10 +35,8 @@ describe('schema.onthefly', function() {
   });
 
   it('should be local to the particular document', function(done) {
-    var db = start(),
-        Decorated = db.model('Decorated', collection);
+    var Decorated = db.model('Decorated', collection);
 
-    db.close();
     var postOne = new Decorated();
     postOne.set('adhoc', '9', Number);
     assert.notStrictEqual(postOne.$__path('adhoc'), undefined);
@@ -46,8 +48,7 @@ describe('schema.onthefly', function() {
   });
 
   it('querying a document that had an on the fly schema should work', function(done) {
-    var db = start(),
-        Decorated = db.model('Decorated', collection);
+    var Decorated = db.model('Decorated', collection);
 
     var post = new Decorated({title: 'AD HOC'});
     // Interpret adhoc as a Number
@@ -57,7 +58,6 @@ describe('schema.onthefly', function() {
       assert.ifError(err);
       assert.strictEqual(null, err);
       Decorated.findById(post.id, function(err, found) {
-        db.close();
         assert.strictEqual(null, err);
         assert.equal(found.get('adhoc'), 9);
         // Interpret adhoc as a String instead of a Number now
@@ -85,10 +85,8 @@ describe('schema.onthefly', function() {
   });
 
   it('on the fly Embedded Array schemas should cast properly', function(done) {
-    var db = start(),
-        Decorated = db.model('Decorated', collection);
+    var Decorated = db.model('Decorated', collection);
 
-    db.close();
     var post = new Decorated();
     post.set('moderators', [{name: 'alex trebek'}], [new Schema({name: String})]);
     assert.equal(post.get('moderators')[0].name, 'alex trebek');
@@ -96,8 +94,7 @@ describe('schema.onthefly', function() {
   });
 
   it('on the fly Embedded Array schemas should get from a fresh queried document properly', function(done) {
-    var db = start(),
-        Decorated = db.model('Decorated', collection);
+    var Decorated = db.model('Decorated', collection);
 
     var post = new Decorated(),
         ModeratorSchema = new Schema({name: String, ranking: Number});
@@ -106,7 +103,6 @@ describe('schema.onthefly', function() {
     post.save(function(err) {
       assert.ifError(err);
       Decorated.findById(post.id, function(err, found) {
-        db.close();
         assert.ifError(err);
         var rankingPreCast = found.get('moderators')[0].ranking;
         assert.equal(rankingPreCast, 1);
@@ -123,7 +119,6 @@ describe('schema.onthefly', function() {
   });
 
   it('casts on get() (gh-2360)', function(done) {
-    var db = start();
     var Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
 
     var d = new Decorated({title: '1'});
@@ -135,6 +130,6 @@ describe('schema.onthefly', function() {
     d.set('title', 1, Number);
     assert.equal(typeof d.get('title'), 'number');
 
-    db.close(done);
+    done();
   });
 });

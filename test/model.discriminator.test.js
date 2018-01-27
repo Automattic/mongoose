@@ -1,19 +1,21 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var start = require('./common');
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
-var util = require('util');
-var clone = require('../lib/utils').clone;
-var random = require('../lib/utils').random;
+const start = require('./common');
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const assert = require('power-assert');
+const util = require('util');
+const clone = require('../lib/utils').clone;
+const random = require('../lib/utils').random;
 
 /**
  * Setup
  */
-var PersonSchema = new Schema({
+const PersonSchema = new Schema({
   name: {first: String, last: String},
   gender: String
 }, {collection: 'model-discriminator-' + random()});
@@ -314,17 +316,6 @@ describe('model', function() {
         done();
       });
 
-      it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 7);
-
-        // EmployeeSchema.pre('save')
-        var queueIndex = Employee.schema.callQueue.length - 1;
-        assert.strictEqual(Employee.schema.callQueue[queueIndex][0], 'pre');
-        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['0'], 'save');
-        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['1'], employeeSchemaPreSaveFn);
-        done();
-      });
-
       it('does not inherit indexes', function(done) {
         assert.deepEqual(Person.schema.indexes(), [[{name: 1}, {background: true}]]);
         assert.deepEqual(Employee.schema.indexes(), [[{department: 1}, {background: true}]]);
@@ -355,6 +346,37 @@ describe('model', function() {
         });
       });
 
+      it('deduplicates hooks (gh-2945)', function() {
+        let called = 0;
+        function middleware(next) {
+          ++called;
+          next();
+        }
+
+        function ActivityBaseSchema() {
+          mongoose.Schema.apply(this, arguments);
+          this.options.discriminatorKey = 'type';
+          this.add({ name: String });
+          this.pre('validate', middleware);
+        }
+        util.inherits(ActivityBaseSchema, mongoose.Schema);
+
+        const parentSchema = new ActivityBaseSchema();
+
+        const model = db.model('gh2945', parentSchema);
+
+        const commentSchema = new ActivityBaseSchema({
+          text: { type: String, required: true }
+        });
+
+        const D = model.discriminator('gh2945_0', commentSchema);
+
+        return new D({ text: 'test' }).validate().
+          then(() => {
+            assert.equal(called, 1);
+          })
+      });
+
       it('with typeKey (gh-4339)', function(done) {
         var options = { typeKey: '$type', discriminatorKey: '_t' };
         var schema = new Schema({ test: { $type: String } }, options);
@@ -379,7 +401,6 @@ describe('model', function() {
         Model.discriminator('gh4965_0', childSchema);
         assert.equal(called, 2);
 
-        mongoose.plugins = [];
         mongoose.set('applyPluginsToDiscriminators', false);
         done();
       });
@@ -840,7 +861,6 @@ describe('model', function() {
                 { kind: 'Purchased', product: 'Test2' }
               ]
             });
-            done();
           }).
           then(function() {
             return MyModel.findOne({
@@ -856,6 +876,7 @@ describe('model', function() {
             assert.ok(doc);
             assert.equal(doc.events.length, 1);
             assert.equal(doc.events[0].element, 'Test');
+            done();
           }).
           catch(done);
       });

@@ -46,6 +46,16 @@ function TestDoc(schema) {
  */
 
 describe('types.documentarray', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   it('behaves and quacks like an array', function(done) {
     var a = new MongooseDocumentArray();
 
@@ -234,7 +244,7 @@ describe('types.documentarray', function() {
       var m = new M;
       m.docs.push({docs: [{title: 'hello'}]});
       var delta = m.$__delta()[1];
-      assert.equal(delta.$pushAll.docs[0].changed, undefined);
+      assert.equal(delta.$push.docs.$each[0].changed, undefined);
 
       M = db.model('gh-1415-1', new Schema({docs: [subSchema]}, {
         usePushEach: true
@@ -247,7 +257,6 @@ describe('types.documentarray', function() {
       done();
     });
     it('uses the correct transform (gh-1412)', function(done) {
-      var db = start();
       var SecondSchema = new Schema({});
 
       SecondSchema.set('toObject', {
@@ -282,7 +291,7 @@ describe('types.documentarray', function() {
       assert.ok(obj.second[1].secondToObject);
       assert.ok(!obj.second[0].firstToObject);
       assert.ok(!obj.second[1].firstToObject);
-      db.close(done);
+      done();
     });
   });
 
@@ -305,8 +314,6 @@ describe('types.documentarray', function() {
 
   describe('push()', function() {
     it('does not re-cast instances of its embedded doc', function(done) {
-      var db = start();
-
       var child = new Schema({name: String, date: Date});
       child.pre('save', function(next) {
         this.date = new Date;
@@ -339,7 +346,7 @@ describe('types.documentarray', function() {
                 doc.children.forEach(function(child) {
                   assert.equal(doc.children[0].id, child.id);
                 });
-                db.close(done);
+                done();
               });
             });
           });
@@ -369,8 +376,7 @@ describe('types.documentarray', function() {
       comments: [Comments]
     });
 
-    var db = start(),
-        Post = db.model('docarray-BlogPost', BlogPost, collection);
+    var Post = db.model('docarray-BlogPost', BlogPost, collection);
 
     var p = new Post({title: 'comment nesting'});
     var c1 = p.comments.create({title: 'c1'});
@@ -394,7 +400,7 @@ describe('types.documentarray', function() {
           Post.findById(p._id, function(err, p) {
             assert.ifError(err);
             assert.equal(p.comments[0].comments[0].comments[0].comments[0].title, 'c4');
-            db.close(done);
+            done();
           });
         });
       });
@@ -430,7 +436,6 @@ describe('types.documentarray', function() {
     });
 
     it('handles validation failures', function(done) {
-      var db = start();
       var nested = new Schema({v: {type: Number, max: 30}});
       var schema = new Schema({
         docs: [nested]
@@ -439,12 +444,11 @@ describe('types.documentarray', function() {
       var m = new M({docs: [{v: 900}]});
       m.save(function(err) {
         assert.equal(err.errors['docs.0.v'].value, 900);
-        db.close(done);
+        done();
       });
     });
 
     it('removes attached event listeners when creating new doc array', function(done) {
-      var db = start();
       var nested = new Schema({v: {type: Number}});
       var schema = new Schema({
         docs: [nested]
@@ -459,7 +463,7 @@ describe('types.documentarray', function() {
         m.save(function(error, m) {
           assert.ifError(error);
           assert.equal(numListeners, m.listeners('save').length);
-          db.close(done);
+          done();
         });
       });
     });

@@ -23,6 +23,7 @@ describe('model: populate:', function() {
   var BlogPost;
   var posts;
   var users;
+  var db;
 
   before(function() {
     User = new Schema({
@@ -61,11 +62,15 @@ describe('model: populate:', function() {
     mongoose.model('RefBlogPost', BlogPost);
     mongoose.model('RefUser', User);
     mongoose.model('RefAlternateUser', User);
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   it('populating array of object', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({name: 'User 1'}, function(err, user1) {
@@ -88,15 +93,14 @@ describe('model: populate:', function() {
             post.populate('comments', function() {
             });
           });
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   it('deep population (gh-3103)', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({name: 'User 01'}, function(err, user1) {
@@ -116,36 +120,35 @@ describe('model: populate:', function() {
 
             assert.doesNotThrow(function() {
               BlogPost
-              .findById(post._id)
-              .select('_creator')
-              .populate({
-                path: '_creator',
-                model: 'RefUser',
-                select: 'name followers',
-                populate: [{
-                  path: 'followers',
+                .findById(post._id)
+                .select('_creator')
+                .populate({
+                  path: '_creator',
+                  model: 'RefUser',
                   select: 'name followers',
-                  options: {limit: 5},
-                  populate: {  // can also use a single object instead of array of objects
+                  populate: [{
                     path: 'followers',
-                    select: 'name',
-                    options: {limit: 2}
-                  }
-                }]
-              })
-              .exec(function(err, post) {
-                db.close();
-                assert.ifError(err);
-                assert.ok(post._creator);
-                assert.equal(post._creator.name, 'User 03');
-                assert.ok(post._creator.followers);
-                assert.ok(post._creator.followers[0]);
-                assert.equal(post._creator.followers[0].name, 'User 02');
-                assert.ok(post._creator.followers[0].followers);
-                assert.ok(post._creator.followers[0].followers[0]);
-                assert.equal(post._creator.followers[0].followers[0].name, 'User 01');
-                done();
-              });
+                    select: 'name followers',
+                    options: {limit: 5},
+                    populate: { // can also use a single object instead of array of objects
+                      path: 'followers',
+                      select: 'name',
+                      options: {limit: 2}
+                    }
+                  }]
+                })
+                .exec(function(err, post) {
+                  assert.ifError(err);
+                  assert.ok(post._creator);
+                  assert.equal(post._creator.name, 'User 03');
+                  assert.ok(post._creator.followers);
+                  assert.ok(post._creator.followers[0]);
+                  assert.equal(post._creator.followers[0].name, 'User 02');
+                  assert.ok(post._creator.followers[0].followers);
+                  assert.ok(post._creator.followers[0].followers[0]);
+                  assert.equal(post._creator.followers[0].followers[0].name, 'User 01');
+                  done();
+                });
             });
           });
         });
@@ -200,15 +203,15 @@ describe('model: populate:', function() {
 
       function test(id) {
         Application.
-        findById(id).
-        populate([
-          {path: 'tasks', populate: {path: 'handler'}}
-        ]).
-        exec(function(error, doc) {
-          assert.ifError(error);
-          assert.ok(doc.tasks[0].handler._id);
-          done();
-        });
+          findById(id).
+          populate([
+            {path: 'tasks', populate: {path: 'handler'}}
+          ]).
+          exec(function(error, doc) {
+            assert.ifError(error);
+            assert.ok(doc.tasks[0].handler._id);
+            done();
+          });
       }
     });
 
@@ -296,23 +299,22 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator')
-        .exec(function(err, post) {
-          assert.ifError(err);
+          .findById(post._id)
+          .populate('_creator')
+          .exec(function(err, post) {
+            assert.ifError(err);
 
-          assert.ok(post._creator instanceof User);
-          assert.equal(post._creator.name, 'Guillermo');
-          assert.equal(post._creator.email, 'rauchg@gmail.com');
-          db.close(done);
-        });
+            assert.ok(post._creator instanceof User);
+            assert.equal(post._creator.name, 'Guillermo');
+            assert.equal(post._creator.email, 'rauchg@gmail.com');
+            db.close(done);
+          });
       });
     });
   });
 
   it('not failing on null as ref', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts);
+    var BlogPost = db.model('RefBlogPost', posts);
 
     BlogPost.create({
       title: 'woot',
@@ -321,32 +323,31 @@ describe('model: populate:', function() {
       assert.ifError(err);
 
       BlogPost
-      .findById(post._id)
-      .populate('_creator')
-      .exec(function(err, post) {
-        assert.ifError(err);
+        .findById(post._id)
+        .populate('_creator')
+        .exec(function(err, post) {
+          assert.ifError(err);
 
-        assert.equal(post._creator, null);
-        db.close(done);
-      });
+          assert.equal(post._creator, null);
+          done();
+        });
     });
   });
 
   it('not failing on empty object as ref', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts);
+    var BlogPost = db.model('RefBlogPost', posts);
 
     BlogPost.create(
-        {title: 'woot'},
-        function(err, post) {
-          assert.ifError(err);
+      {title: 'woot'},
+      function(err, post) {
+        assert.ifError(err);
 
-          BlogPost.
+        BlogPost.
           findByIdAndUpdate(post._id, {$set: {_creator: {}}}, function(err) {
             assert.ok(err);
-            db.close(done);
+            done();
           });
-        });
+      });
   });
 
   it('across DBs', function(done) {
@@ -367,24 +368,23 @@ describe('model: populate:', function() {
       }, function(err, post) {
         assert.ifError(err);
         BlogPost
-        .findById(post._id)
-        .populate('_creator', 'name', User)
-        .exec(function(err, post) {
-          db2.db.dropDatabase(function() {
-            db.close();
-            db2.close();
-            assert.ifError(err);
-            assert.ok(post._creator.name === 'Guillermo');
-            done();
+          .findById(post._id)
+          .populate('_creator', 'name', User)
+          .exec(function(err, post) {
+            db2.db.dropDatabase(function() {
+              db.close();
+              db2.close();
+              assert.ifError(err);
+              assert.ok(post._creator.name === 'Guillermo');
+              done();
+            });
           });
-        });
       });
     });
   });
 
   it('an error in single ref population propagates', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts + '1'),
+    var BlogPost = db.model('RefBlogPost', posts + '1'),
         User = db.model('RefUser', users + '1');
 
     User.create({
@@ -412,15 +412,14 @@ describe('model: populate:', function() {
         };
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator')
-        .exec(function(err) {
-          db.close();
-          assert.ok(err instanceof Error);
-          assert.equal(err.message, 'woot');
-          User.Query.prototype.exec = origExec;
-          done();
-        });
+          .findById(post._id)
+          .populate('_creator')
+          .exec(function(err) {
+            assert.ok(err instanceof Error);
+            assert.equal(err.message, 'woot');
+            User.Query.prototype.exec = origExec;
+            done();
+          });
       });
     });
   });
@@ -443,17 +442,17 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator', 'email')
-        .exec(function(err, post) {
-          db.close();
-          assert.ifError(err);
+          .findById(post._id)
+          .populate('_creator', 'email')
+          .exec(function(err, post) {
+            db.close();
+            assert.ifError(err);
 
-          assert.ok(post._creator instanceof User);
-          assert.equal(post._creator.isInit('name'), false);
-          assert.equal(post._creator.email, 'rauchg@gmail.com');
-          done();
-        });
+            assert.ok(post._creator instanceof User);
+            assert.equal(post._creator.isInit('name'), false);
+            assert.equal(post._creator.email, 'rauchg@gmail.com');
+            done();
+          });
       });
     });
   });
@@ -476,24 +475,24 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator', 'email', {name: 'Peanut'})
-        .exec(function(err, post) {
-          assert.ifError(err);
-          assert.strictEqual(post._creator, null);
-
-          BlogPost
           .findById(post._id)
-          .populate('_creator', 'email', {name: 'Banana'})
+          .populate('_creator', 'email', {name: 'Peanut'})
           .exec(function(err, post) {
-            db.close();
             assert.ifError(err);
-            assert.ok(post._creator instanceof User);
-            assert.equal(false, post._creator.isInit('name'));
-            assert.equal(post._creator.email, 'cats@example.com');
-            done();
+            assert.strictEqual(post._creator, null);
+
+            BlogPost
+              .findById(post._id)
+              .populate('_creator', 'email', {name: 'Banana'})
+              .exec(function(err, post) {
+                db.close();
+                assert.ifError(err);
+                assert.ok(post._creator instanceof User);
+                assert.equal(false, post._creator.isInit('name'));
+                assert.equal(post._creator.email, 'cats@example.com');
+                done();
+              });
           });
-        });
       });
     });
   });
@@ -519,25 +518,23 @@ describe('model: populate:', function() {
         }, function(err) {
           assert.ifError(err);
           BlogPost
-          .find()
-          .populate('_creator')
-          .exec(function(err, posts) {
-            db.close();
-            posts.forEach(function(post) {
-              if ('_creator' in post) {
-                assert.ok(post._creator !== null);
-              }
+            .find()
+            .populate('_creator')
+            .exec(function(err, posts) {
+              db.close();
+              posts.forEach(function(post) {
+                if ('_creator' in post) {
+                  assert.ok(post._creator !== null);
+                }
+              });
+              done();
             });
-            done();
-          });
         });
       });
     });
   });
 
   it('undefined for nested paths (gh-3859)', function(done) {
-    var db = start();
-
     var companySchema = new mongoose.Schema({
       name:  String,
       description:  String
@@ -581,7 +578,7 @@ describe('model: populate:', function() {
         Company.populate(sample, opts, function(error) {
           assert.ifError(error);
           assert.strictEqual(sample.items[1].company, void 0);
-          db.close(done);
+          done();
         });
       });
     }
@@ -605,40 +602,40 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator')
-        .exec(function(err, post) {
-          assert.ifError(err);
-
-          assert.ok(post._creator instanceof User);
-          assert.equal(post._creator.name, 'Guillermo');
-          assert.equal(post._creator.email, 'rauchg@gmail.com');
-
-          User.create({
-            name: 'Aaron',
-            email: 'aaron.heckmann@gmail.com'
-          }, function(err, newCreator) {
+          .findById(post._id)
+          .populate('_creator')
+          .exec(function(err, post) {
             assert.ifError(err);
 
-            post._creator = newCreator._id;
-            assert.equal(newCreator._id, String(post._creator));
+            assert.ok(post._creator instanceof User);
+            assert.equal(post._creator.name, 'Guillermo');
+            assert.equal(post._creator.email, 'rauchg@gmail.com');
 
-            post.save(function(err) {
+            User.create({
+              name: 'Aaron',
+              email: 'aaron.heckmann@gmail.com'
+            }, function(err, newCreator) {
               assert.ifError(err);
 
-              BlogPost
-              .findById(post._id)
-              .populate('_creator')
-              .exec(function(err, post) {
-                db.close();
+              post._creator = newCreator._id;
+              assert.equal(newCreator._id, String(post._creator));
+
+              post.save(function(err) {
                 assert.ifError(err);
-                assert.equal(post._creator.name, 'Aaron');
-                assert.equal(post._creator.email, 'aaron.heckmann@gmail.com');
-                done();
+
+                BlogPost
+                  .findById(post._id)
+                  .populate('_creator')
+                  .exec(function(err, post) {
+                    db.close();
+                    assert.ifError(err);
+                    assert.equal(post._creator.name, 'Aaron');
+                    assert.equal(post._creator.email, 'aaron.heckmann@gmail.com');
+                    done();
+                  });
               });
             });
           });
-        });
       });
     });
   });
@@ -661,45 +658,44 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator', {'name': 1})
-        .exec(function(err, post) {
-          assert.ifError(err);
-
-          assert.ok(post._creator instanceof User);
-          assert.equal(post._creator.name, 'Guillermo');
-
-          User.create({
-            name: 'Aaron',
-            email: 'aaron@learnboost.com'
-          }, function(err, newCreator) {
+          .findById(post._id)
+          .populate('_creator', {'name': 1})
+          .exec(function(err, post) {
             assert.ifError(err);
 
-            post._creator = newCreator._id;
-            post.save(function(err) {
+            assert.ok(post._creator instanceof User);
+            assert.equal(post._creator.name, 'Guillermo');
+
+            User.create({
+              name: 'Aaron',
+              email: 'aaron@learnboost.com'
+            }, function(err, newCreator) {
               assert.ifError(err);
 
-              BlogPost
-              .findById(post._id)
-              .populate('_creator', '-email')
-              .exec(function(err, post) {
-                db.close();
+              post._creator = newCreator._id;
+              post.save(function(err) {
                 assert.ifError(err);
 
-                assert.equal(post._creator.name, 'Aaron');
-                assert.ok(!post._creator.email);
-                done();
+                BlogPost
+                  .findById(post._id)
+                  .populate('_creator', '-email')
+                  .exec(function(err, post) {
+                    db.close();
+                    assert.ifError(err);
+
+                    assert.equal(post._creator.name, 'Aaron');
+                    assert.ok(!post._creator.email);
+                    done();
+                  });
               });
             });
           });
-        });
       });
     });
   });
 
   it('populating an array of refs and fetching many', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -727,23 +723,22 @@ describe('model: populate:', function() {
             assert.ifError(err);
 
             BlogPost
-            .find({_id: {$in: [post1._id, post2._id]}})
-            .populate('fans')
-            .exec(function(err, blogposts) {
-              db.close();
-              assert.ifError(err);
+              .find({_id: {$in: [post1._id, post2._id]}})
+              .populate('fans')
+              .exec(function(err, blogposts) {
+                assert.ifError(err);
 
-              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-              assert.equal(blogposts[0].fans[0].email, 'fan1@learnboost.com');
-              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
-              assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
+                assert.equal(blogposts[0].fans[0].name, 'Fan 1');
+                assert.equal(blogposts[0].fans[0].email, 'fan1@learnboost.com');
+                assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+                assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
 
-              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-              assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
-              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
-              assert.equal(blogposts[1].fans[1].email, 'fan1@learnboost.com');
-              done();
-            });
+                assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+                assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
+                assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+                assert.equal(blogposts[1].fans[1].email, 'fan1@learnboost.com');
+                done();
+              });
           });
         });
       });
@@ -751,8 +746,7 @@ describe('model: populate:', function() {
   });
 
   it('an error in array reference population propagates', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts + '2'),
+    var BlogPost = db.model('RefBlogPost', posts + '2'),
         User = db.model('RefUser', users + '2');
 
     User.create({
@@ -791,16 +785,14 @@ describe('model: populate:', function() {
             };
 
             BlogPost
-            .find({$or: [{_id: post1._id}, {_id: post2._id}]})
-            .populate('fans')
-            .exec(function(err) {
-              db.close();
-
-              assert.ok(err instanceof Error);
-              assert.equal(err.message, 'woot 2');
-              User.Query.prototype.exec = origExec;
-              done();
-            });
+              .find({$or: [{_id: post1._id}, {_id: post2._id}]})
+              .populate('fans')
+              .exec(function(err) {
+                assert.ok(err instanceof Error);
+                assert.equal(err.message, 'woot 2');
+                User.Query.prototype.exec = origExec;
+                done();
+              });
           });
         });
       });
@@ -808,8 +800,7 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references with fields selection', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -837,25 +828,24 @@ describe('model: populate:', function() {
             assert.ifError(err);
 
             BlogPost
-            .find({_id: {$in: [post1._id, post2._id]}})
-            .populate('fans', 'name')
-            .exec(function(err, blogposts) {
-              db.close();
-              assert.ifError(err);
+              .find({_id: {$in: [post1._id, post2._id]}})
+              .populate('fans', 'name')
+              .exec(function(err, blogposts) {
+                assert.ifError(err);
 
-              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-              assert.equal(blogposts[0].fans[0].isInit('email'), false);
-              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
-              assert.equal(blogposts[0].fans[1].isInit('email'), false);
-              assert.strictEqual(blogposts[0].fans[1].email, undefined);
+                assert.equal(blogposts[0].fans[0].name, 'Fan 1');
+                assert.equal(blogposts[0].fans[0].isInit('email'), false);
+                assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+                assert.equal(blogposts[0].fans[1].isInit('email'), false);
+                assert.strictEqual(blogposts[0].fans[1].email, undefined);
 
-              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-              assert.equal(blogposts[1].fans[0].isInit('email'), false);
-              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
-              assert.equal(blogposts[1].fans[1].isInit('email'), false);
+                assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+                assert.equal(blogposts[1].fans[0].isInit('email'), false);
+                assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+                assert.equal(blogposts[1].fans[1].isInit('email'), false);
 
-              done();
-            });
+                done();
+              });
           });
         });
       });
@@ -863,8 +853,7 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references and filtering', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -900,47 +889,46 @@ describe('model: populate:', function() {
               assert.ifError(err);
 
               BlogPost
-              .find({_id: {$in: [post1._id, post2._id]}})
-              .populate('fans', '', {gender: 'female', _id: {$in: [fan2]}})
-              .exec(function(err, blogposts) {
-                assert.ifError(err);
-
-                assert.equal(blogposts[0].fans.length, 1);
-                assert.equal(blogposts[0].fans[0].gender, 'female');
-                assert.equal(blogposts[0].fans[0].name, 'Fan 2');
-                assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
-
-                assert.equal(blogposts[1].fans.length, 1);
-                assert.equal(blogposts[1].fans[0].gender, 'female');
-                assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-                assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
-
-                BlogPost
                 .find({_id: {$in: [post1._id, post2._id]}})
-                .populate('fans', false, {gender: 'female'})
+                .populate('fans', '', {gender: 'female', _id: {$in: [fan2]}})
                 .exec(function(err, blogposts) {
-                  db.close();
                   assert.ifError(err);
 
-                  assert.strictEqual(blogposts[0].fans.length, 2);
+                  assert.equal(blogposts[0].fans.length, 1);
                   assert.equal(blogposts[0].fans[0].gender, 'female');
                   assert.equal(blogposts[0].fans[0].name, 'Fan 2');
                   assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
-                  assert.equal(blogposts[0].fans[1].gender, 'female');
-                  assert.equal(blogposts[0].fans[1].name, 'Fan 3');
-                  assert.equal(blogposts[0].fans[1].email, 'fan3@learnboost.com');
 
-                  assert.strictEqual(blogposts[1].fans.length, 2);
+                  assert.equal(blogposts[1].fans.length, 1);
                   assert.equal(blogposts[1].fans[0].gender, 'female');
-                  assert.equal(blogposts[1].fans[0].name, 'Fan 3');
-                  assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
-                  assert.equal(blogposts[1].fans[1].gender, 'female');
-                  assert.equal(blogposts[1].fans[1].name, 'Fan 2');
-                  assert.equal(blogposts[1].fans[1].email, 'fan2@learnboost.com');
+                  assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+                  assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
 
-                  done();
+                  BlogPost
+                    .find({_id: {$in: [post1._id, post2._id]}})
+                    .populate('fans', false, {gender: 'female'})
+                    .exec(function(err, blogposts) {
+                      assert.ifError(err);
+
+                      assert.strictEqual(blogposts[0].fans.length, 2);
+                      assert.equal(blogposts[0].fans[0].gender, 'female');
+                      assert.equal(blogposts[0].fans[0].name, 'Fan 2');
+                      assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
+                      assert.equal(blogposts[0].fans[1].gender, 'female');
+                      assert.equal(blogposts[0].fans[1].name, 'Fan 3');
+                      assert.equal(blogposts[0].fans[1].email, 'fan3@learnboost.com');
+
+                      assert.strictEqual(blogposts[1].fans.length, 2);
+                      assert.equal(blogposts[1].fans[0].gender, 'female');
+                      assert.equal(blogposts[1].fans[0].name, 'Fan 3');
+                      assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
+                      assert.equal(blogposts[1].fans[1].gender, 'female');
+                      assert.equal(blogposts[1].fans[1].name, 'Fan 2');
+                      assert.equal(blogposts[1].fans[1].email, 'fan2@learnboost.com');
+
+                      done();
+                    });
                 });
-              });
             });
           });
         });
@@ -949,8 +937,7 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references and multi-filtering', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -987,51 +974,50 @@ describe('model: populate:', function() {
               assert.ifError(err);
 
               BlogPost
-              .find({_id: {$in: [post1._id, post2._id]}})
-              .populate('fans', undefined, {_id: fan3})
-              .exec(function(err, blogposts) {
-                assert.ifError(err);
-
-                assert.equal(blogposts[0].fans.length, 1);
-                assert.equal(blogposts[0].fans[0].gender, 'female');
-                assert.equal(blogposts[0].fans[0].name, 'Fan 3');
-                assert.equal(blogposts[0].fans[0].email, 'fan3@learnboost.com');
-                assert.equal(blogposts[0].fans[0].age, 25);
-
-                assert.equal(blogposts[1].fans.length, 1);
-                assert.equal(blogposts[1].fans[0].gender, 'female');
-                assert.equal(blogposts[1].fans[0].name, 'Fan 3');
-                assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
-                assert.equal(blogposts[1].fans[0].age, 25);
-
-                BlogPost
                 .find({_id: {$in: [post1._id, post2._id]}})
-                .populate('fans', 0, {gender: 'female'})
+                .populate('fans', undefined, {_id: fan3})
                 .exec(function(err, blogposts) {
-                  db.close();
                   assert.ifError(err);
 
-                  assert.equal(blogposts[0].fans.length, 2);
+                  assert.equal(blogposts[0].fans.length, 1);
                   assert.equal(blogposts[0].fans[0].gender, 'female');
-                  assert.equal(blogposts[0].fans[0].name, 'Fan 2');
-                  assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
-                  assert.equal(blogposts[0].fans[1].gender, 'female');
-                  assert.equal(blogposts[0].fans[1].name, 'Fan 3');
-                  assert.equal(blogposts[0].fans[1].email, 'fan3@learnboost.com');
-                  assert.equal(blogposts[0].fans[1].age, 25);
+                  assert.equal(blogposts[0].fans[0].name, 'Fan 3');
+                  assert.equal(blogposts[0].fans[0].email, 'fan3@learnboost.com');
+                  assert.equal(blogposts[0].fans[0].age, 25);
 
-                  assert.equal(blogposts[1].fans.length, 2);
+                  assert.equal(blogposts[1].fans.length, 1);
                   assert.equal(blogposts[1].fans[0].gender, 'female');
                   assert.equal(blogposts[1].fans[0].name, 'Fan 3');
                   assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
                   assert.equal(blogposts[1].fans[0].age, 25);
-                  assert.equal(blogposts[1].fans[1].gender, 'female');
-                  assert.equal(blogposts[1].fans[1].name, 'Fan 2');
-                  assert.equal(blogposts[1].fans[1].email, 'fan2@learnboost.com');
 
-                  done();
+                  BlogPost
+                    .find({_id: {$in: [post1._id, post2._id]}})
+                    .populate('fans', 0, {gender: 'female'})
+                    .exec(function(err, blogposts) {
+                      assert.ifError(err);
+
+                      assert.equal(blogposts[0].fans.length, 2);
+                      assert.equal(blogposts[0].fans[0].gender, 'female');
+                      assert.equal(blogposts[0].fans[0].name, 'Fan 2');
+                      assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
+                      assert.equal(blogposts[0].fans[1].gender, 'female');
+                      assert.equal(blogposts[0].fans[1].name, 'Fan 3');
+                      assert.equal(blogposts[0].fans[1].email, 'fan3@learnboost.com');
+                      assert.equal(blogposts[0].fans[1].age, 25);
+
+                      assert.equal(blogposts[1].fans.length, 2);
+                      assert.equal(blogposts[1].fans[0].gender, 'female');
+                      assert.equal(blogposts[1].fans[0].name, 'Fan 3');
+                      assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
+                      assert.equal(blogposts[1].fans[0].age, 25);
+                      assert.equal(blogposts[1].fans[1].gender, 'female');
+                      assert.equal(blogposts[1].fans[1].name, 'Fan 2');
+                      assert.equal(blogposts[1].fans[1].email, 'fan2@learnboost.com');
+
+                      done();
+                    });
                 });
-              });
             });
           });
         });
@@ -1040,8 +1026,7 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references and multi-filtering with field selection', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -1078,28 +1063,27 @@ describe('model: populate:', function() {
               assert.ifError(err);
 
               BlogPost
-              .find({_id: {$in: [post1._id, post2._id]}})
-              .populate('fans', 'name email', {gender: 'female', age: 25})
-              .exec(function(err, blogposts) {
-                db.close();
-                assert.ifError(err);
+                .find({_id: {$in: [post1._id, post2._id]}})
+                .populate('fans', 'name email', {gender: 'female', age: 25})
+                .exec(function(err, blogposts) {
+                  assert.ifError(err);
 
-                assert.strictEqual(blogposts[0].fans.length, 1);
-                assert.equal(blogposts[0].fans[0].name, 'Fan 3');
-                assert.equal(blogposts[0].fans[0].email, 'fan3@learnboost.com');
-                assert.equal(blogposts[0].fans[0].isInit('email'), true);
-                assert.equal(blogposts[0].fans[0].isInit('gender'), false);
-                assert.equal(blogposts[0].fans[0].isInit('age'), false);
+                  assert.strictEqual(blogposts[0].fans.length, 1);
+                  assert.equal(blogposts[0].fans[0].name, 'Fan 3');
+                  assert.equal(blogposts[0].fans[0].email, 'fan3@learnboost.com');
+                  assert.equal(blogposts[0].fans[0].isInit('email'), true);
+                  assert.equal(blogposts[0].fans[0].isInit('gender'), false);
+                  assert.equal(blogposts[0].fans[0].isInit('age'), false);
 
-                assert.strictEqual(blogposts[1].fans.length, 1);
-                assert.equal(blogposts[1].fans[0].name, 'Fan 3');
-                assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
-                assert.equal(blogposts[1].fans[0].isInit('email'), true);
-                assert.equal(blogposts[1].fans[0].isInit('gender'), false);
-                assert.equal(blogposts[1].fans[0].isInit('age'), false);
+                  assert.strictEqual(blogposts[1].fans.length, 1);
+                  assert.equal(blogposts[1].fans[0].name, 'Fan 3');
+                  assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
+                  assert.equal(blogposts[1].fans[0].isInit('email'), true);
+                  assert.equal(blogposts[1].fans[0].isInit('gender'), false);
+                  assert.equal(blogposts[1].fans[0].isInit('age'), false);
 
-                done();
-              });
+                  done();
+                });
             });
           });
         });
@@ -1108,8 +1092,7 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of refs changing one and removing one', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -1137,60 +1120,58 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .find({_id: {$in: [post1._id, post2._id]}})
-        .populate('fans', 'name')
-        .exec(function(err, blogposts) {
-          assert.ifError(err);
-
-          assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-          assert.equal(blogposts[0].fans[0].isInit('email'), false);
-          assert.equal(blogposts[0].fans[1].name, 'Fan 2');
-          assert.equal(blogposts[0].fans[1].isInit('email'), false);
-
-          assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-          assert.equal(blogposts[1].fans[0].isInit('email'), false);
-          assert.equal(blogposts[1].fans[1].name, 'Fan 1');
-          assert.equal(blogposts[1].fans[1].isInit('email'), false);
-
-          blogposts[1].fans = [fan3, fan4];
-
-          blogposts[1].save(function(err) {
+          .find({_id: {$in: [post1._id, post2._id]}})
+          .populate('fans', 'name')
+          .exec(function(err, blogposts) {
             assert.ifError(err);
 
-            BlogPost
-            .findById(blogposts[1]._id, '', {populate: ['fans']})
-            .exec(function(err, post) {
+            assert.equal(blogposts[0].fans[0].name, 'Fan 1');
+            assert.equal(blogposts[0].fans[0].isInit('email'), false);
+            assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+            assert.equal(blogposts[0].fans[1].isInit('email'), false);
+
+            assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+            assert.equal(blogposts[1].fans[0].isInit('email'), false);
+            assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+            assert.equal(blogposts[1].fans[1].isInit('email'), false);
+
+            blogposts[1].fans = [fan3, fan4];
+
+            blogposts[1].save(function(err) {
               assert.ifError(err);
 
-              assert.equal(post.fans[0].name, 'Fan 3');
-              assert.equal(post.fans[1].name, 'Fan 4');
-
-              post.fans.splice(0, 1);
-              post.save(function(err) {
-                assert.ifError(err);
-
-                BlogPost
-                .findById(post._id)
-                .populate('fans')
+              BlogPost
+                .findById(blogposts[1]._id, '', {populate: ['fans']})
                 .exec(function(err, post) {
-                  db.close();
                   assert.ifError(err);
-                  assert.equal(post.fans.length, 1);
-                  assert.equal(post.fans[0].name, 'Fan 4');
-                  done();
+
+                  assert.equal(post.fans[0].name, 'Fan 3');
+                  assert.equal(post.fans[1].name, 'Fan 4');
+
+                  post.fans.splice(0, 1);
+                  post.save(function(err) {
+                    assert.ifError(err);
+
+                    BlogPost
+                      .findById(post._id)
+                      .populate('fans')
+                      .exec(function(err, post) {
+                        assert.ifError(err);
+                        assert.equal(post.fans.length, 1);
+                        assert.equal(post.fans[0].name, 'Fan 4');
+                        done();
+                      });
+                  });
                 });
-              });
             });
           });
-        });
       });
     });
   });
 
   describe('populating sub docs', function() {
     it('works with findById', function(done) {
-      var db = start(),
-          BlogPost = db.model('RefBlogPost', posts),
+      var BlogPost = db.model('RefBlogPost', posts),
           User = db.model('RefUser', users);
 
       User.create({name: 'User 1'}, function(err, user1) {
@@ -1210,25 +1191,24 @@ describe('model: populate:', function() {
             assert.ifError(err);
 
             BlogPost
-            .findById(post._id)
-            .populate('_creator')
-            .populate('comments._creator')
-            .exec(function(err, post) {
-              assert.ifError(err);
+              .findById(post._id)
+              .populate('_creator')
+              .populate('comments._creator')
+              .exec(function(err, post) {
+                assert.ifError(err);
 
-              assert.equal(post._creator.name, 'User 1');
-              assert.equal(post.comments[0]._creator.name, 'User 1');
-              assert.equal(post.comments[1]._creator.name, 'User 2');
-              db.close(done);
-            });
+                assert.equal(post._creator.name, 'User 1');
+                assert.equal(post.comments[0]._creator.name, 'User 1');
+                assert.equal(post.comments[1]._creator.name, 'User 2');
+                done();
+              });
           });
         });
       });
     });
 
     it('works when first doc returned has empty array for populated path (gh-1055)', function(done) {
-      var db = start(),
-          BlogPost = db.model('RefBlogPost', posts),
+      var BlogPost = db.model('RefBlogPost', posts),
           User = db.model('RefUser', users);
 
       User.create({name: 'gh-1055-1'}, {name: 'gh-1055-2'}, function(err, user1, user2) {
@@ -1250,27 +1230,26 @@ describe('model: populate:', function() {
 
           var ran = false;
           BlogPost
-          .find({title: /gh-1055/})
-          .sort('title')
-          .select('comments')
-          .populate('comments._creator')
-          .populate('comments.asers')
-          .exec(function(err, posts) {
-            assert.equal(ran, false);
-            ran = true;
-            assert.ifError(err);
-            assert.ok(posts.length);
-            assert.ok(posts[1].comments[0]._creator);
-            assert.equal(posts[1].comments[0]._creator.name, 'gh-1055-1');
-            db.close(done);
-          });
+            .find({title: /gh-1055/})
+            .sort('title')
+            .select('comments')
+            .populate('comments._creator')
+            .populate('comments.asers')
+            .exec(function(err, posts) {
+              assert.equal(ran, false);
+              ran = true;
+              assert.ifError(err);
+              assert.ok(posts.length);
+              assert.ok(posts[1].comments[0]._creator);
+              assert.equal(posts[1].comments[0]._creator.name, 'gh-1055-1');
+              done();
+            });
         });
       });
     });
   });
 
   it('clears cache when array has been re-assigned (gh-2176)', function(done) {
-    var db = start();
     var BlogPost = db.model('RefBlogPost', posts, 'gh-2176-1');
     var User = db.model('RefUser', users, 'gh-2176-2');
 
@@ -1283,9 +1262,9 @@ describe('model: populate:', function() {
           _creator: user1._id,
           comments: []
         },
-          function(err) {
-            assert.ifError(err);
-            BlogPost.
+        function(err) {
+          assert.ifError(err);
+          BlogPost.
             find({title: 'gh-2176'}).
             populate('_creator').
             exec(function(error, posts) {
@@ -1300,17 +1279,16 @@ describe('model: populate:', function() {
                 posts[0].populate('_creator', function(error, doc) {
                   assert.ifError(error);
                   assert.equal(doc._creator.name, 'val');
-                  db.close(done);
+                  done();
                 });
               });
             });
-          });
+        });
     });
   });
 
   it('populating subdocuments partially', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -1335,27 +1313,25 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           BlogPost
-          .findById(post._id)
-          .populate('comments._creator', 'email')
-          .exec(function(err, post) {
-            db.close();
-            assert.ifError(err);
+            .findById(post._id)
+            .populate('comments._creator', 'email')
+            .exec(function(err, post) {
+              assert.ifError(err);
 
-            assert.equal(post.comments[0]._creator.email, 'user1@learnboost.com');
-            assert.equal(post.comments[0]._creator.isInit('name'), false);
-            assert.equal(post.comments[1]._creator.email, 'user2@learnboost.com');
-            assert.equal(post.comments[1]._creator.isInit('name'), false);
+              assert.equal(post.comments[0]._creator.email, 'user1@learnboost.com');
+              assert.equal(post.comments[0]._creator.isInit('name'), false);
+              assert.equal(post.comments[1]._creator.email, 'user2@learnboost.com');
+              assert.equal(post.comments[1]._creator.isInit('name'), false);
 
-            done();
-          });
+              done();
+            });
         });
       });
     });
   });
 
   it('populating subdocuments partially with conditions', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -1380,27 +1356,25 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           BlogPost
-          .findById(post._id)
-          .populate('comments._creator', {'email': 1}, {name: /User/})
-          .exec(function(err, post) {
-            db.close();
-            assert.ifError(err);
+            .findById(post._id)
+            .populate('comments._creator', {'email': 1}, {name: /User/})
+            .exec(function(err, post) {
+              assert.ifError(err);
 
-            assert.equal(post.comments[0]._creator.email, 'user1@learnboost.com');
-            assert.equal(post.comments[0]._creator.isInit('name'), false);
-            assert.equal(post.comments[1]._creator.email, 'user2@learnboost.com');
-            assert.equal(post.comments[1]._creator.isInit('name'), false);
+              assert.equal(post.comments[0]._creator.email, 'user1@learnboost.com');
+              assert.equal(post.comments[0]._creator.isInit('name'), false);
+              assert.equal(post.comments[1]._creator.email, 'user2@learnboost.com');
+              assert.equal(post.comments[1]._creator.isInit('name'), false);
 
-            done();
-          });
+              done();
+            });
         });
       });
     });
   });
 
   it('populating subdocs with invalid/missing subproperties', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({
@@ -1426,13 +1400,13 @@ describe('model: populate:', function() {
 
           // non-existant subprop
           BlogPost
-          .findById(post._id)
-          .populate('comments._idontexist', 'email')
-          .exec(function(err) {
-            assert.ifError(err);
+            .findById(post._id)
+            .populate('comments._idontexist', 'email')
+            .exec(function(err) {
+              assert.ifError(err);
 
-            // add a non-schema property to the document.
-            BlogPost.collection.update(
+              // add a non-schema property to the document.
+              BlogPost.collection.update(
                 {_id: post._id}
                 , {$set: {'comments.0._idontexist': user2._id}}, function(err) {
                   assert.ifError(err);
@@ -1440,46 +1414,45 @@ describe('model: populate:', function() {
                   // allow population of unknown property by passing model name.
                   // helpful when populating mapReduce results too.
                   BlogPost
-                  .findById(post._id)
-                  .populate('comments._idontexist', 'email', 'RefUser')
-                  .exec(function(err, post) {
-                    assert.ifError(err);
-                    assert.ok(post);
-                    assert.equal(post.comments.length, 2);
-                    assert.ok(post.comments[0].get('_idontexist'));
-                    assert.equal(String(post.comments[0].get('_idontexist')._id), user2.id);
-                    assert.equal(post.comments[0].get('_idontexist').email, 'terminator1000@learnboost.com');
-                    assert.equal(post.comments[0].get('_idontexist').isInit('name'), false);
-                    assert.strictEqual(post.comments[0]._creator, null);
-                    assert.equal(post.comments[1]._creator.toString(), user2.id);
-
-                    // subprop is null in a doc
-                    BlogPost
                     .findById(post._id)
-                    .populate('comments._creator', 'email')
+                    .populate('comments._idontexist', 'email', 'RefUser')
                     .exec(function(err, post) {
                       assert.ifError(err);
-
-                      assert.ok(post.comments);
+                      assert.ok(post);
                       assert.equal(post.comments.length, 2);
+                      assert.ok(post.comments[0].get('_idontexist'));
+                      assert.equal(String(post.comments[0].get('_idontexist')._id), user2.id);
+                      assert.equal(post.comments[0].get('_idontexist').email, 'terminator1000@learnboost.com');
+                      assert.equal(post.comments[0].get('_idontexist').isInit('name'), false);
                       assert.strictEqual(post.comments[0]._creator, null);
-                      assert.strictEqual(post.comments[0].content, 'Woot woot');
-                      assert.equal(post.comments[1]._creator.email, 'terminator1000@learnboost.com');
-                      assert.equal(post.comments[1]._creator.isInit('name'), false);
-                      assert.equal(post.comments[1].content, 'Wha wha');
+                      assert.equal(post.comments[1]._creator.toString(), user2.id);
 
-                      db.close(done);
+                      // subprop is null in a doc
+                      BlogPost
+                        .findById(post._id)
+                        .populate('comments._creator', 'email')
+                        .exec(function(err, post) {
+                          assert.ifError(err);
+
+                          assert.ok(post.comments);
+                          assert.equal(post.comments.length, 2);
+                          assert.strictEqual(post.comments[0]._creator, null);
+                          assert.strictEqual(post.comments[0].content, 'Woot woot');
+                          assert.equal(post.comments[1]._creator.email, 'terminator1000@learnboost.com');
+                          assert.equal(post.comments[1]._creator.isInit('name'), false);
+                          assert.equal(post.comments[1].content, 'Wha wha');
+
+                          done();
+                        });
                     });
-                  });
                 });
-          });
+            });
         });
       });
     });
   });
 
   it('properly handles limit per document (gh-2151)', function(done) {
-    var db = start();
     var ObjectId = mongoose.Types.ObjectId;
 
     var user = new Schema({
@@ -1549,33 +1522,32 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost.
-        find({tags: 'fun'}).
-        lean().
-        populate('author').
-        exec(function(err, docs) {
-          assert.ifError(err);
-          var opts = {
-            path: 'author.friends',
-            select: 'name',
-            options: { limit: 1 }
-          };
-
-          BlogPost.populate(docs, opts, function(err, docs) {
+          find({tags: 'fun'}).
+          lean().
+          populate('author').
+          exec(function(err, docs) {
             assert.ifError(err);
-            assert.equal(docs.length, 2);
-            assert.equal(docs[0].author.friends.length, 1);
-            assert.equal(docs[1].author.friends.length, 1);
-            assert.equal(opts.options.limit, 1);
-            db.close(done);
+            var opts = {
+              path: 'author.friends',
+              select: 'name',
+              options: { limit: 1 }
+            };
+
+            BlogPost.populate(docs, opts, function(err, docs) {
+              assert.ifError(err);
+              assert.equal(docs.length, 2);
+              assert.equal(docs[0].author.friends.length, 1);
+              assert.equal(docs[1].author.friends.length, 1);
+              assert.equal(opts.options.limit, 1);
+              done();
+            });
           });
-        });
       });
     });
   });
 
   it('populating subdocuments partially with empty array (gh-481)', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts);
+    var BlogPost = db.model('RefBlogPost', posts);
 
     BlogPost.create({
       title: 'Woot',
@@ -1584,20 +1556,18 @@ describe('model: populate:', function() {
       assert.ifError(err);
 
       BlogPost
-      .findById(post._id)
-      .populate('comments._creator', 'email')
-      .exec(function(err, returned) {
-        db.close();
-        assert.ifError(err);
-        assert.equal(returned.id, post.id);
-        done();
-      });
+        .findById(post._id)
+        .populate('comments._creator', 'email')
+        .exec(function(err, returned) {
+          assert.ifError(err);
+          assert.equal(returned.id, post.id);
+          done();
+        });
     });
   });
 
   it('populating subdocuments partially with null array', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts);
+    var BlogPost = db.model('RefBlogPost', posts);
 
     BlogPost.create({
       title: 'Woot',
@@ -1606,20 +1576,18 @@ describe('model: populate:', function() {
       assert.ifError(err);
 
       BlogPost
-      .findById(post._id)
-      .populate('comments._creator')
-      .exec(function(err, returned) {
-        db.close();
-        assert.ifError(err);
-        assert.equal(returned.id, post.id);
-        done();
-      });
+        .findById(post._id)
+        .populate('comments._creator')
+        .exec(function(err, returned) {
+          assert.ifError(err);
+          assert.equal(returned.id, post.id);
+          done();
+        });
     });
   });
 
   it('populating subdocuments with array including nulls', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     var user = new User({name: 'hans zimmer'});
@@ -1637,23 +1605,21 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           BlogPost
-          .findById(post._id)
-          .populate('fans', 'name')
-          .exec(function(err, returned) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(returned.id, post.id);
-            assert.equal(returned.fans.length, 1);
-            done();
-          });
+            .findById(post._id)
+            .populate('fans', 'name')
+            .exec(function(err, returned) {
+              assert.ifError(err);
+              assert.equal(returned.id, post.id);
+              assert.equal(returned.fans.length, 1);
+              done();
+            });
         });
       });
     });
   });
 
   it('populating more than one array at a time', function(done) {
-    var db = start(),
-        User = db.model('RefUser', users),
+    var User = db.model('RefUser', users),
         M = db.model('PopMultiSubDocs', new Schema({
           users: [{type: ObjectId, ref: 'RefUser'}],
           fans: [{type: ObjectId, ref: 'RefUser'}],
@@ -1689,46 +1655,44 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         M.where('_id').in([post1, post2])
-        .populate('fans', 'name', {gender: 'female'})
-        .populate('users', 'name', {gender: 'male'})
-        .populate('comments._creator', 'email', {name: null})
-        .exec(function(err, posts) {
-          db.close();
-          assert.ifError(err);
+          .populate('fans', 'name', {gender: 'female'})
+          .populate('users', 'name', {gender: 'male'})
+          .populate('comments._creator', 'email', {name: null})
+          .exec(function(err, posts) {
+            assert.ifError(err);
 
-          assert.ok(posts);
-          assert.equal(posts.length, 2);
-          var p1 = posts[0];
-          var p2 = posts[1];
-          assert.strictEqual(p1.fans.length, 0);
-          assert.strictEqual(p2.fans.length, 1);
-          assert.equal(p2.fans[0].name, 'Fan 2');
-          assert.equal(p2.fans[0].isInit('email'), false);
-          assert.equal(p2.fans[0].isInit('gender'), false);
-          assert.equal(p1.comments.length, 2);
-          assert.equal(p2.comments.length, 2);
-          assert.ok(p1.comments[0]._creator.email);
-          assert.ok(!p2.comments[0]._creator);
-          assert.equal(p1.comments[0]._creator.email, 'fan1@learnboost.com');
-          assert.equal(p2.comments[1]._creator.email, 'fan1@learnboost.com');
-          assert.equal(p1.comments[0]._creator.isInit('name'), false);
-          assert.equal(p2.comments[1]._creator.isInit('name'), false);
-          assert.equal(p1.comments[0].content, 'bejeah!');
-          assert.equal(p2.comments[1].content, 'world');
-          assert.ok(!p1.comments[1]._creator);
-          assert.ok(!p2.comments[0]._creator);
-          assert.equal(p1.comments[1].content, 'chickfila');
-          assert.equal(p2.comments[0].content, 'hello');
+            assert.ok(posts);
+            assert.equal(posts.length, 2);
+            var p1 = posts[0];
+            var p2 = posts[1];
+            assert.strictEqual(p1.fans.length, 0);
+            assert.strictEqual(p2.fans.length, 1);
+            assert.equal(p2.fans[0].name, 'Fan 2');
+            assert.equal(p2.fans[0].isInit('email'), false);
+            assert.equal(p2.fans[0].isInit('gender'), false);
+            assert.equal(p1.comments.length, 2);
+            assert.equal(p2.comments.length, 2);
+            assert.ok(p1.comments[0]._creator.email);
+            assert.ok(!p2.comments[0]._creator);
+            assert.equal(p1.comments[0]._creator.email, 'fan1@learnboost.com');
+            assert.equal(p2.comments[1]._creator.email, 'fan1@learnboost.com');
+            assert.equal(p1.comments[0]._creator.isInit('name'), false);
+            assert.equal(p2.comments[1]._creator.isInit('name'), false);
+            assert.equal(p1.comments[0].content, 'bejeah!');
+            assert.equal(p2.comments[1].content, 'world');
+            assert.ok(!p1.comments[1]._creator);
+            assert.ok(!p2.comments[0]._creator);
+            assert.equal(p1.comments[1].content, 'chickfila');
+            assert.equal(p2.comments[0].content, 'hello');
 
-          done();
-        });
+            done();
+          });
       });
     });
   });
 
   it('populating multiple children of a sub-array at a time', function(done) {
-    var db = start(),
-        User = db.model('RefUser', users),
+    var User = db.model('RefUser', users),
         BlogPost = db.model('RefBlogPost', posts),
         Inner = new Schema({
           user: {type: ObjectId, ref: 'RefUser'},
@@ -1767,44 +1731,42 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           M.findById(m1)
-          .populate('kids.user', 'name')
-          .populate('kids.post', 'title', {title: 'woot'})
-          .exec(function(err, o) {
-            db.close();
-            assert.ifError(err);
-            assert.strictEqual(o.kids.length, 2);
-            var k1 = o.kids[0];
-            var k2 = o.kids[1];
-            assert.strictEqual(true, !k2.post);
-            assert.strictEqual(k1.user.name, 'Fan 1');
-            assert.strictEqual(k1.user.email, undefined);
-            assert.strictEqual(k1.post.title, 'woot');
-            assert.strictEqual(k2.user.name, 'Fan 2');
+            .populate('kids.user', 'name')
+            .populate('kids.post', 'title', {title: 'woot'})
+            .exec(function(err, o) {
+              assert.ifError(err);
+              assert.strictEqual(o.kids.length, 2);
+              var k1 = o.kids[0];
+              var k2 = o.kids[1];
+              assert.strictEqual(true, !k2.post);
+              assert.strictEqual(k1.user.name, 'Fan 1');
+              assert.strictEqual(k1.user.email, undefined);
+              assert.strictEqual(k1.post.title, 'woot');
+              assert.strictEqual(k2.user.name, 'Fan 2');
 
-            done();
-          });
+              done();
+            });
         });
       });
     });
   });
 
   it('passing sort options to the populate method', function(done) {
-    var db = start(),
-        P = db.model('RefBlogPost', posts),
+    var P = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create(
-        {name: 'aaron', age: 10},
-        {name: 'fan2', age: 8},
-        {name: 'someone else', age: 3},
-        {name: 'val', age: 3},
-        function(err, fan1, fan2, fan3, fan4) {
+      {name: 'aaron', age: 10},
+      {name: 'fan2', age: 8},
+      {name: 'someone else', age: 3},
+      {name: 'val', age: 3},
+      function(err, fan1, fan2, fan3, fan4) {
+        assert.ifError(err);
+
+        P.create({fans: [fan4, fan2, fan3, fan1]}, function(err, post) {
           assert.ifError(err);
 
-          P.create({fans: [fan4, fan2, fan3, fan1]}, function(err, post) {
-            assert.ifError(err);
-
-            P.findById(post)
+          P.findById(post)
             .populate('fans', null, null, {sort: {age: 1, name: 1}})
             .exec(function(err, post) {
               assert.ifError(err);
@@ -1816,40 +1778,38 @@ describe('model: populate:', function() {
               assert.equal(post.fans[3].name, 'aaron');
 
               P.findById(post)
-              .populate('fans', 'name', null, {sort: {'name': -1}})
-              .exec(function(err, post) {
-                assert.ifError(err);
-
-                assert.equal(post.fans.length, 4);
-                assert.equal(post.fans[3].name, 'aaron');
-                assert.strictEqual(undefined, post.fans[3].age);
-                assert.equal(post.fans[2].name, 'fan2');
-                assert.strictEqual(undefined, post.fans[2].age);
-                assert.equal(post.fans[1].name, 'someone else');
-                assert.strictEqual(undefined, post.fans[1].age);
-                assert.equal(post.fans[0].name, 'val');
-                assert.strictEqual(undefined, post.fans[0].age);
-
-                P.findById(post)
-                .populate('fans', 'age', {age: {$gt: 3}}, {sort: {'name': 'desc'}})
+                .populate('fans', 'name', null, {sort: {'name': -1}})
                 .exec(function(err, post) {
-                  db.close();
                   assert.ifError(err);
 
-                  assert.equal(post.fans.length, 2);
-                  assert.equal(post.fans[1].age.valueOf(), 10);
-                  assert.equal(post.fans[0].age.valueOf(), 8);
+                  assert.equal(post.fans.length, 4);
+                  assert.equal(post.fans[3].name, 'aaron');
+                  assert.strictEqual(undefined, post.fans[3].age);
+                  assert.equal(post.fans[2].name, 'fan2');
+                  assert.strictEqual(undefined, post.fans[2].age);
+                  assert.equal(post.fans[1].name, 'someone else');
+                  assert.strictEqual(undefined, post.fans[1].age);
+                  assert.equal(post.fans[0].name, 'val');
+                  assert.strictEqual(undefined, post.fans[0].age);
 
-                  done();
+                  P.findById(post)
+                    .populate('fans', 'age', {age: {$gt: 3}}, {sort: {'name': 'desc'}})
+                    .exec(function(err, post) {
+                      assert.ifError(err);
+
+                      assert.equal(post.fans.length, 2);
+                      assert.equal(post.fans[1].age.valueOf(), 10);
+                      assert.equal(post.fans[0].age.valueOf(), 8);
+
+                      done();
+                    });
                 });
-              });
             });
-          });
         });
+      });
   });
 
   it('limit should apply to each returned doc, not in aggregate (gh-1490)', function(done) {
-    var db = start();
     var sB = new Schema({
       name: String
     });
@@ -1891,7 +1851,7 @@ describe('model: populate:', function() {
         assert.equal(j.length, 2);
         assert.equal(j[0].b.length, 2);
         assert.equal(j[1].b.length, 2);
-        db.close(done);
+        done();
       });
     }
   });
@@ -1907,8 +1867,6 @@ describe('model: populate:', function() {
   });
 
   it('populate should work on String _ids', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: String,
       name: String
@@ -1932,7 +1890,6 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         Note.findById(note.id).populate('author').exec(function(err, note) {
-          db.close();
           assert.ifError(err);
           assert.equal(note.body, 'Buy Milk');
           assert.ok(note.author);
@@ -1944,8 +1901,6 @@ describe('model: populate:', function() {
   });
 
   it('populate should work on Number _ids', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: Number,
       name: String
@@ -1969,7 +1924,6 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         Note.findById(note.id).populate('author').exec(function(err, note) {
-          db.close();
           assert.ifError(err);
           assert.equal(note.body, 'Buy Milk');
           assert.ok(note.author);
@@ -1981,8 +1935,6 @@ describe('model: populate:', function() {
   });
 
   it('required works on ref fields (gh-577)', function(done) {
-    var db = start();
-
     var userSchema = new Schema({
       email: {type: String, required: true}
     });
@@ -2040,58 +1992,54 @@ describe('model: populate:', function() {
           assert.strictEqual(err, null);
 
           Comment
-          .findById(comment.id)
-          .populate('user')
-          .populate('num')
-          .populate('str')
-          .exec(function(err, comment) {
-            assert.ifError(err);
-
-            comment.set({text: 'test2'});
-
-            comment.save(function(err) {
-              db.close();
+            .findById(comment.id)
+            .populate('user')
+            .populate('num')
+            .populate('str')
+            .exec(function(err, comment) {
               assert.ifError(err);
-              done();
+
+              comment.set({text: 'test2'});
+
+              comment.save(function(err) {
+                assert.ifError(err);
+                done();
+              });
             });
-          });
         });
       });
     }
   });
 
   it('populate works with schemas with both id and _id defined', function(done) {
-    var db = start(),
-        S1 = new Schema({id: String}),
+    var S1 = new Schema({id: String}),
         S2 = new Schema({things: [{type: ObjectId, ref: '_idAndid'}]});
 
     var M1 = db.model('_idAndid', S1);
     var M2 = db.model('populateWorksWith_idAndidSchemas', S2);
 
     M1.create(
-        {id: 'The Tiger That Isn\'t'}
-        , {id: 'Users Guide To The Universe'}
-        , function(err, a, b) {
-          assert.ifError(err);
+      {id: 'The Tiger That Isn\'t'}
+      , {id: 'Users Guide To The Universe'}
+      , function(err, a, b) {
+        assert.ifError(err);
 
-          var m2 = new M2({things: [a, b]});
-          m2.save(function(err) {
+        var m2 = new M2({things: [a, b]});
+        m2.save(function(err) {
+          assert.ifError(err);
+          M2.findById(m2).populate('things').exec(function(err, doc) {
             assert.ifError(err);
-            M2.findById(m2).populate('things').exec(function(err, doc) {
-              db.close();
-              assert.ifError(err);
-              assert.equal(doc.things.length, 2);
-              assert.equal(doc.things[0].id, 'The Tiger That Isn\'t');
-              assert.equal(doc.things[1].id, 'Users Guide To The Universe');
-              done();
-            });
+            assert.equal(doc.things.length, 2);
+            assert.equal(doc.things[0].id, 'The Tiger That Isn\'t');
+            assert.equal(doc.things[1].id, 'Users Guide To The Universe');
+            done();
           });
         });
+      });
   });
 
   it('Update works with populated arrays (gh-602)', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefUser', users);
 
     User.create({name: 'aphex'}, {name: 'twin'}, function(err, u1, u2) {
@@ -2114,7 +2062,6 @@ describe('model: populate:', function() {
           assert.ok(update.fans[1] instanceof mongoose.Document);
 
           BlogPost.findById(post, function(err, post) {
-            db.close();
             assert.ifError(err);
             assert.equal(post.fans.length, 2);
             assert.ok(post.fans[0] instanceof DocObjectId);
@@ -2158,24 +2105,22 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator')
-        .exec(function(err, post) {
-          db.close();
-          assert.ifError(err);
+          .findById(post._id)
+          .populate('_creator')
+          .exec(function(err, post) {
+            db.close();
+            assert.ifError(err);
 
-          var json = post.toJSON();
-          assert.equal(true, json.was_in_to_json);
-          assert.equal(json._creator.was_in_to_json, true);
-          done();
-        });
+            var json = post.toJSON();
+            assert.equal(true, json.was_in_to_json);
+            assert.equal(json._creator.was_in_to_json, true);
+            done();
+          });
       });
     });
   });
 
   it('populate should work on Buffer _ids (gh-686)', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: Buffer,
       name: String
@@ -2199,7 +2144,6 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         Note.findById(note.id).populate('author').exec(function(err, note) {
-          db.close();
           assert.ifError(err);
           assert.equal(note.body, 'Buy Milk');
           assert.ok(note.author);
@@ -2211,8 +2155,6 @@ describe('model: populate:', function() {
   });
 
   it('populated Buffer _ids should be requireable', function(done) {
-    var db = start();
-
     var UserSchema = new Schema({
       _id: Buffer,
       name: String
@@ -2238,7 +2180,6 @@ describe('model: populate:', function() {
         Note.findById(note.id).populate('author').exec(function(err, note) {
           assert.ifError(err);
           note.save(function(err) {
-            db.close();
             assert.ifError(err);
             done();
           });
@@ -2248,8 +2189,7 @@ describe('model: populate:', function() {
   });
 
   it('populating with custom model selection (gh-773)', function(done) {
-    var db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
+    var BlogPost = db.model('RefBlogPost', posts),
         User = db.model('RefAlternateUser', users);
 
     User.create({
@@ -2265,18 +2205,17 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         BlogPost
-        .findById(post._id)
-        .populate('_creator', 'email', 'RefAlternateUser')
-        .exec(function(err, post) {
-          db.close();
-          assert.ifError(err);
+          .findById(post._id)
+          .populate('_creator', 'email', 'RefAlternateUser')
+          .exec(function(err, post) {
+            assert.ifError(err);
 
-          assert.ok(post._creator instanceof User);
-          assert.equal(post._creator.isInit('name'), false);
-          assert.equal(post._creator.email, 'daniel.baulig@gmx.de');
+            assert.ok(post._creator instanceof User);
+            assert.equal(post._creator.isInit('name'), false);
+            assert.equal(post._creator.email, 'daniel.baulig@gmx.de');
 
-          done();
-        });
+            done();
+          });
       });
     });
   });
@@ -2389,20 +2328,20 @@ describe('model: populate:', function() {
         name: 'use an object',
         email: 'fo-real@objects.r.fun'
       }
-          , {name: 'yup'}
-          , {name: 'not here'}
-          , function(err, fan1, fan2, fan3) {
-            assert.ifError(err);
+        , {name: 'yup'}
+        , {name: 'not here'}
+        , function(err, fan1, fan2, fan3) {
+        assert.ifError(err);
 
-            B.create({
-              title: 'woot',
-              fans: [fan1, fan2, fan3]
-            }, function(err, post_) {
-              assert.ifError(err);
-              post = post_;
-              done();
-            });
-          });
+        B.create({
+          title: 'woot',
+          fans: [fan1, fan2, fan3]
+        }, function(err, post_) {
+          assert.ifError(err);
+          post = post_;
+          done();
+        });
+      });
     });
 
     after(function(done) {
@@ -2411,29 +2350,29 @@ describe('model: populate:', function() {
 
     it('works', function(done) {
       B.findById(post._id)
-      .populate({
-        path: 'fans',
-        select: 'name',
-        model: 'RefAlternateUser',
-        match: {name: /u/},
-        options: {sort: {name: -1}}
-      })
-      .exec(function(err, post) {
-        assert.ifError(err);
+        .populate({
+          path: 'fans',
+          select: 'name',
+          model: 'RefAlternateUser',
+          match: {name: /u/},
+          options: {sort: {name: -1}}
+        })
+        .exec(function(err, post) {
+          assert.ifError(err);
 
-        assert.ok(Array.isArray(post.fans));
-        assert.equal(post.fans.length, 2);
-        assert.ok(post.fans[0] instanceof User);
-        assert.ok(post.fans[1] instanceof User);
-        assert.equal(post.fans[0].isInit('name'), true);
-        assert.equal(post.fans[1].isInit('name'), true);
-        assert.equal(post.fans[0].isInit('email'), false);
-        assert.equal(post.fans[1].isInit('email'), false);
-        assert.equal(post.fans[0].name, 'yup');
-        assert.equal(post.fans[1].name, 'use an object');
+          assert.ok(Array.isArray(post.fans));
+          assert.equal(post.fans.length, 2);
+          assert.ok(post.fans[0] instanceof User);
+          assert.ok(post.fans[1] instanceof User);
+          assert.equal(post.fans[0].isInit('name'), true);
+          assert.equal(post.fans[1].isInit('name'), true);
+          assert.equal(post.fans[0].isInit('email'), false);
+          assert.equal(post.fans[1].isInit('email'), false);
+          assert.equal(post.fans[0].name, 'yup');
+          assert.equal(post.fans[1].name, 'use an object');
 
-        done();
-      });
+          done();
+        });
     });
   });
 
@@ -2487,7 +2426,7 @@ describe('model: populate:', function() {
       it('a promise', function(done) {
         var p = B.populate(post1, '_creator');
         assert.ok(p instanceof mongoose.Promise);
-        p.then(success, done).end();
+        p.then(success, done);
         function success(doc) {
           assert.ok(doc);
           done();
@@ -2575,11 +2514,11 @@ describe('model: populate:', function() {
                 assert.equal(post.fans[1].name, user2.name);
                 assert.ok(Array.isArray(post.populated('fans')));
                 assert.equal(
-                    String(post.fans[0]._id)
-                    , String(post.populated('fans')[0]));
+                  String(post.fans[0]._id)
+                  , String(post.populated('fans')[0]));
                 assert.equal(
-                    String(post.fans[1]._id)
-                    , String(post.populated('fans')[1]));
+                  String(post.fans[1]._id)
+                  , String(post.populated('fans')[1]));
 
                 done();
               });
@@ -2633,19 +2572,19 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           BlogPost
-          .findById(post._id)
-          .lean()
-          .populate('_creator')
-          .exec(function(err, post) {
-            db.close();
-            assert.ifError(err);
+            .findById(post._id)
+            .lean()
+            .populate('_creator')
+            .exec(function(err, post) {
+              db.close();
+              assert.ifError(err);
 
-            assert.ok(utils.isObject(post._creator));
-            assert.equal(post._creator.name, 'Guillermo');
-            assert.equal(post._creator.email, 'rauchg@gmail.com');
-            assert.equal(typeof post._creator.update, 'undefined');
-            done();
-          });
+              assert.ok(utils.isObject(post._creator));
+              assert.equal(post._creator.name, 'Guillermo');
+              assert.equal(post._creator.email, 'rauchg@gmail.com');
+              assert.equal(typeof post._creator.update, 'undefined');
+              done();
+            });
         });
       });
     });
@@ -2674,27 +2613,27 @@ describe('model: populate:', function() {
           assert.ifError(err);
 
           BlogPost
-          .find({_id: {$in: [post1._id, post2._id]}})
-          .populate('fans')
-          .lean()
-          .exec(function(err, blogposts) {
-            assert.ifError(err);
+            .find({_id: {$in: [post1._id, post2._id]}})
+            .populate('fans')
+            .lean()
+            .exec(function(err, blogposts) {
+              assert.ifError(err);
 
-            assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-            assert.equal(blogposts[0].fans[0].email, 'fan1@learnboost.com');
-            assert.equal(typeof blogposts[0].fans[0].update, 'undefined');
-            assert.equal(blogposts[0].fans[1].name, 'Fan 2');
-            assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
-            assert.equal(typeof blogposts[0].fans[1].update, 'undefined');
+              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
+              assert.equal(blogposts[0].fans[0].email, 'fan1@learnboost.com');
+              assert.equal(typeof blogposts[0].fans[0].update, 'undefined');
+              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+              assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
+              assert.equal(typeof blogposts[0].fans[1].update, 'undefined');
 
-            assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-            assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
-            assert.equal(typeof blogposts[1].fans[0].update, 'undefined');
-            assert.equal(blogposts[1].fans[1].name, 'Fan 1');
-            assert.equal(blogposts[1].fans[1].email, 'fan1@learnboost.com');
-            assert.equal(typeof blogposts[1].fans[1].update, 'undefined');
-            db.close(done);
-          });
+              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+              assert.equal(blogposts[1].fans[0].email, 'fan2@learnboost.com');
+              assert.equal(typeof blogposts[1].fans[0].update, 'undefined');
+              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+              assert.equal(blogposts[1].fans[1].email, 'fan1@learnboost.com');
+              assert.equal(typeof blogposts[1].fans[1].update, 'undefined');
+              db.close(done);
+            });
         });
       });
     });
@@ -2801,12 +2740,12 @@ describe('model: populate:', function() {
         c2 = c2_;
 
         U.create(
-            {name: 'u1', comments: [c1, c2], comment: c1}
-            , {name: 'u2', comment: c2}
-            , function(err) {
-              assert.ifError(err);
-              done();
-            });
+          {name: 'u1', comments: [c1, c2], comment: c1}
+          , {name: 'u2', comment: c2}
+          , function(err) {
+            assert.ifError(err);
+            done();
+          });
       });
     });
 
@@ -2884,22 +2823,22 @@ describe('model: populate:', function() {
     describe('of documents being populated', function() {
       it('still works (gh-1441)', function(done) {
         U.find()
-        .select('-_id comment name')
-        .populate('comment', {_id: 0}).exec(function(err, docs) {
-          assert.ifError(err);
-          assert.equal(docs.length, 2);
+          .select('-_id comment name')
+          .populate('comment', {_id: 0}).exec(function(err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 2);
 
-          docs.forEach(function(doc) {
-            assert.ok(doc.comment && doc.comment.body);
-            if (doc.name === 'u1') {
-              assert.equal(doc.comment.body, 'comment 1');
-            } else {
-              assert.equal(doc.comment.body, 'comment 2');
-            }
+            docs.forEach(function(doc) {
+              assert.ok(doc.comment && doc.comment.body);
+              if (doc.name === 'u1') {
+                assert.equal(doc.comment.body, 'comment 1');
+              } else {
+                assert.equal(doc.comment.body, 'comment 2');
+              }
+            });
+
+            done();
           });
-
-          done();
-        });
       });
     });
   });
@@ -3334,24 +3273,24 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         Article.create(
-            {body: 'body1', author: 'a'}
-            , {body: 'body2', author: 'a', mediaAttach: media._id}
-            , {body: 'body3', author: 'a'}, function(err) {
-              if (err) {
-                return done(err);
-              }
+          {body: 'body1', author: 'a'}
+          , {body: 'body2', author: 'a', mediaAttach: media._id}
+          , {body: 'body3', author: 'a'}, function(err) {
+            if (err) {
+              return done(err);
+            }
 
-              Article.find().populate('mediaAttach').exec(function(err, docs) {
-                assert.ifError(err);
+            Article.find().populate('mediaAttach').exec(function(err, docs) {
+              assert.ifError(err);
 
-                var a2 = docs.filter(function(d) {
-                  return d.body === 'body2';
-                })[0];
-                assert.equal(a2.mediaAttach.id, media.id);
+              var a2 = docs.filter(function(d) {
+                return d.body === 'body2';
+              })[0];
+              assert.equal(a2.mediaAttach.id, media.id);
 
-                done();
-              });
+              done();
             });
+          });
       });
     });
 

@@ -87,7 +87,7 @@ describe('schema', function() {
       Test.path('state').doValidate('x', function(err) {
         assert.ok(err instanceof ValidatorError);
         assert.equal(err.message,
-            'enum validator failed for path `state`: test');
+          'enum validator failed for path `state`: test');
       });
 
       Test.path('state').doValidate('opening', function(err) {
@@ -377,7 +377,7 @@ describe('schema', function() {
           likes: {type: Array, required: true}
         });
 
-        var remaining = 3;
+        var remaining = 2;
 
         Loki.path('likes').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
@@ -385,11 +385,6 @@ describe('schema', function() {
         });
 
         Loki.path('likes').doValidate(undefined, function(err) {
-          assert.ok(err instanceof ValidatorError);
-          --remaining || done();
-        });
-
-        Loki.path('likes').doValidate([], function(err) {
           assert.ok(err instanceof ValidatorError);
           --remaining || done();
         });
@@ -458,14 +453,16 @@ describe('schema', function() {
       it('works', function(done) {
         var executed = 0;
 
-        function validator(value, fn) {
-          setTimeout(function() {
-            executed++;
-            fn(value === true);
-            if (executed === 2) {
-              done();
-            }
-          }, 5);
+        function validator(value) {
+          return new global.Promise(function(resolve) {
+            setTimeout(function() {
+              executed++;
+              resolve(value === true);
+              if (executed === 2) {
+                done();
+              }
+            }, 5);
+          });
         }
 
         var Animal = new Schema({
@@ -478,37 +475,6 @@ describe('schema', function() {
 
         Animal.path('ferret').doValidate(false, function(err) {
           assert.ok(err instanceof Error);
-        });
-      });
-
-      it('multiple', function(done) {
-        var executed = 0;
-
-        function validator(value, fn) {
-          setTimeout(function() {
-            executed++;
-            fn(value === true);
-            if (executed === 2) {
-              done();
-            }
-          }, 5);
-        }
-
-        var Animal = new Schema({
-          ferret: {
-            type: Boolean,
-            validate: [{
-              validator: validator,
-              msg: 'validator1'
-            }, {
-              validator: validator,
-              msg: 'validator2'
-            }]
-          }
-        });
-
-        Animal.path('ferret').doValidate(true, function(err) {
-          assert.ifError(err);
         });
       });
 
@@ -536,13 +502,10 @@ describe('schema', function() {
         var Animal = new Schema({
           ferret: {
             type: Boolean,
-            validate: [{
-              validator: validator1,
-              msg: 'validator1'
-            }, {
-              validator: validator2,
-              msg: 'validator2'
-            }]
+            validate: [
+              { validator: validator1, msg: 'validator1' },
+              { validator: validator2, msg: 'validator2' }
+            ].map(function(v) { return Object.assign(v, { isAsync: true }); })
           }
         });
 
@@ -554,17 +517,21 @@ describe('schema', function() {
       it('scope', function(done) {
         var called = false;
 
-        function validator(value, fn) {
-          assert.equal(this.a, 'b');
-
-          setTimeout(function() {
-            called = true;
-            fn(true);
-          }, 5);
+        function validator() {
+          return new global.Promise(resolve => {
+            assert.equal(this.a, 'b');
+            setTimeout(function() {
+              called = true;
+              resolve(true);
+            }, 5);
+          });
         }
 
         var Animal = new Schema({
-          ferret: {type: Boolean, validate: validator}
+          ferret: {
+            type: Boolean,
+            validate: validator
+          }
         });
 
         Animal.path('ferret').doValidate(true, function(err) {
@@ -749,8 +716,8 @@ describe('schema', function() {
             x: {
               type: String,
               validate: [{
-                validator: function(value, fn) {
-                  fn(false, 'Custom message');
+                validator: function() {
+                  throw new Error('Custom message');
                 },
                 msg: 'Does not matter'
               }]
@@ -844,10 +811,10 @@ describe('schema', function() {
           assert.ok(error);
           assert.ok(error.errors['foods.0']);
           assert.equal(error.errors['foods.0'].message,
-              '`tofu` is not a valid enum value for path `foods`.');
+            '`tofu` is not a valid enum value for path `foods`.');
           assert.ok(error.errors['foods.1']);
           assert.equal(error.errors['foods.1'].message,
-              '`waffles` is not a valid enum value for path `foods`.');
+            '`waffles` is not a valid enum value for path `foods`.');
           assert.ok(!error.errors['foods.2']);
 
           done();
@@ -879,7 +846,7 @@ describe('schema', function() {
           assert.ok(error);
           assert.ok(error.errors['votes.0.vote']);
           assert.equal(error.errors['votes.0.vote'].message,
-              '`terrible` is not a valid enum value for path `vote`.');
+            '`terrible` is not a valid enum value for path `vote`.');
 
           done();
         });
@@ -928,9 +895,9 @@ describe('schema', function() {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});
       var validateCalls = 0;
-      B.path('a').validate(function(val, next) {
+      B.path('a').validate(function() {
         ++validateCalls;
-        next();
+        return true;
       });
 
       B = mongoose.model('b', B);

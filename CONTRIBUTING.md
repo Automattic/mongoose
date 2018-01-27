@@ -37,7 +37,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Running the tests
 - Open a terminal and navigate to the root of the project
 - execute `npm install` to install the necessary dependencies
-- start a mongodb instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data> --port 27017`
+- start a mongodb instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data> --port 27017 --storageEngine mmapv1`. Mongoose tests run much faster on the mmapv1 storage engine as opposed to the WiredTiger storage engine.
 - execute `npm test` to run the tests (we're using [mocha](http://mochajs.org/))
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   - any mocha flags can be specified with `-- <mocha flags here>`

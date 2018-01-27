@@ -1,250 +1,120 @@
+'use strict';
+
 /*!
  * Module dependencies
  */
 
-var fs = require('fs');
-var link = require('../helpers/linktype');
-var hl = require('highlight.js');
-var md = require('markdown');
+const _ = require('lodash');
+const dox = require('dox');
+const fs = require('fs');
+const link = require('../helpers/linktype');
+const hl = require('highlight.js');
+const md = require('markdown');
+
+const files = [
+  'lib/schema.js',
+  'lib/connection.js',
+  'lib/document.js',
+  'lib/model.js',
+  'lib/query.js',
+  'lib/aggregate.js',
+  'lib/schematype.js',
+  'lib/virtualtype.js',
+  'lib/error/index.js'
+];
 
 module.exports = {
-    docs: []
-  , github: 'https://github.com/LearnBoost/mongoose/blob/'
-  , title: 'API docs'
+  docs: [],
+  github: 'https://github.com/Automattic/mongoose/blob/',
+  title: 'API docs'
+};
+
+const out = module.exports.docs;
+
+let combinedFiles = [];
+for (const file of files) {
+  const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'));
+  comments.file = file;
+  combinedFiles.push(comments);
 }
 
-var out = module.exports.docs;
+parse();
 
-var docs = fs.readFileSync(__dirname + '/_docs', 'utf8');
-parse(docs);
-order(out);
+function parse() {
+  for (const props of combinedFiles) {
+    const data = {
+      name: _.capitalize(props.file.replace('lib/', '').replace('.js', '').replace('/index', '')),
+      props: []
+    };
 
-function parse (docs) {
-  docs.split(/^### /gm).forEach(function (chunk) {
-    if (!(chunk = chunk.trim())) return;
-
-    chunk = chunk.split(/^([^\n]+)\n/);
-
-    var fulltitle = chunk[1];
-
-    if (!fulltitle || !(fulltitle = fulltitle.trim()))
-      throw new Error('missing title');
-
-    var title = fulltitle.replace(/^lib\//, '');
-    var json = JSON.parse(chunk[2]);
-
-    var props = [];
-    var methods = [];
-    var statics = [];
-    var constructor = null;
-
-    json.forEach(function (comment) {
-      if (comment.description) {
-        highlight(comment.description);
+    for (const prop of props) {
+      if (prop.ignore || prop.isPrivate) {
+        continue;
       }
 
-      var prop = false;
-      comment.params = [];
-      comment.see = [];
-
-      var i = comment.tags.length;
-      while (i--) {
-        var tag = comment.tags[i];
+      const ctx = prop.ctx || {};
+      for (const tag of prop.tags) {
         switch (tag.type) {
-        case 'property':
-          prop = true;
-          comment.ctx || (comment.ctx = {});
-          comment.ctx.name = tag.string;
-          props.unshift(comment);
-          break;
-        case 'method':
-          prop = false;
-          comment.ctx || (comment.ctx = {});
-          comment.ctx.name || (comment.ctx.name = tag.string);
-          comment.ctx.type = 'method';
-          comment.code = '';
-          break;
-        case 'memberOf':
-          prop = false;
-          comment.ctx || (comment.ctx = {});
-          comment.ctx.constructor = tag.parent;
-          break;
-        case 'static':
-          prop = false;
-          comment.ctx || (comment.ctx = {});
-          comment.ctx.name = tag.string;
-          comment.ctx.type = 'static';
-          break;
-        case 'receiver':
-          prop = false;
-          comment.ctx || (comment.ctx = {});
-          comment.ctx.receiver = tag.string;
-          break;
-        case 'constructor':
-          prop = false;
-          comment.ctx || (comment.ctx = {});
-          comment.ctx.name || (comment.ctx.name = tag.string);
-          comment.ctx.type = 'function';
-          comment.code = '';
-          break;
-        case 'inherits':
-          if (/http/.test(tag.string)) {
-            var result = tag.string.split(' ');
-            var href = result.pop();
-            var title = result.join(' ');
-            comment.inherits = '<a href="'
-                     + href
-                     + '" title="' + title + '">' + title + '</a>';
-          } else {
-            comment.inherits = link(tag.string);
-          }
-          comment.tags.splice(i, 1);
-          break;
-        case 'param':
-          comment.params.unshift(tag);
-          comment.tags.splice(i, 1);
-          tag.description = tag.description ?
-            md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') : '';
-          break;
-        case 'return':
-          comment.return = tag;
-          comment.tags.splice(i, 1);
-          break;
-        case 'see':
-          if (tag.local) {
-            var parts = tag.local.split(' ');
-            if (1 === parts.length) {
-              tag.url = link.type(parts[0]);
-              tag.title = parts[0];
-            } else {
-              tag.url = parts.pop();
-              tag.title = parts.join(' ');
+          case 'property':
+            ctx.type = 'property';
+            ctx.name = tag.string;
+            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+            break;
+          case 'return':
+            ctx.return = tag;
+            break;
+          case 'inherits':
+            ctx[tag.type] = tag.string;
+            break;
+          case 'event':
+          case 'param':
+            ctx[tag.type] = (ctx[tag] || []);
+            ctx[tag.type].push(tag);
+            tag.description = tag.description ?
+              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
+              '';
+            break;
+          case 'method':
+            ctx.type = 'method';
+            ctx.name = tag.string;
+            ctx.string = `${ctx.constructor}.prototype.${ctx.name}()`;
+            break;
+          case 'memberOf':
+            ctx.constructor = tag.parent;
+            ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+            if (ctx.type === 'method') {
+              ctx.string += '()';
             }
-          }
-          comment.see.unshift(tag);
-          comment.tags.splice(i, 1);
-          break;
-        case 'event':
-          var str = tag.string.replace(/\\n/g, '\n');
-          tag.string = md.parse(str).replace(/\n/g, '\\n').replace(/'/g, '&#39;');
-          comment.events || (comment.events = []);
-          comment.events.unshift(tag);
-          comment.tags.splice(i, 1);
+            break;
         }
       }
 
-      if (!prop) {
-        methods.push(comment);
-      }
-    });
+      console.log(ctx);
 
-    methods = methods.filter(ignored);
-    props = props.filter(ignored);
+      // Backwards compat
+      if (typeof ctx.constructor === 'string') {
+        ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;
+      } else {
+        ctx.anchorId = `${ctx.name.toLowerCase()}_${ctx.name}`;
+      }
 
-    function ignored (method) {
-      if (method.ignore) {
-        return false;
-      }
-      // Ignore eslint declarations
-      if (method.description && method.description.full &&
-        method.description.full.indexOf('<p>eslint') === 0) {
-        return false;
-      }
-      return true;
+      ctx.description = highlight(prop.description.full.replace(/<br \/>/ig, ' '));
+
+      data.props.push(ctx);
     }
 
-    if (0 === methods.length + props.length) return;
-
-    // add constructor to properties too
-    methods.some(function (method) {
-      if (method.ctx && 'method' === method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
-        props.forEach(function (prop) {
-          prop.ctx.constructor = method.ctx.constructor;
-        });
-        return true;
-      }
-      return false;
-    });
-
-    var len = methods.length;
-    while (len--) {
-      method = methods[len];
-      if (method.ctx && method.ctx.receiver) {
-        var stat = methods.splice(len, 1)[0];
-        statics.unshift(stat);
-      }
-    }
-
-    out.push({
-        title: title
-      , fulltitle: fulltitle
-      , cleantitle: title.replace(/[\.\/#]/g, '-')
-      , methods: methods
-      , props: props
-      , statics: statics
-      , hasPublic: hasPublic(methods, props, statics)
-    });
-  });
-}
-
-function hasPublic () {
-  for (var i = 0; i < arguments.length; ++i) {
-    var arr = arguments[i];
-    for (var j = 0; j < arr.length; ++j) {
-      var item = arr[j];
-      if (!item.ignore && !item.isPrivate) return true;
-    }
+    out.push(data);
   }
-  return false;
 }
 
-// add "class='language'" to our <pre><code> elements
-function highlight (o) {
-  o.full = fix(o.full);
-  o.summary = fix(o.summary);
-  o.body = fix(o.body);
-}
-
-function fix (str) {
+function highlight(str) {
   return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function (_, $1, $2, $3) {
-
-    // parse out the ```language
-    var code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
+    const code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
 
     if ('js' === code[1] || !code[1]) {
       code[1] = 'javascript';
     }
 
-    return $1
-          + hl.highlight(code[1], code[2]).value.trim()
-          + $3;
+    return $1 + hl.highlight(code[1], code[2]).value.trim() + $3;
   });
-}
-
-function order (docs) {
-  var sortByCtxName = function (a, b) {
-    if (!a.ctx) {
-      console.error('missing ctx', a);
-    }
-    if (!b.ctx) {
-      console.error('missing ctx', b);
-    }
-    return a.ctx.name.localeCompare(b.ctx.name);
-  };
-
-  // want index first
-  for (var i = 0; i < docs.length; ++i) {
-    var doc = docs[i];
-
-    if ('index.js' === doc.title) {
-      docs.unshift(docs.splice(i, 1)[0]);
-    } else if ('collection.js' === doc.title) {
-      docs.push(docs.splice(i, 1)[0]);
-    }
-
-    // sort methods, statics and properties alphabetically
-    doc.methods.sort(sortByCtxName);
-    doc.statics.sort(sortByCtxName);
-    doc.props.sort(sortByCtxName);
-  }
 }

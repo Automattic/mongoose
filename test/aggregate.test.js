@@ -1,12 +1,16 @@
+'use strict';
+
 /**
  * Module dependencies
  */
 
-var start = require('./common');
-var Aggregate = require('../lib/aggregate');
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
+const co = require('co');
+const start = require('./common');
+const assert = require('power-assert');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const Aggregate = require('../lib/aggregate');
 
 /**
  * Test data
@@ -22,7 +26,7 @@ var EmployeeSchema = new Schema({
 
 mongoose.model('Employee', EmployeeSchema);
 
-function setupData(callback) {
+function setupData(db, callback) {
   var saved = 0;
   var emps = [
     { name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred'] },
@@ -30,7 +34,6 @@ function setupData(callback) {
     { name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob' },
     { name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol' }
   ];
-  var db = start();
   var Employee = db.model('Employee');
 
   emps.forEach(function(data) {
@@ -38,7 +41,7 @@ function setupData(callback) {
 
     emp.save(function() {
       if (++saved === emps.length) {
-        callback(db);
+        callback();
       }
     });
   });
@@ -70,6 +73,16 @@ function onlyTestMongo34(ctx, done) {
  */
 
 describe('aggregate: ', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('append', function() {
     it('(pipeline)', function(done) {
       var aggregate = new Aggregate();
@@ -135,12 +148,6 @@ describe('aggregate: ', function() {
         aggregate.append([]);
       });
 
-      done();
-    });
-
-    it('called from constructor', function(done) {
-      var aggregate = new Aggregate({ $a: 1 }, { $b: 2 }, { $c: 3 });
-      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
       done();
     });
   });
@@ -506,17 +513,8 @@ describe('aggregate: ', function() {
   });
 
   describe('exec', function() {
-    var db;
-
     before(function(done) {
-      setupData(function(_db) {
-        db = _db;
-        done();
-      });
-    });
-
-    after(function(done) {
-      db.close(done);
+      setupData(db, done);
     });
 
     it('project', function(done) {
@@ -813,16 +811,16 @@ describe('aggregate: ', function() {
     });
 
     describe('error when empty pipeline', function() {
-      it('without a callback', function(done) {
+      it('without a callback', function() {
         var agg = new Aggregate;
 
         agg.model(db.model('Employee'));
         var promise = agg.exec();
         assert.ok(promise instanceof mongoose.Promise);
-        promise.onResolve(function(err) {
-          assert.ok(err);
-          assert.equal(err.message, 'Aggregate has empty pipeline');
-          done();
+
+        return promise.catch(error => {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('empty pipeline') !== -1, error.message);
         });
       });
 
@@ -864,14 +862,16 @@ describe('aggregate: ', function() {
         var m = db.model('Employee');
         var match = { $match: { sal: { $gt: 15000 } } };
         var pref = 'primaryPreferred';
-        var aggregate = m.aggregate(match).read(pref);
+        var aggregate = m.aggregate([match]).read(pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);
+          aggregate.option({maxTimeMS: 1000});
         }
 
         assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {
           assert.equal(aggregate.options.allowDiskUse, true);
+          assert.equal(aggregate.options.maxTimeMS, 1000);
         }
 
         aggregate.
@@ -885,16 +885,6 @@ describe('aggregate: ', function() {
     });
 
     describe('middleware (gh-5251)', function() {
-      var db;
-
-      before(function() {
-        db = start();
-      });
-
-      after(function(done) {
-        db.close(done);
-      });
-
       it('pre', function(done) {
         var s = new Schema({ name: String });
 
@@ -1027,25 +1017,19 @@ describe('aggregate: ', function() {
     });
   });
 
-  it('cursor (gh-3160)', function(done) {
-    var db = start();
+  it('cursor (gh-3160)', function() {
+    const MyModel = db.model('gh3160', { name: String });
 
-    var MyModel = db.model('gh3160', { name: String });
+    return co(function * () {
+      yield MyModel.create({ name: 'test' });
 
-    MyModel.create({ name: 'test' }, function(error) {
-      assert.ifError(error);
-      MyModel.
+      const cursor = MyModel.
         aggregate([{ $match: { name: 'test' } }, { $project: { name: '$name' } }]).
         allowDiskUse(true).
-        cursor({ batchSize: 2500, async: true }).
-        exec(function(error, cursor) {
-          assert.ifError(error);
-          assert.ok(cursor);
-          cursor.toArray(function(error) {
-            assert.ifError(error);
-            db.close(done);
-          });
-        });
+        cursor({ batchSize: 2500 }).
+        exec();
+
+      assert.ok(cursor.eachAsync);
     });
   });
 
@@ -1065,8 +1049,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() with useMongooseAggCursor (gh-5145)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh5145', { name: String });
 
     var cursor = MyModel.
@@ -1079,8 +1061,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() with useMongooseAggCursor works (gh-5145) (gh-5394)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh5394', { name: String });
 
     MyModel.create({ name: 'test' }, function(error) {
@@ -1103,8 +1083,6 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() eachAsync (gh-4300)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh4300', { name: String });
 
     var cur = 0;
@@ -1118,10 +1096,10 @@ describe('aggregate: ', function() {
             var _cur = cur;
             assert.equal(doc.name, expectedNames[cur]);
             return {
-              then: function(onResolve) {
+              then: function(resolve) {
                 setTimeout(function() {
                   assert.equal(_cur, cur++);
-                  onResolve();
+                  resolve();
                 }, 50);
               }
             };
@@ -1134,26 +1112,23 @@ describe('aggregate: ', function() {
   });
 
   it('ability to add noCursorTimeout option (gh-4241)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh4241', {
       name: String
     });
 
-    MyModel.
+    const cursor = MyModel.
       aggregate([{ $match: { name: 'test' } }]).
       addCursorFlag('noCursorTimeout', true).
-      cursor({ async: true }).
-      exec(function(error, cursor) {
-        assert.ifError(error);
-        assert.ok(cursor.s.cmd.noCursorTimeout);
-        done();
-      });
+      cursor().
+      exec();
+
+    cursor.once('cursor', cursor => {
+      assert.ok(cursor.s.cmd.noCursorTimeout);
+      done();
+    });
   });
 
   it('query by document (gh-4866)', function(done) {
-    var db = start();
-
     var MyModel = db.model('gh4866', {
       name: String
     });
@@ -1167,8 +1142,6 @@ describe('aggregate: ', function() {
   });
 
   it('sort by text score (gh-5258)', function(done) {
-    var db = start();
-
     var mySchema = new Schema({ test: String });
     mySchema.index({ test: 'text' });
     var M = db.model('gh5258', mySchema);

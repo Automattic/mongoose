@@ -6,7 +6,7 @@ var start = require('./common'),
     Schema = mongoose.Schema;
 
 describe('model', function() {
-  var schema;
+  var db, schema;
 
   function getModel(db) {
     return db.model('GeoSearch', schema, 'geosearch-' + random());
@@ -19,11 +19,15 @@ describe('model', function() {
       type: String
     });
     schema.index({pos: 'geoHaystack', type: 1}, {bucketSize: 1});
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   describe('geoSearch', function() {
     it('works', function(done) {
-      var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
@@ -59,14 +63,13 @@ describe('model', function() {
             Geo.geoSearch({type: 'place'}, {near: [40, 40], maxDistance: 5}, function(err, results) {
               assert.ifError(err);
               assert.equal(results.length, 0);
-              db.close(done);
+              done();
             });
           });
         }
       });
     });
     it('works with lean', function(done) {
-      var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
@@ -99,13 +102,12 @@ describe('model', function() {
             assert.equal(results[0]._id, geos[0].id);
             assert.strictEqual(results[0].id, undefined);
             assert.ok(!(results[0] instanceof Geo));
-            db.close(done);
+            done();
           });
         }
       });
     });
     it('throws the correct error messages', function(done) {
-      var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
@@ -129,7 +131,7 @@ describe('model', function() {
                 Geo.geoSearch({type: 'test'}, {near: [1, 2]}, function(err) {
                   assert.ok(err);
                   assert.ok(/maxDistance needs a number/.test(err));
-                  db.close(done);
+                  done();
                 });
               });
             });
@@ -141,14 +143,13 @@ describe('model', function() {
       var db = start();
       var Geo = getModel(db);
 
-      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function() {});
+      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {
-      var db = start();
       var Geo = getModel(db);
       Geo.on('index', function(err) {
         assert.ifError(err);
@@ -160,17 +161,16 @@ describe('model', function() {
           assert.doesNotThrow(function() {
             promise = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
           });
-          function validate(ret, stat) {
+          function validate(ret) {
             assert.equal(ret.length, 1);
             assert.equal(ret[0].pos[0], 10);
             assert.equal(ret[0].pos[1], 10);
-            assert.ok(stat);
           }
 
           function finish() {
-            db.close(done);
+            done();
           }
-          promise.then(validate, assert.ifError).then(finish).end();
+          promise.then(validate, assert.ifError).then(finish);
         });
       });
     });

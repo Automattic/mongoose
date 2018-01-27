@@ -16,6 +16,7 @@ describe('types.subdocument', function() {
   var GrandChildSchema;
   var ChildSchema;
   var ParentSchema;
+  var db;
 
   before(function() {
     GrandChildSchema = new Schema({
@@ -33,6 +34,11 @@ describe('types.subdocument', function() {
     });
 
     mongoose.model('Parent-3589-Sub', ParentSchema);
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   it('returns a proper ownerDocument (gh-3589)', function(done) {
@@ -53,7 +59,7 @@ describe('types.subdocument', function() {
     done();
   });
   it('not setting timestamps in subdocuments', function() {
-    var Thing = mongoose.model('Thing', new Schema({
+    var Thing = db.model('Thing', new Schema({
       subArray: [{
         testString: String
       }]
@@ -67,24 +73,19 @@ describe('types.subdocument', function() {
       }]
     });
     var id;
-    thingy.save(function(err, item) {
-      assert(!err);
-      id = item._id;
-    })
-    .then(function() {
-      var thingy2 = {
-        subArray: [{
-          testString: 'Test 2'
-        }]
-      };
-      return Thing.update({
-        _id: id
-      }, {$set: thingy2});
-    })
-    .then(function() {
-      mongoose.connection.close();
-    }, function(reason) {
-      assert(!reason);
-    });
+    thingy.save().
+      then(function() {
+        id = thingy._id;
+      }).
+      then(function() {
+        var thingy2 = {
+          subArray: [{
+            testString: 'Test 2'
+          }]
+        };
+        return Thing.update({
+          _id: id
+        }, {$set: thingy2});
+      });
   });
 });

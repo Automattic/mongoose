@@ -9,9 +9,17 @@ var start = require('./common'),
     Schema = mongoose.Schema;
 
 describe('schema alias option', function() {
-  it('works with all basic schema types', function() {
-    var db = start();
+  var db;
 
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
+  it('works with all basic schema types', function(done) {
     var schema = new Schema({
       string:   { type: String, alias: 'StringAlias' },
       number:   { type: Number, alias: 'NumberAlias' },
@@ -45,25 +53,21 @@ describe('schema alias option', function() {
       assert.equal(s.mixed, s.MixedAlias);
       assert.equal(s.objectId, s.ObjectIdAlias);
       assert.equal(s.array, s.ArrayAlias);
+      done();
     });
   });
 
-  it('works with nested schema types', function() {
-    var db = start();
-
+  it('works with nested schema types', function(done) {
     var schema = new Schema({
       nested: {
-        type: {
-          string:   { type: String, alias: 'StringAlias' },
-          number:   { type: Number, alias: 'NumberAlias' },
-          date:     { type: Date, alias: 'DateAlias' },
-          buffer:   { type: Buffer, alias: 'BufferAlias' },
-          boolean:  { type: Boolean, alias: 'BooleanAlias' },
-          mixed:    { type: Schema.Types.Mixed, alias: 'MixedAlias' },
-          objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
-          array:    { type: [], alias: 'ArrayAlias' }
-        },
-        alias: 'NestedAlias'
+        string:   { type: String, alias: 'StringAlias' },
+        number:   { type: Number, alias: 'NumberAlias' },
+        date:     { type: Date, alias: 'DateAlias' },
+        buffer:   { type: Buffer, alias: 'BufferAlias' },
+        boolean:  { type: Boolean, alias: 'BooleanAlias' },
+        mixed:    { type: Schema.Types.Mixed, alias: 'MixedAlias' },
+        objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
+        array:    { type: [], alias: 'ArrayAlias' }
       }
     });
 
@@ -83,7 +87,6 @@ describe('schema alias option', function() {
       assert.ifError(err);
 
       // Comparing with aliases
-      assert.equal(s.nested, s.NestedAlias);
       assert.equal(s.nested.string, s.StringAlias);
       assert.equal(s.nested.number, s.NumberAlias);
       assert.equal(s.nested.date, s.DateAlias);
@@ -92,6 +95,7 @@ describe('schema alias option', function() {
       assert.equal(s.nested.mixed, s.MixedAlias);
       assert.equal(s.nested.objectId, s.ObjectIdAlias);
       assert.equal(s.nested.array, s.ArrayAlias);
+      done();
     });
   });
 

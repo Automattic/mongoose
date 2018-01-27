@@ -1,8 +1,74 @@
-4.13.9 / 2017-01-07
+5.0.1 / 2018-01-19
+==================
+ * fix(document): make validate() not resolve to document #6014
+ * fix(model): make save() not return DocumentNotFoundError if using fire-and-forget writes #6012
+ * fix(aggregate): make options() work as advertised #6011 [spederiva](https://github.com/spederiva)
+ * docs(queries): fix code samples #6008
+
+5.0.0 / 2018-01-17
+==================
+ * test: refactor tests to use start fewer connections #5985 [fenanquin](https://github.com/fenanquin)
+ * feat: add global bufferCommands option #5879
+ * docs: new docs site and build system #5976
+ * test: increase timeout on slow test cases #5968 [fenanquin](https://github.com/fenanquin)
+ * fix: avoid casting out array filter elements #5965
+ * feat: add Model.watch() wrapper #5964
+ * chore: replace istanbul with nyc #5962 [ChristianMurphy](https://github.com/ChristianMurphy)
+
+4.13.9 / 2018-01-07
 ===================
  * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)
  * fix: upgrade mongodb -> 2.2.34 for ipv6 and autoReconnect fixes #5794 #5760
  * docs: use useMongooseAggCursor for aggregate docs #2955
+
+5.0.0-rc2 / 2018-01-04
+======================
+ * fix: add cleaner warning about no longer needing `useMongoClient` in 5.x #5961
+ * chore: update acquit -> 0.5.1 for minor security patch #5961 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs: add docs for mongoose 4.x at http://mongoosejs.com/docs/4.x #5959
+ * docs: add link to migration guide #5957
+ * chore: update eslint to version 4.14.0 #5955 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * chore: update mocha to version 4.1.0 [ChristianMurphy](https://github.com/ChristianMurphy)
+
+5.0.0-rc1 / 2018-01-02
+======================
+ * fix(index): use pluralize correctly for `mongoose.model()` #5958
+ * fix: make mquery use native promises by default #5945
+ * fix(connection): ensure 'joined' and 'left' events get bubbled up #5944
+
+5.0.0-rc0 / 2017-12-28
+======================
+ * BREAKING CHANGE: always use mongoose aggregation cursor when using `.aggregate().cursor()` #5941
+ * BREAKING CHANGE: attach query middleware when compiling model #5939
+ * BREAKING CHANGE: `emitIndexErrors` is on by default, failing index build will throw uncaught error if not handled #5910
+ * BREAKING CHANGE: remove precompiled browser bundle #5895
+ * feat: add `mongoose.pluralize()` function #5877
+ * BREAKING CHANGE: remove `passRawResult` option for `findOneAndUpdate`, use `rawResult` #5869
+ * BREAKING CHANGE: implicit async validators (based on number of function args) are removed, return a promise instead #5824
+ * BREAKING CHANGE: fail fast if user sets a unique index on `_id` #5820 [varunjayaraman](https://github.com/varunjayaraman)
+ * BREAKING CHANGE: mapReduce resolves to an object with 2 keys rather than 2 separate args #5816
+ * BREAKING CHANGE: `mongoose.connect()` returns a promise, removed MongooseThenable #5796
+ * BREAKING CHANGE: query stream removed, use `cursor()` instead #5795
+ * BREAKING CHANGE: use MongoDB driver 3.0.0, drop support for MongoDB server < 3.0.0 #5791 #4740
+ * BREAKING CHANGE: remove support for `$pushAll`, remove `usePushEach` option #5670
+ * BREAKING CHANGE: make date casting use native Date #5395 [varunjayaraman](https://github.com/varunjayaraman)
+ * BREAKING CHANGE: remove `runSettersOnQuery`, always run setters on query #5340
+ * BREAKING CHANGE: array of length 0 now satisfies `required: true` for arays #5139 [wlingke](https://github.com/wlingke)
+ * BREAKING CHANGE: remove `saveErrorIfNotFound`, always error out if `save()` did not update a document #4973
+ * BREAKING CHANGE: don't execute getters in reverse order #4835
+ * BREAKING CHANGE: make boolean casting more strict #4245
+ * BREAKING CHANGE: `toObject()` and `toJSON()` option parameter merges with defaults rather than overwriting #4131
+ * feat: allow setting `default` on `_id` #4069
+ * BREAKING CHANGE: `deleteX()` and `remove()` promise resolves to the write object result #4013
+ * feat: support returning a promise from middleware functions #3779
+ * BREAKING CHANGE: don't return a promise if callback specified #3670
+ * BREAKING CHANGE: only cast `update()`, `updateX()`, `replaceOne()`, `remove()`, `deleteX()` in exec #3529
+ * BREAKING CHANGE: sync errors in middleware functions are now handled #3483
+ * BREAKING CHANGE: post hooks get flow control #3232
+ * BREAKING CHANGE: deduplicate hooks when merging discriminator schema #2945
+ * BREAKING CHANGE: use native promises by default, remove support for mpromise #2917
+ * BREAKING CHANGE: remove `retainKeyOrder`, always use forward order when iterating through objects #2749
+ * BREAKING CHANGE: `aggregate()` no longer accepts a spread #2716
 
 4.13.8 / 2017-12-27
 ===================

@@ -3691,7 +3691,7 @@ describe('document', function() {
     });
 
     it('timestamps with nested paths (gh-5051)', function(done) {
-      var schema = new Schema({ props: Object }, {
+      var schema = new Schema({ props: {} }, {
         timestamps: {
           createdAt: 'props.createdAt',
           updatedAt: 'props.updatedAt'
@@ -3709,6 +3709,23 @@ describe('document', function() {
         assert.ok(doc.props.updatedAt.valueOf() >= now);
         done();
       });
+    });
+
+    it('Declaring defaults in your schema with timestamps defined (gh-6024)', function(done) {
+      var schemaDefinition = {
+        name: String,
+        misc: {
+          hometown: String,
+          isAlive: { type: Boolean, default: true }
+        }
+      };
+
+      var schemaWithTimestamps = new Schema(schemaDefinition, {timestamps: {createdAt: 'misc.createdAt'}});
+      var PersonWithTimestamps = db.model('Person_timestamps', schemaWithTimestamps);
+      var dude = new PersonWithTimestamps({ name: 'Keanu', misc: {hometown: 'Beirut'} });
+      assert.equal(dude.misc.isAlive, true);
+
+      done();
     });
 
     it('supports $where in pre save hook (gh-4004)', function(done) {

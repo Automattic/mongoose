@@ -34,7 +34,8 @@ block content
     - [Objectid](./api.html#schema-objectid-js)
     - Array
   h4 Example
-  :js
+  :markdown
+    ```javaScript
     var schema = new Schema({
       name:    String,
       binary:  Buffer,
@@ -79,12 +80,12 @@ block content
     m.ofMixed = [1, [], 'three', { four: 5 }];
     m.nested.stuff = 'good';
     m.save(callback);
-
+    ```
   h3 SchemaType Options
   :markdown
     You can declare a schema type using the type directly, or an object with
     a `type` property.
-  :js
+    ```javascript
     var schema1 = new Schema({
       test: String // `test` is a path of type String
     });
@@ -92,16 +93,18 @@ block content
     var schema2 = new Schema({
       test: { type: String } // `test` is a path of type string
     });
+    ```
   :markdown
     In addition to the type property, you can specify additional properties
     for a path. For example, if you want to lowercase a string before saving:
-  :js
+    ```javascript
     var schema2 = new Schema({
       test: {
         type: String,
         lowercase: true // Always convert `test` to lowercase
       }
     });
+    ```
   :markdown
     The `lowercase` property only works for strings. There are certain options
     which apply for all schema types, and some that apply for specific schema
@@ -116,7 +119,7 @@ block content
     * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
     * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](http://mongoosejs.com/docs/guide.html#virtuals) with the given name that gets/sets this path.
 
-  :js
+    ```javascript
     var numberSchema = new Schema({
       integerOnly: {
         type: Number,
@@ -135,7 +138,7 @@ block content
     doc.i = 3.001;
     doc.integerOnly; // 3
     doc.i; // 3
-
+    ```
   h5 Indexes
   p
   :markdown
@@ -146,7 +149,7 @@ block content
     * `index`: boolean, whether to define an [index](https://docs.mongodb.com/manual/indexes/) on this property.
     * `unique`: boolean, whether to define a [unique index](https://docs.mongodb.com/manual/core/index-unique/) on this property.
     * `sparse`: boolean, whether to define a [sparse index](https://docs.mongodb.com/manual/core/index-sparse/) on this property.
-  :js
+    ```javascript
     var schema2 = new Schema({
       test: {
         type: String,
@@ -155,6 +158,7 @@ block content
         // specifying `index: true` is optional if you do `unique: true`
       }
     });
+    ```
   h5 String
   :markdown
     * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
@@ -178,7 +182,7 @@ block content
   :markdown
     [Built-in `Date` methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) are [__not__ hooked into](https://github.com/Automattic/mongoose/issues/1598) the mongoose change tracking logic which in English means that if you use a `Date` in your document and modify it with a method like `setMonth()`, mongoose will be unaware of this change and `doc.save()` will not persist this modification. If you must modify `Date` types using built-in methods, tell mongoose about the change with `doc.markModified('pathToYourDate')` before saving.
 
-  :js
+    ```javascript
     var Assignment = mongoose.model('Assignment', { dueDate: Date });
     Assignment.findOne(function (err, doc) {
       doc.dueDate.setMonth(3);
@@ -187,31 +191,37 @@ block content
       doc.markModified('dueDate');
       doc.save(callback); // works
     })
-
+    ```
   h4#mixed Mixed
   p An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
-  :js
+  :markdown
+    ```javascript
     var Any = new Schema({ any: {} });
     var Any = new Schema({ any: Object });
     var Any = new Schema({ any: Schema.Types.Mixed });
+    ```
   p
     | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the
     code .markModified(path)
     |  method of the document passing the path to the Mixed type you just changed.
-  :js
+  :markdown
+    ```javascript
     person.anything = { x: [3, 4, { y: "changed" }] };
     person.markModified('anything');
     person.save(); // anything will now get saved
+    ```
   h4#objectids ObjectIds
   p
     | To specify a type of ObjectId, use
     code Schema.Types.ObjectId
     |  in your declaration.
-  :js
+  :markdown
+    ```javascript
     var mongoose = require('mongoose');
     var ObjectId = mongoose.Schema.Types.ObjectId;
     var Car = new Schema({ driver: ObjectId });
     // or just Schema.ObjectId for backwards compatibility with v2
+    ```
   h4#arrays Arrays
   p
     | Provide creation of arrays of
@@ -219,7 +229,8 @@ block content
     |  or
     a(href="./subdocs.html") Sub-Documents
     |.
-  :js
+  :markdown
+    ```javascript
     var ToySchema = new Schema({ name: String });
     var ToyBox = new Schema({
       toys: [ToySchema],
@@ -228,34 +239,42 @@ block content
       numbers: [Number]
       // ... etc
     });
+    ```
   p
     | Note: specifying an empty array is equivalent to
     code Mixed
     |. The following all create arrays of
     code Mixed
     |:
-  :js
+  :markdown
+    ```javascript
     var Empty1 = new Schema({ any: [] });
     var Empty2 = new Schema({ any: Array });
     var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
     var Empty4 = new Schema({ any: [{}] });
+    ```
   p
     | Arrays implicitly have a default value of `[]` (empty array).
-  :js
+  :markdown
+    ```javascript
     var Toy = mongoose.model('Test', ToySchema);
     console.log((new Toy()).toys); // []
+    ```
   p
     | To overwrite this default, you need to set the default value to `undefined`
-  :js
+  :markdown
+    ```javascript
     var ToySchema = new Schema({
       toys: {
         type: [ToySchema],
         default: undefined
       }
     });
+    ```
   p
     | If an array is marked as `required`, it must have at least one element.
-  :js
+  :markdown
+    ```javascript
     var ToySchema = new Schema({
       toys: {
         type: [ToySchema],
@@ -266,6 +285,7 @@ block content
     Toy.create({ toys: [] }, function(error) {
       console.log(error.errors['toys'].message); // Path "toys" is required.
     });
+    ```
   h3#customtypes Creating Custom Types
   p
     | Mongoose can also be extended with custom SchemaTypes. Search the
@@ -286,7 +306,7 @@ block content
   :markdown
     The `schema.path()` function returns the instantiated schema type for a
     given path.
-  :js
+    ```javascript
     var sampleSchema = new Schema({ name: { type: String, required: true } });
     console.log(sampleSchema.path('name'));
     // Output looks like:
@@ -298,6 +318,7 @@ block content
      *   instance: 'String',
      *   validators: ...
      */
+     ```
   :markdown
     You can use this function to inspect the schema type for a given path,
     including what validators it has and what the type is.

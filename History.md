@@ -1,3 +1,11 @@
+4.13.10 / 2017-01-28
+====================
+ * docs(model+query): add lean() option to Model helpers #5996 [aguyinmontreal](https://github.com/aguyinmontreal)
+ * fix: use lazy loading so we can build mongoose with webpack #5993 #5842
+ * docs(connections): clarify multi-mongos with useMongoClient for 4.x docs #5984
+ * fix(populate): handle populating embedded discriminator paths #5970
+ * docs(query+aggregate): add more detail re: maxTimeMS #4066
+
 5.0.1 / 2018-01-19
 ==================
  * fix(document): make validate() not resolve to document #6014

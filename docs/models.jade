@@ -6,10 +6,11 @@ block content
     [Models](./api.html#model-js) are fancy constructors compiled from our `Schema` definitions. Instances of these models represent [documents](./documents.html) which can be saved and retrieved from our database. All document creation and retrieval from the database is handled by these models.
 
   h3 Compiling your first model
-  :js
+  :markdown
+    ```javascript
     var schema = new mongoose.Schema({ name: 'string', size: 'string' });
     var Tank = mongoose.model('Tank', schema);
-
+    ```
   :markdown
     The first argument is the _singular_ name of the collection your model is for. ** Mongoose automatically looks for the _plural_ version of your model name. **
     Thus, for the example above, the model Tank is for the **tanks** collection in the database.
@@ -18,7 +19,7 @@ block content
   h3 Constructing documents
   :markdown
     [Documents](./documents.html) are instances of our model. Creating them and saving to the database is easy:
-  :js
+    ```javascript
     var Tank = mongoose.model('Tank', yourSchema);
 
     var small = new Tank({ size: 'small' });
@@ -33,35 +34,39 @@ block content
       if (err) return handleError(err);
       // saved!
     })
+    ```
   :markdown
     Note that no tanks will be created/removed until the connection your model
     uses is open. Every model has an associated connection. When you use
     `mongoose.model()`, your model will use the default mongoose connection.
-  :js
+    ```javascript
     mongoose.connect('localhost', 'gettingstarted');
+    ```
   :markdown
     If you create a custom connection, use that connection's `model()` function
     instead.
-  :js
+    ```javascript
     var connection = mongoose.createConnection('mongodb://localhost:27017/test');
     var Tank = connection.model('Tank', yourSchema);
-
+    ```
   h3 Querying
   :markdown
     Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retreived using each `models` [find](./api.html#model_Model.find), [findById](./api.html#model_Model.findById), [findOne](./api.html#model_Model.findOne), or [where](./api.html#model_Model.where) static methods.
 
-  :js
+    ```javascript
     Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
+    ```
   :markdown
     See the chapter on [querying](./queries.html) for more details on how to use the [Query](./api.html#query-js) api.
   h3 Removing
   :markdown
     Models have a static `remove` method available for removing all documents matching `conditions`.
-  :js
+    ```javascript
     Tank.remove({ size: 'large' }, function (err) {
       if (err) return handleError(err);
       // removed!
     });
+    ```
   h3 Updating
   :markdown
     Each `model` has its own `update` method for modifying documents in the database without returning them to your application. See the [API](./api.html#model_Model.update) docs for more detail.

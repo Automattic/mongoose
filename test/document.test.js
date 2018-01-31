@@ -21,7 +21,8 @@ var EmbeddedDocument = require('../lib/types/embedded');
 var Query = require('../lib/query');
 var validator = require('validator');
 
-var _ = require('lodash');
+const _ = require('lodash');
+const co = require('co');
 
 /**
  * Test Document constructor.
@@ -4811,6 +4812,39 @@ describe('document', function() {
       assert.deepEqual(t2.toObject().nestedArr, [[0, 1]]);
 
       done();
+    });
+
+    it('save() depopulates pushed arrays (gh-6048)', function() {
+      const blogPostSchema = new Schema({
+        comments: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'gh6048_0'
+        }]
+      });
+
+      const BlogPost = db.model('gh6048', blogPostSchema);
+
+      const commentSchema = new Schema({
+        text: String
+      });
+
+      const Comment = db.model('gh6048_0', commentSchema);
+
+      return co(function*() {
+        let blogPost = yield BlogPost.create({});
+        const comment = yield Comment.create({ text: 'Hello' });
+
+        blogPost = yield BlogPost.findById(blogPost);
+        blogPost.comments.push(comment);
+        yield blogPost.save();
+
+        const savedBlogPost = yield BlogPost.collection.
+          findOne({ _id: blogPost._id });
+        assert.equal(savedBlogPost.comments.length, 1);
+        assert.equal(savedBlogPost.comments[0].constructor.name, 'ObjectID');
+        assert.equal(savedBlogPost.comments[0].toString(),
+          blogPost.comments[0]._id.toString());
+      });
     });
 
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {

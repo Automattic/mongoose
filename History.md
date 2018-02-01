@@ -1,3 +1,11 @@
+5.0.3 / 2018-01-31
+==================
+ * fix: consistently use process.nextTick() to avoid sinon.useFakeTimers() causing ops to hang #6074
+ * docs(aggregate): fix typo #6072 [adursun](https://github.com/adursun)
+ * chore: add return type to `mongoose.model()` docs [bryant1410](https://github.com/bryant1410)
+ * fix(document): depopulate push()-ed docs when saving #6048
+ * fix: upgrade mongodb -> 3.0.2 #6019
+
 5.0.2 / 2018-01-28
 ==================
  * fix(schema): do not overwrite default values in schema when nested timestamps are provided #6024 [cdeveas](https://github.com/cdeveas)

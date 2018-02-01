@@ -58,6 +58,7 @@ describe('types.subdocument', function() {
     assert.equal(p._id, p.children[0].child.ownerDocument()._id);
     done();
   });
+
   it('not setting timestamps in subdocuments', function() {
     var Thing = db.model('Thing', new Schema({
       subArray: [{
@@ -73,7 +74,7 @@ describe('types.subdocument', function() {
       }]
     });
     var id;
-    thingy.save().
+    return thingy.save().
       then(function() {
         id = thingy._id;
       }).

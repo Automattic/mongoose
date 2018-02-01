@@ -46,7 +46,7 @@ block content
     not when you call `MyModel.remove()`.
     **Note:** The `create()` function fires `save()` hooks.
 
-    <h3 id="pre">Pre</h3>
+    <h3 id="pre"><a href="#pre">Pre</a></h3>
 
     There are two types of `pre` hooks, serial and parallel.
 
@@ -126,7 +126,7 @@ block content
     });
     ```
 
-    <h3 id="post">Post middleware</h3>
+    <h3 id="post"><a href="#post">Post middleware</a></h3>
 
     [post](/docs/api.html#schema_Schema-post) middleware are executed _after_
     the hooked method and all of its `pre` middleware have completed.
@@ -146,7 +146,7 @@ block content
     });
     ```
 
-    <h3 id="post-async">Asynchronous Post Hooks</h3>
+    <h3 id="post-async"><a href="#post-async">Asynchronous Post Hooks</a></h3>
 
     If your post hook function takes at least 2 parameters, mongoose will
     assume the second parameter is a `next()` function that you will call to
@@ -169,7 +169,7 @@ block content
     });
     ```
 
-    <h3 id="order">Save/Validate Hooks</h3>
+    <h3 id="order"><a href="#order">Save/Validate Hooks</a></h3>
 
     The `save()` function triggers `validate()` hooks, because mongoose
     has a built-in `pre('save')` hook that calls `validate()`. This means
@@ -191,7 +191,7 @@ block content
     });
     ```
 
-    <h3 id="notes">Notes on findAndUpdate() and Query Middleware</h3>
+    <h3 id="notes"><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></h3>
 
     Pre and post `save()` hooks are **not** executed on `update()`,
     `findOneAndUpdate()`, etc. You can see a more detailed discussion why in
@@ -228,7 +228,7 @@ block content
     });
     ```
 
-    <h3 id="error-handling">Error Handling Middleware</h3>
+    <h3 id="error-handling"><a href="#error-handling">Error Handling Middleware</a></h3>
 
     _New in 4.5.0_
 

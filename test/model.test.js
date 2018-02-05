@@ -5172,6 +5172,25 @@ describe('Model', function() {
       });
     });
 
+    it('alias with lean virtual (gh-6069)', function() {
+      const schema = new mongoose.Schema({
+        name: {
+          type: String,
+          alias: 'nameAlias'
+        }
+      });
+
+      const Model = db.model('gh6069', schema);
+
+      return co(function*() {
+        const doc = yield Model.create({ name: 'Val' });
+
+        const res = yield Model.findById(doc._id).lean();
+
+        assert.equal(schema.virtual('nameAlias').getters[0].call(res), 'Val');
+      });
+    });
+
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
       var s1 = new Schema({
         array: mongoose.Schema.Types.Mixed

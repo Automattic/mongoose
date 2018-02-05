@@ -1,18 +1,20 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var CastError = require('../lib/error/cast');
-var start = require('./common');
-var assert = require('power-assert');
-var mongoose = start.mongoose;
-var random = require('../lib/utils').random;
-var Utils = require('../lib/utils');
-var Schema = mongoose.Schema;
-var ObjectId = Schema.Types.ObjectId;
-var DocumentObjectId = mongoose.Types.ObjectId;
-var _ = require('lodash');
-var uuid = require('uuid');
+const CastError = require('../lib/error/cast');
+const start = require('./common');
+const assert = require('power-assert');
+const mongoose = start.mongoose;
+const random = require('../lib/utils').random;
+const Utils = require('../lib/utils');
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const _ = require('lodash');
+const uuid = require('uuid');
 
 describe('model: findOneAndUpdate:', function() {
   var Comments;

@@ -10,3 +10,6 @@
 **What is the expected behavior?**
 
 **Please mention your node.js, mongoose and MongoDB version.**
+
+<!-- Love mongoose? Please consider supporting our collective:
+👉  https://opencollective.com/mongoose/donate -->

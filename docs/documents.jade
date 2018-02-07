@@ -30,7 +30,7 @@ block content
     });
     ```
 
-    You can also use [`.set()`](http://mongoosejs.com/docs/api.html#document_Document-set)
+    You can also use [`.set()`](./api.html#document_Document-set)
     to modify documents. Under the hood, `tank.size = 'large';` becomes
     `tank.set({ size: 'large' })`.
 
@@ -85,7 +85,7 @@ block content
     ### Overwriting
 
     You can overwrite an entire document using `.set()`. This is handy if you
-    want to change what document is being saved in [middleware](http://mongoosejs.com/docs/middleware.html).
+    want to change what document is being saved in [middleware](./middleware.html).
 
     ```javascript
     Tank.findById(id, function (err, tank) {

@@ -112,7 +112,7 @@ block content
 
     **A**. This is a performance optimization. These empty objects are not saved
     to the database, nor are they in the result `toObject()`, nor do they show
-    up in `JSON.stringify()` output unless you turn off the [`minimize` option](http://mongoosejs.com/docs/guide.html#minimize).
+    up in `JSON.stringify()` output unless you turn off the [`minimize` option](./guide.html#minimize).
 
     The reason for this behavior is that Mongoose's change detection
     and getters/setters are based on [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
@@ -121,11 +121,11 @@ block content
     mongoose defines properties on the `Model` prototype when the model is compiled.
     Because mongoose needs to define getters and setters for `nested.prop`, `nested`
     must always be defined as an object on a mongoose document, even if `nested`
-    is undefined on the underlying [POJO](http://mongoosejs.com/docs/guide.html#minimize).
+    is undefined on the underlying [POJO](./guide.html#minimize).
 
     <hr id="arrow-functions" />
 
-    **Q**. I'm using an arrow function for a [virtual](http://mongoosejs.com/docs/guide.html#virtuals), getter/setter, or [method](http://mongoosejs.com/docs/guide.html#methods) and the value of `this` is wrong.
+    **Q**. I'm using an arrow function for a [virtual](./guide.html#virtuals), getter/setter, or [method](./guide.html#methods) and the value of `this` is wrong.
 
     **A**. Arrow functions [handle the `this` keyword much differently than conventional functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this).
     Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.
@@ -243,7 +243,7 @@ block content
     **Q**. All function calls on my models hang, what am I doing wrong?
 
     **A**. By default, mongoose will buffer your function calls until it can
-    connect to MongoDB. Read the [buffering section of the connection docs](http://mongoosejs.com/docs/connections.html#buffering)
+    connect to MongoDB. Read the [buffering section of the connection docs](./connections.html#buffering)
     for more information.
 
     <hr id="enable_debugging" />

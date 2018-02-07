@@ -1,0 +1,78 @@
+extends layout
+
+block content
+  h2 Using Mongoose With AWS Lambda
+  :markdown
+    [AWS Lambda](https://aws.amazon.com/lambda/) is a popular service for running
+    arbitrary functions without managing individual servers. Using Mongoose in your
+    AWS Lambda functions is easy. Here's a sample function that connects to a
+    MongoDB instance and finds a single document:
+
+    ```javascript
+    // Currently, Lambda only supports node v6, so no native async/await.
+    const co = require('co');
+    const mongoose = require('mongoose');
+
+    let conn = null;
+
+    const uri = 'YOUR CONNECTION STRING HERE';
+
+    exports.handler = function(event, context, callback) {
+      // Make sure to add this so you can re-use `conn` between function calls.
+      // See https://www.mongodb.com/blog/post/serverless-development-with-nodejs-aws-lambda-mongodb-atlas
+      context.callbackWaitsForEmptyEventLoop = false;
+
+      run().
+        then(res => {
+          callback(null, res);
+          console.log('done');
+        }).
+        catch(error => callback(error));
+    };
+
+    function run() {
+      return co(function*() {
+        // Because `conn` is in the global scope, Lambda may retain it between
+        // function calls thanks to `callbackWaitsForEmptyEventLoop`.
+        // This means your Lambda function doesn't have to go through the
+        // potentially expensive process of connecting to MongoDB every time.
+        if (conn == null) {
+          conn = yield mongoose.createConnection(uri);
+          conn.model('Test', new mongoose.Schema({ name: String }));
+        }
+
+        const M = conn.model('Test');
+
+        const doc = yield M.findOne();
+        console.log(doc);
+
+        return doc;
+      });
+    }
+    ```
+
+    To import this function into Lambda, go [the AWS Lambda console](https://console.aws.amazon.com/lambda)
+    and click "Create Function".
+
+    <a href="https://i.imgur.com/FlAD0vT.png"><img src="https://i.imgur.com/FlAD0vT.png"></a>
+
+    Create a function called "mongoose-test" with the below settings:
+
+    <a href="https://i.imgur.com/mEtS2Ij.png"><img src="https://i.imgur.com/mEtS2Ij.png"></a>
+
+    Copy the source code into a file called `lambda.js`. Then run `npm install mongoose co`.
+    Finally, run `zip -r mongoose-test.zip node_modules/ lambda.js` to create a
+    zip that you can upload to Lambda using the "Upload a Zip File" option under "Function code".
+    Make sure you also change the "Handler" input to `lambda.handler` to match the `lambda.js` file's `handler` function.
+
+    <a href="https://i.imgur.com/IO9X570.png"><img src="https://i.imgur.com/IO9X570.png"></a>
+
+    Next, click the "Save" button and then the "Test" button. The "Test" button will
+    ask you to create a new test event, just create one because your inputs don't matter
+    for this example. Then, hit "Test" again to actually run your function:
+
+    <a href="https://i.imgur.com/2UKtWYq.png"><img src="https://i.imgur.com/2UKtWYq.png"></a>
+
+    If you're using Mongoose with AWS Lambda to avoid the overhead of managing servers,
+    we recommend using [MongoDB Atlas](http://mbsy.co/mongodb/28365503), MongoDB's
+    hosted service, so you don't have to manage your own database services either.

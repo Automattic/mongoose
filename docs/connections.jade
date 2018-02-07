@@ -49,7 +49,7 @@ block content
     }, 60000);
 
   :markdown
-    To disable buffering, turn off the [`bufferCommands` option on your schema](http://mongoosejs.com/docs/guide.html#bufferCommands).
+    To disable buffering, turn off the [`bufferCommands` option on your schema](./guide.html#bufferCommands).
     If you have `bufferCommands` on and your connection is hanging, try turning
     `bufferCommands` off to see if you haven't opened a connection properly.
 
@@ -92,7 +92,7 @@ block content
 
   h3#callback Callback
   :markdown
-    The `connect()` function also accepts a callback parameter and returns a [promise](http://mongoosejs.com/docs/promises.html).
+    The `connect()` function also accepts a callback parameter and returns a [promise](./promises.html).
   :js
     mongoose.connect(uri, options, function(error) {
       // Check error in initial connection. There is no 2nd param to the callback.

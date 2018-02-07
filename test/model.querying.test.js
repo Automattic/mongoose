@@ -1952,7 +1952,7 @@ describe('model: querying:', function() {
       Test.find({block: {$lte: 'buffer shtuffs are neat'}}, function(err, tests) {
         cb();
         assert.ifError(err);
-        assert.equal(tests.length, 4);
+        assert.equal(tests.length, 3);
       });
 
       var pending = 9;

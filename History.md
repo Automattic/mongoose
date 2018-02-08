@@ -1,4 +1,9 @@
-4.13.10 / 2017-01-28
+4.13.11 / 2018-02-07
+====================
+ * docs: fix links in 4.x docs #6081
+ * chore: add release script that uses --tag for npm publish for 4.x releases #6063
+
+4.13.10 / 2018-01-28
 ====================
  * docs(model+query): add lean() option to Model helpers #5996 [aguyinmontreal](https://github.com/aguyinmontreal)
  * fix: use lazy loading so we can build mongoose with webpack #5993 #5842
@@ -6,7 +11,7 @@
  * fix(populate): handle populating embedded discriminator paths #5970
  * docs(query+aggregate): add more detail re: maxTimeMS #4066
 
-4.13.9 / 2017-01-07
+4.13.9 / 2018-01-07
 ===================
  * chore: update marked (dev dependency) re: security vulnerability #5951 [ChristianMurphy](https://github.com/ChristianMurphy)
  * fix: upgrade mongodb -> 2.2.34 for ipv6 and autoReconnect fixes #5794 #5760

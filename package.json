@@ -65,7 +65,7 @@
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
     "release": "git push origin master --tags && npm publish",
-    "release-legacy": "git push origin 4.x --tags && npm publish --tag 4.x",
+    "release-legacy": "git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },

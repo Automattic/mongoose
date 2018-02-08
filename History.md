@@ -1,3 +1,8 @@
+4.13.11 / 2018-02-07
+====================
+ * docs: fix links in 4.x docs #6081
+ * chore: add release script that uses --tag for npm publish for 4.x releases #6063
+
 5.0.3 / 2018-01-31
 ==================
  * fix: consistently use process.nextTick() to avoid sinon.useFakeTimers() causing ops to hang #6074

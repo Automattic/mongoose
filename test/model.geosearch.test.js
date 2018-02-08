@@ -139,14 +139,16 @@ describe('model', function() {
         });
       });
     });
+
     it('returns a promise (gh-1614)', function(done) {
-      var db = start();
       var Geo = getModel(db);
 
-      var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
-      assert.ok(prom instanceof mongoose.Promise);
-      db.close();
-      done();
+      Geo.on('index', function() {
+        var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
+        assert.ok(prom instanceof mongoose.Promise);
+
+        prom.then(() => done(), err => done(err));
+      });
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {

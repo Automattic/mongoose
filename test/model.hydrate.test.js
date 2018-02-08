@@ -42,6 +42,8 @@ describe('model', function() {
       B = db.model('model-create', schemaB, 'gh-2637-1');
       B.discriminator('C', schemaC);
       Breakfast = db.model('gh-2637-2', breakfastSchema, 'gh-2637-2');
+
+      return db;
     });
 
     after(function(done) {

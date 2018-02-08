@@ -314,6 +314,7 @@ block content
     - [read](#read)
     - [shardKey](#shardKey)
     - [strict](#strict)
+    - [strictQuery](#strictQuery)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
     - [typeKey](#typeKey)
@@ -568,6 +569,41 @@ block content
     thing.save(); // iAmNotInTheSchema is never saved to the db
     ```
 
+    <h3 id="strictQuery">option: strictQuery</h3>
+
+    For backwards compatibility, the `strict` option does **not** apply to
+    the `filter` parameter for queries.
+
+    ```javascript
+    const mySchema = new Schema({ field: Number }, { strict: true });
+    const MyModel = mongoose.model('Test', mySchema);
+
+    // Mongoose will **not** filter out `notInSchema: 1`, despite `strict: true`
+    MyModel.find({ notInSchema: 1 });
+    ```
+
+    The `strict` option does apply to updates.
+
+    ```javascript
+    // Mongoose will strip out `notInSchema` from the update if `strict` is
+    // not `false`
+    MyModel.updateMany({}, { $set: { notInSchema: 1 } });
+    ```
+
+    Mongoose has a separate `strictQuery` option to toggle strict mode for
+    the `filter` parameter to queries.
+
+    ```javascript
+    const mySchema = new Schema({ field: Number }, {
+      strict: true,
+      strictQuery: true // Turn on strict mode for query filters
+    });
+    const MyModel = mongoose.model('Test', mySchema);
+
+    // Mongoose will strip out `notInSchema: 1` because `strictQuery` is `true`
+    MyModel.find({ notInSchema: 1 });
+    ```
+
     <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
     Exactly the same as the [toObject](#toObject) option but only applies when
@@ -728,7 +764,7 @@ block content
     <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
     If set `timestamps`, mongoose assigns `createdAt` and `updatedAt` fields to
-    your schema, the type assigned is [Date](http://mongoosejs.com/docs/api.html#schema-date-js).
+    your schema, the type assigned is [Date](./api.html#schema-date-js).
 
     By default, the name of two fields are `createdAt` and `updatedAt`, customize
     the field name by setting `timestamps.createdAt` and `timestamps.updatedAt`.

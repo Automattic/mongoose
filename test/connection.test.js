@@ -731,6 +731,14 @@ describe('connections:', function() {
     db.close(done);
   });
 
+  it('dbName option (gh-6106)', function() {
+    const opts = { dbName: 'bacon' };
+    return mongoose.createConnection('mongodb://localhost:27017/test', opts).then(db => {
+      assert.equal(db.name, 'bacon');
+      db.close();
+    });
+  });
+
   describe('modelNames()', function() {
     it('returns names of all models registered on it', function(done) {
       var m = new mongoose.Mongoose;

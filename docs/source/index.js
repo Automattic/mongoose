@@ -16,6 +16,7 @@ exports['docs/populate.jade'] = { guide: true, title: 'Query Population' }
 exports['docs/migration.jade'] = { guide: true, title: 'Migration Guide' }
 exports['docs/contributing.jade'] = { guide: true, title: 'Contributing' }
 exports['docs/connections.jade'] = { guide: true, title: 'Connecting to MongoDB' }
+exports['docs/lambda.jade'] = { guide: true, title: 'Using Mongoose With AWS Lambda' }
 exports['docs/faq.jade'] = { guide: true, title: 'FAQ' }
 exports['docs/compatibility.jade'] = {
   title: 'MongoDB Version Compatibility',

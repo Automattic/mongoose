@@ -1,3 +1,22 @@
+5.0.4 / 2018-02-08
+==================
+ * docs: add lambda guide #6107
+ * fix(connection): add `dbName` option to work around `mongodb+srv` not supporting db name in URI #6106
+ * fix(schematype): fix regexp typo in ObjectId #6098 [JoshuaWise](https://github.com/JoshuaWise)
+ * perf(document): re-use the modifiedPaths list #6092 [tarun1793](https://github.com/tarun1793)
+ * fix: use console.info() instead of console.error() for debug output #6088 [yuristsepaniuk](https://github.com/yuristsepaniuk)
+ * docs(validation): clean up runValidators and isAsync options docs for 5.x #6083
+ * docs(model): use array instead of spread consistently for aggregate() #6070
+ * fix(schema): make aliases handle mongoose-lean-virtuals #6069
+ * docs(layout): add link to subdocs guide #6056
+ * fix(query): make strictQuery: true strip out fields that aren't in the schema #6032
+ * docs(guide): add notes for `strictQuery` option #6032
+
+4.13.11 / 2018-02-07
+====================
+ * docs: fix links in 4.x docs #6081
+ * chore: add release script that uses --tag for npm publish for 4.x releases #6063
+
 5.0.3 / 2018-01-31
 ==================
  * fix: consistently use process.nextTick() to avoid sinon.useFakeTimers() causing ops to hang #6074

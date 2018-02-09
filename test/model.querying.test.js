@@ -1,16 +1,19 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId,
-    MongooseBuffer = mongoose.Types.Buffer,
-    DocumentObjectId = mongoose.Types.ObjectId,
-    Query = require('../lib/query');
+const Query = require('../lib/query');
+const assert = require('power-assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const MongooseBuffer = mongoose.Types.Buffer;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model: querying:', function() {
   var Comments;
@@ -2562,6 +2565,14 @@ describe('model: querying:', function() {
           done();
         });
       });
+    });
+
+    it('does not run resetId setter on query (gh-6093)', function() {
+      const schema = new Schema({});
+
+      const Test = db.model('Test', schema);
+
+      return Test.find({ _id: { $in: [void 0] } });
     });
 
     describe('$eq', function() {

@@ -1,16 +1,22 @@
-var assert = require('power-assert');
-var mongoose = require('../../');
+'use strict';
+
+const assert = require('assert');
+const mongoose = require('../../');
 
 describe('defaults docs', function () {
-  var db;
-  var Schema = mongoose.Schema;
+  let db;
+  const Schema = mongoose.Schema;
 
-  before(function () {
+  before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
   });
 
-  after(function (done) {
+  after(function(done) {
     db.close(done);
+  });
+
+  afterEach(function() {
+    db.models = {};
   });
 
   /**
@@ -111,5 +117,38 @@ describe('defaults docs', function () {
         done();
         // acquit:ignore:end
       });
+  });
+
+  /**
+   * Unless it is running on a query with `setDefaultsOnInsert`, a default
+   * function's `this` refers to the document.
+   */
+  it('Default functions and `this`', function() {
+    const schema = new Schema({
+      title: String,
+      released: Boolean,
+      releaseDate: {
+        type: Date,
+        default: function() {
+          if (this.released) {
+            return Date.now();
+          }
+          return null;
+        }
+      }
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    const movie1 = new Movie({ title: 'The Terminator', released: true });
+
+    // The post has a default Date set to now
+    assert.ok(movie1.releaseDate.getTime() >= Date.now() - 1000);
+    assert.ok(movie1.releaseDate.getTime() <= Date.now());
+
+    const movie2 = new Movie({ title: 'The Legend of Conan', released: false });
+
+    // Since `released` is false, the default function will return null
+    assert.strictEqual(movie2.releaseDate, null);
   });
 });

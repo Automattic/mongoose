@@ -4550,8 +4550,7 @@ describe('model: populate:', function() {
           }).
           then(function(bs) {
             assert.equal(bs.length, 2);
-            assert.equal(bs[0].a.name, 'a1');
-            assert.equal(bs[1].a.name, 'a2');
+            assert.deepEqual(bs.map(b => b.a.name).sort(), ['a1', 'a2']);
             done();
           }).
           catch(done);

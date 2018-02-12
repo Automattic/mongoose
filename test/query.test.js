@@ -2059,6 +2059,16 @@ describe('Query', function() {
       });
     });
 
+    it('overwrites when passing an object when path already set to primitive (gh-6097)', function() {
+      const schema = new mongoose.Schema({ status: String });
+
+      const Model = db.model('gh6097', schema);
+
+      return Model.
+        where({ status: 'approved' }).
+        where({ status: { $ne: 'delayed' } });
+    });
+
     it('$exists for arrays and embedded docs (gh-4937)', function(done) {
       var subSchema = new Schema({
         name: String

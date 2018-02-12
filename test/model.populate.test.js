@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
@@ -3212,14 +3214,18 @@ describe('model: populate:', function() {
             exec(function(err, blogposts) {
               assert.ifError(error);
 
-              assert.equal(blogposts[0].title, 'Test 1');
-              assert.equal(blogposts[1].title, 'Test 2');
+              const titles = blogposts.map(bp => bp.title).sort();
 
-              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+              assert.equal(titles[0], 'Test 1');
+              assert.equal(titles[1], 'Test 2');
 
-              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+              const test1 = blogposts.find(bp => bp.title === 'Test 1');
+              assert.equal(test1.fans[0].name, 'Fan 1');
+              assert.equal(test1.fans[1].name, 'Fan 2');
+
+              const test2 = blogposts.find(bp => bp.title === 'Test 2');
+              assert.equal(test2.fans[0].name, 'Fan 2');
+              assert.equal(test2.fans[1].name, 'Fan 1');
               done();
             });
         });

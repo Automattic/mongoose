@@ -1,3 +1,13 @@
+5.0.5 / 2018-02-13
+==================
+ * docs: make > show up correctly in API docs #6114
+ * fix(query): support `where()` overwriting primitive with object #6097
+ * fix(schematype): don't run internal `resetId` setter on queries with _id #6093
+ * fix(discriminator): don't copy `discriminators` property from base schema #6064
+ * fix(utils): respect `valueOf()` when merging object for update #6059
+ * docs(validation): fix typo 'maxLength' #4720
+ * fix(document): apply defaults after setting initial value so default functions don't see empty doc #3781
+
 5.0.4 / 2018-02-08
 ==================
  * docs: add lambda guide #6107

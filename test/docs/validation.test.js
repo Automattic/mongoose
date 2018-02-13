@@ -550,7 +550,7 @@ describe('validation docs', function() {
   it('Update Validators Only Run On Specified Paths', function(done) {
     var testSchema = new Schema({
       number: { type: Number, max: 0 },
-      arr: [{ message: { type: String, maxLength: 10 } }]
+      arr: [{ message: { type: String, maxlength: 10 } }]
     });
 
     // Update validators won't check this, so you can still `$push` 2 elements

@@ -297,4 +297,21 @@ describe('utils', function() {
       done();
     });
   });
+
+  describe('mergeClone', function() {
+    it('handles object with valueOf()', function(done) {
+      var from = {
+        val: {
+          valueOf: function() { return 42; }
+        }
+      };
+      var to = { val: 41 };
+
+      utils.mergeClone(to, from);
+
+      assert.equal(to.val, 42);
+
+      done();
+    });
+  });
 });

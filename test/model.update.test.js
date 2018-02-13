@@ -2704,6 +2704,28 @@ describe('model: update:', function() {
       });
     });
 
+    it('casting $addToSet without $each (gh-6086)', function() {
+      var schema = new mongoose.Schema({
+        numbers: [Number]
+      });
+
+      var Model = db.model('gh6086', schema);
+
+      return Model.create({ numbers: [1, 2] }).
+        then(function(doc) {
+          return Model.findByIdAndUpdate(
+            doc._id,
+            { $addToSet: { numbers: [3, 4] } },
+            { new: true }
+          );
+        }).
+        then(function(doc) {
+          return Model.findById(doc._id);
+        }).then(function(doc) {
+          assert.deepEqual(doc.toObject().numbers, [1, 2, 3, 4]);
+        });
+    });
+
     it('update with nested id (gh-5640)', function(done) {
       var testSchema = new mongoose.Schema({
         _id: {

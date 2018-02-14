@@ -12,15 +12,15 @@ const hl = require('highlight.js');
 const md = require('markdown');
 
 const files = [
-  /*'lib/schema.js',
+  'lib/schema.js',
   'lib/connection.js',
-  'lib/document.js',*/
+  'lib/document.js',
   'lib/model.js',
-  /*'lib/query.js',
+  'lib/query.js',
   'lib/aggregate.js',
   'lib/schematype.js',
   'lib/virtualtype.js',
-  'lib/error/index.js'*/
+  'lib/error/index.js'
 ];
 
 module.exports = {

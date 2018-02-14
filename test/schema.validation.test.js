@@ -1220,6 +1220,31 @@ describe('schema', function() {
       });
     });
 
+    it('enums on arrays (gh-6102)', function() {
+      assert.throws(function() {
+        new Schema({
+          array: {
+            type: [Number],
+            enum: [1]
+          }
+        });
+      }, /`enum` can only be set on an array of strings/);
+
+      var MySchema = new Schema({
+        array: {
+          type: [String],
+          enum: ['qwerty']
+        }
+      });
+
+      var Model = mongoose.model('gh6102', MySchema);
+      var doc = new Model({ array: ['test'] });
+
+      return doc.validate().
+        then(() => assert.ok(false)).
+        catch(err => assert.equal(err.name, 'ValidationError'));
+    });
+
     it('skips conditional required (gh-3539)', function(done) {
       var s = mongoose.Schema({
         n: {

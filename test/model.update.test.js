@@ -2671,6 +2671,26 @@ describe('model: update:', function() {
       }).catch(done);
     });
 
+    it('replaceOne with buffer (gh-6124)', function() {
+      var SomeModel = db.model('gh6124', new Schema({
+        name: String,
+        binaryProp: Buffer
+      }));
+
+      var doc = new SomeModel({
+        name: 'test',
+        binaryProp: Buffer.alloc(255)
+      });
+
+      return doc.save().
+        then(function() {
+          return SomeModel.replaceOne({ name: 'test' }, {
+            name: 'test2',
+            binaryProp: Buffer.alloc(255)
+          }, { upsert: true });
+        });
+    });
+
     it('returns error if passing array as conditions (gh-3677)', function(done) {
       var schema = new mongoose.Schema({
         name: String

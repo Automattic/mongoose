@@ -1693,6 +1693,23 @@ describe('schema', function() {
       done();
     });
 
+    it('clone() copies virtuals (gh-6133)', function(done) {
+      const userSchema = new Schema({
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true }
+      });
+
+      userSchema.virtual('fullName').get(function() {
+        return this.firstName + ' ' + this.lastName;
+      });
+
+      assert.ok(userSchema.virtuals.fullName);
+      const clonedUserSchema = userSchema.clone();
+      assert.ok(clonedUserSchema.virtuals.fullName);
+
+      done();
+    });
+
     it('TTL index with timestamps (gh-5656)', function(done) {
       var testSchema = new mongoose.Schema({
         foo: String,

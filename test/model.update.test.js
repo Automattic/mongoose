@@ -2671,6 +2671,26 @@ describe('model: update:', function() {
       }).catch(done);
     });
 
+    it('replaceOne with buffer (gh-6124)', function() {
+      var SomeModel = db.model('gh6124', new Schema({
+        name: String,
+        binaryProp: Buffer
+      }));
+
+      var doc = new SomeModel({
+        name: 'test',
+        binaryProp: Buffer.alloc(255)
+      });
+
+      return doc.save().
+        then(function() {
+          return SomeModel.replaceOne({ name: 'test' }, {
+            name: 'test2',
+            binaryProp: Buffer.alloc(255)
+          }, { upsert: true });
+        });
+    });
+
     it('returns error if passing array as conditions (gh-3677)', function(done) {
       var schema = new mongoose.Schema({
         name: String
@@ -2702,6 +2722,28 @@ describe('model: update:', function() {
           done();
         });
       });
+    });
+
+    it('casting $addToSet without $each (gh-6086)', function() {
+      var schema = new mongoose.Schema({
+        numbers: [Number]
+      });
+
+      var Model = db.model('gh6086', schema);
+
+      return Model.create({ numbers: [1, 2] }).
+        then(function(doc) {
+          return Model.findByIdAndUpdate(
+            doc._id,
+            { $addToSet: { numbers: [3, 4] } },
+            { new: true }
+          );
+        }).
+        then(function(doc) {
+          return Model.findById(doc._id);
+        }).then(function(doc) {
+          assert.deepEqual(doc.toObject().numbers, [1, 2, 3, 4]);
+        });
     });
 
     it('update with nested id (gh-5640)', function(done) {

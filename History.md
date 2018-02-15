@@ -1,3 +1,12 @@
+5.0.6 / 2018-02-15
+==================
+ * refactor(query.castUpdate): avoid creating error until necessary #6137
+ * docs(api): fix missing api docs #6136 [lineus](https://github.com/lineus)
+ * fix(schema): copy virtuals when using `clone()` #6133
+ * fix(update): avoid digging into buffers with upsert and replaceOne #6124
+ * fix(schema): support `enum` on arrays of strings #6102
+ * fix(update): cast `$addToSet: [1, 2]` -> `$addToSet: { $each: [1, 2] }` #6086
+
 5.0.5 / 2018-02-13
 ==================
  * docs: make > show up correctly in API docs #6114

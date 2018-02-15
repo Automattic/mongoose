@@ -23,6 +23,31 @@ html(lang='en')
       .sponsors {
         margin-bottom: 40px;
       }
+
+      .carbonad{
+        margin-top:0!important;
+        margin-bottom:-3rem!important
+      }
+
+      #carbonads {
+        position:static;
+        display:block;
+        max-width:200px;
+        padding:15px 15px 15px 160px;
+        margin-left: auto;
+        margin-right: auto;
+        overflow:hidden;
+        font-size:13px;
+        line-height:1.4;
+        text-align:left;
+        background-color: #fafafa;
+      }
+
+      #carbonads a{color:#333;text-decoration:none}
+
+      .carbon-img{float:left;margin-left:-145px}
+
+      .carbon-poweredby{display:block;color:#777!important}
   body
     a#forkbanner(href="http://github.com/learnboost/mongoose")
       img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
@@ -53,7 +78,7 @@ html(lang='en')
       #inner
         #what
           p.what
-            | Let's face it,
+            | Let's face it,&nbsp;
             strong writing MongoDB validation, casting and business logic boilerplate is a drag
             | . That's why we wrote Mongoose.
         :markdown
@@ -71,6 +96,10 @@ html(lang='en')
           your application data. It includes built-in type casting, validation,
           query building, business logic hooks and more, out of the box.
 
+        div.carbon-ad
+          <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
+
+        :markdown
           ## Getting Started
 
           * [quick start guide](/docs/index.html)

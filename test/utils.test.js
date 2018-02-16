@@ -299,7 +299,7 @@ describe('utils', function() {
   });
 
   describe('mergeClone', function() {
-    it('handles object with valueOf()', function(done) {
+    it('handles object with valueOf() (gh-6059)', function(done) {
       var from = {
         val: {
           valueOf: function() { return 42; }
@@ -310,6 +310,19 @@ describe('utils', function() {
       utils.mergeClone(to, from);
 
       assert.equal(to.val, 42);
+
+      done();
+    });
+
+    it('copies dates correctly (gh-6145)', function(done) {
+      var from = {
+        val: new Date('2011-06-01')
+      };
+      var to = { val: new Date('2012-06-01') };
+
+      utils.mergeClone(to, from);
+
+      assert.ok(to.val instanceof Date);
 
       done();
     });

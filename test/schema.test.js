@@ -846,6 +846,27 @@ describe('schema', function() {
           done();
         }
       });
+
+      it('with single nested doc (gh-6113)', function(done) {
+        var pointSchema = new Schema({
+          type: {
+            type: String,
+            default: 'Point',
+            validate: v => v === 'Point'
+          },
+          coordinates: [[Number]]
+        });
+
+        var schema = new Schema({
+          point: { type: pointSchema, index: '2dsphere' }
+        });
+
+        assert.deepEqual(schema.indexes(), [
+          [{ point: '2dsphere' }, { background: true }]
+        ]);
+
+        done();
+      });
     });
   });
 

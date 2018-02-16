@@ -510,6 +510,61 @@ describe('aggregate: ', function() {
         done();
       });
     });
+
+    describe('replaceRoot', function() {
+      it('works', function(done) {
+        var aggregate = new Aggregate();
+
+        aggregate.replaceRoot('myNewRoot');
+
+        assert.deepEqual(aggregate._pipeline,
+          [{ $replaceRoot: { newRoot: '$myNewRoot' }}]);
+        done();
+      });
+    });
+
+    describe('count', function() {
+      it('works', function(done) {
+        var aggregate = new Aggregate();
+
+        aggregate.count('countResult');
+
+        assert.deepEqual(aggregate._pipeline, [{ $count: 'countResult' }]);
+        done();
+      });
+    });
+
+    describe('sortByCount', function() {
+      it('works with a string argument', function(done) {
+        var aggregate = new Aggregate();
+
+        aggregate.sortByCount('countedField');
+
+        assert.deepEqual(aggregate._pipeline, [{ $sortByCount: '$countedField' }]);
+        done();
+      });
+
+      it('works with an object argument', function(done) {
+        var aggregate = new Aggregate();
+
+        aggregate.sortByCount({ lname: '$employee.last' });
+
+        assert.deepEqual(aggregate._pipeline,
+          [{ $sortByCount: { lname: '$employee.last' }}]);
+        done();
+      });
+
+      it('throws if the argument is neither a string or object', function(done) {
+        var aggregate = new Aggregate();
+        try {
+          aggregate.sortByCount(1);
+          done(new Error('Should have errored'));
+        } catch (error) {
+          assert.ok(error instanceof TypeError);
+          done();
+        }
+      });
+    });
   });
 
   describe('exec', function() {

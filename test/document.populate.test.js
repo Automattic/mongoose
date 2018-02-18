@@ -604,6 +604,39 @@ describe('document.populate', function() {
     });
   });
 
+  it('depopulate all (gh-6073)', function(done) {
+    var Person = db.model('gh6073_1', {
+      name: String
+    });
+
+    var Band = db.model('gh6073_2', {
+      name: String,
+      members: [{type: Schema.Types.ObjectId, ref: 'gh6073_1'}],
+      lead: {type: Schema.Types.ObjectId, ref: 'gh6073_1'}
+    });
+
+    var people = [{name: 'Axl Rose'}, {name: 'Slash'}];
+    Person.create(people, function(error, docs) {
+      assert.ifError(error);
+      var band = {
+        name: 'Guns N\' Roses',
+        members: [docs[0]._id, docs[1]],
+        lead: docs[0]._id
+      };
+      Band.create(band, function(error, band) {
+        band.populate('members lead', function() {
+          assert.ok(band.populated('members'));
+          assert.ok(band.populated('lead'));
+          assert.equal(band.members[0].name, 'Axl Rose');
+          band.depopulate();
+          assert.ok(!band.populated('members'));
+          assert.ok(!band.populated('lead'));
+          done();
+        });
+      });
+    });
+  });
+
   it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
     var EmbeddedSchema = new Schema({
       reference: {

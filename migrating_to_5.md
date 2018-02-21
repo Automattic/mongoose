@@ -74,7 +74,7 @@ The `useMongooseAggCursor` option from 4.x is now always on. This is the new syn
 // cursor.
 const cursor = MyModel.aggregate([{ $match: { name: 'Val' } }]).cursor().exec();
 // No need to `await` on the cursor or wait for a promise to resolve
-cursor.each(doc => console.log(doc));
+cursor.eachAsync(doc => console.log(doc));
 
 // Can also pass options to `cursor()`
 const cursorWithOptions = MyModel.

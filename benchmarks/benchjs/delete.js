@@ -25,7 +25,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     if (err) {
       throw err;
     }
-    
+
     var db = client.db('mongoose-bench');
 
     var UserSchema = new Schema({

@@ -21,10 +21,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
   if (err) {
     throw err;
   }
-  mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
+  mongo.connect('mongodb://localhost', function(err, client) {
     if (err) {
       throw err;
     }
+
+    var db = client.db('mongoose-bench');
+
     var UserSchema = new Schema({
       name: String,
       age: Number,
@@ -80,7 +83,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         if (err) {
           throw err;
         }
-        db.close();
+        client.close();
       });
     }
 

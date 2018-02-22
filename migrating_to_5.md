@@ -74,7 +74,7 @@ The `useMongooseAggCursor` option from 4.x is now always on. This is the new syn
 // cursor.
 const cursor = MyModel.aggregate([{ $match: { name: 'Val' } }]).cursor().exec();
 // No need to `await` on the cursor or wait for a promise to resolve
-cursor.each(doc => console.log(doc));
+cursor.eachAsync(doc => console.log(doc));
 
 // Can also pass options to `cursor()`
 const cursorWithOptions = MyModel.
@@ -140,7 +140,7 @@ Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,
 `remove()`, `deleteOne()`, and `deleteMany()` doesn't happen until `exec()`.
 This makes it easier for hooks and custom query helpers to modify data, because
 mongoose won't restructure the data you passed in until after your hooks and
-query helpers you ran. It also makes it possible to set the `overwrite` option
+query helpers have ran. It also makes it possible to set the `overwrite` option
 _after_ passing in an update.
 
 ```javascript

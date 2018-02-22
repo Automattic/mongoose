@@ -3115,21 +3115,56 @@ describe('document', function() {
       done();
     });
 
-    it('doesnt markModified child paths if parent is modified (gh-4224)', function(done) {
-      var childSchema = new Schema({
-        name: String
-      });
-      var parentSchema = new Schema({
-        child: childSchema
+    describe('modifiedPaths', function() {
+      it('doesnt markModified child paths if parent is modified (gh-4224)', function(done) {
+        var childSchema = new Schema({
+          name: String
+        });
+        var parentSchema = new Schema({
+          child: childSchema
+        });
+
+        var Parent = db.model('gh4224', parentSchema);
+        Parent.create({ child: { name: 'Jacen' } }, function(error, doc) {
+          assert.ifError(error);
+          doc.child = { name: 'Jaina' };
+          doc.child.name = 'Anakin';
+          assert.deepEqual(doc.modifiedPaths(), ['child']);
+          assert.ok(doc.isModified('child.name'));
+          done();
+        });
       });
 
-      var Parent = db.model('gh4224', parentSchema);
-      Parent.create({ child: { name: 'Jacen' } }, function(error, doc) {
-        assert.ifError(error);
-        doc.child = { name: 'Jaina' };
-        doc.child.name = 'Anakin';
-        assert.deepEqual(doc.modifiedPaths(), ['child']);
-        assert.ok(doc.isModified('child.name'));
+      it('includeChildren option (gh-6134)', function(done) {
+        var personSchema = new mongoose.Schema({
+          name: { type: String },
+          colors: {
+            primary: {
+              type: String,
+              default: 'white',
+              enum: ['blue', 'green', 'red', 'purple', 'yellow']
+            }
+          }
+        });
+
+        var Person = db.model('Person', personSchema);
+
+        var luke = new Person({
+          name: 'Luke',
+          colors: {
+            primary: 'blue'
+          }
+        });
+        assert.deepEqual(luke.modifiedPaths(), ['name', 'colors', 'colors.primary']);
+
+        var obiwan = new Person({ name: 'Obi-Wan' });
+        obiwan.colors.primary = 'blue';
+        assert.deepEqual(obiwan.modifiedPaths(), ['name', 'colors', 'colors.primary']);
+
+        var anakin = new Person({ name: 'Anakin' });
+        anakin.colors = { primary: 'blue' };
+        assert.deepEqual(anakin.modifiedPaths({ includeChildren: true }), ['name', 'colors', 'colors.primary']);
+
         done();
       });
     });

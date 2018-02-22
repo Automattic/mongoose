@@ -1802,6 +1802,61 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('useFindAndModify in opts (gh-5616)', function(done) {
+      var m = new mongoose.constructor();
+
+      m.connect(start.uri);
+
+      var calls = [];
+      m.set('debug', function(collection, fnName) {
+        calls.push({ collection: collection, fnName: fnName });
+      });
+
+      var schema = new m.Schema({
+        arr: [String]
+      });
+
+      var Model = m.model('gh5616', schema);
+
+      var update = { $push: { arr: 'test' } };
+      var options = { useFindAndModify: false };
+      Model.findOneAndUpdate({}, update, options, function() {
+        assert.equal(calls.length, 1);
+        assert.equal(calls[0].collection, 'gh5616');
+        assert.equal(calls[0].fnName, 'findOneAndUpdate');
+        m.disconnect();
+        done();
+      });
+    });
+
+    it('useFindAndModify in set (gh-5616)', function(done) {
+      var m = new mongoose.constructor();
+
+      m.connect(start.uri);
+
+      var calls = [];
+      m.set('debug', function(collection, fnName) {
+        calls.push({ collection: collection, fnName: fnName });
+      });
+
+      m.set('useFindAndModify', false);
+      var schema = new m.Schema({
+        arr: [String]
+      });
+
+      var Model = m.model('gh5616', schema);
+
+      var update = { $push: { arr: 'test' } };
+      var options = {};
+      Model.findOneAndUpdate({}, update, options, function() {
+        assert.equal(calls.length, 1);
+        assert.equal(calls[0].collection, 'gh5616');
+        assert.equal(calls[0].fnName, 'findOneAndUpdate');
+        m.disconnect();
+        done();
+      });
+    });
+
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
       if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
         // Don't run on node 0.x because of `const` issues

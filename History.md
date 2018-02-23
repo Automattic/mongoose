@@ -1,3 +1,18 @@
+5.0.7 / 2018-02-23
+==================
+ * fix: support eachAsync options with aggregation cursor #6169 #6168 [vichle](https://github.com/vichle)
+ * docs: fix link to MongoDB compound indexes docs #6162 [br0p0p](https://github.com/br0p0p)
+ * docs(aggregate): use eachAsync instead of incorrect `each()` #6160 [simllll](https://github.com/simllll)
+ * chore: fix benchmarks #6158 [pradel](https://github.com/pradel)
+ * docs: remove dead link to old blog post #6154 [markstos](https://github.com/markstos)
+ * fix: don't convert dates to numbers when updating mixed path #6146 #6145 [s4rbagamble](https://github.com/s4rbagamble)
+ * feat(aggregate): add replaceRoot, count, sortByCount helpers #6142 [jakesjews](https://github.com/jakesjews)
+ * fix(document): add includedChildren flag to modifiedPaths() #6134
+ * perf: don't create wrapper function if no hooks specified #6126
+ * fix(schema): allow indexes on single nested subdocs for geoJSON #6113
+ * fix(document): allow depopulating all fields #6073
+ * feat(mongoose): add support for `useFindAndModify` option on singleton #5616
+
 5.0.6 / 2018-02-15
 ==================
  * refactor(query.castUpdate): avoid creating error until necessary #6137

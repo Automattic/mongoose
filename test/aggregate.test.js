@@ -1169,7 +1169,7 @@ describe('aggregate: ', function() {
   it('cursor() eachAsync with options (parallel)', function(done) {
     var MyModel = db.model('gh-6168', { name: String });
 
-    var names = []
+    var names = [];
     var startedAt = [];
     var expectedNames = ['Axl', 'Slash'];
     var checkDoc = function(doc) {

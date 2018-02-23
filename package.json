@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.0.7",
+  "version": "5.0.8-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -64,8 +64,8 @@
     "fix-lint": "eslint . --fix",
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
-    "release": "git push origin master --tags && npm publish",
-    "release-legacy": "git push origin 4.x --tags && npm publish --tag legacy",
+    "release": "git pull && git push origin master --tags && npm publish",
+    "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },

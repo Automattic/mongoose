@@ -1166,6 +1166,39 @@ describe('aggregate: ', function() {
       catch(done);
   });
 
+  it('cursor() eachAsync with options (parallel)', function(done) {
+    var MyModel = db.model('gh-6168', { name: String });
+
+    var names = [];
+    var startedAt = [];
+    var expectedNames = ['Axl', 'Slash'];
+    var checkDoc = function(doc) {
+      names.push(doc.name);
+      startedAt.push(Date.now());
+      return {
+        then: function(resolve) {
+          setTimeout(function() {
+            resolve();
+          }, 100);
+        }
+      };
+    };
+    MyModel.create([{ name: 'Axl' }, { name: 'Slash' }]).
+      then(function() {
+        return MyModel.aggregate([{ $sort: { name: 1 } }]).
+          cursor().
+          exec().
+          eachAsync(checkDoc, { parallel: 2}).then(function() {
+            assert.ok(Date.now() - startedAt[1] > 100);
+            assert.equal(startedAt.length, 2);
+            assert.ok(startedAt[1] - startedAt[0] < 50);
+            assert.deepEqual(names.sort(), expectedNames);
+            done();
+          });
+      }).
+      catch(done);
+  });
+
   it('ability to add noCursorTimeout option (gh-4241)', function(done) {
     var MyModel = db.model('gh4241', {
       name: String

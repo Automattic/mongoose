@@ -1052,6 +1052,27 @@ describe('model: update:', function() {
       });
     });
 
+    it('with omitUndefined (gh-6034)', function(done) {
+      var schema = new Schema({
+        boolField: {
+          type: Boolean,
+          default: false
+        }
+      });
+
+      var M = db.model('gh6034', schema);
+
+      var opts = { upsert: true, setDefaultsOnInsert: true, omitUndefined: true };
+      M.update({}, {}, opts, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          assert.strictEqual(doc.boolField, false);
+          done();
+        });
+      });
+    });
+
     it('runs validators if theyre set', function(done) {
       var s = new Schema({
         topping: {

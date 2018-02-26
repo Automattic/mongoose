@@ -81,7 +81,7 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "http://mongoosejs.com",
-  "browser": "lib/browser.js",
+  "browser": "./browser.js",
   "eslintConfig": {
     "extends": [
       "eslint:recommended"

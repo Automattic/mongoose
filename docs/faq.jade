@@ -322,7 +322,11 @@ block content
     **A**. You can set the default of the array to a function that returns null.
     ```javascript
     const CollectionSchema = new Schema({
-      field1: { type: [String], default: () => null },
+      field1: { 
+        type: [String], 
+        default: function() { 
+          return null 
+        }
     });
     ```
 

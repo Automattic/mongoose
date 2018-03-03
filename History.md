@@ -1,3 +1,13 @@
+5.0.8 / 2018-03-03
+==================
+ * docs: remove obsolete references to `emitIndexErrors` #6186 [isaackwan](https://github.com/isaackwan)
+ * fix(query): don't cast findOne() until exec() so setters don't run twice #6157
+ * fix: remove document_provider.web.js file #6186
+ * fix(discriminator): support custom discriminator model names #6100 [wentout](https://github.com/wentout)
+ * fix: support caching calls to `useDb()` #6036 [rocketspacer](https://github.com/rocketspacer)
+ * fix(query): add omitUndefined option so setDefaultsOnInsert can kick in on undefined #6034
+ * fix: upgrade mongodb -> 3.0.3 for reconnectTries: 0 blocking process exit fix #6028
+
 5.0.7 / 2018-02-23
 ==================
  * fix: support eachAsync options with aggregation cursor #6169 #6168 [vichle](https://github.com/vichle)

@@ -134,6 +134,36 @@ The above code does **not** work in 5.x, you **must** wrap the `$match` and `$sk
 MyModel.aggregate([{ $match: { isDeleted: false } }, { $skip: 10 }]).exec(cb);
 ```
 
+### Boolean Casting
+
+By default, mongoose 4 would coerce any value to a boolean without error.
+
+```javascript
+// Fine in mongoose 4, would save a doc with `boolField = true`
+const MyModel = mongoose.model('Test', new Schema({
+  boolField: Boolean
+}));
+
+MyModel.create({ boolField: 'not a boolean' });
+```
+
+Mongoose 5 only casts the following values to `true`:
+
+* `true`
+* `'true'`
+* `1`
+* `'1'`
+* `'yes'`
+
+And the following values to `false`:
+
+* `false`
+* `'false'`
+* `0`
+* `'0'`
+* `'no'`
+
+All other values will cause a `CastError`
 ### Query Casting
 
 Casting for `update()`, `updateOne()`, `updateMany()`, `replaceOne()`,

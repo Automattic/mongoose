@@ -10,6 +10,8 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 [mongoosejs.com](http://mongoosejs.com/)
 
+[Mongoose 5.0.0](https://github.com/Automattic/mongoose/blob/master/History.md#500--2018-01-17) was released on January 17, 2018. You can find more details on backwards breaking changes in 5.0.0 on [GitHub](https://github.com/Automattic/mongoose/blob/master/migrating_to_5.md).
+
 ## Support
 
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
@@ -57,7 +59,7 @@ First, we need to define a connection. If your app uses only one database, you s
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters `host, database, port, options`.
 
 ```js
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/my_database');
 ```
@@ -73,14 +75,14 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 Models are defined through the `Schema` interface.
 
 ```js
-var Schema = mongoose.Schema,
+const Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-var BlogPost = new Schema({
-    author    : ObjectId,
-    title     : String,
-    body      : String,
-    date      : Date
+const BlogPost = new Schema({
+ author: ObjectId,
+ title: String,
+ body: String,
+ date: Date
 });
 ```
 
@@ -100,7 +102,7 @@ Aside from defining the structure of your documents and the types of data you're
 The following example shows some of these features:
 
 ```js
-var Comment = new Schema({
+const Comment = new Schema({
   name: { type: String, default: 'hahaha' },
   age: { type: Number, min: 18, index: true },
   bio: { type: String, match: /[a-z]/ },
@@ -127,19 +129,19 @@ Take a look at the example in `examples/schema.js` for an end-to-end example of 
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can access it through the same function
 
 ```js
-var myModel = mongoose.model('ModelName');
+const myModel = mongoose.model('ModelName');
 ```
 
 Or just do it all at once
 
 ```js
-var MyModel = mongoose.model('ModelName', mySchema);
+const MyModel = mongoose.model('ModelName', mySchema);
 ```
 
 The first argument is the _singular_ name of the collection your model is for. **Mongoose automatically looks for the _plural_ version of your model name.** For example, if you use
 
 ```js
-var MyModel = mongoose.model('Ticket', mySchema);
+const MyModel = mongoose.model('Ticket', mySchema);
 ```
 
 Then Mongoose will create the model for your __tickets__ collection, not your __ticket__ collection.
@@ -147,7 +149,7 @@ Then Mongoose will create the model for your __tickets__ collection, not your __
 Once we have our model, we can then instantiate it, and save it:
 
 ```js
-var instance = new MyModel();
+const instance = new MyModel();
 instance.my.key = 'hello';
 instance.save(function (err) {
   //
@@ -167,18 +169,18 @@ You can also `findOne`, `findById`, `update`, etc. For more details check out [t
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 
 ```js
-var conn = mongoose.createConnection('your connection string'),
-    MyModel = conn.model('ModelName', schema),
-    m = new MyModel;
+const conn = mongoose.createConnection('your connection string');
+const MyModel = conn.model('ModelName', schema);
+const m = new MyModel;
 m.save(); // works
 ```
 
 vs
 
 ```js
-var conn = mongoose.createConnection('your connection string'),
-    MyModel = mongoose.model('ModelName', schema),
-    m = new MyModel;
+const conn = mongoose.createConnection('your connection string');
+const MyModel = mongoose.model('ModelName', schema);
+const m = new MyModel;
 m.save(); // does not work b/c the default connection object was never connected
 ```
 

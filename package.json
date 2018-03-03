@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.0.7",
+  "version": "5.0.8",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -23,7 +23,7 @@
     "bson": "~1.0.4",
     "kareem": "2.0.5",
     "lodash.get": "4.4.2",
-    "mongodb": "3.0.2",
+    "mongodb": "3.0.3",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.3.0",
     "mquery": "3.0.0",
@@ -64,8 +64,8 @@
     "fix-lint": "eslint . --fix",
     "lint": "eslint . --quiet",
     "nsp": "nsp check",
-    "release": "git push origin master --tags && npm publish",
-    "release-legacy": "git push origin 4.x --tags && npm publish --tag legacy",
+    "release": "git pull && git push origin master --tags && npm publish",
+    "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
@@ -81,7 +81,7 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "http://mongoosejs.com",
-  "browser": "lib/browser.js",
+  "browser": "./browser.js",
   "eslintConfig": {
     "extends": [
       "eslint:recommended"

@@ -985,6 +985,15 @@ describe('connections:', function() {
       });
       db2.close();
     });
+
+    it('cache connections to the same db', function() {
+      var db = start();
+      var db2 = db.useDb('mongoose-test-2', { useCache: true });
+      var db3 = db.useDb('mongoose-test-2', { useCache: true });
+
+      assert.strictEqual(db2, db3);
+      db.close();
+    });
   });
 
   describe('shouldAuthenticate()', function() {

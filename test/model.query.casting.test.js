@@ -1037,6 +1037,39 @@ describe('model query casting', function() {
     });
   });
 
+  it('setters run only once on findOne (gh-6157)', function(done) {
+    var vs = [];
+    var UserSchema = new mongoose.Schema({
+      name: String,
+      foo: {
+        type: Number,
+        get: function(val) {
+          return val.toString();
+        },
+        set: function(val) {
+          vs.push(val);
+          return val;
+        }
+      }
+    }, { runSettersOnQuery: true });
+
+    var Test = db.model('gh6157', UserSchema);
+
+    Test.findOne({ foo: '123' }).exec(function(error) {
+      assert.ifError(error);
+      assert.equal(vs.length, 1);
+      assert.strictEqual(vs[0], '123');
+
+      vs = [];
+      Test.findOne({ foo: '123' }, function(error) {
+        assert.ifError(error);
+        assert.equal(vs.length, 1);
+        assert.strictEqual(vs[0], '123');
+        done();
+      });
+    });
+  });
+
   it('runSettersOnQuery as query option (gh-5350)', function(done) {
     var contexts = [];
 

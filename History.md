@@ -1,3 +1,7 @@
+5.0.9 / 2018-03-05
+==================
+ * perf: bump mongodb -> 3.0.4 to fix SSL perf issue #6065
+
 5.0.8 / 2018-03-03
 ==================
  * docs: remove obsolete references to `emitIndexErrors` #6186 [isaackwan](https://github.com/isaackwan)

@@ -5057,6 +5057,29 @@ describe('document', function() {
       });
     });
 
+    it('handles 2nd level nested field with null child (gh-6187)', function(done) {
+      var NestedSchema = new Schema({
+        parent: new Schema({
+          name: String,
+          child: {
+            name: String
+          }
+        }, { strict: false })
+      });
+      var NestedModel = db.model('Nested', NestedSchema);
+      var n = new NestedModel({
+        parent: {
+          name: 'foo',
+          child: null // does not fail if undefined
+        }
+      });
+
+      //console.log('hey', n.validateSync())
+      assert.equal(n.parent.name, 'foo');
+
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

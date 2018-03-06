@@ -5074,7 +5074,6 @@ describe('document', function() {
         }
       });
 
-      //console.log('hey', n.validateSync())
       assert.equal(n.parent.name, 'foo');
 
       done();

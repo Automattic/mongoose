@@ -5057,27 +5057,27 @@ describe('document', function() {
       });
     });
 
-    it('accessing arrays in setters on initial document creation (gh-6155)', function() {
-      return co(function*() {
-        const artistSchema = new mongoose.Schema({
-          name: {
-            type: String,
-            set: function(v) {
-              const sp = v.split(' ');
-              for (let i = 0; i < sp.length; ++i) {
-                this.keywords.push(sp[i]);
-              }
-              return v;
+    it('accessing arrays in setters on initial document creation (gh-6155)', function(done) {
+      const artistSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          set: function(v) {
+            const sp = v.split(' ');
+            for (let i = 0; i < sp.length; ++i) {
+              this.keywords.push(sp[i]);
             }
-          },
-          keywords: [String]
-        });
-
-        const Artist = db.model('gh6155', artistSchema);
-
-        const artist = new Artist({ name: 'Motley Crue' });
-        assert.deepEqual(artist.toObject().keywords, ['Motley', 'Crue']);
+            return v;
+          }
+        },
+        keywords: [String]
       });
+
+      const Artist = db.model('gh6155', artistSchema);
+
+      const artist = new Artist({ name: 'Motley Crue' });
+      assert.deepEqual(artist.toObject().keywords, ['Motley', 'Crue']);
+
+      done();
     });
 
     it('handles 2nd level nested field with null child (gh-6187)', function(done) {

@@ -18,6 +18,7 @@ and other general characteristics for Strings and Sumbers.</p>
 <li>Mixed</li>
 <li><a href="./api.html#schema-objectid-js">Objectid</a></li>
 <li>Array</li>
+<li>Decimal128</li>
 </ul>
 <h4>Example</h4>
 
@@ -29,6 +30,7 @@ and other general characteristics for Strings and Sumbers.</p>
   age:     { type: <span class="hljs-built_in">Number</span>, min: <span class="hljs-number">18</span>, max: <span class="hljs-number">65</span> },
   mixed:   Schema.Types.Mixed,
   _someId: Schema.Types.ObjectId,
+  decimal: Schema.Types.Decimal128,
   array:      [],
   ofString:   [<span class="hljs-built_in">String</span>],
   ofNumber:   [<span class="hljs-built_in">Number</span>],

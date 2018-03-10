@@ -23,6 +23,7 @@ block content
     - Mixed
     - [Objectid](./api.html#schema-objectid-js)
     - Array
+    - Decimal128
 
     <h4>Example</h4>
 
@@ -35,6 +36,7 @@ block content
       age:     { type: Number, min: 18, max: 65 },
       mixed:   Schema.Types.Mixed,
       _someId: Schema.Types.ObjectId,
+      decimal: Schema.Types.Decimal128,
       array:      [],
       ofString:   [String],
       ofNumber:   [Number],

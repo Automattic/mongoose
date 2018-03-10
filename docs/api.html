@@ -1,4 +1,157 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.0.6-pre: API docs</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.0.6-pre</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.11</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Guide</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/subdocs.html" class="pure-menu-link">Subdocuments</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item sub-item"><a href="/docs/lambda.html" class="pure-menu-link">AWS Lambda</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></li></ul></div></div><div class="container"><div id="content"><h1>API Docs</h1><hr class="separate-api"><h2 id="Schema"><a href="#Schema">Schema</a></h2><hr class="separate-api-elements"><h3 id="schema_Schema"><a href="#schema_Schema">Schema()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options] <span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Schema constructor.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.0.10-pre: API docs</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.0.10-pre</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.11</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/schematypes.html" class="pure-menu-link">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/subdocs.html" class="pure-menu-link">Subdocuments</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item sub-item"><a href="/docs/lambda.html" class="pure-menu-link">AWS Lambda</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Error" class="pure-menu-link">Error</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></li></ul></div></div><div class="container"><div id="content"><h1>API Docs</h1><hr class="separate-api"><h2 id="Index"><a href="#Index">Index</a></h2><hr class="separate-api-elements"><h3 id="mongoose_Mongoose"><a href="#mongoose_Mongoose">Mongoose()</a></h3><div><p>Mongoose constructor.</p>
+
+<p>The exports object of the <code>mongoose</code> module is an instance of this class. Most apps will only use this one instance.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-STATES"><a href="#mongoose_Mongoose-STATES">Mongoose.prototypeSTATES</a></h3><div><p>Expose connection states for user-land</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-set"><a href="#mongoose_Mongoose-set">Mongoose.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value <span class="method-type">&laquo;String,Function,Boolean&raquo;</span> </li></ul><div><p>Sets mongoose options</p>
+
+<h4>Example:</h4>
+
+<pre><code>mongoose.set(<span class="hljs-string">'test'</span>, value) <span class="hljs-comment">// sets the 'test' option to `value`</span>
+
+mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-literal">true</span>) <span class="hljs-comment">// enable logging collection methods + arguments to the console</span>
+
+mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">collectionName, methodName, arg1, arg2...</span>) </span>{}); <span class="hljs-comment">// use custom function to log collection methods + arguments</span></code></pre>
+
+<h2>Currently supported options are</h2>
+
+<ul>
+<li>'debug': prints the operations mongoose sends to MongoDB to the console</li>
+<li>'bufferCommands': enable/disable mongoose's buffering mechanism for all connections and models</li>
+<li>'useFindAndModify': true by default. Set to <code>false</code> to make <code>findOneAndUpdate()</code> and <code>findOneAndRemove()</code> use native <code>findOneAndUpdate()</code> rather than <code>findAndModify()</code>.</li>
+</ul></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-get"><a href="#mongoose_Mongoose-get">Mongoose.prototype.get()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">key <span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Gets mongoose options</p>
+
+<h4>Example:</h4>
+
+<pre><code>mongoose.get(<span class="hljs-string">'test'</span>) <span class="hljs-comment">// returns the 'test' value</span></code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-createConnection"><a href="#mongoose_Mongoose-createConnection">Mongoose.prototype.createConnection()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options.bufferCommands=true] <span class="method-type">&laquo;Boolean&raquo;</span> Mongoose specific option. Set to false to <a href="http://mongoosejs.com/docs/faq.html#callback_never_executes">disable buffering</a> on all models associated with this connection.</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> the created Connection object. Connections are thenable, so you can do `await mongoose.createConnection()`</li></ul><div><p>Creates a Connection instance.</p>
+
+<p>Each <code>connection</code> instance maps to a single database. This method is helpful when mangaging multiple db connections.</p>
+
+<p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately. This means we can pass <code>db</code>, <code>server</code>, and <code>replset</code> options to the driver. <em>Note that the <code>safe</code> option specified in your schema will overwrite the <code>safe</code> db option specified here unless you set your schemas <code>safe</code> option to <code>undefined</code>. See <a href="/docs/guide.html#safe">this</a> for more information.</em></p>
+
+<p><em>Options passed take precedence over options included in connection strings.</em></p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-comment">// with mongodb:// URI</span>
+db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>);
+
+<span class="hljs-comment">// and options</span>
+<span class="hljs-keyword">var</span> opts = { db: { native_parser: <span class="hljs-literal">true</span> }}
+db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>, opts);
+
+<span class="hljs-comment">// replica sets</span>
+db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/database'</span>);
+
+<span class="hljs-comment">// and options</span>
+<span class="hljs-keyword">var</span> opts = { replset: { strategy: <span class="hljs-string">'ping'</span>, rs_name: <span class="hljs-string">'testSet'</span> }}
+db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/database'</span>, opts);
+
+<span class="hljs-comment">// with [host, database_name[, port] signature</span>
+db = mongoose.createConnection(<span class="hljs-string">'localhost'</span>, <span class="hljs-string">'database'</span>, port)
+
+<span class="hljs-comment">// and options</span>
+<span class="hljs-keyword">var</span> opts = { server: { auto_reconnect: <span class="hljs-literal">false</span> }, user: <span class="hljs-string">'username'</span>, pass: <span class="hljs-string">'mypassword'</span> }
+db = mongoose.createConnection(<span class="hljs-string">'localhost'</span>, <span class="hljs-string">'database'</span>, port, opts)
+
+<span class="hljs-comment">// initialize now, connect later</span>
+db = mongoose.createConnection();
+db.open(<span class="hljs-string">'localhost'</span>, <span class="hljs-string">'database'</span>, port, [opts]);</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connect"><a href="#mongoose_Mongoose-connect">Mongoose.prototype.connect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback] <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolves to `this` if connection succeeded</li></ul><div><p>Opens the default mongoose connection.</p>
+
+<h4>Example:</h4>
+
+<pre><code>mongoose.connect(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>);
+
+<span class="hljs-comment">// replica sets</span>
+<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/mydatabase'</span>;
+mongoose.connect(uri);
+
+<span class="hljs-comment">// with options</span>
+mongoose.connect(uri, options);
+
+<span class="hljs-comment">// optional callback that gets fired when initial connection completed</span>
+<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://nonexistent.domain:27000'</span>;
+mongoose.connect(uri, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+  <span class="hljs-comment">// if error is truthy, the initial connection failed.</span>
+})</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-disconnect"><a href="#mongoose_Mongoose-disconnect">Mongoose.prototype.disconnect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback] <span class="method-type">&laquo;Function&raquo;</span> called after all connection close, or when first error occurred.</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolves when all connections are closed, or rejects with the first error that occurred.</li></ul><div><p>Runs <code>.close()</code> on all connections in parallel.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-pluralize"><a href="#mongoose_Mongoose-pluralize">Mongoose.prototype.pluralize()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[fn] <span class="method-type">&laquo;Function,null&raquo;</span> overwrites the function used to pluralize connection names</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function,null&raquo;</span> the current function used to pluralize connection names, `undefined` by default.</li></ul><div><p>Getter/setter around function for pluralizing collection names.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-model"><a href="#mongoose_Mongoose-model">Mongoose.prototype.model()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[skipInit] <span class="method-type">&laquo;Boolean&raquo;</span> whether to skip initialization (defaults to false)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> </li></ul><div><p>Defines a model or retrieves it.</p>
+
+<p>Models defined on the <code>mongoose</code> instance are available to all connection created by the same <code>mongoose</code> instance.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+
+<span class="hljs-comment">// define an Actor model with this mongoose instance</span>
+mongoose.model(<span class="hljs-string">'Actor'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));
+
+<span class="hljs-comment">// create a new connection</span>
+<span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+
+<span class="hljs-comment">// retrieve the Actor model</span>
+<span class="hljs-keyword">var</span> Actor = conn.model(<span class="hljs-string">'Actor'</span>);</code></pre>
+
+<p><em>When no <code>collection</code> argument is passed, Mongoose uses the model name. If you don't like this behavior, either pass a collection name, use <code>mongoose.pluralize()</code>, or set your schemas collection name option.</em></p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
+
+<span class="hljs-comment">// or</span>
+
+schema.set(<span class="hljs-string">'collection'</span>, <span class="hljs-string">'actor'</span>);
+
+<span class="hljs-comment">// or</span>
+
+<span class="hljs-keyword">var</span> collectionName = <span class="hljs-string">'actor'</span>
+<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-modelNames"><a href="#mongoose_Mongoose-modelNames">Mongoose.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this instance of Mongoose.</p>
+
+<h4>Note:</h4>
+
+<p><em>Does not include names of models created using <code>connection.model()</code>.</em></p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-plugin"><a href="#mongoose_Mongoose-plugin">Mongoose.prototype.plugin()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[opts] <span class="method-type">&laquo;Object&raquo;</span> optional options</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Mongoose&raquo;</span> this</li></ul><div><p>Declares a global plugin executed on all Schemas.</p>
+
+<p>Equivalent to calling <code>.plugin(fn)</code> on each Schema you create.</p></div><hr class="separate-api-elements"><h3 id="connection_connection"><a href="#connection_connection">function Object() { [native code] }.prototype.connection</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span> </li></ul><div><p>The default connection of the mongoose module.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+mongoose.connect(...);
+mongoose.connection.on(<span class="hljs-string">'error'</span>, cb);</code></pre>
+
+<p>This is the connection used by default for every model created using <a href="#index_Mongoose-model">mongoose.model</a>.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Aggregate"><a href="#mongoose_Mongoose-Aggregate">Mongoose.prototype.Aggregate()</a></h3><div><p>The Mongoose Aggregate constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Collection"><a href="#mongoose_Mongoose-Collection">Mongoose.prototype.Collection()</a></h3><div><p>The Mongoose Collection constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Connection"><a href="#mongoose_Mongoose-Connection">Mongoose.prototype.Connection()</a></h3><div><p>The Mongoose <a href="#connection_Connection">Connection</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-version"><a href="#mongoose_Mongoose-version">Mongoose.prototype.version</a></h3><div><p>The Mongoose version</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Mongoose"><a href="#mongoose_Mongoose-Mongoose">Mongoose.prototype.Mongoose()</a></h3><div><p>The Mongoose constructor</p>
+
+<p>The exports of the mongoose module is an instance of this class.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">var</span> mongoose2 = <span class="hljs-keyword">new</span> mongoose.Mongoose();</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Schema"><a href="#mongoose_Mongoose-Schema">Mongoose.prototype.Schema()</a></h3><div><p>The Mongoose <a href="#schema_Schema">Schema</a> constructor</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">var</span> Schema = mongoose.Schema;
+<span class="hljs-keyword">var</span> CatSchema = <span class="hljs-keyword">new</span> Schema(..);</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaType"><a href="#mongoose_Mongoose-SchemaType">Mongoose.prototype.SchemaType()</a></h3><div><p>The Mongoose <a href="#schematype_SchemaType">SchemaType</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypes"><a href="#mongoose_Mongoose-SchemaTypes">Mongoose.prototype.SchemaTypes</a></h3><div><p>The various Mongoose SchemaTypes.</p>
+
+<h4>Note:</h4>
+
+<p><em>Alias of mongoose.Schema.Types for backwards compatibility.</em></p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-VirtualType"><a href="#mongoose_Mongoose-VirtualType">Mongoose.prototype.VirtualType()</a></h3><div><p>The Mongoose <a href="#virtualtype_VirtualType">VirtualType</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Types"><a href="#mongoose_Mongoose-Types">Mongoose.prototype.Types</a></h3><div><p>The various Mongoose Types.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">var</span> array = mongoose.Types.Array;</code></pre>
+
+<h4>Types:</h4>
+
+<ul>
+<li><a href="#types-objectid-js">ObjectId</a></li>
+<li><a href="#types-buffer-js">Buffer</a></li>
+<li><a href="#types-embedded-js">SubDocument</a></li>
+<li><a href="#types-array-js">Array</a></li>
+<li><a href="#types-documentarray-js">DocumentArray</a></li>
+</ul>
+
+<p>Using this exposed access to the <code>ObjectId</code> type, we can construct ids on demand.</p>
+
+<pre><code><span class="hljs-keyword">var</span> ObjectId = mongoose.Types.ObjectId;
+<span class="hljs-keyword">var</span> id1 = <span class="hljs-keyword">new</span> ObjectId;</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Query"><a href="#mongoose_Mongoose-Query">Mongoose.prototype.Query()</a></h3><div><p>The Mongoose <a href="#query_Query">Query</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="promise_Promise"><a href="#promise_Promise">function Object() { [native code] }.prototype.Promise()</a></h3><div><p>The Mongoose <a href="#promise_Promise">Promise</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-PromiseProvider"><a href="#mongoose_Mongoose-PromiseProvider">Mongoose.prototype.PromiseProvider()</a></h3><div><p>Storage layer for mongoose promises</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Model"><a href="#mongoose_Mongoose-Model">Mongoose.prototype.Model()</a></h3><div><p>The Mongoose <a href="#model_Model">Model</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Document"><a href="#mongoose_Mongoose-Document">Mongoose.prototype.Document()</a></h3><div><p>The Mongoose <a href="#document-js">Document</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-DocumentProvider"><a href="#mongoose_Mongoose-DocumentProvider">Mongoose.prototype.DocumentProvider()</a></h3><div><p>The Mongoose DocumentProvider constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Error"><a href="#mongoose_Mongoose-Error">Mongoose.prototype.Error()</a></h3><div><p>The <a href="#error_MongooseError">MongooseError</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-CastError"><a href="#mongoose_Mongoose-CastError">Mongoose.prototype.CastError()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[reason] <span class="method-type">&laquo;Error&raquo;</span> The original error that was thrown</li></ul><div><p>The Mongoose CastError constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-mongo"><a href="#mongoose_Mongoose-mongo">Mongoose.prototype.mongo</a></h3><div><p>The <a href="https://github.com/mongodb/node-mongodb-native">node-mongodb-native</a> driver Mongoose uses.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-mquery"><a href="#mongoose_Mongoose-mquery">Mongoose.prototype.mquery</a></h3><div><p>The <a href="https://github.com/aheckmann/mquery">mquery</a> query builder Mongoose uses.</p></div><hr class="separate-api"><h2 id="Schema"><a href="#Schema">Schema</a></h2><hr class="separate-api-elements"><h3 id="schema_Schema"><a href="#schema_Schema">Schema()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options] <span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Schema constructor.</p>
 
 <h4>Example:</h4>
 
@@ -16,7 +169,6 @@
 <li><a href="/docs/guide.html#bufferCommands">bufferCommands</a>: bool - defaults to true</li>
 <li><a href="/docs/guide.html#capped">capped</a>: bool - defaults to false</li>
 <li><a href="/docs/guide.html#collection">collection</a>: string - no default</li>
-<li><a href="/docs/guide.html#emitIndexErrors">emitIndexErrors</a>: bool - defaults to false.</li>
 <li><a href="/docs/guide.html#id">id</a>: bool - defaults to true</li>
 <li><a href="/docs/guide.html#_id">_id</a>: bool - defaults to true</li>
 <li><code>minimize</code>: bool - controls <a href="#document_Document-toObject">document#toObject</a> behavior when called manually - defaults to true</li>
@@ -281,7 +433,7 @@ doc.save() <span class="hljs-comment">// changes to foo will not be persisted</s
 
 <pre><code>doc.foo = <span class="hljs-literal">null</span>;
 doc.$ignore(<span class="hljs-string">'foo'</span>);
-doc.save() <span class="hljs-comment">// changes to foo will not be persisted and validators won't be run</span></code></pre></div><hr class="separate-api-elements"><h3 id="document_Document-modifiedPaths"><a href="#document_Document-modifiedPaths">Document.prototype.modifiedPaths()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns the list of paths that have been modified.</p></div><hr class="separate-api-elements"><h3 id="document_Document-isModified"><a href="#document_Document-isModified">Document.prototype.isModified()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path] <span class="method-type">&laquo;String&raquo;</span> optional</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Returns true if this document was modified, else false.</p>
+doc.save() <span class="hljs-comment">// changes to foo will not be persisted and validators won't be run</span></code></pre></div><hr class="separate-api-elements"><h3 id="document_Document-modifiedPaths"><a href="#document_Document-modifiedPaths">Document.prototype.modifiedPaths()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options.includeChildren=false] <span class="method-type">&laquo;Boolean&raquo;</span> if true, returns children of modified paths as well. For example, if false, the list of modified paths for <code>doc.colors = { primary: &#39;blue&#39; };</code> will <strong>not</strong> contain <code>colors.primary</code></li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns the list of paths that have been modified.</p></div><hr class="separate-api-elements"><h3 id="document_Document-isModified"><a href="#document_Document-isModified">Document.prototype.isModified()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path] <span class="method-type">&laquo;String&raquo;</span> optional</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Returns true if this document was modified, else false.</p>
 
 <p>If <code>path</code> is given, checks if a path or any full path containing <code>path</code> as part of its path chain has been modified.</p>
 
@@ -632,7 +784,7 @@ product.save(<span class="hljs-function"><span class="hljs-keyword">function</sp
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">var</span> doc = <span class="hljs-keyword">new</span> Tank;
-doc.model(<span class="hljs-string">'User'</span>).findById(id, callback);</code></pre></div><hr class="separate-api-elements"><h3 id="discriminator_discriminator"><a href="#discriminator_discriminator">Model.discriminator()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">schema <span class="method-type">&laquo;Schema&raquo;</span> discriminator model schema</li></ul><div><p>Adds a discriminator type.</p>
+doc.model(<span class="hljs-string">'User'</span>).findById(id, callback);</code></pre></div><hr class="separate-api-elements"><h3 id="discriminator_discriminator"><a href="#discriminator_discriminator">Model.discriminator()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value <span class="method-type">&laquo;String&raquo;</span> discriminator model typeKey value</li></ul><div><p>Adds a discriminator type.</p>
 
 <h4>Example:</h4>
 
@@ -2136,7 +2288,7 @@ Kitten.find().populate(<span class="hljs-string">'owner'</span>, <span class="hl
 
 <h4>Note</h4>
 
-<p>If <code>obj</code> is present, it is cast instead of this query.</p></div><hr class="separate-api-elements"><h3 id="query_Query-cursor"><a href="#query_Query-cursor">Query.prototype.cursor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options] <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;QueryCursor&raquo;</span> </li></ul><div><p>Returns a wrapper around a <a href="http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html">mongodb driver cursor</a>. A QueryCursor exposes a Streams3-compatible interface, as well as a <code>.next()</code> function.</p>
+<p>If <code>obj</code> is present, it is cast instead of this query.</p></div><hr class="separate-api-elements"><h3 id="query_Query-cursor"><a href="#query_Query-cursor">Query.prototype.cursor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options] <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;QueryCursor&raquo;</span> </li></ul><div><p>Returns a wrapper around a <a href="http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html">mongodb driver cursor</a>. A QueryCursor exposes a Streams3 interface, as well as a <code>.next()</code> function.</p>
 
 <p>The <code>.cursor()</code> function triggers pre find hooks, but <strong>not</strong> post find hooks.</p>
 
@@ -2397,7 +2549,24 @@ aggregate.project({ salary_k: { $divide: [ <span class="hljs-string">"$salary"</
 <h4>Examples:</h4>
 
 <pre><code>aggregate.unwind(<span class="hljs-string">"tags"</span>);
-aggregate.unwind(<span class="hljs-string">"a"</span>, <span class="hljs-string">"b"</span>, <span class="hljs-string">"c"</span>);</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-lookup"><a href="#aggregate_Aggregate-lookup">Aggregate.prototype.lookup()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options <span class="method-type">&laquo;Object&raquo;</span> to $lookup as described in the above link</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $lookup operator(s) to this aggregate pipeline.</p>
+aggregate.unwind(<span class="hljs-string">"a"</span>, <span class="hljs-string">"b"</span>, <span class="hljs-string">"c"</span>);</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-replaceRoot"><a href="#aggregate_Aggregate-replaceRoot">Aggregate.prototype.replaceRoot()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">the <span class="method-type">&laquo;String&raquo;</span> field which will become the new root document</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $replaceRoot operator to this aggregate pipeline.</p>
+
+<p>Note that the <code>$replaceRoot</code> operator requires the new root to start with '$'. Mongoose will prepend '$' if the specified field doesn't start '$'.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.replaceRoot(<span class="hljs-string">"user"</span>);</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-count"><a href="#aggregate_Aggregate-count">Aggregate.prototype.count()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">the <span class="method-type">&laquo;String&raquo;</span> name of the count field</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends a new $count operator to this aggregate pipeline.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.count(<span class="hljs-string">"userCount"</span>);</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-sortByCount"><a href="#aggregate_Aggregate-sortByCount">Aggregate.prototype.sortByCount()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg <span class="method-type">&laquo;Object,String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> this</li></ul><div><p>Appends a new $sortByCount operator to this aggregate pipeline. Accepts either a string field name or a pipeline object.</p>
+
+<p>Note that the <code>$sortByCount</code> operator requires the new root to start with '$'. Mongoose will prepend '$' if the specified field name doesn't start with '$'.</p>
+
+<h4>Examples:</h4>
+
+<pre><code>aggregate.sortByCount(<span class="hljs-string">'users'</span>);
+aggregate.sortByCount({ $mergeObjects: [ <span class="hljs-string">"$employee"</span>, <span class="hljs-string">"$business"</span> ] })</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-lookup"><a href="#aggregate_Aggregate-lookup">Aggregate.prototype.lookup()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options <span class="method-type">&laquo;Object&raquo;</span> to $lookup as described in the above link</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><div><p>Appends new custom $lookup operator(s) to this aggregate pipeline.</p>
 
 <h4>Examples:</h4>
 

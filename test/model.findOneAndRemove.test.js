@@ -1,15 +1,18 @@
+'use strict';
 
 /**
  * Test dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId,
-    DocumentObjectId = mongoose.Types.ObjectId;
+const assert = require('assert');
+const co = require('co');
+const start = require('./common');
+const random = require('../lib/utils').random;
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model: findOneAndRemove:', function() {
   var Comments;
@@ -324,6 +327,27 @@ describe('model: findOneAndRemove:', function() {
             done();
           });
       });
+    });
+  });
+
+  it('only calls setters once (gh-6203)', function() {
+    return co(function*() {
+      const calls = [];
+      const userSchema = new mongoose.Schema({
+        name: String,
+        foo: {
+          type: String,
+          set: function(val) {
+            calls.push(val);
+            return val + val;
+          }
+        }
+      });
+      const Model = db.model('gh6203', userSchema);
+
+      yield Model.findOneAndRemove({ foo: '123' }, { name: 'bar' });
+
+      assert.deepEqual(calls, ['123']);
     });
   });
 

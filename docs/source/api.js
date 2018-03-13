@@ -12,6 +12,7 @@ const hl = require('highlight.js');
 const md = require('markdown');
 
 const files = [
+  'lib/index.js',
   'lib/schema.js',
   'lib/connection.js',
   'lib/document.js',

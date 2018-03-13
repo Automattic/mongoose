@@ -33,6 +33,21 @@ mongoose.connect('mongodb://localhost:27017/test');
 mongoose.model('Test', new Schema({}));
 ```
 
+### Connection Logic and `useMongoClient`
+
+The [`useMongoClient` option](http://mongoosejs.com/docs/4.x/docs/connections.html#use-mongo-client) was
+removed in Mongoose 5, it is now always `true`. As a consequence, Mongoose 5
+no longer supports several function signatures for `mongoose.connect()` that
+worked in Mongoose 4.x if the `useMongoClient` option was off. Below are some
+examples of `mongoose.connect()` calls that do **not** work in Mongoose 5.x.
+
+* `mongoose.connect('localhost', 27017);`
+* `mongoose.connect('localhost', 'mydb', 27017);`
+* `mongoose.connect('mongodb://host1:27017,mongodb://host2:27017');`
+
+In Mongoose 5.x, the first parameter to `mongoose.connect()` and `mongoose.createConnection()`, if specified, **must** be a [MongoDB connection string](https://docs.mongodb.com/manual/reference/connection-string/). The
+connection string and options are then passed down to [the MongoDB Node.js driver's `MongoClient.connect()` function](http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect). Mongoose does not modify the connection string, although `mongoose.connect()` and `mongoose.createConnection()` support a [few additional options in addition to the ones the MongoDB driver supports](http://mongoosejs.com/docs/connections.html#options).
+
 ### Setter Order
 
 Setters run in reverse order in 4.x:

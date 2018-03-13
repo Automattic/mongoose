@@ -1802,6 +1802,50 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('only calls setters once (gh-6203)', function() {
+      return co(function*() {
+        const calls = [];
+        const userSchema = new mongoose.Schema({
+          name: String,
+          foo: {
+            type: String,
+            set: function(val) {
+              calls.push(val);
+              return val + val;
+            }
+          }
+        });
+        const Model = db.model('gh6203', userSchema);
+
+        yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' });
+
+        assert.deepEqual(calls, ['123']);
+      });
+    });
+
+    it('only calls setters once with useFindAndModify (gh-6203)', function() {
+      return co(function*() {
+        const calls = [];
+        const userSchema = new mongoose.Schema({
+          name: String,
+          foo: {
+            type: String,
+            set: function(val) {
+              calls.push(val);
+              return val + val;
+            }
+          }
+        });
+        const Model = db.model('gh6203_0', userSchema);
+
+        yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' }, {
+          useFindAndModify: false
+        });
+
+        assert.deepEqual(calls, ['123']);
+      });
+    });
+
     it('useFindAndModify in opts (gh-5616)', function(done) {
       var m = new mongoose.constructor();
 

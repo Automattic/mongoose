@@ -2278,6 +2278,106 @@ describe('Query', function() {
         });
     });
 
+    it('cast embedded discriminators with dot notation (gh-6027)', function() {
+      return co(function*() {
+        const ownerSchema = new Schema({
+          _id: false
+        }, {
+          discriminatorKey: 'type'
+        });
+
+        const userOwnerSchema = new Schema({
+          id: {type: Schema.Types.ObjectId, required: true}
+        }, { _id: false });
+
+        const tagOwnerSchema = new Schema({
+          id: {type: String, required: true}
+        }, { _id: false });
+
+        const activitySchema = new Schema({
+          owner: {type: ownerSchema, required: true}
+        }, { _id: false });
+
+        activitySchema.path('owner').discriminator('user', userOwnerSchema);
+        activitySchema.path('owner').discriminator('tag', tagOwnerSchema);
+
+        const Activity = db.model('gh6027', activitySchema);
+
+        yield Activity.insertMany([
+          {
+            owner: {
+              id  : '5a042f742a91c1db447534d5',
+              type: 'user'
+            }
+          },
+          {
+            owner: {
+              id  : 'asdf',
+              type: 'tag'
+            }
+          }
+        ]);
+
+        const activity = yield Activity.findOne({
+          'owner.type': 'user',
+          'owner.id': '5a042f742a91c1db447534d5'
+        });
+        assert.ok(activity);
+        assert.equal(activity.owner.type, 'user');
+      });
+    });
+
+    it('cast embedded discriminators with embedded obj (gh-6027)', function() {
+      return co(function*() {
+        const ownerSchema = new Schema({
+          _id: false
+        }, {
+          discriminatorKey: 'type'
+        });
+
+        const userOwnerSchema = new Schema({
+          id: {type: Schema.Types.ObjectId, required: true}
+        }, { _id: false });
+
+        const tagOwnerSchema = new Schema({
+          id: {type: String, required: true}
+        }, { _id: false });
+
+        const activitySchema = new Schema({
+          owner: {type: ownerSchema, required: true}
+        }, { _id: false });
+
+        activitySchema.path('owner').discriminator('user', userOwnerSchema);
+        activitySchema.path('owner').discriminator('tag', tagOwnerSchema);
+
+        const Activity = db.model('gh6027_0', activitySchema);
+
+        yield Activity.insertMany([
+          {
+            owner: {
+              id  : '5a042f742a91c1db447534d5',
+              type: 'user'
+            }
+          },
+          {
+            owner: {
+              id  : 'asdf',
+              type: 'tag'
+            }
+          }
+        ]);
+
+        const activity = yield Activity.findOne({
+          owner: {
+            type: 'user',
+            id: '5a042f742a91c1db447534d5'
+          }
+        });
+        assert.ok(activity);
+        assert.equal(activity.owner.type, 'user');
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       var areaSchema = new Schema({
         name: {type: String},

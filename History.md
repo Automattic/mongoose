@@ -1,3 +1,15 @@
+5.0.10 / 2018-03-12
+===================
+ * docs(schematype): add notes re: running setters on queries #6209
+ * docs: fix typo #6208 [kamagatos](https://github.com/kamagatos)
+ * fix(query): only call setters once on query filter props for findOneAndUpdate and findOneAndRemove #6203
+ * docs: elaborate on connection string changes in migration guide #6193
+ * fix(document): skip applyDefaults if subdoc is null #6187
+ * docs: fix schematypes docs and link to them #6176
+ * docs(faq): add FAQs re: array defaults and casting aggregation pipelines #6184 #6176 #6170 [lineus](https://github.com/lineus)
+ * fix(document): ensure primitive defaults are set and built-in default functions run before setters #6155
+ * fix(query): handle single embedded embedded discriminators in castForQuery #6027
+
 5.0.9 / 2018-03-05
 ==================
  * perf: bump mongodb -> 3.0.4 to fix SSL perf issue #6065

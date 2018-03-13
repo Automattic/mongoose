@@ -5057,6 +5057,51 @@ describe('document', function() {
       });
     });
 
+    it('accessing arrays in setters on initial document creation (gh-6155)', function(done) {
+      const artistSchema = new mongoose.Schema({
+        name: {
+          type: String,
+          set: function(v) {
+            const sp = v.split(' ');
+            for (let i = 0; i < sp.length; ++i) {
+              this.keywords.push(sp[i]);
+            }
+            return v;
+          }
+        },
+        keywords: [String]
+      });
+
+      const Artist = db.model('gh6155', artistSchema);
+
+      const artist = new Artist({ name: 'Motley Crue' });
+      assert.deepEqual(artist.toObject().keywords, ['Motley', 'Crue']);
+
+      done();
+    });
+
+    it('handles 2nd level nested field with null child (gh-6187)', function(done) {
+      var NestedSchema = new Schema({
+        parent: new Schema({
+          name: String,
+          child: {
+            name: String
+          }
+        }, { strict: false })
+      });
+      var NestedModel = db.model('Nested', NestedSchema);
+      var n = new NestedModel({
+        parent: {
+          name: 'foo',
+          child: null // does not fail if undefined
+        }
+      });
+
+      assert.equal(n.parent.name, 'foo');
+
+      done();
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

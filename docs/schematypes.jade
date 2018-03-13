@@ -1,30 +1,20 @@
 extends layout
 
 block content
-  h2 SchemaTypes
-  p
-    | SchemaTypes handle definition of path&nbsp;
-    a(href="./api.html#schematype_SchemaType-default") defaults
-    |,&nbsp;
-    a(href="./api.html#schematype_SchemaType-validate") validation
-    |,&nbsp;
-    a(href="./api.html#schematype_SchemaType-get") getters
-    |,&nbsp;
-    a(href="./api.html#schematype_SchemaType-set") setters
-    |,&nbsp;
-    a(href="./api.html#schematype_SchemaType-select") field selection defaults
-    |  for&nbsp;
-    a(href="./api.html#query-js") queries
-    |  and other general characteristics for&nbsp;
-    a(href="./api.html#schema-string-js") Strings
-    |  and
-    a(href="./api.html#schema-number-js") Numbers
-    |. Check out their respective API documentation for more detail.
-  p
-    | Following are all valid&nbsp;
-    a(href="./api.html#schema_Schema.Types") Schema Types
-    |.
   :markdown
+    <h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
+
+    SchemaTypes handle definition of path
+    [defaults](./api.html#schematype_SchemaType-default),
+    [validation](./api.html#schematype_SchemaType-validate),
+    [getters](./api.html#schematype_SchemaType-get),
+    [setters](./api.html#schematype_SchemaType-set),
+    [field selection defaults](./api.html#schematype_SchemaType-select) for
+    [queries](./api.html#query-js),
+    and other general characteristics for Strings and Sumbers.
+
+    The following are all the valid SchemaTypes in mongoose.
+
     - [String](./api.html#schema-string-js)
     - [Number](./api.html#schema-number-js)
     - [Date](./api.html#schema-date-js)
@@ -33,8 +23,10 @@ block content
     - Mixed
     - [Objectid](./api.html#schema-objectid-js)
     - Array
-  h4 Example
-  :markdown
+    - Decimal128
+
+    <h4>Example</h4>
+
     ```javaScript
     var schema = new Schema({
       name:    String,
@@ -44,6 +36,7 @@ block content
       age:     { type: Number, min: 18, max: 65 },
       mixed:   Schema.Types.Mixed,
       _someId: Schema.Types.ObjectId,
+      decimal: Schema.Types.Decimal128,
       array:      [],
       ofString:   [String],
       ofNumber:   [Number],
@@ -81,10 +74,12 @@ block content
     m.nested.stuff = 'good';
     m.save(callback);
     ```
-  h3 SchemaType Options
-  :markdown
+
+    <h3 id="schematype-options"><a href="#schematype-options">SchemaType Options</a></h3>
+
     You can declare a schema type using the type directly, or an object with
     a `type` property.
+
     ```javascript
     var schema1 = new Schema({
       test: String // `test` is a path of type String
@@ -94,9 +89,10 @@ block content
       test: { type: String } // `test` is a path of type string
     });
     ```
-  :markdown
+
     In addition to the type property, you can specify additional properties
     for a path. For example, if you want to lowercase a string before saving:
+
     ```javascript
     var schema2 = new Schema({
       test: {
@@ -105,12 +101,13 @@ block content
       }
     });
     ```
-  :markdown
+
     The `lowercase` property only works for strings. There are certain options
     which apply for all schema types, and some that apply for specific schema
     types.
-  h5 All Schema Types
-  :markdown
+
+    <h5>All Schema Types</h5>
+
     * `required`: boolean or function, if true adds a [required validator](./validation.html#built-in-validators) for this property
     * `default`: Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.
     * `select`: boolean, specifies default [projections](https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/) for queries
@@ -139,13 +136,12 @@ block content
     doc.integerOnly; // 3
     doc.i; // 3
     ```
-  h5 Indexes
-  p
-  :markdown
+
+    <h5>Indexes</h5>
+
     You can also define [MongoDB indexes](https://docs.mongodb.com/manual/indexes/)
     using schema type options.
 
-  :markdown
     * `index`: boolean, whether to define an [index](https://docs.mongodb.com/manual/indexes/) on this property.
     * `unique`: boolean, whether to define a [unique index](https://docs.mongodb.com/manual/core/index-unique/) on this property.
     * `sparse`: boolean, whether to define a [sparse index](https://docs.mongodb.com/manual/core/index-sparse/) on this property.
@@ -159,27 +155,29 @@ block content
       }
     });
     ```
-  h5 String
-  :markdown
+
+    <h5>String</h5>
+
     * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
     * `uppercase`: boolean, whether to always call `.toUpperCase()` on the value
     * `trim`: boolean, whether to always call `.trim()` on the value
     * `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
     * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
 
-  h5 Number
-  :markdown
+    <h5>Number</h5>
+
     * `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
     * `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
 
-  h5 Date
-  :markdown
+    <h5>Date</h5>
+
     * `min`: Date
     * `max`: Date
 
-  h3 Usage notes:
-  h4#Dates Dates
-  :markdown
+    <h3 id="usage-notes"><a href="#usage-notes">Usage notes</a></h3>
+
+    <h4>Dates</h4>
+
     [Built-in `Date` methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) are [__not__ hooked into](https://github.com/Automattic/mongoose/issues/1598) the mongoose change tracking logic which in English means that if you use a `Date` in your document and modify it with a method like `setMonth()`, mongoose will be unaware of this change and `doc.save()` will not persist this modification. If you must modify `Date` types using built-in methods, tell mongoose about the change with `doc.markModified('pathToYourDate')` before saving.
 
     ```javascript
@@ -192,44 +190,43 @@ block content
       doc.save(callback); // works
     })
     ```
-  h4#mixed Mixed
-  p An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
-  :markdown
+
+    <h4 id="mixed">Mixed</h4>
+
+    An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
+
     ```javascript
     var Any = new Schema({ any: {} });
     var Any = new Schema({ any: Object });
     var Any = new Schema({ any: Schema.Types.Mixed });
     ```
-  p
-    | Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the
-    code .markModified(path)
-    |  method of the document passing the path to the Mixed type you just changed.
-  :markdown
+
+    Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the
+    `.markModified(path)`
+    method of the document passing the path to the Mixed type you just changed.
+
     ```javascript
     person.anything = { x: [3, 4, { y: "changed" }] };
     person.markModified('anything');
     person.save(); // anything will now get saved
     ```
-  h4#objectids ObjectIds
-  p
-    | To specify a type of ObjectId, use
-    code Schema.Types.ObjectId
-    |  in your declaration.
-  :markdown
+
+    <h4 id="objectids">ObjectIds</h4>
+
+    To specify a type of ObjectId, use `Schema.Types.ObjectId` in your declaration.
+
     ```javascript
     var mongoose = require('mongoose');
     var ObjectId = mongoose.Schema.Types.ObjectId;
     var Car = new Schema({ driver: ObjectId });
     // or just Schema.ObjectId for backwards compatibility with v2
     ```
-  h4#arrays Arrays
-  p
-    | Provide creation of arrays of
-    a(href="./api.html#schema_Schema.Types") SchemaTypes
-    |  or
-    a(href="./subdocs.html") Sub-Documents
-    |.
-  :markdown
+
+    <h4 id="arrays">Arrays</h4>
+
+    Provide creation of arrays of [SchemaTypes](./api.html#schema_Schema.Types)
+    or [Sub-Documents](./subdocs.html).
+
     ```javascript
     var ToySchema = new Schema({ name: String });
     var ToyBox = new Schema({
@@ -240,29 +237,26 @@ block content
       // ... etc
     });
     ```
-  p
-    | Note: specifying an empty array is equivalent to
-    code Mixed
-    |. The following all create arrays of
-    code Mixed
-    |:
-  :markdown
+
+    Note: specifying an empty array is equivalent to `Mixed`. The following all create arrays of
+    `Mixed`:
+
     ```javascript
     var Empty1 = new Schema({ any: [] });
     var Empty2 = new Schema({ any: Array });
     var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
     var Empty4 = new Schema({ any: [{}] });
     ```
-  p
-    | Arrays implicitly have a default value of `[]` (empty array).
-  :markdown
+
+    Arrays implicitly have a default value of `[]` (empty array).
+
     ```javascript
     var Toy = mongoose.model('Test', ToySchema);
     console.log((new Toy()).toys); // []
     ```
-  p
-    | To overwrite this default, you need to set the default value to `undefined`
-  :markdown
+
+    To overwrite this default, you need to set the default value to `undefined`
+
     ```javascript
     var ToySchema = new Schema({
       toys: {
@@ -271,41 +265,23 @@ block content
       }
     });
     ```
-  p
-    | If an array is marked as `required`, it must have at least one element.
-  :markdown
-    ```javascript
-    var ToySchema = new Schema({
-      toys: {
-        type: [ToySchema],
-        required: true
-      }
-    });
-    var Toy = mongoose.model('Toy', ToySchema);
-    Toy.create({ toys: [] }, function(error) {
-      console.log(error.errors['toys'].message); // Path "toys" is required.
-    });
-    ```
-  h3#customtypes Creating Custom Types
-  p
-    | Mongoose can also be extended with custom SchemaTypes. Search the
-    a(href="http://plugins.mongoosejs.com") plugins
-    |  site for compatible types like
-    a(href="https://github.com/aheckmann/mongoose-long") mongoose-long
-    | ,&nbsp;
-    a(href="https://github.com/vkarpov15/mongoose-int32") mongoose-int32
-    |  and
-    a(href="https://github.com/aheckmann/mongoose-function") other
-    a(href="https://github.com/OpenifyIt/mongoose-types") types
-    |.
-    | To create your own custom schema take a look at
-    a(href="/docs/customschematypes.html") Creating a Basic Custom Schema Type
-    |.
 
-  h3#path The `schema.path()` Function
-  :markdown
+    <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
+
+    Mongoose can also be extended with custom SchemaTypes. Search the
+    [plugins](http://plugins.mongoosejs.io)
+    site for compatible types like
+    [mongoose-long](https://github.com/aheckmann/mongoose-long),
+    [mongoose-int32](https://github.com/vkarpov15/mongoose-int32),
+    and
+    [other](https://github.com/aheckmann/mongoose-function)
+    [types](https://github.com/OpenifyIt/mongoose-types).
+
+    <h3 id="path"><a href="#path">The `schema.path()` Function</a></h3>
+
     The `schema.path()` function returns the instantiated schema type for a
     given path.
+
     ```javascript
     var sampleSchema = new Schema({ name: { type: String, required: true } });
     console.log(sampleSchema.path('name'));
@@ -319,10 +295,10 @@ block content
      *   validators: ...
      */
      ```
-  :markdown
+
     You can use this function to inspect the schema type for a given path,
     including what validators it has and what the type is.
 
-  h3#next Next Up
-  :markdown
+    <h3 id="next"><a href="#next">Next Up</a></h3>
+
     Now that we've covered `SchemaTypes`, let's take a look at [Models](/docs/models.html).

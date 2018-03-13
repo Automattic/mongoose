@@ -823,6 +823,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('jsonifying an object\'s virtuals ignores nulls with no getter (gh-6223)', function(done) {
+      const personSchema = new mongoose.Schema({
+        name: { type: String },
+        children: [{
+          name: { type: String }
+        }]
+      }, {
+          toObject: { getters: true, virtuals: true },
+          toJSON: { getters: true, virtuals: true }
+      });
+      personSchema.virtual('favoriteChild').set(function (v) {
+        return this.set('children.0', v);
+      });
+
+      personSchema.virtual('heir').get(function () {
+        return this.get('children.0');
+      });
+
+      const Person = db.model('Person', personSchema);
+
+      const person = new Person({
+        name: 'Anakin'
+      });
+
+      assert.strictEqual(void 0, person.toObject().favoriteChild);
+      
+      done()
+    });
   });
 
   describe('inspect', function() {

@@ -1962,6 +1962,25 @@ describe('Query', function() {
       });
     });
 
+    it('does not cast undefined to null in mongoose (gh-6236)', function() {
+      return co(function*() {
+        const TestSchema = new Schema({
+          test: String
+        });
+
+        const Test = db.model('gh6236', TestSchema);
+
+        yield Test.create({});
+
+        const q = Test.find({ test: void 0 });
+        const res = yield q.exec();
+
+        assert.strictEqual(q.getQuery().test, void 0);
+        assert.ok('test' in q.getQuery());
+        assert.equal(res.length, 1);
+      });
+    });
+
     it('runSettersOnQuery works with _id field (gh-5351)', function(done) {
       var testSchema = new Schema({
         val: { type: String }

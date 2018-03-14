@@ -4933,11 +4933,11 @@ describe('document', function() {
         id: false
       });
 
-      personSchema.virtual('favoriteChild').set(function (v) {
+      personSchema.virtual('favoriteChild').set(function(v) {
         return this.set('children.0', v);
       });
 
-      personSchema.virtual('heir').get(function () {
+      personSchema.virtual('heir').get(function() {
         return this.get('children.0');
       });
 

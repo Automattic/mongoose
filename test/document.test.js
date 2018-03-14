@@ -4921,6 +4921,39 @@ describe('document', function() {
       done();
     });
 
+    it('virtuals with no getters return undefined (gh-6223)', function(done) {
+      var personSchema = new mongoose.Schema({
+        name: { type: String },
+        children: [{
+          name: { type: String }
+        }]
+      }, {
+        toObject: { getters: true, virtuals: true },
+        toJSON: { getters: true, virtuals: true },
+        id: false
+      });
+
+      personSchema.virtual('favoriteChild').set(function (v) {
+        return this.set('children.0', v);
+      });
+
+      personSchema.virtual('heir').get(function () {
+        return this.get('children.0');
+      });
+
+      var Person = db.model('gh6223', personSchema);
+
+      var person = new Person({
+        name: 'Anakin'
+      });
+
+      assert.strictEqual(person.favoriteChild, void 0);
+      assert.ok(!('favoriteChild' in person.toJSON()));
+      assert.ok(!('favoriteChild' in person.toObject()));
+
+      done();
+    });
+
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
       var eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',

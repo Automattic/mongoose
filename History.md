@@ -1,3 +1,9 @@
+4.13.12 / 2018-03-13
+====================
+ * fix(document): make virtual get() return undefined instead of null if no getters #6223
+ * docs: fix url in useMongoClient error message #6219 #6217 [lineus](https://github.com/lineus)
+ * fix(discriminator): don't copy `discriminators` property from base schema #6122 #6064
+
 4.13.11 / 2018-02-07
 ====================
  * docs: fix links in 4.x docs #6081

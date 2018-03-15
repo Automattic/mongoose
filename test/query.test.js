@@ -5,13 +5,15 @@
  */
 
 const start = require('./common');
-const mongoose = start.mongoose;
-const DocumentObjectId = mongoose.Types.ObjectId;
 const Query = require('../lib/query');
-const Schema = mongoose.Schema;
 const assert = require('power-assert');
+const async = require('async');
 const co = require('co');
 const random = require('../lib/utils').random;
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test.
@@ -2252,6 +2254,43 @@ describe('Query', function() {
         assert.ok(error);
         assert.equal(error.name, 'ObjectParameterError');
         done();
+      });
+    });
+
+    describe('throw', function() {
+      let listeners;
+
+      beforeEach(function() {
+        listeners = process.listeners('uncaughtException');
+        process.removeAllListeners('uncaughtException');
+      });
+
+      afterEach(function() {
+        process.on('uncaughtException', listeners[0]);
+      });
+
+      it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
+        const schema = new Schema({});
+        const Test = db.model('gh6178', schema);
+
+        process.once('uncaughtException', err => {
+          assert.equal(err.message, 'woops');
+          done();
+        });
+
+        async.waterfall([
+          function(cb) {
+            Test.create({}, cb);
+          },
+          function(res, cb) {
+            Test.find({}, function() { cb(); });
+          },
+          function() {
+            throw new Error('woops');
+          }
+        ], function() {
+          assert.ok(false);
+        });
       });
     });
 

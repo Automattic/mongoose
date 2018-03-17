@@ -4356,12 +4356,12 @@ describe('model: populate:', function() {
           const Person = db.model('gh6234', PersonSchema);
           const Band = db.model('gh6234_0', BandSchema);
 
-          yield Band.create({ name: `Guns N' Roses` });
-          yield Band.create({ name: `Motley Crue` });
-          yield Person.create({ name: `Axl Rose`, band: `Guns N' Roses` });
-          yield Person.create({ name: `Slash`, band: `Guns N' Roses` });
-          yield Person.create({ name: `Vince Neil`, band: `Motley Crue` });
-          yield Person.create({ name: `Nikki Sixx`, band: `Motley Crue` });
+          yield Band.create({ name: 'Guns N\' Roses' });
+          yield Band.create({ name: 'Motley Crue' });
+          yield Person.create({ name: 'Axl Rose', band: 'Guns N\' Roses' });
+          yield Person.create({ name: 'Slash', band: 'Guns N\' Roses' });
+          yield Person.create({ name: 'Vince Neil', band: 'Motley Crue' });
+          yield Person.create({ name: 'Nikki Sixx', band: 'Motley Crue' });
 
           const res = yield Band.find().
             sort({ name: 1 }).
@@ -4369,7 +4369,7 @@ describe('model: populate:', function() {
             lean();
 
           assert.equal(res.length, 2);
-          assert.equal(res[0].name, `Guns N' Roses`);
+          assert.equal(res[0].name, 'Guns N\' Roses');
           assert.equal(res[0].member.name, 'Axl Rose');
           assert.equal(res[1].name, 'Motley Crue');
           assert.equal(res[1].member.name, 'Vince Neil');

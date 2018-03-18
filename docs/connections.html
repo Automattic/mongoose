@@ -60,6 +60,7 @@ exceptions that are explained below.</p>
 <li><code>promiseLibrary</code>    - sets the <a href="http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html">underlying driver&#39;s promise library</a></li>
 <li><code>poolSize</code>          - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, <code>poolSize</code> is 5. Keep in mind that, as of MongoDB 3.4, MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding.</li>
 <li><code>bufferMaxEntries</code>  - The MongoDB driver also has its own buffering mechanism that kicks in when the driver is disconnected. Set this option to 0 and set <code>bufferCommands</code> to <code>false</code> on your schemas if you want your database operations to fail immediately when the driver is not connected, as opposed to waiting for reconnection.</li>
+<li><code>dbName</code>            - specifies which database to connect to. For certain DbaaS providers, such as Mongo Atlas, the driver will only connect to 'admin' unless this parameter is set (cf <a href="https://stackoverflow.com/a/48917626/1094784">this SO answer</a>)</li>
 </ul>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> options = {

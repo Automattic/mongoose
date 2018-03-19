@@ -1934,7 +1934,7 @@ describe('model: findOneAndUpdate:', function() {
       const Model = db.model('gh6240', schema);
 
       return co(function*() {
-        const doc = yield Model.create({
+        yield Model.create({
           _id: '1',
           highlights: [{
             _id: '1',

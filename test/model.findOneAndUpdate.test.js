@@ -1944,7 +1944,7 @@ describe('model: findOneAndUpdate:', function() {
         });
 
         // Should not throw
-        const { highlights } = yield Model.findByIdAndUpdate('1', {
+        const res = yield Model.findByIdAndUpdate('1', {
           $pull: {
             highlights: {
               _id: {
@@ -1954,7 +1954,7 @@ describe('model: findOneAndUpdate:', function() {
           }
         }, { runValidators: true, new: true });
 
-        assert.equal(highlights.length, 0);
+        assert.equal(res.highlights.length, 0);
       });
     });
 

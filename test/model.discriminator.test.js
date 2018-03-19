@@ -4,13 +4,14 @@
  * Test dependencies.
  */
 
-const start = require('./common');
-const mongoose = start.mongoose;
-const Schema = mongoose.Schema;
 const assert = require('power-assert');
-const util = require('util');
 const clone = require('../lib/utils').clone;
 const random = require('../lib/utils').random;
+const start = require('./common');
+const util = require('util');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Setup
@@ -608,6 +609,40 @@ describe('model', function() {
         assert.equal(doc1.stuff[0].name, 'test');
         assert.equal(doc2.things.length, 1);
         assert.equal(doc2.things[0].name, 'test');
+
+        done();
+      });
+
+      it('overwrites nested paths in parent schema (gh-6076)', function(done) {
+        const schema = mongoose.Schema({
+          account: {
+            type: Object,
+          }
+        });
+
+        const Model = db.model('gh6076', schema);
+
+        const discSchema = mongoose.Schema({
+          account: {
+            user: {
+              ref: 'Foo',
+              required: true,
+              type: mongoose.Schema.Types.ObjectId
+            }
+          }
+        });
+
+        const Disc = Model.discriminator('gh6076_0', discSchema);
+
+        const d1 = new Disc({
+          account: {
+            user: 'AAAAAAAAAAAAAAAAAAAAAAAA',
+          },
+          info: 'AAAAAAAAAAAAAAAAAAAAAAAA',
+        });
+
+        // Should not throw
+        assert.ifError(d1.validateSync());
 
         done();
       });

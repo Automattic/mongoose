@@ -4,16 +4,18 @@
  * Test dependencies.
  */
 
-var _ = require('lodash');
-var start = require('./common');
-var async = require('async');
-var assert = require('power-assert');
-var mongoose = start.mongoose;
-var utils = require('../lib/utils');
-var random = utils.random;
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
-var DocObjectId = mongoose.Types.ObjectId;
+const _ = require('lodash');
+const assert = require('assert');
+const async = require('async');
+const co = require('co');
+const start = require('./common');
+const utils = require('../lib/utils');
+
+const mongoose = start.mongoose;
+const random = utils.random;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
+const DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Tests.
@@ -4330,6 +4332,47 @@ describe('model: populate:', function() {
                 done();
               });
           });
+        });
+      });
+
+      it('justOne + lean (gh-6234)', function() {
+        return co(function*() {
+          const PersonSchema = new mongoose.Schema({
+            name: String,
+            band: String
+          });
+
+          const BandSchema = new mongoose.Schema({
+            name: String
+          });
+
+          BandSchema.virtual('member', {
+            ref: 'gh6234',
+            localField: 'name',
+            foreignField: 'band',
+            justOne: true
+          });
+
+          const Person = db.model('gh6234', PersonSchema);
+          const Band = db.model('gh6234_0', BandSchema);
+
+          yield Band.create({ name: 'Guns N\' Roses' });
+          yield Band.create({ name: 'Motley Crue' });
+          yield Person.create({ name: 'Axl Rose', band: 'Guns N\' Roses' });
+          yield Person.create({ name: 'Slash', band: 'Guns N\' Roses' });
+          yield Person.create({ name: 'Vince Neil', band: 'Motley Crue' });
+          yield Person.create({ name: 'Nikki Sixx', band: 'Motley Crue' });
+
+          const res = yield Band.find().
+            sort({ name: 1 }).
+            populate('member').
+            lean();
+
+          assert.equal(res.length, 2);
+          assert.equal(res[0].name, 'Guns N\' Roses');
+          assert.equal(res[0].member.name, 'Axl Rose');
+          assert.equal(res[1].name, 'Motley Crue');
+          assert.equal(res[1].member.name, 'Vince Neil');
         });
       });
 

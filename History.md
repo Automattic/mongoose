@@ -1,3 +1,19 @@
+5.0.11 / 2018-03-19
+===================
+ * fix(update): handle $pull with $in in update validators #6240
+ * fix(query): don't convert undefined to null when casting so driver `ignoreUndefined` option works #6236
+ * docs(middleware): add example of using async/await with middleware #6235
+ * fix(populate): apply justOne option before `completeMany()` so it works with lean() #6234
+ * fix(query): ensure errors in user callbacks aren't caught in init #6195 #6178
+ * docs(connections): document dbName option for Atlas connections #6179
+ * fix(discriminator): make child schema nested paths overwrite parent schema paths #6076
+
+4.13.12 / 2018-03-13
+====================
+ * fix(document): make virtual get() return undefined instead of null if no getters #6223
+ * docs: fix url in useMongoClient error message #6219 #6217 [lineus](https://github.com/lineus)
+ * fix(discriminator): don't copy `discriminators` property from base schema #6122 #6064
+
 5.0.10 / 2018-03-12
 ===================
  * docs(schematype): add notes re: running setters on queries #6209

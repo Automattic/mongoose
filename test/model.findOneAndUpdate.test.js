@@ -1901,12 +1901,64 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
-      if (parseInt(process.version.substr(1).split('.')[0], 10) < 4) {
-        // Don't run on node 0.x because of `const` issues
-        this.skip();
-      }
+    it('update validators with pull + $in (gh-6240)', function() {
+      const highlightSchema = new mongoose.Schema({
+        _id: {
+          type: String,
+          required: true
+        },
+        color: {
+          type: String,
+          required: true
+        },
+        range: {
+          start: {
+            type: Number,
+            required: true
+          },
+          end: {
+            type: Number,
+            required: true
+          }
+        }
+      });
 
+      const schema = new mongoose.Schema({
+        _id: {
+          type: String,
+          required: true
+        },
+        highlights: [highlightSchema]
+      });
+
+      const Model = db.model('gh6240', schema);
+
+      return co(function*() {
+        const doc = yield Model.create({
+          _id: '1',
+          highlights: [{
+            _id: '1',
+            color: 'green',
+            range: { start: 1, end: 2 }
+          }]
+        });
+
+        // Should not throw
+        const { highlights } = yield Model.findByIdAndUpdate('1', {
+          $pull: {
+            highlights: {
+              _id: {
+                $in:  ['1', '2', '3', '4']
+              }
+            }
+          }
+        }, { runValidators: true, new: true });
+
+        assert.equal(highlights.length, 0);
+      });
+    });
+
+    it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
       var uuidParse = require('uuid-parse');
 
       function toUUID(string) {

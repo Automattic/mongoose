@@ -4741,6 +4741,46 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() with error handlers (gh-6228)', function() {
+      const schema = new Schema({
+        name: { type: String, unique: true }
+      });
+
+      let postCalled = 0;
+      let postErrorCalled = 0;
+      schema.post('insertMany', (doc, next) => {
+        ++postCalled;
+        next();
+      });
+
+      schema.post('insertMany', (err, doc, next) => {
+        ++postErrorCalled;
+        next(err);
+      });
+
+      const Movie = db.model('gh6228', schema);
+
+      return co(function*() {
+        yield Movie.init();
+
+        let threw = false;
+        try {
+          yield Movie.insertMany([
+            { name: 'Star Wars' },
+            { name: 'Star Wars' }
+          ]);
+        } catch (error) {
+          assert.ok(error);
+          threw = true;
+        }
+
+        assert.ok(threw);
+        assert.equal(postCalled, 0);
+        assert.equal(postErrorCalled, 1);
+      });
+
+    });
+
     describe('3.6 features', function() {
       before(function(done) {
         start.mongodVersion((err, version) => {

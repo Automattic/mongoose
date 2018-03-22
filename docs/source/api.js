@@ -69,11 +69,11 @@ function parse() {
             break;
           case 'event':
           case 'param':
-            ctx[tag.type] = (ctx[tag] || []);
+            ctx[tag.type] = (ctx[tag.type] || []);
+            if (tag.types) {
+              tag.types = tag.types.join('|');
+            }
             ctx[tag.type].push(tag);
-            tag.description = tag.description ?
-              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
-              '';
             break;
           case 'method':
             ctx.type = 'method';

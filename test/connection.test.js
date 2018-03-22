@@ -8,6 +8,7 @@ const Promise = require('bluebird');
 const Q = require('q');
 const _ = require('lodash');
 const assert = require('power-assert');
+const co = require('co');
 const server = require('./common').server;
 const start = require('./common');
 
@@ -378,6 +379,23 @@ describe('connections:', function() {
       db.openUri('fail connection').catch(function(error) {
         assert.ok(error);
         done();
+      });
+    });
+
+    it('readyState is disconnected if initial connection fails (gh-6244)', function() {
+      var db = mongoose.createConnection();
+
+      return co(function*() {
+        let threw = false;
+        try {
+          yield db.openUri('fail connection');
+        } catch (err) {
+          assert.ok(err);
+          threw = true;
+        }
+
+        assert.ok(threw);
+        assert.strictEqual(db.readyState, 0);
       });
     });
   });

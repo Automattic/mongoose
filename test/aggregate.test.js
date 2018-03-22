@@ -48,20 +48,26 @@ function setupData(db, callback) {
 }
 
 /**
- * Helper function to test operators that only work in MongoDB 3.4 and above (such as some aggregation pipeline operators)
+ * Helper function to test operators that only work in a specific versoin of MongoDB and above (such as some aggregation pipeline operators)
  *
+ * @param {String} semver, `3.4`, specify minimum compatible mongod version
  * @param {Object} ctx, `this`, so that mocha tests can be skipped
  * @param {Function} done
  * @return {Void}
  */
-function onlyTestMongo34(ctx, done) {
+function onlyTestMongo(semver, ctx, done) {
   start.mongodVersion(function(err, version) {
     if (err) {
       done(err);
       return;
     }
-    var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-    if (!mongo34) {
+
+    var [ major, minor ] = semver.split('.').map(function(s) {
+      return parseInt(s);
+    });
+
+    var meetsMinimum = version[0] > major || (version[0] === major && version[1] >= minor);
+    if (!meetsMinimum) {
       ctx.skip();
     }
     done();
@@ -404,7 +410,7 @@ describe('aggregate: ', function() {
 
   describe('Mongo 3.4 operators', function() {
     before(function(done) {
-      onlyTestMongo34(this, done);
+      onlyTestMongo('3.4', this, done);
     });
 
     describe('graphLookup', function() {
@@ -564,6 +570,17 @@ describe('aggregate: ', function() {
           done();
         }
       });
+    });
+  });
+
+  describe('Mongo 3.6 options', function() {
+    before(function(done) {
+      onlyTestMongo('3.6', this, done);
+    });
+    it('adds hint option', function() {
+      var aggregate = new Aggregate();
+      aggregate.hint({ qty: 1 });
+      assert.deepEqual(aggregate.options.hint, { qty: 1 });
     });
   });
 

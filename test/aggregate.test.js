@@ -62,11 +62,11 @@ function onlyTestAtOrAbove(semver, ctx, done) {
       return;
     }
 
-    var [major, minor] = semver.split('.').map(function(s) {
+    var desired = semver.split('.').map(function(s) {
       return parseInt(s);
     });
 
-    var meetsMinimum = version[0] > major || (version[0] === major && version[1] >= minor);
+    var meetsMinimum = version[0] > desired[0] || (version[0] === desired[0] && version[1] >= desired[1]);
 
     if (!meetsMinimum) {
       ctx.skip();

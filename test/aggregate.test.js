@@ -48,20 +48,27 @@ function setupData(db, callback) {
 }
 
 /**
- * Helper function to test operators that only work in MongoDB 3.4 and above (such as some aggregation pipeline operators)
+ * Helper function to test operators that only work in a specific versoin of MongoDB and above (such as some aggregation pipeline operators)
  *
+ * @param {String} semver, `3.4`, specify minimum compatible mongod version
  * @param {Object} ctx, `this`, so that mocha tests can be skipped
  * @param {Function} done
  * @return {Void}
  */
-function onlyTestMongo34(ctx, done) {
+function onlyTestAtOrAbove(semver, ctx, done) {
   start.mongodVersion(function(err, version) {
     if (err) {
       done(err);
       return;
     }
-    var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
-    if (!mongo34) {
+
+    var desired = semver.split('.').map(function(s) {
+      return parseInt(s);
+    });
+
+    var meetsMinimum = version[0] > desired[0] || (version[0] === desired[0] && version[1] >= desired[1]);
+
+    if (!meetsMinimum) {
       ctx.skip();
     }
     done();
@@ -404,7 +411,7 @@ describe('aggregate: ', function() {
 
   describe('Mongo 3.4 operators', function() {
     before(function(done) {
-      onlyTestMongo34(this, done);
+      onlyTestAtOrAbove('3.4', this, done);
     });
 
     describe('graphLookup', function() {
@@ -923,6 +930,7 @@ describe('aggregate: ', function() {
           aggregate.option({maxTimeMS: 1000});
         }
 
+
         assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {
           assert.equal(aggregate.options.allowDiskUse, true);
@@ -1251,5 +1259,39 @@ describe('aggregate: ', function() {
         });
       });
     });
+  });
+
+  describe('Mongo 3.6 options', function() {
+    before(function(done) {
+      onlyTestAtOrAbove('3.6', this, done);
+    });
+
+    it('adds hint option', function(done) {
+      var mySchema = new Schema({ name: String, qty: Number });
+      mySchema.index({ qty: -1, name: -1 });
+      var M = db.model('gh6251', mySchema);
+      M.on('index', function(error) {
+        assert.ifError(error);
+        var docs = [
+          { name: 'Andrew', qty: 4 },
+          { name: 'Betty', qty: 5 },
+          { name: 'Charlie', qty: 4 }
+        ];
+        M.create(docs, function(error) {
+          assert.ifError(error);
+          var aggregate = M.aggregate();
+          aggregate.match({})
+            .hint({ qty: -1, name: -1 }).exec(function(error, docs) {
+              assert.ifError(error);
+              assert.equal(docs[0].name, 'Betty');
+              assert.equal(docs[1].name, 'Charlie');
+              assert.equal(docs[2].name, 'Andrew');
+              done();
+            });
+        });
+      });
+    });
+
+
   });
 });

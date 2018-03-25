@@ -48,7 +48,7 @@ function setupData(db, callback) {
 }
 
 /**
- * Helper function to test operators that only work in a specific versoin of MongoDB and above (such as some aggregation pipeline operators)
+ * Helper function to test operators that only work in a specific version of MongoDB and above (such as some aggregation pipeline operators)
  *
  * @param {String} semver, `3.4`, specify minimum compatible mongod version
  * @param {Object} ctx, `this`, so that mocha tests can be skipped

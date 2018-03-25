@@ -10,7 +10,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   code.
   - If the bug involves an error, please post the stack trace.
   - Please post the version of mongoose and mongodb that you're using.
-  - Please write bug reports in JavaScript (ES5 or ES2015), not coffeescript, typescript, etc.
+  - Please write bug reports in JavaScript (ES5, ES6, etc) that runs in Node.js, not coffeescript, typescript, etc.
 
 ### Requesting new features
 

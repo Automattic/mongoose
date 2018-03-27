@@ -316,25 +316,29 @@ block content
     var Kitten = connection.model('Kitten', kittySchema);
     ```
 
-    **Q**. How can I change mongoose's default behavior of initializing an array 
+    <hr id="array-defaults" />
+
+    **Q**. How can I change mongoose's default behavior of initializing an array
     path to an empty array so that I can require real data on document creation?
 
     **A**. You can set the default of the array to a function that returns null.
     ```javascript
     const CollectionSchema = new Schema({
-      field1: { 
-        type: [String], 
+      field1: {
+        type: [String],
         default: void 0
       }
     });
     ```
 
+    <hr id="aggregate-casting" />
+
     **Q**. Why does my aggregate $match fail to return the document that my find query
     returns when working with dates?
 
-    **A**. Mongoose does not cast aggregation pipeline stages because with $project, 
-    $group, etc. the type of a property may change during the aggregation. If you want 
-    to query by date using the aggregation framework, you're responsible for ensuring 
+    **A**. Mongoose does not cast aggregation pipeline stages because with $project,
+    $group, etc. the type of a property may change during the aggregation. If you want
+    to query by date using the aggregation framework, you're responsible for ensuring
     that you're passing in a valid date.
 
     **Something to add?**

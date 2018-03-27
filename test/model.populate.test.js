@@ -5595,6 +5595,53 @@ describe('model: populate:', function() {
         done();
       });
 
+      it('array underneath non-existent array (gh-6245)', function() {
+        return co(function*() {
+          let DepartmentSchema = new Schema({name: String});
+          let CompanySchema = new Schema({
+            name: String,
+            departments: [DepartmentSchema]
+          });
+
+          let Company = db.model('gh6245', CompanySchema);
+          const company = new Company({
+            name: 'Uber',
+            departments: [{name: 'Security'}, {name: 'Engineering'}],
+          });
+
+          yield company.save();
+
+          const EmployeeSchema = new Schema({name: String});
+          DepartmentSchema = new Schema({
+            name: String,
+            employees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh6245' }]
+          });
+          CompanySchema = new Schema({
+            name: String,
+            departments: [DepartmentSchema]
+          });
+
+          delete db.models['gh6245'];
+          const Employee = db.model('gh6245_0', EmployeeSchema);
+          Company = db.model('gh6245', CompanySchema);
+
+          let uber = yield Company.findOne({ name: 'Uber' });
+          const kurt = yield Employee.create({ name: 'Kurt' });
+
+          const engineering = uber.departments.
+            find(d => d.name === 'Engineering');
+          engineering.employees.addToSet(kurt);
+          yield uber.save();
+
+          uber = yield Company.findOne({ name: 'Uber' }).
+            populate('departments.employees');
+          assert.equal(uber.departments[0].name, 'Security');
+          // Take extra care to make sure this isn't `null`
+          assert.ok(Array.isArray(uber.departments[0].employees));
+          assert.equal(uber.departments[0].employees.length, 0);
+        });
+      });
+
       it('virtuals with justOne false and foreign field not found (gh-5336)', function(done) {
         var BandSchema = new mongoose.Schema({
           name: String,

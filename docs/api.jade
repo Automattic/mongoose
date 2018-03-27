@@ -11,6 +11,11 @@ block content
     h2(id="#{item.name}")
       a(href="##{item.name}")
         | #{item.name}
+    ul
+      each prop in item.props
+        li
+          a(href="##{prop.anchorId}")
+            | #{prop.string}
     each prop in item.props
       hr.separate-api-elements
       h3(id="#{prop.anchorId}")

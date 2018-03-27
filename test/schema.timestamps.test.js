@@ -227,6 +227,18 @@ describe('schema options.timestamps', function() {
       });
     });
 
+    it('should change updatedAt when updateOne', function(done) {
+      Cat.findOne({name: 'newcat'}, function(err, doc) {
+        var old = doc.updatedAt;
+        Cat.updateOne({name: 'newcat'}, {$set: {hobby: 'fish'}}, function() {
+          Cat.findOne({name: 'newcat'}, function(err, doc) {
+            assert.ok(doc.updatedAt.getTime() > old.getTime());
+            done();
+          });
+        });
+      });
+    });
+
     it('nested docs (gh-4049)', function(done) {
       var GroupSchema = new Schema({
         cats: [CatSchema]

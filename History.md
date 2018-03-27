@@ -1,3 +1,17 @@
+5.0.12 / 2018-03-27
+===================
+ * docs(query): updating model name in query API docs #6280 [lineus](https://github.com/lineus)
+ * docs: fix typo in tests #6275 [styler](https://github.com/styler)
+ * fix: add missing `.hint()` to aggregate #6272 #6251 [lineus](https://github.com/lineus)
+ * docs(api): add headers to each API docs section for easer nav #6261
+ * fix(query): ensure hooked query functions always run on next tick for chaining #6250
+ * fix(populate): ensure populated array not set to null if it isn't set #6245
+ * fix(connection): set readyState to disconnected if initial connection fails #6244 #6131
+ * docs(model): make `create()` params show up correctly in docs #6242
+ * fix(model): make error handlers work with MongoDB server errors and `insertMany()` #6228
+ * fix(browser): ensure browser document builds defaults for embedded arrays correctly #6175
+ * fix(timestamps): set timestamps when using `updateOne()` and `updateMany()` #6282 [gualopezb](https://github.com/gualopezb)
+
 5.0.11 / 2018-03-19
 ===================
  * fix(update): handle $pull with $in in update validators #6240

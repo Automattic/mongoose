@@ -2114,6 +2114,33 @@ describe('document', function() {
         });
       });
     });
+
+    it('single embedded schema update validators ignore _id (gh-6269)', function() {
+      return co(function*() {
+        const subDocSchema = new mongoose.Schema({ name: String });
+
+        const schema = new mongoose.Schema({
+          subDoc: subDocSchema,
+          test: String
+        });
+
+        const Model = db.model('gh6269', schema);
+
+        const fakeDoc = new Model({});
+        const doc = yield Model.create({});
+
+        // toggle to false to see correct behavior
+        // where subdoc is not created
+        const setDefaultsFlag = true;
+
+        const res = yield Model.findOneAndUpdate({ _id: fakeDoc._id }, {
+          test: 'test'
+        }, { setDefaultsOnInsert: setDefaultsFlag, upsert: true, new: true });
+
+        assert.equal(res.test, 'test');
+        assert.ok(!res.subDoc);
+      });
+    });
   });
 
   describe('error processing (gh-2284)', function() {

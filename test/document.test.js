@@ -2127,7 +2127,7 @@ describe('document', function() {
         const Model = db.model('gh6269', schema);
 
         const fakeDoc = new Model({});
-        const doc = yield Model.create({});
+        yield Model.create({});
 
         // toggle to false to see correct behavior
         // where subdoc is not created

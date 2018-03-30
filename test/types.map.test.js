@@ -79,4 +79,44 @@ describe('Map', function() {
       assert.ok(threw);
     });
   });
+
+  it('query casting', function() {
+    const TestSchema = new mongoose.Schema({
+      v: {
+        type: Map,
+        of: Number
+      }
+    });
+
+    const Test = db.model('MapQueryTest', TestSchema);
+
+    return co(function*() {
+      const docs = yield Test.create([
+        { v: { n: 1 } },
+        { v: { n: 2 } }
+      ]);
+
+      let res = yield Test.find({ 'v.n': 1 });
+      assert.equal(res.length, 1);
+
+      res = yield Test.find({ v: { n: 2 } });
+      assert.equal(res.length, 1);
+
+      yield Test.updateOne({ _id: docs[1]._id }, { 'v.n': 3 });
+
+      res = yield Test.find({ v: { n: 3 } });
+      assert.equal(res.length, 1);
+
+      let threw = false;
+      try {
+        yield Test.updateOne({ _id: docs[1]._id }, { 'v.n': 'not a number' });
+      } catch (error) {
+        threw = true;
+        assert.equal(error.name, 'CastError');
+      }
+      assert.ok(threw);
+      res = yield Test.find({ v: { n: 3 } });
+      assert.equal(res.length, 1);
+    });
+  });
 });

@@ -124,23 +124,27 @@ describe('Map', function() {
     const TestSchema = new mongoose.Schema({
       m: {
         type: Map,
-        of: new mongoose.Schema({ n: Number })
+        of: new mongoose.Schema({ n: Number }, { _id: false, id: false })
       }
     });
 
     const Test = db.model('MapEmbeddedTest', TestSchema);
 
     return co(function*() {
-      let doc = yield Test.create({ m: { bacon: { n: 2 } } });
-      assert.deepEqual(doc.toObject().m.get('bacon'), { n: 2 });
+      let doc = new Test({ m: { bacon: { n: 2 } } });
+
+      yield doc.save();
+
+      assert.ok(doc.m instanceof Map);
+      assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 2 });
 
       doc.m.get('bacon').n = 4;
       yield doc.save();
-      assert.deepEqual(doc.toObject().m.get('bacon'), { n: 4 });
+      assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
 
       doc = yield Test.findById(doc._id);
 
-      assert.deepEqual(doc.toObject().m.get('bacon'), { n: 4 });
+      assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
     });
   });
 });

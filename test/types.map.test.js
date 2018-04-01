@@ -119,4 +119,28 @@ describe('Map', function() {
       assert.equal(res.length, 1);
     });
   });
+
+  it('with single nested subdocs', function() {
+    const TestSchema = new mongoose.Schema({
+      m: {
+        type: Map,
+        of: new mongoose.Schema({ n: Number })
+      }
+    });
+
+    const Test = db.model('MapEmbeddedTest', TestSchema);
+
+    return co(function*() {
+      let doc = yield Test.create({ m: { bacon: { n: 2 } } });
+      assert.deepEqual(doc.toObject().m.get('bacon'), { n: 2 });
+
+      doc.m.get('bacon').n = 4;
+      yield doc.save();
+      assert.deepEqual(doc.toObject().m.get('bacon'), { n: 4 });
+
+      doc = yield Test.findById(doc._id);
+
+      assert.deepEqual(doc.toObject().m.get('bacon'), { n: 4 });
+    });
+  });
 });

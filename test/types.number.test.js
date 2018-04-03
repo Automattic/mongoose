@@ -4,8 +4,8 @@
  */
 
 var mongoose = require('./common').mongoose,
-  SchemaNumber = mongoose.Schema.Types.Number,
-  assert = require('power-assert');
+    SchemaNumber = mongoose.Schema.Types.Number,
+    assert = require('power-assert');
 
 /**
  * Test.

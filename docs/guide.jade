@@ -57,7 +57,7 @@ block content
     Schemas not only define the structure of your document and casting of
     properties, they also define document [instance methods](#methods),
     [static Model methods](#statics), [compound indexes](#indexes),
-    and document lifecycle hooks called [middleware](./middleware.html)
+    and document lifecycle hooks called [middleware](./middleware.html).
 
     <h3 id="models"><a href="#models">Creating a model</a></h3>
 
@@ -118,7 +118,7 @@ block content
       });
     ```
 
-    _Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`._
+    Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.
 
     <h3 id="query-helpers"><a href="#query-helpers">Query Helpers</a></h3>
 
@@ -411,7 +411,7 @@ block content
     to coincide with MongoDB's default behavior. If you don't want an `_id`
     added to your schema at all, you may disable it using this option.
 
-    You can **only** use this option on sub-documents. Mongoose can't
+    You can **only** use this option on subdocuments. Mongoose can't
     save a document without knowing its id, so you will get an error if
     you try to save a document without an `_id`.
 
@@ -751,7 +751,7 @@ block content
 
     `skipVersioning` allows excluding paths from versioning (i.e., the internal
     revision will not be incremented even if these paths are updated). DO NOT
-    do this unless you know what you're doing. For sub-documents, include this
+    do this unless you know what you're doing. For subdocuments, include this
     on the parent document using the fully qualified path.
 
     ```javascript

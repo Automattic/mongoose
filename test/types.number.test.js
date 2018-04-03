@@ -4,8 +4,8 @@
  */
 
 var mongoose = require('./common').mongoose,
-    SchemaNumber = mongoose.Schema.Types.Number,
-    assert = require('power-assert');
+  SchemaNumber = mongoose.Schema.Types.Number,
+  assert = require('power-assert');
 
 /**
  * Test.
@@ -91,6 +91,21 @@ describe('types.number', function() {
     var n = new SchemaNumber();
     assert.strictEqual(n.cast(true), 1);
     assert.strictEqual(n.cast(false), 0);
+    done();
+  });
+
+  it('prefers toNumber if one exists (gh-6299)', function(done) {
+    var n = new SchemaNumber();
+    var obj = {
+      str: '10',
+      toNumber: function() {
+        return Number(this.str);
+      },
+      toString: function() {
+        return '11';
+      }
+    };
+    assert.strictEqual(n.cast(obj), 10);
     done();
   });
 });

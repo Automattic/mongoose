@@ -758,7 +758,10 @@ describe('document', function() {
     });
 
     it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
-      var userSchema, User, groupSchema, Group;
+      let userSchema;
+      let User;
+      let groupSchema;
+      let Group;
 
       userSchema = new Schema({name: String});
       // includes virtual path when 'toJSON'

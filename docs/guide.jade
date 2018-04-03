@@ -411,7 +411,7 @@ block content
     to coincide with MongoDB's default behavior. If you don't want an `_id`
     added to your schema at all, you may disable it using this option.
 
-    You can **only** use this option on sub-documents. Mongoose can't
+    You can **only** use this option on subdocuments. Mongoose can't
     save a document without knowing its id, so you will get an error if
     you try to save a document without an `_id`.
 
@@ -751,7 +751,7 @@ block content
 
     `skipVersioning` allows excluding paths from versioning (i.e., the internal
     revision will not be incremented even if these paths are updated). DO NOT
-    do this unless you know what you're doing. For sub-documents, include this
+    do this unless you know what you're doing. For subdocuments, include this
     on the parent document using the fully qualified path.
 
     ```javascript

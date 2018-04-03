@@ -89,7 +89,7 @@ block content
     });
     ```
 
-  h3 Finding a sub-document
+  h3 Finding a subdocument
   :markdown
     Each subdocument has an `_id` by default. Mongoose document arrays have a
     special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
@@ -97,7 +97,7 @@ block content
     ```javascript
     var doc = parent.children.id(_id);
     ```
-  h3 Adding sub-docs to arrays
+  h3 Adding subdocs to arrays
   :markdown
     MongooseArray methods such as
     [push](./api.html#types_array_MongooseArray.push),
@@ -120,7 +120,7 @@ block content
     });
     ```
   :markdown
-    Sub-docs may also be created without adding them to the array by using the
+    Subdocs may also be created without adding them to the array by using the
     [create](./api.html#types_documentarray_MongooseDocumentArray.create)
     method of MongooseArrays.
     ```javascript

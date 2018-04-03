@@ -1084,6 +1084,7 @@ describe('schema', function() {
       const breakfast = new Schema({foods: {bacon: Number, eggs: Number}});
 
       const Breakfast = mongoose.model('gh-2592', breakfast, 'gh-2592');
+
       const bad = new Breakfast();
       bad.foods = 'waffles';
       bad.validate(function(error) {

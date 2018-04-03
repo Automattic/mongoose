@@ -1731,6 +1731,33 @@ describe('schema', function() {
       done();
     });
 
+    it('clone() with nested virtuals (gh-6274)', function(done) {
+      const PersonSchema = new Schema({
+        name: {
+          first: String,
+          last: String
+        }
+      });
+
+      PersonSchema.
+        virtual('name.full').
+        get(function() {
+          return this.get('name.first') + ' ' + this.get('name.last');
+        }).
+        set(function(fullName) {
+          var split = fullName.split(' ');
+          this.set('name.first', split[0]);
+          this.set('name.last', split[1]);
+        });
+
+      const M = db.model('gh6274', PersonSchema.clone());
+
+      const doc = new M({ name: { first: 'Axl', last: 'Rose' } });
+      assert.equal(doc.name.full, 'Axl Rose');
+
+      done();
+    });
+
     it('TTL index with timestamps (gh-5656)', function(done) {
       var testSchema = new mongoose.Schema({
         foo: String,

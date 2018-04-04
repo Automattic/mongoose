@@ -1537,7 +1537,9 @@ describe('document', function() {
           });
 
           // vs merging using doc.set(path, object, {merge: true})
-          doc.set('nested', {path: 'did not overwrite the nested object'}, {merge: true});
+          doc.set('nested', {path: 'did not overwrite the nested object'}, {
+            merge: true
+          });
           assert.equal(doc.nested.path, '5did not overwrite the nested object');
           assert.equal(doc.nested.age, 5);
           assert.equal(Object.keys(doc._doc.nested).length, 3);
@@ -4912,6 +4914,32 @@ describe('document', function() {
       done();
     });
 
+    it('nested virtuals + nested toJSON (gh-6294)', function(done) {
+      const schema = mongoose.Schema({
+        nested: {
+          prop: String
+        }
+      }, { _id: false, id: false });
+
+      schema.virtual('nested.virtual').get(() => 'test 2');
+
+      schema.set('toJSON', {
+        virtuals: true
+      });
+
+      const MyModel = db.model('gh6294', schema);
+
+      const doc = new MyModel({ nested: { prop: 'test 1' } });
+
+      assert.deepEqual(doc.toJSON(), {
+        nested: { prop: 'test 1', virtual: 'test 2' }
+      });
+      assert.deepEqual(doc.nested.toJSON(), {
+        prop: 'test 1', virtual: 'test 2'
+      });
+
+      done();
+    });
 
     it('save() depopulates pushed arrays (gh-6048)', function() {
       const blogPostSchema = new Schema({

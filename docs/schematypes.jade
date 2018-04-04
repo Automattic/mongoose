@@ -21,7 +21,7 @@ block content
     - [Buffer](./api.html#schema-buffer-js)
     - Boolean
     - Mixed
-    - [Objectid](./api.html#schema-objectid-js)
+    - [ObjectId](./api.html#schema-objectid-js)
     - Array
     - Decimal128
 
@@ -145,6 +145,7 @@ block content
     * `index`: boolean, whether to define an [index](https://docs.mongodb.com/manual/indexes/) on this property.
     * `unique`: boolean, whether to define a [unique index](https://docs.mongodb.com/manual/core/index-unique/) on this property.
     * `sparse`: boolean, whether to define a [sparse index](https://docs.mongodb.com/manual/core/index-sparse/) on this property.
+
     ```javascript
     var schema2 = new Schema({
       test: {
@@ -225,7 +226,7 @@ block content
     <h4 id="arrays">Arrays</h4>
 
     Provide creation of arrays of [SchemaTypes](./api.html#schema_Schema.Types)
-    or [Sub-Documents](./subdocs.html).
+    or [Subdocuments](./subdocs.html).
 
     ```javascript
     var ToySchema = new Schema({ name: String });
@@ -269,7 +270,7 @@ block content
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
 
     Mongoose can also be extended with custom SchemaTypes. Search the
-    [plugins](http://plugins.mongoosejs.io)
+    [plugins](http://plugins.mongoosejs.com)
     site for compatible types like
     [mongoose-long](https://github.com/aheckmann/mongoose-long),
     [mongoose-int32](https://github.com/vkarpov15/mongoose-int32),
@@ -301,4 +302,4 @@ block content
 
     <h3 id="next"><a href="#next">Next Up</a></h3>
 
-    Now that we've covered `SchemaTypes`, let's take a look at [Models](/docs/models.html).
+    Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.html).

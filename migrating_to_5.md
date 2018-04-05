@@ -261,3 +261,7 @@ was always synchronous, just had a callback for legacy reasons.
 
 You cannot pass parameters to the next pre middleware in the chain using `next()` in mongoose 5.x. In mongoose 4, `next('Test')` in pre middleware would call the
 next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for this.
+
+### `required` validator for arrays
+
+In mongoose 5 the `required` validator only verifies if the value is an array. That is, it will **not** fail for _empty_ arrays as it would in mongoose 4.

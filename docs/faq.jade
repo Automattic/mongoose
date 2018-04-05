@@ -125,7 +125,7 @@ block content
 
     <hr id="arrow-functions" />
 
-    **Q**. I'm using an arrow function for a [virtual](./guide.html#virtuals), getter/setter, or [method](./guide.html#methods) and the value of `this` is wrong.
+    **Q**. I'm using an arrow function for a [virtual](./guide.html#virtuals), [middleware](./middleware.html), [getter](./api.html#schematype_SchemaType-get)/[setter](./api.html#schematype_SchemaType-set), or [method](./guide.html#methods) and the value of `this` is wrong.
 
     **A**. Arrow functions [handle the `this` keyword much differently than conventional functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this).
     Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.

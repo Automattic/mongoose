@@ -758,7 +758,10 @@ describe('document', function() {
     });
 
     it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
-      var userSchema, User, groupSchema, Group;
+      let userSchema;
+      let User;
+      let groupSchema;
+      let Group;
 
       userSchema = new Schema({name: String});
       // includes virtual path when 'toJSON'
@@ -1534,7 +1537,9 @@ describe('document', function() {
           });
 
           // vs merging using doc.set(path, object, {merge: true})
-          doc.set('nested', {path: 'did not overwrite the nested object'}, {merge: true});
+          doc.set('nested', {path: 'did not overwrite the nested object'}, {
+            merge: true
+          });
           assert.equal(doc.nested.path, '5did not overwrite the nested object');
           assert.equal(doc.nested.age, 5);
           assert.equal(Object.keys(doc._doc.nested).length, 3);
@@ -2112,6 +2117,33 @@ describe('document', function() {
             done();
           });
         });
+      });
+    });
+
+    it('single embedded schema update validators ignore _id (gh-6269)', function() {
+      return co(function*() {
+        const subDocSchema = new mongoose.Schema({ name: String });
+
+        const schema = new mongoose.Schema({
+          subDoc: subDocSchema,
+          test: String
+        });
+
+        const Model = db.model('gh6269', schema);
+
+        const fakeDoc = new Model({});
+        yield Model.create({});
+
+        // toggle to false to see correct behavior
+        // where subdoc is not created
+        const setDefaultsFlag = true;
+
+        const res = yield Model.findOneAndUpdate({ _id: fakeDoc._id }, {
+          test: 'test'
+        }, { setDefaultsOnInsert: setDefaultsFlag, upsert: true, new: true });
+
+        assert.equal(res.test, 'test');
+        assert.ok(!res.subDoc);
       });
     });
   });
@@ -4882,6 +4914,32 @@ describe('document', function() {
       done();
     });
 
+    it('nested virtuals + nested toJSON (gh-6294)', function(done) {
+      const schema = mongoose.Schema({
+        nested: {
+          prop: String
+        }
+      }, { _id: false, id: false });
+
+      schema.virtual('nested.virtual').get(() => 'test 2');
+
+      schema.set('toJSON', {
+        virtuals: true
+      });
+
+      const MyModel = db.model('gh6294', schema);
+
+      const doc = new MyModel({ nested: { prop: 'test 1' } });
+
+      assert.deepEqual(doc.toJSON(), {
+        nested: { prop: 'test 1', virtual: 'test 2' }
+      });
+      assert.deepEqual(doc.nested.toJSON(), {
+        prop: 'test 1', virtual: 'test 2'
+      });
+
+      done();
+    });
 
     it('save() depopulates pushed arrays (gh-6048)', function() {
       const blogPostSchema = new Schema({

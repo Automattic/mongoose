@@ -428,6 +428,15 @@ block content
       });
     ```
 
+    <h3 id="populate-post-save"><a href="#populate-post-save">Populate in Post Save hooks</a></h3>
+    ```javascript
+    MySchema.post('save', function(doc, next) {
+      doc.populate('user').execPopulate(function() {
+        next();
+      });
+    });
+    ```
+
     ### Next Up
 
     Now that we've covered `populate()`, let's take a look at [discriminators](/docs/discriminators.html).

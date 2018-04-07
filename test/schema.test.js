@@ -1758,6 +1758,30 @@ describe('schema', function() {
       done();
     });
 
+    it('clone() with alternative option syntaxes (gh-6274)', function(done) {
+      const TestSchema = new Schema({}, { _id: false, id: false });
+
+      TestSchema.virtual('test').get(() => 42);
+
+      TestSchema.set('toJSON', { virtuals: true });
+      TestSchema.options.toObject = { virtuals: true };
+
+      const clone = TestSchema.clone();
+      assert.deepEqual(clone._userProvidedOptions, {
+        toJSON: { virtuals: true },
+        _id: false,
+        id: false
+      });
+      const M = db.model('gh6274_option', clone);
+
+      const doc = new M({});
+
+      assert.deepEqual(doc.toJSON(), { test: 42 });
+      assert.deepEqual(doc.toObject(), { test: 42 });
+
+      done();
+    });
+
     it('TTL index with timestamps (gh-5656)', function(done) {
       var testSchema = new mongoose.Schema({
         foo: String,

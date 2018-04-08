@@ -6073,6 +6073,71 @@ describe('model: populate:', function() {
         });
       });
     });
+
+    it('virtual populate with embedded discriminators (gh-6273)', function() {
+      return co(function*() {
+        // Generate Users Model
+        const userSchema = new Schema({ employeeId: Number, name: String })
+        const UserModel = db.model('gh6273', userSchema);
+
+        // Generate Embedded Discriminators
+        const eventSchema = new Schema(
+          { message: String },
+          { discriminatorKey: 'kind'}
+        );
+
+        const batchSchema = new Schema({ events: [eventSchema] });
+        const docArray = batchSchema.path('events');
+
+        // First embedded discriminator schema
+        const clickedSchema = new Schema(
+          {
+            element: { type: String },
+            users: [ Number ]
+          },
+          {
+            toJSON: { virtuals: true},
+            toObject: { virtuals: true}
+          }
+        );
+
+        // Add virtual to first embedded discriminator schema for virtual population
+        clickedSchema.virtual('users_$', {
+          ref: 'gh6273',
+          localField: 'users',
+          foreignField: 'employeeId'
+        })
+
+        const Clicked = docArray.discriminator('gh6273_Clicked', clickedSchema);
+
+        // Second embedded discriminator
+        const Purchased = docArray.discriminator('gh6273_Purchased', new Schema({
+          product: { type: String }
+        }));
+
+        const Batch = db.model('gh6273_EventBatch', batchSchema);
+
+        // Generate Items
+        const user = { employeeId: 1, name: 'Test name' }
+        const batch = {
+          events: [
+            { kind: 'gh6273_Clicked', element: '#hero', message: 'hello', users: [1] },
+            { kind: 'gh6273_Purchased', product: 'action-figure-1', message: 'world' }
+          ]
+        };
+
+        yield UserModel.create(user);
+        yield Batch.create(batch);
+
+        const doc = yield Batch.findOne().populate('events.users_$');
+
+        assert.equal(doc.events[0].users_$.length, 1);
+        assert.equal(doc.events[0].users_$[0].name, 'Test name');
+        assert.deepEqual(doc.toObject().events[0].users, [1]);
+        assert.ok(!doc.events[1].users_$);
+      });
+    });
+
     describe('populates an array of objects (gh6284)', function() {
       it('with mulitiple space separated paths', function() {
         return co(function* () {

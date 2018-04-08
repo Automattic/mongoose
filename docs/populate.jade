@@ -428,8 +428,32 @@ block content
       });
     ```
 
-    <h3 id="populate-post-save"><a href="#populate-post-save">Populate in Post Save hooks</a></h3>
+    <h3 id="populate-post-save"><a href="#populate-post-save">Populate in Middleware</a></h3>
+    
+    You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html).
+    
     ```javascript
+    // Always attach `populate()` to `find()` calls
+    MySchema.pre('find', function() {
+      this.populate('user');
+    });
+    ```
+    
+    ```javascript
+    // Always `populate()` after `find()` calls. Useful if you want to selectively populate
+    // based on the docs found.
+    MySchema.post('find', async function(docs) {
+      for (let doc of docs) {
+        if (doc.isPublic) {
+          await doc.populate('user').execPopulate();
+        }
+      }
+    });
+    ```
+    
+    ```javascript
+    // `populate()` after saving. Useful for sending populated data back to the client in an
+    // update API endpoint
     MySchema.post('save', function(doc, next) {
       doc.populate('user').execPopulate(function() {
         next();

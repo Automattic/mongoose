@@ -6073,5 +6073,81 @@ describe('model: populate:', function() {
         });
       });
     });
+    describe('populates an array of objects (gh6284)', function() {
+      it('with mulitiple space separated paths', function() {
+        return co(function* () {
+          var db = start();
+          var houseSchema = new Schema({ location: String });
+          var citySchema = new Schema({ name: String });
+          var districtSchema = new Schema({ name: String });
+
+          var userSchema = new Schema({
+            name: String,
+            houseId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_0'
+            },
+            cityId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_2'
+            },
+            districtId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_3'
+            }
+          });
+
+          var postSchema = new Schema({
+            content: String,
+            userId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_1'
+            }
+          });
+
+          var House = db.model('gh6284_0', houseSchema);
+          var User = db.model('gh6284_1', userSchema);
+          var City = db.model('gh6284_2', citySchema);
+          var District = db.model('gh6284_3', districtSchema);
+          var Post = db.model('gh6284_4', postSchema);
+
+          var house = new House({ location: '123 abc st.' });
+          var city = new City({ name: 'Some City' });
+          var district = new District({ name: 'That District' });
+
+          var user = new User({
+            name: 'Billy',
+            houseId: house._id,
+            districtId: district._id,
+            cityId: city._id
+          });
+
+          var post = new Post({
+            content: 'Some meaningful insight.',
+            userId: user._id
+          });
+
+          yield House.create(house);
+          yield City.create(city);
+          yield District.create(district);
+          yield User.create(user);
+          yield Post.create(post);
+          const doc = yield Post.findOne({}).
+            populate({
+              path: 'userId',
+              populate: [{
+                path: 'houseId',
+                select: 'location'
+              }, {
+                path: 'cityId districtId',
+                select: 'name'
+              }]
+            });
+          assert.equal(doc.userId.houseId.location, '123 abc st.');
+          assert.equal(doc.userId.cityId.name, 'Some City');
+          assert.equal(doc.userId.districtId.name, 'That District');
+        });
+      });
+    });
   });
 });

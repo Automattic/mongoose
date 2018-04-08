@@ -428,9 +428,10 @@ block content
       });
     ```
 
-    <h3 id="populate-post-save"><a href="#populate-post-save">Populate in Middleware</a></h3>
+    <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>
     
-    You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html).
+    You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
+    always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
     
     ```javascript
     // Always attach `populate()` to `find()` calls

@@ -2588,4 +2588,37 @@ describe('Query', function() {
         });
     });
   });
+
+  describe('count', function() {
+    it('calls utils.toObject on conditions (gh-6323)', function() {
+      return co(function* () {
+        var priceSchema = new Schema({
+          key: String,
+          price: Number
+        });
+
+        var Model = db.model('gh6323', priceSchema);
+
+        var tests = [];
+
+        for (let i = 0; i < 10; i++) {
+          let p = i * 25;
+          tests.push(new Model({ key: 'value', price: p }));
+        }
+
+        let query = { key: 'value' };
+
+        let priceQuery = Object.create(null);
+
+        priceQuery.$gte = 0;
+        priceQuery.$lte = 200;
+
+        Object.assign(query, { price: priceQuery });
+
+        yield Model.create(tests);
+        var count = yield Model.count(query);
+        assert.strictEqual(count, 9);
+      });
+    });
+  });
 });

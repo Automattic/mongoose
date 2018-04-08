@@ -6077,7 +6077,7 @@ describe('model: populate:', function() {
     it('virtual populate with embedded discriminators (gh-6273)', function() {
       return co(function*() {
         // Generate Users Model
-        const userSchema = new Schema({ employeeId: Number, name: String })
+        const userSchema = new Schema({ employeeId: Number, name: String });
         const UserModel = db.model('gh6273', userSchema);
 
         // Generate Embedded Discriminators
@@ -6106,19 +6106,19 @@ describe('model: populate:', function() {
           ref: 'gh6273',
           localField: 'users',
           foreignField: 'employeeId'
-        })
+        });
 
-        const Clicked = docArray.discriminator('gh6273_Clicked', clickedSchema);
+        docArray.discriminator('gh6273_Clicked', clickedSchema);
 
         // Second embedded discriminator
-        const Purchased = docArray.discriminator('gh6273_Purchased', new Schema({
+        docArray.discriminator('gh6273_Purchased', new Schema({
           product: { type: String }
         }));
 
         const Batch = db.model('gh6273_EventBatch', batchSchema);
 
         // Generate Items
-        const user = { employeeId: 1, name: 'Test name' }
+        const user = { employeeId: 1, name: 'Test name' };
         const batch = {
           events: [
             { kind: 'gh6273_Clicked', element: '#hero', message: 'hello', users: [1] },

@@ -1,3 +1,13 @@
+5.0.14 / 2018-04-09
+===================
+ * fix(schema): clone aliases and alternative option syntax correctly
+ * fix(query): call utils.toObject in query.count like in query.find #6325 [lineus](https://github.com/lineus)
+ * docs(populate): add middleware examples #6320 [BorntraegerMarc](https://github.com/BorntraegerMarc)
+ * docs(compatibility): fix dead link #6319 [lacivert](https://github.com/lacivert)
+ * docs(api): fix markdown parsing for parameters #6318 #6314 [lineus](https://github.com/lineus)
+ * fix(populate): handle space-delimited paths in array populate #6296 #6284 [lineus](https://github.com/lineus)
+ * fix(populate): support basic virtual populate underneath embedded discriminators #6273
+
 5.0.13 / 2018-04-05
 ===================
  * docs(faq): add middleware to faq arrow function warning #6309 [lineus](https://github.com/lineus)

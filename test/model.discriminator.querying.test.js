@@ -2,13 +2,13 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    util = require('util'),
-    async = require('async');
+var start = require('./common');
+var mongoose = start.mongoose;
+var Schema = mongoose.Schema;
+var assert = require('assert');
+var random = require('../lib/utils').random;
+var util = require('util');
+var async = require('async');
 
 
 /**

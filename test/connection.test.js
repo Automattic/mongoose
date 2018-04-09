@@ -514,9 +514,7 @@ describe('connections:', function() {
       var schema = new Schema;
 
       db.model(name, schema);
-      assert.doesNotThrow(function() {
-        db.model(name, schema);
-      });
+      db.model(name, schema);
 
       done();
     });

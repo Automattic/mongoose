@@ -94,12 +94,12 @@ describe('types.number', function() {
     done();
   });
 
-  it('prefers toNumber if one exists (gh-6299)', function(done) {
+  it('prefers valueOf function if one exists (gh-6299)', function(done) {
     var n = new SchemaNumber();
     var obj = {
       str: '10',
-      toNumber: function() {
-        return Number(this.str);
+      valueOf: function() {
+        return this.str;
       },
       toString: function() {
         return '11';

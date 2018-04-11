@@ -1983,10 +1983,10 @@ describe('Query', function() {
       });
     });
 
-    it('runSettersOnQuery works with _id field (gh-5351)', function(done) {
+    it('runs query setters with _id field (gh-5351)', function(done) {
       var testSchema = new Schema({
         val: { type: String }
-      }, { runSettersOnQuery: true });
+      });
 
       var Test = db.model('gh5351', testSchema);
       Test.create({ val: 'A string' }).
@@ -2006,6 +2006,30 @@ describe('Query', function() {
         }).
         then(done).
         catch(done);
+    });
+
+    it('runs setters if query field is an array (gh-6277)', function() {
+      let setterCalled = [];
+
+      const schema = new Schema({
+        strings: {
+          type: [String],
+          set: v => {
+            setterCalled.push(v);
+            return v;
+          }
+        }
+      });
+      const Model = db.model('gh6277', schema);
+
+      return co(function*() {
+        yield Model.find({ strings: 'test' });
+        assert.equal(setterCalled.length, 0);
+
+        yield Model.find({ strings: ['test'] });
+        assert.equal(setterCalled.length, 1);
+        assert.deepEqual(setterCalled, [['test']]);
+      });
     });
 
     it('$exists under $not (gh-4933)', function(done) {

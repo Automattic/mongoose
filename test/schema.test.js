@@ -1731,6 +1731,57 @@ describe('schema', function() {
       done();
     });
 
+    it('clone() with nested virtuals (gh-6274)', function(done) {
+      const PersonSchema = new Schema({
+        name: {
+          first: String,
+          last: String
+        }
+      });
+
+      PersonSchema.
+        virtual('name.full').
+        get(function() {
+          return this.get('name.first') + ' ' + this.get('name.last');
+        }).
+        set(function(fullName) {
+          var split = fullName.split(' ');
+          this.set('name.first', split[0]);
+          this.set('name.last', split[1]);
+        });
+
+      const M = db.model('gh6274', PersonSchema.clone());
+
+      const doc = new M({ name: { first: 'Axl', last: 'Rose' } });
+      assert.equal(doc.name.full, 'Axl Rose');
+
+      done();
+    });
+
+    it('clone() with alternative option syntaxes (gh-6274)', function(done) {
+      const TestSchema = new Schema({}, { _id: false, id: false });
+
+      TestSchema.virtual('test').get(() => 42);
+
+      TestSchema.set('toJSON', { virtuals: true });
+      TestSchema.options.toObject = { virtuals: true };
+
+      const clone = TestSchema.clone();
+      assert.deepEqual(clone._userProvidedOptions, {
+        toJSON: { virtuals: true },
+        _id: false,
+        id: false
+      });
+      const M = db.model('gh6274_option', clone);
+
+      const doc = new M({});
+
+      assert.deepEqual(doc.toJSON(), { test: 42 });
+      assert.deepEqual(doc.toObject(), { test: 42 });
+
+      done();
+    });
+
     it('TTL index with timestamps (gh-5656)', function(done) {
       var testSchema = new mongoose.Schema({
         foo: String,

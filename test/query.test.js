@@ -1983,10 +1983,10 @@ describe('Query', function() {
       });
     });
 
-    it('runSettersOnQuery works with _id field (gh-5351)', function(done) {
+    it('runs query setters with _id field (gh-5351)', function(done) {
       var testSchema = new Schema({
         val: { type: String }
-      }, { runSettersOnQuery: true });
+      });
 
       var Test = db.model('gh5351', testSchema);
       Test.create({ val: 'A string' }).
@@ -2006,6 +2006,30 @@ describe('Query', function() {
         }).
         then(done).
         catch(done);
+    });
+
+    it('runs setters if query field is an array (gh-6277)', function() {
+      let setterCalled = [];
+
+      const schema = new Schema({
+        strings: {
+          type: [String],
+          set: v => {
+            setterCalled.push(v);
+            return v;
+          }
+        }
+      });
+      const Model = db.model('gh6277', schema);
+
+      return co(function*() {
+        yield Model.find({ strings: 'test' });
+        assert.equal(setterCalled.length, 0);
+
+        yield Model.find({ strings: ['test'] });
+        assert.equal(setterCalled.length, 1);
+        assert.deepEqual(setterCalled, [['test']]);
+      });
     });
 
     it('$exists under $not (gh-4933)', function(done) {
@@ -2336,6 +2360,27 @@ describe('Query', function() {
         });
     });
 
+    it('consistently return query when callback specified (gh-6271)', function() {
+      return co(function*() {
+        const schema = new mongoose.Schema({
+          n: Number
+        });
+
+        const Model = db.model('gh6271', schema);
+
+        let doc = yield Model.create({ n: 0 });
+
+        yield Model.findOneAndUpdate({ _id: doc._id }, { $inc: { n: 1 } }, err => {
+          if (err) {
+            throw err;
+          }
+        });
+
+        doc = yield Model.findById(doc);
+        assert.equal(doc.n, 2);
+      });
+    });
+
     it('cast embedded discriminators with dot notation (gh-6027)', function() {
       return co(function*() {
         const ownerSchema = new Schema({
@@ -2565,6 +2610,39 @@ describe('Query', function() {
           assert.equal(person.salary, 25000);
           done();
         });
+    });
+  });
+
+  describe('count', function() {
+    it('calls utils.toObject on conditions (gh-6323)', function() {
+      return co(function* () {
+        var priceSchema = new Schema({
+          key: String,
+          price: Number
+        });
+
+        var Model = db.model('gh6323', priceSchema);
+
+        var tests = [];
+
+        for (let i = 0; i < 10; i++) {
+          let p = i * 25;
+          tests.push(new Model({ key: 'value', price: p }));
+        }
+
+        let query = { key: 'value' };
+
+        let priceQuery = Object.create(null);
+
+        priceQuery.$gte = 0;
+        priceQuery.$lte = 200;
+
+        Object.assign(query, { price: priceQuery });
+
+        yield Model.create(tests);
+        var count = yield Model.count(query);
+        assert.strictEqual(count, 9);
+      });
     });
   });
 });

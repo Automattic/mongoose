@@ -1,3 +1,26 @@
+5.0.14 / 2018-04-09
+===================
+ * fix(schema): clone aliases and alternative option syntax correctly
+ * fix(query): call utils.toObject in query.count like in query.find #6325 [lineus](https://github.com/lineus)
+ * docs(populate): add middleware examples #6320 [BorntraegerMarc](https://github.com/BorntraegerMarc)
+ * docs(compatibility): fix dead link #6319 [lacivert](https://github.com/lacivert)
+ * docs(api): fix markdown parsing for parameters #6318 #6314 [lineus](https://github.com/lineus)
+ * fix(populate): handle space-delimited paths in array populate #6296 #6284 [lineus](https://github.com/lineus)
+ * fix(populate): support basic virtual populate underneath embedded discriminators #6273
+
+5.0.13 / 2018-04-05
+===================
+ * docs(faq): add middleware to faq arrow function warning #6309 [lineus](https://github.com/lineus)
+ * docs(schema): add example to loadClass() docs #6308
+ * docs: clean up misc typos #6304 [sfrieson](https://github.com/sfrieson)
+ * fix(document): apply virtuals when calling `toJSON()` on a nested path #6294
+ * refactor(connection): use `client.db()` syntax rather than double-parsing the URI #6292 #6286
+ * docs: document new behavior of required validator for arrays #6288 [daltones](https://github.com/daltones)
+ * fix(schema): treat set() options as user-provided options #6274
+ * fix(schema): clone discriminators correctly #6274
+ * fix(update): make setDefaultsOnInsert not create subdoc if only default is id #6269
+ * docs(discriminator): clarify 3rd argument to Model.discriminator() #2596
+
 5.0.12 / 2018-03-27
 ===================
  * docs(query): updating model name in query API docs #6280 [lineus](https://github.com/lineus)

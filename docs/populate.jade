@@ -428,6 +428,40 @@ block content
       });
     ```
 
+    <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>
+    
+    You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
+    always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
+    
+    ```javascript
+    // Always attach `populate()` to `find()` calls
+    MySchema.pre('find', function() {
+      this.populate('user');
+    });
+    ```
+    
+    ```javascript
+    // Always `populate()` after `find()` calls. Useful if you want to selectively populate
+    // based on the docs found.
+    MySchema.post('find', async function(docs) {
+      for (let doc of docs) {
+        if (doc.isPublic) {
+          await doc.populate('user').execPopulate();
+        }
+      }
+    });
+    ```
+    
+    ```javascript
+    // `populate()` after saving. Useful for sending populated data back to the client in an
+    // update API endpoint
+    MySchema.post('save', function(doc, next) {
+      doc.populate('user').execPopulate(function() {
+        next();
+      });
+    });
+    ```
+
     ### Next Up
 
     Now that we've covered `populate()`, let's take a look at [discriminators](/docs/discriminators.html).

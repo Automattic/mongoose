@@ -1543,12 +1543,12 @@ describe('Model', function() {
         }
       });
 
-      PersonSchema
-        .virtual('name.full')
-        .get(function() {
+      PersonSchema.
+        virtual('name.full').
+        get(function() {
           return this.get('name.first') + ' ' + this.get('name.last');
-        })
-        .set(function(fullName) {
+        }).
+        set(function(fullName) {
           var split = fullName.split(' ');
           this.set('name.first', split[0]);
           this.set('name.last', split[1]);
@@ -1556,13 +1556,13 @@ describe('Model', function() {
 
       mongoose.model('Person', PersonSchema);
 
-      var Person = db.model('Person'),
-          person = new Person({
-            name: {
-              first: 'Michael',
-              last: 'Sorrentino'
-            }
-          });
+      var Person = db.model('Person');
+      var person = new Person({
+        name: {
+          first: 'Michael',
+          last: 'Sorrentino'
+        }
+      });
 
       assert.equal(person.get('name.full'), 'Michael Sorrentino');
       person.set('name.full', 'The Situation');

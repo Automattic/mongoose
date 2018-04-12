@@ -81,7 +81,7 @@ describe('model', function() {
       var hydrated = B.hydrate({_id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C'});
 
       assert.equal(hydrated.test, 'test');
-      assert.deepEqual(hydrated.schema, schemaC);
+      assert.deepEqual(hydrated.schema.tree, schemaC.tree);
       done();
     });
   });

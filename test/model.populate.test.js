@@ -6073,5 +6073,146 @@ describe('model: populate:', function() {
         });
       });
     });
+
+    it('virtual populate with embedded discriminators (gh-6273)', function() {
+      return co(function*() {
+        // Generate Users Model
+        const userSchema = new Schema({ employeeId: Number, name: String });
+        const UserModel = db.model('gh6273', userSchema);
+
+        // Generate Embedded Discriminators
+        const eventSchema = new Schema(
+          { message: String },
+          { discriminatorKey: 'kind'}
+        );
+
+        const batchSchema = new Schema({ events: [eventSchema] });
+        const docArray = batchSchema.path('events');
+
+        // First embedded discriminator schema
+        const clickedSchema = new Schema(
+          {
+            element: { type: String },
+            users: [ Number ]
+          },
+          {
+            toJSON: { virtuals: true},
+            toObject: { virtuals: true}
+          }
+        );
+
+        // Add virtual to first embedded discriminator schema for virtual population
+        clickedSchema.virtual('users_$', {
+          ref: 'gh6273',
+          localField: 'users',
+          foreignField: 'employeeId'
+        });
+
+        docArray.discriminator('gh6273_Clicked', clickedSchema);
+
+        // Second embedded discriminator
+        docArray.discriminator('gh6273_Purchased', new Schema({
+          product: { type: String }
+        }));
+
+        const Batch = db.model('gh6273_EventBatch', batchSchema);
+
+        // Generate Items
+        const user = { employeeId: 1, name: 'Test name' };
+        const batch = {
+          events: [
+            { kind: 'gh6273_Clicked', element: '#hero', message: 'hello', users: [1] },
+            { kind: 'gh6273_Purchased', product: 'action-figure-1', message: 'world' }
+          ]
+        };
+
+        yield UserModel.create(user);
+        yield Batch.create(batch);
+
+        const doc = yield Batch.findOne().populate('events.users_$');
+
+        assert.equal(doc.events[0].users_$.length, 1);
+        assert.equal(doc.events[0].users_$[0].name, 'Test name');
+        assert.deepEqual(doc.toObject().events[0].users, [1]);
+        assert.ok(!doc.events[1].users_$);
+      });
+    });
+
+    describe('populates an array of objects (gh6284)', function() {
+      it('with mulitiple space separated paths', function() {
+        return co(function* () {
+          var db = start();
+          var houseSchema = new Schema({ location: String });
+          var citySchema = new Schema({ name: String });
+          var districtSchema = new Schema({ name: String });
+
+          var userSchema = new Schema({
+            name: String,
+            houseId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_0'
+            },
+            cityId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_2'
+            },
+            districtId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_3'
+            }
+          });
+
+          var postSchema = new Schema({
+            content: String,
+            userId: {
+              type: Schema.Types.ObjectId,
+              ref: 'gh6284_1'
+            }
+          });
+
+          var House = db.model('gh6284_0', houseSchema);
+          var User = db.model('gh6284_1', userSchema);
+          var City = db.model('gh6284_2', citySchema);
+          var District = db.model('gh6284_3', districtSchema);
+          var Post = db.model('gh6284_4', postSchema);
+
+          var house = new House({ location: '123 abc st.' });
+          var city = new City({ name: 'Some City' });
+          var district = new District({ name: 'That District' });
+
+          var user = new User({
+            name: 'Billy',
+            houseId: house._id,
+            districtId: district._id,
+            cityId: city._id
+          });
+
+          var post = new Post({
+            content: 'Some meaningful insight.',
+            userId: user._id
+          });
+
+          yield House.create(house);
+          yield City.create(city);
+          yield District.create(district);
+          yield User.create(user);
+          yield Post.create(post);
+          const doc = yield Post.findOne({}).
+            populate({
+              path: 'userId',
+              populate: [{
+                path: 'houseId',
+                select: 'location'
+              }, {
+                path: 'cityId districtId',
+                select: 'name'
+              }]
+            });
+          assert.equal(doc.userId.houseId.location, '123 abc st.');
+          assert.equal(doc.userId.cityId.name, 'Some City');
+          assert.equal(doc.userId.districtId.name, 'That District');
+        });
+      });
+    });
   });
 });

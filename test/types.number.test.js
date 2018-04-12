@@ -93,4 +93,19 @@ describe('types.number', function() {
     assert.strictEqual(n.cast(false), 0);
     done();
   });
+
+  it('prefers valueOf function if one exists (gh-6299)', function(done) {
+    var n = new SchemaNumber();
+    var obj = {
+      str: '10',
+      valueOf: function() {
+        return this.str;
+      },
+      toString: function() {
+        return '11';
+      }
+    };
+    assert.strictEqual(n.cast(obj), 10);
+    done();
+  });
 });

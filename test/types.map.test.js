@@ -120,6 +120,32 @@ describe('Map', function() {
     });
   });
 
+  it('defaults', function() {
+    const TestSchema = new mongoose.Schema({
+      n: Number,
+      m: {
+        type: Map,
+        of: Number,
+        default: { bacon: 2, eggs: 6 }
+      }
+    });
+
+    const Test = db.model('MapDefaultsTest', TestSchema);
+
+    return co(function*() {
+      const doc = new Test({});
+      assert.ok(doc.m instanceof Map);
+      assert.deepEqual(Array.from(doc.toObject().m.keys()), ['bacon', 'eggs']);
+
+      yield Test.updateOne({}, { n: 1 }, { upsert: true, setDefaultsOnInsert: true });
+
+      const saved = yield Test.findOne({ n: 1 });
+      assert.ok(saved);
+      assert.deepEqual(Array.from(saved.toObject().m.keys()),
+        ['bacon', 'eggs']);
+    });
+  });
+
   it('with single nested subdocs', function() {
     const TestSchema = new mongoose.Schema({
       m: {

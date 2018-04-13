@@ -173,4 +173,79 @@ describe('Map', function() {
       assert.deepEqual(doc.toObject().m.get('bacon').toObject(), { n: 4 });
     });
   });
+
+  it('discriminators', function() {
+    const TestSchema = new mongoose.Schema({
+      n: Number
+    });
+
+    const Test = db.model('MapDiscrimTest', TestSchema);
+
+    const Disc = Test.discriminator('MapDiscrimTest_0', new mongoose.Schema({
+      m: {
+        type: Map,
+        of: Number
+      }
+    }));
+
+    return co(function*() {
+      const doc = new Disc({ m: { test: 1 } });
+      assert.ok(doc.m instanceof Map);
+      assert.deepEqual(Array.from(doc.toObject().m.keys()), ['test']);
+      yield doc.save();
+
+      const fromDb = yield Disc.findOne({ 'm.test': 1 });
+      assert.ok(fromDb);
+      assert.equal(fromDb._id.toHexString(), doc._id.toHexString());
+    });
+  });
+
+  it('embedded discriminators', function() {
+    const EmployeeSchema = new mongoose.Schema({
+      name: String
+    }, { _id: false, id: false });
+
+    const DepartmentSchema = new mongoose.Schema({
+      employees: [EmployeeSchema]
+    });
+
+    DepartmentSchema.path('employees').discriminator('Sales', new mongoose.Schema({
+      clients: [String]
+    }, { _id: false, id: false }));
+
+    DepartmentSchema.path('employees').discriminator('Engineering', new mongoose.Schema({
+      apiKeys: {
+        type: Map,
+        of: String
+      }
+    }, { _id: false, id: false }));
+
+    const Department = db.model('MapEmbeddedDiscrimTest', DepartmentSchema);
+
+    return co(function*() {
+      const dept = new Department({
+        employees: [
+          { __t: 'Sales', name: 'E1', clients: ['test1', 'test2'] },
+          { __t: 'Engineering', name: 'E2', apiKeys: { github: 'test3' } }
+        ]
+      });
+
+      assert.deepEqual(dept.toObject().employees[0],
+        { __t: 'Sales', name: 'E1', clients: ['test1', 'test2'] });
+
+      assert.deepEqual(Array.from(dept.toObject().employees[1].apiKeys.values()),
+        ['test3']);
+
+      yield dept.save();
+
+      let fromDb = yield Department.findOne({ 'employees.apiKeys.github': 'test3' });
+      assert.ok(fromDb);
+
+      dept.employees[1].apiKeys.set('github', 'test4');
+      yield dept.save();
+
+      fromDb = yield Department.findOne({ 'employees.apiKeys.github': 'test4' });
+      assert.ok(fromDb);
+    });
+  });
 });

@@ -172,6 +172,21 @@ describe('Map', function() {
         assert.ok(err.errors['ratings.github']);
       }
       assert.ok(threw);
+
+      doc.ratings.set('github', 8);
+      // Shouldn't throw
+      yield doc.save();
+
+      threw = false;
+      try {
+        yield Test.updateOne({}, { $set: { 'ratings.github': 11 } }, {
+          runValidators: true
+        });
+      } catch (err) {
+        threw = true;
+        assert.ok(err.errors['ratings.github']);
+      }
+      assert.ok(threw);
     });
   });
 

@@ -146,6 +146,35 @@ describe('Map', function() {
     });
   });
 
+  it('validation', function() {
+    const TestSchema = new mongoose.Schema({
+      ratings: {
+        type: Map,
+        of: {
+          type: Number,
+          min: 1,
+          max: 10
+        }
+      }
+    });
+
+    const Test = db.model('MapValidationTest', TestSchema);
+
+    return co(function*() {
+      const doc = new Test({ ratings: { github: 11 } });
+      assert.ok(doc.ratings instanceof Map);
+
+      let threw = false;
+      try {
+        yield doc.save();
+      } catch (err) {
+        threw = true;
+        assert.ok(err.errors['ratings.github']);
+      }
+      assert.ok(threw);
+    });
+  });
+
   it('with single nested subdocs', function() {
     const TestSchema = new mongoose.Schema({
       m: {

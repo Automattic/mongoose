@@ -1,12 +1,14 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema;
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('id virtual getter', function() {
   var db;
@@ -28,6 +30,7 @@ describe('id virtual getter', function() {
 
       // Comparing with virtual getter
       assert.equal(s._id.toString(), s.id);
+      assert.equal(s.toHexString(), s._id.toString());
       done();
     });
   });

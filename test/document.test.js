@@ -4,25 +4,25 @@
  * Module dependencies.
  */
 
-var start = require('./common');
-var mongoose = start.mongoose;
-var assert = require('power-assert');
-var random = require('../lib/utils').random;
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
-var Document = require('../lib/document');
-var DocumentObjectId = mongoose.Types.ObjectId;
-var EventEmitter = require('events').EventEmitter;
-var SchemaType = mongoose.SchemaType;
-var ValidatorError = SchemaType.ValidatorError;
-var ValidationError = mongoose.Document.ValidationError;
-var MongooseError = mongoose.Error;
-var EmbeddedDocument = require('../lib/types/embedded');
-var Query = require('../lib/query');
-var validator = require('validator');
-
+const Document = require('../lib/document');
+const EventEmitter = require('events').EventEmitter;
+const EmbeddedDocument = require('../lib/types/embedded');
+const Query = require('../lib/query');
 const _ = require('lodash');
+const assert = require('assert');
 const co = require('co');
+const random = require('../lib/utils').random;
+const start = require('./common');
+const validator = require('validator');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const SchemaType = mongoose.SchemaType;
+const ValidatorError = SchemaType.ValidatorError;
+const ValidationError = mongoose.Document.ValidationError;
+const MongooseError = mongoose.Error;
 
 /**
  * Test Document constructor.
@@ -3467,6 +3467,39 @@ describe('document', function() {
 
       assert.equal(kitty.toObject({ depopulate: true }).name, 'Zildjian');
       assert.ok(!person.toObject({ depopulate: true }).petCat.name);
+      done();
+    });
+
+    it('toObject() respects schema-level depopulate (gh-6313)', function(done) {
+      const personSchema = Schema({
+        name: String,
+        car: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh6313_Car'
+        }
+      });
+
+      personSchema.set('toObject', {
+        depopulate: true
+      });
+
+      const carSchema = Schema({
+        name: String
+      });
+
+      const Car = db.model('gh6313_Car', carSchema);
+      const Person = db.model('gh6313_Person', personSchema);
+
+      const car = new Car({
+        name: 'Ford'
+      });
+
+      const person = new Person({
+        name: 'John',
+        car: car
+      });
+
+      assert.equal(person.toObject().car.toHexString(), car._id.toHexString());
       done();
     });
 

@@ -1,13 +1,17 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    VersionError = mongoose.Error.VersionError;
+const assert = require('assert');
+const co = require('co');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const VersionError = mongoose.Error.VersionError;
 
 describe('versioning', function() {
   var db;
@@ -524,6 +528,32 @@ describe('versioning', function() {
       obj = m.toObject({versionKey: false});
       assert.equal(obj.__v, undefined);
       done();
+    });
+  });
+
+  it('pull doesnt add version where clause (gh-6190)', function() {
+    const User = db.model('gh6190_User', new mongoose.Schema({
+      unreadPosts: [{type: mongoose.Schema.Types.ObjectId}]
+    }));
+
+    return co(function*() {
+      const id1 = new mongoose.Types.ObjectId();
+      const id2 = new mongoose.Types.ObjectId();
+      const doc = yield User.create({
+        unreadPosts: [id1, id2]
+      });
+
+      const doc1 = yield User.findById(doc._id);
+      const doc2 = yield User.findById(doc._id);
+
+      doc1.unreadPosts.pull(id1);
+      yield doc1.save();
+
+      doc2.unreadPosts.pull(id2);
+      yield doc2.save();
+
+      const doc3 = yield User.findById(doc._id);
+      assert.equal(doc3.unreadPosts.length, 0);
     });
   });
 

@@ -218,6 +218,70 @@ describe('Map', function() {
     });
   });
 
+  it('populate', function() {
+    const UserSchema = new mongoose.Schema({
+      keys: {
+        type: Map,
+        of: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'MapPopulateTest'
+        }
+      }
+    });
+
+    const KeySchema = new mongoose.Schema({ key: String });
+
+    const User = db.model('MapPopulateTest_0', UserSchema);
+    const Key = db.model('MapPopulateTest', KeySchema);
+
+    return co(function*() {
+      const key = yield Key.create({ key: 'abc123' });
+      const key2 = yield Key.create({ key: 'key' });
+
+      const doc = yield User.create({ keys: { github: key._id } });
+
+      const populated = yield User.findById(doc).populate('keys.github');
+
+      assert.equal(populated.keys.get('github').key, 'abc123');
+
+      populated.keys.set('twitter', key2._id);
+
+      yield populated.save();
+
+      const rawDoc = yield User.collection.findOne({ _id: doc._id });
+      assert.deepEqual(rawDoc.keys, { github: key._id, twitter: key2._id });
+    });
+  });
+
+  it('populate with wildcard', function() {
+    const UserSchema = new mongoose.Schema({
+      apiKeys: {
+        type: Map,
+        of: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'MapPopulateWildcardTest'
+        }
+      }
+    });
+
+    const KeySchema = new mongoose.Schema({ key: String });
+
+    const User = db.model('MapPopulateWildcardTest_0', UserSchema);
+    const Key = db.model('MapPopulateWildcardTest', KeySchema);
+
+    return co(function*() {
+      const key = yield Key.create({ key: 'abc123' });
+      const key2 = yield Key.create({ key: 'key' });
+
+      const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+
+      const populated = yield User.findById(doc).populate('apiKeys');
+
+      assert.equal(populated.apiKeys.get('github').key, 'abc123');
+      assert.equal(populated.apiKeys.get('twitter').key, 'key');
+    });
+  });
+
   it('discriminators', function() {
     const TestSchema = new mongoose.Schema({
       n: Number

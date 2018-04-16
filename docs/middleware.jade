@@ -126,21 +126,47 @@ block content
 
     <h4 id="error-handling">Error handling</h4>
 
-    If any middleware calls `next` or `done` with a parameter of type `Error`,
-    the flow is interrupted, and the error is passed to the callback.
+    If any pre hook errors out, mongoose will not execute subsequent middleware
+    or the hooked function. Mongoose will instead pass an error to the callback
+    and/or reject the returned promise. There are several ways to report an
+    error in middleware:
 
     ```javascript
     schema.pre('save', function(next) {
-      var err = new Error('something went wrong');
+      const err = new Error('something went wrong');
+      // If you call `next()` with an argument, that argument is assumed to be
+      // an error.
       next(err);
+    });
+
+    schema.pre('save', function() {
+      // You can also return a promise that rejects
+      return new Promise((resolve, reject) => {
+        reject(new Error('something went wrong'));
+      });
+    });
+
+    schema.pre('save', function() {
+      // You can also throw a synchronous error
+      throw new Error('something went wrong');
+    });
+
+    schema.pre('save', async function() {
+      await Promise.resolve();
+      // You can also throw an error in an `async` function
+      throw new Error('something went wrong');
     });
 
     // later...
 
+    // Changes will not be persisted to MongoDB because a pre hook errored out
     myDoc.save(function(err) {
-      console.log(err.message) // something went wrong
+      console.log(err.message); // something went wrong
     });
     ```
+
+    Calling `next()` multiple times is a no-op. If you call `next()` with an
+    error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
     <h3 id="post"><a href="#post">Post middleware</a></h3>
 

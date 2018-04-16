@@ -1,3 +1,14 @@
+5.0.15 / 2018-04-16
+===================
+ * fix: add ability for casting from number to decimal128 #6336 #6331 [lineus](https://github.com/lineus)
+ * docs(middleware): enumerate the ways to error out in a hook #6315
+ * fix(document): respect schema-level depopulate option for toObject() #6313
+ * fix: bump mongodb driver -> 3.0.6 #6310
+ * fix(number): check for `valueOf()` function to support Decimal.js #6306 #6299 [lineus](https://github.com/lineus)
+ * fix(query): run array setters on query if input value is an array #6277
+ * fix(versioning): don't require matching version when using array.pull() #6190
+ * fix(document): add `toHexString()` function so you don't need to check whether a path is populated to get an id #6115
+
 5.0.14 / 2018-04-09
 ===================
  * fix(schema): clone aliases and alternative option syntax correctly

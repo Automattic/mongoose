@@ -218,67 +218,99 @@ describe('Map', function() {
     });
   });
 
-  it('populate', function() {
-    const UserSchema = new mongoose.Schema({
-      keys: {
-        type: Map,
-        of: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'MapPopulateTest'
+  describe('populate', function() {
+    it('populate individual path', function() {
+      const UserSchema = new mongoose.Schema({
+        keys: {
+          type: Map,
+          of: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'MapPopulateTest'
+          }
         }
-      }
+      });
+
+      const KeySchema = new mongoose.Schema({ key: String });
+
+      const User = db.model('MapPopulateTest_0', UserSchema);
+      const Key = db.model('MapPopulateTest', KeySchema);
+
+      return co(function*() {
+        const key = yield Key.create({ key: 'abc123' });
+        const key2 = yield Key.create({ key: 'key' });
+
+        const doc = yield User.create({ keys: { github: key._id } });
+
+        const populated = yield User.findById(doc).populate('keys.github');
+
+        assert.equal(populated.keys.get('github').key, 'abc123');
+
+        populated.keys.set('twitter', key2._id);
+
+        yield populated.save();
+
+        const rawDoc = yield User.collection.findOne({ _id: doc._id });
+        assert.deepEqual(rawDoc.keys, { github: key._id, twitter: key2._id });
+      });
     });
 
-    const KeySchema = new mongoose.Schema({ key: String });
-
-    const User = db.model('MapPopulateTest_0', UserSchema);
-    const Key = db.model('MapPopulateTest', KeySchema);
-
-    return co(function*() {
-      const key = yield Key.create({ key: 'abc123' });
-      const key2 = yield Key.create({ key: 'key' });
-
-      const doc = yield User.create({ keys: { github: key._id } });
-
-      const populated = yield User.findById(doc).populate('keys.github');
-
-      assert.equal(populated.keys.get('github').key, 'abc123');
-
-      populated.keys.set('twitter', key2._id);
-
-      yield populated.save();
-
-      const rawDoc = yield User.collection.findOne({ _id: doc._id });
-      assert.deepEqual(rawDoc.keys, { github: key._id, twitter: key2._id });
-    });
-  });
-
-  it('populate with wildcard', function() {
-    const UserSchema = new mongoose.Schema({
-      apiKeys: {
-        type: Map,
-        of: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'MapPopulateWildcardTest'
+    it('populate entire map', function() {
+      const UserSchema = new mongoose.Schema({
+        apiKeys: {
+          type: Map,
+          of: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'MapPopulateWildcardTest'
+          }
         }
-      }
+      });
+
+      const KeySchema = new mongoose.Schema({ key: String });
+
+      const User = db.model('MapPopulateWildcardTest_0', UserSchema);
+      const Key = db.model('MapPopulateWildcardTest', KeySchema);
+
+      return co(function*() {
+        const key = yield Key.create({ key: 'abc123' });
+        const key2 = yield Key.create({ key: 'key' });
+
+        const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+
+        const populated = yield User.findById(doc).populate('apiKeys');
+
+        assert.equal(populated.apiKeys.get('github').key, 'abc123');
+        assert.equal(populated.apiKeys.get('twitter').key, 'key');
+      });
     });
 
-    const KeySchema = new mongoose.Schema({ key: String });
+    it('populate entire map in doc', function() {
+      const UserSchema = new mongoose.Schema({
+        apiKeys: {
+          type: Map,
+          of: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'MapPopulateMapDocTest'
+          }
+        }
+      });
 
-    const User = db.model('MapPopulateWildcardTest_0', UserSchema);
-    const Key = db.model('MapPopulateWildcardTest', KeySchema);
+      const KeySchema = new mongoose.Schema({ key: String });
 
-    return co(function*() {
-      const key = yield Key.create({ key: 'abc123' });
-      const key2 = yield Key.create({ key: 'key' });
+      const User = db.model('MapPopulateMapDocTest_0', UserSchema);
+      const Key = db.model('MapPopulateMapDocTest', KeySchema);
 
-      const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+      return co(function*() {
+        const key = yield Key.create({ key: 'abc123' });
+        const key2 = yield Key.create({ key: 'key' });
 
-      const populated = yield User.findById(doc).populate('apiKeys');
+        const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
 
-      assert.equal(populated.apiKeys.get('github').key, 'abc123');
-      assert.equal(populated.apiKeys.get('twitter').key, 'key');
+        const _doc = yield User.findById(doc);
+        yield _doc.populate('apiKeys').execPopulate();
+
+        assert.equal(_doc.apiKeys.get('github').key, 'abc123');
+        assert.equal(_doc.apiKeys.get('twitter').key, 'key');
+      });
     });
   });
 

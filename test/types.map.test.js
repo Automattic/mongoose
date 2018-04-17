@@ -80,6 +80,26 @@ describe('Map', function() {
     });
   });
 
+  it('deep set', function(done) {
+    const userSchema = new mongoose.Schema({
+      socialMediaHandles: {
+        type: Map,
+        of: String
+      }
+    });
+
+    const User = db.model('MapDeepSet', userSchema);
+
+    const user = new User({ socialMediaHandles: {} });
+
+    user.set('socialMediaHandles.github', 'vkarpov15');
+
+    assert.equal(user.socialMediaHandles.get('github'), 'vkarpov15');
+    assert.equal(user.get('socialMediaHandles.github'), 'vkarpov15');
+
+    done();
+  });
+
   it('query casting', function() {
     const TestSchema = new mongoose.Schema({
       v: {

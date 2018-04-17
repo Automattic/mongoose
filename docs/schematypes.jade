@@ -24,6 +24,7 @@ block content
     - [ObjectId](./api.html#schema-objectid-js)
     - Array
     - Decimal128
+    - Map
 
     <h4>Example</h4>
 
@@ -37,18 +38,23 @@ block content
       mixed:   Schema.Types.Mixed,
       _someId: Schema.Types.ObjectId,
       decimal: Schema.Types.Decimal128,
-      array:      [],
-      ofString:   [String],
-      ofNumber:   [Number],
-      ofDates:    [Date],
-      ofBuffer:   [Buffer],
-      ofBoolean:  [Boolean],
-      ofMixed:    [Schema.Types.Mixed],
+      array: [],
+      ofString: [String],
+      ofNumber: [Number],
+      ofDates: [Date],
+      ofBuffer: [Buffer],
+      ofBoolean: [Boolean],
+      ofMixed: [Schema.Types.Mixed],
       ofObjectId: [Schema.Types.ObjectId],
-      ofArrays:   [[]],
+      ofArrays: [[]],
       ofArrayOfNumbers: [[Number]],
       nested: {
         stuff: { type: String, lowercase: true, trim: true }
+      },
+      map: Map,
+      mapOfString: {
+        type: Map,
+        of: String
       }
     })
 
@@ -72,6 +78,7 @@ block content
     m.ofBuffer.pop();
     m.ofMixed = [1, [], 'three', { four: 5 }];
     m.nested.stuff = 'good';
+    m.map = new Map([['key', 'value']]);
     m.save(callback);
     ```
 
@@ -266,6 +273,66 @@ block content
       }
     });
     ```
+
+    <h4 id="maps">Maps</h4>
+
+    _New in Mongoose 5.1.0_
+
+    A `MongooseMap` is a subclass of the built-in [`Map` class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map).
+    In these docs, we'll use the terms 'map' and `MongooseMap` interchangeably.
+    In Mongoose, maps are how you create a nested document with arbitrary keys.
+
+    ```javascript
+    const userSchema = new Schema({
+      // `socialMediaHandles` is a map whose values are strings. A map's
+      // keys are always strings. You specify the type of values using `of`.
+      socialMediaHandles: {
+        type: Map,
+        of: String
+      }
+    });
+
+    const User = mongoose.model('User', userSchema);
+    // Map { 'github' => 'vkarpov15', 'twitter' => '@code_barbarian' }
+    console.log(new User({
+      socialMediaHandles: {
+        github: 'vkarpov15',
+        twitter: '@code_barbarian'
+      }
+    }).socialMediaHandles);
+    ```
+
+    The above example doesn't explicitly declare `github` or `twitter` as paths,
+    but, since `socialMediaHandles` is a map, you can store arbitrary key/value
+    pairs. However, since `socialMediaHandles` is a map, you **must** use
+    `.get()` to get the value of a key and `.set()` to set the value of a key.
+
+    ```javascript
+    const user = new User({
+      socialMediaHandles: {}
+    });
+
+    // Good
+    user.socialMediaHandles.set('github', 'vkarpov15');
+    // Works too
+    user.set('socialMediaHandles.twitter', '@code_barbarian');
+    // Bad, the `myspace` property will **not** get saved
+    user.socialMediaHandles.myspace = 'fail';
+
+    // 'vkarpov15'
+    console.log(user.socialMediaHandles.get('github'));
+    // '@code_barbarian'
+    console.log(user.get('socialMediaHandles.twitter'));
+    // undefined
+    user.socialMediaHandles.github;
+
+    // Will only save the 'github' field
+    user.save();
+    ```
+
+    Map types are stored as [BSON objects in MongoDB](https://en.wikipedia.org/wiki/BSON#Data_types_and_syntax).
+    Keys in a BSON object are ordered, so this means the [insertion order](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Description)
+    property of maps is maintained.
 
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
 

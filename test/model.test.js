@@ -4860,6 +4860,33 @@ describe('Model', function() {
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
         });
       });
+
+      it('startSession() (gh-6362)', function() {
+        return co(function*() {
+          const MyModel = db.model('gh6362', new Schema({ name: String }));
+
+          const session = yield MyModel.startSession({ causalConsistency: true });
+
+          assert.equal(session.supports.causalConsistency, true);
+        });
+      });
+
+      it('startSession() before connecting (gh-6362)', function() {
+        return co(function*() {
+          const db = start();
+
+          const MyModel = db.model('gh6362_2', new Schema({ name: String }));
+
+          // Don't wait for promise
+          const sessionPromise = MyModel.startSession({ causalConsistency: true });
+
+          yield db;
+
+          const session = yield sessionPromise;
+
+          assert.equal(session.supports.causalConsistency, true);
+        });
+      });
     });
 
     it('method with same name as prop should throw (gh-4475)', function(done) {

@@ -18,7 +18,9 @@ const files = [
   'lib/document.js',
   'lib/model.js',
   'lib/query.js',
+  'lib/cursor/QueryCursor.js',
   'lib/aggregate.js',
+  'lib/cursor/AggregationCursor.js',
   'lib/schematype.js',
   'lib/virtualtype.js',
   'lib/error/index.js'

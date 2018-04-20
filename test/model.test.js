@@ -4901,14 +4901,21 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
-            const doc = yield MyModel.findOne({}, null, { session });
+            let doc = yield MyModel.findOne({}, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
 
-            doc.name = 'test2';
+            doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' }, { session });
+            assert.strictEqual(doc.$__.session, session);
+            assert.strictEqual(doc.$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            doc.name = 'test3';
 
             yield doc.save();
 

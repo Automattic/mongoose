@@ -4861,30 +4861,59 @@ describe('Model', function() {
         });
       });
 
-      it('startSession() (gh-6362)', function() {
-        return co(function*() {
-          const MyModel = db.model('gh6362', new Schema({ name: String }));
+      describe('sessions (gh-6362)', function() {
+        let MyModel;
 
-          const session = yield MyModel.startSession({ causalConsistency: true });
-
-          assert.equal(session.supports.causalConsistency, true);
+        before(function() {
+          MyModel = db.model('gh6362', new Schema({ name: String }));
         });
-      });
 
-      it('startSession() before connecting (gh-6362)', function() {
-        return co(function*() {
-          const db = start();
+        it('startSession()', function() {
+          return co(function*() {
+            const session = yield MyModel.startSession({ causalConsistency: true });
 
-          const MyModel = db.model('gh6362_2', new Schema({ name: String }));
+            assert.equal(session.supports.causalConsistency, true);
+          });
+        });
 
-          // Don't wait for promise
-          const sessionPromise = MyModel.startSession({ causalConsistency: true });
+        it('startSession() before connecting', function() {
+          return co(function*() {
+            const db = start();
 
-          yield db;
+            const MyModel = db.model('gh6362_2', new Schema({ name: String }));
 
-          const session = yield sessionPromise;
+            // Don't wait for promise
+            const sessionPromise = MyModel.startSession({ causalConsistency: true });
 
-          assert.equal(session.supports.causalConsistency, true);
+            yield db;
+
+            const session = yield sessionPromise;
+
+            assert.equal(session.supports.causalConsistency, true);
+          });
+        });
+
+        it('sets session when pulling a document from db', function() {
+          return co(function*() {
+            yield MyModel.create({ name: 'test' });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            const doc = yield MyModel.findOne({}, null, { session });
+            assert.strictEqual(doc.$__.session, session);
+            assert.strictEqual(doc.$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            doc.name = 'test2';
+
+            yield doc.save();
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+          });
         });
       });
     });

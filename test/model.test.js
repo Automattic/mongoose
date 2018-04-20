@@ -4873,6 +4873,8 @@ describe('Model', function() {
             const session = yield MyModel.startSession({ causalConsistency: true });
 
             assert.equal(session.supports.causalConsistency, true);
+
+            session.endSession();
           });
         });
 
@@ -4890,6 +4892,8 @@ describe('Model', function() {
             const session = yield sessionPromise;
 
             assert.equal(session.supports.causalConsistency, true);
+
+            session.endSession();
           });
         });
 
@@ -4920,6 +4924,8 @@ describe('Model', function() {
             yield doc.save();
 
             assert.ok(session.serverSession.lastUse > lastUse);
+
+            session.endSession();
           });
         });
       });

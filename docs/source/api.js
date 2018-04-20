@@ -112,6 +112,14 @@ function parse() {
       data.props.push(ctx);
     }
 
+    data.props.sort(function(a, b) {
+      if (a.string < b.string) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
     out.push(data);
   }
 }

@@ -4821,7 +4821,7 @@ describe('Model', function() {
         });
       });
 
-      it('watch() (gh-5964)', function() {
+      it.skip('watch() (gh-5964)', function() {
         return co(function*() {
           const MyModel = db.model('gh5964', new Schema({ name: String }));
 
@@ -4840,7 +4840,7 @@ describe('Model', function() {
         });
       });
 
-      it('watch() before connecting (gh-5964)', function() {
+      it.skip('watch() before connecting (gh-5964)', function() {
         return co(function*() {
           const db = start();
 

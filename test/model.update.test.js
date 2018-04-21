@@ -4,13 +4,14 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId,
-    DocumentObjectId = mongoose.Types.ObjectId;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model: update:', function() {
   var post;
@@ -2626,6 +2627,34 @@ describe('model: update:', function() {
           });
         });
       });
+    });
+
+    it('$pull with updateValidators and required array (gh-6341)', function() {
+      const RecordingSchema = new Schema({ name: String });
+
+      const ItemSchema = new Schema({
+        recordings: {
+          type: [RecordingSchema],
+          required: true
+        }
+      });
+
+      const Item = db.model('gh6431', ItemSchema);
+
+      const opts = {
+        runValidators: true,
+        context: 'query'
+      };
+      const update = {
+        $pull: {
+          recordings: {
+            _id: '000000000000000000000000'
+          }
+        }
+      };
+
+      // Shouldn't error out
+      return Item.findOneAndUpdate({}, update, opts);
     });
 
     it('update with Decimal type (gh-5361)', function(done) {

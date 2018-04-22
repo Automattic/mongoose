@@ -4912,7 +4912,8 @@ describe('Model', function() {
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
 
-            doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' }, { session });
+            doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' },
+              { session: session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
 
@@ -4931,13 +4932,14 @@ describe('Model', function() {
 
         it('sets session when pulling multiple docs from db', function() {
           return co(function*() {
-            yield MyModel.create({ name: 'test' });
+            const doc = yield MyModel.create({ name: 'test' });
 
             const session = yield MyModel.startSession();
 
             let lastUse = session.serverSession.lastUse;
 
-            let docs = yield MyModel.find({}, null, { session });
+            let docs = yield MyModel.find({ _id: doc._id }, null,
+              { session: session });
             assert.equal(docs.length, 1);
             assert.strictEqual(docs[0].$__.session, session);
             assert.strictEqual(docs[0].$session(), session);
@@ -4950,6 +4952,29 @@ describe('Model', function() {
             yield docs[0].save();
 
             assert.ok(session.serverSession.lastUse > lastUse);
+
+            session.endSession();
+          });
+        });
+
+        it('supports overwriting `session` in save()', function() {
+          return co(function*() {
+            yield MyModel.create({ name: 'test' });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            let doc = yield MyModel.findOne({}, null, { session });
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            doc.name = 'test3';
+
+            yield doc.save({ session: null });
+
+            assert.ok(session.serverSession.lastUse <= lastUse);
 
             session.endSession();
           });

@@ -4928,6 +4928,32 @@ describe('Model', function() {
             session.endSession();
           });
         });
+
+        it('sets session when pulling multiple docs from db', function() {
+          return co(function*() {
+            yield MyModel.create({ name: 'test' });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            let docs = yield MyModel.find({}, null, { session });
+            assert.equal(docs.length, 1);
+            assert.strictEqual(docs[0].$__.session, session);
+            assert.strictEqual(docs[0].$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            docs[0].name = 'test3';
+
+            yield docs[0].save();
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+
+            session.endSession();
+          });
+        });
       });
     });
 

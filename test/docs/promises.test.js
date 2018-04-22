@@ -26,7 +26,8 @@ describe('promises docs', function () {
    * Mongoose async operations, like `.save()` and queries, return
    * [ES6 promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
    * This means that you can do things like `MyModel.findOne({}).then()` and
-   * `await MyModel.findOne({}).exec()` (if you're using [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
+   * `await MyModel.findOne({}).exec()` if you're using
+   * [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
    */
   it('Built-in Promises', function (done) {
     var gnr = new Band({
@@ -46,8 +47,9 @@ describe('promises docs', function () {
   });
 
   /**
-   * Mongoose queries are **not** promises. However, they do have a `.then()`
-   * function for `yield` and async/await. If you need
+   * [Mongoose queries](http://mongoosejs.com/docs/queries.html) are **not** promises. They have a `.then()`
+   * function for [co](https://www.npmjs.com/package/co) and async/await as
+   * a convenience. If you need
    * a fully-fledged promise, use the `.exec()` function.
    */
   it('Queries are not promises', function (done) {
@@ -105,33 +107,5 @@ describe('promises docs', function () {
     // acquit:ignore:start
     done();
     // acquit:ignore:end
-  });
-
-  /**
-   * The `mongoose.Promise` property sets the promises mongoose uses. However,
-   * this does **not** affect the underlying MongoDB driver. If you use the
-   * underlying driver, for instance `Model.collection.db.insert()`, you
-   * need to do a little extra work to change the underlying promises library.
-   * Note that the below code assumes mongoose >= 4.4.4.
-   */
-  it('Promises for the MongoDB Driver', function (done) {
-    // acquit:ignore:start
-    if (!global.Promise) {
-      return done();
-    }
-    // acquit:ignore:end
-    var uri = 'mongodb://localhost:27017/mongoose_test';
-    // Use bluebird
-    var options = { promiseLibrary: require('bluebird') };
-    var db = mongoose.createConnection(uri, options);
-
-    Band = db.model('band-promises', { name: String });
-
-    db.on('open', function() {
-      assert.equal(Band.collection.findOne().constructor, require('bluebird'));
-      // acquit:ignore:start
-      done();
-      // acquit:ignore:end
-    });
   });
 });

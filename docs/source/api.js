@@ -18,7 +18,9 @@ const files = [
   'lib/document.js',
   'lib/model.js',
   'lib/query.js',
+  'lib/cursor/QueryCursor.js',
   'lib/aggregate.js',
+  'lib/cursor/AggregationCursor.js',
   'lib/schematype.js',
   'lib/virtualtype.js',
   'lib/error/index.js'
@@ -109,6 +111,14 @@ function parse() {
 
       data.props.push(ctx);
     }
+
+    data.props.sort(function(a, b) {
+      if (a.string < b.string) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
 
     out.push(data);
   }

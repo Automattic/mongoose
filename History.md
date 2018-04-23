@@ -1,3 +1,16 @@
+5.0.16 / 2018-04-23
+===================
+ * docs(api): sort api methods based on their string property #6374 [lineus](https://github.com/lineus)
+ * docs(connection): fix typo in `createCollection()` #6370 [mattc41190](https://github.com/mattc41190)
+ * docs(document): remove vestigial reference to `numAffected` #6367 [ekulabuhov](https://github.com/ekulabuhov)
+ * docs(schema): fix typo #6366 [dhritzkiv](https://github.com/dhritzkiv)
+ * docs(schematypes): add missing `minlength` and `maxlength` docs #6365 [treble-snake](https://github.com/treble-snake)
+ * docs(queries): fix formatting #6360 [treble-snake](https://github.com/treble-snake)
+ * docs(api): add cursors to API docs #6353 #6344 [lineus](https://github.com/lineus)
+ * docs(aggregate): remove reference to non-existent `.select()` method #6346
+ * fix(update): handle `required` array with update validators and $pull #6341
+ * fix(update): avoid setting __v in findOneAndUpdate if it is `$set` #5973
+
 5.0.15 / 2018-04-16
 ===================
  * fix: add ability for casting from number to decimal128 #6336 #6331 [lineus](https://github.com/lineus)

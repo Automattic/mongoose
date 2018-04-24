@@ -4371,8 +4371,7 @@ describe('Model', function() {
 
     test.save(function(error) {
       assert.ok(error);
-      assert.equal(error.toString(),
-        'MongoError: document is larger than the maximum size 16777216');
+      assert.equal(error.name, 'MongoError');
       db.close(done);
     });
   });
@@ -4391,8 +4390,7 @@ describe('Model', function() {
     db.on('connected', function() {
       test.save(function(error) {
         assert.ok(error);
-        assert.equal(error.toString(),
-          'MongoError: document is larger than the maximum size 16777216');
+        assert.equal(error.name, 'MongoError');
         db.close(done);
       });
     });

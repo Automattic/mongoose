@@ -14,7 +14,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 
-describe('model: findOneAndRemove:', function() {
+describe('model: findOneAndDelete:', function() {
   var Comments;
   var BlogPost;
   var modelname;
@@ -90,7 +90,7 @@ describe('model: findOneAndRemove:', function() {
     return co(function*() {
       yield post.save();
 
-      const doc = yield M.findOneAndRemove({title: title});
+      const doc = yield M.findOneAndDelete({title: title});
 
       assert.equal(post.id, doc.id);
 
@@ -100,50 +100,50 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var M = db.model(modelname, collection);
+    const M = db.model(modelname, collection);
 
-    var now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
-    // Model.findOneAndRemove
-    query = M.findOneAndRemove({author: 'aaron'}, {select: 'author'});
+    // Model.findOneAndDelete
+    query = M.findOneAndDelete({author: 'aaron'}, {select: 'author'});
     assert.equal(query._fields.author, 1);
     assert.equal(query._conditions.author, 'aaron');
 
-    query = M.findOneAndRemove({author: 'aaron'});
+    query = M.findOneAndDelete({author: 'aaron'});
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions.author, 'aaron');
 
-    query = M.findOneAndRemove();
+    query = M.findOneAndDelete();
     assert.equal(query.options.new, undefined);
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions.author, undefined);
 
-    // Query.findOneAndRemove
-    query = M.where('author', 'aaron').findOneAndRemove({date: now});
+    // Query.findOneAndDelete
+    query = M.where('author', 'aaron').findOneAndDelete({date: now});
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions.date, now);
     assert.equal(query._conditions.author, 'aaron');
 
-    query = M.find().findOneAndRemove({author: 'aaron'}, {select: 'author'});
+    query = M.find().findOneAndDelete({author: 'aaron'}, {select: 'author'});
     assert.equal(query._fields.author, 1);
     assert.equal(query._conditions.author, 'aaron');
 
-    query = M.find().findOneAndRemove();
+    query = M.find().findOneAndDelete();
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions.author, undefined);
     done();
   });
 
   it('executes when a callback is passed', function(done) {
-    var M = db.model(modelname, collection + random()),
-        pending = 5;
+    const M = db.model(modelname, collection + random());
+    let pending = 5;
 
-    M.findOneAndRemove({name: 'aaron1'}, {select: 'name'}, cb);
-    M.findOneAndRemove({name: 'aaron1'}, cb);
-    M.where().findOneAndRemove({name: 'aaron1'}, {select: 'name'}, cb);
-    M.where().findOneAndRemove({name: 'aaron1'}, cb);
-    M.where('name', 'aaron1').findOneAndRemove(cb);
+    M.findOneAndDelete({name: 'aaron1'}, {select: 'name'}, cb);
+    M.findOneAndDelete({name: 'aaron1'}, cb);
+    M.where().findOneAndDelete({name: 'aaron1'}, {select: 'name'}, cb);
+    M.where().findOneAndDelete({name: 'aaron1'}, cb);
+    M.where('name', 'aaron1').findOneAndDelete(cb);
 
     function cb(err, doc) {
       assert.ifError(err);
@@ -154,11 +154,11 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    var M = db.model(modelname, collection),
-        err;
+    const M = db.model(modelname, collection);
+    let err;
 
     try {
-      M.findOneAndRemove(function() {});
+      M.findOneAndDelete(function() {});
     } catch (e) {
       err = e;
     }
@@ -168,11 +168,11 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    var M = db.model(modelname, collection),
-        err;
+    const M = db.model(modelname, collection);
+    let err;
 
     try {
-      M.findByIdAndRemove(function() {});
+      M.findByIdAndDelete(function() {});
     } catch (e) {
       err = e;
     }
@@ -182,12 +182,12 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var M = db.model(modelname, collection + random()),
-        _id = new DocumentObjectId,
-        pending = 2;
+    const M = db.model(modelname, collection + random());
+    let _id = new DocumentObjectId;
+    let pending = 2;
 
-    M.findByIdAndRemove(_id, {select: 'name'}, cb);
-    M.findByIdAndRemove(_id, cb);
+    M.findByIdAndDelete(_id, {select: 'name'}, cb);
+    M.findByIdAndDelete(_id, cb);
 
     function cb(err, doc) {
       assert.ifError(err);
@@ -198,13 +198,13 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('returns the original document', function(done) {
-    var M = db.model(modelname, collection),
-        title = 'remove muah pleez';
+    const M = db.model(modelname, collection);
+    const title = 'remove muah pleez';
 
-    var post = new M({title: title});
+    const post = new M({title: title});
     post.save(function(err) {
       assert.ifError(err);
-      M.findByIdAndRemove(post.id, function(err, doc) {
+      M.findByIdAndDelete(post.id, function(err, doc) {
         assert.ifError(err);
         assert.equal(post.id, doc.id);
         M.findById(post.id, function(err, gone) {
@@ -217,21 +217,21 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId();
 
-    var query;
+    let query;
 
-    // Model.findByIdAndRemove
-    query = M.findByIdAndRemove(_id, {select: 'author'});
+    // Model.findByIdAndDelete
+    query = M.findByIdAndDelete(_id, {select: 'author'});
     assert.equal(query._fields.author, 1);
     assert.equal(query._conditions._id.toString(), _id.toString());
 
-    query = M.findByIdAndRemove(_id.toString());
+    query = M.findByIdAndDelete(_id.toString());
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions._id, _id.toString());
 
-    query = M.findByIdAndRemove();
+    query = M.findByIdAndDelete();
     assert.equal(query.options.new, undefined);
     assert.equal(query._fields, undefined);
     assert.equal(query._conditions._id, undefined);
@@ -239,49 +239,49 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    var M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId();
 
-    var query;
+    let query;
 
-    query = M.findByIdAndRemove(_id, {select: 'author -title'});
+    query = M.findByIdAndDelete(_id, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
-    query = M.findOneAndRemove({}, {select: 'author -title'});
+    query = M.findOneAndDelete({}, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
   });
 
   it('supports v3 select object syntax', function(done) {
-    var M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
-    var query;
+    let query;
 
-    query = M.findByIdAndRemove(_id, {select: {author: 1, title: 0}});
+    query = M.findByIdAndDelete(_id, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
-    query = M.findOneAndRemove({}, {select: {author: 1, title: 0}});
+    query = M.findOneAndDelete({}, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
   });
 
   it('supports v3 sort string syntax', function(done) {
-    var M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId();
 
-    var query;
+    let query;
 
-    query = M.findByIdAndRemove(_id, {sort: 'author -title'});
+    query = M.findByIdAndDelete(_id, {sort: 'author -title'});
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
 
-    query = M.findOneAndRemove({}, {sort: 'author -title'});
+    query = M.findOneAndDelete({}, {sort: 'author -title'});
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
@@ -289,17 +289,17 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    var M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId();
 
-    var query;
+    let query;
 
-    query = M.findByIdAndRemove(_id, {sort: {author: 1, title: -1}});
+    query = M.findByIdAndDelete(_id, {sort: {author: 1, title: -1}});
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
 
-    query = M.findOneAndRemove(_id, {sort: {author: 1, title: -1}});
+    query = M.findOneAndDelete(_id, {sort: {author: 1, title: -1}});
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
@@ -307,15 +307,15 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports population (gh-1395)', function(done) {
-    var M = db.model('A', {name: String});
-    var N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
+    const M = db.model('A', {name: String});
+    const N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
 
     M.create({name: 'i am an A'}, function(err, a) {
       if (err) return done(err);
       N.create({a: a._id, i: 10}, function(err, b) {
         if (err) return done(err);
 
-        N.findOneAndRemove({_id: b._id}, {select: 'a -_id'})
+        N.findOneAndDelete({_id: b._id}, {select: 'a -_id'})
           .populate('a')
           .exec(function(err, doc) {
             if (err) return done(err);
@@ -344,7 +344,7 @@ describe('model: findOneAndRemove:', function() {
       });
       const Model = db.model('gh6203', userSchema);
 
-      yield Model.findOneAndRemove({ foo: '123' }, { name: 'bar' });
+      yield Model.findOneAndDelete({ foo: '123' }, { name: 'bar' });
 
       assert.deepEqual(calls, ['123']);
     });
@@ -358,12 +358,12 @@ describe('model: findOneAndRemove:', function() {
       });
 
       var preCount = 0;
-      s.pre('findOneAndRemove', function() {
+      s.pre('findOneAndDelete', function() {
         ++preCount;
       });
 
       var postCount = 0;
-      s.post('findOneAndRemove', function() {
+      s.post('findOneAndDelete', function() {
         ++postCount;
       });
 
@@ -375,7 +375,7 @@ describe('model: findOneAndRemove:', function() {
       breakfast.save(function(error) {
         assert.ifError(error);
 
-        Breakfast.findOneAndRemove(
+        Breakfast.findOneAndDelete(
           {base: 'eggs'},
           {},
           function(error, breakfast) {
@@ -395,12 +395,12 @@ describe('model: findOneAndRemove:', function() {
       });
 
       var preCount = 0;
-      s.pre('findOneAndRemove', function() {
+      s.pre('findOneAndDelete', function() {
         ++preCount;
       });
 
       var postCount = 0;
-      s.post('findOneAndRemove', function() {
+      s.post('findOneAndDelete', function() {
         ++postCount;
       });
 
@@ -413,7 +413,7 @@ describe('model: findOneAndRemove:', function() {
         assert.ifError(error);
 
         Breakfast.
-          findOneAndRemove({base: 'eggs'}, {}).
+          findOneAndDelete({base: 'eggs'}, {}).
           exec(function(error, breakfast) {
             assert.ifError(error);
             assert.equal(breakfast.base, 'eggs');

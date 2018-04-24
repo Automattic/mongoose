@@ -4229,7 +4229,7 @@ describe('Model', function() {
         yield Person.init();
 
         let err;
-        yield p.save().catch(_err => { err = _err });
+        yield p.save().catch(_err => { err = _err; });
 
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);

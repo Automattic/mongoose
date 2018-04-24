@@ -206,7 +206,7 @@ describe('schema options.timestamps', function() {
     });
 
     it('should change updatedAt when findOneAndUpdate', function(done) {
-      Cat.create({name: 'test123'}, function(err, doc) {
+      Cat.create({name: 'test123'}, function(err) {
         assert.ifError(err);
         Cat.findOne({name: 'test123'}, function(err, doc) {
           var old = doc.updatedAt;

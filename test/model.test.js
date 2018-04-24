@@ -4084,7 +4084,7 @@ describe('Model', function() {
     var db;
 
     before(function() {
-      db = start();
+      db = start({ noErrorListener: true });
     });
 
     after(function(done) {
@@ -4400,7 +4400,7 @@ describe('Model', function() {
     var db;
 
     before(function() {
-      db = start();
+      db = start({ noErrorListener: true });
     });
 
     after(function(done) {

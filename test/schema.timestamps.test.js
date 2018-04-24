@@ -206,11 +206,14 @@ describe('schema options.timestamps', function() {
     });
 
     it('should change updatedAt when findOneAndUpdate', function(done) {
-      Cat.findOne({name: 'newcat'}, function(err, doc) {
-        var old = doc.updatedAt;
-        Cat.findOneAndUpdate({name: 'newcat'}, {$set: {hobby: 'fish'}}, {new: true}, function(err, doc) {
-          assert.ok(doc.updatedAt.getTime() > old.getTime());
-          done();
+      Cat.create({name: 'test123'}, function(err, doc) {
+        assert.ifError(err);
+        Cat.findOne({name: 'test123'}, function(err, doc) {
+          var old = doc.updatedAt;
+          Cat.findOneAndUpdate({name: 'test123'}, {$set: {hobby: 'fish'}}, {new: true}, function(err, doc) {
+            assert.ok(doc.updatedAt.getTime() > old.getTime());
+            done();
+          });
         });
       });
     });

@@ -66,13 +66,13 @@ describe('model: findOneAndDelete:', function() {
       return this;
     });
 
-    modelname = 'RemoveOneBlogPost';
+    modelname = 'DeleteOneBlogPost';
     mongoose.model(modelname, BlogPost);
 
-    collection = 'removeoneblogposts_' + random();
+    collection = 'deleteoneblogposts';
 
     strictSchema = new Schema({name: String}, {strict: true});
-    mongoose.model('RemoveOneStrictSchema', strictSchema);
+    mongoose.model('DeleteOneStrictSchema', strictSchema);
 
     db = start();
   });

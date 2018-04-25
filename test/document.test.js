@@ -5247,7 +5247,7 @@ describe('document', function() {
       return co(function*() {
         yield TestModel.collection.insertOne({});
 
-        let doc = yield TestModel.findOne();
+        let doc = yield TestModel.findOne({});
         assert.strictEqual(doc.test, void 0);
         assert.deepEqual(isNew, [false]);
 

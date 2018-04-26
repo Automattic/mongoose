@@ -444,11 +444,13 @@ describe('types.documentarray', function() {
 
       var T = mongoose.model('DocArrayNestedRequired', schema);
       var t = new T({});
-      t.docs.push({name: 'test1'});
+      t.docs.push(null);
       t.docs.push({name: 'test2'});
 
-      t.validateSync();
+      const err = t.validateSync();
       assert.equal(calls.length, 2);
+      assert.ok(err);
+      assert.ok(err.errors['docs.0']);
       done();
     });
   });

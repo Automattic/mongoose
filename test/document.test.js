@@ -5227,6 +5227,38 @@ describe('document', function() {
       done();
     });
 
+    it('defaults should see correct isNew (gh-3793)', function() {
+      let isNew = [];
+      const TestSchema = new mongoose.Schema({
+        test: {
+          type: Date,
+          default: function() {
+            isNew.push(this.isNew);
+            if (this.isNew) {
+              return Date.now();
+            }
+            return void 0;
+          }
+        }
+      });
+
+      const TestModel = db.model('gh3793', TestSchema);
+
+      return co(function*() {
+        yield TestModel.collection.insertOne({});
+
+        let doc = yield TestModel.findOne({});
+        assert.strictEqual(doc.test, void 0);
+        assert.deepEqual(isNew, [false]);
+
+        isNew = [];
+
+        doc = yield TestModel.create({});
+        assert.ok(doc.test instanceof Date);
+        assert.deepEqual(isNew, [true]);
+      });
+    });
+
     it('modify multiple subdoc paths (gh-4405)', function(done) {
       var ChildObjectSchema = new Schema({
         childProperty1: String,

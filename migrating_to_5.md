@@ -102,7 +102,43 @@ const cursorWithOptions = MyModel.
 
 `Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/3.0.0/CHANGES_3.0.0.md#geonear-command-helper)
 
-### Domain sockets
+### Required URI encoding of connection strings
+
+Due to changes in the MongoDB driver, connection strings must be URI encoded.
+
+If they are not, connections may fail with an illegeal character message.
+
+#### Passwords which contain certain characters
+
+See a [full list of affected characters](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+
+If your app is used by a lot of different connection strings, it's possible
+that your test cases will pass, but production passwords will fail. Encode all your connection
+strings to be safe.
+
+If you want to continue to use unencoded connection strings, the easiest fix is to use
+the `mongodb-uri` module to parse the connection strings, and then produce the properly encoded
+versions. You can use a function like this:
+
+```javascript
+const uriFormat = require('mongodb-uri')
+function encodeMongoURI (urlString) {
+    if (urlString) {
+      let parsed = uriFormat.parse(urlString)
+      urlString = uriFormat.format(parsed);
+    }
+    return urlString;
+  }
+}
+
+// Your un-encoded string.
+const mongodbConnectString = "mongodb://...";
+mongoose.connect(encodeMongoURI(mongodbConnectString)
+```
+
+The function above is safe to use whether the existing string is already encoded or not.
+
+#### Domain sockets
 
 Domain sockets must be URI encoded. For example:
 

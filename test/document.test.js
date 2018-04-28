@@ -4023,6 +4023,43 @@ describe('document', function() {
       done();
     });
 
+    it('hooks/middleware for custom methods (gh-6385)', function() {
+      const mySchema = new Schema({
+        name: String
+      });
+
+      mySchema.methods.foo = function(cb) {
+        return cb(null, this.name);
+      };
+      mySchema.methods.bar = function() {
+        return this.name;
+      };
+
+      let preFoo = 0;
+      let postFoo = 0;
+      mySchema.pre('foo', function() {
+        ++preFoo;
+      });
+      mySchema.post('foo', function() {
+        ++postFoo;
+      });
+
+      const MyModel = db.model('gh6385', mySchema);
+
+      return co(function*() {
+        const doc = new MyModel({ name: 'test' });
+
+        assert.equal(doc.bar(), 'test');
+
+        assert.equal(preFoo, 0);
+        assert.equal(postFoo, 0);
+
+        assert.equal(yield cb => doc.foo(cb), 'test');
+        assert.equal(preFoo, 1);
+        assert.equal(postFoo, 1);
+      });
+    });
+
     it('setting to discriminator (gh-4935)', function(done) {
       var Buyer = db.model('gh4935_0', new Schema({
         name: String,

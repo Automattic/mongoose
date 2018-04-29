@@ -4410,6 +4410,34 @@ describe('document', function() {
       });
     });
 
+    it('push() onto a nested doc array (gh-6398)', function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        array: [[{key: String, value: Number}]]
+      });
+
+      const Model = db.model('gh6398', schema);
+
+      return co(function*() {
+        yield Model.create({
+          name: 'small',
+          array: [[{ key: 'answer', value: 42 }]]
+        });
+
+        let doc = yield Model.findOne();
+
+        assert.ok(doc);
+        doc.array[0].push({ key: 'lucky', value: 7 });
+
+        yield doc.save();
+
+        doc = yield Model.findOne();
+        assert.equal(doc.array.length, 1);
+        assert.equal(doc.array[0].length, 2);
+        assert.equal(doc.array[0][1].key, 'lucky');
+      });
+    });
+
     it('null _id (gh-5236)', function(done) {
       var childSchema = new mongoose.Schema({});
 

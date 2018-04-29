@@ -1,12 +1,15 @@
+'use strict';
 
 /**
  * Test dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema;
+const assert = require('power-assert');
+const co = require('co');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('schema options.timestamps', function() {
   var conn;
@@ -215,6 +218,37 @@ describe('schema options.timestamps', function() {
             done();
           });
         });
+      });
+    });
+
+    it('insertMany with createdAt off (gh-6381)', function() {
+      const CatSchema = new Schema({
+        name: String,
+        createdAt: {
+          type: Date,
+          default: function() {
+            return new Date('2013-06-01');
+          }
+        }
+      },
+      {
+        timestamps: {
+          createdAt: false,
+          updatedAt: true
+        }
+      });
+
+      const Cat = conn.model('gh6381', CatSchema);
+
+      const d = new Date('2011-06-01');
+
+      return co(function*() {
+        yield Cat.insertMany([{ name: 'a' }, { name: 'b', createdAt: d }]);
+
+        const cats = yield Cat.find().sort('name');
+
+        assert.equal(cats[0].createdAt.valueOf(), new Date('2013-06-01').valueOf());
+        assert.equal(cats[1].createdAt.valueOf(), new Date('2011-06-01').valueOf());
       });
     });
 

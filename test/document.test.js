@@ -4023,6 +4023,43 @@ describe('document', function() {
       done();
     });
 
+    it('hooks/middleware for custom methods (gh-6385)', function() {
+      const mySchema = new Schema({
+        name: String
+      });
+
+      mySchema.methods.foo = function(cb) {
+        return cb(null, this.name);
+      };
+      mySchema.methods.bar = function() {
+        return this.name;
+      };
+
+      let preFoo = 0;
+      let postFoo = 0;
+      mySchema.pre('foo', function() {
+        ++preFoo;
+      });
+      mySchema.post('foo', function() {
+        ++postFoo;
+      });
+
+      const MyModel = db.model('gh6385', mySchema);
+
+      return co(function*() {
+        const doc = new MyModel({ name: 'test' });
+
+        assert.equal(doc.bar(), 'test');
+
+        assert.equal(preFoo, 0);
+        assert.equal(postFoo, 0);
+
+        assert.equal(yield cb => doc.foo(cb), 'test');
+        assert.equal(preFoo, 1);
+        assert.equal(postFoo, 1);
+      });
+    });
+
     it('setting to discriminator (gh-4935)', function(done) {
       var Buyer = db.model('gh4935_0', new Schema({
         name: String,
@@ -4370,6 +4407,34 @@ describe('document', function() {
         assert.ifError(error);
         assert.deepEqual(t.toObject().strs, [['a', 'b']]);
         done();
+      });
+    });
+
+    it('push() onto a nested doc array (gh-6398)', function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        array: [[{key: String, value: Number}]]
+      });
+
+      const Model = db.model('gh6398', schema);
+
+      return co(function*() {
+        yield Model.create({
+          name: 'small',
+          array: [[{ key: 'answer', value: 42 }]]
+        });
+
+        let doc = yield Model.findOne();
+
+        assert.ok(doc);
+        doc.array[0].push({ key: 'lucky', value: 7 });
+
+        yield doc.save();
+
+        doc = yield Model.findOne();
+        assert.equal(doc.array.length, 1);
+        assert.equal(doc.array[0].length, 2);
+        assert.equal(doc.array[0][1].key, 'lucky');
       });
     });
 

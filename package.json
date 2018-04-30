@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.0.16",
+  "version": "5.0.17",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -21,7 +21,7 @@
   "dependencies": {
     "async": "2.1.4",
     "bson": "~1.0.4",
-    "kareem": "2.0.6",
+    "kareem": "2.0.7",
     "lodash.get": "4.4.2",
     "mongodb": "3.0.7",
     "mongoose-legacy-pluralize": "1.0.2",

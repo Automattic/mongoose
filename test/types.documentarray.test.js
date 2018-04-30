@@ -407,6 +407,54 @@ describe('types.documentarray', function() {
     });
   });
 
+  describe('required (gh-6364)', function() {
+    it('on top level', function(done) {
+      var calls = [];
+      var schema = new Schema({
+        docs: {
+          type: [{name: 'string'}],
+          required: function() {
+            calls.push(this);
+            return true;
+          }
+        }
+      });
+
+      var T = mongoose.model('TopLevelRequired', schema);
+      var t = new T({});
+      t.docs.push({name: 'test1'});
+      t.docs.push({name: 'test2'});
+
+      t.validateSync();
+      assert.equal(calls.length, 1);
+      done();
+    });
+
+    it('in arr', function(done) {
+      var calls = [];
+      var schema = new Schema({
+        docs: [{
+          type: new Schema({ name: 'string' }),
+          required: function() {
+            calls.push(this);
+            return true;
+          }
+        }]
+      });
+
+      var T = mongoose.model('DocArrayNestedRequired', schema);
+      var t = new T({});
+      t.docs.push(null);
+      t.docs.push({name: 'test2'});
+
+      const err = t.validateSync();
+      assert.equal(calls.length, 2);
+      assert.ok(err);
+      assert.ok(err.errors['docs.0']);
+      done();
+    });
+  });
+
   describe('invalidate()', function() {
     it('works', function(done) {
       var schema = new Schema({docs: [{name: 'string'}]});

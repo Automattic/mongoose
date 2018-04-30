@@ -1,3 +1,12 @@
+5.0.17 / 2018-04-30
+===================
+ * docs(migration): certain chars in passwords may cause connection failures #6401 [markstos](https://github.com/markstos)
+ * fix(document): don't throw when `push()` on a nested doc array #6398
+ * fix(model): apply hooks to custom methods if specified #6385
+ * fix(schema): support opting out of one timestamp field but not the other for `insertMany()` #6381
+ * fix(documentarray): handle `required: true` within documentarray definition #6364
+ * fix(document): ensure `isNew` is set before default functions run on init #3793
+
 5.0.16 / 2018-04-23
 ===================
  * docs(api): sort api methods based on their string property #6374 [lineus](https://github.com/lineus)

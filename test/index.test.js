@@ -57,6 +57,16 @@ describe('mongoose module:', function() {
     assert.equal(mongoose.model('User').collection.name, 'users');
     done();
   });
+  
+  it('returns legacy pluralize function by default', function(done) {
+    var legacyPluralize = require('mongoose-legacy-pluralize');
+    var mongoose = new Mongoose();
+    
+    var pluralize = mongoose.pluralize();
+
+    assert.equal(pluralize, legacyPluralize);
+    done();
+  });
 
   it('{g,s}etting options', function(done) {
     var mongoose = new Mongoose();

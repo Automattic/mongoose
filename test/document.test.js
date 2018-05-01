@@ -447,15 +447,32 @@ describe('document', function() {
     });
   });
 
-  it('allows you to skip validation on save (gh-2981)', function(done) {
-    var MyModel = db.model('gh2981',
-      {name: {type: String, required: true}});
+  it('saves even if `_id` is null (gh-6406)', function() {
+    const schema = new Schema({ _id: Number, val: String });
+    const Model = db.model('gh6406', schema);
 
-    var doc = new MyModel();
-    doc.save({validateBeforeSave: false}, function(error) {
-      assert.ifError(error);
-      done();
+    return co(function*() {
+      yield Model.updateOne({ _id: null }, { val: 'test' }, { upsert: true });
+
+      let doc = yield Model.findOne();
+
+      doc.val = 'test2';
+
+      // Should not throw
+      yield doc.save();
+
+      doc = yield Model.findOne();
+      assert.strictEqual(doc._id, null);
+      assert.equal(doc.val, 'test2');
     });
+  });
+
+  it('allows you to skip validation on save (gh-2981)', function() {
+    const schema = new Schema({ name: { type: String, required: true } });
+    const MyModel = db.model('gh2981', schema);
+
+    const doc = new MyModel();
+    return doc.save({ validateBeforeSave: false });
   });
 
   it('doesnt use custom toObject options on save', function(done) {

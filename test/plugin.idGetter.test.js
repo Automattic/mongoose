@@ -30,7 +30,6 @@ describe('id virtual getter', function() {
 
       // Comparing with virtual getter
       assert.equal(s._id.toString(), s.id);
-      assert.equal(s.toHexString(), s._id.toString());
       done();
     });
   });

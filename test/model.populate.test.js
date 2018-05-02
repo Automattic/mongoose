@@ -4991,6 +4991,36 @@ describe('model: populate:', function() {
         });
       });
 
+      it('attaches `_id` property to ref ids (gh-6359) (gh-6115)', function() {
+        const articleSchema = new Schema({
+          title: String,
+          author: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh6115_Author'
+          }
+        });
+        const authorSchema = new Schema({
+          name: String
+        });
+
+        const Article = db.model('gh6115_Article', articleSchema);
+        const Author = db.model('gh6115_Author', authorSchema);
+
+        const author = new Author({ name: 'Val' });
+        const article = new Article({
+          title: 'async/await',
+          author: author._id
+        });
+
+        assert.ok(!article.author.name);
+        assert.equal(article.author.toHexString(), author._id.toHexString());
+        assert.equal(article.author._id.toHexString(), author._id.toHexString());
+
+        article.author = author;
+        assert.equal(article.author.name, 'Val');
+        assert.equal(article.author._id.toHexString(), author._id.toHexString());
+      });
+
       it('auto select populated fields (gh-5669) (gh-5685)', function(done) {
         var ProductSchema = new mongoose.Schema({
           name: {

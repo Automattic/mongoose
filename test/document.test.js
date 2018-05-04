@@ -5387,5 +5387,42 @@ describe('document', function() {
         });
       });
     });
+    it('doesnt try to cast populated embedded docs (gh-6390)', function() {
+      var otherSchema = new Schema({
+        name: String
+      });
+
+      var subSchema = new Schema({
+        my: String,
+        other: {
+          type: Schema.Types.ObjectId,
+          refPath: 'sub.my'
+        }
+      });
+
+      var schema = new Schema({
+        name: String,
+        sub: subSchema
+      });
+
+      var Other = db.model('gh6390', otherSchema);
+      var Test = db.model('6h6390_2', schema);
+
+      var other = new Other({ name: 'Nicole' });
+
+      var test = new Test({
+        name: 'abc',
+        sub: {
+          my: 'gh6390',
+          other: other._id
+        }
+      });
+      return co(function* () {
+        yield other.save();
+        yield test.save();
+        var doc = yield Test.findOne({}).populate('sub.other');
+        assert.strictEqual('Nicole', doc.sub.other.name);
+      });
+    });
   });
 });

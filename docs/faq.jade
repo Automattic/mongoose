@@ -197,30 +197,6 @@ block content
     });
     ```
 
-    <hr id="date_changes" />
-
-    **Q**. Why don't in-place modifications to date objects
-    (e.g. `date.setMonth(1);`) get saved?
-
-    ```javascript
-    doc.createdAt.setDate(2011, 5, 1);
-    doc.save(); // createdAt changes won't get saved!
-    ```
-
-    **A**. Mongoose currently doesn't watch for in-place updates to date
-    objects. If you have need for this feature, feel free to discuss on
-    [this GitHub issue](https://github.com/Automattic/mongoose/issues/3738).
-    There are several workarounds:
-
-    ```javascript
-    doc.createdAt.setDate(2011, 5, 1);
-    doc.markModified('createdAt');
-    doc.save(); // Works
-
-    doc.createdAt = new Date(2011, 5, 1).setHours(4);
-    doc.save(); // Works
-    ```
-
     <hr id="populate_sort_order" />
 
     **Q**. I'm populating a nested property under an array like the below code:
@@ -340,6 +316,30 @@ block content
     $group, etc. the type of a property may change during the aggregation. If you want
     to query by date using the aggregation framework, you're responsible for ensuring
     that you're passing in a valid date.
+
+    <hr id="date_changes" />
+
+    **Q**. Why don't in-place modifications to date objects
+    (e.g. `date.setMonth(1);`) get saved?
+
+    ```javascript
+    doc.createdAt.setDate(2011, 5, 1);
+    doc.save(); // createdAt changes won't get saved!
+    ```
+
+    **A**. Mongoose currently doesn't watch for in-place updates to date
+    objects. If you have need for this feature, feel free to discuss on
+    [this GitHub issue](https://github.com/Automattic/mongoose/issues/3738).
+    There are several workarounds:
+
+    ```javascript
+    doc.createdAt.setDate(2011, 5, 1);
+    doc.markModified('createdAt');
+    doc.save(); // Works
+
+    doc.createdAt = new Date(2011, 5, 1).setHours(4);
+    doc.save(); // Works
+    ```
 
     **Something to add?**
 

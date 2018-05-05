@@ -22,7 +22,7 @@ block content
     - Boolean
     - Mixed
     - [ObjectId](./api.html#schema-objectid-js)
-    - Array
+    - [Array](#arrays)
     - Decimal128
 
     <h4>Example</h4>
@@ -241,17 +241,7 @@ block content
     });
     ```
 
-    Note: specifying an empty array is equivalent to `Mixed`. The following all create arrays of
-    `Mixed`:
-
-    ```javascript
-    var Empty1 = new Schema({ any: [] });
-    var Empty2 = new Schema({ any: Array });
-    var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
-    var Empty4 = new Schema({ any: [{}] });
-    ```
-
-    Arrays implicitly have a default value of `[]` (empty array).
+    Arrays are special because they implicitly have a default value of `[]` (empty array).
 
     ```javascript
     var Toy = mongoose.model('Test', ToySchema);
@@ -267,6 +257,16 @@ block content
         default: undefined
       }
     });
+    ```
+
+    Note: specifying an empty array is equivalent to `Mixed`. The following all create arrays of
+    `Mixed`:
+
+    ```javascript
+    var Empty1 = new Schema({ any: [] });
+    var Empty2 = new Schema({ any: Array });
+    var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
+    var Empty4 = new Schema({ any: [{}] });
     ```
 
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>

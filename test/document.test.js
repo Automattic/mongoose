@@ -4011,6 +4011,53 @@ describe('document', function() {
         catch(done);
     });
 
+    it('does not run schema type validator on single nested if not direct modified (gh-5885)', function() {
+      let childValidateCalls = 0;
+      const childSchema = new Schema({
+        name: String,
+        otherProp: {
+          type: String,
+          validate: v => {
+            ++childValidateCalls;
+            return true;
+          }
+        }
+      });
+
+      let validateCalls = 0;
+      const parentSchema = new Schema({
+        child: {
+          type: childSchema,
+          validate: v => {
+            ++validateCalls;
+            return true;
+          }
+        }
+      });
+
+      return co(function*() {
+        const Parent = db.model('gh5885', parentSchema);
+
+        const doc = yield Parent.create({
+          child: {
+            name: 'test',
+            otherProp: 'test'
+          }
+        });
+
+        assert.equal(childValidateCalls, 1);
+        assert.equal(validateCalls, 1);
+        childValidateCalls = 0;
+        validateCalls = 0;
+
+        doc.set('child.name', 'test2');
+        yield doc.validate();
+
+        assert.equal(childValidateCalls, 0);
+        assert.equal(validateCalls, 0);
+      });
+    });
+
     it('does not overwrite when setting nested (gh-4793)', function(done) {
       var grandchildSchema = new mongoose.Schema();
       grandchildSchema.method({

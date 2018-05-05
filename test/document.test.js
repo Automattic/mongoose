@@ -4017,7 +4017,7 @@ describe('document', function() {
         name: String,
         otherProp: {
           type: String,
-          validate: v => {
+          validate: () => {
             ++childValidateCalls;
             return true;
           }
@@ -4028,7 +4028,7 @@ describe('document', function() {
       const parentSchema = new Schema({
         child: {
           type: childSchema,
-          validate: v => {
+          validate: () => {
             ++validateCalls;
             return true;
           }

@@ -4857,8 +4857,21 @@ describe('Model', function() {
       describe('sessions (gh-6362)', function() {
         let MyModel;
 
-        before(function() {
+        before(function(done) {
           MyModel = db.model('gh6362', new Schema({ name: String }));
+
+          start.mongodVersion((err, version) => {
+            if (err) {
+              done(err);
+              return;
+            }
+            var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+            if (!mongo36) {
+              this.skip();
+            }
+
+            done();
+          });
         });
 
         it('startSession()', function() {

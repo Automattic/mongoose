@@ -5356,6 +5356,31 @@ describe('document', function() {
       done();
     });
 
+    it('does not call default function on init if value set (gh-6410)', function() {
+      let called = 0;
+
+      function generateRandomID() {
+        called++;
+        return called;
+      }
+
+      const TestDefaultsWithFunction = db.model('gh6410', new Schema({
+        randomID: {type: Number, default: generateRandomID}
+      }));
+
+      const post = new TestDefaultsWithFunction;
+      assert.equal(post.get('randomID'), 1);
+      assert.equal(called, 1);
+
+      return co(function*() {
+        yield post.save();
+
+        yield TestDefaultsWithFunction.findById(post._id);
+
+        assert.equal(called, 1);
+      });
+    });
+
     it('defaults should see correct isNew (gh-3793)', function() {
       let isNew = [];
       const TestSchema = new mongoose.Schema({
@@ -5374,6 +5399,8 @@ describe('document', function() {
       const TestModel = db.model('gh3793', TestSchema);
 
       return co(function*() {
+        yield Promise.resolve(db);
+
         yield TestModel.collection.insertOne({});
 
         let doc = yield TestModel.findOne({});
@@ -5432,6 +5459,44 @@ describe('document', function() {
             });
           });
         });
+      });
+    });
+
+    it('doesnt try to cast populated embedded docs (gh-6390)', function() {
+      var otherSchema = new Schema({
+        name: String
+      });
+
+      var subSchema = new Schema({
+        my: String,
+        other: {
+          type: Schema.Types.ObjectId,
+          refPath: 'sub.my'
+        }
+      });
+
+      var schema = new Schema({
+        name: String,
+        sub: subSchema
+      });
+
+      var Other = db.model('gh6390', otherSchema);
+      var Test = db.model('6h6390_2', schema);
+
+      var other = new Other({ name: 'Nicole' });
+
+      var test = new Test({
+        name: 'abc',
+        sub: {
+          my: 'gh6390',
+          other: other._id
+        }
+      });
+      return co(function* () {
+        yield other.save();
+        yield test.save();
+        var doc = yield Test.findOne({}).populate('sub.other');
+        assert.strictEqual('Nicole', doc.sub.other.name);
       });
     });
   });

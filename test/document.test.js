@@ -5328,7 +5328,7 @@ describe('document', function() {
       return co(function*() {
         yield post.save();
 
-        const doc = yield TestDefaultsWithFunction.findById(post._id);
+        yield TestDefaultsWithFunction.findById(post._id);
 
         assert.equal(called, 1);
       });

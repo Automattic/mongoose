@@ -3340,7 +3340,7 @@ describe('document', function() {
         doc = yield Test.findById(doc._id);
 
         assert.equal(doc.name, 'val');
-      })
+      });
     });
 
     it('ignore subdocs paths (gh-4480) (gh-6152)', function() {

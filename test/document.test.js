@@ -3320,28 +3320,64 @@ describe('document', function() {
       done();
     });
 
-    it('ignore paths (gh-4480)', function(done) {
-      var TestSchema = new Schema({
+    it('ignore paths (gh-4480)', function() {
+      const TestSchema = new Schema({
         name: { type: String, required: true }
       });
 
-      var Test = db.model('gh4480', TestSchema);
+      const Test = db.model('gh4480', TestSchema);
 
-      Test.create({ name: 'val' }, function(error) {
-        assert.ifError(error);
-        Test.findOne(function(error, doc) {
-          assert.ifError(error);
-          doc.name = null;
-          doc.$ignore('name');
-          doc.save(function(error) {
-            assert.ifError(error);
-            Test.findById(doc._id, function(error, doc) {
-              assert.ifError(error);
-              assert.equal(doc.name, 'val');
-              done();
-            });
-          });
+      return co(function*() {
+        yield Test.create({ name: 'val' });
+
+        let doc = yield Test.findOne();
+
+        doc.name = null;
+        doc.$ignore('name');
+
+        yield doc.save();
+
+        doc = yield Test.findById(doc._id);
+
+        assert.equal(doc.name, 'val');
+      })
+    });
+
+    it('ignore subdocs paths (gh-4480) (gh-6152)', function() {
+      const childSchema = new Schema({
+        name: { type: String, required: true }
+      });
+      const testSchema = new Schema({
+        child: childSchema,
+        children: [childSchema]
+      });
+
+      const Test = db.model('gh6152', testSchema);
+
+      return co(function*() {
+        yield Test.create({
+          child: { name: 'testSingle' },
+          children: [{ name: 'testArr' }]
         });
+
+        let doc = yield Test.findOne();
+        doc.child.name = null;
+        doc.child.$ignore('name');
+
+        yield doc.save();
+
+        doc = yield Test.findById(doc._id);
+
+        assert.equal(doc.child.name, 'testSingle');
+
+        doc.children[0].name = null;
+        doc.children[0].$ignore('name');
+
+        yield doc.save();
+
+        doc = yield Test.findById(doc._id);
+
+        assert.equal(doc.children[0].name, 'testArr');
       });
     });
 

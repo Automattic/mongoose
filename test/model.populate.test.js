@@ -6224,6 +6224,7 @@ describe('model: populate:', function() {
           var officeSchema = new Schema({
             managerId: { type: Schema.ObjectId, ref: 'gh6414User' },
             supervisorId: { type: Schema.ObjectId, ref: 'gh6414User' },
+            janitorId: { type: Schema.ObjectId, ref: 'gh6414User' },
             associatesIds: [{ type: Schema.ObjectId, ref: 'gh6414User' }]
           });
 
@@ -6232,10 +6233,12 @@ describe('model: populate:', function() {
           var manager = new User({ name: 'John' });
           var billy = new User({ name: 'Billy' });
           var tom = new User({ name: 'Tom' });
+          var kevin = new User({ name: 'Kevin' });
           var hafez = new User({ name: 'Hafez' });
           var office = new Office({
             managerId: manager._id,
             supervisorId: hafez._id,
+            janitorId: kevin._id,
             associatesIds: [billy._id, tom._id]
           });
 
@@ -6243,18 +6246,20 @@ describe('model: populate:', function() {
           yield hafez.save();
           yield billy.save();
           yield tom.save();
+          yield kevin.save();
           yield office.save();
 
           let doc = yield Office.findOne()
             .populate([
               { path: 'managerId supervisorId associatesIds', select: 'name -_id' },
-              //{ path: 'someOtherField' }
+              { path: 'janitorId', select: 'name -_id' }
             ]);
 
           assert.strictEqual(doc.managerId.name, 'John');
           assert.strictEqual(doc.supervisorId.name, 'Hafez');
           assert.strictEqual(doc.associatesIds[0].name, 'Billy');
           assert.strictEqual(doc.associatesIds[1].name, 'Tom');
+          assert.strictEqual(doc.janitorId.name, 'Kevin');
         });
       });
     });

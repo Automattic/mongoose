@@ -107,6 +107,24 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('cloneSchemas option (gh-6274)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('cloneSchemas', true);
+
+    const s = new Schema({});
+    const M = mongoose.model('Test', s);
+    assert.ok(M.schema !== s);
+    mongoose.model('Test', M.schema); // Shouldn't throw
+
+    mongoose.set('cloneSchemas', false);
+
+    const M2 = mongoose.model('Test2', s);
+    assert.ok(M2.schema === s);
+
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });
@@ -137,8 +155,8 @@ describe('mongoose module:', function() {
 
     assert.equal(called, 1);
     assert.equal(calls.length, 2);
-    assert.equal(calls[0], schema);
-    assert.equal(calls[1], subSchema);
+    assert.deepEqual(calls[0].obj, schema.obj);
+    assert.deepEqual(calls[1].obj, subSchema.obj);
 
     assert.equal(preSaveCalls, 0);
     mong.connect(start.uri);
@@ -264,12 +282,12 @@ describe('mongoose module:', function() {
     });
 
     it('allows passing identical name + schema args', function(done) {
-      var m = new Mongoose;
-      var schema = new Schema;
-      m.model('A', schema);
+      const m = new Mongoose;
+      const schema = new Schema;
+      let model = m.model('A', schema);
 
       assert.doesNotThrow(function() {
-        m.model('A', schema);
+        m.model('A', model.schema);
       });
 
       done();

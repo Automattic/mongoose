@@ -513,8 +513,8 @@ describe('connections:', function() {
       var name = 'gh-1209-b';
       var schema = new Schema;
 
-      db.model(name, schema);
-      db.model(name, schema);
+      let model = db.model(name, schema);
+      db.model(name, model.schema);
 
       done();
     });

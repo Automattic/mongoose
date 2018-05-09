@@ -54,7 +54,7 @@ describe('versioning', function() {
         }
       });
 
-    mongoose.model('Versioning', BlogPost);
+    BlogPost = mongoose.model('Versioning', BlogPost).schema;
   });
 
   after(function(done) {

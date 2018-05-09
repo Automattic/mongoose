@@ -1861,7 +1861,7 @@ describe('model: populate:', function() {
   });
 
   it('refs should cast to ObjectId from hexstrings', function(done) {
-    var BP = mongoose.model('RefBlogPost', BlogPost);
+    var BP = mongoose.model('RefBlogPost');
     var bp = new BP;
     bp._creator = new DocObjectId().toString();
     assert.ok(bp._creator instanceof DocObjectId);

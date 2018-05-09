@@ -1,3 +1,16 @@
+5.0.18 / 2018-05-09
+===================
+ * fix(update): stop clobbering $in when casting update #6441 #6339 [lineus](https://github.com/lineus)
+ * fix: upgrade mongodb driver -> 3.0.8 to fix session issue #6437 #6357 [simllll](https://github.com/simllll)
+ * fix: upgrade bson -> 1.0.5 re: https://snyk.io/vuln/npm:bson:20180225 #6423 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: look for `valueOf()` when casting to Decimal128 #6419 #6418 [lineus](https://github.com/lineus)
+ * fix: populate array of objects with space separated paths #6414 [lineus](https://github.com/lineus)
+ * test: add coverage for `mongoose.pluralize()` #6412 [FastDeath](https://github.com/FastDeath)
+ * fix(document): avoid running default functions on init() if path has value #6410
+ * fix(document): allow saving document with `null` id #6406
+ * fix: prevent casting of populated docs in document.init #6390 [lineus](https://github.com/lineus)
+ * fix: remove `toHexString()` helper that was added in 5.0.15 #6359
+
 5.0.17 / 2018-04-30
 ===================
  * docs(migration): certain chars in passwords may cause connection failures #6401 [markstos](https://github.com/markstos)

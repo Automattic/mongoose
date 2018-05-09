@@ -6138,8 +6138,8 @@ describe('model: populate:', function() {
       });
     });
 
-    describe('populates an array of objects (gh6284)', function() {
-      it('with mulitiple space separated paths', function() {
+    describe('populates an array of objects', function() {
+      it('subpopulates array w/ space separated path (gh-6284)', function() {
         return co(function* () {
           var db = start();
           var houseSchema = new Schema({ location: String });
@@ -6211,6 +6211,55 @@ describe('model: populate:', function() {
           assert.equal(doc.userId.houseId.location, '123 abc st.');
           assert.equal(doc.userId.cityId.name, 'Some City');
           assert.equal(doc.userId.districtId.name, 'That District');
+        });
+      });
+      it('populates array of space separated path objs (gh-6414)', function() {
+        return co(function* () {
+          var userSchema = new Schema({
+            name: String
+          });
+
+          var User = db.model('gh6414User', userSchema);
+
+          var officeSchema = new Schema({
+            managerId: { type: Schema.ObjectId, ref: 'gh6414User' },
+            supervisorId: { type: Schema.ObjectId, ref: 'gh6414User' },
+            janitorId: { type: Schema.ObjectId, ref: 'gh6414User' },
+            associatesIds: [{ type: Schema.ObjectId, ref: 'gh6414User' }]
+          });
+
+          var Office = db.model('gh6414Office', officeSchema);
+
+          var manager = new User({ name: 'John' });
+          var billy = new User({ name: 'Billy' });
+          var tom = new User({ name: 'Tom' });
+          var kevin = new User({ name: 'Kevin' });
+          var hafez = new User({ name: 'Hafez' });
+          var office = new Office({
+            managerId: manager._id,
+            supervisorId: hafez._id,
+            janitorId: kevin._id,
+            associatesIds: [billy._id, tom._id]
+          });
+
+          yield manager.save();
+          yield hafez.save();
+          yield billy.save();
+          yield tom.save();
+          yield kevin.save();
+          yield office.save();
+
+          let doc = yield Office.findOne()
+            .populate([
+              { path: 'managerId supervisorId associatesIds', select: 'name -_id' },
+              { path: 'janitorId', select: 'name -_id' }
+            ]);
+
+          assert.strictEqual(doc.managerId.name, 'John');
+          assert.strictEqual(doc.supervisorId.name, 'Hafez');
+          assert.strictEqual(doc.associatesIds[0].name, 'Billy');
+          assert.strictEqual(doc.associatesIds[1].name, 'Tom');
+          assert.strictEqual(doc.janitorId.name, 'Kevin');
         });
       });
     });

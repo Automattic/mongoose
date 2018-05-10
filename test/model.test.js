@@ -4091,8 +4091,8 @@ describe('Model', function() {
       db.close(done);
     });
 
-    it('2dsphere indexed field with value is saved', function(done) {
-      var PersonSchema = new Schema({
+    it('2dsphere indexed field with value is saved', function() {
+      const PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
@@ -4100,28 +4100,27 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('Person_1', PersonSchema);
-      var loc = [0.3, 51.4];
-      var p = new Person({
+      const Person = db.model('Person_1', PersonSchema);
+      const loc = [0.3, 51.4];
+      const p = new Person({
         name: 'Jimmy Page',
         loc: loc
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(personDoc.loc[0], loc[0]);
-          assert.equal(personDoc.loc[1], loc[1]);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(personDoc.loc[0], loc[0]);
+        assert.equal(personDoc.loc[1], loc[1]);
       });
     });
 
-    it('2dsphere indexed field without value is saved (gh-1668)', function(done) {
-      var PersonSchema = new Schema({
+    it('2dsphere indexed field without value is saved (gh-1668)', function() {
+      const PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
@@ -4129,26 +4128,25 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('Person_2', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_2', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page'
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(personDoc.name, 'Jimmy Page');
-          assert.equal(personDoc.loc, undefined);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(personDoc.name, 'Jimmy Page');
+        assert.equal(personDoc.loc, undefined);
       });
     });
 
-    it('2dsphere indexed field in subdoc without value is saved', function(done) {
-      var PersonSchema = new Schema({
+    it('2dsphere indexed field in subdoc without value is saved', function() {
+      const PersonSchema = new Schema({
         name: {type: String, required: true},
         nested: {
           tag: String,
@@ -4160,29 +4158,28 @@ describe('Model', function() {
 
       PersonSchema.index({'nested.loc': '2dsphere'});
 
-      var Person = db.model('Person_3', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_3', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page'
       });
 
       p.nested.tag = 'guitarist';
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(personDoc.name, 'Jimmy Page');
-          assert.equal(personDoc.nested.tag, 'guitarist');
-          assert.equal(personDoc.nested.loc, undefined);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(personDoc.name, 'Jimmy Page');
+        assert.equal(personDoc.nested.tag, 'guitarist');
+        assert.equal(personDoc.nested.loc, undefined);
       });
     });
 
-    it('Doc with 2dsphere indexed field without initial value can be updated', function(done) {
-      var PersonSchema = new Schema({
+    it('Doc with 2dsphere indexed field without initial value can be updated', function() {
+      const PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
@@ -4190,32 +4187,31 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('Person_4', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_4', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page'
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        var updates = {
+        yield p.save();
+
+        const updates = {
           $set: {
             loc: [0.3, 51.4]
           }
         };
 
-        Person.findByIdAndUpdate(p._id, updates, {new: true}, function(err, personDoc) {
-          assert.ifError(err);
+        const personDoc = yield Person.findByIdAndUpdate(p._id, updates, {new: true});
 
-          assert.equal(personDoc.loc[0], updates.$set.loc[0]);
-          assert.equal(personDoc.loc[1], updates.$set.loc[1]);
-          done();
-        });
+        assert.equal(personDoc.loc[0], updates.$set.loc[0]);
+        assert.equal(personDoc.loc[1], updates.$set.loc[1]);
       });
     });
 
-    it('2dsphere indexed required field without value is rejected', function(done) {
-      var PersonSchema = new Schema({
+    it('2dsphere indexed required field without value is rejected', function() {
+      const PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
@@ -4224,21 +4220,25 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('Person_5', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_5', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page'
       });
 
-      p.save(function(err) {
+      return co(function*() {
+        yield Person.init();
+
+        let err;
+        yield p.save().catch(_err => { err = _err; });
+
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
-        done();
       });
     });
 
-    it('2dsphere field without value but with schema default is saved', function(done) {
-      var loc = [0, 1];
-      var PersonSchema = new Schema({
+    it('2dsphere field without value but with schema default is saved', function() {
+      const loc = [0, 1];
+      const PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
@@ -4247,26 +4247,25 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('Person_6', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_6', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page'
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(loc[0], personDoc.loc[0]);
-          assert.equal(loc[1], personDoc.loc[1]);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(loc[0], personDoc.loc[0]);
+        assert.equal(loc[1], personDoc.loc[1]);
       });
     });
 
-    it('2d indexed field without value is saved', function(done) {
-      var PersonSchema = new Schema({
+    it('2d indexed field without value is saved', function() {
+      const PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
@@ -4274,25 +4273,24 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('Person_7', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_7', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page'
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(personDoc.loc, undefined);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(personDoc.loc, undefined);
       });
     });
 
-    it('Compound index with 2dsphere field without value is saved', function(done) {
-      var PersonSchema = new Schema({
+    it('Compound index with 2dsphere field without value is saved', function() {
+      const PersonSchema = new Schema({
         name: String,
         type: String,
         slug: {type: String, index: {unique: true}},
@@ -4302,30 +4300,28 @@ describe('Model', function() {
 
       PersonSchema.index({name: 1, loc: '2dsphere'});
 
-      var Person = db.model('Person_8', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_8', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page',
         type: 'musician',
         slug: 'ledzep-1',
         tags: ['guitarist']
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(personDoc.name, 'Jimmy Page');
-          assert.equal(personDoc.loc, undefined);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(personDoc.name, 'Jimmy Page');
+        assert.equal(personDoc.loc, undefined);
       });
     });
 
-
-    it('Compound index on field earlier declared with 2dsphere index is saved', function(done) {
-      var PersonSchema = new Schema({
+    it('Compound index on field earlier declared with 2dsphere index is saved', function() {
+      const PersonSchema = new Schema({
         name: String,
         type: String,
         slug: {type: String, index: {unique: true}},
@@ -4336,24 +4332,23 @@ describe('Model', function() {
       PersonSchema.index({loc: '2dsphere'});
       PersonSchema.index({name: 1, loc: -1});
 
-      var Person = db.model('Person_9', PersonSchema);
-      var p = new Person({
+      const Person = db.model('Person_9', PersonSchema);
+      const p = new Person({
         name: 'Jimmy Page',
         type: 'musician',
         slug: 'ledzep-1',
         tags: ['guitarist']
       });
 
-      p.save(function(err) {
-        assert.ifError(err);
+      return co(function*() {
+        yield Person.init();
 
-        Person.findById(p._id, function(err, personDoc) {
-          assert.ifError(err);
+        yield p.save();
 
-          assert.equal(personDoc.name, 'Jimmy Page');
-          assert.equal(personDoc.loc, undefined);
-          done();
-        });
+        const personDoc = yield Person.findById(p._id);
+
+        assert.equal(personDoc.name, 'Jimmy Page');
+        assert.equal(personDoc.loc, undefined);
       });
     });
   });
@@ -4371,8 +4366,7 @@ describe('Model', function() {
 
     test.save(function(error) {
       assert.ok(error);
-      assert.equal(error.toString(),
-        'MongoError: document is larger than the maximum size 16777216');
+      assert.equal(error.name, 'MongoError');
       db.close(done);
     });
   });
@@ -4391,8 +4385,7 @@ describe('Model', function() {
     db.on('connected', function() {
       test.save(function(error) {
         assert.ok(error);
-        assert.equal(error.toString(),
-          'MongoError: document is larger than the maximum size 16777216');
+        assert.equal(error.name, 'MongoError');
         db.close(done);
       });
     });
@@ -4821,7 +4814,7 @@ describe('Model', function() {
         });
       });
 
-      it('watch() (gh-5964)', function() {
+      it.skip('watch() (gh-5964)', function() {
         return co(function*() {
           const MyModel = db.model('gh5964', new Schema({ name: String }));
 
@@ -4840,7 +4833,7 @@ describe('Model', function() {
         });
       });
 
-      it('watch() before connecting (gh-5964)', function() {
+      it.skip('watch() before connecting (gh-5964)', function() {
         return co(function*() {
           const db = start();
 
@@ -4858,6 +4851,139 @@ describe('Model', function() {
           const changeData = yield changed;
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
+        });
+      });
+
+      describe('sessions (gh-6362)', function() {
+        let MyModel;
+
+        before(function(done) {
+          MyModel = db.model('gh6362', new Schema({ name: String }));
+
+          start.mongodVersion((err, version) => {
+            if (err) {
+              done(err);
+              return;
+            }
+            var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+            if (!mongo36) {
+              this.skip();
+            }
+
+            done();
+          });
+        });
+
+        it('startSession()', function() {
+          return co(function*() {
+            const session = yield MyModel.startSession({ causalConsistency: true });
+
+            assert.equal(session.supports.causalConsistency, true);
+
+            session.endSession();
+          });
+        });
+
+        it('startSession() before connecting', function() {
+          return co(function*() {
+            const db = start();
+
+            const MyModel = db.model('gh6362_2', new Schema({ name: String }));
+
+            // Don't wait for promise
+            const sessionPromise = MyModel.startSession({ causalConsistency: true });
+
+            yield db;
+
+            const session = yield sessionPromise;
+
+            assert.equal(session.supports.causalConsistency, true);
+
+            session.endSession();
+          });
+        });
+
+        it('sets session when pulling a document from db', function() {
+          return co(function*() {
+            yield MyModel.create({ name: 'test' });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            let doc = yield MyModel.findOne({}, null, { session });
+            assert.strictEqual(doc.$__.session, session);
+            assert.strictEqual(doc.$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' },
+              { session: session });
+            assert.strictEqual(doc.$__.session, session);
+            assert.strictEqual(doc.$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            doc.name = 'test3';
+
+            yield doc.save();
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+
+            session.endSession();
+          });
+        });
+
+        it('sets session when pulling multiple docs from db', function() {
+          return co(function*() {
+            const doc = yield MyModel.create({ name: 'test' });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            let docs = yield MyModel.find({ _id: doc._id }, null,
+              { session: session });
+            assert.equal(docs.length, 1);
+            assert.strictEqual(docs[0].$__.session, session);
+            assert.strictEqual(docs[0].$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            docs[0].name = 'test3';
+
+            yield docs[0].save();
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+
+            session.endSession();
+          });
+        });
+
+        it('supports overwriting `session` in save()', function() {
+          return co(function*() {
+            yield MyModel.create({ name: 'test' });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            let doc = yield MyModel.findOne({}, null, { session });
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+            lastUse = session.serverSession.lastUse;
+
+            doc.name = 'test3';
+
+            yield doc.save({ session: null });
+
+            assert.ok(session.serverSession.lastUse <= lastUse);
+
+            session.endSession();
+          });
         });
       });
     });

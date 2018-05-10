@@ -1,3 +1,19 @@
+5.1.0 / 2018-05-10
+==================
+ * feat(ObjectId): add `_id` getter so you can get a usable id whether or not the path is populated #6415 #6115
+ * feat(model): add Model.startSession() #6362
+ * feat(document): add doc.$session() and set session on doc after query #6362
+ * feat: add Map type that supports arbitrary keys #6287 #681
+ * feat: add `cloneSchemas` option to mongoose global to opt in to always cloning schemas before use #6274
+ * feat(model): add `findOneAndDelete()` and `findByIdAndDelete()` #6164
+ * feat(document): support `$ignore()` on single nested and array subdocs #6152
+ * feat(document): add warning about calling `save()` on subdocs #6152
+ * fix(model): make `save()` use `updateOne()` instead of `update()` #6031
+ * feat(error): add version number to VersionError #5966
+ * fix(query): allow `[]` as a value for `$in` when casting #5913
+ * fix(document): avoid running validators on single nested paths if only a child path is modified #5885
+ * feat(schema): print warning if method conflicts with mongoose internals #5860
+
 5.0.18 / 2018-05-09
 ===================
  * fix(update): stop clobbering $in when casting update #6441 #6339 [lineus](https://github.com/lineus)

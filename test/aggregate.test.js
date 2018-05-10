@@ -906,9 +906,14 @@ describe('aggregate: ', function() {
         var aggregate = new Aggregate();
 
         aggregate.skip(0);
-        assert.throws(function() {
+        let threw = false;
+        try {
           aggregate.exec();
-        }, 'Aggregate not bound to any Model');
+        } catch (error) {
+          threw = true;
+          assert.equal(error.message, 'Aggregate not bound to any Model');
+        }
+        assert.ok(threw);
 
         done();
       });

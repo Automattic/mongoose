@@ -123,17 +123,17 @@ describe('model', function() {
     });
 
     it('sets schema root discriminator mapping', function(done) {
-      assert.deepEqual(PersonSchema.discriminatorMapping, {key: '__t', value: null, isRoot: true});
+      assert.deepEqual(Person.schema.discriminatorMapping, {key: '__t', value: null, isRoot: true});
       done();
     });
 
     it('sets schema discriminator type mapping', function(done) {
-      assert.deepEqual(EmployeeSchema.discriminatorMapping, {key: '__t', value: 'model-discriminator-employee', isRoot: false});
+      assert.deepEqual(Employee.schema.discriminatorMapping, {key: '__t', value: 'model-discriminator-employee', isRoot: false});
       done();
     });
 
     it('adds discriminatorKey to schema with default as name', function(done) {
-      var type = EmployeeSchema.paths.__t;
+      var type = Employee.schema.paths.__t;
       assert.equal(type.options.type, String);
       assert.equal(type.options.default, 'model-discriminator-employee');
       done();

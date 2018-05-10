@@ -53,6 +53,18 @@ describe('cast: ', function() {
       done();
     });
 
+    it('casts $in with empty array (gh-5913)', function(done) {
+      var schema = new Schema({
+        v: Number,
+        arr: [Number]
+      });
+      assert.deepEqual(cast(schema, { v: { $in: [1, []] } }),
+        { v: { $in: [1, []] } });
+      assert.deepEqual(cast(schema, { arr: { $in: [1, []] } }),
+        { arr: { $in: [1, []] } });
+      done();
+    });
+
     it('casts array with Numbers to $in query when values are strings', function(done) {
       var schema = new Schema({x: Number});
       var numbers = ['42', '25'];

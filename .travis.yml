@@ -1,6 +1,7 @@
 language: node_js
 sudo: false
 node_js:
+  - "10"
   - "9"
   - "8"
   - "7"
@@ -8,11 +9,11 @@ node_js:
   - "5"
   - "4"
 before_script:
-  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.15.tgz
-  - tar -zxvf mongodb-linux-x86_64-3.0.15.tgz
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.6.4.tgz
+  - tar -zxvf mongodb-linux-x86_64-3.6.4.tgz
   - mkdir -p ./data/db/27017
   - mkdir -p ./data/db/27000
-  - ./mongodb-linux-x86_64-3.0.15/bin/mongod --storageEngine mmapv1 --fork --nopreallocj --dbpath ./data/db/27017 --syslog --port 27017
+  - ./mongodb-linux-x86_64-3.6.4/bin/mongod --fork --nopreallocj --dbpath ./data/db/27017 --syslog --port 27017
 script:
   - npm test
   - npm run lint

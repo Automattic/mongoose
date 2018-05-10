@@ -100,7 +100,7 @@ const cursorWithOptions = MyModel.
 
 ### geoNear
 
-`Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/3.0.0/CHANGES_3.0.0.md#geonear-command-helper)
+`Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/master/CHANGES_3.0.0.md#geonear-command-helper)
 
 ### Required URI encoding of connection strings
 

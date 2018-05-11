@@ -6360,6 +6360,7 @@ describe('model: populate:', function() {
           let doc = yield Test.findOne({ visible: true }).populate(popObj);
           assert.strictEqual(doc.o.length, 1);
           assert.strictEqual(doc.o[0].value, 'yippie');
+          assert.strictEqual(doc.o[0].online, true);
           assert.strictEqual(doc.o[0].a.name, 'testing');
         });
       });

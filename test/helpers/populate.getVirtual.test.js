@@ -2,7 +2,6 @@
 
 const Schema = require('../../lib/schema');
 const assert = require('assert');
-const co = require('co');
 const getVirtual = require('../../lib/services/populate/getVirtual');
 
 describe('getVirtual', function() {
@@ -31,12 +30,12 @@ describe('getVirtual', function() {
       ref: 'Users',
       localField: 'users',
       foreignField: 'employeeId'
-    })
+    });
 
-    const Clicked = docArray.discriminator('Clicked', clickedSchema);
+    docArray.discriminator('Clicked', clickedSchema);
 
     // Second embedded discriminator does not have a virtual
-    const Purchased = docArray.discriminator('Purchased', new Schema({
+    docArray.discriminator('Purchased', new Schema({
       product: { type: String }
     }));
 

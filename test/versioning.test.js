@@ -13,7 +13,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const VersionError = mongoose.Error.VersionError;
 
-describe.only('versioning', function() {
+describe('versioning', function() {
   var db;
   var Comments;
   var BlogPost;

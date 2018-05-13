@@ -9,6 +9,7 @@ var Schema = mongoose.Schema;
 var assert = require('power-assert');
 var random = require('../lib/utils').random;
 var Query = require('../lib/query');
+var co = require('co');
 
 /**
  * Test.
@@ -916,6 +917,45 @@ describe('Query', function() {
       assert.ok(params.numbers.$ne instanceof Array);
       assert.equal(params.numbers.$ne[0], 10000);
       done();
+    });
+
+    it('doesn\'t wipe out $in (gh-6439)', function () {
+      var embeddedSchema = new Schema({
+        name: String
+      }, { _id: false });
+
+      var catSchema = new Schema({
+        name: String,
+        props: [embeddedSchema]
+      });
+
+      var Cat = db.model('gh6439', catSchema);
+      var kitty = new Cat({
+        name: 'Zildjian',
+        props: [
+          { name: 'invalid' },
+          { name: 'abc' },
+          { name: 'def' }
+        ]
+      });
+
+      return co(function* () {
+        yield kitty.save();
+        var cond = { _id: kitty._id };
+        var update = {
+          $pull: {
+            props: {
+              $in: [
+                { name: 'invalid' },
+                { name: 'def' }
+              ]
+            }
+          }
+        };
+        yield Cat.update(cond, update);
+        let found = yield Cat.findOne(cond);
+        assert.strictEqual(found.props[0].name, 'abc');
+      });
     });
 
     it('subdocument array with $ne: null should not throw', function(done) {

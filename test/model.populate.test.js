@@ -1590,35 +1590,59 @@ describe('model: populate:', function() {
     });
   });
 
-  it('populating subdocuments with array including nulls', function(done) {
-    var BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+  it('populating subdocuments with array including nulls', function() {
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
-    var user = new User({name: 'hans zimmer'});
-    user.save(function(err) {
-      assert.ifError(err);
+    return co(function*() {
+      const user = new User({name: 'hans zimmer'});
+      yield user.save();
 
-      BlogPost.create({
+      const post = yield BlogPost.create({
         title: 'Woot',
         fans: []
-      }, function(err, post) {
-        assert.ifError(err);
-
-        // shove some uncasted vals
-        BlogPost.collection.update({_id: post._id}, {$set: {fans: [null, undefined, user.id, null]}}, function(err) {
-          assert.ifError(err);
-
-          BlogPost
-            .findById(post._id)
-            .populate('fans', 'name')
-            .exec(function(err, returned) {
-              assert.ifError(err);
-              assert.equal(returned.id, post.id);
-              assert.equal(returned.fans.length, 1);
-              done();
-            });
-        });
       });
+
+      yield BlogPost.collection.updateOne({_id: post._id}, {
+        $set: {fans: [null, undefined, user.id, null]}
+      });
+
+      const returned = yield BlogPost.
+        findById(post._id).
+        populate('fans', 'name');
+
+      assert.equal(returned.id, post.id);
+      assert.equal(returned.fans.length, 1);
+    });
+  });
+
+  it('supports `retainNullValues` to override filtering out null docs (gh-6432)', function() {
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
+
+    return co(function*() {
+      const user = new User({name: 'Victor Hugo'});
+      yield user.save();
+
+      const post = yield BlogPost.create({
+        title: 'Notre-Dame de Paris',
+        fans: []
+      });
+
+      yield BlogPost.collection.updateOne({_id: post._id}, {
+        $set: {fans: [null, user.id, null, undefined]}
+      });
+
+      const returned = yield BlogPost.
+        findById(post._id).
+        populate({ path: 'fans', options: { retainNullValues: true } });
+
+      assert.equal(returned.id, post.id);
+      assert.equal(returned.fans.length, 4);
+      assert.strictEqual(returned.fans[0], null);
+      assert.equal(returned.fans[1].name, 'Victor Hugo');
+      assert.strictEqual(returned.fans[2], null);
+      assert.strictEqual(returned.fans[3], null);
     });
   });
 

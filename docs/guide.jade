@@ -99,6 +99,7 @@ block content
     ```
 
     * Overwriting a default mongoose document method may lead to unpredictable results. See [this](./api.html#schema_Schema.reserved) for more details.
+    * The example above uses the `Schema.methods` object directly to save an instance method. You can also use the `Schema.method()` helper as described [here](./api.html#schema_Schema-method).
     * Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work.
 
     <h3 id="statics"><a href="#statics">Statics</a></h3>

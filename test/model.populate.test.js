@@ -1590,35 +1590,59 @@ describe('model: populate:', function() {
     });
   });
 
-  it('populating subdocuments with array including nulls', function(done) {
-    var BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+  it('populating subdocuments with array including nulls', function() {
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
-    var user = new User({name: 'hans zimmer'});
-    user.save(function(err) {
-      assert.ifError(err);
+    return co(function*() {
+      const user = new User({name: 'hans zimmer'});
+      yield user.save();
 
-      BlogPost.create({
+      const post = yield BlogPost.create({
         title: 'Woot',
         fans: []
-      }, function(err, post) {
-        assert.ifError(err);
-
-        // shove some uncasted vals
-        BlogPost.collection.update({_id: post._id}, {$set: {fans: [null, undefined, user.id, null]}}, function(err) {
-          assert.ifError(err);
-
-          BlogPost
-            .findById(post._id)
-            .populate('fans', 'name')
-            .exec(function(err, returned) {
-              assert.ifError(err);
-              assert.equal(returned.id, post.id);
-              assert.equal(returned.fans.length, 1);
-              done();
-            });
-        });
       });
+
+      yield BlogPost.collection.updateOne({_id: post._id}, {
+        $set: {fans: [null, undefined, user.id, null]}
+      });
+
+      const returned = yield BlogPost.
+        findById(post._id).
+        populate('fans', 'name');
+
+      assert.equal(returned.id, post.id);
+      assert.equal(returned.fans.length, 1);
+    });
+  });
+
+  it('supports `retainNullValues` to override filtering out null docs (gh-6432)', function() {
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
+
+    return co(function*() {
+      const user = new User({name: 'Victor Hugo'});
+      yield user.save();
+
+      const post = yield BlogPost.create({
+        title: 'Notre-Dame de Paris',
+        fans: []
+      });
+
+      yield BlogPost.collection.updateOne({_id: post._id}, {
+        $set: {fans: [null, user.id, null, undefined]}
+      });
+
+      const returned = yield BlogPost.
+        findById(post._id).
+        populate({ path: 'fans', options: { retainNullValues: true } });
+
+      assert.equal(returned.id, post.id);
+      assert.equal(returned.fans.length, 4);
+      assert.strictEqual(returned.fans[0], null);
+      assert.equal(returned.fans[1].name, 'Victor Hugo');
+      assert.strictEqual(returned.fans[2], null);
+      assert.strictEqual(returned.fans[3], null);
     });
   });
 
@@ -6245,27 +6269,27 @@ describe('model: populate:', function() {
       });
       it('populates array of space separated path objs (gh-6414)', function() {
         return co(function* () {
-          var userSchema = new Schema({
+          const userSchema = new Schema({
             name: String
           });
 
-          var User = db.model('gh6414User', userSchema);
+          const User = db.model('gh6414User', userSchema);
 
-          var officeSchema = new Schema({
+          const officeSchema = new Schema({
             managerId: { type: Schema.ObjectId, ref: 'gh6414User' },
             supervisorId: { type: Schema.ObjectId, ref: 'gh6414User' },
             janitorId: { type: Schema.ObjectId, ref: 'gh6414User' },
             associatesIds: [{ type: Schema.ObjectId, ref: 'gh6414User' }]
           });
 
-          var Office = db.model('gh6414Office', officeSchema);
+          const Office = db.model('gh6414Office', officeSchema);
 
-          var manager = new User({ name: 'John' });
-          var billy = new User({ name: 'Billy' });
-          var tom = new User({ name: 'Tom' });
-          var kevin = new User({ name: 'Kevin' });
-          var hafez = new User({ name: 'Hafez' });
-          var office = new Office({
+          const manager = new User({ name: 'John' });
+          const billy = new User({ name: 'Billy' });
+          const tom = new User({ name: 'Tom' });
+          const kevin = new User({ name: 'Kevin' });
+          const hafez = new User({ name: 'Hafez' });
+          const office = new Office({
             managerId: manager._id,
             supervisorId: hafez._id,
             janitorId: kevin._id,
@@ -6290,6 +6314,78 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.associatesIds[0].name, 'Billy');
           assert.strictEqual(doc.associatesIds[1].name, 'Tom');
           assert.strictEqual(doc.janitorId.name, 'Kevin');
+        });
+      });
+      it('honors top-level match with subPopulation (gh-6451)', function() {
+        const anotherSchema = new Schema({
+          name: String,
+        });
+
+        const Another = db.model('gh6451another', anotherSchema);
+
+        const otherSchema = new Schema({
+          online: Boolean,
+          value: String,
+          a: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh6451another'
+          }
+        });
+
+        const Other = db.model('gh6451other', otherSchema);
+
+        const schema = new Schema({
+          visible: Boolean,
+          name: String,
+          o: [{
+            type: Schema.Types.ObjectId,
+            ref: 'gh6451other'
+          }]
+        });
+
+        const Test = db.model('gh6451test', schema);
+
+        const another = new Another({
+          name: 'testing'
+        });
+
+        const other = new Other({
+          online: false,
+          value: 'woohoo',
+          a: another._id
+        });
+
+        const other2 = new Other({
+          online: true,
+          value: 'yippie',
+          a: another._id
+        });
+
+        const test = new Test({
+          visible: true,
+          name: 'Billy',
+          o: [other._id, other2._id]
+        });
+
+        return co(function* () {
+          yield another.save();
+          yield Other.create([other, other2]);
+          yield test.save();
+
+          let popObj = {
+            path: 'o',
+            select: '-_id',
+            match: { online: true },
+            populate: {
+              path: 'a',
+              select: '-_id name',
+            }
+          };
+          let doc = yield Test.findOne({ visible: true }).populate(popObj);
+          assert.strictEqual(doc.o.length, 1);
+          assert.strictEqual(doc.o[0].value, 'yippie');
+          assert.strictEqual(doc.o[0].online, true);
+          assert.strictEqual(doc.o[0].a.name, 'testing');
         });
       });
     });

@@ -6,6 +6,7 @@
 
 const assert = require('power-assert');
 const clone = require('../lib/utils').clone;
+const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 const util = require('util');
@@ -553,6 +554,36 @@ describe('model', function() {
           ModelB.discriminator('gh5721_b1', schemaExt.clone());
 
           done();
+        });
+      });
+
+      it('incorrect discriminator key throws readable error with create (gh-6434)', function() {
+        return co(function*() {
+          const settingSchema = new Schema({ name: String }, {
+            discriminatorKey: 'kind'
+          });
+
+          const defaultAdvisorSchema = new Schema({
+            _advisor: String
+          });
+
+          const Setting = db.model('gh6434_Setting', settingSchema);
+          const DefaultAdvisor = Setting.discriminator('gh6434_DefaultAdvisor',
+            defaultAdvisorSchema);
+
+          let threw = false;
+          try {
+            yield Setting.create({
+              kind: 'defaultAdvisor',
+              name: 'xyz'
+            });
+          } catch (error) {
+            threw = true;
+            assert.equal(error.name, 'MongooseError');
+            assert.equal(error.message, 'Discriminator "defaultAdvisor" not ' +
+              'found for model "gh6434_Setting"');
+          }
+          assert.ok(threw);
         });
       });
 

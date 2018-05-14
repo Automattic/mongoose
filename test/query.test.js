@@ -9,7 +9,6 @@ var Schema = mongoose.Schema;
 var assert = require('power-assert');
 var random = require('../lib/utils').random;
 var Query = require('../lib/query');
-var co = require('co');
 
 /**
  * Test.
@@ -919,7 +918,7 @@ describe('Query', function() {
       done();
     });
 
-    it('doesn\'t wipe out $in (gh-6439)', function () {
+    it('doesn\'t wipe out $in (gh-6439)', function(done) {
       var embeddedSchema = new Schema({
         name: String
       }, { _id: false });
@@ -939,8 +938,8 @@ describe('Query', function() {
         ]
       });
 
-      return co(function* () {
-        yield kitty.save();
+      kitty.save(function(err) {
+        assert.ifError(err);
         var cond = { _id: kitty._id };
         var update = {
           $pull: {
@@ -952,9 +951,14 @@ describe('Query', function() {
             }
           }
         };
-        yield Cat.update(cond, update);
-        let found = yield Cat.findOne(cond);
-        assert.strictEqual(found.props[0].name, 'abc');
+        Cat.update(cond, update, function(err) {
+          assert.ifError(err);
+          Cat.findOne(cond, function(err, found) {
+            assert.ifError(err);
+            assert.strictEqual(found.props[0].name, 'abc');
+            done();
+          });
+        });
       });
     });
 

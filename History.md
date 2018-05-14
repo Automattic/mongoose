@@ -1,3 +1,14 @@
+5.1.1 / 2018-05-14
+==================
+ * docs(schema): add notes in api and guide about schema.methods object #6470 #6440 [lineus](https://github.com/lineus)
+ * fix(error): add modified paths to VersionError #6464 #6433 [paglias](https://github.com/paglias)
+ * fix(populate): only call populate with full param signature when match is not present #6458 #6451 [lineus](https://github.com/lineus)
+ * docs: fix geoNear link in migration guide #6450 [kawache](https://github.com/kawache)
+ * fix(discriminator): throw readable error when `create()` with a non-existent discriminator key #6434
+ * fix(populate): add `retainNullValues` option to avoid stripping out null keys #6432
+ * fix(populate): handle populate in embedded discriminators underneath nested paths #6411
+ * docs(model): add change streams and ToC, make terminology more consistent #5888
+
 5.1.0 / 2018-05-10
 ==================
  * feat(ObjectId): add `_id` getter so you can get a usable id whether or not the path is populated #6415 #6115

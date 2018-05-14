@@ -579,6 +579,7 @@ describe('model', function() {
             });
           } catch (error) {
             threw = true;
+            assert.equal(error.name, 'MongooseError');
             assert.equal(error.message, 'Discriminator "defaultAdvisor" not ' +
               'found for model "gh6434_Setting"');
           }

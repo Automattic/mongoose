@@ -519,13 +519,22 @@ describe('aggregate: ', function() {
     });
 
     describe('replaceRoot', function() {
-      it('works', function(done) {
+      it('works with a string', function(done) {
         var aggregate = new Aggregate();
 
         aggregate.replaceRoot('myNewRoot');
 
         assert.deepEqual(aggregate._pipeline,
           [{ $replaceRoot: { newRoot: '$myNewRoot' }}]);
+        done();
+      });
+      it('works with an object (gh-6474)', function (done) {
+        var aggregate = new Aggregate();
+
+        aggregate.replaceRoot({ x: { $concat: ['$this', '$that'] } });
+
+        assert.deepEqual(aggregate._pipeline,
+          [{ $replaceRoot: { newRoot: { x: { $concat: ['$this', '$that'] } } } } ]);
         done();
       });
     });

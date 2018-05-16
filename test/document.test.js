@@ -4160,6 +4160,50 @@ describe('document', function() {
       });
     });
 
+    it('custom methods with promises (gh-6385)', function() {
+      const mySchema = new Schema({
+        name: String
+      });
+
+      mySchema.methods.foo = function() {
+        return Promise.resolve(this.name + ' foo');
+      };
+      mySchema.methods.bar = function() {
+        return this.name + ' bar';
+      };
+
+      let preFoo = 0;
+      let preBar = 0;
+      mySchema.pre('foo', function() {
+        ++preFoo;
+      });
+      mySchema.pre('bar', function() {
+        ++preBar;
+      });
+
+      const MyModel = db.model('gh6385_1', mySchema);
+
+      return co(function*() {
+        const doc = new MyModel({ name: 'test' });
+
+        assert.equal(preFoo, 0);
+        assert.equal(preBar, 0);
+
+        let foo = doc.foo();
+        let bar = doc.bar();
+        assert.ok(foo instanceof Promise);
+        assert.ok(bar instanceof Promise);
+
+        foo = yield foo;
+        bar = yield bar;
+
+        assert.equal(preFoo, 1);
+        assert.equal(preBar, 1);
+        assert.equal(foo, 'test foo');
+        assert.equal(bar, 'test bar');
+      });
+    });
+
     it('setting to discriminator (gh-4935)', function(done) {
       var Buyer = db.model('gh4935_0', new Schema({
         name: String,

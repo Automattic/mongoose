@@ -528,7 +528,7 @@ describe('aggregate: ', function() {
           [{ $replaceRoot: { newRoot: '$myNewRoot' }}]);
         done();
       });
-      it('works with an object (gh-6474)', function (done) {
+      it('works with an object (gh-6474)', function(done) {
         var aggregate = new Aggregate();
 
         aggregate.replaceRoot({ x: { $concat: ['$this', '$that'] } });

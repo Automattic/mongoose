@@ -3977,8 +3977,10 @@ describe('Model', function() {
       assert.strictEqual(found.t, true);
       assert.strictEqual(found.f, false);
 
+      // use native driver directly to kill the fields
       yield Test.collection.update({}, { $unset: { t: true, f: true } });
 
+      // use native driver directly to ensure fields are saved correctly.
       let updated = yield Test.collection.findOne({});
       assert.strictEqual(updated.t, undefined);
       assert.strictEqual(updated.f, undefined);

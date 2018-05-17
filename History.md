@@ -1,3 +1,8 @@
+4.13.13 / 2018-05-17
+====================
+ * fix(update): stop clobbering $in when casting update #6441 #6339
+ * fix: upgrade async -> 2.6.0 re: security warning
+
 5.1.1 / 2018-05-14
 ==================
  * docs(schema): add notes in api and guide about schema.methods object #6470 #6440 [lineus](https://github.com/lineus)

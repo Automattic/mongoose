@@ -961,6 +961,50 @@ describe('Query', function() {
       done();
     });
 
+    it('doesn\'t wipe out $in (gh-6439)', function(done) {
+      var embeddedSchema = new Schema({
+        name: String
+      }, { _id: false });
+
+      var catSchema = new Schema({
+        name: String,
+        props: [embeddedSchema]
+      });
+
+      var Cat = db.model('gh6439', catSchema);
+      var kitty = new Cat({
+        name: 'Zildjian',
+        props: [
+          { name: 'invalid' },
+          { name: 'abc' },
+          { name: 'def' }
+        ]
+      });
+
+      kitty.save(function(err) {
+        assert.ifError(err);
+        var cond = { _id: kitty._id };
+        var update = {
+          $pull: {
+            props: {
+              $in: [
+                { name: 'invalid' },
+                { name: 'def' }
+              ]
+            }
+          }
+        };
+        Cat.update(cond, update, function(err) {
+          assert.ifError(err);
+          Cat.findOne(cond, function(err, found) {
+            assert.ifError(err);
+            assert.strictEqual(found.props[0].name, 'abc');
+            done();
+          });
+        });
+      });
+    });
+
     it('subdocument array with $ne: null should not throw', function(done) {
       var query = new Query({}, {}, null, p1.collection);
       var Product = db.model('Product');

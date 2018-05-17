@@ -3985,6 +3985,7 @@ describe('Model', function() {
       assert.strictEqual(updated.t, undefined);
       assert.strictEqual(updated.f, undefined);
 
+      // udate the doc with the expectation that default booleans will be saved.
       let again = yield Test.findOne({});
       again.name = 'Britney';
       yield again.save();

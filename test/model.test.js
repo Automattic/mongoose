@@ -3952,6 +3952,48 @@ describe('Model', function() {
     });
   });
 
+  it('sets a boolean path to the desired default (gh-6477)', function() {
+    var schema = new Schema({
+      name: String,
+      f: {
+        type: Boolean,
+        default: false
+      },
+      t: {
+        type: Boolean,
+        default: true
+      }
+    });
+
+    var Test = db.model('gh6477', schema);
+
+    var test = new Test;
+    assert.strictEqual(test.t, true);
+    assert.strictEqual(test.f, false);
+
+    return co(function*() {
+      yield test.save();
+      let found = yield Test.findOne({});
+      assert.strictEqual(found.t, true);
+      assert.strictEqual(found.f, false);
+
+      yield Test.collection.update({}, { $unset: { t: true, f: true } });
+
+      let updated = yield Test.collection.findOne({});
+      assert.strictEqual(updated.t, undefined);
+      assert.strictEqual(updated.f, undefined);
+
+      let again = yield Test.findOne({});
+      again.name = 'Britney';
+      yield again.save();
+
+      let final = yield Test.collection.findOne({});
+      assert.strictEqual(final.name, 'Britney');
+      assert.strictEqual(final.t, true);
+      assert.strictEqual(final.f, false);
+    });
+  });
+
   it('setting a path to undefined should retain the value as undefined', function(done) {
     var B = db.model('BlogPost', collection + random());
 

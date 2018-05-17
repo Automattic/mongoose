@@ -1,3 +1,8 @@
+4.13.13 / 2018-05-17
+====================
+ * fix(update): stop clobbering $in when casting update #6441 #6339
+ * fix: upgrade async -> 2.6.0 re: security warning
+
 4.13.12 / 2018-03-13
 ====================
  * fix(document): make virtual get() return undefined instead of null if no getters #6223

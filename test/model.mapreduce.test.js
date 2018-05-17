@@ -69,9 +69,7 @@ describe('model: mapreduce:', function() {
       magicID = insertedDocs[1]._id;
 
       var o = {
-        map: function() {
-          emit(this.author, 1);
-        },
+        map: 'function() { emit(this.author, 1); }',
         reduce: function(k, vals) {
           return vals.length;
         }

@@ -44,7 +44,7 @@
     "highlight.js": "7.0.1",
     "istanbul": "0.4.4",
     "jade": "0.26.3",
-    "lodash": "4.16.6",
+    "lodash": "4.17.10",
     "markdown": "0.5.0",
     "marked": "0.3.9",
     "mocha": "3.2.0",

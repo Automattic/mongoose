@@ -3,6 +3,7 @@ var start = require('./common'),
     Schema = mongoose.Schema,
     assert = require('power-assert'),
     random = require('../lib/utils').random,
+    co = require('co'),
     Query = require('../lib/query');
 
 describe('Query:', function() {
@@ -186,6 +187,28 @@ describe('Query:', function() {
       Q().findOneAndUpdate(query, update, function(error) {
         assert.ifError(error);
         done();
+      });
+    });
+
+    it('gets middleware from model (gh-6455)', function() {
+      var called = 0;
+      var schema = new Schema({
+        name: String
+      });
+
+      schema.pre('findOne', function logHook() {
+        called++;
+      });
+
+      var Test = db.model('gh6455', schema);
+      var test = new Test({ name: 'Romero' });
+      var Q = Test.findOne({}).toConstructor();
+
+      return co(function*() {
+        yield test.save();
+        let doc = yield Q();
+        assert.strictEqual(doc.name, 'Romero');
+        assert.strictEqual(called, 1);
       });
     });
   });

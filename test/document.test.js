@@ -5123,7 +5123,37 @@ describe('document', function() {
       done();
     });
 
-    it('sets a boolean path to the desired default (gh-6477)', function() {
+    it('sets path to the empty string on save after query (gh-6477)', function() {
+      var schema = new Schema({
+        name: String,
+        s: {
+          type: String,
+          default: ''
+        }
+      });
+
+      var Test = db.model('gh6477_2', schema);
+
+      var test = new Test;
+      assert.strictEqual(test.s, '');
+
+      return co(function* () {
+        // use native driver directly to insert an empty doc
+        yield Test.collection.insert({});
+
+        // udate the doc with the expectation that default booleans will be saved.
+        let found = yield Test.findOne({});
+        found.name = 'Max';
+        yield found.save();
+
+        // use native driver directly to check doc for saved string
+        let final = yield Test.collection.findOne({});
+        assert.strictEqual(final.name, 'Max');
+        assert.strictEqual(final.s, '');
+      });
+    });
+
+    it('sets path to the default boolean on save after query (gh-6477)', function() {
       var schema = new Schema({
         name: String,
         f: {
@@ -5138,29 +5168,16 @@ describe('document', function() {
 
       var Test = db.model('gh6477', schema);
 
-      var test = new Test;
-      assert.strictEqual(test.t, true);
-      assert.strictEqual(test.f, false);
-
       return co(function* () {
-        yield test.save();
-        let found = yield Test.findOne({});
-        assert.strictEqual(found.t, true);
-        assert.strictEqual(found.f, false);
-
         // use native driver directly to kill the fields
-        yield Test.collection.update({}, { $unset: { t: true, f: true } });
-
-        // use native driver directly to ensure fields were updated correctly.
-        let updated = yield Test.collection.findOne({});
-        assert.strictEqual(updated.t, undefined);
-        assert.strictEqual(updated.f, undefined);
+        yield Test.collection.insert({});
 
         // udate the doc with the expectation that default booleans will be saved.
-        let again = yield Test.findOne({});
-        again.name = 'Britney';
-        yield again.save();
+        let found = yield Test.findOne({});
+        found.name = 'Britney';
+        yield found.save();
 
+        // use native driver directly to check doc for saved string
         let final = yield Test.collection.findOne({});
         assert.strictEqual(final.name, 'Britney');
         assert.strictEqual(final.t, true);

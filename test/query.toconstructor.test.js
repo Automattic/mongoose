@@ -1,3 +1,5 @@
+'use strict';
+
 var start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,

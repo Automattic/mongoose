@@ -3177,6 +3177,58 @@ describe('model: populate:', function() {
     });
   });
 
+  it('strips out not-matched ids when populating a hydrated doc (gh-6435)', function() {
+    const coopBrandSchema = new Schema({
+      name: String
+    });
+
+    coopBrandSchema.virtual('products', {
+      ref: 'gh6435_Product',
+      localField: '_id',
+      foreignField: 'coopBrandId',
+      justOne: false
+    });
+
+    const agentSchema = new Schema({
+      coopBrands: [coopBrandSchema],
+      name: String
+    });
+
+    const productSchema = new Schema({
+      coopBrandId: Schema.Types.ObjectId,
+      name: String
+    });
+
+    const Agent = db.model('gh6435_Agent', agentSchema);
+    const Product = db.model('gh6435_Product', productSchema);
+
+    return co(function*() {
+      const billy = yield Agent.create({
+        name: 'Billy',
+        coopBrands: [
+          { name: 'Has product' },
+          { name: 'Has no product' }
+        ]
+      });
+
+      const product1 = yield Product.create({
+        coopBrandId: billy.coopBrands[0]._id,
+        name: 'Product 1 for "Has product"'
+      });
+
+      const product2 = yield Product.create({
+        coopBrandId: billy.coopBrands[0]._id,
+        name: 'Product 2 for "Has product'
+      });
+
+      let agent = yield Agent.findOne({});
+      yield agent.populate('coopBrands.products').execPopulate();
+      agent = agent.toObject({ virtuals: true });
+      assert.equal(agent.coopBrands[0].products.length, 2);
+      assert.deepEqual(agent.coopBrands[1].products, []);
+    });
+  });
+
   describe('leaves Documents within Mixed properties alone (gh-1471)', function() {
     var db;
     var Cat;

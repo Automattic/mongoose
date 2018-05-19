@@ -5123,6 +5123,68 @@ describe('document', function() {
       done();
     });
 
+    it('sets path to the empty string on save after query (gh-6477)', function() {
+      var schema = new Schema({
+        name: String,
+        s: {
+          type: String,
+          default: ''
+        }
+      });
+
+      var Test = db.model('gh6477_2', schema);
+
+      var test = new Test;
+      assert.strictEqual(test.s, '');
+
+      return co(function* () {
+        // use native driver directly to insert an empty doc
+        yield Test.collection.insert({});
+
+        // udate the doc with the expectation that default booleans will be saved.
+        let found = yield Test.findOne({});
+        found.name = 'Max';
+        yield found.save();
+
+        // use native driver directly to check doc for saved string
+        let final = yield Test.collection.findOne({});
+        assert.strictEqual(final.name, 'Max');
+        assert.strictEqual(final.s, '');
+      });
+    });
+
+    it('sets path to the default boolean on save after query (gh-6477)', function() {
+      var schema = new Schema({
+        name: String,
+        f: {
+          type: Boolean,
+          default: false
+        },
+        t: {
+          type: Boolean,
+          default: true
+        }
+      });
+
+      var Test = db.model('gh6477', schema);
+
+      return co(function* () {
+        // use native driver directly to kill the fields
+        yield Test.collection.insert({});
+
+        // udate the doc with the expectation that default booleans will be saved.
+        let found = yield Test.findOne({});
+        found.name = 'Britney';
+        yield found.save();
+
+        // use native driver directly to check doc for saved string
+        let final = yield Test.collection.findOne({});
+        assert.strictEqual(final.name, 'Britney');
+        assert.strictEqual(final.t, true);
+        assert.strictEqual(final.f, false);
+      });
+    });
+
     it('virtuals with no getters return undefined (gh-6223)', function(done) {
       var personSchema = new mongoose.Schema({
         name: { type: String },

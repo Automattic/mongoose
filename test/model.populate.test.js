@@ -3211,15 +3211,11 @@ describe('model: populate:', function() {
         ]
       });
 
-      const product1 = yield Product.create({
-        coopBrandId: billy.coopBrands[0]._id,
-        name: 'Product 1 for "Has product"'
-      });
-
-      const product2 = yield Product.create({
-        coopBrandId: billy.coopBrands[0]._id,
-        name: 'Product 2 for "Has product'
-      });
+      const coopBrandId = billy.coopBrands[0]._id;
+      yield Product.create([
+        { coopBrandId: coopBrandId, name: 'Product 1' },
+        { coopBrandId: coopBrandId, name: 'Product 2' }
+      ]);
 
       let agent = yield Agent.findOne({});
       yield agent.populate('coopBrands.products').execPopulate();

@@ -5642,4 +5642,25 @@ describe('document', function() {
       });
     });
   });
+
+  describe('clobbered Array.prototype', function() {
+    afterEach(function() {
+      delete Array.prototype.remove;
+    });
+
+    it('handles clobbered Array.prototype.remove (gh-6431)', function(done) {
+      Object.defineProperty(Array.prototype, 'remove', {
+        value: 42,
+        configurable: true,
+        writable: false
+      });
+
+      const schema = new Schema({ arr: [{ name: String }] });
+      const MyModel = db.model('gh6431', schema);
+
+      const doc = new MyModel();
+      assert.deepEqual(doc.toObject().arr, []);
+      done();
+    });
+  });
 });

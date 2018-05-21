@@ -32,132 +32,133 @@ html(lang='en')
       meta(name='theme-color', content='#ffffff')
 
   body
-    #layout
-      #mobile-menu
-        a#menuLink.menu-link(href='#menu')
-          span
-        #mobile-logo-container
-          a(href="/")
-            img#logo(src="/docs/images/mongoose5_62x30_transparent.png")
-            span.logo-text mongoose
-      #menu
-        .pure-menu
-          #logo-container.pure-menu-heading
+    block layout
+      #layout
+        #mobile-menu
+          a#menuLink.menu-link(href='#menu')
+            span
+          #mobile-logo-container
             a(href="/")
               img#logo(src="/docs/images/mongoose5_62x30_transparent.png")
               span.logo-text mongoose
-          ul.pure-menu-list
-            li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
-              a(href="#").pure-menu-link Version #{package.version}
-              ul.pure-menu-children
-                li.pure-menu-item
-                  a.pure-menu-link(href="/docs/4.x") Version #{package.latest4x}
-                li.pure-menu-item
-                  a.pure-menu-link(href="/docs/3.8.x") Version #{package.latest38x}
-            li.pure-menu-item
-              a.pure-menu-link(href="/docs/index.html") Quick Start
-            li.pure-menu-item
-              a.pure-menu-link(href="/docs/guide.html") Schemas
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/schematypes.html") SchemaTypes
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/connections.html") Connections
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/models.html") Models
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/documents.html") Documents
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/subdocs.html") Subdocuments
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/queries.html") Queries
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/validation.html") Validation
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/middleware.html") Middleware
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/populate.html") Populate
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/discriminators.html") Discriminators
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/plugins.html") Plugins
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/lambda.html") AWS Lambda
-            li.pure-menu-item
-              a.pure-menu-link(href="/docs/api.html") API
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#mongoose_Mongoose") Mongoose
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Schema") Schema
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Connection") Connection
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Document") Document
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Model") Model
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Query") Query
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Aggregate") Aggregate
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Schematype") SchemaType
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Virtualtype") VirtualType
-            li.pure-menu-item.sub-item
-              a.pure-menu-link(href="/docs/api.html#Error") Error
-            li.pure-menu-item
-              a.pure-menu-link(href="/docs/compatibility.html") Version Compatibility
-            li.pure-menu-item
-              a.pure-menu-link(href="/docs/faq.html") FAQ
-            li.carbon-ad
-              <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
-      .container
-        #content
-          block content
-      include includes/keen
+        #menu
+          .pure-menu
+            #logo-container.pure-menu-heading
+              a(href="/")
+                img#logo(src="/docs/images/mongoose5_62x30_transparent.png")
+                span.logo-text mongoose
+            ul.pure-menu-list
+              li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
+                a(href="#").pure-menu-link Version #{package.version}
+                ul.pure-menu-children
+                  li.pure-menu-item
+                    a.pure-menu-link(href="/docs/4.x") Version #{package.latest4x}
+                  li.pure-menu-item
+                    a.pure-menu-link(href="/docs/3.8.x") Version #{package.latest38x}
+              li.pure-menu-item
+                a.pure-menu-link(href="/docs/index.html") Quick Start
+              li.pure-menu-item
+                a.pure-menu-link(href="/docs/guide.html") Schemas
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/schematypes.html") SchemaTypes
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/connections.html") Connections
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/models.html") Models
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/documents.html") Documents
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/subdocs.html") Subdocuments
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/queries.html") Queries
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/validation.html") Validation
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/middleware.html") Middleware
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/populate.html") Populate
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/discriminators.html") Discriminators
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/plugins.html") Plugins
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/lambda.html") AWS Lambda
+              li.pure-menu-item
+                a.pure-menu-link(href="/docs/api.html") API
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#mongoose_Mongoose") Mongoose
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Schema") Schema
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Connection") Connection
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Document") Document
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Model") Model
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Query") Query
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Aggregate") Aggregate
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Schematype") SchemaType
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Virtualtype") VirtualType
+              li.pure-menu-item.sub-item
+                a.pure-menu-link(href="/docs/api.html#Error") Error
+              li.pure-menu-item
+                a.pure-menu-link(href="/docs/compatibility.html") Version Compatibility
+              li.pure-menu-item
+                a.pure-menu-link(href="/docs/faq.html") FAQ
+              li.carbon-ad
+                <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
+        .container
+          #content
+            block content
+        include includes/keen
 
-      script(type="text/javascript").
-        (function (window, document) {
-          var layout   = document.getElementById('layout'),
-              menu     = document.getElementById('menu'),
-              menuLink = document.getElementById('menuLink'),
-              content  = document.getElementById('content');
+        script(type="text/javascript").
+          (function (window, document) {
+            var layout   = document.getElementById('layout'),
+                menu     = document.getElementById('menu'),
+                menuLink = document.getElementById('menuLink'),
+                content  = document.getElementById('content');
 
-          function toggleClass(element, className) {
-              var classes = element.className.split(/\s+/),
-                  length = classes.length,
-                  i = 0;
+            function toggleClass(element, className) {
+                var classes = element.className.split(/\s+/),
+                    length = classes.length,
+                    i = 0;
 
-              for(; i < length; i++) {
-                if (classes[i] === className) {
-                  classes.splice(i, 1);
-                  break;
+                for(; i < length; i++) {
+                  if (classes[i] === className) {
+                    classes.splice(i, 1);
+                    break;
+                  }
                 }
-              }
-              // The className is not found
-              if (length === classes.length) {
-                  classes.push(className);
-              }
+                // The className is not found
+                if (length === classes.length) {
+                    classes.push(className);
+                }
 
-              element.className = classes.join(' ');
-          }
+                element.className = classes.join(' ');
+            }
 
-          function toggleAll(e) {
-              var active = 'active';
+            function toggleAll(e) {
+                var active = 'active';
 
-              e.preventDefault();
-              toggleClass(layout, active);
-              toggleClass(menu, active);
-              toggleClass(menuLink, active);
-          }
+                e.preventDefault();
+                toggleClass(layout, active);
+                toggleClass(menu, active);
+                toggleClass(menuLink, active);
+            }
 
-          menuLink.onclick = function (e) {
-              toggleAll(e);
-          };
+            menuLink.onclick = function (e) {
+                toggleAll(e);
+            };
 
-          content.onclick = function(e) {
-              if (menu.className.indexOf('active') !== -1) {
-                  toggleAll(e);
-              }
-          };
+            content.onclick = function(e) {
+                if (menu.className.indexOf('active') !== -1) {
+                    toggleAll(e);
+                }
+            };
 
-        }(this, this.document));
+          }(this, this.document));

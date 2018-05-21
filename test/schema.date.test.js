@@ -42,4 +42,12 @@ describe('SchemaDate', function() {
     assert.ok(doc.x instanceof Date);
     assert.equal(doc.x.valueOf(), mockDate);
   });
+
+  it('casts string representation of unix timestamps (gh-6443)', function() {
+    var timestamp = Date.now();
+    var stringTimestamp = timestamp.toString();
+    var doc = new M({ x: stringTimestamp });
+    assert.ok(doc.x instanceof Date);
+    assert.equal(doc.x.getTime(), timestamp);
+  });
 });

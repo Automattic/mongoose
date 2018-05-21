@@ -1,3 +1,24 @@
+5.1.2 / 2018-05-21
+==================
+ * docs(guide): add missing SchemaTypes #6490 [distancesprinter](https://github.com/distancesprinter)
+ * fix(map): make MongooseMap.toJSON return a serialized object #6486 #6478 [lineus](https://github.com/lineus)
+ * fix(query): make CustomQuery inherit from model.Query for hooks #6483 #6455 [lineus](https://github.com/lineus)
+ * fix(document): prevent default falses from being skipped by $__dirty #6481 #6477 [lineus](https://github.com/lineus)
+ * docs(connection): document `useDb()` #6480
+ * fix(model): skip redundant clone in insertMany #6479 [d1manson](https://github.com/d1manson)
+ * fix(aggregate): let replaceRoot accept objects as well as strings #6475 #6474 [lineus](https://github.com/lineus)
+ * docs(model): clarify `emit()` in mapReduce and how map/reduce are run #6465
+ * fix(populate): flatten array to handle multi-level nested `refPath` #6457
+ * fix(date): cast small numeric strings as years #6444 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): remove unmatched ids when using virtual populate on already hydrated document #6435
+ * fix(array): use custom array class to avoid clobbered property names #6431
+ * fix(model): handle hooks for custom methods that return promises #6385
+
+4.13.13 / 2018-05-17
+====================
+ * fix(update): stop clobbering $in when casting update #6441 #6339
+ * fix: upgrade async -> 2.6.0 re: security warning
+
 5.1.1 / 2018-05-14
 ==================
  * docs(schema): add notes in api and guide about schema.methods object #6470 #6440 [lineus](https://github.com/lineus)

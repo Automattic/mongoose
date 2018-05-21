@@ -408,4 +408,38 @@ describe('Map', function() {
       assert.ok(fromDb);
     });
   });
+
+  it('toJSON seralizes map paths (gh-6478)', function() {
+    const schema = new mongoose.Schema({
+      str: {
+        type: Map,
+        of: String
+      },
+      num: {
+        type: Map,
+        of: Number
+      }
+    });
+
+    const Test = db.model('gh6478', schema);
+    const test = new Test({
+      str: {
+        testing: '123'
+      },
+      num: {
+        testing: 456
+      }
+    });
+
+    assert.deepEqual(test.str.toJSON(), { testing: '123' });
+    assert.deepEqual(test.num.toJSON(), { testing: 456 });
+
+    return co(function*() {
+      yield test.save();
+
+      let found = yield Test.findOne();
+      assert.deepEqual(found.str.toJSON(), { testing: '123' });
+      assert.deepEqual(found.num.toJSON(), { testing: 456 });
+    });
+  });
 });

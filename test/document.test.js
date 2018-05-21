@@ -4160,6 +4160,50 @@ describe('document', function() {
       });
     });
 
+    it('custom methods with promises (gh-6385)', function() {
+      const mySchema = new Schema({
+        name: String
+      });
+
+      mySchema.methods.foo = function() {
+        return Promise.resolve(this.name + ' foo');
+      };
+      mySchema.methods.bar = function() {
+        return this.name + ' bar';
+      };
+
+      let preFoo = 0;
+      let preBar = 0;
+      mySchema.pre('foo', function() {
+        ++preFoo;
+      });
+      mySchema.pre('bar', function() {
+        ++preBar;
+      });
+
+      const MyModel = db.model('gh6385_1', mySchema);
+
+      return co(function*() {
+        const doc = new MyModel({ name: 'test' });
+
+        assert.equal(preFoo, 0);
+        assert.equal(preBar, 0);
+
+        let foo = doc.foo();
+        let bar = doc.bar();
+        assert.ok(foo instanceof Promise);
+        assert.ok(bar instanceof Promise);
+
+        foo = yield foo;
+        bar = yield bar;
+
+        assert.equal(preFoo, 1);
+        assert.equal(preBar, 1);
+        assert.equal(foo, 'test foo');
+        assert.equal(bar, 'test bar');
+      });
+    });
+
     it('setting to discriminator (gh-4935)', function(done) {
       var Buyer = db.model('gh4935_0', new Schema({
         name: String,
@@ -5079,6 +5123,68 @@ describe('document', function() {
       done();
     });
 
+    it('sets path to the empty string on save after query (gh-6477)', function() {
+      var schema = new Schema({
+        name: String,
+        s: {
+          type: String,
+          default: ''
+        }
+      });
+
+      var Test = db.model('gh6477_2', schema);
+
+      var test = new Test;
+      assert.strictEqual(test.s, '');
+
+      return co(function* () {
+        // use native driver directly to insert an empty doc
+        yield Test.collection.insert({});
+
+        // udate the doc with the expectation that default booleans will be saved.
+        let found = yield Test.findOne({});
+        found.name = 'Max';
+        yield found.save();
+
+        // use native driver directly to check doc for saved string
+        let final = yield Test.collection.findOne({});
+        assert.strictEqual(final.name, 'Max');
+        assert.strictEqual(final.s, '');
+      });
+    });
+
+    it('sets path to the default boolean on save after query (gh-6477)', function() {
+      var schema = new Schema({
+        name: String,
+        f: {
+          type: Boolean,
+          default: false
+        },
+        t: {
+          type: Boolean,
+          default: true
+        }
+      });
+
+      var Test = db.model('gh6477', schema);
+
+      return co(function* () {
+        // use native driver directly to kill the fields
+        yield Test.collection.insert({});
+
+        // udate the doc with the expectation that default booleans will be saved.
+        let found = yield Test.findOne({});
+        found.name = 'Britney';
+        yield found.save();
+
+        // use native driver directly to check doc for saved string
+        let final = yield Test.collection.findOne({});
+        assert.strictEqual(final.name, 'Britney');
+        assert.strictEqual(final.t, true);
+        assert.strictEqual(final.f, false);
+      });
+    });
+
     it('virtuals with no getters return undefined (gh-6223)', function(done) {
       var personSchema = new mongoose.Schema({
         name: { type: String },
@@ -5534,6 +5640,27 @@ describe('document', function() {
         var doc = yield Test.findOne({}).populate('sub.other');
         assert.strictEqual('Nicole', doc.sub.other.name);
       });
+    });
+  });
+
+  describe('clobbered Array.prototype', function() {
+    afterEach(function() {
+      delete Array.prototype.remove;
+    });
+
+    it('handles clobbered Array.prototype.remove (gh-6431)', function(done) {
+      Object.defineProperty(Array.prototype, 'remove', {
+        value: 42,
+        configurable: true,
+        writable: false
+      });
+
+      const schema = new Schema({ arr: [{ name: String }] });
+      const MyModel = db.model('gh6431', schema);
+
+      const doc = new MyModel();
+      assert.deepEqual(doc.toObject().arr, []);
+      done();
     });
   });
 });

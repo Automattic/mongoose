@@ -168,6 +168,12 @@ block content
     mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
     ```
 
+    For example:
+
+    ```javascript
+    mongoose.connect('mongodb://root:toor@hosta.com:27017,hostb.com:27017,hostc.com:27017/testdb?replicaSet=testing123')
+    ```
+
     To connect to a single node replica set, specify the `replicaSet` option.
 
     ```javascript

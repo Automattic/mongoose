@@ -6472,6 +6472,66 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.o[0].a.name, 'testing');
         });
       });
+
+      it('handles embedded discriminator (gh-6487)', function() {
+        const userSchema = new Schema({ employeeId: Number, name: String });
+        const UserModel = db.model('gh6487Users', userSchema);
+
+        const eventSchema = new Schema(
+          { message: String },
+          { discriminatorKey: 'kind' }
+        );
+
+        const batchSchema = new Schema({
+          nested: new Schema({
+            events: [eventSchema]
+          })
+        });
+
+        const docArray = batchSchema.path('nested.events');
+
+        const clickedSchema = new Schema({
+          element: { type: String },
+          users: [Number]
+        },{
+          toJSON: { virtuals: true },
+          toObject: { virtuals: true }
+        });
+
+        clickedSchema.virtual('users_$', {
+          ref: 'gh6487Users',
+          localField: 'users',
+          foreignField: 'employeeId'
+        });
+
+        docArray.discriminator('Clicked', clickedSchema);
+
+        docArray.discriminator('Purchased', new Schema({
+          product: { type: String }
+        }));
+
+        const Batch = db.model('gh6487EventBatch', batchSchema);
+
+        const user = { employeeId: 1, name: 'Test name' };
+        const batch = {
+          nested: {
+            events: [
+              { kind: 'Clicked', element: '#hero', message: 'hello', users: [1] },
+              { kind: 'Purchased', product: 'action-figure-1', message: 'world' }
+            ]
+          }
+        };
+
+        return co(function*() {
+          yield UserModel.create(user);
+          yield Batch.create(batch);
+          let docs = yield Batch.find({})
+            .populate('nested.events.users_$')
+            .lean();
+          let name = docs[0].nested.events[0].users_$[0].name;
+          assert.strictEqual(name, 'Test name');
+        });
+      });
     });
   });
 });

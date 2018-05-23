@@ -867,6 +867,34 @@ describe('schema', function() {
 
         done();
       });
+
+      it('with embedded discriminator (gh-6485)', function(done) {
+        const eventSchema = new Schema({
+          message: { type: String, index: true }
+        }, { discriminatorKey: 'kind', _id: false });
+
+        const batchSchema = new Schema({
+          events: [eventSchema],
+        });
+
+        const docArray = batchSchema.path('events');
+
+        docArray.discriminator('gh6485_Clicked', new Schema({
+          element: { type: String, index: true }
+        }, { _id: false }));
+
+        docArray.discriminator('gh6485_Purchased', Schema({
+          product: { type: String, index: true },
+        }, { _id: false }));
+
+        assert.deepEqual(batchSchema.indexes().map(v => v[0]), [
+          { 'events.message': 1 },
+          { 'events.element': 1 },
+          { 'events.product': 1 }
+        ]);
+
+        done();
+      });
     });
   });
 

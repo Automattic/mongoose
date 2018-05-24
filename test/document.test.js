@@ -3122,8 +3122,8 @@ describe('document', function() {
       });
     });
 
-    it('setting path to empty object works (gh-4218)', function(done) {
-      var schema = new Schema({
+    it('setting path to empty object works (gh-4218)', function() {
+      const schema = new Schema({
         object: {
           nested: {
             field1: { type: Number, default: 1 }
@@ -3131,18 +3131,34 @@ describe('document', function() {
         }
       });
 
-      var MyModel = db.model('gh4218', schema);
+      const MyModel = db.model('gh4218', schema);
 
-      MyModel.create({}, function(error, doc) {
+      return co(function*() {
+        let doc = yield MyModel.create({});
         doc.object.nested = {};
-        doc.save(function(error, doc) {
-          assert.ifError(error);
-          MyModel.collection.findOne({ _id: doc._id }, function(error, doc) {
-            assert.ifError(error);
-            assert.deepEqual(doc.object.nested, {});
-            done();
-          });
-        });
+        yield doc.save();
+        doc = yield MyModel.collection.findOne({ _id: doc._id });
+        assert.deepEqual(doc.object.nested, {});
+      });
+    });
+
+    it('setting path to object with strict and no paths in the schema (gh-6436) (gh-4218)', function() {
+      const schema = new Schema({
+        object: {
+          nested: {
+            field1: { type: Number, default: 1 }
+          }
+        }
+      });
+
+      const MyModel = db.model('gh6436', schema);
+
+      return co(function*() {
+        let doc = yield MyModel.create({});
+        doc.object.nested = { field2: 'foo' }; // `field2` not in the schema
+        yield doc.save();
+        doc = yield MyModel.collection.findOne({ _id: doc._id });
+        assert.deepEqual(doc.object.nested, {});
       });
     });
 

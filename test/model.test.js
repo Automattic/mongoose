@@ -5398,5 +5398,29 @@ describe('Model', function() {
         });
       });
     });
+    it('Throws when saving same doc in parallel (gh-6456)', function() {
+      const schema = new Schema({
+        name: String
+      });
+
+      const Test = db.model('gh6456', schema);
+
+      const test = new Test({
+        name: 'Billy'
+      });
+
+      function handler() {
+      }
+
+      assert.throws(function() {
+        test.save(handler);
+        test.save(handler);
+      }, /Do Not Save in parallel/);
+
+      assert.throws(function() {
+        test.save().then(handler);
+        test.save().then(handler);
+      }, /Do Not Save in parallel/);
+    });
   });
 });

@@ -48,7 +48,6 @@
     "mongodb-topology-manager": "1.0.11",
     "mongoose-long": "0.1.1",
     "node-static": "0.7.10",
-    "nsp": "~2.8.1",
     "nyc": "11.4.1",
     "power-assert": "1.4.1",
     "q": "1.5.1",
@@ -63,7 +62,6 @@
   "scripts": {
     "fix-lint": "eslint . --fix",
     "lint": "eslint . --quiet",
-    "nsp": "nsp check",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",

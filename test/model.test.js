@@ -5398,7 +5398,8 @@ describe('Model', function() {
         });
       });
     });
-    it('Throws when saving same doc in parallel (gh-6456)', function() {
+
+    it('Throws when saving same doc in parallel w/ callback (gh-6456)', function(done) {
       const schema = new Schema({
         name: String
       });
@@ -5409,18 +5410,42 @@ describe('Model', function() {
         name: 'Billy'
       });
 
-      function handler() {
+      test.save(function cb(err, doc) {
+        assert.ifError(err);
+        assert.strictEqual(doc.name, 'Billy');
+        done();
+      });
+
+      test.save(function cb(err) {
+        assert.strictEqual(err.name, 'ParallelSaveError');
+        let regex = new RegExp(test.id);
+        assert.ok(regex.test(err.message));
+      });
+    });
+
+    it('Throws when saving same doc in parallel w/ promises (gh-6456)', function() {
+      const schema = new Schema({
+        name: String
+      });
+
+      const Test = db.model('gh6456_2', schema);
+
+      const test = new Test({
+        name: 'Sarah'
+      });
+
+      function handler(doc) {
+        assert.strictEqual(doc.id, test.id);
       }
 
-      assert.throws(function() {
-        test.save(handler);
-        test.save(handler);
-      }, /Do Not Save in parallel/);
+      function error(err) {
+        assert.strictEqual(err.name, 'ParallelSaveError');
+        let regex = new RegExp(test.id);
+        assert.ok(regex.test(err.message));
+      }
 
-      assert.throws(function() {
-        test.save().then(handler);
-        test.save().then(handler);
-      }, /Do Not Save in parallel/);
+      test.save().then(handler);
+      test.save().catch(error);
     });
   });
 });

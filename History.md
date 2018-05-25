@@ -10,11 +10,7 @@
  * fix(document): prevent default falses from being skipped by $__dirty #6481 #6477 [lineus](https://github.com/lineus)
  * docs(connection): document `useDb()` #6480
  * fix(model): skip redundant clone in insertMany #6479 [d1manson](https://github.com/d1manson)
- * fix(aggregate): let replaceRoot accept objects as well as strings #6475 #6474 [lineus](https://github.com/lineus)=======
-4.13.14 / 2018-05-25
-====================
- * fix(model): handle retainKeyOrder option in findOneAndUpdate() #6484
->>>>>>> 4.x
+ * fix(aggregate): let replaceRoot accept objects as well as strings #6475 #6474 [lineus](https://github.com/lineus)
  * docs(model): clarify `emit()` in mapReduce and how map/reduce are run #6465
  * fix(populate): flatten array to handle multi-level nested `refPath` #6457
  * fix(date): cast small numeric strings as years #6444 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

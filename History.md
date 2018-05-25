@@ -1,3 +1,7 @@
+4.13.14 / 2018-05-25
+====================
+ * fix(model): handle retainKeyOrder option in findOneAndUpdate() #6484
+
 4.13.13 / 2018-05-17
 ====================
  * fix(update): stop clobbering $in when casting update #6441 #6339

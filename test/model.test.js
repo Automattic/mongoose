@@ -5400,6 +5400,18 @@ describe('Model', function() {
     });
 
     it('Throws when saving same doc in parallel w/ callback (gh-6456)', function(done) {
+      let called = 0;
+
+      function counter() {
+        if (++called === 2) {
+          Test.count(function(err, cnt) {
+            assert.ifError(err);
+            assert.strictEqual(cnt, 1);
+            done();
+          });
+        }
+      }
+
       const schema = new Schema({
         name: String
       });
@@ -5413,17 +5425,30 @@ describe('Model', function() {
       test.save(function cb(err, doc) {
         assert.ifError(err);
         assert.strictEqual(doc.name, 'Billy');
-        done();
+        counter();
       });
 
       test.save(function cb(err) {
         assert.strictEqual(err.name, 'ParallelSaveError');
         let regex = new RegExp(test.id);
         assert.ok(regex.test(err.message));
+        counter();
       });
     });
 
-    it('Throws when saving same doc in parallel w/ promises (gh-6456)', function() {
+    it('Throws when saving same doc in parallel w/ promises (gh-6456)', function(done) {
+      let called = 0;
+
+      function counter() {
+        if (++called === 2) {
+          Test.count(function(err, cnt) {
+            assert.ifError(err);
+            assert.strictEqual(cnt, 1);
+            done();
+          });
+        }
+      }
+
       const schema = new Schema({
         name: String
       });
@@ -5436,12 +5461,14 @@ describe('Model', function() {
 
       function handler(doc) {
         assert.strictEqual(doc.id, test.id);
+        counter();
       }
 
       function error(err) {
         assert.strictEqual(err.name, 'ParallelSaveError');
         let regex = new RegExp(test.id);
         assert.ok(regex.test(err.message));
+        counter();
       }
 
       test.save().then(handler);

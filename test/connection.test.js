@@ -1110,4 +1110,14 @@ describe('connections:', function() {
       });
     });
   });
+  describe('passing a function into createConnection', function() {
+    it('should store the name of the function (gh-6517)', function(done) {
+      var conn = mongoose.createConnection('mongodb://localhost:27017/gh6517');
+      var schema = new Schema({ name: String });
+      class Person extends mongoose.Model {}
+      conn.model(Person, schema);
+      assert.strictEqual(conn.modelNames()[0], 'Person');
+      done();
+    });
+  });
 });

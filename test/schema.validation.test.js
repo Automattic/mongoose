@@ -1276,8 +1276,8 @@ describe('schema', function() {
             validator: function() {
               return false;
             },
-            message: function() {
-              return 'fail';
+            message: function(properties) {
+              return 'fail ' + properties.value;
             }
           }
         }
@@ -1286,7 +1286,7 @@ describe('schema', function() {
       const m = new M({ n: 0 });
 
       m.validate(function(error) {
-        assert.equal('fail', error.errors['n'].message);
+        assert.equal('fail 0', error.errors['n'].message);
         done();
       });
     });
@@ -1296,8 +1296,8 @@ describe('schema', function() {
         n: {
           type: String,
           // required: true,
-          required: [true, function() {
-            return 'fail';
+          required: [true, function(properties) {
+            return 'fail ' + properties.path;
           }]
         }
       });
@@ -1305,7 +1305,7 @@ describe('schema', function() {
       const m = new M();
 
       m.validate(function(error) {
-        assert.equal('fail', error.errors['n'].message);
+        assert.equal('fail n', error.errors['n'].message);
         done();
       });
     });

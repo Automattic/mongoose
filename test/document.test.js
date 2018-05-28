@@ -5438,6 +5438,7 @@ describe('document', function() {
           media: { kind: 'photo', file: 'cover.jpg', position: 'left' }
         });
 
+        // Using positional args syntax
         doc.set('media.position', 'right');
         assert.equal(doc.media.position, 'right');
 
@@ -5445,6 +5446,15 @@ describe('document', function() {
 
         doc = yield Page.findById(doc._id);
         assert.equal(doc.media.position, 'right');
+
+        // Using object syntax
+        doc.set({ 'media.position': 'left' });
+        assert.equal(doc.media.position, 'left');
+
+        yield doc.save();
+
+        doc = yield Page.findById(doc._id);
+        assert.equal(doc.media.position, 'left');
       });
     });
 

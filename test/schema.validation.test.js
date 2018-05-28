@@ -1301,7 +1301,7 @@ describe('schema', function() {
           }]
         }
       });
-      const M = mongoose.model('gh6523', s);
+      const M = mongoose.model('gh6523-2', s);
       const m = new M();
 
       m.validate(function(error) {

@@ -5458,6 +5458,33 @@ describe('document', function() {
       });
     });
 
+    it('set() underneath array embedded discriminator (gh-6526)', function() {
+      const mediaSchema = new Schema({ file: String },
+        { discriminatorKey: 'kind', _id: false });
+
+      const photoSchema = new Schema({ position: String });
+      const pageSchema = new Schema({ media: [mediaSchema] });
+
+      pageSchema.path('media').discriminator('photo', photoSchema);
+
+      const Page = db.model('gh6526_Page', pageSchema);
+
+      return co(function*() {
+        let doc = yield Page.create({
+          media: [{ kind: 'photo', file: 'cover.jpg', position: 'left' }]
+        });
+
+        // Using positional args syntax
+        doc.set('media.0.position', 'right');
+        assert.equal(doc.media[0].position, 'right');
+
+        yield doc.save();
+
+        doc = yield Page.findById(doc._id);
+        assert.equal(doc.media[0].position, 'right');
+      });
+    });
+
     it('consistent context for nested docs (gh-5347)', function(done) {
       var contexts = [];
       var childSchema = new mongoose.Schema({

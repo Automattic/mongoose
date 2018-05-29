@@ -2895,5 +2895,40 @@ describe('model: update:', function() {
         done();
       });
     });
+    it('casts objects to array when clobbering with $set (gh-6532)', function(done) {
+      var sub = new Schema({
+        x: String
+      });
+
+      var schema = new Schema({
+        name: String,
+        arr: [sub]
+      });
+
+      var Test = db.model('gh6532', schema);
+
+      var test = {
+        name: 'Xyz',
+        arr: [{ x: 'Z' }]
+      };
+
+      var cond = { name: 'Xyz' };
+      var obj1 = { x: 'Y' };
+      var set = { $set: { 'arr': obj1 } };
+
+      Test.create(test).
+        then(function() {
+          return Test.update(cond, set);
+        }).
+        then(function() {
+          return Test.collection.findOne({});
+        }).
+        then(function(found) {
+          assert.ok(Array.isArray(found.arr));
+          assert.strictEqual(found.arr[0].x, 'Y');
+          done();
+        }).
+        catch(done);
+    });
   });
 });

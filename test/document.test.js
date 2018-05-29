@@ -3122,8 +3122,8 @@ describe('document', function() {
       });
     });
 
-    it('setting path to empty object works (gh-4218)', function(done) {
-      var schema = new Schema({
+    it('setting path to empty object works (gh-4218)', function() {
+      const schema = new Schema({
         object: {
           nested: {
             field1: { type: Number, default: 1 }
@@ -3131,18 +3131,34 @@ describe('document', function() {
         }
       });
 
-      var MyModel = db.model('gh4218', schema);
+      const MyModel = db.model('gh4218', schema);
 
-      MyModel.create({}, function(error, doc) {
+      return co(function*() {
+        let doc = yield MyModel.create({});
         doc.object.nested = {};
-        doc.save(function(error, doc) {
-          assert.ifError(error);
-          MyModel.collection.findOne({ _id: doc._id }, function(error, doc) {
-            assert.ifError(error);
-            assert.deepEqual(doc.object.nested, {});
-            done();
-          });
-        });
+        yield doc.save();
+        doc = yield MyModel.collection.findOne({ _id: doc._id });
+        assert.deepEqual(doc.object.nested, {});
+      });
+    });
+
+    it('setting path to object with strict and no paths in the schema (gh-6436) (gh-4218)', function() {
+      const schema = new Schema({
+        object: {
+          nested: {
+            field1: { type: Number, default: 1 }
+          }
+        }
+      });
+
+      const MyModel = db.model('gh6436', schema);
+
+      return co(function*() {
+        let doc = yield MyModel.create({});
+        doc.object.nested = { field2: 'foo' }; // `field2` not in the schema
+        yield doc.save();
+        doc = yield MyModel.collection.findOne({ _id: doc._id });
+        assert.deepEqual(doc.object.nested, {});
       });
     });
 
@@ -5404,6 +5420,69 @@ describe('document', function() {
           assert.equal(doc.a.b, 'not the default');
           assert.equal(doc.a.d, 'some value');
         });
+    });
+
+    it('set() underneath embedded discriminator (gh-6482)', function() {
+      const mediaSchema = new Schema({ file: String },
+        { discriminatorKey: 'kind', _id: false });
+
+      const photoSchema = new Schema({ position: String });
+      const pageSchema = new Schema({ media: mediaSchema });
+
+      pageSchema.path('media').discriminator('photo', photoSchema);
+
+      const Page = db.model('gh6482_Page', pageSchema);
+
+      return co(function*() {
+        let doc = yield Page.create({
+          media: { kind: 'photo', file: 'cover.jpg', position: 'left' }
+        });
+
+        // Using positional args syntax
+        doc.set('media.position', 'right');
+        assert.equal(doc.media.position, 'right');
+
+        yield doc.save();
+
+        doc = yield Page.findById(doc._id);
+        assert.equal(doc.media.position, 'right');
+
+        // Using object syntax
+        doc.set({ 'media.position': 'left' });
+        assert.equal(doc.media.position, 'left');
+
+        yield doc.save();
+
+        doc = yield Page.findById(doc._id);
+        assert.equal(doc.media.position, 'left');
+      });
+    });
+
+    it('set() underneath array embedded discriminator (gh-6526)', function() {
+      const mediaSchema = new Schema({ file: String },
+        { discriminatorKey: 'kind', _id: false });
+
+      const photoSchema = new Schema({ position: String });
+      const pageSchema = new Schema({ media: [mediaSchema] });
+
+      pageSchema.path('media').discriminator('photo', photoSchema);
+
+      const Page = db.model('gh6526_Page', pageSchema);
+
+      return co(function*() {
+        let doc = yield Page.create({
+          media: [{ kind: 'photo', file: 'cover.jpg', position: 'left' }]
+        });
+
+        // Using positional args syntax
+        doc.set('media.0.position', 'right');
+        assert.equal(doc.media[0].position, 'right');
+
+        yield doc.save();
+
+        doc = yield Page.findById(doc._id);
+        assert.equal(doc.media[0].position, 'right');
+      });
     });
 
     it('consistent context for nested docs (gh-5347)', function(done) {

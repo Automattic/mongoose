@@ -1,3 +1,21 @@
+5.1.3 / 2018-05-28
+==================
+ * fix(document): support set() on path underneath array embedded discriminator #6526
+ * chore: update lodash and nsp dev dependencies #6514 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix(document): throw readable error when saving the same doc instance more than once in parallel #6511 #6456 #4064 [lineus](https://github.com/lineus)
+ * fix(populate): set correct nestedSchemaPath for virtual underneath embedded discriminator #6501 #6487 [lineus](https://github.com/lineus)
+ * docs(query): add section on promises and warning about not mixing promises and callbacks #6495
+ * docs(connection): add concrete example of connecting to multiple hosts #6492 [lineus](https://github.com/lineus)
+ * fix(populate): handle virtual populate under single nested doc under embedded discriminator #6488
+ * fix(schema): collect indexes from embedded discriminators for autoIndex build #6485
+ * fix(document): handle `doc.set()` underneath embedded discriminator #6482
+ * fix(document): handle set() on path under embedded discriminator with object syntax #6482
+ * fix(document): handle setting nested property to object with only non-schema properties #6436
+
+4.13.14 / 2018-05-25
+====================
+ * fix(model): handle retainKeyOrder option in findOneAndUpdate() #6484
+
 5.1.2 / 2018-05-21
 ==================
  * docs(guide): add missing SchemaTypes #6490 [distancesprinter](https://github.com/distancesprinter)

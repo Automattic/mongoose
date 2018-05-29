@@ -4,17 +4,31 @@ block content
   :markdown
     ## Queries
 
-    Documents can be retrieved through several static helper methods of [models](./models.html).
+    Mongoose [models](./models.html) provide several static helper functions
+    for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
+    Each of these functions returns a
+    [mongoose `Query` object](http://mongoosejs.com/docs/api.html#Query).
 
-    Any [model](./api.html#model_Model) method which [involves](./api.html#model_Model.find) [specifying](./api.html#model_Model.findById) [query](./api.html#model_Model.count) [conditions](./api.html#model_Model.update) can be executed two ways:
+    - [`Model.deleteMany()`](/docs/api.html#deletemany_deleteMany)
+    - [`Model.deleteOne()`](/docs/api.html#deleteone_deleteOne)
+    - [`Model.find()`](/docs/api.html#find_find)
+    - [`Model.findById()`](/docs/api.html#findbyid_findById)
+    - [`Model.findByIdAndDelete()`](/docs/api.html#findbyidanddelete_findByIdAndDelete)
+    - [`Model.findByIdAndRemove()`](/docs/api.html#findbyidandremove_findByIdAndRemove)
+    - [`Model.findByIdAndUpdate()`](/docs/api.html#findbyidandupdate_findByIdAndUpdate)
+    - [`Model.findOne()`](/docs/api.html#findone_findOne)
+    - [`Model.findOneAndDelete()`](/docs/api.html#findoneanddelete_findOneAndDelete)
+    - [`Model.findOneAndRemove()`](/docs/api.html#findoneandremove_findOneAndRemove)
+    - [`Model.findOneAndUpdate()`](/docs/api.html#findoneandremove_findOneAndRemove)
+    - [`Model.replaceOne()`](/docs/api.html#replaceone_replaceOne)
+    - [`Model.updateMany()`](/docs/api.html#updatemany_updateMany)
+    - [`Model.updateOne()`](/docs/api.html#updateone_updateOne)
 
-    When a `callback` function:
+    A mongoose query can be executed in one of two ways. First, if you
+    pass in a `callback` function the operation will be executed immediately
+    with the results passed to the callback.
 
-    - is passed, the operation will be executed immediately with the results passed to the callback.
-    - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special query builder interface.
-
-    A [Query](./api.html#query-js) has a `.then()` function, and
-    thus can be used as a promise.
+    A query also has a `.then()` function, and thus can be used as a promise.
 
     When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
 
@@ -86,6 +100,33 @@ block content
 
     A full list of [Query helper functions can be found in the API docs](./api.html#query-js).
 
+    <h3 id="queries-are-not-promises">
+      <a href="#queries-are-not-promises">
+        Queries are not promises
+      </a>
+    </h3>
+
+    Mongoose queries are **not** promises. They have a `.then()`
+    function for [co](https://www.npmjs.com/package/co) and
+    [async/await](http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html)
+    as a convenience. However, unlike promises, calling a query's `.then()`
+    can execute the query multiple times.
+
+    For example, the below code will execute 3 `updateMany()` calls, one
+    because of the callback, and two because `.then()` is called twice.
+
+    ```javascript
+    const q = MyModel.updateMany({}, { isDeleted: true }, function() {
+      console.log('Update 1');
+    });
+
+    q.then(() => console.log('Update 2'));
+    q.then(() => console.log('Update 3'));
+    ```
+
+    Don't mix using callbacks and promises with queries, or you may end up
+    with duplicate operations.
+
     <h3 id="refs"><a href="#refs">References to other documents</a></h3>
 
     There are no joins in MongoDB but sometimes we still want references to
@@ -109,8 +150,7 @@ block content
       // Called when done
     });
     ```
-    
+
     <h3 id="next"><a href="#next">Next Up</a></h3>
 
     Now that we've covered `Queries`, let's take a look at [Validation](/docs/validation.html).
-    

@@ -341,6 +341,13 @@ block content
     doc.save(); // Works
     ```
 
+    **Q**. Why does calling `save()` multiple times on the same document in parallel only let 
+    the first save call succeed and return ParallelSaveErrors for the rest?
+
+    **A**. Due to the asynchronous nature of validation and middleware in general, calling
+    `save()` multiple times in parallel on the same doc could result in conflicts. For example,
+    validating, and then subsequently invalidating the same path.
+
     **Something to add?**
 
     If you'd like to contribute to this page, please

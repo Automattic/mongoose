@@ -6533,5 +6533,83 @@ describe('model: populate:', function() {
         });
       });
     });
+    it('populates refPath from array element (gh-6509)', function() {
+      const jobSchema = new Schema({
+        kind: String,
+        title: String,
+        company: String
+      });
+
+      const Job = db.model('gh6509_job', jobSchema);
+
+      const volunteerSchema = new Schema({
+        kind: String,
+        resp: String,
+        org: String
+      });
+
+      const Volunteer = db.model('gh6509_charity', volunteerSchema);
+
+      const cvSchema = new Schema({
+        title: String,
+        date: { type: Date, default: Date.now },
+        sections: [{
+          name: String,
+          active: Boolean,
+          list: [{
+            kind: String,
+            active: Boolean,
+            item: {
+              type: Schema.Types.ObjectId,
+              refPath: 'sections.list.kind'
+            }
+          }]
+        }]
+      });
+
+      const CV = db.model('gh6509_cv', cvSchema);
+
+      const job = new Job({
+        kind: 'gh6509_job',
+        title: 'janitor',
+        company: 'Bait & Tackle'
+      });
+
+      const volunteer = new Volunteer({
+        kind: 'gh6509_charity',
+        resp: 'construction',
+        org: 'Habitat for Humanity'
+      });
+
+      const test = new CV({
+        title: 'Billy',
+        sections: [{
+          name: 'Experience',
+          active: true,
+          list: [
+            { kind: 'gh6509_job', active: true, item: job._id },
+            { kind: 'gh6509_charity', active: true, item: volunteer._id }
+          ]
+        }]
+      });
+
+      return co(function* () {
+        yield job.save();
+        yield volunteer.save();
+        yield test.save();
+        let found = yield CV.findOne({}).populate('sections.list.item');
+
+        assert.ok(found.sections[0].list[0].item);
+        assert.strictEqual(
+          found.sections[0].list[0].item.company,
+          'Bait & Tackle'
+        );
+        assert.ok(found.sections[0].list[1].item);
+        assert.strictEqual(
+          found.sections[0].list[1].item.org,
+          'Habitat for Humanity'
+        );
+      });
+    });
   });
 });

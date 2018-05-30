@@ -6472,7 +6472,6 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.o[0].a.name, 'testing');
         });
       });
-
       it('handles embedded discriminator (gh-6487)', function() {
         const userSchema = new Schema({ employeeId: Number, name: String });
         const UserModel = db.model('gh6487Users', userSchema);
@@ -6531,6 +6530,66 @@ describe('model: populate:', function() {
           let name = docs[0].nested.events[0].users_$[0].name;
           assert.strictEqual(name, 'Test name');
         });
+      });
+    });
+  });
+
+  describe('lean + deep populate (gh-6498)', function() {
+    const isLean = v => v != null && !(v instanceof mongoose.Document);
+
+    before(function() {
+      const userSchema = new Schema({
+        name: String,
+        roomId: { type: Schema.ObjectId, ref: 'gh6498_Room' }
+      });
+      const officeSchema = new Schema();
+      const roomSchema = new Schema({
+        officeId: { type: Schema.ObjectId, ref: 'gh6498_Office' }
+      });
+
+      const User = db.model('gh6498_User', userSchema);
+      const Office = db.model('gh6498_Office', officeSchema);
+      const Room = db.model('gh6498_Room', roomSchema);
+
+      const user = new User();
+      const office = new Office();
+      const room = new Room();
+
+      user.roomId = room._id;
+      room.officeId = office._id;
+
+      return Promise.all([user.save(), office.save(), room.save()]);
+    });
+
+    it('document, and subdocuments are not lean by default', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().populate({
+          path: 'roomId',
+          populate: {
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), false);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
+
+    it('.lean() makes query result, and all populated fields lean', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().
+          populate({
+            path: 'roomId',
+            populate: {
+              path: 'officeId'
+            }
+          }).
+          lean();
+
+        assert.equal(isLean(user), true);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), true);
       });
     });
   });

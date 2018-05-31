@@ -6400,6 +6400,116 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.janitorId.name, 'Kevin');
         });
       });
+
+      it('handles subpopulation with options (gh-6528)', function() {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const teachSchema = new Schema({
+          name: String
+        });
+
+        const commentSchema = new Schema({
+          content: String,
+          user: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh6528_User'
+          }
+        });
+
+        const postSchema = new Schema({
+          title: String,
+          content: String,
+          teacher: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh6528_Teacher'
+          },
+          commentIds: [{
+            type: Schema.Types.ObjectId
+          }]
+        }, { timestamps: true });
+
+        postSchema.virtual('comments', {
+          ref: 'gh6528_Comment',
+          localField: 'commentIds',
+          foreignField: '_id',
+          justOne: false
+        });
+
+        const User = db.model('gh6528_User', userSchema);
+        const Teacher = db.model('gh6528_Teacher', teachSchema);
+        const Post = db.model('gh6528_Post', postSchema);
+        const Comment = db.model('gh6528_Comment', commentSchema);
+
+        const users = [];
+        const teachers = [];
+        const posts = [];
+        const comments = [];
+
+        for (let i = 0; i < 2; i++) {
+          let t = new Teacher({ name: `teacher${i}` });
+          users.push(new User({ name: `user${i}` }));
+          for (let j = 0; j < 2; j++) {
+            posts.push(new Post({
+              title: `title${j}`,
+              content: `content${j}`,
+              teacher: t._id
+            }));
+          }
+          teachers.push(t);
+        }
+
+        posts.forEach((post) => {
+          users.forEach((user, i) => {
+            let com = new Comment({
+              content: `comment${i} on ${post.title}`,
+              user: user._id
+            });
+            comments.push(com);
+            post.commentIds.push(com._id);
+          });
+        });
+
+        function getTeacherPosts(id, skip) {
+          let cond = { teacher: id };
+          let opts = {
+            sort: { title: -1 },
+            limit: 1,
+            skip: skip
+          };
+          let pop = {
+            path: 'comments',
+            options: {
+              sort: { content: -1 },
+              limit: 1,
+              skip: 1
+            },
+            populate: {
+              path: 'user',
+              select: 'name -_id',
+            }
+          };
+          return Post.find(cond, null, opts).populate(pop).exec();
+        }
+
+        return co(function* () {
+          yield User.create(users);
+          yield Teacher.create(teachers);
+          yield Post.create(posts);
+          yield Comment.create(comments);
+          let t = yield Teacher.findOne({ name: 'teacher1' });
+          let found = yield getTeacherPosts(t._id, 1);
+          // skipped 1 posts, sorted backwards from title1 should equal title0
+          assert.strictEqual(found[0].title, 'title0');
+          assert.strictEqual(found[0].teacher.toHexString(), t.id);
+          // skipped 1 comment
+          assert.strictEqual(found[0].comments.length, 1);
+          // skipped 1 comment, sorted backwards from comment1 should equal comment0
+          assert.strictEqual(found[0].comments[0].content, 'comment0 on title0');
+        });
+      });
+
       it('honors top-level match with subPopulation (gh-6451)', function() {
         const anotherSchema = new Schema({
           name: String,

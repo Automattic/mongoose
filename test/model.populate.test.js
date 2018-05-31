@@ -6780,5 +6780,56 @@ describe('model: populate:', function() {
         assert.equal(isLean(user.roomId.officeId), true);
       });
     });
+
+    it('disabling lean at some populating level reflects on it, and descendants', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().
+          populate({
+            path: 'roomId',
+            options: { lean: false },
+            populate: {
+              path: 'officeId'
+            }
+          }).
+          lean();
+
+        assert.equal(isLean(user), true);
+        assert.equal(isLean(user.roomId), false);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
+
+    it('enabling lean at some populating level reflects on it, and descendants', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().populate({
+          path: 'roomId',
+          options: { lean: true },
+          populate: {
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), true);
+      });
+    });
+
+    it('disabling lean on nested population overwrites parent lean', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().populate({
+          path: 'roomId',
+          options: { lean: true },
+          populate: {
+            options: { lean: false },
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
   });
 });

@@ -1266,5 +1266,48 @@ describe('schema', function() {
         done();
       });
     });
+
+    it('evaluate message function gh6523', function(done) {
+      const s = mongoose.Schema({
+        n: {
+          type: String,
+          // required: true,
+          validate: {
+            validator: function() {
+              return false;
+            },
+            message: function(properties) {
+              return 'fail ' + properties.value;
+            }
+          }
+        }
+      });
+      const M = mongoose.model('gh6523', s);
+      const m = new M({ n: 0 });
+
+      m.validate(function(error) {
+        assert.equal('fail 0', error.errors['n'].message);
+        done();
+      });
+    });
+
+    it('evaluate message function for required field gh6523', function(done) {
+      const s = mongoose.Schema({
+        n: {
+          type: String,
+          // required: true,
+          required: [true, function(properties) {
+            return 'fail ' + properties.path;
+          }]
+        }
+      });
+      const M = mongoose.model('gh6523-2', s);
+      const m = new M();
+
+      m.validate(function(error) {
+        assert.equal('fail n', error.errors['n'].message);
+        done();
+      });
+    });
   });
 });

@@ -1,3 +1,16 @@
+5.1.4 / 2018-06-04
+==================
+ * docs(faq): add hr tags for parallel save error #6550 [lineus](https://github.com/lineus)
+ * docs(connection): fix broken link #6545 [iblamefish](https://github.com/iblamefish)
+ * fix(populate): honor subpopulate options #6539 #6528 [lineus](https://github.com/lineus)
+ * fix(populate): allow population of refpath under array #6537 #6509 [lineus](https://github.com/lineus)
+ * fix(query): dont treat $set the same as the other ops in update casting #6535 [lineus](https://github.com/lineus)
+ * fix: bump async -> 2.6.1 #6534 #6505 [lineus](https://github.com/lineus)
+ * fix: support using a function as validation error message #6530 [lucandrade](https://github.com/lucandrade)
+ * fix(populate): propagate `lean()` down to subpopulate #6498 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(lambda): add info on what happens if database does down between lambda function calls #6409
+ * fix(update): allow updating embedded discriminator path if discriminator key is in filter #5841
+
 5.1.3 / 2018-05-28
 ==================
  * fix(document): support set() on path underneath array embedded discriminator #6526

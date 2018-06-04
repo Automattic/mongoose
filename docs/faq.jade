@@ -340,7 +340,9 @@ block content
     doc.createdAt = new Date(2011, 5, 1).setHours(4);
     doc.save(); // Works
     ```
-
+    
+    <hr id="parallel_saves" />
+    
     **Q**. Why does calling `save()` multiple times on the same document in parallel only let 
     the first save call succeed and return ParallelSaveErrors for the rest?
 
@@ -348,6 +350,8 @@ block content
     `save()` multiple times in parallel on the same doc could result in conflicts. For example,
     validating, and then subsequently invalidating the same path.
 
+    <hr id="add_something" />
+    
     **Something to add?**
 
     If you'd like to contribute to this page, please

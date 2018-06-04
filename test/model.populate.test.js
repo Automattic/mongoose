@@ -6400,6 +6400,116 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.janitorId.name, 'Kevin');
         });
       });
+
+      it('handles subpopulation with options (gh-6528)', function() {
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const teachSchema = new Schema({
+          name: String
+        });
+
+        const commentSchema = new Schema({
+          content: String,
+          user: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh6528_User'
+          }
+        });
+
+        const postSchema = new Schema({
+          title: String,
+          content: String,
+          teacher: {
+            type: Schema.Types.ObjectId,
+            ref: 'gh6528_Teacher'
+          },
+          commentIds: [{
+            type: Schema.Types.ObjectId
+          }]
+        }, { timestamps: true });
+
+        postSchema.virtual('comments', {
+          ref: 'gh6528_Comment',
+          localField: 'commentIds',
+          foreignField: '_id',
+          justOne: false
+        });
+
+        const User = db.model('gh6528_User', userSchema);
+        const Teacher = db.model('gh6528_Teacher', teachSchema);
+        const Post = db.model('gh6528_Post', postSchema);
+        const Comment = db.model('gh6528_Comment', commentSchema);
+
+        const users = [];
+        const teachers = [];
+        const posts = [];
+        const comments = [];
+
+        for (let i = 0; i < 2; i++) {
+          let t = new Teacher({ name: `teacher${i}` });
+          users.push(new User({ name: `user${i}` }));
+          for (let j = 0; j < 2; j++) {
+            posts.push(new Post({
+              title: `title${j}`,
+              content: `content${j}`,
+              teacher: t._id
+            }));
+          }
+          teachers.push(t);
+        }
+
+        posts.forEach((post) => {
+          users.forEach((user, i) => {
+            let com = new Comment({
+              content: `comment${i} on ${post.title}`,
+              user: user._id
+            });
+            comments.push(com);
+            post.commentIds.push(com._id);
+          });
+        });
+
+        function getTeacherPosts(id, skip) {
+          let cond = { teacher: id };
+          let opts = {
+            sort: { title: -1 },
+            limit: 1,
+            skip: skip
+          };
+          let pop = {
+            path: 'comments',
+            options: {
+              sort: { content: -1 },
+              limit: 1,
+              skip: 1
+            },
+            populate: {
+              path: 'user',
+              select: 'name -_id',
+            }
+          };
+          return Post.find(cond, null, opts).populate(pop).exec();
+        }
+
+        return co(function* () {
+          yield User.create(users);
+          yield Teacher.create(teachers);
+          yield Post.create(posts);
+          yield Comment.create(comments);
+          let t = yield Teacher.findOne({ name: 'teacher1' });
+          let found = yield getTeacherPosts(t._id, 1);
+          // skipped 1 posts, sorted backwards from title1 should equal title0
+          assert.strictEqual(found[0].title, 'title0');
+          assert.strictEqual(found[0].teacher.toHexString(), t.id);
+          // skipped 1 comment
+          assert.strictEqual(found[0].comments.length, 1);
+          // skipped 1 comment, sorted backwards from comment1 should equal comment0
+          assert.strictEqual(found[0].comments[0].content, 'comment0 on title0');
+        });
+      });
+
       it('honors top-level match with subPopulation (gh-6451)', function() {
         const anotherSchema = new Schema({
           name: String,
@@ -6472,7 +6582,6 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.o[0].a.name, 'testing');
         });
       });
-
       it('handles embedded discriminator (gh-6487)', function() {
         const userSchema = new Schema({ employeeId: Number, name: String });
         const UserModel = db.model('gh6487Users', userSchema);
@@ -6531,6 +6640,195 @@ describe('model: populate:', function() {
           let name = docs[0].nested.events[0].users_$[0].name;
           assert.strictEqual(name, 'Test name');
         });
+      });
+    });
+    it('populates refPath from array element (gh-6509)', function() {
+      const jobSchema = new Schema({
+        kind: String,
+        title: String,
+        company: String
+      });
+
+      const Job = db.model('gh6509_job', jobSchema);
+
+      const volunteerSchema = new Schema({
+        kind: String,
+        resp: String,
+        org: String
+      });
+
+      const Volunteer = db.model('gh6509_charity', volunteerSchema);
+
+      const cvSchema = new Schema({
+        title: String,
+        date: { type: Date, default: Date.now },
+        sections: [{
+          name: String,
+          active: Boolean,
+          list: [{
+            kind: String,
+            active: Boolean,
+            item: {
+              type: Schema.Types.ObjectId,
+              refPath: 'sections.list.kind'
+            }
+          }]
+        }]
+      });
+
+      const CV = db.model('gh6509_cv', cvSchema);
+
+      const job = new Job({
+        kind: 'gh6509_job',
+        title: 'janitor',
+        company: 'Bait & Tackle'
+      });
+
+      const volunteer = new Volunteer({
+        kind: 'gh6509_charity',
+        resp: 'construction',
+        org: 'Habitat for Humanity'
+      });
+
+      const test = new CV({
+        title: 'Billy',
+        sections: [{
+          name: 'Experience',
+          active: true,
+          list: [
+            { kind: 'gh6509_job', active: true, item: job._id },
+            { kind: 'gh6509_charity', active: true, item: volunteer._id }
+          ]
+        }]
+      });
+
+      return co(function* () {
+        yield job.save();
+        yield volunteer.save();
+        yield test.save();
+        let found = yield CV.findOne({}).populate('sections.list.item');
+
+        assert.ok(found.sections[0].list[0].item);
+        assert.strictEqual(
+          found.sections[0].list[0].item.company,
+          'Bait & Tackle'
+        );
+        assert.ok(found.sections[0].list[1].item);
+        assert.strictEqual(
+          found.sections[0].list[1].item.org,
+          'Habitat for Humanity'
+        );
+      });
+    });
+  });
+
+  describe('lean + deep populate (gh-6498)', function() {
+    const isLean = v => v != null && !(v instanceof mongoose.Document);
+
+    before(function() {
+      const userSchema = new Schema({
+        name: String,
+        roomId: { type: Schema.ObjectId, ref: 'gh6498_Room' }
+      });
+      const officeSchema = new Schema();
+      const roomSchema = new Schema({
+        officeId: { type: Schema.ObjectId, ref: 'gh6498_Office' }
+      });
+
+      const User = db.model('gh6498_User', userSchema);
+      const Office = db.model('gh6498_Office', officeSchema);
+      const Room = db.model('gh6498_Room', roomSchema);
+
+      const user = new User();
+      const office = new Office();
+      const room = new Room();
+
+      user.roomId = room._id;
+      room.officeId = office._id;
+
+      return Promise.all([user.save(), office.save(), room.save()]);
+    });
+
+    it('document, and subdocuments are not lean by default', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().populate({
+          path: 'roomId',
+          populate: {
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), false);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
+
+    it('.lean() makes query result, and all populated fields lean', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().
+          populate({
+            path: 'roomId',
+            populate: {
+              path: 'officeId'
+            }
+          }).
+          lean();
+
+        assert.equal(isLean(user), true);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), true);
+      });
+    });
+
+    it('disabling lean at some populating level reflects on it, and descendants', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().
+          populate({
+            path: 'roomId',
+            options: { lean: false },
+            populate: {
+              path: 'officeId'
+            }
+          }).
+          lean();
+
+        assert.equal(isLean(user), true);
+        assert.equal(isLean(user.roomId), false);
+        assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
+
+    it('enabling lean at some populating level reflects on it, and descendants', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().populate({
+          path: 'roomId',
+          options: { lean: true },
+          populate: {
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), true);
+      });
+    });
+
+    it('disabling lean on nested population overwrites parent lean', function() {
+      return co(function*() {
+        const user = yield db.model('gh6498_User').findOne().populate({
+          path: 'roomId',
+          options: { lean: true },
+          populate: {
+            options: { lean: false },
+            path: 'officeId'
+          }
+        });
+
+        assert.equal(isLean(user), false);
+        assert.equal(isLean(user.roomId), true);
+        assert.equal(isLean(user.roomId.officeId), false);
       });
     });
   });

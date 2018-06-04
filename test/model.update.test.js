@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 
@@ -2796,6 +2797,38 @@ describe('model: update:', function() {
         });
     });
 
+    it('casting embedded discriminators if path specified in filter (gh-5841)', function() {
+      return co(function*() {
+        const sectionSchema = new Schema({ show: Boolean, order: Number },
+          { discriminatorKey: 'type', _id: false });
+
+        const siteSchema = new Schema({ sections: [sectionSchema] });
+        const sectionArray = siteSchema.path('sections');
+
+        const headerSchema = new Schema({ title: String }, { _id: false });
+        sectionArray.discriminator('header', headerSchema);
+
+        const textSchema = new Schema({ text: String }, { _id: false });
+        sectionArray.discriminator('text', textSchema);
+
+        const Site = db.model('gh5841', siteSchema);
+
+        let doc = yield Site.create({
+          sections: [
+            { type: 'header', title: 't1' },
+            { type: 'text', text: 'abc' }
+          ]
+        });
+
+        yield Site.update({ 'sections.type': 'header' }, {
+          $set: { 'sections.$.title': 'Test' }
+        });
+
+        doc = yield Site.findById(doc._id);
+        assert.equal(doc.sections[0].title, 'Test');
+      });
+    });
+
     it('update with nested id (gh-5640)', function(done) {
       var testSchema = new mongoose.Schema({
         _id: {
@@ -2894,6 +2927,41 @@ describe('model: update:', function() {
         assert.ok(error.errors['users.0.permission']);
         done();
       });
+    });
+    it('casts objects to array when clobbering with $set (gh-6532)', function(done) {
+      var sub = new Schema({
+        x: String
+      });
+
+      var schema = new Schema({
+        name: String,
+        arr: [sub]
+      });
+
+      var Test = db.model('gh6532', schema);
+
+      var test = {
+        name: 'Xyz',
+        arr: [{ x: 'Z' }]
+      };
+
+      var cond = { name: 'Xyz' };
+      var obj1 = { x: 'Y' };
+      var set = { $set: { 'arr': obj1 } };
+
+      Test.create(test).
+        then(function() {
+          return Test.update(cond, set);
+        }).
+        then(function() {
+          return Test.collection.findOne({});
+        }).
+        then(function(found) {
+          assert.ok(Array.isArray(found.arr));
+          assert.strictEqual(found.arr[0].x, 'Y');
+          done();
+        }).
+        catch(done);
     });
   });
 });

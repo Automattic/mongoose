@@ -6831,5 +6831,62 @@ describe('model: populate:', function() {
         assert.equal(isLean(user.roomId.officeId), false);
       });
     });
+    it('populates virtual of embedded discriminator with dynamic ref (gh-6554)', function() {
+      const userSchema = new Schema({
+        employeeId: Number,
+        name: String
+      });
+
+      const UserModel = db.model('gh6554_Users', userSchema, 'users');
+
+      const eventSchema = new Schema({
+        message: String
+      },{ discriminatorKey: 'kind' });
+
+      const batchSchema = new Schema({
+        events: [eventSchema]
+      });
+
+      const docArray = batchSchema.path('events');
+
+      const clickedSchema = new Schema({
+        element: { type: String },
+        users: [{}]
+      },
+      {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      });
+
+      clickedSchema.virtual('users_$', {
+        ref: function(doc) {
+          return doc.events[0].users[0].refKey;
+        },
+        localField: 'users.ID',
+        foreignField: 'employeeId'
+      });
+
+      docArray.discriminator('Clicked', clickedSchema);
+      const Batch = db.model('gh6554_EventBatch', batchSchema);
+
+      const user = { employeeId: 1, name: 'Test name' };
+      const batch = {
+        events: [
+          {
+            kind: 'Clicked',
+            element: '#hero',
+            message: 'hello',
+            users: [{ ID: 1, refKey: 'gh6554_Users' }]
+          }
+        ]
+      };
+
+      return co(function*() {
+        yield UserModel.create(user);
+        yield Batch.create(batch);
+        let doc = yield Batch.findOne({}).populate('events.users_$');
+        assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
+      });
+    });
   });
 });

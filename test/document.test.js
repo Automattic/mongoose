@@ -4220,6 +4220,17 @@ describe('document', function() {
       });
     });
 
+    it('toString() as custom method (gh-6538)', function(done) {
+      const commentSchema = new Schema({ title: String });
+      commentSchema.methods.toString = function() {
+        return `${this.constructor.modelName}(${this.title})`;
+      };
+      const Comment = db.model('gh6538_Comment', commentSchema);
+      const c = new Comment({ title: 'test' });
+      assert.strictEqual('gh6538_Comment(test)', `${c}`);
+      done();
+    });
+
     it('setting to discriminator (gh-4935)', function(done) {
       var Buyer = db.model('gh4935_0', new Schema({
         name: String,

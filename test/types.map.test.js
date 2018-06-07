@@ -332,6 +332,27 @@ describe('Map', function() {
         assert.equal(_doc.apiKeys.get('twitter').key, 'key');
       });
     });
+
+    it('avoid populating as map if populate on obj (gh-6460)', function() {
+      const UserSchema = new mongoose.Schema({
+        apiKeys: {}
+      });
+
+      const KeySchema = new mongoose.Schema({ key: String });
+
+      const User = db.model('gh6460_User', UserSchema);
+      const Key = db.model('gh6460_Key', KeySchema);
+
+      return co(function*() {
+        const key = yield Key.create({ key: 'abc123' });
+        const key2 = yield Key.create({ key: 'key' });
+
+        const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
+
+        const populated = yield User.findById(doc).populate('apiKeys');
+        assert.ok(!(populated.apiKeys instanceof Map));
+      });
+    });
   });
 
   it('discriminators', function() {

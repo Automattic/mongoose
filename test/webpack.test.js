@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const rimraf = require('rimraf');
 const utils = require('../lib/utils');
 const webpack = require('webpack');
 
@@ -26,5 +27,9 @@ describe('webpack', function() {
       assert.deepEqual(stats.compilation.errors, []);
       done();
     }));
+  });
+
+  after(function(done) {
+    rimraf('./dist', done);
   });
 });

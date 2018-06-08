@@ -3,10 +3,13 @@
 const assert = require('assert');
 const rimraf = require('rimraf');
 const utils = require('../lib/utils');
-const webpack = require('webpack');
+const semver = require('semver');
 
 describe('webpack', function() {
   it('works', function(done) {
+    // Webpack doesn't work on Node.js 4.x or 5.x
+    if (!semver.satisfies(process.version, '>=6.0.0'));
+    const webpack = require('webpack');
     this.timeout(30000);
 
     const config = {

@@ -34,6 +34,7 @@
   "devDependencies": {
     "acquit": "0.6.3",
     "acquit-ignore": "0.0.3",
+    "babel-loader": "7.1.4",
     "benchmark": "2.1.2",
     "bluebird": "3.5.0",
     "co": "4.6.0",
@@ -54,6 +55,7 @@
     "tbd": "0.6.4",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
+    "webpack": "4.12.0",
     "validator": "5.4.0"
   },
   "directories": {

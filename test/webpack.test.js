@@ -8,7 +8,9 @@ const semver = require('semver');
 describe('webpack', function() {
   it('works', function(done) {
     // Webpack doesn't work on Node.js 4.x or 5.x
-    if (!semver.satisfies(process.version, '>=6.0.0'));
+    if (!semver.satisfies(process.version, '>=6.0.0')) {
+      this.skip();
+    }
     const webpack = require('webpack');
     this.timeout(30000);
 

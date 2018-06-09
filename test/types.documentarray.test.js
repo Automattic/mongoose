@@ -56,6 +56,13 @@ describe('types.documentarray', function() {
     db.close(done);
   });
 
+  it('only contains non-enumerable properties (gh-6572)', function(done) {
+    var a = new MongooseDocumentArray([1, 2, 3]);
+    var keys = Object.keys(a);
+    assert.deepEqual(['0', '1', '2'], keys);
+    done();
+  });
+
   it('behaves and quacks like an array', function(done) {
     var a = new MongooseDocumentArray();
 

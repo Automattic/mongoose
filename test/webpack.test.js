@@ -6,16 +6,18 @@ const utils = require('../lib/utils');
 const semver = require('semver');
 
 describe('webpack', function() {
-  it('works', function(done) {
+  it('works for browser build', function(done) {
+    // Below is the Webpack config Mongoose uses for testing
+    // acquit:ignore:start
     // Webpack doesn't work on Node.js 4.x or 5.x
     if (!semver.satisfies(process.version, '>=6.0.0')) {
       this.skip();
     }
     const webpack = require('webpack');
     this.timeout(30000);
-
+    // acquit:ignore:end
     const config = {
-      entry: ['./browser.js'],
+      entry: ['./test/files/sample.js'],
       module: {
         rules: [
           {
@@ -25,13 +27,25 @@ describe('webpack', function() {
           }
         ]
       },
-      target: 'node'
+      node: {
+        // Replace these Node.js native modules with empty objects, Mongoose's
+        // browser library does not use them.
+        // See https://webpack.js.org/configuration/node/
+        dns: 'empty',
+        fs: 'empty',
+        'module': 'empty',
+        net: 'empty',
+        tls: 'empty'
+      },
+      target: 'web'
     };
+    // acquit:ignore:start
     webpack(config, utils.tick(function(error, stats) {
       assert.ifError(error);
       assert.deepEqual(stats.compilation.errors, []);
       done();
     }));
+    // acquit:ignore:end
   });
 
   after(function(done) {

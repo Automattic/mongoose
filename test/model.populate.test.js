@@ -6582,6 +6582,7 @@ describe('model: populate:', function() {
           assert.strictEqual(doc.o[0].a.name, 'testing');
         });
       });
+
       it('handles embedded discriminator (gh-6487)', function() {
         const userSchema = new Schema({ employeeId: Number, name: String });
         const UserModel = db.model('gh6487Users', userSchema);
@@ -6641,7 +6642,77 @@ describe('model: populate:', function() {
           assert.strictEqual(name, 'Test name');
         });
       });
+
+      it('handles virtual embedded discriminator underneath single nested (gh-6571)', co.wrap(function*() {
+        // Generate Users Model
+        const userSchema = new Schema({ id: Number, name: String });
+        const User = db.model('gh6571_Users', userSchema);
+
+        // Generate Product Model
+        const productSchema = new Schema({ id: Number, name: String });
+        const Product = db.model('gh6571_Products', productSchema);
+
+        // FlexibleItemSchema discriminator with a bunch of nested subdocs
+        const flexibleItemSchema = new Schema();
+        const outerSchema = new Schema();
+        const innerSchema = new Schema();
+
+        flexibleItemSchema.add({ outer: outerSchema });
+        outerSchema.add({ inner: innerSchema });
+        innerSchema.add({
+          flexible: [new Schema({ 'kind': String }, { discriminatorKey: 'kind' })]
+        });
+
+        const docArray = innerSchema.path('flexible');
+
+        const flexibleUserSchema = new Schema({ users: [{}] });
+
+        flexibleUserSchema.virtual('users_$', {
+          ref: 'gh6571_Users',
+          localField: 'users.id',
+          foreignField: 'id'
+        });
+
+        docArray.discriminator('6571_UserDisc', flexibleUserSchema);
+
+        const flexibleProductSchema = new Schema({ products: [{}] });
+
+        flexibleProductSchema.virtual('products_$', {
+          ref: 'gh6571_Products',
+          localField: 'products.id',
+          foreignField: 'id'
+        });
+
+        docArray.discriminator('6571_ProductDisc', flexibleProductSchema);
+
+        const FlexibleItem = db.model('gh6571_FlexibleItem', flexibleItemSchema);
+
+        // Generate items
+        yield User.create({ id: 111, name: 'John Doe' });
+        yield Product.create({ id: 222, name: 'Notebook' });
+        yield FlexibleItem.create({
+          outer: {
+            inner: {
+              flexible: [
+                { kind: '6571_UserDisc', users: [{ id: 111, refKey: 'Users' }] },
+                { kind: '6571_ProductDisc', products: [{ id: 222, refKey: 'Products' }] }
+              ]
+            }
+          }
+        });
+
+        const doc = yield FlexibleItem.findOne().
+          populate('outer.inner.flexible.users_$').
+          populate('outer.inner.flexible.products_$').
+          then(doc => doc.toObject({ virtuals: true }));
+        assert.equal(doc.outer.inner.flexible.length, 2);
+        assert.equal(doc.outer.inner.flexible[0].users_$.length, 1);
+        assert.equal(doc.outer.inner.flexible[0].users_$[0].name, 'John Doe');
+        assert.equal(doc.outer.inner.flexible[1].products_$.length, 1);
+        assert.equal(doc.outer.inner.flexible[1].products_$[0].name, 'Notebook');
+      }));
     });
+
     it('populates refPath from array element (gh-6509)', function() {
       const jobSchema = new Schema({
         kind: String,
@@ -6829,6 +6900,63 @@ describe('model: populate:', function() {
         assert.equal(isLean(user), false);
         assert.equal(isLean(user.roomId), true);
         assert.equal(isLean(user.roomId.officeId), false);
+      });
+    });
+    it('populates virtual of embedded discriminator with dynamic ref (gh-6554)', function() {
+      const userSchema = new Schema({
+        employeeId: Number,
+        name: String
+      });
+
+      const UserModel = db.model('gh6554_Users', userSchema, 'users');
+
+      const eventSchema = new Schema({
+        message: String
+      },{ discriminatorKey: 'kind' });
+
+      const batchSchema = new Schema({
+        events: [eventSchema]
+      });
+
+      const docArray = batchSchema.path('events');
+
+      const clickedSchema = new Schema({
+        element: { type: String },
+        users: [{}]
+      },
+      {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      });
+
+      clickedSchema.virtual('users_$', {
+        ref: function(doc) {
+          return doc.events[0].users[0].refKey;
+        },
+        localField: 'users.ID',
+        foreignField: 'employeeId'
+      });
+
+      docArray.discriminator('Clicked', clickedSchema);
+      const Batch = db.model('gh6554_EventBatch', batchSchema);
+
+      const user = { employeeId: 1, name: 'Test name' };
+      const batch = {
+        events: [
+          {
+            kind: 'Clicked',
+            element: '#hero',
+            message: 'hello',
+            users: [{ ID: 1, refKey: 'gh6554_Users' }]
+          }
+        ]
+      };
+
+      return co(function*() {
+        yield UserModel.create(user);
+        yield Batch.create(batch);
+        let doc = yield Batch.findOne({}).populate('events.users_$');
+        assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
       });
     });
   });

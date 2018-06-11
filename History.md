@@ -1,3 +1,17 @@
+5.1.5 / 2018-06-11
+==================
+ * docs(guide): rework query helper example #6575 [lineus](https://github.com/lineus)
+ * fix(populate): handle virtual populate with embedded discriminator under single nested subdoc #6571
+ * docs: add string option to projections that call query select #6563 [lineus](https://github.com/lineus)
+ * style: use ES6 in collection.js #6560 [l33ds](https://github.com/l33ds)
+ * fix(populate): add virtual ref function ability getModelsMapForPopulate #6559 #6554 [lineus](https://github.com/lineus)
+ * docs(queries): fix link #6557 [sun1x](https://github.com/sun1x)
+ * fix(schema): rename indexes -> getIndexes to avoid webpack duplicate declaration #6547
+ * fix(document): support `toString()` as custom method #6538
+ * docs: add @instance for instance methods to be more compliant with JSDoc #6516 [treble-snake](https://github.com/treble-snake)
+ * fix(populate): avoid converting to map when using mongoose-deep-populate #6460
+ * docs(browser): create new browser docs page #6061
+
 5.1.4 / 2018-06-04
 ==================
  * docs(faq): add hr tags for parallel save error #6550 [lineus](https://github.com/lineus)

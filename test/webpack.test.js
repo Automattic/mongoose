@@ -9,12 +9,13 @@ describe('webpack', function() {
   it('works for browser build', function(done) {
     // Below is the Webpack config Mongoose uses for testing
     // acquit:ignore:start
-    // Webpack doesn't work on Node.js 4.x or 5.x
-    if (!semver.satisfies(process.version, '>=6.0.0')) {
+    // Webpack doesn't work on Node.js 4.x or 5.x, and very slow on
+    // Travis with 6.x and 7.x.
+    if (!semver.satisfies(process.version, '>=8.0.0')) {
       this.skip();
     }
     const webpack = require('webpack');
-    this.timeout(30000);
+    this.timeout(45000);
     // acquit:ignore:end
     const config = {
       entry: ['./test/files/sample.js'],

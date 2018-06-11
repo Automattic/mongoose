@@ -32,7 +32,7 @@
     "sliced": "1.0.1"
   },
   "devDependencies": {
-    "acquit": "0.6.3",
+    "acquit": "1.0.0",
     "acquit-ignore": "0.0.3",
     "babel-loader": "7.1.4",
     "benchmark": "2.1.2",

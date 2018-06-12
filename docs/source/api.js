@@ -58,10 +58,19 @@ function parse() {
       const ctx = prop.ctx || {};
       for (const tag of prop.tags) {
         switch (tag.type) {
+          case 'receiver':
+            ctx.constructor = tag.string;
+            break;
           case 'property':
             ctx.type = 'property';
             ctx.name = tag.string;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+            break;
+          case 'static':
+            ctx.type = 'property';
+            ctx.static = true;
+            ctx.name = tag.string;
+            ctx.string = `${ctx.constructor}.${ctx.name}`;
             break;
           case 'return':
             ctx.return = tag;
@@ -78,7 +87,7 @@ function parse() {
             ctx[tag.type].push(tag);
             tag.description = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
-              ''; 
+              '';
             break;
           case 'method':
             ctx.type = 'method';

@@ -1491,25 +1491,41 @@ describe('model: querying:', function() {
         });
       });
 
-      it('works when text search is called by a schema (gh-3824)', function(done) {
+      it('works when text search is called by a schema (gh-3824) (gh-6851)', function() {
         if (!mongo26_or_greater) {
           return done();
         }
 
-        var exampleSchema = new Schema({
+        const exampleSchema = new Schema({
           title: String,
           name: { type: String, text: true },
-          large_text: String
+          tag: String
         });
 
-        var Example = db.model('gh3824', exampleSchema);
+        const Example = db.model('gh3824', exampleSchema);
 
-        Example.on('index', function(error) {
-          assert.ifError(error);
-          Example.findOne({ $text: { $search: 'text search' } }, function(error) {
-            assert.ifError(error);
-            done();
+        return co(function*() {
+          yield Example.init(); // Wait for index build
+          // Should not error
+          yield Example.findOne({ $text: { $search: 'text search' } });
+
+          yield Example.create({ name: '1234 ABCD', tag: 'test1' });
+          let doc = yield Example.findOne({
+            $text: {
+              $search: 1234 // Will be casted to a string
+            }
           });
+          assert.ok(doc);
+          assert.equal(doc.tag, 'test1');
+
+          doc = yield Example.findOne({
+            $text: {
+              $search: 'abcd',
+              $caseSensitive: 'no' // Casted to boolean
+            }
+          });
+          assert.ok(doc);
+          assert.equal(doc.tag, 'test1');
         });
       });
     });

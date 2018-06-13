@@ -6,6 +6,7 @@
 
 const Query = require('../lib/query');
 const assert = require('power-assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 
@@ -986,23 +987,31 @@ describe('model: querying:', function() {
       });
     });
 
-    it('where $exists', function(done) {
-      var ExistsSchema = new Schema({
-        a: Number,
-        b: String
-      });
+    it('where $exists', function() {
+      const ExistsSchema = new Schema({ a: Number, b: String });
       mongoose.model('Exists', ExistsSchema);
-      var Exists = db.model('Exists', 'exists_' + random());
-      Exists.create({a: 1}, function(err) {
-        assert.ifError(err);
-        Exists.create({b: 'hi'}, function(err) {
-          assert.ifError(err);
-          Exists.find({b: {$exists: true}}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
-            done();
-          });
-        });
+      const Exists = db.model('Exists');
+
+      return co(function*() {
+        yield Exists.create({ a: 1 }, { b: 'hi' });
+        let docs = yield Exists.find({ b: { $exists: true } });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].b, 'hi');
+
+        docs = yield Exists.find({ b: { $exists: 'true' } });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].b, 'hi');
+
+        let threw = false;
+        try {
+          yield Exists.find({ b: { $exists: 'foo' } });
+        } catch (error) {
+          threw = true;
+          assert.equal(error.path, 'b');
+          assert.equal(error.value, 'foo');
+          assert.equal(error.name, 'CastError');
+        }
+        assert.ok(threw);
       });
     });
 

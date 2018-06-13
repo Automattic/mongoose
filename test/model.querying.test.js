@@ -1493,7 +1493,7 @@ describe('model: querying:', function() {
 
       it('works when text search is called by a schema (gh-3824) (gh-6851)', function() {
         if (!mongo26_or_greater) {
-          return done();
+          return this.skip();
         }
 
         const exampleSchema = new Schema({

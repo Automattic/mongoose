@@ -36,7 +36,14 @@ Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundre
 
 ## Contributors
 
-View all 300+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
+Pull requests are always welcome! Please base pull requests against the `master`
+branch and follow the [contributing guide](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md).
+
+If your pull requests makes documentation changes, please do **not**
+modify any `.html` files. The `.html` files are compiled code, so please make
+your changes in `docs/*.jade`, `lib/*.js`, or `test/docs/*.js`.
+
+View all 300+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors).
 
 ## Installation
 
@@ -45,10 +52,6 @@ First install [node.js](http://nodejs.org/) and [mongodb](https://www.mongodb.or
 ```sh
 $ npm install mongoose
 ```
-
-## Stability
-
-The current stable branch is [master](https://github.com/Automattic/mongoose/tree/master). The [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x) branch contains legacy support for the 3.x release series, which is no longer under active development as of September 2015. The [3.8.x docs](http://mongoosejs.com/docs/3.8.x/) are still available.
 
 ## Overview
 

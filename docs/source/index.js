@@ -5,6 +5,7 @@ exports['docs/browser.jade'] = { guide: true, title: 'Browser Library', acquit: 
 exports['docs/index.jade'] = { title: 'Getting Started' };
 exports['docs/production.jade'] = require('./production');
 exports['docs/prior.jade'] = require('./prior');
+exports['docs/guides.jade'] = { guide: true, schema: true, title: 'Schemas' };
 exports['docs/guide.jade'] = { guide: true, schema: true, title: 'Schemas' };
 exports['docs/schematypes.jade'] = { guide: true, schema: true, title: 'SchemaTypes' };
 exports['docs/middleware.jade'] = { guide: true, title: 'Middleware' };

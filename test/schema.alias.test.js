@@ -106,4 +106,14 @@ describe('schema alias option', function() {
       });
     });
   });
+
+  it('with add() (gh-6593)', function() {
+    const s = new Schema({ name: { type: String, alias: 'test1' } });
+
+    assert.deepEqual(Object.keys(s.aliases), ['test1']);
+
+    s.add({ name2: { type: String, alias: 'test2' } });
+
+    assert.deepEqual(Object.keys(s.aliases), ['test1', 'test2']);
+  });
 });

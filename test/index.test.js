@@ -125,6 +125,25 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('objectIdGetter option (gh-6588)', function(done) {
+    const mongoose = new Mongoose();
+
+    let o = new mongoose.Types.ObjectId();
+    assert.strictEqual(o._id, o);
+
+    mongoose.set('objectIdGetter', false);
+
+    o = new mongoose.Types.ObjectId();
+    assert.strictEqual(o._id, void 0);
+
+    mongoose.set('objectIdGetter', true);
+
+    o = new mongoose.Types.ObjectId();
+    assert.strictEqual(o._id, o);
+
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });

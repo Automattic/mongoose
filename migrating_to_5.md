@@ -68,6 +68,34 @@ schema.path('name').
   get(() => console.log('This will print 2nd'));
 ```
 
+### Checking if a path is populated
+
+Mongoose 5.1.0 introduced an `_id` getter to ObjectIds that lets you get an ObjectId regardless of whether a path
+is populated.
+
+```javascript
+const blogPostSchema = new Schema({
+  title: String,
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Author'
+  }
+});
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+
+await BlogPost.create({ title: 'test', author: author._id });
+const blogPost = await BlogPost.findOne();
+
+console.log(blogPost.author); // '5b207f84e8061d1d2711b421'
+// New in Mongoose 5.1.0: this will print '5b207f84e8061d1d2711b421' as well
+console.log(blogPost.author._id);
+
+await blogPost.populate('author');
+console.log(blogPost.author._id); '5b207f84e8061d1d2711b421'
+```
+
+As a consequence, checking whether `blogPost.author._id` is [no longer viable as a way to check whether `author` is populated](https://github.com/Automattic/mongoose/issues/6415#issuecomment-388579185). Use `blogPost.populated('author') != null` or `blogPost.author instanceof mongoose.Types.ObjectId` to check whether `author` is populated instead.
+
 ### Return Values for `remove()` and `deleteX()`
 
 `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object

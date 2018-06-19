@@ -135,7 +135,7 @@ block content
       };
 
       var Animal = mongoose.model('Animal', animalSchema);
-      
+
       Animal.find().byName('fido').exec(function(err, animals) {
         console.log(animals);
       });

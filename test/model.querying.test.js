@@ -6,6 +6,7 @@
 
 const Query = require('../lib/query');
 const assert = require('power-assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 
@@ -986,23 +987,31 @@ describe('model: querying:', function() {
       });
     });
 
-    it('where $exists', function(done) {
-      var ExistsSchema = new Schema({
-        a: Number,
-        b: String
-      });
+    it('where $exists', function() {
+      const ExistsSchema = new Schema({ a: Number, b: String });
       mongoose.model('Exists', ExistsSchema);
-      var Exists = db.model('Exists', 'exists_' + random());
-      Exists.create({a: 1}, function(err) {
-        assert.ifError(err);
-        Exists.create({b: 'hi'}, function(err) {
-          assert.ifError(err);
-          Exists.find({b: {$exists: true}}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
-            done();
-          });
-        });
+      const Exists = db.model('Exists');
+
+      return co(function*() {
+        yield Exists.create({ a: 1 }, { b: 'hi' });
+        let docs = yield Exists.find({ b: { $exists: true } });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].b, 'hi');
+
+        docs = yield Exists.find({ b: { $exists: 'true' } });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0].b, 'hi');
+
+        let threw = false;
+        try {
+          yield Exists.find({ b: { $exists: 'foo' } });
+        } catch (error) {
+          threw = true;
+          assert.equal(error.path, 'b');
+          assert.equal(error.value, 'foo');
+          assert.equal(error.name, 'CastError');
+        }
+        assert.ok(threw);
       });
     });
 
@@ -1482,25 +1491,41 @@ describe('model: querying:', function() {
         });
       });
 
-      it('works when text search is called by a schema (gh-3824)', function(done) {
+      it('works when text search is called by a schema (gh-3824) (gh-6851)', function() {
         if (!mongo26_or_greater) {
-          return done();
+          return this.skip();
         }
 
-        var exampleSchema = new Schema({
+        const exampleSchema = new Schema({
           title: String,
           name: { type: String, text: true },
-          large_text: String
+          tag: String
         });
 
-        var Example = db.model('gh3824', exampleSchema);
+        const Example = db.model('gh3824', exampleSchema);
 
-        Example.on('index', function(error) {
-          assert.ifError(error);
-          Example.findOne({ $text: { $search: 'text search' } }, function(error) {
-            assert.ifError(error);
-            done();
+        return co(function*() {
+          yield Example.init(); // Wait for index build
+          // Should not error
+          yield Example.findOne({ $text: { $search: 'text search' } });
+
+          yield Example.create({ name: '1234 ABCD', tag: 'test1' });
+          let doc = yield Example.findOne({
+            $text: {
+              $search: 1234 // Will be casted to a string
+            }
           });
+          assert.ok(doc);
+          assert.equal(doc.tag, 'test1');
+
+          doc = yield Example.findOne({
+            $text: {
+              $search: 'abcd',
+              $caseSensitive: 'no' // Casted to boolean
+            }
+          });
+          assert.ok(doc);
+          assert.equal(doc.tag, 'test1');
         });
       });
     });

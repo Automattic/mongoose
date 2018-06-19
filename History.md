@@ -1,3 +1,16 @@
+5.1.6 / 2018-06-19
+==================
+ * fix: upgrade mongodb -> 3.0.10
+ * docs(model+document): clarify that `save()` returns `undefined` if passed a callback #6604 [lineus](https://github.com/lineus)
+ * fix(schema): apply alias when adding fields with .add() #6593
+ * docs: add full list of guides and streamline nav #6592
+ * docs(model): add `projection` option to `findOneAndUpdate()` #6590 [lineus](https://github.com/lineus)
+ * docs: support @static JSDoc declaration #6584
+ * fix(query): use boolean casting logic for $exists #6581
+ * fix(query): cast all $text options to correct values #6581
+ * fix(model): add support synchronous pre hooks for `createModel` #6552 [profbiss](https://github.com/profbiss)
+ * docs: add note about the `applyPluginsToDiscriminators` option #4965
+
 5.1.5 / 2018-06-11
 ==================
  * docs(guide): rework query helper example #6575 [lineus](https://github.com/lineus)

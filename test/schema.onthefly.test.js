@@ -84,7 +84,7 @@ describe('schema.onthefly', function() {
     });
   });
 
-  it('on the fly Embedded Array schemas should cast properly', function(done) {
+  it('on the fly Embedded Array schemas should cast properly YYY', function(done) {
     var Decorated = db.model('Decorated', collection);
 
     var post = new Decorated();

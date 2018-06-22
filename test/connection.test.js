@@ -338,9 +338,8 @@ describe('connections:', function() {
   });
 
   it('should accept mongodb://localhost/fake', function(done) {
-    const db = mongoose.createConnection('mongodb://localhost/fake');
-    db.on('error', function() {
-      db.close(done);
+    const db = mongoose.createConnection('mongodb://localhost/fake', () => {
+      db.close(done)
     });
     assert.ok(db instanceof mongoose.Connection);
     assert.equal(db.name, 'fake');
@@ -349,8 +348,7 @@ describe('connections:', function() {
   });
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
-    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
-    db.catch(() => {
+    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', () => {
       db.close(done);
     });
     assert.equal(db.pass, 'psw');

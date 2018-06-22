@@ -338,14 +338,14 @@ describe('connections:', function() {
   });
 
   it('should accept mongodb://localhost/fake', function(done) {
-    var db = mongoose.createConnection('mongodb://localhost/fake');
+    const db = mongoose.createConnection('mongodb://localhost/fake');
     db.on('error', function() {
+      db.close(done);
     });
     assert.ok(db instanceof mongoose.Connection);
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
     assert.equal(db.port, 27017);
-    db.close(done);
   });
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {

@@ -6996,8 +6996,8 @@ describe('model: populate:', function() {
 
       clickedSchema.virtual('users_$', {
         ref: function(doc) {
-          const refKeys = doc.events[0].users.map(user => user.refKey)
-          return refKeys
+          const refKeys = doc.events[0].users.map(user => user.refKey);
+          return refKeys;
         },
         localField: 'users.ID',
         foreignField: 'employeeId'

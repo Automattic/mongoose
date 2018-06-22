@@ -6959,5 +6959,77 @@ describe('model: populate:', function() {
         assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
       });
     });
+
+    it('populates virtual of embedded discriminator with dynamic ref when more than one model name is returned (gh-6612)', function() {
+      const userSchema = new Schema({
+        employeeId: Number,
+        name: String
+      });
+
+      const UserModel = db.model('gh6612_Users', userSchema);
+
+      const authorSchema = new Schema({
+        employeeId: Number,
+        name: String
+      });
+
+      const AuthorModel = db.model('gh6612_Author', authorSchema);
+
+      const eventSchema = new Schema({
+        message: String
+      },{ discriminatorKey: 'kind' });
+
+      const batchSchema = new Schema({
+        events: [eventSchema]
+      });
+
+      const docArray = batchSchema.path('events');
+
+      const clickedSchema = new Schema({
+        element: { type: String },
+        users: [{}]
+      },
+      {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      });
+
+      clickedSchema.virtual('users_$', {
+        ref: function(doc) {
+          const refKeys = doc.events[0].users.map(user => user.refKey)
+          return refKeys
+        },
+        localField: 'users.ID',
+        foreignField: 'employeeId'
+      });
+
+      docArray.discriminator('Clicked', clickedSchema);
+      const Batch = db.model('gh6612_EventBatch', batchSchema);
+
+      const user = { employeeId: 1, name: 'Test name' };
+      const author = { employeeId: 2, name: 'Author Name' };
+      const batch = {
+        events: [
+          {
+            kind: 'Clicked',
+            element: '#hero',
+            message: 'hello',
+            users: [
+              { ID: 1, refKey: 'gh6612_Users' },
+              { ID: 2, refKey: 'gh6612_Author' }
+            ]
+          }
+        ]
+      };
+
+      return co(function*() {
+        yield UserModel.create(user);
+        yield AuthorModel.create(author);
+        yield Batch.create(batch);
+        let doc = yield Batch.findOne({}).populate('events.users_$');
+        assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
+        assert.strictEqual(doc.events[0].users_$[1].name, 'Author Name');
+      });
+    });
   });
 });

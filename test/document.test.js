@@ -4609,6 +4609,33 @@ describe('document', function() {
       });
     });
 
+    it('push() onto a triple nested doc array (gh-6602) (gh-6398)', function() {
+      const schema = new mongoose.Schema({
+        array: [[[{key: String, value: Number}]]]
+      });
+
+      const Model = db.model('gh6602', schema);
+
+      return co(function*() {
+        yield Model.create({
+          array: [[[{ key: 'answer', value: 42 }]]]
+        });
+
+        let doc = yield Model.findOne();
+
+        assert.ok(doc);
+        doc.array[0][0].push({ key: 'lucky', value: 7 });
+
+        yield doc.save();
+
+        doc = yield Model.findOne();
+        assert.equal(doc.array.length, 1);
+        assert.equal(doc.array[0].length, 1);
+        assert.equal(doc.array[0][0].length, 2);
+        assert.equal(doc.array[0][0][1].key, 'lucky');
+      });
+    });
+
     it('null _id (gh-5236)', function(done) {
       var childSchema = new mongoose.Schema({});
 

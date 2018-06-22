@@ -350,14 +350,14 @@ describe('connections:', function() {
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
-    db.catch(() => {});
+    db.catch(() => {
+      db.close(done);
+    });
     assert.equal(db.pass, 'psw');
     assert.equal(db.user, 'aaron');
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
     assert.equal(db.port, 27000);
-    db.close();
-    done();
   });
 
   it('should accept unix domain sockets', function(done) {
@@ -623,11 +623,11 @@ describe('connections:', function() {
 
         var db = mongoose.createConnection();
         db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {server: {auto_reconnect: false}});
-        db.catch(() => {});
+        db.catch(() => {
+          db.close(done);
+        });
         assert.equal(db.user, 'aaron');
         assert.equal(db.pass, 'psw');
-        db.close();
-        done();
       });
     });
 

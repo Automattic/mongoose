@@ -407,7 +407,7 @@ describe('mongoose module:', function() {
 
     it('of result from .connect() (gh-3940)', function(done) {
       var m = new mongoose.Mongoose;
-      m.connect('mongodb://localhost:27017').then(function(m) {
+      m.connect('mongodb://localhost:27017/test').then(function(m) {
         test(m);
         m.disconnect();
         done();

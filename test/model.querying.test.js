@@ -2574,6 +2574,28 @@ describe('model: querying:', function() {
       done();
     });
 
+    it('test mongodb crash with invalid objectid string (gh-407)', function(done) {
+      const IndexedGuy = new mongoose.Schema({
+        name: {type: String}
+      });
+
+      const Guy = db.model('Guy', IndexedGuy);
+      Guy.find({
+        _id: {
+          $in: [
+            '4e0de2a6ee47bff98000e145',
+            '4e137bd81a6a8e00000007ac',
+            '',
+            '4e0e2ca0795666368603d974']
+        }
+      }, function(err) {
+        db.close(done);
+
+        assert.equal(err.message,
+          'Cast to ObjectId failed for value "" at path "_id" for model "Guy"');
+      });
+    });
+
     it('casts $elemMatch (gh-2199)', function(done) {
       var schema = new Schema({dates: [Date]});
       var Dates = db.model('Date', schema, 'dates');

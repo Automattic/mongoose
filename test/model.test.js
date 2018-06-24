@@ -5474,5 +5474,27 @@ describe('Model', function() {
       test.save().then(handler);
       test.save().catch(error);
     });
+    it('allows calling save in a post save hook (gh-6611)', function() {
+      let called = 0;
+      const noteSchema = new Schema({
+        body: String
+      });
+
+      noteSchema.post('save', function(note) {
+        if (!called) {
+          called++;
+          note.body = 'a note, part deux.';
+          return note.save();
+        }
+      });
+
+
+      const Note = db.model('gh6611', noteSchema);
+      return co(function*() {
+        yield Note.create({ body: 'a note.' });
+        let doc = yield Note.findOne({});
+        assert.strictEqual(doc.body, 'a note, part deux.');
+      });
+    });
   });
 });

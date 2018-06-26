@@ -499,7 +499,7 @@ describe('validation docs', function() {
    * you try to explicitly `$unset` the key.
    */
 
-  it('Update Validator Paths', function(done) {
+  it('Update Validators Only Run On Updated Paths', function(done) {
     // acquit:ignore:start
     var outstanding = 2;
     // acquit:ignore:end
@@ -542,12 +542,14 @@ describe('validation docs', function() {
    * - `$pullAll` (>= 4.12.0)
    *
    * For instance, the below update will succeed, regardless of the value of
-   * `number`, because update validators ignore `$inc`. Also, `$push`,
-   * `$addToSet`, `$pull`, and `$pullAll` validation does **not** run any
-   * validation on the array itself, only individual elements of the array.
+   * `number`, because update validators ignore `$inc`.
+   *
+   * Also, `$push`, `$addToSet`, `$pull`, and `$pullAll` validation does
+   * **not** run any validation on the array itself, only individual elements
+   * of the array.
    */
 
-  it('Update Validators Only Run On Specified Paths', function(done) {
+  it('Update Validators Only Run For Some Operations', function(done) {
     var testSchema = new Schema({
       number: { type: Number, max: 0 },
       arr: [{ message: { type: String, maxlength: 10 } }]

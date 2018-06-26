@@ -277,7 +277,8 @@ block content
     Middleware execution normally stops the first time a piece of middleware
     calls `next()` with an error. However, there is a special kind of post
     middleware called "error handling middleware" that executes specifically
-    when an error occurs.
+    when an error occurs. Error handling middleware is useful for reporting
+    errors and making error messages more readable.
 
     Error handling middleware is defined as middleware that takes one extra
     parameter: the 'error' that occurred as the first parameter to the function.
@@ -299,7 +300,7 @@ block content
       if (error.name === 'MongoError' && error.code === 11000) {
         next(new Error('There was a duplicate key error'));
       } else {
-        next(error);
+        next();
       }
     });
 
@@ -320,7 +321,7 @@ block content
       if (error.name === 'MongoError' && error.code === 11000) {
         next(new Error('There was a duplicate key error'));
       } else {
-        next(error);
+        next(); // The `update()` call will still error out.
       }
     });
 
@@ -331,6 +332,10 @@ block content
       });
     });
     ```
+
+    Error handling middleware can transform an error, but it can't remove the
+    error. Even if you call `next()` with no error as shown above, the
+    function call will still error out.
 
     <h3 id="next">Next Up</h3>
 

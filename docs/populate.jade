@@ -396,8 +396,7 @@ block content
     });
     ```
 
-    Keep in mind that virtuals are _not_ included in `toJSON()` output by
-    default. If you want populate virtuals to show up when using functions
+    Keep in mind that virtuals are _not_ included in `toJSON()` output by default. If you want populate virtuals to show up when using functions
     that rely on `JSON.stringify()`, like Express'
     [`res.json()` function](http://expressjs.com/en/4x/api.html#res.json),
     set the `virtuals: true` option on your schema's `toJSON` options.
@@ -429,17 +428,17 @@ block content
     ```
 
     <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>
-    
+
     You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
     always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
-    
+
     ```javascript
     // Always attach `populate()` to `find()` calls
     MySchema.pre('find', function() {
       this.populate('user');
     });
     ```
-    
+
     ```javascript
     // Always `populate()` after `find()` calls. Useful if you want to selectively populate
     // based on the docs found.
@@ -451,7 +450,7 @@ block content
       }
     });
     ```
-    
+
     ```javascript
     // `populate()` after saving. Useful for sending populated data back to the client in an
     // update API endpoint

@@ -2426,7 +2426,7 @@ describe('Query', function() {
 
         const Model = db.model('gh6625', schema);
 
-        let doc = yield Model.create({ n: 42 });
+        yield Model.create({ n: 42 });
 
         let res = yield Model.find().explain('queryPlanner');
         assert.ok(res[0].queryPlanner);

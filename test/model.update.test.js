@@ -1132,6 +1132,25 @@ describe('model: update:', function() {
       });
     });
 
+    it('global validators option (gh-6578)', function() {
+      const s = new Schema({
+        steak: { type: String, required: true }
+      });
+      const m = new mongoose.Mongoose();
+      const Breakfast = m.model('gh6578', s);
+
+      const updateOptions = { runValidators: true };
+      return co(function*() {
+        const error = yield Breakfast.
+          update({}, { $unset: { steak: 1 } }, updateOptions).
+          catch(err => err);
+
+        assert.ok(!!error);
+        assert.equal(Object.keys(error.errors).length, 1);
+        assert.ok(Object.keys(error.errors).includes('steak'));
+      });
+    });
+
     it('min/max, enum, and regex built-in validators work', function(done) {
       var s = new Schema({
         steak: {type: String, enum: ['ribeye', 'sirloin']},

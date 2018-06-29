@@ -12,8 +12,8 @@ describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection,
-          uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection;
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -26,8 +26,8 @@ describe('mongoose module:', function() {
 
     it('with options', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection,
-          uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection;
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
 
@@ -40,8 +40,8 @@ describe('mongoose module:', function() {
 
     it('with promise (gh-3790)', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection,
-          uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection;
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri).then(function() {
         db.close(done);
@@ -192,11 +192,11 @@ describe('mongoose module:', function() {
   describe('disconnection of all connections', function() {
     describe('no callback', function() {
       it('works', function(done) {
-        var mong = new Mongoose(),
-            uri = 'mongodb://localhost/mongoose_test',
-            connections = 0,
-            disconnections = 0,
-            pending = 4;
+        var mong = new Mongoose();
+        var uri = 'mongodb://localhost:27017/mongoose_test';
+        var connections = 0;
+        var disconnections = 0;
+        var pending = 4;
 
         mong.connect(process.env.MONGOOSE_TEST_URI || uri);
         var db = mong.connection;

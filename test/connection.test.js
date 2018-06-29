@@ -53,7 +53,6 @@ describe('connections:', function() {
 
       promise.then(function(conn) {
         assert.strictEqual(conn.config.autoIndex, false);
-        assert.deepEqual(_.omit(conn._connectionOptions, 'promiseLibrary'), {});
         done();
       }).catch(done);
     });
@@ -339,7 +338,7 @@ describe('connections:', function() {
 
   it('should accept mongodb://localhost/fake', function(done) {
     const db = mongoose.createConnection('mongodb://localhost/fake', () => {
-      db.close(done)
+      db.close(done);
     });
     assert.ok(db instanceof mongoose.Connection);
     assert.equal(db.name, 'fake');
@@ -781,7 +780,7 @@ describe('connections:', function() {
 
   describe('connection pool sharing: ', function() {
     it('works', function(done) {
-      var db = mongoose.createConnection('mongodb://localhost/mongoose1');
+      var db = mongoose.createConnection('mongodb://localhost:27017/mongoose1');
 
       var db2 = db.useDb('mongoose2');
 

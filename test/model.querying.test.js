@@ -2589,10 +2589,9 @@ describe('model: querying:', function() {
             '4e0e2ca0795666368603d974']
         }
       }, function(err) {
-        db.close(done);
-
         assert.equal(err.message,
           'Cast to ObjectId failed for value "" at path "_id" for model "Guy"');
+        done();
       });
     });
 

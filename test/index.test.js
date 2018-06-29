@@ -235,8 +235,8 @@ describe('mongoose module:', function() {
     });
 
     it('with callback', function(done) {
-      var mong = new Mongoose(),
-          uri = 'mongodb://localhost/mongoose_test';
+      var mong = new Mongoose();
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -249,7 +249,7 @@ describe('mongoose module:', function() {
 
     it('with promise (gh-3790)', function(done) {
       var mong = new Mongoose();
-      var uri = 'mongodb://localhost/mongoose_test';
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -351,8 +351,8 @@ describe('mongoose module:', function() {
 
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
-      var mong = new Mongoose(),
-          uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+      var mong = new Mongoose();
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(uri, {}, function(err) {
         assert.ifError(err);
@@ -362,8 +362,8 @@ describe('mongoose module:', function() {
     });
 
     it('with replica set', function(done) {
-      var mong = new Mongoose(),
-          uri = process.env.MONGOOSE_SET_TEST_URI;
+      var mong = new Mongoose();
+      var uri = process.env.MONGOOSE_SET_TEST_URI;
 
       if (!uri) return done();
 

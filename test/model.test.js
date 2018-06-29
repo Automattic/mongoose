@@ -3729,6 +3729,38 @@ describe('Model', function() {
         done();
       });
     });
+
+    it('no TypeError when attempting to save more than once after using atomics', function(done) {
+      const M = db.model('M', new Schema({
+        test: {type: 'string', unique: true},
+        elements: [{
+          el: {type: 'string', required: true}
+        }]
+      }));
+      const a = new M({
+        test: 'a',
+        elements: [{el: 'b'}]
+      });
+      const b = new M({
+        test: 'b',
+        elements: [{el: 'c'}]
+      });
+      a.save(function() {
+        b.save(function() {
+          b.elements.push({el: 'd'});
+          b.test = 'a';
+          b.save(function(error,res) {
+            assert.strictEqual(error.message,'E11000 duplicate key error collection: mongoose_test.ms index: test_1 dup key: { : "a" }');
+            assert.strictEqual(res,undefined);
+            b.save(function(error,res) {
+              assert.strictEqual(error.message,'E11000 duplicate key error collection: mongoose_test.ms index: test_1 dup key: { : "a" }');
+              assert.strictEqual(res,undefined);
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 
 

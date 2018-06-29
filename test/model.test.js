@@ -3750,10 +3750,10 @@ describe('Model', function() {
           b.elements.push({el: 'd'});
           b.test = 'a';
           b.save(function(error,res) {
-            assert.strictEqual(error.message,'E11000 duplicate key error collection: mongoose_test.ms index: test_1 dup key: { : "a" }');
+            assert.strictEqual(!error,false);
             assert.strictEqual(res,undefined);
             b.save(function(error,res) {
-              assert.strictEqual(error.message,'E11000 duplicate key error collection: mongoose_test.ms index: test_1 dup key: { : "a" }');
+              assert.strictEqual(!error,false);
               assert.strictEqual(res,undefined);
               done();
             });

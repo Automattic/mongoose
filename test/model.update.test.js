@@ -1147,7 +1147,7 @@ describe('model: update:', function() {
 
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 1);
-        assert.ok(Object.keys(error.errors).includes('steak'));
+        assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
       });
     });
 

@@ -1,5 +1,5 @@
 var assert = require('power-assert');
-var updateValidators = require('../lib/services/updateValidators');
+var updateValidators = require('../lib/helpers/updateValidators');
 var emitter = require('events').EventEmitter;
 
 describe('updateValidators', function() {

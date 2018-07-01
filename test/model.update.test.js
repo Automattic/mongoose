@@ -1475,6 +1475,38 @@ describe('model: update:', function() {
     });
   });
 
+  describe('set() (gh-5770)', function() {
+    it('works with middleware and doesn\'t change the op', function() {
+      const schema = new Schema({ name: String, updatedAt: Date });
+      const date = new Date();
+      schema.pre('updateOne', function() {
+        this.set('updatedAt', date);
+      });
+      const M = db.model('gh5770_0', schema);
+
+      return M.updateOne({}, { name: 'Test' }, { upsert: true }).
+        then(() => M.findOne()).
+        then(doc => {
+          assert.equal(doc.updatedAt.valueOf(), date.valueOf());
+        });
+    });
+
+    it('object syntax for path parameter', function() {
+      const schema = new Schema({ name: String, updatedAt: Date });
+      const date = new Date();
+      schema.pre('updateOne', function() {
+        this.set({ updatedAt: date });
+      });
+      const M = db.model('gh5770_1', schema);
+
+      return M.updateOne({}, { name: 'Test' }, { upsert: true }).
+        then(() => M.findOne()).
+        then(doc => {
+          assert.equal(doc.updatedAt.valueOf(), date.valueOf());
+        });
+    });
+  });
+
   it('does not add virtuals to update (gh-2046)', function(done) {
     var childSchema = new Schema({foo: String}, {toObject: {getters: true}});
     var parentSchema = new Schema({children: [childSchema]});

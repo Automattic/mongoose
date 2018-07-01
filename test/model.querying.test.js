@@ -1998,8 +1998,8 @@ describe('model: querying:', function() {
   });
 
   it('with previously existing null values in the db', function(done) {
-    var BlogPostB = db.model('BlogPostB', collection),
-        post = new BlogPostB();
+    var BlogPostB = db.model('BlogPostB', collection);
+    var post = new BlogPostB();
 
     post.collection.insert({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
       assert.ifError(err);

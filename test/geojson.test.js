@@ -49,7 +49,7 @@ describe('geojson', function() {
         [-109, 37],
         [-109, 41]
       ]]
-    }
+    };
     const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
     return City.create({ name: 'Denver', location: denver }).
       then(() => City.findOne({
@@ -59,6 +59,30 @@ describe('geojson', function() {
           }
         }
       })).
+      then(doc => assert.equal(doc.name, 'Denver'));
+  });
+
+  it('within helper', function() {
+    const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
+    // acquit:ignore:start
+    const City = db.model('City', new Schema({
+      name: String,
+      location: pointSchema
+    }));
+
+    const colorado = {
+      type: 'Polygon',
+      coordinates: [[
+        [-109, 41],
+        [-102, 41],
+        [-102, 37],
+        [-109, 37],
+        [-109, 41]
+      ]]
+    };
+    // acquit:ignore:end
+    return City.create({ name: 'Denver', location: denver }).
+      then(() => City.findOne().where('location').within(colorado)).
       then(doc => assert.equal(doc.name, 'Denver'));
   });
 });

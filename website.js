@@ -21,7 +21,10 @@ markdown.setOptions({
 
 jade.filters.markdown = markdown;
 
-const tests = acquit.parse(fs.readFileSync('./test/webpack.test.js').toString());
+const tests = [
+  ...acquit.parse(fs.readFileSync('./test/webpack.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString())
+];
 
 function getVersion() {
   return require('./package.json').version;

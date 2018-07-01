@@ -3232,6 +3232,43 @@ describe('document', function() {
 
         done();
       });
+
+      it('includeChildren option with arrays (gh-5904)', function(done) {
+        const teamSchema = new mongoose.Schema({
+          name: String,
+          colors: {
+            primary: {
+              type: String,
+              enum: ['blue', 'green', 'red', 'purple', 'yellow', 'white', 'black']
+            }
+          },
+          members: [{
+            name: String,
+          }]
+        });
+
+        const Team = db.model('gh5904', teamSchema);
+
+        const jedis = new Team({
+          name: 'Jedis',
+          colors: {
+            primary: 'blue'
+          },
+          members: [{ name: 'luke' }]
+        });
+
+        const paths = jedis.modifiedPaths({ includeChildren: true });
+        assert.deepEqual(paths, [
+          'name',
+          'colors',
+          'colors.primary',
+          'members',
+          'members.0',
+          'members.0.name'
+        ]);
+
+        done();
+      });
     });
 
     it('single nested isNew (gh-4369)', function(done) {

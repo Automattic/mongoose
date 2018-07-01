@@ -1,3 +1,12 @@
+5.1.7 / 2018-06-26
+==================
+ * docs: add npm badge to readme #6623 [VFedyk](https://github.com/VFedyk)
+ * fix(document): don't throw parallel save error if post save hooks in parallel #6614 #6611 [lineus](https://github.com/lineus)
+ * fix(populate): allow dynamic ref to handle >1 model getModelsMapForPopulate #6613 #6612 [jimmytsao](https://github.com/jimmytsao)
+ * fix(document): handle `push()` on triple nested document array #6602
+ * docs(validation): improve update validator doc headers #6577 [joeytwiddle](https://github.com/joeytwiddle)
+ * fix(document): handle document arrays in `modifiedPaths()` with includeChildren option #5904
+
 5.1.6 / 2018-06-19
 ==================
  * fix: upgrade mongodb -> 3.0.10

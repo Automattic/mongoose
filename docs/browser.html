@@ -1,93 +1,71 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Using Mongoose Schema Validation in the Browser v4.13.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2><p>Mongoose in the browser</p>
-</h2><p>As of v3.9.3, Mongoose schema declarations are isomorphic, that is,
-you can use mongoose&#39;s browser component to validate objects against
-your mongoose schemas in the browser.</p>
-<p>To include mongoose in your browser code, you can use
-<code>require(&#39;mongoose&#39;)</code> if you are using <a href="https://www.npmjs.com/package/browserify">Browserify</a>
-or you can include mongoose in a <code>script</code> tag. The below example
-utilizes mongoose&#39;s Amazon <a href="http://aws.amazon.com/cloudfront/">CloudFront</a>
-CDN.</p>
-<p>If you are using webpack to bundle your client-side code, you need to add the following plugin to webpack&#39;s <code>plugins</code> array
-so that webpack does not attempt to resolve mongoose&#39;s server-side dependencies:</p>
-<p>new webpack.DefinePlugin({
-&#39;typeof window&#39;: &#39;\&quot;object\&quot;&#39;
-})</p>
-<pre><code>&lt;script type=&quot;text/javascript&quot; src=&quot;//d1l4stvdmqmdzl.cloudfront.net/4.0.2/mongoose.js&quot;&gt;
-&lt;/script&gt;
-</code></pre><h3><p>Declaring schemas in the browser</p>
-</h3><p>When you include the <code>mongoose.js</code> file in a script tag, mongoose will
-attach a <code>mongoose</code> object to the global <code>window</code>. This object includes
-a Schema constructor that you can use to define schemas much like
-in NodeJS.</p>
-<p>Note: Mongoose&#39;s browser component requires an ECMAScript 5 compliant
-browser. In particular, it will <em>not</em> work in Internet Explorer 8
-or Safari 5.</p>
-<h4><p>allows you to use mongoose types</p>
-</h4><pre><code class="javascript">
-      var foodSchema = new mongoose.Schema({name: String});
-      var breakfastSchema = new mongoose.Schema({
-        foods: [foodSchema],
-        date: {type: Date, default: Date.now}
-      });
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.1.8-pre: Browser Library</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><script type="text/javascript" src="/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.1.8-pre</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.14</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guides.html" class="pure-menu-link">Guides</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/schematypes.html" class="pure-menu-link">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/subdocs.html" class="pure-menu-link">Subdocuments</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#mongoose_Mongoose" class="pure-menu-link">Mongoose</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schema" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Connection" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Document" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Model" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Query" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Aggregate" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Schematype" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api.html#Virtualtype" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="carbon-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></li></ul></div></div><div class="container"><div id="content"><h1>Mongoose in the Browser</h1>
 
-      assert.ok(foodSchema.path('name') instanceof mongoose.Schema.Types.String);
-      assert.ok(breakfastSchema.path('foods') instanceof mongoose.Schema.Types.DocumentArray);
-      assert.ok(breakfastSchema.path('date') instanceof mongoose.Schema.Types.Date);
-    </code></pre><h3><p>Validating documents in the browser</p>
-</h3><p>The primary goal of mongoose&#39;s browser component is to validate documents
-against a given schema. Because the mongoose browser component doesn&#39;t
-currently support any sort of querying, you&#39;re responsible for creating
-your own documents.</p>
-<h4><p>allows you to create a schema and use it to validate documents</p>
-</h4><pre><code class="javascript">
-      var schema = new mongoose.Schema({
-        name: {type: String, required: true},
-        quest: {type: String, match: /Holy Grail/i, required: true},
-        favoriteColor: {type: String, enum: ['Red', 'Blue'], required: true}
-      });
+<p>Mongoose supports creating schemas and validating documents in the browser.
+Mongoose&#39;s browser library does <strong>not</strong> support saving documents, <a href="http://mongoosejs.com/docs/queries.html">queries</a>,
+<a href="http://mongoosejs.com/docs/populate.html">populate</a>,
+<a href="http://mongoosejs.com/docs/discriminators.html">discriminators</a>,
+or any other Mongoose feature other than schemas and validating documents.</p>
+<p>Use the below syntax to access the Mongoose browser library.</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// Using `require()`</span>
+<span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose/browser'</span>);
 
-      /* `mongoose.Document` is different in the browser than in NodeJS.
-       * the constructor takes an initial state and a schema. You can
-       * then modify the document and call `validate()` to make sure it
-       * passes validation rules. */
-      var doc = new mongoose.Document({}, schema);
-      doc.validate(function(error) {
-        assert.ok(error);
-        assert.equal('Path `name` is required.', error.errors['name'].message);
-        assert.equal('Path `quest` is required.', error.errors['quest'].message);
-        assert.equal('Path `favoriteColor` is required.',
-          error.errors['favoriteColor'].message);
+<span class="hljs-comment">// Using ES6 imports</span>
+<span class="hljs-keyword">import</span> mongoose <span class="hljs-keyword">from</span> <span class="hljs-string">'mongoose/browser'</span>;
+</code></pre>
+<h2 id="usage">Using the Browser Library</h2>
 
-        doc.name = 'Sir Lancelot of Camelot';
-        doc.quest = 'To seek the holy grail';
-        doc.favoriteColor = 'Blue';
-        doc.validate(function(error) {
-          assert.ifError(error);
+<p>Mongoose&#39;s browser library is very limited. The only use case it supports
+is validating documents as shown below.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> mongoose <span class="hljs-keyword">from</span> <span class="hljs-string">'mongoose/browser'</span>;
 
-          doc.name = 'Sir Galahad of Camelot';
-          doc.quest = 'I seek the grail'; // Invalid, must contain 'holy grail'
-          doc.favoriteColor = 'Yellow'; // Invalid, not 'Red' or 'Blue'
-          doc.validate(function(error) {
-            assert.ok(error);
-            assert.ok(!error.errors['name']);
-            assert.equal('Path `quest` is invalid (I seek the grail).',
-              error.errors['quest'].message);
-            assert.equal('`Yellow` is not a valid enum value for path `favoriteColor`.',
-              error.errors['favoriteColor'].message);
-            done();
-          });
-        });
-      });
-    </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
-  var cx = '012173159455227967368:uvscsuqjovs';
-  var gcse = document.createElement('script');
-  gcse.type = 'text/javascript';
-  gcse.async = true;
-  gcse.src = (document.location.protocol === 'https:' ? 'https:' : 'http:') +
-      '//www.google.com/cse/cse.js?cx=' + cx;
-  var s = document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(gcse, s);
-})();</script><script type="text/javascript">!function(name,path,ctx){
+<span class="hljs-comment">// Mongoose's browser library does **not** have models. It only supports</span>
+<span class="hljs-comment">// schemas and documents. The primary use case is validating documents</span>
+<span class="hljs-comment">// against Mongoose schemas.</span>
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> mongoose.Document({}, <span class="hljs-keyword">new</span> mongoose.Schema({
+  name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> }
+}));
+<span class="hljs-comment">// Prints an error because `name` is required.</span>
+<span class="hljs-built_in">console</span>.log(doc.validateSync());
+</code></pre>
+<h2 id="webpack">Building With Webpack</h2>
+
+<p>Mongoose uses <a href="https://www.ecma-international.org/ecma-262/6.0/">ES2015 (also known as ES6)</a>
+syntax, so in order to use Mongoose with older browsers you&#39;ll need to use
+a tool like <a href="https://www.npmjs.com/package/babel-cli">Babel</a>. As of version
+5.x, Mongoose no longer has an officially supported pre-built browser bundle,
+you need to compile the browser library yourself.</p>
+<p>To build Mongoose&#39;s browser library using Webpack, you&#39;ll need to use
+<a href="https://www.npmjs.com/package/babel-loader"><code>babel-loader</code></a>. Because of
+how Webpack loads <code>require()</code> statements, it pulls in a lot of built-in
+Node.js modules. In order to avoid this, you need to use the
+<a href="https://webpack.js.org/configuration/node/"><code>node</code> Webpack config option</a>
+as shown below.</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// Below is the Webpack config Mongoose uses for testing</span>
+<span class="hljs-keyword">const</span> config = {
+  entry: [<span class="hljs-string">'./test/files/sample.js'</span>],
+  <span class="hljs-built_in">module</span>: {
+    rules: [
+      {
+        test: <span class="hljs-regexp">/\.js$/</span>,
+        exclude: <span class="hljs-regexp">/node_modules/i</span>,
+        loader: <span class="hljs-string">'babel-loader'</span>
+      }
+    ]
+  },
+  node: {
+    <span class="hljs-comment">// Replace these Node.js native modules with empty objects, Mongoose's</span>
+    <span class="hljs-comment">// browser library does not use them.</span>
+    <span class="hljs-comment">// See https://webpack.js.org/configuration/node/</span>
+    dns: <span class="hljs-string">'empty'</span>,
+    fs: <span class="hljs-string">'empty'</span>,
+    <span class="hljs-string">'module'</span>: <span class="hljs-string">'empty'</span>,
+    net: <span class="hljs-string">'empty'</span>,
+    tls: <span class="hljs-string">'empty'</span>
+  },
+  target: <span class="hljs-string">'web'</span>
+};
+</code></pre>
+</div></div><script type="text/javascript">!function(name,path,ctx){
   var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
 }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.1.3.min.js',this);
 
@@ -97,10 +75,94 @@ KeenAsync.ready(function(){
     projectId: '59aad9cbc9e77c0001ce1b32',
     writeKey: '4B38B0046086885E425D368BFAEAD8FD0D4F2DC2FA2F936FDE058D79508AEFAD9886BC020B96520823BB9C8241D9D9BCFDC0EF52E6033BD89D06E4B24FC13AE955896BF443406269A84DD009CEB5862DCEC944874DB2107FD648DA91ADC1E6DE'
   });
-  
+
   client.recordEvent('pageView', {
     host: window.location.host,
     pathname: window.location.pathname,
     hash: window.location.hash
   });
-});</script></body></html>
+});</script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div><script>_native.init("CK7DT53U", {
+  targetClass: 'native-js',
+  display: 'flex',
+  visibleClass: 'native-show'
+});
+</script><div class="native-js"><div class="native-sponsor">Sponsored by #native_company# — Learn More</div>
+<a href="#native_link#" class="native-flex">
+  <style>
+  .native-js {
+    background: linear-gradient(-30deg, #native_bg_color#E5, #native_bg_color#E5 45%, #native_bg_color# 45%) #fff;
+  }
+
+  .native-details,
+  .native-sponsor,
+  .native-bsa {
+    color: #native_color# !important;
+  }
+
+  .native-details:hover {
+    color: #native_color_hover# !important;
+  }
+
+  .native-cta {
+    color: #native_cta_color#;
+    background-color: #native_cta_bg_color#;
+  }
+
+  .native-cta:hover {
+    color: #native_cta_color_hover;
+    background-color: #native_cta_bg_color_hover#;
+  }
+  </style>
+  <div class="native-main">
+    <img class="native-img" src="#native_logo#">
+    <div class="native-details">
+      <span class="native-company">#native_title#</span>
+      <span class="native-desc">#native_desc#</span>
+    </div>
+  </div>
+  <span class="native-cta">#native_cta#</span>
+</a></div></body></html>

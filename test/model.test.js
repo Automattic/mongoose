@@ -5436,6 +5436,22 @@ describe('Model', function() {
       });
     });
 
+    it('listIndexes() (gh-6281)', function() {
+      return co(function*() {
+        const M = db.model('gh6281', new Schema({
+          name: { type: String, index: true }
+        }));
+
+        yield M.init();
+
+        let indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { name: 1 }
+        ]);
+      });
+    });
+
     it('Throws when saving same doc in parallel w/ promises (gh-6456)', function(done) {
       let called = 0;
 

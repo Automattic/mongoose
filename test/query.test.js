@@ -1129,7 +1129,7 @@ describe('Query', function() {
         assert.ifError(error);
         M.deleteOne({ name: /Stark/ }, function(error) {
           assert.ifError(error);
-          M.count({}, function(error, count) {
+          M.countDocuments({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 1);
             done();
@@ -1250,7 +1250,7 @@ describe('Query', function() {
         Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 1);
-          Test.count({}, function(error, count) {
+          Test.countDocuments({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 1);
             done();
@@ -1669,6 +1669,12 @@ describe('Query', function() {
           assert.ifError(error);
           done();
         });
+      });
+
+      it('ignores sort when passed to countDocuments', function() {
+        var Product = db.model('Product', 'Product_setOptions_test');
+        return Product.create({}).
+          then(() => Product.find().sort({_id: 1}).countDocuments({}).exec());
       });
 
       it('ignores count when passed to sort', function(done) {
@@ -2698,7 +2704,7 @@ describe('Query', function() {
         Object.assign(query, { price: priceQuery });
 
         yield Model.create(tests);
-        var count = yield Model.count(query);
+        var count = yield Model.countDocuments(query);
         assert.strictEqual(count, 9);
       });
     });

@@ -2,15 +2,16 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
 
 describe('model', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -374,6 +375,37 @@ describe('model', function() {
           done();
         });
       });
+    });
+  });
+
+  describe('discriminators with unique', function() {
+    it('converts to partial unique index (gh-6347)', function() {
+      const baseOptions = { discriminatorKey: 'kind' };
+
+      const baseSchema = new Schema({}, baseOptions);
+
+      const Base = db.model('gh6347_Base', baseSchema);
+
+      const userSchema = new Schema({
+        emailId: { type: String, unique: true }, // Should become a partial
+        firstName: { type: String }
+      });
+
+      const User = Base.discriminator('gh6347_User', userSchema);
+
+      const deviceSchema = new Schema({
+        _id: { type: Schema.ObjectId, auto: true },
+        emailId: { type: String, unique: true }, // Should become a partial
+        model: { type: String }
+      });
+
+      const Device = Base.discriminator('gh6347_Device', deviceSchema);
+
+      return Promise.all([
+        Base.create({}),
+        User.create({ emailId: 'val@karpov.io', firstName: 'Val' }),
+        Device.create({ name: 'Samsung', model: 'Galaxy' })
+      ]);
     });
   });
 });

@@ -2420,6 +2420,25 @@ describe('Query', function() {
       });
     });
 
+    it('explain() (gh-6625)', function() {
+      return co(function*() {
+        const schema = new mongoose.Schema({ n: Number });
+
+        const Model = db.model('gh6625', schema);
+
+        yield Model.create({ n: 42 });
+
+        let res = yield Model.find().explain('queryPlanner');
+        assert.ok(res[0].queryPlanner);
+
+        res = yield Model.find().explain();
+        assert.ok(res[0].queryPlanner);
+
+        res = yield Model.find().explain().explain(false);
+        assert.equal(res[0].n, 42);
+      });
+    });
+
     it('cast embedded discriminators with dot notation (gh-6027)', function() {
       return co(function*() {
         const ownerSchema = new Schema({

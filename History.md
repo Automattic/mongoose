@@ -1,3 +1,11 @@
+5.1.8 / 2018-07-02
+==================
+ * fix: don't throw TypeError if calling save() after original save() failed with push() #6638 [evanhenke](https://github.com/evanhenke)
+ * fix(query): add explain() helper and don't hydrate explain output #6625
+ * docs(query): fix `setOptions()` lists #6624
+ * docs: add geojson docs #6607
+ * fix: bump mongodb -> 3.0.11 to avoid cyclic dependency error with retryWrites #6109
+
 5.1.7 / 2018-06-26
 ==================
  * docs: add npm badge to readme #6623 [VFedyk](https://github.com/VFedyk)

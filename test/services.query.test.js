@@ -54,5 +54,26 @@ describe('Query helpers', function() {
 
       done();
     });
+
+    it('ignores populated paths not inclusively selected (gh-6546)', function(done) {
+      var schema = new Schema({
+        one: String,
+        two: String
+      });
+
+      var q = new Query({});
+      q.schema = schema;
+
+      assert.strictEqual(q._fields, void 0);
+
+      q.select('one');
+      q.populate('two');
+      assert.deepEqual(q._fields, { one: 1 });
+
+      selectPopulatedFields(q);
+
+      assert.deepEqual(q._fields, { one: 1 });
+      done();
+    });
   });
 });

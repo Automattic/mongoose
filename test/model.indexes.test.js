@@ -139,7 +139,7 @@ describe('model', function() {
 
     it('of multiple embedded documents with same schema', function(done) {
       var BlogPosts = new Schema({
-        _id: {type: ObjectId, index: true},
+        _id: {type: ObjectId, unique: true},
         title: {type: String, index: true},
         desc: String
       });

@@ -835,17 +835,6 @@ describe('schema', function() {
 
         done();
       });
-      it('errors if unique index on _id', function(done) {
-        try {
-          var schema = new Schema({ _id: { type: mongoose.Schema.Types.ObjectId, unique: true } });
-
-          schema.path('_id').index({ unique: true });
-          done(new Error('Should not have reached this point!'));
-        } catch (error) {
-          assert.equal(error.message, 'Cannot put unique index on _id');
-          done();
-        }
-      });
 
       it('with single nested doc (gh-6113)', function(done) {
         var pointSchema = new Schema({

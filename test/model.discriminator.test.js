@@ -989,6 +989,52 @@ describe('model', function() {
         }).
         catch(done);
     });
+
+    it('Embedded discriminators in nested doc arrays (gh-6202)', function() {
+      const eventSchema = new Schema({ message: String }, {
+        discriminatorKey: 'kind',
+        _id: false
+      });
+
+      const batchSchema = new Schema({ events: [[eventSchema]] });
+      const docArray = batchSchema.path('events');
+
+      const clickedSchema = new Schema({
+        element: {type: String, required: true}
+      }, { _id: false });
+      const Clicked = docArray.discriminator('Clicked', clickedSchema);
+
+      const M = db.model('gh6202', batchSchema);
+
+      return M.create({ events: [[{ kind: 'Clicked', element: 'foo' }]] }).
+        then(() => M.findOne()).
+        then(doc => {
+          assert.deepEqual(doc.toObject().events[0][0], {
+            kind: 'Clicked',
+            element: 'foo'
+          });
+        });
+    });
+
+    it('throws an error if calling discriminator on non-doc array (gh-6202)', function() {
+      const batchSchema = new Schema({ events: [[Number]] });
+      const arr = batchSchema.path('events');
+
+      const clickedSchema = new Schema({
+        element: {type: String, required: true}
+      }, { _id: false });
+
+      let threw = false;
+      try {
+        arr.discriminator('Clicked', clickedSchema);
+      } catch (error) {
+        threw = true;
+        assert.ok(error.message.indexOf('embedded discriminator') !== -1,
+          error.message);
+      }
+      assert.ok(threw);
+    });
+
     describe('embedded discriminators + hooks (gh-5706)', function(){
       var counters = {
         eventPreSave: 0,
@@ -1073,8 +1119,8 @@ describe('model', function() {
             assert.equal(counters[i], 1);
           });
           done();
-        })
-      })
+        });
+      });
 
       it('should call the hooks on the embedded document in an embedded array defined by both the parent and discriminated schemas', function(done){
         var trackSchema = new Schema({

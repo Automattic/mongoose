@@ -6,7 +6,6 @@
 
 const Promise = require('bluebird');
 const Q = require('q');
-const _ = require('lodash');
 const assert = require('power-assert');
 const co = require('co');
 const server = require('./common').server;
@@ -53,7 +52,6 @@ describe('connections:', function() {
 
       promise.then(function(conn) {
         assert.strictEqual(conn.config.autoIndex, false);
-        assert.deepEqual(_.omit(conn._connectionOptions, 'promiseLibrary'), {});
         done();
       }).catch(done);
     });
@@ -338,26 +336,24 @@ describe('connections:', function() {
   });
 
   it('should accept mongodb://localhost/fake', function(done) {
-    var db = mongoose.createConnection('mongodb://localhost/fake');
-    db.on('error', function() {
+    const db = mongoose.createConnection('mongodb://localhost/fake', () => {
+      db.close(done);
     });
     assert.ok(db instanceof mongoose.Connection);
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
     assert.equal(db.port, 27017);
-    db.close(done);
   });
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
-    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
-    db.catch(() => {});
+    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', () => {
+      db.close(done);
+    });
     assert.equal(db.pass, 'psw');
     assert.equal(db.user, 'aaron');
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
     assert.equal(db.port, 27000);
-    db.close();
-    done();
   });
 
   it('should accept unix domain sockets', function(done) {
@@ -435,7 +431,7 @@ describe('connections:', function() {
       assert.ok(!db.options);
     });
     it('should use admin db if not specified and user/pass specified', function(done) {
-      var db = mongoose.createConnection('mongodb://u:p@localhost', function() {
+      var db = mongoose.createConnection('mongodb://u:p@localhost/admin', function() {
         done();
       });
       assert.equal(typeof db.options, 'object');
@@ -623,11 +619,11 @@ describe('connections:', function() {
 
         var db = mongoose.createConnection();
         db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {server: {auto_reconnect: false}});
-        db.catch(() => {});
+        db.catch(() => {
+          db.close(done);
+        });
         assert.equal(db.user, 'aaron');
         assert.equal(db.pass, 'psw');
-        db.close();
-        done();
       });
     });
 
@@ -639,7 +635,7 @@ describe('connections:', function() {
       db.catch(() => {});
       assert.equal(typeof db.options, 'object');
       assert.equal(db.name, 'fake');
-      assert.equal(db.host, '/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock');
+      assert.equal(db.host, '/tmp/mongodb-27018.sock');
       assert.equal(db.pass, 'psw');
       assert.equal(db.user, 'aaron');
       db.close();
@@ -783,7 +779,7 @@ describe('connections:', function() {
 
   describe('connection pool sharing: ', function() {
     it('works', function(done) {
-      var db = mongoose.createConnection('mongodb://localhost/mongoose1');
+      var db = mongoose.createConnection('mongodb://localhost:27017/mongoose1');
 
       var db2 = db.useDb('mongoose2');
 
@@ -1040,16 +1036,30 @@ describe('connections:', function() {
         });
       });
       describe('when only username is defined', function() {
+        let listeners;
+
+        beforeEach(function() {
+          listeners = process.listeners('uncaughtException');
+          process.removeAllListeners('uncaughtException');
+        });
+
+        afterEach(function() {
+          process.on('uncaughtException', listeners[0]);
+        });
+
         it('should return true', function(done) {
-          var db = mongoose.createConnection('mongodb://localhost:27017/fake', {
+          var db = mongoose.createConnection();
+          db.openUri('mongodb://localhost:27017/fake', {
             user: 'user'
           });
-          db.catch(() => {});
+          process.once('uncaughtException', err => {
+            err.uncaught = false;
+            assert.ok(err.message.includes('password must be a string'));
+            done();
+          });
 
           assert.equal(db.shouldAuthenticate(), true);
-
-          db.close();
-          done();
+          db.close(done);
         });
       });
       describe('when both username and password are defined', function() {

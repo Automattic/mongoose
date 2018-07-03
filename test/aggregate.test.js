@@ -805,10 +805,7 @@ describe('aggregate: ', function() {
             if (error) {
               return done(error);
             }
-            assert.deepEqual(docs[0].departments, [
-              { _id: 'r&d', count: 2 },
-              { _id: 'sales', count: 2 }
-            ]);
+            assert.deepEqual(docs[0].departments.map(d => d.count), [2, 2]);
 
             assert.deepEqual(docs[0].employeesPerCustomer, [
               { _id: 'Eve', count: 1 },

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
@@ -13,10 +15,9 @@ const DocumentObjectId = mongoose.Types.ObjectId;
  * Setup
  */
 
-var schema = new Schema({
+const schema = new Schema({
   title: { type: String, required: true }
 });
-
 
 describe('model', function() {
   describe('create()', function() {
@@ -62,6 +63,15 @@ describe('model', function() {
       B.create([], function(err, a) {
         assert.ifError(err);
         assert.ok(!a);
+        done();
+      });
+    });
+
+    it('supports passing options', function(done) {
+      B.create([{}], { validateBeforeSave: false }, function(error, docs) {
+        assert.ifError(error);
+        assert.ok(Array.isArray(docs));
+        assert.equal(docs.length, 1);
         done();
       });
     });

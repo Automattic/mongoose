@@ -1998,8 +1998,8 @@ describe('model: querying:', function() {
   });
 
   it('with previously existing null values in the db', function(done) {
-    var BlogPostB = db.model('BlogPostB', collection),
-        post = new BlogPostB();
+    var BlogPostB = db.model('BlogPostB', collection);
+    var post = new BlogPostB();
 
     post.collection.insert({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
       assert.ifError(err);
@@ -2572,6 +2572,27 @@ describe('model: querying:', function() {
       assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num, 'number');
       assert.equal(typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num'], 'number');
       done();
+    });
+
+    it('test mongodb crash with invalid objectid string (gh-407)', function(done) {
+      const IndexedGuy = new mongoose.Schema({
+        name: {type: String}
+      });
+
+      const Guy = db.model('Guy', IndexedGuy);
+      Guy.find({
+        _id: {
+          $in: [
+            '4e0de2a6ee47bff98000e145',
+            '4e137bd81a6a8e00000007ac',
+            '',
+            '4e0e2ca0795666368603d974']
+        }
+      }, function(err) {
+        assert.equal(err.message,
+          'Cast to ObjectId failed for value "" at path "_id" for model "Guy"');
+        done();
+      });
     });
 
     it('casts $elemMatch (gh-2199)', function(done) {

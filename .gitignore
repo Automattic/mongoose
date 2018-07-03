@@ -29,7 +29,7 @@ tools/31*
 *.njsproj
 *.sln
 
-# Visual STudio Code
+# Visual Studio Code
 .vscode
 
 *.key
@@ -38,3 +38,5 @@ docs/*.html
 
 # Webpack output
 dist
+
+package-lock.json

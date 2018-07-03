@@ -2,7 +2,7 @@
 
 const Schema = require('../../lib/schema');
 const assert = require('assert');
-const getVirtual = require('../../lib/services/populate/getVirtual');
+const getVirtual = require('../../lib/helpers/populate/getVirtual');
 
 describe('getVirtual', function() {
   it('handles embedded discriminators (gh-6411)', function(done) {

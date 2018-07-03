@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const modifiedPaths = require('../../lib/services/update/modifiedPaths');
+const modifiedPaths = require('../../lib/helpers/update/modifiedPaths');
 
 describe('modifiedPaths', function() {
   it('works without any update operators', function(done) {

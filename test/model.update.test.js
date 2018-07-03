@@ -1132,6 +1132,25 @@ describe('model: update:', function() {
       });
     });
 
+    it('global validators option (gh-6578)', function() {
+      const s = new Schema({
+        steak: { type: String, required: true }
+      });
+      const m = new mongoose.Mongoose();
+      const Breakfast = m.model('gh6578', s);
+
+      const updateOptions = { runValidators: true };
+      return co(function*() {
+        const error = yield Breakfast.
+          update({}, { $unset: { steak: 1 } }, updateOptions).
+          catch(err => err);
+
+        assert.ok(!!error);
+        assert.equal(Object.keys(error.errors).length, 1);
+        assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+      });
+    });
+
     it('min/max, enum, and regex built-in validators work', function(done) {
       var s = new Schema({
         steak: {type: String, enum: ['ribeye', 'sirloin']},
@@ -1453,6 +1472,38 @@ describe('model: update:', function() {
       D.update({}, {d: undefined}, function() {
         done();
       });
+    });
+  });
+
+  describe('set() (gh-5770)', function() {
+    it('works with middleware and doesn\'t change the op', function() {
+      const schema = new Schema({ name: String, updatedAt: Date });
+      const date = new Date();
+      schema.pre('updateOne', function() {
+        this.set('updatedAt', date);
+      });
+      const M = db.model('gh5770_0', schema);
+
+      return M.updateOne({}, { name: 'Test' }, { upsert: true }).
+        then(() => M.findOne()).
+        then(doc => {
+          assert.equal(doc.updatedAt.valueOf(), date.valueOf());
+        });
+    });
+
+    it('object syntax for path parameter', function() {
+      const schema = new Schema({ name: String, updatedAt: Date });
+      const date = new Date();
+      schema.pre('updateOne', function() {
+        this.set({ updatedAt: date });
+      });
+      const M = db.model('gh5770_1', schema);
+
+      return M.updateOne({}, { name: 'Test' }, { upsert: true }).
+        then(() => M.findOne()).
+        then(doc => {
+          assert.equal(doc.updatedAt.valueOf(), date.valueOf());
+        });
     });
   });
 

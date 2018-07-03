@@ -835,17 +835,6 @@ describe('schema', function() {
 
         done();
       });
-      it('errors if unique index on _id', function(done) {
-        try {
-          var schema = new Schema({ _id: { type: mongoose.Schema.Types.ObjectId, unique: true } });
-
-          schema.path('_id').index({ unique: true });
-          done(new Error('Should not have reached this point!'));
-        } catch (error) {
-          assert.equal(error.message, 'Cannot put unique index on _id');
-          done();
-        }
-      });
 
       it('with single nested doc (gh-6113)', function(done) {
         var pointSchema = new Schema({
@@ -962,9 +951,9 @@ describe('schema', function() {
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'primary');
 
-      Tobi = new Schema({}, { read: ['p', tags] });
+      Tobi = new Schema({}, { read: ['s', tags] });
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal(Tobi.options.read.mode, 'primary');
+      assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);
@@ -973,9 +962,9 @@ describe('schema', function() {
       assert.ok(Tobi.options.read instanceof ReadPref);
       assert.equal(Tobi.options.read.mode, 'primary');
 
-      Tobi = new Schema({}, { read: ['primary', tags] });
+      Tobi = new Schema({}, { read: ['secondary', tags] });
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal(Tobi.options.read.mode, 'primary');
+      assert.equal(Tobi.options.read.mode, 'secondary');
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(Tobi.options.read.tags.length, 1);
       assert.equal(Tobi.options.read.tags[0].x, 1);

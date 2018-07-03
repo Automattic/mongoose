@@ -3,7 +3,7 @@
 var Query = require('../lib/query');
 var Schema = require('../lib/schema');
 var assert = require('assert');
-var selectPopulatedFields = require('../lib/services/query/selectPopulatedFields');
+var selectPopulatedFields = require('../lib/helpers/query/selectPopulatedFields');
 
 describe('Query helpers', function() {
   describe('selectPopulatedFields', function() {

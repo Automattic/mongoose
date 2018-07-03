@@ -1,3 +1,17 @@
+5.2.0 / 2018-07-02
+==================
+ * feat(model): add `countDocuments()` #6643
+ * feat(model): make ensureIndexes() fail if specifying an index on _id #6605
+ * feat(mongoose): add `objectIdGetter` option to remove ObjectId.prototype._id #6588
+ * feat: upgrade mongodb -> 3.1.0 for full MongoDB 4.0 support #6579
+ * feat(query): support `runValidators` as a global option #6578
+ * perf(schema): use WeakMap instead of array for schema stack #6503
+ * feat(model): decorate unique discriminator indexes with partialFilterExpressions #6347
+ * feat(model): add `syncIndexes()`, drops indexes that aren't in schema #6281
+ * feat(document): add default getter/setter if virtual doesn't have one #6262
+ * feat(discriminator): support discriminators on nested doc arrays #6202
+ * feat(update): add `Query.prototype.set()` #5770
+
 5.1.8 / 2018-07-02
 ==================
  * fix: don't throw TypeError if calling save() after original save() failed with push() #6638 [evanhenke](https://github.com/evanhenke)

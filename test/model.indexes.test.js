@@ -1,16 +1,19 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
 
 describe('model', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -136,7 +139,7 @@ describe('model', function() {
 
     it('of multiple embedded documents with same schema', function(done) {
       var BlogPosts = new Schema({
-        _id: {type: ObjectId, index: true},
+        _id: {type: ObjectId, unique: true},
         title: {type: String, index: true},
         desc: String
       });
@@ -374,6 +377,57 @@ describe('model', function() {
           done();
         });
       });
+    });
+  });
+
+  describe('discriminators with unique', function() {
+    it('converts to partial unique index (gh-6347)', function() {
+      const baseOptions = { discriminatorKey: 'kind' };
+      const baseSchema = new Schema({}, baseOptions);
+
+      const Base = db.model('gh6347_Base', baseSchema);
+
+      const userSchema = new Schema({
+        emailId: { type: String, unique: true }, // Should become a partial
+        firstName: { type: String }
+      });
+
+      const User = Base.discriminator('gh6347_User', userSchema);
+
+      const deviceSchema = new Schema({
+        _id: { type: Schema.ObjectId, auto: true },
+        name: { type: String, unique: true }, // Should become a partial
+        model: { type: String }
+      });
+
+      const Device = Base.discriminator('gh6347_Device', deviceSchema);
+
+      return Promise.all([
+        Base.init(),
+        User.init(),
+        Device.init(),
+        Base.create({}),
+        User.create({ emailId: 'val@karpov.io', firstName: 'Val' }),
+        Device.create({ name: 'Samsung', model: 'Galaxy' })
+      ]);
+    });
+
+    it('decorated discriminator index with syncIndexes (gh-6347)', function() {
+      const baseOptions = { discriminatorKey: 'kind' };
+      const baseSchema = new Schema({}, baseOptions);
+
+      const Base = db.model('gh6347_Base_0', baseSchema);
+
+      const userSchema = new Schema({
+        emailId: { type: String, unique: true }, // Should become a partial
+        firstName: { type: String }
+      });
+
+      const User = Base.discriminator('gh6347_User_0', userSchema);
+
+      return User.init().
+        then(() => User.syncIndexes()).
+        then(dropped => assert.equal(dropped.length, 0));
     });
   });
 });

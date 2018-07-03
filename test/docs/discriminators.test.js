@@ -353,9 +353,6 @@ describe('discriminator docs', function () {
       catch(done);
   });
 
-  /**
-   * Recursive embedded discriminators
-   */
   it('Recursive embedded discriminators in arrays', function(done) {
     var singleEventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });

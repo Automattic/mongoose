@@ -3319,6 +3319,16 @@ describe('Model', function() {
       });
     });
 
+    it('countDocuments()', function() {
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
+
+      return BlogPost.create({ title: 'foo' }).
+        then(() => BlogPost.count({ title: 'foo' }).exec()).
+        then(count => {
+          assert.equal(count, 1);
+        });
+    });
+
     it('update()', function(done) {
       var col = 'BlogPost' + random();
       var BlogPost = db.model(col, bpSchema);
@@ -5465,6 +5475,76 @@ describe('Model', function() {
         let regex = new RegExp(test.id);
         assert.ok(regex.test(err.message));
         counter();
+      });
+    });
+
+    it('listIndexes() (gh-6281)', function() {
+      return co(function*() {
+        const M = db.model('gh6281', new Schema({
+          name: { type: String, index: true }
+        }), 'gh6281_0');
+
+        yield M.init();
+
+        let indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { name: 1 }
+        ]);
+      });
+    });
+
+    it('syncIndexes() (gh-6281)', function() {
+      return co(function*() {
+        let M = db.model('gh6281', new Schema({
+          name: { type: String, index: true }
+        }, { autoIndex: false }), 'gh6281');
+
+        yield M.db.createCollection('gh6281');
+
+        let indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [{ _id: 1 }]);
+
+        let dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, []);
+
+        indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { name: 1 }
+        ]);
+
+        // New model, same collection, index on different property
+        M = db.model('gh6281_0', new Schema({
+          otherName: { type: String, index: true }
+        }, { autoIndex: false }), 'gh6281');
+
+        dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, ['name_1']);
+
+        indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { otherName: 1 }
+        ]);
+
+        // New model, same collection, different options
+        M = db.model('gh6281_1', new Schema({
+          otherName: { type: String, unique: true }
+        }, { autoIndex: false }), 'gh6281');
+
+        dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, ['otherName_1']);
+
+        indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { otherName: 1 }
+        ]);
+
+        // Re-run syncIndexes(), shouldn't change anything
+        dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, []);
       });
     });
 

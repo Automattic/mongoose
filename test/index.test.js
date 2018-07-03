@@ -12,8 +12,8 @@ describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection,
-          uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection;
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -26,8 +26,8 @@ describe('mongoose module:', function() {
 
     it('with options', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection,
-          uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection;
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
 
@@ -40,8 +40,8 @@ describe('mongoose module:', function() {
 
     it('with promise (gh-3790)', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection,
-          uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection;
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri).then(function() {
         db.close(done);
@@ -125,6 +125,25 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('objectIdGetter option (gh-6588)', function(done) {
+    const mongoose = new Mongoose();
+
+    let o = new mongoose.Types.ObjectId();
+    assert.strictEqual(o._id, o);
+
+    mongoose.set('objectIdGetter', false);
+
+    o = new mongoose.Types.ObjectId();
+    assert.strictEqual(o._id, void 0);
+
+    mongoose.set('objectIdGetter', true);
+
+    o = new mongoose.Types.ObjectId();
+    assert.strictEqual(o._id, o);
+
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });
@@ -173,11 +192,11 @@ describe('mongoose module:', function() {
   describe('disconnection of all connections', function() {
     describe('no callback', function() {
       it('works', function(done) {
-        var mong = new Mongoose(),
-            uri = 'mongodb://localhost/mongoose_test',
-            connections = 0,
-            disconnections = 0,
-            pending = 4;
+        var mong = new Mongoose();
+        var uri = 'mongodb://localhost:27017/mongoose_test';
+        var connections = 0;
+        var disconnections = 0;
+        var pending = 4;
 
         mong.connect(process.env.MONGOOSE_TEST_URI || uri);
         var db = mong.connection;
@@ -216,8 +235,8 @@ describe('mongoose module:', function() {
     });
 
     it('with callback', function(done) {
-      var mong = new Mongoose(),
-          uri = 'mongodb://localhost/mongoose_test';
+      var mong = new Mongoose();
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -230,7 +249,7 @@ describe('mongoose module:', function() {
 
     it('with promise (gh-3790)', function(done) {
       var mong = new Mongoose();
-      var uri = 'mongodb://localhost/mongoose_test';
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -332,8 +351,8 @@ describe('mongoose module:', function() {
 
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
-      var mong = new Mongoose(),
-          uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+      var mong = new Mongoose();
+      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(uri, {}, function(err) {
         assert.ifError(err);
@@ -343,8 +362,8 @@ describe('mongoose module:', function() {
     });
 
     it('with replica set', function(done) {
-      var mong = new Mongoose(),
-          uri = process.env.MONGOOSE_SET_TEST_URI;
+      var mong = new Mongoose();
+      var uri = process.env.MONGOOSE_SET_TEST_URI;
 
       if (!uri) return done();
 
@@ -388,7 +407,7 @@ describe('mongoose module:', function() {
 
     it('of result from .connect() (gh-3940)', function(done) {
       var m = new mongoose.Mongoose;
-      m.connect('mongodb://localhost:27017').then(function(m) {
+      m.connect('mongodb://localhost:27017/test').then(function(m) {
         test(m);
         m.disconnect();
         done();

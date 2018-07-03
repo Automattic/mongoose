@@ -2,7 +2,7 @@
 
 var Schema = require('../../lib/schema');
 var assert = require('assert');
-var getSchemaTypes = require('../../lib/services/populate/getSchemaTypes');
+var getSchemaTypes = require('../../lib/helpers/populate/getSchemaTypes');
 
 describe('getSchemaTypes', function() {
   it('handles embedded discriminators (gh-5970)', function(done) {

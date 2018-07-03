@@ -5309,6 +5309,23 @@ describe('document', function() {
       done();
     });
 
+    it('add default getter/setter (gh-6262)', function(done) {
+      const testSchema = new mongoose.Schema({});
+
+      testSchema.virtual('totalValue');
+
+      const Test = db.model('gh6262', testSchema);
+
+      assert.equal(Test.schema.virtuals.totalValue.getters.length, 1);
+      assert.equal(Test.schema.virtuals.totalValue.setters.length, 1);
+
+      const doc = new Test();
+      doc.totalValue = 5;
+      assert.equal(doc.totalValue, 5);
+
+      done();
+    });
+
     it('nested virtuals + nested toJSON (gh-6294)', function(done) {
       const schema = mongoose.Schema({
         nested: {

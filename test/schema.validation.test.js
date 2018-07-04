@@ -710,6 +710,7 @@ describe('schema', function() {
           const m = new M({x: 'a'});
           m.validate(function(err) {
             assert.equal(err.errors.x.toString(), 'Error code 25');
+            assert.equal(err.errors.x.properties.message, 'Error code 25');
             assert.equal(err.errors.x.properties.errorCode, 25);
             done();
           });
@@ -754,6 +755,7 @@ describe('schema', function() {
 
           m.validate(function(err) {
             assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
+            assert.equal(err.errors.x.properties.message, 'x failed validation (3,4,5,6)');
             assert.equal(err.errors.x.kind, 'customType');
             done();
           });

@@ -2765,7 +2765,7 @@ describe('model: update:', function() {
       }, { strict: true });
 
       var Model = db.model('gh5453', schema);
-      var q = { $isolated: true };
+      var q = { notInSchema: true };
       var u = { $set: { smth: 1 } };
       var o = { strict: false, upsert: true };
       Model.update(q, u, o).then(function() {

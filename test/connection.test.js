@@ -21,7 +21,7 @@ const Schema = mongoose.Schema;
 describe('connections:', function() {
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
-      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
+      var conn = mongoose.createConnection('mongodb://localhost/mongoosetest');
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       var Test = conn.model('Test', new Schema({ name: String }));

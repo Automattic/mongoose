@@ -1,3 +1,8 @@
+5.2.1 / 2018-07-03
+==================
+ * fix(connection): allow setting the mongodb driver's useNewUrlParser option, default to false #6656 #6648 #6647
+ * fix(model): only warn on custom _id index if index only has _id key #6650
+
 5.2.0 / 2018-07-02
 ==================
  * feat(model): add `countDocuments()` #6643

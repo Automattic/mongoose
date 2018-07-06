@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "acquit": "1.0.0",
-    "acquit-ignore": "0.0.3",
+    "acquit-ignore": "0.1.0",
     "acquit-require": "0.1.1",
     "babel-loader": "7.1.4",
     "benchmark": "2.1.2",

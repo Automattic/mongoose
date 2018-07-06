@@ -19,7 +19,6 @@ describe('setDefaultsOnInsert', function() {
     const opts = { upsert: true, setDefaultsOnInsert: true };
     let update = { $setOnInsert: { 'nested1.nested2': { name: 'foo' } } };
     update = setDefaultsOnInsert({}, schema, update, opts);
-    console.log(update)
     assert.deepEqual(_.omit(update.$setOnInsert, ['_id']),
       { 'nested1.nested2': { name: 'foo' } });
 

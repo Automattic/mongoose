@@ -4707,6 +4707,70 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('with function for refPath (gh-6669)', function() {
+        const connectionSchema = new Schema({
+          destination: String
+        });
+
+        const Conn = db.model('gh-6669_C', connectionSchema);
+
+        const userSchema = new Schema({
+          name: String
+        });
+
+        const User = db.model('gh-6669_U', userSchema);
+
+        const agentSchema = new Schema({
+          vendor: String
+        });
+
+        const Agent = db.model('gh-6669_A', agentSchema);
+
+        const subSchema = new Schema({
+          kind: {
+            type: String
+          },
+          item: {
+            type: Schema.Types.ObjectId,
+            refPath: function(doc, path) {
+              return path.replace(/\.item$/, '.kind');
+            }
+          }
+        });
+
+        const recordSchema = new Schema({
+          name: String,
+          connections: [subSchema],
+          users: [subSchema],
+          agents: [subSchema]
+        });
+
+        const Record = db.model('gh-6669_R', recordSchema);
+
+        const connection = new Conn({ destination: '192.168.1.15' });
+        const user = new User({ name: 'Kev' });
+        const agent = new Agent({ vendor: 'chrome' });
+        const record = new Record({
+          connections: [{ kind: 'gh-6669_C', item: connection._id }],
+          users: [{ kind: 'gh-6669_U', item: user._id }],
+          agents: [{ kind: 'gh-6669_A', item: agent._id }]
+        });
+
+        return co(function*() {
+          yield connection.save();
+          yield user.save();
+          yield agent.save();
+          yield record.save();
+          let doc = yield Record.findOne({})
+            .populate('connections.item')
+            .populate('users.item')
+            .populate('agents.item');
+          assert.strictEqual(doc.connections[0].item.destination, '192.168.1.15');
+          assert.strictEqual(doc.users[0].item.name, 'Kev');
+          assert.strictEqual(doc.agents[0].item.vendor, 'chrome');
+        });
+      });
+
       it('with no results (gh-4284)', function(done) {
         var PersonSchema = new Schema({
           name: String,

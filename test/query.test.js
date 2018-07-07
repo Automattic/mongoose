@@ -1144,7 +1144,7 @@ describe('Query', function() {
         assert.ifError(error);
         M.deleteMany({ name: /Stark/ }, function(error) {
           assert.ifError(error);
-          M.count({}, function(error, count) {
+          M.countDocuments({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
             done();
@@ -1216,7 +1216,7 @@ describe('Query', function() {
         Test.remove({ name: /Stark/ }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 2);
-          Test.count({}, function(error, count) {
+          Test.countDocuments({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
             done();
@@ -1233,7 +1233,7 @@ describe('Query', function() {
         Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 2);
-          Test.count({}, function(error, count) {
+          Test.countDocuments({}, function(error, count) {
             assert.ifError(error);
             assert.equal(count, 0);
             done();

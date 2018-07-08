@@ -1,3 +1,17 @@
+5.2.2 / 2018-07-08
+==================
+ * fix(model+query): add missing estimatedDocumentCount() function #6697
+ * docs(faq): improve array-defaults section #6695 [lineus](https://github.com/lineus)
+ * docs(model): fix countDocuments() docs, bad copy/paste from count() docs #6694 #6643
+ * fix(connection): add `startSession()` helper to connection and mongoose global #6689
+ * fix: upgrade mongodb driver -> 3.1.1 for countDocuments() fix #6688 #6666
+ * docs(compatibility): add MongoDB 4 range #6685
+ * fix(populate): add ability to define refPath as a function #6683 [lineus](https://github.com/lineus)
+ * docs: add rudimentary transactions guide #6672
+ * fix(update): make setDefaultsOnInsert handle nested subdoc updates with deeply nested defaults #6665
+ * docs: use latest acquit-ignore to handle examples that start with acquit:ignore:start #6657
+ * fix(validation): format `properties.message` as well as `message` #6621
+
 5.2.1 / 2018-07-03
 ==================
  * fix(connection): allow setting the mongodb driver's useNewUrlParser option, default to false #6656 #6648 #6647

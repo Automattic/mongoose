@@ -214,6 +214,58 @@ describe('query middleware', function() {
     });
   });
 
+  it('has hooks for countDocuments()', function(done) {
+    var preCount = 0;
+    var postCount = 0;
+
+    schema.pre('countDocuments', function() {
+      ++preCount;
+    });
+
+    schema.post('countDocuments', function() {
+      ++postCount;
+    });
+
+    initializeData(function(error) {
+      assert.ifError(error);
+      Author.
+        find({ title: 'Professional AngularJS' }).
+        countDocuments(function(error, count) {
+          assert.ifError(error);
+          assert.equal(1, count);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+  });
+
+  it('has hooks for estimatedDocumentCount()', function(done) {
+    var preCount = 0;
+    var postCount = 0;
+
+    schema.pre('estimatedDocumentCount', function() {
+      ++preCount;
+    });
+
+    schema.post('estimatedDocumentCount', function() {
+      ++postCount;
+    });
+
+    initializeData(function(error) {
+      assert.ifError(error);
+      Author.
+        find({ title: 'Professional AngularJS' }).
+        estimatedDocumentCount(function(error, count) {
+          assert.ifError(error);
+          assert.equal(1, count);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+  });
+
   it('updateOne() (gh-3997)', function(done) {
     var preCount = 0;
     var postCount = 0;

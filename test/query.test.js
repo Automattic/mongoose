@@ -1129,7 +1129,7 @@ describe('Query', function() {
         assert.ifError(error);
         M.deleteOne({ name: /Stark/ }, function(error) {
           assert.ifError(error);
-          M.countDocuments({}, function(error, count) {
+          M.estimatedDocumentCount(function(error, count) {
             assert.ifError(error);
             assert.equal(count, 1);
             done();

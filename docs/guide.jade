@@ -319,6 +319,8 @@ block content
     - [_id](#_id)
     - [minimize](#minimize)
     - [read](#read)
+    - [writeConcern](#writeConcern)
+    - [safe](#safe)
     - [shardKey](#shardKey)
     - [strict](#strict)
     - [strictQuery](#strictQuery)
@@ -511,6 +513,27 @@ block content
     var schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
     mongoose.model('JellyBean', schema);
     ```
+
+    <h3 id="writeConcern"><a href="#writeConcern">option: writeConcern</a></h3>
+
+    Allows setting [write concern](https://docs.mongodb.com/manual/reference/write-concern/)
+    at the schema level.
+
+    ```javascript
+    const schema = new Schema({ name: String }, {
+      writeConcern: {
+        w: 'majority',
+        j: true,
+        wtimeout: 1000
+      }
+    });
+    ```
+
+    <h3 id="safe"><a href="#safe">option: safe</a></h3>
+
+    `safe` is a legacy option that is similar to `writeConcern`. In particular,
+    `safe: false` is a shorthand for unacknowledged writes `writeConcern: { w: 0 }`.
+    Use the `writeConcern` option instead.
 
     <h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 

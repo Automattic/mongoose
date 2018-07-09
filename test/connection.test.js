@@ -751,6 +751,24 @@ describe('connections:', function() {
     });
   });
 
+  it('startSession() (gh-6653)', function() {
+    const conn = mongoose.createConnection('mongodb://localhost:27017/test');
+
+    let lastUse;
+    let session;
+    return conn.startSession().
+      then(_session => {
+        session = _session;
+        assert.ok(session);
+        lastUse = session.serverSession.lastUse;
+        return conn.model('Test', new Schema({})).findOne({}, null, { session });
+      }).
+      then(() => {
+        assert.ok(session.serverSession.lastUse > lastUse);
+        conn.close();
+      });
+  });
+
   describe('modelNames()', function() {
     it('returns names of all models registered on it', function(done) {
       var m = new mongoose.Mongoose;

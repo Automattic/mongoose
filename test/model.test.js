@@ -3329,6 +3329,16 @@ describe('Model', function() {
         });
     });
 
+    it('estimatedDocumentCount()', function() {
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
+
+      return BlogPost.create({ title: 'foo' }).
+        then(() => BlogPost.count({ title: 'foo' }).exec()).
+        then(count => {
+          assert.equal(count, 1);
+        });
+    });
+
     it('update()', function(done) {
       var col = 'BlogPost' + random();
       var BlogPost = db.model(col, bpSchema);

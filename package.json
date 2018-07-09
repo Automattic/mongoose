@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -23,7 +23,7 @@
     "bson": "~1.0.5",
     "kareem": "2.2.1",
     "lodash.get": "4.4.2",
-    "mongodb": "3.1.0",
+    "mongodb": "3.1.1",
     "mongodb-core": "3.1.0",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.4.1",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "acquit": "1.0.0",
-    "acquit-ignore": "0.0.3",
+    "acquit-ignore": "0.1.0",
     "acquit-require": "0.1.1",
     "babel-loader": "7.1.4",
     "benchmark": "2.1.2",

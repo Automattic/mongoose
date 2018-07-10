@@ -1325,6 +1325,19 @@ describe('Query', function() {
       });
       done();
     });
+
+    it('session() (gh-6663)', function(done) {
+      const q = new Query();
+
+      const fakeSession = 'foo';
+      q.session(fakeSession);
+
+      const options = q._optionsForExec();
+      assert.deepEqual(options, {
+        session: fakeSession
+      });
+      done();
+    });
   });
 
   // Advanced Query options

@@ -243,10 +243,11 @@ block content
     console.log(axl.fullName); // Axl Rose
     ```
 
-    If you use `toJSON()` or `toObject()` (or use `JSON.stringify()` on a
-    mongoose document) mongoose will *not* include virtuals by default.
+    If you use `toJSON()` or `toObject()` mongoose will *not* include virtuals
+    by default. This includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+    on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
     Pass `{ virtuals: true }` to either
-    [toObject()](./api.html#document_Document-toObject) or `toJSON()`.
+    [`toObject()`](./api.html#document_Document-toObject) or [`toJSON()`](./api.html#document_Document-toJSON).
 
     You can also add a custom setter to your virtual that will let you set both
     first name and last name via the `fullName` virtual.

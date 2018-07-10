@@ -43,7 +43,7 @@ describe('transactions', function() {
       then(doc => assert.ok(!doc)).
       // This `findOne()` will return the doc, because passing the `session`
       // means this `findOne()` will run as part of the transaction.
-      then(() => Customer.findOne({ name: 'Test' }, null, { session: session })).
+      then(() => Customer.findOne({ name: 'Test' }).session(session)).
       then(doc => assert.ok(doc)).
       // Once the transaction is committed, the write operation becomes
       // visible outside of the transaction.
@@ -64,7 +64,7 @@ describe('transactions', function() {
       }).
       then(() => {
         session.startTransaction();
-        return User.findOne({ name: 'foo' }, null, { session: session });
+        return User.findOne({ name: 'foo' }).session(session);
       }).
       then(user => {
         // Getter/setter for the session associated with this document.

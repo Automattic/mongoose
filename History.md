@@ -1,3 +1,14 @@
+5.2.3 / 2018-07-11
+==================
+ * fix(populate): if a getter is defined on the localField, use it when populating #6702 #6618 [lineus](https://github.com/lineus)
+ * docs(schema): add example of nested aliases #6671
+ * fix(query): add `session()` function to queries to avoid positional argument mistakes #6663
+ * docs(transactions): use new session() helper to make positional args less confusing #6663
+ * fix(query+model+schema): add support for `writeConcern` option and writeConcern helpers #6620
+ * docs(guide): add `writeConcern` option and re-add description for `safe` option #6620
+ * docs(schema): fix broken API links #6619
+ * docs(connections): add information re: socketTimeoutMS and connectTimeoutMS #4789
+
 5.2.2 / 2018-07-08
 ==================
  * fix(model+query): add missing estimatedDocumentCount() function #6697

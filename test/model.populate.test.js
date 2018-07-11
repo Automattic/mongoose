@@ -7095,5 +7095,40 @@ describe('model: populate:', function() {
         assert.strictEqual(doc.events[0].users_$[1].name, 'Author Name');
       });
     });
+
+    it('uses getter if one is defined on the localField (gh-6618)', function() {
+      const userSchema = new Schema({
+        name: String
+      });
+
+      const schema = new Schema({
+        referrer: {
+          type: String,
+          get: function(val) {
+            return val.slice(6);
+          }
+        }
+      }, { toObject: { virtuals: true } });
+
+      schema.virtual('referrerUser', {
+        ref: 'gh6618_user',
+        localField: 'referrer',
+        foreignField: '_id',
+        justOne: false
+      });
+
+      const User = db.model('gh6618_user', userSchema);
+      const Test = db.model('gh6618_test', schema);
+
+      const user = new User({ name: 'billy' });
+      const test = new Test({ referrer: 'Model$' + user.id });
+
+      return co(function*() {
+        yield user.save();
+        yield test.save();
+        let pop = yield Test.findOne().populate('referrerUser');
+        assert.strictEqual(pop.referrerUser[0].name, 'billy');
+      });
+    });
   });
 });

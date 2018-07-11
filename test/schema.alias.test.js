@@ -1,12 +1,14 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema;
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('schema alias option', function() {
   var db;
@@ -115,5 +117,40 @@ describe('schema alias option', function() {
     s.add({ name2: { type: String, alias: 'test2' } });
 
     assert.deepEqual(Object.keys(s.aliases), ['test1', 'test2']);
+  });
+
+  it('nested aliases (gh-6671)', function(done) {
+    const childSchema = new Schema({
+      n: {
+        type: String,
+        alias: 'name'
+      }
+    }, { _id: false });
+
+    const parentSchema = new Schema({
+      // If in a child schema, alias doesn't need to include the full nested path
+      c: childSchema,
+      name: {
+        f: {
+          type: String,
+          // Alias needs to include the full nested path if declared inline
+          alias: 'name.first'
+        }
+      }
+    });
+    // acquit:ignore:start
+    const Parent = mongoose.model('gh6671', parentSchema);
+    const doc = new Parent({
+      c: {
+        name: 'foo'
+      },
+      name: {
+        first: 'bar'
+      }
+    });
+    assert.deepEqual(doc.toObject().c, { n: 'foo' });
+    assert.deepEqual(doc.toObject().name, { f: 'bar' });
+    done();
+    // acquit:ignore:end
   });
 });

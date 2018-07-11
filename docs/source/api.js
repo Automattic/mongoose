@@ -104,11 +104,15 @@ function parse() {
         }
       }
 
-      console.log(ctx);
+      if (ctx.string.includes('Model')) {
+        console.log(ctx);
+      }
 
       // Backwards compat
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;
+      } else if (typeof ctx.receiver === 'string') {
+        ctx.anchorId = `${ctx.receiver.toLowerCase()}_${ctx.receiver}.${ctx.name}`;
       } else {
         ctx.anchorId = `${ctx.name.toLowerCase()}_${ctx.name}`;
       }

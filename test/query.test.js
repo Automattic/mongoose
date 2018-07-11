@@ -1293,7 +1293,7 @@ describe('Query', function() {
     });
   });
 
-  describe('optionsForExecute', function() {
+  describe('optionsForExec', function() {
     it('should retain key order', function(done) {
       // this is important for query hints
       var hint = {x: 1, y: 1, z: 1};
@@ -1304,6 +1304,38 @@ describe('Query', function() {
 
       var options = q._optionsForExec({schema: {options: {safe: true}}});
       assert.equal(JSON.stringify(options), a);
+      done();
+    });
+
+    it('applies schema-level writeConcern option', function(done) {
+      const q = new Query();
+
+      q.j(true);
+
+      const options = q._optionsForExec({
+        schema: {
+          options: {
+            writeConcern: { w: 'majority' }
+          }
+        }
+      });
+      assert.deepEqual(options, {
+        w: 'majority',
+        j: true
+      });
+      done();
+    });
+
+    it('session() (gh-6663)', function(done) {
+      const q = new Query();
+
+      const fakeSession = 'foo';
+      q.session(fakeSession);
+
+      const options = q._optionsForExec();
+      assert.deepEqual(options, {
+        session: fakeSession
+      });
       done();
     });
   });

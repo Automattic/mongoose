@@ -243,10 +243,11 @@ block content
     console.log(axl.fullName); // Axl Rose
     ```
 
-    If you use `toJSON()` or `toObject()` (or use `JSON.stringify()` on a
-    mongoose document) mongoose will *not* include virtuals by default.
+    If you use `toJSON()` or `toObject()` mongoose will *not* include virtuals
+    by default. This includes the output of calling [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+    on a Mongoose document, because [`JSON.stringify()` calls `toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description).
     Pass `{ virtuals: true }` to either
-    [toObject()](./api.html#document_Document-toObject) or `toJSON()`.
+    [`toObject()`](./api.html#document_Document-toObject) or [`toJSON()`](./api.html#document_Document-toJSON).
 
     You can also add a custom setter to your virtual that will let you set both
     first name and last name via the `fullName` virtual.
@@ -295,6 +296,15 @@ block content
     console.log(person); // { n: 'Not Val' }
     ```
 
+    You can also declare aliases on nested paths. It is easier to use nested
+    schemas and [subdocuments](/docs/subdocs.html), but you can also declare
+    nested path aliases inline as long as you use the full nested path
+    `nested.myProp` as the alias.
+
+    ```javascript
+    [require:gh-6671]
+    ```
+
     <h3 id="options"><a href="#options">Options</a></h3>
 
     Schemas have a few configurable options which can be passed to the
@@ -319,6 +329,8 @@ block content
     - [_id](#_id)
     - [minimize](#minimize)
     - [read](#read)
+    - [writeConcern](#writeConcern)
+    - [safe](#safe)
     - [shardKey](#shardKey)
     - [strict](#strict)
     - [strictQuery](#strictQuery)
@@ -511,6 +523,27 @@ block content
     var schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
     mongoose.model('JellyBean', schema);
     ```
+
+    <h3 id="writeConcern"><a href="#writeConcern">option: writeConcern</a></h3>
+
+    Allows setting [write concern](https://docs.mongodb.com/manual/reference/write-concern/)
+    at the schema level.
+
+    ```javascript
+    const schema = new Schema({ name: String }, {
+      writeConcern: {
+        w: 'majority',
+        j: true,
+        wtimeout: 1000
+      }
+    });
+    ```
+
+    <h3 id="safe"><a href="#safe">option: safe</a></h3>
+
+    `safe` is a legacy option that is similar to `writeConcern`. In particular,
+    `safe: false` is a shorthand for unacknowledged writes `writeConcern: { w: 0 }`.
+    Use the `writeConcern` option instead.
 
     <h3 id="shardKey"><a href="#shardKey">option: shardKey</a></h3>
 

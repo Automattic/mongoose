@@ -37,7 +37,7 @@ operation in a transaction, you need to pass the <code>session</code> as an opti
   then(doc =&gt; assert.ok(!doc)).
   <span class="hljs-comment">// This `findOne()` will return the doc, because passing the `session`</span>
   <span class="hljs-comment">// means this `findOne()` will run as part of the transaction.</span>
-  then(() =&gt; Customer.findOne({ name: <span class="hljs-string">'Test'</span> }, <span class="hljs-literal">null</span>, { session: session })).
+  then(() =&gt; Customer.findOne({ name: <span class="hljs-string">'Test'</span> }).session(session)).
   then(doc =&gt; assert.ok(doc)).
   <span class="hljs-comment">// Once the transaction is committed, the write operation becomes</span>
   <span class="hljs-comment">// visible outside of the transaction.</span>
@@ -61,7 +61,7 @@ keep a reference to the session and use that session for <a href="/docs/api.html
   }).
   then(() =&gt; {
     session.startTransaction();
-    <span class="hljs-keyword">return</span> User.findOne({ name: <span class="hljs-string">'foo'</span> }, <span class="hljs-literal">null</span>, { session: session });
+    <span class="hljs-keyword">return</span> User.findOne({ name: <span class="hljs-string">'foo'</span> }).session(session);
   }).
   then(user =&gt; {
     <span class="hljs-comment">// Getter/setter for the session associated with this document.</span>

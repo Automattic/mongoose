@@ -19,6 +19,20 @@ describe('transactions', function() {
           this.skip();
         }
       }).
+      then(() => new Promise((resolve, reject) => {
+        start.mongodVersion(function(err, version) {
+          if (err) {
+            return reject(err);
+          }
+          resolve(version);
+        });
+      })).
+      then(version => {
+        const sp = version.split('.');
+        if (parseInt(sp[0], 10) < 4) {
+          this.skip();
+        }
+      }).
       catch(() => this.skip());
   });
 

@@ -192,10 +192,11 @@ And what if you want to do some extra processing on the name, like
 <code>fullName</code> property:</p>
 <pre><code class="lang-javascript"><span class="hljs-built_in">console</span>.log(axl.fullName); <span class="hljs-comment">// Axl Rose</span>
 </code></pre>
-<p>If you use <code>toJSON()</code> or <code>toObject()</code> (or use <code>JSON.stringify()</code> on a
-mongoose document) mongoose will <em>not</em> include virtuals by default.
+<p>If you use <code>toJSON()</code> or <code>toObject()</code> mongoose will <em>not</em> include virtuals
+by default. This includes the output of calling <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"><code>JSON.stringify()</code></a>
+on a Mongoose document, because <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description"><code>JSON.stringify()</code> calls <code>toJSON()</code></a>.
 Pass <code>{ virtuals: true }</code> to either
-<a href="./api.html#document_Document-toObject">toObject()</a> or <code>toJSON()</code>.</p>
+<a href="./api.html#document_Document-toObject"><code>toObject()</code></a> or <a href="./api.html#document_Document-toJSON"><code>toJSON()</code></a>.</p>
 <p>You can also add a custom setter to your virtual that will let you set both
 first name and last name via the <code>fullName</code> virtual.</p>
 <pre><code class="lang-javascript">personSchema.virtual(<span class="hljs-string">'fullName'</span>).
@@ -234,6 +235,29 @@ into a longer name for code readability.</p>
 
 person.name = <span class="hljs-string">'Not Val'</span>;
 <span class="hljs-built_in">console</span>.log(person); <span class="hljs-comment">// { n: 'Not Val' }</span>
+</code></pre>
+<p>You can also declare aliases on nested paths. It is easier to use nested
+schemas and <a href="/docs/subdocs.html">subdocuments</a>, but you can also declare
+nested path aliases inline as long as you use the full nested path
+<code>nested.myProp</code> as the alias.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({
+  n: {
+    type: <span class="hljs-built_in">String</span>,
+    alias: <span class="hljs-string">'name'</span>
+  }
+}, { _id: <span class="hljs-literal">false</span> });
+
+<span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-comment">// If in a child schema, alias doesn't need to include the full nested path</span>
+  c: childSchema,
+  name: {
+    f: {
+      type: <span class="hljs-built_in">String</span>,
+      <span class="hljs-comment">// Alias needs to include the full nested path if declared inline</span>
+      alias: <span class="hljs-string">'name.first'</span>
+    }
+  }
+});
 </code></pre>
 <h3 id="options"><a href="#options">Options</a></h3>
 

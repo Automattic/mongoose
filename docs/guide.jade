@@ -296,6 +296,15 @@ block content
     console.log(person); // { n: 'Not Val' }
     ```
 
+    You can also declare aliases on nested paths. It is easier to use nested
+    schemas and [subdocuments](/docs/subdocs.html), but you can also declare
+    nested path aliases inline as long as you use the full nested path
+    `nested.myProp` as the alias.
+
+    ```javascript
+    [require:gh-6671]
+    ```
+
     <h3 id="options"><a href="#options">Options</a></h3>
 
     Schemas have a few configurable options which can be passed to the

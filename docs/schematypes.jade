@@ -1,5 +1,8 @@
 extends layout
 
+block append style
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
   :markdown
     <h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
@@ -234,8 +237,10 @@ block content
 
     <h4 id="arrays">Arrays</h4>
 
-    Provide creation of arrays of [SchemaTypes](./api.html#schema_Schema.Types)
-    or [Subdocuments](./subdocs.html).
+    Mongoose supports arrays of [SchemaTypes](./api.html#schema_Schema.Types)
+    and arrays of [subdocuments](./subdocs.html). Arrays of SchemaTypes are
+    also called _primitive arrays_, and arrays of subdocuments are also called
+    _document arrays_.
 
     ```javascript
     var ToySchema = new Schema({ name: String });
@@ -372,3 +377,49 @@ block content
     <h3 id="next"><a href="#next">Next Up</a></h3>
 
     Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.html).
+
+block append layout
+  script.
+    _native.init("CK7DT53U", {
+      targetClass: 'native-js',
+      display: 'flex',
+      visibleClass: 'native-show'
+    });
+
+  div(class="native-js").
+    <div class="native-sponsor">Sponsored by #native_company# — Learn More</div>
+    <a href="#native_link#" class="native-flex">
+      <style>
+      .native-js {
+        background: linear-gradient(-30deg, #native_bg_color#E5, #native_bg_color#E5 45%, #native_bg_color# 45%) #fff;
+      }
+
+      .native-details,
+      .native-sponsor,
+      .native-bsa {
+        color: #native_color# !important;
+      }
+
+      .native-details:hover {
+        color: #native_color_hover# !important;
+      }
+
+      .native-cta {
+        color: #native_cta_color#;
+        background-color: #native_cta_bg_color#;
+      }
+
+      .native-cta:hover {
+        color: #native_cta_color_hover;
+        background-color: #native_cta_bg_color_hover#;
+      }
+      </style>
+      <div class="native-main">
+        <img class="native-img" src="#native_logo#">
+        <div class="native-details">
+          <span class="native-company">#native_title#</span>
+          <span class="native-desc">#native_desc#</span>
+        </div>
+      </div>
+      <span class="native-cta">#native_cta#</span>
+    </a>

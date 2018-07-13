@@ -80,14 +80,14 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 Models are defined through the `Schema` interface.
 
 ```js
-const Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 const BlogPost = new Schema({
- author: ObjectId,
- title: String,
- body: String,
- date: Date
+  author: ObjectId,
+  title: String,
+  body: String,
+  date: Date
 });
 ```
 

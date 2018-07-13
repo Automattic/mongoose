@@ -28,12 +28,13 @@ describe('transactions', function() {
         });
       })).
       then(version => {
-        const sp = version.split('.');
-        if (parseInt(sp[0], 10) < 4) {
+        if (version[0] < 4) {
           this.skip();
         }
       }).
-      catch(() => this.skip());
+      catch(() => {
+        this.skip()
+      });
   });
 
   it('basic example', function() {

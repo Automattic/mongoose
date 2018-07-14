@@ -5558,6 +5558,18 @@ describe('Model', function() {
       });
     });
 
+    it('using `new db.model()()` (gh-6698)', function(done) {
+      db.model('gh6698', new Schema({
+        name: String
+      }));
+
+      assert.throws(function() {
+        new db.model('gh6698')({ name: 'test' });
+      }, /should not be run with `new`/);
+
+      done();
+    });
+
     it('Throws when saving same doc in parallel w/ promises (gh-6456)', function(done) {
       let called = 0;
 

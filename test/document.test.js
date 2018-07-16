@@ -5833,5 +5833,26 @@ describe('document', function() {
       assert.deepEqual(doc.toObject().arr, []);
       done();
     });
+
+    it('set single nested to num throws ObjectExpectedError (gh-6710)', function() {
+      const schema = new Schema({
+        nested: new Schema({
+          num: Number
+        })
+      });
+
+      const Test = mongoose.model('gh6710', schema);
+
+      const doc = new Test({ nested: { num: 123 } });
+      doc.nested = 123;
+
+      return doc.validate().then(
+        () => { throw new Error('Should have thrown'); },
+        err => {
+          assert.ok(err.message.indexOf('Cast to Embedded') !== -1, err.message);
+          assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
+        }
+      );
+    });
   });
 });

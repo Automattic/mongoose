@@ -5558,6 +5558,32 @@ describe('Model', function() {
       });
     });
 
+    it('using `new db.model()()` (gh-6698)', function(done) {
+      db.model('gh6698', new Schema({
+        name: String
+      }));
+
+      assert.throws(function() {
+        new db.model('gh6698')({ name: 'test' });
+      }, /should not be run with `new`/);
+
+      done();
+    });
+
+    it('throws if non-function passed as callback (gh-6640)', function(done) {
+      const Model = db.model('gh6640', new Schema({
+        name: String
+      }));
+
+      const doc = new Model({});
+
+      assert.throws(function() {
+        doc.save({}, {});
+      }, /callback must be a function/i);
+
+      done();
+    });
+
     it('Throws when saving same doc in parallel w/ promises (gh-6456)', function(done) {
       let called = 0;
 

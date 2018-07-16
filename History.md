@@ -1,3 +1,13 @@
+5.2.4 / 2018-07-16
+==================
+ * docs: Model.insertMany rawResult option in api docs #6724 [lineus](https://github.com/lineus)
+ * docs: fix typo on migrating to 5 guide #6722 [iagowp](https://github.com/iagowp)
+ * docs: update doc about keepalive #6719 #6718 [simllll](https://github.com/simllll)
+ * fix: ensure debug mode doesn't crash with sessions #6712
+ * fix(document): report castError when setting single nested doc to primitive value #6710
+ * fix(connection): throw helpful error if using `new db.model(foo)(bar)` #6698
+ * fix(model): throw readable error with better stack trace when non-cb passed to $wrapCallback() #6640
+
 5.2.3 / 2018-07-11
 ==================
  * fix(populate): if a getter is defined on the localField, use it when populating #6702 #6618 [lineus](https://github.com/lineus)

@@ -162,8 +162,11 @@ block content
     you may decide to enable `keepAlive`:
 
     ```javascript
-    mongoose.connect(uri, { keepAlive: 120 });
+    mongoose.connect(uri, { keepAlive: true, keepAliveInitialDelay: 300000 });
     ```
+    
+    `keepAliveInitialDelay` is the number of milliseconds to wait before initiating `keepAlive` on the socket. 
+    `keepAlive` is true by default since mongoose 5.2.0.
 
     <h3 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h3>
 

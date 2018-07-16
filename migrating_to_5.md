@@ -134,7 +134,7 @@ const cursorWithOptions = MyModel.
 
 Due to changes in the MongoDB driver, connection strings must be URI encoded.
 
-If they are not, connections may fail with an illegeal character message.
+If they are not, connections may fail with an illegal character message.
 
 #### Passwords which contain certain characters
 

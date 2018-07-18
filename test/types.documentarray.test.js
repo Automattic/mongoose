@@ -1,17 +1,20 @@
+'use strict';
+
 /**
  * Module dependencies.
  */
 
-var start = require('./common');
-var mongoose = require('./common').mongoose;
-var random = require('../lib/utils').random;
-var setValue = require('../lib/utils').setValue;
-var MongooseDocumentArray = mongoose.Types.DocumentArray;
-var EmbeddedDocument = require('../lib/types/embedded');
-var DocumentArray = require('../lib/types/documentarray');
-var Schema = mongoose.Schema;
-var assert = require('power-assert');
-var collection = 'types.documentarray_' + random();
+const DocumentArray = require('../lib/types/documentarray');
+const EmbeddedDocument = require('../lib/types/embedded');
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const setValue = require('../lib/utils').setValue;
+const start = require('./common');
+
+const mongoose = require('./common').mongoose;
+const Schema = mongoose.Schema;
+const MongooseDocumentArray = mongoose.Types.DocumentArray;
+const collection = 'types.documentarray_' + random();
 
 /**
  * Setup.
@@ -494,6 +497,21 @@ describe('types.documentarray', function() {
         assert.equal(err.errors['docs.0.v'].value, 900);
         done();
       });
+    });
+
+    it('clears listeners on cast error (gh-6723)', function() {
+      const nested = new Schema({v: {type: Number}});
+      const schema = new Schema({
+        docs: [nested]
+      });
+      const M = db.model('gh6723', schema);
+
+      const m = new M({});
+      m.docs = [50];
+      m.docs = [];
+      m.docs.push({ v: 50 });
+
+      return m.save();
     });
 
     it('removes attached event listeners when creating new doc array', function(done) {

@@ -362,6 +362,13 @@ block content
     `save()` multiple times in parallel on the same doc could result in conflicts. For example,
     validating, and then subsequently invalidating the same path.
 
+    <hr id="ObjectId Validation" />
+
+    **Q**. Why is **any** 12 character string successfully cast to an ObjectId?
+
+    **A**. Technically, any 12 character string is a valid [ObjectId](https://docs.mongodb.com/manual/reference/bson-types/#objectid). 
+    Consider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exactly 24 hex characters.
+
     <hr id="add_something" />
     
     **Something to add?**

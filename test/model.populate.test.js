@@ -7130,5 +7130,30 @@ describe('model: populate:', function() {
         assert.strictEqual(pop.referrerUser[0].name, 'billy');
       });
     });
+
+    it('passes scope as Model instance (gh-6726)', function() {
+      const otherSchema = new Schema({ name: String });
+      const Other = db.model('gh6726_Other', otherSchema);
+      const schema = new Schema({
+        x: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh6726_Other',
+          get: function(v) {
+            assert.strictEqual(this.constructor.name, 'model');
+            return v;
+          }
+        }
+      });
+      const Test = db.model('gh6726_Test', schema);
+      const other = new Other({ name: 'Max' });
+      const test = new Test({ x: other._id });
+      return co(function*() {
+        yield other.save();
+        yield test.save();
+        let doc = yield Test.findOne({}).populate('x');
+        assert.strictEqual(doc.x.name, 'Max');
+      });
+    });
+
   });
 });

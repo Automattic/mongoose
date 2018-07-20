@@ -104,7 +104,7 @@ describe('getVirtual', function() {
       foreignField: 'employeeId'
     });
 
-    const Clicked = docArray.discriminator('Clicked', clickedSchema);
+    docArray.discriminator('Clicked', clickedSchema);
 
     let virtual = getVirtual(batchSchema, 'events.users_$');
     assert.equal(virtual.options.ref, 'Users');
@@ -113,5 +113,7 @@ describe('getVirtual', function() {
     virtual = getVirtual(batchSchema, 'events.users_$');
     assert.equal(virtual.options.ref, 'Users');
     assert.equal(virtual.$nestedSchemaPath, 'events');
+
+    done();
   });
 });

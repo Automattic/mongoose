@@ -1608,6 +1608,19 @@ describe('document', function() {
           done();
         });
 
+        it('allows positional syntax on mixed nested paths (gh-6738)', function() {
+          var schema = new Schema({ nested: {} });
+          var M = mongoose.model('gh6738', schema);
+          var doc = new M({
+            'nested.x': 'foo',
+            'nested.y': 42,
+            'nested.a.b.c': { d: { e: { f: 'g' } } }
+          });
+          assert.strictEqual(doc.nested.x, 'foo');
+          assert.strictEqual(doc.nested.y, 42);
+          assert.strictEqual(doc.nested.a.b.c.d.e.f, 'g');
+        });
+
         it('gh-1954', function(done) {
           var schema = new Schema({
             schedule: [new Schema({open: Number, close: Number})]

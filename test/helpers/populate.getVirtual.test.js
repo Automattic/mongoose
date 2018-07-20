@@ -85,4 +85,33 @@ describe('getVirtual', function() {
 
     done();
   });
+
+  it('handles multiple calls with discriminator under doc array (gh-6644)', function(done) {
+    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind'});
+
+    const batchSchema = new Schema({ events: [eventSchema] });
+
+    const docArray = batchSchema.path('events');
+
+    const clickedSchema = new Schema({ element: { type: String }, users: [{}] }, {
+      toJSON: { virtuals: true},
+      toObject: { virtuals: true}
+    });
+
+    clickedSchema.virtual('users_$', {
+      ref: 'Users',
+      localField: 'users',
+      foreignField: 'employeeId'
+    });
+
+    const Clicked = docArray.discriminator('Clicked', clickedSchema);
+
+    let virtual = getVirtual(batchSchema, 'events.users_$');
+    assert.equal(virtual.options.ref, 'Users');
+    assert.equal(virtual.$nestedSchemaPath, 'events');
+
+    virtual = getVirtual(batchSchema, 'events.users_$');
+    assert.equal(virtual.options.ref, 'Users');
+    assert.equal(virtual.$nestedSchemaPath, 'events');
+  });
 });

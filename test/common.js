@@ -176,5 +176,8 @@ beforeEach(function() {
 });
 
 process.on('unhandledRejection', function(error) {
+  if (error.$expected) {
+    return;
+  }
   console.error(`unhandledRejection in "${global.CURRENT_TEST}":`, error.stack);
 });

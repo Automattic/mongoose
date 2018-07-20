@@ -25,7 +25,8 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/webpack.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/docs/transactions.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/model.middleware.test.js').toString())
 ];
 
 function getVersion() {

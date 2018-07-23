@@ -201,40 +201,43 @@ describe('model middleware', function() {
     });
   });
 
-  it('post init', function(done) {
-    var schema = new Schema({
-      title: String
-    });
+  describe('post init hooks', function() {
+    it('success', function() {
+      const schema = new Schema({ title: String, loadedAt: Date });
 
-    var preinit = 0,
-        postinit = 0;
-
-    schema.pre('init', function() {
-      ++preinit;
-    });
-
-    schema.post('init', function(doc) {
-      assert.ok(doc instanceof mongoose.Document);
-      ++postinit;
-    });
-
-    mongoose.model('TestPostInitMiddleware', schema);
-
-    var Test = db.model('TestPostInitMiddleware');
-
-    var test = new Test({title: 'banana'});
-
-    test.save(function(err) {
-      assert.ifError(err);
-
-      Test.findById(test._id, function(err, test) {
-        assert.ifError(err);
-        assert.equal(preinit, 1);
-        assert.equal(postinit, 1);
-        test.remove(function() {
-          done();
-        });
+      schema.pre('init', pojo => {
+        assert.equal(pojo.constructor.name, 'Object'); // Plain object before init
       });
+
+      const now = new Date();
+      schema.post('init', doc => {
+        assert.ok(doc instanceof mongoose.Document); // Mongoose doc after init
+        doc.loadedAt = now;
+      });
+
+      const Test = db.model('TestPostInitMiddleware', schema);
+
+      return Test.create({ title: 'Casino Royale' }).
+        then(doc => Test.findById(doc)).
+        then(doc => assert.equal(doc.loadedAt.valueOf(), now.valueOf()));
+    });
+
+    it('with errors', function() {
+      const schema = new Schema({ title: String });
+
+      const swallowedError = new Error('will not show');
+      // acquit:ignore:start
+      swallowedError.$expected = true;
+      // acquit:ignore:end
+      // init hooks do **not** handle async errors or any sort of async behavior
+      schema.pre('init', () => Promise.reject(swallowedError));
+      schema.post('init', () => { throw Error('will show'); });
+
+      const Test = db.model('PostInitBook', schema);
+
+      return Test.create({ title: 'Casino Royale' }).
+        then(doc => Test.findById(doc)).
+        catch(error => assert.equal(error.message, 'will show'));
     });
   });
 

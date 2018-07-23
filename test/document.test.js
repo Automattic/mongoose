@@ -5847,7 +5847,7 @@ describe('document', function() {
       done();
     });
 
-    it('set single nested to num throws ObjectExpectedError (gh-6710)', function() {
+    it('set single nested to num throws ObjectExpectedError (gh-6710) (gh-6753)', function() {
       const schema = new Schema({
         nested: new Schema({
           num: Number
@@ -5859,13 +5859,21 @@ describe('document', function() {
       const doc = new Test({ nested: { num: 123 } });
       doc.nested = 123;
 
-      return doc.validate().then(
-        () => { throw new Error('Should have thrown'); },
-        err => {
+      return doc.validate().
+        then(() => { throw new Error('Should have errored'); }).
+        catch(err => {
           assert.ok(err.message.indexOf('Cast to Embedded') !== -1, err.message);
           assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
-        }
-      );
+
+          const doc = new Test({ nested: { num: 123 } });
+          doc.nested = [];
+          return doc.validate();
+        }).
+        then(() => { throw new Error('Should have errored'); }).
+        catch(err => {
+          assert.ok(err.message.indexOf('Cast to Embedded') !== -1, err.message);
+          assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
+        });
     });
   });
 });

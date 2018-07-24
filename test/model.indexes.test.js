@@ -377,6 +377,18 @@ describe('model', function() {
           done();
         });
       });
+
+      it('doesnt crash if close() called and automatic build in progress (gh-6707)', function() {
+        const db = start();
+        const FooSchema = new mongoose.Schema({
+          name: {type: String, required: true}
+        });
+        FooSchema.index({name: 'text'});
+        const Foo = db.model('Foo', FooSchema);
+
+        return db.close().
+          then(() => new Promise(resolve => setTimeout(resolve, 200)));
+      });
     });
   });
 

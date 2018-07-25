@@ -38,12 +38,16 @@ describe('webpack', function() {
         net: 'empty',
         tls: 'empty'
       },
-      target: 'web'
+      target: 'web',
+      mode: 'production'
     };
     // acquit:ignore:start
     webpack(config, utils.tick(function(error, stats) {
       assert.ifError(error);
       assert.deepEqual(stats.compilation.errors, []);
+      // Avoid expressions in `require()` because that scares webpack (gh-6705)
+      assert.ok(!stats.compilation.warnings.
+        find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
       done();
     }));
     // acquit:ignore:end

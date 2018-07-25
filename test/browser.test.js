@@ -15,7 +15,7 @@ const exec = require('child_process').exec;
  */
 describe('browser', function() {
   it('require() works with no other require calls (gh-5842)', function(done) {
-    exec('node --eval "require(\'./lib/browserDocument\')"', done);
+    exec('node --eval "require(\'./lib/browser\')"', done);
   });
 
   it('document works (gh-4987)', function(done) {

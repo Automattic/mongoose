@@ -266,7 +266,7 @@ block content
     console.log(mongoose.Schema.Types.Boolean.convertToFalse);
 
     mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
-    console.log(new M({ b: 'nay' }).b); // true
+    console.log(new M({ b: 'nay' }).b); // false
     ```
 
     <h4 id="arrays">Arrays</h4>

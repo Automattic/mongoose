@@ -56,6 +56,13 @@ describe('connections:', function() {
       }).catch(done);
     });
 
+    it('throws helpful error with legacy syntax (gh-6756)', function(done) {
+      assert.throws(function() {
+        mongoose.createConnection('localhost', 'dbname', 27017);
+      }, /mongoosejs\.com.*connections\.html/);
+      done();
+    });
+
     it('resolving with q (gh-5714)', function(done) {
       var bootMongo = Q.defer();
 

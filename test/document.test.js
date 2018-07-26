@@ -5707,6 +5707,28 @@ describe('document', function() {
       });
     });
 
+    it('convertToFalse and convertToTrue (gh-6758)', function() {
+      const TestSchema = new Schema({ b: Boolean });
+      const Test = db.model('gh6758', TestSchema);
+
+      mongoose.Schema.Types.Boolean.convertToTrue.add('aye');
+      mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
+
+      const doc1 = new Test({ b: 'aye' });
+      const doc2 = new Test({ b: 'nay' });
+
+      assert.strictEqual(doc1.b, true);
+      assert.strictEqual(doc2.b, false);
+
+      return doc1.save().
+        then(() => Test.findOne({ b: { $exists: 'aye' } })).
+        then(doc => assert.ok(doc)).
+        then(() => {
+          mongoose.Schema.Types.Boolean.convertToTrue.delete('aye');
+          mongoose.Schema.Types.Boolean.convertToFalse.delete('nay');
+        });
+    });
+
     it('defaults should see correct isNew (gh-3793)', function() {
       let isNew = [];
       const TestSchema = new mongoose.Schema({
@@ -5847,7 +5869,7 @@ describe('document', function() {
       done();
     });
 
-    it('set single nested to num throws ObjectExpectedError (gh-6710)', function() {
+    it('set single nested to num throws ObjectExpectedError (gh-6710) (gh-6753)', function() {
       const schema = new Schema({
         nested: new Schema({
           num: Number
@@ -5859,13 +5881,21 @@ describe('document', function() {
       const doc = new Test({ nested: { num: 123 } });
       doc.nested = 123;
 
-      return doc.validate().then(
-        () => { throw new Error('Should have thrown'); },
-        err => {
+      return doc.validate().
+        then(() => { throw new Error('Should have errored'); }).
+        catch(err => {
           assert.ok(err.message.indexOf('Cast to Embedded') !== -1, err.message);
           assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
-        }
-      );
+
+          const doc = new Test({ nested: { num: 123 } });
+          doc.nested = [];
+          return doc.validate();
+        }).
+        then(() => { throw new Error('Should have errored'); }).
+        catch(err => {
+          assert.ok(err.message.indexOf('Cast to Embedded') !== -1, err.message);
+          assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
+        });
     });
   });
 });

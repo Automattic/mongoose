@@ -7,13 +7,12 @@ block content
     You can connect to MongoDB with the `mongoose.connect()` method.
 
     ```javascript
-    mongoose.connect('mongodb://localhost/myapp');
+    mongoose.connect('mongodb://localhost:27017/myapp');
     ```
 
     This is the minimum needed to connect the `myapp` database running locally
-    on the default port (27017). If the local connection fails then try using
-    127.0.0.1 instead of localhost. Sometimes issues may arise when the local
-    hostname has been changed.
+    on the default port (27017). If connecting fails on your machine, try using
+    `127.0.0.1` instead of `localhost`.
 
     You can also specify several more parameters in the `uri`:
 
@@ -29,7 +28,7 @@ block content
     mongoose to establish a connection to MongoDB.
 
     ```javascript
-    mongoose.connect('mongodb://localhost/myapp');
+    mongoose.connect('mongodb://localhost:27017/myapp');
     var MyModel = mongoose.model('Test', new Schema({ name: String }));
     // Works
     MyModel.findOne(function(error, result) { /* ... */ });
@@ -46,7 +45,7 @@ block content
     MyModel.findOne(function(error, result) { /* ... */ });
 
     setTimeout(function() {
-      mongoose.connect('mongodb://localhost/myapp');
+      mongoose.connect('mongodb://localhost:27017/myapp');
     }, 60000);
     ```
 
@@ -87,6 +86,7 @@ block content
     * `bufferMaxEntries`  - The MongoDB driver also has its own buffering mechanism that kicks in when the driver is disconnected. Set this option to 0 and set `bufferCommands` to `false` on your schemas if you want your database operations to fail immediately when the driver is not connected, as opposed to waiting for reconnection.
     * `connectTimeoutMS`  - How long the MongoDB driver will wait before failing its initial connection attempt. Once Mongoose has successfully connected, `connectTimeoutMS` is no longer relevant.
     * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing an inactive socket. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds.
+    * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 
     Example:
 
@@ -101,6 +101,7 @@ block content
       bufferMaxEntries: 0,
       connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      family: 4 // Use IPv4, skip trying IPv6
     };
     mongoose.connect(uri, options);
     ```
@@ -164,8 +165,8 @@ block content
     ```javascript
     mongoose.connect(uri, { keepAlive: true, keepAliveInitialDelay: 300000 });
     ```
-    
-    `keepAliveInitialDelay` is the number of milliseconds to wait before initiating `keepAlive` on the socket. 
+
+    `keepAliveInitialDelay` is the number of milliseconds to wait before initiating `keepAlive` on the socket.
     `keepAlive` is true by default since mongoose 5.2.0.
 
     <h3 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h3>
@@ -231,7 +232,7 @@ block content
     // With object options
     mongoose.createConnection(uri, { poolSize: 4 });
 
-    const uri = 'mongodb://localhost/test?poolSize=4';
+    const uri = 'mongodb://localhost:27017/test?poolSize=4';
     mongoose.createConnection(uri);
     ```
 

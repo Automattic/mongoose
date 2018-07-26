@@ -1,3 +1,19 @@
+5.2.5 / 2018-07-23
+==================
+ * fix(boolean): expose `convertToTrue` and `convertToFalse` for custom boolean casting #6758
+ * docs(schematypes): add note about what values are converted to booleans #6758
+ * fix(document): fix(document): report castError when setting single nested doc to array #6753
+ * docs: prefix mongoose.Schema call with new operator #6751 [sajadtorkamani](https://github.com/sajadtorkamani)
+ * docs(query): add examples and links to schema writeConcern option for writeConcern helpers #6748
+ * docs(middleware): clarify that init middleware is sync #6747
+ * perf(model): create error rather than modifying stack for source map perf #6735
+ * fix(model): throw helpful error when passing object to aggregate() #6732
+ * fix(model): pass Model instance as context to applyGetters when calling getters for virtual populate #6726 [lineus](https://github.com/lineus)
+ * fix(documentarray): remove `isNew` and `save` listeners on CastError because otherwise they never get removed #6723
+ * docs(model+query): clarify when to use `countDocuments()` vs `estimatedDocumentCount()` #6713
+ * fix(populate): correctly set virtual nestedSchemaPath when calling populate() multiple times #6644
+ * docs(connections): add note about the `family` option for IPv4 vs IPv6 and add port to example URIs #6566
+
 5.2.4 / 2018-07-16
 ==================
  * docs: Model.insertMany rawResult option in api docs #6724 [lineus](https://github.com/lineus)

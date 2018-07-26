@@ -22,7 +22,7 @@ block content
     - [Number](./api.html#schema-number-js)
     - [Date](./api.html#schema-date-js)
     - [Buffer](./api.html#schema-buffer-js)
-    - Boolean
+    - [Boolean](#booleans)
     - Mixed
     - [ObjectId](./api.html#schema-objectid-js)
     - [Array](#arrays)
@@ -233,6 +233,40 @@ block content
     var ObjectId = mongoose.Schema.Types.ObjectId;
     var Car = new Schema({ driver: ObjectId });
     // or just Schema.ObjectId for backwards compatibility with v2
+    ```
+
+    <h4 id="booleans">Boolean</h4>
+
+    Booleans in Mongoose are [plain JavaScript booleans](https://www.w3schools.com/js/js_booleans.asp).
+    By default, Mongoose casts the below values to `true`:
+
+    * `true`
+    * `'true'`
+    * `1`
+    * `'1'`
+    * `'yes'`
+
+    Mongoose casts the below values to `false`:
+
+    * `false`
+    * `'false'`
+    * `0`
+    * `'0'`
+    * `'no'`
+
+    Any other value causes a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError).
+    You can modify what values Mongoose converts to true or false using the
+    `convertToTrue` and `convertToFalse` properties, which are [JavaScript sets](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set).
+
+    ```javascript
+    const M = mongoose.model('Test', new Schema({ b: Boolean }));
+    console.log(new M({ b: 'nay' }).b); // undefined
+
+    // Set { false, 'false', 0, '0', 'no' }
+    console.log(mongoose.Schema.Types.Boolean.convertToFalse);
+
+    mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
+    console.log(new M({ b: 'nay' }).b); // true
     ```
 
     <h4 id="arrays">Arrays</h4>

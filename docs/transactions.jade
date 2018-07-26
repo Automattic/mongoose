@@ -46,6 +46,17 @@ block content
     [require:transactions.*save]
     ```
 
+    ## With the Aggregation Framework
+
+    The `Model.aggregate()` function also supports transactions. Mongoose
+    aggregations have a [`session()` helper](/docs/api.html#aggregate_Aggregate-session)
+    that sets the [`session` option](/docs/api.html#aggregate_Aggregate-option).
+    Below is an example of executing an aggregation within a transaction.
+
+    ```javascript
+    [require:transactions.*aggregate]
+    ```
+
 block append layout
   script.
     _native.init("CK7DT53U", {

@@ -278,10 +278,10 @@ block content
 
     ```javascript
     var ToySchema = new Schema({ name: String });
-    var ToyBox = new Schema({
+    var ToyBoxSchema = new Schema({
       toys: [ToySchema],
       buffers: [Buffer],
-      string:  [String],
+      strings: [String],
       numbers: [Number]
       // ... etc
     });
@@ -290,14 +290,14 @@ block content
     Arrays are special because they implicitly have a default value of `[]` (empty array).
 
     ```javascript
-    var Toy = mongoose.model('Test', ToySchema);
-    console.log((new Toy()).toys); // []
+    var ToyBox = mongoose.model('ToyBox', ToyBoxSchema);
+    console.log((new ToyBox()).toys); // []
     ```
 
     To overwrite this default, you need to set the default value to `undefined`
 
     ```javascript
-    var ToySchema = new Schema({
+    var ToyBoxSchema = new Schema({
       toys: {
         type: [ToySchema],
         default: undefined

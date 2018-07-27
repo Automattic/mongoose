@@ -135,4 +135,34 @@ describe('transactions', function() {
         session.commitTransaction();
       });
   });
+
+  it('populate (gh-6754)', function() {
+    const Author = db.model('Author', new Schema({ name: String }), 'Author');
+    const Article = db.model('Article', new Schema({
+      author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Author'
+      }
+    }), 'Article');
+
+    let session = null;
+    return db.createCollection('Author').
+      then(() => db.createCollection('Article')).
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return Author.create([{ name: 'Val' }], { session: session });
+      }).
+      then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+      then(articles => Article.findById(articles[0]._id).session(session)).
+      then(article => {
+        assert.ok(article.$session());
+        return article.populate('author').execPopulate();
+      }).
+      then(article => {
+        assert.equal(article.author.name, 'Val');
+        session.commitTransaction();
+      });
+  });
 });

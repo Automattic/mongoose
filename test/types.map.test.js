@@ -463,4 +463,23 @@ describe('Map', function() {
       assert.deepEqual(found.num.toJSON(), { testing: 456 });
     });
   });
+
+  it('updating map doesnt crash (gh-6750)', function() {
+    return co(function*() {
+      const Schema = mongoose.Schema;
+      const User = db.model('gh6750_User', {
+        maps: { type: Map, of: String, default: {} }
+      });
+
+      const Post = db.model('gh6750_Post', {
+        user: { type: Schema.Types.ObjectId, ref: 'User' }
+      });
+
+      const user = yield User.create({});
+      const doc = yield Post.
+        findOneAndUpdate({}, { user: user }, { upsert: true, new: true });
+      assert.ok(doc);
+      assert.equal(doc.user.toHexString(), user._id.toHexString());
+    });
+  });
 });

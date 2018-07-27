@@ -97,4 +97,72 @@ describe('transactions', function() {
       }).
       then(doc => assert.ok(doc));
   });
+
+  it('aggregate', function() {
+    const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
+
+    let session = null;
+    return db.createCollection('Event').
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return Event.insertMany([
+          { createdAt: new Date('2018-06-01') },
+          { createdAt: new Date('2018-06-02') },
+          { createdAt: new Date('2017-06-01') },
+          { createdAt: new Date('2017-05-31') }
+        ], { session: session });
+      }).
+      then(() => Event.aggregate([
+        {
+          $group: {
+            _id: {
+              month: { $month: '$createdAt' },
+              year: { $year: '$createdAt' }
+            },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
+      ]).session(session)).
+      then(res => {
+        assert.deepEqual(res, [
+          { _id: { month: 6, year: 2018 }, count: 2 },
+          { _id: { month: 6, year: 2017 }, count: 1 },
+          { _id: { month: 5, year: 2017 }, count: 1 }
+        ]);
+        session.commitTransaction();
+      });
+  });
+
+  it('populate (gh-6754)', function() {
+    const Author = db.model('Author', new Schema({ name: String }), 'Author');
+    const Article = db.model('Article', new Schema({
+      author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Author'
+      }
+    }), 'Article');
+
+    let session = null;
+    return db.createCollection('Author').
+      then(() => db.createCollection('Article')).
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return Author.create([{ name: 'Val' }], { session: session });
+      }).
+      then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+      then(articles => Article.findById(articles[0]._id).session(session)).
+      then(article => {
+        assert.ok(article.$session());
+        return article.populate('author').execPopulate();
+      }).
+      then(article => {
+        assert.equal(article.author.name, 'Val');
+        session.commitTransaction();
+      });
+  });
 });

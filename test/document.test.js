@@ -5729,6 +5729,29 @@ describe('document', function() {
         });
     });
 
+    it('doesnt double-call getters when using get() (gh-6779)', function() {
+      const schema = new Schema({
+        nested: {
+          arr: [{ key: String }]
+        }
+      });
+
+      schema.path('nested.arr.0.key').get(v => {
+        return 'foobar' + v;
+      });
+
+      const M = db.model('gh6779', schema);
+      const test = new M();
+
+      test.nested.arr.push({ key: 'value' });
+      test.nested.arr.push({ key: 'value2' });
+
+      assert.equal(test.get('nested.arr.0.key'), 'foobarvalue');
+      assert.equal(test.get('nested.arr.1.key'), 'foobarvalue2');
+
+      return Promise.resolve();
+    });
+
     it('defaults should see correct isNew (gh-3793)', function() {
       let isNew = [];
       const TestSchema = new mongoose.Schema({

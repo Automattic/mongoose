@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const rimraf = require('rimraf');
 const utils = require('../lib/utils');
 const semver = require('semver');
 
@@ -19,6 +18,11 @@ describe('webpack', function() {
     // acquit:ignore:end
     const config = {
       entry: ['./test/files/sample.js'],
+      // acquit:ignore:start
+      output: {
+        path: `${__dirname}/files`
+      },
+      // acquit:ignore:end
       module: {
         rules: [
           {
@@ -38,18 +42,18 @@ describe('webpack', function() {
         net: 'empty',
         tls: 'empty'
       },
-      target: 'web'
+      target: 'web',
+      mode: 'production'
     };
     // acquit:ignore:start
     webpack(config, utils.tick(function(error, stats) {
       assert.ifError(error);
       assert.deepEqual(stats.compilation.errors, []);
+      // Avoid expressions in `require()` because that scares webpack (gh-6705)
+      assert.ok(!stats.compilation.warnings.
+        find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
       done();
     }));
     // acquit:ignore:end
-  });
-
-  after(function(done) {
-    rimraf('./dist', done);
   });
 });

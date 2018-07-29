@@ -8,6 +8,7 @@ const Schema = mongoose.Schema;
 
 describe('transactions', function() {
   let db;
+  let _skipped = false;
 
   before(function() {
     db = start({ replicaSet: 'rs' });
@@ -16,6 +17,7 @@ describe('transactions', function() {
       then(() => {
         // Skip if not a repl set
         if (db.client.topology.constructor.name !== 'ReplSet') {
+          _skipped = true;
           this.skip();
         }
       }).
@@ -29,11 +31,13 @@ describe('transactions', function() {
       })).
       then(version => {
         if (version[0] < 4) {
+          _skipped = true;
           this.skip();
         }
       }).
       catch(() => {
-        this.skip()
+        _skipped = true;
+        this.skip();
       });
   });
 
@@ -155,10 +159,16 @@ describe('transactions', function() {
     });
 
     beforeEach(function() {
+      if (_skipped) {
+        return this.skip(); // https://github.com/mochajs/mocha/issues/2546
+      }
       return Author.deleteMany({}).then(() => Article.deleteMany({}));
     });
 
     beforeEach(function() {
+      if (_skipped) {
+        return this.skip(); // https://github.com/mochajs/mocha/issues/2546
+      }
       return db.startSession().then(_session => {
         session = _session;
         session.startTransaction();
@@ -166,6 +176,9 @@ describe('transactions', function() {
     });
 
     afterEach(function() {
+      if (_skipped) {
+        return; // https://github.com/mochajs/mocha/issues/2546
+      }
       return session.commitTransaction();
     });
 

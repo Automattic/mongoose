@@ -146,6 +146,11 @@ describe('transactions', function() {
     let session;
 
     before(function() {
+      if (_skipped) {
+        this.skip();
+        return; // https://github.com/mochajs/mocha/issues/2546
+      }
+
       Author = db.model('Author', new Schema({ name: String }), 'Author');
       Article = db.model('Article', new Schema({
         author: {
@@ -159,10 +164,6 @@ describe('transactions', function() {
     });
 
     beforeEach(function() {
-      if (_skipped) {
-        this.skip();
-        return Promise.resolve(); // https://github.com/mochajs/mocha/issues/2546
-      }
       return Author.deleteMany({}).
         then(() => Article.deleteMany({})).
         then(() => db.startSession()).
@@ -173,9 +174,6 @@ describe('transactions', function() {
     });
 
     afterEach(function(done) {
-      if (_skipped) {
-        return done(); // https://github.com/mochajs/mocha/issues/2546
-      }
       session.commitTransaction();
       done();
     });

@@ -136,33 +136,85 @@ describe('transactions', function() {
       });
   });
 
-  it('populate (gh-6754)', function() {
-    const Author = db.model('Author', new Schema({ name: String }), 'Author');
-    const Article = db.model('Article', new Schema({
-      author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Author'
-      }
-    }), 'Article');
+  describe('populate (gh-6754)', function() {
+    let Author;
+    let Article;
+    let session;
 
-    let session = null;
-    return db.createCollection('Author').
-      then(() => db.createCollection('Article')).
-      then(() => db.startSession()).
-      then(_session => {
+    before(function() {
+      Author = db.model('Author', new Schema({ name: String }), 'Author');
+      Article = db.model('Article', new Schema({
+        author: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Author'
+        }
+      }), 'Article');
+
+      return db.createCollection('Author').
+        then(() => db.createCollection('Article'));
+    });
+
+    beforeEach(function() {
+      return Author.deleteMany({}).then(() => Article.deleteMany({}));
+    });
+
+    beforeEach(function() {
+      return db.startSession().then(_session => {
         session = _session;
         session.startTransaction();
-        return Author.create([{ name: 'Val' }], { session: session });
-      }).
-      then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
-      then(articles => Article.findById(articles[0]._id).session(session)).
-      then(article => {
-        assert.ok(article.$session());
-        return article.populate('author').execPopulate();
-      }).
-      then(article => {
-        assert.equal(article.author.name, 'Val');
-        session.commitTransaction();
       });
+    });
+
+    afterEach(function() {
+      return session.commitTransaction();
+    });
+
+    it('`populate()` uses the querys session', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+        then(articles => {
+          return Article.
+            findById(articles[0]._id).
+            session(session).
+            populate('author');
+        }).
+        then(article => assert.equal(article.author.name, 'Val'));
+    });
+
+    it('can override `populate()` session', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        // Article created _outside_ the transaction
+        then(authors => Article.create([{ author: authors[0]._id }])).
+        then(articles => {
+          return Article.
+            findById(articles[0]._id).
+            populate({ path: 'author', options: { session: session } });
+        }).
+        then(article => assert.equal(article.author.name, 'Val'));
+    });
+
+    it('`execPopulate()` uses the documents `$session()` by default', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+        // By default, the populate query should use the associated `$session()`
+        then(articles => Article.findById(articles[0]._id).session(session)).
+        then(article => {
+          assert.ok(article.$session());
+          return article.populate('author').execPopulate();
+        }).
+        then(article => assert.equal(article.author.name, 'Val'));
+    });
+
+    it('`execPopulate()` supports overwriting the session', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+        then(() => Article.findOne().session(session)).
+        then(article => {
+          return article.
+            populate({ path: 'author', options: { session: null } }).
+            execPopulate();
+        }).
+        then(article => assert.ok(!article.author));
+    });
   });
 });

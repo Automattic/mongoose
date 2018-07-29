@@ -160,26 +160,24 @@ describe('transactions', function() {
 
     beforeEach(function() {
       if (_skipped) {
-        return this.skip(); // https://github.com/mochajs/mocha/issues/2546
+        this.skip();
+        return Promise.resolve(); // https://github.com/mochajs/mocha/issues/2546
       }
-      return Author.deleteMany({}).then(() => Article.deleteMany({}));
+      return Author.deleteMany({}).
+        then(() => Article.deleteMany({})).
+        then(() => db.startSession()).
+        then(_session => {
+          session = _session;
+          session.startTransaction();
+        });
     });
 
-    beforeEach(function() {
+    afterEach(function(done) {
       if (_skipped) {
-        return this.skip(); // https://github.com/mochajs/mocha/issues/2546
+        return done(); // https://github.com/mochajs/mocha/issues/2546
       }
-      return db.startSession().then(_session => {
-        session = _session;
-        session.startTransaction();
-      });
-    });
-
-    afterEach(function() {
-      if (_skipped) {
-        return; // https://github.com/mochajs/mocha/issues/2546
-      }
-      return session.commitTransaction();
+      session.commitTransaction();
+      done();
     });
 
     it('`populate()` uses the querys session', function() {

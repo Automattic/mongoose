@@ -4256,6 +4256,21 @@ describe('model: populate:', function() {
         });
       });
 
+      it('catchable error if localField or foreignField not specified (gh-6767)', function() {
+        const BandSchema = new Schema({
+          name: String
+        });
+        BandSchema.virtual('members');
+
+        const Band = db.model('gh6767_Band', BandSchema);
+
+        return Band.create({ name: 'Motley Crue' }).
+          then(() => Band.find().populate('members')).
+          catch(error => {
+            assert.ok(error.message.indexOf('foreignField') !== -1, error.message);
+          });
+      });
+
       it('source array', function(done) {
         var PersonSchema = new Schema({
           name: String

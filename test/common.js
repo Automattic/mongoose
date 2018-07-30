@@ -4,8 +4,6 @@
  * Module dependencies.
  */
 
-Error.stackTraceLimit = 10;
-
 const Server = require('mongodb-topology-manager').Server;
 const mongoose = require('../');
 const Collection = mongoose.Collection;

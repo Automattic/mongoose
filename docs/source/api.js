@@ -104,9 +104,7 @@ function parse() {
         }
       }
 
-      if (ctx.string.includes('Model')) {
-        console.log(ctx);
-      }
+      console.log(ctx);
 
       // Backwards compat
       if (typeof ctx.constructor === 'string') {

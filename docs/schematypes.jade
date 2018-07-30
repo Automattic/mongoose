@@ -10,7 +10,7 @@ block content
     SchemaTypes handle definition of path
     [defaults](./api.html#schematype_SchemaType-default),
     [validation](./api.html#schematype_SchemaType-validate),
-    [getters](./api.html#schematype_SchemaType-get),
+    [getters](#getters),
     [setters](./api.html#schematype_SchemaType-set),
     [field selection defaults](./api.html#schematype_SchemaType-select) for
     [queries](./api.html#query-js),
@@ -174,8 +174,8 @@ block content
     * `trim`: boolean, whether to always call `.trim()` on the value
     * `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
     * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
-    * `minlength`: Number, creates a [validator](./validation.html) that checks if the value length is not less then the given number
-    * `maxlength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater then the given number
+    * `minlength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
+    * `maxlength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
 
     <h5>Number</h5>
 
@@ -266,7 +266,7 @@ block content
     console.log(mongoose.Schema.Types.Boolean.convertToFalse);
 
     mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
-    console.log(new M({ b: 'nay' }).b); // true
+    console.log(new M({ b: 'nay' }).b); // false
     ```
 
     <h4 id="arrays">Arrays</h4>
@@ -278,10 +278,10 @@ block content
 
     ```javascript
     var ToySchema = new Schema({ name: String });
-    var ToyBox = new Schema({
+    var ToyBoxSchema = new Schema({
       toys: [ToySchema],
       buffers: [Buffer],
-      string:  [String],
+      strings: [String],
       numbers: [Number]
       // ... etc
     });
@@ -290,14 +290,14 @@ block content
     Arrays are special because they implicitly have a default value of `[]` (empty array).
 
     ```javascript
-    var Toy = mongoose.model('Test', ToySchema);
-    console.log((new Toy()).toys); // []
+    var ToyBox = mongoose.model('ToyBox', ToyBoxSchema);
+    console.log((new ToyBox()).toys); // []
     ```
 
     To overwrite this default, you need to set the default value to `undefined`
 
     ```javascript
-    var ToySchema = new Schema({
+    var ToyBoxSchema = new Schema({
       toys: {
         type: [ToySchema],
         default: undefined
@@ -374,6 +374,68 @@ block content
     Map types are stored as [BSON objects in MongoDB](https://en.wikipedia.org/wiki/BSON#Data_types_and_syntax).
     Keys in a BSON object are ordered, so this means the [insertion order](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Description)
     property of maps is maintained.
+
+    <h3 id="getters"><a href="#getters">Getters</a></h3>
+
+    Getters are like virtuals for paths defined in your schema. For example,
+    let's say you wanted to store user profile pictures as relative paths and
+    then add the hostname in your application. Below is how you would structure
+    your `userSchema`:
+
+    ```javascript
+    const root = 'https://s3.amazonaws.com/mybucket';
+
+    const userSchema = new Schema({
+      name: String,
+      picture: {
+        type: String,
+        get: v => `${root}${v}`
+      }
+    });
+
+    const User = mongoose.model('User', userSchema);
+
+    const doc = new User({ name: 'Val', picture: '/123.png' });
+    doc.picture; // 'https://s3.amazonaws.com/mybucket/123.png'
+    doc.toObject({ getters: false }).picture; // '123.png'
+    ```
+
+    Generally, you only use getters on primitive paths as opposed to arrays
+    or subdocuments. Because getters override what accessing a Mongoose path returns,
+    declaring a getter on an object may remove Mongoose change tracking for
+    that path.
+
+    ```javascript
+    const schema = new Schema({
+      arr: [{ url: String }]
+    });
+
+    const root = 'https://s3.amazonaws.com/mybucket';
+
+    // Bad, don't do this!
+    schema.path('arr').get(v => {
+      return v.map(el => Object.assign(el, { url: root + el.url }));
+    });
+
+    // Later
+    doc.arr.push({ key: String });
+    doc.arr[0]; // 'undefined' because every `doc.arr` creates a new array!
+    ```
+
+    Instead of declaring a getter on the array as shown above, you should
+    declare a getter on the `url` string as shown below. If you need to declare
+    a getter on a nested document or array, be very careful!
+
+    ```javascript
+    const schema = new Schema({
+      arr: [{ url: String }]
+    });
+
+    const root = 'https://s3.amazonaws.com/mybucket';
+
+    // Good, do this instead of declaring a getter on `arr`
+    schema.path('arr.0.url').get(v => `${root}${v}`);
+    ```
 
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
 

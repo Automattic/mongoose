@@ -8,6 +8,7 @@ const Schema = mongoose.Schema;
 
 describe('transactions', function() {
   let db;
+  let _skipped = false;
 
   before(function() {
     db = start({ replicaSet: 'rs' });
@@ -16,6 +17,7 @@ describe('transactions', function() {
       then(() => {
         // Skip if not a repl set
         if (db.client.topology.constructor.name !== 'ReplSet') {
+          _skipped = true;
           this.skip();
         }
       }).
@@ -29,11 +31,13 @@ describe('transactions', function() {
       })).
       then(version => {
         if (version[0] < 4) {
+          _skipped = true;
           this.skip();
         }
       }).
       catch(() => {
-        this.skip()
+        _skipped = true;
+        this.skip();
       });
   });
 
@@ -96,5 +100,130 @@ describe('transactions', function() {
         return User.findOne({ name: 'bar' });
       }).
       then(doc => assert.ok(doc));
+  });
+
+  it('aggregate', function() {
+    const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
+
+    let session = null;
+    return db.createCollection('Event').
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return Event.insertMany([
+          { createdAt: new Date('2018-06-01') },
+          { createdAt: new Date('2018-06-02') },
+          { createdAt: new Date('2017-06-01') },
+          { createdAt: new Date('2017-05-31') }
+        ], { session: session });
+      }).
+      then(() => Event.aggregate([
+        {
+          $group: {
+            _id: {
+              month: { $month: '$createdAt' },
+              year: { $year: '$createdAt' }
+            },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
+      ]).session(session)).
+      then(res => {
+        assert.deepEqual(res, [
+          { _id: { month: 6, year: 2018 }, count: 2 },
+          { _id: { month: 6, year: 2017 }, count: 1 },
+          { _id: { month: 5, year: 2017 }, count: 1 }
+        ]);
+        session.commitTransaction();
+      });
+  });
+
+  describe('populate (gh-6754)', function() {
+    let Author;
+    let Article;
+    let session;
+
+    before(function() {
+      if (_skipped) {
+        this.skip();
+        return; // https://github.com/mochajs/mocha/issues/2546
+      }
+
+      Author = db.model('Author', new Schema({ name: String }), 'Author');
+      Article = db.model('Article', new Schema({
+        author: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Author'
+        }
+      }), 'Article');
+
+      return db.createCollection('Author').
+        then(() => db.createCollection('Article'));
+    });
+
+    beforeEach(function() {
+      return Author.deleteMany({}).
+        then(() => Article.deleteMany({})).
+        then(() => db.startSession()).
+        then(_session => {
+          session = _session;
+          session.startTransaction();
+        });
+    });
+
+    afterEach(function(done) {
+      session.commitTransaction();
+      done();
+    });
+
+    it('`populate()` uses the querys session', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+        then(articles => {
+          return Article.
+            findById(articles[0]._id).
+            session(session).
+            populate('author');
+        }).
+        then(article => assert.equal(article.author.name, 'Val'));
+    });
+
+    it('can override `populate()` session', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        // Article created _outside_ the transaction
+        then(authors => Article.create([{ author: authors[0]._id }])).
+        then(articles => {
+          return Article.
+            findById(articles[0]._id).
+            populate({ path: 'author', options: { session: session } });
+        }).
+        then(article => assert.equal(article.author.name, 'Val'));
+    });
+
+    it('`execPopulate()` uses the documents `$session()` by default', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+        // By default, the populate query should use the associated `$session()`
+        then(articles => Article.findById(articles[0]._id).session(session)).
+        then(article => {
+          assert.ok(article.$session());
+          return article.populate('author').execPopulate();
+        }).
+        then(article => assert.equal(article.author.name, 'Val'));
+    });
+
+    it('`execPopulate()` supports overwriting the session', function() {
+      return Author.create([{ name: 'Val' }], { session: session }).
+        then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
+        then(() => Article.findOne().session(session)).
+        then(article => {
+          return article.
+            populate({ path: 'author', options: { session: null } }).
+            execPopulate();
+        }).
+        then(article => assert.ok(!article.author));
+    });
   });
 });

@@ -38,5 +38,6 @@ docs/*.html
 
 # Webpack output
 dist
+test/files/main.js
 
 package-lock.json

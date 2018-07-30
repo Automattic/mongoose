@@ -1,3 +1,18 @@
+5.2.6 / 2018-07-30
+==================
+ * fix(document): don't double-call deeply nested custom getters when using `get()` #6779 #6637
+ * fix(query): upgrade mquery for readConcern() helper #6777
+ * docs(schematypes): clean up typos #6773 [sajadtorkamani](https://github.com/sajadtorkamani)
+ * refactor(browser): fix webpack warnings #6771 #6705
+ * fix(populate): make error reported when no `localField` specified catchable #6767
+ * docs(connection): use correct form in createConnection example #6766 [lineus](https://github.com/lineus)
+ * fix(connection): throw helpful error when using legacy `mongoose.connect()` syntax #6756
+ * fix(document): handle overwriting `$session` in `execPopulate()` #6754
+ * fix(query): propagate top-level session down to `populate()` #6754
+ * fix(aggregate): add `session()` helper for consistency with query api #6752
+ * fix(map): avoid infinite recursion when update overwrites a map #6750
+ * fix(model): be consistent about passing noop callback to mongoose.model() `init()` as well as db.model() #6707
+
 5.2.5 / 2018-07-23
 ==================
  * fix(boolean): expose `convertToTrue` and `convertToFalse` for custom boolean casting #6758

@@ -4,6 +4,20 @@
   margin-right: 0.25em;
 }
 
+.api-nav {
+  position: fixed;
+  left: 1250px;
+  top: 30px;
+  border: 1px solid orange;
+  width: 150px;
+}
+
+@media (max-width: 1400px) {
+  .api-nav {
+    display: none;
+  }
+}
+
 ul {
   margin-top: -10px;
 }

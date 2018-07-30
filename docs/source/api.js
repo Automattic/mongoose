@@ -45,8 +45,14 @@ parse();
 
 function parse() {
   for (const props of combinedFiles) {
+    let name = props.file.
+      replace('lib/', '').
+      replace('.js', '').
+      replace('/index', '');
+    const lastSlash = name.lastIndexOf('/');
+    name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
     const data = {
-      name: _.capitalize(props.file.replace('lib/', '').replace('.js', '').replace('/index', '')),
+      name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : _.capitalize(name),
       props: []
     };
 

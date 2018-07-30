@@ -6,9 +6,15 @@ append style
 block content
   h1 API Docs
 
+  div.api-nav
+    each item in docs
+      div.nav-item(id="nav-#{item.name}")
+        a(href="##{item.name}")
+          | #{item.name}
+
   each item in docs
     hr.separate-api
-    h2(id="#{item.name}")
+    h2(id="#{item.name}", class="item-header")
       a(href="##{item.name}")
         | #{item.name}
     ul
@@ -32,3 +38,25 @@ block content
           li <span class="method-type">&laquo;#{prop.return.types}&raquo;</span> #{prop.return.description}
       div
         | !{prop.description}
+
+  script(type="text/javascript").
+    var headers = document.querySelectorAll('.item-header');
+    var navItems = document.querySelectorAll('.nav-item');
+    var cur = '';
+    window.addEventListener('scroll', function() {
+      var scrollY = window.scrollY;
+      var highlight = headers[0];
+      for (var i = 0; i < headers.length; ++i) {
+        if (headers[i].offsetTop > scrollY) {
+          break;
+        }
+        highlight = headers[i];
+      }
+      if (highlight.id !== cur) {
+        cur = highlight.id;
+        for (var j = 0; j < navItems.length; ++j) {
+          navItems[j].style.fontWeight = '';
+        }
+        document.querySelector('#nav-' + highlight.id).style.fontWeight = 'bold';
+      }
+    });

@@ -77,7 +77,12 @@ hr.separate-api {
 /* CPC ad */
 
 #api-carbon-ad {
-  display: none;
+  width: 250px;
+  margin-top: 75px;
+}
+
+.native-ad img {
+  width: auto !important;
 }
 
 .native-ad {

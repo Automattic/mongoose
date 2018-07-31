@@ -1,0 +1,124 @@
+/* CPC ads */
+
+.native-js {
+  visibility: hidden;
+  transition: all .25s ease-in-out;
+  opacity: 0;
+  flex-flow: column nowrap;
+  transform: translateY(calc(100% - 35px));
+}
+
+.native-show {
+  visibility: visible;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  box-shadow: 0 -1px 4px 1px hsla(0, 0%, 0%, .15);
+  opacity: 1;
+  z-index: 10;
+}
+
+.native-show:hover {
+  transform: translateY(0);
+}
+
+.native-img {
+  margin-right: 20px;
+  max-height: 50px;
+  border-radius: 3px;
+  width: auto;
+}
+
+.native-sponsor {
+  margin: 10px 20px;
+  text-align: center;
+  text-transform: uppercase;
+  transform-origin: left;
+  letter-spacing: .5px;
+  transition: all .3s ease-in-out;
+  font-size: 12px;
+}
+
+.native-show:hover .native-sponsor {
+  transform: scaleY(0);
+  margin: 0 20px;
+  opacity: 0;
+}
+
+.native-flex {
+  display: flex;
+  padding: 20px 20px 40px;
+  text-decoration: none;
+
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.native-main {
+  display: flex;
+
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.native-details {
+  display: flex;
+  margin-right: 30px;
+
+  flex-flow: column nowrap;
+}
+
+.native-company {
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 10px;
+}
+
+.native-desc {
+  letter-spacing: 1px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.native-cta {
+  padding: 10px 14px;
+  border-radius: 3px;
+  box-shadow: 0 6px 13px 0 hsla(0, 0%, 0%, .15);
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  font-weight: 400;
+  font-size: 12px;
+  transition: all .3s ease-in-out;
+  transform: translateY(-1px);
+}
+
+.native-cta:hover {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+@media only screen and (min-width: 320px) and (max-width: 759px) {
+  .native-flex {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .native-img {
+    margin: 0;
+  }
+
+  .native-details {
+    margin: 0;
+  }
+
+  .native-main {
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: center;
+    align-content: center;
+  }
+}

@@ -2,15 +2,58 @@ extends layout
 
 append style
   link(rel="stylesheet", href="/docs/css/api.css")
+  script(type="text/javascript" src="/docs/js/native.js")
 
 block content
   h1 API Docs
 
   div.api-nav
-    each item in docs
-      div.nav-item(id="nav-#{item.name}")
-        a(href="##{item.name}")
-          | #{item.name}
+    div.api-nav-content
+      each item in docs
+        div.nav-item(id="nav-#{item.name}")
+          div.nav-item-title
+            a(href="##{item.name}")
+              | #{item.name}
+          ul.nav-item-sub
+            each prop in item.props
+              li
+                a(href="##{prop.anchorId}")
+                  | #{prop.string}
+    script.
+      _native.init("CK7DT53U", {
+        targetClass: 'native-js',
+        display: 'flex',
+        visibleClass: 'native-show'
+      });
+    div#api-carbon-ad.
+      <div class="native-ad">
+        <style>
+        .native-img.#native_index# {
+          background-color: #native_bg_color#;
+        }
+
+        .native-img:hover.#native_index# {
+          background-color: #native_bg_color_hover#;
+        }
+
+        .native-cta.#native_index# {
+          color: #native_cta_color#;
+          background-color: #native_cta_bg_color#;
+        }
+        .native-cta.#native_index#:hover {
+          color: #native_cta_color_hover#;
+          background-color: #native_cta_bg_color_hover#;
+        }
+        </style>
+        <a href="#native_link#">
+        <div class="native-banner">
+          <img class="native-img #native_index#" src="#native_logo#">
+          <span class="native-cta #native_index#">#native_cta#</span>
+        </div>
+        <span class="native-desc"> #native_desc#</span>
+        <span class="native-sponsor">Sponsored by <strong>#native_company#</strong></span>
+      </a>
+      </div>
 
   each item in docs
     hr.separate-api
@@ -41,7 +84,8 @@ block content
 
   script(type="text/javascript").
     var headers = document.querySelectorAll('.item-header');
-    var navItems = document.querySelectorAll('.nav-item');
+    var navItems = document.querySelectorAll('.nav-item .nav-item-title');
+    var navSubs = document.querySelectorAll('.nav-item-sub');
     var cur = '';
     window.addEventListener('scroll', function() {
       var scrollY = window.scrollY;
@@ -57,6 +101,10 @@ block content
         for (var j = 0; j < navItems.length; ++j) {
           navItems[j].style.fontWeight = '';
         }
-        document.querySelector('#nav-' + highlight.id).style.fontWeight = 'bold';
+        for (j = 0; j < navSubs.length; ++j) {
+          navSubs[j].style.display = 'none';
+        }
+        document.querySelector('#nav-' + highlight.id + ' .nav-item-title').style.fontWeight = 'bold';
+        document.querySelector('#nav-' + highlight.id + ' .nav-item-sub').style.display = 'block';
       }
     });

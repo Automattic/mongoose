@@ -63,6 +63,13 @@ describe('connections:', function() {
       done();
     });
 
+    it('throws helpful error with undefined uri (gh-6763)', function(done) {
+      assert.throws(function() {
+        mongoose.createConnection(void 0);
+      }, /string.*createConnection/);
+      done();
+    });
+
     it('resolving with q (gh-5714)', function(done) {
       var bootMongo = Q.defer();
 

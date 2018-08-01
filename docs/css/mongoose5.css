@@ -246,11 +246,11 @@ pre {
   }
 }
 
-/* CPM ads */
-
 .pure-menu-item:last-of-type {
-  padding-bottom: 260px;
+  padding-bottom: 200px;
 }
+
+/* CPM ads */
 
 #carbonads {
   position: fixed;

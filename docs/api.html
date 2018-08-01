@@ -1727,10 +1727,19 @@ Model.update(query, { $set: { name: <span class="hljs-string">'jason bourne'</sp
 
 <p>This function does <strong>not</strong> trigger any middleware. In particular, it does <strong>not</strong> trigger aggregate middleware.</p>
 
+<h2>The ChangeStream object is an event emitter that emits the following events</h2>
+
+<ul>
+<li>'change': A change occurred, see below example</li>
+<li>'error': An unrecoverable error occurred. In particular, change streams currently error out if they lose connection to the replica set primary. Follow <a href="https://github.com/Automattic/mongoose/issues/6799">this GitHub issue</a> for updates.</li>
+<li>'end': Emitted if the underlying stream is closed</li>
+<li>'close': Emitted if the underlying stream is closed</li>
+</ul>
+
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> Person.create({ name: <span class="hljs-string">'Ned Stark'</span> });
-Person.watch().on(<span class="hljs-string">'change'</span>, change =&gt; <span class="hljs-built_in">console</span>.log(change));
+<span class="hljs-keyword">const</span> changeStream = Person.watch().on(<span class="hljs-string">'change'</span>, change =&gt; <span class="hljs-built_in">console</span>.log(change));
 <span class="hljs-comment">// Will print from the above `console.log()`:</span>
 <span class="hljs-comment">// { _id: { _data: ... },</span>
 <span class="hljs-comment">//   operationType: 'delete',</span>

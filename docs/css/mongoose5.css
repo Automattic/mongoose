@@ -149,18 +149,18 @@ pre {
 
 /* CPM ads */
 
-.carbon-ad {
-  margin-top: 10px;
-  padding-top: 0 !important;
-  border-bottom: solid 1px #dddddd;
+.pure-menu-item:last-of-type {
+  padding-bottom: 260px;
 }
 
 #carbonads {
+  position: fixed;
+  bottom: 0;
   display: block;
   overflow: hidden;
   padding: 20px 10px;
   max-width: 230px;
-  background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) #eeeeee;;
+  background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) #eeeeee;
   text-align: center;
   font-size: 14px;
   line-height: 1.5;
@@ -192,103 +192,4 @@ pre {
   letter-spacing: 1px;
   font-size: 10px;
   line-height: 1;
-}
-
-@media (max-width: 1160px) {
-  .container {
-    width: 100%;
-    padding: 0px;
-    left: 0px;
-    margin: auto;
-  }
-
-  #content {
-    margin: 10px;
-  }
-
-  #menu {
-    display: none;
-    position: absolute;
-    top: 45px;
-    border-top: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    left: 0px;
-  }
-
-  pre {
-    margin: 0px;
-    margin-top: 10px;
-  }
-
-  #mobile-menu {
-    display: block;
-    height: 45px;
-    background-color: #eee;
-    border-bottom: 1px solid #ddd;
-  }
-
-  #logo {
-    border: 0;
-  }
-
-  #mobile-logo-container {
-    padding: 0;
-    border: 0px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    width: 215px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  #logo-container {
-    display: none;
-  }
-
-  .menu-link {
-    position: absolute;
-    display: block;
-    top: 0px;
-    left: 0;
-    background-color: #eee;
-    font-size: 10px; /* change this value to increase/decrease button size */
-    z-index: 10;
-    width: 2em;
-    height: 3px;
-    padding: 2.1em 1.6em;
-  }
-
-  .menu-link:hover,
-  .menu-link:focus {
-    background: #ddd;
-  }
-
-  .menu-link span {
-    position: relative;
-    display: block;
-  }
-
-  .menu-link span,
-  .menu-link span:before,
-  .menu-link span:after {
-    background-color: #333;
-    width: 100%;
-    height: 0.2em;
-  }
-
-  .menu-link span:before,
-  .menu-link span:after {
-    position: absolute;
-    margin-top: -0.6em;
-    content: " ";
-  }
-
-  .menu-link span:after {
-    margin-top: 0.6em;
-  }
-
-  .active {
-    display: block !important;
-  }
 }

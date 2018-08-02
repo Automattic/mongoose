@@ -13,6 +13,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
+const CastError = mongoose.Error.CastError;
 
 describe('model: update:', function() {
   var post;
@@ -2912,6 +2913,35 @@ describe('model: update:', function() {
             done();
           });
         });
+      });
+    });
+
+    it('$inc cast errors (gh-6770)', function() {
+      const testSchema = new mongoose.Schema({ num: Number });
+      const Test = db.model('gh6770', testSchema);
+
+      return co(function*() {
+        yield Test.create({ num: 1 });
+
+        let threw = false;
+        try {
+          yield Test.updateOne({}, { $inc: { num: 'not a number' } });
+        } catch (error) {
+          threw = true;
+          assert.ok(error instanceof CastError);
+          assert.equal(error.path, 'num');
+        }
+        assert.ok(threw);
+
+        threw = false;
+        try {
+          yield Test.updateOne({}, { $inc: { num: null } });
+        } catch (error) {
+          threw = true;
+          assert.ok(error instanceof CastError);
+          assert.equal(error.path, 'num');
+        }
+        assert.ok(threw);
       });
     });
 

@@ -1,12 +1,16 @@
+'use strict';
+
 /**
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema;
+const assert = require('assert');
+const co = require('co');
+const start = require('./common');
+const random = require('../lib/utils').random;
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('schema select option', function() {
   var db;
@@ -367,6 +371,21 @@ describe('schema select option', function() {
           assert.equal(doc.many.length, 2);
           done();
         });
+      });
+    });
+
+    it('ignores if path does not have select in schema (gh-6785)', function() {
+      const M = db.model('gh6785', new Schema({
+        a: String,
+        b: String
+      }));
+
+      return co(function*() {
+        yield M.create({ a: 'foo', b: 'bar' });
+
+        const doc = yield M.findOne().select('+a');
+        assert.equal(doc.a, 'foo');
+        assert.equal(doc.b, 'bar');
       });
     });
   });

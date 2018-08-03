@@ -2849,6 +2849,28 @@ describe('model: update:', function() {
         });
     });
 
+    it('doesn\'t add $each when pushing an array into an array (gh-6768)', function() {
+      const schema = new Schema({
+        arr: [[String]]
+      });
+
+      const Test = db.model('gh6768', schema);
+
+      const test = new Test;
+
+      return co(function*() {
+        yield test.save();
+        let cond = { _id: test._id };
+        let data = ['one', 'two'];
+        let update = { $push: { arr: data } };
+        let opts = { new: true };
+        let doc = yield Test.findOneAndUpdate(cond, update, opts);
+        assert.strictEqual(doc.arr.length, 1);
+        assert.strictEqual(doc.arr[0][0], 'one');
+        assert.strictEqual(doc.arr[0][1], 'two');
+      });
+    });
+
     it('casting embedded discriminators if path specified in filter (gh-5841)', function() {
       return co(function*() {
         const sectionSchema = new Schema({ show: Boolean, order: Number },

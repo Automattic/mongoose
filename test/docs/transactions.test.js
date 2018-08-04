@@ -226,4 +226,28 @@ describe('transactions', function() {
         then(article => assert.ok(!article.author));
     });
   });
+
+  it('deleteMany (gh-6805)', function() {
+    const Character = db.model('Character', new Schema({ name: String }), 'Character');
+
+    let session = null;
+    return db.createCollection('Character').
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return Character.insertMany([
+          { name: 'Tyrion Lannister' },
+          { name: 'Cersei Lannister' },
+          { name: 'Jon Snow' },
+          { name: 'Daenerys Targaryen' }
+        ], { session: session });
+      }).
+      then(() => Character.deleteMany({ name: /Lannister/ }, { session: session })).
+      then(() => Character.find({}).session(session))
+      .then(res => {
+        assert.equal(res.length, 2);
+        session.commitTransaction();
+      });
+  });
 });

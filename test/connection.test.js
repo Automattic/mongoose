@@ -775,6 +775,8 @@ describe('connections:', function() {
         session = _session;
         assert.ok(session);
         lastUse = session.serverSession.lastUse;
+        return new Promise(resolve => setTimeout(resolve, 1));
+      }).then(() => {
         return conn.model('Test', new Schema({})).findOne({}, null, { session });
       }).
       then(() => {

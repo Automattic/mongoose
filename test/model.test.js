@@ -4823,7 +4823,32 @@ describe('Model', function() {
         assert.equal(postCalled, 0);
         assert.equal(postErrorCalled, 1);
       });
+    });
 
+    it('deleteMany() with options (gh-6805)', function(done) {
+      var schema = new Schema({
+        name: String
+      });
+      var Character = db.model('gh6805', schema);
+
+      var arr = [
+        { name: 'Tyrion Lannister' },
+        { name: 'Cersei Lannister' },
+        { name: 'Jon Snow' },
+        { name: 'Daenerys Targaryen' }
+      ];
+      Character.insertMany(arr, function(err, docs) {
+        assert.ifError(err);
+        assert.equal(docs.length, 4);
+        Character.deleteMany({ name: /Lannister/ }, { w: 1 }, function(err) {
+          assert.ifError(err);
+          Character.find({}, function(err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
     });
 
     describe('3.6 features', function() {

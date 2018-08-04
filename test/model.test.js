@@ -4933,6 +4933,7 @@ describe('Model', function() {
 
       describe('sessions (gh-6362)', function() {
         let MyModel;
+        let delay = ms => done => setTimeout(done, ms);
 
         before(function(done) {
           MyModel = db.model('gh6362', new Schema({ name: String }));
@@ -4988,12 +4989,16 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
+            yield delay(1);
+
             let doc = yield MyModel.findOne({}, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' },
               { session: session });
@@ -5002,6 +5007,8 @@ describe('Model', function() {
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             doc.name = 'test3';
 
@@ -5021,6 +5028,8 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
+            yield delay(1);
+
             let docs = yield MyModel.find({ _id: doc._id }, null,
               { session: session });
             assert.equal(docs.length, 1);
@@ -5029,6 +5038,8 @@ describe('Model', function() {
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             docs[0].name = 'test3';
 
@@ -5048,10 +5059,14 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
+            yield delay(1);
+
             let doc = yield MyModel.findOne({}, null, { session });
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             doc.name = 'test3';
 

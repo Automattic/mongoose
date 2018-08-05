@@ -2347,29 +2347,22 @@ describe('model: populate:', function() {
     var db, B, User;
     var post;
 
-    before(function(done) {
+    before(function() {
       db = start();
       B = db.model('RefBlogPost');
       User = db.model('RefAlternateUser');
 
-      User.create({
-        name: 'use an object',
-        email: 'fo-real@objects.r.fun'
-      }
-        , {name: 'yup'}
-        , {name: 'not here'}
-        , function(err, fan1, fan2, fan3) {
-        assert.ifError(err);
-
-        B.create({
+      return User.
+        create([
+          { name: 'use an object', email: 'fo-real@objects.r.fun' },
+          { name: 'yup' },
+          { name: 'not here' }
+        ]).
+        then(fans => B.create({
           title: 'woot',
-          fans: [fan1, fan2, fan3]
-        }, function(err, post_) {
-          assert.ifError(err);
-          post = post_;
-          done();
-        });
-      });
+          fans: fans
+        })).
+        then(_post => { post = _post; });
     });
 
     after(function(done) {

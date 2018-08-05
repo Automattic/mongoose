@@ -41,7 +41,7 @@
     "bluebird": "3.5.0",
     "co": "4.6.0",
     "dox": "0.3.1",
-    "eslint": "4.14.0",
+    "eslint": "5.3.0",
     "highlight.js": "9.1.0",
     "jade": "1.11.0",
     "lodash": "4.17.5",
@@ -58,7 +58,7 @@
     "tbd": "0.6.4",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
-    "webpack": "4.12.0",
+    "webpack": "4.16.4",
     "validator": "5.4.0"
   },
   "directories": {

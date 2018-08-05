@@ -65,7 +65,6 @@
     "lib": "./lib/mongoose"
   },
   "scripts": {
-    "fix-lint": "eslint . --fix",
     "lint": "eslint . --quiet",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",

@@ -16,6 +16,6 @@ before_script:
   - ./mongodb-linux-x86_64-3.6.4/bin/mongod --fork --nopreallocj --dbpath ./data/db/27017 --syslog --port 27017
 script:
   - npm test
-  - npm run lint
+  - node tools/checkNodeVersion.js "4.x || 5.x" || npm run lint
 notifications:
   email: false

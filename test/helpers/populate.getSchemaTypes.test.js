@@ -1,8 +1,9 @@
 'use strict';
 
-var Schema = require('../../lib/schema');
-var assert = require('assert');
-var getSchemaTypes = require('../../lib/helpers/populate/getSchemaTypes');
+const Schema = require('../../lib/schema');
+const assert = require('assert');
+const getSchemaTypes = require('../../lib/helpers/populate/getSchemaTypes');
+const mongoose = require('../common').mongoose;
 
 describe('getSchemaTypes', function() {
   it('handles embedded discriminators (gh-5970)', function(done) {
@@ -131,6 +132,37 @@ describe('getSchemaTypes', function() {
     assert.equal(schemaTypes.length, 2);
     assert.equal(schemaTypes[0].options.ref, 'Ref1');
     assert.equal(schemaTypes[1].options.ref, 'Ref2');
+
+    done();
+  });
+
+  it('handles already populated paths (gh-6798)', function(done) {
+    const DriverSchema = new mongoose.Schema({
+      name: 'String',
+      cars: [{ type: 'ObjectId', required: false, ref: 'gh6798_Car' }]
+    });
+
+    const CarSchema = new mongoose.Schema({
+      name: 'String',
+      producer: { type: 'ObjectId', required: false, ref: 'gh6798_Producer' }
+    });
+
+    const ProducerSchema = new mongoose.Schema({
+      name: 'String',
+    });
+
+    const Driver = mongoose.model('gh6798_Driver', DriverSchema);
+    const Car = mongoose.model('gh6798_Car', CarSchema);
+    mongoose.model('gh6798_Producer', ProducerSchema);
+
+    const car = new Car({ name: '1970 Dodge Charger' });
+    const driver = new Driver({ name: 'Dominic Toretto', cars: [car] });
+
+    assert.equal(driver.cars[0].name, '1970 Dodge Charger');
+    assert.ok(driver.populated('cars'));
+
+    const schematype = getSchemaTypes(DriverSchema, driver, 'cars.producer');
+    assert.equal(schematype.options.ref, 'gh6798_Producer');
 
     done();
   });

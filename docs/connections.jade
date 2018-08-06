@@ -78,6 +78,7 @@ block content
 
     Below are some of the options that are important for tuning mongoose.
 
+    * `useNewUrlParser`   - The underlying MongoDB driver has deprecated their current [connection string](https://docs.mongodb.com/manual/reference/connection-string/) parser. Because this is a major change, they added the `useNewUrlParser` flag to allow users to fall back to the old parser if they find a bug in the new parser. You should set `useNewUrlParser: true` unless that prevents you from connecting.
     * `autoReconnect`     - The underlying MongoDB driver will automatically try to reconnect when it loses connection to MongoDB. Unless you are an extremely advanced user that wants to manage their own connection pool, do **not** set this option to `false`.
     * `reconnectTries`    - If you're connected to a single server or mongos proxy (as opposed to a replica set), the MongoDB driver will try to reconnect every `reconnectInterval` milliseconds for `reconnectTries` times, and give up afterward. When the driver gives up, the mongoose connection emits a `reconnectFailed` event. This option does nothing for replica set connections.
     * `reconnectInterval` - See `reconnectTries`
@@ -92,7 +93,7 @@ block content
 
     ```javascript
     const options = {
-      useMongoClient: true,
+      useNewUrlParser: true,
       autoIndex: false, // Don't build indexes
       reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
       reconnectInterval: 500, // Reconnect every 500ms

@@ -1,3 +1,20 @@
+5.2.7 / 2018-08-06
+==================
+ * fix(model): check `expireAfterSeconds` option when diffing indexes in syncIndexes() #6820 #6819 [christopherhex](https://github.com/christopherhex)
+ * chore: fix some common test flakes in travis #6816 [Fonger](https://github.com/Fonger)
+ * chore: bump eslint and webpack to avoid bad versions of eslint-scope #6814
+ * test(model): add delay to session tests to improve pass rate #6811 [Fonger](https://github.com/Fonger)
+ * fix(model): support options in `deleteMany` #6810 [Fonger](https://github.com/Fonger)
+ * fix(query): don't use $each when pushing an array into an array #6809 [lineus](https://github.com/lineus)
+ * chore: bump mquery so eslint isn't a prod dependency #6800
+ * fix(populate): correctly get schema type when calling `populate()` on already populated path #6798
+ * fix(populate): propagate readConcern options in populate from parent query #6792 #6785 [Fonger](https://github.com/Fonger)
+ * docs(connection): add description of useNewUrlParser option #6789
+ * fix(query): make select('+path') a no-op if no select prop in schema #6785
+ * docs(schematype+validation): document using function syntax for custom validator message #6772
+ * fix(update): throw CastError if updating with `$inc: null` #6770
+ * fix(connection): throw helpful error when calling `createConnection(undefined)` #6763
+
 5.2.6 / 2018-07-30
 ==================
  * fix(document): don't double-call deeply nested custom getters when using `get()` #6779 #6637

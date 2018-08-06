@@ -4823,7 +4823,32 @@ describe('Model', function() {
         assert.equal(postCalled, 0);
         assert.equal(postErrorCalled, 1);
       });
+    });
 
+    it('deleteMany() with options (gh-6805)', function(done) {
+      var schema = new Schema({
+        name: String
+      });
+      var Character = db.model('gh6805', schema);
+
+      var arr = [
+        { name: 'Tyrion Lannister' },
+        { name: 'Cersei Lannister' },
+        { name: 'Jon Snow' },
+        { name: 'Daenerys Targaryen' }
+      ];
+      Character.insertMany(arr, function(err, docs) {
+        assert.ifError(err);
+        assert.equal(docs.length, 4);
+        Character.deleteMany({ name: /Lannister/ }, { w: 1 }, function(err) {
+          assert.ifError(err);
+          Character.find({}, function(err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
     });
 
     describe('3.6 features', function() {
@@ -4908,6 +4933,7 @@ describe('Model', function() {
 
       describe('sessions (gh-6362)', function() {
         let MyModel;
+        let delay = ms => done => setTimeout(done, ms);
 
         before(function(done) {
           MyModel = db.model('gh6362', new Schema({ name: String }));
@@ -4963,12 +4989,16 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
+            yield delay(1);
+
             let doc = yield MyModel.findOne({}, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             doc = yield MyModel.findOneAndUpdate({}, { name: 'test2' },
               { session: session });
@@ -4977,6 +5007,8 @@ describe('Model', function() {
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             doc.name = 'test3';
 
@@ -4996,6 +5028,8 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
+            yield delay(1);
+
             let docs = yield MyModel.find({ _id: doc._id }, null,
               { session: session });
             assert.equal(docs.length, 1);
@@ -5004,6 +5038,8 @@ describe('Model', function() {
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             docs[0].name = 'test3';
 
@@ -5023,10 +5059,14 @@ describe('Model', function() {
 
             let lastUse = session.serverSession.lastUse;
 
+            yield delay(1);
+
             let doc = yield MyModel.findOne({}, null, { session });
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
 
             doc.name = 'test3';
 

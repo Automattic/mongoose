@@ -13,6 +13,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
+const CastError = mongoose.Error.CastError;
 
 describe('model: update:', function() {
   var post;
@@ -2848,6 +2849,28 @@ describe('model: update:', function() {
         });
     });
 
+    it('doesn\'t add $each when pushing an array into an array (gh-6768)', function() {
+      const schema = new Schema({
+        arr: [[String]]
+      });
+
+      const Test = db.model('gh6768', schema);
+
+      const test = new Test;
+
+      return co(function*() {
+        yield test.save();
+        let cond = { _id: test._id };
+        let data = ['one', 'two'];
+        let update = { $push: { arr: data } };
+        let opts = { new: true };
+        let doc = yield Test.findOneAndUpdate(cond, update, opts);
+        assert.strictEqual(doc.arr.length, 1);
+        assert.strictEqual(doc.arr[0][0], 'one');
+        assert.strictEqual(doc.arr[0][1], 'two');
+      });
+    });
+
     it('casting embedded discriminators if path specified in filter (gh-5841)', function() {
       return co(function*() {
         const sectionSchema = new Schema({ show: Boolean, order: Number },
@@ -2912,6 +2935,35 @@ describe('model: update:', function() {
             done();
           });
         });
+      });
+    });
+
+    it('$inc cast errors (gh-6770)', function() {
+      const testSchema = new mongoose.Schema({ num: Number });
+      const Test = db.model('gh6770', testSchema);
+
+      return co(function*() {
+        yield Test.create({ num: 1 });
+
+        let threw = false;
+        try {
+          yield Test.updateOne({}, { $inc: { num: 'not a number' } });
+        } catch (error) {
+          threw = true;
+          assert.ok(error instanceof CastError);
+          assert.equal(error.path, 'num');
+        }
+        assert.ok(threw);
+
+        threw = false;
+        try {
+          yield Test.updateOne({}, { $inc: { num: null } });
+        } catch (error) {
+          threw = true;
+          assert.ok(error instanceof CastError);
+          assert.equal(error.path, 'num');
+        }
+        assert.ok(threw);
       });
     });
 

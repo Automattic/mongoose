@@ -1983,7 +1983,7 @@ describe('model: querying:', function() {
         assert.equal(tests.length, 3);
       });
 
-      var pending = 9;
+      var pending = 10;
 
       function cb() {
         if (--pending) {

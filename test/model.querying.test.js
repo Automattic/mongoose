@@ -54,7 +54,6 @@ describe('model: querying:', function() {
     });
 
     mongoose.model('BlogPostB', BlogPostB);
-    collection = 'blogposts_' + random();
 
     ModSchema = new Schema({
       num: Number,
@@ -82,6 +81,11 @@ describe('model: querying:', function() {
 
   after(function(done) {
     db.close(done);
+  });
+
+  beforeEach(function() {
+    // use different collection name in every test to avoid conflict (gh-6816)
+    collection = 'blogposts_' + random();
   });
 
   it('find returns a Query', function(done) {

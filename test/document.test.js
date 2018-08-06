@@ -2860,12 +2860,16 @@ describe('document', function() {
 
       var MyModel = db.model('gh4014', schema);
 
-      MyModel.
-        where('geo').near({ center: [50, 50] }).
-        exec(function(error) {
-          assert.ifError(error);
-          done();
-        });
+      MyModel.on('index', function(err) {
+        assert.ifError(err);
+
+        MyModel.
+          where('geo').near({ center: [50, 50], spherical: true }).
+          exec(function(err) {
+            assert.ifError(err);
+            done();
+          });
+      });
     });
 
     it('skip validation if required returns false (gh-4094)', function(done) {

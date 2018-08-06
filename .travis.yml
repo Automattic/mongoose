@@ -6,8 +6,6 @@ node_js:
   - "8"
   - "7"
   - "6"
-  - "5"
-  - "4"
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.6.4.tgz
   - tar -zxvf mongodb-linux-x86_64-3.6.4.tgz

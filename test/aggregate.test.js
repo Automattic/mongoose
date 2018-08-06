@@ -1208,7 +1208,7 @@ describe('aggregate: ', function() {
           cursor().
           exec().
           eachAsync(checkDoc, { parallel: 2}).then(function() {
-            assert.ok(Date.now() - startedAt[1] > 100);
+            assert.ok(Date.now() - startedAt[1] >= 100);
             assert.equal(startedAt.length, 2);
             assert.ok(startedAt[1] - startedAt[0] < 50);
             assert.deepEqual(names.sort(), expectedNames);

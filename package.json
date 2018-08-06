@@ -73,7 +73,7 @@
   },
   "main": "./index.js",
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=4.0.0"
   },
   "bugs": {
     "url": "https://github.com/Automattic/mongoose/issues/new"

@@ -2447,11 +2447,20 @@ describe('Query', function() {
 
         let doc = yield Model.create({ n: 0 });
 
-        yield Model.findOneAndUpdate({ _id: doc._id }, { $inc: { n: 1 } }, err => {
+        let callbackDone;
+        let callbackPromise = new Promise(resolve => {
+          callbackDone = resolve;
+        });
+
+        // Both yield and callback will execute query.
+        // Wait for both execution finish (gh-6822)
+
+        yield [Model.findOneAndUpdate({ _id: doc._id }, { $inc: { n: 1 } }, err => {
           if (err) {
             throw err;
           }
-        });
+          callbackDone();
+        }), callbackPromise];
 
         doc = yield Model.findById(doc);
         assert.equal(doc.n, 2);

@@ -5447,6 +5447,37 @@ describe('document', function() {
       });
     });
 
+    it('required function only gets called once (gh-6801)', function() {
+      let reqCount = 0;
+      const childSchema = new Schema({
+        name: {
+          type: String,
+          required: function () {
+            reqCount++;
+            return true;
+          }
+        }
+      });
+      const Child = mongoose.model('gh6801_Child', childSchema);
+
+      const parentSchema = new Schema({
+        name: String,
+        child: childSchema
+      });
+      const Parent = mongoose.model('gh6801_Parent', parentSchema);
+
+      const child = new Child(/* name is required */);
+      const parent = new Parent({ child: child });
+
+      return parent.validate().then(
+        () => assert.ok(false),
+        error => {
+          assert.equal(reqCount, 1);
+          assert.ok(error.errors['child.name']);
+        }
+      );
+    });
+
     it('doc array: set then remove (gh-3511)', function(done) {
       var ItemChildSchema = new mongoose.Schema({
         name: {

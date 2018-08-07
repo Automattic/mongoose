@@ -5456,7 +5456,7 @@ describe('document', function() {
       const childSchema = new Schema({
         name: {
           type: String,
-          required: function () {
+          required: function() {
             reqCount++;
             return true;
           }

@@ -15,7 +15,9 @@ before_script:
   - tar -zxvf mongodb-linux-x86_64-2.6.11.tgz
   - mkdir -p ./data/db/27017
   - mkdir -p ./data/db/27000
-  - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --nopreallocj --dbpath ./data/db/27017 --syslog --port 27017
+  - printf "\n--timeout 8000" >> ./test/mocha.opts
+  - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+  - sleep 3
 script:
   - npm test
   - npm run lint

@@ -107,6 +107,8 @@ describe('mongoose module:', function() {
   });
 
   describe('disconnection of all connections', function() {
+    this.timeout(10000);
+
     describe('no callback', function() {
       it('works', function(done) {
         var mong = new Mongoose(),

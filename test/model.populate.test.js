@@ -22,6 +22,8 @@ const DocObjectId = mongoose.Types.ObjectId;
  */
 
 describe('model: populate:', function() {
+  this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
   var User;
   var Comment;
   var BlogPost;

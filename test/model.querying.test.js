@@ -1729,7 +1729,7 @@ describe('model: querying:', function() {
     });
 
     it('with Dates', function(done) {
-      this.timeout(3000);
+      this.timeout(process.env.TRAVIS ? 8000 : 4500);
       var SSchema = new Schema({d: Date});
       var PSchema = new Schema({sub: [SSchema]});
 
@@ -1860,7 +1860,7 @@ describe('model: querying:', function() {
 
     Test.create(docA, docB, docC, function(err, a, b, c) {
       assert.ifError(err);
-      if (err) return done(err);
+
       assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
       assert.equal(a.block.toString('utf8'), 'über');
       assert.equal(c.block.toString('utf8'), 'hello world');
@@ -1924,42 +1924,33 @@ describe('model: querying:', function() {
         assert.equal(c.block.toString('utf8'), 'hello world');
 
         let testPromises = [
-          Test.find({block: {$in: [[195, 188, 98, 101, 114], 'buffer shtuffs are neat', new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$in: [[195, 188, 98, 101, 114], 'buffer shtuffs are neat', new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
             assert.equal(tests.length, 3);
           }),
-          Test.find({block: {$in: ['über', 'hello world']}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$in: ['über', 'hello world']}}).exec().then(tests => {
             assert.equal(tests.length, 2);
           }),
-          Test.find({block: {$in: ['über']}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$in: ['über']}}).exec().then(tests => {
             assert.equal(tests.length, 1);
             assert.equal(tests[0].block.toString('utf8'), 'über');
           }),
-          Test.find({block: {$nin: ['über']}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$nin: ['über']}}).exec().then(tests => {
             assert.equal(tests.length, 2);
           }),
-          Test.find({block: {$nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
             assert.equal(tests.length, 1);
             assert.equal(tests[0].block.toString('utf8'), 'buffer shtuffs are neat');
           }),
-          Test.find({block: {$ne: 'über'}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$ne: 'über'}}).exec().then(tests => {
             assert.equal(tests.length, 2);
           }),
-          Test.find({block: {$gt: 'über'}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$gt: 'über'}}).exec().then(tests => {
             assert.equal(tests.length, 2);
           }),
-          Test.find({block: {$gte: 'über'}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$gte: 'über'}}).exec().then(tests => {
             assert.equal(tests.length, 3);
           }),
-          Test.find({block: {$lt: new Buffer('buffer shtuffs are neat')}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$lt: new Buffer('buffer shtuffs are neat')}}).exec().then(tests => {
             assert.equal(tests.length, 2);
             var ret = {};
             ret[tests[0].block.toString('utf8')] = 1;
@@ -1967,8 +1958,7 @@ describe('model: querying:', function() {
 
             assert.ok(ret['über'] !== undefined);
           }),
-          Test.find({block: {$lte: 'buffer shtuffs are neat'}}, function(err, tests) {
-            assert.ifError(err);
+          Test.find({block: {$lte: 'buffer shtuffs are neat'}}).exec().then(tests => {
             assert.equal(tests.length, 3);
           })
         ];
@@ -1976,7 +1966,6 @@ describe('model: querying:', function() {
         // run all of the tests in parallel
         yield testPromises;
         yield Test.remove({});
-
         done();
       }).catch(done);
     });

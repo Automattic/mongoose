@@ -70,7 +70,7 @@ block content
     m.name = 'Statue of Liberty';
     m.age = 125;
     m.updated = new Date;
-    m.binary = new Buffer(0);
+    m.binary = Buffer.alloc(0);
     m.living = false;
     m.mixed = { any: { thing: 'i want' } };
     m.markModified('mixed');

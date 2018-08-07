@@ -1,6 +1,8 @@
 var mongoose = require('../'),
     Schema = mongoose.Schema;
 
+var Buffer = require('safe-buffer').Buffer;
+
 var DocSchema = new Schema({
   title: String
 });
@@ -33,14 +35,14 @@ var a = new A({
   number: 444848484,
   date: new Date,
   bool: true,
-  buffer: new Buffer(0),
+  buffer: Buffer.alloc(0),
   objectid: new mongoose.Types.ObjectId(),
   array: [4, {}, [], 'asdfa'],
   strings: ['one', 'two', 'three', 'four'],
   numbers: [72, 6493, 83984643, 348282.55],
   dates: [new Date, new Date, new Date],
   bools: [true, false, false, true, true],
-  buffers: [new Buffer([33]), new Buffer([12])],
+  buffers: [Buffer.from([33]), Buffer.from([12])],
   objectids: [new mongoose.Types.ObjectId],
   docs: [{title: 'yo'}, {title: 'nowafasdi0fas asjkdfla fa'}],
   s: {nest: 'hello there everyone!'}

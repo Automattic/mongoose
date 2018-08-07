@@ -7,7 +7,8 @@ var start = require('./common'),
     mongoose = require('./common').mongoose,
     Schema = mongoose.Schema,
     random = require('../lib/utils').random,
-    MongooseBuffer = mongoose.Types.Buffer;
+    MongooseBuffer = mongoose.Types.Buffer,
+    Buffer = require('safe-buffer').Buffer;
 
 function valid(v) {
   return !v || v.length > 10;
@@ -85,19 +86,19 @@ describe('types.buffer', function() {
           assert.equal(err.errors.required.kind, 'Buffer');
           assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "{ x: [ 20 ] }" at path "required"');
           assert.deepEqual(err.errors.required.value, {x: [20]});
-          t.required = new Buffer('hello');
+          t.required = Buffer.from('hello');
 
           t.sub.push({name: 'Friday Friday'});
           t.save(function(err) {
             assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
             assert.equal(err.errors['sub.0.buf'].kind, 'required');
-            t.sub[0].buf = new Buffer('well well');
+            t.sub[0].buf = Buffer.from('well well');
             t.save(function(err) {
               assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
               assert.equal(err.errors['sub.0.buf'].kind, 'user defined');
               assert.equal(err.errors['sub.0.buf'].message, 'valid failed');
 
-              t.sub[0].buf = new Buffer('well well well');
+              t.sub[0].buf = Buffer.from('well well well');
               t.validate(function(err) {
                 assert.ifError(err);
                 done();
@@ -113,12 +114,12 @@ describe('types.buffer', function() {
     var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
-      var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
+      var sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
 
       var tj = new User({
         name: 'tj',
         serial: sampleBuffer,
-        required: new Buffer(sampleBuffer)
+        required: Buffer.from(sampleBuffer)
       });
 
       tj.save(function(err) {
@@ -142,7 +143,7 @@ describe('types.buffer', function() {
     var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
-      var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
+      var sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
 
       var tj = new User({
         name: 'tj',
@@ -162,7 +163,7 @@ describe('types.buffer', function() {
           User.findById(tj._id, function(err, user) {
             assert.ifError(err);
 
-            var expectedBuffer = new Buffer([123, 97, 97, 42, 11]);
+            var expectedBuffer = Buffer.from([123, 97, 97, 42, 11]);
 
             assert.equal(expectedBuffer.toString('base64'),
               user.serial.toString('base64'), 'buffer mismatch');
@@ -261,17 +262,17 @@ describe('types.buffer', function() {
                 assert.equal(tj.required[1], 0x00);
                 assert.equal(tj.required[2], 0x00);
                 assert.equal(tj.required[3], 0x23);
-                tj.required = new Buffer(8);
+                tj.required = Buffer.alloc(8);
               },
               writeInt32LE: function() {
-                tj.required = new Buffer(8);
+                tj.required = Buffer.alloc(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeInt32LE(0x23, 0);
                 is(tj);
               },
               writeInt32BE: function() {
-                tj.required = new Buffer(8);
+                tj.required = Buffer.alloc(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeInt32BE(0x23, 0);
@@ -282,7 +283,7 @@ describe('types.buffer', function() {
                 assert.equal(tj.required[3], 0x23);
               },
               writeFloat: function() {
-                tj.required = new Buffer(16);
+                tj.required = Buffer.alloc(16);
                 reset(tj);
                 not(tj);
                 tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
@@ -297,35 +298,35 @@ describe('types.buffer', function() {
                 assert.equal(tj.required[7], 0xff);
               },
               writeFloatLE: function() {
-                tj.required = new Buffer(16);
+                tj.required = Buffer.alloc(16);
                 reset(tj);
                 not(tj);
                 tj.required.writeFloatLE(2.225073858507201e-308, 0);
                 is(tj);
               },
               writeFloatBE: function() {
-                tj.required = new Buffer(16);
+                tj.required = Buffer.alloc(16);
                 reset(tj);
                 not(tj);
                 tj.required.writeFloatBE(2.225073858507201e-308, 0);
                 is(tj);
               },
               writeDoubleLE: function() {
-                tj.required = new Buffer(8);
+                tj.required = Buffer.alloc(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
                 is(tj);
               },
               writeDoubleBE: function() {
-                tj.required = new Buffer(8);
+                tj.required = Buffer.alloc(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
                 is(tj);
               },
               fill: function() {
-                tj.required = new Buffer(8);
+                tj.required = Buffer.alloc(8);
                 reset(tj);
                 not(tj);
                 tj.required.fill(0);
@@ -370,7 +371,7 @@ describe('types.buffer', function() {
 
   it('can be set to null', function(done) {
     var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
-        user = new User({array: [null], required: new Buffer(1)});
+        user = new User({array: [null], required: Buffer.alloc(1)});
     user.save(function(err, doc) {
       assert.ifError(err);
       User.findById(doc, function(err, doc) {
@@ -384,7 +385,7 @@ describe('types.buffer', function() {
 
   it('can be updated to null', function(done) {
     var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
-        user = new User({array: [null], required: new Buffer(1), serial: new Buffer(1)});
+        user = new User({array: [null], required: Buffer.alloc(1), serial: Buffer.alloc(1)});
     user.save(function(err, doc) {
       assert.ifError(err);
       User.findOneAndUpdate({_id: doc.id}, {serial: null}, {new: true}, function(err, doc) {
@@ -415,20 +416,20 @@ describe('types.buffer', function() {
     });
 
     it('default value', function(done) {
-      var b = new B({buf: new Buffer('hi')});
+      var b = new B({buf: Buffer.from('hi')});
       assert.strictEqual(0, b.buf._subtype);
       done();
     });
 
     it('method works', function(done) {
-      var b = new B({buf: new Buffer('hi')});
+      var b = new B({buf: Buffer.from('hi')});
       b.buf.subtype(128);
       assert.strictEqual(128, b.buf._subtype);
       done();
     });
 
     it('is stored', function(done) {
-      var b = new B({buf: new Buffer('hi')});
+      var b = new B({buf: Buffer.from('hi')});
       b.buf.subtype(128);
       b.save(function(err) {
         if (err) {
@@ -447,7 +448,7 @@ describe('types.buffer', function() {
     });
 
     it('changes are retained', function(done) {
-      var b = new B({buf: new Buffer('hi')});
+      var b = new B({buf: Buffer.from('hi')});
       b.buf.subtype(128);
       b.save(function(err) {
         if (err) {

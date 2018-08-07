@@ -14,6 +14,7 @@ const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 const validator = require('validator');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -4014,7 +4015,7 @@ describe('document', function() {
 
       var Test = db.model('gh4800', TestSchema);
 
-      Test.create({ buf: new Buffer('abcd') }).
+      Test.create({ buf: Buffer.from('abcd') }).
         then(function(doc) {
           return Test.findById(doc._id);
         }).

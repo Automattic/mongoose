@@ -8,6 +8,7 @@ const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -1708,7 +1709,7 @@ describe('model: update:', function() {
       var Schema = mongoose.Schema({myBufferField: Buffer});
       var Model = db.model('gh3496', Schema);
 
-      Model.update({}, {myBufferField: new Buffer(1)}, function(error) {
+      Model.update({}, {myBufferField: Buffer.alloc(1)}, function(error) {
         assert.ifError(error);
         done();
       });
@@ -1821,7 +1822,7 @@ describe('model: update:', function() {
 
       var ModelA = db.model('gh3890', ModelASchema);
 
-      var propValue = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+      var propValue = Buffer.from('aa267824dc1796f265ab47870e279780', 'base64');
 
       var update = {
         $push: {
@@ -1842,7 +1843,7 @@ describe('model: update:', function() {
 
       var Model = db.model('gh3961', schema);
 
-      var value = new Buffer('aa267824dc1796f265ab47870e279780', 'base64');
+      var value = Buffer.from('aa267824dc1796f265ab47870e279780', 'base64');
       var instance = new Model({ name: null });
 
       instance.save(function(error) {
@@ -2148,10 +2149,10 @@ describe('model: update:', function() {
 
       var M = db.model('gh4609', schema);
 
-      var m = new M({ arr: [{ ip: new Buffer(1) }] });
+      var m = new M({ arr: [{ ip: Buffer.alloc(1) }] });
       m.save(function(error, m) {
         assert.ifError(error);
-        m.update({ $push: { arr: { ip: new Buffer(1) } } }).exec(function(error) {
+        m.update({ $push: { arr: { ip: Buffer.alloc(1) } } }).exec(function(error) {
           assert.ifError(error);
           done();
         });

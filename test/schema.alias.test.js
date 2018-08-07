@@ -6,6 +6,7 @@
 
 const assert = require('assert');
 const start = require('./common');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -38,7 +39,7 @@ describe('schema alias option', function() {
       string: 'hello',
       number: 1,
       date: new Date(),
-      buffer: new Buffer('World'),
+      buffer: Buffer.from('World'),
       boolean: false,
       mixed: [1, [], 'three', { four: 5 }],
       objectId: new mongoose.Types.ObjectId(),
@@ -79,7 +80,7 @@ describe('schema alias option', function() {
         string: 'hello',
         number: 1,
         date: new Date(),
-        buffer: new Buffer('World'),
+        buffer: Buffer.from('World'),
         boolean: false,
         mixed: [1, [], 'three', { four: 5 }],
         objectId: new mongoose.Types.ObjectId(),

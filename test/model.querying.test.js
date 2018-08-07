@@ -1729,7 +1729,7 @@ describe('model: querying:', function() {
     });
 
     it('with Dates', function(done) {
-      this.timeout(3000);
+      this.timeout(process.env.TRAVIS ? 8000 : 4500);
       var SSchema = new Schema({d: Date});
       var PSchema = new Schema({sub: [SSchema]});
 

@@ -19,6 +19,8 @@ const Schema = mongoose.Schema;
  */
 
 describe('connections:', function() {
+  this.timeout(10000);
+
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
       var conn = mongoose.createConnection('mongodb://localhost/mongoosetest');
@@ -458,7 +460,7 @@ describe('connections:', function() {
 
   describe('errors', function() {
     it('event fires with one listener', function(done) {
-      this.timeout(1000);
+      this.timeout(1500);
       var db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100');
       db.catch(() => {});
       db.on('error', function() {

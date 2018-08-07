@@ -1328,6 +1328,8 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', function(done) {
+      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
       var count = 0;
       var db = start();
 
@@ -1362,9 +1364,8 @@ describe('document', function() {
 
 
     it('validator should run in parallel', function(done) {
-      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater than that)
-      this.timeout(1000);
       var count = 0;
+      var startTime, endTime;
 
       var SchemaWithValidator = new Schema({
         preference: {
@@ -1373,7 +1374,9 @@ describe('document', function() {
           validate: {
             validator: function validator(value, done) {
               count++;
-              setTimeout(done.bind(null, true), 500);
+              if (count === 1) startTime = Date.now();
+              else if (count === 4) endTime = Date.now();
+              setTimeout(done.bind(null, true), 150);
             },
             isAsync: true
           }
@@ -1396,6 +1399,7 @@ describe('document', function() {
       m.save(function(err) {
         assert.ifError(err);
         assert.equal(count, 4);
+        assert(endTime - startTime < 150 * 4); // serial >= 150 * 4, parallel < 150 * 4
         done();
       });
     });

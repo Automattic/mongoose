@@ -13,7 +13,9 @@ before_script:
   - tar -zxvf mongodb-linux-x86_64-3.6.6.tgz
   - mkdir -p ./data/db/27017
   - mkdir -p ./data/db/27000
+  - printf "\n--timeout 8000" >> ./test/mocha.opts
   - ./mongodb-linux-x86_64-3.6.6/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+  - sleep 3
 script:
   - npm test
   - node tools/checkNodeVersion.js "4.x || 5.x" || npm run lint

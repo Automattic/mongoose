@@ -2437,24 +2437,22 @@ describe('Query', function() {
         });
     });
 
-    it('consistently return query when callback specified (gh-6271)', function() {
-      return co(function*() {
-        const schema = new mongoose.Schema({
-          n: Number
+    it('consistently return query when callback specified (gh-6271)', function(done) {
+      const schema = new mongoose.Schema({
+        n: Number
+      });
+
+      const Model = db.model('gh6271', schema);
+
+      Model.create({ n: 0 }, (err, doc) => {
+        assert.ifError(err);
+
+        let updateQuery = Model.findOneAndUpdate({ _id: doc._id }, { $inc: { n: 1 } }, { new: true }, (err, doc) => {
+          assert.ifError(err);
+          assert.equal(doc.n, 1);
+          done();
         });
-
-        const Model = db.model('gh6271', schema);
-
-        let doc = yield Model.create({ n: 0 });
-
-        yield Model.findOneAndUpdate({ _id: doc._id }, { $inc: { n: 1 } }, err => {
-          if (err) {
-            throw err;
-          }
-        });
-
-        doc = yield Model.findById(doc);
-        assert.equal(doc.n, 2);
+        assert.ok(updateQuery instanceof Query);
       });
     });
 

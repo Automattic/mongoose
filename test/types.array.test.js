@@ -9,6 +9,7 @@ var Schema = mongoose.Schema;
 var random = require('../lib/utils').random;
 var mongodb = require('mongodb');
 var MongooseArray = mongoose.Types.Array;
+var Buffer = require('safe-buffer').Buffer;
 var collection = 'avengers_' + random();
 
 /**
@@ -196,7 +197,7 @@ describe('types array', function() {
     });
 
     it('works with buffers', function(done) {
-      var m = new B({arr: [[0], new Buffer(1)]});
+      var m = new B({arr: [[0], Buffer.alloc(1)]});
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, 2);
@@ -244,7 +245,7 @@ describe('types array', function() {
           assert.equal(doc.arr.length, 6);
           assert.strictEqual(Infinity, doc.arr[5]);
 
-          doc.arr.push(new Buffer(0));
+          doc.arr.push(Buffer.alloc(0));
           assert.equal(doc.arr.length, 7);
           assert.strictEqual('', doc.arr[6].toString());
 
@@ -1365,7 +1366,7 @@ describe('types array', function() {
     });
 
     it('works with buffers', function(done) {
-      var m = new B({arr: [[0], new Buffer(1)]});
+      var m = new B({arr: [[0], Buffer.alloc(1)]});
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, 2);
@@ -1421,7 +1422,7 @@ describe('types array', function() {
           assert.strictEqual(Infinity, doc.arr[8]);
           assert.equal(doc.arr[7], undefined);
 
-          doc.arr.push(new Buffer(0));
+          doc.arr.push(Buffer.alloc(0));
           assert.equal(doc.arr[9].toString(), '');
           assert.equal(doc.arr.length, 10);
 
@@ -1897,13 +1898,13 @@ describe('types array', function() {
           assert.ifError(err);
           B.findById(post, function(err, post) {
             assert.ifError(err);
-            post.bufferIds.remove(new Buffer('a'));
+            post.bufferIds.remove(Buffer.from('a'));
             post.save(function(err) {
               assert.ifError(err);
               B.findById(post, function(err, post) {
                 assert.ifError(err);
                 assert.equal(post.bufferIds.length, 3);
-                assert.ok(!post.bufferIds.id(new Buffer('a')));
+                assert.ok(!post.bufferIds.id(Buffer.from('a')));
                 done();
               });
             });

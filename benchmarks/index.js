@@ -1,3 +1,5 @@
+var Buffer = require('safe-buffer').Buffer;
+
 Error.stackTraceLimit = Infinity;
 var out = process.argv.length < 3;
 function log() {
@@ -98,7 +100,7 @@ run('bool', function() {
 });
 run('buffer', function() {
   return new A({
-    buffer: new Buffer(0)
+    buffer: Buffer.alloc(0)
   });
 });
 run('objectid', function() {
@@ -133,7 +135,7 @@ run('array of bools', function() {
 });
 run('array of buffers', function() {
   return new A({
-    buffers: [new Buffer([33]), new Buffer([12])]
+    buffers: [Buffer.from([33]), Buffer.from([12])]
   });
 });
 run('array of objectids', function() {

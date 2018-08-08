@@ -30,6 +30,7 @@
     "mquery": "3.1.2",
     "ms": "2.0.0",
     "regexp-clone": "0.0.1",
+    "safe-buffer": "5.1.2",
     "sliced": "1.0.1"
   },
   "devDependencies": {
@@ -65,7 +66,7 @@
     "lib": "./lib/mongoose"
   },
   "scripts": {
-    "lint": "eslint . --quiet",
+    "lint": "eslint .",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
@@ -111,6 +112,7 @@
         }
       ],
       "keyword-spacing": "error",
+      "no-buffer-constructor": "warn",
       "no-console": "off",
       "no-multi-spaces": "error",
       "func-call-spacing": "error",

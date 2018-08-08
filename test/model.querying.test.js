@@ -9,6 +9,7 @@ const assert = require('power-assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -583,16 +584,16 @@ describe('model: querying:', function() {
       var BlogPostB = db.model('BlogPostB', collection);
 
       BlogPostB.create({
-        sigs: [new Buffer([1, 2, 3]),
-          new Buffer([4, 5, 6]),
-          new Buffer([7, 8, 9])]
+        sigs: [Buffer.from([1, 2, 3]),
+          Buffer.from([4, 5, 6]),
+          Buffer.from([7, 8, 9])]
       }, function(err, created) {
         assert.ifError(err);
-        BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function(err, found) {
+        BlogPostB.findOne({sigs: Buffer.from([1, 2, 3])}, function(err, found) {
           assert.ifError(err);
           found.id;
           assert.equal(found._id.toString(), created._id);
-          var query = {sigs: {'$in': [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])]}};
+          var query = {sigs: {'$in': [Buffer.from([3, 3, 3]), Buffer.from([4, 5, 6])]}};
           BlogPostB.findOne(query, function(err) {
             assert.ifError(err);
             done();
@@ -1854,8 +1855,8 @@ describe('model: querying:', function() {
     var BufSchema = new Schema({name: String, block: Buffer}),
         Test = db.model('BufferTest', BufSchema, 'buffers');
 
-    var docA = {name: 'A', block: new Buffer('über')};
-    var docB = {name: 'B', block: new Buffer('buffer shtuffs are neat')};
+    var docA = {name: 'A', block: Buffer.from('über')};
+    var docB = {name: 'B', block: Buffer.from('buffer shtuffs are neat')};
     var docC = {name: 'C', block: 'hello world'};
 
     Test.create(docA, docB, docC, function(err, a, b, c) {
@@ -1884,7 +1885,7 @@ describe('model: querying:', function() {
                 assert.ifError(err);
                 assert.strictEqual(rb, null);
 
-                Test.findOne({block: new Buffer('aGVsbG8gd29ybGQ=', 'base64')}, function(err, rb) {
+                Test.findOne({block: Buffer.from('aGVsbG8gd29ybGQ=', 'base64')}, function(err, rb) {
                   assert.ifError(err);
                   assert.equal(rb.block.toString('utf8'), 'hello world');
 
@@ -1924,7 +1925,8 @@ describe('model: querying:', function() {
         assert.equal(c.block.toString('utf8'), 'hello world');
 
         let testPromises = [
-          Test.find({block: {$in: [[195, 188, 98, 101, 114], 'buffer shtuffs are neat', new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
+          Test.find({block: {$in: [[195, 188, 98, 101, 114], 'buffer shtuffs are neat', Buffer.from('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
+            assert.ifError(err);
             assert.equal(tests.length, 3);
           }),
           Test.find({block: {$in: ['über', 'hello world']}}).exec().then(tests => {
@@ -1937,7 +1939,9 @@ describe('model: querying:', function() {
           Test.find({block: {$nin: ['über']}}).exec().then(tests => {
             assert.equal(tests.length, 2);
           }),
-          Test.find({block: {$nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
+
+          Test.find({block: {$nin: [[195, 188, 98, 101, 114], Buffer.from('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
+            assert.ifError(err);
             assert.equal(tests.length, 1);
             assert.equal(tests[0].block.toString('utf8'), 'buffer shtuffs are neat');
           }),
@@ -1950,7 +1954,8 @@ describe('model: querying:', function() {
           Test.find({block: {$gte: 'über'}}).exec().then(tests => {
             assert.equal(tests.length, 3);
           }),
-          Test.find({block: {$lt: new Buffer('buffer shtuffs are neat')}}).exec().then(tests => {
+          Test.find({block: {$lt: Buffer.from('buffer shtuffs are neat')}}).exec().then(tests => {
+            assert.ifError(err);
             assert.equal(tests.length, 2);
             var ret = {};
             ret[tests[0].block.toString('utf8')] = 1;

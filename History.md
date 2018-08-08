@@ -476,6 +476,7 @@
  * BREAKING CHANGE: mapReduce resolves to an object with 2 keys rather than 2 separate args #5816
  * BREAKING CHANGE: `mongoose.connect()` returns a promise, removed MongooseThenable #5796
  * BREAKING CHANGE: query stream removed, use `cursor()` instead #5795
+ * BREAKING CHANGE: connection `open()` and `openSet()` removed, use `openUri()` instead #5795
  * BREAKING CHANGE: use MongoDB driver 3.0.0, drop support for MongoDB server < 3.0.0 #5791 #4740
  * BREAKING CHANGE: remove support for `$pushAll`, remove `usePushEach` option #5670
  * BREAKING CHANGE: make date casting use native Date #5395 [varunjayaraman](https://github.com/varunjayaraman)

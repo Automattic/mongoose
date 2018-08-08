@@ -6,6 +6,7 @@ var Schema = require('../lib/schema');
 var assert = require('power-assert');
 var cast = require('../lib/cast');
 var ObjectId = require('bson').ObjectId;
+var Buffer = require('safe-buffer').Buffer;
 
 describe('cast: ', function() {
   describe('when casting an array', function() {
@@ -99,8 +100,8 @@ describe('cast: ', function() {
 
     it('with a buffer', function(done) {
       var schema = new Schema({x: Number});
-      assert.deepEqual(cast(schema, {x: {$bitsAnyClear: new Buffer([3])}}),
-        {x: {$bitsAnyClear: new Buffer([3])}});
+      assert.deepEqual(cast(schema, {x: {$bitsAnyClear: Buffer.from([3])}}),
+        {x: {$bitsAnyClear: Buffer.from([3])}});
       done();
     });
 

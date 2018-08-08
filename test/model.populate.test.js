@@ -10,6 +10,7 @@ const async = require('async');
 const co = require('co');
 const start = require('./common');
 const utils = require('../lib/utils');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const random = utils.random;
@@ -2301,7 +2302,7 @@ describe('model: populate:', function() {
       var db = start();
       var A = db.model('A', {name: String, _id: Buffer});
       var B = db.model('B', {other: Buffer});
-      A.create({name: 'hello', _id: new Buffer('x')}, function(err, a) {
+      A.create({name: 'hello', _id: Buffer.from('x')}, function(err, a) {
         if (err) {
           return done(err);
         }

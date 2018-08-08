@@ -10,6 +10,7 @@ var start = require('./common'),
     StateMachine = require('../lib/statemachine'),
     ObjectId = require('../lib/types/objectid'),
     MongooseBuffer = require('../lib/types/buffer'),
+    Buffer = require('safe-buffer').Buffer,
     assert = require('power-assert');
 
 /**
@@ -196,9 +197,9 @@ describe('utils', function() {
     var str = 'this is the day';
     var a = new MongooseBuffer(str);
     var b = new MongooseBuffer(str);
-    var c = new Buffer(str);
-    var d = new Buffer('this is the way');
-    var e = new Buffer('other length');
+    var c = Buffer.from(str);
+    var d = Buffer.from('this is the way');
+    var e = Buffer.from('other length');
 
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, c));

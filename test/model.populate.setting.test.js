@@ -10,7 +10,8 @@ var start = require('./common'),
     utils = require('../lib/utils'),
     random = utils.random,
     Schema = mongoose.Schema,
-    DocObjectId = mongoose.Types.ObjectId;
+    DocObjectId = mongoose.Types.ObjectId,
+    Buffer = require('safe-buffer').Buffer;
 
 /**
  * Setup.
@@ -39,7 +40,7 @@ describe('model: populate:', function() {
     construct.ObjectId = DocObjectId;
     construct.Number = random;
     construct.Buffer = function() {
-      return new Buffer(random());
+      return Buffer.from(random());
     };
 
     Object.keys(types).forEach(function(id) {
@@ -97,7 +98,6 @@ describe('model: populate:', function() {
               title: 'Woot2',
               fans: [fan2, fan1],
               adhoc: [{subdoc: fan1, subarray: [{things: [fan2]}]}],
-              _creator: fan1,
               _creator: fan2,
               embed: [{other: fan2, array: [fan2, fan1]}, {other: fan1, array: [fan1, fan2]}]
             }, function(err, post1, post2) {

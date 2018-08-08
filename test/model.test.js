@@ -8,6 +8,7 @@ const assert = require('power-assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -2662,13 +2663,13 @@ describe('Model', function() {
 
         BufList.findOne({_id: t.get('_id')}, function(err, doc) {
           assert.ifError(err);
-          doc.get('buffers').push(new Buffer([140]));
+          doc.get('buffers').push(Buffer.from([140]));
           save(doc);
         });
 
         BufList.findOne({_id: t.get('_id')}, function(err, doc) {
           assert.ifError(err);
-          doc.get('buffers').push(new Buffer([141]), new Buffer([142]));
+          doc.get('buffers').push(Buffer.from([141]), Buffer.from([142]));
           save(doc);
         });
       });

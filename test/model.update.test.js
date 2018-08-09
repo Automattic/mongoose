@@ -2968,6 +2968,22 @@ describe('model: update:', function() {
       });
     });
 
+    it('does not treat virtuals as an error for strict: throw (gh-6731)', function() {
+      const schema = new Schema({
+        _id: String,
+        total: Number
+      }, { strict: 'throw' });
+
+      schema.virtual('capitalGainsTax').get(function() {
+        return this.total * 0.15;
+      });
+
+      const Test = db.model('gh6731', schema);
+
+      // Shouldn't throw an error because `capitalGainsTax` is a virtual
+      return Test.updateOne({}, { total: 10000, capitalGainsTax: 1500 });
+    });
+
     it('cast error in update conditions (gh-5477)', function(done) {
       var schema = new mongoose.Schema({
         name: String

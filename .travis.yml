@@ -1,13 +1,6 @@
 language: node_js
 sudo: false
-node_js:
-  - "10"
-  - "9"
-  - "8"
-  - "7"
-  - "6"
-  - "5"
-  - "4"
+node_js: [10, 9, 8, 7, 6, 5, 4]
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.6.6.tgz
   - tar -zxvf mongodb-linux-x86_64-3.6.6.tgz
@@ -15,9 +8,12 @@ before_script:
   - mkdir -p ./data/db/27000
   - printf "\n--timeout 8000" >> ./test/mocha.opts
   - ./mongodb-linux-x86_64-3.6.6/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
-  - sleep 3
-script:
-  - npm test
-  - node tools/checkNodeVersion.js "4.x || 5.x" || npm run lint
+  - sleep 2
+matrix:
+  include:
+    - name: "👕Linter"
+      node_js: 10
+      before_script: skip
+      script: npm run lint
 notifications:
   email: false

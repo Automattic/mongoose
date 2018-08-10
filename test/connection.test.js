@@ -143,7 +143,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 50);
+              setTimeout(function() { resolve(); }, 100);
             });
           }).
           then(function() {
@@ -157,7 +157,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 2000);
+              setTimeout(function() { resolve(); }, 4000);
             });
           }).
           then(function() {

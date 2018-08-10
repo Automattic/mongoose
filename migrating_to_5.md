@@ -96,6 +96,8 @@ console.log(blogPost.author._id); '5b207f84e8061d1d2711b421'
 
 As a consequence, checking whether `blogPost.author._id` is [no longer viable as a way to check whether `author` is populated](https://github.com/Automattic/mongoose/issues/6415#issuecomment-388579185). Use `blogPost.populated('author') != null` or `blogPost.author instanceof mongoose.Types.ObjectId` to check whether `author` is populated instead.
 
+Note that you can call `mongoose.set('objectIdGetter', false)` to change this behavior.
+
 ### Return Values for `remove()` and `deleteX()`
 
 `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object

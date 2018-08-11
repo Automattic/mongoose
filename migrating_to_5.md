@@ -296,6 +296,19 @@ m.save(function() {
 
 The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects. If you have queries or indexes that rely on reverse key order, you will have to change them.
 
+### Run setters on queries
+
+Setters now run on queries by default, and the old `runSettersOnQuery` option
+has been removed.
+
+```javascript
+const schema = new Schema({
+  email: { type: String, lowercase: true }
+});
+const Model = mongoose.model('Test', schema);
+Model.find({ email: 'FOO@BAR.BAZ' }); // Converted to `find({ email: 'foo@bar.baz' })`
+```
+
 ### Pre-compiled Browser Bundle
 
 We no longer have a pre-compiled version of mongoose for the browser. If you want to use mongoose schemas in the browser, you need to build your own bundle with browserify/webpack.

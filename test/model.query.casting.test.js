@@ -976,7 +976,7 @@ describe('model query casting', function() {
           return Math.floor(v);
         }
       }
-    }, { runSettersOnQuery: true });
+    });
 
     var Test = db.model('gh-4569', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
@@ -1018,7 +1018,7 @@ describe('model query casting', function() {
           return val;
         }
       }
-    }, { runSettersOnQuery: true });
+    });
 
     var Test = db.model('gh5434', UserSchema);
 
@@ -1051,7 +1051,7 @@ describe('model query casting', function() {
           return val;
         }
       }
-    }, { runSettersOnQuery: true });
+    });
 
     var Test = db.model('gh6157', UserSchema);
 
@@ -1082,16 +1082,14 @@ describe('model query casting', function() {
           return Math.floor(v);
         }
       }
-    }, { runSettersOnQuery: false });
+    });
 
     var Test = db.model('gh5350', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
       then(function() {
         assert.equal(contexts.length, 1);
         assert.equal(contexts[0].constructor.name, 'model');
-        return Test.findOne({ name: 'VAL' }, { _id: 0 }, {
-          runSettersOnQuery: true
-        });
+        return Test.findOne({ name: 'VAL' }, { _id: 0 });
       }).
       then(function(doc) {
         assert.ok(doc);

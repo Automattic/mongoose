@@ -5932,6 +5932,46 @@ describe('document', function() {
       done();
     });
 
+    it('calls array validators again after save (gh-6818)', function() {
+      const schema = new Schema({
+        roles: {
+          type: [{
+            name: String,
+            folders: {
+              type: [{ folderId: String }],
+              validate: v => assert.ok(v.length === new Set(v.map(el => el.folderId)).size, 'Duplicate')
+            }
+          }]
+        }
+      });
+      const Model = db.model('gh6818', schema);
+
+      return co(function*() {
+        yield Model.create({
+          roles: [
+            { name: 'admin' },
+            { name: 'mod', folders: [{ folderId: 'foo' }] }
+          ]
+        });
+
+        const doc = yield Model.findOne();
+
+        doc.roles[1].folders.push({ folderId: 'bar' });
+
+        yield doc.save();
+
+        doc.roles[1].folders[1].folderId = 'foo';
+        let threw = false;
+        try {
+          yield doc.save();
+        } catch (error) {
+          threw = true;
+          assert.equal(error.errors['roles.1.folders'].reason.message, 'Duplicate');
+        }
+        assert.ok(threw);
+      });
+    });
+
     it('set single nested to num throws ObjectExpectedError (gh-6710) (gh-6753)', function() {
       const schema = new Schema({
         nested: new Schema({

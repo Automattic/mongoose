@@ -4197,6 +4197,34 @@ describe('model: populate:', function() {
         });
       });
 
+      it('match (gh-6787)', function() {
+        const PersonSchema = new Schema({ name: String, band: String });
+        const BandSchema = new Schema({ name: String });
+        BandSchema.virtual('members', {
+          ref: 'gh6787_Person',
+          localField: 'name',
+          foreignField: 'band',
+          options: {
+            match: { name: /^a/i }
+          }
+        });
+
+        const Person = db.model('gh6787_Person', PersonSchema);
+        const Band = db.model('gh6787_Band', BandSchema);
+
+        const people = _.map(['BB', 'AA', 'AB', 'BA'], function(v) {
+          return { name: v, band: 'Test' };
+        });
+
+        return co(function*() {
+          yield Person.create(people);
+          yield Band.create({ name: 'Test' });
+
+          const band = yield Band.findOne().populate('members');
+          assert.deepEqual(band.members.map(b => b.name).sort(), ['AA', 'AB']);
+        });
+      });
+
       it('multiple source docs', function(done) {
         var PersonSchema = new Schema({
           name: String,

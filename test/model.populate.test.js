@@ -3171,6 +3171,37 @@ describe('model: populate:', function() {
         assert.deepEqual(post.toObject().comments[0].references, []);
       });
     });
+
+    it('readable error with deselected refPath (gh-6834)', function() {
+      const offerSchema = new Schema({
+        text: String,
+        city: String,
+        formData: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: 'city'
+        }
+      });
+
+      const Offer = db.model('gh6834', offerSchema);
+
+      return co(function*() {
+        yield Offer.create({
+          text: 'special discount',
+          city: 'New York',
+          formData: new mongoose.Types.ObjectId()
+        });
+
+        let threw = false;
+        try {
+          yield Offer.findOne().populate('formData').select('-city');
+        } catch (error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('refPath') !== -1, error.message);
+          threw = true;
+        }
+        assert.ok(threw);
+      });
+    });
   });
 
   it('strips out not-matched ids when populating a hydrated doc (gh-6435)', function() {

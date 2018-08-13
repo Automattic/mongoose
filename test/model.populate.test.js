@@ -6847,6 +6847,44 @@ describe('model: populate:', function() {
       }));
     });
 
+    it('populates undefined nested fields without error (gh-6845)', co.wrap(function*() {
+      const metaDataSchema = new Schema({
+        type: String
+      });
+
+      const commentSchema = new Schema({
+        metadata: {
+          type: Schema.Types.ObjectId,
+          ref: 'MetaData-6845'
+        },
+      });
+
+      const postSchema = new Schema({
+        comments: [commentSchema]
+      });
+
+      const userSchema = new Schema({
+        username: String,
+        password: String,
+        posts: [postSchema]
+      });
+
+      db.model('MetaData-6845', metaDataSchema);
+      const User = db.model('User-6845', userSchema);
+
+      const user = yield User.findOneAndUpdate(
+        { username: 'Jennifer' }, /* upsert username but missing posts */
+        { },
+        {
+          upsert: true,
+          new: true
+        })
+        .populate(['posts.comments.metadata'])
+        .exec();
+
+      assert.ok(user && user.username === 'Jennifer');
+    }));
+
     it('populates refPath from array element (gh-6509)', function() {
       const jobSchema = new Schema({
         kind: String,

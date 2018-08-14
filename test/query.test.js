@@ -2739,4 +2739,13 @@ describe('Query', function() {
       });
     });
   });
+
+  describe('setQuery', function() {
+    it('replaces existing query with new value (gh-6854)', function() {
+      var q = new Query({}, {}, null, p1.collection);
+      q.where('userName').exists();
+      q.setQuery({ a: 1 });
+      assert.deepStrictEqual(q._conditions, { a: 1 });
+    });
+  });
 });

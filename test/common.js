@@ -101,6 +101,23 @@ module.exports = function(options) {
 };
 
 /*!
+ * ignore
+ */
+
+before(function(done) {
+  module.exports.mongodVersion(function(err, version) {
+    if (err) {
+      return done(err);
+    }
+    var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+    if (mongo36) {
+      mongoose.set('usePushEach', true);
+    }
+    done();
+  });
+});
+
+/*!
  * testing uri
  */
 

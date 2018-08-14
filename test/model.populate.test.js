@@ -18,6 +18,8 @@ var DocObjectId = mongoose.Types.ObjectId;
  */
 
 describe('model: populate:', function() {
+  this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
   var User;
   var Comment;
   var BlogPost;
@@ -3271,16 +3273,27 @@ describe('model: populate:', function() {
             slice('fans', [0, 5]).
             populate('fans').
             exec(function(err, blogposts) {
-              assert.ifError(error);
+              assert.ifError(err);
 
-              assert.equal(blogposts[0].title, 'Test 1');
-              assert.equal(blogposts[1].title, 'Test 2');
+              assert.ok(blogposts.length === 2);
 
-              assert.equal(blogposts[0].fans[0].name, 'Fan 1');
-              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+              var test1, test2;
+              if (blogposts[0].title === 'Test 1') {
+                test1 = blogposts[0];
+                test2 = blogposts[1];
+              } else {
+                test1 = blogposts[1];
+                test2 = blogposts[0];
+              }
 
-              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
-              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+              assert.ok(test1.title === 'Test 1');
+              assert.ok(test2.title === 'Test 2');
+
+              assert.equal(test1.fans[0].name, 'Fan 1');
+              assert.equal(test1.fans[1].name, 'Fan 2');
+
+              assert.equal(test2.fans[0].name, 'Fan 2');
+              assert.equal(test2.fans[1].name, 'Fan 1');
               done();
             });
         });
@@ -4605,8 +4618,8 @@ describe('model: populate:', function() {
           }).
           then(function(bs) {
             assert.equal(bs.length, 2);
-            assert.equal(bs[0].a.name, 'a1');
-            assert.equal(bs[1].a.name, 'a2');
+            var names = bs.map(function(b) { return b.a.name; }).sort();
+            assert.deepEqual(names, ['a1', 'a2']);
             done();
           }).
           catch(done);

@@ -14,6 +14,7 @@ const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 const validator = require('validator');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -1328,6 +1329,8 @@ describe('document', function() {
     });
 
     it('validator should run only once per sub-doc gh-1743', function(done) {
+      this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
       var count = 0;
       var db = start();
 
@@ -1362,9 +1365,8 @@ describe('document', function() {
 
 
     it('validator should run in parallel', function(done) {
-      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater than that)
-      this.timeout(1000);
       var count = 0;
+      var startTime, endTime;
 
       var SchemaWithValidator = new Schema({
         preference: {
@@ -1373,7 +1375,9 @@ describe('document', function() {
           validate: {
             validator: function validator(value, done) {
               count++;
-              setTimeout(done.bind(null, true), 500);
+              if (count === 1) startTime = Date.now();
+              else if (count === 4) endTime = Date.now();
+              setTimeout(done.bind(null, true), 150);
             },
             isAsync: true
           }
@@ -1396,6 +1400,7 @@ describe('document', function() {
       m.save(function(err) {
         assert.ifError(err);
         assert.equal(count, 4);
+        assert(endTime - startTime < 150 * 4); // serial >= 150 * 4, parallel < 150 * 4
         done();
       });
     });
@@ -2816,12 +2821,16 @@ describe('document', function() {
 
       var MyModel = db.model('gh4014', schema);
 
-      MyModel.
-        where('geo').near({ center: [50, 50] }).
-        exec(function(error) {
-          assert.ifError(error);
-          done();
-        });
+      MyModel.on('index', function(err) {
+        assert.ifError(err);
+
+        MyModel.
+          where('geo').near({ center: [50, 50], spherical: true }).
+          exec(function(err) {
+            assert.ifError(err);
+            done();
+          });
+      });
     });
 
     it('skip validation if required returns false (gh-4094)', function(done) {
@@ -4006,7 +4015,7 @@ describe('document', function() {
 
       var Test = db.model('gh4800', TestSchema);
 
-      Test.create({ buf: new Buffer('abcd') }).
+      Test.create({ buf: Buffer.from('abcd') }).
         then(function(doc) {
           return Test.findById(doc._id);
         }).
@@ -5447,6 +5456,37 @@ describe('document', function() {
       });
     });
 
+    it('required function only gets called once (gh-6801)', function() {
+      let reqCount = 0;
+      const childSchema = new Schema({
+        name: {
+          type: String,
+          required: function() {
+            reqCount++;
+            return true;
+          }
+        }
+      });
+      const Child = mongoose.model('gh6801_Child', childSchema);
+
+      const parentSchema = new Schema({
+        name: String,
+        child: childSchema
+      });
+      const Parent = mongoose.model('gh6801_Parent', parentSchema);
+
+      const child = new Child(/* name is required */);
+      const parent = new Parent({ child: child });
+
+      return parent.validate().then(
+        () => assert.ok(false),
+        error => {
+          assert.equal(reqCount, 1);
+          assert.ok(error.errors['child.name']);
+        }
+      );
+    });
+
     it('doc array: set then remove (gh-3511)', function(done) {
       var ItemChildSchema = new mongoose.Schema({
         name: {
@@ -5890,6 +5930,46 @@ describe('document', function() {
       const doc = new MyModel();
       assert.deepEqual(doc.toObject().arr, []);
       done();
+    });
+
+    it('calls array validators again after save (gh-6818)', function() {
+      const schema = new Schema({
+        roles: {
+          type: [{
+            name: String,
+            folders: {
+              type: [{ folderId: String }],
+              validate: v => assert.ok(v.length === new Set(v.map(el => el.folderId)).size, 'Duplicate')
+            }
+          }]
+        }
+      });
+      const Model = db.model('gh6818', schema);
+
+      return co(function*() {
+        yield Model.create({
+          roles: [
+            { name: 'admin' },
+            { name: 'mod', folders: [{ folderId: 'foo' }] }
+          ]
+        });
+
+        const doc = yield Model.findOne();
+
+        doc.roles[1].folders.push({ folderId: 'bar' });
+
+        yield doc.save();
+
+        doc.roles[1].folders[1].folderId = 'foo';
+        let threw = false;
+        try {
+          yield doc.save();
+        } catch (error) {
+          threw = true;
+          assert.equal(error.errors['roles.1.folders'].reason.message, 'Duplicate');
+        }
+        assert.ok(threw);
+      });
     });
 
     it('set single nested to num throws ObjectExpectedError (gh-6710) (gh-6753)', function() {

@@ -1,3 +1,24 @@
+5.2.8 / 2018-08-13
+==================
+ * docs: update `execPopulate()` code example #6851 [WJakub](https://github.com/WJakub)
+ * fix(document): allow passing callback to `execPopulate()` #6851
+ * fix(populate): populate with undefined fields without error #6848 #6845 [Fonger](https://github.com/Fonger)
+ * docs(migrating_to_5): Add `objectIdGetter` option docs #6842 [jwalton](https://github.com/jwalton)
+ * chore: run lint in parallel and only on Node.js v10 #6836 [Fonger](https://github.com/Fonger)
+ * fix(populate): throw helpful error if refPath excluded in query #6834
+ * docs(migrating_to_5): add note about removing runSettersOnQuery #6832
+ * fix: use safe-buffer to avoid buffer deprecation errors in Node.js 10 #6829 [Fonger](https://github.com/Fonger)
+ * docs(query): fix broken links #6828 [yaynick](https://github.com/yaynick)
+ * docs(defaults): clarify that defaults only run on undefined #6827
+ * chore: fix flakey tests #6824 [Fonger](https://github.com/Fonger)
+ * docs: fix custom inspect function deprecation warning in Node.js 10 #6821 [yelworc](https://github.com/yelworc)
+ * fix(document): ensure subdocs get set to init state after save() so validators can run again #6818
+ * fix(query): make sure embedded query casting always throws a CastError #6803
+ * fix(document): ensure `required` function only gets called once when validating #6801
+ * docs(connections): note that you must specify port if using `useNewUrlParser: true` #6789
+ * fix(populate): support `options.match` in virtual populate schema definition #6787
+ * fix(update): strip out virtuals from updates if strict: 'throw' rather than returning an error #6731
+
 5.2.7 / 2018-08-06
 ==================
  * fix(model): check `expireAfterSeconds` option when diffing indexes in syncIndexes() #6820 #6819 [christopherhex](https://github.com/christopherhex)
@@ -476,6 +497,7 @@
  * BREAKING CHANGE: mapReduce resolves to an object with 2 keys rather than 2 separate args #5816
  * BREAKING CHANGE: `mongoose.connect()` returns a promise, removed MongooseThenable #5796
  * BREAKING CHANGE: query stream removed, use `cursor()` instead #5795
+ * BREAKING CHANGE: connection `open()` and `openSet()` removed, use `openUri()` instead #5795
  * BREAKING CHANGE: use MongoDB driver 3.0.0, drop support for MongoDB server < 3.0.0 #5791 #4740
  * BREAKING CHANGE: remove support for `$pushAll`, remove `usePushEach` option #5670
  * BREAKING CHANGE: make date casting use native Date #5395 [varunjayaraman](https://github.com/varunjayaraman)

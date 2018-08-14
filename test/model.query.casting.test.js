@@ -1,19 +1,19 @@
-/* vim: set softtabstop=2 ts=2 sw=2 expandtab tw=120: */
+'use strict';
 
 /**
  * Test dependencies.
  */
 
-var assert = require('power-assert');
-var random = require('../lib/utils').random;
-var start = require('./common');
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
 
-var mongoose = start.mongoose;
+const mongoose = start.mongoose;
 
-var CastError = mongoose.SchemaType.CastError;
-var DocumentObjectId = mongoose.Types.ObjectId;
-var ObjectId = mongoose.Schema.Types.ObjectId;
-var Schema = mongoose.Schema;
+const CastError = mongoose.SchemaType.CastError;
+const DocumentObjectId = mongoose.Types.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
+const Schema = mongoose.Schema;
 
 describe('model query casting', function() {
   var Comments;
@@ -976,7 +976,7 @@ describe('model query casting', function() {
           return Math.floor(v);
         }
       }
-    }, { runSettersOnQuery: true });
+    });
 
     var Test = db.model('gh-4569', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
@@ -1018,7 +1018,7 @@ describe('model query casting', function() {
           return val;
         }
       }
-    }, { runSettersOnQuery: true });
+    });
 
     var Test = db.model('gh5434', UserSchema);
 
@@ -1051,7 +1051,7 @@ describe('model query casting', function() {
           return val;
         }
       }
-    }, { runSettersOnQuery: true });
+    });
 
     var Test = db.model('gh6157', UserSchema);
 
@@ -1082,16 +1082,14 @@ describe('model query casting', function() {
           return Math.floor(v);
         }
       }
-    }, { runSettersOnQuery: false });
+    });
 
     var Test = db.model('gh5350', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
       then(function() {
         assert.equal(contexts.length, 1);
         assert.equal(contexts[0].constructor.name, 'model');
-        return Test.findOne({ name: 'VAL' }, { _id: 0 }, {
-          runSettersOnQuery: true
-        });
+        return Test.findOne({ name: 'VAL' }, { _id: 0 });
       }).
       then(function(doc) {
         assert.ok(doc);
@@ -1114,6 +1112,19 @@ describe('model query casting', function() {
         done();
       });
     });
+  });
+
+  it('converts to CastError (gh-6803)', function() {
+    const membershipSchema = new Schema({ tier: String });
+    const schema = new Schema({ membership: membershipSchema, name: String });
+    const Model = mongoose.model('gh6803', schema);
+
+    return Model.findOne({ membership: '12345' }).
+      catch(error => {
+        assert.equal(error.name, 'CastError');
+        assert.equal(error.path, 'membership');
+        assert.equal(error.reason.name, 'ObjectParameterError');
+      });
   });
 
   it('minDistance (gh-4197)', function(done) {

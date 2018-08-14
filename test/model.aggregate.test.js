@@ -24,6 +24,8 @@ var collection = 'aggregate_' + random();
 mongoose.model('Aggregate', userSchema);
 
 describe('model aggregate', function() {
+  this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
   var group = {$group: {_id: null, maxAge: {$max: '$age'}}};
   var project = {$project: {maxAge: 1, _id: 0}};
   var db, A, maxAge;
@@ -62,8 +64,6 @@ describe('model aggregate', function() {
 
   describe('works', function() {
     it('when return promise', function(done) {
-      this.timeout(4000);
-
       A.aggregate([group, project]).then( function(res) {
         assert.ok(res);
         assert.equal(1, res.length);
@@ -74,8 +74,6 @@ describe('model aggregate', function() {
     });
 
     it('with arrays', function(done) {
-      this.timeout(4000);
-
       A.aggregate([group, project], function(err, res) {
         assert.ifError(err);
         assert.ok(res);
@@ -87,8 +85,6 @@ describe('model aggregate', function() {
     });
 
     it('with Aggregate syntax', function(done) {
-      this.timeout(4000);
-
       A.aggregate()
         .group(group.$group)
         .project(project.$project)
@@ -103,8 +99,6 @@ describe('model aggregate', function() {
     });
 
     it('with Aggregate syntax if callback not provided', function(done) {
-      this.timeout(4000);
-
       var promise = A.aggregate()
         .group(group.$group)
         .project(project.$project)
@@ -134,8 +128,6 @@ describe('model aggregate', function() {
       if (!mongo26_or_greater) {
         return done();
       }
-
-      this.timeout(4000);
 
       var outputCollection = 'aggregate_output_' + random();
       A.aggregate()

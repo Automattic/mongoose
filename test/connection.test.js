@@ -19,6 +19,8 @@ const Schema = mongoose.Schema;
  */
 
 describe('connections:', function() {
+  this.timeout(10000);
+
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
       var conn = mongoose.createConnection('mongodb://localhost/mongoosetest');
@@ -135,7 +137,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 50);
+              setTimeout(function() { resolve(); }, 100);
             });
           }).
           then(function() {
@@ -149,7 +151,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 2000);
+              setTimeout(function() { resolve(); }, 4000);
             });
           }).
           then(function() {
@@ -208,7 +210,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 400);
+              setTimeout(function() { resolve(); }, 4000);
             });
           }).
           then(function() {
@@ -458,7 +460,7 @@ describe('connections:', function() {
 
   describe('errors', function() {
     it('event fires with one listener', function(done) {
-      this.timeout(1000);
+      this.timeout(1500);
       var db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100');
       db.catch(() => {});
       db.on('error', function() {
@@ -602,89 +604,6 @@ describe('connections:', function() {
           });
         });
       });
-    });
-  });
-
-  describe('openSet', function() {
-    it('accepts uris, dbname, options', function(done) {
-      var m = new mongoose.Mongoose;
-      var uris = process.env.MONGOOSE_SET_TEST_URI;
-      if (!uris) {
-        return done();
-      }
-
-      m.connection.on('error', done);
-      m.connection.on('open', function() {
-        m.connection.close(done);
-      });
-
-      try {
-        m.connect(uris, 'mongoose_test', {server: {auto_reconnect: true}});
-      } catch (err) {
-        done(err);
-      }
-    });
-    describe('auth', function() {
-      it('from uri', function(done) {
-        var uris = process.env.MONGOOSE_SET_TEST_URI;
-        if (!uris) {
-          return done();
-        }
-
-        var db = mongoose.createConnection();
-        db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {server: {auto_reconnect: false}});
-        db.catch(() => {
-          db.close(done);
-        });
-        assert.equal(db.user, 'aaron');
-        assert.equal(db.pass, 'psw');
-      });
-    });
-
-    it('handles unix domain sockets', function(done) {
-      const host1 = encodeURIComponent('/tmp/mongodb-27018.sock');
-      const host2 = encodeURIComponent('/tmp/mongodb-27019.sock');
-      const url = `mongodb://aaron:psw@${host1},${host2}/fake?replicaSet=bacon`;
-      const db = mongoose.createConnection(url);
-      db.catch(() => {});
-      assert.equal(typeof db.options, 'object');
-      assert.equal(db.name, 'fake');
-      assert.equal(db.host, '/tmp/mongodb-27018.sock');
-      assert.equal(db.pass, 'psw');
-      assert.equal(db.user, 'aaron');
-      db.close();
-      done();
-    });
-
-    it('can reopen a disconnected replica set (gh-1263)', function(done) {
-      var uris = process.env.MONGOOSE_SET_TEST_URI;
-      if (!uris) {
-        return done();
-      }
-
-      var conn = mongoose.createConnection();
-
-      conn.on('error', done);
-
-      try {
-        conn.openSet(uris, 'mongoose_test', {}, function(err) {
-          if (err) {
-            return done(err);
-          }
-
-          conn.close(function(err) {
-            if (err) {
-              return done(err);
-            }
-
-            conn.openSet(uris, 'mongoose_test', {}, function() {
-              conn.close(done);
-            });
-          });
-        });
-      } catch (err) {
-        done(err);
-      }
     });
   });
 

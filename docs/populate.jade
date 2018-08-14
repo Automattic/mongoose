@@ -456,7 +456,7 @@ block content
     // `populate()` after saving. Useful for sending populated data back to the client in an
     // update API endpoint
     MySchema.post('save', function(doc, next) {
-      doc.populate('user').execPopulate(function() {
+      doc.populate('user').execPopulate().then(function() {
         next();
       });
     });

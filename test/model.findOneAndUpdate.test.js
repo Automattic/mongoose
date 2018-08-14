@@ -2022,7 +2022,7 @@ describe('model: findOneAndUpdate:', function() {
             set: toUUID
           }
         }]
-      }, { collection: 'users', runSettersOnQuery: true });
+      }, { collection: 'users' });
 
       UserSchema.pre('findOneAndUpdate', function() {
         this.update({},{ $set: {lastUpdate: new Date()} });
@@ -2080,7 +2080,6 @@ describe('model: findOneAndUpdate:', function() {
       var opts = {
         upsert: true,
         setDefaultsOnInsert: true,
-        runSettersOnQuery: true,
         new: true
       };
       User.findOneAndUpdate({}, user, opts).exec(function(error, doc) {

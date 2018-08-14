@@ -10,6 +10,7 @@ const async = require('async');
 const co = require('co');
 const start = require('./common');
 const utils = require('../lib/utils');
+const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
 const random = utils.random;
@@ -22,6 +23,8 @@ const DocObjectId = mongoose.Types.ObjectId;
  */
 
 describe('model: populate:', function() {
+  this.timeout(process.env.TRAVIS ? 8000 : 4500);
+
   var User;
   var Comment;
   var BlogPost;
@@ -2299,7 +2302,7 @@ describe('model: populate:', function() {
       var db = start();
       var A = db.model('A', {name: String, _id: Buffer});
       var B = db.model('B', {other: Buffer});
-      A.create({name: 'hello', _id: new Buffer('x')}, function(err, a) {
+      A.create({name: 'hello', _id: Buffer.from('x')}, function(err, a) {
         if (err) {
           return done(err);
         }
@@ -3166,6 +3169,37 @@ describe('model: populate:', function() {
         const post = yield Post.findOne().populate('comments.references.item');
 
         assert.deepEqual(post.toObject().comments[0].references, []);
+      });
+    });
+
+    it('readable error with deselected refPath (gh-6834)', function() {
+      const offerSchema = new Schema({
+        text: String,
+        city: String,
+        formData: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: 'city'
+        }
+      });
+
+      const Offer = db.model('gh6834', offerSchema);
+
+      return co(function*() {
+        yield Offer.create({
+          text: 'special discount',
+          city: 'New York',
+          formData: new mongoose.Types.ObjectId()
+        });
+
+        let threw = false;
+        try {
+          yield Offer.findOne().populate('formData').select('-city');
+        } catch (error) {
+          assert.ok(error);
+          assert.ok(error.message.indexOf('refPath') !== -1, error.message);
+          threw = true;
+        }
+        assert.ok(threw);
       });
     });
   });
@@ -4191,6 +4225,34 @@ describe('model: populate:', function() {
               done();
             });
           });
+        });
+      });
+
+      it('match (gh-6787)', function() {
+        const PersonSchema = new Schema({ name: String, band: String });
+        const BandSchema = new Schema({ name: String });
+        BandSchema.virtual('members', {
+          ref: 'gh6787_Person',
+          localField: 'name',
+          foreignField: 'band',
+          options: {
+            match: { name: /^a/i }
+          }
+        });
+
+        const Person = db.model('gh6787_Person', PersonSchema);
+        const Band = db.model('gh6787_Band', BandSchema);
+
+        const people = _.map(['BB', 'AA', 'AB', 'BA'], function(v) {
+          return { name: v, band: 'Test' };
+        });
+
+        return co(function*() {
+          yield Person.create(people);
+          yield Band.create({ name: 'Test' });
+
+          const band = yield Band.findOne().populate('members');
+          assert.deepEqual(band.members.map(b => b.name).sort(), ['AA', 'AB']);
         });
       });
 
@@ -6784,6 +6846,44 @@ describe('model: populate:', function() {
         assert.equal(doc.outer.inner.flexible[1].products_$[0].name, 'Notebook');
       }));
     });
+
+    it('populates undefined nested fields without error (gh-6845)', co.wrap(function*() {
+      const metaDataSchema = new Schema({
+        type: String
+      });
+
+      const commentSchema = new Schema({
+        metadata: {
+          type: Schema.Types.ObjectId,
+          ref: 'MetaData-6845'
+        },
+      });
+
+      const postSchema = new Schema({
+        comments: [commentSchema]
+      });
+
+      const userSchema = new Schema({
+        username: String,
+        password: String,
+        posts: [postSchema]
+      });
+
+      db.model('MetaData-6845', metaDataSchema);
+      const User = db.model('User-6845', userSchema);
+
+      const user = yield User.findOneAndUpdate(
+        { username: 'Jennifer' }, /* upsert username but missing posts */
+        { },
+        {
+          upsert: true,
+          new: true
+        })
+        .populate(['posts.comments.metadata'])
+        .exec();
+
+      assert.ok(user && user.username === 'Jennifer');
+    }));
 
     it('populates refPath from array element (gh-6509)', function() {
       const jobSchema = new Schema({

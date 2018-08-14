@@ -22,6 +22,9 @@ describe('defaults docs', function () {
   /**
    * Your schemas can define default values for certain paths. If you create
    * a new document without that path set, the default will kick in.
+   *
+   * Note: Mongoose only applies a default if the value of the path is
+   * strictly `undefined`.
    */
   it('Declaring defaults in your schema', function(done) {
     var schema = new Schema({
@@ -39,6 +42,10 @@ describe('defaults docs', function () {
 
     var izzy = new Person({ name: 'Izzy', role: undefined });
     assert.equal(izzy.role, 'guitarist');
+
+    // Defaults do **not** run on `null`, `''`, or value other than `undefined`.
+    var foo = new Person({ name: 'Bar', role: null });
+    assert.strictEqual(foo.role, null);
 
     Person.create(axl, slash, function(error) {
       assert.ifError(error);

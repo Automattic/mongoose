@@ -16,6 +16,7 @@ const Mixed = SchemaTypes.Mixed;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
+const Buffer = require('safe-buffer').Buffer;
 
 /**
  * Test Document constructor.
@@ -383,7 +384,7 @@ describe('schema', function() {
       assert.equal(typeof strings[1], 'string');
       assert.equal(strings[1], '123');
 
-      var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer('abc')]);
+      var buffers = Loki.path('buffers').cast(['\0\0\0', Buffer.from('abc')]);
 
       assert.ok(buffers[0] instanceof Buffer);
       assert.ok(buffers[1] instanceof Buffer);

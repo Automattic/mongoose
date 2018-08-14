@@ -96,6 +96,8 @@ console.log(blogPost.author._id); '5b207f84e8061d1d2711b421'
 
 As a consequence, checking whether `blogPost.author._id` is [no longer viable as a way to check whether `author` is populated](https://github.com/Automattic/mongoose/issues/6415#issuecomment-388579185). Use `blogPost.populated('author') != null` or `blogPost.author instanceof mongoose.Types.ObjectId` to check whether `author` is populated instead.
 
+Note that you can call `mongoose.set('objectIdGetter', false)` to change this behavior.
+
 ### Return Values for `remove()` and `deleteX()`
 
 `deleteOne()`, `deleteMany()`, and `remove()` now resolve to the result object
@@ -293,6 +295,19 @@ m.save(function() {
 ### Always Use Forward Key Order
 
 The `retainKeyOrder` option was removed, mongoose will now always retain the same key position when cloning objects. If you have queries or indexes that rely on reverse key order, you will have to change them.
+
+### Run setters on queries
+
+Setters now run on queries by default, and the old `runSettersOnQuery` option
+has been removed.
+
+```javascript
+const schema = new Schema({
+  email: { type: String, lowercase: true }
+});
+const Model = mongoose.model('Test', schema);
+Model.find({ email: 'FOO@BAR.BAZ' }); // Converted to `find({ email: 'foo@bar.baz' })`
+```
 
 ### Pre-compiled Browser Bundle
 

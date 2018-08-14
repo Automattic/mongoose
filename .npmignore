@@ -17,3 +17,5 @@ format_deps.js
 tools/31*
 *.key
 data/
+
+test/files

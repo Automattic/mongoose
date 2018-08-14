@@ -64,7 +64,7 @@ describe('model aggregate', function() {
 
   describe('works', function() {
     it('when return promise', function(done) {
-      A.aggregate([group, project]).then( function(res) {
+      A.aggregate([group, project]).then(function(res) {
         assert.ok(res);
         assert.equal(1, res.length);
         assert.ok('maxAge' in res[0]);

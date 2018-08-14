@@ -3349,7 +3349,7 @@ describe('model: populate:', function() {
             slice('fans', [0, 5]).
             populate('fans').
             exec(function(err, blogposts) {
-              assert.ifError(error);
+              assert.ifError(err);
 
               const titles = blogposts.map(bp => bp.title).sort();
 

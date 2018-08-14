@@ -1,3 +1,9 @@
+4.13.15 / 2018-08-14
+====================
+ * fix(mongoose): add global `usePushEach` option for easier Mongoose 4.x + MongoDB 3.6 #6858
+ * chore: fix flakey tests for 4.x #6853 [Fonger](https://github.com/Fonger)
+ * feat(error): add version number to VersionError #6852 [freewil](https://github.com/freewil)
+ 
 5.2.8 / 2018-08-13
 ==================
  * docs: update `execPopulate()` code example #6851 [WJakub](https://github.com/WJakub)
@@ -191,6 +197,7 @@
  * fix(document): handle `doc.set()` underneath embedded discriminator #6482
  * fix(document): handle set() on path under embedded discriminator with object syntax #6482
  * fix(document): handle setting nested property to object with only non-schema properties #6436
+>>>>>>> 4.x
 
 4.13.14 / 2018-05-25
 ====================

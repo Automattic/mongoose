@@ -1,3 +1,9 @@
+4.13.15 / 2018-08-14
+====================
+ * fix(mongoose): add global `usePushEach` option for easier Mongoose 4.x + MongoDB 3.6 #6858
+ * chore: fix flakey tests for 4.x #6853 [Fonger](https://github.com/Fonger)
+ * feat(error): add version number to VersionError #6852 [freewil](https://github.com/freewil)
+
 4.13.14 / 2018-05-25
 ====================
  * fix(model): handle retainKeyOrder option in findOneAndUpdate() #6484

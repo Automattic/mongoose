@@ -1858,13 +1858,15 @@ describe('model: querying:', function() {
     var docA = {name: 'A', block: Buffer.from('über')};
     var docB = {name: 'B', block: Buffer.from('buffer shtuffs are neat')};
     var docC = {name: 'C', block: 'hello world'};
+    var docD = {name: 'D', block: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] }};
 
-    Test.create(docA, docB, docC, function(err, a, b, c) {
+    Test.create(docA, docB, docC, docD, function(err, a, b, c, d) {
       assert.ifError(err);
 
-      assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
       assert.equal(a.block.toString('utf8'), 'über');
+      assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
       assert.equal(c.block.toString('utf8'), 'hello world');
+      assert.equal(d.block.toString('utf8'), 'gh-6863');
 
       Test.findById(a._id, function(err, a) {
         assert.ifError(err);
@@ -1889,9 +1891,9 @@ describe('model: querying:', function() {
                   assert.ifError(err);
                   assert.equal(rb.block.toString('utf8'), 'hello world');
 
-                  Test.findOne({block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64')}, function(err, rb) {
+                  Test.findOne({block: { type: 'Buffer', data: [195, 188, 98, 101, 114] }}, function(err, rb) {
                     assert.ifError(err);
-                    assert.equal(rb.block.toString('utf8'), 'hello world');
+                    assert.equal(rb.block.toString('utf8'), 'über');
 
                     Test.remove({}, function(err) {
                       assert.ifError(err);
@@ -1915,19 +1917,27 @@ describe('model: querying:', function() {
     var docA = {name: 'A', block: new MongooseBuffer([195, 188, 98, 101, 114])}; // über
     var docB = {name: 'B', block: new MongooseBuffer('buffer shtuffs are neat')};
     var docC = {name: 'C', block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64')};
+    var docD = {name: 'D', block: new MongooseBuffer({ type: 'Buffer', data: [ 103, 104, 45, 54, 56, 54, 51 ] })};
 
-    Test.create(docA, docB, docC, function(err, a, b, c) {
+    Test.create(docA, docB, docC, docD, function(err, a, b, c, d) {
       if (err) return done(err);
 
       co(function*() {
         assert.equal(a.block.toString('utf8'), 'über');
         assert.equal(b.block.toString('utf8'), 'buffer shtuffs are neat');
         assert.equal(c.block.toString('utf8'), 'hello world');
+        assert.equal(d.block.toString('utf8'), 'gh-6863');
 
         let testPromises = [
-          Test.find({block: {$in: [[195, 188, 98, 101, 114], 'buffer shtuffs are neat', Buffer.from('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
+          Test.find({block: {
+            $in: [
+              [195, 188, 98, 101, 114],
+              'buffer shtuffs are neat',
+              Buffer.from('aGVsbG8gd29ybGQ=', 'base64'),
+              { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } // gh-6863
+            ]}}).exec().then(tests => {
             assert.ifError(err);
-            assert.equal(tests.length, 3);
+            assert.equal(tests.length, 4);
           }),
           Test.find({block: {$in: ['über', 'hello world']}}).exec().then(tests => {
             assert.equal(tests.length, 2);
@@ -1937,34 +1947,42 @@ describe('model: querying:', function() {
             assert.equal(tests[0].block.toString('utf8'), 'über');
           }),
           Test.find({block: {$nin: ['über']}}).exec().then(tests => {
-            assert.equal(tests.length, 2);
+            assert.equal(tests.length, 3);
           }),
-
-          Test.find({block: {$nin: [[195, 188, 98, 101, 114], Buffer.from('aGVsbG8gd29ybGQ=', 'base64')]}}).exec().then(tests => {
+          Test.find({block: {
+            $nin: [
+              [195, 188, 98, 101, 114],
+              Buffer.from('aGVsbG8gd29ybGQ=', 'base64'),
+              { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } // gh-6863
+            ]}}).exec().then(tests => {
             assert.ifError(err);
             assert.equal(tests.length, 1);
             assert.equal(tests[0].block.toString('utf8'), 'buffer shtuffs are neat');
           }),
           Test.find({block: {$ne: 'über'}}).exec().then(tests => {
-            assert.equal(tests.length, 2);
+            assert.equal(tests.length, 3);
           }),
           Test.find({block: {$gt: 'über'}}).exec().then(tests => {
-            assert.equal(tests.length, 2);
+            assert.equal(tests.length, 3);
           }),
           Test.find({block: {$gte: 'über'}}).exec().then(tests => {
-            assert.equal(tests.length, 3);
+            assert.equal(tests.length, 4);
           }),
           Test.find({block: {$lt: Buffer.from('buffer shtuffs are neat')}}).exec().then(tests => {
             assert.ifError(err);
-            assert.equal(tests.length, 2);
+            assert.equal(tests.length, 3);
             var ret = {};
             ret[tests[0].block.toString('utf8')] = 1;
             ret[tests[1].block.toString('utf8')] = 1;
+            ret[tests[2].block.toString('utf8')] = 1;
 
             assert.ok(ret['über'] !== undefined);
           }),
           Test.find({block: {$lte: 'buffer shtuffs are neat'}}).exec().then(tests => {
-            assert.equal(tests.length, 3);
+            assert.equal(tests.length, 4);
+          }),
+          Test.find({block: {$gt: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] }}}).exec().then(tests => {
+            assert.equal(tests.length, 2);
           })
         ];
 

@@ -8,12 +8,13 @@ var Schema = mongoose.Schema;
 var random = require('../lib/utils').random;
 var collection = 'blogposts_' + random();
 
+const uri = 'mongodb://localhost:27017/mongoose_test';
+
 describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', function(done) {
       var goose = new Mongoose;
       var db = goose.connection;
-      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -27,7 +28,6 @@ describe('mongoose module:', function() {
     it('with options', function(done) {
       var goose = new Mongoose;
       var db = goose.connection;
-      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
 
@@ -41,7 +41,6 @@ describe('mongoose module:', function() {
     it('with promise (gh-3790)', function(done) {
       var goose = new Mongoose;
       var db = goose.connection;
-      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri).then(function() {
         db.close(done);
@@ -144,6 +143,24 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('runValidators option (gh-6865) (gh-6578)', function() {
+    const mongoose = new Mongoose();
+
+    mongoose.set('runValidators', true);
+
+    const M = mongoose.model('Test', new Schema({
+      name: { type: String, required: true }
+    }));
+
+    return mongoose.connect(uri).
+      then(() => M.updateOne({}, { name: null })).
+      then(
+        () => assert.ok(false),
+        err => assert.ok(err.errors['name'])
+      ).
+      then(() => mongoose.disconnect());
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });
@@ -195,7 +212,6 @@ describe('mongoose module:', function() {
     describe('no callback', function() {
       it('works', function(done) {
         var mong = new Mongoose();
-        var uri = 'mongodb://localhost:27017/mongoose_test';
         var connections = 0;
         var disconnections = 0;
         var pending = 4;
@@ -238,7 +254,6 @@ describe('mongoose module:', function() {
 
     it('with callback', function(done) {
       var mong = new Mongoose();
-      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -251,7 +266,6 @@ describe('mongoose module:', function() {
 
     it('with promise (gh-3790)', function(done) {
       var mong = new Mongoose();
-      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -354,7 +368,6 @@ describe('mongoose module:', function() {
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
       var mong = new Mongoose();
-      var uri = 'mongodb://localhost:27017/mongoose_test';
 
       mong.connect(uri, {}, function(err) {
         assert.ifError(err);

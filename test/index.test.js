@@ -161,6 +161,47 @@ describe('mongoose module:', function() {
       then(() => mongoose.disconnect());
   });
 
+  it('toJSON options (gh-6815)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('toJSON', { virtuals: true });
+
+    const schema = new Schema({});
+    schema.virtual('foo').get(() => 42);
+    const M = mongoose.model('Test', schema);
+
+    let doc = new M();
+    assert.equal(doc.toJSON().foo, 42);
+    assert.equal(doc.toObject().foo, void 0);
+
+    assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
+
+    const schema2 = new Schema({}, { toJSON: { virtuals: true } });
+    schema2.virtual('foo').get(() => 'bar');
+    const M2 = mongoose.model('Test2', schema2);
+
+    doc = new M2();
+    assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
+    assert.equal(doc.toJSON().foo, 'bar');
+
+    done();
+  });
+
+  it('toObject options (gh-6815)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('toObject', { virtuals: true });
+
+    const schema = new Schema({});
+    schema.virtual('foo').get(() => 42);
+    const M = mongoose.model('Test', schema);
+
+    const doc = new M();
+    assert.equal(doc.toObject().foo, 42);
+    assert.strictEqual(doc.toJSON().foo, void 0);
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });

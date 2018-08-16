@@ -2748,4 +2748,155 @@ describe('Query', function() {
       assert.deepStrictEqual(q._conditions, { a: 1 });
     });
   });
+
+  describe('orFail (gh-6841)', function() {
+    let Model;
+
+    before(function() {
+      Model = db.model('gh6841', new Schema({ name: String }));
+    });
+
+    beforeEach(function() {
+      return Model.deleteMany({}).then(() => Model.create({ name: 'Test' }));
+    });
+
+    it('find()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.find({ name: 'na' }).orFail(() => new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.find({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('findOne()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.findOne({ name: 'na' }).orFail(() => new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.findOne({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('deleteMany()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.deleteMany({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('deleteOne()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.deleteOne({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('remove()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.remove({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('update()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.update({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('updateMany()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.updateMany({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('updateOne()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.updateOne({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+  });
 });

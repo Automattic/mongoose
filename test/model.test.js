@@ -4852,6 +4852,29 @@ describe('Model', function() {
       });
     });
 
+    it('run default function with correct this scope in DocumentArray (gh-6840)', function() {
+      var schema = new Schema({
+        title: String,
+        actors: {
+          type: [{ name: String, character: String }],
+          default: function() {
+            // `this` should be root document and has initial data
+            if (this.title === 'Passenger') {
+              return [
+                { name: 'Jennifer Lawrence', character: 'Aurora Lane' },
+                { name: 'Chris Pratt', character: 'Jim Preston' }
+              ];
+            }
+            return [];
+          }
+        }
+      });
+
+      var Movie = db.model('gh6840', schema);
+      var movie = new Movie({ title: 'Passenger'});
+      assert.equal(movie.actors.length, 2);
+    });
+
     describe('3.6 features', function() {
       before(function(done) {
         start.mongodVersion((err, version) => {

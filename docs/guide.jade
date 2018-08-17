@@ -1,7 +1,23 @@
 extends layout
 
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
-  h2 Schemas
+  :markdown
+    ## Schemas
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
+
   .important
     :markdown
       If you haven't yet done so, please take a minute to read the [quickstart](./index.html) to get an idea of how Mongoose works.

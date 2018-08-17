@@ -210,7 +210,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 4000);
+              setTimeout(function() { resolve(); }, 8000);
             });
           }).
           then(function() {

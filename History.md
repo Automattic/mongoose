@@ -1,9 +1,20 @@
+5.2.9 / 2018-08-17
+==================
+ * fix(document): correctly propagate write concern options in save() #6877 [Fonger](https://github.com/Fonger)
+ * fix: upgrade mongodb driver -> 3.1.3 for numerous fixes #6869 #6843 #6692 #6670 [simllll](https://github.com/simllll)
+ * fix: correct `this` scope of default functions for DocumentArray and Array #6868 #6840 [Fonger](https://github.com/Fonger)
+ * fix(types): support casting JSON form of buffers #6866 #6863 [Fonger](https://github.com/Fonger)
+ * fix(query): get global runValidators option correctly #6865 #6578
+ * fix(query): add Query.prototype.setQuery() analogous to `getQuery()` #6855 #6854
+ * docs(connections): add note about the `family` option for IPv4 vs IPv6 and add port to example URIs #6784
+ * fix(query): get global runValidators option correctly #6578
+
 4.13.15 / 2018-08-14
 ====================
  * fix(mongoose): add global `usePushEach` option for easier Mongoose 4.x + MongoDB 3.6 #6858
  * chore: fix flakey tests for 4.x #6853 [Fonger](https://github.com/Fonger)
  * feat(error): add version number to VersionError #6852 [freewil](https://github.com/freewil)
- 
+
 5.2.8 / 2018-08-13
 ==================
  * docs: update `execPopulate()` code example #6851 [WJakub](https://github.com/WJakub)

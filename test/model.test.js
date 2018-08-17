@@ -4852,6 +4852,29 @@ describe('Model', function() {
       });
     });
 
+    it('run default function with correct this scope in DocumentArray (gh-6840)', function() {
+      var schema = new Schema({
+        title: String,
+        actors: {
+          type: [{ name: String, character: String }],
+          default: function() {
+            // `this` should be root document and has initial data
+            if (this.title === 'Passenger') {
+              return [
+                { name: 'Jennifer Lawrence', character: 'Aurora Lane' },
+                { name: 'Chris Pratt', character: 'Jim Preston' }
+              ];
+            }
+            return [];
+          }
+        }
+      });
+
+      var Movie = db.model('gh6840', schema);
+      var movie = new Movie({ title: 'Passenger'});
+      assert.equal(movie.actors.length, 2);
+    });
+
     describe('3.6 features', function() {
       before(function(done) {
         start.mongodVersion((err, version) => {
@@ -5354,6 +5377,88 @@ describe('Model', function() {
       const doc = new Model();
 
       return doc.save({ safe: { w: 0 } });
+    });
+
+    it('save() with acknowledged writes fail if topology is not replica set (gh-6862)', function(done) {
+      // If w > 1 and there is no replica sets, mongodb will throw BadValue error
+      // This test uses this to check if option `w` is correctly propagated to mongodb
+
+      // skip this test if the server is a replica set
+      if (db.client.topology.constructor.name === 'ReplSet') {
+        return this.skip();
+      }
+
+      const schemaA = new Schema({
+        name: String
+      }, { writeConcern: { w: 2 }});
+      const schemaB = new Schema({
+        name: String
+      });
+
+      const UserA = db.model('gh6862_1', schemaA);
+      const UserB = db.model('gh6862_2', schemaB);
+
+      const userA = new UserA();
+      const userB = new UserB();
+      userA.save(function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'MongoError');
+        assert.equal(error.codeName, 'BadValue');
+
+        userB.save({ w: 2 },function(error) {
+          assert.ok(error);
+          assert.equal(error.name, 'MongoError');
+          assert.equal(error.codeName, 'BadValue');
+          done();
+        });
+      });
+    });
+
+    it.skip('save() with wtimeout defined in schema (gh-6862)', function(done) {
+      // If you want to test this, setup replica set with 1 primary up and 1 slave down
+      this.timeout(process.env.TRAVIS ? 9000 : 5500);
+      const schema = new Schema({
+        name: String
+      }, {
+        writeConcern: {
+          w: 2,
+          wtimeout: 1000
+        }
+      });
+      const User = db.model('gh6862_3', schema);
+      const user = new User();
+      user.name = 'Jon Snow';
+      user.save(function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'MongoWriteConcernError');
+
+        // although timeout, it should have successfully saved the doc
+        User.findOne({}, function(err, user) {
+          if (err) return done(err);
+          assert.equal(user.name, 'Jon Snow');
+          done();
+        });
+      });
+    });
+
+    it.skip('save with wtimeout in options (gh_6862)', function(done) {
+      // If you want to test this, setup replica set with 1 primary up and 1 slave down
+      this.timeout(process.env.TRAVIS ? 9000 : 5500);
+      const schema = new Schema({
+        name: String
+      });
+      const User = db.model('gh6862_4', schema);
+      const user = new User();
+      user.name = 'Jon Snow';
+      user.save({ w: 2, wtimeout: 1000 }, function(error) {
+        assert.ok(error);
+        assert.equal(error.name, 'MongoWriteConcernError');
+        User.findOne({}, function(err, user) {
+          if (err) return done(err);
+          assert.equal(user.name, 'Jon Snow');
+          done();
+        });
+      });
     });
 
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {

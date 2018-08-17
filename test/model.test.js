@@ -5357,8 +5357,8 @@ describe('Model', function() {
     });
 
     it('save() with acknowledged writes fail if topology is not replica set (gh-6862)', function(done) {
-      // If there is no replica sets, speicify w > 1 will throw BadValue error
-      // This test use his error to check if w options are correctly passed to mongodb
+      // If w > 1 and there is no replica sets, mongodb will throw BadValue error
+      // This test uses this to check if option `w` is correctly propagated to mongodb
 
       // skip this test if the server is a replica set
       if (db.client.topology.constructor.name === 'ReplSet') {

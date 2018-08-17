@@ -488,5 +488,45 @@ describe('types.buffer', function() {
       assert.equal(doc.buf.length, 1);
       done();
     });
+
+    it('cast from string', function(done) {
+      var schema = new Schema({buf: Buffer});
+      var MyModel = mongoose.model('bufferFromString', schema);
+
+      var doc = new MyModel({buf: 'hi'});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), 'hi');
+      done();
+    });
+
+    it('cast from array', function(done) {
+      var schema = new Schema({buf: Buffer});
+      var MyModel = mongoose.model('bufferFromArray', schema);
+
+      var doc = new MyModel({buf: [195, 188, 98, 101, 114]});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), 'über');
+      done();
+    });
+
+    it('cast from Binary', function(done) {
+      var schema = new Schema({buf: Buffer});
+      var MyModel = mongoose.model('bufferFromBinary', schema);
+
+      var doc = new MyModel({buf: new MongooseBuffer.Binary([228, 189, 160, 229, 165, 189], 0)});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), '你好');
+      done();
+    });
+
+    it('cast from json (gh-6863)', function(done) {
+      var schema = new Schema({buf: Buffer});
+      var MyModel = mongoose.model('gh6863', schema);
+
+      var doc = new MyModel({buf: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51]}});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), 'gh-6863');
+      done();
+    });
   });
 });

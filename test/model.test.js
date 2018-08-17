@@ -3,7 +3,7 @@
 /**
  * Test dependencies.
  */
-require('../lib/driver').set(require('../lib/drivers/node-mongodb-native'));
+
 const assert = require('power-assert');
 const co = require('co');
 const random = require('../lib/utils').random;

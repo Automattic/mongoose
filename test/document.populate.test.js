@@ -3,7 +3,7 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
+let start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
     utils = require('../lib/utils'),
@@ -34,11 +34,11 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-var em = new Schema({title: String, body: String});
+const em = new Schema({title: String, body: String});
 em.virtual('works').get(function() {
   return 'em virtual works';
 });
-var schema = new Schema({
+const schema = new Schema({
   test: String,
   oids: [ObjectId],
   numbers: [Number],
@@ -66,7 +66,7 @@ TestDocument.prototype.$__setSchema(schema);
  * User schema.
  */
 
-var User = new Schema({
+const User = new Schema({
   name: String,
   email: String,
   gender: {type: String, enum: ['male', 'female'], default: 'male'},
@@ -78,7 +78,7 @@ var User = new Schema({
  * Comment subdocument schema.
  */
 
-var Comment = new Schema({
+const Comment = new Schema({
   asers: [{type: ObjectId, ref: 'doc.populate.u'}],
   _creator: {type: ObjectId, ref: 'doc.populate.u'},
   content: String
@@ -88,7 +88,7 @@ var Comment = new Schema({
  * Blog post schema.
  */
 
-var BlogPost = new Schema({
+const BlogPost = new Schema({
   _creator: {type: ObjectId, ref: 'doc.populate.u'},
   title: String,
   comments: [Comment],
@@ -100,8 +100,8 @@ mongoose.model('doc.populate.u', User);
 mongoose.model('doc.populate.u2', User);
 
 describe('document.populate', function() {
-  var db, B, User;
-  var user1, user2, post, _id;
+  let db, B, User;
+  let user1, user2, post, _id;
 
   before(function(done) {
     db = start();
@@ -182,7 +182,7 @@ describe('document.populate', function() {
   describe('options', function() {
     it('resets populate options after execution', function(done) {
       B.findById(post, function(err, post) {
-        var creator_id = post._creator;
+        const creator_id = post._creator;
         post.populate('_creator', function(err) {
           assert.ifError(err);
           assert.ok(!post.$__.populate);
@@ -194,8 +194,8 @@ describe('document.populate', function() {
     });
 
     it('are not modified when no arguments are passed', function(done) {
-      var d = new TestDocument();
-      var o = utils.clone(d.options);
+      const d = new TestDocument();
+      const o = utils.clone(d.options);
       assert.deepEqual(o, d.populate().options);
       done();
     });
@@ -204,8 +204,8 @@ describe('document.populate', function() {
   describe('populating two paths', function() {
     it('with space delmited string works', function(done) {
       B.findById(post, function(err, post) {
-        var creator_id = post._creator;
-        var alt_id = post.fans[1];
+        const creator_id = post._creator;
+        const alt_id = post.fans[1];
         post.populate('_creator fans', function(err) {
           assert.ifError(err);
           assert.ok(post._creator);
@@ -220,8 +220,8 @@ describe('document.populate', function() {
 
   it('works with just a callback', function(done) {
     B.findById(post, function(err, post) {
-      var creator_id = post._creator;
-      var alt_id = post.fans[1];
+      const creator_id = post._creator;
+      const alt_id = post.fans[1];
       post.populate('_creator').populate(function(err) {
         assert.ifError(err);
         assert.ok(post._creator);
@@ -234,13 +234,13 @@ describe('document.populate', function() {
 
   it('populating using space delimited paths with options', function(done) {
     B.findById(post, function(err, post) {
-      var param = {};
+      const param = {};
       param.select = '-email';
       param.options = {sort: 'name'};
       param.path = '_creator fans'; // 2 paths
 
-      var creator_id = post._creator;
-      var alt_id = post.fans[1];
+      const creator_id = post._creator;
+      const alt_id = post.fans[1];
       post.populate(param, function(err, post) {
         assert.ifError(err);
         assert.equal(post.fans.length, 2);
@@ -258,10 +258,10 @@ describe('document.populate', function() {
 
   it('using multiple populate calls', function(done) {
     B.findById(post, function(err, post) {
-      var creator_id = post._creator;
-      var alt_id = post.fans[1];
+      const creator_id = post._creator;
+      const alt_id = post.fans[1];
 
-      var param = {};
+      const param = {};
       param.select = '-email';
       param.options = {sort: 'name'};
       param.path = '_creator';
@@ -285,14 +285,14 @@ describe('document.populate', function() {
 
   it('with custom model selection', function(done) {
     B.findById(post, function(err, post) {
-      var param = {};
+      const param = {};
       param.select = '-email';
       param.options = {sort: 'name'};
       param.path = '_creator fans';
       param.model = 'doc.populate.u2';
 
-      var creator_id = post._creator;
-      var alt_id = post.fans[1];
+      const creator_id = post._creator;
+      const alt_id = post.fans[1];
       post.populate(param, function(err, post) {
         assert.ifError(err);
         assert.equal(post.fans.length, 2);
@@ -360,25 +360,25 @@ describe('document.populate', function() {
   });
 
   it('String _ids', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       _id: String,
       name: String
     });
 
-    var NoteSchema = new Schema({
+    const NoteSchema = new Schema({
       author: {type: String, ref: 'UserWithStringId'},
       body: String
     });
 
-    var User = db.model('UserWithStringId', UserSchema, random());
-    var Note = db.model('NoteWithStringId', NoteSchema, random());
+    const User = db.model('UserWithStringId', UserSchema, random());
+    const Note = db.model('NoteWithStringId', NoteSchema, random());
 
-    var alice = new User({_id: 'alice', name: 'Alice In Wonderland'});
+    const alice = new User({_id: 'alice', name: 'Alice In Wonderland'});
 
     alice.save(function(err) {
       assert.ifError(err);
 
-      var note = new Note({author: 'alice', body: 'Buy Milk'});
+      const note = new Note({author: 'alice', body: 'Buy Milk'});
       note.populate('author', function(err) {
         assert.ifError(err);
         assert.ok(note.author);
@@ -390,25 +390,25 @@ describe('document.populate', function() {
   });
 
   it('Buffer _ids', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       _id: Buffer,
       name: String
     });
 
-    var NoteSchema = new Schema({
+    const NoteSchema = new Schema({
       author: {type: Buffer, ref: 'UserWithBufferId'},
       body: String
     });
 
-    var User = db.model('UserWithBufferId', UserSchema, random());
-    var Note = db.model('NoteWithBufferId', NoteSchema, random());
+    const User = db.model('UserWithBufferId', UserSchema, random());
+    const Note = db.model('NoteWithBufferId', NoteSchema, random());
 
-    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: 'Alice'});
+    const alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: 'Alice'});
 
     alice.save(function(err) {
       assert.ifError(err);
 
-      var note = new Note({author: 'alice', body: 'Buy Milk'});
+      const note = new Note({author: 'alice', body: 'Buy Milk'});
       note.save(function(err) {
         assert.ifError(err);
 
@@ -428,25 +428,25 @@ describe('document.populate', function() {
   });
 
   it('Number _ids', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       _id: Number,
       name: String
     });
 
-    var NoteSchema = new Schema({
+    const NoteSchema = new Schema({
       author: {type: Number, ref: 'UserWithNumberId'},
       body: String
     });
 
-    var User = db.model('UserWithNumberId', UserSchema, random());
-    var Note = db.model('NoteWithNumberId', NoteSchema, random());
+    const User = db.model('UserWithNumberId', UserSchema, random());
+    const Note = db.model('NoteWithNumberId', NoteSchema, random());
 
-    var alice = new User({_id: 2359, name: 'Alice'});
+    const alice = new User({_id: 2359, name: 'Alice'});
 
     alice.save(function(err) {
       assert.ifError(err);
 
-      var note = new Note({author: 2359, body: 'Buy Milk'});
+      const note = new Note({author: 2359, body: 'Buy Milk'});
       note.populate('author').populate(function(err, note) {
         assert.ifError(err);
         assert.ok(note.author);
@@ -460,8 +460,8 @@ describe('document.populate', function() {
   describe('sub-level properties', function() {
     it('with string arg', function(done) {
       B.findById(post, function(err, post) {
-        var id0 = post.comments[0]._creator;
-        var id1 = post.comments[1]._creator;
+        const id0 = post.comments[0]._creator;
+        const id1 = post.comments[1]._creator;
         post.populate('comments._creator', function(err, post) {
           assert.ifError(err);
           assert.equal(post.comments.length, 2);
@@ -475,7 +475,7 @@ describe('document.populate', function() {
 
   describe('of new document', function() {
     it('should save just the populated _id (gh-1442)', function(done) {
-      var b = new B({_creator: user1});
+      const b = new B({_creator: user1});
       b.populate('_creator', function(err, b) {
         if (err) return done(err);
         assert.equal(b._creator.name, 'Phoenix');
@@ -492,22 +492,22 @@ describe('document.populate', function() {
   });
 
   it('gh-3308', function(done) {
-    var Person = db.model('gh3308', {
+    const Person = db.model('gh3308', {
       name: String
     });
 
-    var Band = db.model('gh3308_0', {
+    const Band = db.model('gh3308_0', {
       guitarist: {type: Schema.Types.ObjectId, ref: 'gh3308'}
     });
 
-    var slash = new Person({name: 'Slash'});
-    var gnr = new Band({guitarist: slash._id});
+    const slash = new Person({name: 'Slash'});
+    const gnr = new Band({guitarist: slash._id});
 
     gnr.guitarist = slash;
     assert.equal(gnr.guitarist.name, 'Slash');
     assert.ok(gnr.populated('guitarist'));
 
-    var buckethead = new Person({name: 'Buckethead'});
+    const buckethead = new Person({name: 'Buckethead'});
     gnr.guitarist = buckethead._id;
     assert.ok(!gnr.populated('guitarist'));
 
@@ -516,12 +516,12 @@ describe('document.populate', function() {
 
   describe('gh-2214', function() {
     it('should return a real document array when populating', function(done) {
-      var Car = db.model('gh-2214-1', {
+      const Car = db.model('gh-2214-1', {
         color: String,
         model: String
       });
 
-      var Person = db.model('gh-2214-2', {
+      const Person = db.model('gh-2214-2', {
         name: String,
         cars: [
           {
@@ -531,8 +531,8 @@ describe('document.populate', function() {
         ]
       });
 
-      var car;
-      var joe;
+      let car;
+      let joe;
       joe = new Person({
         name: 'Joe'
       });
@@ -565,20 +565,20 @@ describe('document.populate', function() {
   });
 
   it('can depopulate (gh-2509)', function(done) {
-    var Person = db.model('gh2509_1', {
+    const Person = db.model('gh2509_1', {
       name: String
     });
 
-    var Band = db.model('gh2509_2', {
+    const Band = db.model('gh2509_2', {
       name: String,
       members: [{type: Schema.Types.ObjectId, ref: 'gh2509_1'}],
       lead: {type: Schema.Types.ObjectId, ref: 'gh2509_1'}
     });
 
-    var people = [{name: 'Axl Rose'}, {name: 'Slash'}];
+    const people = [{name: 'Axl Rose'}, {name: 'Slash'}];
     Person.create(people, function(error, docs) {
       assert.ifError(error);
-      var band = {
+      const band = {
         name: 'Guns N\' Roses',
         members: [docs[0]._id, docs[1]],
         lead: docs[0]._id
@@ -605,20 +605,20 @@ describe('document.populate', function() {
   });
 
   it('depopulate all (gh-6073)', function(done) {
-    var Person = db.model('gh6073_1', {
+    const Person = db.model('gh6073_1', {
       name: String
     });
 
-    var Band = db.model('gh6073_2', {
+    const Band = db.model('gh6073_2', {
       name: String,
       members: [{type: Schema.Types.ObjectId, ref: 'gh6073_1'}],
       lead: {type: Schema.Types.ObjectId, ref: 'gh6073_1'}
     });
 
-    var people = [{name: 'Axl Rose'}, {name: 'Slash'}];
+    const people = [{name: 'Axl Rose'}, {name: 'Slash'}];
     Person.create(people, function(error, docs) {
       assert.ifError(error);
-      var band = {
+      const band = {
         name: 'Guns N\' Roses',
         members: [docs[0]._id, docs[1]],
         lead: docs[0]._id
@@ -638,20 +638,20 @@ describe('document.populate', function() {
   });
 
   it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
-    var EmbeddedSchema = new Schema({
+    const EmbeddedSchema = new Schema({
       reference: {
         type: mongoose.Schema.ObjectId,
         ref: 'Reference'
       }
     });
 
-    var ModelSchema = new Schema({
+    const ModelSchema = new Schema({
       embedded: EmbeddedSchema
     });
 
-    var Model = db.model('gh4552', ModelSchema);
+    const Model = db.model('gh4552', ModelSchema);
 
-    var m = new Model({});
+    const m = new Model({});
     m.embedded = {};
     assert.throws(function() {
       m.embedded.populate('reference');
@@ -660,22 +660,22 @@ describe('document.populate', function() {
   });
 
   it('handles pulling from populated array (gh-3579)', function(done) {
-    var barSchema = new Schema({name: String});
+    const barSchema = new Schema({name: String});
 
-    var Bar = db.model('gh3579', barSchema);
+    const Bar = db.model('gh3579', barSchema);
 
-    var fooSchema = new Schema({
+    const fooSchema = new Schema({
       bars: [{
         type: Schema.Types.ObjectId,
         ref: 'gh3579'
       }]
     });
 
-    var Foo = db.model('gh3579_0', fooSchema);
+    const Foo = db.model('gh3579_0', fooSchema);
 
     Bar.create([{name: 'bar1'}, {name: 'bar2'}], function(error, docs) {
       assert.ifError(error);
-      var foo = new Foo({bars: [docs[0], docs[1]]});
+      const foo = new Foo({bars: [docs[0], docs[1]]});
       foo.bars.pull(docs[0]._id);
       foo.save(function(error) {
         assert.ifError(error);

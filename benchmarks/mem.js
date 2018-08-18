@@ -1,15 +1,15 @@
-var mongoose = require('../'),
+let mongoose = require('../'),
     Schema = mongoose.Schema;
 
-var Buffer = require('safe-buffer').Buffer;
+const Buffer = require('safe-buffer').Buffer;
 
 mongoose.connect('localhost', 'testing_bench');
 
-var DocSchema = new Schema({
+const DocSchema = new Schema({
   title: String
 });
 
-var AllSchema = new Schema({
+const AllSchema = new Schema({
   string: {type: String, required: true},
   number: {type: Number, min: 10},
   date: Date,
@@ -31,9 +31,9 @@ var AllSchema = new Schema({
   s: {nest: String}
 });
 
-var A = mongoose.model('A', AllSchema);
+const A = mongoose.model('A', AllSchema);
 
-var methods = [];
+const methods = [];
 methods.push(function(a, cb) {
   A.findOne({_id: a._id}, cb);
 }); // 2 MB
@@ -95,16 +95,16 @@ methods.push(function(a, cb) {
   cb();
 });
 
-var started = process.memoryUsage();
-var start = new Date;
-var total = 10000;
+const started = process.memoryUsage();
+const start = new Date;
+const total = 10000;
 var i = total;
 
 function done() {
-  var time = (new Date - start);
-  var used = process.memoryUsage();
+  const time = (new Date - start);
+  const used = process.memoryUsage();
 
-  var res = {};
+  const res = {};
   res.rss = used.rss - started.rss;
   res.heapTotal = used.heapTotal - started.heapTotal;
   res.heapUsed = used.heapUsed - started.heapUsed;
@@ -120,7 +120,7 @@ function cycle() {
   if (i-- === 0) {
     return done();
   }
-  var a = new A({
+  let a = new A({
     string: 'hello world',
     number: 444848484,
     date: new Date,

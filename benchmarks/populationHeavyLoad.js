@@ -1,23 +1,23 @@
-var tbd = require('tbd');
-var mongoose = require('../');
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
+const tbd = require('tbd');
+const mongoose = require('../');
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
-var turns = process.argv[2] ? process.argv[2] | 0 : 5;
-var dicCnt = process.argv[3] ? process.argv[3] | 0 : 100;
-var mainCnt = process.argv[4] ? process.argv[4] | 0 : 25;
+const turns = process.argv[2] ? process.argv[2] | 0 : 5;
+const dicCnt = process.argv[3] ? process.argv[3] | 0 : 100;
+const mainCnt = process.argv[4] ? process.argv[4] | 0 : 25;
 
-var load = {};
+const load = {};
 
 function createRandomWord(len) {
-  var cons = 'bcdfghjklmnpqrstvwxyz';
-  var vow = 'aeiou';
-  var i, word = '', length = parseInt(len, 10), consonants = cons.split(''), vowels = vow.split('');
+  const cons = 'bcdfghjklmnpqrstvwxyz';
+  const vow = 'aeiou';
+  let i, word = '', length = parseInt(len, 10), consonants = cons.split(''), vowels = vow.split('');
   function rand(limit) {
     return Math.floor(Math.random() * limit);
   }
   for (i = 0; i < length / 2; i++) {
-    var randConsonant = consonants[rand(consonants.length)],
+    let randConsonant = consonants[rand(consonants.length)],
         randVowel = vowels[rand(vowels.length)];
     word += (i === 0) ? randConsonant.toUpperCase() : randConsonant;
     word += i * 2 < length - 1 ? randVowel : '';
@@ -409,7 +409,7 @@ load.Conclusion = tbd.from({
 
 function getItem(list) {
   return function() {
-    var cnt = Math.floor(Math.random() * dicCnt);
+    const cnt = Math.floor(Math.random() * dicCnt);
     return list[cnt];
   };
 }
@@ -436,10 +436,10 @@ mongoose.model('MedicalCard', Schema({
   conclusion: {type: ObjectId, ref: 'Conclusion'}
 }));
 
-var collectionsNames = Object.keys(load);
-var i, cn;
-var len = collectionsNames.length;
-var creatList = [];
+const collectionsNames = Object.keys(load);
+let i, cn;
+const len = collectionsNames.length;
+const creatList = [];
 for (i = 0; i < len; i++) {
   cn = collectionsNames[i];
   creatList.push({list: load[cn], collection: mongoose.model(cn).collection.name, model: cn});
@@ -452,8 +452,8 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
       done();
     }
     return function() {
-      var cnt = Math.floor(Math.random() * dicCnt);
-      var i, res = [];
+      const cnt = Math.floor(Math.random() * dicCnt);
+      let i, res = [];
       for (i = 0; i < cnt; i++) {
         res.push(list[i]);
       }
@@ -461,13 +461,13 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
     };
   }
 
-  var cnt = creatList.length;
-  var length = cnt;
-  var runResults = {};
-  var finalResults = {};
-  var doBenchmark = function() {
-    var mc = db.model('MedicalCard');
-    var run = [];
+  let cnt = creatList.length;
+  const length = cnt;
+  const runResults = {};
+  const finalResults = {};
+  const doBenchmark = function() {
+    const mc = db.model('MedicalCard');
+    const run = [];
 
     run.push({
       name: 'findAll lean=false',
@@ -559,10 +559,10 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
         .populate('conclusion')
     });
 
-    var gcnt = run.length;
-    var qryName;
-    var turn = turns;
-    var nextQuery = function(err) {
+    let gcnt = run.length;
+    let qryName;
+    let turn = turns;
+    const nextQuery = function(err) {
       if (err) {
         done();
       } else if (--gcnt >= 0) {
@@ -581,7 +581,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
         return nextQuery(err);
       }
       if (turn < turns) {
-        var res = runResults[qryName][turn];
+        const res = runResults[qryName][turn];
         res.finish = new Date();
         console.log(res.finish - res.start);
       }
@@ -597,12 +597,12 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
     nextQuery();
   };
 
-  var createRelations = function() {
-    var coll = db.db.collection('medicalcards');
+  const createRelations = function() {
+    const coll = db.db.collection('medicalcards');
     console.log('Main Collection prepare');
     coll.remove({}, function() {
       console.log('clean collection done');
-      var loadMedicalCard = tbd.from({})
+      const loadMedicalCard = tbd.from({})
         .prop('firstName').use(function() {
           return createRandomWord(10);
         }).done()
@@ -628,7 +628,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
         .prop('conclusion').use(getItem(load.Conclusion)).done()
         .make(mainCnt);
 
-      var saveAll = function(err) {
+      const saveAll = function(err) {
         if (err) {
           done();
         } else if (--res === 0) {
@@ -638,9 +638,9 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
       };
 
       var res = loadMedicalCard.length;
-      var mc = db.model('MedicalCard');
-      var i;
-      var len = loadMedicalCard.length;
+      const mc = db.model('MedicalCard');
+      let i;
+      const len = loadMedicalCard.length;
       for (i = 0; i < len; i++) {
         new mc(loadMedicalCard[i]).save(saveAll);
       }
@@ -649,15 +649,15 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
 
 
   function done() {
-    var qrs = Object.keys(runResults);
-    var i, qry;
-    var len = qrs.length;
+    const qrs = Object.keys(runResults);
+    let i, qry;
+    const len = qrs.length;
     for (i = 0; i < len; i++) {
       qry = runResults[qrs[i]];
-      var resSet = Object.keys(qry);
+      const resSet = Object.keys(qry);
       var j, rs;
-      var rsLen = resSet.length;
-      var sum = 0;
+      const rsLen = resSet.length;
+      let sum = 0;
       for (j = 0; j < rsLen; j++) {
         rs = qry[resSet[j]];
         sum += rs.finish - rs.start;
@@ -689,12 +689,12 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
     mongoose.disconnect();
   }
 
-  var updated = {};
+  const updated = {};
   var next = function(err, data) {
     if (cnt < length && Array.isArray(data)) {
       // debugger
-      var modelName = creatList[cnt].model;
-      var items = load[modelName];
+      const modelName = creatList[cnt].model;
+      const items = load[modelName];
       updated[cnt] = modelName;
       items.length = 0;
       items.push.apply(items, data);
@@ -704,12 +704,12 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
       return done(err);
     }
     if (--cnt >= 0) {
-      var item = creatList[cnt];
-      var coll = db.db.collection(item.collection);
+      const item = creatList[cnt];
+      const coll = db.db.collection(item.collection);
       console.log(item.model);
       coll.remove({}, function() {
         coll.save(item.list, function() {
-          var mdl = db.model(item.model);
+          const mdl = db.model(item.model);
           mdl.find({}, next);
         });
       });

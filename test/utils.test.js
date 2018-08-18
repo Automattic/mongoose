@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
+let start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,
     utils = require('../lib/utils'),
@@ -17,7 +17,7 @@ var start = require('./common'),
  * Setup.
  */
 
-var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
+const ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
 
 /**
  * Test.
@@ -26,28 +26,28 @@ var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
 describe('utils', function() {
   describe('ActiveRoster', function() {
     it('should detect a path as required if it has been required', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.require('hello');
       assert.equal(ar.paths.hello, 'require');
       done();
     });
 
     it('should detect a path as inited if it has been inited', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       assert.equal(ar.paths.hello, 'init');
       done();
     });
 
     it('should detect a path as modified', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.modify('hello');
       assert.equal(ar.paths.hello, 'modify');
       done();
     });
 
     it('should remove a path from an old state upon a state change', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('hello');
       assert.ok(!ar.states.init.hasOwnProperty('hello'));
@@ -56,7 +56,7 @@ describe('utils', function() {
     });
 
     it('forEach should be able to iterate through the paths belonging to one state', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
@@ -68,7 +68,7 @@ describe('utils', function() {
     });
 
     it('forEach should be able to iterate through the paths in the union of two or more states', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
@@ -80,7 +80,7 @@ describe('utils', function() {
     });
 
     it('forEach should iterate through all paths that have any state if given no state arguments', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
@@ -92,7 +92,7 @@ describe('utils', function() {
     });
 
     it('should be able to detect if at least one path exists in a set of states', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       assert.ok(ar.some('init'));
@@ -105,11 +105,11 @@ describe('utils', function() {
     });
 
     it('should be able to `map` over the set of paths in a given state', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       ar.require('iAmTheWalrus');
-      var suffixedPaths = ar.map('init', 'modify', function(path) {
+      const suffixedPaths = ar.map('init', 'modify', function(path) {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths, ['hello-suffix', 'world-suffix']);
@@ -117,11 +117,11 @@ describe('utils', function() {
     });
 
     it('should `map` over all states\' paths if no states are specified in a `map` invocation', function(done) {
-      var ar = new ActiveRoster();
+      const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       ar.require('iAmTheWalrus');
-      var suffixedPaths = ar.map(function(path) {
+      const suffixedPaths = ar.map(function(path) {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths, ['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
@@ -130,9 +130,9 @@ describe('utils', function() {
   });
 
   it('utils.options', function(done) {
-    var o = {a: 1, b: 2, c: 3, 0: 'zero1'};
-    var defaults = {b: 10, d: 20, 0: 'zero2'};
-    var result = utils.options(defaults, o);
+    const o = {a: 1, b: 2, c: 3, 0: 'zero1'};
+    const defaults = {b: 10, d: 20, 0: 'zero2'};
+    const result = utils.options(defaults, o);
     assert.equal(result.a, 1);
     assert.equal(result.b, 2);
     assert.equal(result.c, 3);
@@ -140,7 +140,7 @@ describe('utils', function() {
     assert.deepEqual(o.d, result.d);
     assert.equal(result['0'], 'zero1');
 
-    var result2 = utils.options(defaults);
+    const result2 = utils.options(defaults);
     assert.equal(result2.b, 10);
     assert.equal(result2.d, 20);
     assert.equal(result2['0'], 'zero2');
@@ -154,9 +154,9 @@ describe('utils', function() {
   });
 
   it('deepEquals on ObjectIds', function(done) {
-    var s = (new ObjectId).toString();
+    const s = (new ObjectId).toString();
 
-    var a = new ObjectId(s),
+    let a = new ObjectId(s),
         b = new ObjectId(s);
 
     assert.ok(utils.deepEqual(a, b));
@@ -166,7 +166,7 @@ describe('utils', function() {
   });
 
   it('deepEquals on MongooseDocumentArray works', function(done) {
-    var db = start(),
+    let db = start(),
         A = new Schema({a: String}),
         M = db.model('deepEqualsOnMongooseDocArray', new Schema({
           a1: [A],
@@ -175,14 +175,14 @@ describe('utils', function() {
 
     db.close();
 
-    var m1 = new M({
+    const m1 = new M({
       a1: [{a: 'Hi'}, {a: 'Bye'}]
     });
 
     m1.a2 = m1.a1;
     assert.ok(utils.deepEqual(m1.a1, m1.a2));
 
-    var m2 = new M;
+    const m2 = new M;
     m2.init(m1.toObject());
 
     assert.ok(utils.deepEqual(m1.a1, m2.a1));
@@ -194,12 +194,12 @@ describe('utils', function() {
 
   // gh-688
   it('deepEquals with MongooseBuffer', function(done) {
-    var str = 'this is the day';
-    var a = new MongooseBuffer(str);
-    var b = new MongooseBuffer(str);
-    var c = Buffer.from(str);
-    var d = Buffer.from('this is the way');
-    var e = Buffer.from('other length');
+    const str = 'this is the day';
+    const a = new MongooseBuffer(str);
+    const b = new MongooseBuffer(str);
+    const c = Buffer.from(str);
+    const d = Buffer.from('this is the way');
+    const e = Buffer.from('other length');
 
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, c));
@@ -212,12 +212,12 @@ describe('utils', function() {
 
   describe('clone', function() {
     it('retains RegExp options gh-1355', function(done) {
-      var a = new RegExp('hello', 'igm');
+      const a = new RegExp('hello', 'igm');
       assert.ok(a.global);
       assert.ok(a.ignoreCase);
       assert.ok(a.multiline);
 
-      var b = utils.clone(a);
+      const b = utils.clone(a);
       assert.equal(b.source, a.source);
       assert.equal(a.global, b.global);
       assert.equal(a.ignoreCase, b.ignoreCase);
@@ -226,13 +226,13 @@ describe('utils', function() {
     });
 
     it('clones objects created with Object.create(null)', function(done) {
-      var o = Object.create(null);
+      const o = Object.create(null);
       o.a = 0;
       o.b = '0';
       o.c = 1;
       o.d = '1';
 
-      var out = utils.clone(o);
+      const out = utils.clone(o);
       assert.strictEqual(0, out.a);
       assert.strictEqual('0', out.b);
       assert.strictEqual(1, out.c);
@@ -244,16 +244,16 @@ describe('utils', function() {
   });
 
   it('array.flatten', function(done) {
-    var orig = [0, [1, 2, [3, 4, [5, [6]], 7], 8], 9];
+    const orig = [0, [1, 2, [3, 4, [5, [6]], 7], 8], 9];
     assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], utils.array.flatten(orig));
     done();
   });
 
   it('array.unique', function(done) {
-    var case1 = [1, 2, 3, 3, 5, 'a', 6, 'a'];
+    const case1 = [1, 2, 3, 3, 5, 'a', 6, 'a'];
     assert.deepEqual(utils.array.unique(case1), [1, 2, 3, 5, 'a', 6]);
-    var objId = new ObjectId('000000000000000000000001');
-    var case2 = [
+    const objId = new ObjectId('000000000000000000000001');
+    const case2 = [
       1,
       '000000000000000000000001',
       1,
@@ -283,8 +283,8 @@ describe('utils', function() {
       From.prototype.getName = function() {};
       From.prototype.fromMethod = function() {};
 
-      var to = new To();
-      var from = new From();
+      const to = new To();
+      const from = new From();
 
       utils.merge(to, from);
 
@@ -301,12 +301,12 @@ describe('utils', function() {
 
   describe('mergeClone', function() {
     it('handles object with valueOf() (gh-6059)', function(done) {
-      var from = {
+      const from = {
         val: {
           valueOf: function() { return 42; }
         }
       };
-      var to = { val: 41 };
+      const to = { val: 41 };
 
       utils.mergeClone(to, from);
 
@@ -316,10 +316,10 @@ describe('utils', function() {
     });
 
     it('copies dates correctly (gh-6145)', function(done) {
-      var from = {
+      const from = {
         val: new Date('2011-06-01')
       };
-      var to = { val: new Date('2012-06-01') };
+      const to = { val: new Date('2012-06-01') };
 
       utils.mergeClone(to, from);
 

@@ -3,25 +3,25 @@
  * Module dependencies.
  */
 
-var assert = require('power-assert');
-var start = require('./common');
-var mongoose = start.mongoose;
-var EmbeddedDocument = require('../lib/types/embedded');
-var EventEmitter = require('events').EventEmitter;
-var DocumentArray = require('../lib/types/documentarray');
-var Schema = mongoose.Schema;
-var ValidationError = mongoose.Document.ValidationError;
+const assert = require('power-assert');
+const start = require('./common');
+const mongoose = start.mongoose;
+const EmbeddedDocument = require('../lib/types/embedded');
+const EventEmitter = require('events').EventEmitter;
+const DocumentArray = require('../lib/types/documentarray');
+const Schema = mongoose.Schema;
+const ValidationError = mongoose.Document.ValidationError;
 
 /**
  * Test.
  */
 
 describe('types.document', function() {
-  var Dummy;
-  var Subdocument;
-  var RatingSchema;
-  var MovieSchema;
-  var db;
+  let Dummy;
+  let Subdocument;
+  let RatingSchema;
+  let MovieSchema;
+  let db;
 
   before(function() {
     function _Dummy() {
@@ -32,7 +32,7 @@ describe('types.document', function() {
     Dummy.prototype.$__setSchema(new Schema);
 
     function _Subdocument() {
-      var arr = new DocumentArray;
+      const arr = new DocumentArray;
       arr._path = 'jsconf.ar';
       arr._parent = new Dummy;
       arr[0] = this;
@@ -42,7 +42,7 @@ describe('types.document', function() {
 
     Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
 
-    for (var i in EventEmitter.prototype) {
+    for (const i in EventEmitter.prototype) {
       Subdocument[i] = EventEmitter.prototype[i];
     }
 
@@ -70,7 +70,7 @@ describe('types.document', function() {
   });
 
   it('test that validate sets errors', function(done) {
-    var a = new Subdocument();
+    const a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
     a.__index = 0;
@@ -83,7 +83,7 @@ describe('types.document', function() {
   });
 
   it('objects can be passed to #set', function(done) {
-    var a = new Subdocument();
+    const a = new Subdocument();
     a.set({test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
@@ -91,11 +91,11 @@ describe('types.document', function() {
   });
 
   it('Subdocuments can be passed to #set', function(done) {
-    var a = new Subdocument();
+    const a = new Subdocument();
     a.set({test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
-    var b = new Subdocument();
+    const b = new Subdocument();
     b.set(a);
     assert.equal(b.test, 'paradiddle');
     assert.equal(b.work, 'good flam');
@@ -103,16 +103,16 @@ describe('types.document', function() {
   });
 
   it('cached _ids', function(done) {
-    var Movie = db.model('Movie');
-    var m = new Movie;
+    const Movie = db.model('Movie');
+    const m = new Movie;
 
     assert.equal(m.id, m.$__._id);
-    var old = m.id;
+    const old = m.id;
     m._id = new mongoose.Types.ObjectId;
     assert.equal(m.id, m.$__._id);
     assert.strictEqual(true, old !== m.$__._id);
 
-    var m2 = new Movie;
+    const m2 = new Movie;
     delete m2._doc._id;
     m2.init({_id: new mongoose.Types.ObjectId});
     assert.equal(m2.id, m2.$__._id);
@@ -123,14 +123,14 @@ describe('types.document', function() {
   });
 
   it('Subdocument#remove (gh-531)', function(done) {
-    var Movie = db.model('Movie');
+    const Movie = db.model('Movie');
 
-    var super8 = new Movie({title: 'Super 8'});
+    const super8 = new Movie({title: 'Super 8'});
 
-    var id1 = '4e3d5fc7da5d7eb635063c96';
-    var id2 = '4e3d5fc7da5d7eb635063c97';
-    var id3 = '4e3d5fc7da5d7eb635063c98';
-    var id4 = '4e3d5fc7da5d7eb635063c99';
+    const id1 = '4e3d5fc7da5d7eb635063c96';
+    const id2 = '4e3d5fc7da5d7eb635063c97';
+    const id3 = '4e3d5fc7da5d7eb635063c98';
+    const id4 = '4e3d5fc7da5d7eb635063c99';
 
     super8.ratings.push({stars: 9, _id: id1});
     super8.ratings.push({stars: 8, _id: id2});
@@ -195,7 +195,7 @@ describe('types.document', function() {
 
   describe('setting nested objects', function() {
     it('works (gh-1394)', function(done) {
-      var Movie = db.model('Movie');
+      const Movie = db.model('Movie');
 
       Movie.create({
         title: 'Life of Pi',
@@ -227,7 +227,7 @@ describe('types.document', function() {
               // overwritten date
               assert.equal(undefined, movie.ratings[0].description.source.time);
 
-              var newDate = new Date;
+              const newDate = new Date;
               movie.ratings[0].set('description.source.time', newDate, {merge: true});
               movie.save(function(err) {
                 assert.ifError(err);

@@ -1,12 +1,12 @@
-var mongoose = require('../../lib');
-var Benchmark = require('benchmark');
+const mongoose = require('../../lib');
+const Benchmark = require('benchmark');
 
-var suite = new Benchmark.Suite();
+const suite = new Benchmark.Suite();
 
-var Schema = mongoose.Schema;
-var ObjectId = Schema.Types.ObjectId;
-var mongo = require('mongodb');
-var utils = require('../../lib/utils.js');
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const mongo = require('mongodb');
+const utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
 /*
@@ -28,9 +28,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       throw err;
     }
 
-    var db = client.db('mongoose-bench');
+    const db = client.db('mongoose-bench');
 
-    var Comments = new Schema;
+    const Comments = new Schema;
     Comments.add({
       title: String,
       date: Date,
@@ -38,7 +38,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       comments: [Comments]
     });
 
-    var BlogPost = new Schema({
+    let BlogPost = new Schema({
       title: String,
       author: String,
       slug: String,
@@ -56,7 +56,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       def: {type: String, default: 'kandinsky'}
     });
 
-    var blogData = {
+    const blogData = {
       title: 'dummy post',
       author: 'somebody',
       slug: 'test.post',
@@ -74,7 +74,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       def: 'THANGS!!!',
       comments: []
     };
-    var commentData = {
+    const commentData = {
       title: 'test comment',
       date: new Date(),
       body: 'this be some crazzzyyyyy text that would go in a comment',
@@ -87,25 +87,25 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     for (var i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       name: String,
       age: Number,
       likes: [String],
       address: String
     });
 
-    var User = mongoose.model('User', UserSchema);
+    const User = mongoose.model('User', UserSchema);
     BlogPost = mongoose.model('BlogPost', BlogPost);
-    var user = db.collection('user');
-    var blogpost = db.collection('blogpost');
+    const user = db.collection('user');
+    const blogpost = db.collection('blogpost');
 
-    var mIds = [];
-    var dIds = [];
+    const mIds = [];
+    const dIds = [];
 
-    var bmIds = [];
-    var bdIds = [];
+    const bmIds = [];
+    const bdIds = [];
 
-    var data = {
+    const data = {
       name: 'name',
       age: 0,
       likes: ['dogs', 'cats', 'pizza'],
@@ -113,7 +113,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     };
 
     // insert all of the data here
-    var count = 4000;
+    let count = 4000;
     for (i = 0; i < 1000; i++) {
       data.age = Math.floor(Math.random() * 50);
       User.create(data, function(err, u) {
@@ -123,7 +123,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         mIds.push(u.id);
         --count || next();
       });
-      var nData = utils.clone(data);
+      const nData = utils.clone(data);
       user.insert(nData, function(err, res) {
         if (err) {
           throw err;
@@ -139,7 +139,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         --count || next();
       });
 
-      var bpData = utils.clone(blogData);
+      const bpData = utils.clone(blogData);
       blogpost.insert(bpData, function(err, res) {
         if (err) {
           throw err;
@@ -149,7 +149,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       });
     }
 
-    var mi = 0,
+    let mi = 0,
         di = 0,
         bmi = 0,
         bdi = 0;
@@ -184,8 +184,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     suite.add('Multi-Op - Mongoose - Heavy Read, low write', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
-        for (var i = 0; i < 150; i++) {
+        let count = 150;
+        for (let i = 0; i < 150; i++) {
           User.findOne({_id: getNextmId()}, function(err) {
             if (err) {
               throw err;
@@ -193,7 +193,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            var nData = utils.clone(data);
+            const nData = utils.clone(data);
             User.create(nData, function(err) {
               if (err) {
                 throw err;
@@ -206,8 +206,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Driver - Heavy Read, low write', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
-        for (var i = 0; i < 150; i++) {
+        let count = 150;
+        for (let i = 0; i < 150; i++) {
           user.findOne({_id: getNextdId()}, function(err) {
             if (err) {
               throw err;
@@ -215,7 +215,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            var nData = utils.clone(data);
+            const nData = utils.clone(data);
             user.insert(nData, function(err) {
               if (err) {
                 throw err;
@@ -228,8 +228,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Mongoose - Embedded Docs - Heavy Read, low write', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
-        for (var i = 0; i < 150; i++) {
+        let count = 150;
+        for (let i = 0; i < 150; i++) {
           BlogPost.findOne({_id: getNextbmId()}, function(err) {
             if (err) {
               throw err;
@@ -237,7 +237,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            var nData = utils.clone(blogData);
+            const nData = utils.clone(blogData);
             BlogPost.create(nData, function(err) {
               if (err) {
                 throw err;
@@ -250,8 +250,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Driver - Embedded Docs - Heavy Read, low write', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
-        for (var i = 0; i < 150; i++) {
+        let count = 150;
+        for (let i = 0; i < 150; i++) {
           blogpost.findOne({_id: getNextbdId()}, function(err) {
             if (err) {
               throw err;
@@ -259,7 +259,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             --count || deferred.resolve();
           });
           if (i % 15 === 0) {
-            var nData = utils.clone(blogData);
+            const nData = utils.clone(blogData);
             blogpost.insert(nData, function(err) {
               if (err) {
                 throw err;
@@ -272,10 +272,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Mongoose - Heavy Write, low read', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
+        let count = 150;
 
-        for (var i = 0; i < 150; i++) {
-          var nData = utils.clone(data);
+        for (let i = 0; i < 150; i++) {
+          const nData = utils.clone(data);
           User.create(nData, function(err) {
             if (err) {
               throw err;
@@ -295,10 +295,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Driver - Heavy Write, low read', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
+        let count = 150;
 
-        for (var i = 0; i < 150; i++) {
-          var nData = utils.clone(data);
+        for (let i = 0; i < 150; i++) {
+          const nData = utils.clone(data);
           user.insert(nData, function(err) {
             if (err) {
               throw err;
@@ -318,10 +318,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Mongoose - Embedded Docs - Heavy Write, low read', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
+        let count = 150;
 
-        for (var i = 0; i < 150; i++) {
-          var nData = utils.clone(blogData);
+        for (let i = 0; i < 150; i++) {
+          const nData = utils.clone(blogData);
           BlogPost.create(nData, function(err) {
             if (err) {
               throw err;
@@ -341,10 +341,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Driver - Embedded Docs - Heavy Write, low read', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
+        let count = 150;
 
-        for (var i = 0; i < 150; i++) {
-          var nData = utils.clone(blogData);
+        for (let i = 0; i < 150; i++) {
+          const nData = utils.clone(blogData);
           blogpost.insert(nData, function(err) {
             if (err) {
               throw err;
@@ -364,9 +364,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Mongoose - Embedded Docs - Read-write-update', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
-        var updates = 0;
-        for (var i = 0; i < 150; i++) {
+        let count = 150;
+        let updates = 0;
+        for (let i = 0; i < 150; i++) {
           BlogPost.findOne({_id: getNextbmId()}, function(err, res) {
             if (err) {
               throw err;
@@ -387,7 +387,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             }
           });
           if (i % 15 === 0) {
-            var nData = utils.clone(blogData);
+            const nData = utils.clone(blogData);
             BlogPost.create(nData, function(err) {
               if (err) {
                 throw err;
@@ -400,9 +400,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Multi-Op - Driver - Embedded Docs - Read-write-update', {
       defer: true,
       fn: function(deferred) {
-        var count = 150;
-        var updates = 0;
-        for (var i = 0; i < 150; i++) {
+        let count = 150;
+        let updates = 0;
+        for (let i = 0; i < 150; i++) {
           blogpost.findOne({_id: getNextbdId()}, function(err, bp) {
             if (err) {
               throw err;
@@ -423,7 +423,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
             }
           });
           if (i % 15 === 0) {
-            var nData = utils.clone(blogData);
+            const nData = utils.clone(blogData);
             blogpost.insert(nData, function(err) {
               if (err) {
                 throw err;
@@ -441,9 +441,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }).on('complete', function() {
         closeDB();
         if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
-          var outObj = {};
+          const outObj = {};
           this.forEach(function(item) {
-            var out = {};
+            const out = {};
             out.stats = item.stats;
             delete out.stats.sample;
             out.ops = item.hz;

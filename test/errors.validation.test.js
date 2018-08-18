@@ -3,18 +3,18 @@
  * Module dependencies.
  */
 
-var assert = require('power-assert');
-var start = require('./common');
-var mongoose = start.mongoose;
-var Schema = mongoose.Schema;
-var SchemaType = mongoose.SchemaType;
-var ValidatorError = SchemaType.ValidatorError;
-var ValidationError = require('../lib/error/validation');
+const assert = require('power-assert');
+const start = require('./common');
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const SchemaType = mongoose.SchemaType;
+const ValidatorError = SchemaType.ValidatorError;
+const ValidationError = require('../lib/error/validation');
 
 describe('ValidationError', function() {
   describe('#infiniteRecursion', function() {
     it('does not cause RangeError (gh-1834)', function(done) {
-      var SubSchema,
+      let SubSchema,
           M,
           model;
 
@@ -46,7 +46,7 @@ describe('ValidationError', function() {
 
   describe('#minDate', function() {
     it('causes a validation error', function(done) {
-      var MinSchema,
+      let MinSchema,
           M,
           model;
 
@@ -76,7 +76,7 @@ describe('ValidationError', function() {
 
   describe('#maxDate', function() {
     it('causes a validation error', function(done) {
-      var MaxSchema,
+      let MaxSchema,
           M,
           model;
 
@@ -106,7 +106,7 @@ describe('ValidationError', function() {
 
   describe('#minlength', function() {
     it('causes a validation error', function(done) {
-      var AddressSchema,
+      let AddressSchema,
           Address,
           model;
 
@@ -134,20 +134,20 @@ describe('ValidationError', function() {
     });
 
     it('with correct error message (gh-4207)', function(done) {
-      var old = mongoose.Error.messages;
+      const old = mongoose.Error.messages;
       mongoose.Error.messages = {
         'String': {
           minlength: 'woops!'
         }
       };
 
-      var AddressSchema = new Schema({
+      const AddressSchema = new Schema({
         postalCode: { type: String, minlength: 5 }
       });
 
-      var Address = mongoose.model('gh4207', AddressSchema);
+      const Address = mongoose.model('gh4207', AddressSchema);
 
-      var model = new Address({
+      const model = new Address({
         postalCode: '9512'
       });
 
@@ -162,7 +162,7 @@ describe('ValidationError', function() {
 
   describe('#maxlength', function() {
     it('causes a validation error', function(done) {
-      var AddressSchema,
+      let AddressSchema,
           Address,
           model;
 
@@ -192,17 +192,17 @@ describe('ValidationError', function() {
 
   describe('#toString', function() {
     it('does not cause RangeError (gh-1296)', function(done) {
-      var ASchema = new Schema({
+      const ASchema = new Schema({
         key: {type: String, required: true},
         value: {type: String, required: true}
       });
 
-      var BSchema = new Schema({
+      const BSchema = new Schema({
         contents: [ASchema]
       });
 
-      var M = mongoose.model('A', BSchema);
-      var m = new M;
+      const M = mongoose.model('A', BSchema);
+      const m = new M;
       m.contents.push({key: 'asdf'});
       m.validate(function(err) {
         assert.doesNotThrow(function() {
@@ -215,10 +215,10 @@ describe('ValidationError', function() {
 
   describe('formatMessage', function() {
     it('replaces properties in a message', function(done) {
-      var props = {base: 'eggs', topping: 'bacon'};
-      var message = 'I had {BASE} and {TOPPING} for breakfast';
+      const props = {base: 'eggs', topping: 'bacon'};
+      const message = 'I had {BASE} and {TOPPING} for breakfast';
 
-      var result = ValidatorError.prototype.formatMessage(message, props);
+      const result = ValidatorError.prototype.formatMessage(message, props);
       assert.equal(result, 'I had eggs and bacon for breakfast');
       done();
     });
@@ -226,11 +226,11 @@ describe('ValidationError', function() {
 
   it('JSON.stringify() with message (gh-5309)', function(done) {
     model.modelName = 'TestClass';
-    var err = new ValidationError(new model());
+    const err = new ValidationError(new model());
 
     err.addError('test', { message: 'Fail' });
 
-    var obj = JSON.parse(JSON.stringify(err));
+    const obj = JSON.parse(JSON.stringify(err));
     assert.ok(obj.message.indexOf('TestClass validation failed') !== -1,
       obj.message);
     assert.ok(obj.message.indexOf('test: Fail') !== -1,

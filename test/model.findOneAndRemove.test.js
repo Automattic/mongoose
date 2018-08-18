@@ -15,12 +15,12 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model: findOneAndRemove:', function() {
-  var Comments;
-  var BlogPost;
-  var modelname;
-  var collection;
-  var strictSchema;
-  var db;
+  let Comments;
+  let BlogPost;
+  let modelname;
+  let collection;
+  let strictSchema;
+  let db;
 
   before(function() {
     Comments = new Schema;
@@ -53,7 +53,7 @@ describe('model: findOneAndRemove:', function() {
         return this.get('title') + ' by ' + this.get('author');
       })
       .set(function(val) {
-        var split = val.split(' by ');
+        const split = val.split(' by ');
         this.set('title', split[0]);
         this.set('author', split[1]);
       });
@@ -100,9 +100,9 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var M = db.model(modelname, collection);
+    const M = db.model(modelname, collection);
 
-    var now = new Date,
+    let now = new Date,
         query;
 
     // Model.findOneAndRemove
@@ -136,7 +136,7 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var M = db.model(modelname, collection + random()),
+    let M = db.model(modelname, collection + random()),
         pending = 5;
 
     M.findOneAndRemove({name: 'aaron1'}, {select: 'name'}, cb);
@@ -154,7 +154,7 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         err;
 
     try {
@@ -168,7 +168,7 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         err;
 
     try {
@@ -182,7 +182,7 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var M = db.model(modelname, collection + random()),
+    let M = db.model(modelname, collection + random()),
         _id = new DocumentObjectId,
         pending = 2;
 
@@ -198,10 +198,10 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('returns the original document', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         title = 'remove muah pleez';
 
-    var post = new M({title: title});
+    const post = new M({title: title});
     post.save(function(err) {
       assert.ifError(err);
       M.findByIdAndRemove(post.id, function(err, doc) {
@@ -217,10 +217,10 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var query;
+    let query;
 
     // Model.findByIdAndRemove
     query = M.findByIdAndRemove(_id, {select: 'author'});
@@ -239,10 +239,10 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var query;
+    let query;
 
     query = M.findByIdAndRemove(_id, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
@@ -255,10 +255,10 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var query;
+    let query;
 
     query = M.findByIdAndRemove(_id, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
@@ -271,10 +271,10 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 sort string syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var query;
+    let query;
 
     query = M.findByIdAndRemove(_id, {sort: 'author -title'});
     assert.equal(Object.keys(query.options.sort).length, 2);
@@ -289,10 +289,10 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var query;
+    let query;
 
     query = M.findByIdAndRemove(_id, {sort: {author: 1, title: -1}});
     assert.equal(Object.keys(query.options.sort).length, 2);
@@ -307,8 +307,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports population (gh-1395)', function(done) {
-    var M = db.model('A', {name: String});
-    var N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
+    const M = db.model('A', {name: String});
+    const N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
 
     M.create({name: 'i am an A'}, function(err, a) {
       if (err) return done(err);
@@ -352,23 +352,23 @@ describe('model: findOneAndRemove:', function() {
 
   describe('middleware', function() {
     it('works', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
-      var preCount = 0;
+      let preCount = 0;
       s.pre('findOneAndRemove', function() {
         ++preCount;
       });
 
-      var postCount = 0;
+      let postCount = 0;
       s.post('findOneAndRemove', function() {
         ++postCount;
       });
 
-      var Breakfast = db.model('gh-439', s);
-      var breakfast = new Breakfast({
+      const Breakfast = db.model('gh-439', s);
+      const breakfast = new Breakfast({
         base: 'eggs'
       });
 
@@ -389,23 +389,23 @@ describe('model: findOneAndRemove:', function() {
     });
 
     it('works with exec() (gh-439)', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
-      var preCount = 0;
+      let preCount = 0;
       s.pre('findOneAndRemove', function() {
         ++preCount;
       });
 
-      var postCount = 0;
+      let postCount = 0;
       s.post('findOneAndRemove', function() {
         ++postCount;
       });
 
-      var Breakfast = db.model('Breakfast', s);
-      var breakfast = new Breakfast({
+      const Breakfast = db.model('Breakfast', s);
+      const breakfast = new Breakfast({
         base: 'eggs'
       });
 

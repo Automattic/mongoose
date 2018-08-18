@@ -128,7 +128,9 @@
         "never"
       ],
       "space-infix-ops": "error",
-      "space-unary-ops": "error"
+      "space-unary-ops": "error",
+      "no-var": "warn",
+      "prefer-const": "warn"
     }
   }
 }

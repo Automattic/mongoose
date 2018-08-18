@@ -2,7 +2,7 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
+let start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
     random = require('../lib/utils').random,
@@ -11,11 +11,11 @@ var start = require('./common'),
     DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model field selection', function() {
-  var Comments;
-  var BlogPostB;
-  var modelName;
-  var collection;
-  var db;
+  let Comments;
+  let BlogPostB;
+  let modelName;
+  let collection;
+  let db;
 
   before(function() {
     Comments = new Schema;
@@ -57,10 +57,10 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined', function(done) {
-    var BlogPostB = db.model(modelName, collection),
+    let BlogPostB = db.model(modelName, collection),
         date = new Date;
 
-    var doc = {
+    const doc = {
       title: 'subset 1',
       author: 'me',
       comments: [{title: 'first comment', date: new Date}, {title: '2nd', date: new Date}],
@@ -70,7 +70,7 @@ describe('model field selection', function() {
     BlogPostB.create(doc, function(err, created) {
       assert.ifError(err);
 
-      var id = created.id;
+      const id = created.id;
       BlogPostB.findById(id, {title: 0, 'meta.date': 0, owners: 0, 'comments.user': 0}, function(err, found) {
         assert.ifError(err);
         assert.equal(found._id.toString(), created._id);
@@ -92,7 +92,7 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined and defaults applied to other fields', function(done) {
-    var BlogPostB = db.model(modelName, collection),
+    let BlogPostB = db.model(modelName, collection),
         id = new DocumentObjectId,
         date = new Date;
 
@@ -114,7 +114,7 @@ describe('model field selection', function() {
   });
 
   it('where subset of fields excludes _id', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
     BlogPostB.create({title: 'subset 1'}, function(err) {
       assert.ifError(err);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function(err, found) {
@@ -127,7 +127,7 @@ describe('model field selection', function() {
   });
 
   it('works with subset of fields, excluding _id', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
     BlogPostB.create({title: 'subset 1', author: 'me'}, function(err) {
       assert.ifError(err);
       BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function(err, found) {
@@ -143,7 +143,7 @@ describe('model field selection', function() {
   });
 
   it('works with just _id and findOneAndUpdate (gh-3407)', function(done) {
-    var MyModel = db.model('gh3407', {test: {type: Number, default: 1}});
+    const MyModel = db.model('gh3407', {test: {type: Number, default: 1}});
 
     MyModel.collection.insert({}, function(error) {
       assert.ifError(error);
@@ -156,7 +156,7 @@ describe('model field selection', function() {
   });
 
   it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
 
     BlogPostB.create({title: 'LOTR', comments: [{title: ':)'}]}, function(err, created) {
       assert.ifError(err);
@@ -178,7 +178,7 @@ describe('model field selection', function() {
   });
 
   it('included fields should have defaults applied when no value exists in db (gh-870)', function(done) {
-    var BlogPostB = db.model(modelName, collection),
+    let BlogPostB = db.model(modelName, collection),
         id = new DocumentObjectId;
 
     BlogPostB.collection.insert(
@@ -200,7 +200,7 @@ describe('model field selection', function() {
   });
 
   it('including subdoc field excludes other subdoc fields (gh-1027)', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
 
     BlogPostB.create({comments: [{title: 'a'}, {title: 'b'}]}, function(err, doc) {
       assert.ifError(err);
@@ -223,7 +223,7 @@ describe('model field selection', function() {
   });
 
   it('excluding nested subdoc fields (gh-1027)', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
 
     BlogPostB.create({title: 'top', comments: [{title: 'a', body: 'body'}, {title: 'b', body: 'body', comments: [{title: 'c'}]}]}, function(err, doc) {
       assert.ifError(err);
@@ -256,13 +256,13 @@ describe('model field selection', function() {
     // mongodb 2.2 support
 
     it('casts elemMatch args (gh-1091)', function(done) {
-      var postSchema = new Schema({
+      const postSchema = new Schema({
         ids: [{type: Schema.ObjectId}]
       });
 
-      var B = db.model('gh-1091', postSchema);
-      var _id1 = new mongoose.Types.ObjectId;
-      var _id2 = new mongoose.Types.ObjectId;
+      const B = db.model('gh-1091', postSchema);
+      const _id1 = new mongoose.Types.ObjectId;
+      const _id2 = new mongoose.Types.ObjectId;
 
       B.create({ids: [_id1, _id2]}, function(err, doc) {
         assert.ifError(err);
@@ -294,14 +294,14 @@ describe('model field selection', function() {
     });
 
     it('saves modified elemMatch paths (gh-1334)', function(done) {
-      var postSchema = new Schema({
+      const postSchema = new Schema({
         ids: [{type: Schema.ObjectId}],
         ids2: [{type: Schema.ObjectId}]
       });
 
-      var B = db.model('gh-1334', postSchema);
-      var _id1 = new mongoose.Types.ObjectId;
-      var _id2 = new mongoose.Types.ObjectId;
+      const B = db.model('gh-1334', postSchema);
+      const _id1 = new mongoose.Types.ObjectId;
+      const _id2 = new mongoose.Types.ObjectId;
 
       B.create({ids: [_id1, _id2], ids2: [_id2, _id1]}, function(err, doc) {
         assert.ifError(err);
@@ -340,11 +340,11 @@ describe('model field selection', function() {
     });
 
     it('works with $ positional in select (gh-2031)', function(done) {
-      var postSchema = new Schema({
+      const postSchema = new Schema({
         tags: [{tag: String, count: 0}]
       });
 
-      var Post = db.model('gh-2031', postSchema, 'gh-2031');
+      const Post = db.model('gh-2031', postSchema, 'gh-2031');
       Post.create({tags: [{tag: 'bacon', count: 2}, {tag: 'eggs', count: 3}]}, function(error) {
         assert.ifError(error);
         Post.findOne({'tags.tag': 'eggs'}, {'tags.$': 1}, function(error, post) {
@@ -360,9 +360,9 @@ describe('model field selection', function() {
   });
 
   it('selecting an array of docs applies defaults properly (gh-1108)', function(done) {
-    var M = db.model(modelName, collection);
+    const M = db.model(modelName, collection);
 
-    var m = new M({title: '1108', comments: [{body: 'yay'}]});
+    const m = new M({title: '1108', comments: [{body: 'yay'}]});
     m.comments[0].comments = undefined;
     m.save(function(err, doc) {
       assert.ifError(err);
@@ -377,12 +377,12 @@ describe('model field selection', function() {
   });
 
   it('select properties named length (gh-3903)', function(done) {
-    var schema = new mongoose.Schema({
+    const schema = new mongoose.Schema({
       length: Number,
       name: String
     });
 
-    var MyModel = db.model('gh3903', schema);
+    const MyModel = db.model('gh3903', schema);
 
     MyModel.create({ name: 'val', length: 3 }, function(error) {
       assert.ifError(error);
@@ -395,7 +395,7 @@ describe('model field selection', function() {
   });
 
   it('appropriately filters subdocuments based on properties (gh-1280)', function(done) {
-    var RouteSchema = new Schema({
+    const RouteSchema = new Schema({
       stations: {
         start: {
           name: {type: String},
@@ -414,9 +414,9 @@ describe('model field selection', function() {
       }
     });
 
-    var Route = db.model('Route' + random(), RouteSchema);
+    const Route = db.model('Route' + random(), RouteSchema);
 
-    var item = {
+    const item = {
       stations: {
         start: {
           name: 'thing',

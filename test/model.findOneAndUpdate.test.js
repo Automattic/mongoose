@@ -18,13 +18,13 @@ const co = require('co');
 const uuid = require('uuid');
 
 describe('model: findOneAndUpdate:', function() {
-  var Comments;
-  var BlogPost;
-  var modelname;
-  var collection;
-  var strictSchema;
-  var strictThrowSchema;
-  var db;
+  let Comments;
+  let BlogPost;
+  let modelname;
+  let collection;
+  let strictSchema;
+  let strictThrowSchema;
+  let db;
 
   before(function() {
     Comments = new Schema();
@@ -57,7 +57,7 @@ describe('model: findOneAndUpdate:', function() {
         return this.get('title') + ' by ' + this.get('author');
       })
       .set(function(val) {
-        var split = val.split(' by ');
+        const split = val.split(' by ');
         this.set('title', split[0]);
         this.set('author', split[1]);
       });
@@ -89,14 +89,14 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('WWW returns the edited document', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         title = 'Tobi ' + random(),
         author = 'Brian ' + random(),
         newTitle = 'Woot ' + random(),
         id0 = new DocumentObjectId,
         id1 = new DocumentObjectId;
 
-    var post = new M;
+    const post = new M;
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
@@ -129,7 +129,7 @@ describe('model: findOneAndUpdate:', function() {
         assert.ok(cf.comments[0]._id instanceof DocumentObjectId);
         assert.ok(cf.comments[1]._id instanceof DocumentObjectId);
 
-        var update = {
+        const update = {
           title: newTitle, // becomes $set
           $inc: {'meta.visitors': 2},
           $set: {date: new Date},
@@ -166,10 +166,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   describe('will correctly', function() {
-    var ItemParentModel, ItemChildModel;
+    let ItemParentModel, ItemChildModel;
 
     before(function() {
-      var itemSpec = new Schema({
+      const itemSpec = new Schema({
         item_id: {
           type: ObjectId, required: true, default: function() {
             return new DocumentObjectId();
@@ -181,7 +181,7 @@ describe('model: findOneAndUpdate:', function() {
         },
         age: Number
       }, {_id: false});
-      var itemSchema = new Schema({
+      const itemSchema = new Schema({
         items: [itemSpec]
       });
       ItemParentModel = db.model('ItemParentModel', itemSchema);
@@ -189,25 +189,25 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('update subdocument in array item', function(done) {
-      var item1 = new ItemChildModel({
+      const item1 = new ItemChildModel({
         address: {
           street: 'times square',
           zipcode: '10036'
         }
       });
-      var item2 = new ItemChildModel({
+      const item2 = new ItemChildModel({
         address: {
           street: 'bryant park',
           zipcode: '10030'
         }
       });
-      var item3 = new ItemChildModel({
+      const item3 = new ItemChildModel({
         address: {
           street: 'queens',
           zipcode: '1002?'
         }
       });
-      var itemParent = new ItemParentModel({items: [item1, item2, item3]});
+      const itemParent = new ItemParentModel({items: [item1, item2, item3]});
       itemParent.save(function(err) {
         assert.ifError(err);
         ItemParentModel.findOneAndUpdate(
@@ -229,14 +229,14 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returns the original document', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         title = 'Tobi ' + random(),
         author = 'Brian ' + random(),
         newTitle = 'Woot ' + random(),
         id0 = new DocumentObjectId,
         id1 = new DocumentObjectId;
 
-    var post = new M;
+    const post = new M;
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
@@ -252,7 +252,7 @@ describe('model: findOneAndUpdate:', function() {
       M.findById(post._id, function(err) {
         assert.ifError(err);
 
-        var update = {
+        const update = {
           title: newTitle, // becomes $set
           $inc: {'meta.visitors': 2},
           $set: {date: new Date},
@@ -289,14 +289,14 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('allows upserting', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         title = 'Tobi ' + random(),
         author = 'Brian ' + random(),
         newTitle = 'Woot ' + random(),
         id0 = new DocumentObjectId,
         id1 = new DocumentObjectId;
 
-    var post = new M;
+    const post = new M;
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
@@ -307,7 +307,7 @@ describe('model: findOneAndUpdate:', function() {
     post.owners = [id0, id1];
     post.comments = [{body: 'been there'}, {body: 'done that'}];
 
-    var update = {
+    const update = {
       title: newTitle, // becomes $set
       $inc: {'meta.visitors': 2},
       $set: {date: new Date},
@@ -335,9 +335,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var M = db.model(modelname, collection);
+    const M = db.model(modelname, collection);
 
-    var now = new Date,
+    let now = new Date,
         query;
 
     // Model.findOneAndUpdate
@@ -386,7 +386,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var M = db.model(modelname, collection + random()),
+    let M = db.model(modelname, collection + random()),
         pending = 6;
 
     M.findOneAndUpdate({name: 'aaron'}, {$set: {name: 'Aaron6'}}, {new: false}, cb);
@@ -407,7 +407,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed to a succeeding function', function(done) {
-    var M = db.model(modelname, collection + random()),
+    let M = db.model(modelname, collection + random()),
         pending = 6;
 
     M.findOneAndUpdate({name: 'aaron'}, {$set: {name: 'Aaron'}}, {new: false}).exec(cb);
@@ -428,7 +428,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executing with only a callback throws', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         err;
 
     try {
@@ -443,10 +443,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    var BlogPost = db.model(modelname, collection),
+    let BlogPost = db.model(modelname, collection),
         totalDocs = 4;
 
-    var post = new BlogPost();
+    const post = new BlogPost();
     post.set('meta.visitors', 5);
 
     post.save(function(err) {
@@ -457,7 +457,7 @@ describe('model: findOneAndUpdate:', function() {
         --totalDocs || complete();
       }
 
-      for (var i = 0; i < 4; ++i) {
+      for (let i = 0; i < 4; ++i) {
         BlogPost
           .findOneAndUpdate({_id: post._id}, {$inc: {'meta.visitors': 1}}, callback);
       }
@@ -473,12 +473,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('honors strict schemas', function(done) {
-    var S = db.model('UpdateOneStrictSchema');
-    var s = new S({name: 'orange crush'});
+    const S = db.model('UpdateOneStrictSchema');
+    const s = new S({name: 'orange crush'});
 
     s.save(function(err) {
       assert.ifError(err);
-      var name = Date.now();
+      const name = Date.now();
       S.findOneAndUpdate({name: name}, {ignore: true}, {upsert: true, new: true}, function(err, doc) {
         assert.ifError(err);
         assert.ok(doc);
@@ -504,13 +504,13 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returns errors with strict:throw schemas', function(done) {
-    var S = db.model('UpdateOneStrictThrowSchema');
-    var s = new S({name: 'orange crush'});
+    const S = db.model('UpdateOneStrictThrowSchema');
+    const s = new S({name: 'orange crush'});
 
     s.save(function(err) {
       assert.ifError(err);
 
-      var name = Date.now();
+      const name = Date.now();
       S.findOneAndUpdate({name: name}, {ignore: true}, {upsert: true}, function(err, doc) {
         assert.ok(err);
         assert.ok(/not in schema/.test(err));
@@ -527,7 +527,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executing with just a callback throws', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         err;
 
     try {
@@ -542,7 +542,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var M = db.model(modelname, collection + random()),
+    let M = db.model(modelname, collection + random()),
         _id = new DocumentObjectId,
         pending = 2;
 
@@ -560,7 +560,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed to a succeeding function', function(done) {
-    var M = db.model(modelname, collection + random()),
+    let M = db.model(modelname, collection + random()),
         _id = new DocumentObjectId,
         pending = 2;
 
@@ -578,14 +578,14 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returns the original document', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         title = 'Tobi ' + random(),
         author = 'Brian ' + random(),
         newTitle = 'Woot ' + random(),
         id0 = new DocumentObjectId,
         id1 = new DocumentObjectId;
 
-    var post = new M;
+    const post = new M;
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
@@ -601,7 +601,7 @@ describe('model: findOneAndUpdate:', function() {
       M.findById(post._id, function(err) {
         assert.ifError(err);
 
-        var update = {
+        const update = {
           title: newTitle, // becomes $set
           $inc: {'meta.visitors': 2},
           $set: {date: new Date},
@@ -638,10 +638,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var now = new Date,
+    let now = new Date,
         query;
 
     // Model.findByIdAndUpdate
@@ -668,10 +668,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var now = new Date,
+    let now = new Date,
         query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {select: 'author -title'});
@@ -685,10 +685,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var now = new Date,
+    let now = new Date,
         query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {select: {author: 1, title: 0}});
@@ -702,11 +702,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 sort string syntax', function(done) {
-    var M = db.model(modelname, collection);
+    const M = db.model(modelname, collection);
 
-    var now = new Date;
-    var _id = new DocumentObjectId;
-    var query;
+    const now = new Date;
+    const _id = new DocumentObjectId;
+    let query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {sort: 'author -title'});
     assert.equal(Object.keys(query.options.sort).length, 2);
@@ -741,10 +741,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    var M = db.model(modelname, collection),
+    let M = db.model(modelname, collection),
         _id = new DocumentObjectId;
 
-    var now = new Date,
+    let now = new Date,
         query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {sort: {author: 1, title: -1}});
@@ -761,14 +761,14 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done) {
-    var postSchema = new Schema({
+    const postSchema = new Schema({
       ids: [{type: Schema.ObjectId}],
       title: String
     });
 
-    var B = db.model('gh-1091+1100', postSchema);
-    var _id1 = new mongoose.Types.ObjectId;
-    var _id2 = new mongoose.Types.ObjectId;
+    const B = db.model('gh-1091+1100', postSchema);
+    const _id1 = new mongoose.Types.ObjectId;
+    const _id2 = new mongoose.Types.ObjectId;
 
     B.create({ids: [_id1, _id2]}, function(err, doc) {
       assert.ifError(err);
@@ -789,8 +789,8 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports population (gh-1395)', function(done) {
-    var M = db.model('A', {name: String});
-    var N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
+    const M = db.model('A', {name: String});
+    const N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
 
     M.create({name: 'i am an A'}, function(err, a) {
       if (err) {
@@ -816,7 +816,7 @@ describe('model: findOneAndUpdate:', function() {
     });
   });
   it('returns null when doing an upsert & new=false gh-1533', function(done) {
-    var thingSchema = new Schema({
+    const thingSchema = new Schema({
       _id: String,
       flag: {
         type: Boolean,
@@ -824,8 +824,8 @@ describe('model: findOneAndUpdate:', function() {
       }
     });
 
-    var Thing = db.model('Thing', thingSchema);
-    var key = 'some-id';
+    const Thing = db.model('Thing', thingSchema);
+    const key = 'some-id';
 
     Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false}).exec(function(err, thing) {
       assert.ifError(err);
@@ -840,11 +840,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('allows properties to be set to null gh-1643', function(done) {
-    var thingSchema = new Schema({
+    const thingSchema = new Schema({
       name: [String]
     });
 
-    var Thing = db.model('Thing1', thingSchema);
+    const Thing = db.model('Thing1', thingSchema);
 
     Thing.create({name: ['Test']}, function(err, thing) {
       if (err) {
@@ -863,7 +863,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('honors the overwrite option (gh-1809)', function(done) {
-    var M = db.model('1809', {name: String, change: Boolean});
+    const M = db.model('1809', {name: String, change: Boolean});
     M.create({name: 'first'}, function(err, doc) {
       if (err) {
         return done(err);
@@ -880,7 +880,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
-    var accountSchema = new Schema({
+    const accountSchema = new Schema({
       name: String,
       contacts: [{
         account: {type: Schema.Types.ObjectId, ref: 'Account'},
@@ -888,10 +888,10 @@ describe('model: findOneAndUpdate:', function() {
       }]
     });
 
-    var Account = db.model('2070', accountSchema);
+    const Account = db.model('2070', accountSchema);
 
-    var a1 = new Account({name: 'parent'});
-    var a2 = new Account({name: 'child'});
+    const a1 = new Account({name: 'parent'});
+    const a2 = new Account({name: 'child'});
 
     a1.save(function(error) {
       assert.ifError(error);
@@ -933,11 +933,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('adds __v on upsert (gh-2122) (gh-4505)', function(done) {
-    var accountSchema = new Schema({
+    const accountSchema = new Schema({
       name: String
     });
 
-    var Account = db.model('2122', accountSchema);
+    const Account = db.model('2122', accountSchema);
 
     Account.findOneAndUpdate(
       {name: 'account'},
@@ -958,13 +958,13 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('doesn\'t add __v on upsert if `$set` (gh-4505) (gh-5973)', function() {
-    var accountSchema = new Schema({
+    const accountSchema = new Schema({
       name: String
     });
 
-    var Account = db.model('gh5973', accountSchema);
+    const Account = db.model('gh5973', accountSchema);
 
-    var update = { $set: { name: 'test', __v: 1 } };
+    const update = { $set: { name: 'test', __v: 1 } };
     return Account.
       findOneAndUpdate({}, update, { upsert: true, new: true }).
       then(() => Account.findOne({ name: 'test' })).
@@ -972,10 +972,10 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('works with nested schemas and $pull+$or (gh-1932)', function(done) {
-    var TickSchema = new Schema({name: String});
-    var TestSchema = new Schema({a: Number, b: Number, ticks: [TickSchema]});
+    const TickSchema = new Schema({name: String});
+    const TestSchema = new Schema({a: Number, b: Number, ticks: [TickSchema]});
 
-    var TestModel = db.model('gh-1932', TestSchema, 'gh-1932');
+    const TestModel = db.model('gh-1932', TestSchema, 'gh-1932');
 
     TestModel.create({a: 1, b: 0, ticks: [{name: 'eggs'}, {name: 'bacon'}, {name: 'coffee'}]}, function(error) {
       assert.ifError(error);
@@ -993,12 +993,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('accepts undefined', function(done) {
-    var s = new Schema({
+    const s = new Schema({
       time: Date,
       base: String
     });
 
-    var Breakfast = db.model('gh-2272', s);
+    const Breakfast = db.model('gh-2272', s);
 
     Breakfast.
       findOneAndUpdate({}, {time: undefined, base: undefined}, {}).
@@ -1009,11 +1009,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('cast errors for empty objects as object ids (gh-2732)', function(done) {
-    var s = new Schema({
+    const s = new Schema({
       base: ObjectId
     });
 
-    var Breakfast = db.model('gh2732', s);
+    const Breakfast = db.model('gh2732', s);
 
     Breakfast.
       findOneAndUpdate({}, {base: {}}, {}).
@@ -1024,12 +1024,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('strict mode with objects (gh-2947)', function(done) {
-    var s = new Schema({
+    const s = new Schema({
       test: String
     }, {strict: true});
 
-    var Breakfast = db.model('gh2947', s);
-    var q = Breakfast.findOneAndUpdate({},
+    const Breakfast = db.model('gh2947', s);
+    const q = Breakfast.findOneAndUpdate({},
       {notInSchema: {a: 1}, test: 'abc'},
       {new: true, strict: true, upsert: true});
 
@@ -1042,22 +1042,22 @@ describe('model: findOneAndUpdate:', function() {
 
   describe('middleware', function() {
     it('works', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
-      var preCount = 0;
+      let preCount = 0;
       s.pre('findOneAndUpdate', function() {
         ++preCount;
       });
 
-      var postCount = 0;
+      let postCount = 0;
       s.post('findOneAndUpdate', function() {
         ++postCount;
       });
 
-      var Breakfast = db.model('gh-964', s);
+      const Breakfast = db.model('gh-964', s);
 
       Breakfast.findOneAndUpdate(
         {},
@@ -1072,22 +1072,22 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('works with exec()', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
-      var preCount = 0;
+      let preCount = 0;
       s.pre('findOneAndUpdate', function() {
         ++preCount;
       });
 
-      var postCount = 0;
+      let postCount = 0;
       s.post('findOneAndUpdate', function() {
         ++postCount;
       });
 
-      var Breakfast = db.model('gh-964-2', s);
+      const Breakfast = db.model('gh-964-2', s);
 
       Breakfast.
         findOneAndUpdate({}, {base: 'eggs'}, {}).
@@ -1102,13 +1102,13 @@ describe('model: findOneAndUpdate:', function() {
 
   describe('validators (gh-860)', function() {
     it('applies defaults on upsert', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
-      var Breakfast = db.model('fam-gh-860-0', s);
+      const Breakfast = db.model('fam-gh-860-0', s);
 
-      var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
+      const updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
         {},
         {base: 'eggs'},
@@ -1126,14 +1126,14 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('doesnt set default on upsert if query sets it', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         numEggs: {type: Number, default: 3},
         base: String
       }, { versionKey: null });
-      var Breakfast = db.model('fam-gh-860-1', s);
+      const Breakfast = db.model('fam-gh-860-1', s);
 
-      var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
+      const updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
         {topping: 'sausage', numEggs: 4},
         {base: 'eggs'},
@@ -1148,13 +1148,13 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('properly sets default on upsert if query wont set it', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
-      var Breakfast = db.model('fam-gh-860-2', s);
+      const Breakfast = db.model('fam-gh-860-2', s);
 
-      var updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
+      const updateOptions = {upsert: true, setDefaultsOnInsert: true, new: true};
       Breakfast.findOneAndUpdate(
         {topping: {$ne: 'sausage'}},
         {base: 'eggs'},
@@ -1172,7 +1172,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('runs validators if theyre set', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {
           type: String,
           validate: function() {
@@ -1186,9 +1186,9 @@ describe('model: findOneAndUpdate:', function() {
           }
         }
       });
-      var Breakfast = db.model('fam-gh-860-3', s);
+      const Breakfast = db.model('fam-gh-860-3', s);
 
-      var updateOptions = {
+      const updateOptions = {
         upsert: true,
         setDefaultsOnInsert: true,
         runValidators: true,
@@ -1211,7 +1211,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('validators handle $unset and $setOnInsert', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         steak: {type: String, required: true},
         eggs: {
           type: String, validate: function() {
@@ -1219,9 +1219,9 @@ describe('model: findOneAndUpdate:', function() {
           }
         }
       });
-      var Breakfast = db.model('fam-gh-860-4', s);
+      const Breakfast = db.model('fam-gh-860-4', s);
 
-      var updateOptions = {runValidators: true, new: true};
+      const updateOptions = {runValidators: true, new: true};
       Breakfast.findOneAndUpdate(
         {},
         {$unset: {steak: ''}, $setOnInsert: {eggs: 'softboiled'}},
@@ -1239,14 +1239,14 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('min/max, enum, and regex built-in validators work', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         steak: {type: String, enum: ['ribeye', 'sirloin']},
         eggs: {type: Number, min: 4, max: 6},
         bacon: {type: String, match: /strips/}
       });
-      var Breakfast = db.model('fam-gh-860-5', s);
+      const Breakfast = db.model('fam-gh-860-5', s);
 
-      var updateOptions = {runValidators: true, new: true};
+      const updateOptions = {runValidators: true, new: true};
       Breakfast.findOneAndUpdate(
         {},
         {$set: {steak: 'ribeye', eggs: 3, bacon: '3 strips'}},
@@ -1284,14 +1284,14 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('multiple validation errors', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         steak: {type: String, enum: ['ribeye', 'sirloin']},
         eggs: {type: Number, min: 4, max: 6},
         bacon: {type: String, match: /strips/}
       });
-      var Breakfast = db.model('fam-gh-860-6', s);
+      const Breakfast = db.model('fam-gh-860-6', s);
 
-      var updateOptions = {runValidators: true, new: true};
+      const updateOptions = {runValidators: true, new: true};
       Breakfast.findOneAndUpdate(
         {},
         {$set: {steak: 'tofu', eggs: 2, bacon: '3 strips'}},
@@ -1307,13 +1307,13 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('validators ignore $inc', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         steak: {type: String, required: true},
         eggs: {type: Number, min: 4}
       });
-      var Breakfast = db.model('fam-gh-860-7', s);
+      const Breakfast = db.model('fam-gh-860-7', s);
 
-      var updateOptions = {runValidators: true, upsert: true, new: true};
+      const updateOptions = {runValidators: true, upsert: true, new: true};
       Breakfast.findOneAndUpdate(
         {},
         {$inc: {eggs: 1}},
@@ -1327,7 +1327,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('should work with arrays (gh-3035)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         id: String,
         name: String,
         a: [String],
@@ -1337,7 +1337,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      var TestModel = db.model('gh3035', testSchema);
+      const TestModel = db.model('gh3035', testSchema);
       TestModel.create({id: '1'}, function(error) {
         assert.ifError(error);
         TestModel.findOneAndUpdate({id: '1'}, {$set: {name: 'Joe'}}, {upsert: true, setDefaultsOnInsert: true},
@@ -1349,13 +1349,13 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('should allow null values in query (gh-3135)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         id: String,
         blob: ObjectId,
         status: String
       });
 
-      var TestModel = db.model('gh3135', testSchema);
+      const TestModel = db.model('gh3135', testSchema);
       TestModel.create({blob: null, status: 'active'}, function(error) {
         assert.ifError(error);
         TestModel.findOneAndUpdate({id: '1', blob: null}, {$set: {status: 'inactive'}}, {upsert: true, setDefaultsOnInsert: true},
@@ -1367,7 +1367,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('should work with array documents (gh-3034)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         id: String,
         name: String,
         a: [{
@@ -1379,7 +1379,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      var TestModel = db.model('gh3034', testSchema);
+      const TestModel = db.model('gh3034', testSchema);
       TestModel.create({id: '1'}, function(error) {
         assert.ifError(error);
         TestModel.findOneAndUpdate({id: '1'}, {$set: {name: 'Joe'}}, {upsert: true, setDefaultsOnInsert: true},
@@ -1391,7 +1391,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('handles setting array (gh-3107)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         name: String,
         a: [{
           foo: String
@@ -1399,9 +1399,9 @@ describe('model: findOneAndUpdate:', function() {
         b: [Number]
       });
 
-      var TestModel = db.model('gh3107', testSchema);
-      var update = { $setOnInsert: { a: [{foo: 'bar'}], b: [2] } };
-      var opts = {upsert: true, new: true, setDefaultsOnInsert: true};
+      const TestModel = db.model('gh3107', testSchema);
+      const update = { $setOnInsert: { a: [{foo: 'bar'}], b: [2] } };
+      const opts = {upsert: true, new: true, setDefaultsOnInsert: true};
       TestModel
         .findOneAndUpdate({name: 'abc'}, update, opts,
           function(error, doc) {
@@ -1416,19 +1416,19 @@ describe('model: findOneAndUpdate:', function() {
 
 
     it('handles nested cast errors (gh-3468)', function(done) {
-      var recordSchema = new mongoose.Schema({
+      const recordSchema = new mongoose.Schema({
         kind: String,
         amount: Number
       }, {
         _id: false
       });
 
-      var shiftSchema = new mongoose.Schema({
+      const shiftSchema = new mongoose.Schema({
         userId: String,
         records: [recordSchema]
       });
 
-      var Shift = db.model('gh3468', shiftSchema);
+      const Shift = db.model('gh3468', shiftSchema);
 
       Shift.create({
         userId: 'tom',
@@ -1448,12 +1448,12 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('cast errors with nested schemas (gh-3580)', function(done) {
-      var nested = new Schema({num: Number});
-      var s = new Schema({nested: nested});
+      const nested = new Schema({num: Number});
+      const s = new Schema({nested: nested});
 
-      var MyModel = db.model('gh3580', s);
+      const MyModel = db.model('gh3580', s);
 
-      var update = {nested: {num: 'Not a Number'}};
+      const update = {nested: {num: 'Not a Number'}};
       MyModel.findOneAndUpdate({}, update, function(error) {
         assert.ok(error);
         done();
@@ -1461,15 +1461,15 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('pull with nested schemas (gh-3616)', function(done) {
-      var nested = new Schema({arr: [{num: Number}]});
-      var s = new Schema({nested: nested});
+      const nested = new Schema({arr: [{num: Number}]});
+      const s = new Schema({nested: nested});
 
-      var MyModel = db.model('gh3616', s);
+      const MyModel = db.model('gh3616', s);
 
       MyModel.create({nested: {arr: [{num: 5}]}}, function(error) {
         assert.ifError(error);
-        var update = {$pull: {'nested.arr': {num: 5}}};
-        var options = {new: true};
+        const update = {$pull: {'nested.arr': {num: 5}}};
+        const options = {new: true};
         MyModel.findOneAndUpdate({}, update, options, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.nested.arr.length, 0);
@@ -1479,9 +1479,9 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('setting nested schema (gh-3889)', function(done) {
-      var nested = new Schema({ test: String });
-      var s = new Schema({ nested: nested });
-      var MyModel = db.model('gh3889', s);
+      const nested = new Schema({ test: String });
+      const s = new Schema({ nested: nested });
+      const MyModel = db.model('gh3889', s);
       MyModel.findOneAndUpdate(
         {},
         { $set: { nested: { test: 'abc' } } },
@@ -1494,13 +1494,13 @@ describe('model: findOneAndUpdate:', function() {
 
   describe('bug fixes', function() {
     it('passes raw result if rawResult specified (gh-4925)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         test: String
       });
 
-      var TestModel = db.model('gh4925', testSchema);
-      var options = { upsert: true, new: true, rawResult: true };
-      var update = { $set: { test: 'abc' } };
+      const TestModel = db.model('gh4925', testSchema);
+      const options = { upsert: true, new: true, rawResult: true };
+      const update = { $set: { test: 'abc' } };
 
       TestModel.findOneAndUpdate({}, update, options).
         exec(function(error, res) {
@@ -1515,18 +1515,18 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('handles setting single embedded docs to null (gh-4281)', function(done) {
-      var foodSchema = new mongoose.Schema({
+      const foodSchema = new mongoose.Schema({
         name: { type: String, default: 'Bacon' }
       });
 
-      var breakfastSchema = new mongoose.Schema({
+      const breakfastSchema = new mongoose.Schema({
         main: foodSchema,
         for: String
       });
 
-      var TestModel = db.model('gh4281', breakfastSchema);
-      var options = { upsert: true, new: true };
-      var update = { $set: { main: null, for: 'Val' } };
+      const TestModel = db.model('gh4281', breakfastSchema);
+      const options = { upsert: true, new: true };
+      const update = { $set: { main: null, for: 'Val' } };
 
       TestModel.findOneAndUpdate({}, update, options).
         exec(function(error, doc) {
@@ -1539,9 +1539,9 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('custom validator on mixed field (gh-4305)', function(done) {
-      var called = 0;
+      let called = 0;
 
-      var boardSchema = new Schema({
+      const boardSchema = new Schema({
         name: {
           type: String,
           required: true
@@ -1558,9 +1558,9 @@ describe('model: findOneAndUpdate:', function() {
           }
         }
       });
-      var Board = db.model('gh4305', boardSchema);
+      const Board = db.model('gh4305', boardSchema);
 
-      var update = {
+      const update = {
         structure: [
           {
             capacity: 0,
@@ -1571,7 +1571,7 @@ describe('model: findOneAndUpdate:', function() {
           }
         ]
       };
-      var opts = {
+      const opts = {
         'new': true,
         upsert: false,
         passRawResult: false,
@@ -1589,19 +1589,19 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('single nested doc cast errors (gh-3602)', function(done) {
-      var AddressSchema = new Schema({
+      const AddressSchema = new Schema({
         street: {
           type: Number
         }
       });
 
-      var PersonSchema = new Schema({
+      const PersonSchema = new Schema({
         addresses: [AddressSchema]
       });
 
-      var Person = db.model('gh3602', PersonSchema);
+      const Person = db.model('gh3602', PersonSchema);
 
-      var update = { $push: { addresses: { street: 'not a num' } } };
+      const update = { $push: { addresses: { street: 'not a num' } } };
       Person.findOneAndUpdate({}, update, function(error) {
         assert.ok(error.message.indexOf('street') !== -1);
         assert.equal(error.reason.message,
@@ -1611,13 +1611,13 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('projection option as alias for fields (gh-4315)', function(done) {
-      var TestSchema = new Schema({
+      const TestSchema = new Schema({
         test1: String,
         test2: String
       });
-      var Test = db.model('gh4315', TestSchema);
-      var update = { $set: { test1: 'a', test2: 'b' } };
-      var options = { projection: { test2: 0 }, new: true, upsert: true };
+      const Test = db.model('gh4315', TestSchema);
+      const update = { $set: { test1: 'a', test2: 'b' } };
+      const options = { projection: { test2: 0 }, new: true, upsert: true };
       Test.findOneAndUpdate({}, update, options, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.test2);
@@ -1627,9 +1627,9 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('handles upserting a non-existing field (gh-4757)', function(done) {
-      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+      const modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 
-      var Model = db.model('gh4757', modelSchema);
+      const Model = db.model('gh4757', modelSchema);
       Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
         upsert: true,
         setDefaultsOnInsert: true,
@@ -1642,9 +1642,9 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('strictQuery option (gh-4136)', function(done) {
-      var modelSchema = new Schema({ field: Number }, { strictQuery: 'throw' });
+      const modelSchema = new Schema({ field: Number }, { strictQuery: 'throw' });
 
-      var Model = db.model('gh4136', modelSchema);
+      const Model = db.model('gh4136', modelSchema);
       Model.find({ nonexistingField: 1 }).exec(function(error) {
         assert.ok(error);
         assert.ok(error.message.indexOf('strictQuery') !== -1, error.message);
@@ -1667,9 +1667,9 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('strict option (gh-5108)', function(done) {
-      var modelSchema = new Schema({ field: Number }, { strict: 'throw' });
+      const modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 
-      var Model = db.model('gh5108', modelSchema);
+      const Model = db.model('gh5108', modelSchema);
       Model.findOneAndUpdate({}, { field: 2, otherField: 3 }, {
         upsert: true,
         strict: false,
@@ -1683,12 +1683,12 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('honors retainKeyOrder (gh-6484)', function() {
-      var modelSchema = new Schema({
+      const modelSchema = new Schema({
         nested: { field1: Number, field2: Number }
       }, { retainKeyOrder: true });
 
-      var Model = db.model('gh6484', modelSchema);
-      var opts = { upsert: true, new: true };
+      const Model = db.model('gh6484', modelSchema);
+      const opts = { upsert: true, new: true };
       return Model.findOneAndUpdate({}, { nested: { field1: 1, field2: 2 } }, opts).exec().
         then(function() {
           return Model.collection.findOne();
@@ -1700,7 +1700,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('should not apply schema transforms (gh-4574)', function(done) {
-      var options = {
+      const options = {
         toObject: {
           transform: function() {
             assert.ok(false, 'should not call transform');
@@ -1708,16 +1708,16 @@ describe('model: findOneAndUpdate:', function() {
         }
       };
 
-      var SubdocSchema = new Schema({ test: String }, options);
+      const SubdocSchema = new Schema({ test: String }, options);
 
-      var CollectionSchema = new Schema({
+      const CollectionSchema = new Schema({
         field1: { type: String },
         field2 : {
           arrayField: [SubdocSchema]
         }
       }, options);
 
-      var Collection = db.model('test', CollectionSchema);
+      const Collection = db.model('test', CollectionSchema);
 
       Collection.create({ field2: { arrayField: [] } }).
         then(function(doc) {
@@ -1731,16 +1731,16 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('overwrite doc with update validators (gh-3556)', function(done) {
-      var testSchema = new Schema({
+      const testSchema = new Schema({
         name: {
           type: String,
           required: true
         },
         otherName: String
       });
-      var Test = db.model('gh3556', testSchema);
+      const Test = db.model('gh3556', testSchema);
 
-      var opts = { overwrite: true, runValidators: true };
+      const opts = { overwrite: true, runValidators: true };
       Test.findOneAndUpdate({}, { otherName: 'test' }, opts, function(error) {
         assert.ok(error);
         assert.ok(error.errors['name']);
@@ -1752,15 +1752,15 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('update using $ (gh-5628)', function(done) {
-      var schema = new mongoose.Schema({
+      const schema = new mongoose.Schema({
         elems: [String]
       });
 
-      var Model = db.model('gh5628', schema);
+      const Model = db.model('gh5628', schema);
       Model.create({ elems: ['a', 'b'] }, function(error, doc) {
         assert.ifError(error);
-        var query = { _id: doc._id, elems: 'a' };
-        var update = { $set: { 'elems.$': 'c' } };
+        const query = { _id: doc._id, elems: 'a' };
+        const update = { $set: { 'elems.$': 'c' } };
         Model.findOneAndUpdate(query, update, { new: true }, function(error) {
           assert.ifError(error);
           Model.collection.findOne({ _id: doc._id }, function(error, doc) {
@@ -1773,18 +1773,18 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('projection with $elemMatch (gh-5661)', function(done) {
-      var schema = new mongoose.Schema({
+      const schema = new mongoose.Schema({
         name: { type: String, default: 'test' },
         arr: [{ tag: String }]
       });
 
-      var Model = db.model('gh5661', schema);
-      var doc = { arr: [{ tag: 't1' }, { tag: 't2' }] };
+      const Model = db.model('gh5661', schema);
+      const doc = { arr: [{ tag: 't1' }, { tag: 't2' }] };
       Model.create(doc, function(error) {
         assert.ifError(error);
-        var query = {};
-        var update = { $set: { name: 'test2' } };
-        var opts = {
+        const query = {};
+        const update = { $set: { name: 'test2' } };
+        const opts = {
           new: true,
           fields: { arr: { $elemMatch: { tag: 't1' } } }
         };
@@ -1799,14 +1799,14 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('multi cast error (gh-5609)', function(done) {
-      var schema = new mongoose.Schema({
+      const schema = new mongoose.Schema({
         num1: Number,
         num2: Number
       });
 
-      var Model = db.model('gh5609', schema);
+      const Model = db.model('gh5609', schema);
 
-      var opts = { multipleCastError: true };
+      const opts = { multipleCastError: true };
       Model.findOneAndUpdate({}, { num1: 'fail', num2: 'fail' }, opts, function(error) {
         assert.ok(error);
         assert.equal(error.name, 'ValidationError');
@@ -1819,14 +1819,14 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('update validators with pushing null (gh-5710)', function(done) {
-      var schema = new mongoose.Schema({
+      const schema = new mongoose.Schema({
         arr: [String]
       });
 
-      var Model = db.model('gh5710', schema);
+      const Model = db.model('gh5710', schema);
 
-      var update = { $addToSet: { arr: null } };
-      var options = { runValidators: true };
+      const update = { $addToSet: { arr: null } };
+      const options = { runValidators: true };
       Model.findOneAndUpdate({}, update, options, function(error) {
         assert.ifError(error);
         done();
@@ -1878,23 +1878,23 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('useFindAndModify in opts (gh-5616)', function(done) {
-      var m = new mongoose.constructor();
+      const m = new mongoose.constructor();
 
       m.connect(start.uri);
 
-      var calls = [];
+      const calls = [];
       m.set('debug', function(collection, fnName) {
         calls.push({ collection: collection, fnName: fnName });
       });
 
-      var schema = new m.Schema({
+      const schema = new m.Schema({
         arr: [String]
       });
 
-      var Model = m.model('gh5616', schema);
+      const Model = m.model('gh5616', schema);
 
-      var update = { $push: { arr: 'test' } };
-      var options = { useFindAndModify: false };
+      const update = { $push: { arr: 'test' } };
+      const options = { useFindAndModify: false };
       Model.findOneAndUpdate({}, update, options, function() {
         assert.equal(calls.length, 1);
         assert.equal(calls[0].collection, 'gh5616');
@@ -1905,24 +1905,24 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('useFindAndModify in set (gh-5616)', function(done) {
-      var m = new mongoose.constructor();
+      const m = new mongoose.constructor();
 
       m.connect(start.uri);
 
-      var calls = [];
+      const calls = [];
       m.set('debug', function(collection, fnName) {
         calls.push({ collection: collection, fnName: fnName });
       });
 
       m.set('useFindAndModify', false);
-      var schema = new m.Schema({
+      const schema = new m.Schema({
         arr: [String]
       });
 
-      var Model = m.model('gh5616', schema);
+      const Model = m.model('gh5616', schema);
 
-      var update = { $push: { arr: 'test' } };
-      var options = {};
+      const update = { $push: { arr: 'test' } };
+      const options = {};
       Model.findOneAndUpdate({}, update, options, function() {
         assert.equal(calls.length, 1);
         assert.equal(calls[0].collection, 'gh5616');
@@ -1990,7 +1990,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('avoids edge case with middleware cloning buffers (gh-5702)', function(done) {
-      var uuidParse = require('uuid-parse');
+      const uuidParse = require('uuid-parse');
 
       function toUUID(string) {
         if (!string) {
@@ -1999,7 +1999,7 @@ describe('model: findOneAndUpdate:', function() {
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-        var buffer = uuidParse.parse(string);
+        const buffer = uuidParse.parse(string);
         return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 
@@ -2010,7 +2010,7 @@ describe('model: findOneAndUpdate:', function() {
         return uuidParse.unparse(buffer);
       }
 
-      var UserSchema = new mongoose.Schema({
+      const UserSchema = new mongoose.Schema({
         name: String,
         lastUpdate: {type: Date},
         friends: [{
@@ -2028,10 +2028,10 @@ describe('model: findOneAndUpdate:', function() {
         this.update({},{ $set: {lastUpdate: new Date()} });
       });
 
-      var User = db.model('gh5702', UserSchema);
+      const User = db.model('gh5702', UserSchema);
 
-      var friendId = uuid.v4();
-      var user = {
+      const friendId = uuid.v4();
+      const user = {
         name: 'Sean',
         friends: [{status: 'New', id: friendId}]
       };
@@ -2039,8 +2039,8 @@ describe('model: findOneAndUpdate:', function() {
       User.create(user, function(error, user) {
         assert.ifError(error);
 
-        var q = { _id: user._id, 'friends.id': friendId };
-        var upd = {'friends.$.status': 'Active'};
+        const q = { _id: user._id, 'friends.id': friendId };
+        const upd = {'friends.$.status': 'Active'};
         User.findOneAndUpdate(q, upd, {new: true}).lean().exec(function(error) {
           assert.ifError(error);
           done();
@@ -2054,7 +2054,7 @@ describe('model: findOneAndUpdate:', function() {
         this.skip();
       }
 
-      var uuidParse = require('uuid-parse');
+      const uuidParse = require('uuid-parse');
       function toUUID(string) {
         if (!string) {
           return null;
@@ -2062,11 +2062,11 @@ describe('model: findOneAndUpdate:', function() {
         if (Buffer.isBuffer(string) || Buffer.isBuffer(string.buffer)) {
           return string;
         }
-        var buffer = uuidParse.parse(string);
+        const buffer = uuidParse.parse(string);
         return new mongoose.Types.Buffer(buffer).toObject(0x04);
       }
 
-      var UserSchema = new mongoose.Schema({
+      const UserSchema = new mongoose.Schema({
         name: String,
         foo: {
           type: mongoose.Schema.Types.Buffer,
@@ -2074,10 +2074,10 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      var User = db.model('gh5551', UserSchema);
+      const User = db.model('gh5551', UserSchema);
 
-      var user = { name: 'upsert', foo: uuid.v4() };
-      var opts = {
+      const user = { name: 'upsert', foo: uuid.v4() };
+      const opts = {
         upsert: true,
         setDefaultsOnInsert: true,
         new: true
@@ -2093,7 +2093,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('properly handles casting nested objects in update (gh-4724)', function(done) {
-      var locationSchema = new Schema({
+      const locationSchema = new Schema({
         _id: false,
         location: {
           type: { type: String, default: 'Point' },
@@ -2101,13 +2101,13 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      var testSchema = new Schema({
+      const testSchema = new Schema({
         locations: [locationSchema]
       });
 
-      var T = db.model('gh4724', testSchema);
+      const T = db.model('gh4724', testSchema);
 
-      var t = new T({
+      const t = new T({
         locations: [{
           location: { type: 'Point', coordinates: [-122, 44] }
         }]
@@ -2131,9 +2131,9 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('doesnt do double validation on document arrays during updates (gh-4440)', function(done) {
-      var A = new Schema({str: String});
-      var B = new Schema({a: [A]});
-      var validateCalls = 0;
+      const A = new Schema({str: String});
+      let B = new Schema({a: [A]});
+      let validateCalls = 0;
       B.path('a').validate(function(val) {
         ++validateCalls;
         assert(Array.isArray(val));

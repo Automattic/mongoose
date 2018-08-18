@@ -1,5 +1,5 @@
 
-var model = require('./modelA');
+const model = require('./modelA');
 
 exports.home = function(req, res, next) {
   model.find(function(err, docs) {

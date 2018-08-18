@@ -7,30 +7,30 @@ const mongoose = require('../common').mongoose;
 
 describe('getSchemaTypes', function() {
   it('handles embedded discriminators (gh-5970)', function(done) {
-    var ItemSchema = new Schema({
+    const ItemSchema = new Schema({
       title: {
         type: String,
         required: true
       }
     }, {discriminatorKey: 'type'});
 
-    var ItemBookSchema = new Schema({
+    const ItemBookSchema = new Schema({
       author: {
         type: String,
         ref: 'Ref1'
       }
     });
 
-    var ItemEBookSchema = new Schema({
+    const ItemEBookSchema = new Schema({
       author: {
         type: String,
         ref: 'Ref2'
       }
     });
 
-    var OtherItem = new Schema({ name: String });
+    const OtherItem = new Schema({ name: String });
 
-    var BundleSchema = new Schema({
+    const BundleSchema = new Schema({
       items: [{
         type: ItemSchema,
         required: false
@@ -41,7 +41,7 @@ describe('getSchemaTypes', function() {
     BundleSchema.path('items').discriminator('EBook', ItemEBookSchema);
     BundleSchema.path('items').discriminator('Other', OtherItem);
 
-    var doc = {
+    const doc = {
       items: [
         { type: 'Book', author: 'test 1' },
         { type: 'EBook', author: 'test 2' },
@@ -49,7 +49,7 @@ describe('getSchemaTypes', function() {
       ]
     };
 
-    var schemaTypes = getSchemaTypes(BundleSchema, doc, 'items.author');
+    const schemaTypes = getSchemaTypes(BundleSchema, doc, 'items.author');
 
     assert.ok(Array.isArray(schemaTypes));
     // Make sure we only got the schema paths for Book and EBook, and none
@@ -62,30 +62,30 @@ describe('getSchemaTypes', function() {
   });
 
   it('multiple embedded discriminators (gh-6064)', function(done) {
-    var ItemSchema = new Schema({
+    const ItemSchema = new Schema({
       title: {
         type: String,
         required: true
       }
     }, {discriminatorKey: 'type'});
 
-    var ItemBookSchema = new Schema({
+    const ItemBookSchema = new Schema({
       author: {
         type: String,
         ref: 'Ref1'
       }
     });
 
-    var ItemEBookSchema = new Schema({
+    const ItemEBookSchema = new Schema({
       author: {
         type: String,
         ref: 'Ref2'
       }
     });
 
-    var OtherItem = new Schema({ name: String });
+    const OtherItem = new Schema({ name: String });
 
-    var BundleSchema = new Schema({
+    const BundleSchema = new Schema({
       level1: {
         items: [{
           type: ItemSchema,
@@ -109,7 +109,7 @@ describe('getSchemaTypes', function() {
     BundleSchema.path('level2.items').discriminator('EBook', ItemEBookSchema);
     BundleSchema.path('level2.items').discriminator('Other', OtherItem);
 
-    var doc = {
+    const doc = {
       level1: {
         items: [
           { type: 'Book', author: 'level 1 test 1' },
@@ -124,7 +124,7 @@ describe('getSchemaTypes', function() {
         ]
       }
     };
-    var schemaTypes = getSchemaTypes(BundleSchema, doc, 'level2.items.author');
+    const schemaTypes = getSchemaTypes(BundleSchema, doc, 'level2.items.author');
 
     assert.ok(Array.isArray(schemaTypes));
     // Make sure we only got the schema paths for Book and EBook, and none

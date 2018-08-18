@@ -3,7 +3,7 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
+let start = require('./common'),
     mongoose = start.mongoose,
     assert = require('power-assert'),
     random = require('../lib/utils').random,
@@ -11,10 +11,10 @@ var start = require('./common'),
     ObjectId = Schema.Types.ObjectId;
 
 describe('model: mapreduce:', function() {
-  var Comments;
-  var BlogPost;
-  var collection;
-  var db;
+  let Comments;
+  let BlogPost;
+  let collection;
+  let db;
 
   before(function() {
     Comments = new Schema();
@@ -52,14 +52,14 @@ describe('model: mapreduce:', function() {
   });
 
   it('works', function(done) {
-    var MR = db.model('MapReduce', collection);
+    const MR = db.model('MapReduce', collection);
 
-    var magicID;
-    var id = new mongoose.Types.ObjectId;
-    var authors = 'aaron guillermo brian nathan'.split(' ');
-    var num = 10;
-    var docs = [];
-    for (var i = 0; i < num; ++i) {
+    let magicID;
+    const id = new mongoose.Types.ObjectId;
+    const authors = 'aaron guillermo brian nathan'.split(' ');
+    const num = 10;
+    const docs = [];
+    for (let i = 0; i < num; ++i) {
       docs.push({author: authors[i % authors.length], owners: [id], published: true});
     }
 
@@ -68,7 +68,7 @@ describe('model: mapreduce:', function() {
 
       magicID = insertedDocs[1]._id;
 
-      var o = {
+      const o = {
         map: 'function() { emit(this.author, 1); }',
         reduce: function(k, vals) {
           return vals.length;
@@ -76,8 +76,8 @@ describe('model: mapreduce:', function() {
       };
 
       MR.mapReduce(o, function(err, res) {
-        var ret = res.results;
-        var stats = res.stats;
+        const ret = res.results;
+        const stats = res.stats;
         assert.ifError(err);
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
@@ -96,7 +96,7 @@ describe('model: mapreduce:', function() {
           }
         });
 
-        var o = {
+        const o = {
           map: function() {
             emit(this.author, 1);
           },
@@ -107,8 +107,8 @@ describe('model: mapreduce:', function() {
         };
 
         MR.mapReduce(o, function(err, res) {
-          var ret = res.results;
-          var stats = res.stats;
+          const ret = res.results;
+          const stats = res.stats;
           assert.ifError(err);
 
           assert.ok(Array.isArray(ret));
@@ -122,7 +122,7 @@ describe('model: mapreduce:', function() {
       });
 
       function modeling() {
-        var o = {
+        const o = {
           map: function() {
             emit(this.author, {own: magicID});
           },
@@ -135,7 +135,7 @@ describe('model: mapreduce:', function() {
 
         MR.mapReduce(o, function(err, res) {
           assert.ifError(err);
-          var model = res.model;
+          const model = res.model;
 
           // ret is a model
           assert.equal(typeof model.findOne, 'function');
@@ -173,9 +173,9 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity', function(done) {
-    var MR = db.model('MapReduce', collection);
+    const MR = db.model('MapReduce', collection);
 
-    var o = {
+    const o = {
       map: function() {
       },
       reduce: function() {
@@ -192,9 +192,9 @@ describe('model: mapreduce:', function() {
 
   describe('promises (gh-1628)', function() {
     it('are returned', function(done) {
-      var MR = db.model('MapReduce', collection);
+      const MR = db.model('MapReduce', collection);
 
-      var o = {
+      const o = {
         map: function() {
         },
         reduce: function() {
@@ -202,7 +202,7 @@ describe('model: mapreduce:', function() {
         }
       };
 
-      var promise = MR.mapReduce(o);
+      const promise = MR.mapReduce(o);
       assert.ok(promise instanceof mongoose.Promise);
 
       done();
@@ -210,27 +210,27 @@ describe('model: mapreduce:', function() {
   });
 
   describe('with promises', function() {
-    var MR;
-    var db;
-    var magicID;
-    var id;
-    var docs = [];
+    let MR;
+    let db;
+    let magicID;
+    let id;
+    const docs = [];
 
     before(function(done) {
       db = start();
       MR = db.model('MapReduce', collection);
 
       id = new mongoose.Types.ObjectId;
-      var authors = 'aaron guillermo brian nathan'.split(' ');
-      var num = 10;
-      for (var i = 0; i < num; ++i) {
+      const authors = 'aaron guillermo brian nathan'.split(' ');
+      const num = 10;
+      for (let i = 0; i < num; ++i) {
         docs.push({author: authors[i % authors.length], owners: [id], published: true});
       }
 
       MR.create(docs, function(err, insertedDocs) {
         assert.ifError(err);
 
-        var b = insertedDocs[1];
+        const b = insertedDocs[1];
         magicID = b._id;
         done();
       });
@@ -241,7 +241,7 @@ describe('model: mapreduce:', function() {
     });
 
     it('works', function() {
-      var o = {
+      const o = {
         map: function() {
           emit(this.author, 1);
         },
@@ -251,7 +251,7 @@ describe('model: mapreduce:', function() {
       };
 
       return MR.mapReduce(o).then(function(res) {
-        var ret = res.results;
+        const ret = res.results;
         assert.ok(Array.isArray(ret));
         ret.forEach(function(res) {
           if (res._id === 'aaron') {
@@ -271,7 +271,7 @@ describe('model: mapreduce:', function() {
     });
 
     it('works with model', function() {
-      var o = {
+      const o = {
         map: function() {
           emit(this.author, {own: magicID});
         },
@@ -284,7 +284,7 @@ describe('model: mapreduce:', function() {
 
       return MR.mapReduce(o).
         then(function(res) {
-          var ret = res.model;
+          const ret = res.model;
           // ret is a model
           assert.ok(!Array.isArray(ret));
           assert.equal(typeof ret.findOne, 'function');
@@ -303,9 +303,9 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity using then', function(done) {
-    var MR = db.model('MapReduce', collection);
+    const MR = db.model('MapReduce', collection);
 
-    var o = {
+    const o = {
       map: function() {
       },
       reduce: function() {

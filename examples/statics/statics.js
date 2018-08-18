@@ -1,11 +1,11 @@
-var mongoose = require('../../lib');
+const mongoose = require('../../lib');
 
 
 // import the schema
 require('./person.js')();
 
 // grab the person model object
-var Person = mongoose.model('Person');
+const Person = mongoose.model('Person');
 
 // connect to a server to do a quick write / read example
 

@@ -38,7 +38,7 @@ describe('collections:', function() {
   });
 
   it('methods should that throw (unimplemented)', function(done) {
-    var collection = new Collection('test', mongoose.connection),
+    let collection = new Collection('test', mongoose.connection),
         thrown = false;
 
     try {

@@ -1,7 +1,7 @@
-var p = require('./package.json');
-var _ = require('lodash');
+const p = require('./package.json');
+const _ = require('lodash');
 
-var result = _.map(p.browserDependencies, function(v, k) {
+const result = _.map(p.browserDependencies, function(v, k) {
   return k + '@' + v;
 });
 

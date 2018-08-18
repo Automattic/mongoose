@@ -1,10 +1,10 @@
-var mongoose = require('../../lib');
-var Benchmark = require('benchmark');
+const mongoose = require('../../lib');
+const Benchmark = require('benchmark');
 
-var suite = new Benchmark.Suite();
+const suite = new Benchmark.Suite();
 
-var Schema = mongoose.Schema;
-var mongo = require('mongodb');
+const Schema = mongoose.Schema;
+const mongo = require('mongodb');
 
 // to make things work in the way the are normally described online...
 /*
@@ -26,22 +26,22 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       throw err;
     }
 
-    var db = client.db('mongoose-bench');
+    const db = client.db('mongoose-bench');
 
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       name: String,
       age: Number,
       likes: [String],
       address: String
     });
 
-    var User = mongoose.model('User', UserSchema);
-    var user = db.collection('user');
+    const User = mongoose.model('User', UserSchema);
+    const user = db.collection('user');
 
-    var mIds = [];
-    var dIds = [];
+    const mIds = [];
+    const dIds = [];
 
-    var data = {
+    const data = {
       name: 'name',
       age: 0,
       likes: ['dogs', 'cats', 'pizza'],
@@ -49,8 +49,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     };
 
     // insert all of the data here
-    var count = 1000;
-    for (var i = 0; i < 500; i++) {
+    let count = 1000;
+    for (let i = 0; i < 500; i++) {
       User.create(data, function(err, u) {
         if (err) {
           throw err;
@@ -58,7 +58,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         mIds.push(u.id);
         --count || next();
       });
-      var nData = {};
+      const nData = {};
       nData.name = data.name;
       nData.age = data.age;
       nData.likes = data.likes;
@@ -115,9 +115,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }).on('complete', function() {
         closeDB();
         if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
-          var outObj = {};
+          const outObj = {};
           this.forEach(function(item) {
-            var out = {};
+            const out = {};
             out.stats = item.stats;
             delete out.stats.sample;
             out.ops = item.hz;

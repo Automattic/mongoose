@@ -16,13 +16,13 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 const Schema = mongoose.Schema;
 
 describe('model query casting', function() {
-  var Comments;
-  var BlogPostB;
-  var collection;
-  var geoSchemaArray;
-  var geoSchemaObject;
-  var modelName;
-  var db;
+  let Comments;
+  let BlogPostB;
+  let collection;
+  let geoSchemaArray;
+  let geoSchemaObject;
+  let modelName;
+  let db;
 
   before(function() {
     Comments = new Schema;
@@ -69,10 +69,10 @@ describe('model query casting', function() {
   });
 
   it('works', function(done) {
-    var BlogPostB = db.model(modelName, collection),
+    let BlogPostB = db.model(modelName, collection),
         title = 'Loki ' + random();
 
-    var post = new BlogPostB(),
+    let post = new BlogPostB(),
         id = post.get('_id').toString();
 
     post.set('title', title);
@@ -89,7 +89,7 @@ describe('model query casting', function() {
   });
 
   it('returns cast errors', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
 
     BlogPostB.find({date: 'invalid date'}, function(err) {
       assert.ok(err instanceof Error);
@@ -99,7 +99,7 @@ describe('model query casting', function() {
   });
 
   it('casts $modifiers', function(done) {
-    var BlogPostB = db.model(modelName, collection),
+    let BlogPostB = db.model(modelName, collection),
         post = new BlogPostB({
           meta: {
             visitors: -75
@@ -123,9 +123,9 @@ describe('model query casting', function() {
   });
 
   it('casts $in values of arrays (gh-199)', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
 
-    var post = new BlogPostB(),
+    let post = new BlogPostB(),
         id = post._id.toString();
 
     post.save(function(err) {
@@ -141,9 +141,9 @@ describe('model query casting', function() {
   });
 
   it('casts $in values of arrays with single item instead of array (jrl-3238)', function(done) {
-    var BlogPostB = db.model(modelName, collection);
+    const BlogPostB = db.model(modelName, collection);
 
-    var post = new BlogPostB(),
+    let post = new BlogPostB(),
         id = post._id.toString();
 
     post.save(function(err) {
@@ -159,13 +159,13 @@ describe('model query casting', function() {
   });
 
   it('casts $nin values of arrays (gh-232)', function(done) {
-    var NinSchema = new Schema({
+    const NinSchema = new Schema({
       num: Number
     });
 
     mongoose.model('Nin', NinSchema);
 
-    var Nin = db.model('Nin', 'nins_' + random());
+    const Nin = db.model('Nin', 'nins_' + random());
 
     Nin.create({num: 1}, function(err) {
       assert.ifError(err);
@@ -184,9 +184,9 @@ describe('model query casting', function() {
   });
 
   it('works when finding by Date (gh-204)', function(done) {
-    var P = db.model(modelName, collection);
+    const P = db.model(modelName, collection);
 
-    var post = new P;
+    const post = new P;
 
     post.meta.date = new Date();
 
@@ -211,7 +211,7 @@ describe('model query casting', function() {
   });
 
   it('works with $type matching', function(done) {
-    var B = db.model(modelName, collection);
+    const B = db.model(modelName, collection);
 
     B.find({title: {$type: {x:1}}}, function(err) {
       assert.equal(err.message, '$type parameter must be number or string');
@@ -225,9 +225,9 @@ describe('model query casting', function() {
   });
 
   it('works when finding Boolean with $in (gh-998)', function(done) {
-    var B = db.model(modelName, collection);
+    const B = db.model(modelName, collection);
 
-    var b = new B({published: true});
+    const b = new B({published: true});
     b.save(function(err) {
       assert.ifError(err);
       B.find({_id: b._id, boolean: {$in: [null, true]}}, function(err, doc) {
@@ -240,9 +240,9 @@ describe('model query casting', function() {
   });
 
   it('works when finding Boolean with $ne (gh-1093)', function(done) {
-    var B = db.model(modelName, collection + random());
+    const B = db.model(modelName, collection + random());
 
-    var b = new B({published: false});
+    const b = new B({published: false});
     b.save(function(err) {
       assert.ifError(err);
       B.find().ne('published', true).exec(function(err, doc) {
@@ -255,7 +255,7 @@ describe('model query casting', function() {
   });
 
   it('properly casts $and (gh-1180)', function(done) {
-    var B = db.model(modelName, collection + random()),
+    let B = db.model(modelName, collection + random()),
         result = B.find({}).cast(B, {$and: [{date: '1987-03-17T20:00:00.000Z'}, {_id: '000000000000000000000000'}]});
     assert.ok(result.$and[0].date instanceof Date);
     assert.ok(result.$and[1]._id instanceof DocumentObjectId);
@@ -266,12 +266,12 @@ describe('model query casting', function() {
     this.slow(60);
 
     it('with arrays', function(done) {
-      var Test = db.model('Geo4', geoSchemaArray, 'y' + random());
+      const Test = db.model('Geo4', geoSchemaArray, 'y' + random());
 
       Test.once('index', complete);
       Test.create({loc: [10, 20]}, {loc: [40, 90]}, complete);
 
-      var pending = 2;
+      let pending = 2;
 
       function complete(err) {
         if (complete.ran) {
@@ -293,9 +293,9 @@ describe('model query casting', function() {
     });
 
     it('with objects', function(done) {
-      var Test = db.model('Geo5', geoSchemaObject, 'y' + random());
+      const Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 
-      var pending = 2;
+      let pending = 2;
 
       function complete(err) {
         if (complete.ran) {
@@ -320,12 +320,12 @@ describe('model query casting', function() {
     });
 
     it('with nested objects', function(done) {
-      var geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
+      const geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
       geoSchemaObject.index({'loc.nested': '2d'});
 
-      var Test = db.model('Geo52', geoSchemaObject, 'y' + random());
+      const Test = db.model('Geo52', geoSchemaObject, 'y' + random());
 
-      var pending = 2;
+      let pending = 2;
 
       function complete(err) {
         if (complete.ran) {
@@ -357,9 +357,9 @@ describe('model query casting', function() {
     this.slow(70);
 
     it('with arrays', function(done) {
-      var Test = db.model('Geo4', geoSchemaArray, 'y' + random());
+      const Test = db.model('Geo4', geoSchemaArray, 'y' + random());
 
-      var pending = 2;
+      let pending = 2;
 
       function complete(err) {
         if (complete.ran) {
@@ -384,9 +384,9 @@ describe('model query casting', function() {
     });
 
     it('with objects', function(done) {
-      var Test = db.model('Geo5', geoSchemaObject, 'y' + random());
+      const Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 
-      var pending = 2;
+      let pending = 2;
 
       function complete(err) {
         if (complete.ran) {
@@ -411,12 +411,12 @@ describe('model query casting', function() {
     });
 
     it('with nested objects', function(done) {
-      var geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
+      const geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
       geoSchemaObject.index({'loc.nested': '2d'});
 
-      var Test = db.model('Geo52', geoSchemaObject, 'y' + random());
+      const Test = db.model('Geo52', geoSchemaObject, 'y' + random());
 
-      var pending = 2;
+      let pending = 2;
 
       function complete(err) {
         if (complete.ran) {
@@ -446,9 +446,9 @@ describe('model query casting', function() {
 
     describe('$centerSphere', function() {
       it('with arrays', function(done) {
-        var Test = db.model('Geo4', geoSchemaArray, 'y' + random());
+        const Test = db.model('Geo4', geoSchemaArray, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -473,9 +473,9 @@ describe('model query casting', function() {
       });
 
       it('with objects', function(done) {
-        var Test = db.model('Geo5', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -500,12 +500,12 @@ describe('model query casting', function() {
       });
 
       it('with nested objects', function(done) {
-        var geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
+        const geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
         geoSchemaObject.index({'loc.nested': '2d'});
 
-        var Test = db.model('Geo52', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo52', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -532,9 +532,9 @@ describe('model query casting', function() {
 
     describe('$center', function() {
       it('with arrays', function(done) {
-        var Test = db.model('Geo4', geoSchemaArray, 'y' + random());
+        const Test = db.model('Geo4', geoSchemaArray, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -559,9 +559,9 @@ describe('model query casting', function() {
       });
 
       it('with objects', function(done) {
-        var Test = db.model('Geo5', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -586,12 +586,12 @@ describe('model query casting', function() {
       });
 
       it('with nested objects', function(done) {
-        var geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
+        const geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
         geoSchemaObject.index({'loc.nested': '2d'});
 
-        var Test = db.model('Geo52', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo52', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -618,9 +618,9 @@ describe('model query casting', function() {
 
     describe('$polygon', function() {
       it('with arrays', function(done) {
-        var Test = db.model('Geo4', geoSchemaArray, 'y' + random());
+        const Test = db.model('Geo4', geoSchemaArray, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -645,9 +645,9 @@ describe('model query casting', function() {
       });
 
       it('with objects', function(done) {
-        var Test = db.model('Geo5', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -672,12 +672,12 @@ describe('model query casting', function() {
       });
 
       it('with nested objects', function(done) {
-        var geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
+        const geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
         geoSchemaObject.index({'loc.nested': '2d'});
 
-        var Test = db.model('Geo52', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo52', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -704,9 +704,9 @@ describe('model query casting', function() {
 
     describe('$box', function() {
       it('with arrays', function(done) {
-        var Test = db.model('Geo4', geoSchemaArray, 'y' + random());
+        const Test = db.model('Geo4', geoSchemaArray, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -731,9 +731,9 @@ describe('model query casting', function() {
       });
 
       it('with objects', function(done) {
-        var Test = db.model('Geo5', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo5', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -758,12 +758,12 @@ describe('model query casting', function() {
       });
 
       it('with nested objects', function(done) {
-        var geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
+        const geoSchemaObject = new Schema({loc: {nested: {long: Number, lat: Number}}});
         geoSchemaObject.index({'loc.nested': '2d'});
 
-        var Test = db.model('Geo52', geoSchemaObject, 'y' + random());
+        const Test = db.model('Geo52', geoSchemaObject, 'y' + random());
 
-        var pending = 2;
+        let pending = 2;
 
         function complete(err) {
           if (complete.ran) {
@@ -791,12 +791,12 @@ describe('model query casting', function() {
 
   describe('$options', function() {
     it('works on arrays gh-1462', function(done) {
-      var opts = {};
+      const opts = {};
       opts.toString = function() {
         return 'img';
       };
 
-      var B = db.model(modelName, collection + random()),
+      let B = db.model(modelName, collection + random()),
           result = B.find({}).cast(B, {tags: {$regex: /a/, $options: opts}});
 
       assert.equal(result.tags.$options, 'img');
@@ -806,11 +806,11 @@ describe('model query casting', function() {
 
   describe('$elemMatch', function() {
     it('should cast String to ObjectId in $elemMatch', function(done) {
-      var BlogPostB = db.model(modelName, collection);
+      const BlogPostB = db.model(modelName, collection);
 
-      var commentId = mongoose.Types.ObjectId(111);
+      const commentId = mongoose.Types.ObjectId(111);
 
-      var post = new BlogPostB({comments: [{_id: commentId}]}), id = post._id.toString();
+      let post = new BlogPostB({comments: [{_id: commentId}]}), id = post._id.toString();
 
       post.save(function(err) {
         assert.ifError(err);
@@ -825,11 +825,11 @@ describe('model query casting', function() {
     });
 
     it('should cast String to ObjectId in $elemMatch inside $not', function(done) {
-      var BlogPostB = db.model(modelName, collection);
+      const BlogPostB = db.model(modelName, collection);
 
-      var commentId = mongoose.Types.ObjectId(111);
+      const commentId = mongoose.Types.ObjectId(111);
 
-      var post = new BlogPostB({comments: [{_id: commentId}]}), id = post._id.toString();
+      let post = new BlogPostB({comments: [{_id: commentId}]}), id = post._id.toString();
 
       post.save(function(err) {
         assert.ifError(err);
@@ -844,15 +844,15 @@ describe('model query casting', function() {
     });
 
     it('should cast subdoc _id typed as String to String in $elemMatch gh3719', function(done) {
-      var child = new Schema({
+      const child = new Schema({
         _id: {type: String}
       }, {_id: false});
 
-      var parent = new Schema({
+      const parent = new Schema({
         children: [child]
       });
 
-      var Parent = db.model('gh3719-1', parent);
+      const Parent = db.model('gh3719-1', parent);
 
       Parent.create({children: [{ _id: 'foobar' }] }, function(error) {
         assert.ifError(error);
@@ -872,15 +872,15 @@ describe('model query casting', function() {
     });
 
     it('should cast subdoc _id typed as String to String in $elemMatch inside $not gh3719', function(done) {
-      var child = new Schema({
+      const child = new Schema({
         _id: {type: String}
       }, {_id: false});
 
-      var parent = new Schema({
+      const parent = new Schema({
         children: [child]
       });
 
-      var Parent = db.model('gh3719-2', parent);
+      const Parent = db.model('gh3719-2', parent);
 
       Parent.create({children: [{ _id: 'foobar' }] }, function(error) {
         assert.ifError(error);
@@ -901,9 +901,9 @@ describe('model query casting', function() {
   });
 
   it('works with $all (gh-3394)', function(done) {
-    var MyModel = db.model('gh3394', {tags: [ObjectId]});
+    const MyModel = db.model('gh3394', {tags: [ObjectId]});
 
-    var doc = {
+    const doc = {
       tags: ['00000000000000000000000a', '00000000000000000000000b']
     };
 
@@ -919,7 +919,7 @@ describe('model query casting', function() {
   });
 
   it('date with $not + $type (gh-4632)', function(done) {
-    var MyModel = db.model('gh4632', { test: Date });
+    const MyModel = db.model('gh4632', { test: Date });
 
     MyModel.find({ test: { $not: { $type: 9 } } }, function(error) {
       assert.ifError(error);
@@ -935,7 +935,7 @@ describe('model query casting', function() {
     mongoose.Schema.Types.Point = Point;
     Point.prototype = Object.create(mongoose.SchemaType.prototype);
 
-    var called = 0;
+    let called = 0;
     Point.prototype.cast = function(point) {
       ++called;
       if (point.type !== 'Point') {
@@ -945,10 +945,10 @@ describe('model query casting', function() {
       return point;
     };
 
-    var testSchema = new mongoose.Schema({ name: String, test: Point });
-    var Test = db.model('gh5126', testSchema);
+    const testSchema = new mongoose.Schema({ name: String, test: Point });
+    const Test = db.model('gh5126', testSchema);
 
-    var u = {
+    const u = {
       $setOnInsert: {
         name: 'a',
         test: {
@@ -965,9 +965,9 @@ describe('model query casting', function() {
   });
 
   it('lowercase in query (gh-4569)', function(done) {
-    var contexts = [];
+    const contexts = [];
 
-    var testSchema = new Schema({
+    const testSchema = new Schema({
       name: { type: String, lowercase: true },
       num: {
         type: Number,
@@ -978,7 +978,7 @@ describe('model query casting', function() {
       }
     });
 
-    var Test = db.model('gh-4569', testSchema);
+    const Test = db.model('gh-4569', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
       then(function() {
         assert.equal(contexts.length, 1);
@@ -1005,8 +1005,8 @@ describe('model query casting', function() {
   });
 
   it('runSettersOnQuery only once on find (gh-5434)', function(done) {
-    var vs = [];
-    var UserSchema = new mongoose.Schema({
+    let vs = [];
+    const UserSchema = new mongoose.Schema({
       name: String,
       foo: {
         type: Number,
@@ -1020,7 +1020,7 @@ describe('model query casting', function() {
       }
     });
 
-    var Test = db.model('gh5434', UserSchema);
+    const Test = db.model('gh5434', UserSchema);
 
     Test.find({ foo: '123' }).exec(function(error) {
       assert.ifError(error);
@@ -1038,8 +1038,8 @@ describe('model query casting', function() {
   });
 
   it('setters run only once on findOne (gh-6157)', function(done) {
-    var vs = [];
-    var UserSchema = new mongoose.Schema({
+    let vs = [];
+    const UserSchema = new mongoose.Schema({
       name: String,
       foo: {
         type: Number,
@@ -1053,7 +1053,7 @@ describe('model query casting', function() {
       }
     });
 
-    var Test = db.model('gh6157', UserSchema);
+    const Test = db.model('gh6157', UserSchema);
 
     Test.findOne({ foo: '123' }).exec(function(error) {
       assert.ifError(error);
@@ -1071,9 +1071,9 @@ describe('model query casting', function() {
   });
 
   it('runSettersOnQuery as query option (gh-5350)', function(done) {
-    var contexts = [];
+    const contexts = [];
 
-    var testSchema = new Schema({
+    const testSchema = new Schema({
       name: { type: String, lowercase: true },
       num: {
         type: Number,
@@ -1084,7 +1084,7 @@ describe('model query casting', function() {
       }
     });
 
-    var Test = db.model('gh5350', testSchema);
+    const Test = db.model('gh5350', testSchema);
     Test.create({ name: 'val', num: 2.02 }).
       then(function() {
         assert.equal(contexts.length, 1);
@@ -1101,7 +1101,7 @@ describe('model query casting', function() {
   });
 
   it('_id = 0 (gh-4610)', function(done) {
-    var MyModel = db.model('gh4610', { _id: Number });
+    const MyModel = db.model('gh4610', { _id: Number });
 
     MyModel.create({ _id: 0 }, function(error) {
       assert.ifError(error);
@@ -1128,7 +1128,7 @@ describe('model query casting', function() {
   });
 
   it('minDistance (gh-4197)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       name: String,
       loc: {
         type: { type: String },
@@ -1138,16 +1138,16 @@ describe('model query casting', function() {
 
     schema.index({ loc: '2dsphere' });
 
-    var MyModel = db.model('gh4197', schema);
+    const MyModel = db.model('gh4197', schema);
 
     MyModel.on('index', function(error) {
       assert.ifError(error);
-      var docs = [
+      const docs = [
         { name: 'San Mateo Caltrain', loc: _geojsonPoint([-122.33, 37.57]) },
         { name: 'Squaw Valley', loc: _geojsonPoint([-120.24, 39.21]) },
         { name: 'Mammoth Lakes', loc: _geojsonPoint([-118.9, 37.61]) }
       ];
-      var RADIUS_OF_EARTH_IN_METERS = 6378100;
+      const RADIUS_OF_EARTH_IN_METERS = 6378100;
       MyModel.create(docs, function(error) {
         assert.ifError(error);
         MyModel.

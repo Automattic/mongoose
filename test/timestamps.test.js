@@ -1,12 +1,12 @@
 'use strict';
 
-var assert = require('assert');
-var start = require('./common');
+const assert = require('assert');
+const start = require('./common');
 
-var mongoose = start.mongoose;
+const mongoose = start.mongoose;
 
 describe('timestamps', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -17,8 +17,8 @@ describe('timestamps', function() {
   });
 
   it('does not override timestamp params defined in schema (gh-4868)', function(done) {
-    var startTime = Date.now();
-    var schema = new mongoose.Schema({
+    const startTime = Date.now();
+    const schema = new mongoose.Schema({
       createdAt: {
         type: Date,
         select: false
@@ -29,7 +29,7 @@ describe('timestamps', function() {
       },
       name: String
     }, { timestamps: true });
-    var M = db.model('gh4868', schema);
+    const M = db.model('gh4868', schema);
 
     M.create({ name: 'Test' }, function(error) {
       assert.ifError(error);
@@ -44,11 +44,11 @@ describe('timestamps', function() {
   });
 
   it('updatedAt without createdAt (gh-5598)', function(done) {
-    var startTime = Date.now();
-    var schema = new mongoose.Schema({
+    const startTime = Date.now();
+    const schema = new mongoose.Schema({
       name: String
     }, { timestamps: { createdAt: null, updatedAt: true } });
-    var M = db.model('gh5598', schema);
+    const M = db.model('gh5598', schema);
 
     M.create({ name: 'Test' }, function(error) {
       assert.ifError(error);
@@ -63,14 +63,14 @@ describe('timestamps', function() {
   });
 
   it('updatedAt without createdAt for nested (gh-5598)', function(done) {
-    var startTime = Date.now();
-    var schema = new mongoose.Schema({
+    const startTime = Date.now();
+    const schema = new mongoose.Schema({
       name: String
     }, { timestamps: { createdAt: null, updatedAt: true } });
-    var parentSchema = new mongoose.Schema({
+    const parentSchema = new mongoose.Schema({
       child: schema
     });
-    var M = db.model('gh5598_0', parentSchema);
+    const M = db.model('gh5598_0', parentSchema);
 
     M.create({ child: { name: 'test' } }, function(error) {
       assert.ifError(error);
@@ -85,11 +85,11 @@ describe('timestamps', function() {
   });
 
   it('nested paths (gh-4503)', function(done) {
-    var startTime = Date.now();
-    var schema = new mongoose.Schema({
+    const startTime = Date.now();
+    const schema = new mongoose.Schema({
       name: String
     }, { timestamps: { createdAt: 'ts.c', updatedAt: 'ts.a' } });
-    var M = db.model('gh4503', schema);
+    const M = db.model('gh4503', schema);
 
     M.create({ name: 'Test' }, function(error) {
       assert.ifError(error);
@@ -105,8 +105,8 @@ describe('timestamps', function() {
   });
 
   it('does not override nested timestamp params defined in schema (gh-4868)', function(done) {
-    var startTime = Date.now();
-    var schema = new mongoose.Schema({
+    const startTime = Date.now();
+    const schema = new mongoose.Schema({
       ts: {
         createdAt: {
           type: Date,
@@ -119,7 +119,7 @@ describe('timestamps', function() {
       },
       name: String
     }, { timestamps: { createdAt: 'ts.createdAt', updatedAt: 'ts.updatedAt' } });
-    var M = db.model('gh4868_0', schema);
+    const M = db.model('gh4868_0', schema);
 
     M.create({ name: 'Test' }, function(error) {
       assert.ifError(error);
@@ -134,8 +134,8 @@ describe('timestamps', function() {
   });
 
   it('does not override timestamps in nested schema (gh-4868)', function(done) {
-    var startTime = Date.now();
-    var tsSchema = new mongoose.Schema({
+    const startTime = Date.now();
+    const tsSchema = new mongoose.Schema({
       createdAt: {
         type: Date,
         select: false
@@ -145,11 +145,11 @@ describe('timestamps', function() {
         select: true
       }
     });
-    var schema = new mongoose.Schema({
+    const schema = new mongoose.Schema({
       ts: tsSchema,
       name: String
     }, { timestamps: { createdAt: 'ts.createdAt', updatedAt: 'ts.updatedAt' } });
-    var M = db.model('gh4868_1', schema);
+    const M = db.model('gh4868_1', schema);
 
     M.create({ name: 'Test' }, function(error) {
       assert.ifError(error);

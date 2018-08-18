@@ -2,13 +2,13 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
+let start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose;
 
 describe('model translate aliases', function() {
   it('should translate correctly', function() {
-    var Character = mongoose.model('Character', new mongoose.Schema({
+    const Character = mongoose.model('Character', new mongoose.Schema({
       name: { type: String, alias: '名' },
       bio: {
         age: { type: Number, alias: '年齢' }

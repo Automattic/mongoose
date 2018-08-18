@@ -1,13 +1,13 @@
-var mongoose = require('../'),
+let mongoose = require('../'),
     Schema = mongoose.Schema;
 
-var Buffer = require('safe-buffer').Buffer;
+const Buffer = require('safe-buffer').Buffer;
 
-var DocSchema = new Schema({
+const DocSchema = new Schema({
   title: String
 });
 
-var AllSchema = new Schema({
+const AllSchema = new Schema({
   string: {type: String, required: true},
   number: {type: Number, min: 10},
   date: Date,
@@ -29,8 +29,8 @@ var AllSchema = new Schema({
   s: {nest: String}
 });
 
-var A = mongoose.model('A', AllSchema);
-var a = new A({
+const A = mongoose.model('A', AllSchema);
+const a = new A({
   string: 'hello world',
   number: 444848484,
   date: new Date,
@@ -48,16 +48,16 @@ var a = new A({
   s: {nest: 'hello there everyone!'}
 });
 
-var start = new Date;
-var total = 100000;
-var i = total;
-var len;
+const start = new Date;
+const total = 100000;
+let i = total;
+let len;
 
 for (i = 0, len = total; i < len; ++i) {
   a.toObject({depopulate: true});
 }
 
-var time = (new Date - start) / 1000;
+const time = (new Date - start) / 1000;
 console.error('took %d seconds for %d docs (%d dps)', time, total, total / time);
 process.memoryUsage();
 

@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-var mongoose = require('../../lib'),
+let mongoose = require('../../lib'),
     Schema = mongoose.Schema;
 
 /**
@@ -11,7 +11,7 @@ var mongoose = require('../../lib'),
 
 // recursive embedded-document schema
 
-var Comment = new Schema();
+const Comment = new Schema();
 
 Comment.add({
   title: {
@@ -23,7 +23,7 @@ Comment.add({
   comments: [Comment]
 });
 
-var BlogPost = new Schema({
+const BlogPost = new Schema({
   title: {
     type: String,
     index: true
@@ -39,7 +39,7 @@ var BlogPost = new Schema({
   creator: Schema.ObjectId
 });
 
-var Person = new Schema({
+const Person = new Schema({
   name: {
     first: String,
     last: String
@@ -99,7 +99,7 @@ BlogPost.methods.expressiveQuery = function(creator, date, callback) {
 
 function slugGenerator(options) {
   options = options || {};
-  var key = options.key || 'title';
+  const key = options.key || 'title';
 
   return function slugGenerator(schema) {
     schema.path(key).set(function(v) {

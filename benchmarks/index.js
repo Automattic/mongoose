@@ -1,21 +1,21 @@
-var Buffer = require('safe-buffer').Buffer;
+const Buffer = require('safe-buffer').Buffer;
 
 Error.stackTraceLimit = Infinity;
-var out = process.argv.length < 3;
+const out = process.argv.length < 3;
 function log() {
   if (out) {
     console.error.apply(console, arguments);
   }
 }
 
-var mongoose = require('../'),
+let mongoose = require('../'),
     Schema = mongoose.Schema;
 
-var DocSchema = new Schema({
+const DocSchema = new Schema({
   title: String
 });
 
-var AllSchema = new Schema({
+const AllSchema = new Schema({
   string: String,
   number: Number,
   date: Date,
@@ -32,10 +32,10 @@ var AllSchema = new Schema({
   docs: [DocSchema]
 });
 
-var A = mongoose.model('A', AllSchema);
+const A = mongoose.model('A', AllSchema);
 
-var numdocs = 0;
-var totaltime = 0;
+let numdocs = 0;
+let totaltime = 0;
 
 // bench the normal way
 // the try building the doc into the document prototype
@@ -47,11 +47,11 @@ var totaltime = 0;
 
 function run(label, fn) {
   log('running %s', label);
-  var started = process.memoryUsage();
-  var start = new Date;
-  var total = 10000;
-  var i = total;
-  var a;
+  let started = process.memoryUsage();
+  let start = new Date;
+  let total = 10000;
+  let i = total;
+  let a;
   while (i--) {
     a = fn();
     if (i % 2) {
@@ -64,12 +64,12 @@ function run(label, fn) {
       }
     }
   }
-  var time = (new Date - start) / 1000;
+  let time = (new Date - start) / 1000;
   totaltime += time;
   numdocs += total;
   log(label + ' took %d seconds for %d docs (%d dps)', time, total, total / time);
-  var used = process.memoryUsage();
-  var res = {};
+  let used = process.memoryUsage();
+  let res = {};
   res.rss = used.rss - started.rss;
   res.heapTotal = used.heapTotal - started.heapTotal;
   res.heapUsed = used.heapUsed - started.heapUsed;

@@ -3,7 +3,7 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
+let start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
     DivergentArrayError = mongoose.Error.DivergentArrayError,
@@ -24,7 +24,7 @@ describe('model: populate: divergent arrays', function() {
   // $pop -1
   // $pop 1
 
-  var db, C, M;
+  let db, C, M;
 
   before(function(done) {
     db = start();

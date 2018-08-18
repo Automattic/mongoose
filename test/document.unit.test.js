@@ -2,26 +2,26 @@
  * Module dependencies.
  */
 
-var assert = require('power-assert');
-var start = require('./common');
-var storeShard = require('../lib/plugins/sharding').storeShard;
+const assert = require('power-assert');
+const start = require('./common');
+const storeShard = require('../lib/plugins/sharding').storeShard;
 
-var mongoose = start.mongoose;
+const mongoose = start.mongoose;
 
 describe('sharding', function() {
   it('should handle shard keys properly (gh-2127)', function(done) {
-    var mockSchema = {
+    const mockSchema = {
       options: {
         shardKey: {date: 1}
       }
     };
-    var Stub = function() {
+    const Stub = function() {
       this.schema = mockSchema;
       this.$__ = {};
     };
     Stub.prototype.__proto__ = mongoose.Document.prototype;
-    var d = new Stub();
-    var currentTime = new Date();
+    const d = new Stub();
+    const currentTime = new Date();
     d._doc = {date: currentTime};
 
     storeShard.call(d);
@@ -31,11 +31,11 @@ describe('sharding', function() {
 });
 
 describe('toObject()', function() {
-  var Stub;
+  let Stub;
 
   beforeEach(function() {
     Stub = function() {
-      var schema = this.schema = {
+      const schema = this.schema = {
         options: {toObject: {minimize: false, virtuals: true}},
         virtuals: {virtual: 'test'}
       };
@@ -47,19 +47,19 @@ describe('toObject()', function() {
   });
 
   it('should inherit options from schema', function(done) {
-    var d = new Stub();
+    const d = new Stub();
     assert.deepEqual(d.toObject(), {empty: {}, virtual: 'test'});
     done();
   });
 
   it('can overwrite schema-set default options', function(done) {
-    var d = new Stub();
+    const d = new Stub();
     assert.deepEqual(d.toObject({minimize: true, virtuals: false}), {});
     done();
   });
 
   it('doesnt crash with empty object (gh-3130)', function(done) {
-    var d = new Stub();
+    const d = new Stub();
     d._doc = undefined;
     assert.doesNotThrow(function() {
       d.toObject();

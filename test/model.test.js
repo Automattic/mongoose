@@ -5415,7 +5415,7 @@ describe('Model', function() {
     });
 
     it.skip('save() with wtimeout defined in schema (gh-6862)', function(done) {
-      // If you want to test this, setup replica set with 1 primary up and 1 slave down
+      // If you want to test this, setup replica set with 1 primary up and 1 secondary down
       this.timeout(process.env.TRAVIS ? 9000 : 5500);
       const schema = new Schema({
         name: String
@@ -5432,7 +5432,7 @@ describe('Model', function() {
         assert.ok(error);
         assert.equal(error.name, 'MongoWriteConcernError');
 
-        // although timeout, it should have successfully saved the doc
+        // although timeout, the doc have been successfully saved in the primary.
         User.findOne({}, function(err, user) {
           if (err) return done(err);
           assert.equal(user.name, 'Jon Snow');
@@ -5442,7 +5442,7 @@ describe('Model', function() {
     });
 
     it.skip('save with wtimeout in options (gh_6862)', function(done) {
-      // If you want to test this, setup replica set with 1 primary up and 1 slave down
+      // If you want to test this, setup replica set with 1 primary up and 1 secondary down
       this.timeout(process.env.TRAVIS ? 9000 : 5500);
       const schema = new Schema({
         name: String

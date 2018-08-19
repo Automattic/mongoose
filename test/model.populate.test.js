@@ -7221,21 +7221,25 @@ describe('model: populate:', function() {
       schema.virtual('referrerUser', {
         ref: 'gh6618_user',
         localField: 'referrer',
-        foreignField: '_id',
-        justOne: false
+        foreignField: 'name',
+        justOne: false,
+        getters: true
       });
 
       const User = db.model('gh6618_user', userSchema);
       const Test = db.model('gh6618_test', schema);
 
       const user = new User({ name: 'billy' });
-      const test = new Test({ referrer: 'Model$' + user.id });
+      const test = new Test({ referrer: 'Model$' + user.name });
 
       return co(function*() {
         yield user.save();
         yield test.save();
         let pop = yield Test.findOne().populate('referrerUser');
         assert.strictEqual(pop.referrerUser[0].name, 'billy');
+
+        pop = yield Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
+        assert.strictEqual(pop.referrerUser.length, 0);
       });
     });
 

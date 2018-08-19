@@ -3,12 +3,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    DivergentArrayError = mongoose.Error.DivergentArrayError,
-    utils = require('../lib/utils'),
-    random = utils.random;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, DivergentArrayError = mongoose.Error.DivergentArrayError, utils = require('../lib/utils'), random = utils.random;
 
 /**
  * Tests.

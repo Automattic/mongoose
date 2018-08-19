@@ -4,14 +4,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    utils = require('../lib/utils'),
-    random = utils.random,
-    Schema = mongoose.Schema,
-    DocObjectId = mongoose.Types.ObjectId,
-    Buffer = require('safe-buffer').Buffer;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, utils = require('../lib/utils'), random = utils.random, Schema = mongoose.Schema, DocObjectId = mongoose.Types.ObjectId, Buffer = require('safe-buffer').Buffer;
 
 /**
  * Setup.

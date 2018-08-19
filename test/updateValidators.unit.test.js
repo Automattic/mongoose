@@ -1,3 +1,4 @@
+'use strict';
 const assert = require('power-assert');
 const updateValidators = require('../lib/helpers/updateValidators');
 const emitter = require('events').EventEmitter;

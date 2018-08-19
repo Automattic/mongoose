@@ -3,6 +3,8 @@
  * Test dependencies.
  */
 
+'use strict';
+
 const Aggregate = require('../lib/aggregate');
 const assert = require('assert');
 const random = require('../lib/utils').random;

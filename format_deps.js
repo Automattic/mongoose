@@ -1,3 +1,4 @@
+'use strict';
 const p = require('./package.json');
 const _ = require('lodash');
 

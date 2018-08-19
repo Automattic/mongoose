@@ -1,3 +1,5 @@
+/* eslint strict: 0 */
+
 let start = require('./common'),
     assert = require('power-assert'),
     random = require('../lib/utils').random,

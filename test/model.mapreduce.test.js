@@ -3,12 +3,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId;
+'use strict';
+
+let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), random = require('../lib/utils').random, Schema = mongoose.Schema, ObjectId = Schema.Types.ObjectId;
 
 describe('model: mapreduce:', function() {
   let Comments;

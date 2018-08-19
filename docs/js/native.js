@@ -1,3 +1,4 @@
+'use strict';
 var _native = {
   construct: function(e) {
     var default_options = {

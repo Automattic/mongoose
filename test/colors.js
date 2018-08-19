@@ -2,13 +2,9 @@
  * Module dependencies.
  */
 
-let start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    MongooseDocumentArray = mongoose.Types.DocumentArray,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray');
+'use strict';
+
+let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), Schema = mongoose.Schema, MongooseDocumentArray = mongoose.Types.DocumentArray, EmbeddedDocument = require('../lib/types/embedded'), DocumentArray = require('../lib/types/documentarray');
 
 /**
  * setup

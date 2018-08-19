@@ -1,3 +1,4 @@
+'use strict';
 let start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,

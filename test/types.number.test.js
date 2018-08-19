@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-let mongoose = require('./common').mongoose,
-    SchemaNumber = mongoose.Schema.Types.Number,
-    assert = require('power-assert');
+'use strict';
+
+let mongoose = require('./common').mongoose, SchemaNumber = mongoose.Schema.Types.Number, assert = require('power-assert');
 
 /**
  * Test.

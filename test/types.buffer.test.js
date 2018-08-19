@@ -2,13 +2,9 @@
  * Module dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = require('./common').mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
-    MongooseBuffer = mongoose.Types.Buffer,
-    Buffer = require('safe-buffer').Buffer;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = require('./common').mongoose, Schema = mongoose.Schema, random = require('../lib/utils').random, MongooseBuffer = mongoose.Types.Buffer, Buffer = require('safe-buffer').Buffer;
 
 function valid(v) {
   return !v || v.length > 10;

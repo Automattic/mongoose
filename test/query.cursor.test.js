@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+'use strict';
+
 const assert = require('assert');
 const start = require('./common');
 

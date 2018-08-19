@@ -3,15 +3,9 @@
  * Module dependencies.
  */
 
-let start = require('./common'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    utils = require('../lib/utils'),
-    StateMachine = require('../lib/statemachine'),
-    ObjectId = require('../lib/types/objectid'),
-    MongooseBuffer = require('../lib/types/buffer'),
-    Buffer = require('safe-buffer').Buffer,
-    assert = require('power-assert');
+'use strict';
+
+let start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema, utils = require('../lib/utils'), StateMachine = require('../lib/statemachine'), ObjectId = require('../lib/types/objectid'), MongooseBuffer = require('../lib/types/buffer'), Buffer = require('safe-buffer').Buffer, assert = require('power-assert');
 
 /**
  * Setup.

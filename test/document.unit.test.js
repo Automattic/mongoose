@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+'use strict';
+
 const assert = require('power-assert');
 const start = require('./common');
 const storeShard = require('../lib/plugins/sharding').storeShard;

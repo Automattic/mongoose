@@ -1,3 +1,4 @@
+'use strict';
 let mongoose = require('../'),
     Schema = mongoose.Schema;
 

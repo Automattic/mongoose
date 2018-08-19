@@ -2,11 +2,9 @@
  * Module dependencies.
  */
 
-let start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random;
+'use strict';
+
+let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), Schema = mongoose.Schema, random = require('../lib/utils').random;
 
 /**
  * setup

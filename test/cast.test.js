@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+'use strict';
+
 const Schema = require('../lib/schema');
 const assert = require('power-assert');
 const cast = require('../lib/cast');

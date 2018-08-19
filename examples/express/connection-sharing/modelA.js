@@ -1,3 +1,4 @@
+'use strict';
 const Schema = require('../../../lib').Schema;
 const mySchema = Schema({name: String});
 

@@ -2,13 +2,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId,
-    DocumentObjectId = mongoose.Types.ObjectId;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, random = require('../lib/utils').random, Schema = mongoose.Schema, ObjectId = Schema.Types.ObjectId, DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model field selection', function() {
   let Comments;

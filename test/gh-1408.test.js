@@ -3,10 +3,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, Schema = mongoose.Schema;
 
 describe('documents should not be converted to _id (gh-1408)', function() {
   it('if an embedded doc', function(done) {

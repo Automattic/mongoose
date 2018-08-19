@@ -3,10 +3,9 @@
  * Module dependencies.
  */
 
-let assert = require('power-assert'),
-    start = require('./common'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+'use strict';
+
+let assert = require('power-assert'), start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema;
 
 /**
  * Test.

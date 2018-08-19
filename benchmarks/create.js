@@ -1,5 +1,7 @@
 // require('nodetime').profile();
 
+'use strict';
+
 const mongoose = require('../../mongoose');
 const fs = require('fs');
 

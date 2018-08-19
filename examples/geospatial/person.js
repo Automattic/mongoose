@@ -1,4 +1,6 @@
 // import the necessary modules
+'use strict';
+
 const mongoose = require('../../lib');
 const Schema = mongoose.Schema;
 

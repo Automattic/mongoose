@@ -2,6 +2,8 @@
  * Module dependencies
  */
 
+'use strict';
+
 var fs = require('fs');
 var link = require('../helpers/linktype');
 var hl = require('highlight.js')

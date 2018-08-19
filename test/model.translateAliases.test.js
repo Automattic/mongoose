@@ -2,9 +2,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose;
 
 describe('model translate aliases', function() {
   it('should translate correctly', function() {

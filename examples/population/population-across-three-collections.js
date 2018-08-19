@@ -1,4 +1,5 @@
 
+'use strict';
 const assert = require('assert');
 const mongoose = require('../../lib');
 const Schema = mongoose.Schema;

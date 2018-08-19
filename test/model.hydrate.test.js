@@ -2,11 +2,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    DocumentObjectId = mongoose.Types.ObjectId;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, Schema = mongoose.Schema, DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model', function() {
   let schemaB;

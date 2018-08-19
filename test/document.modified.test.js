@@ -2,13 +2,9 @@
  * Test dependencies.
  */
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
-    DocumentObjectId = mongoose.Types.ObjectId;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, random = require('../lib/utils').random, Schema = mongoose.Schema, ObjectId = Schema.ObjectId, DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.

@@ -1,3 +1,4 @@
+'use strict';
 var PromiseProvider = require('../../lib/promise_provider');
 var assert = require('power-assert');
 var mongoose = require('../../');

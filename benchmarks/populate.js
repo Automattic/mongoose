@@ -1,3 +1,4 @@
+'use strict';
 const mongoose = require('../');
 const Schema = mongoose.Schema;
 const docs = process.argv[2] ? process.argv[2] | 0 : 100;

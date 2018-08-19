@@ -1,5 +1,7 @@
 
 // import async to make control flow simplier
+'use strict';
+
 const async = require('async');
 
 // import the rest of the normal stuff

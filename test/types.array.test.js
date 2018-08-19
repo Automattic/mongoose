@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+'use strict';
+
 const start = require('./common');
 const assert = require('power-assert');
 const mongoose = require('./common').mongoose;

@@ -2,8 +2,9 @@
  * Module dependencies.
  */
 
-let mongoose = require('../../lib'),
-    Schema = mongoose.Schema;
+'use strict';
+
+let mongoose = require('../../lib'), Schema = mongoose.Schema;
 
 /**
  * Schema definition

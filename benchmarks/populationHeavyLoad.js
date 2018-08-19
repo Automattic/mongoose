@@ -1,3 +1,4 @@
+'use strict';
 const tbd = require('tbd');
 const mongoose = require('../');
 const Schema = mongoose.Schema;

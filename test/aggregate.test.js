@@ -954,7 +954,6 @@ describe('aggregate: ', function() {
         if (err) {
           throw err;
         }
-        const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
 
         const m = db.model('Employee');
         const match = { $match: { sal: { $gt: 15000 } } };
@@ -963,10 +962,6 @@ describe('aggregate: ', function() {
         var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         var mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
 
-        var m = db.model('Employee');
-        var match = { $match: { sal: { $gt: 15000 } } };
-        var pref = 'primaryPreferred';
-        var aggregate = m.aggregate([match]).read(pref);
         assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);

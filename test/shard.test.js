@@ -1,7 +1,8 @@
-/* eslint strict: 0 */
+'use strict';
 
 let start = require('./common'),
     assert = require('power-assert'),
+    chalk = require('chalk'),
     random = require('../lib/utils').random,
     mongoose = start.mongoose,
     Schema = mongoose.Schema;
@@ -10,11 +11,12 @@ const uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
   console.log(
-    '\033[31m', '\n', 'You\'re not testing shards!',
-    '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n',
-    'e.g: `mongodb://localhost:27017/database', '\n',
-    'Sharding must already be enabled on your database',
-    '\033[39m'
+    chalk.red(
+      '\n', 'You\'re not testing shards!',
+      '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n',
+      'e.g: `mongodb://localhost:27017/database', '\n',
+      'Sharding must already be enabled on your database'
+    )
   );
 
   return;

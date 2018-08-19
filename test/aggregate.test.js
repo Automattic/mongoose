@@ -409,6 +409,30 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('redact', function() {
+    const pipelineResult = [{ $redact: { $cond: { if: { $eq: ['$level', 5] }, then: '$$PRUNE', else: '$$DESCEND' } } }];
+    it('works', function(done) {
+      const aggregate = new Aggregate();
+      aggregate.redact({
+        $cond: {
+          if: { $eq: [ '$level', 5 ] },
+          then: '$$PRUNE',
+          else: '$$DESCEND'
+        }
+      });
+      assert.deepEqual(aggregate._pipeline, pipelineResult);
+
+      done();
+    });
+    it('works with (condition, string, string)', function(done) {
+      const aggregate = new Aggregate();
+      aggregate.redact({ $eq: ['$level', 5] }, '$$PRUNE', '$$DESCEND');
+      assert.deepEqual(aggregate._pipeline, pipelineResult);
+
+      done();
+    });
+  });
+
   describe('Mongo 3.4 operators', function() {
     before(function(done) {
       onlyTestAtOrAbove('3.4', this, done);
@@ -936,16 +960,24 @@ describe('aggregate: ', function() {
         const match = { $match: { sal: { $gt: 15000 } } };
         const pref = 'primaryPreferred';
         const aggregate = m.aggregate([match]).read(pref);
+        var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+        var mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
+
+        var m = db.model('Employee');
+        var match = { $match: { sal: { $gt: 15000 } } };
+        var pref = 'primaryPreferred';
+        var aggregate = m.aggregate([match]).read(pref);
+        assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);
           aggregate.option({maxTimeMS: 1000});
-        }
-
-
-        assert.equal(aggregate.options.readPreference.mode, pref);
-        if (mongo26_or_greater) {
           assert.equal(aggregate.options.allowDiskUse, true);
           assert.equal(aggregate.options.maxTimeMS, 1000);
+        }
+
+        if (mongo32_or_greater) {
+          aggregate.readConcern('m');
+          assert.deepEqual(aggregate.options.readConcern, { level: 'majority' });
         }
 
         aggregate.

@@ -7238,8 +7238,8 @@ describe('model: populate:', function() {
         const pop = yield Test.findOne().populate('referrerUser');
         assert.strictEqual(pop.referrerUser[0].name, 'billy');
 
-        pop = yield Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
-        assert.strictEqual(pop.referrerUser.length, 0);
+        const pop2 = yield Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
+        assert.strictEqual(pop2.referrerUser.length, 0);
       });
     });
 

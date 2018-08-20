@@ -161,6 +161,30 @@ describe('mongoose module:', function() {
       then(() => mongoose.disconnect());
   });
 
+  it('useCreateIndex option (gh-6880)', function() {
+    const mongoose = new Mongoose();
+
+    mongoose.set('useCreateIndex', true);
+
+    return mongoose.connect(uri).
+      then(() => {
+        const M = mongoose.model('Test', new Schema({
+          name: { type: String, index: true }
+        }));
+
+        M.collection.ensureIndex = function() {
+          throw new Error('Fail');
+        };
+
+        return M.init();
+      }).
+      then(() => {
+        const M = mongoose.model('Test');
+        delete M.$init;
+        return M.init();
+      });
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     var mong = new Mongoose();
     var subSchema = new Schema({ name: String });

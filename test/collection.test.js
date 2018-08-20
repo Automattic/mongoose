@@ -23,7 +23,7 @@ describe('collections:', function() {
       done();
     }
 
-    collection.insert({}, {}, function() {
+    collection.insertOne({}, {}, function() {
       assert.ok(connected);
       inserted = true;
       db.close();
@@ -72,9 +72,9 @@ describe('collections:', function() {
     thrown = false;
 
     try {
-      collection.insert();
+      collection.insertOne();
     } catch (e) {
-      assert.ok(/unimplemented/.test(e.message));
+      assert.ok(/unimplemented/.test(e.message), e.message);
       thrown = true;
     }
 

@@ -1932,6 +1932,49 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('useFindAndModify with overwrite (gh-6887)', function() {
+      return co(function*() {
+        const m = new mongoose.constructor();
+        yield m.connect(start.uri);
+
+        const calls = [];
+        m.set('debug', function(collection, fnName) {
+          calls.push({ collection: collection, fnName: fnName });
+        });
+
+        m.set('useFindAndModify', false);
+
+        const schema = new m.Schema({
+          name: String,
+          age: Number,
+          location: String
+        });
+
+        const Model = m.model('gh6887', schema);
+
+        const options = { overwrite: true, new: true };
+        const doc = yield Model.create({ name: 'Jennifer', location: 'Taipei' });
+        const newDoc1 = yield Model.findOneAndUpdate({ name: 'Jennifer' }, { age: 24 }, options);
+        const newDoc2 = yield Model.findByIdAndUpdate(doc._id, { name: 'Fonger', location: 'Hsinchu' }, options);
+
+        assert.strictEqual(newDoc1.name, undefined);
+        assert.strictEqual(newDoc1.age, 24);
+        assert.strictEqual(newDoc1.location, undefined);
+
+        assert.strictEqual(newDoc2.name, 'Fonger');
+        assert.strictEqual(newDoc2.age, undefined);
+        assert.strictEqual(newDoc2.location, 'Hsinchu');
+
+        assert.equal(calls.length, 3);
+        assert.equal(calls[1].collection, 'gh6887');
+        assert.equal(calls[1].collection, 'gh6887');
+        assert.equal(calls[2].fnName, 'findOneAndReplace');
+        assert.equal(calls[2].fnName, 'findOneAndReplace');
+
+        m.disconnect();
+      });
+    });
+
     it('update validators with pull + $in (gh-6240)', function() {
       const highlightSchema = new mongoose.Schema({
         _id: {

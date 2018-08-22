@@ -1889,7 +1889,7 @@ describe('model: update:', function() {
       var Tag = db.model('gh4989', TagSchema);
       var tagId;
 
-      Tag.remove({}).
+      Tag.deleteOne({}).
         then(function() { return Tag.create({ name: 'test' }); }).
         then(function() { return Tag.findOne(); }).
         then(function(tag) {

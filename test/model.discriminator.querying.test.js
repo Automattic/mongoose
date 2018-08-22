@@ -49,13 +49,13 @@ describe('model', function() {
       async.series(
         [
           function removeBaseEvent(next) {
-            BaseEvent.remove(next);
+            BaseEvent.deleteMany({}, next);
           },
           function removeImpressionEvent(next) {
-            ImpressionEvent.remove(next);
+            ImpressionEvent.deleteMany({}, next);
           },
           function removeConversionEvent(next) {
-            ConversionEvent.remove(next);
+            ConversionEvent.deleteMany({}, next);
           }
         ],
         done

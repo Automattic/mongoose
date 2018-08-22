@@ -14,12 +14,12 @@ describe('query middleware', function() {
     Author = db.model('gh-2138', schema, 'gh-2138');
     Publisher = db.model('gh-2138-1', publisherSchema, 'gh-2138-1');
 
-    Author.remove({}, function(error) {
+    Author.deleteMany({}, function(error) {
       if (error) {
         return done(error);
       }
 
-      Publisher.remove({}, function(error) {
+      Publisher.deleteMany({}, function(error) {
         if (error) {
           return done(error);
         }

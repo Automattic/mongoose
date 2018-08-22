@@ -15,7 +15,7 @@ describe('promises docs', function () {
   });
 
   beforeEach(function (done) {
-    Band.remove({}, done);
+    Band.deleteMany({}, done);
   });
 
   after(function (done) {

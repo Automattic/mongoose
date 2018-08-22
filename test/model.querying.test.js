@@ -1483,9 +1483,9 @@ describe('model: querying:', function() {
                   assert.ifError(error);
                   assert.equal(documents.length, 1);
                   assert.equal(documents[0].title, 'text search in mongoose');
-                  a.remove(function(error) {
+                  a.remove({}, function(error) {
                     assert.ifError(error);
-                    b.remove(function(error) {
+                    b.remove({}, function(error) {
                       assert.ifError(error);
                       done();
                     });
@@ -1844,7 +1844,7 @@ describe('model: querying:', function() {
     it('works with nested query selectors gh-1884', function(done) {
       var B = db.model('gh1884', {a: String, b: String}, 'gh1884');
 
-      B.remove({$and: [{a: 'coffee'}, {b: {$in: ['bacon', 'eggs']}}]}, function(error) {
+      B.deleteOne({$and: [{a: 'coffee'}, {b: {$in: ['bacon', 'eggs']}}]}, function(error) {
         assert.ifError(error);
         done();
       });
@@ -1895,7 +1895,7 @@ describe('model: querying:', function() {
                     assert.ifError(err);
                     assert.equal(rb.block.toString('utf8'), 'über');
 
-                    Test.remove({}, function(err) {
+                    Test.deleteOne({}, function(err) {
                       assert.ifError(err);
                       done();
                     });
@@ -1988,7 +1988,7 @@ describe('model: querying:', function() {
 
         // run all of the tests in parallel
         yield testPromises;
-        yield Test.remove({});
+        yield Test.deleteOne({});
         done();
       }).catch(done);
     });

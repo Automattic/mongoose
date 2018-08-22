@@ -609,7 +609,7 @@ describe('Model', function() {
       MyModel.findById(35, function(err, doc) {
         assert.ifError(err);
 
-        doc.remove(function(err) {
+        doc.deleteOne({}, function(err) {
           assert.ifError(err);
           done();
         });
@@ -942,7 +942,7 @@ describe('Model', function() {
           assert.ifError(err);
           m.save(function(err) {
             assert.ifError(err);
-            M.remove(function(err) {
+            M.deleteOne({}, function(err) {
               delete Date.prototype.toObject;
               assert.ifError(err);
               done();
@@ -1578,7 +1578,7 @@ describe('Model', function() {
     });
   });
 
-  describe('.remove()', function() {
+  describe.skip('.remove()', function() {
     it('works', function(done) {
       var collection = 'blogposts_' + random(),
           BlogPost = db.model('BlogPost', collection);
@@ -1654,7 +1654,7 @@ describe('Model', function() {
     });
   });
 
-  describe('#remove()', function() {
+  describe.skip('#remove()', function() {
     var B;
 
     before(function() {
@@ -3394,7 +3394,7 @@ describe('Model', function() {
         });
     });
 
-    it('remove()', function(done) {
+    it.skip('remove()', function(done) {
       var BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create(
@@ -3496,7 +3496,7 @@ describe('Model', function() {
           });
       });
 
-      it('remove()', function() {
+      it.skip('remove()', function() {
         const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         return BlogPost.create({title: 'interoperable remove as promise 2'}).

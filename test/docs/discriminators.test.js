@@ -31,8 +31,8 @@ describe('discriminator docs', function () {
     db.close(done);
   });
 
-  beforeEach(function (done) {
-    Event.remove({}, done);
+  beforeEach(function(done) {
+    Event.deleteMany({}, done);
   });
 
   /**

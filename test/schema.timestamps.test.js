@@ -156,13 +156,13 @@ describe('schema options.timestamps', function() {
     var CatSchema;
     var Cat;
 
-    before(function(done) {
+    before(function() {
       CatSchema = new Schema({
         name: String,
         hobby: String
       }, {timestamps: true});
       Cat = conn.model('Cat', CatSchema);
-      Cat.remove({}, done);
+      return Cat.deleteMany({});
     });
 
     it('should have fields when create', function(done) {
@@ -326,7 +326,7 @@ describe('schema options.timestamps', function() {
     });
 
     after(function(done) {
-      Cat.remove({}, done);
+      return Cat.deleteMany({});
     });
   });
 });

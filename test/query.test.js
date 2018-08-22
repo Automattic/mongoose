@@ -1081,7 +1081,7 @@ describe('Query', function() {
             assert.ifError(err);
             assert.equal(p.length, 1);
 
-            Product.find({tags: 123456}).remove();
+            Product.find({tags: 123456}).deleteMany();
             setTimeout(function() {
               Product.find({tags: 123456}, function(err, p) {
                 assert.ifError(err);
@@ -1159,7 +1159,7 @@ describe('Query', function() {
       var Product = db.model('Product');
 
       assert.doesNotThrow(function() {
-        Product.where({numbers: [[[]]]}).remove(function(err) {
+        Product.where({numbers: [[[]]]}).deleteMany(function(err) {
           assert.ok(err);
           done();
         });
@@ -1170,7 +1170,7 @@ describe('Query', function() {
       var Product = db.model('Product');
 
       Product.create({strings: ['remove-single-condition']}).then(function() {
-        var q = Product.where().remove({strings: 'remove-single-condition'});
+        var q = Product.where().deleteMany({strings: 'remove-single-condition'});
         assert.ok(q instanceof mongoose.Query);
         done();
       }, done);
@@ -1181,7 +1181,7 @@ describe('Query', function() {
       var val = 'remove-single-callback';
 
       Product.create({strings: [val]}).then(function() {
-        Product.where({strings: val}).remove(function(err) {
+        Product.where({strings: val}).deleteMany(function(err) {
           assert.ifError(err);
           Product.findOne({strings: val}, function(err, doc) {
             assert.ifError(err);
@@ -1197,7 +1197,7 @@ describe('Query', function() {
       var val = 'remove-cond-and-callback';
 
       Product.create({strings: [val]}).then(function() {
-        Product.where().remove({strings: val}, function(err) {
+        Product.where().deleteMany({strings: val}, function(err) {
           assert.ifError(err);
           Product.findOne({strings: val}, function(err, doc) {
             assert.ifError(err);
@@ -1213,7 +1213,7 @@ describe('Query', function() {
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
-        Test.remove({ name: /Stark/ }).exec(function(error, res) {
+        Test.deleteMany({ name: /Stark/ }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 2);
           Test.countDocuments({}, function(error, count) {
@@ -1230,7 +1230,7 @@ describe('Query', function() {
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
+        Test.deleteMany({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 2);
           Test.countDocuments({}, function(error, count) {
@@ -1247,7 +1247,7 @@ describe('Query', function() {
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
+        Test.deleteMany({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 1);
           Test.countDocuments({}, function(error, count) {

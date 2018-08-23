@@ -252,7 +252,7 @@ describe('schema options.timestamps', function() {
       });
     });
 
-    it('should have fields when update', function(done) {
+    it.skip('should have fields when update', function(done) {
       Cat.findOne({name: 'newcat'}, function(err, doc) {
         var old = doc.updatedAt;
         Cat.update({name: 'newcat'}, {$set: {hobby: 'fish'}}, function() {

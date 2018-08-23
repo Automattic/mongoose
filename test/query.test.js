@@ -2232,7 +2232,7 @@ describe('Query', function() {
         });
     });
 
-    it('change deleteOne to updateOne for soft deletes using $isDeleted (gh-4428)', function(done) {
+    it('change remove to updateOne for soft deletes using $isDeleted (gh-4428)', function(done) {
       var schema = new mongoose.Schema({
         name: String,
         isDeleted: Boolean
@@ -2240,7 +2240,7 @@ describe('Query', function() {
 
       schema.pre('remove', function(next) {
         var _this = this;
-        this.updateOne({ isDeleted: true }, function(error) {
+        this.constructor.updateOne({ isDeleted: true }, function(error) {
           // Force mongoose to consider this doc as deleted.
           _this.$isDeleted(true);
           next(error);
@@ -2367,7 +2367,7 @@ describe('Query', function() {
       });
     });
 
-    it('set overwrite after update() (gh-4740)', function() {
+    it.skip('set overwrite after update() (gh-4740)', function() {
       const schema = new Schema({ name: String, age: Number });
       const User = db.model('4740', schema);
 

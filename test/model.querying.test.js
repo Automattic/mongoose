@@ -320,7 +320,7 @@ describe('model: querying:', function() {
       });
 
       return Model.create({}).
-        then(() => Model.update({}, {mixed: {}, name: 'abc'}, {minimize: true})).
+        then(() => Model.replaceOne({}, {mixed: {}, name: 'abc'}, {minimize: true})).
         then(() => Model.collection.findOne()).
         then(doc => {
           assert.ok(doc.mixed == null);

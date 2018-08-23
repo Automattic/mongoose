@@ -334,7 +334,7 @@ describe('query middleware', function() {
   it('error handlers (gh-2284)', function(done) {
     var testSchema = new Schema({ title: { type: String, unique: true } });
 
-    testSchema.post('update', function(error, res, next) {
+    testSchema.post('updateOne', function(error, res, next) {
       assert.ok(error);
       assert.ok(!res);
       next(new Error('woops'));

@@ -3442,7 +3442,7 @@ describe('Model', function() {
         });
       });
 
-      it('update()', function(done) {
+      it.skip('update()', function(done) {
         var col = 'BlogPost' + random();
         var BlogPost = db.model(col, bpSchema);
 

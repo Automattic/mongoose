@@ -920,7 +920,7 @@ describe('document', function() {
     });
   });
 
-  describe('#update', function() {
+  describe.skip('#update', function() {
     it('returns a Query', function(done) {
       var mg = new mongoose.Mongoose;
       var M = mg.model('doc#update', {s: String});

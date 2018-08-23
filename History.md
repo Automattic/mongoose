@@ -208,7 +208,6 @@
  * fix(document): handle `doc.set()` underneath embedded discriminator #6482
  * fix(document): handle set() on path under embedded discriminator with object syntax #6482
  * fix(document): handle setting nested property to object with only non-schema properties #6436
->>>>>>> 4.x
 
 4.13.14 / 2018-05-25
 ====================

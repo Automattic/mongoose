@@ -1616,6 +1616,17 @@ describe('Query', function() {
     });
   });
 
+  describe('getOptions', function() {
+    const q = new Query;
+    q.limit(10);
+    q.setOptions({ maxTimeMS: 1000 });
+    const opts = q.getOptions();
+
+    // does not use assert.deepEqual() because setOptions may alter the options internally
+    assert.strictEqual(opts.limit, 10);
+    assert.strictEqual(opts.maxTimeMS, 1000);
+  });
+
   describe('update', function() {
     it('when empty, nothing is run', function(done) {
       var q = new Query;

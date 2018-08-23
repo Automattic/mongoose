@@ -385,7 +385,7 @@ describe('versioning', function() {
   it('version works with existing unversioned docs', function(done) {
     var V = db.model('Versioning');
 
-    V.collection.insert({title: 'unversioned', numbers: [1, 2, 3]}, {safe: true}, function(err) {
+    V.collection.insertOne({title: 'unversioned', numbers: [1, 2, 3]}, {safe: true}, function(err) {
       assert.ifError(err);
       V.findOne({title: 'unversioned'}, function(err, d) {
         assert.ifError(err);

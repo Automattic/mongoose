@@ -416,7 +416,7 @@ describe('model: querying:', function() {
         });
       });
 
-      post.collection.insert({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
+      post.collection.insertOne({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
         assert.ifError(err);
 
         BlogPostA.findOne({_id: b.ops[0]._id}, function(err, found) {
@@ -1468,7 +1468,7 @@ describe('model: querying:', function() {
 
         var blogPost = db.model('BlogPostB', collection);
 
-        blogPost.collection.ensureIndex({title: 'text'}, function(error) {
+        blogPost.collection.createIndex({title: 'text'}, function(error) {
           assert.ifError(error);
           var a = new blogPost({title: 'querying in mongoose'});
           var b = new blogPost({title: 'text search in mongoose'});
@@ -1614,7 +1614,7 @@ describe('model: querying:', function() {
 
       var blogPost = db.model('BlogPostB', collection);
 
-      blogPost.collection.ensureIndex({title: 'text'}, function(error) {
+      blogPost.collection.createIndex({title: 'text'}, function(error) {
         assert.ifError(error);
         var a = new blogPost({title: 'searching in mongoose'});
         var b = new blogPost({title: 'text search in mongoose'});
@@ -1998,7 +1998,7 @@ describe('model: querying:', function() {
     var BlogPostB = db.model('BlogPostB', collection);
     var post = new BlogPostB();
 
-    post.collection.insert({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
+    post.collection.insertOne({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
       assert.ifError(err);
 
       BlogPostB.findOne({_id: b.ops[0]._id}, function(err, found) {
@@ -2013,7 +2013,7 @@ describe('model: querying:', function() {
     var BlogPostB = db.model('BlogPostB', collection),
         post = new BlogPostB();
 
-    post.collection.insert({meta: {visitors: 9898, color: 'blue'}}, {}, function(err, b) {
+    post.collection.insertOne({meta: {visitors: 9898, color: 'blue'}}, {}, function(err, b) {
       assert.ifError(err);
 
       BlogPostB.findOne({_id: b.ops[0]._id}, function(err, found) {

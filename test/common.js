@@ -15,6 +15,10 @@ if (process.env.D === '1') {
   mongoose.set('debug', true);
 }
 
+// For 3.1.3 deprecations
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+
 /**
  * Override all Collection related queries to keep count
  */
@@ -81,6 +85,9 @@ module.exports = function(options) {
 
   var noErrorListener = !!options.noErrorListener;
   delete options.noErrorListener;
+
+  // For 3.1.3 deprecations
+  options.useNewUrlParser = true;
 
   var conn = mongoose.createConnection(uri, options);
 

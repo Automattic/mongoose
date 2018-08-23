@@ -609,7 +609,7 @@ describe('Model', function() {
       MyModel.findById(35, function(err, doc) {
         assert.ifError(err);
 
-        doc.deleteOne({}, function(err) {
+        doc.remove({}, function(err) {
           assert.ifError(err);
           done();
         });
@@ -843,7 +843,7 @@ describe('Model', function() {
       post.save(function(err) {
         assert.ifError(err);
 
-        BlogPost.update({title: 1, _id: id}, {title: 2}, function(err) {
+        BlogPost.updateOne({title: 1, _id: id}, {title: 2}, function(err) {
           assert.ifError(err);
 
           BlogPost.findOne({_id: post.get('_id')}, function(err, doc) {
@@ -1133,7 +1133,7 @@ describe('Model', function() {
 
       var TestP = db.model('TestPreviousNullValidation');
 
-      TestP.collection.insert({a: null, previous: null}, {}, function(err, f) {
+      TestP.collection.insertOne({a: null, previous: null}, {}, function(err, f) {
         assert.ifError(err);
         TestP.findOne({_id: f.ops[0]._id}, function(err, found) {
           assert.ifError(err);
@@ -3306,7 +3306,7 @@ describe('Model', function() {
   });
 
   describe('#exec()', function() {
-    it('count()', function(done) {
+    it.skip('count()', function(done) {
       var BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create({title: 'interoperable count as promise'}, function(err) {
@@ -3340,7 +3340,7 @@ describe('Model', function() {
         });
     });
 
-    it('update()', function(done) {
+    it.skip('update()', function(done) {
       var col = 'BlogPost' + random();
       var BlogPost = db.model(col, bpSchema);
 
@@ -3428,7 +3428,7 @@ describe('Model', function() {
     });
 
     describe('promises', function() {
-      it('count()', function(done) {
+      it.skip('count()', function(done) {
         var BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable count as promise 2'}, function(err) {
@@ -3902,7 +3902,7 @@ describe('Model', function() {
           }
         };
 
-        M.collection.insert(o, {safe: true}, function(err) {
+        M.collection.insertOne(o, {safe: true}, function(err) {
           assert.ifError(err);
           M.findById(o._id, function(err, doc) {
             db.close();
@@ -3995,7 +3995,7 @@ describe('Model', function() {
   it('path is cast to correct value when retreived from db', function(done) {
     var schema = new Schema({title: {type: 'string', index: true}});
     var T = db.model('T', schema);
-    T.collection.insert({title: 234}, {safe: true}, function(err) {
+    T.collection.insertOne({title: 234}, {safe: true}, function(err) {
       assert.ifError(err);
       T.findOne(function(err, doc) {
         assert.ifError(err);
@@ -4076,7 +4076,7 @@ describe('Model', function() {
   describe('unsetting a default value', function() {
     it('should be ignored (gh-758)', function(done) {
       var M = db.model('758', new Schema({s: String, n: Number, a: Array}));
-      M.collection.insert({}, {safe: true}, function(err) {
+      M.collection.insertOne({}, {safe: true}, function(err) {
         assert.ifError(err);
         M.findOne(function(err, m) {
           assert.ifError(err);

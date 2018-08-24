@@ -266,6 +266,7 @@ describe('versioning', function() {
       assert.ok(/No matching document/.test(err), err);
       assert.equal(a._doc.__v, 5);
       assert.equal(err.version, b._doc.__v - 1);
+      assert.deepEqual(err.modifiedPaths, ['numbers', 'numbers.2']);
       a.set('arr.0.0', 'updated');
       var d = a.$__delta();
       assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');

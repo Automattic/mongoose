@@ -325,7 +325,7 @@ describe('schema options.timestamps', function() {
       });
     });
 
-    after(function(done) {
+    after(function() {
       return Cat.deleteMany({});
     });
   });

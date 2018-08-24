@@ -197,7 +197,7 @@ describe('model: querying:', function() {
     assert.ok(BlogPostB.findOne(q, null, {}, fn) instanceof Query);
   });
 
-  describe('count', function() {
+  describe.skip('count', function() {
     it('returns a Query', function(done) {
       var BlogPostB = db.model('BlogPostB', collection);
       assert.ok(BlogPostB.count({}) instanceof Query);

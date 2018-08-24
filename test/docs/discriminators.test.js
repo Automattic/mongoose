@@ -95,7 +95,7 @@ describe('discriminator docs', function () {
       assert.ifError(error);
       // acquit:ignore:end
 
-      Event.count({}, function (error, count) {
+      Event.countDocuments({}, function (error, count) {
         // acquit:ignore:start
         assert.ifError(error);
         // acquit:ignore:end

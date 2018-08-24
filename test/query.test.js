@@ -1667,7 +1667,7 @@ describe('Query', function() {
     });
 
     describe('gh-1950', function() {
-      it('ignores sort when passed to count', function(done) {
+      it.skip('ignores sort when passed to count', function(done) {
         var Product = db.model('Product', 'Product_setOptions_test');
         Product.find().sort({_id: 1}).count({}).exec(function(error) {
           assert.ifError(error);
@@ -1681,7 +1681,7 @@ describe('Query', function() {
           then(() => Product.find().sort({_id: 1}).countDocuments({}).exec());
       });
 
-      it('ignores count when passed to sort', function(done) {
+      it.skip('ignores count when passed to sort', function(done) {
         var Product = db.model('Product', 'Product_setOptions_test');
         Product.find().count({}).sort({_id: 1}).exec(function(error) {
           assert.ifError(error);
@@ -1749,7 +1749,7 @@ describe('Query', function() {
       });
     });
 
-    it('allows sort with count (gh-3914)', function(done) {
+    it.skip('allows sort with count (gh-3914)', function(done) {
       var Post = db.model('gh3914_0', {
         title: String
       });
@@ -1761,7 +1761,7 @@ describe('Query', function() {
       });
     });
 
-    it('allows sort with select (gh-3914)', function(done) {
+    it.skip('allows sort with select (gh-3914)', function(done) {
       var Post = db.model('gh3914_1', {
         title: String
       });

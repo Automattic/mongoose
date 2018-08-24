@@ -3324,7 +3324,7 @@ describe('Model', function() {
       const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       return BlogPost.create({ title: 'foo' }).
-        then(() => BlogPost.count({ title: 'foo' }).exec()).
+        then(() => BlogPost.countDocuments({ title: 'foo' }).exec()).
         then(count => {
           assert.equal(count, 1);
         });
@@ -3334,7 +3334,7 @@ describe('Model', function() {
       const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       return BlogPost.create({ title: 'foo' }).
-        then(() => BlogPost.count({ title: 'foo' }).exec()).
+        then(() => BlogPost.estimatedDocumentCount({ title: 'foo' }).exec()).
         then(count => {
           assert.equal(count, 1);
         });
@@ -5496,7 +5496,7 @@ describe('Model', function() {
       ];
       M.bulkWrite(ops, function(error) {
         assert.ifError(error);
-        M.count({}, function(error, count) {
+        M.countDocuments({}, function(error, count) {
           assert.ifError(error);
           assert.equal(count, 0);
           done();
@@ -5602,7 +5602,7 @@ describe('Model', function() {
 
       function counter() {
         if (++called === 2) {
-          Test.count(function(err, cnt) {
+          Test.countDocuments(function(err, cnt) {
             assert.ifError(err);
             assert.strictEqual(cnt, 1);
             done();
@@ -5735,7 +5735,7 @@ describe('Model', function() {
 
       function counter() {
         if (++called === 2) {
-          Test.count(function(err, cnt) {
+          Test.countDocuments(function(err, cnt) {
             assert.ifError(err);
             assert.strictEqual(cnt, 1);
             done();

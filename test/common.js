@@ -18,6 +18,7 @@ if (process.env.D === '1') {
 // For 3.1.3 deprecations
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
+mongoose.set('useNewUrlParser', true);
 
 /**
  * Override all Collection related queries to keep count

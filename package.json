@@ -27,7 +27,7 @@
     "mongodb-core": "3.1.2",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.4.1",
-    "mquery": "3.1.2",
+    "mquery": "3.2.0",
     "ms": "2.0.0",
     "regexp-clone": "0.0.1",
     "safe-buffer": "5.1.2",

@@ -609,7 +609,7 @@ describe('Model', function() {
       MyModel.findById(35, function(err, doc) {
         assert.ifError(err);
 
-        doc.remove(function(err) {
+        doc.remove({}, function(err) {
           assert.ifError(err);
           done();
         });
@@ -843,7 +843,7 @@ describe('Model', function() {
       post.save(function(err) {
         assert.ifError(err);
 
-        BlogPost.update({title: 1, _id: id}, {title: 2}, function(err) {
+        BlogPost.updateOne({title: 1, _id: id}, {title: 2}, function(err) {
           assert.ifError(err);
 
           BlogPost.findOne({_id: post.get('_id')}, function(err, doc) {
@@ -942,7 +942,7 @@ describe('Model', function() {
           assert.ifError(err);
           m.save(function(err) {
             assert.ifError(err);
-            M.remove(function(err) {
+            M.deleteOne({}, function(err) {
               delete Date.prototype.toObject;
               assert.ifError(err);
               done();
@@ -1133,7 +1133,7 @@ describe('Model', function() {
 
       var TestP = db.model('TestPreviousNullValidation');
 
-      TestP.collection.insert({a: null, previous: null}, {}, function(err, f) {
+      TestP.collection.insertOne({a: null, previous: null}, {}, function(err, f) {
         assert.ifError(err);
         TestP.findOne({_id: f.ops[0]._id}, function(err, found) {
           assert.ifError(err);
@@ -1578,7 +1578,7 @@ describe('Model', function() {
     });
   });
 
-  describe('.remove()', function() {
+  describe.skip('.remove()', function() {
     it('works', function(done) {
       var collection = 'blogposts_' + random(),
           BlogPost = db.model('BlogPost', collection);
@@ -1654,7 +1654,7 @@ describe('Model', function() {
     });
   });
 
-  describe('#remove()', function() {
+  describe.skip('#remove()', function() {
     var B;
 
     before(function() {
@@ -3306,7 +3306,7 @@ describe('Model', function() {
   });
 
   describe('#exec()', function() {
-    it('count()', function(done) {
+    it.skip('count()', function(done) {
       var BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create({title: 'interoperable count as promise'}, function(err) {
@@ -3324,7 +3324,7 @@ describe('Model', function() {
       const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       return BlogPost.create({ title: 'foo' }).
-        then(() => BlogPost.count({ title: 'foo' }).exec()).
+        then(() => BlogPost.countDocuments({ title: 'foo' }).exec()).
         then(count => {
           assert.equal(count, 1);
         });
@@ -3334,13 +3334,13 @@ describe('Model', function() {
       const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       return BlogPost.create({ title: 'foo' }).
-        then(() => BlogPost.count({ title: 'foo' }).exec()).
+        then(() => BlogPost.estimatedDocumentCount({ title: 'foo' }).exec()).
         then(count => {
           assert.equal(count, 1);
         });
     });
 
-    it('update()', function(done) {
+    it.skip('update()', function(done) {
       var col = 'BlogPost' + random();
       var BlogPost = db.model(col, bpSchema);
 
@@ -3394,7 +3394,7 @@ describe('Model', function() {
         });
     });
 
-    it('remove()', function(done) {
+    it.skip('remove()', function(done) {
       var BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create(
@@ -3428,7 +3428,7 @@ describe('Model', function() {
     });
 
     describe('promises', function() {
-      it('count()', function(done) {
+      it.skip('count()', function(done) {
         var BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable count as promise 2'}, function(err) {
@@ -3442,7 +3442,7 @@ describe('Model', function() {
         });
       });
 
-      it('update()', function(done) {
+      it.skip('update()', function(done) {
         var col = 'BlogPost' + random();
         var BlogPost = db.model(col, bpSchema);
 
@@ -3496,7 +3496,7 @@ describe('Model', function() {
           });
       });
 
-      it('remove()', function() {
+      it.skip('remove()', function() {
         const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         return BlogPost.create({title: 'interoperable remove as promise 2'}).
@@ -3902,7 +3902,7 @@ describe('Model', function() {
           }
         };
 
-        M.collection.insert(o, {safe: true}, function(err) {
+        M.collection.insertOne(o, {safe: true}, function(err) {
           assert.ifError(err);
           M.findById(o._id, function(err, doc) {
             db.close();
@@ -3995,7 +3995,7 @@ describe('Model', function() {
   it('path is cast to correct value when retreived from db', function(done) {
     var schema = new Schema({title: {type: 'string', index: true}});
     var T = db.model('T', schema);
-    T.collection.insert({title: 234}, {safe: true}, function(err) {
+    T.collection.insertOne({title: 234}, {safe: true}, function(err) {
       assert.ifError(err);
       T.findOne(function(err, doc) {
         assert.ifError(err);
@@ -4076,7 +4076,7 @@ describe('Model', function() {
   describe('unsetting a default value', function() {
     it('should be ignored (gh-758)', function(done) {
       var M = db.model('758', new Schema({s: String, n: Number, a: Array}));
-      M.collection.insert({}, {safe: true}, function(err) {
+      M.collection.insertOne({}, {safe: true}, function(err) {
         assert.ifError(err);
         M.findOne(function(err, m) {
           assert.ifError(err);
@@ -5496,7 +5496,7 @@ describe('Model', function() {
       ];
       M.bulkWrite(ops, function(error) {
         assert.ifError(error);
-        M.count({}, function(error, count) {
+        M.countDocuments({}, function(error, count) {
           assert.ifError(error);
           assert.equal(count, 0);
           done();
@@ -5602,7 +5602,7 @@ describe('Model', function() {
 
       function counter() {
         if (++called === 2) {
-          Test.count(function(err, cnt) {
+          Test.countDocuments(function(err, cnt) {
             assert.ifError(err);
             assert.strictEqual(cnt, 1);
             done();
@@ -5735,7 +5735,7 @@ describe('Model', function() {
 
       function counter() {
         if (++called === 2) {
-          Test.count(function(err, cnt) {
+          Test.countDocuments(function(err, cnt) {
             assert.ifError(err);
             assert.strictEqual(cnt, 1);
             done();

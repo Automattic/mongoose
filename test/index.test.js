@@ -10,26 +10,17 @@ var collection = 'blogposts_' + random();
 
 const uri = 'mongodb://localhost:27017/mongoose_test';
 
+const options = {
+  useNewUrlParser: true
+};
+
 describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', function(done) {
       var goose = new Mongoose;
       var db = goose.connection;
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri);
-
-      db.on('open', function() {
-        db.close(function() {
-          done();
-        });
-      });
-    });
-
-    it('with options', function(done) {
-      var goose = new Mongoose;
-      var db = goose.connection;
-
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
 
       db.on('open', function() {
         db.close(function() {
@@ -42,7 +33,7 @@ describe('mongoose module:', function() {
       var goose = new Mongoose;
       var db = goose.connection;
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri).then(function() {
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, options).then(function() {
         db.close(done);
       });
     });
@@ -152,7 +143,7 @@ describe('mongoose module:', function() {
       name: { type: String, required: true }
     }));
 
-    return mongoose.connect(uri).
+    return mongoose.connect(uri, options).
       then(() => M.updateOne({}, { name: null })).
       then(
         () => assert.ok(false),
@@ -166,7 +157,7 @@ describe('mongoose module:', function() {
 
     mongoose.set('useCreateIndex', true);
 
-    return mongoose.connect(uri).
+    return mongoose.connect(uri, options).
       then(() => {
         const M = mongoose.model('Test', new Schema({
           name: { type: String, index: true }
@@ -219,7 +210,7 @@ describe('mongoose module:', function() {
     assert.deepEqual(calls[1].obj, subSchema.obj);
 
     assert.equal(preSaveCalls, 0);
-    mong.connect(start.uri);
+    mong.connect(start.uri, options);
     M.create({ test: [{ name: 'Val' }] }, function(error, doc) {
       assert.ifError(error);
       assert.equal(preSaveCalls, 2);
@@ -240,7 +231,7 @@ describe('mongoose module:', function() {
         var disconnections = 0;
         var pending = 4;
 
-        mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+        mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
         var db = mong.connection;
 
         function cb() {
@@ -260,7 +251,7 @@ describe('mongoose module:', function() {
           cb();
         });
 
-        var db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri);
+        var db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri, options);
 
         db2.on('open', function() {
           connections++;
@@ -279,7 +270,7 @@ describe('mongoose module:', function() {
     it('with callback', function(done) {
       var mong = new Mongoose();
 
-      mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+      mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
 
       mong.connection.on('open', function() {
         mong.disconnect(function() {
@@ -291,7 +282,7 @@ describe('mongoose module:', function() {
     it('with promise (gh-3790)', function(done) {
       var mong = new Mongoose();
 
-      mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+      mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
 
       mong.connection.on('open', function() {
         mong.disconnect().then(function() { done(); });
@@ -393,7 +384,7 @@ describe('mongoose module:', function() {
     it('with single mongod', function(done) {
       var mong = new Mongoose();
 
-      mong.connect(uri, {}, function(err) {
+      mong.connect(uri, options, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -406,7 +397,7 @@ describe('mongoose module:', function() {
 
       if (!uri) return done();
 
-      mong.connect(uri, {}, function(err) {
+      mong.connect(uri, options, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -446,7 +437,7 @@ describe('mongoose module:', function() {
 
     it('of result from .connect() (gh-3940)', function(done) {
       var m = new mongoose.Mongoose;
-      m.connect('mongodb://localhost:27017/test').then(function(m) {
+      m.connect('mongodb://localhost:27017/test', options).then(function(m) {
         test(m);
         m.disconnect();
         done();

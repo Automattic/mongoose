@@ -49,7 +49,8 @@ describe('connections:', function() {
 
     it('with autoIndex (gh-5423)', function(done) {
       var promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        autoIndex: false
+        autoIndex: false,
+        useNewUrlParser: true
       });
 
       promise.then(function(conn) {
@@ -67,7 +68,7 @@ describe('connections:', function() {
 
     it('throws helpful error with undefined uri (gh-6763)', function(done) {
       assert.throws(function() {
-        mongoose.createConnection(void 0);
+        mongoose.createConnection(void 0, { useNewUrlParser: true });
       }, /string.*createConnection/);
       done();
     });
@@ -75,7 +76,8 @@ describe('connections:', function() {
     it('resolving with q (gh-5714)', function(done) {
       var bootMongo = Q.defer();
 
-      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
+      var conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
+        { useNewUrlParser: true });
 
       conn.on('connected', function() {
         bootMongo.resolve(this);
@@ -110,7 +112,9 @@ describe('connections:', function() {
         var numReconnected = 0;
         var numReconnect = 0;
         var numClose = 0;
-        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest');
+        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          useNewUrlParser: true
+        });
 
         conn.on('connected', function() {
           ++numConnected;
@@ -177,7 +181,8 @@ describe('connections:', function() {
         var numReconnected = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           reconnectTries: 3,
-          reconnectInterval: 100
+          reconnectInterval: 100,
+          useNewUrlParser: true
         });
 
         conn.on('connected', function() {
@@ -245,7 +250,8 @@ describe('connections:', function() {
         var numDisconnected = 0;
         conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           socketTimeoutMS: 100,
-          poolSize: 1
+          poolSize: 1,
+          useNewUrlParser: true
         });
 
         conn.on('timeout', function() {
@@ -351,18 +357,8 @@ describe('connections:', function() {
     db.close(done);
   });
 
-  it('should accept mongodb://localhost/fake', function(done) {
-    const db = mongoose.createConnection('mongodb://localhost/fake', () => {
-      db.close(done);
-    });
-    assert.ok(db instanceof mongoose.Connection);
-    assert.equal(db.name, 'fake');
-    assert.equal(db.host, 'localhost');
-    assert.equal(db.port, 27017);
-  });
-
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
-    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', () => {
+    var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { useNewUrlParser: true }, () => {
       db.close(done);
     });
     assert.equal(db.pass, 'psw');
@@ -374,7 +370,7 @@ describe('connections:', function() {
 
   it('should accept unix domain sockets', function(done) {
     const host = encodeURIComponent('/tmp/mongodb-27017.sock');
-    var db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
+    var db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`, { useNewUrlParser: true });
     db.catch(() => {});
     assert.equal(db.name, 'fake');
     assert.equal(db.host, '/tmp/mongodb-27017.sock');
@@ -414,7 +410,7 @@ describe('connections:', function() {
 
   describe('connect callbacks', function() {
     it('execute with user:pwd connection strings', function(done) {
-      var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', function() {
+      var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { useNewUrlParser: true }, function() {
         done();
       });
       db.catch(() => {});
@@ -424,7 +420,7 @@ describe('connections:', function() {
       db.close();
     });
     it('execute without user:pwd connection strings', function(done) {
-      var db = mongoose.createConnection('mongodb://localhost/fake', function() {
+      var db = mongoose.createConnection('mongodb://localhost/fake', { useNewUrlParser: true }, function() {
       });
       db.on('error', function(err) {
         assert.ok(err);
@@ -439,7 +435,7 @@ describe('connections:', function() {
     });
 
     it('should return an error if malformed uri passed', function(done) {
-      var db = mongoose.createConnection('mongodb:///fake', function(err) {
+      var db = mongoose.createConnection('mongodb:///fake', { useNewUrlParser: true }, function(err) {
         assert.ok(/hostname/.test(err.message));
         done();
       });
@@ -447,7 +443,7 @@ describe('connections:', function() {
       assert.ok(!db.options);
     });
     it('should use admin db if not specified and user/pass specified', function(done) {
-      var db = mongoose.createConnection('mongodb://u:p@localhost/admin', function() {
+      var db = mongoose.createConnection('mongodb://u:p@localhost/admin', { useNewUrlParser: true }, function() {
         done();
       });
       assert.equal(typeof db.options, 'object');

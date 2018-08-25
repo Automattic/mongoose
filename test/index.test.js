@@ -1,35 +1,26 @@
 'use strict';
 
-var start = require('./common');
-var assert = require('power-assert');
-var mongoose = start.mongoose;
-var Mongoose = mongoose.Mongoose;
-var Schema = mongoose.Schema;
-var random = require('../lib/utils').random;
-var collection = 'blogposts_' + random();
+const start = require('./common');
+const assert = require('power-assert');
+const mongoose = start.mongoose;
+const Mongoose = mongoose.Mongoose;
+const Schema = mongoose.Schema;
+const random = require('../lib/utils').random;
+const collection = 'blogposts_' + random();
 
 const uri = 'mongodb://localhost:27017/mongoose_test';
+
+const options = {
+  useNewUrlParser: true
+};
 
 describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', function(done) {
-      var goose = new Mongoose;
-      var db = goose.connection;
+      const goose = new Mongoose;
+      const db = goose.connection;
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri);
-
-      db.on('open', function() {
-        db.close(function() {
-          done();
-        });
-      });
-    });
-
-    it('with options', function(done) {
-      var goose = new Mongoose;
-      var db = goose.connection;
-
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {});
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, options);
 
       db.on('open', function() {
         db.close(function() {
@@ -39,17 +30,17 @@ describe('mongoose module:', function() {
     });
 
     it('with promise (gh-3790)', function(done) {
-      var goose = new Mongoose;
-      var db = goose.connection;
+      const goose = new Mongoose;
+      const db = goose.connection;
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri).then(function() {
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, options).then(function() {
         db.close(done);
       });
     });
   });
 
   it('legacy pluralize by default (gh-5958)', function(done) {
-    var mongoose = new Mongoose();
+    const mongoose = new Mongoose();
 
     mongoose.model('User', new Schema({}));
 
@@ -58,23 +49,23 @@ describe('mongoose module:', function() {
   });
 
   it('returns legacy pluralize function by default', function(done) {
-    var legacyPluralize = require('mongoose-legacy-pluralize');
-    var mongoose = new Mongoose();
+    const legacyPluralize = require('mongoose-legacy-pluralize');
+    const mongoose = new Mongoose();
 
-    var pluralize = mongoose.pluralize();
+    const pluralize = mongoose.pluralize();
 
     assert.equal(pluralize, legacyPluralize);
     done();
   });
 
   it('sets custom pluralize function (gh-5877)', function(done) {
-    var mongoose = new Mongoose();
+    const mongoose = new Mongoose();
 
     // some custom function of type (str: string) => string
-    var customPluralize = (str) => str;
+    const customPluralize = (str) => str;
     mongoose.pluralize(customPluralize);
 
-    var pluralize = mongoose.pluralize();
+    const pluralize = mongoose.pluralize();
     assert.equal(pluralize, customPluralize);
 
     mongoose.model('User', new Schema({}));
@@ -83,7 +74,7 @@ describe('mongoose module:', function() {
   });
 
   it('{g,s}etting options', function(done) {
-    var mongoose = new Mongoose();
+    const mongoose = new Mongoose();
 
     mongoose.set('a', 'b');
     mongoose.set('long option', 'c');
@@ -152,13 +143,37 @@ describe('mongoose module:', function() {
       name: { type: String, required: true }
     }));
 
-    return mongoose.connect(uri).
+    return mongoose.connect(uri, options).
       then(() => M.updateOne({}, { name: null })).
       then(
         () => assert.ok(false),
         err => assert.ok(err.errors['name'])
       ).
       then(() => mongoose.disconnect());
+  });
+
+  it('useCreateIndex option (gh-6880)', function() {
+    const mongoose = new Mongoose();
+
+    mongoose.set('useCreateIndex', true);
+
+    return mongoose.connect(uri, options).
+      then(() => {
+        const M = mongoose.model('Test', new Schema({
+          name: { type: String, index: true }
+        }));
+
+        M.collection.ensureIndex = function() {
+          throw new Error('Fail');
+        };
+
+        return M.init();
+      }).
+      then(() => {
+        const M = mongoose.model('Test');
+        delete M.$init;
+        return M.init();
+      });
   });
 
   it('toJSON options (gh-6815)', function(done) {
@@ -203,15 +218,15 @@ describe('mongoose module:', function() {
   });
 
   it('declaring global plugins (gh-5690)', function(done) {
-    var mong = new Mongoose();
-    var subSchema = new Schema({ name: String });
-    var schema = new Schema({
+    const mong = new Mongoose();
+    const subSchema = new Schema({ name: String });
+    const schema = new Schema({
       test: [subSchema]
     });
-    var called = 0;
+    let called = 0;
 
-    var calls = [];
-    var preSaveCalls = 0;
+    const calls = [];
+    let preSaveCalls = 0;
     mong.plugin(function(s) {
       calls.push(s);
 
@@ -228,7 +243,7 @@ describe('mongoose module:', function() {
       called++;
     });
 
-    var M = mong.model('GlobalPlugins', schema);
+    const M = mong.model('GlobalPlugins', schema);
 
     assert.equal(called, 1);
     assert.equal(calls.length, 2);
@@ -236,7 +251,7 @@ describe('mongoose module:', function() {
     assert.deepEqual(calls[1].obj, subSchema.obj);
 
     assert.equal(preSaveCalls, 0);
-    mong.connect(start.uri);
+    mong.connect(start.uri, options);
     M.create({ test: [{ name: 'Val' }] }, function(error, doc) {
       assert.ifError(error);
       assert.equal(preSaveCalls, 2);
@@ -252,13 +267,13 @@ describe('mongoose module:', function() {
 
     describe('no callback', function() {
       it('works', function(done) {
-        var mong = new Mongoose();
-        var connections = 0;
-        var disconnections = 0;
-        var pending = 4;
+        const mong = new Mongoose();
+        let connections = 0;
+        let disconnections = 0;
+        let pending = 4;
 
-        mong.connect(process.env.MONGOOSE_TEST_URI || uri);
-        var db = mong.connection;
+        mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
+        const db = mong.connection;
 
         function cb() {
           if (--pending) return;
@@ -277,7 +292,7 @@ describe('mongoose module:', function() {
           cb();
         });
 
-        var db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri);
+        const db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri, options);
 
         db2.on('open', function() {
           connections++;
@@ -294,9 +309,9 @@ describe('mongoose module:', function() {
     });
 
     it('with callback', function(done) {
-      var mong = new Mongoose();
+      const mong = new Mongoose();
 
-      mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+      mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
 
       mong.connection.on('open', function() {
         mong.disconnect(function() {
@@ -306,9 +321,9 @@ describe('mongoose module:', function() {
     });
 
     it('with promise (gh-3790)', function(done) {
-      var mong = new Mongoose();
+      const mong = new Mongoose();
 
-      mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+      mong.connect(process.env.MONGOOSE_TEST_URI || uri, options);
 
       mong.connection.on('open', function() {
         mong.disconnect().then(function() { done(); });
@@ -318,7 +333,7 @@ describe('mongoose module:', function() {
 
   describe('model()', function() {
     it('accessing a model that hasn\'t been defined', function(done) {
-      var mong = new Mongoose(),
+      let mong = new Mongoose(),
           thrown = false;
 
       try {
@@ -333,21 +348,21 @@ describe('mongoose module:', function() {
     });
 
     it('returns the model at creation', function(done) {
-      var Named = mongoose.model('Named', new Schema({name: String}));
-      var n1 = new Named();
+      const Named = mongoose.model('Named', new Schema({name: String}));
+      const n1 = new Named();
       assert.equal(n1.name, null);
-      var n2 = new Named({name: 'Peter Bjorn'});
+      const n2 = new Named({name: 'Peter Bjorn'});
       assert.equal(n2.name, 'Peter Bjorn');
 
-      var schema = new Schema({number: Number});
-      var Numbered = mongoose.model('Numbered', schema, collection);
-      var n3 = new Numbered({number: 1234});
+      const schema = new Schema({number: Number});
+      const Numbered = mongoose.model('Numbered', schema, collection);
+      const n3 = new Numbered({number: 1234});
       assert.equal(n3.number.valueOf(), 1234);
       done();
     });
 
     it('prevents overwriting pre-existing models', function(done) {
-      var m = new Mongoose;
+      const m = new Mongoose;
       m.model('A', new Schema);
 
       assert.throws(function() {
@@ -360,7 +375,7 @@ describe('mongoose module:', function() {
     it('allows passing identical name + schema args', function(done) {
       const m = new Mongoose;
       const schema = new Schema;
-      let model = m.model('A', schema);
+      const model = m.model('A', schema);
 
       assert.doesNotThrow(function() {
         m.model('A', model.schema);
@@ -380,12 +395,12 @@ describe('mongoose module:', function() {
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {
-          var m = new Mongoose;
-          var s1 = new Schema({a: []});
-          var name = 'non-cached-collection-name';
-          var A = m.model(name, s1);
-          var B = m.model(name);
-          var C = m.model(name, 'alternate');
+          const m = new Mongoose;
+          const s1 = new Schema({a: []});
+          const name = 'non-cached-collection-name';
+          const A = m.model(name, s1);
+          const B = m.model(name);
+          const C = m.model(name, 'alternate');
           assert.ok(A.collection.name === B.collection.name);
           assert.ok(A.collection.name !== C.collection.name);
           assert.ok(m.models[name].collection.name !== C.collection.name);
@@ -397,9 +412,9 @@ describe('mongoose module:', function() {
 
     describe('passing object literal schemas', function() {
       it('works', function(done) {
-        var m = new Mongoose;
-        var A = m.model('A', {n: [{age: 'number'}]});
-        var a = new A({n: [{age: '47'}]});
+        const m = new Mongoose;
+        const A = m.model('A', {n: [{age: 'number'}]});
+        const a = new A({n: [{age: '47'}]});
         assert.strictEqual(47, a.n[0].age);
         done();
       });
@@ -408,9 +423,9 @@ describe('mongoose module:', function() {
 
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
-      var mong = new Mongoose();
+      const mong = new Mongoose();
 
-      mong.connect(uri, {}, function(err) {
+      mong.connect(uri, options, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -418,12 +433,12 @@ describe('mongoose module:', function() {
     });
 
     it('with replica set', function(done) {
-      var mong = new Mongoose();
-      var uri = process.env.MONGOOSE_SET_TEST_URI;
+      const mong = new Mongoose();
+      const uri = process.env.MONGOOSE_SET_TEST_URI;
 
       if (!uri) return done();
 
-      mong.connect(uri, {}, function(err) {
+      mong.connect(uri, options, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -462,8 +477,8 @@ describe('mongoose module:', function() {
     });
 
     it('of result from .connect() (gh-3940)', function(done) {
-      var m = new mongoose.Mongoose;
-      m.connect('mongodb://localhost:27017/test').then(function(m) {
+      const m = new mongoose.Mongoose;
+      m.connect('mongodb://localhost:27017/test', options).then(function(m) {
         test(m);
         m.disconnect();
         done();

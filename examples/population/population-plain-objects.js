@@ -1,6 +1,7 @@
 
-var mongoose = require('../../lib');
-var Schema = mongoose.Schema;
+'use strict';
+const mongoose = require('../../lib');
+const Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);
 
@@ -8,18 +9,18 @@ console.log('Running mongoose version %s', mongoose.version);
  * Console schema
  */
 
-var consoleSchema = Schema({
+const consoleSchema = Schema({
   name: String,
   manufacturer: String,
   released: Date
 });
-var Console = mongoose.model('Console', consoleSchema);
+const Console = mongoose.model('Console', consoleSchema);
 
 /**
  * Game schema
  */
 
-var gameSchema = Schema({
+const gameSchema = Schema({
   name: String,
   developer: String,
   released: Date,
@@ -28,7 +29,7 @@ var gameSchema = Schema({
     ref: 'Console'
   }]
 });
-var Game = mongoose.model('Game', gameSchema);
+const Game = mongoose.model('Game', gameSchema);
 
 /**
  * Connect to the console database on localhost with

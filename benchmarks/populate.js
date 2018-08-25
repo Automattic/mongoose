@@ -1,21 +1,22 @@
-var mongoose = require('../');
-var Schema = mongoose.Schema;
-var docs = process.argv[2] ? process.argv[2] | 0 : 100;
+'use strict';
+const mongoose = require('../');
+const Schema = mongoose.Schema;
+const docs = process.argv[2] ? process.argv[2] | 0 : 100;
 
-var A = mongoose.model('A', Schema({name: 'string'}));
+const A = mongoose.model('A', Schema({name: 'string'}));
 
-var nested = Schema({
+const nested = Schema({
   a: {type: Schema.ObjectId, ref: 'A'}
 });
 
-var B = mongoose.model('B', Schema({
+const B = mongoose.model('B', Schema({
   as: [{type: Schema.ObjectId, ref: 'A'}],
   a: {type: Schema.ObjectId, ref: 'A'},
   nested: [nested]
 }));
 
-var start;
-var count = 0;
+let start;
+let count = 0;
 
 mongoose.connect('localhost', 'benchmark-populate', function(err) {
   if (err) {
@@ -27,8 +28,8 @@ mongoose.connect('localhost', 'benchmark-populate', function(err) {
       return done(err);
     }
 
-    var pending = docs;
-    for (var i = 0; i < pending; ++i) {
+    let pending = docs;
+    for (let i = 0; i < pending; ++i) {
       new B({
         as: [a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
         a: a,
@@ -49,7 +50,7 @@ mongoose.connect('localhost', 'benchmark-populate', function(err) {
 });
 
 function test() {
-  var pending = 2;
+  let pending = 2;
 
   B.find().populate('as').populate('a').populate('nested.a').exec(handle);
   B.findOne().populate('as').populate('a').populate('nested.a').exec(handle);

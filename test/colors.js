@@ -2,19 +2,15 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema,
-    MongooseDocumentArray = mongoose.Types.DocumentArray,
-    EmbeddedDocument = require('../lib/types/embedded'),
-    DocumentArray = require('../lib/types/documentarray');
+'use strict';
+
+let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), Schema = mongoose.Schema, MongooseDocumentArray = mongoose.Types.DocumentArray, EmbeddedDocument = require('../lib/types/embedded'), DocumentArray = require('../lib/types/documentarray');
 
 /**
  * setup
  */
 
-var test = new Schema({
+const test = new Schema({
   string: String,
   number: Number,
   date: {
@@ -24,7 +20,7 @@ var test = new Schema({
 });
 
 function TestDoc(schema) {
-  var Subdocument = function() {
+  const Subdocument = function() {
     EmbeddedDocument.call(this, {}, new DocumentArray);
   };
 
@@ -48,8 +44,8 @@ function TestDoc(schema) {
  */
 
 describe('debug: colors', function() {
-  var db;
-  var Test;
+  let db;
+  let Test;
 
   before(function() {
     db = start();
@@ -61,7 +57,7 @@ describe('debug: colors', function() {
   });
 
   it('Document', function(done) {
-    var date = new Date();
+    const date = new Date();
 
     Test.create([{
       string: 'qwerty',
@@ -83,12 +79,12 @@ describe('debug: colors', function() {
         .exec(function(err, docs) {
           assert.ifError(err);
 
-          var colorfull = require('util').inspect(docs, {
+          const colorfull = require('util').inspect(docs, {
             depth: null,
             colors: true
           });
 
-          var colorless = require('util').inspect(docs, {
+          const colorless = require('util').inspect(docs, {
             depth: null,
             colors: false
           });
@@ -103,21 +99,21 @@ describe('debug: colors', function() {
   });
 
   it('MongooseDocumentArray', function() {
-    var Subdocument = TestDoc();
+    const Subdocument = TestDoc();
 
-    var sub1 = new Subdocument();
+    const sub1 = new Subdocument();
     sub1.string = 'string';
     sub1.number = 12345;
     sub1.date = new Date();
 
-    var docs = new MongooseDocumentArray([sub1]);
+    const docs = new MongooseDocumentArray([sub1]);
 
-    var colorfull = require('util').inspect(docs, {
+    const colorfull = require('util').inspect(docs, {
       depth: null,
       colors: true
     });
 
-    var colorless = require('util').inspect(docs, {
+    const colorless = require('util').inspect(docs, {
       depth: null,
       colors: false
     });

@@ -14,9 +14,9 @@ const Schema = mongoose.Schema;
 const VersionError = mongoose.Error.VersionError;
 
 describe('versioning', function() {
-  var db;
-  var Comments;
-  var BlogPost;
+  let db;
+  let Comments;
+  let BlogPost;
 
   before(function() {
     db = start();
@@ -69,9 +69,9 @@ describe('versioning', function() {
   });
 
   it('works', function(done) {
-    var V = db.model('Versioning');
+    const V = db.model('Versioning');
 
-    var doc = new V;
+    const doc = new V;
     doc.title = 'testing versioning';
     doc.date = new Date;
     doc.meta.date = new Date;
@@ -94,9 +94,9 @@ describe('versioning', function() {
     doc.arr = [['2d']];
 
     function save(a, b, cb) {
-      var e;
+      let e;
       function lookup() {
-        var a1, b1;
+        let a1, b1;
         V.findById(a, function(err, a_) {
           if (err && !e) {
             e = err;
@@ -158,7 +158,7 @@ describe('versioning', function() {
 
       a.comments.addToSet({title: 'aven'});
       a.comments.addToSet({title: 'avengers'});
-      var d = a.$__delta();
+      let d = a.$__delta();
 
       assert.equal(d[0].__v, undefined, 'version should not be included in where clause');
       assert.ok(!d[1].$set);
@@ -185,7 +185,7 @@ describe('versioning', function() {
       a.comments.addToSet({title: 'monkey'});
       b.markModified('comments');
 
-      var d = b.$__delta();
+      const d = b.$__delta();
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
 
       save(a, b, test12);
@@ -272,7 +272,7 @@ describe('versioning', function() {
       assert.equal(err.version, b._doc.__v - 1);
       assert.deepEqual(err.modifiedPaths, ['numbers', 'numbers.2']);
       a.set('arr.0.0', 'updated');
-      var d = a.$__delta();
+      const d = a.$__delta();
       assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');
       assert.ok(!('$inc' in d[1]));
       save(a, b, test5);
@@ -309,7 +309,7 @@ describe('versioning', function() {
     }
 
     doc.save(function(err) {
-      var a, b;
+      let a, b;
       assert.ifError(err);
       // test 2 concurrent ops
       V.findById(doc, function(err, _a) {
@@ -330,9 +330,9 @@ describe('versioning', function() {
   });
 
   it('versioning without version key', function(done) {
-    var V = db.model('Versioning');
+    const V = db.model('Versioning');
 
-    var doc = new V;
+    const doc = new V;
     doc.numbers = [3, 4, 5, 6, 7];
     doc.comments = [
       {title: 'does it work?', date: new Date},
@@ -347,7 +347,7 @@ describe('versioning', function() {
       V.findById(doc).select('numbers comments').exec(function(err, doc) {
         assert.ifError(err);
         doc.comments[0].title = 'no version was included';
-        var d = doc.$__delta();
+        const d = doc.$__delta();
         assert.ok(!d[0].__v, 'no version key was selected so should not be included');
         done();
       });
@@ -357,9 +357,9 @@ describe('versioning', function() {
   });
 
   it('version works with strict docs', function(done) {
-    var schema = new Schema({str: ['string']}, {strict: true, collection: 'versionstrict_' + random()});
-    var M = db.model('VersionStrict', schema);
-    var m = new M({str: ['death', 'to', 'smootchy']});
+    const schema = new Schema({str: ['string']}, {strict: true, collection: 'versionstrict_' + random()});
+    const M = db.model('VersionStrict', schema);
+    const m = new M({str: ['death', 'to', 'smootchy']});
     m.save(function(err) {
       assert.ifError(err);
       M.find(m, function(err, m) {
@@ -383,15 +383,15 @@ describe('versioning', function() {
   });
 
   it('version works with existing unversioned docs', function(done) {
-    var V = db.model('Versioning');
+    const V = db.model('Versioning');
 
-    V.collection.insert({title: 'unversioned', numbers: [1, 2, 3]}, {safe: true}, function(err) {
+    V.collection.insertOne({title: 'unversioned', numbers: [1, 2, 3]}, {safe: true}, function(err) {
       assert.ifError(err);
       V.findOne({title: 'unversioned'}, function(err, d) {
         assert.ifError(err);
         assert.ok(!d._doc.__v);
         d.numbers.splice(1, 1, 10);
-        var o = d.$__delta();
+        const o = d.$__delta();
         assert.equal(o[0].__v, undefined);
         assert.ok(o[1].$inc);
         assert.equal(o[1].$inc.__v, 1);
@@ -409,11 +409,11 @@ describe('versioning', function() {
   });
 
   it('versionKey is configurable', function(done) {
-    var schema = new Schema(
+    const schema = new Schema(
       {configured: 'bool'},
       {versionKey: 'lolwat', collection: 'configuredversion' + random()});
-    var V = db.model('ConfiguredVersionKey', schema);
-    var v = new V({configured: true});
+    const V = db.model('ConfiguredVersionKey', schema);
+    const v = new V({configured: true});
     v.save(function(err) {
       assert.ifError(err);
       V.findById(v, function(err1, v) {
@@ -425,8 +425,8 @@ describe('versioning', function() {
   });
 
   it('can be disabled', function(done) {
-    var schema = new Schema({x: ['string']}, {versionKey: false});
-    var M = db.model('disabledVersioning', schema, 's' + random());
+    const schema = new Schema({x: ['string']}, {versionKey: false});
+    const M = db.model('disabledVersioning', schema, 's' + random());
     M.create({x: ['hi']}, function(err, doc) {
       assert.ifError(err);
       assert.equal('__v' in doc._doc, false);
@@ -436,7 +436,7 @@ describe('versioning', function() {
         assert.equal('__v' in doc._doc, false);
 
         doc.set('x.0', 'updated');
-        var d = doc.$__delta()[0];
+        const d = doc.$__delta()[0];
         assert.equal(d.__v, undefined, 'version should not be added to where clause');
 
         M.collection.findOne({_id: doc._id}, function(err, doc) {
@@ -448,9 +448,9 @@ describe('versioning', function() {
   });
 
   it('works with numbericAlpha paths', function(done) {
-    var M = db.model('Versioning');
-    var m = new M({mixed: {}});
-    var path = 'mixed.4a';
+    const M = db.model('Versioning');
+    const m = new M({mixed: {}});
+    const path = 'mixed.4a';
     m.set(path, 2);
     m.save(function(err) {
       assert.ifError(err);
@@ -460,9 +460,9 @@ describe('versioning', function() {
 
   describe('doc.increment()', function() {
     it('works without any other changes (gh-1475)', function(done) {
-      var V = db.model('Versioning');
+      const V = db.model('Versioning');
 
-      var doc = new V;
+      const doc = new V;
       doc.save(function(err) {
         assert.ifError(err);
         assert.equal(doc.__v, 0);
@@ -486,23 +486,23 @@ describe('versioning', function() {
 
   describe('versioning is off', function() {
     it('when { safe: false } is set (gh-1520)', function(done) {
-      var schema1 = new Schema({title: String}, {safe: false});
+      const schema1 = new Schema({title: String}, {safe: false});
       assert.equal(schema1.options.versionKey, false);
       done();
     });
     it('when { safe: { w: 0 }} is set (gh-1520)', function(done) {
-      var schema1 = new Schema({title: String}, {safe: {w: 0}});
+      const schema1 = new Schema({title: String}, {safe: {w: 0}});
       assert.equal(schema1.options.versionKey, false);
       done();
     });
   });
 
   it('gh-1898', function(done) {
-    var schema = new Schema({tags: [String], name: String});
+    const schema = new Schema({tags: [String], name: String});
 
-    var M = db.model('gh-1898', schema, 'gh-1898');
+    const M = db.model('gh-1898', schema, 'gh-1898');
 
-    var m = new M({tags: ['eggs']});
+    const m = new M({tags: ['eggs']});
 
     m.save(function(err) {
       assert.ifError(err);
@@ -519,13 +519,13 @@ describe('versioning', function() {
   });
 
   it('can remove version key from toObject() (gh-2675)', function(done) {
-    var schema = new Schema({name: String});
-    var M = db.model('gh2675', schema, 'gh2675');
+    const schema = new Schema({name: String});
+    const M = db.model('gh2675', schema, 'gh2675');
 
-    var m = new M();
+    const m = new M();
     m.save(function(err, m) {
       assert.ifError(err);
-      var obj = m.toObject();
+      let obj = m.toObject();
       assert.equal(obj.__v, 0);
       obj = m.toObject({versionKey: false});
       assert.equal(obj.__v, undefined);
@@ -560,10 +560,10 @@ describe('versioning', function() {
   });
 
   it('copying doc works (gh-5779)', function(done) {
-    var schema = new Schema({ subdocs: [{ a: Number }] });
-    var M = db.model('gh5779', schema, 'gh5779');
-    var m = new M({ subdocs: [] });
-    var m2;
+    const schema = new Schema({ subdocs: [{ a: Number }] });
+    const M = db.model('gh5779', schema, 'gh5779');
+    const m = new M({ subdocs: [] });
+    let m2;
 
     m.save().
       then(function() {

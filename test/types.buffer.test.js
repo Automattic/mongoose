@@ -2,13 +2,9 @@
  * Module dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = require('./common').mongoose,
-    Schema = mongoose.Schema,
-    random = require('../lib/utils').random,
-    MongooseBuffer = mongoose.Types.Buffer,
-    Buffer = require('safe-buffer').Buffer;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = require('./common').mongoose, Schema = mongoose.Schema, random = require('../lib/utils').random, MongooseBuffer = mongoose.Types.Buffer, Buffer = require('safe-buffer').Buffer;
 
 function valid(v) {
   return !v || v.length > 10;
@@ -23,9 +19,9 @@ function valid(v) {
  */
 
 describe('types.buffer', function() {
-  var subBuf;
-  var UserBuffer;
-  var db;
+  let subBuf;
+  let UserBuffer;
+  let db;
 
   before(function() {
     db = start();
@@ -49,16 +45,16 @@ describe('types.buffer', function() {
   });
 
   it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
-    var a = new MongooseBuffer;
+    let a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
     assert.ok(a.isMongooseBuffer);
     assert.equal(true, Buffer.isBuffer(a));
 
     a = new MongooseBuffer([195, 188, 98, 101, 114]);
-    var b = new MongooseBuffer('buffer shtuffs are neat');
-    var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
-    var d = new MongooseBuffer(0);
+    const b = new MongooseBuffer('buffer shtuffs are neat');
+    const c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
+    const d = new MongooseBuffer(0);
 
     assert.equal(a.toString('utf8'), 'über');
     assert.equal(b.toString('utf8'), 'buffer shtuffs are neat');
@@ -68,10 +64,10 @@ describe('types.buffer', function() {
   });
 
   it('buffer validation', function(done) {
-    var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
-      var t = new User({
+      const t = new User({
         name: 'test validation'
       });
 
@@ -111,12 +107,12 @@ describe('types.buffer', function() {
   });
 
   it('buffer storage', function(done) {
-    var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
-      var sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
+      const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
 
-      var tj = new User({
+      const tj = new User({
         name: 'tj',
         serial: sampleBuffer,
         required: Buffer.from(sampleBuffer)
@@ -127,8 +123,8 @@ describe('types.buffer', function() {
         User.find({}, function(err, users) {
           assert.ifError(err);
           assert.equal(users.length, 1);
-          var user = users[0];
-          var base64 = sampleBuffer.toString('base64');
+          const user = users[0];
+          const base64 = sampleBuffer.toString('base64');
           assert.equal(base64,
             user.serial.toString('base64'), 'buffer mismatch');
           assert.equal(base64,
@@ -140,12 +136,12 @@ describe('types.buffer', function() {
   });
 
   it('test write markModified', function(done) {
-    var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
-      var sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
+      const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
 
-      var tj = new User({
+      const tj = new User({
         name: 'tj',
         serial: sampleBuffer,
         required: sampleBuffer
@@ -163,7 +159,7 @@ describe('types.buffer', function() {
           User.findById(tj._id, function(err, user) {
             assert.ifError(err);
 
-            var expectedBuffer = Buffer.from([123, 97, 97, 42, 11]);
+            const expectedBuffer = Buffer.from([123, 97, 97, 42, 11]);
 
             assert.equal(expectedBuffer.toString('base64'),
               user.serial.toString('base64'), 'buffer mismatch');
@@ -182,7 +178,7 @@ describe('types.buffer', function() {
             }
 
             // buffer method tests
-            var fns = {
+            const fns = {
               writeUInt8: function() {
                 reset(tj);
                 not(tj);
@@ -331,7 +327,7 @@ describe('types.buffer', function() {
                 not(tj);
                 tj.required.fill(0);
                 is(tj);
-                for (var i = 0; i < tj.required.length; i++) {
+                for (let i = 0; i < tj.required.length; i++) {
                   assert.strictEqual(tj.required[i], 0);
                 }
               },
@@ -344,7 +340,7 @@ describe('types.buffer', function() {
               }
             };
 
-            var keys = Object.keys(fns),
+            let keys = Object.keys(fns),
                 i = keys.length,
                 key;
 
@@ -370,7 +366,7 @@ describe('types.buffer', function() {
   });
 
   it('can be set to null', function(done) {
-    var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
+    let User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
         user = new User({array: [null], required: Buffer.alloc(1)});
     user.save(function(err, doc) {
       assert.ifError(err);
@@ -384,7 +380,7 @@ describe('types.buffer', function() {
   });
 
   it('can be updated to null', function(done) {
-    var User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
+    let User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
         user = new User({array: [null], required: Buffer.alloc(1), serial: Buffer.alloc(1)});
     user.save(function(err, doc) {
       assert.ifError(err);
@@ -398,8 +394,8 @@ describe('types.buffer', function() {
 
   describe('#toObject', function() {
     it('retains custom subtypes', function(done) {
-      var buf = new MongooseBuffer(0);
-      var out = buf.toObject(2);
+      const buf = new MongooseBuffer(0);
+      const out = buf.toObject(2);
       // validate the drivers Binary type output retains the option
       assert.equal(out.sub_type, 2);
       done();
@@ -407,7 +403,7 @@ describe('types.buffer', function() {
   });
 
   describe('subtype', function() {
-    var bufferSchema, B;
+    let bufferSchema, B;
 
     before(function(done) {
       bufferSchema = new Schema({buf: Buffer});
@@ -416,20 +412,20 @@ describe('types.buffer', function() {
     });
 
     it('default value', function(done) {
-      var b = new B({buf: Buffer.from('hi')});
+      const b = new B({buf: Buffer.from('hi')});
       assert.strictEqual(0, b.buf._subtype);
       done();
     });
 
     it('method works', function(done) {
-      var b = new B({buf: Buffer.from('hi')});
+      const b = new B({buf: Buffer.from('hi')});
       b.buf.subtype(128);
       assert.strictEqual(128, b.buf._subtype);
       done();
     });
 
     it('is stored', function(done) {
-      var b = new B({buf: Buffer.from('hi')});
+      const b = new B({buf: Buffer.from('hi')});
       b.buf.subtype(128);
       b.save(function(err) {
         if (err) {
@@ -448,7 +444,7 @@ describe('types.buffer', function() {
     });
 
     it('changes are retained', function(done) {
-      var b = new B({buf: Buffer.from('hi')});
+      const b = new B({buf: Buffer.from('hi')});
       b.buf.subtype(128);
       b.save(function(err) {
         if (err) {
@@ -481,11 +477,51 @@ describe('types.buffer', function() {
     });
 
     it('cast from number (gh-3764)', function(done) {
-      var schema = new Schema({buf: Buffer});
-      var MyModel = mongoose.model('gh3764', schema);
+      const schema = new Schema({buf: Buffer});
+      const MyModel = mongoose.model('gh3764', schema);
 
-      var doc = new MyModel({buf: 9001});
+      const doc = new MyModel({buf: 9001});
       assert.equal(doc.buf.length, 1);
+      done();
+    });
+
+    it('cast from string', function(done) {
+      const schema = new Schema({buf: Buffer});
+      const MyModel = mongoose.model('bufferFromString', schema);
+
+      const doc = new MyModel({buf: 'hi'});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), 'hi');
+      done();
+    });
+
+    it('cast from array', function(done) {
+      const schema = new Schema({buf: Buffer});
+      const MyModel = mongoose.model('bufferFromArray', schema);
+
+      const doc = new MyModel({buf: [195, 188, 98, 101, 114]});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), 'über');
+      done();
+    });
+
+    it('cast from Binary', function(done) {
+      const schema = new Schema({buf: Buffer});
+      const MyModel = mongoose.model('bufferFromBinary', schema);
+
+      const doc = new MyModel({buf: new MongooseBuffer.Binary([228, 189, 160, 229, 165, 189], 0)});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), '你好');
+      done();
+    });
+
+    it('cast from json (gh-6863)', function(done) {
+      const schema = new Schema({buf: Buffer});
+      const MyModel = mongoose.model('gh6863', schema);
+
+      const doc = new MyModel({buf: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51]}});
+      assert.ok(doc.buf instanceof Buffer);
+      assert.equal(doc.buf.toString('utf8'), 'gh-6863');
       done();
     });
   });

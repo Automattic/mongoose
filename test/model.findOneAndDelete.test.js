@@ -15,12 +15,12 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model: findOneAndDelete:', function() {
-  var Comments;
-  var BlogPost;
-  var modelname;
-  var collection;
-  var strictSchema;
-  var db;
+  let Comments;
+  let BlogPost;
+  let modelname;
+  let collection;
+  let strictSchema;
+  let db;
 
   before(function() {
     Comments = new Schema;
@@ -53,7 +53,7 @@ describe('model: findOneAndDelete:', function() {
         return this.get('title') + ' by ' + this.get('author');
       })
       .set(function(val) {
-        var split = val.split(' by ');
+        const split = val.split(' by ');
         this.set('title', split[0]);
         this.set('author', split[1]);
       });
@@ -183,7 +183,7 @@ describe('model: findOneAndDelete:', function() {
 
   it('executes when a callback is passed', function(done) {
     const M = db.model(modelname, collection + random());
-    let _id = new DocumentObjectId;
+    const _id = new DocumentObjectId;
     let pending = 2;
 
     M.findByIdAndDelete(_id, {select: 'name'}, cb);
@@ -352,23 +352,23 @@ describe('model: findOneAndDelete:', function() {
 
   describe('middleware', function() {
     it('works', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
-      var preCount = 0;
+      let preCount = 0;
       s.pre('findOneAndDelete', function() {
         ++preCount;
       });
 
-      var postCount = 0;
+      let postCount = 0;
       s.post('findOneAndDelete', function() {
         ++postCount;
       });
 
-      var Breakfast = db.model('gh-439', s);
-      var breakfast = new Breakfast({
+      const Breakfast = db.model('gh-439', s);
+      const breakfast = new Breakfast({
         base: 'eggs'
       });
 
@@ -389,23 +389,23 @@ describe('model: findOneAndDelete:', function() {
     });
 
     it('works with exec() (gh-439)', function(done) {
-      var s = new Schema({
+      const s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
-      var preCount = 0;
+      let preCount = 0;
       s.pre('findOneAndDelete', function() {
         ++preCount;
       });
 
-      var postCount = 0;
+      let postCount = 0;
       s.post('findOneAndDelete', function() {
         ++postCount;
       });
 
-      var Breakfast = db.model('Breakfast', s);
-      var breakfast = new Breakfast({
+      const Breakfast = db.model('Breakfast', s);
+      const breakfast = new Breakfast({
         base: 'eggs'
       });
 

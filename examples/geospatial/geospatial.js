@@ -1,15 +1,17 @@
 // import async to make control flow simplier
-var async = require('async');
+'use strict';
+
+const async = require('async');
 
 // import the rest of the normal stuff
-var mongoose = require('../../lib');
+const mongoose = require('../../lib');
 
 require('./person.js')();
 
-var Person = mongoose.model('Person');
+const Person = mongoose.model('Person');
 
 // define some dummy data
-var data = [
+const data = [
   {
     name: 'bill',
     age: 25,
@@ -83,7 +85,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
         // we can also just query straight off of the model. For more
         // information about geospatial queries and indexes, see
         // http://docs.mongodb.org/manual/applications/geospatial-indexes/
-        var coords = [7, 7];
+        const coords = [7, 7];
         Person.find({loc: {$nearSphere: coords}}).limit(1).exec(function(err, res) {
           console.log('Closest to %s is %s', coords, res);
           cleanup();

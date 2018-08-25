@@ -15,6 +15,11 @@ if (process.env.D === '1') {
   mongoose.set('debug', true);
 }
 
+// For 3.1.3 deprecations
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useNewUrlParser', true);
+
 /**
  * Override all Collection related queries to keep count
  */
@@ -34,7 +39,7 @@ if (process.env.D === '1') {
   'isCapped',
   'options'
 ].forEach(function(method) {
-  var oldMethod = Collection.prototype[method];
+  const oldMethod = Collection.prototype[method];
 
   Collection.prototype[method] = function() {
     return oldMethod.apply(this, arguments);
@@ -45,7 +50,7 @@ if (process.env.D === '1') {
  * Override Collection#onOpen to keep track of connections
  */
 
-var oldOnOpen = Collection.prototype.onOpen;
+const oldOnOpen = Collection.prototype.onOpen;
 
 Collection.prototype.onOpen = function() {
   return oldOnOpen.apply(this, arguments);
@@ -55,7 +60,7 @@ Collection.prototype.onOpen = function() {
  * Override Collection#onClose to keep track of disconnections
  */
 
-var oldOnClose = Collection.prototype.onClose;
+const oldOnClose = Collection.prototype.onClose;
 
 Collection.prototype.onClose = function() {
   return oldOnClose.apply(this, arguments);
@@ -70,7 +75,7 @@ Collection.prototype.onClose = function() {
 
 module.exports = function(options) {
   options || (options = {});
-  var uri;
+  let uri;
 
   if (options.uri) {
     uri = options.uri;
@@ -79,10 +84,10 @@ module.exports = function(options) {
     uri = module.exports.uri;
   }
 
-  var noErrorListener = !!options.noErrorListener;
+  const noErrorListener = !!options.noErrorListener;
   delete options.noErrorListener;
 
-  var conn = mongoose.createConnection(uri, options);
+  const conn = mongoose.createConnection(uri, options);
 
   if (noErrorListener) {
     return conn;
@@ -104,7 +109,7 @@ before(function(done) {
     if (err) {
       return done(err);
     }
-    var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+    const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
     if (mongo36) {
       mongoose.set('usePushEach', true);
     }
@@ -129,16 +134,16 @@ module.exports.mongoose = mongoose;
  */
 
 module.exports.mongodVersion = function(cb) {
-  var db = module.exports();
+  const db = module.exports();
   db.on('error', cb);
 
   db.on('open', function() {
-    var admin = db.db.admin();
+    const admin = db.db.admin();
     admin.serverStatus(function(err, info) {
       if (err) {
         return cb(err);
       }
-      var version = info.version.split('.').map(function(n) {
+      const version = info.version.split('.').map(function(n) {
         return parseInt(n, 10);
       });
       db.close(function() {
@@ -149,7 +154,7 @@ module.exports.mongodVersion = function(cb) {
 };
 
 function dropDBs(done) {
-  var db = module.exports({ noErrorListener: true });
+  const db = module.exports({ noErrorListener: true });
   db.once('open', function() {
     // drop the default test database
     db.db.dropDatabase(function() {

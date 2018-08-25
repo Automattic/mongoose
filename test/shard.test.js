@@ -1,24 +1,28 @@
-var start = require('./common'),
+'use strict';
+
+let start = require('./common'),
     assert = require('power-assert'),
+    chalk = require('chalk'),
     random = require('../lib/utils').random,
     mongoose = start.mongoose,
     Schema = mongoose.Schema;
 
-var uri = process.env.MONGOOSE_SHARD_TEST_URI;
+const uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
   console.log(
-    '\033[31m', '\n', 'You\'re not testing shards!',
-    '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n',
-    'e.g: `mongodb://localhost:27017/database', '\n',
-    'Sharding must already be enabled on your database',
-    '\033[39m'
+    chalk.red(
+      '\n', 'You\'re not testing shards!',
+      '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n',
+      'e.g: `mongodb://localhost:27017/database', '\n',
+      'Sharding must already be enabled on your database'
+    )
   );
 
   return;
 }
 
-var schema = new Schema({
+const schema = new Schema({
   name: String,
   age: Number,
   likes: [String]
@@ -28,12 +32,12 @@ var schema = new Schema({
 // we add a matching index
 schema.index({name: 1, age: 1});
 
-var collection = 'shardperson_' + random();
+const collection = 'shardperson_' + random();
 mongoose.model('ShardPerson', schema, collection);
 
-var version;
-var greaterThan20x;
-var db;
+let version;
+let greaterThan20x;
+let db;
 describe('shard', function() {
   before(function(done) {
     db = start({uri: uri});
@@ -50,12 +54,12 @@ describe('shard', function() {
     });
     db.on('open', function() {
       // set up a sharded test collection
-      var P = db.model('ShardPerson', collection);
+      const P = db.model('ShardPerson', collection);
 
       // an existing index on shard key is required before sharding
       P.on('index', function() {
         // enable sharding on our collection
-        var cmd = {};
+        const cmd = {};
         cmd.shardcollection = db.name + '.' + collection;
         cmd.key = P.schema.options.shardkey;
 
@@ -77,8 +81,8 @@ describe('shard', function() {
   });
 
   it('can read and write to a shard', function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
 
     P.create({name: 'ryu', age: 25, likes: ['street fighting']}, function(err, ryu) {
       assert.ifError(err);
@@ -92,10 +96,10 @@ describe('shard', function() {
   });
 
   it('save() and remove() works with shard keys transparently', function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
 
-    var zangief = new P({name: 'Zangief', age: 33});
+    const zangief = new P({name: 'Zangief', age: 33});
     zangief.save(function(err) {
       assert.ifError(err);
 
@@ -132,10 +136,10 @@ describe('shard', function() {
   });
 
   it('inserting to a sharded collection without the full shard key fails', function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
 
-    var pending = 6;
+    let pending = 6;
 
     P.create({name: 'ryu', likes: ['street fighting']}, function(err) {
       assert.ok(err);
@@ -182,7 +186,7 @@ describe('shard', function() {
       }
     });
 
-    var p = new P;
+    const p = new P;
     p.save(function(err) {
       assert.ok(err);
       assert.ok(err.message);
@@ -194,8 +198,8 @@ describe('shard', function() {
   });
 
   it('updating a sharded collection without the full shard key fails', function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
 
     P.create({name: 'ken', age: 27}, function(err, ken) {
       assert.ifError(err);
@@ -231,8 +235,8 @@ describe('shard', function() {
   });
 
   it('updating shard key values fails', function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
     P.create({name: 'chun li', age: 19, likes: ['street fighting']}, function(err, chunli) {
       assert.ifError(err);
 
@@ -264,8 +268,8 @@ describe('shard', function() {
   });
 
   it('allows null shard key values', function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
 
     P.create({name: null, age: 27}, function(err, ken) {
       assert.ifError(err);
@@ -277,8 +281,8 @@ describe('shard', function() {
   });
 
   after(function(done) {
-    var db = start({uri: uri});
-    var P = db.model('ShardPerson', collection);
+    const db = start({uri: uri});
+    const P = db.model('ShardPerson', collection);
     P.collection.drop(function() {
       db.close();
       done();

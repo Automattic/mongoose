@@ -23,7 +23,7 @@ describe('collections:', function() {
       done();
     }
 
-    collection.insert({}, {}, function() {
+    collection.insertOne({}, {}, function() {
       assert.ok(connected);
       inserted = true;
       db.close();
@@ -31,14 +31,14 @@ describe('collections:', function() {
     });
 
     const uri = 'mongodb://localhost:27017/mongoose_test';
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri, { useNewUrlParser: true }, function(err) {
       connected = !err;
       finish();
     });
   });
 
   it('methods should that throw (unimplemented)', function(done) {
-    var collection = new Collection('test', mongoose.connection),
+    let collection = new Collection('test', mongoose.connection),
         thrown = false;
 
     try {
@@ -72,9 +72,9 @@ describe('collections:', function() {
     thrown = false;
 
     try {
-      collection.insert();
+      collection.insertOne();
     } catch (e) {
-      assert.ok(/unimplemented/.test(e.message));
+      assert.ok(/unimplemented/.test(e.message), e.message);
       thrown = true;
     }
 

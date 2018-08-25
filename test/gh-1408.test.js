@@ -3,32 +3,31 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, Schema = mongoose.Schema;
 
 describe('documents should not be converted to _id (gh-1408)', function() {
   it('if an embedded doc', function(done) {
     this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
-    var db = start();
+    const db = start();
 
-    var PreferenceSchema = new Schema({
+    const PreferenceSchema = new Schema({
       _id: {type: Schema.ObjectId, auto: true},
       preference: {type: String, required: true},
       value: {type: Schema.Types.Mixed}
     }, {versionKey: false});
 
-    var BrandSchema = new Schema({
+    const BrandSchema = new Schema({
       settings: {
         preferences: [PreferenceSchema]
       }
     });
 
-    var A = db.model('gh-1408', BrandSchema);
+    const A = db.model('gh-1408', BrandSchema);
 
-    var a = new A({
+    const a = new A({
       settings: {
         preferences:
          [{preference: 'group_colors', value: false},
@@ -45,7 +44,7 @@ describe('documents should not be converted to _id (gh-1408)', function() {
       A.findById(a, function(err, doc) {
         if (err) return done(err);
 
-        var newData = {
+        const newData = {
           settings: {
             preferences:
              [{preference: 'group_colors', value: true},

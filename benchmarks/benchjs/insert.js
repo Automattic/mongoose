@@ -1,12 +1,13 @@
-var mongoose = require('../../lib');
-var Benchmark = require('benchmark');
+'use strict';
+const mongoose = require('../../lib');
+const Benchmark = require('benchmark');
 
-var suite = new Benchmark.Suite();
+const suite = new Benchmark.Suite();
 
-var Schema = mongoose.Schema;
-var mongo = require('mongodb');
-var utils = require('../../lib/utils.js');
-var ObjectId = Schema.Types.ObjectId;
+const Schema = mongoose.Schema;
+const mongo = require('mongodb');
+const utils = require('../../lib/utils.js');
+const ObjectId = Schema.Types.ObjectId;
 
 // to make things work in the way the are normally described online...
 /*
@@ -28,9 +29,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       throw err;
     }
 
-    var db = client.db('mongoose-bench');
+    const db = client.db('mongoose-bench');
 
-    var Comments = new Schema;
+    const Comments = new Schema;
     Comments.add({
       title: String,
       date: Date,
@@ -38,7 +39,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       comments: [Comments]
     });
 
-    var BlogPost = new Schema({
+    let BlogPost = new Schema({
       title: String,
       author: String,
       slug: String,
@@ -59,7 +60,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     });
 
-    var blogData = {
+    const blogData = {
       title: 'dummy post',
       author: 'somebody',
       slug: 'test.post',
@@ -72,7 +73,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       def: 'THANGS!!!',
       comments: []
     };
-    var commentData = {
+    const commentData = {
       title: 'test comment',
       date: new Date(),
       body: 'this be some crazzzyyyyy text that would go in a comment',
@@ -82,27 +83,27 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         body: 'texttt'
       }]
     };
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
-    var data = {
+    const data = {
       name: 'name',
       age: 0,
       likes: ['dogs', 'cats', 'pizza'],
       address: ' Nowhere-ville USA'
     };
 
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       name: String,
       age: Number,
       likes: [String],
       address: String
     });
 
-    var User = mongoose.model('User', UserSchema);
+    const User = mongoose.model('User', UserSchema);
     BlogPost = mongoose.model('BlogPost', BlogPost);
-    var user = db.collection('user');
-    var blogpost = db.collection('blogpost');
+    const user = db.collection('user');
+    const blogpost = db.collection('blogpost');
 
     function closeDB() {
       mongoose.connection.db.dropDatabase(function() {
@@ -114,7 +115,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     suite.add('Insert - Mongoose - Basic', {
       defer: true,
       fn: function(deferred) {
-        var nData = utils.clone(data);
+        const nData = utils.clone(data);
         User.create(nData, function(err) {
           if (err) {
             throw err;
@@ -125,7 +126,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Insert - Driver - Basic', {
       defer: true,
       fn: function(deferred) {
-        var nData = utils.clone(data);
+        const nData = utils.clone(data);
         user.insert(nData, function(err) {
           if (err) {
             throw err;
@@ -136,7 +137,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Insert - Mongoose - Embedded Docs', {
       defer: true,
       fn: function(deferred) {
-        var bp = utils.clone(blogData);
+        const bp = utils.clone(blogData);
         BlogPost.create(bp, function(err) {
           if (err) {
             throw err;
@@ -147,7 +148,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }).add('Insert - Driver - Embedded Docs', {
       defer: true,
       fn: function(deferred) {
-        var bp = utils.clone(blogData);
+        const bp = utils.clone(blogData);
         blogpost.insert(bp, function(err) {
           if (err) {
             throw err;
@@ -163,9 +164,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }).on('complete', function() {
         closeDB();
         if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
-          var outObj = {};
+          const outObj = {};
           this.forEach(function(item) {
-            var out = {};
+            const out = {};
             out.stats = item.stats;
             delete out.stats.sample;
             out.ops = item.hz;

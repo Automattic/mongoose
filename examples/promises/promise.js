@@ -1,15 +1,17 @@
 // import async to make control flow simplier
-var async = require('async');
+'use strict';
+
+const async = require('async');
 
 // import the rest of the normal stuff
-var mongoose = require('../../lib');
+const mongoose = require('../../lib');
 
 require('./person.js')();
 
-var Person = mongoose.model('Person');
+const Person = mongoose.model('Person');
 
 // define some dummy data
-var data = [
+const data = [
   {
     name: 'bill',
     age: 25,
@@ -52,7 +54,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     }
 
     // create a promise (get one from the query builder)
-    var prom = Person.find({age: {$lt: 1000}}).exec();
+    const prom = Person.find({age: {$lt: 1000}}).exec();
 
     // add a callback on the promise. This will be called on both error and
     // complete
@@ -75,7 +77,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     // that we defined will all fire after the initial promise is fulfilled
     prom.then(function(people) {
       // just getting the stuff for the next query
-      var ids = people.map(function(p) {
+      const ids = people.map(function(p) {
         return p._id;
       });
 

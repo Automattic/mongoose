@@ -13,7 +13,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('schema select option', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -24,20 +24,20 @@ describe('schema select option', function() {
   });
 
   it('excluding paths through schematype', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       thin: Boolean,
       name: {type: String, select: false},
       docs: [new Schema({bool: Boolean, name: {type: String, select: false}})]
     });
 
-    var S = db.model('ExcludingBySchemaType', schema);
+    const S = db.model('ExcludingBySchemaType', schema);
     S.create({thin: true, name: 'the excluded', docs: [{bool: true, name: 'test'}]}, function(err, s) {
       assert.ifError(err);
       assert.equal(s.name, 'the excluded');
       assert.equal(s.docs[0].name, 'test');
 
-      var pending = 5;
-      var item = s;
+      let pending = 5;
+      const item = s;
 
       function cb(err, s) {
         pending--;
@@ -66,19 +66,19 @@ describe('schema select option', function() {
   });
 
   it('including paths through schematype', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       thin: Boolean,
       name: {type: String, select: true},
       docs: [new Schema({bool: Boolean, name: {type: String, select: true}})]
     });
 
-    var S = db.model('IncludingBySchemaType', schema);
+    const S = db.model('IncludingBySchemaType', schema);
     S.create({thin: true, name: 'the included', docs: [{bool: true, name: 'test'}]}, function(err, s) {
       assert.ifError(err);
       assert.equal(s.name, 'the included');
       assert.equal(s.docs[0].name, 'test');
 
-      var pending = 4;
+      let pending = 4;
 
       function cb(err, s) {
         pending--;
@@ -110,7 +110,7 @@ describe('schema select option', function() {
   });
 
   describe('overriding schematype select options', function() {
-    var selected, excluded, S, E;
+    let selected, excluded, S, E;
 
     before(function() {
       selected = new Schema({
@@ -130,7 +130,7 @@ describe('schema select option', function() {
 
     describe('works', function() {
       describe('for inclusions', function() {
-        var s;
+        let s;
         before(function(done) {
           S.create({thin: true, name: 'the included', docs: [{name: 'test', bool: true}]}, function(err, s_) {
             assert.ifError(err);
@@ -202,7 +202,7 @@ describe('schema select option', function() {
       });
 
       describe('for exclusions', function() {
-        var e;
+        let e;
         before(function(done) {
           E.create({thin: true, name: 'the excluded', docs: [{name: 'test', bool: true}]}, function(err, e_) {
             e = e_;
@@ -275,17 +275,17 @@ describe('schema select option', function() {
 
   describe('exclusion in root schema should override child schema', function() {
     it('works (gh-1333)', function(done) {
-      var m = new mongoose.Mongoose();
-      var child = new Schema({
+      const m = new mongoose.Mongoose();
+      const child = new Schema({
         name1: {type: String, select: false},
         name2: {type: String, select: true}
       });
-      var selected = new Schema({
+      const selected = new Schema({
         docs: {type: [child], select: false}
       });
-      var M = m.model('gh-1333-deselect', selected);
+      const M = m.model('gh-1333-deselect', selected);
 
-      var query = M.findOne();
+      const query = M.findOne();
       query._applyPaths();
       assert.equal(Object.keys(query._fields).length, 1);
       assert.equal(query._fields['docs.name1'], undefined);
@@ -297,13 +297,13 @@ describe('schema select option', function() {
 
   describe('forcing inclusion of a deselected schema path', function() {
     it('works', function(done) {
-      var excluded = new Schema({
+      const excluded = new Schema({
         thin: Boolean,
         name: {type: String, select: false},
         docs: [new Schema({name: {type: String, select: false}, bool: Boolean})]
       });
 
-      var M = db.model('ForcedInclusionOfPath', excluded);
+      const M = db.model('ForcedInclusionOfPath', excluded);
       M.create({thin: false, name: '1 meter', docs: [{name: 'test', bool: false}]}, function(err, d) {
         assert.ifError(err);
 
@@ -355,14 +355,14 @@ describe('schema select option', function() {
     });
 
     it('works with query.slice (gh-1370)', function(done) {
-      var M = db.model('1370', new Schema({many: {type: [String], select: false}}));
+      const M = db.model('1370', new Schema({many: {type: [String], select: false}}));
 
       M.create({many: ['1', '2', '3', '4', '5']}, function(err) {
         if (err) {
           return done(err);
         }
 
-        var query = M.findOne().select('+many').where('many').slice(2);
+        const query = M.findOne().select('+many').where('many').slice(2);
 
         query.exec(function(err, doc) {
           if (err) {
@@ -391,19 +391,19 @@ describe('schema select option', function() {
   });
 
   it('conflicting schematype path selection should not error', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       thin: Boolean,
       name: {type: String, select: true},
       conflict: {type: String, select: false}
     });
 
-    var S = db.model('ConflictingBySchemaType', schema);
+    const S = db.model('ConflictingBySchemaType', schema);
     S.create({thin: true, name: 'bing', conflict: 'crosby'}, function(err, s) {
       assert.strictEqual(null, err);
       assert.equal(s.name, 'bing');
       assert.equal(s.conflict, 'crosby');
 
-      var pending = 2;
+      let pending = 2;
 
       function cb(err, s) {
         if (!--pending) {
@@ -423,11 +423,11 @@ describe('schema select option', function() {
   });
 
   it('selecting _id works with excluded schematype path', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       name: {type: String, select: false}
     });
 
-    var M = db.model('SelectingOnly_idWithExcludedSchemaType', schema);
+    const M = db.model('SelectingOnly_idWithExcludedSchemaType', schema);
     M.find().select('_id -name').exec(function(err) {
       assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
 
@@ -439,11 +439,11 @@ describe('schema select option', function() {
   });
 
   it('selecting _id works with excluded schematype path on sub doc', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       docs: [new Schema({name: {type: String, select: false}})]
     });
 
-    var M = db.model('SelectingOnly_idWithExcludedSchemaTypeSubDoc', schema);
+    const M = db.model('SelectingOnly_idWithExcludedSchemaTypeSubDoc', schema);
     M.find().select('_id -docs.name').exec(function(err) {
       assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
 
@@ -455,25 +455,25 @@ describe('schema select option', function() {
   });
 
   it('all inclusive/exclusive combos work', function(done) {
-    var coll = 'inclusiveexclusivecomboswork_' + random();
+    const coll = 'inclusiveexclusivecomboswork_' + random();
 
-    var schema = new Schema({
+    const schema = new Schema({
       name: {type: String},
       age: Number
     }, {collection: coll});
-    var M = db.model('InclusiveExclusiveCombosWork', schema);
+    const M = db.model('InclusiveExclusiveCombosWork', schema);
 
-    var schema1 = new Schema({
+    const schema1 = new Schema({
       name: {type: String, select: false},
       age: Number
     }, {collection: coll});
-    var S = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionFalse', schema1);
+    const S = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionFalse', schema1);
 
-    var schema2 = new Schema({
+    const schema2 = new Schema({
       name: {type: String, select: true},
       age: Number
     }, {collection: coll});
-    var T = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionTrue', schema2);
+    const T = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionTrue', schema2);
 
     function useId(M, id, cb) {
       M.findOne().select('_id -name').exec(function(err, d) {
@@ -528,7 +528,7 @@ describe('schema select option', function() {
 
     M.create({name: 'ssd', age: 0}, function(err, d) {
       assert.ifError(err);
-      var id = d.id;
+      const id = d.id;
       useId(M, id, function() {
         nonId(M, id, function() {
           useId(S, id, function() {
@@ -546,7 +546,7 @@ describe('schema select option', function() {
   });
 
   it('does not set defaults for nested objects (gh-4707)', function(done) {
-    var userSchema = new Schema({
+    const userSchema = new Schema({
       name: String,
       age: Number,
       profile: {
@@ -555,9 +555,9 @@ describe('schema select option', function() {
       }
     });
 
-    var User = db.model('gh4707', userSchema);
+    const User = db.model('gh4707', userSchema);
 
-    var obj = {
+    const obj = {
       name: 'Val',
       age: 28,
       profile: { email: 'test@a.co', flags: 'abc' }
@@ -575,7 +575,7 @@ describe('schema select option', function() {
   });
 
   it('does not create nested objects if not included (gh-4669)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       field1: String,
       field2: String,
       field3: {
@@ -588,8 +588,8 @@ describe('schema select option', function() {
       field5: String
     }, { minimize: false });
 
-    var M = db.model('Test', schema);
-    var obj = {
+    const M = db.model('Test', schema);
+    const obj = {
       field1: 'a',
       field2: 'b',
       field3: { f1: 'c', f2: 'd' },
@@ -608,15 +608,15 @@ describe('schema select option', function() {
   });
 
   it('initializes nested defaults with selected objects (gh-2629)', function(done) {
-    var NestedSchema = new mongoose.Schema({
+    const NestedSchema = new mongoose.Schema({
       nested: {
         name: {type: String, default: 'val'}
       }
     });
 
-    var Model = db.model('nested', NestedSchema);
+    const Model = db.model('nested', NestedSchema);
 
-    var doc = new Model();
+    const doc = new Model();
     doc.nested.name = undefined;
     doc.save(function(error) {
       assert.ifError(error);

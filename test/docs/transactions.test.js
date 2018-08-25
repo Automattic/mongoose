@@ -11,7 +11,11 @@ describe('transactions', function() {
   let _skipped = false;
 
   before(function() {
-    db = start({ replicaSet: 'rs' });
+    if (!process.env.REPLICA_SET) {
+      _skipped = true;
+      this.skip();
+    }
+    db = start({ replicaSet: process.env.REPLICA_SET });
 
     return db.
       then(() => {

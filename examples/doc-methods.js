@@ -1,6 +1,7 @@
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+'use strict';
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);
 
@@ -8,7 +9,7 @@ console.log('Running mongoose version %s', mongoose.version);
  * Schema
  */
 
-var CharacterSchema = Schema({
+const CharacterSchema = Schema({
   name: {
     type: String,
     required: true
@@ -32,15 +33,15 @@ CharacterSchema.methods.attack = function() {
  * Character model
  */
 
-var Character = mongoose.model('Character', CharacterSchema);
+const Character = mongoose.model('Character', CharacterSchema);
 
 /**
  * Connect to the database on localhost with
  * the default port (27017)
  */
 
-var dbname = 'mongoose-example-doc-methods-' + ((Math.random() * 10000) | 0);
-var uri = 'mongodb://localhost/' + dbname;
+const dbname = 'mongoose-example-doc-methods-' + ((Math.random() * 10000) | 0);
+const uri = 'mongodb://localhost/' + dbname;
 
 console.log('connecting to %s', uri);
 

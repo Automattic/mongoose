@@ -11,7 +11,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('id virtual getter', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -22,9 +22,9 @@ describe('id virtual getter', function() {
   });
 
   it('should work as expected with an ObjectId', function(done) {
-    var schema = new Schema({});
+    const schema = new Schema({});
 
-    var S = db.model('Basic', schema);
+    const S = db.model('Basic', schema);
     S.create({}, function(err, s) {
       assert.ifError(err);
 
@@ -35,9 +35,9 @@ describe('id virtual getter', function() {
   });
 
   it('should be turned off when `id` option is set to false', function(done) {
-    var schema = new Schema({}, {id: false});
+    const schema = new Schema({}, {id: false});
 
-    var S = db.model('NoIdGetter', schema);
+    const S = db.model('NoIdGetter', schema);
     S.create({}, function(err, s) {
       assert.ifError(err);
 
@@ -49,11 +49,11 @@ describe('id virtual getter', function() {
 
 
   it('should be turned off when the schema has a set `id` path', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       id: String
     });
 
-    var S = db.model('SchemaHasId', schema);
+    const S = db.model('SchemaHasId', schema);
     S.create({ id: 'test'}, function(err, s) {
       assert.ifError(err);
 

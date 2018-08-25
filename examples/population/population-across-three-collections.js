@@ -1,14 +1,15 @@
 
-var assert = require('assert');
-var mongoose = require('../../lib');
-var Schema = mongoose.Schema;
-var ObjectId = mongoose.Types.ObjectId;
+'use strict';
+const assert = require('assert');
+const mongoose = require('../../lib');
+const Schema = mongoose.Schema;
+const ObjectId = mongoose.Types.ObjectId;
 
 /**
  * Connect to the db
  */
 
-var dbname = 'testing_populateAdInfinitum_' + require('../../lib/utils').random();
+const dbname = 'testing_populateAdInfinitum_' + require('../../lib/utils').random();
 mongoose.connect('localhost', dbname);
 mongoose.connection.on('error', function() {
   console.error('connection error', arguments);
@@ -18,16 +19,16 @@ mongoose.connection.on('error', function() {
  * Schemas
  */
 
-var user = new Schema({
+const user = new Schema({
   name: String,
   friends: [{
     type: Schema.ObjectId,
     ref: 'User'
   }]
 });
-var User = mongoose.model('User', user);
+const User = mongoose.model('User', user);
 
-var blogpost = Schema({
+const blogpost = Schema({
   title: String,
   tags: [String],
   author: {
@@ -35,7 +36,7 @@ var blogpost = Schema({
     ref: 'User'
   }
 });
-var BlogPost = mongoose.model('BlogPost', blogpost);
+const BlogPost = mongoose.model('BlogPost', blogpost);
 
 /**
  * example
@@ -46,8 +47,8 @@ mongoose.connection.on('open', function() {
    * Generate data
    */
 
-  var userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
-  var users = [];
+  const userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
+  const users = [];
 
   users.push({
     _id: userIds[0],
@@ -73,7 +74,7 @@ mongoose.connection.on('open', function() {
   User.create(users, function(err) {
     assert.ifError(err);
 
-    var blogposts = [];
+    const blogposts = [];
     blogposts.push({
       title: 'blog 1',
       tags: ['fun', 'cool'],
@@ -108,7 +109,7 @@ mongoose.connection.on('open', function() {
          * Populate the populated documents
          */
 
-          var opts = {
+          const opts = {
             path: 'author.friends',
             select: 'name',
             options: {limit: 2}
@@ -117,7 +118,7 @@ mongoose.connection.on('open', function() {
           BlogPost.populate(docs, opts, function(err, docs) {
             assert.ifError(err);
             console.log('populated');
-            var s = require('util').inspect(docs, {depth: null, colors: true});
+            const s = require('util').inspect(docs, {depth: null, colors: true});
             console.log(s);
             done();
           });

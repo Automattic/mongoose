@@ -1,21 +1,21 @@
 'use strict';
 
-var Query = require('../lib/query');
-var Schema = require('../lib/schema');
-var assert = require('assert');
-var selectPopulatedFields = require('../lib/helpers/query/selectPopulatedFields');
+const Query = require('../lib/query');
+const Schema = require('../lib/schema');
+const assert = require('assert');
+const selectPopulatedFields = require('../lib/helpers/query/selectPopulatedFields');
 
 describe('Query helpers', function() {
   describe('selectPopulatedFields', function() {
     it('handles nested populate if parent key is projected in (gh-5669)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         nested: {
           key1: String,
           key2: String
         }
       });
 
-      var q = new Query({});
+      const q = new Query({});
       q.schema = schema;
 
       assert.strictEqual(q._fields, void 0);
@@ -32,14 +32,14 @@ describe('Query helpers', function() {
     });
 
     it('handles nested populate if parent key is projected out (gh-5669)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         nested: {
           key1: String,
           key2: String
         }
       });
 
-      var q = new Query({});
+      const q = new Query({});
       q.schema = schema;
 
       assert.strictEqual(q._fields, void 0);

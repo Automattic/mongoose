@@ -344,7 +344,7 @@ describe('model', function() {
       });
     });
 
-    describe('model.ensureIndexes()', function() {
+    describe.skip('model.ensureIndexes()', function() {
       it('is a function', function(done) {
         const schema = mongoose.Schema({x: 'string'});
         const Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);

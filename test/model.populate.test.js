@@ -1413,7 +1413,7 @@ describe('model: populate:', function() {
               assert.ifError(err);
 
               // add a non-schema property to the document.
-              BlogPost.collection.update(
+              BlogPost.collection.updateOne(
                 {_id: post._id}
                 , {$set: {'comments.0._idontexist': user2._id}}, function(err) {
                   assert.ifError(err);
@@ -2070,8 +2070,8 @@ describe('model: populate:', function() {
   });
 
   it('Update works with populated arrays (gh-602)', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    let BlogPost = db.model('RefBlogPost', posts);
+    let User = db.model('RefUser', users);
 
     User.create({name: 'aphex'}, {name: 'twin'}, function(err, u1, u2) {
       assert.ifError(err);
@@ -2083,7 +2083,7 @@ describe('model: populate:', function() {
         assert.ifError(err);
 
         const update = {fans: [u1, u2]};
-        BlogPost.update({_id: post}, update, function(err) {
+        BlogPost.updateOne({_id: post}, update, function(err) {
           assert.ifError(err);
 
           // the original update doc should not be modified

@@ -83,7 +83,7 @@ describe('types.subdocument', function() {
             testString: 'Test 2'
           }]
         };
-        return Thing.update({
+        return Thing.updateOne({
           _id: id
         }, {$set: thingy2});
       });

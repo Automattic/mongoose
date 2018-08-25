@@ -92,7 +92,7 @@ describe('model field selection', function() {
         id = new DocumentObjectId,
         date = new Date;
 
-    BlogPostB.collection.insert({_id: id, title: 'hahaha1', meta: {date: date}}, function(err) {
+    BlogPostB.collection.insertOne({_id: id, title: 'hahaha1', meta: {date: date}}, function(err) {
       assert.ifError(err);
 
       BlogPostB.findById(id, {title: 0}, function(err, found) {
@@ -141,7 +141,7 @@ describe('model field selection', function() {
   it('works with just _id and findOneAndUpdate (gh-3407)', function(done) {
     const MyModel = db.model('gh3407', {test: {type: Number, default: 1}});
 
-    MyModel.collection.insert({}, function(error) {
+    MyModel.collection.insertOne({}, function(error) {
       assert.ifError(error);
       MyModel.findOne({}, {_id: 1}, function(error, doc) {
         assert.ifError(error);
@@ -177,7 +177,7 @@ describe('model field selection', function() {
     let BlogPostB = db.model(modelName, collection),
         id = new DocumentObjectId;
 
-    BlogPostB.collection.insert(
+    BlogPostB.collection.insertOne(
       {_id: id, title: 'issue 870'}, {safe: true}, function(err) {
         assert.ifError(err);
 

@@ -946,7 +946,7 @@ describe('model: findOneAndUpdate:', function() {
       function(error, doc) {
         assert.ifError(error);
         assert.equal(doc.__v, 0);
-        Account.update({ name: 'test' }, {}, { upsert: true }, function(error) {
+        Account.replaceOne({ name: 'test' }, {}, { upsert: true }, function(error) {
           assert.ifError(error);
           Account.findOne({ name: 'test' }, function(error, doc) {
             assert.ifError(error);
@@ -1117,7 +1117,7 @@ describe('model: findOneAndUpdate:', function() {
           assert.ifError(error);
           assert.equal(breakfast.base, 'eggs');
           assert.equal(breakfast.topping, 'bacon');
-          Breakfast.count({topping: 'bacon'}, function(error, count) {
+          Breakfast.countDocuments({topping: 'bacon'}, function(error, count) {
             assert.ifError(error);
             assert.equal(1, count);
             done();
@@ -1163,7 +1163,7 @@ describe('model: findOneAndUpdate:', function() {
           assert.ifError(error);
           assert.equal(breakfast.base, 'eggs');
           assert.equal(breakfast.topping, 'bacon');
-          Breakfast.count({topping: 'bacon'}, function(error, count) {
+          Breakfast.countDocuments({topping: 'bacon'}, function(error, count) {
             assert.ifError(error);
             assert.equal(1, count);
             done();
@@ -1880,7 +1880,7 @@ describe('model: findOneAndUpdate:', function() {
     it('useFindAndModify in opts (gh-5616)', function(done) {
       const m = new mongoose.constructor();
 
-      m.connect(start.uri);
+      m.connect(start.uri, { useNewUrlParser: true });
 
       const calls = [];
       m.set('debug', function(collection, fnName) {
@@ -1907,7 +1907,7 @@ describe('model: findOneAndUpdate:', function() {
     it('useFindAndModify in set (gh-5616)', function(done) {
       const m = new mongoose.constructor();
 
-      m.connect(start.uri);
+      m.connect(start.uri, { useNewUrlParser: true });
 
       const calls = [];
       m.set('debug', function(collection, fnName) {
@@ -1935,7 +1935,7 @@ describe('model: findOneAndUpdate:', function() {
     it('useFindAndModify with overwrite (gh-6887)', function() {
       return co(function*() {
         const m = new mongoose.constructor();
-        yield m.connect(start.uri);
+        yield m.connect(start.uri, { useNewUrlParser: true });
 
         const calls = [];
         m.set('debug', function(collection, fnName) {

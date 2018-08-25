@@ -400,7 +400,7 @@ describe('validation docs', function() {
     }, 'Invalid color');
 
     var opts = { runValidators: true };
-    Toy.update({}, { color: 'bacon' }, opts, function (err) {
+    Toy.updateOne({}, { color: 'bacon' }, opts, function (err) {
       assert.equal(err.errors.color.message,
         'Invalid color');
       // acquit:ignore:start
@@ -443,7 +443,7 @@ describe('validation docs', function() {
     var update = { color: 'red', name: 'Red Power Ranger' };
     var opts = { runValidators: true };
 
-    Toy.update({}, update, opts, function(error) {
+    Toy.updateOne({}, update, opts, function(error) {
       // The update validator throws an error:
       // "TypeError: Cannot read property 'toLowerCase' of undefined",
       // because `this` is **not** the document being updated when using
@@ -482,7 +482,7 @@ describe('validation docs', function() {
     // Note the context option
     var opts = { runValidators: true, context: 'query' };
 
-    Toy.update({}, update, opts, function(error) {
+    Toy.updateOne({}, update, opts, function(error) {
       assert.ok(error.errors['color']);
       // acquit:ignore:start
       done();
@@ -513,7 +513,7 @@ describe('validation docs', function() {
 
     var update = { color: 'blue' };
     var opts = { runValidators: true };
-    Kitten.update({}, update, opts, function(err) {
+    Kitten.updateOne({}, update, opts, function(err) {
       // Operation succeeds despite the fact that 'name' is not specified
       // acquit:ignore:start
       --outstanding || done();
@@ -521,7 +521,7 @@ describe('validation docs', function() {
     });
 
     var unset = { $unset: { name: 1 } };
-    Kitten.update({}, unset, opts, function(err) {
+    Kitten.updateOne({}, unset, opts, function(err) {
       // Operation fails because 'name' is required
       assert.ok(err);
       assert.ok(err.errors['name']);
@@ -566,10 +566,10 @@ describe('validation docs', function() {
 
     var update = { $inc: { number: 1 } };
     var opts = { runValidators: true };
-    Test.update({}, update, opts, function(error) {
+    Test.updateOne({}, update, opts, function(error) {
       // There will never be a validation error here
       update = { $push: [{ message: 'hello' }, { message: 'world' }] };
-      Test.update({}, update, opts, function(error) {
+      Test.updateOne({}, update, opts, function(error) {
         // This will never error either even though the array will have at
         // least 2 elements.
         // acquit:ignore:start
@@ -601,7 +601,7 @@ describe('validation docs', function() {
       }
     };
     var opts = { runValidators: true };
-    Test.update({}, update, opts, function(error) {
+    Test.updateOne({}, update, opts, function(error) {
       assert.ok(error.errors['numbers']);
       assert.ok(error.errors['docs']);
       // acquit:ignore:start

@@ -31,7 +31,7 @@ describe('collections:', function() {
     });
 
     const uri = 'mongodb://localhost:27017/mongoose_test';
-    db.openUri(process.env.MONGOOSE_TEST_URI || uri, function(err) {
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri, { useNewUrlParser: true }, function(err) {
       connected = !err;
       finish();
     });

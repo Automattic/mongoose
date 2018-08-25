@@ -11,7 +11,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('model middleware', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -22,11 +22,11 @@ describe('model middleware', function() {
   });
 
   it('post save', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
 
-    var called = 0;
+    let called = 0;
 
     schema.post('save', function(obj) {
       assert.equal(obj.title, 'Little Green Running Hood');
@@ -62,7 +62,7 @@ describe('model middleware', function() {
   });
 
   it('sync error in post save (gh-3483)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
 
@@ -133,10 +133,10 @@ describe('model middleware', function() {
   });
 
   it('validate middleware runs before save middleware (gh-2462)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
-    var count = 0;
+    let count = 0;
 
     schema.pre('validate', function(next) {
       assert.equal(count++, 0);
@@ -148,7 +148,7 @@ describe('model middleware', function() {
       next();
     });
 
-    var Book = db.model('gh2462', schema);
+    const Book = db.model('gh2462', schema);
 
     Book.create({}, function() {
       assert.equal(count, 2);
@@ -157,11 +157,11 @@ describe('model middleware', function() {
   });
 
   it('works', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
 
-    var called = 0;
+    let called = 0;
 
     schema.pre('init', function() {
       called++;
@@ -179,9 +179,9 @@ describe('model middleware', function() {
 
     mongoose.model('TestMiddleware', schema);
 
-    var TestMiddleware = db.model('TestMiddleware');
+    const TestMiddleware = db.model('TestMiddleware');
 
-    var test = new TestMiddleware();
+    const test = new TestMiddleware();
 
     test.init({ title: 'Test' }, function(err) {
       assert.ifError(err);
@@ -242,13 +242,13 @@ describe('model middleware', function() {
   });
 
   it('gh-1829', function(done) {
-    var childSchema = new mongoose.Schema({
+    const childSchema = new mongoose.Schema({
       name: String
     });
 
-    var childPreCalls = 0;
-    var childPreCallsByName = {};
-    var parentPreCalls = 0;
+    let childPreCalls = 0;
+    const childPreCallsByName = {};
+    let parentPreCalls = 0;
 
     childSchema.pre('save', function(next) {
       childPreCallsByName[this.name] = childPreCallsByName[this.name] || 0;
@@ -257,7 +257,7 @@ describe('model middleware', function() {
       next();
     });
 
-    var parentSchema = new mongoose.Schema({
+    const parentSchema = new mongoose.Schema({
       name: String,
       children: [childSchema]
     });
@@ -267,9 +267,9 @@ describe('model middleware', function() {
       next();
     });
 
-    var Parent = db.model('gh-1829', parentSchema, 'gh-1829');
+    const Parent = db.model('gh-1829', parentSchema, 'gh-1829');
 
-    var parent = new Parent({
+    const parent = new Parent({
       name: 'Han',
       children: [
         {name: 'Jaina'},
@@ -298,7 +298,7 @@ describe('model middleware', function() {
   });
 
   it('sync error in pre save (gh-3483)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
 
@@ -318,11 +318,11 @@ describe('model middleware', function() {
   });
 
   it('sync error in pre save after next() (gh-3483)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
 
-    var called = 0;
+    let called = 0;
 
     schema.pre('save', function(next) {
       next();
@@ -347,11 +347,11 @@ describe('model middleware', function() {
   });
 
   it('validate + remove', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String
     });
 
-    var preValidate = 0,
+    let preValidate = 0,
         postValidate = 0,
         preRemove = 0,
         postRemove = 0;
@@ -376,9 +376,9 @@ describe('model middleware', function() {
       ++postRemove;
     });
 
-    var Test = db.model('TestPostValidateMiddleware', schema);
+    const Test = db.model('TestPostValidateMiddleware', schema);
 
-    var test = new Test({title: 'banana'});
+    const test = new Test({title: 'banana'});
 
     test.save(function(err) {
       assert.ifError(err);

@@ -1,4 +1,5 @@
 
+'use strict';
 module.exports = exports = function (str, char) {
   if ('string' != typeof str) return str;
   return encodeURIComponent(

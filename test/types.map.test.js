@@ -26,8 +26,8 @@ describe('Map', function() {
   });
 
   it('validation', function() {
-    let nestedValidateCalls = [];
-    let validateCalls = [];
+    const nestedValidateCalls = [];
+    const validateCalls = [];
     const TestSchema = new mongoose.Schema({
       v: {
         type: Map,
@@ -458,7 +458,7 @@ describe('Map', function() {
     return co(function*() {
       yield test.save();
 
-      let found = yield Test.findOne();
+      const found = yield Test.findOne();
       assert.deepEqual(found.str.toJSON(), { testing: '123' });
       assert.deepEqual(found.num.toJSON(), { testing: 456 });
     });

@@ -1,11 +1,12 @@
-var mongoose = require('../../lib');
-var Benchmark = require('benchmark');
+'use strict';
+const mongoose = require('../../lib');
+const Benchmark = require('benchmark');
 
-var suite = new Benchmark.Suite();
+const suite = new Benchmark.Suite();
 
-var Schema = mongoose.Schema;
-var ObjectId = Schema.Types.ObjectId;
-var utils = require('../../lib/utils.js');
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
 /*
@@ -18,7 +19,7 @@ var utils = require('../../lib/utils.js');
  */
 
 
-var Comments = new Schema;
+const Comments = new Schema;
 
 Comments.add({
   title: String,
@@ -27,7 +28,7 @@ Comments.add({
   comments: [Comments]
 });
 
-var BlogPost = new Schema({
+const BlogPost = new Schema({
   title: String,
   author: String,
   slug: String,
@@ -48,7 +49,7 @@ var BlogPost = new Schema({
   }
 });
 
-var blogData = {
+const blogData = {
   title: 'dummy post',
   author: 'somebody',
   slug: 'test.post',
@@ -67,20 +68,20 @@ var blogData = {
   comments: []
 };
 
-var blogData10 = utils.clone(blogData);
-var blogData100 = utils.clone(blogData);
-var blogData1000 = utils.clone(blogData);
-var blogData10000 = utils.clone(blogData);
-for (var i = 0; i < 10; i++) {
+const blogData10 = utils.clone(blogData);
+const blogData100 = utils.clone(blogData);
+const blogData1000 = utils.clone(blogData);
+const blogData10000 = utils.clone(blogData);
+for (let i = 0; i < 10; i++) {
   blogData10.comments.push(commentData);
 }
-for (i = 0; i < 100; i++) {
+for (let i = 0; i < 100; i++) {
   blogData100.comments.push(commentData);
 }
-for (i = 0; i < 1000; i++) {
+for (let i = 0; i < 1000; i++) {
   blogData1000.comments.push(commentData);
 }
-for (i = 0; i < 10000; i++) {
+for (let i = 0; i < 10000; i++) {
   blogData10000.comments.push(commentData);
 }
 var commentData = {
@@ -93,32 +94,32 @@ mongoose.model('BlogPost', BlogPost);
 
 suite.add('Casting - Embedded Docs - 0 Docs', {
   fn: function() {
-    var BlogPost = mongoose.model('BlogPost');
-    var bp = new BlogPost();
+    const BlogPost = mongoose.model('BlogPost');
+    const bp = new BlogPost();
     bp.init(blogData);
   }
 }).add('Casting - Embedded Docs - 10 Docs', {
   fn: function() {
-    var BlogPost = mongoose.model('BlogPost');
-    var bp = new BlogPost();
+    const BlogPost = mongoose.model('BlogPost');
+    const bp = new BlogPost();
     bp.init(blogData10);
   }
 }).add('Casting - Embedded Docs - 100 Docs', {
   fn: function() {
-    var BlogPost = mongoose.model('BlogPost');
-    var bp = new BlogPost();
+    const BlogPost = mongoose.model('BlogPost');
+    const bp = new BlogPost();
     bp.init(blogData100);
   }
 }).add('Casting - Embedded Docs - 1000 Docs', {
   fn: function() {
-    var BlogPost = mongoose.model('BlogPost');
-    var bp = new BlogPost();
+    const BlogPost = mongoose.model('BlogPost');
+    const bp = new BlogPost();
     bp.init(blogData1000);
   }
 }).add('Casting - Embedded Docs - 10000 Docs', {
   fn: function() {
-    var BlogPost = mongoose.model('BlogPost');
-    var bp = new BlogPost();
+    const BlogPost = mongoose.model('BlogPost');
+    const bp = new BlogPost();
     bp.init(blogData10000);
   }
 })
@@ -128,9 +129,9 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
     }
   }).on('complete', function() {
     if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
-      var outObj = {};
+      const outObj = {};
       this.forEach(function(item) {
-        var out = {};
+        const out = {};
         out.stats = item.stats;
         delete out.stats.sample;
         out.ops = item.hz;

@@ -3,20 +3,19 @@
  * Module dependencies.
  */
 
-var assert = require('power-assert'),
-    start = require('./common'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+'use strict';
+
+let assert = require('power-assert'), start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema;
 
 /**
  * Test.
  */
 
 describe('types.subdocument', function() {
-  var GrandChildSchema;
-  var ChildSchema;
-  var ParentSchema;
-  var db;
+  let GrandChildSchema;
+  let ChildSchema;
+  let ParentSchema;
+  let db;
 
   before(function() {
     GrandChildSchema = new Schema({
@@ -42,8 +41,8 @@ describe('types.subdocument', function() {
   });
 
   it('returns a proper ownerDocument (gh-3589)', function(done) {
-    var Parent = mongoose.model('Parent-3589-Sub');
-    var p = new Parent({
+    const Parent = mongoose.model('Parent-3589-Sub');
+    const p = new Parent({
       name: 'Parent Parentson',
       children: [
         {
@@ -60,7 +59,7 @@ describe('types.subdocument', function() {
   });
 
   it('not setting timestamps in subdocuments', function() {
-    var Thing = db.model('Thing', new Schema({
+    const Thing = db.model('Thing', new Schema({
       subArray: [{
         testString: String
       }]
@@ -68,18 +67,18 @@ describe('types.subdocument', function() {
       timestamps: true
     }));
 
-    var thingy = new Thing({
+    const thingy = new Thing({
       subArray: [{
         testString: 'Test 1'
       }]
     });
-    var id;
+    let id;
     return thingy.save().
       then(function() {
         id = thingy._id;
       }).
       then(function() {
-        var thingy2 = {
+        const thingy2 = {
           subArray: [{
             testString: 'Test 2'
           }]

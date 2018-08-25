@@ -4,20 +4,15 @@
  * Test dependencies.
  */
 
-var start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    utils = require('../lib/utils'),
-    random = utils.random,
-    Schema = mongoose.Schema,
-    DocObjectId = mongoose.Types.ObjectId,
-    Buffer = require('safe-buffer').Buffer;
+'use strict';
+
+let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, utils = require('../lib/utils'), random = utils.random, Schema = mongoose.Schema, DocObjectId = mongoose.Types.ObjectId, Buffer = require('safe-buffer').Buffer;
 
 /**
  * Setup.
  */
 
-var posts = 'blogposts_' + random(),
+let posts = 'blogposts_' + random(),
     users = 'users_' + random();
 
 /**
@@ -28,14 +23,14 @@ describe('model: populate:', function() {
   this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
   describe('setting populated paths (gh-570)', function() {
-    var types = {
+    const types = {
       ObjectId: DocObjectId,
       String: String,
       Number: Number,
       Buffer: Buffer
     };
 
-    var construct = {};
+    const construct = {};
     construct.String = random;
     construct.ObjectId = DocObjectId;
     construct.Number = random;
@@ -45,16 +40,16 @@ describe('model: populate:', function() {
 
     Object.keys(types).forEach(function(id) {
       describe('should not cast to _id of type ' + id, function() {
-        var refuser;
-        var db;
-        var B, U;
-        var u1;
-        var b1, b2;
+        let refuser;
+        let db;
+        let B, U;
+        let u1;
+        let b1, b2;
 
         before(function(done) {
           refuser = 'RefUser-' + id;
 
-          var bSchema = new Schema({
+          const bSchema = new Schema({
             title: String,
             fans: [{type: id, ref: refuser}],
             adhoc: [{subdoc: id, subarray: [{things: [id]}]}],
@@ -66,7 +61,7 @@ describe('model: populate:', function() {
             }]
           });
 
-          var uSchema = new Schema({
+          const uSchema = new Schema({
             _id: id,
             name: String,
             email: String
@@ -122,30 +117,30 @@ describe('model: populate:', function() {
         }
 
         it('if a document', function(done) {
-          var query = B.findById(b1).
+          const query = B.findById(b1).
             populate('fans _creator embed.other embed.array embed.nested.subdoc').
             populate({path: 'adhoc.subdoc', model: refuser}).
             populate({path: 'adhoc.subarray.things', model: refuser});
           query.exec(function(err, doc) {
             assert.ifError(err);
 
-            var user3 = user('user3');
+            const user3 = user('user3');
             doc.fans.push(user3);
             assert.deepEqual(doc.fans[2].toObject(), user3.toObject());
 
-            var user4 = user('user4');
+            const user4 = user('user4');
             doc.fans.nonAtomicPush(user4);
             assert.deepEqual(doc.fans[3].toObject(), user4.toObject());
 
-            var user5 = user('user5');
+            const user5 = user('user5');
             doc.fans.splice(2, 1, user5);
             assert.deepEqual(doc.fans[2].toObject(), user5.toObject());
 
-            var user6 = user('user6');
+            const user6 = user('user6');
             doc.fans.unshift(user6);
             assert.deepEqual(doc.fans[0].toObject(), user6.toObject());
 
-            var user7 = user('user7');
+            const user7 = user('user7');
             doc.fans.addToSet(user7);
             assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
 
@@ -153,14 +148,14 @@ describe('model: populate:', function() {
               assert.ok(doc instanceof U);
             });
 
-            var user8 = user('user8');
+            const user8 = user('user8');
             doc.fans.set(0, user8);
             assert.deepEqual(doc.fans[0].toObject(), user8.toObject());
 
             doc.fans.push(null);
             assert.equal(doc.fans[6], null);
 
-            var _id = construct[id]();
+            const _id = construct[id]();
             doc.fans.addToSet(_id);
             if (Buffer.isBuffer(_id)) {
               assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
@@ -173,30 +168,30 @@ describe('model: populate:', function() {
             doc._creator = null;
             assert.equal(doc._creator, null);
 
-            var creator = user('creator');
+            const creator = user('creator');
             doc._creator = creator;
             assert.ok(doc._creator instanceof mongoose.Document);
             assert.deepEqual(doc._creator.toObject(), creator.toObject());
 
             // embedded with declared ref in schema
-            var user1a = user('user1a');
+            const user1a = user('user1a');
             doc.embed[0].array.set(0, user1a);
             assert.deepEqual(doc.embed[0].array[0].toObject(), user1a.toObject());
 
-            var user1b = user('user1b');
+            const user1b = user('user1b');
             doc.embed[0].other = user1b;
             assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
-            var user1c = user('user2c');
+            const user1c = user('user2c');
             doc.embed[0].nested = [{subdoc: user1c}];
             assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
 
             // embedded without declared ref in schema
-            var user2a = user('user2a');
+            const user2a = user('user2a');
             doc.adhoc[0].subdoc = user2a;
             assert.deepEqual(doc.adhoc[0].subdoc.toObject(), user2a.toObject());
 
-            var user2b = user('user2b');
+            const user2b = user('user2b');
             doc.adhoc[0].subarray[0].things.push(user2b);
             assert.deepEqual(doc.adhoc[0].subarray[0].things[1].toObject(), user2b.toObject());
 
@@ -230,7 +225,7 @@ describe('model: populate:', function() {
             .exec(function(err, doc) {
               assert.ifError(err);
 
-              var name = 'fan1';
+              let name = 'fan1';
               doc.fans.push(userLiteral(name));
               assert.ok(doc.fans[2]._id);
               assert.equal(doc.fans[2].name, name);
@@ -265,46 +260,46 @@ describe('model: populate:', function() {
               });
 
               name = 'creator';
-              var creator = userLiteral(name);
+              const creator = userLiteral(name);
               doc._creator = creator;
-              var creatorId = doc._creator._id;
+              const creatorId = doc._creator._id;
               assert.ok(creatorId);
               assert.equal(doc._creator.name, name);
               assert.ok(doc._creator instanceof U);
 
-              var fan2Id = doc.fans[2]._id;
-              var fan5Id = doc.fans[5]._id;
+              const fan2Id = doc.fans[2]._id;
+              const fan5Id = doc.fans[5]._id;
 
               name = 'user1a';
-              var user1a = userLiteral(name);
+              const user1a = userLiteral(name);
               doc.embed[0].array.set(0, user1a);
               assert.equal(doc.embed[0].array[0].name, name);
-              var user1aId = doc.embed[0].array[0]._id;
+              const user1aId = doc.embed[0].array[0]._id;
 
               name = 'user1b';
-              var user1b = userLiteral(name);
+              const user1b = userLiteral(name);
               doc.embed[0].other = user1b;
               assert.equal(doc.embed[0].other.name, name);
-              var user1bId = doc.embed[0].other._id;
+              const user1bId = doc.embed[0].other._id;
 
               name = 'user1c';
-              var user1c = userLiteral(name);
+              const user1c = userLiteral(name);
               doc.embed[0].nested = [{subdoc: user1c}];
               assert.equal(doc.embed[0].nested[0].subdoc.name, name);
-              var user1cId = doc.embed[0].nested[0].subdoc._id;
+              const user1cId = doc.embed[0].nested[0].subdoc._id;
 
               // embedded without declared ref in schema
               name = 'user2a';
-              var user2a = userLiteral(name);
+              const user2a = userLiteral(name);
               doc.adhoc[0].subdoc = user2a;
               assert.equal(doc.adhoc[0].subdoc.name, name);
-              var user2aId = doc.adhoc[0].subdoc._id;
+              const user2aId = doc.adhoc[0].subdoc._id;
 
               name = 'user2b';
-              var user2b = userLiteral(name);
+              const user2b = userLiteral(name);
               doc.adhoc[0].subarray[0].things.push(user2b);
               assert.deepEqual(name, doc.adhoc[0].subarray[0].things[1].name);
-              var user2bId = doc.adhoc[0].subarray[0].things[1]._id;
+              const user2bId = doc.adhoc[0].subarray[0].things[1]._id;
 
               doc.save(function(err) {
                 assert.ifError(err);

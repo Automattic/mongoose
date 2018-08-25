@@ -1,11 +1,12 @@
-var mongoose = require('../../lib');
-var Benchmark = require('benchmark');
+'use strict';
+const mongoose = require('../../lib');
+const Benchmark = require('benchmark');
 
-var suite = new Benchmark.Suite();
+const suite = new Benchmark.Suite();
 
-var Schema = mongoose.Schema;
-var ObjectId = Schema.Types.ObjectId;
-var utils = require('../../lib/utils.js');
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
 /*
@@ -23,49 +24,49 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     throw err;
   }
 
-  var commentSchema = new Schema;
+  const commentSchema = new Schema;
   commentSchema.add({
     title: String,
     date: Date,
     body: String
   });
-  var dummy1Schema = new Schema({
+  const dummy1Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy2Schema = new Schema({
+  const dummy2Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy3Schema = new Schema({
+  const dummy3Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy4Schema = new Schema({
+  const dummy4Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy5Schema = new Schema({
+  const dummy5Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy6Schema = new Schema({
+  const dummy6Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy7Schema = new Schema({
+  const dummy7Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy8Schema = new Schema({
+  const dummy8Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var dummy9Schema = new Schema({
+  const dummy9Schema = new Schema({
     title: String,
     isThisTest: Boolean
   });
-  var BlogPost = new Schema({
+  let BlogPost = new Schema({
     title: String,
     author: String,
     slug: String,
@@ -92,7 +93,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     def: {type: String, default: 'kandinsky'}
   });
 
-  var blogData = {
+  const blogData = {
     title: 'dummy post',
     author: 'somebody',
     slug: 'test.post',
@@ -114,33 +115,33 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     dummy8: [],
     dummy9: []
   };
-  var commentData = {
+  const commentData = {
     title: 'test comment',
     date: new Date(),
     body: 'this be some crazzzyyyyy text that would go in a comment'
   };
-  var dummyData = {
+  const dummyData = {
     title: 'dummy data~',
     isThisTest: true
   };
-  var Comments = mongoose.model('Comment', commentSchema);
+  const Comments = mongoose.model('Comment', commentSchema);
   BlogPost = mongoose.model('BlogPost', BlogPost);
-  var Dummy1 = mongoose.model('Dummy1', dummy1Schema);
-  var Dummy2 = mongoose.model('Dummy2', dummy2Schema);
-  var Dummy3 = mongoose.model('Dummy3', dummy3Schema);
-  var Dummy4 = mongoose.model('Dummy4', dummy4Schema);
-  var Dummy5 = mongoose.model('Dummy5', dummy5Schema);
-  var Dummy6 = mongoose.model('Dummy6', dummy6Schema);
-  var Dummy7 = mongoose.model('Dummy7', dummy7Schema);
-  var Dummy8 = mongoose.model('Dummy8', dummy8Schema);
-  var Dummy9 = mongoose.model('Dummy9', dummy9Schema);
-  var cIds = [];
-  var dIds = [];
+  const Dummy1 = mongoose.model('Dummy1', dummy1Schema);
+  const Dummy2 = mongoose.model('Dummy2', dummy2Schema);
+  const Dummy3 = mongoose.model('Dummy3', dummy3Schema);
+  const Dummy4 = mongoose.model('Dummy4', dummy4Schema);
+  const Dummy5 = mongoose.model('Dummy5', dummy5Schema);
+  const Dummy6 = mongoose.model('Dummy6', dummy6Schema);
+  const Dummy7 = mongoose.model('Dummy7', dummy7Schema);
+  const Dummy8 = mongoose.model('Dummy8', dummy8Schema);
+  const Dummy9 = mongoose.model('Dummy9', dummy9Schema);
+  const cIds = [];
+  const dIds = [];
   for (var i = 0; i < 9; i++) {
     dIds.push([]);
   }
 
-  var cn = 5000;
+  let cn = 5000;
   for (i = 0; i < 500; i++) {
     Comments.create(commentData, function(err, com) {
       cIds.push(com.id);
@@ -211,7 +212,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     });
   }
 
-  var blog = [];
+  const blog = [];
 
   function cont() {
     blog[0] = utils.clone(blogData);
@@ -256,7 +257,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
       blog[6].dummy4.push(getNextdId(8));
     }
 
-    var count = 7;
+    let count = 7;
 
     function iter(c) {
       BlogPost.create(blog[c], function(err, bl) {
@@ -275,8 +276,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     }
   }
 
-  var ci = 0;
-  var di = [];
+  let ci = 0;
+  const di = [];
   for (i = 0; i < 9; i++) {
     di.push(0);
   }
@@ -379,9 +380,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     }).on('complete', function() {
       closeDB();
       if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
-        var outObj = {};
+        const outObj = {};
         this.forEach(function(item) {
-          var out = {};
+          const out = {};
           out.stats = item.stats;
           delete out.stats.sample;
           out.ops = item.hz;

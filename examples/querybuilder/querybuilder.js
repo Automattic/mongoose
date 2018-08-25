@@ -1,16 +1,18 @@
 
 // import async to make control flow simplier
-var async = require('async');
+'use strict';
+
+const async = require('async');
 
 // import the rest of the normal stuff
-var mongoose = require('../../lib');
+const mongoose = require('../../lib');
 
 require('./person.js')();
 
-var Person = mongoose.model('Person');
+const Person = mongoose.model('Person');
 
 // define some dummy data
-var data = [
+const data = [
   {
     name: 'bill',
     age: 25,
@@ -50,7 +52,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // when querying data, instead of providing a callback, you can instead
     // leave that off and get a query object returned
-    var query = Person.find({age: {$lt: 1000}});
+    const query = Person.find({age: {$lt: 1000}});
 
     // this allows you to continue applying modifiers to it
     query.sort('birthday');

@@ -20,12 +20,12 @@ const EmbeddedDocument = mongoose.Types.Embedded;
 const MongooseError = mongoose.Error;
 
 describe('Model', function() {
-  var db;
-  var Test;
-  var Comments;
-  var BlogPost;
-  var bpSchema;
-  var collection;
+  let db;
+  let Test;
+  let Comments;
+  let BlogPost;
+  let bpSchema;
+  let collection;
 
   before(function() {
     Comments = new Schema;
@@ -60,7 +60,7 @@ describe('Model', function() {
         return this.get('title') + ' by ' + this.get('author');
       })
       .set(function(val) {
-        var split = val.split(' by ');
+        const split = val.split(' by ');
         this.set('title', split[0]);
         this.set('author', split[1]);
       });
@@ -81,7 +81,7 @@ describe('Model', function() {
 
   before(function() {
     db = start();
-    var testSchema = new Schema({
+    const testSchema = new Schema({
       _id: {
         first_name: {type: String},
         age: {type: Number}
@@ -100,7 +100,7 @@ describe('Model', function() {
   });
 
   it('can be created using _id as embedded document', function(done) {
-    var t = new Test({
+    const t = new Test({
       _id: {
         first_name: 'Daniel',
         age: 21
@@ -133,8 +133,8 @@ describe('Model', function() {
 
   describe('constructor', function() {
     it('works without "new" keyword', function(done) {
-      var B = mongoose.model('BlogPost');
-      var b = B();
+      let B = mongoose.model('BlogPost');
+      let b = B();
       assert.ok(b instanceof B);
       B = db.model('BlogPost');
       b = B();
@@ -142,8 +142,8 @@ describe('Model', function() {
       done();
     });
     it('works "new" keyword', function(done) {
-      var B = mongoose.model('BlogPost');
-      var b = new B();
+      let B = mongoose.model('BlogPost');
+      let b = new B();
       assert.ok(b instanceof B);
       B = db.model('BlogPost');
       b = new B();
@@ -153,27 +153,27 @@ describe('Model', function() {
   });
   describe('isNew', function() {
     it('is true on instantiation', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
-      var post = new BlogPost;
+      const BlogPost = db.model('BlogPost', collection);
+      const post = new BlogPost;
       assert.equal(post.isNew, true);
       done();
     });
 
     it('on parent and subdocs on failed inserts', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: {type: String, unique: true},
         em: [new Schema({x: Number})]
       }, {collection: 'testisnewonfail_' + random()});
 
-      var A = db.model('isNewOnFail', schema);
+      const A = db.model('isNewOnFail', schema);
 
       A.on('index', function() {
-        var a = new A({name: 'i am new', em: [{x: 1}]});
+        const a = new A({name: 'i am new', em: [{x: 1}]});
         a.save(function(err) {
           assert.ifError(err);
           assert.equal(a.isNew, false);
           assert.equal(a.em[0].isNew, false);
-          var b = new A({name: 'i am new', em: [{x: 2}]});
+          const b = new A({name: 'i am new', em: [{x: 2}]});
           b.save(function(err) {
             assert.ok(err);
             assert.equal(b.isNew, true);
@@ -186,12 +186,12 @@ describe('Model', function() {
   });
 
   it('gh-2140', function(done) {
-    var S = new Schema({
+    const S = new Schema({
       field: [{text: String}]
     });
 
-    var Model = db.model('gh-2140', S, 'gh-2140');
-    var s = new Model();
+    const Model = db.model('gh-2140', S, 'gh-2140');
+    const s = new Model();
     s.field = [null];
     s.field = [{text: 'text'}];
 
@@ -201,21 +201,21 @@ describe('Model', function() {
 
   describe('schema', function() {
     it('should exist', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
       assert.ok(BlogPost.schema instanceof Schema);
       assert.ok(BlogPost.prototype.schema instanceof Schema);
       done();
     });
     it('emits init event', function(done) {
-      var schema = new Schema({name: String}),
+      let schema = new Schema({name: String}),
           model;
 
       schema.on('init', function(model_) {
         model = model_;
       });
 
-      var Named = db.model('EmitInitOnSchema', schema);
+      const Named = db.model('EmitInitOnSchema', schema);
       assert.equal(model, Named);
       done();
     });
@@ -223,9 +223,9 @@ describe('Model', function() {
 
   describe('structure', function() {
     it('default when instantiated', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost;
+      const post = new BlogPost;
       assert.equal(post.db.model('BlogPost').modelName, 'BlogPost');
       assert.equal(post.constructor.modelName, 'BlogPost');
 
@@ -253,13 +253,13 @@ describe('Model', function() {
     describe('array', function() {
       describe('defaults', function() {
         it('to a non-empty array', function(done) {
-          var DefaultArraySchema = new Schema({
+          const DefaultArraySchema = new Schema({
             arr: {type: Array, cast: String, default: ['a', 'b', 'c']},
             single: {type: Array, cast: String, default: ['a']}
           });
           mongoose.model('DefaultArray', DefaultArraySchema);
-          var DefaultArray = db.model('DefaultArray', collection);
-          var arr = new DefaultArray;
+          const DefaultArray = db.model('DefaultArray', collection);
+          const arr = new DefaultArray;
           assert.equal(arr.get('arr').length, 3);
           assert.equal(arr.get('arr')[0], 'a');
           assert.equal(arr.get('arr')[1], 'b');
@@ -270,13 +270,13 @@ describe('Model', function() {
         });
 
         it('empty', function(done) {
-          var DefaultZeroCardArraySchema = new Schema({
+          const DefaultZeroCardArraySchema = new Schema({
             arr: {type: Array, cast: String, default: []},
             auto: [Number]
           });
           mongoose.model('DefaultZeroCardArray', DefaultZeroCardArraySchema);
-          var DefaultZeroCardArray = db.model('DefaultZeroCardArray', collection);
-          var arr = new DefaultZeroCardArray();
+          const DefaultZeroCardArray = db.model('DefaultZeroCardArray', collection);
+          const arr = new DefaultZeroCardArray();
           assert.equal(arr.get('arr').length, 0);
           assert.equal(arr.arr.length, 0);
           assert.equal(arr.auto.length, 0);
@@ -286,9 +286,9 @@ describe('Model', function() {
     });
 
     it('a hash with one null value', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost({
+      const post = new BlogPost({
         title: null
       });
       assert.strictEqual(null, post.title);
@@ -296,7 +296,7 @@ describe('Model', function() {
     });
 
     it('when saved', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           pending = 2;
 
       function cb() {
@@ -306,7 +306,7 @@ describe('Model', function() {
         done();
       }
 
-      var post = new BlogPost();
+      const post = new BlogPost();
       post.on('save', function(post) {
         assert.ok(post.get('_id') instanceof DocumentObjectId);
 
@@ -347,9 +347,9 @@ describe('Model', function() {
 
     describe('init', function() {
       it('works', function(done) {
-        var BlogPost = db.model('BlogPost', collection);
+        const BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost();
+        const post = new BlogPost();
 
         post.init({
           title: 'Test',
@@ -402,9 +402,9 @@ describe('Model', function() {
       });
 
       it('partially', function(done) {
-        var BlogPost = db.model('BlogPost', collection);
+        const BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost;
+        const post = new BlogPost;
         post.init({
           title: 'Test',
           slug: 'test',
@@ -427,9 +427,9 @@ describe('Model', function() {
       });
 
       it('with partial hash', function(done) {
-        var BlogPost = db.model('BlogPost', collection);
+        const BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost({
+        const post = new BlogPost({
           meta: {
             date: new Date,
             visitors: 5
@@ -441,9 +441,9 @@ describe('Model', function() {
       });
 
       it('isNew on embedded documents', function(done) {
-        var BlogPost = db.model('BlogPost', collection);
+        const BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost();
+        const post = new BlogPost();
         post.init({
           title: 'Test',
           slug: 'test',
@@ -455,9 +455,9 @@ describe('Model', function() {
       });
 
       it('isNew on embedded documents after saving', function(done) {
-        var BlogPost = db.model('BlogPost', collection);
+        const BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost({title: 'hocus pocus'});
+        const post = new BlogPost({title: 'hocus pocus'});
         post.comments.push({title: 'Humpty Dumpty', comments: [{title: 'nested'}]});
         assert.equal(post.get('comments')[0].isNew, true);
         assert.equal(post.get('comments')[0].comments[0].isNew, true);
@@ -479,20 +479,20 @@ describe('Model', function() {
   });
 
   it('collection name can be specified through schema', function(done) {
-    var schema = new Schema({name: String}, {collection: 'users1'});
-    var Named = mongoose.model('CollectionNamedInSchema1', schema);
+    const schema = new Schema({name: String}, {collection: 'users1'});
+    const Named = mongoose.model('CollectionNamedInSchema1', schema);
     assert.equal(Named.prototype.collection.name, 'users1');
 
-    var users2schema = new Schema({name: String}, {collection: 'users2'});
-    var Named2 = db.model('CollectionNamedInSchema2', users2schema);
+    const users2schema = new Schema({name: String}, {collection: 'users2'});
+    const Named2 = db.model('CollectionNamedInSchema2', users2schema);
     assert.equal(Named2.prototype.collection.name, 'users2');
     done();
   });
 
   it('saving a model with a null value should perpetuate that null value to the db', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost({
+    const post = new BlogPost({
       title: null
     });
     assert.strictEqual(null, post.title);
@@ -507,9 +507,9 @@ describe('Model', function() {
   });
 
   it('saves subdocuments middleware correctly', function(done) {
-    var child_hook;
-    var parent_hook;
-    var childSchema = new Schema({
+    let child_hook;
+    let parent_hook;
+    const childSchema = new Schema({
       name: String
     });
 
@@ -518,7 +518,7 @@ describe('Model', function() {
       next();
     });
 
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       name: String,
       children: [childSchema]
     });
@@ -528,9 +528,9 @@ describe('Model', function() {
       next();
     });
 
-    var Parent = db.model('doc', parentSchema);
+    const Parent = db.model('doc', parentSchema);
 
-    var parent = new Parent({
+    const parent = new Parent({
       name: 'Bob',
       children: [{
         name: 'Mary'
@@ -551,9 +551,9 @@ describe('Model', function() {
   });
 
   it('instantiating a model with a hash that maps to at least 1 undefined value', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost({
+    const post = new BlogPost({
       title: undefined
     });
     assert.strictEqual(undefined, post.title);
@@ -568,14 +568,14 @@ describe('Model', function() {
   });
 
   it('modified nested objects which contain MongoseNumbers should not cause a RangeError on save (gh-714)', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         num: Number
       }
     });
 
-    var M = db.model('NestedObjectWithMongooseNumber', schema);
-    var m = new M;
+    const M = db.model('NestedObjectWithMongooseNumber', schema);
+    const m = new M;
     m.nested = null;
     m.save(function(err) {
       assert.ifError(err);
@@ -592,14 +592,14 @@ describe('Model', function() {
   });
 
   it('no RangeError on remove() of a doc with Number _id (gh-714)', function(done) {
-    var MySchema = new Schema({
+    const MySchema = new Schema({
       _id: {type: Number},
       name: String
     });
 
-    var MyModel = db.model('MyModel', MySchema, 'numberrangeerror' + random());
+    const MyModel = db.model('MyModel', MySchema, 'numberrangeerror' + random());
 
-    var instance = new MyModel({
+    const instance = new MyModel({
       name: 'test',
       _id: 35
     });
@@ -618,9 +618,9 @@ describe('Model', function() {
   });
 
   it('over-writing a number should persist to the db (gh-342)', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost({
+    const post = new BlogPost({
       meta: {
         date: new Date,
         visitors: 10
@@ -643,44 +643,44 @@ describe('Model', function() {
 
   describe('methods', function() {
     it('can be defined', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost();
+      const post = new BlogPost();
       assert.equal(post.cool(), post);
       done();
     });
 
     it('can be defined on embedded documents', function(done) {
-      var ChildSchema = new Schema({name: String});
+      const ChildSchema = new Schema({name: String});
       ChildSchema.method('talk', function() {
         return 'gaga';
       });
 
-      var ParentSchema = new Schema({
+      const ParentSchema = new Schema({
         children: [ChildSchema]
       });
 
-      var ChildA = db.model('ChildA', ChildSchema, 'children_' + random());
-      var ParentA = db.model('ParentA', ParentSchema, 'parents_' + random());
+      const ChildA = db.model('ChildA', ChildSchema, 'children_' + random());
+      const ParentA = db.model('ParentA', ParentSchema, 'parents_' + random());
 
-      var c = new ChildA;
+      const c = new ChildA;
       assert.equal(typeof c.talk, 'function');
 
-      var p = new ParentA();
+      const p = new ParentA();
       p.children.push({});
       assert.equal(typeof p.children[0].talk, 'function');
       done();
     });
 
     it('can be defined with nested key', function(done) {
-      var NestedKeySchema = new Schema({});
+      const NestedKeySchema = new Schema({});
       NestedKeySchema.method('foo', {
         bar: function() {
           return this;
         }
       });
-      var NestedKey = db.model('NestedKey', NestedKeySchema);
-      var n = new NestedKey();
+      const NestedKey = db.model('NestedKey', NestedKeySchema);
+      const n = new NestedKey();
       assert.equal(n.foo.bar(), n);
       done();
     });
@@ -688,7 +688,7 @@ describe('Model', function() {
 
   describe('statics', function() {
     it('can be defined', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
       assert.equal(BlogPost.woot(), BlogPost);
       done();
@@ -697,10 +697,10 @@ describe('Model', function() {
 
   describe('casting as validation errors', function() {
     it('error', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           threw = false;
 
-      var post;
+      let post;
       try {
         post = new BlogPost({date: 'Test', meta: {date: 'Test'}});
       } catch (e) {
@@ -730,10 +730,10 @@ describe('Model', function() {
       });
     });
     it('nested error', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           threw = false;
 
-      var post = new BlogPost;
+      const post = new BlogPost;
 
       try {
         post.init({
@@ -764,9 +764,9 @@ describe('Model', function() {
 
 
     it('subdocument cast error', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost({
+      const post = new BlogPost({
         title: 'Test',
         slug: 'test',
         comments: [{title: 'Test', date: new Date, body: 'Test'}]
@@ -787,7 +787,7 @@ describe('Model', function() {
         return false;
       }
 
-      var db = start(),
+      let db = start(),
           subs = new Schema({
             str: {
               type: String, validate: failingvalidator
@@ -795,7 +795,7 @@ describe('Model', function() {
           }),
           BlogPost = db.model('BlogPost', {subs: [subs]});
 
-      var post = new BlogPost();
+      const post = new BlogPost();
       post.init({
         subs: [{str: 'gaga'}]
       });
@@ -809,10 +809,10 @@ describe('Model', function() {
 
 
     it('subdocument error when adding a subdoc', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           threw = false;
 
-      var post = new BlogPost();
+      const post = new BlogPost();
 
       try {
         post.get('comments').push({
@@ -833,12 +833,12 @@ describe('Model', function() {
 
 
     it('updates', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost();
+      const post = new BlogPost();
       post.set('title', '1');
 
-      var id = post.get('_id');
+      const id = post.get('_id');
 
       post.save(function(err) {
         assert.ifError(err);
@@ -856,7 +856,7 @@ describe('Model', function() {
     });
 
     it('$pull', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
 
       post.get('numbers').push('3');
@@ -865,7 +865,7 @@ describe('Model', function() {
     });
 
     it('$push', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
@@ -885,9 +885,9 @@ describe('Model', function() {
     });
 
     it('Number arrays', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost();
+      const post = new BlogPost();
       post.numbers.push(1, '2', 3);
 
       post.save(function(err) {
@@ -919,7 +919,7 @@ describe('Model', function() {
         };
       };
 
-      var S = new Schema({
+      const S = new Schema({
         name: String,
         description: String,
         sabreId: String,
@@ -933,9 +933,9 @@ describe('Model', function() {
         valid: {type: Boolean, default: true}
       });
 
-      var M = db.model('gh502', S);
+      const M = db.model('gh502', S);
 
-      var m = new M;
+      const m = new M;
       m.save(function(err) {
         assert.ifError(err);
         M.findById(m._id, function(err, m) {
@@ -971,9 +971,9 @@ describe('Model', function() {
         asyncScope: {type: String, validate: [dovalidateAsync, 'async scope failed'], required: true}
       }));
 
-      var TestValidation = db.model('TestValidation');
+      const TestValidation = db.model('TestValidation');
 
-      var post = new TestValidation();
+      const post = new TestValidation();
       post.set('simple', '');
       post.set('scope', 'correct');
       post.set('asyncScope', 'correct');
@@ -999,9 +999,9 @@ describe('Model', function() {
         simple: {type: String, validate: [validate, 'must be abc']}
       }));
 
-      var TestValidationMessage = db.model('TestValidationMessage');
+      const TestValidationMessage = db.model('TestValidationMessage');
 
-      var post = new TestValidationMessage();
+      const post = new TestValidationMessage();
       post.set('simple', '');
 
       post.save(function(err) {
@@ -1020,14 +1020,14 @@ describe('Model', function() {
     });
 
     it('with Model.schema.path introspection (gh-272)', function(done) {
-      var IntrospectionValidationSchema = new Schema({
+      const IntrospectionValidationSchema = new Schema({
         name: String
       });
-      var IntrospectionValidation = db.model('IntrospectionValidation', IntrospectionValidationSchema, 'introspections_' + random());
+      const IntrospectionValidation = db.model('IntrospectionValidation', IntrospectionValidationSchema, 'introspections_' + random());
       IntrospectionValidation.schema.path('name').validate(function(value) {
         return value.length < 2;
       }, 'Name cannot be greater than 1 character for path "{PATH}" with value `{VALUE}`');
-      var doc = new IntrospectionValidation({name: 'hi'});
+      const doc = new IntrospectionValidation({name: 'hi'});
       doc.save(function(err) {
         assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
         assert.equal(err.name, 'ValidationError');
@@ -1041,9 +1041,9 @@ describe('Model', function() {
         simple: {type: String, required: true}
       }));
 
-      var TestUndefinedValidation = db.model('TestUndefinedValidation');
+      const TestUndefinedValidation = db.model('TestUndefinedValidation');
 
-      var post = new TestUndefinedValidation;
+      const post = new TestUndefinedValidation;
 
       post.save(function(err) {
         assert.ok(err instanceof MongooseError);
@@ -1058,19 +1058,19 @@ describe('Model', function() {
     });
 
     it('save callback should only execute once (gh-319)', function(done) {
-      var D = db.model('CallbackFiresOnceValidation', new Schema({
+      const D = db.model('CallbackFiresOnceValidation', new Schema({
         username: {type: String, validate: /^[a-z]{6}$/i},
         email: {type: String, validate: /^[a-z]{6}$/i},
         password: {type: String, validate: /^[a-z]{6}$/i}
       }));
 
-      var post = new D({
+      const post = new D({
         username: 'nope',
         email: 'too',
         password: 'short'
       });
 
-      var timesCalled = 0;
+      let timesCalled = 0;
 
       post.save(function(err) {
         assert.ok(err instanceof MongooseError);
@@ -1102,9 +1102,9 @@ describe('Model', function() {
         resultv: {type: String, required: true}
       }));
 
-      var TestV = db.model('TestValidationOnResult');
+      const TestV = db.model('TestValidationOnResult');
 
-      var post = new TestV;
+      const post = new TestV;
 
       post.validate(function(err) {
         assert.ok(err instanceof MongooseError);
@@ -1131,7 +1131,7 @@ describe('Model', function() {
         a: String
       }));
 
-      var TestP = db.model('TestPreviousNullValidation');
+      const TestP = db.model('TestPreviousNullValidation');
 
       TestP.collection.insertOne({a: null, previous: null}, {}, function(err, f) {
         assert.ifError(err);
@@ -1161,9 +1161,9 @@ describe('Model', function() {
         }
       }));
 
-      var TestNestedValidation = db.model('TestNestedValidation');
+      const TestNestedValidation = db.model('TestNestedValidation');
 
-      var post = new TestNestedValidation();
+      const post = new TestNestedValidation();
       post.set('nested.required', null);
 
       post.save(function(err) {
@@ -1179,9 +1179,9 @@ describe('Model', function() {
     });
 
     it('of nested subdocuments', function(done) {
-      var Subsubdocs = new Schema({required: {type: String, required: true}});
+      const Subsubdocs = new Schema({required: {type: String, required: true}});
 
-      var Subdocs = new Schema({
+      const Subdocs = new Schema({
         required: {type: String, required: true},
         subs: [Subsubdocs]
       });
@@ -1190,9 +1190,9 @@ describe('Model', function() {
         items: [Subdocs]
       }));
 
-      var TestSubdocumentsValidation = db.model('TestSubdocumentsValidation');
+      const TestSubdocumentsValidation = db.model('TestSubdocumentsValidation');
 
-      var post = new TestSubdocumentsValidation();
+      const post = new TestSubdocumentsValidation();
 
       post.get('items').push({required: '', subs: [{required: ''}]});
 
@@ -1236,9 +1236,9 @@ describe('Model', function() {
         item: {type: String, required: true}
       }));
 
-      var TestCallingValidation = db.model('TestCallingValidation');
+      const TestCallingValidation = db.model('TestCallingValidation');
 
-      var post = new TestCallingValidation;
+      const post = new TestCallingValidation;
 
       assert.equal(post.schema.path('item').isRequired, true);
       assert.strictEqual(post.isNew, true);
@@ -1266,9 +1266,9 @@ describe('Model', function() {
         result: {type: String, validate: [validator, 'chump validator'], required: false}
       }));
 
-      var TestV = db.model('TestRequiredFalse');
+      const TestV = db.model('TestRequiredFalse');
 
-      var post = new TestV;
+      const post = new TestV;
 
       assert.equal(post.schema.path('result').isRequired, false);
       done();
@@ -1276,7 +1276,7 @@ describe('Model', function() {
 
     describe('middleware', function() {
       it('works', function(done) {
-        var ValidationMiddlewareSchema = null,
+        let ValidationMiddlewareSchema = null,
             Post = null,
             post = null;
 
@@ -1312,7 +1312,7 @@ describe('Model', function() {
       });
 
       it('async', function(done) {
-        var AsyncValidationMiddlewareSchema = null,
+        let AsyncValidationMiddlewareSchema = null,
             Post = null,
             post = null;
 
@@ -1321,7 +1321,7 @@ describe('Model', function() {
         });
 
         AsyncValidationMiddlewareSchema.pre('validate', true, function(next, done) {
-          var _this = this;
+          const _this = this;
           setTimeout(function() {
             if (_this.get('prop') === 'bad') {
               _this.invalidate('prop', 'bad');
@@ -1352,7 +1352,7 @@ describe('Model', function() {
       });
 
       it('complex', function(done) {
-        var ComplexValidationMiddlewareSchema = null,
+        let ComplexValidationMiddlewareSchema = null,
             Post = null,
             post = null,
             abc = function(v) {
@@ -1367,7 +1367,7 @@ describe('Model', function() {
         });
 
         ComplexValidationMiddlewareSchema.pre('validate', true, function(next, done) {
-          var _this = this;
+          const _this = this;
           setTimeout(function() {
             if (_this.get('baz') === 'bad') {
               _this.invalidate('baz', 'bad');
@@ -1424,22 +1424,22 @@ describe('Model', function() {
 
   describe('defaults application', function() {
     it('works', function(done) {
-      var now = Date.now();
+      const now = Date.now();
 
       mongoose.model('TestDefaults', new Schema({
         date: {type: Date, default: now}
       }));
 
-      var TestDefaults = db.model('TestDefaults');
+      const TestDefaults = db.model('TestDefaults');
 
-      var post = new TestDefaults;
+      const post = new TestDefaults;
       assert.ok(post.get('date') instanceof Date);
       assert.equal(+post.get('date'), now);
       done();
     });
 
     it('nested', function(done) {
-      var now = Date.now();
+      const now = Date.now();
 
       mongoose.model('TestNestedDefaults', new Schema({
         nested: {
@@ -1447,18 +1447,18 @@ describe('Model', function() {
         }
       }));
 
-      var TestDefaults = db.model('TestNestedDefaults');
+      const TestDefaults = db.model('TestNestedDefaults');
 
-      var post = new TestDefaults();
+      const post = new TestDefaults();
       assert.ok(post.get('nested.date') instanceof Date);
       assert.equal(+post.get('nested.date'), now);
       done();
     });
 
     it('subdocument', function(done) {
-      var now = Date.now();
+      const now = Date.now();
 
-      var Items = new Schema({
+      const Items = new Schema({
         date: {type: Date, default: now}
       });
 
@@ -1466,9 +1466,9 @@ describe('Model', function() {
         items: [Items]
       }));
 
-      var TestSubdocumentsDefaults = db.model('TestSubdocumentsDefaults');
+      const TestSubdocumentsDefaults = db.model('TestSubdocumentsDefaults');
 
-      var post = new TestSubdocumentsDefaults();
+      const post = new TestSubdocumentsDefaults();
       post.get('items').push({});
       assert.ok(post.get('items')[0].get('date') instanceof Date);
       assert.equal(+post.get('items')[0].get('date'), now);
@@ -1476,8 +1476,8 @@ describe('Model', function() {
     });
 
     it('allows nulls', function(done) {
-      var T = db.model('NullDefault', new Schema({name: {type: String, default: null}}), collection);
-      var t = new T();
+      const T = db.model('NullDefault', new Schema({name: {type: String, default: null}}), collection);
+      const t = new T();
 
       assert.strictEqual(null, t.name);
 
@@ -1495,7 +1495,7 @@ describe('Model', function() {
 
   describe('virtuals', function() {
     it('getters', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           post = new BlogPost({
             title: 'Letters from Earth',
             author: 'Mark Twain'
@@ -1507,7 +1507,7 @@ describe('Model', function() {
     });
 
     it('set()', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
 
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
@@ -1517,7 +1517,7 @@ describe('Model', function() {
     });
 
     it('should not be saved to the db AZZ', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           post = new BlogPost();
 
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
@@ -1537,7 +1537,7 @@ describe('Model', function() {
     });
 
     it('nested', function(done) {
-      var PersonSchema = new Schema({
+      const PersonSchema = new Schema({
         name: {
           first: String,
           last: String
@@ -1550,15 +1550,15 @@ describe('Model', function() {
           return this.get('name.first') + ' ' + this.get('name.last');
         }).
         set(function(fullName) {
-          var split = fullName.split(' ');
+          const split = fullName.split(' ');
           this.set('name.first', split[0]);
           this.set('name.last', split[1]);
         });
 
       mongoose.model('Person', PersonSchema);
 
-      var Person = db.model('Person');
-      var person = new Person({
+      const Person = db.model('Person');
+      const person = new Person({
         name: {
           first: 'Michael',
           last: 'Sorrentino'
@@ -1580,7 +1580,7 @@ describe('Model', function() {
 
   describe.skip('.remove()', function() {
     it('works', function(done) {
-      var collection = 'blogposts_' + random(),
+      let collection = 'blogposts_' + random(),
           BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({title: 1}, {title: 2}, function(err) {
@@ -1600,7 +1600,7 @@ describe('Model', function() {
     });
 
     it('errors when id deselected (gh-3118)', function(done) {
-      var collection = 'blogposts_' + random(),
+      let collection = 'blogposts_' + random(),
           BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({title: 1}, {title: 2}, function(err) {
@@ -1617,8 +1617,8 @@ describe('Model', function() {
     });
 
     it('should not remove any records when deleting by id undefined', function(done) {
-      var collection = 'blogposts_' + random();
-      var BlogPost = db.model('BlogPost', collection);
+      const collection = 'blogposts_' + random();
+      const BlogPost = db.model('BlogPost', collection);
       BlogPost.create({title: 1}, {title: 2}, function(err) {
         assert.ifError(err);
 
@@ -1633,7 +1633,7 @@ describe('Model', function() {
     });
 
     it('should not remove all documents in the collection (gh-3326)', function(done) {
-      var collection = 'blogposts_' + random(),
+      let collection = 'blogposts_' + random(),
           BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({title: 1}, {title: 2}, function(err) {
@@ -1655,7 +1655,7 @@ describe('Model', function() {
   });
 
   describe.skip('#remove()', function() {
-    var B;
+    let B;
 
     before(function() {
       B = db.model('BlogPost', 'blogposts_' + random());
@@ -1693,8 +1693,8 @@ describe('Model', function() {
     });
 
     it('works as a promise with a hook', function(done) {
-      var called = 0;
-      var RHS = new Schema({
+      let called = 0;
+      const RHS = new Schema({
         name: String
       });
       RHS.pre('remove', function(next) {
@@ -1702,7 +1702,7 @@ describe('Model', function() {
         return next();
       });
 
-      var RH = db.model('RH', RHS, 'RH_' + random());
+      const RH = db.model('RH', RHS, 'RH_' + random());
 
       RH.create({name: 'to be removed'}, function(err, post) {
         assert.ifError(err);
@@ -1724,14 +1724,14 @@ describe('Model', function() {
 
     describe('when called multiple times', function() {
       it('always executes the passed callback gh-1210', function(done) {
-        var collection = 'blogposts_' + random(),
+        let collection = 'blogposts_' + random(),
             BlogPost = db.model('BlogPost', collection),
             post = new BlogPost();
 
         post.save(function(err) {
           assert.ifError(err);
 
-          var pending = 2;
+          let pending = 2;
 
           post.remove(function() {
             if (--pending) {
@@ -1752,7 +1752,7 @@ describe('Model', function() {
 
   describe('getters', function() {
     it('with same name on embedded docs do not class', function(done) {
-      var Post = new Schema({
+      const Post = new Schema({
         title: String,
         author: {name: String},
         subject: {name: String}
@@ -1760,9 +1760,9 @@ describe('Model', function() {
 
       mongoose.model('PostWithClashGetters', Post);
 
-      var PostModel = db.model('PostWithClashGetters', 'postwithclash' + random());
+      const PostModel = db.model('PostWithClashGetters', 'postwithclash' + random());
 
-      var post = new PostModel({
+      const post = new PostModel({
         title: 'Test',
         author: {name: 'A'},
         subject: {name: 'B'}
@@ -1775,9 +1775,9 @@ describe('Model', function() {
     });
 
     it('should not be triggered at construction (gh-685)', function(done) {
-      var called = false;
+      let called = false;
 
-      var schema = new mongoose.Schema({
+      const schema = new mongoose.Schema({
         number: {
           type: Number,
           set: function(x) {
@@ -1790,17 +1790,17 @@ describe('Model', function() {
         }
       });
 
-      var A = mongoose.model('gettersShouldNotBeTriggeredAtConstruction', schema);
+      const A = mongoose.model('gettersShouldNotBeTriggeredAtConstruction', schema);
 
-      var a = new A({number: 100});
+      const a = new A({number: 100});
       assert.equal(called, false);
-      var num = a.number;
+      let num = a.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
       assert.equal(a.getValue('number').valueOf(), 50);
 
       called = false;
-      var b = new A;
+      const b = new A;
       b.init({number: 50});
       assert.equal(called, false);
       num = b.number;
@@ -1811,13 +1811,13 @@ describe('Model', function() {
     });
 
     it('with type defined with { type: Native } (gh-190)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         date: {type: Date}
       });
 
       mongoose.model('ShortcutGetterObject', schema);
 
-      var ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random()),
+      let ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random()),
           post = new ShortcutGetter();
 
       post.set('date', Date.now());
@@ -1827,14 +1827,14 @@ describe('Model', function() {
 
     describe('nested', function() {
       it('works', function(done) {
-        var schema = new Schema({
+        const schema = new Schema({
           first: {
             second: [Number]
           }
         });
         mongoose.model('ShortcutGetterNested', schema);
 
-        var ShortcutGetterNested = db.model('ShortcutGetterNested', collection),
+        let ShortcutGetterNested = db.model('ShortcutGetterNested', collection),
             doc = new ShortcutGetterNested();
 
         assert.equal(typeof doc.first, 'object');
@@ -1843,16 +1843,16 @@ describe('Model', function() {
       });
 
       it('works with object literals', function(done) {
-        var BlogPost = db.model('BlogPost', collection);
+        const BlogPost = db.model('BlogPost', collection);
 
-        var date = new Date;
+        const date = new Date;
 
-        var meta = {
+        const meta = {
           date: date,
           visitors: 5
         };
 
-        var post = new BlogPost();
+        const post = new BlogPost();
         post.init({
           meta: meta
         });
@@ -1860,9 +1860,9 @@ describe('Model', function() {
         assert.ok(post.get('meta').date instanceof Date);
         assert.ok(post.meta.date instanceof Date);
 
-        var threw = false;
-        var getter1;
-        var getter2;
+        let threw = false;
+        let getter1;
+        let getter2;
         try {
           JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
@@ -1886,7 +1886,7 @@ describe('Model', function() {
         assert.equal(typeof post.get('meta').visitors, 'number');
         assert.equal(typeof post.meta.visitors, 'number');
 
-        var newmeta = {
+        const newmeta = {
           date: date - 2000,
           visitors: 234
         };
@@ -1920,16 +1920,16 @@ describe('Model', function() {
       });
 
       it('object property access works when root initd with null', function(done) {
-        var schema = new Schema({
+        const schema = new Schema({
           nest: {
             st: String
           }
         });
 
         mongoose.model('NestedStringA', schema);
-        var T = db.model('NestedStringA', collection);
+        const T = db.model('NestedStringA', collection);
 
-        var t = new T({nest: null});
+        const t = new T({nest: null});
 
         assert.strictEqual(t.nest.st, undefined);
         t.nest = {st: 'jsconf rules'};
@@ -1943,16 +1943,16 @@ describe('Model', function() {
       });
 
       it('object property access works when root initd with undefined', function(done) {
-        var schema = new Schema({
+        const schema = new Schema({
           nest: {
             st: String
           }
         });
 
         mongoose.model('NestedStringB', schema);
-        var T = db.model('NestedStringB', collection);
+        const T = db.model('NestedStringB', collection);
 
-        var t = new T({nest: undefined});
+        const t = new T({nest: undefined});
 
         assert.strictEqual(t.nest.st, undefined);
         t.nest = {st: 'jsconf rules'};
@@ -1966,7 +1966,7 @@ describe('Model', function() {
       });
 
       it('pre-existing null object re-save', function(done) {
-        var schema = new Schema({
+        const schema = new Schema({
           nest: {
             st: String,
             yep: String
@@ -1974,9 +1974,9 @@ describe('Model', function() {
         });
 
         mongoose.model('NestedStringC', schema);
-        var T = db.model('NestedStringC', collection);
+        const T = db.model('NestedStringC', collection);
 
-        var t = new T({nest: null});
+        const t = new T({nest: null});
 
         t.save(function(err) {
           assert.ifError(err);
@@ -1984,7 +1984,7 @@ describe('Model', function() {
           t.nest = {st: 'jsconf rules', yep: 'it does'};
 
           // check that entire `nest` object is being $set
-          var u = t.$__delta()[1];
+          const u = t.$__delta()[1];
           assert.ok(u.$set);
           assert.ok(u.$set.nest);
           assert.equal(Object.keys(u.$set.nest).length, 2);
@@ -2017,7 +2017,7 @@ describe('Model', function() {
           }
         }));
 
-        var DooDad = db.model('MySchema'),
+        let DooDad = db.model('MySchema'),
             doodad = new DooDad({nested: {arrays: []}}),
             date = 1234567890;
 
@@ -2060,7 +2060,7 @@ describe('Model', function() {
           }
         }));
 
-        var DooDad = db.model('MySchema2', collection),
+        let DooDad = db.model('MySchema2', collection),
             doodad = new DooDad();
 
         doodad.save(function(err) {
@@ -2097,18 +2097,18 @@ describe('Model', function() {
         return parseInt(val, 10);
       }
 
-      var tick = 0;
+      let tick = 0;
 
       function uptick() {
         return ++tick;
       }
 
-      var Location = new Schema({
+      let Location = new Schema({
         lat: {type: Number, default: 0, set: setLat},
         long: {type: Number, set: uptick}
       });
 
-      var Deal = new Schema({
+      let Deal = new Schema({
         title: String,
         locations: [Location]
       });
@@ -2116,11 +2116,11 @@ describe('Model', function() {
       Location = db.model('Location', Location, 'locations_' + random());
       Deal = db.model('Deal', Deal, 'deals_' + random());
 
-      var location = new Location({lat: 1.2, long: 10});
+      const location = new Location({lat: 1.2, long: 10});
       assert.equal(location.lat.valueOf(), 1);
       assert.equal(location.long.valueOf(), 1);
 
-      var deal = new Deal({title: 'My deal', locations: [{lat: 1.2, long: 33}]});
+      const deal = new Deal({title: 'My deal', locations: [{lat: 1.2, long: 33}]});
       assert.equal(deal.locations[0].lat.valueOf(), 1);
       assert.equal(deal.locations[0].long.valueOf(), 2);
 
@@ -2138,9 +2138,9 @@ describe('Model', function() {
   });
 
   it('changing a number non-atomically (gh-203)', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost();
+    const post = new BlogPost();
 
     post.meta.visitors = 5;
 
@@ -2167,11 +2167,11 @@ describe('Model', function() {
 
   describe('atomic subdocument', function() {
     it('saving', function(done) {
-      var BlogPost = db.model('BlogPost', collection),
+      let BlogPost = db.model('BlogPost', collection),
           totalDocs = 4,
           saveQueue = [];
 
-      var post = new BlogPost;
+      const post = new BlogPost;
 
       function complete() {
         BlogPost.findOne({_id: post.get('_id')}, function(err, doc) {
@@ -2179,7 +2179,7 @@ describe('Model', function() {
           assert.ifError(err);
           assert.equal(doc.get('comments').length, 5);
 
-          var v = doc.get('comments').some(function(comment) {
+          let v = doc.get('comments').some(function(comment) {
             return comment.get('title') === '1';
           });
 
@@ -2254,7 +2254,7 @@ describe('Model', function() {
     });
 
     it('setting (gh-310)', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({
         comments: [{title: 'first-title', body: 'first-body'}]
@@ -2272,7 +2272,7 @@ describe('Model', function() {
                 assert.ifError(err);
                 BlogPost.findById(blog.id, function(err, foundBlog) {
                   assert.ifError(err);
-                  var comment = foundBlog.get('comments')[0];
+                  const comment = foundBlog.get('comments')[0];
                   assert.equal(comment.title, 'second-title');
                   assert.equal(comment.body, 'second-body');
                   done();
@@ -2286,18 +2286,18 @@ describe('Model', function() {
   });
 
   it('doubly nested array saving and loading', function(done) {
-    var Inner = new Schema({
+    const Inner = new Schema({
       arr: [Number]
     });
 
-    var Outer = new Schema({
+    let Outer = new Schema({
       inner: [Inner]
     });
     mongoose.model('Outer', Outer);
 
     Outer = db.model('Outer', 'arr_test_' + random());
 
-    var outer = new Outer();
+    const outer = new Outer();
     outer.inner.push({});
     outer.save(function(err) {
       assert.ifError(err);
@@ -2323,14 +2323,14 @@ describe('Model', function() {
   });
 
   it('multiple number push() calls', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         nums: [Number]
       }
     });
 
     mongoose.model('NestedPushes', schema);
-    var Temp = db.model('NestedPushes', collection);
+    const Temp = db.model('NestedPushes', collection);
 
     Temp.create({}, function(err, t) {
       assert.ifError(err);
@@ -2352,13 +2352,13 @@ describe('Model', function() {
   });
 
   it('multiple push() calls', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         nums: [Number]
       }
     });
 
-    var Temp = db.model('NestedPushes', schema, collection);
+    const Temp = db.model('NestedPushes', schema, collection);
 
     Temp.create({}, function(err, t) {
       assert.ifError(err);
@@ -2379,13 +2379,13 @@ describe('Model', function() {
   });
 
   it('activePaths should be updated for nested modifieds', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         nums: [Number]
       }
     });
 
-    var Temp = db.model('NestedPushes', schema, collection);
+    const Temp = db.model('NestedPushes', schema, collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function(err, t) {
       assert.ifError(err);
@@ -2398,15 +2398,15 @@ describe('Model', function() {
 
 
   it('activePaths should be updated for nested modifieds as promise', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         nums: [Number]
       }
     });
 
-    var Temp = db.model('NestedPushes', schema, collection);
+    const Temp = db.model('NestedPushes', schema, collection);
 
-    var p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
+    const p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
     p1.then(function(t) {
       t.nested.nums.pull(1);
       t.nested.nums.pull(2);
@@ -2416,13 +2416,13 @@ describe('Model', function() {
   });
 
   it('$pull should affect what you see in an array before a save', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         nums: [Number]
       }
     });
 
-    var Temp = db.model('NestedPushes', schema, collection);
+    const Temp = db.model('NestedPushes', schema, collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function(err, t) {
       assert.ifError(err);
@@ -2433,14 +2433,14 @@ describe('Model', function() {
   });
 
   it('$shift', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         nums: [Number]
       }
     });
 
     mongoose.model('TestingShift', schema);
-    var Temp = db.model('TestingShift', collection);
+    const Temp = db.model('TestingShift', collection);
 
     Temp.create({nested: {nums: [1, 2, 3]}}, function(err, t) {
       assert.ifError(err);
@@ -2481,23 +2481,23 @@ describe('Model', function() {
 
   describe('saving embedded arrays', function() {
     it('of Numbers atomically', function(done) {
-      var TempSchema = new Schema({
+      let TempSchema = new Schema({
             nums: [Number]
           }),
           totalDocs = 2,
           saveQueue = [];
 
       mongoose.model('Temp', TempSchema);
-      var Temp = db.model('Temp', collection);
+      const Temp = db.model('Temp', collection);
 
-      var t = new Temp();
+      const t = new Temp();
 
       function complete() {
         Temp.findOne({_id: t.get('_id')}, function(err, doc) {
           assert.ifError(err);
           assert.equal(doc.get('nums').length, 3);
 
-          var v = doc.get('nums').some(function(num) {
+          let v = doc.get('nums').some(function(num) {
             return num.valueOf() === 1;
           });
           assert.ok(v);
@@ -2545,16 +2545,16 @@ describe('Model', function() {
     });
 
     it('of Strings atomically', function(done) {
-      var StrListSchema = new Schema({
+      let StrListSchema = new Schema({
             strings: [String]
           }),
           totalDocs = 2,
           saveQueue = [];
 
       mongoose.model('StrList', StrListSchema);
-      var StrList = db.model('StrList');
+      const StrList = db.model('StrList');
 
-      var t = new StrList();
+      const t = new StrList();
 
       function complete() {
         StrList.findOne({_id: t.get('_id')}, function(err, doc) {
@@ -2562,7 +2562,7 @@ describe('Model', function() {
 
           assert.equal(doc.get('strings').length, 3);
 
-          var v = doc.get('strings').some(function(str) {
+          let v = doc.get('strings').some(function(str) {
             return str === 'a';
           });
           assert.ok(v);
@@ -2610,16 +2610,16 @@ describe('Model', function() {
     });
 
     it('of Buffers atomically', function(done) {
-      var BufListSchema = new Schema({
+      let BufListSchema = new Schema({
             buffers: [Buffer]
           }),
           totalDocs = 2,
           saveQueue = [];
 
       mongoose.model('BufList', BufListSchema);
-      var BufList = db.model('BufList');
+      const BufList = db.model('BufList');
 
-      var t = new BufList();
+      const t = new BufList();
 
       function complete() {
         BufList.findOne({_id: t.get('_id')}, function(err, doc) {
@@ -2627,7 +2627,7 @@ describe('Model', function() {
 
           assert.equal(doc.get('buffers').length, 3);
 
-          var v = doc.get('buffers').some(function(buf) {
+          let v = doc.get('buffers').some(function(buf) {
             return buf[0] === 140;
           });
           assert.ok(v);
@@ -2676,7 +2676,7 @@ describe('Model', function() {
     });
 
     it('works with modified element properties + doc removal (gh-975)', function(done) {
-      var B = db.model('BlogPost', collection),
+      let B = db.model('BlogPost', collection),
           b = new B({comments: [{title: 'gh-975'}]});
 
       b.save(function(err) {
@@ -2709,7 +2709,7 @@ describe('Model', function() {
     });
 
     it('updating an embedded document in an embedded array with set call', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({
         comments: [{
@@ -2720,7 +2720,7 @@ describe('Model', function() {
         BlogPost.findById(post._id, function(err, found) {
           assert.ifError(err);
           assert.equal(found.comments[0].title, 'before-change');
-          var subDoc = [{
+          const subDoc = [{
             _id: found.comments[0]._id,
             title: 'after-change'
           }];
@@ -2740,7 +2740,7 @@ describe('Model', function() {
   });
 
   it('updating an embedded document in an embedded array (gh-255)', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
     BlogPost.create({comments: [{title: 'woot'}]}, function(err, post) {
       assert.ifError(err);
@@ -2761,15 +2761,15 @@ describe('Model', function() {
   });
 
   it('updating an embedded array document to an Object value (gh-334)', function(done) {
-    var SubSchema = new Schema({
+    const SubSchema = new Schema({
       name: String,
       subObj: {subName: String}
     });
-    var GH334Schema = new Schema({name: String, arrData: [SubSchema]});
+    const GH334Schema = new Schema({name: String, arrData: [SubSchema]});
 
     mongoose.model('GH334', GH334Schema);
-    var AModel = db.model('GH334');
-    var instance = new AModel();
+    const AModel = db.model('GH334');
+    const instance = new AModel();
 
     instance.set({name: 'name-value', arrData: [{name: 'arrName1', subObj: {subName: 'subName1'}}]});
     instance.save(function(err) {
@@ -2790,7 +2790,7 @@ describe('Model', function() {
   });
 
   it('saving an embedded document twice should not push that doc onto the parent doc twice (gh-267)', function(done) {
-    var BlogPost = db.model('BlogPost', collection),
+    let BlogPost = db.model('BlogPost', collection),
         post = new BlogPost();
 
     post.comments.push({title: 'woot'});
@@ -2815,15 +2815,15 @@ describe('Model', function() {
 
   describe('embedded array filtering', function() {
     it('by the id shortcut function', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost();
+      const post = new BlogPost();
 
       post.comments.push({title: 'woot'});
       post.comments.push({title: 'aaaa'});
 
-      var subdoc1 = post.comments[0];
-      var subdoc2 = post.comments[1];
+      const subdoc1 = post.comments[0];
+      const subdoc2 = post.comments[1];
 
       post.save(function(err) {
         assert.ifError(err);
@@ -2835,7 +2835,7 @@ describe('Model', function() {
           assert.equal(doc.comments.id(subdoc1.get('_id')).title, 'woot');
 
           // test with a string
-          var id = subdoc2._id.toString();
+          const id = subdoc2._id.toString();
           assert.equal(doc.comments.id(id).title, 'aaaa');
           done();
         });
@@ -2843,9 +2843,9 @@ describe('Model', function() {
     });
 
     it('by the id with cast error', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost();
+      const post = new BlogPost();
 
       post.save(function(err) {
         assert.ifError(err);
@@ -2859,9 +2859,9 @@ describe('Model', function() {
     });
 
     it('by the id shortcut with no match', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost();
+      const post = new BlogPost();
 
       post.save(function(err) {
         assert.ifError(err);
@@ -2876,9 +2876,9 @@ describe('Model', function() {
   });
 
   it('removing a subdocument atomically', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost();
+    const post = new BlogPost();
     post.title = 'hahaha';
     post.comments.push({title: 'woot'});
     post.comments.push({title: 'aaaa'});
@@ -2905,9 +2905,9 @@ describe('Model', function() {
   });
 
   it('single pull embedded doc', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost();
+    const post = new BlogPost();
     post.title = 'hahaha';
     post.comments.push({title: 'woot'});
     post.comments.push({title: 'aaaa'});
@@ -2934,11 +2934,11 @@ describe('Model', function() {
   });
 
   it('saving mixed data', function(done) {
-    var BlogPost = db.model('BlogPost', collection),
+    let BlogPost = db.model('BlogPost', collection),
         count = 3;
 
     // string
-    var post = new BlogPost();
+    const post = new BlogPost();
     post.mixed = 'woot';
     post.save(function(err) {
       assert.ifError(err);
@@ -2953,7 +2953,7 @@ describe('Model', function() {
     });
 
     // array
-    var post2 = new BlogPost();
+    const post2 = new BlogPost();
     post2.mixed = {name: 'mr bungle', arr: []};
     post2.save(function(err) {
       assert.ifError(err);
@@ -2993,7 +2993,7 @@ describe('Model', function() {
           });
 
           // date
-          var post3 = new BlogPost();
+          const post3 = new BlogPost();
           post3.mixed = new Date;
           post3.save(function(err) {
             assert.ifError(err);
@@ -3013,9 +3013,9 @@ describe('Model', function() {
   });
 
   it('populating mixed data from the constructor (gh-200)', function(done) {
-    var BlogPost = db.model('BlogPost');
+    const BlogPost = db.model('BlogPost');
 
-    var post = new BlogPost({
+    const post = new BlogPost({
       mixed: {
         type: 'test',
         github: 'rules',
@@ -3036,14 +3036,14 @@ describe('Model', function() {
       type: {type: String, default: 'YES!'}
     }));
 
-    var TestDefaults = db.model('TestTypeDefaults');
+    const TestDefaults = db.model('TestTypeDefaults');
 
-    var post = new TestDefaults();
+    let post = new TestDefaults();
     assert.equal(typeof post.get('type'), 'string');
     assert.equal(post.get('type'), 'YES!');
 
     // GH-402
-    var TestDefaults2 = db.model('TestTypeDefaults2', new Schema({
+    const TestDefaults2 = db.model('TestTypeDefaults2', new Schema({
       x: {y: {type: {type: String}, owner: String}}
     }));
 
@@ -3057,9 +3057,9 @@ describe('Model', function() {
   });
 
   it('unaltered model does not clear the doc (gh-195)', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost();
+    const post = new BlogPost();
     post.title = 'woot';
     post.save(function(err) {
       assert.ifError(err);
@@ -3084,8 +3084,8 @@ describe('Model', function() {
   describe('hooks', function() {
     describe('pre', function() {
       it('with undefined and null', function(done) {
-        var schema = new Schema({name: String});
-        var called = 0;
+        const schema = new Schema({name: String});
+        let called = 0;
 
         schema.pre('save', function(next) {
           called++;
@@ -3097,8 +3097,8 @@ describe('Model', function() {
           next(null);
         });
 
-        var S = db.model('S', schema, collection);
-        var s = new S({name: 'zupa'});
+        const S = db.model('S', schema, collection);
+        const s = new S({name: 'zupa'});
 
         s.save(function(err) {
           assert.ifError(err);
@@ -3109,8 +3109,8 @@ describe('Model', function() {
 
 
       it('with an async waterfall', function(done) {
-        var schema = new Schema({name: String});
-        var called = 0;
+        const schema = new Schema({name: String});
+        let called = 0;
 
         schema.pre('save', true, function(next, done) {
           called++;
@@ -3125,10 +3125,10 @@ describe('Model', function() {
           return next();
         });
 
-        var S = db.model('S', schema, collection);
-        var s = new S({name: 'zupa'});
+        const S = db.model('S', schema, collection);
+        const s = new S({name: 'zupa'});
 
-        var p = s.save();
+        const p = s.save();
         p.then(function() {
           assert.equal(called, 2);
           done();
@@ -3137,27 +3137,27 @@ describe('Model', function() {
 
 
       it('called on all sub levels', function(done) {
-        var grandSchema = new Schema({name: String});
+        const grandSchema = new Schema({name: String});
         grandSchema.pre('save', function(next) {
           this.name = 'grand';
           next();
         });
 
-        var childSchema = new Schema({name: String, grand: [grandSchema]});
+        const childSchema = new Schema({name: String, grand: [grandSchema]});
         childSchema.pre('save', function(next) {
           this.name = 'child';
           next();
         });
 
-        var schema = new Schema({name: String, child: [childSchema]});
+        const schema = new Schema({name: String, child: [childSchema]});
 
         schema.pre('save', function(next) {
           this.name = 'parent';
           next();
         });
 
-        var S = db.model('presave_hook', schema, 'presave_hook');
-        var s = new S({name: 'a', child: [{name: 'b', grand: [{name: 'c'}]}]});
+        const S = db.model('presave_hook', schema, 'presave_hook');
+        const s = new S({name: 'a', child: [{name: 'b', grand: [{name: 'c'}]}]});
 
         s.save(function(err, doc) {
           assert.ifError(err);
@@ -3170,25 +3170,25 @@ describe('Model', function() {
 
 
       it('error on any sub level', function(done) {
-        var grandSchema = new Schema({name: String});
+        const grandSchema = new Schema({name: String});
         grandSchema.pre('save', function(next) {
           next(new Error('Error 101'));
         });
 
-        var childSchema = new Schema({name: String, grand: [grandSchema]});
+        const childSchema = new Schema({name: String, grand: [grandSchema]});
         childSchema.pre('save', function(next) {
           this.name = 'child';
           next();
         });
 
-        var schema = new Schema({name: String, child: [childSchema]});
+        const schema = new Schema({name: String, child: [childSchema]});
         schema.pre('save', function(next) {
           this.name = 'parent';
           next();
         });
 
-        var S = db.model('presave_hook_error', schema, 'presave_hook_error');
-        var s = new S({name: 'a', child: [{name: 'b', grand: [{name: 'c'}]}]});
+        const S = db.model('presave_hook_error', schema, 'presave_hook_error');
+        const s = new S({name: 'a', child: [{name: 'b', grand: [{name: 'c'}]}]});
 
         s.save(function(err) {
           assert.ok(err instanceof Error);
@@ -3199,16 +3199,16 @@ describe('Model', function() {
 
       describe('init', function() {
         it('has access to the true ObjectId when used with querying (gh-289)', function(done) {
-          var PreInitSchema = new Schema({}),
+          let PreInitSchema = new Schema({}),
               preId = null;
 
           PreInitSchema.pre('init', function() {
             preId = this._id;
           });
 
-          var PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());
+          const PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());
 
-          var doc = new PreInit();
+          const doc = new PreInit();
           doc.save(function(err) {
             assert.ifError(err);
             PreInit.findById(doc._id, function(err) {
@@ -3223,7 +3223,7 @@ describe('Model', function() {
 
     describe('post', function() {
       it('works', function(done) {
-        var schema = new Schema({
+        let schema = new Schema({
               title: String
             }),
             save = false,
@@ -3247,7 +3247,7 @@ describe('Model', function() {
 
         mongoose.model('PostHookTest', schema);
 
-        var BlogPost = db.model('PostHookTest');
+        const BlogPost = db.model('PostHookTest');
 
         post = new BlogPost();
 
@@ -3274,9 +3274,9 @@ describe('Model', function() {
       });
 
       it('on embedded docs', function(done) {
-        var save = false;
+        let save = false;
 
-        var EmbeddedSchema = new Schema({
+        const EmbeddedSchema = new Schema({
           title: String
         });
 
@@ -3284,15 +3284,15 @@ describe('Model', function() {
           save = true;
         });
 
-        var ParentSchema = new Schema({
+        const ParentSchema = new Schema({
           embeds: [EmbeddedSchema]
         });
 
         mongoose.model('Parent', ParentSchema);
 
-        var Parent = db.model('Parent');
+        const Parent = db.model('Parent');
 
-        var parent = new Parent();
+        const parent = new Parent();
 
         parent.embeds.push({title: 'Testing post hooks for embedded docs'});
 
@@ -3307,11 +3307,11 @@ describe('Model', function() {
 
   describe('#exec()', function() {
     it.skip('count()', function(done) {
-      var BlogPost = db.model('BlogPost' + random(), bpSchema);
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create({title: 'interoperable count as promise'}, function(err) {
         assert.ifError(err);
-        var query = BlogPost.count({title: 'interoperable count as promise'});
+        const query = BlogPost.count({title: 'interoperable count as promise'});
         query.exec(function(err, count) {
           assert.ifError(err);
           assert.equal(count, 1);
@@ -3341,12 +3341,12 @@ describe('Model', function() {
     });
 
     it.skip('update()', function(done) {
-      var col = 'BlogPost' + random();
-      var BlogPost = db.model(col, bpSchema);
+      const col = 'BlogPost' + random();
+      const BlogPost = db.model(col, bpSchema);
 
       BlogPost.create({title: 'interoperable update as promise'}, function(err) {
         assert.ifError(err);
-        var query = BlogPost.update({title: 'interoperable update as promise'}, {title: 'interoperable update as promise delta'});
+        const query = BlogPost.update({title: 'interoperable update as promise'}, {title: 'interoperable update as promise delta'});
         query.exec(function(err) {
           assert.ifError(err);
           BlogPost.count({title: 'interoperable update as promise delta'}, function(err, count) {
@@ -3359,11 +3359,11 @@ describe('Model', function() {
     });
 
     it('findOne()', function(done) {
-      var BlogPost = db.model('BlogPost' + random(), bpSchema);
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create({title: 'interoperable findOne as promise'}, function(err, created) {
         assert.ifError(err);
-        var query = BlogPost.findOne({title: 'interoperable findOne as promise'});
+        const query = BlogPost.findOne({title: 'interoperable findOne as promise'});
         query.exec(function(err, found) {
           assert.ifError(err);
           assert.equal(found.id, created.id);
@@ -3373,18 +3373,18 @@ describe('Model', function() {
     });
 
     it('find()', function(done) {
-      var BlogPost = db.model('BlogPost' + random(), bpSchema);
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create(
         {title: 'interoperable find as promise'},
         {title: 'interoperable find as promise'},
         function(err, createdOne, createdTwo) {
           assert.ifError(err);
-          var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
+          const query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
           query.exec(function(err, found) {
             assert.ifError(err);
             assert.equal(found.length, 2);
-            var ids = {};
+            const ids = {};
             ids[String(found[0]._id)] = 1;
             ids[String(found[1]._id)] = 1;
             assert.ok(String(createdOne._id) in ids);
@@ -3395,13 +3395,13 @@ describe('Model', function() {
     });
 
     it.skip('remove()', function(done) {
-      var BlogPost = db.model('BlogPost' + random(), bpSchema);
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create(
         {title: 'interoperable remove as promise'},
         function(err) {
           assert.ifError(err);
-          var query = BlogPost.remove({title: 'interoperable remove as promise'});
+          const query = BlogPost.remove({title: 'interoperable remove as promise'});
           query.exec(function(err) {
             assert.ifError(err);
             BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
@@ -3413,12 +3413,12 @@ describe('Model', function() {
     });
 
     it('op can be changed', function(done) {
-      var BlogPost = db.model('BlogPost' + random(), bpSchema),
+      let BlogPost = db.model('BlogPost' + random(), bpSchema),
           title = 'interop ad-hoc as promise';
 
       BlogPost.create({title: title}, function(err, created) {
         assert.ifError(err);
-        var query = BlogPost.count({title: title});
+        const query = BlogPost.count({title: title});
         query.exec('findOne', function(err, found) {
           assert.ifError(err);
           assert.equal(found.id, created.id);
@@ -3429,12 +3429,12 @@ describe('Model', function() {
 
     describe('promises', function() {
       it.skip('count()', function(done) {
-        var BlogPost = db.model('BlogPost' + random(), bpSchema);
+        const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable count as promise 2'}, function(err) {
           assert.ifError(err);
-          var query = BlogPost.count({title: 'interoperable count as promise 2'});
-          var promise = query.exec();
+          const query = BlogPost.count({title: 'interoperable count as promise 2'});
+          const promise = query.exec();
           promise.then(function(count) {
             assert.equal(count, 1);
             done();
@@ -3443,13 +3443,13 @@ describe('Model', function() {
       });
 
       it.skip('update()', function(done) {
-        var col = 'BlogPost' + random();
-        var BlogPost = db.model(col, bpSchema);
+        const col = 'BlogPost' + random();
+        const BlogPost = db.model(col, bpSchema);
 
         BlogPost.create({title: 'interoperable update as promise 2'}, function(err) {
           assert.ifError(err);
-          var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
-          var promise = query.exec();
+          const query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
+          const promise = query.exec();
           promise.then(function() {
             BlogPost.count({title: 'interoperable update as promise delta 2'}, function(err, count) {
               assert.ifError(err);
@@ -3477,15 +3477,15 @@ describe('Model', function() {
       });
 
       it('find()', function(done) {
-        var BlogPost = db.model('BlogPost' + random(), bpSchema);
+        const BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create(
           {title: 'interoperable find as promise 2'},
           {title: 'interoperable find as promise 2'},
           function(err, createdOne, createdTwo) {
             assert.ifError(err);
-            var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
-            var promise = query.exec();
+            const query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
+            const promise = query.exec();
             promise.then(function(found) {
               assert.ifError(err);
               assert.equal(found.length, 2);
@@ -3512,10 +3512,10 @@ describe('Model', function() {
       });
 
       it('are thenable', function(done) {
-        var B = db.model('BlogPost' + random(), bpSchema);
+        const B = db.model('BlogPost' + random(), bpSchema);
 
-        var peopleSchema = new Schema({name: String, likes: ['ObjectId']});
-        var P = db.model('promise-BP-people', peopleSchema, random());
+        const peopleSchema = new Schema({name: String, likes: ['ObjectId']});
+        const P = db.model('promise-BP-people', peopleSchema, random());
         B.create(
           {title: 'then promise 1'},
           {title: 'then promise 2'},
@@ -3530,9 +3530,9 @@ describe('Model', function() {
               function(err) {
                 assert.ifError(err);
 
-                var promise = B.find({title: /^then promise/}).select('_id').exec();
+                const promise = B.find({title: /^then promise/}).select('_id').exec();
                 promise.then(function(blogs) {
-                  var ids = blogs.map(function(m) {
+                  const ids = blogs.map(function(m) {
                     return m._id;
                   });
                   return P.where('likes').in(ids).exec();
@@ -3552,15 +3552,15 @@ describe('Model', function() {
 
   describe('console.log', function() {
     it('hides private props', function(done) {
-      var BlogPost = db.model('BlogPost', collection);
+      const BlogPost = db.model('BlogPost', collection);
 
-      var date = new Date(1305730951086);
-      var id0 = new DocumentObjectId('4dd3e169dbfb13b4570000b9');
-      var id1 = new DocumentObjectId('4dd3e169dbfb13b4570000b6');
-      var id2 = new DocumentObjectId('4dd3e169dbfb13b4570000b7');
-      var id3 = new DocumentObjectId('4dd3e169dbfb13b4570000b8');
+      const date = new Date(1305730951086);
+      const id0 = new DocumentObjectId('4dd3e169dbfb13b4570000b9');
+      const id1 = new DocumentObjectId('4dd3e169dbfb13b4570000b6');
+      const id2 = new DocumentObjectId('4dd3e169dbfb13b4570000b7');
+      const id3 = new DocumentObjectId('4dd3e169dbfb13b4570000b8');
 
-      var post = new BlogPost({
+      const post = new BlogPost({
         title: 'Test',
         _id: id0,
         date: date,
@@ -3572,7 +3572,7 @@ describe('Model', function() {
           {_id: id3, title: 'the next thang', date: date, body: 'this is a comment too!'}]
       });
 
-      var out = post.inspect();
+      const out = post.inspect();
       assert.equal(out.meta.visitors, post.meta.visitors);
       assert.deepEqual(out.numbers, Array.prototype.slice.call(post.numbers));
       assert.equal(out.date.valueOf(), post.date.valueOf());
@@ -3584,9 +3584,9 @@ describe('Model', function() {
 
   describe('pathnames', function() {
     it('named path can be used', function(done) {
-      var P = db.model('pathnametest', new Schema({path: String}));
+      const P = db.model('pathnametest', new Schema({path: String}));
 
-      var threw = false;
+      let threw = false;
       try {
         new P({path: 'i should not throw'});
       } catch (err) {
@@ -3599,10 +3599,10 @@ describe('Model', function() {
   });
 
   it('subdocuments with changed values should persist the values', function(done) {
-    var Subdoc = new Schema({name: String, mixed: Schema.Types.Mixed});
-    var T = db.model('SubDocMixed', new Schema({subs: [Subdoc]}));
+    const Subdoc = new Schema({name: String, mixed: Schema.Types.Mixed});
+    const T = db.model('SubDocMixed', new Schema({subs: [Subdoc]}));
 
-    var t = new T({subs: [{name: 'Hubot', mixed: {w: 1, x: 2}}]});
+    const t = new T({subs: [{name: 'Hubot', mixed: {w: 1, x: 2}}]});
     assert.equal(t.subs[0].name, 'Hubot');
     assert.equal(t.subs[0].mixed.w, 1);
     assert.equal(t.subs[0].mixed.x, 2);
@@ -3616,7 +3616,7 @@ describe('Model', function() {
         assert.equal(t.subs[0].mixed.w, 1);
         assert.equal(t.subs[0].mixed.x, 2);
 
-        var sub = t.subs[0];
+        const sub = t.subs[0];
         sub.name = 'Hubot1';
         assert.equal(sub.name, 'Hubot1');
         assert.ok(sub.isModified('name'));
@@ -3629,7 +3629,7 @@ describe('Model', function() {
             assert.ifError(err);
             assert.strictEqual(t.subs[0].name, 'Hubot1');
 
-            var sub = t.subs[0];
+            const sub = t.subs[0];
             sub.mixed.w = 5;
             assert.equal(sub.mixed.w, 5);
             assert.ok(!sub.isModified('mixed'));
@@ -3655,10 +3655,10 @@ describe('Model', function() {
 
   describe('RegExps', function() {
     it('can be saved', function(done) {
-      var db = start(),
+      let db = start(),
           BlogPost = db.model('BlogPost', collection);
 
-      var post = new BlogPost({mixed: {rgx: /^asdf$/}});
+      const post = new BlogPost({mixed: {rgx: /^asdf$/}});
       assert.ok(post.mixed.rgx instanceof RegExp);
       assert.equal(post.mixed.rgx.source, '^asdf$');
       post.save(function(err) {
@@ -3676,9 +3676,9 @@ describe('Model', function() {
 
   // Demonstration showing why GH-261 is a misunderstanding
   it('a single instantiated document should be able to update its embedded documents more than once', function(done) {
-    var BlogPost = db.model('BlogPost', collection);
+    const BlogPost = db.model('BlogPost', collection);
 
-    var post = new BlogPost();
+    const post = new BlogPost();
     post.comments.push({title: 'one'});
     post.save(function(err) {
       assert.ifError(err);
@@ -3704,7 +3704,7 @@ describe('Model', function() {
           next(new Error);
         });
 
-        var DefaultErr = db.model('DefaultErr3', DefaultErrSchema, 'default_err_' + random());
+        const DefaultErr = db.model('DefaultErr3', DefaultErrSchema, 'default_err_' + random());
 
         DefaultErr.on('error', function(err) {
           assert.ok(err instanceof Error);
@@ -3716,9 +3716,9 @@ describe('Model', function() {
     });
 
     it('saved changes made within callback of a previous no-op save gh-1139', function(done) {
-      var B = db.model('BlogPost', collection);
+      const B = db.model('BlogPost', collection);
 
-      var post = new B({title: 'first'});
+      const post = new B({title: 'first'});
       post.save(function(err) {
         assert.ifError(err);
 
@@ -3741,9 +3741,9 @@ describe('Model', function() {
     });
 
     it('rejects new documents that have no _id set (1595)', function(done) {
-      var s = new Schema({_id: {type: String}});
-      var B = db.model('1595', s);
-      var b = new B;
+      const s = new Schema({_id: {type: String}});
+      const B = db.model('1595', s);
+      const b = new B;
       b.save(function(err) {
         assert.ok(err);
         assert.ok(/must have an _id/.test(err));
@@ -3787,7 +3787,7 @@ describe('Model', function() {
 
   describe('_delta()', function() {
     it('should overwrite arrays when directly set (gh-1126)', function(done) {
-      var B = db.model('BlogPost', collection);
+      const B = db.model('BlogPost', collection);
 
       B.create({title: 'gh-1126', numbers: [1, 2]}, function(err, b) {
         assert.ifError(err);
@@ -3798,7 +3798,7 @@ describe('Model', function() {
           b.numbers = [];
           b.numbers.push(3);
 
-          var d = b.$__delta()[1];
+          const d = b.$__delta()[1];
           assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
           assert.ok(Array.isArray(d.$set.numbers));
           assert.equal(d.$set.numbers.length, 1);
@@ -3814,7 +3814,7 @@ describe('Model', function() {
               assert.equal(b.numbers[0], 3);
 
               b.numbers = [3];
-              var d = b.$__delta();
+              const d = b.$__delta();
               assert.ok(!d);
 
               b.numbers = [4];
@@ -3837,7 +3837,7 @@ describe('Model', function() {
     });
 
     it('should use $set when subdoc changed before pulling (gh-1303)', function(done) {
-      var B = db.model('BlogPost', 'gh-1303-' + random());
+      const B = db.model('BlogPost', 'gh-1303-' + random());
 
       B.create(
         {title: 'gh-1303', comments: [{body: 'a'}, {body: 'b'}, {body: 'c'}]},
@@ -3853,7 +3853,7 @@ describe('Model', function() {
             assert.equal(b.comments[0].body, 'a');
             assert.equal(b.comments[1].body, 'changed');
 
-            var d = b.$__delta()[1];
+            const d = b.$__delta()[1];
             assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
             assert.ok(Array.isArray(d.$set.comments));
             assert.equal(d.$set.comments.length, 2);
@@ -3877,8 +3877,8 @@ describe('Model', function() {
 
   describe('backward compatibility', function() {
     it('with conflicted data in db', function(done) {
-      var M = db.model('backwardDataConflict', new Schema({namey: {first: String, last: String}}));
-      var m = new M({namey: '[object Object]'});
+      const M = db.model('backwardDataConflict', new Schema({namey: {first: String, last: String}}));
+      const m = new M({namey: '[object Object]'});
       m.namey = {first: 'GI', last: 'Joe'};// <-- should overwrite the string
       m.save(function(err) {
         assert.strictEqual(err, null);
@@ -3889,11 +3889,11 @@ describe('Model', function() {
     });
 
     it('with positional notation on path not existing in schema (gh-1048)', function(done) {
-      var db = start();
+      const db = start();
 
-      var M = db.model('backwardCompat-gh-1048', Schema({name: 'string'}));
+      const M = db.model('backwardCompat-gh-1048', Schema({name: 'string'}));
       db.on('open', function() {
-        var o = {
+        const o = {
           name: 'gh-1048',
           _id: new mongoose.Types.ObjectId,
           databases: {
@@ -3921,9 +3921,9 @@ describe('Model', function() {
 
   describe('non-schema adhoc property assignments', function() {
     it('are not saved', function(done) {
-      var B = db.model('BlogPost', collection);
+      const B = db.model('BlogPost', collection);
 
-      var b = new B;
+      const b = new B;
       b.whateveriwant = 10;
       b.save(function(err) {
         assert.ifError(err);
@@ -3937,9 +3937,9 @@ describe('Model', function() {
   });
 
   it('should not throw range error when using Number _id and saving existing doc (gh-691)', function(done) {
-    var T = new Schema({_id: Number, a: String});
-    var D = db.model('Testing691', T, 'asdf' + random());
-    var d = new D({_id: 1});
+    const T = new Schema({_id: Number, a: String});
+    const D = db.model('Testing691', T, 'asdf' + random());
+    const d = new D({_id: 1});
     d.save(function(err) {
       assert.ifError(err);
 
@@ -3957,13 +3957,13 @@ describe('Model', function() {
 
   describe('setting an unset value', function() {
     it('is saved (gh-742)', function(done) {
-      var DefaultTestObject = db.model('defaultTestObject',
+      const DefaultTestObject = db.model('defaultTestObject',
         new Schema({
           score: {type: Number, default: 55}
         })
       );
 
-      var myTest = new DefaultTestObject();
+      const myTest = new DefaultTestObject();
 
       myTest.save(function(err, doc) {
         assert.ifError(err);
@@ -3993,8 +3993,8 @@ describe('Model', function() {
   });
 
   it('path is cast to correct value when retreived from db', function(done) {
-    var schema = new Schema({title: {type: 'string', index: true}});
-    var T = db.model('T', schema);
+    const schema = new Schema({title: {type: 'string', index: true}});
+    const T = db.model('T', schema);
     T.collection.insertOne({title: 234}, {safe: true}, function(err) {
       assert.ifError(err);
       T.findOne(function(err, doc) {
@@ -4006,9 +4006,9 @@ describe('Model', function() {
   });
 
   it('setting a path to undefined should retain the value as undefined', function(done) {
-    var B = db.model('BlogPost', collection + random());
+    const B = db.model('BlogPost', collection + random());
 
-    var doc = new B;
+    const doc = new B;
     doc.title = 'css3';
     assert.equal(doc.$__delta()[1].$set.title, 'css3');
     doc.title = undefined;
@@ -4075,7 +4075,7 @@ describe('Model', function() {
 
   describe('unsetting a default value', function() {
     it('should be ignored (gh-758)', function(done) {
-      var M = db.model('758', new Schema({s: String, n: Number, a: Array}));
+      const M = db.model('758', new Schema({s: String, n: Number, a: Array}));
       M.collection.insertOne({}, {safe: true}, function(err) {
         assert.ifError(err);
         M.findOne(function(err, m) {
@@ -4089,8 +4089,8 @@ describe('Model', function() {
   });
 
   it('allow for object passing to ref paths (gh-1606)', function(done) {
-    var schA = new Schema({title: String});
-    var schma = new Schema({
+    const schA = new Schema({title: String});
+    const schma = new Schema({
       thing: {type: Schema.Types.ObjectId, ref: 'A'},
       subdoc: {
         some: String,
@@ -4098,10 +4098,10 @@ describe('Model', function() {
       }
     });
 
-    var M1 = db.model('A', schA);
-    var M2 = db.model('A2', schma);
-    var a = new M1({title: 'hihihih'}).toObject();
-    var thing = new M2({
+    const M1 = db.model('A', schA);
+    const M2 = db.model('A2', schma);
+    const a = new M1({title: 'hihihih'}).toObject();
+    const thing = new M2({
       thing: a,
       subdoc: {
         title: 'blah',
@@ -4116,7 +4116,7 @@ describe('Model', function() {
   });
 
   it('setters trigger on null values (gh-1445)', function(done) {
-    var OrderSchema = new Schema({
+    const OrderSchema = new Schema({
       total: {
         type: Number,
         default: 0,
@@ -4127,14 +4127,14 @@ describe('Model', function() {
       }
     });
 
-    var Order = db.model('order' + random(), OrderSchema);
-    var o = new Order({total: null});
+    const Order = db.model('order' + random(), OrderSchema);
+    const o = new Order({total: null});
     assert.equal(o.total, 10);
     done();
   });
 
   describe('Skip setting default value for Geospatial-indexed fields (gh-1668)', function() {
-    var db;
+    let db;
 
     before(function() {
       db = start({ noErrorListener: true });
@@ -4408,10 +4408,10 @@ describe('Model', function() {
 
   it('save max bson size error with buffering (gh-3906)', function(done) {
     this.timeout(10000);
-    var db = start({ noErrorListener: true });
-    var Test = db.model('gh3906_0', { name: Object });
+    const db = start({ noErrorListener: true });
+    const Test = db.model('gh3906_0', { name: Object });
 
-    var test = new Test({
+    const test = new Test({
       name: {
         data: (new Array(16 * 1024 * 1024)).join('x')
       }
@@ -4426,10 +4426,10 @@ describe('Model', function() {
 
   it('reports max bson size error in save (gh-3906)', function(done) {
     this.timeout(10000);
-    var db = start({ noErrorListener: true });
-    var Test = db.model('gh3906', { name: Object });
+    const db = start({ noErrorListener: true });
+    const Test = db.model('gh3906', { name: Object });
 
-    var test = new Test({
+    const test = new Test({
       name: {
         data: (new Array(16 * 1024 * 1024)).join('x')
       }
@@ -4445,7 +4445,7 @@ describe('Model', function() {
   });
 
   describe('bug fixes', function() {
-    var db;
+    let db;
 
     before(function() {
       db = start({ noErrorListener: true });
@@ -4456,15 +4456,15 @@ describe('Model', function() {
     });
 
     it('doesnt crash (gh-1920)', function(done) {
-      var parentSchema = new Schema({
+      const parentSchema = new Schema({
         children: [new Schema({
           name: String
         })]
       });
 
-      var Parent = db.model('gh-1920', parentSchema);
+      const Parent = db.model('gh-1920', parentSchema);
 
-      var parent = new Parent();
+      const parent = new Parent();
       parent.children.push({name: 'child name'});
       parent.save(function(err, it) {
         assert.ifError(err);
@@ -4477,7 +4477,7 @@ describe('Model', function() {
     });
 
     it('doesnt reset "modified" status for fields', function(done) {
-      var UniqueSchema = new Schema({
+      const UniqueSchema = new Schema({
         changer: String,
         unique: {
           type: Number,
@@ -4485,14 +4485,14 @@ describe('Model', function() {
         }
       });
 
-      var Unique = db.model('Unique', UniqueSchema);
+      const Unique = db.model('Unique', UniqueSchema);
 
-      var u1 = new Unique({
+      const u1 = new Unique({
         changer: 'a',
         unique: 5
       });
 
-      var u2 = new Unique({
+      const u2 = new Unique({
         changer: 'a',
         unique: 6
       });
@@ -4518,12 +4518,12 @@ describe('Model', function() {
     });
 
     it('insertMany() (gh-723)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: String
       }, { timestamps: true });
-      var Movie = db.model('gh723', schema);
+      const Movie = db.model('gh723', schema);
 
-      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
@@ -4549,7 +4549,7 @@ describe('Model', function() {
           done(err);
           return;
         }
-        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
         if (!mongo34) {
           done();
           return;
@@ -4559,12 +4559,12 @@ describe('Model', function() {
       });
 
       function test() {
-        var schema = new Schema({
+        const schema = new Schema({
           name: { type: String, unique: true }
         });
-        var Movie = db.model('gh3893', schema);
+        const Movie = db.model('gh3893', schema);
 
-        var arr = [
+        const arr = [
           { name: 'Star Wars' },
           { name: 'Star Wars' },
           { name: 'The Empire Strikes Back' }
@@ -4591,7 +4591,7 @@ describe('Model', function() {
           done(err);
           return;
         }
-        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
         if (!mongo34) {
           done();
           return;
@@ -4601,12 +4601,12 @@ describe('Model', function() {
       });
 
       function test() {
-        var schema = new Schema({
+        const schema = new Schema({
           name: { type: String, required: true }
         });
-        var Movie = db.model('gh5068', schema);
+        const Movie = db.model('gh5068', schema);
 
-        var arr = [
+        const arr = [
           { name: 'Star Wars' },
           { foo: 'Star Wars' },
           { name: 'The Empire Strikes Back' }
@@ -4630,7 +4630,7 @@ describe('Model', function() {
           done(err);
           return;
         }
-        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
         if (!mongo34) {
           done();
           return;
@@ -4640,12 +4640,12 @@ describe('Model', function() {
       });
 
       function test() {
-        var schema = new Schema({
+        const schema = new Schema({
           name: { type: String, required: true }
         });
-        var Movie = db.model('gh5068-2', schema);
+        const Movie = db.model('gh5068-2', schema);
 
-        var arr = [
+        const arr = [
           { foo: 'Star Wars' },
           { foo: 'The Fast and the Furious' }
         ];
@@ -4660,11 +4660,11 @@ describe('Model', function() {
     });
 
     it('insertMany() hooks (gh-3846)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: String
       });
-      var calledPre = 0;
-      var calledPost = 0;
+      let calledPre = 0;
+      let calledPost = 0;
       schema.pre('insertMany', function(next, docs) {
         assert.equal(docs.length, 2);
         assert.equal(docs[0].name, 'Star Wars');
@@ -4681,9 +4681,9 @@ describe('Model', function() {
       schema.post('insertMany', function() {
         ++calledPost;
       });
-      var Movie = db.model('gh3846', schema);
+      const Movie = db.model('gh3846', schema);
 
-      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
@@ -4699,12 +4699,12 @@ describe('Model', function() {
     });
 
     it('insertMany() with timestamps (gh-723)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: String
       });
-      var Movie = db.model('gh723_0', schema);
+      const Movie = db.model('gh723_0', schema);
 
-      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
       Movie.insertMany(arr, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 2);
@@ -4719,18 +4719,18 @@ describe('Model', function() {
     });
 
     it('insertMany() multi validation error with ordered false (gh-5337)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: { type: String, required: true }
       });
-      var Movie = db.model('gh5337', schema);
+      const Movie = db.model('gh5337', schema);
 
-      var arr = [
+      const arr = [
         { foo: 'The Phantom Menace' },
         { name: 'Star Wars' },
         { name: 'The Empire Strikes Back' },
         { foobar: 'The Force Awakens' }
       ];
-      var opts = { ordered: false, rawResult: true };
+      const opts = { ordered: false, rawResult: true };
       Movie.insertMany(arr, opts, function(error, res) {
         assert.ifError(error);
         assert.equal(res.mongoose.validationErrors.length, 2);
@@ -4741,10 +4741,10 @@ describe('Model', function() {
     });
 
     it('insertMany() depopulate (gh-4590)', function(done) {
-      var personSchema = new Schema({
+      const personSchema = new Schema({
         name: String
       });
-      var movieSchema = new Schema({
+      const movieSchema = new Schema({
         name: String,
         leadActor: {
           type: Schema.Types.ObjectId,
@@ -4752,11 +4752,11 @@ describe('Model', function() {
         }
       });
 
-      var Person = db.model('gh4590', personSchema);
-      var Movie = db.model('gh4590_0', movieSchema);
+      const Person = db.model('gh4590', personSchema);
+      const Movie = db.model('gh4590_0', movieSchema);
 
-      var arnold = new Person({ name: 'Arnold Schwarzenegger' });
-      var movies = [{ name: 'Predator', leadActor: arnold }];
+      const arnold = new Person({ name: 'Arnold Schwarzenegger' });
+      const movies = [{ name: 'Predator', leadActor: arnold }];
       Movie.insertMany(movies, function(error, docs) {
         assert.ifError(error);
         assert.equal(docs.length, 1);
@@ -4769,12 +4769,12 @@ describe('Model', function() {
     });
 
     it('insertMany() with promises (gh-4237)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: String
       });
-      var Movie = db.model('gh4237', schema);
+      const Movie = db.model('gh4237', schema);
 
-      var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+      const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
       Movie.insertMany(arr).then(function(docs) {
         assert.equal(docs.length, 2);
         assert.ok(!docs[0].isNew);
@@ -4827,12 +4827,12 @@ describe('Model', function() {
     });
 
     it('deleteMany() with options (gh-6805)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         name: String
       });
-      var Character = db.model('gh6805', schema);
+      const Character = db.model('gh6805', schema);
 
-      var arr = [
+      const arr = [
         { name: 'Tyrion Lannister' },
         { name: 'Cersei Lannister' },
         { name: 'Jon Snow' },
@@ -4853,7 +4853,7 @@ describe('Model', function() {
     });
 
     it('run default function with correct this scope in DocumentArray (gh-6840)', function() {
-      var schema = new Schema({
+      const schema = new Schema({
         title: String,
         actors: {
           type: [{ name: String, character: String }],
@@ -4870,8 +4870,8 @@ describe('Model', function() {
         }
       });
 
-      var Movie = db.model('gh6840', schema);
-      var movie = new Movie({ title: 'Passenger'});
+      const Movie = db.model('gh6840', schema);
+      const movie = new Movie({ title: 'Passenger'});
       assert.equal(movie.actors.length, 2);
     });
 
@@ -4882,7 +4882,7 @@ describe('Model', function() {
             done(err);
             return;
           }
-          var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+          const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
           if (!mongo36) {
             this.skip();
           }
@@ -4957,7 +4957,7 @@ describe('Model', function() {
 
       describe('sessions (gh-6362)', function() {
         let MyModel;
-        let delay = ms => done => setTimeout(done, ms);
+        const delay = ms => done => setTimeout(done, ms);
 
         before(function(done) {
           MyModel = db.model('gh6362', new Schema({ name: String }));
@@ -4967,7 +4967,7 @@ describe('Model', function() {
               done(err);
               return;
             }
-            var mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
+            const mongo36 = version[0] > 3 || (version[0] === 3 && version[1] >= 6);
             if (!mongo36) {
               this.skip();
             }
@@ -5054,7 +5054,7 @@ describe('Model', function() {
 
             yield delay(1);
 
-            let docs = yield MyModel.find({ _id: doc._id }, null,
+            const docs = yield MyModel.find({ _id: doc._id }, null,
               { session: session });
             assert.equal(docs.length, 1);
             assert.strictEqual(docs[0].$__.session, session);
@@ -5085,7 +5085,7 @@ describe('Model', function() {
 
             yield delay(1);
 
-            let doc = yield MyModel.findOne({}, null, { session });
+            const doc = yield MyModel.findOne({}, null, { session });
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
@@ -5105,14 +5105,14 @@ describe('Model', function() {
     });
 
     it('method with same name as prop should throw (gh-4475)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         isPaid: Boolean
       });
       testSchema.methods.isPaid = function() {
         return false;
       };
 
-      var threw = false;
+      let threw = false;
       try {
         db.model('gh4475', testSchema);
       } catch (error) {
@@ -5125,8 +5125,8 @@ describe('Model', function() {
     });
 
     it('emits errors in create cb (gh-3222) (gh-3478)', function(done) {
-      var schema = new Schema({ name: 'String' });
-      var Movie = db.model('gh3222', schema);
+      const schema = new Schema({ name: 'String' });
+      const Movie = db.model('gh3222', schema);
 
       Movie.on('error', function(error) {
         assert.equal(error.message, 'fail!');
@@ -5140,12 +5140,12 @@ describe('Model', function() {
     });
 
     it('create() reuses existing doc if one passed in (gh-4449)', function(done) {
-      var testSchema = new mongoose.Schema({
+      const testSchema = new mongoose.Schema({
         name: String
       });
-      var Test = db.model('gh4449_0', testSchema);
+      const Test = db.model('gh4449_0', testSchema);
 
-      var t = new Test();
+      const t = new Test();
       Test.create(t, function(error, t2) {
         assert.ifError(error);
         assert.ok(t === t2);
@@ -5154,7 +5154,7 @@ describe('Model', function() {
     });
 
     it('emits errors correctly from exec (gh-4500)', function(done) {
-      var someModel = db.model('gh4500', new Schema({}));
+      const someModel = db.model('gh4500', new Schema({}));
 
       someModel.on('error', function(error) {
         assert.equal(error.message, 'This error will not disappear');
@@ -5167,27 +5167,27 @@ describe('Model', function() {
     });
 
     it('disabling id getter with .set() (gh-5548)', function(done) {
-      var ChildSchema = new mongoose.Schema({
+      const ChildSchema = new mongoose.Schema({
         name: String,
         _id: false
       });
 
       ChildSchema.set('id', false);
 
-      var ParentSchema = new mongoose.Schema({
+      const ParentSchema = new mongoose.Schema({
         child: {
           type: ChildSchema,
           default: {}
         }
       }, { id: false });
 
-      var Parent = db.model('gh5548', ParentSchema);
+      const Parent = db.model('gh5548', ParentSchema);
 
-      var doc = new Parent({ child: { name: 'test' } });
+      const doc = new Parent({ child: { name: 'test' } });
       assert.ok(!doc.id);
       assert.ok(!doc.child.id);
 
-      var obj = doc.toObject({ virtuals: true });
+      const obj = doc.toObject({ virtuals: true });
       assert.ok(!('id' in obj));
       assert.ok(!('id' in obj.child));
 
@@ -5195,17 +5195,17 @@ describe('Model', function() {
     });
 
     it('creates new array when initializing from existing doc (gh-4449)', function(done) {
-      var TodoSchema = new mongoose.Schema({
+      const TodoSchema = new mongoose.Schema({
         title: String
       }, { _id: false });
 
-      var UserSchema = new mongoose.Schema({
+      const UserSchema = new mongoose.Schema({
         name: String,
         todos: [TodoSchema]
       });
-      var User = db.model('User', UserSchema);
+      const User = db.model('User', UserSchema);
 
-      var val = new User({ name: 'Val' });
+      const val = new User({ name: 'Val' });
       User.create(val, function(error, val) {
         assert.ifError(error);
         val.todos.push({ title: 'Groceries' });
@@ -5214,7 +5214,7 @@ describe('Model', function() {
           User.findById(val, function(error, val) {
             assert.ifError(error);
             assert.deepEqual(val.toObject().todos, [{ title: 'Groceries' }]);
-            var u2 = new User();
+            const u2 = new User();
             val.todos = u2.todos;
             val.todos.push({ title: 'Cook' });
             val.save(function(error) {
@@ -5232,14 +5232,14 @@ describe('Model', function() {
     });
 
     it('bulkWrite casting (gh-3998)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         str: String,
         num: Number
       });
 
-      var M = db.model('gh3998', schema);
+      const M = db.model('gh3998', schema);
 
-      var ops = [
+      const ops = [
         {
           insertOne: {
             document: { str: 1, num: '1' }
@@ -5266,14 +5266,14 @@ describe('Model', function() {
     });
 
     it('bulkWrite with setDefaultsOnInsert (gh-5708)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         str: { type: String, default: 'test' },
         num: Number
       });
 
-      var M = db.model('gh5708', schema);
+      const M = db.model('gh5708', schema);
 
-      var ops = [
+      const ops = [
         {
           updateOne: {
             filter: { num: 0 },
@@ -5302,7 +5302,7 @@ describe('Model', function() {
           done(err);
           return;
         }
-        var mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
+        const mongo34 = version[0] > 3 || (version[0] === 3 && version[1] >= 4);
         if (!mongo34) {
           done();
           return;
@@ -5312,10 +5312,10 @@ describe('Model', function() {
       });
 
       function test() {
-        var schema = new mongoose.Schema({
+        const schema = new mongoose.Schema({
           amount : mongoose.Schema.Types.Decimal
         });
-        var Money = db.model('gh5190', schema);
+        const Money = db.model('gh5190', schema);
 
         Money.insertMany([{ amount : '123.45' }], function(error) {
           assert.ifError(error);
@@ -5325,12 +5325,12 @@ describe('Model', function() {
     });
 
     it('remove with cast error (gh-5323)', function(done) {
-      var schema = new mongoose.Schema({
+      const schema = new mongoose.Schema({
         name: String
       });
 
-      var Model = db.model('gh5323', schema);
-      var arr = [
+      const Model = db.model('gh5323', schema);
+      const arr = [
         { name: 'test-1' },
         { name: 'test-2' }
       ];
@@ -5351,9 +5351,9 @@ describe('Model', function() {
     });
 
     it('.create() with non-object (gh-2037)', function(done) {
-      var schema = new mongoose.Schema({ name: String });
+      const schema = new mongoose.Schema({ name: String });
 
-      var Model = db.model('gh2037', schema);
+      const Model = db.model('gh2037', schema);
 
       Model.create(1, function(error) {
         assert.ok(error);
@@ -5363,7 +5363,7 @@ describe('Model', function() {
     });
 
     it('save() with unacknowledged writes (gh-6012)', function() {
-      var schema = new mongoose.Schema({ name: String }, { safe: false });
+      const schema = new mongoose.Schema({ name: String }, { safe: false });
 
       const Model = db.model('gh6012', schema);
 
@@ -5371,7 +5371,7 @@ describe('Model', function() {
     });
 
     it('save() with unacknowledged writes in options (gh-6012)', function() {
-      var schema = new mongoose.Schema({ name: String });
+      const schema = new mongoose.Schema({ name: String });
 
       const Model = db.model('gh6012_1', schema);
       const doc = new Model();
@@ -5462,14 +5462,14 @@ describe('Model', function() {
     });
 
     it('bulkWrite casting updateMany, deleteOne, deleteMany (gh-3998)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         str: String,
         num: Number
       });
 
-      var M = db.model('gh3998_0', schema);
+      const M = db.model('gh3998_0', schema);
 
-      var ops = [
+      const ops = [
         {
           insertOne: {
             document: { str: 1, num: '1' }
@@ -5505,14 +5505,14 @@ describe('Model', function() {
     });
 
     it('bulkWrite casting replaceOne (gh-3998)', function(done) {
-      var schema = new Schema({
+      const schema = new Schema({
         str: String,
         num: Number
       });
 
-      var M = db.model('gh3998_1', schema);
+      const M = db.model('gh3998_1', schema);
 
-      var ops = [
+      const ops = [
         {
           insertOne: {
             document: { str: 1, num: '1' }
@@ -5556,11 +5556,11 @@ describe('Model', function() {
     });
 
     it('marks array as modified when initializing non-array from db (gh-2442)', function(done) {
-      var s1 = new Schema({
+      const s1 = new Schema({
         array: mongoose.Schema.Types.Mixed
       }, {minimize: false});
 
-      var s2 = new Schema({
+      const s2 = new Schema({
         array: {
           type: [{
             _id: false,
@@ -5573,8 +5573,8 @@ describe('Model', function() {
         }
       });
 
-      var M1 = db.model('gh-2442-1', s1, 'gh-2442');
-      var M2 = db.model('gh-2442-2', s2, 'gh-2442');
+      const M1 = db.model('gh-2442-1', s1, 'gh-2442');
+      const M2 = db.model('gh-2442-2', s2, 'gh-2442');
 
       M1.create({array: {}}, function(err, doc) {
         assert.ifError(err);
@@ -5628,7 +5628,7 @@ describe('Model', function() {
 
       test.save(function cb(err) {
         assert.strictEqual(err.name, 'ParallelSaveError');
-        let regex = new RegExp(test.id);
+        const regex = new RegExp(test.id);
         assert.ok(regex.test(err.message));
         counter();
       });
@@ -5642,7 +5642,7 @@ describe('Model', function() {
 
         yield M.init();
 
-        let indexes = yield M.listIndexes();
+        const indexes = yield M.listIndexes();
         assert.deepEqual(indexes.map(i => i.key), [
           { _id: 1 },
           { name: 1 }
@@ -5760,7 +5760,7 @@ describe('Model', function() {
 
       function error(err) {
         assert.strictEqual(err.name, 'ParallelSaveError');
-        let regex = new RegExp(test.id);
+        const regex = new RegExp(test.id);
         assert.ok(regex.test(err.message));
         counter();
       }
@@ -5786,7 +5786,7 @@ describe('Model', function() {
       const Note = db.model('gh6611', noteSchema);
       return co(function*() {
         yield Note.create({ body: 'a note.' });
-        let doc = yield Note.findOne({});
+        const doc = yield Note.findOne({});
         assert.strictEqual(doc.body, 'a note, part deux.');
       });
     });

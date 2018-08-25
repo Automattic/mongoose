@@ -1,19 +1,21 @@
 
 // modules
-var mongoose = require('../../../lib');
-var Schema = mongoose.Schema;
+'use strict';
+
+const mongoose = require('../../../lib');
+const Schema = mongoose.Schema;
 
 // parse json
-var raw = require('./schema.json');
+const raw = require('./schema.json');
 
 // create a schema
-var timeSignatureSchema = Schema(raw);
+const timeSignatureSchema = Schema(raw);
 
 // compile the model
-var TimeSignature = mongoose.model('TimeSignatures', timeSignatureSchema);
+const TimeSignature = mongoose.model('TimeSignatures', timeSignatureSchema);
 
 // create a TimeSignature document
-var threeFour = new TimeSignature({
+const threeFour = new TimeSignature({
   count: 3,
   unit: 4,
   description: '3/4',

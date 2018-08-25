@@ -34,13 +34,13 @@ function getVersion() {
 }
 
 function getLatestLegacyVersion(startsWith) {
-  var hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
-  for (var i = 0; i < hist.length; ++i) {
-    var line = (hist[i] || '').trim();
+  const hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
+  for (let i = 0; i < hist.length; ++i) {
+    const line = (hist[i] || '').trim();
     if (!line) {
       continue;
     }
-    var match = /^\s*([^\s]+)\s/.exec(line);
+    const match = /^\s*([^\s]+)\s/.exec(line);
     if (match && match[1] && match[1].startsWith(startsWith)) {
       return match[1];
     }
@@ -53,8 +53,8 @@ pkg.version = getVersion();
 pkg.latest4x = getLatestLegacyVersion('4.');
 pkg.latest38x = getLatestLegacyVersion('3.8');
 
-var filemap = require('./docs/source');
-var files = Object.keys(filemap);
+const filemap = require('./docs/source');
+const files = Object.keys(filemap);
 
 function jadeify(filename, options, newfile) {
   options = options || {};
@@ -90,7 +90,7 @@ function jadeify(filename, options, newfile) {
 }
 
 files.forEach(function(file) {
-  var filename = __dirname + '/' + file;
+  const filename = __dirname + '/' + file;
   jadeify(filename, filemap[file]);
 
   if (process.argv[2] === '--watch') {
@@ -105,6 +105,6 @@ files.forEach(function(file) {
 const _acquit = require('./docs/source/acquit');
 const acquitFiles = Object.keys(_acquit);
 acquitFiles.forEach(function(file) {
-  var filename = __dirname + '/docs/acquit.jade';
+  const filename = __dirname + '/docs/acquit.jade';
   jadeify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

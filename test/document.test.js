@@ -6001,4 +6001,19 @@ describe('document', function() {
         });
     });
   });
+
+  it('does not save duplicate items after two saves (gh-6900)', function() {
+    const M = db.model('gh6900', {items: [{name: String}]});
+    const doc = new M();
+    doc.items.push({ name: '1' });
+
+    return co(function*() {
+      yield doc.save();
+      doc.items.push({ name: '2' });
+      yield doc.save();
+
+      const found = yield M.findById(doc.id);
+      assert.equal(found.items.length, 2);
+    });
+  });
 });

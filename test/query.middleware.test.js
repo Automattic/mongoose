@@ -156,6 +156,30 @@ describe('query middleware', function() {
     });
   });
 
+  it('with regular expression (gh-6680)', function(done) {
+    let count = 0;
+    schema.pre(/find/, function(next) {
+      ++count;
+      next();
+    });
+
+    initializeData(function() {
+      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
+        assert.ifError(error);
+        assert.equal(count, 1);
+        assert.equal(doc.author, 'Val');
+
+        count = 0;
+        Author.find({title: 'Professional AngularJS'}, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(count, 1);
+          assert.equal(docs[0].author, 'Val');
+          done();
+        });
+      });
+    });
+  });
+
   it('can populate in pre hook', function(done) {
     schema.pre('findOne', function(next) {
       this.populate('publisher');

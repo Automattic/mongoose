@@ -217,6 +217,46 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('strict option (gh-6858)', function(done) {
+    const mongoose = new Mongoose();
+
+    // With strict: throw, no schema-level override
+    mongoose.set('strict', 'throw');
+
+    let schema = new Schema({ name: String });
+    let M = mongoose.model('gh6858', schema);
+    assert.throws(() => {
+      new M({ name: 'foo', bar: 'baz' });
+    }, /Field `bar` is not in schema/);
+
+    mongoose.deleteModel('gh6858');
+
+    // With strict: throw and schema-level override
+    schema = new Schema({ name: String }, { strict: true });
+    M = mongoose.model('gh6858', schema);
+
+    let doc = new M({ name: 'foo', bar: 'baz' });
+    assert.equal(doc.name, 'foo');
+    assert.strictEqual(doc.bar, void 0);
+    assert.strictEqual(doc.toObject().bar, void 0);
+    assert.strictEqual(doc.$__.strictMode, true);
+
+    mongoose.deleteModel('gh6858');
+
+    // With strict: false, no schema-level override
+    mongoose.set('strict', false);
+
+    schema = new Schema({ name: String });
+    M = mongoose.model('gh6858', schema);
+    doc = new M({ name: 'foo', bar: 'baz' });
+
+    assert.strictEqual(doc.$__.strictMode, false);
+
+    assert.equal(doc.toObject().bar, 'baz');
+
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     const mong = new Mongoose();
     const subSchema = new Schema({ name: String });

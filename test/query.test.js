@@ -2811,7 +2811,7 @@ describe('Query', function() {
       });
     });
 
-    it('remove()', function() {
+    it.skip('remove()', function() {
       return co(function*() {
         let threw = false;
         try {
@@ -2828,7 +2828,7 @@ describe('Query', function() {
       });
     });
 
-    it('update()', function() {
+    it.skip('update()', function() {
       return co(function*() {
         let threw = false;
         try {

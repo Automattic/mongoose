@@ -421,6 +421,23 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('deleteModel()', function() {
+    const mongoose = new Mongoose();
+
+    mongoose.model('gh6813', new mongoose.Schema({ name: String }));
+
+    assert.ok(mongoose.model('gh6813'));
+    mongoose.deleteModel('gh6813');
+
+    let threw = false;
+    assert.throws(function() {
+      mongoose.model('gh6813');
+    }, /Schema hasn't been registered/);
+
+    const Model = mongoose.model('gh6813', new Schema({ name: String }));
+    assert.ok(Model);
+  });
+
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
       const mong = new Mongoose();

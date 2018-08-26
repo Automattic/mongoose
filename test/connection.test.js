@@ -1067,6 +1067,7 @@ describe('connections:', function() {
       });
     });
   });
+
   describe('passing a function into createConnection', function() {
     it('should store the name of the function (gh-6517)', function(done) {
       const conn = mongoose.createConnection('mongodb://localhost:27017/gh6517');
@@ -1076,5 +1077,23 @@ describe('connections:', function() {
       assert.strictEqual(conn.modelNames()[0], 'Person');
       done();
     });
+  });
+
+  it('deleteModel()', function() {
+    const conn = mongoose.createConnection('mongodb://localhost:27017/gh6813');
+
+    conn.model('gh6813', new Schema({ name: String }));
+
+    assert.ok(conn.model('gh6813'));
+    conn.deleteModel('gh6813');
+
+    let threw = false;
+    assert.throws(function() {
+      conn.model('gh6813');
+    }, /Schema hasn't been registered/);
+
+    const Model = conn.model('gh6813', new Schema({ name: String }));
+    assert.ok(Model);
+    return Model.create({ name: 'test' });
   });
 });

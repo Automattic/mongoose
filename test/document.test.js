@@ -5487,6 +5487,26 @@ describe('document', function() {
       );
     });
 
+    it('required function called again after save() (gh-6892)', function() {
+      const schema = new mongoose.Schema({
+        field: {
+          type: String,
+          default: null,
+          required: function() { return this && this.field === undefined; }
+        }
+      });
+      const Model = db.model('gh6892', schema);
+
+      return co(function*() {
+        yield Model.create({});
+        const doc1 = yield Model.findOne({}).select({_id: 1});
+        yield doc1.save();
+
+        // Should not throw
+        yield Model.create({});
+      });
+    });
+
     it('doc array: set then remove (gh-3511)', function(done) {
       const ItemChildSchema = new mongoose.Schema({
         name: {

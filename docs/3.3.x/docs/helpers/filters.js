@@ -1,4 +1,5 @@
 
+'use strict';
 var hl = require('highlight.js')
 
 module.exports = exports = function (jade) {

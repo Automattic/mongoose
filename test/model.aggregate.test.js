@@ -3,6 +3,8 @@
  * Test dependencies.
  */
 
+'use strict';
+
 const Aggregate = require('../lib/aggregate');
 const assert = require('assert');
 const random = require('../lib/utils').random;
@@ -15,34 +17,34 @@ const Schema = mongoose.Schema;
  * Setup.
  */
 
-var userSchema = new Schema({
+const userSchema = new Schema({
   name: String,
   age: Number
 });
 
-var collection = 'aggregate_' + random();
+const collection = 'aggregate_' + random();
 mongoose.model('Aggregate', userSchema);
 
 describe('model aggregate', function() {
   this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
-  var group = {$group: {_id: null, maxAge: {$max: '$age'}}};
-  var project = {$project: {maxAge: 1, _id: 0}};
-  var db, A, maxAge;
+  const group = {$group: {_id: null, maxAge: {$max: '$age'}}};
+  const project = {$project: {maxAge: 1, _id: 0}};
+  let db, A, maxAge;
 
-  var mongo26_or_greater = false;
+  let mongo26_or_greater = false;
 
   before(function(done) {
     db = start();
     A = db.model('Aggregate', collection);
 
-    var authors = 'guillermo nathan tj damian marco'.split(' ');
-    var num = 10;
-    var docs = [];
+    const authors = 'guillermo nathan tj damian marco'.split(' ');
+    const num = 10;
+    const docs = [];
     maxAge = 0;
 
-    for (var i = 0; i < num; ++i) {
-      var age = Math.random() * 100 | 0;
+    for (let i = 0; i < num; ++i) {
+      const age = Math.random() * 100 | 0;
       maxAge = Math.max(maxAge, age);
       docs.push({author: authors[i % authors.length], age: age});
     }
@@ -99,7 +101,7 @@ describe('model aggregate', function() {
     });
 
     it('with Aggregate syntax if callback not provided', function(done) {
-      var promise = A.aggregate()
+      const promise = A.aggregate()
         .group(group.$group)
         .project(project.$project)
         .exec();
@@ -129,7 +131,7 @@ describe('model aggregate', function() {
         return done();
       }
 
-      var outputCollection = 'aggregate_output_' + random();
+      const outputCollection = 'aggregate_output_' + random();
       A.aggregate()
         .group(group.$group)
         .project(project.$project)

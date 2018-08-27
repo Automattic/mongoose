@@ -1,3 +1,18 @@
+5.2.10 / 2018-08-27
+===================
+ * fix: bump mongodb driver -> 3.1.4 #6920 #6903 #6884 #6799 #6741 [Fonger](https://github.com/Fonger)
+ * fix(model): track `session` option for `save()` as the document's `$session()` #6909
+ * fix(query): add Query.getOptions() helper #6907 [Fonger](https://github.com/Fonger)
+ * fix(document): ensure array atomics get cleared after save() #6900
+ * fix(aggregate): add missing redact and readConcern helpers #6895 [Fonger](https://github.com/Fonger)
+ * fix: add global option `mongoose.set('useCreateIndex', true)` to avoid ensureIndex deprecation warning #6890
+ * fix(query): use `projection` option to avoid deprecation warnings #6888 #6880 [Fonger](https://github.com/Fonger)
+ * fix(query): use `findOneAndReplace()` internally if using `overwrite: true` with `findOneAndUpdate()` #6888 [Fonger](https://github.com/Fonger)
+ * fix(document): ensure required cache gets cleared correctly between subsequent saves #6892
+ * fix(aggregate): support session chaining correctly #6886 #6885 [Fonger](https://github.com/Fonger)
+ * fix(query): use `projection` instead of `fields` internally for `find()` and `findOne()` to avoid deprecation warning #6880
+ * fix(populate): add `getters` option to opt in to calling getters on populate #6844
+
 5.2.9 / 2018-08-17
 ==================
  * fix(document): correctly propagate write concern options in save() #6877 [Fonger](https://github.com/Fonger)
@@ -208,7 +223,6 @@
  * fix(document): handle `doc.set()` underneath embedded discriminator #6482
  * fix(document): handle set() on path under embedded discriminator with object syntax #6482
  * fix(document): handle setting nested property to object with only non-schema properties #6436
->>>>>>> 4.x
 
 4.13.14 / 2018-05-25
 ====================

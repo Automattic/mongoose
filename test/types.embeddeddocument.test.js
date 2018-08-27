@@ -3,19 +3,18 @@
  * Module dependencies.
  */
 
-var assert = require('power-assert'),
-    start = require('./common'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+'use strict';
+
+let assert = require('power-assert'), start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema;
 
 /**
  * Test.
  */
 
 describe('types.embeddeddocument', function() {
-  var GrandChildSchema;
-  var ChildSchema;
-  var ParentSchema;
+  let GrandChildSchema;
+  let ChildSchema;
+  let ParentSchema;
 
   before(function() {
     GrandChildSchema = new Schema({
@@ -36,8 +35,8 @@ describe('types.embeddeddocument', function() {
   });
 
   it('returns a proper ownerDocument (gh-3589)', function(done) {
-    var Parent = mongoose.model('Parent-3589-Embedded');
-    var p = new Parent({
+    const Parent = mongoose.model('Parent-3589-Embedded');
+    const p = new Parent({
       name: 'Parent Parentson',
       child: {
         name: 'Child Parentson',

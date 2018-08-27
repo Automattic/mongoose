@@ -1,9 +1,10 @@
-var assert = require('power-assert');
-var updateValidators = require('../lib/helpers/updateValidators');
-var emitter = require('events').EventEmitter;
+'use strict';
+const assert = require('power-assert');
+const updateValidators = require('../lib/helpers/updateValidators');
+const emitter = require('events').EventEmitter;
 
 describe('updateValidators', function() {
-  var schema;
+  let schema;
 
   beforeEach(function() {
     schema = {};
@@ -22,7 +23,7 @@ describe('updateValidators', function() {
 
   describe('validators', function() {
     it('flattens paths', function(done) {
-      var fn = updateValidators({}, schema, {test: {a: 1, b: null}}, {});
+      const fn = updateValidators({}, schema, {test: {a: 1, b: null}}, {});
       schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
@@ -44,8 +45,8 @@ describe('updateValidators', function() {
     });
 
     it('doesnt flatten dates (gh-3194)', function(done) {
-      var dt = new Date();
-      var fn = updateValidators({}, schema, {test: dt}, {});
+      const dt = new Date();
+      const fn = updateValidators({}, schema, {test: dt}, {});
       schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
@@ -60,7 +61,7 @@ describe('updateValidators', function() {
     });
 
     it('doesnt flatten empty arrays (gh-3554)', function(done) {
-      var fn = updateValidators({}, schema, {test: []}, {});
+      const fn = updateValidators({}, schema, {test: []}, {});
       schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });

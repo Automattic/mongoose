@@ -262,7 +262,7 @@ describe('schema', function() {
         });
 
         let required = true;
-        let isRequired = function() {
+        const isRequired = function() {
           return required;
         };
 
@@ -918,7 +918,7 @@ describe('schema', function() {
     });
 
     it('doesnt do double validation on document arrays underneath nested (gh-5411)', function(done) {
-      let callScope = [];
+      const callScope = [];
 
       function myValidator() {
         callScope.push(this);

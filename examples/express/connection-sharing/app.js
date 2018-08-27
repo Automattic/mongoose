@@ -1,13 +1,14 @@
 
-var express = require('express');
-var mongoose = require('../../../lib');
+'use strict';
+const express = require('express');
+const mongoose = require('../../../lib');
 
-var uri = 'mongodb://localhost/mongoose-shared-connection';
+const uri = 'mongodb://localhost/mongoose-shared-connection';
 global.db = mongoose.createConnection(uri);
 
-var routes = require('./routes');
+const routes = require('./routes');
 
-var app = express();
+const app = express();
 app.get('/', routes.home);
 app.get('/insert', routes.insert);
 app.get('/name', routes.modelName);

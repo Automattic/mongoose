@@ -1,3 +1,4 @@
+'use strict';
 var fs = require('fs');
 var acquit = require('acquit');
 var hl = require('highlight.js');

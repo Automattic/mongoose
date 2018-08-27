@@ -1,12 +1,13 @@
 
-var start = require('./common'),
+'use strict';
+let start = require('./common'),
     assert = require('power-assert'),
     mongoose = start.mongoose,
     random = require('../lib/utils').random,
     Schema = mongoose.Schema;
 
 describe('model', function() {
-  var db, schema;
+  let db, schema;
 
   function getModel(db) {
     return db.model('GeoSearch', schema, 'geosearch-' + random());
@@ -30,20 +31,20 @@ describe('model', function() {
     this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
     it('works', function(done) {
-      var Geo = getModel(db);
+      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err) {
         assert.ifError(err);
 
-        var geos = [];
+        const geos = [];
         geos[0] = new Geo({pos: [10, 10], type: 'place'});
         geos[1] = new Geo({pos: [15, 5], type: 'place'});
         geos[2] = new Geo({pos: [20, 15], type: 'house'});
         geos[3] = new Geo({pos: [1, -1], type: 'house'});
-        var count = geos.length;
+        let count = geos.length;
 
-        for (var i = 0; i < geos.length; i++) {
+        for (let i = 0; i < geos.length; i++) {
           geos[i].save(function(err) {
             assert.ifError(err);
             --count || next();
@@ -72,20 +73,20 @@ describe('model', function() {
       });
     });
     it('works with lean', function(done) {
-      var Geo = getModel(db);
+      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err) {
         assert.ifError(err);
 
-        var geos = [];
+        const geos = [];
         geos[0] = new Geo({pos: [10, 10], type: 'place'});
         geos[1] = new Geo({pos: [15, 5], type: 'place'});
         geos[2] = new Geo({pos: [20, 15], type: 'house'});
         geos[3] = new Geo({pos: [1, -1], type: 'house'});
-        var count = geos.length;
+        let count = geos.length;
 
-        for (var i = 0; i < geos.length; i++) {
+        for (let i = 0; i < geos.length; i++) {
           geos[i].save(function(err) {
             assert.ifError(err);
             --count || next();
@@ -110,13 +111,13 @@ describe('model', function() {
       });
     });
     it('throws the correct error messages', function(done) {
-      var Geo = getModel(db);
+      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err) {
         assert.ifError(err);
 
-        var g = new Geo({pos: [10, 10], type: 'place'});
+        const g = new Geo({pos: [10, 10], type: 'place'});
         g.save(function() {
           Geo.geoSearch([], {}, function(e) {
             assert.ok(e);
@@ -143,10 +144,10 @@ describe('model', function() {
     });
 
     it('returns a promise (gh-1614)', function(done) {
-      var Geo = getModel(db);
+      const Geo = getModel(db);
 
       Geo.on('index', function() {
-        var prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
+        const prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
         assert.ok(prom instanceof mongoose.Promise);
 
         prom.then(() => done(), err => done(err));
@@ -154,14 +155,14 @@ describe('model', function() {
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {
-      var Geo = getModel(db);
+      const Geo = getModel(db);
       Geo.on('index', function(err) {
         assert.ifError(err);
-        var g = new Geo({pos: [10, 10], type: 'place'});
+        const g = new Geo({pos: [10, 10], type: 'place'});
         g.save(function(err) {
           assert.ifError(err);
 
-          var promise;
+          let promise;
           assert.doesNotThrow(function() {
             promise = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
           });

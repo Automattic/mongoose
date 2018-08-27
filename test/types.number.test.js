@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-var mongoose = require('./common').mongoose,
-    SchemaNumber = mongoose.Schema.Types.Number,
-    assert = require('power-assert');
+'use strict';
+
+let mongoose = require('./common').mongoose, SchemaNumber = mongoose.Schema.Types.Number, assert = require('power-assert');
 
 /**
  * Test.
@@ -13,20 +13,20 @@ var mongoose = require('./common').mongoose,
 
 describe('types.number', function() {
   it('an empty string casts to null', function(done) {
-    var n = new SchemaNumber();
+    const n = new SchemaNumber();
     assert.strictEqual(n.cast(''), null);
     done();
   });
 
   it('a null number should castForQuery to null', function(done) {
-    var n = new SchemaNumber();
+    const n = new SchemaNumber();
     assert.strictEqual(n.castForQuery(null), null);
     done();
   });
 
   it('undefined throws number cast error', function(done) {
-    var n = new SchemaNumber();
-    var err;
+    const n = new SchemaNumber();
+    let err;
     try {
       n.cast(undefined);
     } catch (e) {
@@ -37,8 +37,8 @@ describe('types.number', function() {
   });
 
   it('array throws cast number error', function(done) {
-    var n = new SchemaNumber();
-    var err;
+    const n = new SchemaNumber();
+    let err;
     try {
       n.cast([]);
     } catch (e) {
@@ -49,8 +49,8 @@ describe('types.number', function() {
   });
 
   it('three throws cast number error', function(done) {
-    var n = new SchemaNumber();
-    var err;
+    const n = new SchemaNumber();
+    let err;
     try {
       n.cast('three');
     } catch (e) {
@@ -61,8 +61,8 @@ describe('types.number', function() {
   });
 
   it('{} throws cast number error', function(done) {
-    var n = new SchemaNumber();
-    var err;
+    const n = new SchemaNumber();
+    let err;
     try {
       n.cast({});
     } catch (e) {
@@ -73,11 +73,11 @@ describe('types.number', function() {
   });
 
   it('does not throw number cast error', function(done) {
-    var n = new SchemaNumber();
-    var items = [1, '2', '0', null, '', new String('47'), new Number(5), Number(47), Number('09'), 0x12];
-    var err;
+    const n = new SchemaNumber();
+    const items = [1, '2', '0', null, '', new String('47'), new Number(5), Number(47), Number('09'), 0x12];
+    let err;
     try {
-      for (var i = 0, len = items.length; i < len; ++i) {
+      for (let i = 0, len = items.length; i < len; ++i) {
         n.cast(items[i]);
       }
     } catch (e) {
@@ -88,15 +88,15 @@ describe('types.number', function() {
   });
 
   it('boolean casts to 0/1 (gh-3475)', function(done) {
-    var n = new SchemaNumber();
+    const n = new SchemaNumber();
     assert.strictEqual(n.cast(true), 1);
     assert.strictEqual(n.cast(false), 0);
     done();
   });
 
   it('prefers valueOf function if one exists (gh-6299)', function(done) {
-    var n = new SchemaNumber();
-    var obj = {
+    const n = new SchemaNumber();
+    const obj = {
       str: '10',
       valueOf: function() {
         return this.str;

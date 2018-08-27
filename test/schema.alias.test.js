@@ -12,7 +12,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('schema alias option', function() {
-  var db;
+  let db;
 
   before(function() {
     db = start();
@@ -23,7 +23,7 @@ describe('schema alias option', function() {
   });
 
   it('works with all basic schema types', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       string:   { type: String, alias: 'StringAlias' },
       number:   { type: Number, alias: 'NumberAlias' },
       date:     { type: Date, alias: 'DateAlias' },
@@ -34,7 +34,7 @@ describe('schema alias option', function() {
       array:    { type: [], alias: 'ArrayAlias' }
     });
 
-    var S = db.model('AliasSchemaType', schema);
+    const S = db.model('AliasSchemaType', schema);
     S.create({
       string: 'hello',
       number: 1,
@@ -61,7 +61,7 @@ describe('schema alias option', function() {
   });
 
   it('works with nested schema types', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       nested: {
         string:   { type: String, alias: 'StringAlias' },
         number:   { type: Number, alias: 'NumberAlias' },
@@ -74,7 +74,7 @@ describe('schema alias option', function() {
       }
     });
 
-    var S = db.model('AliasNestedSchemaType', schema);
+    const S = db.model('AliasNestedSchemaType', schema);
     S.create({
       nested: {
         string: 'hello',

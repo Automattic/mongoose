@@ -2,14 +2,16 @@
  * Module dependencies.
  */
 
-var start = require('./common');
-var mongoose = start.mongoose;
-var assert = require('power-assert');
-var EventEmitter = require('events').EventEmitter;
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
-var Document = require('../lib/document');
-var DocumentObjectId = mongoose.Types.ObjectId;
+'use strict';
+
+const start = require('./common');
+const mongoose = start.mongoose;
+const assert = require('power-assert');
+const EventEmitter = require('events').EventEmitter;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
+const Document = require('../lib/document');
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -25,7 +27,7 @@ function TestDocument() {
 
 TestDocument.prototype.__proto__ = Document.prototype;
 
-for (var i in EventEmitter.prototype) {
+for (const i in EventEmitter.prototype) {
   TestDocument[i] = EventEmitter.prototype[i];
 }
 
@@ -33,11 +35,11 @@ for (var i in EventEmitter.prototype) {
  * Set a dummy schema to simulate compilation.
  */
 
-var em = new Schema({title: String, body: String});
+const em = new Schema({title: String, body: String});
 em.virtual('works').get(function() {
   return 'em virtual works';
 });
-var schema = new Schema({
+const schema = new Schema({
   test: String,
   oids: [ObjectId],
   numbers: [Number],
@@ -94,7 +96,7 @@ TestDocument.prototype.hooksTest = function(fn) {
  */
 describe('document', function() {
   it('isSelected()', function(done) {
-    var doc = new TestDocument();
+    let doc = new TestDocument();
 
     doc.init({
       test: 'test',
@@ -129,7 +131,7 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.body'));
     assert.ok(doc.isSelected('em.nonpath')); // not a path
 
-    var selection = {
+    let selection = {
       test: 1,
       numbers: 1,
       'nested.deep': 1,
@@ -333,14 +335,14 @@ describe('document', function() {
   });
 
   it('isDirectSelected (gh-5063)', function(done) {
-    var selection = {
+    const selection = {
       test: 1,
       numbers: 1,
       'nested.deep': 1,
       oids: 1
     };
 
-    var doc = new TestDocument(undefined, selection);
+    const doc = new TestDocument(undefined, selection);
 
     doc.init({
       test: 'test',

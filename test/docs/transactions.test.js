@@ -106,6 +106,30 @@ describe('transactions', function() {
       then(doc => assert.ok(doc));
   });
 
+  it('create (gh-6909)', function() {
+    const User = db.model('gh6909_User', new Schema({ name: String }));
+
+    let session = null;
+    return db.createCollection('gh6909_users').
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return User.create([{ name: 'foo' }], { session: session });
+      }).
+      then(users => {
+        users[0].name = 'bar';
+        return users[0].save();
+      }).
+      then(() => User.findOne({ name: 'bar' })).
+      then(user => {
+        // Not in transaction, shouldn't find it
+        assert.ok(!user);
+
+        session.commitTransaction();
+      });
+  });
+
   it('aggregate', function() {
     const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
 

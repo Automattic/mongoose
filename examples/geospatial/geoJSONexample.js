@@ -1,16 +1,18 @@
 // import async to make control flow simplier
-var async = require('async');
+'use strict';
+
+const async = require('async');
 
 // import the rest of the normal stuff
-var mongoose = require('../../lib');
+const mongoose = require('../../lib');
 
 require('./geoJSONSchema.js')();
 
-var Location = mongoose.model('Location');
+const Location = mongoose.model('Location');
 
 // define some dummy data
 // note: the type can be Point, LineString, or Polygon
-var data = [
+const data = [
   {loc: {type: 'Point', coordinates: [-20.0, 5.0]}},
   {loc: {type: 'Point', coordinates: [6.0, 10.0]}},
   {loc: {type: 'Point', coordinates: [34.0, -50.0]}},
@@ -36,7 +38,7 @@ mongoose.connect('mongodb://localhost/locations', function(err) {
         throw err;
       }
       // create the location we want to search for
-      var coords = {type: 'Point', coordinates: [-5, 5]};
+      const coords = {type: 'Point', coordinates: [-5, 5]};
       // search for it
       Location.find({loc: {$near: coords}}).limit(1).exec(function(err, res) {
         if (err) {

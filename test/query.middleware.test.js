@@ -158,8 +158,14 @@ describe('query middleware', function() {
 
   it('with regular expression (gh-6680)', function(done) {
     let count = 0;
+    let postCount = 0;
     schema.pre(/find/, function(next) {
       ++count;
+      next();
+    });
+
+    schema.post(/find/, function(result, next) {
+      ++postCount;
       next();
     });
 
@@ -167,14 +173,23 @@ describe('query middleware', function() {
       Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(count, 1);
+        assert.equal(postCount, 1);
         assert.equal(doc.author, 'Val');
 
         count = 0;
+        postCount = 0;
         Author.find({title: 'Professional AngularJS'}, function(error, docs) {
           assert.ifError(error);
           assert.equal(count, 1);
+          assert.equal(postCount, 1);
           assert.equal(docs[0].author, 'Val');
-          done();
+
+          Author.updateOne({}, { title: 'Foo' }, function(error) {
+            assert.ifError(error);
+            assert.equal(count, 1);
+            assert.equal(postCount, 1);
+            done();
+          });
         });
       });
     });

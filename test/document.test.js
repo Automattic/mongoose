@@ -5812,6 +5812,30 @@ describe('document', function() {
       return Promise.resolve();
     });
 
+    it('returns doubly nested field in inline sub schema when using get() (gh-6925)', function() {
+      const child = new Schema({
+        nested: {
+          key: String
+        }
+      });
+      const parent = new Schema({
+        child: child
+      });
+
+      const M = db.model('gh6925', parent);
+      const test = new M({
+        child: {
+          nested: {
+            key: 'foobarvalue'
+          }
+        }
+      });
+
+      assert.equal(test.get('child.nested.key'), 'foobarvalue');
+
+      return Promise.resolve();
+    });
+
     it('defaults should see correct isNew (gh-3793)', function() {
       let isNew = [];
       const TestSchema = new mongoose.Schema({

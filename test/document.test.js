@@ -4391,10 +4391,33 @@ describe('document', function() {
         Model.findOne({}, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.children.length, 1);
-          assert.equal(doc.children[0].text, 'bar');
+          assert.equal(doc.children[0].text, 'test');
           done();
         });
       });
+    });
+
+    it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
+      const subSchema = new Schema({
+        val: String
+      });
+      
+      subSchema.post('save', function() {
+        return Promise.reject(new Error('Oops'));
+      });
+      
+      const schema = new Schema({
+        sub: subSchema
+      });
+      
+      const Test = db.model('gh6926', schema);
+      
+      const test = new Test({ sub: { val: 'test' } });
+
+      return test.save().
+        then(() => assert.ok(false), err => assert.equal(err.message, 'Oops')).
+        then(() => Test.findOne()).
+        then(doc => assert.equal(doc.sub.val, 'test'));
     });
 
     it('nested docs toObject() clones (gh-5008)', function(done) {

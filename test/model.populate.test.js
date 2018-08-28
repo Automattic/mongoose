@@ -3596,7 +3596,7 @@ describe('model: populate:', function() {
         });
       });
 
-      var test = function(id) {
+      const test = function(id) {
         const options = {populate: {path: 'users', model: 'User'}};
         Group.find({_id: id}, '-name', options, function(error, group) {
           assert.ifError(error);
@@ -4568,7 +4568,7 @@ describe('model: populate:', function() {
             ref: 'gh6867_Item',
             localField: 'idItem',
             foreignField: '_id',
-            justOne: true  // here is the problem
+            justOne: true // here is the problem
           });
 
           const ItemSchema = new Schema({

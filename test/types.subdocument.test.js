@@ -5,7 +5,11 @@
 
 'use strict';
 
-let assert = require('power-assert'), start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema;
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Test.

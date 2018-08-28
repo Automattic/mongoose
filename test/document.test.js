@@ -1151,7 +1151,7 @@ describe('document', function() {
         });
       });
 
-      var timeout = setTimeout(function() {
+      const timeout = setTimeout(function() {
         db.close();
         throw new Error('Promise not fulfilled!');
       }, 500);
@@ -1211,7 +1211,7 @@ describe('document', function() {
         done();
       });
 
-      var timeout = setTimeout(function() {
+      const timeout = setTimeout(function() {
         db.close();
         throw new Error('Promise not fulfilled!');
       }, 500);
@@ -2199,7 +2199,7 @@ describe('document', function() {
         next(new Error('Catch all #2'));
       });
 
-      var Model = mongoose.model('gh2284', schema);
+      const Model = mongoose.model('gh2284', schema);
 
       Model.create({}, function(error) {
         assert.ok(error);

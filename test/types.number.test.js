@@ -1,11 +1,13 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-'use strict';
+const assert = require('assert');
+const mongoose = require('./common').mongoose;
 
-let mongoose = require('./common').mongoose, SchemaNumber = mongoose.Schema.Types.Number, assert = require('power-assert');
+const SchemaNumber = mongoose.Schema.Types.Number;
 
 /**
  * Test.

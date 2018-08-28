@@ -4554,6 +4554,43 @@ describe('model: populate:', function() {
         });
       });
 
+      it('justOne underneath array (gh-6867)', function() {
+        return co(function*() {
+          const ReportItemSchema = new Schema({
+            idItem: String
+          });
+
+          const ReportSchema = new Schema({
+            items: [ReportItemSchema]
+          });
+
+          ReportItemSchema.virtual('itemDetail', {
+            ref: 'gh6867_Item',
+            localField: 'idItem',
+            foreignField: '_id',
+            justOne: true  // here is the problem
+          });
+
+          const ItemSchema = new Schema({
+            _id: String
+          });
+
+          const ReportModel = db.model('gh6867_Report', ReportSchema);
+          const ItemModel = db.model('gh6867_Item', ItemSchema);
+
+          yield ItemModel.create({ _id: 'foo' });
+
+          yield ReportModel.create({
+            items: [{ idItem: 'foo' }, { idItem: 'bar' }]
+          });
+
+          let doc = yield ReportModel.findOne({}).populate('items.itemDetail');
+          doc = doc.toObject({ virtuals: true });
+          assert.equal(doc.items[0].itemDetail._id, 'foo');
+          assert.ok(!doc.items[1].itemDetail);
+        });
+      });
+
       it('with no results and justOne (gh-4284)', function(done) {
         const PersonSchema = new Schema({
           name: String,

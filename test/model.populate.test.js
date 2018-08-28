@@ -2070,8 +2070,8 @@ describe('model: populate:', function() {
   });
 
   it('Update works with populated arrays (gh-602)', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts);
-    let User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({name: 'aphex'}, {name: 'twin'}, function(err, u1, u2) {
       assert.ifError(err);

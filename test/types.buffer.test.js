@@ -5,13 +5,12 @@
  */
 
 const Buffer = require('safe-buffer').Buffer;
-const MongooseBuffer = mongoose.Types.Buffer;
 const assert = require('power-assert');
 const mongoose = require('./common').mongoose;
 const random = require('../lib/utils').random;
 const start = require('./common');
 
-
+const MongooseBuffer = mongoose.Types.Buffer;
 const Schema = mongoose.Schema;
 
 function valid(v) {

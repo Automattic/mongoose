@@ -1,12 +1,10 @@
 'use strict';
-let start = require('./common'),
-    mongoose = start.mongoose,
-    assert = require('power-assert'),
-    Schema = mongoose.Schema;
 
-/**
- * Test.
- */
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('SchemaDate', function() {
   let M;

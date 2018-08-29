@@ -1,11 +1,13 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-'use strict';
+const mongoose = require('./common').mongoose;
+const assert = require('assert');
 
-let mongoose = require('./common').mongoose, assert = require('power-assert'), Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 describe('schematype', function() {
   it('honors the selected option', function(done) {

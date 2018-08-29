@@ -158,8 +158,8 @@ describe('utils', function() {
   it('deepEquals on ObjectIds', function(done) {
     const s = (new ObjectId).toString();
 
-    let a = new ObjectId(s),
-        b = new ObjectId(s);
+    const a = new ObjectId(s);
+    const b = new ObjectId(s);
 
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, a));
@@ -168,12 +168,12 @@ describe('utils', function() {
   });
 
   it('deepEquals on MongooseDocumentArray works', function(done) {
-    let db = start(),
-        A = new Schema({a: String}),
-        M = db.model('deepEqualsOnMongooseDocArray', new Schema({
-          a1: [A],
-          a2: [A]
-        }));
+    const db = start();
+    const A = new Schema({a: String});
+    const M = db.model('deepEqualsOnMongooseDocArray', new Schema({
+      a1: [A],
+      a2: [A]
+    }));
 
     db.close();
 

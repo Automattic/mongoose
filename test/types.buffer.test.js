@@ -347,12 +347,11 @@ describe('types.buffer', function() {
               }
             };
 
-            let keys = Object.keys(fns),
-                i = keys.length,
-                key;
+            const keys = Object.keys(fns);
+            let i = keys.length;
 
             while (i--) {
-              key = keys[i];
+              const key = keys[i];
               if (Buffer.prototype[key]) {
                 fns[key]();
               }
@@ -373,8 +372,8 @@ describe('types.buffer', function() {
   });
 
   it('can be set to null', function(done) {
-    let User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
-        user = new User({array: [null], required: Buffer.alloc(1)});
+    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const user = new User({array: [null], required: Buffer.alloc(1)});
     user.save(function(err, doc) {
       assert.ifError(err);
       User.findById(doc, function(err, doc) {
@@ -387,8 +386,8 @@ describe('types.buffer', function() {
   });
 
   it('can be updated to null', function(done) {
-    let User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random()),
-        user = new User({array: [null], required: Buffer.alloc(1), serial: Buffer.alloc(1)});
+    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const user = new User({array: [null], required: Buffer.alloc(1), serial: Buffer.alloc(1)});
     user.save(function(err, doc) {
       assert.ifError(err);
       User.findOneAndUpdate({_id: doc.id}, {serial: null}, {new: true}, function(err, doc) {

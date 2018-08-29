@@ -1,11 +1,14 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-'use strict';
+const assert = require('assert');
+const start = require('./common');
 
-let start = require('./common'), mongoose = new start.mongoose.Mongoose, assert = require('power-assert'), Schema = mongoose.Schema;
+const mongoose = new start.mongoose.Mongoose;
+const Schema = mongoose.Schema;
 
 describe('schematype mixed', function() {
   describe('empty object defaults (gh-1380)', function() {

@@ -7310,15 +7310,15 @@ describe('model: populate:', function() {
       company : [{ type: Schema.Types.ObjectId, ref: 'gh6908_Company' }]
     });
     const Job = db.model('gh6908_Job', jobSchema);
-  
+
     const companySchema = new Schema({ name: String });
     const Company = db.model('gh6908_Company', companySchema);
 
     return co(function*() {
       const mdb = yield Company.create({ name: 'MongoDB' });
-  
+
       yield Job.collection.insertOne({ company: mdb._id });
-  
+
       const res = yield Job.findOne().populate('company');
 
       assert.ok(Array.isArray(res.company));

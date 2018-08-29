@@ -543,17 +543,17 @@ describe('model: populate:', function() {
 
   it('undefined for nested paths (gh-3859)', function(done) {
     const companySchema = new mongoose.Schema({
-      name:  String,
-      description:  String
+      name: String,
+      description: String
     });
 
     const userSchema = new mongoose.Schema({
-      name:  String,
+      name: String,
       company: {type: mongoose.Schema.Types.ObjectId, ref: 'Company'}
     });
 
     const sampleSchema = new mongoose.Schema({
-      items:  [userSchema]
+      items: [userSchema]
     });
 
     const Company = db.model('gh3859_0', companySchema);
@@ -7303,6 +7303,26 @@ describe('model: populate:', function() {
         assert.strictEqual(doc.x.name, 'Max');
       });
     });
+  });
 
+  it('respects schema array even if underlying doc doesnt use array (gh-6908)', function() {
+    const jobSchema = new Schema({
+      company : [{ type: Schema.Types.ObjectId, ref: 'gh6908_Company' }]
+    });
+    const Job = db.model('gh6908_Job', jobSchema);
+  
+    const companySchema = new Schema({ name: String });
+    const Company = db.model('gh6908_Company', companySchema);
+
+    return co(function*() {
+      const mdb = yield Company.create({ name: 'MongoDB' });
+  
+      yield Job.collection.insertOne({ company: mdb._id });
+  
+      const res = yield Job.findOne().populate('company');
+
+      assert.ok(Array.isArray(res.company));
+      assert.equal(res.company[0].name, 'MongoDB');
+    });
   });
 });

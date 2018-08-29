@@ -2430,6 +2430,20 @@ describe('model: querying:', function() {
           });
         }
       });
+      it('works with legacy 2dsphere pair in schema (gh-6937)', function() {
+        if (!mongo24_or_greater) {
+          return it.skip();
+        }
+
+        return co(function*() {
+          const Model = db.model('2dsphere-geo', schema2dsphere, 'geospatial' + random());
+          const model = new Model();
+          model.loc = [1, 2];
+          yield model.save();
+          const result = yield Model.where('loc').near({ center: { type: 'Point', coordinates: [1, 2] }, maxDistance: 10 });
+          assert.equal(result.length, 1);
+        });
+      });
     });
   });
 

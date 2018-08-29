@@ -4401,17 +4401,17 @@ describe('document', function() {
       const subSchema = new Schema({
         val: String
       });
-      
+
       subSchema.post('save', function() {
         return Promise.reject(new Error('Oops'));
       });
-      
+
       const schema = new Schema({
         sub: subSchema
       });
-      
+
       const Test = db.model('gh6926', schema);
-      
+
       const test = new Test({ sub: { val: 'test' } });
 
       return test.save().

@@ -731,10 +731,10 @@ describe('model', function() {
           num_of_places: Number
         });
 
-        let Vehicle = db.model('gh2719PopulationVehicle', vehicleSchema),
-            Car = Vehicle.discriminator('gh2719PopulationCar', carSchema),
-            Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema),
-            Garage = db.model('gh2719PopulationGarage', garageSchema);
+        const Vehicle = db.model('gh2719PopulationVehicle', vehicleSchema);
+        const Car = Vehicle.discriminator('gh2719PopulationCar', carSchema);
+        const Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema);
+        const Garage = db.model('gh2719PopulationGarage', garageSchema);
 
         Garage.create({name: 'My', num_of_places: 3}, function(err, garage) {
           assert.ifError(err);
@@ -817,8 +817,6 @@ describe('model', function() {
       });
 
       it('reference in child schemas (gh-2719-2)', function(done) {
-        let EventSchema, Event, TalkSchema, Talk, Survey;
-
         function BaseSchema() {
           Schema.apply(this, arguments);
 
@@ -833,10 +831,10 @@ describe('model', function() {
 
         util.inherits(BaseSchema, Schema);
 
-        EventSchema = new BaseSchema({});
-        Event = db.model('Event', EventSchema);
+        const EventSchema = new BaseSchema({});
+        const Event = db.model('Event', EventSchema);
 
-        TalkSchema = new BaseSchema({
+        const TalkSchema = new BaseSchema({
           pin: {type: String, required: true, index: {unique: true}},
           totalAttendees: {type: Number},
           speakers: [{type: Schema.Types.ObjectId, ref: 'Speaker'}],
@@ -844,9 +842,9 @@ describe('model', function() {
           questions: [{type: Schema.Types.ObjectId, ref: 'Question'}]
         });
 
-        Talk = Event.discriminator('Talk', TalkSchema);
+        const Talk = Event.discriminator('Talk', TalkSchema);
 
-        Survey = db.model('Survey', Schema({
+        const Survey = db.model('Survey', Schema({
           name: String,
           date: Date
         }));

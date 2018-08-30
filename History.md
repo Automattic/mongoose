@@ -1,3 +1,8 @@
+4.13.16 / 2018-08-30
+====================
+ * fix(document): disallow setting __proto__ if strict mode false
+ * feat(error): backport adding modified paths to VersionError #6928 [freewil](https://github.com/freewil)
+
 4.13.15 / 2018-08-14
 ====================
  * fix(mongoose): add global `usePushEach` option for easier Mongoose 4.x + MongoDB 3.6 #6858

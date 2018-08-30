@@ -1,3 +1,11 @@
+5.2.12 / 2018-08-30
+===================
+ * fix(document): disallow setting `constructor` and `prototype` if strict mode false
+
+4.13.17 / 2018-08-30
+====================
+ * fix(document): disallow setting `constructor` and `prototype` if strict mode false
+
 5.2.11 / 2018-08-30
 ===================
  * fix(document): disallow setting __proto__ if strict mode false

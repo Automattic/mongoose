@@ -5396,18 +5396,22 @@ describe('document', function() {
       });
     });
 
-    it('Disallows writing to __proto__', function(done) {
-      var schema = new mongoose.Schema({
+    it('Disallows writing to __proto__ and other special properties', function(done) {
+      const schema = new mongoose.Schema({
         name: String
       }, { strict: false });
 
-      var Model = db.model('prototest', schema);
-      var doc = new Model({ '__proto__.x': 'foo' });
+      const Model = db.model('prototest', schema);
+      const doc = new Model({ '__proto__.x': 'foo' });
 
       assert.strictEqual(Model.x, void 0);
       doc.set('__proto__.y', 'bar');
 
       assert.strictEqual(Model.y, void 0);
+
+      doc.set('constructor.prototype.z', 'baz');
+
+      assert.strictEqual(Model.z, void 0);
 
       done();
     });

@@ -4964,6 +4964,22 @@ describe('document', function() {
       done();
     });
 
+    it('Disallows writing to __proto__', function(done) {
+      const schema = new mongoose.Schema({
+        name: String
+      }, { strict: false });
+
+      const Model = db.model('prototest', schema);
+      const doc = new Model({ '__proto__.x': 'foo' });
+
+      assert.strictEqual(Model.x, void 0);
+      doc.set('__proto__.y', 'bar');
+
+      assert.strictEqual(Model.y, void 0);
+
+      done();
+    });
+
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
       var eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',

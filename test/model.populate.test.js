@@ -3160,7 +3160,7 @@ describe('model: populate:', function() {
       return co(function*() {
         yield Post.create({
           text: 'Post 2',
-          comments: [{}, {
+          comments: [{
             text: 'Comment'
             // No `references`
           }]

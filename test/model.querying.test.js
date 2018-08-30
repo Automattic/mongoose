@@ -2437,6 +2437,7 @@ describe('model: querying:', function() {
 
         return co(function*() {
           const Model = db.model('2dsphere-geo', schema2dsphere, 'geospatial' + random());
+          yield Model.init();
           const model = new Model();
           model.loc = [1, 2];
           yield model.save();

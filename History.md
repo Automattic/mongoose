@@ -1,3 +1,8 @@
+4.13.16 / 2018-08-30
+====================
+ * fix(document): disallow setting __proto__ if strict mode false
+ * feat(error): backport adding modified paths to VersionError #6928 [freewil](https://github.com/freewil)
+
 5.2.10 / 2018-08-27
 ===================
  * fix: bump mongodb driver -> 3.1.4 #6920 #6903 #6884 #6799 #6741 [Fonger](https://github.com/Fonger)

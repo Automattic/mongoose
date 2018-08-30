@@ -543,17 +543,17 @@ describe('model: populate:', function() {
 
   it('undefined for nested paths (gh-3859)', function(done) {
     const companySchema = new mongoose.Schema({
-      name:  String,
-      description:  String
+      name: String,
+      description: String
     });
 
     const userSchema = new mongoose.Schema({
-      name:  String,
+      name: String,
       company: {type: mongoose.Schema.Types.ObjectId, ref: 'Company'}
     });
 
     const sampleSchema = new mongoose.Schema({
-      items:  [userSchema]
+      items: [userSchema]
     });
 
     const Company = db.model('gh3859_0', companySchema);
@@ -2070,8 +2070,8 @@ describe('model: populate:', function() {
   });
 
   it('Update works with populated arrays (gh-602)', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts);
-    let User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({name: 'aphex'}, {name: 'twin'}, function(err, u1, u2) {
       assert.ifError(err);
@@ -3596,7 +3596,7 @@ describe('model: populate:', function() {
         });
       });
 
-      var test = function(id) {
+      const test = function(id) {
         const options = {populate: {path: 'users', model: 'User'}};
         Group.find({_id: id}, '-name', options, function(error, group) {
           assert.ifError(error);
@@ -4551,6 +4551,43 @@ describe('model: populate:', function() {
           assert.equal(res[0].member.name, 'Axl Rose');
           assert.equal(res[1].name, 'Motley Crue');
           assert.equal(res[1].member.name, 'Vince Neil');
+        });
+      });
+
+      it('justOne underneath array (gh-6867)', function() {
+        return co(function*() {
+          const ReportItemSchema = new Schema({
+            idItem: String
+          });
+
+          const ReportSchema = new Schema({
+            items: [ReportItemSchema]
+          });
+
+          ReportItemSchema.virtual('itemDetail', {
+            ref: 'gh6867_Item',
+            localField: 'idItem',
+            foreignField: '_id',
+            justOne: true // here is the problem
+          });
+
+          const ItemSchema = new Schema({
+            _id: String
+          });
+
+          const ReportModel = db.model('gh6867_Report', ReportSchema);
+          const ItemModel = db.model('gh6867_Item', ItemSchema);
+
+          yield ItemModel.create({ _id: 'foo' });
+
+          yield ReportModel.create({
+            items: [{ idItem: 'foo' }, { idItem: 'bar' }]
+          });
+
+          let doc = yield ReportModel.findOne({}).populate('items.itemDetail');
+          doc = doc.toObject({ virtuals: true });
+          assert.equal(doc.items[0].itemDetail._id, 'foo');
+          assert.ok(!doc.items[1].itemDetail);
         });
       });
 
@@ -7266,6 +7303,26 @@ describe('model: populate:', function() {
         assert.strictEqual(doc.x.name, 'Max');
       });
     });
+  });
 
+  it('respects schema array even if underlying doc doesnt use array (gh-6908)', function() {
+    const jobSchema = new Schema({
+      company : [{ type: Schema.Types.ObjectId, ref: 'gh6908_Company' }]
+    });
+    const Job = db.model('gh6908_Job', jobSchema);
+
+    const companySchema = new Schema({ name: String });
+    const Company = db.model('gh6908_Company', companySchema);
+
+    return co(function*() {
+      const mdb = yield Company.create({ name: 'MongoDB' });
+
+      yield Job.collection.insertOne({ company: mdb._id });
+
+      const res = yield Job.findOne().populate('company');
+
+      assert.ok(Array.isArray(res.company));
+      assert.equal(res.company[0].name, 'MongoDB');
+    });
   });
 });

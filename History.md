@@ -1,3 +1,21 @@
+5.2.11 / 2018-08-30
+===================
+ * fix(document): disallow setting __proto__ if strict mode false
+ * fix(document): run document middleware on docs embedded in maps #6945 #6938 [Fonger](https://github.com/Fonger)
+ * fix(query): make castForQuery return a CastError #6943 #6927 [lineus](https://github.com/lineus)
+ * fix(query): use correct `this` scope when casting query with legacy 2dsphere pairs defined in schema #6939 #6937 [Fonger](https://github.com/Fonger)
+ * fix(document): avoid crash when calling `get()` on deeply nested subdocs #6929 #6925 [jakemccloskey](https://github.com/jakemccloskey)
+ * fix(plugins): make saveSubdocs execute child post save hooks _after_ the actual save #6926
+ * docs: add dbName to api docs for .connect() #6923 [p722](https://github.com/p722)
+ * fix(populate): convert to array when schema specifies array, even if doc doesn't have an array #6908
+ * fix(populate): handle `justOne` virtual populate underneath array #6867
+ * fix(model): dont set versionKey on upsert if it is already `$set` #5973
+
+4.13.16 / 2018-08-30
+====================
+ * fix(document): disallow setting __proto__ if strict mode false
+ * feat(error): backport adding modified paths to VersionError #6928 [freewil](https://github.com/freewil)
+
 5.2.10 / 2018-08-27
 ===================
  * fix: bump mongodb driver -> 3.1.4 #6920 #6903 #6884 #6799 #6741 [Fonger](https://github.com/Fonger)

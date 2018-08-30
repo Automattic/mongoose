@@ -1779,7 +1779,7 @@ describe('model: querying:', function() {
         next();
       });
 
-      var next = function() {
+      const next = function() {
         const schema = new Schema({test: [String]});
         const MyModel = db.model('gh3163', schema);
 
@@ -2119,7 +2119,7 @@ describe('model: querying:', function() {
       const Test = db.model('gh1874', geoSchema, 'gh1874');
 
       let pending = 2;
-      var complete = function(err) {
+      const complete = function(err) {
         if (complete.ran) {
           return;
         }
@@ -2136,7 +2136,7 @@ describe('model: querying:', function() {
         {loc: {coordinates: [31, 40]}},
         complete);
 
-      var test = function() {
+      const test = function() {
         const q = new Query({}, {}, null, Test.collection);
         q.find({
           loc: {
@@ -2429,6 +2429,21 @@ describe('model: querying:', function() {
             done();
           });
         }
+      });
+      it('works with legacy 2dsphere pair in schema (gh-6937)', function() {
+        if (!mongo24_or_greater) {
+          return it.skip();
+        }
+
+        return co(function*() {
+          const Model = db.model('2dsphere-geo', schema2dsphere, 'geospatial' + random());
+          yield Model.init();
+          const model = new Model();
+          model.loc = [1, 2];
+          yield model.save();
+          const result = yield Model.where('loc').near({ center: { type: 'Point', coordinates: [1, 2] }, maxDistance: 10 });
+          assert.equal(result.length, 1);
+        });
       });
     });
   });

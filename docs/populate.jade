@@ -1,8 +1,22 @@
 extends layout
 
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
   :markdown
     ## Populate
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
 
     MongoDB has the join-like [$lookup](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/) aggregation operator in versions >= 3.2. Mongoose has a more powerful alternative called `populate()`, which lets you reference documents in other collections.
 

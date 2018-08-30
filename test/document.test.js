@@ -1151,7 +1151,7 @@ describe('document', function() {
         });
       });
 
-      var timeout = setTimeout(function() {
+      const timeout = setTimeout(function() {
         db.close();
         throw new Error('Promise not fulfilled!');
       }, 500);
@@ -1211,7 +1211,7 @@ describe('document', function() {
         done();
       });
 
-      var timeout = setTimeout(function() {
+      const timeout = setTimeout(function() {
         db.close();
         throw new Error('Promise not fulfilled!');
       }, 500);
@@ -2199,7 +2199,7 @@ describe('document', function() {
         next(new Error('Catch all #2'));
       });
 
-      var Model = mongoose.model('gh2284', schema);
+      const Model = mongoose.model('gh2284', schema);
 
       Model.create({}, function(error) {
         assert.ok(error);
@@ -4391,10 +4391,33 @@ describe('document', function() {
         Model.findOne({}, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.children.length, 1);
-          assert.equal(doc.children[0].text, 'bar');
+          assert.equal(doc.children[0].text, 'test');
           done();
         });
       });
+    });
+
+    it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
+      const subSchema = new Schema({
+        val: String
+      });
+
+      subSchema.post('save', function() {
+        return Promise.reject(new Error('Oops'));
+      });
+
+      const schema = new Schema({
+        sub: subSchema
+      });
+
+      const Test = db.model('gh6926', schema);
+
+      const test = new Test({ sub: { val: 'test' } });
+
+      return test.save().
+        then(() => assert.ok(false), err => assert.equal(err.message, 'Oops')).
+        then(() => Test.findOne()).
+        then(doc => assert.equal(doc.sub.val, 'test'));
     });
 
     it('nested docs toObject() clones (gh-5008)', function(done) {
@@ -5348,7 +5371,7 @@ describe('document', function() {
       done();
     });
 
-    it('nested virtuals + nested toJSON (gh-6294)', function(done) {
+    it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {
           prop: String
@@ -5371,6 +5394,20 @@ describe('document', function() {
       assert.deepEqual(doc.nested.toJSON(), {
         prop: 'test 1', virtual: 'test 2'
       });
+    });
+
+    it('Disallows writing to __proto__', function(done) {
+      var schema = new mongoose.Schema({
+        name: String
+      }, { strict: false });
+
+      var Model = db.model('prototest', schema);
+      var doc = new Model({ '__proto__.x': 'foo' });
+
+      assert.strictEqual(Model.x, void 0);
+      doc.set('__proto__.y', 'bar');
+
+      assert.strictEqual(Model.y, void 0);
 
       done();
     });
@@ -5808,6 +5845,30 @@ describe('document', function() {
 
       assert.equal(test.get('nested.arr.0.key'), 'foobarvalue');
       assert.equal(test.get('nested.arr.1.key'), 'foobarvalue2');
+
+      return Promise.resolve();
+    });
+
+    it('returns doubly nested field in inline sub schema when using get() (gh-6925)', function() {
+      const child = new Schema({
+        nested: {
+          key: String
+        }
+      });
+      const parent = new Schema({
+        child: child
+      });
+
+      const M = db.model('gh6925', parent);
+      const test = new M({
+        child: {
+          nested: {
+            key: 'foobarvalue'
+          }
+        }
+      });
+
+      assert.equal(test.get('child.nested.key'), 'foobarvalue');
 
       return Promise.resolve();
     });

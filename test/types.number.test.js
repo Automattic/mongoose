@@ -1,11 +1,13 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-'use strict';
+const assert = require('assert');
+const mongoose = require('./common').mongoose;
 
-let mongoose = require('./common').mongoose, SchemaNumber = mongoose.Schema.Types.Number, assert = require('power-assert');
+const SchemaNumber = mongoose.Schema.Types.Number;
 
 /**
  * Test.
@@ -107,5 +109,16 @@ describe('types.number', function() {
     };
     assert.strictEqual(n.cast(obj), 10);
     done();
+  });
+
+  it('throws a CastError with a bad conditional (gh-6927)', function() {
+    const n = new SchemaNumber();
+    let err;
+    try {
+      n.castForQuery({ somePath: { $x: 43 } });
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(/CastError/.test(err));
   });
 });

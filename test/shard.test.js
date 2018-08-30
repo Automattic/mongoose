@@ -1,11 +1,12 @@
 'use strict';
 
-let start = require('./common'),
-    assert = require('power-assert'),
-    chalk = require('chalk'),
-    random = require('../lib/utils').random,
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema;
+const assert = require('power-assert');
+const chalk = require('chalk');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 const uri = process.env.MONGOOSE_SHARD_TEST_URI;
 

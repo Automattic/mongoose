@@ -5371,7 +5371,7 @@ describe('document', function() {
       done();
     });
 
-    it('nested virtuals + nested toJSON (gh-6294)', function(done) {
+    it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {
           prop: String

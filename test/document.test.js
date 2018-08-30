@@ -4964,7 +4964,7 @@ describe('document', function() {
       done();
     });
 
-    it('Disallows writing to __proto__', function(done) {
+    it('Disallows writing to __proto__ and other special properties', function(done) {
       var schema = new mongoose.Schema({
         name: String
       }, { strict: false });
@@ -4976,6 +4976,10 @@ describe('document', function() {
       doc.set('__proto__.y', 'bar');
 
       assert.strictEqual(Model.y, void 0);
+
+      doc.set('constructor.prototype.z', 'baz');
+
+      assert.strictEqual(Model.z, void 0);
 
       done();
     });

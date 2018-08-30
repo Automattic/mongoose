@@ -4965,12 +4965,12 @@ describe('document', function() {
     });
 
     it('Disallows writing to __proto__', function(done) {
-      const schema = new mongoose.Schema({
+      var schema = new mongoose.Schema({
         name: String
       }, { strict: false });
 
-      const Model = db.model('prototest', schema);
-      const doc = new Model({ '__proto__.x': 'foo' });
+      var Model = db.model('prototest', schema);
+      var doc = new Model({ '__proto__.x': 'foo' });
 
       assert.strictEqual(Model.x, void 0);
       doc.set('__proto__.y', 'bar');

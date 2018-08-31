@@ -5790,5 +5790,19 @@ describe('Model', function() {
         assert.strictEqual(doc.body, 'a note, part deux.');
       });
     });
+    it('createCollection() (gh-6711)', function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      const rand = random();
+      const model = db.model('gh6711_' + rand + '_User', userSchema);
+
+      return co(function*() {
+        yield model.createCollection();
+        // If the collection is not created, the following will throw
+        // MongoError: Collection [mongoose_test.create_xxx_users] not found.
+        yield db.collection('gh6711_' + rand + '_users').stats();
+      });
+    });
   });
 });

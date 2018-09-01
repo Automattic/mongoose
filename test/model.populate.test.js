@@ -3174,7 +3174,7 @@ describe('model: populate:', function() {
 
     it('where first doc doesnt have a refPath (gh-6913', function() {
       const UserSchema = new Schema({ name: String });
-      
+
       const PostSchema = new Schema({
         comments: [{
           references: [{
@@ -3186,15 +3186,15 @@ describe('model: populate:', function() {
           }]
         }]
       });
-      
+
       const Post = db.model('gh6913_Post', PostSchema);
       const User = db.model('gh6913_User', UserSchema);
-      
+
       const user = {
         _id: mongoose.Types.ObjectId(),
         name: 'Arnold',
       };
-      
+
       const post = {
         _id: mongoose.Types.ObjectId(),
         comments: [

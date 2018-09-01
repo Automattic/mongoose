@@ -4,7 +4,10 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose;
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
 
 describe('model translate aliases', function() {
   it('should translate correctly', function() {

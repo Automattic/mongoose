@@ -3172,6 +3172,66 @@ describe('model: populate:', function() {
       });
     });
 
+    it('with nested sparse refPath (gh-6913)', function() {
+      const CommentSchema = new Schema({
+        text: String,
+        references: {
+          type: [{
+            item: {
+              type: Schema.Types.ObjectId,
+              refPath: 'comments.references.kind'
+            },
+            kind: String
+          }]
+        }
+      });
+      const UserSchema = new Schema({
+        name: String
+      });
+      const PostSchema = new Schema({
+        text: String,
+        comments: [CommentSchema]
+      });
+
+      const Post = db.model('gh6913_Post', PostSchema);
+      const User = db.model('gh6913_User', UserSchema);
+      this.timeout(0);
+      return co(function*() {
+        const user1 = yield User.create({
+          name: 'Conan',
+          age: 6
+        });
+        const user2 = yield User.create({
+          name: 'Shelly'
+        });
+
+        yield Post.create({
+          text: 'Post',
+          comments: [
+            {
+              references: [{
+                item: user1._id,
+                kind: 'gh6913_User'
+              }]
+            },
+            {}, // sparse empty Object
+            {
+              references: [{
+                item: user2._id,
+                kind: 'gh6913_User'
+              }]
+            }
+          ]
+        });
+
+        let post = yield Post.findOne().populate('comments.references.item');
+        post = post.toObject();
+        assert.strictEqual(post.comments[0].references[0].item.name, 'Conan');
+        assert.strictEqual(post.comments[1].references.length, 0);
+        assert.strictEqual(post.comments[2].references[0].item.name, 'Shelly');
+      });
+    });
+
     it('readable error with deselected refPath (gh-6834)', function() {
       const offerSchema = new Schema({
         text: String,

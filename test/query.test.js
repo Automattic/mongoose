@@ -1060,7 +1060,7 @@ describe('Query', function() {
     it('op', function(done) {
       const Product = db.model('Product');
       const prod = new Product({});
-      var q = new Query({}, {}, Product, prod.collection).distinct('blah', function() {
+      const q = new Query({}, {}, Product, prod.collection).distinct('blah', function() {
         assert.equal(q.op, 'distinct');
         done();
       });

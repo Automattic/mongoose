@@ -1,11 +1,14 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-'use strict';
+const assert = require('assert');
+const start = require('./common');
 
-let assert = require('power-assert'), start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema;
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Test.

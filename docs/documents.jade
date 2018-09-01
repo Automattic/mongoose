@@ -1,8 +1,22 @@
 extends layout
 
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
   :markdown
     ## Documents
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
 
     Mongoose [documents](./api.html#document-js) represent a one-to-one mapping
     to documents as stored in MongoDB. Each document is an instance of its

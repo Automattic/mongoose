@@ -971,6 +971,20 @@ describe('model: findOneAndUpdate:', function() {
       then(doc => assert.strictEqual(doc.__v, 1));
   });
 
+  it('doesn\'t add __v on upsert if `$set` with `update()` (gh-5973)', function() {
+    const accountSchema = new Schema({
+      name: String
+    });
+
+    const Account = db.model('gh5973_Update', accountSchema);
+
+    const update = { $set: { name: 'test', __v: 1 } };
+    return Account.
+      updateOne({}, update, { upsert: true, new: true }).
+      then(() => Account.findOne({ name: 'test' })).
+      then(doc => assert.strictEqual(doc.__v, 1));
+  });
+
   it('works with nested schemas and $pull+$or (gh-1932)', function(done) {
     const TickSchema = new Schema({name: String});
     const TestSchema = new Schema({a: Number, b: Number, ticks: [TickSchema]});

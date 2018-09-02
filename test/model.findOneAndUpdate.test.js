@@ -2206,7 +2206,7 @@ describe('model: findOneAndUpdate:', function() {
         function(err) {
           assert.ifError(err);
           assert.equal(validateCalls, 1); // Assertion error: 1 == 2
-          db.close(done);
+          done();
         }
       );
     });

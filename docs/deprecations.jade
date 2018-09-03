@@ -92,3 +92,26 @@ block content
     * [`Query.findOneAndDelete()`](/docs/api.html#query_Query-findOneAndDelete)
     * [`Query.findOneAndRemove()`](/docs/api.html#query_Query-findOneAndRemove)
     * [`Query.findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate)
+
+    ## `ensureIndex()`
+
+    If you define [indexes in your Mongoose schemas](https://mongoosejs.com/docs/guide.html#indexes), you'll see the below
+    deprecation warning.
+
+    ```
+    DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes
+    instead.
+    ```
+
+    By default, Mongoose 5.x calls the [MongoDB driver's `ensureIndex()` function](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#ensureIndex).
+    The MongoDB driver deprecated this function in favor of [`createIndex()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#createIndex).
+    Set the [`useCreateIndex` global option](https://mongoosejs.com/docs/api.html#mongoose_Mongoose-set) to opt in to making Mongoose use `createIndex()` instead.
+
+    ```javascript
+    mongoose.set('useCreateIndex', true);
+    ```
+
+    There are no intentional backwards breaking changes with the `useCreateIndex`
+    option, so you should be able to turn
+    this option on without any code changes. If you discover any issues,
+    please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).

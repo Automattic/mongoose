@@ -1,0 +1,59 @@
+extends layout
+
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
+block content
+  :markdown
+    ## Deprecation Warnings
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
+
+    There are several deprecations in the [MongoDB Node.js driver](http://npmjs.com/package/mongodb)
+    that Mongoose users should be aware of. Mongoose provides options to work
+    around these deprecation warnings, but you need to test whether these options
+    cause any problems for your application. Please [report any issues on GitHub](https://github.com/Automattic/mongoose/issues/new).
+
+    ## The `useNewUrlParser` Option
+
+    By default, `mongoose.connect()` will print out the below warning:
+
+    ```
+    DeprecationWarning: current URL string parser is deprecated, and will be
+    removed in a future version. To use the new parser, pass option
+    { useNewUrlParser: true } to MongoClient.connect.
+    ```
+
+    The MongoDB Node.js driver rewrote the tool it uses to parse [MongoDB connection strings](https://docs.mongodb.com/manual/reference/connection-string/).
+    Because this is such a big change, they put the new connection string parser
+    behind a flag. To turn on this option, pass the `useNewUrlParser` option to
+    [`mongoose.connect()`](https://mongoosejs.com/docs/api.html#mongoose_Mongoose-connect)
+    or [`mongoose.createConnection()`](https://mongoosejs.com/docs/api.html#mongoose_Mongoose-createConnection).
+
+    ```javascript
+    mongoose.connect(uri, { useNewUrlParser: true });
+    mongoose.createConnection(uri, { useNewUrlParser: true });
+    ```
+
+    You can also [set the global `useNewUrlParser` option](https://mongoosejs.com/docs/api.html#mongoose_Mongoose-set)
+    to turn on `useNewUrlParser` for every connection by default.
+
+    ```javascript
+    // Optional. Use this if you create a lot of connections and don't want
+    // to copy/paste `{ useNewUrlParser: true }`.
+    mongoose.set('useNewUrlParser', true);
+    ```
+
+    To test your app with `{ useNewUrlParser: true }`, you only need to check
+    whether your app successfully connects. Once Mongoose has successfully
+    connected, the URL parser is no longer important. If you can't connect
+    with `{ useNewUrlParser: true }`, please [open an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).

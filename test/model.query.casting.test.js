@@ -1167,6 +1167,22 @@ describe('model query casting', function() {
       });
     });
   });
+  it('array ops don\'t break with strict:false (gh-6952)', function(done) {
+    const schema = new Schema({}, { strict: false });
+    const Test = db.model('gh6952', schema);
+    Test.create({ outerArray: [] })
+      .then(function(created) {
+        const toBePushedObj = { innerArray: ['onetwothree'] };
+        const update = { $push: { outerArray: toBePushedObj } };
+        const opts = { new: true };
+        return Test.findOneAndUpdate({ _id: created._id }, update, opts);
+      })
+      .then(function(updated) {
+        const doc = updated.toObject();
+        assert.strictEqual(doc.outerArray[0].innerArray[0], 'onetwothree');
+        done();
+      });
+  });
 });
 
 function _geojsonPoint(coordinates) {

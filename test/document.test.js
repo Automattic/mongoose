@@ -130,6 +130,48 @@ describe('document', function() {
     db.close(done);
   });
 
+  describe('delete', function() {
+    it('deletes the document', function() {
+      const schema = new Schema({ x: String });
+      const Test = db.model('gh6940', schema);
+      return co(function* () {
+        const test = new Test({ x: 'test' });
+        const doc = yield test.save();
+        yield doc.delete();
+        const found = yield Test.findOne({ _id: doc._id });
+        assert.strictEqual(found, null);
+      });
+    });
+  });
+
+  describe('updateOne', function() {
+    it('updates the document', function() {
+      const schema = new Schema({ x: String, y: String });
+      const Test = db.model('gh6940_2', schema);
+      return co(function* () {
+        const test = new Test({ x: 'test' });
+        const doc = yield test.save();
+        yield doc.updateOne({ y: 'test' });
+        const found = yield Test.findOne({ _id: doc._id });
+        assert.strictEqual(found.y, 'test');
+      });
+    });
+  });
+
+  describe('replaceOne', function() {
+    it('replaces the document', function() {
+      const schema = new Schema({ x: String });
+      const Test = db.model('gh6940_3', schema);
+      return co(function* () {
+        const test = new Test({ x: 'test' });
+        const doc = yield test.save();
+        yield doc.replaceOne({ x: 'updated' });
+        const found = yield Test.findOne({ _id: doc._id });
+        assert.strictEqual(found.x, 'updated');
+      });
+    });
+  });
+
   describe('shortcut getters', function() {
     it('return undefined for properties with a null/undefined parent object (gh-1326)', function(done) {
       const doc = new TestDocument;

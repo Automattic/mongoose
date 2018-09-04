@@ -1,12 +1,13 @@
 'use strict';
 
-let start = require('./common'),
-    mongoose = start.mongoose,
-    Schema = mongoose.Schema,
-    assert = require('power-assert'),
-    random = require('../lib/utils').random,
-    co = require('co'),
-    Query = require('../lib/query');
+const Query = require('../lib/query');
+const assert = require('assert');
+const co = require('co');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('Query:', function() {
   let Comment;

@@ -3172,6 +3172,53 @@ describe('model: populate:', function() {
       });
     });
 
+    it('where first doc doesnt have a refPath (gh-6913', function() {
+      const UserSchema = new Schema({ name: String });
+
+      const PostSchema = new Schema({
+        comments: [{
+          references: [{
+            item: {
+              type: Schema.Types.ObjectId,
+              refPath: 'comments.references.kind'
+            },
+            kind: String
+          }]
+        }]
+      });
+
+      const Post = db.model('gh6913_Post', PostSchema);
+      const User = db.model('gh6913_User', UserSchema);
+
+      const user = {
+        _id: mongoose.Types.ObjectId(),
+        name: 'Arnold',
+      };
+
+      const post = {
+        _id: mongoose.Types.ObjectId(),
+        comments: [
+          {},
+          {
+            references: [{
+              item: user._id,
+              kind: 'gh6913_User'
+            }]
+          }
+        ]
+      };
+
+      return co(function*() {
+        yield User.create(user);
+        yield Post.create(post);
+
+        const _post = yield Post.findOne().populate('comments.references.item');
+        assert.equal(_post.comments.length, 2);
+        assert.equal(_post.comments[1].references.length, 1);
+        assert.equal(_post.comments[1].references[0].item.name, 'Arnold');
+      });
+    });
+
     it('readable error with deselected refPath (gh-6834)', function() {
       const offerSchema = new Schema({
         text: String,

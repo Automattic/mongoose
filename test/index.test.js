@@ -155,18 +155,18 @@ describe('mongoose module:', function() {
   it('useCreateIndex option (gh-6880)', function() {
     const mongoose = new Mongoose();
 
+    const M = mongoose.model('Test', new Schema({
+      name: { type: String, index: true }
+    }));
+
+    M.collection.ensureIndex = function() {
+      throw new Error('Fail');
+    };
+
     mongoose.set('useCreateIndex', true);
 
     return mongoose.connect(uri, options).
       then(() => {
-        const M = mongoose.model('Test', new Schema({
-          name: { type: String, index: true }
-        }));
-
-        M.collection.ensureIndex = function() {
-          throw new Error('Fail');
-        };
-
         return M.init();
       }).
       then(() => {

@@ -490,8 +490,8 @@ describe.skip('model: update:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    let BlogPost = db.model('BlogPostForUpdates', collection),
-        totalDocs = 4;
+    const BlogPost = db.model('BlogPostForUpdates', collection);
+    let totalDocs = 4;
 
     const post = new BlogPost;
     post.set('meta.visitors', 5);

@@ -2206,9 +2206,25 @@ describe('model: findOneAndUpdate:', function() {
         function(err) {
           assert.ifError(err);
           assert.equal(validateCalls, 1); // Assertion error: 1 == 2
-          db.close(done);
+          done();
         }
       );
+    });
+
+    it('consistent array with $pull on doc array (gh-6889)', function() {
+      const schema = new Schema({
+        arr: {
+          type: [{ x: String }],
+          validate: {
+            validator: v => assert.ok(Array.isArray(v))
+          }
+        }
+      });
+
+      const Model = db.model('gh6889', schema);
+
+      const opts = { runValidators: true };
+      return Model.findOneAndUpdate({}, { $pull: { arr: { x: 'three' } } }, opts);
     });
   });
 });

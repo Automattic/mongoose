@@ -1,3 +1,15 @@
+5.2.13 / 2018-09-04
+===================
+ * fix(map): throw TypeError if keys are not string #6968 [Fonger](https://github.com/Fonger)
+ * fix(update): make array op casting work with strict:false and {} #6962 #6952 [lineus](https://github.com/lineus)
+ * fix(document): add doc.deleteOne(), doc.updateOne(), doc.replaceOne() re: deprecation warnings #6959 #6940 [lineus](https://github.com/lineus)
+ * docs(faq+schematypes): add note about map keys needing to be strings #6957 #6956 [lineus](https://github.com/lineus)
+ * fix(schematype): remove unused if statement #6950 #6949 [cacothi](https://github.com/cacothi)
+ * docs: add /docs/deprecations.html for dealing with MongoDB driver deprecation warnings #6922
+ * fix(populate): handle refPath where first element in array has no refPath #6913
+ * fix(mongoose): allow setting useCreateIndex option after creating a model but before initial connection succeeds #6890
+ * fix(updateValidators): ensure $pull validators always get an array #6889
+
 5.2.12 / 2018-08-30
 ===================
  * fix(document): disallow setting `constructor` and `prototype` if strict mode false

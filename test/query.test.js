@@ -2882,4 +2882,44 @@ describe('Query', function() {
       });
     });
   });
+
+  describe('getPopulatedPaths', function() {
+    it('doesn\'t break on a query without population (gh-6677)', function() {
+      const schema = new Schema({ name: String });
+      schema.pre('findOne', function() {
+        assert.deepStrictEqual(this.getPopulatedPaths(), []);
+      });
+
+      const Model = db.model('gh6677_model', schema);
+
+      return co(function*() {
+        yield Model.findOne({});
+      });
+    });
+
+    it('returns an array of populated paths as strings (gh-6677)', function() {
+      const otherSchema = new Schema({ name: String });
+      const schema = new Schema({
+        other: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh6677_other'
+        }
+      });
+      schema.pre('findOne', function() {
+        assert.deepStrictEqual(this.getPopulatedPaths(), ['other']);
+      });
+
+      const Other = db.model('gh6677_other', otherSchema);
+      const Test = db.model('gh6677_test', schema);
+
+      const other = new Other({ name: 'one' });
+      const test = new Test({ other: other._id });
+
+      return co(function*() {
+        yield other.save();
+        yield test.save();
+        yield Test.findOne({}).populate('other');
+      });
+    });
+  });
 });

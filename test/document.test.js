@@ -6143,4 +6143,40 @@ describe('document', function() {
       assert.equal(found.items.length, 2);
     });
   });
+
+  it('validateSync() on embedded doc (gh-6931)', function() {
+    const innerSchema = new mongoose.Schema({
+      innerField: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      }
+    });
+
+    const schema = new mongoose.Schema({
+      field: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
+      inner: [innerSchema]
+    });
+
+    const Model = db.model('gh6931', schema);
+
+    return co(function*() {
+      const doc2 = new Model();
+      doc2.field = mongoose.Types.ObjectId();
+      doc2.inner.push({
+        innerField: mongoose.Types.ObjectId()
+      });
+      doc2.inner[0].innerField = '';
+
+      let err = doc2.inner[0].validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['innerField']);
+
+      err = yield doc2.inner[0].validate().then(() => assert.ok(false), err => err);
+      assert.ok(err);
+      assert.ok(err.errors['innerField']);
+    });
+  });
 });

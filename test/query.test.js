@@ -1556,6 +1556,26 @@ describe('Query', function() {
             assert.strictEqual(doc.toObject().nested.v, 'xyz');
           });
         });
+
+        it('overrides schema useNestedStrict: true (gh-5144)', function() {
+          const subSchema = new Schema({}, { strict: false });
+          const schema = new Schema({
+            name: String,
+            nested: subSchema
+          }, { strict: 'throw', useNestedStrict: true });
+
+          const Test = db.model('gh5144_2', schema);
+          const test = new Test({ name: 'Test1' });
+          return co(function* () {
+            yield test.save();
+            const cond = { _id: test._id };
+            const update = { 'nested.v': 'xyz' };
+            const opts = { useNestedStrict: false };
+            let error;
+            yield Test.findOneAndUpdate(cond, update, opts).catch(e => error = e);
+            assert.strictEqual(error.name, 'StrictModeError');
+          });
+        });
       });
     });
   });

@@ -24,15 +24,8 @@ describe('promises docs', function () {
   });
 
   /**
-<<<<<<< HEAD
    * Mongoose async operations, like `.save()` and queries, return thenables.
    * This means that you can do things like `MyModel.findOne({}).then()` and
-=======
-   * Mongoose async operations, like `.save()` and queries, return either an
-   * [ES6 promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-   * or a [Query Object](https://mongoosejs.com/docs/queries.html).
-   * This means that you can do things like `MyModel.findOne({}).then()` or
->>>>>>> 95529cc0b6986e04a721f865c5781c34b5f2a614
    * `await MyModel.findOne({}).exec()` if you're using
    * [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
    * 

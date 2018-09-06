@@ -5294,6 +5294,37 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite with timestamps (gh-5708)', function() {
+      const schema = new Schema({
+        str: { type: String, default: 'test' },
+        num: Number
+      }, { timestamps: true });
+
+      const M = db.model('gh5708_ts', schema);
+
+      const ops = [
+        {
+          updateOne: {
+            filter: { num: 0 },
+            update: {
+              $inc: { num: 1 }
+            },
+            upsert: true
+          }
+        }
+      ];
+
+      const now = Date.now();
+
+      return co(function*() {
+        yield M.bulkWrite(ops);
+
+        const doc = yield M.findOne();
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+      });
+    });
+
     it('insertMany with Decimal (gh-5190)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

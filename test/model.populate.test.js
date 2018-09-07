@@ -77,8 +77,8 @@ describe('model: populate:', function() {
   });
 
   it('populating array of object', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({name: 'User 1'}, function(err, user1) {
       assert.ifError(err);
@@ -107,8 +107,8 @@ describe('model: populate:', function() {
   });
 
   it('deep population (gh-3103)', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({name: 'User 01'}, function(err, user1) {
       assert.ifError(err);
@@ -289,9 +289,9 @@ describe('model: populate:', function() {
   });
 
   it('populating a single ref', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Guillermo',
@@ -358,10 +358,10 @@ describe('model: populate:', function() {
   });
 
   it('across DBs', function(done) {
-    let db = start(),
-        db2 = db.useDb('mongoose_test2'),
-        BlogPost = db.model('RefBlogPost', posts + '2'),
-        User = db2.model('RefUser', users + '2');
+    const db = start();
+    const db2 = db.useDb('mongoose_test2');
+    const BlogPost = db.model('RefBlogPost', posts + '2');
+    const User = db2.model('RefUser', users + '2');
 
     User.create({
       name: 'Guillermo',
@@ -391,8 +391,8 @@ describe('model: populate:', function() {
   });
 
   it('an error in single ref population propagates', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts + '1'),
-        User = db.model('RefUser', users + '1');
+    const BlogPost = db.model('RefBlogPost', posts + '1');
+    const User = db.model('RefUser', users + '1');
 
     User.create({
       name: 'Guillermo',
@@ -432,9 +432,9 @@ describe('model: populate:', function() {
   });
 
   it('populating with partial fields selection', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Guillermo',
@@ -465,9 +465,9 @@ describe('model: populate:', function() {
   });
 
   it('population of single oid with partial field selection and filter', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', 'blogposts_' + random()),
-        User = db.model('RefUser', 'users_' + random());
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', 'blogposts_' + random());
+    const User = db.model('RefUser', 'users_' + random());
 
     User.create({
       name: 'Banana',
@@ -505,9 +505,9 @@ describe('model: populate:', function() {
   });
 
   it('population of undefined fields in a collection of docs', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', 'blogposts_' + random()),
-        User = db.model('RefUser', 'users_' + random());
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', 'blogposts_' + random());
+    const User = db.model('RefUser', 'users_' + random());
     User.create({
       name: 'Eloy',
       email: 'eloytoro@gmail.com'
@@ -592,9 +592,9 @@ describe('model: populate:', function() {
   });
 
   it('population and changing a reference', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Guillermo',
@@ -648,9 +648,9 @@ describe('model: populate:', function() {
   });
 
   it('populating with partial fields selection and changing ref', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Guillermo',
@@ -702,8 +702,8 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of refs and fetching many', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Fan 1',
@@ -753,8 +753,8 @@ describe('model: populate:', function() {
   });
 
   it('an error in array reference population propagates', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts + '2'),
-        User = db.model('RefUser', users + '2');
+    const BlogPost = db.model('RefBlogPost', posts + '2');
+    const User = db.model('RefUser', users + '2');
 
     User.create({
       name: 'Fan 1',
@@ -807,8 +807,8 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references with fields selection', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Fan 1',
@@ -860,8 +860,8 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references and filtering', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Fan 1',
@@ -944,8 +944,8 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references and multi-filtering', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Fan 1',
@@ -1033,8 +1033,8 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of references and multi-filtering with field selection', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Fan 1',
@@ -1099,8 +1099,8 @@ describe('model: populate:', function() {
   });
 
   it('populating an array of refs changing one and removing one', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'Fan 1',
@@ -1178,8 +1178,8 @@ describe('model: populate:', function() {
 
   describe('populating sub docs', function() {
     it('works with findById', function(done) {
-      let BlogPost = db.model('RefBlogPost', posts),
-          User = db.model('RefUser', users);
+      const BlogPost = db.model('RefBlogPost', posts);
+      const User = db.model('RefUser', users);
 
       User.create({name: 'User 1'}, function(err, user1) {
         assert.ifError(err);
@@ -1215,8 +1215,8 @@ describe('model: populate:', function() {
     });
 
     it('works when first doc returned has empty array for populated path (gh-1055)', function(done) {
-      let BlogPost = db.model('RefBlogPost', posts),
-          User = db.model('RefUser', users);
+      const BlogPost = db.model('RefBlogPost', posts);
+      const User = db.model('RefUser', users);
 
       User.create({name: 'gh-1055-1'}, {name: 'gh-1055-2'}, function(err, user1, user2) {
         assert.ifError(err);
@@ -1295,8 +1295,8 @@ describe('model: populate:', function() {
   });
 
   it('populating subdocuments partially', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'User 1',
@@ -1338,8 +1338,8 @@ describe('model: populate:', function() {
   });
 
   it('populating subdocuments partially with conditions', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'User 1',
@@ -1381,8 +1381,8 @@ describe('model: populate:', function() {
   });
 
   it('populating subdocs with invalid/missing subproperties', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create({
       name: 'T-100',
@@ -1650,12 +1650,12 @@ describe('model: populate:', function() {
   });
 
   it('populating more than one array at a time', function(done) {
-    let User = db.model('RefUser', users),
-        M = db.model('PopMultiSubDocs', new Schema({
-          users: [{type: ObjectId, ref: 'RefUser'}],
-          fans: [{type: ObjectId, ref: 'RefUser'}],
-          comments: [Comment]
-        }));
+    const User = db.model('RefUser', users);
+    const M = db.model('PopMultiSubDocs', new Schema({
+      users: [{type: ObjectId, ref: 'RefUser'}],
+      fans: [{type: ObjectId, ref: 'RefUser'}],
+      comments: [Comment]
+    }));
 
     User.create({
       email: 'fan1@learnboost.com'
@@ -1723,12 +1723,12 @@ describe('model: populate:', function() {
   });
 
   it('populating multiple children of a sub-array at a time', function(done) {
-    let User = db.model('RefUser', users),
-        BlogPost = db.model('RefBlogPost', posts),
-        Inner = new Schema({
-          user: {type: ObjectId, ref: 'RefUser'},
-          post: {type: ObjectId, ref: 'RefBlogPost'}
-        });
+    const User = db.model('RefUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const Inner = new Schema({
+      user: {type: ObjectId, ref: 'RefUser'},
+      post: {type: ObjectId, ref: 'RefBlogPost'}
+    });
     db.model('PopMultiChildrenOfSubDocInner', Inner);
 
     const M = db.model('PopMultiChildrenOfSubDoc', new Schema({
@@ -1783,8 +1783,8 @@ describe('model: populate:', function() {
   });
 
   it('passing sort options to the populate method', function(done) {
-    let P = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const P = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.create(
       {name: 'aaron', age: 10},
@@ -2043,8 +2043,8 @@ describe('model: populate:', function() {
   });
 
   it('populate works with schemas with both id and _id defined', function(done) {
-    let S1 = new Schema({id: String}),
-        S2 = new Schema({things: [{type: ObjectId, ref: '_idAndid'}]});
+    const S1 = new Schema({id: String});
+    const S2 = new Schema({things: [{type: ObjectId, ref: '_idAndid'}]});
 
     const M1 = db.model('_idAndid', S1);
     const M2 = db.model('populateWorksWith_idAndidSchemas', S2);
@@ -2105,9 +2105,9 @@ describe('model: populate:', function() {
   });
 
   it('toJSON should also be called for refs (gh-675)', function(done) {
-    let db = start(),
-        BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefUser', users);
+    const db = start();
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefUser', users);
 
     User.prototype._toJSON = User.prototype.toJSON;
     User.prototype.toJSON = function() {
@@ -2220,8 +2220,8 @@ describe('model: populate:', function() {
   });
 
   it('populating with custom model selection (gh-773)', function(done) {
-    let BlogPost = db.model('RefBlogPost', posts),
-        User = db.model('RefAlternateUser', users);
+    const BlogPost = db.model('RefBlogPost', posts);
+    const User = db.model('RefAlternateUser', users);
 
     User.create({
       name: 'Daniel',
@@ -2579,9 +2579,9 @@ describe('model: populate:', function() {
 
   describe('populating combined with lean (gh-1260)', function() {
     it('with findOne', function(done) {
-      let db = start(),
-          BlogPost = db.model('RefBlogPost', posts + random()),
-          User = db.model('RefUser', users + random());
+      const db = start();
+      const BlogPost = db.model('RefBlogPost', posts + random());
+      const User = db.model('RefUser', users + random());
 
       User.create({
         name: 'Guillermo',
@@ -2614,9 +2614,9 @@ describe('model: populate:', function() {
     });
 
     it('with find', function(done) {
-      let db = start(),
-          BlogPost = db.model('RefBlogPost', posts + random()),
-          User = db.model('RefUser', users + random());
+      const db = start();
+      const BlogPost = db.model('RefBlogPost', posts + random());
+      const User = db.model('RefUser', users + random());
 
       User.create({
         name: 'Fan 1',

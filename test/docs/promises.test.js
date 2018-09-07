@@ -24,11 +24,12 @@ describe('promises docs', function () {
   });
 
   /**
-   * Mongoose async operations, like `.save()` and queries, return
-   * [ES6 promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+   * Mongoose async operations, like `.save()` and queries, return thenables.
    * This means that you can do things like `MyModel.findOne({}).then()` and
    * `await MyModel.findOne({}).exec()` if you're using
    * [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
+   * 
+   * You can find the return type of specific operations [in the api docs](https://mongoosejs.com/docs/api.html)
    */
   it('Built-in Promises', function (done) {
     var gnr = new Band({

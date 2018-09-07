@@ -3136,6 +3136,69 @@ describe('model: populate:', function() {
         catch(done);
     });
 
+    it('with different schema types for local fields (gh-6870)', function() {
+      const TestSchema = new mongoose.Schema({
+        _id: Number,
+        exercises: [String]
+      });
+      const LessonSchema = new mongoose.Schema({
+        _id: String,
+        url: String
+      });
+      const StudyPlanSchema = new mongoose.Schema({
+        parts: [
+          {
+            title: String,
+            contents: [
+              {
+                item: {
+                  type: mongoose.Schema.Types.Mixed,
+                  refPath: 'parts.contents.kind'
+                },
+                kind: String
+              }
+            ]
+          }
+        ]
+      });
+
+      const StudyPlan = db.model('gh6870_StudyPlan', StudyPlanSchema);
+      const Test = db.model('gh6870_Test', TestSchema);
+      const Lesson = db.model('gh6870_Lesson', LessonSchema);
+
+      const test = new Test({ _id: 123, exercises: ['t1', 't2'] });
+      const lesson = new Lesson({ _id: 'lesson', url: 'https://youtube.com' });
+      const studyPlan = new StudyPlan({
+        parts: [
+          {
+            title: 'Study Plan 01',
+            contents: [
+              {
+                item: test._id,
+                kind: 'gh6870_Test'
+              },
+              {
+                item: lesson._id,
+                kind: 'gh6870_Lesson'
+              },
+              {
+                item: lesson._id,
+                kind: 'gh6870_Lesson'
+              }
+            ]
+          }
+        ]
+      });
+
+      return co(function*() {
+        yield [test.save(), lesson.save(), studyPlan.save()];
+        const doc = yield StudyPlan.findOne({}).populate('parts.contents.item');
+
+        assert.strictEqual(doc.parts[0].contents[0].item.exercises[0], 't1');
+        assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
+      });
+    });
+
     it('with nested nonexistant refPath (gh-6457)', function() {
       const CommentSchema = new Schema({
         text: String,

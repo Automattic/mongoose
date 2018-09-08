@@ -59,7 +59,7 @@ pre code {
 }
 #header {
   text-align: center;
-  padding-top: 40px;
+  padding-top: 20px;
 }
 #header, h2, h3, .tagline, .blurb {
   text-transform: lowercase;
@@ -266,4 +266,36 @@ h2 a {
 
 .unstable {
   padding-left: 180px;
+}
+
+/* tidelift */
+
+#tidelift {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#tidelift-button {
+  display: inline-block;
+  background-color: #444;
+  padding-top: 9px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 11px;
+  border-radius: 3px;
+  color: white;
+  font-size: 20px;
+  display: inline-block;
+  text-decoration: none;
+  text-shadow: 1px 1px 7px #222;
+  margin: auto;
+}
+#tidelift-button span {
+  margin-top: -20px;
+}
+#tidelift-button img {
+  height: 25px;
+  margin-right: 5px;
+  position: relative;
+  top: 5px;
 }

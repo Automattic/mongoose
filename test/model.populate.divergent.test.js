@@ -5,7 +5,13 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, DivergentArrayError = mongoose.Error.DivergentArrayError, utils = require('../lib/utils'), random = utils.random;
+const assert = require('assert');
+const start = require('./common');
+const utils = require('../lib/utils');
+
+const mongoose = start.mongoose;
+const DivergentArrayError = mongoose.Error.DivergentArrayError;
+const random = utils.random;
 
 /**
  * Tests.

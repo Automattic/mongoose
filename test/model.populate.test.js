@@ -7390,6 +7390,38 @@ describe('model: populate:', function() {
       });
     });
 
+    it('populate child with same name as parent (gh-6839) (gh-6908)', function() {
+      const parentFieldsToPopulate = [
+        {path: 'children.child'},
+        {path: 'child'}
+      ];
+
+      const childSchema = new mongoose.Schema({ name: String });
+      const Child = db.model('gh6839_Child', childSchema);
+
+      const parentSchema = new mongoose.Schema({
+        child: {type: mongoose.Schema.Types.ObjectId, ref: 'gh6839_Child'},
+        children: [{
+          child: {type: mongoose.Schema.Types.ObjectId, ref: 'gh6839_Child' }
+        }]
+      });
+      const Parent = db.model('gh6839_Parent', parentSchema);
+
+      return co(function*() {
+        let child = yield Child.create({ name: 'test' });
+        let p = yield Parent.create({ child: child });
+
+        child = yield Child.findById(child._id);
+        p = yield Parent.findById(p._id).populate(parentFieldsToPopulate);
+        p.children.push({ child: child });
+        yield p.save();
+
+        p = yield p.populate(parentFieldsToPopulate).execPopulate();
+        assert.ok(p.children[0].child);
+        assert.equal(p.children[0].child.name, 'test');
+      });
+    });
+
     it('passes scope as Model instance (gh-6726)', function() {
       const otherSchema = new Schema({ name: String });
       const Other = db.model('gh6726_Other', otherSchema);

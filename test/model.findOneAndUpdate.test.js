@@ -89,12 +89,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('WWW returns the edited document', function(done) {
-    let M = db.model(modelname, collection),
-        title = 'Tobi ' + random(),
-        author = 'Brian ' + random(),
-        newTitle = 'Woot ' + random(),
-        id0 = new DocumentObjectId,
-        id1 = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const title = 'Tobi ' + random();
+    const author = 'Brian ' + random();
+    const newTitle = 'Woot ' + random();
+    const id0 = new DocumentObjectId;
+    const id1 = new DocumentObjectId;
 
     const post = new M;
     post.set('title', title);
@@ -229,12 +229,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returns the original document', function(done) {
-    let M = db.model(modelname, collection),
-        title = 'Tobi ' + random(),
-        author = 'Brian ' + random(),
-        newTitle = 'Woot ' + random(),
-        id0 = new DocumentObjectId,
-        id1 = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const title = 'Tobi ' + random();
+    const author = 'Brian ' + random();
+    const newTitle = 'Woot ' + random();
+    const id0 = new DocumentObjectId;
+    const id1 = new DocumentObjectId;
 
     const post = new M;
     post.set('title', title);
@@ -289,12 +289,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('allows upserting', function(done) {
-    let M = db.model(modelname, collection),
-        title = 'Tobi ' + random(),
-        author = 'Brian ' + random(),
-        newTitle = 'Woot ' + random(),
-        id0 = new DocumentObjectId,
-        id1 = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const title = 'Tobi ' + random();
+    const author = 'Brian ' + random();
+    const newTitle = 'Woot ' + random();
+    const id0 = new DocumentObjectId;
+    const id1 = new DocumentObjectId;
 
     const post = new M;
     post.set('title', title);
@@ -337,8 +337,8 @@ describe('model: findOneAndUpdate:', function() {
   it('options/conditions/doc are merged when no callback is passed', function(done) {
     const M = db.model(modelname, collection);
 
-    let now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
     // Model.findOneAndUpdate
     query = M.findOneAndUpdate({author: 'aaron'}, {$set: {date: now}}, {new: false, fields: 'author'});
@@ -386,8 +386,8 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    let M = db.model(modelname, collection + random()),
-        pending = 6;
+    const M = db.model(modelname, collection + random());
+    let pending = 6;
 
     M.findOneAndUpdate({name: 'aaron'}, {$set: {name: 'Aaron6'}}, {new: false}, cb);
     M.findOneAndUpdate({name: 'aaron'}, {$set: {name: 'Aaron4'}}, cb);
@@ -407,8 +407,8 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed to a succeeding function', function(done) {
-    let M = db.model(modelname, collection + random()),
-        pending = 6;
+    const M = db.model(modelname, collection + random());
+    let pending = 6;
 
     M.findOneAndUpdate({name: 'aaron'}, {$set: {name: 'Aaron'}}, {new: false}).exec(cb);
     M.findOneAndUpdate({name: 'aaron'}, {$set: {name: 'Aaron'}}).exec(cb);
@@ -428,8 +428,8 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executing with only a callback throws', function(done) {
-    let M = db.model(modelname, collection),
-        err;
+    const M = db.model(modelname, collection);
+    let err;
 
     try {
       M.findOneAndUpdate(function() {
@@ -443,8 +443,8 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    let BlogPost = db.model(modelname, collection),
-        totalDocs = 4;
+    const BlogPost = db.model(modelname, collection);
+    let totalDocs = 4;
 
     const post = new BlogPost();
     post.set('meta.visitors', 5);
@@ -527,8 +527,8 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executing with just a callback throws', function(done) {
-    let M = db.model(modelname, collection),
-        err;
+    const M = db.model(modelname, collection);
+    let err;
 
     try {
       M.findByIdAndUpdate(function() {
@@ -542,9 +542,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    let M = db.model(modelname, collection + random()),
-        _id = new DocumentObjectId,
-        pending = 2;
+    const M = db.model(modelname, collection + random());
+    const _id = new DocumentObjectId;
+    let pending = 2;
 
     M.findByIdAndUpdate(_id, {$set: {name: 'Aaron'}}, {new: false}, cb);
     M.findByIdAndUpdate(_id, {$set: {name: 'changed'}}, cb);
@@ -560,9 +560,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed to a succeeding function', function(done) {
-    let M = db.model(modelname, collection + random()),
-        _id = new DocumentObjectId,
-        pending = 2;
+    const M = db.model(modelname, collection + random());
+    const _id = new DocumentObjectId;
+    let pending = 2;
 
     M.findByIdAndUpdate(_id, {$set: {name: 'Aaron'}}, {new: false}).exec(cb);
     M.findByIdAndUpdate(_id, {$set: {name: 'changed'}}).exec(cb);
@@ -578,12 +578,12 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returns the original document', function(done) {
-    let M = db.model(modelname, collection),
-        title = 'Tobi ' + random(),
-        author = 'Brian ' + random(),
-        newTitle = 'Woot ' + random(),
-        id0 = new DocumentObjectId,
-        id1 = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const title = 'Tobi ' + random();
+    const author = 'Brian ' + random();
+    const newTitle = 'Woot ' + random();
+    const id0 = new DocumentObjectId;
+    const id1 = new DocumentObjectId;
 
     const post = new M;
     post.set('title', title);
@@ -638,11 +638,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
-    let now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
     // Model.findByIdAndUpdate
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {new: false, fields: 'author'});
@@ -668,11 +668,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
-    let now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
@@ -685,11 +685,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
-    let now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
@@ -741,11 +741,11 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
-    let now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
     query = M.findByIdAndUpdate(_id, {$set: {date: now}}, {sort: {author: 1, title: -1}});
     assert.equal(Object.keys(query.options.sort).length, 2);
@@ -967,6 +967,20 @@ describe('model: findOneAndUpdate:', function() {
     const update = { $set: { name: 'test', __v: 1 } };
     return Account.
       findOneAndUpdate({}, update, { upsert: true, new: true }).
+      then(() => Account.findOne({ name: 'test' })).
+      then(doc => assert.strictEqual(doc.__v, 1));
+  });
+
+  it('doesn\'t add __v on upsert if `$set` with `update()` (gh-5973)', function() {
+    const accountSchema = new Schema({
+      name: String
+    });
+
+    const Account = db.model('gh5973_Update', accountSchema);
+
+    const update = { $set: { name: 'test', __v: 1 } };
+    return Account.
+      updateOne({}, update, { upsert: true, new: true }).
       then(() => Account.findOne({ name: 'test' })).
       then(doc => assert.strictEqual(doc.__v, 1));
   });
@@ -2192,9 +2206,25 @@ describe('model: findOneAndUpdate:', function() {
         function(err) {
           assert.ifError(err);
           assert.equal(validateCalls, 1); // Assertion error: 1 == 2
-          db.close(done);
+          done();
         }
       );
+    });
+
+    it('consistent array with $pull on doc array (gh-6889)', function() {
+      const schema = new Schema({
+        arr: {
+          type: [{ x: String }],
+          validate: {
+            validator: v => assert.ok(Array.isArray(v))
+          }
+        }
+      });
+
+      const Model = db.model('gh6889', schema);
+
+      const opts = { runValidators: true };
+      return Model.findOneAndUpdate({}, { $pull: { arr: { x: 'three' } } }, opts);
     });
   });
 });

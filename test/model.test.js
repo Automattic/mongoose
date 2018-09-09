@@ -208,8 +208,8 @@ describe('Model', function() {
       done();
     });
     it('emits init event', function(done) {
-      let schema = new Schema({name: String}),
-          model;
+      const schema = new Schema({name: String});
+      let model;
 
       schema.on('init', function(model_) {
         model = model_;
@@ -296,8 +296,8 @@ describe('Model', function() {
     });
 
     it('when saved', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          pending = 2;
+      const BlogPost = db.model('BlogPost', collection);
+      let pending = 2;
 
       function cb() {
         if (--pending) {
@@ -697,8 +697,8 @@ describe('Model', function() {
 
   describe('casting as validation errors', function() {
     it('error', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          threw = false;
+      const BlogPost = db.model('BlogPost', collection);
+      let threw = false;
 
       let post;
       try {
@@ -730,8 +730,8 @@ describe('Model', function() {
       });
     });
     it('nested error', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          threw = false;
+      const BlogPost = db.model('BlogPost', collection);
+      let threw = false;
 
       const post = new BlogPost;
 
@@ -787,13 +787,13 @@ describe('Model', function() {
         return false;
       }
 
-      let db = start(),
-          subs = new Schema({
-            str: {
-              type: String, validate: failingvalidator
-            }
-          }),
-          BlogPost = db.model('BlogPost', {subs: [subs]});
+      const db = start();
+      const subs = new Schema({
+        str: {
+          type: String, validate: failingvalidator
+        }
+      });
+      const BlogPost = db.model('BlogPost', {subs: [subs]});
 
       const post = new BlogPost();
       post.init({
@@ -809,8 +809,8 @@ describe('Model', function() {
 
 
     it('subdocument error when adding a subdoc', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          threw = false;
+      const BlogPost = db.model('BlogPost', collection);
+      let threw = false;
 
       const post = new BlogPost();
 
@@ -856,8 +856,8 @@ describe('Model', function() {
     });
 
     it('$pull', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          post = new BlogPost();
+      const BlogPost = db.model('BlogPost', collection);
+      const post = new BlogPost();
 
       post.get('numbers').push('3');
       assert.equal(post.get('numbers')[0], 3);
@@ -865,8 +865,8 @@ describe('Model', function() {
     });
 
     it('$push', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          post = new BlogPost();
+      const BlogPost = db.model('BlogPost', collection);
+      const post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
       post.save(function() {
@@ -1352,12 +1352,10 @@ describe('Model', function() {
       });
 
       it('complex', function(done) {
-        let ComplexValidationMiddlewareSchema = null,
-            Post = null,
-            post = null,
-            abc = function(v) {
-              return v === 'abc';
-            };
+        let ComplexValidationMiddlewareSchema = null;
+        let Post = null;
+        let post = null;
+        const abc = v => v === 'abc';
 
         ComplexValidationMiddlewareSchema = new Schema({
           baz: {type: String},
@@ -1495,11 +1493,11 @@ describe('Model', function() {
 
   describe('virtuals', function() {
     it('getters', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          post = new BlogPost({
-            title: 'Letters from Earth',
-            author: 'Mark Twain'
-          });
+      const BlogPost = db.model('BlogPost', collection);
+      const post = new BlogPost({
+        title: 'Letters from Earth',
+        author: 'Mark Twain'
+      });
 
       assert.equal(post.get('titleWithAuthor'), 'Letters from Earth by Mark Twain');
       assert.equal(post.titleWithAuthor, 'Letters from Earth by Mark Twain');
@@ -1507,8 +1505,8 @@ describe('Model', function() {
     });
 
     it('set()', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          post = new BlogPost();
+      const BlogPost = db.model('BlogPost', collection);
+      const post = new BlogPost();
 
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
       assert.equal(post.get('title'), 'Huckleberry Finn');
@@ -1516,9 +1514,9 @@ describe('Model', function() {
       done();
     });
 
-    it('should not be saved to the db AZZ', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          post = new BlogPost();
+    it('should not be saved to the db', function(done) {
+      const BlogPost = db.model('BlogPost', collection);
+      const post = new BlogPost();
 
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
 
@@ -1580,8 +1578,8 @@ describe('Model', function() {
 
   describe.skip('.remove()', function() {
     it('works', function(done) {
-      let collection = 'blogposts_' + random(),
-          BlogPost = db.model('BlogPost', collection);
+      const collection = 'blogposts_' + random();
+      const BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({title: 1}, {title: 2}, function(err) {
         assert.ifError(err);
@@ -1600,8 +1598,8 @@ describe('Model', function() {
     });
 
     it('errors when id deselected (gh-3118)', function(done) {
-      let collection = 'blogposts_' + random(),
-          BlogPost = db.model('BlogPost', collection);
+      const collection = 'blogposts_' + random();
+      const BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({title: 1}, {title: 2}, function(err) {
         assert.ifError(err);
@@ -1633,8 +1631,8 @@ describe('Model', function() {
     });
 
     it('should not remove all documents in the collection (gh-3326)', function(done) {
-      let collection = 'blogposts_' + random(),
-          BlogPost = db.model('BlogPost', collection);
+      const collection = 'blogposts_' + random();
+      const BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({title: 1}, {title: 2}, function(err) {
         assert.ifError(err);
@@ -1724,9 +1722,9 @@ describe('Model', function() {
 
     describe('when called multiple times', function() {
       it('always executes the passed callback gh-1210', function(done) {
-        let collection = 'blogposts_' + random(),
-            BlogPost = db.model('BlogPost', collection),
-            post = new BlogPost();
+        const collection = 'blogposts_' + random();
+        const BlogPost = db.model('BlogPost', collection);
+        const post = new BlogPost();
 
         post.save(function(err) {
           assert.ifError(err);
@@ -1817,8 +1815,8 @@ describe('Model', function() {
 
       mongoose.model('ShortcutGetterObject', schema);
 
-      let ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random()),
-          post = new ShortcutGetter();
+      const ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random());
+      const post = new ShortcutGetter();
 
       post.set('date', Date.now());
       assert.ok(post.date instanceof Date);
@@ -1834,8 +1832,8 @@ describe('Model', function() {
         });
         mongoose.model('ShortcutGetterNested', schema);
 
-        let ShortcutGetterNested = db.model('ShortcutGetterNested', collection),
-            doc = new ShortcutGetterNested();
+        const ShortcutGetterNested = db.model('ShortcutGetterNested', collection);
+        const doc = new ShortcutGetterNested();
 
         assert.equal(typeof doc.first, 'object');
         assert.ok(doc.first.second.isMongooseArray);
@@ -2017,9 +2015,9 @@ describe('Model', function() {
           }
         }));
 
-        let DooDad = db.model('MySchema'),
-            doodad = new DooDad({nested: {arrays: []}}),
-            date = 1234567890;
+        const DooDad = db.model('MySchema');
+        const doodad = new DooDad({nested: {arrays: []}});
+        const date = 1234567890;
 
         doodad.nested.arrays.push(['+10', 'yup', date]);
 
@@ -2060,8 +2058,8 @@ describe('Model', function() {
           }
         }));
 
-        let DooDad = db.model('MySchema2', collection),
-            doodad = new DooDad();
+        const DooDad = db.model('MySchema2', collection);
+        const doodad = new DooDad();
 
         doodad.save(function(err) {
           assert.ifError(err);
@@ -2167,9 +2165,9 @@ describe('Model', function() {
 
   describe('atomic subdocument', function() {
     it('saving', function(done) {
-      let BlogPost = db.model('BlogPost', collection),
-          totalDocs = 4,
-          saveQueue = [];
+      const BlogPost = db.model('BlogPost', collection);
+      let totalDocs = 4;
+      const saveQueue = [];
 
       const post = new BlogPost;
 
@@ -2481,11 +2479,11 @@ describe('Model', function() {
 
   describe('saving embedded arrays', function() {
     it('of Numbers atomically', function(done) {
-      let TempSchema = new Schema({
-            nums: [Number]
-          }),
-          totalDocs = 2,
-          saveQueue = [];
+      const TempSchema = new Schema({
+        nums: [Number]
+      });
+      let totalDocs = 2;
+      const saveQueue = [];
 
       mongoose.model('Temp', TempSchema);
       const Temp = db.model('Temp', collection);
@@ -2545,11 +2543,11 @@ describe('Model', function() {
     });
 
     it('of Strings atomically', function(done) {
-      let StrListSchema = new Schema({
-            strings: [String]
-          }),
-          totalDocs = 2,
-          saveQueue = [];
+      const StrListSchema = new Schema({
+        strings: [String]
+      });
+      let totalDocs = 2;
+      const saveQueue = [];
 
       mongoose.model('StrList', StrListSchema);
       const StrList = db.model('StrList');
@@ -2610,11 +2608,11 @@ describe('Model', function() {
     });
 
     it('of Buffers atomically', function(done) {
-      let BufListSchema = new Schema({
-            buffers: [Buffer]
-          }),
-          totalDocs = 2,
-          saveQueue = [];
+      const BufListSchema = new Schema({
+        buffers: [Buffer]
+      });
+      let totalDocs = 2;
+      const saveQueue = [];
 
       mongoose.model('BufList', BufListSchema);
       const BufList = db.model('BufList');
@@ -2676,8 +2674,8 @@ describe('Model', function() {
     });
 
     it('works with modified element properties + doc removal (gh-975)', function(done) {
-      let B = db.model('BlogPost', collection),
-          b = new B({comments: [{title: 'gh-975'}]});
+      const B = db.model('BlogPost', collection);
+      const b = new B({comments: [{title: 'gh-975'}]});
 
       b.save(function(err) {
         assert.ifError(err);
@@ -2790,8 +2788,8 @@ describe('Model', function() {
   });
 
   it('saving an embedded document twice should not push that doc onto the parent doc twice (gh-267)', function(done) {
-    let BlogPost = db.model('BlogPost', collection),
-        post = new BlogPost();
+    const BlogPost = db.model('BlogPost', collection);
+    const post = new BlogPost();
 
     post.comments.push({title: 'woot'});
     post.save(function(err) {
@@ -2934,8 +2932,8 @@ describe('Model', function() {
   });
 
   it('saving mixed data', function(done) {
-    let BlogPost = db.model('BlogPost', collection),
-        count = 3;
+    const BlogPost = db.model('BlogPost', collection);
+    let count = 3;
 
     // string
     const post = new BlogPost();
@@ -3199,8 +3197,8 @@ describe('Model', function() {
 
       describe('init', function() {
         it('has access to the true ObjectId when used with querying (gh-289)', function(done) {
-          let PreInitSchema = new Schema({}),
-              preId = null;
+          const PreInitSchema = new Schema({});
+          let preId = null;
 
           PreInitSchema.pre('init', function() {
             preId = this._id;
@@ -3223,13 +3221,13 @@ describe('Model', function() {
 
     describe('post', function() {
       it('works', function(done) {
-        let schema = new Schema({
-              title: String
-            }),
-            save = false,
-            remove = false,
-            init = false,
-            post = undefined;
+        const schema = new Schema({
+          title: String
+        });
+        let save = false;
+        let remove = false;
+        let init = false;
+        let post = undefined;
 
         schema.post('save', function(arg) {
           assert.equal(arg.id, post.id);
@@ -3413,8 +3411,8 @@ describe('Model', function() {
     });
 
     it('op can be changed', function(done) {
-      let BlogPost = db.model('BlogPost' + random(), bpSchema),
-          title = 'interop ad-hoc as promise';
+      const BlogPost = db.model('BlogPost' + random(), bpSchema);
+      const title = 'interop ad-hoc as promise';
 
       BlogPost.create({title: title}, function(err, created) {
         assert.ifError(err);
@@ -3655,8 +3653,8 @@ describe('Model', function() {
 
   describe('RegExps', function() {
     it('can be saved', function(done) {
-      let db = start(),
-          BlogPost = db.model('BlogPost', collection);
+      const db = start();
+      const BlogPost = db.model('BlogPost', collection);
 
       const post = new BlogPost({mixed: {rgx: /^asdf$/}});
       assert.ok(post.mixed.rgx instanceof RegExp);
@@ -5293,6 +5291,37 @@ describe('Model', function() {
           assert.strictEqual(doc.num, 1);
           done();
         });
+      });
+    });
+
+    it('bulkWrite with timestamps (gh-5708)', function() {
+      const schema = new Schema({
+        str: { type: String, default: 'test' },
+        num: Number
+      }, { timestamps: true });
+
+      const M = db.model('gh5708_ts', schema);
+
+      const ops = [
+        {
+          updateOne: {
+            filter: { num: 0 },
+            update: {
+              $inc: { num: 1 }
+            },
+            upsert: true
+          }
+        }
+      ];
+
+      const now = Date.now();
+
+      return co(function*() {
+        yield M.bulkWrite(ops);
+
+        const doc = yield M.findOne();
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
       });
     });
 

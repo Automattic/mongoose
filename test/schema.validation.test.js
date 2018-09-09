@@ -1189,7 +1189,7 @@ describe('schema', function() {
         p.children.push(bad);
         bad.validate(function(error) {
           assert.ok(error);
-          assert.ok(error.errors['children.0.name']);
+          assert.ok(error.errors['name']);
           done();
         });
       });

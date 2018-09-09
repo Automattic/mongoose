@@ -82,13 +82,13 @@ describe('types array', function() {
 
   describe('indexOf()', function() {
     it('works', function(done) {
-      let User = db.model('User', 'users_' + random()),
-          Pet = db.model('Pet', 'pets' + random());
+      const User = db.model('User', 'users_' + random());
+      const Pet = db.model('Pet', 'pets' + random());
 
-      let tj = new User({name: 'tj'}),
-          tobi = new Pet({name: 'tobi'}),
-          loki = new Pet({name: 'loki'}),
-          jane = new Pet({name: 'jane'});
+      const tj = new User({name: 'tj'});
+      const tobi = new Pet({name: 'tobi'});
+      const loki = new Pet({name: 'loki'});
+      const jane = new Pet({name: 'jane'});
 
       tj.pets.push(tobi);
       tj.pets.push(loki);
@@ -319,8 +319,8 @@ describe('types array', function() {
   describe('splice()', function() {
     it('works', function(done) {
       const collection = 'splicetest-number' + random();
-      let schema = new Schema({numbers: [Number]}),
-          A = db.model('splicetestNumber', schema, collection);
+      const schema = new Schema({numbers: [Number]});
+      const A = db.model('splicetestNumber', schema, collection);
 
       const a = new A({numbers: [4, 5, 6, 7]});
       a.save(function(err) {
@@ -349,8 +349,8 @@ describe('types array', function() {
 
     it('on embedded docs', function(done) {
       const collection = 'splicetest-embeddeddocs' + random();
-      let schema = new Schema({types: [new Schema({type: String})]}),
-          A = db.model('splicetestEmbeddedDoc', schema, collection);
+      const schema = new Schema({types: [new Schema({type: String})]});
+      const A = db.model('splicetestEmbeddedDoc', schema, collection);
 
       const a = new A({types: [{type: 'bird'}, {type: 'boy'}, {type: 'frog'}, {type: 'cloud'}]});
       a.save(function(err) {
@@ -386,12 +386,12 @@ describe('types array', function() {
 
   describe('unshift()', function() {
     it('works', function(done) {
-      let schema = new Schema({
-            types: [new Schema({type: String})],
-            nums: [Number],
-            strs: [String]
-          }),
-          A = db.model('unshift', schema, 'unshift' + random());
+      const schema = new Schema({
+        types: [new Schema({type: String})],
+        nums: [Number],
+        strs: [String]
+      });
+      const A = db.model('unshift', schema, 'unshift' + random());
 
       const a = new A({
         types: [{type: 'bird'}, {type: 'boy'}, {type: 'frog'}, {type: 'cloud'}],
@@ -819,14 +819,14 @@ describe('types array', function() {
 
   describe('addToSet()', function() {
     it('works', function(done) {
-      let e = new Schema({name: String, arr: []}),
-          schema = new Schema({
-            num: [Number],
-            str: [String],
-            doc: [e],
-            date: [Date],
-            id: [Schema.ObjectId]
-          });
+      const e = new Schema({name: String, arr: []});
+      const schema = new Schema({
+        num: [Number],
+        str: [String],
+        doc: [e],
+        date: [Date],
+        id: [Schema.ObjectId]
+      });
 
       const M = db.model('testAddToSet', schema);
       const m = new M;
@@ -1055,10 +1055,10 @@ describe('types array', function() {
     });
 
     it('handles sub-documents that do not have an _id gh-1973', function(done) {
-      let e = new Schema({name: String, arr: []}, {_id: false}),
-          schema = new Schema({
-            doc: [e]
-          });
+      const e = new Schema({name: String, arr: []}, {_id: false});
+      const schema = new Schema({
+        doc: [e]
+      });
 
       const M = db.model('gh1973', schema);
       const m = new M;

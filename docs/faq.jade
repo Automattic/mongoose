@@ -383,6 +383,12 @@ block content
     mongoose.connect('mongodb://localhost:27017/test', { family: 4 });
     ```
 
+    <hr id="map-keys-strings" />
+
+    **Q**. Why do keys in Mongoose Maps have to be strings?
+
+    **A**. Because the Map eventually gets stored in MongoDB where the keys must be strings.
+
     <hr id="add_something" />
 
     **Something to add?**

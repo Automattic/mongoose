@@ -1,11 +1,19 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-'use strict';
+const Buffer = require('safe-buffer').Buffer;
+const MongooseBuffer = require('../lib/types/buffer');
+const ObjectId = require('../lib/types/objectid');
+const StateMachine = require('../lib/statemachine');
+const assert = require('assert');
+const start = require('./common');
+const utils = require('../lib/utils');
 
-let start = require('./common'), mongoose = start.mongoose, Schema = mongoose.Schema, utils = require('../lib/utils'), StateMachine = require('../lib/statemachine'), ObjectId = require('../lib/types/objectid'), MongooseBuffer = require('../lib/types/buffer'), Buffer = require('safe-buffer').Buffer, assert = require('power-assert');
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Setup.
@@ -150,8 +158,8 @@ describe('utils', function() {
   it('deepEquals on ObjectIds', function(done) {
     const s = (new ObjectId).toString();
 
-    let a = new ObjectId(s),
-        b = new ObjectId(s);
+    const a = new ObjectId(s);
+    const b = new ObjectId(s);
 
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, a));
@@ -160,12 +168,12 @@ describe('utils', function() {
   });
 
   it('deepEquals on MongooseDocumentArray works', function(done) {
-    let db = start(),
-        A = new Schema({a: String}),
-        M = db.model('deepEqualsOnMongooseDocArray', new Schema({
-          a1: [A],
-          a2: [A]
-        }));
+    const db = start();
+    const A = new Schema({a: String});
+    const M = db.model('deepEqualsOnMongooseDocArray', new Schema({
+      a1: [A],
+      a2: [A]
+    }));
 
     db.close();
 

@@ -959,8 +959,8 @@ describe('aggregate: ', function() {
         const match = { $match: { sal: { $gt: 15000 } } };
         const pref = 'primaryPreferred';
         const aggregate = m.aggregate([match]).read(pref);
-        var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-        var mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
+        const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
+        const mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
 
         assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {

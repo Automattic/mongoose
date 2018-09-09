@@ -6,14 +6,22 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, utils = require('../lib/utils'), random = utils.random, Schema = mongoose.Schema, DocObjectId = mongoose.Types.ObjectId, Buffer = require('safe-buffer').Buffer;
+const Buffer = require('safe-buffer').Buffer;
+const assert = require('assert');
+const start = require('./common');
+const utils = require('../lib/utils');
+
+const mongoose = start.mongoose;
+const random = utils.random;
+const Schema = mongoose.Schema;
+const DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
  */
 
-let posts = 'blogposts_' + random(),
-    users = 'users_' + random();
+const posts = 'blogposts_' + random();
+const users = 'users_' + random();
 
 /**
  * Tests.

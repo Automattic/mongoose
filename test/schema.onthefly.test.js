@@ -1,10 +1,12 @@
 'use strict';
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId;
+
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 describe('schema.onthefly', function() {
   let DecoratedSchema;
@@ -97,8 +99,9 @@ describe('schema.onthefly', function() {
   it('on the fly Embedded Array schemas should get from a fresh queried document properly', function(done) {
     const Decorated = db.model('Decorated', collection);
 
-    let post = new Decorated(),
-        ModeratorSchema = new Schema({name: String, ranking: Number});
+    const post = new Decorated();
+    const ModeratorSchema = new Schema({name: String, ranking: Number});
+
     post.set('moderators', [{name: 'alex trebek', ranking: '1'}], [ModeratorSchema]);
     assert.equal(post.get('moderators')[0].name, 'alex trebek');
     post.save(function(err) {

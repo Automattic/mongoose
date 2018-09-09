@@ -5,7 +5,13 @@
 
 'use strict';
 
-let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), random = require('../lib/utils').random, Schema = mongoose.Schema, ObjectId = Schema.Types.ObjectId;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
 
 describe('model: mapreduce:', function() {
   let Comments;

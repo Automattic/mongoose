@@ -482,4 +482,39 @@ describe('Map', function() {
       assert.equal(doc.user.toHexString(), user._id.toHexString());
     });
   });
+
+  it('works with sub doc hooks (gh-6938)', function() {
+    return co(function*() {
+      const Schema = mongoose.Schema;
+      let subDocHooksCalledTimes = 0;
+      let mapChildHooksCalledTimes = 0;
+      const mapChildSchema = new Schema({
+        y: Number
+      });
+      mapChildSchema.pre('save', function() {
+        mapChildHooksCalledTimes++;
+      });
+      const mapSchema = new Schema({
+        x: String,
+        child: mapChildSchema
+      });
+      mapSchema.pre('save', function() {
+        subDocHooksCalledTimes++;
+      });
+      const schema = new Schema({
+        widgets: {
+          type: Map,
+          of: mapSchema
+        }
+      });
+
+      const Test = db.model('gh6938', schema);
+      const test = new Test({ widgets: { one: { x: 'a' } } });
+      test.widgets.set('two', { x: 'b' });
+      test.widgets.set('three', { x: 'c', child: { y: 2018 } });
+      yield test.save();
+      assert.strictEqual(subDocHooksCalledTimes, 3);
+      assert.strictEqual(mapChildHooksCalledTimes, 1);
+    });
+  });
 });

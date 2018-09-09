@@ -22,6 +22,7 @@ exports['docs/connections.jade'] = { guide: true, title: 'Connecting to MongoDB'
 exports['docs/lambda.jade'] = { guide: true, title: 'Using Mongoose With AWS Lambda' };
 exports['docs/geojson.jade'] = { guide: true, title: 'Using GeoJSON', acquit: true };
 exports['docs/transactions.jade'] = { guide: true, title: 'Transactions', acquit: true };
+exports['docs/deprecations.jade'] = { guide: true, title: 'Deprecation Warnings' };
 exports['docs/faq.jade'] = { guide: true, title: 'FAQ' };
 exports['docs/compatibility.jade'] = {
   title: 'MongoDB Version Compatibility',

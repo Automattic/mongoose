@@ -1536,6 +1536,47 @@ describe('Query', function() {
           });
         });
       });
+
+      describe('useNestedStrict', function() {
+        it('overrides schema useNestedStrict: false (gh-5144)', function() {
+          const subSchema = new Schema({}, { strict: false });
+          const schema = new Schema({
+            name: String,
+            nested: subSchema
+          }, { strict: 'throw' });
+
+          const Test = db.model('gh5144', schema);
+          const test = new Test({ name: 'Test1' });
+          return co(function*() {
+            yield test.save();
+            const cond = { _id: test._id };
+            const update = { 'nested.v': 'xyz' };
+            const opts = { new: true, useNestedStrict: true };
+            const doc = yield Test.findOneAndUpdate(cond, update, opts);
+            assert.strictEqual(doc.toObject().nested.v, 'xyz');
+          });
+        });
+
+        it('overrides schema useNestedStrict: true (gh-5144)', function() {
+          const subSchema = new Schema({}, { strict: false });
+          const schema = new Schema({
+            name: String,
+            nested: subSchema
+          }, { strict: 'throw', useNestedStrict: true });
+
+          const Test = db.model('gh5144_2', schema);
+          const test = new Test({ name: 'Test1' });
+          return co(function* () {
+            yield test.save();
+            const cond = { _id: test._id };
+            const update = { 'nested.v': 'xyz' };
+            const opts = { useNestedStrict: false };
+            let error;
+            yield Test.findOneAndUpdate(cond, update, opts).catch(e => error = e);
+            assert.strictEqual(error.name, 'StrictModeError');
+          });
+        });
+      });
     });
   });
 
@@ -2879,6 +2920,46 @@ describe('Query', function() {
 
         // Shouldn't throw
         yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+  });
+
+  describe('getPopulatedPaths', function() {
+    it('doesn\'t break on a query without population (gh-6677)', function() {
+      const schema = new Schema({ name: String });
+      schema.pre('findOne', function() {
+        assert.deepStrictEqual(this.getPopulatedPaths(), []);
+      });
+
+      const Model = db.model('gh6677_model', schema);
+
+      return co(function*() {
+        yield Model.findOne({});
+      });
+    });
+
+    it('returns an array of populated paths as strings (gh-6677)', function() {
+      const otherSchema = new Schema({ name: String });
+      const schema = new Schema({
+        other: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh6677_other'
+        }
+      });
+      schema.pre('findOne', function() {
+        assert.deepStrictEqual(this.getPopulatedPaths(), ['other']);
+      });
+
+      const Other = db.model('gh6677_other', otherSchema);
+      const Test = db.model('gh6677_test', schema);
+
+      const other = new Other({ name: 'one' });
+      const test = new Test({ other: other._id });
+
+      return co(function*() {
+        yield other.save();
+        yield test.save();
+        yield Test.findOne({}).populate('other');
       });
     });
   });

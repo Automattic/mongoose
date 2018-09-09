@@ -49,7 +49,7 @@ describe('transactions', function() {
     const Customer = db.model('Customer', new Schema({ name: String }));
 
     let session = null;
-    return db.createCollection('customers').
+    return Customer.createCollection().
       then(() => db.startSession()).
       then(_session => {
         session = _session;
@@ -79,7 +79,7 @@ describe('transactions', function() {
     const User = db.model('User', new Schema({ name: String }));
 
     let session = null;
-    return db.createCollection('users').
+    return User.createCollection().
       then(() => db.startSession()).
       then(_session => {
         session = _session;
@@ -110,7 +110,7 @@ describe('transactions', function() {
     const User = db.model('gh6909_User', new Schema({ name: String }));
 
     let session = null;
-    return db.createCollection('gh6909_users').
+    return User.createCollection().
       then(() => db.startSession()).
       then(_session => {
         session = _session;
@@ -134,7 +134,7 @@ describe('transactions', function() {
     const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
 
     let session = null;
-    return db.createCollection('Event').
+    return Event.createCollection().
       then(() => db.startSession()).
       then(_session => {
         session = _session;
@@ -187,8 +187,8 @@ describe('transactions', function() {
         }
       }), 'Article');
 
-      return db.createCollection('Author').
-        then(() => db.createCollection('Article'));
+      return Author.createCollection().
+        then(() => Article.createCollection());
     });
 
     beforeEach(function() {
@@ -259,7 +259,7 @@ describe('transactions', function() {
     const Character = db.model('Character', new Schema({ name: String }), 'Character');
 
     let session = null;
-    return db.createCollection('Character').
+    return Character.createCollection().
       then(() => db.startSession()).
       then(_session => {
         session = _session;

@@ -1,3 +1,13 @@
+5.2.14 / 2018-09-09
+===================
+ * docs: fix wording on promise docs to not imply queries only return promises #6983 #6982 [lineus](https://github.com/lineus)
+ * fix(map): throw TypeError if keys are not string #6956
+ * fix(document): ensure you can `validate()` a child doc #6931
+ * fix(populate): avoid cast error if refPath points to localFields with 2 different types #6870
+ * fix(populate): handle populating already-populated paths #6839
+ * fix(schematype): make ObjectIds handle refPaths when checking required #6714
+ * fix(model): set timestamps on bulkWrite() updates #5708
+
 5.2.13 / 2018-09-04
 ===================
  * fix(map): throw TypeError if keys are not string #6968 [Fonger](https://github.com/Fonger)

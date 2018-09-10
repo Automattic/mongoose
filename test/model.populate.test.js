@@ -7467,4 +7467,42 @@ describe('model: populate:', function() {
       assert.equal(res.company[0].name, 'MongoDB');
     });
   });
+
+  it('save objectid with populated refPath (gh-6714)', function() {
+    const parentSchema = new Schema({
+      kind: {
+        type: String
+      },
+      item: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        refPath: 'parent.kind'
+      }
+    });
+    const schema = new Schema({
+      parent: parentSchema,
+      lockingVersion: mongoose.Schema.Types.ObjectId,
+      lastUpdate: {
+        alias: String,
+        date: Date
+      },
+      test: String
+    });
+
+    const Role = db.model('gh6714_Role', schema);
+
+    return co(function*() {
+      const role = yield Role.create({ });
+      const role2 = yield Role.create({
+        parent: { kind: 'gh6714_Role', item: role._id }
+      });
+
+      const toUpdate = yield Role.find({ _id: role2._id }).
+        populate('parent.item').
+        then(res => res[0]);
+
+      toUpdate.test = 'foo';
+      yield toUpdate.save();
+    });
+  });
 });

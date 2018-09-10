@@ -1087,7 +1087,6 @@ describe('connections:', function() {
     assert.ok(conn.model('gh6813'));
     conn.deleteModel('gh6813');
 
-    let threw = false;
     assert.throws(function() {
       conn.model('gh6813');
     }, /Schema hasn't been registered/);

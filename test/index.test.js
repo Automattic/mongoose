@@ -469,7 +469,6 @@ describe('mongoose module:', function() {
     assert.ok(mongoose.model('gh6813'));
     mongoose.deleteModel('gh6813');
 
-    let threw = false;
     assert.throws(function() {
       mongoose.model('gh6813');
     }, /Schema hasn't been registered/);

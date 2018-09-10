@@ -7470,10 +7470,10 @@ describe('model: populate:', function() {
 
   it('save objectid with populated refPath (gh-6714)', function() {
     const parentSchema = new Schema({
-      kind: { 
+      kind: {
         type: String
       },
-      item: { 
+      item: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         refPath: 'parent.kind'
@@ -7500,7 +7500,7 @@ describe('model: populate:', function() {
       const toUpdate = yield Role.find({ _id: role2._id }).
         populate('parent.item').
         then(res => res[0]);
-      
+
       toUpdate.test = 'foo';
       yield toUpdate.save();
     });

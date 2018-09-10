@@ -102,8 +102,8 @@ describe('model: findOneAndRemove:', function() {
   it('options/conditions/doc are merged when no callback is passed', function(done) {
     const M = db.model(modelname, collection);
 
-    let now = new Date,
-        query;
+    const now = new Date;
+    let query;
 
     // Model.findOneAndRemove
     query = M.findOneAndRemove({author: 'aaron'}, {select: 'author'});
@@ -136,8 +136,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    let M = db.model(modelname, collection + random()),
-        pending = 5;
+    const M = db.model(modelname, collection + random());
+    let pending = 5;
 
     M.findOneAndRemove({name: 'aaron1'}, {select: 'name'}, cb);
     M.findOneAndRemove({name: 'aaron1'}, cb);
@@ -154,8 +154,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    let M = db.model(modelname, collection),
-        err;
+    const M = db.model(modelname, collection);
+    let err;
 
     try {
       M.findOneAndRemove(function() {});
@@ -168,8 +168,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    let M = db.model(modelname, collection),
-        err;
+    const M = db.model(modelname, collection);
+    let err;
 
     try {
       M.findByIdAndRemove(function() {});
@@ -182,9 +182,9 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    let M = db.model(modelname, collection + random()),
-        _id = new DocumentObjectId,
-        pending = 2;
+    const M = db.model(modelname, collection + random());
+    const _id = new DocumentObjectId;
+    let pending = 2;
 
     M.findByIdAndRemove(_id, {select: 'name'}, cb);
     M.findByIdAndRemove(_id, cb);
@@ -198,8 +198,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('returns the original document', function(done) {
-    let M = db.model(modelname, collection),
-        title = 'remove muah pleez';
+    const M = db.model(modelname, collection);
+    const title = 'remove muah pleez';
 
     const post = new M({title: title});
     post.save(function(err) {
@@ -217,8 +217,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
     let query;
 
@@ -239,8 +239,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
     let query;
 
@@ -255,8 +255,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
     let query;
 
@@ -271,8 +271,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 sort string syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
     let query;
 
@@ -289,8 +289,8 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    let M = db.model(modelname, collection),
-        _id = new DocumentObjectId;
+    const M = db.model(modelname, collection);
+    const _id = new DocumentObjectId;
 
     let query;
 

@@ -292,8 +292,8 @@ describe('mongoose module:', function() {
 
   describe('model()', function() {
     it('accessing a model that hasn\'t been defined', function(done) {
-      let mong = new Mongoose(),
-          thrown = false;
+      const mong = new Mongoose();
+      let thrown = false;
 
       try {
         mong.model('Test');

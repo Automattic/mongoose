@@ -7505,4 +7505,57 @@ describe('model: populate:', function() {
       yield toUpdate.save();
     });
   });
+
+  it('correct model and justOne when double populating (gh-6978)', function() {
+    const authorSchema = new Schema({
+      name: String
+    });
+    
+    const commentSchema = new Schema({
+      text: String,
+      author: {
+        type: Schema.Types.ObjectId,
+        ref: 'gh6978_Author'
+      }
+    });
+    
+    const postSchema = new Schema({
+      content: String,
+      comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'gh6978_Comment'
+      }]
+    });
+
+    const Author = db.model('gh6978_Author', authorSchema);
+    const Comment = db.model('gh6978_Comment', commentSchema);
+    const Post = db.model('gh6978_Post', postSchema);
+
+    const authors = '123'.split('').map(n => { 
+      return new Author({ name: `author${n}`});
+    });
+    
+    const comments = 'abc'.split('').map((l,i) => {
+      let id = authors[i]._id;
+      return new Comment({ text: `comment_${l}`, author: id });
+    });
+
+    return co(function*() {
+      yield Post.create({
+        content: 'foobar',
+        comments: comments
+      });
+
+      yield Author.create(authors);
+      yield Comment.create(comments);
+
+      let post = yield Post.findOne({});
+      post = yield Post.populate(post, { path: 'comments' });
+      post = yield Post.populate(post, { path: 'comments.author' });
+
+      post.comments.forEach((c, i) => {
+        assert.ok(!Array.isArray(c.author), `author ${i} is an array`);
+      });
+    });
+  });
 });

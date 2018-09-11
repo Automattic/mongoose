@@ -5,7 +5,15 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, utils = require('../lib/utils'), random = utils.random, Schema = mongoose.Schema, ObjectId = Schema.ObjectId, Document = require('../lib/document');
+const Document = require('../lib/document');
+const assert = require('power-assert');
+const start = require('./common');
+const utils = require('../lib/utils');
+
+const mongoose = start.mongoose;
+const random = utils.random;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 /**
  * Setup.
@@ -526,12 +534,10 @@ describe('document.populate', function() {
         ]
       });
 
-      let car;
-      let joe;
-      joe = new Person({
+      const joe = new Person({
         name: 'Joe'
       });
-      car = new Car({
+      let car = new Car({
         model: 'BMW',
         color: 'red'
       });

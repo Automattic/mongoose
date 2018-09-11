@@ -5304,6 +5304,13 @@ describe('Model', function() {
 
       const ops = [
         {
+          insertOne: {
+            document: {
+              num: 42
+            }
+          }
+        },
+        {
           updateOne: {
             filter: { num: 0 },
             update: {
@@ -5319,9 +5326,43 @@ describe('Model', function() {
       return co(function*() {
         yield M.bulkWrite(ops);
 
-        const doc = yield M.findOne();
+        let doc = yield M.findOne({ num: 42 });
         assert.ok(doc.createdAt);
         assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+
+        doc = yield M.findOne({ num: 1 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
+    });
+
+    it('bulkWrite with timestamps and replaceOne (gh-5708)', function() {
+      const schema = new Schema({ num: Number }, { timestamps: true });
+
+      const M = db.model('gh5708_ts2', schema);
+
+      return co(function*() {
+        yield M.create({ num: 42 });
+
+        yield cb => setTimeout(cb, 10);
+        const now = Date.now();
+
+        yield M.bulkWrite([{
+          replaceOne: {
+            filter: { num: 42 },
+            replacement: { num: 100 }
+          }
+        }]);
+
+        let doc = yield M.findOne({ num: 100 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
       });
     });
 

@@ -7510,7 +7510,7 @@ describe('model: populate:', function() {
     const authorSchema = new Schema({
       name: String
     });
-    
+
     const commentSchema = new Schema({
       text: String,
       author: {
@@ -7518,7 +7518,7 @@ describe('model: populate:', function() {
         ref: 'gh6978_Author'
       }
     });
-    
+
     const postSchema = new Schema({
       content: String,
       comments: [{
@@ -7531,10 +7531,10 @@ describe('model: populate:', function() {
     const Comment = db.model('gh6978_Comment', commentSchema);
     const Post = db.model('gh6978_Post', postSchema);
 
-    const authors = '123'.split('').map(n => { 
+    const authors = '123'.split('').map(n => {
       return new Author({ name: `author${n}`});
     });
-    
+
     const comments = 'abc'.split('').map((l,i) => {
       let id = authors[i]._id;
       return new Comment({ text: `comment_${l}`, author: id });

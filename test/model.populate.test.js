@@ -7536,7 +7536,7 @@ describe('model: populate:', function() {
     });
 
     const comments = 'abc'.split('').map((l,i) => {
-      let id = authors[i]._id;
+      const id = authors[i]._id;
       return new Comment({ text: `comment_${l}`, author: id });
     });
 

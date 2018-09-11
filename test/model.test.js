@@ -5358,7 +5358,7 @@ describe('Model', function() {
           }
         }]);
 
-        let doc = yield M.findOne({ num: 100 });
+        const doc = yield M.findOne({ num: 100 });
         assert.ok(doc.createdAt);
         assert.ok(doc.createdAt.valueOf() >= now.valueOf());
         assert.ok(doc.updatedAt);

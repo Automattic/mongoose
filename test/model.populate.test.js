@@ -7599,7 +7599,7 @@ describe('model: populate:', function() {
         { make: 'Ford', versions: [{ type: 'F150', editions: [editions[0]] }] },
         { make: 'BMW', versions: [{ type: 'i8', editions: [editions[1]] }] }
       ]);
-    
+
       cars = yield Car.find().sort({ make: 1 });
       cars = yield Car.populate(cars, 'versions.editions');
       cars = yield Car.populate(cars, 'versions.editions.editionOptions.image');

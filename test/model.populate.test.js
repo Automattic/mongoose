@@ -7558,4 +7558,56 @@ describe('model: populate:', function() {
       });
     });
   });
+
+  it('correctly finds justOne when double-populating underneath an array (gh-6798)', function() {
+    const FileSchema = new Schema({ filename: 'String' });
+    const EditionOptionsSchema = new Schema({
+      price: 'Number',
+      image: {
+        type: 'ObjectId',
+        ref: 'gh6798_File'
+      }
+    });
+    const EditionSchema = new Schema({ editionOptions: EditionOptionsSchema });
+    const CarVersionSchema = new Schema({
+      type: {
+        type: 'String'
+      },
+      editions: [{
+        type: 'ObjectId',
+        ref: 'gh6798_Edition'
+      }]
+    });
+    const CarSchema = new mongoose.Schema({
+      make: 'String',
+      versions: [CarVersionSchema]
+    });
+
+    const File = db.model('gh6798_File', FileSchema);
+    const Edition = db.model('gh6798_Edition', EditionSchema);
+    const Car = db.model('gh6798_Car', CarSchema);
+
+    return co(function*() {
+      const file = yield File.create({ filename: 'file1.png' });
+
+      const editions = yield Edition.create([
+        { editionOptions: { price: 15000, image: file._id } },
+        { editionOptions: { price: 150000 } }
+      ]);
+
+      let cars = yield Car.create([
+        { make: 'Ford', versions: [{ type: 'F150', editions: [editions[0]] }] },
+        { make: 'BMW', versions: [{ type: 'i8', editions: [editions[1]] }] }
+      ]);
+    
+      cars = yield Car.find().sort({ make: 1 });
+      cars = yield Car.populate(cars, 'versions.editions');
+      cars = yield Car.populate(cars, 'versions.editions.editionOptions.image');
+
+      assert.strictEqual(cars[0].versions[0].editions[0].editionOptions.image,
+        void 0);
+      assert.equal(cars[1].versions[0].editions[0].editionOptions.image.filename,
+        'file1.png');
+    });
+  });
 });

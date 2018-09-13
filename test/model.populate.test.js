@@ -7615,17 +7615,17 @@ describe('model: populate:', function() {
     const postSchema = new Schema({
       name: String
     });
-    
+
     postSchema.virtual('comments', {
       ref: 'gh6988_Comment',
       localField: '_id',
       foreignField: 'postId'
     });
-    
+
     const commentSchema = new Schema({
       postId: { type: Schema.Types.ObjectId }
     });
-    
+
     const Post = db.model('gh6988_Post', postSchema);
     const Comment = db.model('gh6988_Comment', commentSchema);
 

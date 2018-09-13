@@ -106,13 +106,12 @@ describe('connections:', function() {
       it('disconnected (gh-5498) (gh-5524)', function(done) {
         this.timeout(60000);
 
-        let conn;
         let numConnected = 0;
         let numDisconnected = 0;
         let numReconnected = 0;
         let numReconnect = 0;
         let numClose = 0;
-        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', { useNewUrlParser: true });
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', { useNewUrlParser: true });
 
         conn.on('connected', function() {
           ++numConnected;
@@ -172,12 +171,11 @@ describe('connections:', function() {
       it('reconnectFailed (gh-4027)', function(done) {
         this.timeout(60000);
 
-        let conn;
         let numReconnectFailed = 0;
         let numConnected = 0;
         let numDisconnected = 0;
         let numReconnected = 0;
-        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           reconnectTries: 3,
           reconnectInterval: 100,
           useNewUrlParser: true
@@ -243,10 +241,9 @@ describe('connections:', function() {
       it('timeout (gh-4513)', function(done) {
         this.timeout(60000);
 
-        let conn;
         let numTimeout = 0;
         let numDisconnected = 0;
-        conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           socketTimeoutMS: 100,
           poolSize: 1,
           useNewUrlParser: true

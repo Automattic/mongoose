@@ -7610,4 +7610,34 @@ describe('model: populate:', function() {
         'file1.png');
     });
   });
+
+  it('handles virtual justOne if it is not set (gh-6988)', function() {
+    const postSchema = new Schema({
+      name: String
+    });
+    
+    postSchema.virtual('comments', {
+      ref: 'gh6988_Comment',
+      localField: '_id',
+      foreignField: 'postId'
+    });
+    
+    const commentSchema = new Schema({
+      postId: { type: Schema.Types.ObjectId }
+    });
+    
+    const Post = db.model('gh6988_Post', postSchema);
+    const Comment = db.model('gh6988_Comment', commentSchema);
+
+    return co(function*() {
+      const post = yield Post.create({ name: 'n1'});
+      const comment = yield Comment.create({ postId: post._id });
+
+      const doc = yield Post.findOne({}).populate('comments').lean();
+      assert.ok(Array.isArray(doc.comments));
+      assert.equal(doc.comments.length, 1);
+      assert.equal(doc.comments[0]._id.toHexString(),
+        comment._id.toHexString());
+    });
+  });
 });

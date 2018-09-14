@@ -5410,48 +5410,121 @@ describe('model: populate:', function() {
         assert.equal(article.author._id.toHexString(), author._id.toHexString());
       });
 
-      it('auto select populated fields (gh-5669) (gh-5685)', function(done) {
-        const ProductSchema = new mongoose.Schema({
-          name: {
-            type: String
-          },
-          categories: {
-            type: [{
-              type: mongoose.Schema.Types.ObjectId,
-              ref: 'gh5669'
-            }],
-            select: false
-          }
+      describe('selectPopulatedFields (gh-5669)', function() {
+        afterEach(function() {
+          delete mongoose.options.selectPopulatedPaths;
         });
 
-        const CategorySchema = new Schema({ name: String });
-        const Product = db.model('gh5669_0', ProductSchema);
-        const Category = db.model('gh5669', CategorySchema);
+        it('auto select populated fields (gh-5669) (gh-5685)', function(done) {
+          const ProductSchema = new mongoose.Schema({
+            name: {
+              type: String
+            },
+            categories: {
+              type: [{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'gh5669'
+              }],
+              select: false
+            }
+          });
 
-        Category.create({ name: 'Books' }, function(error, doc) {
-          assert.ifError(error);
-          const product = {
-            name: 'Professional AngularJS',
-            categories: [doc._id]
-          };
-          Product.create(product, function(error, product) {
+          const CategorySchema = new Schema({ name: String });
+          const Product = db.model('gh5669_0', ProductSchema);
+          const Category = db.model('gh5669', CategorySchema);
+
+          Category.create({ name: 'Books' }, function(error, doc) {
             assert.ifError(error);
-            Product.findById(product._id).populate('categories').exec(function(error, product) {
+            const product = {
+              name: 'Professional AngularJS',
+              categories: [doc._id]
+            };
+            Product.create(product, function(error, product) {
               assert.ifError(error);
-              assert.equal(product.categories.length, 1);
-              assert.equal(product.categories[0].name, 'Books');
-              Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
+              Product.findById(product._id).populate('categories').exec(function(error, product) {
                 assert.ifError(error);
-                assert.ok(!product.categories);
-                Product.findById(product._id).select({ name: 0 }).populate('categories').exec(function(error, product) {
+                assert.equal(product.categories.length, 1);
+                assert.equal(product.categories[0].name, 'Books');
+                Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
                   assert.ifError(error);
-                  assert.equal(product.categories.length, 1);
-                  assert.equal(product.categories[0].name, 'Books');
-                  assert.ok(!product.name);
-                  done();
+                  assert.ok(!product.categories);
+                  Product.findById(product._id).select({ name: 0 }).populate('categories').exec(function(error, product) {
+                    assert.ifError(error);
+                    assert.equal(product.categories.length, 1);
+                    assert.equal(product.categories[0].name, 'Books');
+                    assert.ok(!product.name);
+                    done();
+                  });
                 });
               });
             });
+          });
+        });
+
+        it('disabling at schema level (gh-6546)', function() {
+          const Person = db.model('gh6546_Person', new Schema({ name: String }));
+
+          const bookSchema = new Schema({
+            title: 'String',
+            author: { type: 'ObjectId', ref: 'gh6546_Person' }
+          }, { selectPopulatedPaths: false });
+          const Book = db.model('gh6546_Book', bookSchema);
+
+          return co(function*() {
+            const author = yield Person.create({ name: 'Val' });
+            yield Book.create({
+              title: 'Mastering Async/Await',
+              author: author._id
+            });
+
+            const res = yield Book.findOne().select('title').populate('author');
+            assert.ok(!res.author);
+          });
+        });
+
+        it('disabling at global level (gh-6546)', function() {
+          const Person = db.model('gh6546_Person_0', new Schema({ name: String }));
+
+          const bookSchema = new Schema({
+            title: 'String',
+            author: { type: 'ObjectId', ref: 'gh6546_Person_0' }
+          });
+          const Book = db.model('gh6546_Book_0', bookSchema);
+
+          mongoose.set('selectPopulatedPaths', false);
+
+          return co(function*() {
+            const author = yield Person.create({ name: 'Val' });
+            yield Book.create({
+              title: 'Mastering Async/Await',
+              author: author._id
+            });
+
+            const res = yield Book.findOne().select('title').populate('author');
+            assert.ok(!res.author);
+          });
+        });
+
+        it('schema overwrites global (gh-6546)', function() {
+          const Person = db.model('gh6546_Person_1', new Schema({ name: String }));
+
+          const bookSchema = new Schema({
+            title: 'String',
+            author: { type: 'ObjectId', ref: 'gh6546_Person_1' }
+          }, { selectPopulatedPaths: true });
+          const Book = db.model('gh6546_Book_1', bookSchema);
+
+          mongoose.set('selectPopulatedPaths', false);
+
+          return co(function*() {
+            const author = yield Person.create({ name: 'Val' });
+            yield Book.create({
+              title: 'Mastering Async/Await',
+              author: author._id
+            });
+
+            const res = yield Book.findOne().select('title').populate('author');
+            assert.equal(res.author.name, 'Val');
           });
         });
       });

@@ -4,7 +4,12 @@
 
 'use strict';
 
-let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), Schema = mongoose.Schema, random = require('../lib/utils').random;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * setup
@@ -71,8 +76,6 @@ describe('collections: capped:', function() {
         }
         assert.ifError(err);
 
-        let timer;
-
         db.on('error', function(err1) {
           clearTimeout(timer);
           db.close();
@@ -81,7 +84,7 @@ describe('collections: capped:', function() {
         });
 
         db.model('CappedExisting', capped, conn);
-        timer = setTimeout(function() {
+        const timer = setTimeout(function() {
           db.close();
           throw new Error('capped test timeout');
         }, 900);

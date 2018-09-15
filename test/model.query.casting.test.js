@@ -69,11 +69,11 @@ describe('model query casting', function() {
   });
 
   it('works', function(done) {
-    let BlogPostB = db.model(modelName, collection),
-        title = 'Loki ' + random();
+    const BlogPostB = db.model(modelName, collection);
+    const title = 'Loki ' + random();
 
-    let post = new BlogPostB(),
-        id = post.get('_id').toString();
+    const post = new BlogPostB();
+    const id = post.get('_id').toString();
 
     post.set('title', title);
 
@@ -99,12 +99,12 @@ describe('model query casting', function() {
   });
 
   it('casts $modifiers', function(done) {
-    let BlogPostB = db.model(modelName, collection),
-        post = new BlogPostB({
-          meta: {
-            visitors: -75
-          }
-        });
+    const BlogPostB = db.model(modelName, collection);
+    const post = new BlogPostB({
+      meta: {
+        visitors: -75
+      }
+    });
 
     post.save(function(err) {
       assert.ifError(err);
@@ -125,8 +125,8 @@ describe('model query casting', function() {
   it('casts $in values of arrays (gh-199)', function(done) {
     const BlogPostB = db.model(modelName, collection);
 
-    let post = new BlogPostB(),
-        id = post._id.toString();
+    const post = new BlogPostB();
+    const id = post._id.toString();
 
     post.save(function(err) {
       assert.ifError(err);
@@ -143,8 +143,8 @@ describe('model query casting', function() {
   it('casts $in values of arrays with single item instead of array (jrl-3238)', function(done) {
     const BlogPostB = db.model(modelName, collection);
 
-    let post = new BlogPostB(),
-        id = post._id.toString();
+    const post = new BlogPostB();
+    const id = post._id.toString();
 
     post.save(function(err) {
       assert.ifError(err);
@@ -255,8 +255,8 @@ describe('model query casting', function() {
   });
 
   it('properly casts $and (gh-1180)', function(done) {
-    let B = db.model(modelName, collection + random()),
-        result = B.find({}).cast(B, {$and: [{date: '1987-03-17T20:00:00.000Z'}, {_id: '000000000000000000000000'}]});
+    const B = db.model(modelName, collection + random());
+    const result = B.find({}).cast(B, {$and: [{date: '1987-03-17T20:00:00.000Z'}, {_id: '000000000000000000000000'}]});
     assert.ok(result.$and[0].date instanceof Date);
     assert.ok(result.$and[1]._id instanceof DocumentObjectId);
     done();
@@ -796,8 +796,8 @@ describe('model query casting', function() {
         return 'img';
       };
 
-      let B = db.model(modelName, collection + random()),
-          result = B.find({}).cast(B, {tags: {$regex: /a/, $options: opts}});
+      const B = db.model(modelName, collection + random());
+      const result = B.find({}).cast(B, {tags: {$regex: /a/, $options: opts}});
 
       assert.equal(result.tags.$options, 'img');
       done();
@@ -810,7 +810,8 @@ describe('model query casting', function() {
 
       const commentId = mongoose.Types.ObjectId(111);
 
-      let post = new BlogPostB({comments: [{_id: commentId}]}), id = post._id.toString();
+      const post = new BlogPostB({comments: [{_id: commentId}]});
+      const id = post._id.toString();
 
       post.save(function(err) {
         assert.ifError(err);
@@ -829,7 +830,8 @@ describe('model query casting', function() {
 
       const commentId = mongoose.Types.ObjectId(111);
 
-      let post = new BlogPostB({comments: [{_id: commentId}]}), id = post._id.toString();
+      const post = new BlogPostB({comments: [{_id: commentId}]});
+      const id = post._id.toString();
 
       post.save(function(err) {
         assert.ifError(err);

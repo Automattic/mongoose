@@ -4,9 +4,9 @@
  * Module dependencies
  */
 
+const assert = require('assert');
 const co = require('co');
 const start = require('./common');
-const assert = require('power-assert');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -635,11 +635,10 @@ describe('aggregate: ', function() {
         model(db.model('Employee')).
         group({ _id: '$dept' }).
         exec(function(err, docs) {
-          let depts;
           assert.ifError(err);
           assert.equal(docs.length, 2);
 
-          depts = docs.map(function(doc) {
+          const depts = docs.map(function(doc) {
             return doc._id;
           });
           assert.notEqual(depts.indexOf('sales'), -1);
@@ -918,10 +917,9 @@ describe('aggregate: ', function() {
 
       it('with a callback', function(done) {
         const aggregate = new Aggregate();
-        let callback;
 
         aggregate.model(db.model('Employee'));
-        callback = function(err) {
+        const callback = function(err) {
           assert.ok(err);
           assert.equal(err.message, 'Aggregate has empty pipeline');
           done();

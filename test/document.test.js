@@ -473,8 +473,8 @@ describe('document', function() {
       }
     });
 
-    let Test = db.model('toObject-transform', schema),
-        Places = db.model('toObject-transform-places', schemaPlaces);
+    const Test = db.model('toObject-transform', schema);
+    const Places = db.model('toObject-transform-places', schemaPlaces);
 
     Places.create({identity: 'a'}, {identity: 'b'}, {identity: 'c'}, function(err, a, b, c) {
       Test.create({name: 'chetverikov', places: [a, b, c]}, function(err) {
@@ -718,9 +718,9 @@ describe('document', function() {
       assert.equal(Object.keys(clone.nested2).length, 1);
 
       // gh-852
-      let arr = [doc],
-          err = false,
-          str;
+      const arr = [doc];
+      let err = false;
+      let str;
       try {
         str = JSON.stringify(arr);
       } catch (_) {
@@ -805,8 +805,8 @@ describe('document', function() {
     });
 
     it('jsonifying an object', function(done) {
-      let doc = new TestDocument({test: 'woot'}),
-          oidString = doc._id.toString();
+      const doc = new TestDocument({test: 'woot'});
+      const oidString = doc._id.toString();
       // convert to json string
       const json = JSON.stringify(doc);
       // parse again
@@ -818,25 +818,20 @@ describe('document', function() {
     });
 
     it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
-      let userSchema;
-      let User;
-      let groupSchema;
-      let Group;
-
-      userSchema = new Schema({name: String});
+      const userSchema = new Schema({name: String});
       // includes virtual path when 'toJSON'
       userSchema.set('toJSON', {getters: true});
       userSchema.virtual('hello').get(function() {
         return 'Hello, ' + this.name;
       });
-      User = db.model('User', userSchema);
+      const User = db.model('User', userSchema);
 
-      groupSchema = new Schema({
+      const groupSchema = new Schema({
         name: String,
         _users: [{type: Schema.ObjectId, ref: 'User'}]
       });
 
-      Group = db.model('Group', groupSchema);
+      const Group = db.model('Group', groupSchema);
 
       User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
         assert.ifError(err);
@@ -997,8 +992,8 @@ describe('document', function() {
   });
 
   it('toObject should not set undefined values to null', function(done) {
-    let doc = new TestDocument(),
-        obj = doc.toObject();
+    const doc = new TestDocument();
+    const obj = doc.toObject();
 
     delete obj._id;
     assert.deepEqual(obj, {numbers: [], oids: [], em: []});
@@ -1007,14 +1002,14 @@ describe('document', function() {
 
   describe('Errors', function() {
     it('MongooseErrors should be instances of Error (gh-209)', function(done) {
-      let MongooseError = require('../lib/error'),
-          err = new MongooseError('Some message');
+      const MongooseError = require('../lib/error');
+      const err = new MongooseError('Some message');
       assert.ok(err instanceof Error);
       done();
     });
     it('ValidationErrors should be instances of Error', function(done) {
-      let ValidationError = Document.ValidationError,
-          err = new ValidationError(new TestDocument);
+      const ValidationError = Document.ValidationError;
+      const err = new ValidationError(new TestDocument);
       assert.ok(err instanceof Error);
       done();
     });
@@ -1092,8 +1087,11 @@ describe('document', function() {
   });
 
   it('unselected required fields should pass validation', function(done) {
-    let Tschema = new Schema({name: String, req: {type: String, required: true}}),
-        T = db.model('unselectedRequiredFieldValidation', Tschema);
+    const Tschema = new Schema({
+      name: String,
+      req: {type: String, required: true}
+    });
+    const T = db.model('unselectedRequiredFieldValidation', Tschema);
 
     const t = new T({name: 'teeee', req: 'i am required'});
     t.save(function(err) {
@@ -3227,14 +3225,11 @@ describe('document', function() {
     });
 
     it('minimize + empty object (gh-4337)', function(done) {
-      let SomeModel;
-      let SomeModelSchema;
-
-      SomeModelSchema = new mongoose.Schema({}, {
+      const SomeModelSchema = new mongoose.Schema({}, {
         minimize: false
       });
 
-      SomeModel = mongoose.model('somemodel', SomeModelSchema);
+      const SomeModel = mongoose.model('somemodel', SomeModelSchema);
 
       try {
         new SomeModel({});
@@ -6141,6 +6136,42 @@ describe('document', function() {
 
       const found = yield M.findById(doc.id);
       assert.equal(found.items.length, 2);
+    });
+  });
+
+  it('validateSync() on embedded doc (gh-6931)', function() {
+    const innerSchema = new mongoose.Schema({
+      innerField: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      }
+    });
+
+    const schema = new mongoose.Schema({
+      field: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
+      inner: [innerSchema]
+    });
+
+    const Model = db.model('gh6931', schema);
+
+    return co(function*() {
+      const doc2 = new Model();
+      doc2.field = mongoose.Types.ObjectId();
+      doc2.inner.push({
+        innerField: mongoose.Types.ObjectId()
+      });
+      doc2.inner[0].innerField = '';
+
+      let err = doc2.inner[0].validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['innerField']);
+
+      err = yield doc2.inner[0].validate().then(() => assert.ok(false), err => err);
+      assert.ok(err);
+      assert.ok(err.errors['innerField']);
     });
   });
 });

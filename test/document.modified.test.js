@@ -4,7 +4,14 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, random = require('../lib/utils').random, Schema = mongoose.Schema, ObjectId = Schema.ObjectId, DocumentObjectId = mongoose.Types.ObjectId;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -82,8 +89,8 @@ describe('document modified', function() {
 
   describe('modified states', function() {
     it('reset after save', function(done) {
-      let B = db.model(modelName, collection),
-          b = new B;
+      const B = db.model(modelName, collection);
+      const b = new B;
 
       b.numbers.push(3);
       b.save(function(err) {
@@ -104,8 +111,8 @@ describe('document modified', function() {
     });
 
     it('of embedded docs reset after save', function(done) {
-      let BlogPost = db.model(modelName, collection),
-          post = new BlogPost({title: 'hocus pocus'});
+      const BlogPost = db.model(modelName, collection);
+      const post = new BlogPost({title: 'hocus pocus'});
       post.comments.push({title: 'Humpty Dumpty', comments: [{title: 'nested'}]});
       post.save(function(err) {
         assert.strictEqual(null, err);
@@ -144,8 +151,8 @@ describe('document modified', function() {
     });
 
     it('when modifying keys', function(done) {
-      let BlogPost = db.model(modelName, collection),
-          post = new BlogPost;
+      const BlogPost = db.model(modelName, collection);
+      const post = new BlogPost;
       post.init({
         title: 'Test',
         slug: 'test',
@@ -182,8 +189,8 @@ describe('document modified', function() {
 
     describe('on DocumentArray', function() {
       it('work', function(done) {
-        let BlogPost = db.model(modelName, collection),
-            post = new BlogPost();
+        const BlogPost = db.model(modelName, collection);
+        const post = new BlogPost();
         post.init({
           title: 'Test',
           slug: 'test',
@@ -200,8 +207,8 @@ describe('document modified', function() {
         done();
       });
       it('with accessors', function(done) {
-        let BlogPost = db.model(modelName, collection),
-            post = new BlogPost();
+        const BlogPost = db.model(modelName, collection);
+        const post = new BlogPost();
         post.init({
           title: 'Test',
           slug: 'test',
@@ -222,8 +229,8 @@ describe('document modified', function() {
     describe('on MongooseArray', function() {
       it('atomic methods', function(done) {
         // COMPLETEME
-        let BlogPost = db.model(modelName, collection),
-            post = new BlogPost();
+        const BlogPost = db.model(modelName, collection);
+        const post = new BlogPost();
         assert.equal(post.isModified('owners'), false);
         post.get('owners').push(new DocumentObjectId);
         assert.equal(post.isModified('owners'), true);
@@ -231,8 +238,8 @@ describe('document modified', function() {
       });
       it('native methods', function(done) {
         // COMPLETEME
-        let BlogPost = db.model(modelName, collection),
-            post = new BlogPost;
+        const BlogPost = db.model(modelName, collection);
+        const post = new BlogPost;
         assert.equal(post.isModified('owners'), false);
         done();
       });
@@ -535,8 +542,8 @@ describe('document modified', function() {
     });
 
     it('should reset the modified state after calling unmarkModified', function(done) {
-      let BlogPost = db.model(modelName, collection),
-          b = new BlogPost();
+      const BlogPost = db.model(modelName, collection);
+      const b = new BlogPost();
       assert.equal(b.isModified('author'), false);
       b.author = 'foo';
       assert.equal(b.isModified('author'), true);

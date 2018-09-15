@@ -5294,6 +5294,78 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite with timestamps (gh-5708)', function() {
+      const schema = new Schema({
+        str: { type: String, default: 'test' },
+        num: Number
+      }, { timestamps: true });
+
+      const M = db.model('gh5708_ts', schema);
+
+      const ops = [
+        {
+          insertOne: {
+            document: {
+              num: 42
+            }
+          }
+        },
+        {
+          updateOne: {
+            filter: { num: 0 },
+            update: {
+              $inc: { num: 1 }
+            },
+            upsert: true
+          }
+        }
+      ];
+
+      const now = Date.now();
+
+      return co(function*() {
+        yield M.bulkWrite(ops);
+
+        let doc = yield M.findOne({ num: 42 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+
+        doc = yield M.findOne({ num: 1 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
+    });
+
+    it('bulkWrite with timestamps and replaceOne (gh-5708)', function() {
+      const schema = new Schema({ num: Number }, { timestamps: true });
+
+      const M = db.model('gh5708_ts2', schema);
+
+      return co(function*() {
+        yield M.create({ num: 42 });
+
+        yield cb => setTimeout(cb, 10);
+        const now = Date.now();
+
+        yield M.bulkWrite([{
+          replaceOne: {
+            filter: { num: 42 },
+            replacement: { num: 100 }
+          }
+        }]);
+
+        const doc = yield M.findOne({ num: 100 });
+        assert.ok(doc.createdAt);
+        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.updatedAt);
+        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
+    });
+
     it('insertMany with Decimal (gh-5190)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {
@@ -5766,6 +5838,7 @@ describe('Model', function() {
       test.save().then(handler);
       test.save().catch(error);
     });
+
     it('allows calling save in a post save hook (gh-6611)', function() {
       let called = 0;
       const noteSchema = new Schema({
@@ -5787,6 +5860,40 @@ describe('Model', function() {
         const doc = yield Note.findOne({});
         assert.strictEqual(doc.body, 'a note, part deux.');
       });
+    });
+  });
+
+  it('dropDatabase() after init allows re-init (gh-6967)', function() {
+    const db = mongoose.createConnection(start.uri + '_6967');
+
+    const Model = db.model('gh6640', new Schema({
+      name: { type: String, index: true }
+    }));
+
+    return co(function*() {
+      yield Model.init();
+
+      yield db.dropDatabase();
+
+      assert.ok(!Model.$init);
+
+      let threw = false;
+
+      try {
+        yield Model.listIndexes();
+      } catch (err) {
+        assert.ok(err.message.indexOf('Database mongoose_test') !== -1,
+          err.message);
+        threw = true;
+      }
+      assert.ok(threw);
+
+      yield Model.init();
+
+      const indexes = yield Model.listIndexes();
+
+      assert.equal(indexes.length, 2);
+      assert.deepEqual(indexes[1].key, { name: 1});
     });
   });
 });

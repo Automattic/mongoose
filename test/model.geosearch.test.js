@@ -1,10 +1,11 @@
-
 'use strict';
-let start = require('./common'),
-    assert = require('power-assert'),
-    mongoose = start.mongoose,
-    random = require('../lib/utils').random,
-    Schema = mongoose.Schema;
+
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('model', function() {
   let db, schema;

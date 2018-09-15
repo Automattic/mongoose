@@ -142,9 +142,9 @@ describe('model: querying:', function() {
   });
 
   it('a query is executed when a callback is passed', function(done) {
-    let BlogPostB = db.model('BlogPostB', collection),
-        count = 5,
-        q = {_id: new DocumentObjectId}; // make sure the query is fast
+    const BlogPostB = db.model('BlogPostB', collection);
+    let count = 5;
+    const q = {_id: new DocumentObjectId}; // make sure the query is fast
 
     function fn() {
       if (--count) {
@@ -170,9 +170,9 @@ describe('model: querying:', function() {
   });
 
   it('query is executed where a callback for findOne', function(done) {
-    let BlogPostB = db.model('BlogPostB', collection),
-        count = 5,
-        q = {_id: new DocumentObjectId}; // make sure the query is fast
+    const BlogPostB = db.model('BlogPostB', collection);
+    let count = 5;
+    const q = {_id: new DocumentObjectId}; // make sure the query is fast
 
     function fn() {
       if (--count) {
@@ -205,8 +205,8 @@ describe('model: querying:', function() {
     });
 
     it('Query executes when you pass a callback', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          pending = 2;
+      const BlogPostB = db.model('BlogPostB', collection);
+      let pending = 2;
 
       function fn() {
         if (--pending) {
@@ -220,8 +220,8 @@ describe('model: querying:', function() {
     });
 
     it('counts documents', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Wooooot ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
@@ -299,8 +299,8 @@ describe('model: querying:', function() {
     });
 
     it('Query executes when you pass a callback', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          count = 2;
+      const BlogPostB = db.model('BlogPostB', collection);
+      let count = 2;
 
       function fn() {
         if (--count) {
@@ -333,8 +333,8 @@ describe('model: querying:', function() {
 
   describe('findOne', function() {
     it('works', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Wooooot ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
@@ -353,12 +353,12 @@ describe('model: querying:', function() {
     });
 
     it('casts $modifiers', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          post = new BlogPostB({
-            meta: {
-              visitors: -10
-            }
-          });
+      const BlogPostB = db.model('BlogPostB', collection);
+      const post = new BlogPostB({
+        meta: {
+          visitors: -10
+        }
+      });
 
       post.save(function(err) {
         assert.ifError(err);
@@ -471,12 +471,12 @@ describe('model: querying:', function() {
     });
 
     it('based on nested fields', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          post = new BlogPostB({
-            meta: {
-              visitors: 5678
-            }
-          });
+      const BlogPostB = db.model('BlogPostB', collection);
+      const post = new BlogPostB({
+        meta: {
+          visitors: 5678
+        }
+      });
 
       post.save(function(err) {
         assert.ifError(err);
@@ -637,9 +637,9 @@ describe('model: querying:', function() {
     });
 
     it('works with $elemMatch and $in combo (gh-1100)', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          id1 = new DocumentObjectId,
-          id2 = new DocumentObjectId;
+      const BlogPostB = db.model('BlogPostB', collection);
+      const id1 = new DocumentObjectId;
+      const id2 = new DocumentObjectId;
 
       BlogPostB.create({owners: [id1, id2]}, function(err, created) {
         assert.ifError(err);
@@ -655,8 +655,8 @@ describe('model: querying:', function() {
 
   describe('findById', function() {
     it('handles undefined', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Edwald ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Edwald ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
@@ -673,8 +673,8 @@ describe('model: querying:', function() {
     });
 
     it('works', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Edwald ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Edwald ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
@@ -707,8 +707,8 @@ describe('model: querying:', function() {
     });
 
     it('works with partial initialization', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          queries = 5;
+      const BlogPostB = db.model('BlogPostB', collection);
+      let queries = 5;
 
       const post = new BlogPostB();
 
@@ -845,8 +845,8 @@ describe('model: querying:', function() {
 
   describe('find', function() {
     it('works', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Wooooot ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
@@ -931,8 +931,8 @@ describe('model: querying:', function() {
     });
 
     it('with partial initialization', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          queries = 4;
+      const BlogPostB = db.model('BlogPostB', collection);
+      let queries = 4;
 
       const post = new BlogPostB();
 
@@ -1021,9 +1021,9 @@ describe('model: querying:', function() {
     });
 
     it('works with $elemMatch (gh-1100)', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          id1 = new DocumentObjectId,
-          id2 = new DocumentObjectId;
+      const BlogPostB = db.model('BlogPostB', collection);
+      const id1 = new DocumentObjectId;
+      const id2 = new DocumentObjectId;
 
       BlogPostB.create({owners: [id1, id2]}, function(err) {
         assert.ifError(err);
@@ -1652,8 +1652,8 @@ describe('model: querying:', function() {
 
   it('by Date (gh-336)', function(done) {
     // GH-336
-    let Test = db.model('TestDateQuery', new Schema({date: Date}), 'datetest_' + random()),
-        now = new Date;
+    const Test = db.model('TestDateQuery', new Schema({date: Date}), 'datetest_' + random());
+    const now = new Date;
 
     Test.create({date: now}, {date: new Date(now - 10000)}, function(err) {
       assert.ifError(err);
@@ -1666,8 +1666,8 @@ describe('model: querying:', function() {
   });
 
   it('mixed types with $elemMatch (gh-591)', function(done) {
-    let S = new Schema({a: [{}], b: Number}),
-        M = db.model('QueryingMixedArrays', S, random());
+    const S = new Schema({a: [{}], b: Number});
+    const M = db.model('QueryingMixedArrays', S, random());
 
     const m = new M;
     m.a = [1, 2, {name: 'Frodo'}, 'IDK', {name: 100}];
@@ -1852,8 +1852,8 @@ describe('model: querying:', function() {
   });
 
   it('works with different methods and query types', function(done) {
-    let BufSchema = new Schema({name: String, block: Buffer}),
-        Test = db.model('BufferTest', BufSchema, 'buffers');
+    const BufSchema = new Schema({name: String, block: Buffer});
+    const Test = db.model('BufferTest', BufSchema, 'buffers');
 
     const docA = {name: 'A', block: Buffer.from('über')};
     const docB = {name: 'B', block: Buffer.from('buffer shtuffs are neat')};
@@ -1911,8 +1911,8 @@ describe('model: querying:', function() {
 
   it('with conditionals', function(done) {
     // $in $nin etc
-    let BufSchema = new Schema({name: String, block: Buffer}),
-        Test = db.model('Buffer2', BufSchema, 'buffer_' + random());
+    const BufSchema = new Schema({name: String, block: Buffer});
+    const Test = db.model('Buffer2', BufSchema, 'buffer_' + random());
 
     const docA = {name: 'A', block: new MongooseBuffer([195, 188, 98, 101, 114])}; // über
     const docB = {name: 'B', block: new MongooseBuffer('buffer shtuffs are neat')};
@@ -2010,8 +2010,8 @@ describe('model: querying:', function() {
   });
 
   it('with unused values in the db', function(done) {
-    let BlogPostB = db.model('BlogPostB', collection),
-        post = new BlogPostB();
+    const BlogPostB = db.model('BlogPostB', collection);
+    const post = new BlogPostB();
 
     post.collection.insertOne({meta: {visitors: 9898, color: 'blue'}}, {}, function(err, b) {
       assert.ifError(err);
@@ -2507,8 +2507,8 @@ describe('model: querying:', function() {
 
   describe('lean', function() {
     it('find', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Wooooot ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);
@@ -2530,8 +2530,8 @@ describe('model: querying:', function() {
     });
 
     it('findOne', function(done) {
-      let BlogPostB = db.model('BlogPostB', collection),
-          title = 'Wooooot ' + random();
+      const BlogPostB = db.model('BlogPostB', collection);
+      const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
       post.set('title', title);

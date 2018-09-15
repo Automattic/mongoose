@@ -667,10 +667,10 @@ describe('model', function() {
           favoriteBus: {type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationBus'}
         });
 
-        let Vehicle = db.model('ModelDiscriminatorPopulationVehicle', vehicleSchema),
-            Car = Vehicle.discriminator('ModelDiscriminatorPopulationCar', carSchema),
-            Bus = Vehicle.discriminator('ModelDiscriminatorPopulationBus', busSchema),
-            User = db.model('ModelDiscriminatorPopulationUser', userSchema);
+        const Vehicle = db.model('ModelDiscriminatorPopulationVehicle', vehicleSchema);
+        const Car = Vehicle.discriminator('ModelDiscriminatorPopulationCar', carSchema);
+        const Bus = Vehicle.discriminator('ModelDiscriminatorPopulationBus', busSchema);
+        const User = db.model('ModelDiscriminatorPopulationUser', userSchema);
 
         Vehicle.create({}, function(err, vehicle) {
           assert.ifError(err);

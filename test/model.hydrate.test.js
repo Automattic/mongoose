@@ -4,7 +4,12 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, Schema = mongoose.Schema, DocumentObjectId = mongoose.Types.ObjectId;
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model', function() {
   let schemaB;

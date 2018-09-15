@@ -358,6 +358,7 @@ block content
     - [collation](#collation)
     - [skipVersioning](#skipVersioning)
     - [timestamps](#timestamps)
+    - [selectPopulatedPaths](#selectPopulatedPaths)
 
     <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
@@ -865,6 +866,44 @@ block content
     Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
       // Works!
     });
+    ```
+
+    <h3 id="selectPopulatedPaths">
+      <a href="#selectPopulatedPaths">
+        option: selectPopulatedPaths
+      </a>
+    </h3>
+
+    By default, Mongoose will automatically `select()` any populated paths for
+    you, unless you explicitly exclude them.
+
+    ```javascript
+    const bookSchema = new Schema({
+      title: 'String',
+      author: { type: 'ObjectId', ref: 'Person' }
+    });
+    const Book = mongoose.model('Book', bookSchema);
+
+    // By default, Mongoose will add `author` to the below `select()`.
+    await Book.find().select('title').populate('author');
+
+    // In other words, the below query is equivalent to the above
+    await Book.find().select('title author').populate('author');
+    ```
+
+    To opt out of selecting populated fields by default, set `selectPopulatedPaths`
+    to `false` in your schema.
+
+    ```javascript
+    const bookSchema = new Schema({
+      title: 'String',
+      author: { type: 'ObjectId', ref: 'Person' }
+    }, { selectPopulatedPaths: false });
+    const Book = mongoose.model('Book', bookSchema);
+
+    // Because `selectPopulatedPaths` is false, the below doc will **not**
+    // contain an `author` property.
+    const doc = await Book.findOne().select('title').populate('author');
     ```
 
     <h3 id="plugins"><a href="#plugins">Pluggable</a></h3>

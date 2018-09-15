@@ -5838,6 +5838,7 @@ describe('Model', function() {
       test.save().then(handler);
       test.save().catch(error);
     });
+
     it('allows calling save in a post save hook (gh-6611)', function() {
       let called = 0;
       const noteSchema = new Schema({
@@ -5859,6 +5860,38 @@ describe('Model', function() {
         const doc = yield Note.findOne({});
         assert.strictEqual(doc.body, 'a note, part deux.');
       });
+    });
+  });
+
+  it('dropDatabase() after init allows re-init (gh-6967)', function() {
+    const Model = db.model('gh6640', new Schema({
+      name: { type: String, index: true }
+    }));
+
+    return co(function*() {
+      yield Model.init();
+
+      yield db.dropDatabase();
+
+      assert.ok(!Model.$init);
+
+      let threw = false;
+      
+      try {
+        yield Model.listIndexes();
+      } catch (err) {
+        assert.ok(err.message.indexOf('Database mongoose_test') !== -1,
+          err.message);
+        threw = true;
+      }
+      assert.ok(threw);
+
+      yield Model.init();
+
+      const indexes = yield Model.listIndexes();
+
+      assert.equal(indexes.length, 2);
+      assert.deepEqual(indexes[1].key, { name: 1});
     });
   });
 });

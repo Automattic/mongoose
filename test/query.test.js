@@ -2731,4 +2731,14 @@ describe('Query', function() {
       assert.deepStrictEqual(q._conditions, { a: 1 });
     });
   });
+
+  describe('setUpdate', function() {
+    it('replaces existing update doc with new value', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.set('testing', '123');
+      q.setUpdate({ $set: { newPath: 'newValue' } });
+      assert.strictEqual(q._update.$set.testing, undefined);
+      assert.strictEqual(q._update.$set.newPath, 'newValue');
+    });
+  });
 });

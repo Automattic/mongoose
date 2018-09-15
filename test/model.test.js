@@ -5864,6 +5864,8 @@ describe('Model', function() {
   });
 
   it('dropDatabase() after init allows re-init (gh-6967)', function() {
+    const db = mongoose.createConnection(start.uri + '_6967');
+
     const Model = db.model('gh6640', new Schema({
       name: { type: String, index: true }
     }));
@@ -5876,7 +5878,7 @@ describe('Model', function() {
       assert.ok(!Model.$init);
 
       let threw = false;
-      
+
       try {
         yield Model.listIndexes();
       } catch (err) {

@@ -1269,12 +1269,12 @@ describe('Query', function() {
     it('should retain key order', function(done) {
       // this is important for query hints
       const hint = {x: 1, y: 1, z: 1};
-      const a = JSON.stringify({hint: hint, safe: true});
+      const a = JSON.stringify({ hint: hint });
 
       const q = new Query;
       q.hint(hint);
 
-      const options = q._optionsForExec({schema: {options: {safe: true}}});
+      const options = q._optionsForExec({ schema: { options: {} } });
       assert.equal(JSON.stringify(options), a);
       done();
     });

@@ -4,7 +4,14 @@
 
 'use strict';
 
-let start = require('./common'), assert = require('power-assert'), mongoose = start.mongoose, random = require('../lib/utils').random, Schema = mongoose.Schema, ObjectId = Schema.Types.ObjectId, DocumentObjectId = mongoose.Types.ObjectId;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('model field selection', function() {
   let Comments;
@@ -53,8 +60,8 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined', function(done) {
-    let BlogPostB = db.model(modelName, collection),
-        date = new Date;
+    const BlogPostB = db.model(modelName, collection);
+    const date = new Date;
 
     const doc = {
       title: 'subset 1',
@@ -88,9 +95,9 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined and defaults applied to other fields', function(done) {
-    let BlogPostB = db.model(modelName, collection),
-        id = new DocumentObjectId,
-        date = new Date;
+    const BlogPostB = db.model(modelName, collection);
+    const id = new DocumentObjectId;
+    const date = new Date;
 
     BlogPostB.collection.insertOne({_id: id, title: 'hahaha1', meta: {date: date}}, function(err) {
       assert.ifError(err);
@@ -174,8 +181,8 @@ describe('model field selection', function() {
   });
 
   it('included fields should have defaults applied when no value exists in db (gh-870)', function(done) {
-    let BlogPostB = db.model(modelName, collection),
-        id = new DocumentObjectId;
+    const BlogPostB = db.model(modelName, collection);
+    const id = new DocumentObjectId;
 
     BlogPostB.collection.insertOne(
       {_id: id, title: 'issue 870'}, {safe: true}, function(err) {

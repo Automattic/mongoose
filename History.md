@@ -1,3 +1,13 @@
+5.2.15 / 2018-09-15
+===================
+ * fix(populate): handle virtual justOne correctly if it isn't set #6988
+ * fix(populate): consistently use lowercase `model` instead of `Model` so double-populating works with existing docs #6978
+ * fix(model): allow calling `Model.init()` again after calling `dropDatabase()` #6967
+ * fix(populate): find correct justOne when double-populating underneath an array #6798
+ * docs(webpack): make webpack docs use es2015 preset for correct libs and use acorn to test output is valid ES5 #6740
+ * fix(populate): add selectPopulatedPaths option to opt out of auto-adding `populate()`-ed fields to `select()` #6546
+ * fix(model): set timestamps on bulkWrite `insertOne` and `replaceOne` #5708
+
 5.2.14 / 2018-09-09
 ===================
  * docs: fix wording on promise docs to not imply queries only return promises #6983 #6982 [lineus](https://github.com/lineus)

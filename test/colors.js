@@ -4,7 +4,14 @@
 
 'use strict';
 
-let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), Schema = mongoose.Schema, MongooseDocumentArray = mongoose.Types.DocumentArray, EmbeddedDocument = require('../lib/types/embedded'), DocumentArray = require('../lib/types/documentarray');
+const DocumentArray = require('../lib/types/documentarray');
+const EmbeddedDocument = require('../lib/types/embedded');
+const assert = require('assert');
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
+const MongooseDocumentArray = mongoose.Types.DocumentArray;
 
 /**
  * setup

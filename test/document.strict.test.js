@@ -4,7 +4,12 @@
 
 'use strict';
 
-let start = require('./common'), mongoose = start.mongoose, assert = require('power-assert'), random = require('../lib/utils').random, Schema = mongoose.Schema;
+const assert = require('assert');
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('document: strict mode:', function() {
   let db;

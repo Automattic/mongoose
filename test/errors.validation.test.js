@@ -5,22 +5,19 @@
 
 'use strict';
 
+const ValidationError = require('../lib/error/validation');
 const assert = require('power-assert');
 const start = require('./common');
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const SchemaType = mongoose.SchemaType;
 const ValidatorError = SchemaType.ValidatorError;
-const ValidationError = require('../lib/error/validation');
 
 describe('ValidationError', function() {
   describe('#infiniteRecursion', function() {
     it('does not cause RangeError (gh-1834)', function(done) {
-      let SubSchema,
-          M,
-          model;
-
-      SubSchema = new Schema({
+      const SubSchema = new Schema({
         name: {type: String, required: true},
         contents: [new Schema({
           key: {type: String, required: true},
@@ -28,9 +25,9 @@ describe('ValidationError', function() {
         }, {_id: false})]
       });
 
-      M = mongoose.model('SubSchema', SubSchema);
+      const M = mongoose.model('SubSchema', SubSchema);
 
-      model = new M({
+      const model = new M({
         name: 'Model',
         contents: [
           {key: 'foo'}
@@ -48,17 +45,13 @@ describe('ValidationError', function() {
 
   describe('#minDate', function() {
     it('causes a validation error', function(done) {
-      let MinSchema,
-          M,
-          model;
-
-      MinSchema = new Schema({
+      const MinSchema = new Schema({
         appointmentDate: {type: Date, min: Date.now}
       });
 
-      M = mongoose.model('MinSchema', MinSchema);
+      const M = mongoose.model('MinSchema', MinSchema);
 
-      model = new M({
+      const model = new M({
         appointmentDate: new Date(Date.now().valueOf() - 10000)
       });
 
@@ -78,17 +71,13 @@ describe('ValidationError', function() {
 
   describe('#maxDate', function() {
     it('causes a validation error', function(done) {
-      let MaxSchema,
-          M,
-          model;
-
-      MaxSchema = new Schema({
+      const MaxSchema = new Schema({
         birthdate: {type: Date, max: Date.now}
       });
 
-      M = mongoose.model('MaxSchema', MaxSchema);
+      const M = mongoose.model('MaxSchema', MaxSchema);
 
-      model = new M({
+      const model = new M({
         birthdate: new Date(Date.now().valueOf() + 2000)
       });
 
@@ -108,17 +97,13 @@ describe('ValidationError', function() {
 
   describe('#minlength', function() {
     it('causes a validation error', function(done) {
-      let AddressSchema,
-          Address,
-          model;
-
-      AddressSchema = new Schema({
+      const AddressSchema = new Schema({
         postalCode: {type: String, minlength: 5}
       });
 
-      Address = mongoose.model('MinLengthAddress', AddressSchema);
+      const Address = mongoose.model('MinLengthAddress', AddressSchema);
 
-      model = new Address({
+      const model = new Address({
         postalCode: '9512'
       });
 
@@ -164,17 +149,13 @@ describe('ValidationError', function() {
 
   describe('#maxlength', function() {
     it('causes a validation error', function(done) {
-      let AddressSchema,
-          Address,
-          model;
-
-      AddressSchema = new Schema({
+      const AddressSchema = new Schema({
         postalCode: {type: String, maxlength: 10}
       });
 
-      Address = mongoose.model('MaxLengthAddress', AddressSchema);
+      const Address = mongoose.model('MaxLengthAddress', AddressSchema);
 
-      model = new Address({
+      const model = new Address({
         postalCode: '95125012345'
       });
 

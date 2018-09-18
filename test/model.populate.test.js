@@ -5410,48 +5410,121 @@ describe('model: populate:', function() {
         assert.equal(article.author._id.toHexString(), author._id.toHexString());
       });
 
-      it('auto select populated fields (gh-5669) (gh-5685)', function(done) {
-        const ProductSchema = new mongoose.Schema({
-          name: {
-            type: String
-          },
-          categories: {
-            type: [{
-              type: mongoose.Schema.Types.ObjectId,
-              ref: 'gh5669'
-            }],
-            select: false
-          }
+      describe('selectPopulatedFields (gh-5669)', function() {
+        afterEach(function() {
+          delete mongoose.options.selectPopulatedPaths;
         });
 
-        const CategorySchema = new Schema({ name: String });
-        const Product = db.model('gh5669_0', ProductSchema);
-        const Category = db.model('gh5669', CategorySchema);
+        it('auto select populated fields (gh-5669) (gh-5685)', function(done) {
+          const ProductSchema = new mongoose.Schema({
+            name: {
+              type: String
+            },
+            categories: {
+              type: [{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'gh5669'
+              }],
+              select: false
+            }
+          });
 
-        Category.create({ name: 'Books' }, function(error, doc) {
-          assert.ifError(error);
-          const product = {
-            name: 'Professional AngularJS',
-            categories: [doc._id]
-          };
-          Product.create(product, function(error, product) {
+          const CategorySchema = new Schema({ name: String });
+          const Product = db.model('gh5669_0', ProductSchema);
+          const Category = db.model('gh5669', CategorySchema);
+
+          Category.create({ name: 'Books' }, function(error, doc) {
             assert.ifError(error);
-            Product.findById(product._id).populate('categories').exec(function(error, product) {
+            const product = {
+              name: 'Professional AngularJS',
+              categories: [doc._id]
+            };
+            Product.create(product, function(error, product) {
               assert.ifError(error);
-              assert.equal(product.categories.length, 1);
-              assert.equal(product.categories[0].name, 'Books');
-              Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
+              Product.findById(product._id).populate('categories').exec(function(error, product) {
                 assert.ifError(error);
-                assert.ok(!product.categories);
-                Product.findById(product._id).select({ name: 0 }).populate('categories').exec(function(error, product) {
+                assert.equal(product.categories.length, 1);
+                assert.equal(product.categories[0].name, 'Books');
+                Product.findById(product._id).populate('categories').select({ categories: 0 }).exec(function(error, product) {
                   assert.ifError(error);
-                  assert.equal(product.categories.length, 1);
-                  assert.equal(product.categories[0].name, 'Books');
-                  assert.ok(!product.name);
-                  done();
+                  assert.ok(!product.categories);
+                  Product.findById(product._id).select({ name: 0 }).populate('categories').exec(function(error, product) {
+                    assert.ifError(error);
+                    assert.equal(product.categories.length, 1);
+                    assert.equal(product.categories[0].name, 'Books');
+                    assert.ok(!product.name);
+                    done();
+                  });
                 });
               });
             });
+          });
+        });
+
+        it('disabling at schema level (gh-6546)', function() {
+          const Person = db.model('gh6546_Person', new Schema({ name: String }));
+
+          const bookSchema = new Schema({
+            title: 'String',
+            author: { type: 'ObjectId', ref: 'gh6546_Person' }
+          }, { selectPopulatedPaths: false });
+          const Book = db.model('gh6546_Book', bookSchema);
+
+          return co(function*() {
+            const author = yield Person.create({ name: 'Val' });
+            yield Book.create({
+              title: 'Mastering Async/Await',
+              author: author._id
+            });
+
+            const res = yield Book.findOne().select('title').populate('author');
+            assert.ok(!res.author);
+          });
+        });
+
+        it('disabling at global level (gh-6546)', function() {
+          const Person = db.model('gh6546_Person_0', new Schema({ name: String }));
+
+          const bookSchema = new Schema({
+            title: 'String',
+            author: { type: 'ObjectId', ref: 'gh6546_Person_0' }
+          });
+          const Book = db.model('gh6546_Book_0', bookSchema);
+
+          mongoose.set('selectPopulatedPaths', false);
+
+          return co(function*() {
+            const author = yield Person.create({ name: 'Val' });
+            yield Book.create({
+              title: 'Mastering Async/Await',
+              author: author._id
+            });
+
+            const res = yield Book.findOne().select('title').populate('author');
+            assert.ok(!res.author);
+          });
+        });
+
+        it('schema overwrites global (gh-6546)', function() {
+          const Person = db.model('gh6546_Person_1', new Schema({ name: String }));
+
+          const bookSchema = new Schema({
+            title: 'String',
+            author: { type: 'ObjectId', ref: 'gh6546_Person_1' }
+          }, { selectPopulatedPaths: true });
+          const Book = db.model('gh6546_Book_1', bookSchema);
+
+          mongoose.set('selectPopulatedPaths', false);
+
+          return co(function*() {
+            const author = yield Person.create({ name: 'Val' });
+            yield Book.create({
+              title: 'Mastering Async/Await',
+              author: author._id
+            });
+
+            const res = yield Book.findOne().select('title').populate('author');
+            assert.equal(res.author.name, 'Val');
           });
         });
       });
@@ -7503,6 +7576,225 @@ describe('model: populate:', function() {
 
       toUpdate.test = 'foo';
       yield toUpdate.save();
+    });
+  });
+
+  it('correct model and justOne when double populating (gh-6978)', function() {
+    const authorSchema = new Schema({
+      name: String
+    });
+
+    const commentSchema = new Schema({
+      text: String,
+      author: {
+        type: Schema.Types.ObjectId,
+        ref: 'gh6978_Author'
+      }
+    });
+
+    const postSchema = new Schema({
+      content: String,
+      comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'gh6978_Comment'
+      }]
+    });
+
+    const Author = db.model('gh6978_Author', authorSchema);
+    const Comment = db.model('gh6978_Comment', commentSchema);
+    const Post = db.model('gh6978_Post', postSchema);
+
+    const authors = '123'.split('').map(n => {
+      return new Author({ name: `author${n}`});
+    });
+
+    const comments = 'abc'.split('').map((l,i) => {
+      const id = authors[i]._id;
+      return new Comment({ text: `comment_${l}`, author: id });
+    });
+
+    return co(function*() {
+      yield Post.create({
+        content: 'foobar',
+        comments: comments
+      });
+
+      yield Author.create(authors);
+      yield Comment.create(comments);
+
+      let post = yield Post.findOne({});
+      post = yield Post.populate(post, { path: 'comments' });
+      post = yield Post.populate(post, { path: 'comments.author' });
+
+      post.comments.forEach((c, i) => {
+        assert.ok(!Array.isArray(c.author), `author ${i} is an array`);
+      });
+    });
+  });
+
+  it('correctly finds justOne when double-populating underneath an array (gh-6798)', function() {
+    const FileSchema = new Schema({ filename: 'String' });
+    const EditionOptionsSchema = new Schema({
+      price: 'Number',
+      image: {
+        type: 'ObjectId',
+        ref: 'gh6798_File'
+      }
+    });
+    const EditionSchema = new Schema({ editionOptions: EditionOptionsSchema });
+    const CarVersionSchema = new Schema({
+      type: {
+        type: 'String'
+      },
+      editions: [{
+        type: 'ObjectId',
+        ref: 'gh6798_Edition'
+      }]
+    });
+    const CarSchema = new mongoose.Schema({
+      make: 'String',
+      versions: [CarVersionSchema]
+    });
+
+    const File = db.model('gh6798_File', FileSchema);
+    const Edition = db.model('gh6798_Edition', EditionSchema);
+    const Car = db.model('gh6798_Car', CarSchema);
+
+    return co(function*() {
+      const file = yield File.create({ filename: 'file1.png' });
+
+      const editions = yield Edition.create([
+        { editionOptions: { price: 15000, image: file._id } },
+        { editionOptions: { price: 150000 } }
+      ]);
+
+      let cars = yield Car.create([
+        { make: 'Ford', versions: [{ type: 'F150', editions: [editions[0]] }] },
+        { make: 'BMW', versions: [{ type: 'i8', editions: [editions[1]] }] }
+      ]);
+
+      cars = yield Car.find().sort({ make: 1 });
+      cars = yield Car.populate(cars, 'versions.editions');
+      cars = yield Car.populate(cars, 'versions.editions.editionOptions.image');
+
+      assert.strictEqual(cars[0].versions[0].editions[0].editionOptions.image,
+        void 0);
+      assert.equal(cars[1].versions[0].editions[0].editionOptions.image.filename,
+        'file1.png');
+    });
+  });
+
+  it('handles virtual justOne if it is not set (gh-6988)', function() {
+    const postSchema = new Schema({
+      name: String
+    });
+
+    postSchema.virtual('comments', {
+      ref: 'gh6988_Comment',
+      localField: '_id',
+      foreignField: 'postId'
+    });
+
+    const commentSchema = new Schema({
+      postId: { type: Schema.Types.ObjectId }
+    });
+
+    const Post = db.model('gh6988_Post', postSchema);
+    const Comment = db.model('gh6988_Comment', commentSchema);
+
+    return co(function*() {
+      const post = yield Post.create({ name: 'n1'});
+      const comment = yield Comment.create({ postId: post._id });
+
+      const doc = yield Post.findOne({}).populate('comments').lean();
+      assert.ok(Array.isArray(doc.comments));
+      assert.equal(doc.comments.length, 1);
+      assert.equal(doc.comments[0]._id.toHexString(),
+        comment._id.toHexString());
+    });
+  });
+
+  it('does not set `justOne` if underneath Mixed (gh-6985)', function() {
+    const articleSchema = new Schema({
+      title: String,
+      content: String
+    });
+
+    const schema = new Schema({
+      title: String,
+      data: Schema.Types.Mixed
+    });
+
+    const Article = db.model('gh6985_Article', articleSchema);
+    const Test = db.model('gh6985_Test', schema);
+
+    return co(function*() {
+      const articles = yield Article.create([
+        { title: 'An Overview of BigInt in Node.js', content: '' },
+        { title: 'Building a Serverless App with MongoDB Stitch', content: '' }
+      ]);
+
+      yield Test.create({
+        title: 'test',
+        data: { articles: articles.map(a => a._id) }
+      });
+
+      let res = yield Test.findOne();
+      const popObj = {
+        path: 'data.articles',
+        select: 'title',
+        model: 'gh6985_Article',
+        options: { lean: true }
+      };
+
+      res = yield Test.populate(res, popObj);
+
+      assert.ok(Array.isArray(res.data.articles));
+      assert.deepEqual(res.data.articles.map(a => a.title), [
+        'An Overview of BigInt in Node.js',
+        'Building a Serverless App with MongoDB Stitch'
+      ]);
+    });
+  });
+
+  it('supports setting `justOne` as an option (gh-6985)', function() {
+    const articleSchema = new Schema({
+      title: String,
+      content: String
+    });
+
+    const schema = new Schema({
+      title: String,
+      data: Schema.Types.Mixed
+    });
+
+    const Article = db.model('gh6985_Article_0', articleSchema);
+    const Test = db.model('gh6985_Test_0', schema);
+
+    return co(function*() {
+      const articles = yield Article.create([
+        { title: 'An Overview of BigInt in Node.js', content: '' },
+        { title: 'Building a Serverless App with MongoDB Stitch', content: '' }
+      ]);
+
+      yield Test.create({
+        title: 'test',
+        data: { articles: articles.map(a => a._id) }
+      });
+
+      let res = yield Test.findOne();
+      const popObj = {
+        path: 'data.articles',
+        select: 'title',
+        model: 'gh6985_Article_0',
+        justOne: true,
+        options: { lean: true }
+      };
+
+      res = yield Test.populate(res, popObj);
+
+      assert.ok(!Array.isArray(res.data.articles));
+      assert.equal(res.data.articles.title, 'An Overview of BigInt in Node.js');
     });
   });
 });

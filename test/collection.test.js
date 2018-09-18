@@ -38,8 +38,8 @@ describe('collections:', function() {
   });
 
   it('methods should that throw (unimplemented)', function(done) {
-    let collection = new Collection('test', mongoose.connection),
-        thrown = false;
+    const collection = new Collection('test', mongoose.connection);
+    let thrown = false;
 
     try {
       collection.getIndexes();

@@ -1,6 +1,8 @@
 'use strict';
 
+const acorn = require('acorn');
 const assert = require('assert');
+const fs = require('fs');
 const utils = require('../lib/utils');
 const semver = require('semver');
 
@@ -27,8 +29,14 @@ describe('webpack', function() {
         rules: [
           {
             test: /\.js$/,
-            exclude: /node_modules/i,
-            loader: 'babel-loader'
+            include: [
+              /\/mongoose\//i,
+              /\/kareem\//i
+            ],
+            loader: 'babel-loader',
+            options: {
+              presets: ['es2015']
+            }
           }
         ]
       },
@@ -49,9 +57,15 @@ describe('webpack', function() {
     webpack(config, utils.tick(function(error, stats) {
       assert.ifError(error);
       assert.deepEqual(stats.compilation.errors, []);
+
       // Avoid expressions in `require()` because that scares webpack (gh-6705)
       assert.ok(!stats.compilation.warnings.
         find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
+
+      const content = fs.readFileSync(`${__dirname}/files/main.js`, 'utf8');
+
+      acorn.parse(content, { ecmaVersion: 5 });
+
       done();
     }));
     // acquit:ignore:end

@@ -1842,7 +1842,7 @@ describe('schema', function() {
 
     assert.throws(function() {
       new Schema({ badRef: { type: String, ref: testSchema } });
-    }, /Invalid ref at path "badRef"/)
+    }, /Invalid ref at path "badRef"/);
 
     const parentSchema = new Schema({ name: String });
     assert.throws(function() {

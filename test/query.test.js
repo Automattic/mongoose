@@ -2731,4 +2731,26 @@ describe('Query', function() {
       assert.deepStrictEqual(q._conditions, { a: 1 });
     });
   });
+
+  it('allows skipping timestamps in updateOne() (gh-6980)', function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+
+    const M = db.model('gh6980', schema);
+
+    return co(function*() {
+      const doc = yield M.create({ name: 'foo' });
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
+
+      const start = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      const opts = { timestamps: false, new: true };
+      const res = yield M.findOneAndUpdate({}, { name: 'bar' }, opts);
+
+      assert.equal(res.name, 'bar');
+      assert.ok(res.updatedAt.valueOf() <= start,
+        `Expected ${res.updatedAt.valueOf} <= ${start}`);
+    });
+  });
 });

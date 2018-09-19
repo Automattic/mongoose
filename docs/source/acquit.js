@@ -20,7 +20,24 @@ var files = [
   {
     input: 'test/docs/promises.test.js',
     output: 'promises.html',
-    title: 'Promises'
+    title: 'Promises',
+    suffix: `
+      <div>
+        <br>
+        <i>
+          Want to learn how to check whether your favorite npm modules work with
+          async/await without cobbling together contradictory answers from Google
+          and Stack Overflow? Chapter 4 Mastering Async/Await, explains the
+          basic principles for determining whether frameworks like React and
+          Mongoose support async/await.
+          <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=promises">Get your copy!</a>
+        </i>
+        <br><br>
+        <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=promises" style="margin-left: 100px">
+          <img src="/docs/images/asyncawait.png" style="width: 650px" />
+        </a>
+      </div>
+    `
   },
   {
     input: 'test/docs/customschematypes.test.js',
@@ -72,6 +89,7 @@ files.forEach(function(file) {
   exports[file.output] = {
     title: file.title,
     acquitBlocks: blocks,
+    suffix: file.suffix,
     destination: file.output,
     guide: true
   }

@@ -2750,7 +2750,7 @@ describe('Query', function() {
 
       assert.equal(res.name, 'bar');
       assert.ok(res.updatedAt.valueOf() <= start,
-        `Expected ${res.updatedAt.valueOf} <= ${start}`);
+        `Expected ${res.updatedAt.valueOf()} <= ${start}`);
     });
   });
 });

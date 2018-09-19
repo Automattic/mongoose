@@ -16,7 +16,7 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const CastError = mongoose.Error.CastError;
 
-describe.skip('model: update:', function() {
+describe('model: update:', function() {
   let post;
   const title = 'Tobi';
   const author = 'Brian';

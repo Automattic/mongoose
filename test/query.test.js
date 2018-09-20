@@ -2985,4 +2985,33 @@ describe('Query', function() {
         `Expected ${res.updatedAt.valueOf()} <= ${start}`);
     });
   });
+
+  it('increments timestamps for nested subdocs (gh-4412)', function() {
+    const childSchema = new Schema({ name: String }, {
+      timestamps: true,
+      versionKey: false
+    });
+    const parentSchema = new Schema({ child: childSchema }, {
+      // timestamps: true,
+      versionKey: false
+    });
+    const Parent = db.model('gh4412', parentSchema);
+
+    return co(function*() {
+      let doc = yield Parent.create({ child: { name: 'foo' } });
+      assert.ok(doc.child.updatedAt);
+      assert.ok(doc.child.createdAt);
+
+      const start = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      yield Parent.updateOne({}, { $set: { 'child.name': 'Luke' } });
+
+      doc = yield Parent.findOne();
+
+      const updatedAt = doc.child.updatedAt.valueOf();
+
+      assert.ok(updatedAt > start, `Expected ${updatedAt} >= ${start}`);
+    });
+  });
 });

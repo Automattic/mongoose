@@ -59,6 +59,23 @@ describe('connections:', function() {
       }).catch(done);
     });
 
+    it('useCreateIndex (gh-6922)', function(done) {
+      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
+        useCreateIndex: true,
+        useNewUrlParser: true
+      });
+
+      const M = conn.model('Test', new Schema({
+        name: { type: String, index: true }
+      }));
+
+      M.collection.ensureIndex = function() {
+        throw new Error('Fail');
+      };
+
+      conn.then(() => done(), err => done(err));
+    });
+
     it('throws helpful error with legacy syntax (gh-6756)', function(done) {
       assert.throws(function() {
         mongoose.createConnection('localhost', 'dbname', 27017);

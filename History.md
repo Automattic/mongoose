@@ -1,3 +1,12 @@
+5.2.17 / 2018-09-20
+===================
+ * docs(guide): clarify that Mongoose only increments versionKey on `save()` and add a workaround for `findOneAndUpdate()` #7038
+ * fix(model): correctly handle `createIndex` option to `ensureIndexes()` #7036 #6922 [lineus](https://github.com/lineus)
+ * docs(migrating_to_5): add a note about changing debug output from stderr to stdout #7034 #7018 [lineus](https://github.com/lineus)
+ * fix(query): add `setUpdate()` to allow overwriting update without changing op #7024 #7012 [lineus](https://github.com/lineus)
+ * fix(update): find top-level version key even if there are `$` operators in the update #7003
+ * docs(model+query): explain which operators `count()` supports that `countDocuments()` doesn't #6911
+
 5.2.16 / 2018-09-19
 ===================
  * fix(index): use dynamic require only when needed for better webpack support #7014 #7010 [jaydp17](https://github.com/jaydp17)

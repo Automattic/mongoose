@@ -760,15 +760,15 @@ block content
     your application you can configure as such:
 
     ```javascript
-    var schema = new Schema({ name: 'string' });
-    var Thing = mongoose.model('Thing', schema);
-    var thing = new Thing({ name: 'mongoose v3' });
-    thing.save(); // { __v: 0, name: 'mongoose v3' }
+    const schema = new Schema({ name: 'string' });
+    const Thing = mongoose.model('Thing', schema);
+    const thing = new Thing({ name: 'mongoose v3' });
+    await thing.save(); // { __v: 0, name: 'mongoose v3' }
 
     // customized versionKey
     new Schema({..}, { versionKey: '_somethingElse' })
-    var Thing = mongoose.model('Thing', schema);
-    var thing = new Thing({ name: 'mongoose v3' });
+    const Thing = mongoose.model('Thing', schema);
+    const thing = new Thing({ name: 'mongoose v3' });
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
     ```
 
@@ -778,9 +778,33 @@ block content
 
     ```javascript
     new Schema({..}, { versionKey: false });
-    var Thing = mongoose.model('Thing', schema);
-    var thing = new Thing({ name: 'no versioning please' });
+    const Thing = mongoose.model('Thing', schema);
+    const thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
+    ```
+
+    Mongoose _only_ updates the version key when you use [`save()`](/docs/api.html#document_Document-save).
+    If you use `update()`, `findOneAndUpdate()`, etc. Mongoose will **not**
+    update the version key. As a workaround, you can use the below middleware.
+
+    ```javascript
+    schema.pre('findOneAndUpdate', function() {
+      const update = this.getUpdate();
+      if (update.__v != null) {
+        delete update.__v;
+      }
+      const keys = ['$set', '$setOnInsert'];
+      for (const key of keys) {
+        if (update[key] != null && update[key].__v != null) {
+          delete update[key].__v;
+          if (Object.keys(update[key]).length === 0) {
+            delete update[key];
+          }
+        }
+      }
+      update.$inc = update.$inc || {};
+      update.$inc.__v = 1;
+    });
     ```
 
     <h3 id="collation"><a href="#collation">option: collation</a></h3>

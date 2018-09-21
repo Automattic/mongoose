@@ -344,3 +344,7 @@ next middleware with 'Test' as a parameter. Mongoose 5.x has removed support for
 ### `required` validator for arrays
 
 In mongoose 5 the `required` validator only verifies if the value is an array. That is, it will **not** fail for _empty_ arrays as it would in mongoose 4.
+
+### debug output defaults to stdout instead of stderr
+
+In mongoose 5 the default debug function uses `console.info()` to display messages instead of `console.error()`.

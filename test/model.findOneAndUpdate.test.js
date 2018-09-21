@@ -2227,4 +2227,21 @@ describe('model: findOneAndUpdate:', function() {
       return Model.findOneAndUpdate({}, { $pull: { arr: { x: 'three' } } }, opts);
     });
   });
+
+  it('with versionKey in top-level and a `$` key (gh-7003)', function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('gh7003', schema);
+
+    return co(function*() {
+      let doc = yield Model.create({ name: 'test', __v: 10 });
+      yield Model.findByIdAndUpdate(doc._id, {
+        '$unset': { name: '' },
+        __v: 0
+      }, { upsert: true });
+
+      doc = yield Model.findOne();
+      assert.strictEqual(doc.__v, 0);
+      assert.ok(!doc.name);
+    });
+  });
 });

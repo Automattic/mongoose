@@ -9,6 +9,7 @@ const co = require('co');
 const start = require('./common');
 
 const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Test.
@@ -516,5 +517,14 @@ describe('Map', function() {
       assert.strictEqual(subDocHooksCalledTimes, 3);
       assert.strictEqual(mapChildHooksCalledTimes, 1);
     });
+  });
+
+  it('array of mixed maps (gh-6995)', function() {
+    const Model = db.model('gh6995', new Schema({ arr: [Map] }));
+
+    return Model.create({ arr: [{ a: 1 }] }).
+      then(doc => {
+        assert.deepEqual(doc.toObject().arr, [new Map([['a', 1]])]);
+      });
   });
 });

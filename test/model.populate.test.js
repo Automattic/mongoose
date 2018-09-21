@@ -7713,4 +7713,88 @@ describe('model: populate:', function() {
         comment._id.toHexString());
     });
   });
+
+  it('does not set `justOne` if underneath Mixed (gh-6985)', function() {
+    const articleSchema = new Schema({
+      title: String,
+      content: String
+    });
+
+    const schema = new Schema({
+      title: String,
+      data: Schema.Types.Mixed
+    });
+
+    const Article = db.model('gh6985_Article', articleSchema);
+    const Test = db.model('gh6985_Test', schema);
+
+    return co(function*() {
+      const articles = yield Article.create([
+        { title: 'An Overview of BigInt in Node.js', content: '' },
+        { title: 'Building a Serverless App with MongoDB Stitch', content: '' }
+      ]);
+
+      yield Test.create({
+        title: 'test',
+        data: { articles: articles.map(a => a._id) }
+      });
+
+      let res = yield Test.findOne();
+      const popObj = {
+        path: 'data.articles',
+        select: 'title',
+        model: 'gh6985_Article',
+        options: { lean: true }
+      };
+
+      res = yield Test.populate(res, popObj);
+
+      assert.ok(Array.isArray(res.data.articles));
+      assert.deepEqual(res.data.articles.map(a => a.title), [
+        'An Overview of BigInt in Node.js',
+        'Building a Serverless App with MongoDB Stitch'
+      ]);
+    });
+  });
+
+  it('supports setting `justOne` as an option (gh-6985)', function() {
+    const articleSchema = new Schema({
+      title: String,
+      content: String
+    });
+
+    const schema = new Schema({
+      title: String,
+      data: Schema.Types.Mixed
+    });
+
+    const Article = db.model('gh6985_Article_0', articleSchema);
+    const Test = db.model('gh6985_Test_0', schema);
+
+    return co(function*() {
+      const articles = yield Article.create([
+        { title: 'An Overview of BigInt in Node.js', content: '' },
+        { title: 'Building a Serverless App with MongoDB Stitch', content: '' }
+      ]);
+
+      yield Test.create({
+        title: 'test',
+        data: { articles: articles.map(a => a._id) }
+      });
+
+      let res = yield Test.findOne();
+      const popObj = {
+        path: 'data.articles',
+        select: 'title',
+        model: 'gh6985_Article_0',
+        justOne: true,
+        options: { lean: true }
+      };
+
+      res = yield Test.populate(res, popObj);
+
+      assert.ok(!Array.isArray(res.data.articles));
+      assert.equal(res.data.articles.title, 'An Overview of BigInt in Node.js');
+    });
+  });
 });

@@ -1836,4 +1836,22 @@ describe('schema', function() {
       done();
     });
   });
+
+  it('throws a sane error if passing a schema to `ref` (gh-6915)', function() {
+    const testSchema = new Schema({ name: String });
+
+    assert.throws(function() {
+      new Schema({ badRef: { type: String, ref: testSchema } });
+    }, /Invalid ref at path "badRef"/);
+
+    const parentSchema = new Schema({ name: String });
+    assert.throws(function() {
+      parentSchema.add({ badRef2: { type: String, ref: testSchema } });
+    }, /Invalid ref at path "badRef2"/);
+
+    assert.ok(!parentSchema.tree.badRef2);
+    assert.deepEqual(Object.keys(parentSchema.paths).sort(), ['_id', 'name']);
+
+    return Promise.resolve();
+  });
 });

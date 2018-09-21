@@ -1,3 +1,25 @@
+5.2.16 / 2018-09-19
+===================
+ * fix(index): use dynamic require only when needed for better webpack support #7014 #7010 [jaydp17](https://github.com/jaydp17)
+ * fix(map): handle arrays of mixed maps #6995
+ * fix(populate): leave justOne as null if populating underneath a Mixed type #6985
+ * fix(populate): add justOne option to allow overriding any bugs with justOne #6985
+ * fix(query): add option to skip adding timestamps to an update #6980
+ * docs(model+schematype): improve docs about background indexes and init() #6966
+ * fix: bump mongodb -> 3.1.6 to allow connecting to srv url without credentials #6955 #6881 [lineus](https://github.com/lineus)
+ * fix(connection): allow specifying `useCreateIndex` at the connection level, overrides global-level #6922
+ * fix(schema): throw a helpful error if setting `ref` to an invalid value #6915
+
+5.2.15 / 2018-09-15
+===================
+ * fix(populate): handle virtual justOne correctly if it isn't set #6988
+ * fix(populate): consistently use lowercase `model` instead of `Model` so double-populating works with existing docs #6978
+ * fix(model): allow calling `Model.init()` again after calling `dropDatabase()` #6967
+ * fix(populate): find correct justOne when double-populating underneath an array #6798
+ * docs(webpack): make webpack docs use es2015 preset for correct libs and use acorn to test output is valid ES5 #6740
+ * fix(populate): add selectPopulatedPaths option to opt out of auto-adding `populate()`-ed fields to `select()` #6546
+ * fix(model): set timestamps on bulkWrite `insertOne` and `replaceOne` #5708
+
 5.2.14 / 2018-09-09
 ===================
  * docs: fix wording on promise docs to not imply queries only return promises #6983 #6982 [lineus](https://github.com/lineus)

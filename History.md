@@ -1,4 +1,4 @@
-5.2.17 / 2018-09-20
+5.2.17 / 2018-09-21
 ===================
  * docs(guide): clarify that Mongoose only increments versionKey on `save()` and add a workaround for `findOneAndUpdate()` #7038
  * fix(model): correctly handle `createIndex` option to `ensureIndexes()` #7036 #6922 [lineus](https://github.com/lineus)

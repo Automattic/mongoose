@@ -4,7 +4,8 @@
 
 'use strict';
 
-let mongoose = require('../../lib'), Schema = mongoose.Schema;
+const mongoose = require('../../lib');
+const Schema = mongoose.Schema;
 
 /**
  * Schema definition

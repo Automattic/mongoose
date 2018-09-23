@@ -1,12 +1,16 @@
 'use strict';
 
+const assert = require('assert');
+const co = require('co');
+const random = require('../lib/utils').random;
 const start = require('./common');
-const assert = require('power-assert');
+const stream = require('stream');
+
+const collection = 'blogposts_' + random();
+
 const mongoose = start.mongoose;
 const Mongoose = mongoose.Mongoose;
 const Schema = mongoose.Schema;
-const random = require('../lib/utils').random;
-const collection = 'blogposts_' + random();
 
 const uri = 'mongodb://localhost:27017/mongoose_test';
 
@@ -71,6 +75,28 @@ describe('mongoose module:', function() {
     mongoose.model('User', new Schema({}));
     assert.equal(mongoose.model('User').collection.name, 'User');
     done();
+  });
+
+  it('debug to stream (gh-7018)', function() {
+    const mongoose = new Mongoose();
+
+    const written = [];
+    class StubStream extends stream.Writable {
+      write(chunk) {
+        written.push(chunk);
+      }
+    }
+
+    mongoose.set('debug', new StubStream());
+
+    const User = mongoose.model('User', new Schema({ name: String }));
+
+    return co(function*() {
+      yield mongoose.connect(uri);
+      yield User.findOne();
+      assert.equal(written.length, 1);
+      assert.ok(written[0].startsWith('users.findOne('));
+    });
   });
 
   it('{g,s}etting options', function(done) {

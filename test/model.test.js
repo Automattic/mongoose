@@ -5875,6 +5875,29 @@ describe('Model', function() {
         yield db.collection('gh6711_' + rand + '_users').stats();
       });
     });
+
+    it('createCollection() respects schema collation (gh-6489)', function() {
+      const userSchema = new Schema({
+        name: String
+      }, { collation: { locale: 'en_US', strength: 1 } });
+      const Model = db.model('gh6489_User', userSchema, 'gh6489_User');
+
+      return co(function*() {
+        yield Model.createCollection();
+
+        // If the collection is not created, the following will throw
+        // MongoError: Collection [mongoose_test.create_xxx_users] not found.
+        yield db.collection('gh6489_User').stats();
+
+        yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+
+        // Ensure that the default collation is set. Mongoose will set the
+        // collation on the query itself (see gh-4839).
+        const res = yield db.collection('gh6489_User').
+          find({}).sort({ name: 1 }).toArray();
+        assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+      });
+    });
   });
 
   it('dropDatabase() after init allows re-init (gh-6967)', function() {

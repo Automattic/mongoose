@@ -14,6 +14,8 @@ const start = require('./common');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
+const uri = 'mongodb://localhost:27017/mongoose_test';
+
 /**
  * Test.
  */
@@ -57,6 +59,31 @@ describe('connections:', function() {
         assert.strictEqual(conn.config.autoIndex, false);
         done();
       }).catch(done);
+    });
+
+    it('with autoCreate (gh-6489)', function() {
+      return co(function*() {
+        const conn = yield mongoose.createConnection(uri, {
+          autoCreate: true
+        });
+
+        const Model = conn.model('gh6489_Conn', new Schema({ name: String }, {
+          collation: { locale: 'en_US', strength: 1 },
+          collection: 'gh6489_Conn'
+        }));
+        yield Model.init();
+
+        // Will throw if collection was not created
+        yield conn.collection('gh6489_Conn').stats();
+
+        yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+
+        // Ensure that the default collation is set. Mongoose will set the
+        // collation on the query itself (see gh-4839).
+        const res = yield conn.collection('gh6489_Conn').
+          find({}).sort({ name: 1 }).toArray();
+        assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
+      });
     });
 
     it('useCreateIndex (gh-6922)', function(done) {

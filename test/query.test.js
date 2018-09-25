@@ -3012,47 +3012,113 @@ describe('Query', function() {
       assert.ok(doc.child.updatedAt);
       assert.ok(doc.child.createdAt);
 
-      const start = Date.now();
+      let start = Date.now();
       yield cb => setTimeout(cb, 10);
 
       yield Parent.updateOne({}, { $set: { 'child.name': 'Luke' } });
 
       doc = yield Parent.findOne();
 
-      const updatedAt = doc.child.updatedAt.valueOf();
+      let updatedAt = doc.child.updatedAt.valueOf();
 
+      assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+
+      // Overwrite whole doc
+      start = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      yield Parent.updateOne({}, { $set: { child: { name: 'Luke' } } });
+
+      doc = yield Parent.findOne();
+
+      const createdAt = doc.child.createdAt.valueOf();
+      updatedAt = doc.child.updatedAt.valueOf();
+
+      assert.ok(createdAt > start, `Expected ${createdAt} > ${start}`);
       assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
     });
   });
 
-  it('increments timestamps for arrays of nested subdocs (gh-4412)', function() {
-    const childSchema = new Schema({ name: String }, {
-      timestamps: true,
-      versionKey: false
+  describe('increments timestamps for arrays of nested subdocs (gh-4412)', function() {
+    let Parent;
+
+    before(function() {
+      const childSchema = new Schema({ name: String }, {
+        timestamps: true,
+        versionKey: false
+      });
+      const parentSchema = new Schema({ children: [childSchema] }, {
+        versionKey: false });
+      Parent = db.model('gh4412_arr', parentSchema);
     });
-    const parentSchema = new Schema({ children: [childSchema] }, {
-      versionKey: false });
-    const Parent = db.model('gh4412_arr', parentSchema);
 
-    return co(function*() {
-      const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
-      const doc = yield Parent.create({ children: kids });
-      assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
-      assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
-      assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+    it('$set nested property with numeric position', function() {
+      return co(function*() {
+        const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+        const doc = yield Parent.create({ children: kids });
+        assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+        assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+        assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
 
-      const start = Date.now();
-      yield cb => setTimeout(cb, 10);
+        const start = Date.now();
+        yield cb => setTimeout(cb, 10);
 
-      const cond = { 'children.name': 'bar' };
-      const update = { $set: { 'children.$.name': 'Luke' } };
-      yield Parent.updateOne(cond, update);
+        const cond = {};
+        const update = { $set: { 'children.0.name': 'Luke' } };
+        yield Parent.updateOne(cond, update);
 
-      const found = yield Parent.findOne({});
-      const updatedAt = found.children[1].updatedAt.valueOf();
-      const name = found.children[1].name;
-      assert.ok(name, 'Luke');
-      assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+        const found = yield Parent.findOne({});
+        const updatedAt = found.children[0].updatedAt.valueOf();
+        const name = found.children[0].name;
+        assert.ok(name, 'Luke');
+        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+      });
+    });
+
+    it('$set numeric element', function() {
+      return co(function*() {
+        const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+        const doc = yield Parent.create({ children: kids });
+        assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+        assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+        assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+
+        const start = Date.now();
+        yield cb => setTimeout(cb, 10);
+
+        const cond = {};
+        const update = { $set: { 'children.0': { name: 'Luke' } } };
+        yield Parent.updateOne(cond, update);
+
+        const found = yield Parent.findOne({});
+        const updatedAt = found.children[0].updatedAt.valueOf();
+        const name = found.children[0].name;
+        assert.ok(name, 'Luke');
+        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+      });
+    });
+
+    it('$set with positional operator', function() {
+      return co(function*() {
+        const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+        const doc = yield Parent.create({ children: kids });
+        assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+        assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+        assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+
+        const start = Date.now();
+        yield cb => setTimeout(cb, 10);
+
+        const cond = { 'children.name': 'bar' };
+        const update = { $set: { 'children.$.name': 'Luke' } };
+        yield Parent.updateOne(cond, update);
+
+        const found = yield Parent.findOne({});
+        const updatedAt = found.children[1].updatedAt.valueOf();
+        const name = found.children[1].name;
+        assert.ok(name, 'Luke');
+        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+      });
     });
   });
 });

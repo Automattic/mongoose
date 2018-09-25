@@ -3021,7 +3021,38 @@ describe('Query', function() {
 
       const updatedAt = doc.child.updatedAt.valueOf();
 
-      assert.ok(updatedAt > start, `Expected ${updatedAt} >= ${start}`);
+      assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+    });
+  });
+
+  it('increments timestamps for arrays of nested subdocs (gh-4412)', function() {
+    const childSchema = new Schema({ name: String }, {
+      timestamps: true,
+      versionKey: false
+    });
+    const parentSchema = new Schema({ children: [childSchema] }, {
+      versionKey: false });
+    const Parent = db.model('gh4412_arr', parentSchema);
+
+    return co(function*() {
+      const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+      const doc = yield Parent.create({ children: kids });
+      assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+      assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+      assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+
+      const start = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      const cond = { 'children.name': 'bar' };
+      const update = { $set: { 'children.$.name': 'Luke' } };
+      yield Parent.updateOne(cond, update);
+
+      const found = yield Parent.findOne({});
+      const updatedAt = found.children[1].updatedAt.valueOf();
+      const name = found.children[1].name;
+      assert.ok(name, 'Luke');
+      assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
     });
   });
 });

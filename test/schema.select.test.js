@@ -388,6 +388,27 @@ describe('schema select option', function() {
         assert.equal(doc.b, 'bar');
       });
     });
+
+    it('omits if not in schema (gh-7017)', function() {
+      const M = db.model('gh7017', new Schema({
+        a: { type: String, select: false },
+        b: { type: String, select: false }
+      }), 'gh7017');
+
+      return co(function*() {
+        yield db;
+        yield db.db.collection('gh7017').insertOne({
+          a: 'foo',
+          b: 'bar',
+          c: 'baz'
+        });
+
+        const doc = yield M.find({}, '+c').then(res => res[0]);
+        assert.strictEqual(doc.a, void 0);
+        assert.strictEqual(doc.b, void 0);
+        assert.equal(doc.c, 'baz');
+      });
+    });
   });
 
   it('conflicting schematype path selection should not error', function(done) {

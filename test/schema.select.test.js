@@ -396,7 +396,7 @@ describe('schema select option', function() {
       }), 'gh7017');
 
       return co(function*() {
-        yield db;
+        yield db.$initialConnection;
         yield db.collection('gh7017').insertOne({
           a: 'foo',
           b: 'bar',

@@ -397,16 +397,19 @@ describe('schema select option', function() {
 
       return co(function*() {
         yield db;
-        yield db.db.collection('gh7017').insertOne({
+        yield db.collection('gh7017').insertOne({
           a: 'foo',
           b: 'bar',
           c: 'baz'
         });
 
-        const doc = yield M.find({}, '+c').then(res => res[0]);
+        const q = M.find({}).select('+c');
+        const doc = yield q.then(res => res[0]);
+        assert.deepEqual(q._fields, { a: 0, b: 0 });
+
         assert.strictEqual(doc.a, void 0);
         assert.strictEqual(doc.b, void 0);
-        assert.equal(doc.c, 'baz');
+        assert.equal(doc.toObject().c, 'baz');
       });
     });
   });

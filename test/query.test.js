@@ -2964,6 +2964,16 @@ describe('Query', function() {
     });
   });
 
+  describe('setUpdate', function() {
+    it('replaces existing update doc with new value', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.set('testing', '123');
+      q.setUpdate({ $set: { newPath: 'newValue' } });
+      assert.strictEqual(q._update.$set.testing, undefined);
+      assert.strictEqual(q._update.$set.newPath, 'newValue');
+    });
+  });
+
   it('allows skipping timestamps in updateOne() (gh-6980)', function() {
     const schema = new Schema({ name: String }, { timestamps: true });
 

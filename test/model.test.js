@@ -1312,9 +1312,9 @@ describe('Model', function() {
       });
 
       it('async', function(done) {
-        let AsyncValidationMiddlewareSchema = null,
-            Post = null,
-            post = null;
+        let AsyncValidationMiddlewareSchema = null;
+        let Post = null;
+        let post = null;
 
         AsyncValidationMiddlewareSchema = new Schema({
           prop: {type: String}
@@ -1576,7 +1576,7 @@ describe('Model', function() {
     });
   });
 
-  describe.skip('.remove()', function() {
+  describe('.remove()', function() {
     it('works', function(done) {
       const collection = 'blogposts_' + random();
       const BlogPost = db.model('BlogPost', collection);
@@ -1652,7 +1652,7 @@ describe('Model', function() {
     });
   });
 
-  describe.skip('#remove()', function() {
+  describe('#remove()', function() {
     let B;
 
     before(function() {
@@ -1717,6 +1717,40 @@ describe('Model', function() {
             done();
           }).catch(done);
         });
+      });
+    });
+
+    it('handles query vs document middleware (gh-3054)', function() {
+      const schema = new Schema({ name: String });
+
+      let docMiddleware = 0;
+      let queryMiddleware = 0;
+
+      schema.pre('remove', { query: true }, function() {
+        assert.ok(this instanceof Model.Query);
+        ++queryMiddleware;
+      });
+
+      schema.pre('remove', { document: true }, function() {
+        assert.ok(this instanceof Model);
+        ++docMiddleware;
+      });
+
+      const Model = db.model('gh3054', schema);
+
+      return co(function*() {
+        const doc = yield Model.create({ name: String });
+
+        assert.equal(docMiddleware, 0);
+        assert.equal(queryMiddleware, 0);
+        yield doc.remove();
+
+        assert.equal(docMiddleware, 1);
+        assert.equal(queryMiddleware, 0);
+
+        yield Model.remove({});
+        assert.equal(docMiddleware, 1);
+        assert.equal(queryMiddleware, 1);
       });
     });
 
@@ -5873,6 +5907,29 @@ describe('Model', function() {
         // If the collection is not created, the following will throw
         // MongoError: Collection [mongoose_test.create_xxx_users] not found.
         yield db.collection('gh6711_' + rand + '_users').stats();
+      });
+    });
+
+    it('createCollection() respects schema collation (gh-6489)', function() {
+      const userSchema = new Schema({
+        name: String
+      }, { collation: { locale: 'en_US', strength: 1 } });
+      const Model = db.model('gh6489_User', userSchema, 'gh6489_User');
+
+      return co(function*() {
+        yield Model.createCollection();
+
+        // If the collection is not created, the following will throw
+        // MongoError: Collection [mongoose_test.create_xxx_users] not found.
+        yield db.collection('gh6489_User').stats();
+
+        yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+
+        // Ensure that the default collation is set. Mongoose will set the
+        // collation on the query itself (see gh-4839).
+        const res = yield db.collection('gh6489_User').
+          find({}).sort({ name: 1 }).toArray();
+        assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
       });
     });
   });

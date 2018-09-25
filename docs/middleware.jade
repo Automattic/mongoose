@@ -25,6 +25,7 @@ block content
     * [findOne](./api.html#query_Query-findOne)
     * [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
     * [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
+    * [remove](./api.html#model_Model.remove)
     * [update](./api.html#query_Query-update)
     * [updateOne](./api.html#query_Query-updateOne)
     * [updateMany](./api.html#query_Query-updateMany)
@@ -50,11 +51,7 @@ block content
 
     <h3 id="pre"><a href="#pre">Pre</a></h3>
 
-    There are two types of `pre` hooks, serial and parallel.
-
-    <h4 id="serial">Serial</h4>
-
-    Serial middleware functions are executed one after another, when each
+    Pre middleware functions are executed one after another, when each
     middleware calls `next`.
 
     ```javascript
@@ -97,25 +94,6 @@ block content
       console.log('after next');
     });
     ```
-
-    <h4 id="parallel">Parallel</h4>
-
-    Parallel middleware offer more fine-grained flow control.
-
-    ```javascript
-    var schema = new Schema(..);
-
-    // `true` means this is a parallel middleware. You **must** specify `true`
-    // as the second parameter if you want to use parallel middleware.
-    schema.pre('save', true, function(next, done) {
-      // calling next kicks off the next middleware in parallel
-      next();
-      setTimeout(done, 100);
-    });
-    ```
-
-    The hooked method, in this case `save`, will not be executed until `done`
-    is called by each middleware.
 
     <h4 id="use-cases">Use Cases</h4>
 
@@ -232,6 +210,39 @@ block content
     });
     schema.post('save', function() {
       console.log('this gets printed fourth');
+    });
+    ```
+
+    <h3 id="naming"><a href="#naming">Naming Conflicts</a></h3>
+
+    Mongoose has both query and document hooks for `remove()`.
+
+    ```javascript
+    schema.pre('remove', function() { console.log('Removing!'); });
+
+    // Prints "Removing!"
+    doc.remove();
+
+    // Does **not** print "Removing!". Query middleware for `remove` is not
+    // executed by default.
+    Model.remove();
+    ```
+
+    You can pass options to [`Schema.pre()`](/docs/api.html#schema_Schema-pre)
+    and [`Schema.post()`](/docs/api.html#schema_Schema-post) to switch whether
+    Mongoose calls your `remove()` hook for [`Document.remove()`](/docs/api.html#model_Model-remove)
+    or [`Model.remove()`](/docs/api.html#model_Model.remove):
+
+    ```javascript
+    // Only document middleware
+    schema.pre('remove', { document: true } function() {
+      console.log('Removing doc!');
+    });
+
+    // Only query middleware. This will get called when you do `Model.remove()`
+    // but not `doc.remove()`.
+    schema.pre('remove', { query: true } function() {
+      console.log('Removing!');
     });
     ```
 

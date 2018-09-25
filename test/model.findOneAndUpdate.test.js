@@ -2226,5 +2226,44 @@ describe('model: findOneAndUpdate:', function() {
       const opts = { runValidators: true };
       return Model.findOneAndUpdate({}, { $pull: { arr: { x: 'three' } } }, opts);
     });
+
+    it('$pull with `required` and runValidators (gh-6972)', function() {
+      const schema = new mongoose.Schema({
+        someArray: {
+          type: [{
+            innerField: {
+              type: mongoose.Schema.Types.ObjectId,
+              required: true
+            }
+          }]
+        }
+      });
+
+      return co(function*() {
+        const Model = db.model('gh6972', schema);
+        yield Model.findOneAndUpdate({}, {
+          $pull: {someArray: {innerField: '507f191e810c19729de860ea'}}
+        }, {
+          runValidators: true
+        });
+      });
+    });
+  });
+
+  it('with versionKey in top-level and a `$` key (gh-7003)', function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('gh7003', schema);
+
+    return co(function*() {
+      let doc = yield Model.create({ name: 'test', __v: 10 });
+      yield Model.findByIdAndUpdate(doc._id, {
+        '$unset': { name: '' },
+        __v: 0
+      }, { upsert: true });
+
+      doc = yield Model.findOne();
+      assert.strictEqual(doc.__v, 0);
+      assert.ok(!doc.name);
+    });
   });
 });

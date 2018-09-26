@@ -328,6 +328,25 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function(done) {
+    const mongoose = new Mongoose();
+
+    const schema = new Schema({
+      testId: mongoose.ObjectId,
+      testNum: mongoose.Decimal128,
+      testMixed: mongoose.Mixed
+    });
+
+    const M = mongoose.model('gh6760', schema);
+
+    const doc = new M({ testId: 'length12str0', testNum: 123, mixed: {} });
+
+    assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
+    assert.ok(doc.testNum instanceof mongoose.Types.Decimal128);
+
+    done();
+  });
+
   describe('disconnection of all connections', function() {
     this.timeout(10000);
 

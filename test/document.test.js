@@ -6174,4 +6174,23 @@ describe('document', function() {
       assert.ok(err.errors['innerField']);
     });
   });
+
+  it('retains user-defined key order with nested docs (gh-6944)', function() {
+    const schema = new Schema({
+      _id: String,
+      foo: String,
+      bar: {
+        a: String
+      }
+    });
+
+    const Model = db.model('gh6944', schema);
+
+    const doc = new Model({ _id: 'test', foo: 'hello', bar: { a: 'world' } });
+
+    // Same order as in the initial set above
+    assert.deepEqual(Object.keys(doc._doc), ['_id', 'foo', 'bar']);
+
+    return Promise.resolve();
+  });
 });

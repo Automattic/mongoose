@@ -348,3 +348,13 @@ In mongoose 5 the `required` validator only verifies if the value is an array. T
 ### debug output defaults to stdout instead of stderr
 
 In mongoose 5 the default debug function uses `console.info()` to display messages instead of `console.error()`.
+
+### Overwriting filter properties
+
+In Mongoose 4.x, overwriting a filter property that's a primitive with one that is an object would silently fail. For example, the below code would ignore the `where()` and be equivalent to `Sport.find({ name: 'baseball' })`
+
+```javascript
+Sport.find({ name: 'baseball' }).where({name: {$ne: 'softball'}});
+```
+
+In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }` 

@@ -13,13 +13,17 @@ const load = {};
 function createRandomWord(len) {
   const cons = 'bcdfghjklmnpqrstvwxyz';
   const vow = 'aeiou';
-  let i, word = '', length = parseInt(len, 10), consonants = cons.split(''), vowels = vow.split('');
+  let i;
+  let word = '';
+  const length = parseInt(len, 10);
+  const consonants = cons.split('');
+  const vowels = vow.split('');
   function rand(limit) {
     return Math.floor(Math.random() * limit);
   }
   for (i = 0; i < length / 2; i++) {
-    let randConsonant = consonants[rand(consonants.length)],
-        randVowel = vowels[rand(vowels.length)];
+    const randConsonant = consonants[rand(consonants.length)];
+    const randVowel = vowels[rand(vowels.length)];
     word += (i === 0) ? randConsonant.toUpperCase() : randConsonant;
     word += i * 2 < length - 1 ? randVowel : '';
   }
@@ -447,14 +451,15 @@ for (i = 0; i < len; i++) {
 }
 
 
-var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
+const db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
   function getItems(list) {
     if (!list) {
       done();
     }
     return function() {
       const cnt = Math.floor(Math.random() * dicCnt);
-      let i, res = [];
+      let i;
+      const res = [];
       for (i = 0; i < cnt; i++) {
         res.push(list[i]);
       }
@@ -577,7 +582,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
       }
     };
 
-    var nextRun = function(err) {
+    function nextRun(err) {
       if (err) {
         return nextQuery(err);
       }
@@ -593,7 +598,8 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
       } else {
         nextQuery();
       }
-    };
+    }
+
     console.log('start benchmark');
     nextQuery();
   };
@@ -638,7 +644,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
         }
       };
 
-      var res = loadMedicalCard.length;
+      let res = loadMedicalCard.length;
       const mc = db.model('MedicalCard');
       let i;
       const len = loadMedicalCard.length;
@@ -656,7 +662,8 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
     for (i = 0; i < len; i++) {
       qry = runResults[qrs[i]];
       const resSet = Object.keys(qry);
-      var j, rs;
+      let j;
+      let rs;
       const rsLen = resSet.length;
       let sum = 0;
       for (j = 0; j < rsLen; j++) {
@@ -691,7 +698,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
   }
 
   const updated = {};
-  var next = function(err, data) {
+  function next(err, data) {
     if (cnt < length && Array.isArray(data)) {
       // debugger
       const modelName = creatList[cnt].model;
@@ -717,7 +724,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function() {
     } else {
       createRelations(err);
     }
-  };
+  }
   console.log('Dictionaries:');
   next();
 });

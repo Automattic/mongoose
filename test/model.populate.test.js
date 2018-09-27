@@ -7817,7 +7817,7 @@ describe('model: populate:', function() {
         return this.internalOrderId ? '_id' : 'sourceId';
       }
     });
-  
+
     const Order = db.model('gh5704_Order', OrderSchema);
     const Refund = db.model('gh5704_Refund', RefundSchema);
 
@@ -7826,12 +7826,12 @@ describe('model: populate:', function() {
         { _id: 1 },
         { _id: 99, sourceId: 2 }
       ]);
-    
+
       yield Refund.create([
         { _id: 10, internalOrderId: 1 },
         { _id: 11, sourceOrderId: 2 }
       ]);
-    
+
       let res = yield Refund.find().sort({ _id: 1 }).populate('orders');
 
       res = res.map(doc => doc.toObject({ virtuals: true }));

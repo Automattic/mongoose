@@ -1,6 +1,8 @@
 'use strict';
-let mongoose = require('../'),
-    Schema = mongoose.Schema;
+
+const mongoose = require('../');
+
+const Schema = mongoose.Schema;
 
 const Buffer = require('safe-buffer').Buffer;
 
@@ -99,7 +101,7 @@ methods.push(function(a, cb) {
 const started = process.memoryUsage();
 const start = new Date;
 const total = 10000;
-var i = total;
+let i = total;
 
 function done() {
   const time = (new Date - start);

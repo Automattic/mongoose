@@ -1,4 +1,5 @@
 'use strict';
+
 const Buffer = require('safe-buffer').Buffer;
 
 Error.stackTraceLimit = Infinity;
@@ -9,8 +10,8 @@ function log() {
   }
 }
 
-let mongoose = require('../'),
-    Schema = mongoose.Schema;
+const mongoose = require('../');
+const Schema = mongoose.Schema;
 
 const DocSchema = new Schema({
   title: String

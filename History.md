@@ -1,3 +1,11 @@
+5.2.18 / 2018-09-27
+===================
+ * docs(migrating_to_5): add note about overwriting filter properties #7030
+ * fix(query): correctly handle `select('+c')` if c is not in schema #7017
+ * fix(document): check path exists before checking for required #6974
+ * fix(document): retain user-defined key order on initial set with nested docs #6944
+ * fix(populate): handle multiple localFields + foreignFields using `localField: function() {}` syntax #5704
+
 5.2.17 / 2018-09-21
 ===================
  * docs(guide): clarify that Mongoose only increments versionKey on `save()` and add a workaround for `findOneAndUpdate()` #7038

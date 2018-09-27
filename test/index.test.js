@@ -347,6 +347,29 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('stubbing now() for timestamps (gh-6728)', function() {
+    const mongoose = new Mongoose();
+
+    const date = new Date('2011-06-01');
+
+    mongoose.now = () => date;
+
+    const schema = new Schema({ name: String }, { timestamps: true });
+
+    const M = mongoose.model('gh6728', schema);
+
+    return co(function*() {
+      yield mongoose.connect(uri);
+
+      const doc = new M({ name: 'foo' });
+
+      yield doc.save();
+
+      assert.equal(doc.createdAt.valueOf(), date.valueOf());
+      assert.equal(doc.updatedAt.valueOf(), date.valueOf());
+    });
+  });
+
   describe('disconnection of all connections', function() {
     this.timeout(10000);
 

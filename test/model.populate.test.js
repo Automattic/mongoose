@@ -7797,4 +7797,49 @@ describe('model: populate:', function() {
       assert.equal(res.data.articles.title, 'An Overview of BigInt in Node.js');
     });
   });
+
+  it('multiple localFields and foreignFields (gh-5704)', function() {
+    const OrderSchema = new Schema({
+      _id: Number,
+      sourceId: Number
+    });
+    const RefundSchema = new Schema({
+      _id: Number,
+      internalOrderId: Number,
+      sourceOrderId: Number
+    });
+    RefundSchema.virtual('orders', {
+      ref: 'gh5704_Order',
+      localField: function() {
+        return this.internalOrderId ? 'internalOrderId' : 'sourceOrderId';
+      },
+      foreignField: function() {
+        return this.internalOrderId ? '_id' : 'sourceId';
+      }
+    });
+  
+    const Order = db.model('gh5704_Order', OrderSchema);
+    const Refund = db.model('gh5704_Refund', RefundSchema);
+
+    return co(function*() {
+      yield Order.create([
+        { _id: 1 },
+        { _id: 99, sourceId: 2 }
+      ]);
+    
+      yield Refund.create([
+        { _id: 10, internalOrderId: 1 },
+        { _id: 11, sourceOrderId: 2 }
+      ]);
+    
+      let res = yield Refund.find().sort({ _id: 1 }).populate('orders');
+
+      res = res.map(doc => doc.toObject({ virtuals: true }));
+      assert.equal(res[0].orders.length, 1);
+      assert.strictEqual(res[0].orders[0]._id, 1);
+
+      assert.equal(res[1].orders.length, 1);
+      assert.strictEqual(res[1].orders[0]._id, 99);
+    });
+  });
 });

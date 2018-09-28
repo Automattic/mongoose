@@ -84,7 +84,7 @@ for (let i = 0; i < 1000; i++) {
 for (let i = 0; i < 10000; i++) {
   blogData10000.comments.push(commentData);
 }
-var commentData = {
+const commentData = {
   title: 'test comment',
   date: new Date(),
   body: 'this be some crazzzyyyyy text that would go in a comment',

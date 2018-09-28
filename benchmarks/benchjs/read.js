@@ -1,4 +1,5 @@
 'use strict';
+
 const mongoose = require('../../lib');
 const Benchmark = require('benchmark');
 
@@ -79,7 +80,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       body: 'this be some crazzzyyyyy text that would go in a comment',
       comments: [{title: 'second level', date: new Date(), body: 'texttt'}]
     };
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
     const UserSchema = new Schema({
@@ -109,7 +110,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
 
     // insert all of the data here
     let count = 4000;
-    for (i = 0; i < 1000; i++) {
+    for (let i = 0; i < 1000; i++) {
       data.age = Math.floor(Math.random() * 50);
       User.create(data, function(err, u) {
         if (err) {

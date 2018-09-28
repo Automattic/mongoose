@@ -1,6 +1,7 @@
 'use strict';
-let mongoose = require('../'),
-    Schema = mongoose.Schema;
+
+const mongoose = require('../');
+const Schema = mongoose.Schema;
 
 const Buffer = require('safe-buffer').Buffer;
 

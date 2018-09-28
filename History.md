@@ -1,3 +1,23 @@
+5.3.0 / 2018-09-28
+==================
+ * feat(mongoose): support `mongoose.set('debug', WritableStream)` so you can pipe debug to stderr, file, or network #7018
+ * feat(query): add useNestedStrict option #6973 #5144 [lineus](https://github.com/lineus)
+ * feat(query): add getPopulatedPaths helper to Query.prototype #6970 #6677 [lineus](https://github.com/lineus)
+ * feat(model): add `createCollection()` helper to make transactions easier #6948 #6711 [Fonger](https://github.com/Fonger)
+ * feat(schema): add ability to do `schema.add(otherSchema)` to merge hooks, virtuals, etc. #6897
+ * feat(query): add `orFail()` helper that throws an error if no documents match `filter` #6841
+ * feat(mongoose): support global toObject and toJSON #6815
+ * feat(connection): add deleteModel() to remove a model from a connection #6813
+ * feat(mongoose): add top-level mongoose.ObjectId, mongoose.Decimal128 for easier schema declarations #6760
+ * feat(aggregate+query): support for/await/of (async iterators) #6737
+ * feat(mongoose): add global `now()` function that you can stub for testing timestamps #6728
+ * feat(schema): support `schema.pre(RegExp, fn)` and `schema.post(RegExp, fn)` #6680
+ * docs(query): add better docs for the `mongooseOptions()` function #6677
+ * feat(mongoose): add support for global strict object #6858
+ * feat(schema+mongoose): add autoCreate option to automatically create collections #6489
+ * feat(update): update timestamps on nested subdocs when using `$set` #4412
+ * feat(query+schema): add query `remove` hook and ability to switch between query `remove` and document `remove` middleware #3054
+
 5.2.18 / 2018-09-27
 ===================
  * docs(migrating_to_5): add note about overwriting filter properties #7030

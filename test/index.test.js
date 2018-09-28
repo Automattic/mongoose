@@ -1,12 +1,16 @@
 'use strict';
 
+const assert = require('assert');
+const co = require('co');
+const random = require('../lib/utils').random;
 const start = require('./common');
-const assert = require('power-assert');
+const stream = require('stream');
+
+const collection = 'blogposts_' + random();
+
 const mongoose = start.mongoose;
 const Mongoose = mongoose.Mongoose;
 const Schema = mongoose.Schema;
-const random = require('../lib/utils').random;
-const collection = 'blogposts_' + random();
 
 const uri = 'mongodb://localhost:27017/mongoose_test';
 
@@ -71,6 +75,28 @@ describe('mongoose module:', function() {
     mongoose.model('User', new Schema({}));
     assert.equal(mongoose.model('User').collection.name, 'User');
     done();
+  });
+
+  it('debug to stream (gh-7018)', function() {
+    const mongoose = new Mongoose();
+
+    const written = [];
+    class StubStream extends stream.Writable {
+      write(chunk) {
+        written.push(chunk);
+      }
+    }
+
+    mongoose.set('debug', new StubStream());
+
+    const User = mongoose.model('User', new Schema({ name: String }));
+
+    return co(function*() {
+      yield mongoose.connect(uri);
+      yield User.findOne();
+      assert.equal(written.length, 1);
+      assert.ok(written[0].startsWith('users.findOne('));
+    });
   });
 
   it('{g,s}etting options', function(done) {
@@ -176,6 +202,87 @@ describe('mongoose module:', function() {
       });
   });
 
+  it('toJSON options (gh-6815)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('toJSON', { virtuals: true });
+
+    const schema = new Schema({});
+    schema.virtual('foo').get(() => 42);
+    const M = mongoose.model('Test', schema);
+
+    let doc = new M();
+    assert.equal(doc.toJSON().foo, 42);
+    assert.equal(doc.toObject().foo, void 0);
+
+    assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
+
+    const schema2 = new Schema({}, { toJSON: { virtuals: true } });
+    schema2.virtual('foo').get(() => 'bar');
+    const M2 = mongoose.model('Test2', schema2);
+
+    doc = new M2();
+    assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
+    assert.equal(doc.toJSON().foo, 'bar');
+
+    done();
+  });
+
+  it('toObject options (gh-6815)', function(done) {
+    const mongoose = new Mongoose();
+
+    mongoose.set('toObject', { virtuals: true });
+
+    const schema = new Schema({});
+    schema.virtual('foo').get(() => 42);
+    const M = mongoose.model('Test', schema);
+
+    const doc = new M();
+    assert.equal(doc.toObject().foo, 42);
+    assert.strictEqual(doc.toJSON().foo, void 0);
+    done();
+  });
+
+  it('strict option (gh-6858)', function(done) {
+    const mongoose = new Mongoose();
+
+    // With strict: throw, no schema-level override
+    mongoose.set('strict', 'throw');
+
+    let schema = new Schema({ name: String });
+    let M = mongoose.model('gh6858', schema);
+    assert.throws(() => {
+      new M({ name: 'foo', bar: 'baz' });
+    }, /Field `bar` is not in schema/);
+
+    mongoose.deleteModel('gh6858');
+
+    // With strict: throw and schema-level override
+    schema = new Schema({ name: String }, { strict: true });
+    M = mongoose.model('gh6858', schema);
+
+    let doc = new M({ name: 'foo', bar: 'baz' });
+    assert.equal(doc.name, 'foo');
+    assert.strictEqual(doc.bar, void 0);
+    assert.strictEqual(doc.toObject().bar, void 0);
+    assert.strictEqual(doc.$__.strictMode, true);
+
+    mongoose.deleteModel('gh6858');
+
+    // With strict: false, no schema-level override
+    mongoose.set('strict', false);
+
+    schema = new Schema({ name: String });
+    M = mongoose.model('gh6858', schema);
+    doc = new M({ name: 'foo', bar: 'baz' });
+
+    assert.strictEqual(doc.$__.strictMode, false);
+
+    assert.equal(doc.toObject().bar, 'baz');
+
+    done();
+  });
+
   it('declaring global plugins (gh-5690)', function(done) {
     const mong = new Mongoose();
     const subSchema = new Schema({ name: String });
@@ -218,6 +325,48 @@ describe('mongoose module:', function() {
       assert.equal(doc.test[0].testMethod(), 42);
       mong.disconnect();
       done();
+    });
+  });
+
+  it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function(done) {
+    const mongoose = new Mongoose();
+
+    const schema = new Schema({
+      testId: mongoose.ObjectId,
+      testNum: mongoose.Decimal128,
+      testMixed: mongoose.Mixed
+    });
+
+    const M = mongoose.model('gh6760', schema);
+
+    const doc = new M({ testId: 'length12str0', testNum: 123, mixed: {} });
+
+    assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
+    assert.ok(doc.testNum instanceof mongoose.Types.Decimal128);
+
+    done();
+  });
+
+  it('stubbing now() for timestamps (gh-6728)', function() {
+    const mongoose = new Mongoose();
+
+    const date = new Date('2011-06-01');
+
+    mongoose.now = () => date;
+
+    const schema = new Schema({ name: String }, { timestamps: true });
+
+    const M = mongoose.model('gh6728', schema);
+
+    return co(function*() {
+      yield mongoose.connect(uri);
+
+      const doc = new M({ name: 'foo' });
+
+      yield doc.save();
+
+      assert.equal(doc.createdAt.valueOf(), date.valueOf());
+      assert.equal(doc.updatedAt.valueOf(), date.valueOf());
     });
   });
 
@@ -378,6 +527,22 @@ describe('mongoose module:', function() {
         done();
       });
     });
+  });
+
+  it('deleteModel()', function() {
+    const mongoose = new Mongoose();
+
+    mongoose.model('gh6813', new mongoose.Schema({ name: String }));
+
+    assert.ok(mongoose.model('gh6813'));
+    mongoose.deleteModel('gh6813');
+
+    assert.throws(function() {
+      mongoose.model('gh6813');
+    }, /Schema hasn't been registered/);
+
+    const Model = mongoose.model('gh6813', new Schema({ name: String }));
+    assert.ok(Model);
   });
 
   describe('connecting with a signature of uri, options, function', function() {

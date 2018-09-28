@@ -1269,12 +1269,12 @@ describe('Query', function() {
     it('should retain key order', function(done) {
       // this is important for query hints
       const hint = {x: 1, y: 1, z: 1};
-      const a = JSON.stringify({hint: hint, safe: true});
+      const a = JSON.stringify({ hint: hint });
 
       const q = new Query;
       q.hint(hint);
 
-      const options = q._optionsForExec({schema: {options: {safe: true}}});
+      const options = q._optionsForExec({ schema: { options: {} } });
       assert.equal(JSON.stringify(options), a);
       done();
     });
@@ -1533,6 +1533,47 @@ describe('Query', function() {
             }
             assert.ok(called);
             done();
+          });
+        });
+      });
+
+      describe('useNestedStrict', function() {
+        it('overrides schema useNestedStrict: false (gh-5144)', function() {
+          const subSchema = new Schema({}, { strict: false });
+          const schema = new Schema({
+            name: String,
+            nested: subSchema
+          }, { strict: 'throw' });
+
+          const Test = db.model('gh5144', schema);
+          const test = new Test({ name: 'Test1' });
+          return co(function*() {
+            yield test.save();
+            const cond = { _id: test._id };
+            const update = { 'nested.v': 'xyz' };
+            const opts = { new: true, useNestedStrict: true };
+            const doc = yield Test.findOneAndUpdate(cond, update, opts);
+            assert.strictEqual(doc.toObject().nested.v, 'xyz');
+          });
+        });
+
+        it('overrides schema useNestedStrict: true (gh-5144)', function() {
+          const subSchema = new Schema({}, { strict: false });
+          const schema = new Schema({
+            name: String,
+            nested: subSchema
+          }, { strict: 'throw', useNestedStrict: true });
+
+          const Test = db.model('gh5144_2', schema);
+          const test = new Test({ name: 'Test1' });
+          return co(function* () {
+            yield test.save();
+            const cond = { _id: test._id };
+            const update = { 'nested.v': 'xyz' };
+            const opts = { useNestedStrict: false };
+            let error;
+            yield Test.findOneAndUpdate(cond, update, opts).catch(e => error = e);
+            assert.strictEqual(error.name, 'StrictModeError');
           });
         });
       });
@@ -2732,6 +2773,197 @@ describe('Query', function() {
     });
   });
 
+  describe('orFail (gh-6841)', function() {
+    let Model;
+
+    before(function() {
+      Model = db.model('gh6841', new Schema({ name: String }));
+    });
+
+    beforeEach(function() {
+      return Model.deleteMany({}).then(() => Model.create({ name: 'Test' }));
+    });
+
+    it('find()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.find({ name: 'na' }).orFail(() => new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.find({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('findOne()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.findOne({ name: 'na' }).orFail(() => new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.findOne({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('deleteMany()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.deleteMany({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('deleteOne()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.deleteOne({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('remove()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.remove({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('update()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.update({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('updateMany()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.updateMany({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+
+    it('updateOne()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.updateOne({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
+      });
+    });
+  });
+
+  describe('getPopulatedPaths', function() {
+    it('doesn\'t break on a query without population (gh-6677)', function() {
+      const schema = new Schema({ name: String });
+      schema.pre('findOne', function() {
+        assert.deepStrictEqual(this.getPopulatedPaths(), []);
+      });
+
+      const Model = db.model('gh6677_model', schema);
+
+      return co(function*() {
+        yield Model.findOne({});
+      });
+    });
+
+    it('returns an array of populated paths as strings (gh-6677)', function() {
+      const otherSchema = new Schema({ name: String });
+      const schema = new Schema({
+        other: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh6677_other'
+        }
+      });
+      schema.pre('findOne', function() {
+        assert.deepStrictEqual(this.getPopulatedPaths(), ['other']);
+      });
+
+      const Other = db.model('gh6677_other', otherSchema);
+      const Test = db.model('gh6677_test', schema);
+
+      const other = new Other({ name: 'one' });
+      const test = new Test({ other: other._id });
+
+      return co(function*() {
+        yield other.save();
+        yield test.save();
+        yield Test.findOne({}).populate('other');
+      });
+    });
+  });
+
   describe('setUpdate', function() {
     it('replaces existing update doc with new value', function() {
       const q = new Query({}, {}, null, p1.collection);
@@ -2761,6 +2993,132 @@ describe('Query', function() {
       assert.equal(res.name, 'bar');
       assert.ok(res.updatedAt.valueOf() <= start,
         `Expected ${res.updatedAt.valueOf()} <= ${start}`);
+    });
+  });
+
+  it('increments timestamps for nested subdocs (gh-4412)', function() {
+    const childSchema = new Schema({ name: String }, {
+      timestamps: true,
+      versionKey: false
+    });
+    const parentSchema = new Schema({ child: childSchema }, {
+      // timestamps: true,
+      versionKey: false
+    });
+    const Parent = db.model('gh4412', parentSchema);
+
+    return co(function*() {
+      let doc = yield Parent.create({ child: { name: 'foo' } });
+      assert.ok(doc.child.updatedAt);
+      assert.ok(doc.child.createdAt);
+
+      let start = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      yield Parent.updateOne({}, { $set: { 'child.name': 'Luke' } });
+
+      doc = yield Parent.findOne();
+
+      let updatedAt = doc.child.updatedAt.valueOf();
+
+      assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+
+      // Overwrite whole doc
+      start = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      yield Parent.updateOne({}, { $set: { child: { name: 'Luke' } } });
+
+      doc = yield Parent.findOne();
+
+      const createdAt = doc.child.createdAt.valueOf();
+      updatedAt = doc.child.updatedAt.valueOf();
+
+      assert.ok(createdAt > start, `Expected ${createdAt} > ${start}`);
+      assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+    });
+  });
+
+  describe('increments timestamps for arrays of nested subdocs (gh-4412)', function() {
+    let Parent;
+
+    before(function() {
+      const childSchema = new Schema({ name: String }, {
+        timestamps: true,
+        versionKey: false
+      });
+      const parentSchema = new Schema({ children: [childSchema] }, {
+        versionKey: false });
+      Parent = db.model('gh4412_arr', parentSchema);
+    });
+
+    it('$set nested property with numeric position', function() {
+      return co(function*() {
+        const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+        const doc = yield Parent.create({ children: kids });
+        assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+        assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+        assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+
+        const start = Date.now();
+        yield cb => setTimeout(cb, 10);
+
+        const cond = {};
+        const update = { $set: { 'children.0.name': 'Luke' } };
+        yield Parent.updateOne(cond, update);
+
+        const found = yield Parent.findOne({});
+        const updatedAt = found.children[0].updatedAt.valueOf();
+        const name = found.children[0].name;
+        assert.ok(name, 'Luke');
+        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+      });
+    });
+
+    it('$set numeric element', function() {
+      return co(function*() {
+        const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+        const doc = yield Parent.create({ children: kids });
+        assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+        assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+        assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+
+        const start = Date.now();
+        yield cb => setTimeout(cb, 10);
+
+        const cond = {};
+        const update = { $set: { 'children.0': { name: 'Luke' } } };
+        yield Parent.updateOne(cond, update);
+
+        const found = yield Parent.findOne({});
+        const updatedAt = found.children[0].updatedAt.valueOf();
+        const name = found.children[0].name;
+        assert.ok(name, 'Luke');
+        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+      });
+    });
+
+    it('$set with positional operator', function() {
+      return co(function*() {
+        const kids = 'foo bar baz'.split(' ').map(n => { return { name: `${n}`};});
+        const doc = yield Parent.create({ children: kids });
+        assert.ok(doc.children[0].updatedAt && doc.children[0].createdAt);
+        assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
+        assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
+
+        const start = Date.now();
+        yield cb => setTimeout(cb, 10);
+
+        const cond = { 'children.name': 'bar' };
+        const update = { $set: { 'children.$.name': 'Luke' } };
+        yield Parent.updateOne(cond, update);
+
+        const found = yield Parent.findOne({});
+        const updatedAt = found.children[1].updatedAt.valueOf();
+        const name = found.children[1].name;
+        assert.ok(name, 'Luke');
+        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+      });
     });
   });
 });

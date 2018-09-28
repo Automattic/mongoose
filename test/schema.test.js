@@ -1246,6 +1246,25 @@ describe('schema', function() {
       assert.equal(s.pathType('prefix'), 'nested');
       done();
     });
+
+    it('adds another schema (gh-6897)', function(done) {
+      const s = new Schema({ name: String });
+
+      const s2 = new Schema({ age: Number });
+
+      s2.statics.foo = function() { return 42; };
+      s2.pre('save', function() {
+        throw new Error('oops!');
+      });
+
+      s.add(s2);
+
+      assert.ok(s.paths.age);
+      assert.strictEqual(s.statics.foo, s2.statics.foo);
+      assert.ok(s.s.hooks._pres.get('save'));
+
+      done();
+    });
   });
 
   it('debugging msgs', function(done) {

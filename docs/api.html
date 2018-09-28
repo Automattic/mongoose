@@ -2457,7 +2457,22 @@ query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-
 
 <h4>Example</h4>
 
-<pre><code>query.or([{ color: <span class="hljs-string">'red'</span> }, { status: <span class="hljs-string">'emergency'</span> }])</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-orFail"><a href="#query_Query-orFail">Query.prototype.orFail()</a></h3><div></div><hr class="separate-api-elements"><h3 id="query_Query-polygon"><a href="#query_Query-polygon">Query.prototype.polygon()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path] <span class="method-type">&laquo;String|Array&raquo;</span> </li><li class="param">[coordinatePairs...] <span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a $polygon condition</p>
+<pre><code>query.or([{ color: <span class="hljs-string">'red'</span> }, { status: <span class="hljs-string">'emergency'</span> }])</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-orFail"><a href="#query_Query-orFail">Query.prototype.orFail()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[err] <span class="method-type">&laquo;Function|Error&raquo;</span> optional error to throw if no docs match <code>filter</code></li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Make this query throw an error if no documents match the given <code>filter</code>. This is handy for integrating with async/await, because <code>orFail()</code> saves you an extra <code>if</code> statement to check if no document was found.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="hljs-comment">// Throws if no doc returned</span>
+<span class="hljs-keyword">await</span> Model.findOne({ foo: <span class="hljs-string">'bar'</span> }).orFail();
+
+<span class="hljs-comment">// Throws if no document was updated</span>
+<span class="hljs-keyword">await</span> Model.updateOne({ foo: <span class="hljs-string">'bar'</span> }, { name: <span class="hljs-string">'test'</span> }).orFail();
+
+<span class="hljs-comment">// Throws "No docs found!" error if no docs match `{ foo: 'bar' }`</span>
+<span class="hljs-keyword">await</span> Model.find({ foo: <span class="hljs-string">'bar'</span> }).orFail(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'No docs found!'</span>));
+
+<span class="hljs-comment">// Throws "Not found" error if no document was found</span>
+<span class="hljs-keyword">await</span> Model.findOneAndUpdate({ foo: <span class="hljs-string">'bar'</span> }, { name: <span class="hljs-string">'test'</span> }).
+  orFail(() =&gt; <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Not found'</span>));</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-polygon"><a href="#query_Query-polygon">Query.prototype.polygon()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path] <span class="method-type">&laquo;String|Array&raquo;</span> </li><li class="param">[coordinatePairs...] <span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a $polygon condition</p>
 
 <h4>Example</h4>
 

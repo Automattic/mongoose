@@ -137,12 +137,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
   const Dummy9 = mongoose.model('Dummy9', dummy9Schema);
   const cIds = [];
   const dIds = [];
-  for (var i = 0; i < 9; i++) {
+  for (let i = 0; i < 9; i++) {
     dIds.push([]);
   }
 
   let cn = 5000;
-  for (i = 0; i < 500; i++) {
+  for (let i = 0; i < 500; i++) {
     Comments.create(commentData, function(err, com) {
       cIds.push(com.id);
       --cn || cont();
@@ -225,19 +225,19 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     blog[5] = utils.clone(blogData);
     blog[6] = utils.clone(blogData);
 
-    for (var i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
       blog[0].comments.push(getNextcId());
     }
-    for (i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
       blog[1].comments.push(getNextcId());
     }
-    for (i = 0; i < 1000; i++) {
+    for (let i = 0; i < 1000; i++) {
       blog[2].comments.push(getNextcId());
     }
-    for (i = 0; i < 10000; i++) {
+    for (let i = 0; i < 10000; i++) {
       blog[3].comments.push(getNextcId());
     }
-    for (i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
       blog[5].comments.push(getNextcId());
       blog[6].comments.push(getNextcId());
 
@@ -270,7 +270,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
     }
 
     // insert all of the data here
-    for (i = 0; i < blog.length; i++) {
+    for (let i = 0; i < blog.length; i++) {
       // use some closure magic to make sure we retain the index
       iter(i);
     }
@@ -278,7 +278,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
 
   let ci = 0;
   const di = [];
-  for (i = 0; i < 9; i++) {
+  for (let i = 0; i < 9; i++) {
     di.push(0);
   }
 

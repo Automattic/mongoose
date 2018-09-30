@@ -5400,6 +5400,33 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite with child timestamps (gh-7032)', function() {
+      const nested = new Schema({ name: String }, { timestamps: true });
+      const schema = new Schema({ nested: [nested] }, { timestamps: true });
+
+      const M = db.model('gh7032', schema);
+
+      return co(function*() {
+        yield M.create({ nested: [] });
+
+        yield cb => setTimeout(cb, 10);
+        const now = Date.now();
+
+        yield M.bulkWrite([{
+          updateOne: {
+            filter: {},
+            update: { $push: { nested: { name: 'test' } } }
+          }
+        }]);
+
+        const doc = yield M.findOne({});
+        assert.ok(doc.nested[0].createdAt);
+        assert.ok(doc.nested[0].createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.nested[0].updatedAt);
+        assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
+      });
+    });
+
     it('insertMany with Decimal (gh-5190)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

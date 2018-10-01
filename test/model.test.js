@@ -4987,6 +4987,42 @@ describe('Model', function() {
         });
       });
 
+      it('watch() close() prevents buffered watch op from running (gh-7022)', function() {
+        return co(function*() {
+          const db = start();
+          const MyModel = db.model('gh7022', new Schema({}));
+          const changeStream = MyModel.watch();
+          const ready = new global.Promise(resolve => {
+            changeStream.once('ready', () => {
+              resolve(true);
+            });
+            setTimeout(resolve, 500, false);
+          });
+
+          changeStream.close();
+          yield db;
+          const readyCalled = yield ready;
+          assert.strictEqual(readyCalled, false);
+        });
+      });
+
+      it('watch() close() closes the stream (gh-7022)', function() {
+        return co(function*() {
+          const db = start();
+          const MyModel = db.model('gh7022', new Schema({ name: String }));
+          const changeStream = MyModel.watch();
+          const closed = new global.Promise(resolve => {
+            changeStream.once('close', () => resolve(true));
+          });
+
+          yield MyModel.create({ name: 'Hodor' });
+
+          changeStream.close();
+          const closedData = yield closed;
+          assert.strictEqual(closedData, true);
+        });
+      });
+
       describe('sessions (gh-6362)', function() {
         let MyModel;
         const delay = ms => done => setTimeout(done, ms);

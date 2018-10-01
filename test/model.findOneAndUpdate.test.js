@@ -2266,4 +2266,16 @@ describe('model: findOneAndUpdate:', function() {
       assert.ok(!doc.name);
     });
   });
+
+  it('empty update with timestamps (gh-7041)', function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+    const Model = db.model('gh7041', schema);
+
+    return co(function*() {
+      let doc = yield Model.create({ name: 'test' });
+      // Should not throw
+      doc = yield Model.findOneAndUpdate({ _id: doc._id }, void 0, { new: true });
+      assert.equal(doc.name, 'test');
+    });
+  });
 });

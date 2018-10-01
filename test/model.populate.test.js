@@ -7842,4 +7842,39 @@ describe('model: populate:', function() {
       assert.strictEqual(res[1].orders[0]._id, 99);
     });
   });
+
+  it('lean populate underneath array (gh-7052)', function() {
+    const ownerSchema = new Schema({ 
+      name: String, 
+      age: Number, 
+      dogs: [Schema.Types.ObjectId] 
+    });
+    
+    const dogSchema = new Schema({ 
+      name: String,
+      trick: Schema.Types.ObjectId 
+    });
+    
+    const trickSchema = new Schema({ description: String });
+    
+    const Owner = db.model('gh7052_Owner', ownerSchema);
+    const Dog = db.model('gh7052_Dog', dogSchema);
+    const Trick = db.model('gh7052_Trick', trickSchema);
+    
+    const t = new Trick({ description: 'roll over'});
+    const d = new Dog({ name: 'Fido', trick: t._id });
+    const o = new Owner({ name: 'Bill', age: 10, dogs: [ d._id ] });
+
+    return co(function*() {
+      yield [t.save(), d.save(), o.save()];
+
+      const owner = yield Owner.findOne({}).lean();
+      let populated = yield Owner.populate(owner,
+        [{ path: 'dogs', model: 'gh7052_Dog', options: { lean: true } }]);
+      populated = yield Owner.populate(owner,
+        [{ path: 'dogs.trick', model: 'gh7052_Trick', options: { lean: true } }]);
+
+      assert.ok(!Array.isArray(populated.dogs[0].trick));
+    });
+  });
 });

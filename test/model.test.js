@@ -4947,43 +4947,90 @@ describe('Model', function() {
         });
       });
 
-      it.skip('watch() (gh-5964)', function() {
-        return co(function*() {
-          const MyModel = db.model('gh5964', new Schema({ name: String }));
-
-          const doc = yield MyModel.create({ name: 'Ned Stark' });
-
-          const changed = new global.Promise(resolve => {
-            MyModel.watch().once('change', data => resolve(data));
-          });
-
-          yield doc.remove();
-
-          const changeData = yield changed;
-          assert.equal(changeData.operationType, 'delete');
-          assert.equal(changeData.documentKey._id.toHexString(),
-            doc._id.toHexString());
+      describe('watch()', function() {
+        before(function() {
+          if (!process.env.REPLICA_SET) {
+            this.skip();
+          }
         });
-      });
 
-      it.skip('watch() before connecting (gh-5964)', function() {
-        return co(function*() {
-          const db = start();
+        it('watch() (gh-5964)', function() {
+          return co(function*() {
+            const MyModel = db.model('gh5964', new Schema({ name: String }));
 
-          const MyModel = db.model('gh5964', new Schema({ name: String }));
+            const doc = yield MyModel.create({ name: 'Ned Stark' });
 
-          // Synchronous, before connection happens
-          const changeStream = MyModel.watch();
-          const changed = new global.Promise(resolve => {
-            changeStream.once('change', data => resolve(data));
+            const changed = new global.Promise(resolve => {
+              MyModel.watch().once('change', data => resolve(data));
+            });
+
+            yield doc.remove();
+
+            const changeData = yield changed;
+            assert.equal(changeData.operationType, 'delete');
+            assert.equal(changeData.documentKey._id.toHexString(),
+              doc._id.toHexString());
           });
+        });
 
-          yield db;
-          yield MyModel.create({ name: 'Ned Stark' });
+        it('watch() before connecting (gh-5964)', function() {
+          return co(function*() {
+            const db = start();
 
-          const changeData = yield changed;
-          assert.equal(changeData.operationType, 'insert');
-          assert.equal(changeData.fullDocument.name, 'Ned Stark');
+            const MyModel = db.model('gh5964', new Schema({ name: String }));
+
+            // Synchronous, before connection happens
+            const changeStream = MyModel.watch();
+            const changed = new global.Promise(resolve => {
+              changeStream.once('change', data => resolve(data));
+            });
+
+            yield db;
+            yield MyModel.create({ name: 'Ned Stark' });
+
+            const changeData = yield changed;
+            assert.equal(changeData.operationType, 'insert');
+            assert.equal(changeData.fullDocument.name, 'Ned Stark');
+          });
+        });
+
+        it('watch() close() prevents buffered watch op from running (gh-7022)', function() {
+          return co(function*() {
+            const db = start();
+            const MyModel = db.model('gh7022', new Schema({}));
+            const changeStream = MyModel.watch();
+            const ready = new global.Promise(resolve => {
+              changeStream.once('ready', () => {
+                resolve(true);
+              });
+              setTimeout(resolve, 500, false);
+            });
+
+            changeStream.close();
+            yield db;
+            const readyCalled = yield ready;
+            assert.strictEqual(readyCalled, false);
+          });
+        });
+
+        it('watch() close() closes the stream (gh-7022)', function() {
+          return co(function*() {
+            const db = yield start();
+            const MyModel = db.model('gh7022', new Schema({ name: String }));
+
+            yield MyModel.createCollection();
+
+            const changeStream = MyModel.watch();
+            const closed = new global.Promise(resolve => {
+              changeStream.once('close', () => resolve(true));
+            });
+
+            yield MyModel.create({ name: 'Hodor' });
+
+            changeStream.close();
+            const closedData = yield closed;
+            assert.strictEqual(closedData, true);
+          });
         });
       });
 
@@ -5397,6 +5444,33 @@ describe('Model', function() {
         assert.ok(doc.createdAt.valueOf() >= now.valueOf());
         assert.ok(doc.updatedAt);
         assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
+    });
+
+    it('bulkWrite with child timestamps (gh-7032)', function() {
+      const nested = new Schema({ name: String }, { timestamps: true });
+      const schema = new Schema({ nested: [nested] }, { timestamps: true });
+
+      const M = db.model('gh7032', schema);
+
+      return co(function*() {
+        yield M.create({ nested: [] });
+
+        yield cb => setTimeout(cb, 10);
+        const now = Date.now();
+
+        yield M.bulkWrite([{
+          updateOne: {
+            filter: {},
+            update: { $push: { nested: { name: 'test' } } }
+          }
+        }]);
+
+        const doc = yield M.findOne({});
+        assert.ok(doc.nested[0].createdAt);
+        assert.ok(doc.nested[0].createdAt.valueOf() >= now.valueOf());
+        assert.ok(doc.nested[0].updatedAt);
+        assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
       });
     });
 

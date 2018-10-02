@@ -19,13 +19,13 @@ block content
 
     The following are all the valid SchemaTypes in mongoose.
 
-    - [String](./api.html#schema-string-js)
+    - [String](#strings)
     - [Number](./api.html#schema-number-js)
-    - [Date](./api.html#schema-date-js)
+    - [Date](#dates)
     - [Buffer](./api.html#schema-buffer-js)
     - [Boolean](#booleans)
     - Mixed
-    - [ObjectId](./api.html#schema-objectid-js)
+    - [ObjectId](#objectids)
     - [Array](#arrays)
     - Decimal128
     - [Map](#maps)
@@ -168,7 +168,7 @@ block content
     });
     ```
 
-    <h5>String</h5>
+    <h5 id="string-validators">String</h5>
 
     * `lowercase`: boolean, whether to always call `.toLowerCase()` on the value
     * `uppercase`: boolean, whether to always call `.toUpperCase()` on the value
@@ -178,7 +178,7 @@ block content
     * `minlength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
     * `maxlength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
 
-    <h5>Number</h5>
+    <h5 id="number-validators">Number</h5>
 
     * `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
     * `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
@@ -190,7 +190,30 @@ block content
 
     <h3 id="usage-notes"><a href="#usage-notes">Usage notes</a></h3>
 
-    <h4>Dates</h4>
+    <h4 id="strings">String</h4>
+
+    To declare a path as a string, you may use either the `String` global
+    constructor or the string `'String'`.
+
+    ```javascript
+    const schema1 = new Schema({ name: String }); // Name will be casted to string
+    const schema2 = new Schema({ name: 'String' }); // Equivalent
+
+    const Person = mongoose.model('Person', schema2);
+    ```
+
+    If you pass an element that has a `toString()` function, Mongoose will call it,
+    unless the `toString()` function is strictly equal to `Object.prototype.toString()`.
+
+    ```javascript
+    new Person({ name: 42 }).name; // "42" as a string
+    new Person({ name: { toString: () => 42 } }).name; // "42" as a string
+
+    // "undefined", will get a cast error if you `save()` this document 
+    new Person({ name: { foo: 42 } }).name; 
+    ```
+
+    <h4 id="dates">Dates</h4>
 
     [Built-in `Date` methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) are [__not__ hooked into](https://github.com/Automattic/mongoose/issues/1598) the mongoose change tracking logic which in English means that if you use a `Date` in your document and modify it with a method like `setMonth()`, mongoose will be unaware of this change and `doc.save()` will not persist this modification. If you must modify `Date` types using built-in methods, tell mongoose about the change with `doc.markModified('pathToYourDate')` before saving.
 

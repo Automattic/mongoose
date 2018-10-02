@@ -1,3 +1,14 @@
+5.3.1 / 2018-10-02
+==================
+ * fix(ChangeStream): expose driver's `close()` function #7068 #7022 [lineus](https://github.com/lineus)
+ * fix(model): avoid printing warning if `_id` index is set to "hashed" #7053
+ * fix(populate): handle nested populate underneath lean array correctly #7052
+ * fix(update): make timestamps not crash on a null or undefined update #7041
+ * docs(schematypes+validation): clean up links from validation docs to schematypes docs #7040
+ * fix(model): apply timestamps to nested docs in bulkWrite() #7032
+ * docs(populate): rewrite refPath docs to be simpler and more direct #7013
+ * docs(faq): explain why destructuring imports are not supported in FAQ #7009
+
 5.3.0 / 2018-09-28
 ==================
  * feat(mongoose): support `mongoose.set('debug', WritableStream)` so you can pipe debug to stderr, file, or network #7018

@@ -22,6 +22,18 @@ const files = [
   'lib/aggregate.js',
   'lib/cursor/AggregationCursor.js',
   'lib/schematype.js',
+  'lib/schema/array.js',
+  'lib/schema/boolean.js',
+  'lib/schema/buffer.js',
+  'lib/schema/date.js',
+  'lib/schema/decimal128.js',
+  'lib/schema/documentarray.js',
+  'lib/schema/embedded.js',
+  'lib/schema/map.js',
+  'lib/schema/mixed.js',
+  'lib/schema/number.js',
+  'lib/schema/objectid.js',
+  'lib/schema/string.js',
   'lib/virtualtype.js',
   'lib/error/index.js'
 ];
@@ -34,7 +46,7 @@ module.exports = {
 
 const out = module.exports.docs;
 
-let combinedFiles = [];
+const combinedFiles = [];
 for (const file of files) {
   const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'));
   comments.file = file;
@@ -142,7 +154,7 @@ function parse() {
 }
 
 function highlight(str) {
-  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function (_, $1, $2, $3) {
+  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function(_, $1, $2, $3) {
     const code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
 
     if ('js' === code[1] || !code[1]) {

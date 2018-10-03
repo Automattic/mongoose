@@ -163,7 +163,7 @@ function encodeMongoURI (urlString) {
 
 // Your un-encoded string.
 const mongodbConnectString = "mongodb://...";
-mongoose.connect(encodeMongoURI(mongodbConnectString)
+mongoose.connect(encodeMongoURI(mongodbConnectString))
 ```
 
 The function above is safe to use whether the existing string is already encoded or not.

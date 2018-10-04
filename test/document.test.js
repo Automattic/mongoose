@@ -6193,4 +6193,22 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('does not mark modified if setting nested subdoc to same value (gh-7048)', function() {
+    const BarSchema = new Schema({ bar: String }, { _id: false });
+    const FooNestedSchema = new Schema({ foo: BarSchema });
+
+    const Model = db.model('gh7048', FooNestedSchema);
+
+    return co(function*() {
+      const doc = yield Model.create({ foo: { bar: 'test' } });
+      doc.set({ foo: { bar: 'test' } });
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+
+      doc.set('foo.bar', 'test');
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+    });
+  });
 });

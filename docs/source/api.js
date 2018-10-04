@@ -22,18 +22,6 @@ const files = [
   'lib/aggregate.js',
   'lib/cursor/AggregationCursor.js',
   'lib/schematype.js',
-  'lib/schema/array.js',
-  'lib/schema/boolean.js',
-  'lib/schema/buffer.js',
-  'lib/schema/date.js',
-  'lib/schema/decimal128.js',
-  'lib/schema/documentarray.js',
-  'lib/schema/embedded.js',
-  'lib/schema/map.js',
-  'lib/schema/mixed.js',
-  'lib/schema/number.js',
-  'lib/schema/objectid.js',
-  'lib/schema/string.js',
   'lib/virtualtype.js',
   'lib/error/index.js'
 ];

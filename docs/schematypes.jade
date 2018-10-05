@@ -20,7 +20,7 @@ block content
     The following are all the valid SchemaTypes in mongoose.
 
     - [String](#strings)
-    - [Number](./api.html#Number)
+    - [Number](#numbers)
     - [Date](#dates)
     - [Buffer](./api.html#Buffer)
     - [Boolean](#booleans)
@@ -212,6 +212,37 @@ block content
     // "undefined", will get a cast error if you `save()` this document 
     new Person({ name: { foo: 42 } }).name; 
     ```
+
+    <h4 id="numbers">Number</h4>
+
+    To declare a path as a number, you may use either the `Number` global
+    constructor or the string `'Number'`.
+
+    ```javascript
+    const schema1 = new Schema({ age: Number }); // Name will be casted to string
+    const schema2 = new Schema({ age: 'Number' }); // Equivalent
+
+    const Car = mongoose.model('Car', schema2);
+    ```
+
+    There are several types of values that will be successfully cast to a Number.
+
+    ```javascript
+    new Car({ age: '15' }).age; // 15 as a Number
+    new Car({ age: true }).age; // 1 as a Number
+    new Car({ age: false }).age; // 0 as a Number
+    new Car({ age: { valueOf: () => 83 } }).age; // 83 as a Number
+    ```
+
+    If you pass an object with a `valueOf()` function that returns a Number, Mongoose will
+    call it and assign the returned value to the path.
+
+    There are a few noteworthy values that will not be cast to a Number:
+    The values `null` and `undefined` are not cast, they are instead assigned to the path. 
+    An empty string `''` assigns null to the path rather than being cast or throwing a CastError.
+
+    NaN, strings that cast to NaN, arrays, and objects that don't have a `valueOf()` function
+    will all result in a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError).
 
     <h4 id="dates">Dates</h4>
 

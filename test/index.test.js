@@ -612,7 +612,7 @@ describe('mongoose module:', function() {
     it('connect with url doesnt cause unhandled rejection (gh-6997)', function(done) {
       const m = new mongoose.Mongoose;
       m.connect('mongodb://doesnotexist:27009/test', options, function(error) {
-        m.disconnect();
+        assert.ok(error);
         done();
       });
     });

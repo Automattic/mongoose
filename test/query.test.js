@@ -2797,7 +2797,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.find({ name: 'Test' }).orFail(new Error('Oops'));
+        const res = yield Model.find({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res[0].name, 'Test');
       });
     });
 
@@ -2814,7 +2815,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.findOne({ name: 'Test' }).orFail(new Error('Oops'));
+        const res = yield Model.findOne({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.name, 'Test');
       });
     });
 
@@ -2831,7 +2833,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
+        const res = yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.n, 1);
       });
     });
 
@@ -2848,7 +2851,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
+        const res = yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.n, 1);
       });
     });
 
@@ -2865,7 +2869,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
+        const res = yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.n, 1);
       });
     });
 
@@ -2883,7 +2888,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        const res = yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        assert.equal(res.n, 1);
       });
     });
 
@@ -2901,7 +2907,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        const res = yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        assert.equal(res.n, 1);
       });
     });
 
@@ -2919,7 +2926,8 @@ describe('Query', function() {
         assert.ok(threw);
 
         // Shouldn't throw
-        yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        const res = yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        assert.equal(res.n, 1);
       });
     });
   });

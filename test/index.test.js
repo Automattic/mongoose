@@ -370,6 +370,22 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('isolates custom types between mongoose instances (gh-6933)', function() {
+    const m1 = new Mongoose();
+    const m2 = new Mongoose();
+
+    class T1 extends mongoose.SchemaType {}
+    class T2 extends mongoose.SchemaType {}
+
+    m1.Schema.Types.T = T1;
+    m2.Schema.Types.T = T2;
+
+    assert.strictEqual(m1.Schema.Types.T, T1);
+    assert.strictEqual(m2.Schema.Types.T, T2);
+
+    return Promise.resolve();
+  });
+
   describe('disconnection of all connections', function() {
     this.timeout(10000);
 
@@ -605,6 +621,14 @@ describe('mongoose module:', function() {
       m.connect('mongodb://localhost:27017/test', options).then(function(m) {
         test(m);
         m.disconnect();
+        done();
+      });
+    });
+
+    it('connect with url doesnt cause unhandled rejection (gh-6997)', function(done) {
+      const m = new mongoose.Mongoose;
+      m.connect('mongodb://doesnotexist:27009/test', options, function(error) {
+        assert.ok(error);
         done();
       });
     });

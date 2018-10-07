@@ -90,6 +90,11 @@ block content
     mongoose.set('useFindAndModify', false);
     ```
 
+    You can also configure `useFindAndModify` by passing it through the connection options.
+    ```javascript
+    mongoose.connect(uri, { useFindAndModify: false });
+    ```
+
     This option affects the following model and query functions. There are
     no intentional backwards breaking changes, so you should be able to turn
     this option on without any code changes. If you discover any issues,
@@ -121,6 +126,11 @@ block content
 
     ```javascript
     mongoose.set('useCreateIndex', true);
+    ```
+
+    You can also configure `useCreateIndex` by passing it through the connection options.
+    ```javascript
+    mongoose.connect(uri, { useCreateIndex: true });
     ```
 
     There are no intentional backwards breaking changes with the `useCreateIndex`

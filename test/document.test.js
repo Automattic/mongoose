@@ -3956,6 +3956,16 @@ describe('document', function() {
       done();
     });
 
+    it('timestamps set to false works (gh-7074)', function() {
+      const schema = new Schema({ name: String }, { timestamps: false });
+      const Test = db.model('gh7074', schema);
+      return co(function*() {
+        const doc = yield Test.create({ name: 'test' });
+        assert.strictEqual(doc.updatedAt, undefined);
+        assert.strictEqual(doc.createdAt, undefined);
+      });
+    });
+
     it('timestamps with nested paths (gh-5051)', function(done) {
       const schema = new Schema({ props: {} }, {
         timestamps: {
@@ -6192,5 +6202,23 @@ describe('document', function() {
     assert.deepEqual(Object.keys(doc._doc), ['_id', 'foo', 'bar']);
 
     return Promise.resolve();
+  });
+
+  it('does not mark modified if setting nested subdoc to same value (gh-7048)', function() {
+    const BarSchema = new Schema({ bar: String }, { _id: false });
+    const FooNestedSchema = new Schema({ foo: BarSchema });
+
+    const Model = db.model('gh7048', FooNestedSchema);
+
+    return co(function*() {
+      const doc = yield Model.create({ foo: { bar: 'test' } });
+      doc.set({ foo: { bar: 'test' } });
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+
+      doc.set('foo.bar', 'test');
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+    });
   });
 });

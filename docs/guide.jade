@@ -893,7 +893,7 @@ block content
     // With updates, Mongoose will add `updatedAt` to `$set`
     await Thing.updateOne({}, { $set: { name: 'Test' } });
 
-    // If you set upsert: true, Mongoose will add `createdAt` to `$setOnInsert` as well
+    // If you set upsert: true, Mongoose will add `created_at` to `$setOnInsert` as well
     await Thing.findOneAndUpdate({}, { $set: { name: 'Test2' } });
 
     // Mongoose also adds timestamps to bulkWrite() operations

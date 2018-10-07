@@ -1,3 +1,16 @@
+5.3.2 / 2018-10-07
+==================
+ * fix(query): make sure to return correct result from `orFail()` #7101 #7099 [gsandorx](https://github.com/gsandorx)
+ * fix(schema): handle `{ timestamps: false }` correctly #7088 #7074 [lineus](https://github.com/lineus)
+ * docs: fix markdown in options.useCreateIndex documentation #7085 [Cyral](https://github.com/Cyral)
+ * docs(schema): correct field name in timestamps example #7082 [kizmo04](https://github.com/kizmo04)
+ * docs(migrating_to_5): correct markdown syntax #7078 [gwuah](https://github.com/gwuah)
+ * fix(connection): add useFindAndModify option in connect #7059 [NormanPerrin](https://github.com/NormanPerrin)
+ * fix(document): dont mark single nested path as modified if setting to the same value #7048
+ * fix(populate): use WeakMap to track lean populate models rather than leanPopulateSymbol #7026
+ * fix(mongoose): avoid unhandled rejection when `mongoose.connect()` errors with a callback #6997
+ * fix(mongoose): isolate Schema.Types between custom Mongoose instances #6933
+
 5.3.1 / 2018-10-02
 ==================
  * fix(ChangeStream): expose driver's `close()` function #7068 #7022 [lineus](https://github.com/lineus)

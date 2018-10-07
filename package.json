@@ -57,6 +57,7 @@
     "node-static": "0.7.10",
     "nyc": "11.8.0",
     "power-assert": "1.4.1",
+    "promise-debug": "0.1.1",
     "q": "1.5.1",
     "semver": "5.5.0",
     "tbd": "0.6.4",

@@ -3956,6 +3956,16 @@ describe('document', function() {
       done();
     });
 
+    it('timestamps set to false works (gh-7074)', function() {
+      const schema = new Schema({ name: String }, { timestamps: false });
+      const Test = db.model('gh7074', schema);
+      return co(function*() {
+        const doc = yield Test.create({ name: 'test' });
+        assert.strictEqual(doc.updatedAt, undefined);
+        assert.strictEqual(doc.createdAt, undefined);
+      });
+    });
+
     it('timestamps with nested paths (gh-5051)', function(done) {
       const schema = new Schema({ props: {} }, {
         timestamps: {

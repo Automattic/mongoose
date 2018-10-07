@@ -90,6 +90,20 @@ describe('schema options.timestamps', function() {
       done();
     });
 
+    it('should have just createdAt if updatedAt set to falsy', function(done) {
+      const TestSchema = new Schema({
+        name: String
+      });
+
+      TestSchema.set('timestamps', {
+        updatedAt: false
+      });
+
+      assert.ok(TestSchema.path('createdAt'));
+      assert.ok(!TestSchema.path('updatedAt'));
+      done();
+    });
+
     it('should have created and updated fields', function(done) {
       const TestSchema = new Schema({
         name: String
@@ -252,7 +266,7 @@ describe('schema options.timestamps', function() {
       });
     });
 
-    it.skip('should have fields when update', function(done) {
+    it('should have fields when update', function(done) {
       Cat.findOne({name: 'newcat'}, function(err, doc) {
         const old = doc.updatedAt;
         Cat.update({name: 'newcat'}, {$set: {hobby: 'fish'}}, function() {

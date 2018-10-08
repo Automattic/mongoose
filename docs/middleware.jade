@@ -44,10 +44,12 @@ block content
     All middleware types support pre and post hooks.
     How pre and post hooks work is described in more detail below.
 
-    **Note:** There is no query hook for `remove()`, only for documents.
-    If you set a 'remove' hook, it will be fired when you call `myDoc.remove()`,
-    not when you call `MyModel.remove()`.
-    **Note:** The `create()` function fires `save()` hooks.
+    **Note:** If you specify `schema.pre('remove')`, Mongoose will register this
+    middleware for [`doc.remove()`](./api.html#model_Model-remove) by default. If you
+    want to your middleware to run on [`Query.remove()`](./api.html#query_Query-remove)
+    use [`schema.pre('remove', { query: true, document: false }, fn)`](./api.html#schema_Schema-pre).
+
+    **Note:** The [`create()`](./api.html#model_Model.create) function fires `save()` hooks.
 
     <h3 id="pre"><a href="#pre">Pre</a></h3>
 

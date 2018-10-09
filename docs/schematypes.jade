@@ -22,9 +22,9 @@ block content
     - [String](#strings)
     - [Number](#numbers)
     - [Date](#dates)
-    - [Buffer](./api.html#Buffer)
+    - [Buffer](#buffers)
     - [Boolean](#booleans)
-    - [Mixed](./api.html#Mixed)
+    - [Mixed](#mixed)
     - [ObjectId](#objectids)
     - [Array](#arrays)
     - [Decimal128](./api.html#Decimal128)
@@ -196,7 +196,7 @@ block content
     constructor or the string `'String'`.
 
     ```javascript
-    const schema1 = new Schema({ name: String }); // Name will be casted to string
+    const schema1 = new Schema({ name: String }); // name will be cast to string
     const schema2 = new Schema({ name: 'String' }); // Equivalent
 
     const Person = mongoose.model('Person', schema2);
@@ -219,7 +219,7 @@ block content
     constructor or the string `'Number'`.
 
     ```javascript
-    const schema1 = new Schema({ age: Number }); // Name will be casted to string
+    const schema1 = new Schema({ age: Number }); // age will be cast to a Number
     const schema2 = new Schema({ age: 'Number' }); // Equivalent
 
     const Car = mongoose.model('Car', schema2);
@@ -257,6 +257,26 @@ block content
       doc.markModified('dueDate');
       doc.save(callback); // works
     })
+    ```
+
+    <h4 id="buffers">Buffer</h4>
+
+    To declare a path as a Buffer, you may use either the `Buffer` global
+    constructor or the string `'Buffer'`.
+
+    ```javascript
+    const schema1 = new Schema({ binData: Buffer }); // binData will be cast to a Buffer
+    const schema2 = new Schema({ binData: 'Buffer' }); // Equivalent
+
+    const Data = mongoose.model('Data', schema2);
+    ```
+
+    There are several types of values that will be successfully cast to a Buffer.
+
+    ```
+    const file1 = new Data({ binData: 'test'}); // {"type":"Buffer","data":[116,101,115,116]}
+    const file2 = new Data({ binData: 72987 }); // {"type":"Buffer","data":[27]}
+    const file4 = new Data({ binData: { type: 'Buffer', data: [1, 2, 3]}}); // {"type":"Buffer","data":[1,2,3]}
     ```
 
     <h4 id="mixed">Mixed</h4>

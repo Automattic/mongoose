@@ -237,9 +237,7 @@ block content
     If you pass an object with a `valueOf()` function that returns a Number, Mongoose will
     call it and assign the returned value to the path.
 
-    There are a few noteworthy values that will not be cast to a Number:
-    The values `null` and `undefined` are not cast, they are instead assigned to the path. 
-    An empty string `''` assigns null to the path rather than being cast or throwing a CastError.
+    The values `null` and `undefined` are not cast.
 
     NaN, strings that cast to NaN, arrays, and objects that don't have a `valueOf()` function
     will all result in a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError).
@@ -271,7 +269,7 @@ block content
     const Data = mongoose.model('Data', schema2);
     ```
 
-    There are several types of values that will be successfully cast to a Buffer.
+    Mongoose will successfully cast the below values to buffers.
 
     ```
     const file1 = new Data({ binData: 'test'}); // {"type":"Buffer","data":[116,101,115,116]}

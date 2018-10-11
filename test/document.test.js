@@ -6221,4 +6221,26 @@ describe('document', function() {
       assert.deepEqual(doc.modifiedPaths(), []);
     });
   });
+
+  it('allow saving validation error in db (gh-7127)', function() {
+    return co(function*() {
+      const schema = new Schema({
+        error: mongoose.Schema.Types.Mixed,
+        name: { type: String, required: true }
+      });
+      const Model = db.model('gh7127', schema);
+
+      const doc = new Model();
+
+      const error = yield doc.validate().catch(error => error);
+
+      doc.name = 'foo';
+      doc.error = error;
+
+      yield doc.save();
+
+      const fromDb = yield Model.findOne();
+      assert.ok(fromDb.error.errors.name);
+    });
+  });
 });

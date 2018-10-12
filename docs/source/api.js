@@ -23,7 +23,8 @@ const files = [
   'lib/cursor/AggregationCursor.js',
   'lib/schematype.js',
   'lib/virtualtype.js',
-  'lib/error/index.js'
+  'lib/error/index.js',
+  'lib/types/array.js'
 ];
 
 module.exports = {

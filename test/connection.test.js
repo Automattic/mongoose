@@ -86,6 +86,21 @@ describe('connections:', function() {
       });
     });
 
+    it('autoCreate when collection already exists does not fail (gh-7122)', function() {
+      return co(function*() {
+        const conn = yield mongoose.createConnection(uri);
+
+        const schema = new mongoose.Schema({
+          name: {
+            type: String,
+            index: { unique: true }
+          }
+        }, { autoCreate: true });
+
+        yield conn.model('Actor', schema).init();
+      });
+    });
+
     it('useCreateIndex (gh-6922)', function(done) {
       const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         useCreateIndex: true,

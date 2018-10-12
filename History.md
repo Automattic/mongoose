@@ -1,3 +1,16 @@
+5.3.3 / 2018-10-12
+==================
+ * fix(document): enable storing mongoose validation error in MongoDB by removing `$isValidatorError` property #7127
+ * docs(api): clarify that aggregate triggers aggregate middleware #7126 [lineus](https://github.com/lineus)
+ * fix(connection): handle Model.init() when an index exists on schema + autoCreate == true #7122 [jesstelford](https://github.com/jesstelford)
+ * docs(middleware): explain how to switch between document and query hooks for `remove()` #7093
+ * docs(api): clean up encoding issues in SchemaType.prototype.validate docs #7091
+ * docs(schema): add schema types to api docs and update links on schematypes page #7080 #7076 [lineus](https://github.com/lineus)
+ * docs(model): expand model constructor docs with examples and `fields` param #7077
+ * docs(aggregate): remove incorrect description of noCursorTimeout and add description of aggregate options #7056
+ * docs: re-add array type to API docs #7027
+ * docs(connections): add note about `members.host` errors due to bad host names in replica set #7006
+
 5.3.2 / 2018-10-07
 ==================
  * fix(query): make sure to return correct result from `orFail()` #7101 #7099 [gsandorx](https://github.com/gsandorx)

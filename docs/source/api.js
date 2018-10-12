@@ -23,7 +23,8 @@ const files = [
   'lib/cursor/AggregationCursor.js',
   'lib/schematype.js',
   'lib/virtualtype.js',
-  'lib/error/index.js'
+  'lib/error/index.js',
+  'lib/types/array.js'
 ];
 
 module.exports = {
@@ -34,7 +35,7 @@ module.exports = {
 
 const out = module.exports.docs;
 
-let combinedFiles = [];
+const combinedFiles = [];
 for (const file of files) {
   const comments = dox.parseComments(fs.readFileSync(`./${file}`, 'utf8'));
   comments.file = file;
@@ -142,7 +143,7 @@ function parse() {
 }
 
 function highlight(str) {
-  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function (_, $1, $2, $3) {
+  return str.replace(/(<pre><code>)([^<]+)(<\/code)/gm, function(_, $1, $2, $3) {
     const code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
 
     if ('js' === code[1] || !code[1]) {

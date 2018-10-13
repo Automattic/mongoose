@@ -1884,4 +1884,16 @@ describe('schema', function() {
 
     return Promise.resolve();
   });
+
+  it('allows using ObjectId type as schema path (gh-7049)', function() {
+    const testSchema = new Schema({
+      p1: mongoose.Types.ObjectId,
+      p2: require('mongodb').ObjectId
+    });
+
+    assert.ok(testSchema.path('p1') instanceof mongoose.ObjectId);
+    assert.ok(testSchema.path('p2') instanceof mongoose.ObjectId);
+
+    return Promise.resolve();
+  });
 });

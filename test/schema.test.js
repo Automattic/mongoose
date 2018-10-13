@@ -1198,6 +1198,12 @@ describe('schema', function() {
       done();
     });
 
+    it('returns the schema instance', function() {
+      const schema = new Schema({ name: String });
+      const ret = schema.clone().add({ age: Number });
+      assert.ok(ret instanceof Schema);
+    });
+
     it('merging nested objects (gh-662)', function(done) {
       const MergedSchema = new Schema({
         a: {
@@ -1640,6 +1646,11 @@ describe('schema', function() {
         f: String,
         g: [String]
       });
+    });
+
+    it('returns the schema instance', function() {
+      const ret = this.schema.clone().remove('g');
+      assert.ok(ret instanceof Schema);
     });
 
     it('removes a single path', function(done) {

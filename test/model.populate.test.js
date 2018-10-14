@@ -7877,4 +7877,41 @@ describe('model: populate:', function() {
       assert.ok(!Array.isArray(populated.dogs[0].trick));
     });
   });
+
+  it('handles plus path projections with virtual populate (gh-7050)', function() {
+    const CatSchema = mongoose.Schema({ name: String }, { toObject: { virtuals: true } });
+    
+    CatSchema.virtual('friends', {
+      ref: 'gh7050_Dog',
+      localField: '_id', 
+      foreignField: 'cat'
+    });
+    
+    const Cat = db.model('gh7050_Cat', CatSchema);
+
+    const DogSchema = mongoose.Schema({
+      name: String,
+      cat: mongoose.ObjectId,
+      secret: { type: String, select: false }
+    });
+    
+    const Dog = db.model('gh7050_Dog', DogSchema);
+
+    return co(function*() {
+      const kitty = yield Cat.create({ name: 'foo' });
+    
+      const dog = yield Dog.create({
+        name: 'Scooby',
+        cat: kitty,
+        secret: 'I ate all the scooby snacks!'
+      });
+
+      const res = yield Cat.findOne().select().populate({
+        path: 'friends',
+        select: '+secret'
+      });
+      assert.equal(res.friends[0].name, 'Scooby');
+      assert.equal(res.friends[0].secret, 'I ate all the scooby snacks!');
+    });
+  });
 });

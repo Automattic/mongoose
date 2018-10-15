@@ -1946,6 +1946,26 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
+    it('useFindAndModify in connection options (gh-7108)', function(done) {
+      const m = new mongoose.constructor();
+      m.connect(start.uri, { useNewUrlParser: true, useFindAndModify: false });
+
+      const calls = [];
+      m.set('debug', function(collection, fnName) {
+        calls.push({ collection: collection, fnName: fnName });
+      });
+
+      const Model = m.model('gh7108', { name: String });
+      const update = { name: 'test' };
+      Model.findOneAndUpdate({}, update, {}, function() {
+        assert.equal(calls.length, 1);
+        assert.equal(calls[0].collection, 'gh7108');
+        assert.equal(calls[0].fnName, 'findOneAndUpdate');
+        m.disconnect();
+        done();
+      });
+    });
+
     it('useFindAndModify with overwrite (gh-6887)', function() {
       return co(function*() {
         const m = new mongoose.constructor();

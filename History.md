@@ -1,3 +1,14 @@
+5.3.4 / 2018-10-15
+==================
+ * fix(schema): make `add()` and `remove()` return the schema instance #7131 [lineus](https://github.com/lineus)
+ * fix(query): don't require passing model to `cast()` #7118
+ * fix: support `useFindAndModify` as a connection-level option #7110 [lineus](https://github.com/lineus)
+ * fix(populate): handle plus path projection with virtual populate #7050
+ * fix(schema): allow using ObjectId type as schema path type #7049
+ * docs(schematypes): elaborate on how schematypes relate to types #7049
+ * docs(deprecations): add note about gridstore deprecation #6922
+ * docs(guide): add storeSubdocValidationError option to guide #6802
+
 5.3.3 / 2018-10-12
 ==================
  * fix(document): enable storing mongoose validation error in MongoDB by removing `$isValidatorError` property #7127

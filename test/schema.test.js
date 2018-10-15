@@ -1198,6 +1198,12 @@ describe('schema', function() {
       done();
     });
 
+    it('returns the schema instance', function() {
+      const schema = new Schema({ name: String });
+      const ret = schema.clone().add({ age: Number });
+      assert.ok(ret instanceof Schema);
+    });
+
     it('merging nested objects (gh-662)', function(done) {
       const MergedSchema = new Schema({
         a: {
@@ -1642,6 +1648,11 @@ describe('schema', function() {
       });
     });
 
+    it('returns the schema instance', function() {
+      const ret = this.schema.clone().remove('g');
+      assert.ok(ret instanceof Schema);
+    });
+
     it('removes a single path', function(done) {
       this.schema.remove('a');
       assert.strictEqual(this.schema.path('a'), undefined);
@@ -1870,6 +1881,18 @@ describe('schema', function() {
 
     assert.ok(!parentSchema.tree.badRef2);
     assert.deepEqual(Object.keys(parentSchema.paths).sort(), ['_id', 'name']);
+
+    return Promise.resolve();
+  });
+
+  it('allows using ObjectId type as schema path (gh-7049)', function() {
+    const testSchema = new Schema({
+      p1: mongoose.Types.ObjectId,
+      p2: require('mongodb').ObjectId
+    });
+
+    assert.ok(testSchema.path('p1') instanceof mongoose.ObjectId);
+    assert.ok(testSchema.path('p2') instanceof mongoose.ObjectId);
 
     return Promise.resolve();
   });

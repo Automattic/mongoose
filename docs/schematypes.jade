@@ -15,9 +15,24 @@ block content
     [setters](./api.html#schematype_SchemaType-set),
     [field selection defaults](./api.html#schematype_SchemaType-select) for
     [queries](./api.html#query-js),
-    and other general characteristics for Strings and Numbers.
+    and other general characteristics for Mongoose document properties.
 
-    The following are all the valid SchemaTypes in mongoose.
+    You can think of a Mongoose schema as the configuration object for a
+    Mongoose model. A SchemaType is then a configuration object for an individual
+    property of instances of the model. A SchemaType says what type a given
+    path should have, whether it has any getters/setters, and what values are
+    valid for that path.
+
+    ```javascript
+    const schema = new Schema({ name: String });
+    schema.path('name') instanceof mongoose.SchemaType; // true
+    schema.path('name') instanceof mongoose.Schema.Types.String; // true
+    schema.path('name').instance; // 'String'
+    ```
+
+    The following are all the valid SchemaTypes in Mongoose. Mongoose plugins
+    can also add custom SchemaTypes like [int32](http://plugins.mongoosejs.io/plugins/int32).
+    Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plugins.
 
     - [String](#strings)
     - [Number](#numbers)
@@ -32,7 +47,7 @@ block content
 
     <h4>Example</h4>
 
-    ```javaScript
+    ```javascript
     var schema = new Schema({
       name:    String,
       binary:  Buffer,

@@ -194,3 +194,28 @@ block content
     // Replace with this:
     MyModel.updateMany(filter, update);
     ```
+
+    ## `GridStore`
+
+    If you're using [gridfs-stream](https://www.npmjs.com/package/gridfs-stream),
+    you'll see the below deprecation warning:
+
+    ```
+    DeprecationWarning: GridStore is deprecated, and will be removed in a
+    future version. Please use GridFSBucket instead.
+    ```
+
+    That is because gridfs-stream relies on a [deprecated MongoDB driver class](http://mongodb.github.io/node-mongodb-native/3.1/api/GridStore.html).
+    You should instead use the [MongoDB driver's own streaming API](https://thecodebarbarian.com/mongodb-gridfs-stream).
+
+    ```javascript
+    // Replace this:
+    const conn = mongoose.createConnection('mongodb://localhost:27017/gfstest');
+    const gfs = require('gridfs-store')(conn.db);
+    const writeStream = gfs.createWriteStream({ filename: 'test.dat' });
+
+    // With this:
+    const conn = mongoose.createConnection('mongodb://localhost:27017/gfstest');
+    const gridFSBucket = new mongoose.mongo.GridFSBucket(conn.db);
+    const writeStream = gridFSBucket.openUploadStream('test.dat');
+    ```

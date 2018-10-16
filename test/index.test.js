@@ -249,7 +249,10 @@ describe('mongoose module:', function() {
     // With strict: throw, no schema-level override
     mongoose.set('strict', 'throw');
 
-    let schema = new Schema({ name: String });
+    // `mongoose.Schema` as opposed to just `Schema` matters here because we
+    // a schema pulls the `strict` property default from its Mongoose global.
+    // See gh-7103. We should deprecate default options.
+    let schema = new mongoose.Schema({ name: String });
     let M = mongoose.model('gh6858', schema);
     assert.throws(() => {
       new M({ name: 'foo', bar: 'baz' });
@@ -258,7 +261,7 @@ describe('mongoose module:', function() {
     mongoose.deleteModel('gh6858');
 
     // With strict: throw and schema-level override
-    schema = new Schema({ name: String }, { strict: true });
+    schema = new mongoose.Schema({ name: String }, { strict: true });
     M = mongoose.model('gh6858', schema);
 
     let doc = new M({ name: 'foo', bar: 'baz' });
@@ -272,7 +275,7 @@ describe('mongoose module:', function() {
     // With strict: false, no schema-level override
     mongoose.set('strict', false);
 
-    schema = new Schema({ name: String });
+    schema = new mongoose.Schema({ name: String });
     M = mongoose.model('gh6858', schema);
     doc = new M({ name: 'foo', bar: 'baz' });
 

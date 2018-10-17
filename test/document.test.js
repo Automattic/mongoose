@@ -6286,10 +6286,10 @@ describe('document', function() {
       arr2: [{}],
       arr3: [Object]
     });
-    
+
     const Test = db.model('gh7109', schema);
-    
-    const test = new Test({ 
+
+    const test = new Test({
       arr1: ['test1', { two: 'three' }, [4, 'five', 6]],
       arr2: ['test2', { three: 'four' }, [5, 'six', 7]],
       arr3: ['test3', { four: 'five' }, [6, 'seven', 8]]

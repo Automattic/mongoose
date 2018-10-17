@@ -5427,15 +5427,15 @@ describe('Model', function() {
       const parentSchema = new Schema({ children: [childSchema] }, {
         timestamps: true
       });
-    
+
       const Parent = db.model('gh7032_Parent', parentSchema);
 
       return co(function*() {
         yield Parent.create({ children: [{ name: 'foo' }] });
-    
+
         const end = Date.now();
         yield new Promise(resolve => setTimeout(resolve, 100));
-    
+
         yield Parent.bulkWrite([
           {
             updateOne: {
@@ -5444,7 +5444,7 @@ describe('Model', function() {
             }
           }
         ]);
-    
+
         const doc = yield Parent.findOne();
         assert.ok(doc.children[0].updatedAt.valueOf() > end);
       });

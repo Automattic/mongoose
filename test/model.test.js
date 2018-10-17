@@ -5421,6 +5421,35 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite with child timestamps and array filters (gh-7032)', function() {
+      const childSchema = new Schema({ name: String }, { timestamps: true });
+
+      const parentSchema = new Schema({ children: [childSchema] }, {
+        timestamps: true
+      });
+    
+      const Parent = db.model('gh7032_Parent', parentSchema);
+
+      return co(function*() {
+        yield Parent.create({ children: [{ name: 'foo' }] });
+    
+        const end = Date.now();
+        yield new Promise(resolve => setTimeout(resolve, 100));
+    
+        yield Parent.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { 'children.$[].name': 'bar' } },
+            }
+          }
+        ]);
+    
+        const doc = yield Parent.findOne();
+        assert.ok(doc.children[0].updatedAt.valueOf() > end);
+      });
+    });
+
     it('bulkWrite with timestamps and replaceOne (gh-5708)', function() {
       const schema = new Schema({ num: Number }, { timestamps: true });
 

@@ -3128,5 +3128,33 @@ describe('Query', function() {
         assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
       });
     });
+
+    it('$set with positional operator and array (gh-7106)', function() {
+      return co(function*() {
+        const subSub = new Schema({ x: String });
+        const sub = new Schema({ name: String, subArr: [subSub] });
+        const schema = new Schema({ arr: [sub] }, {
+          timestamps: true
+        });
+        
+        const Test = db.model('gh7106', schema);
+        
+        const cond = { arr: { $elemMatch: { name: 'abc' } } };
+        const set = { $set: { 'arr.$.subArr': [{ x: 'b' }] } };
+        
+        const test = yield Test.create({
+          arr: [{
+            name: 'abc',
+            subArr: [{ x: 'a' }]
+          }]
+        });
+        yield Test.updateOne(cond, set);
+
+        const res = yield Test.collection.findOne({});
+
+        assert.ok(Array.isArray(res.arr));
+        assert.strictEqual(res.arr[0].subArr[0].x, 'b');
+      });
+    });
   });
 });

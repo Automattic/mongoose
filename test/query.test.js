@@ -3136,13 +3136,13 @@ describe('Query', function() {
         const schema = new Schema({ arr: [sub] }, {
           timestamps: true
         });
-        
+
         const Test = db.model('gh7106', schema);
-        
+
         const cond = { arr: { $elemMatch: { name: 'abc' } } };
         const set = { $set: { 'arr.$.subArr': [{ x: 'b' }] } };
-        
-        const test = yield Test.create({
+
+        yield Test.create({
           arr: [{
             name: 'abc',
             subArr: [{ x: 'a' }]

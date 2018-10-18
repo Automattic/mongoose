@@ -946,7 +946,7 @@ describe('model: findOneAndUpdate:', function() {
       function(error, doc) {
         assert.ifError(error);
         assert.equal(doc.__v, 0);
-        Account.replaceOne({ name: 'test' }, {}, { upsert: true }, function(error) {
+        Account.replaceOne({ name: 'test' }, { name: 'test' }, { upsert: true }, function(error) {
           assert.ifError(error);
           Account.findOne({ name: 'test' }, function(error, doc) {
             assert.ifError(error);

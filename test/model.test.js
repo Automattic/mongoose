@@ -6070,4 +6070,26 @@ describe('Model', function() {
       assert.deepEqual(indexes[1].key, { name: 1});
     });
   });
+
+  it('replaceOne always sets version key in top-level (gh-7138)', function() {
+    const key = 'A';
+
+    const schema = new mongoose.Schema({
+      key: String,
+      items: { type: [String], default: [] }
+    });
+
+    const Record = db.model('gh7138', schema);
+
+    const record = { key: key, items: ['A', 'B', 'C'] };
+
+    return co(function*() {
+      const result = yield Record.
+        replaceOne({ key: key }, record, { upsert: true });
+
+      const fetchedRecord = yield Record.findOne({ key: key });
+
+      assert.deepEqual(fetchedRecord.toObject().items, ['A', 'B', 'C']);
+    });
+  });
 });

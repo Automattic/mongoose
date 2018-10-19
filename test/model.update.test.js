@@ -3085,3 +3085,37 @@ describe('model: update:', function() {
     });
   });
 });
+
+describe('model: updateOne: ', function() {
+  let db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
+  it('updating a map (gh-7111)', function() {
+    const accountSchema = new Schema({ balance: Number });
+    
+    const schema = new Schema({
+      accounts: {
+        type: Map,
+        of: accountSchema
+      }
+    });
+
+    const Test = db.model('gh7111', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ accounts: { USD: { balance: 345 } } });
+
+      yield Test.updateOne({}, { accounts: { USD: { balance: 8 } } });
+
+      const updated = yield Test.findOne({ _id: doc._id });
+      assert.strictEqual(updated.accounts.get('USD').balance, 8);
+    });
+  });
+});

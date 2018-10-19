@@ -3099,7 +3099,7 @@ describe('model: updateOne: ', function() {
 
   it('updating a map (gh-7111)', function() {
     const accountSchema = new Schema({ balance: Number });
-    
+
     const schema = new Schema({
       accounts: {
         type: Map,

@@ -6084,8 +6084,7 @@ describe('Model', function() {
     const record = { key: key, items: ['A', 'B', 'C'] };
 
     return co(function*() {
-      const result = yield Record.
-        replaceOne({ key: key }, record, { upsert: true });
+      yield Record.replaceOne({ key: key }, record, { upsert: true });
 
       const fetchedRecord = yield Record.findOne({ key: key });
 

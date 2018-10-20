@@ -5039,7 +5039,11 @@ describe('Model', function() {
         const delay = ms => done => setTimeout(done, ms);
 
         before(function(done) {
-          MyModel = db.model('gh6362', new Schema({ name: String }));
+          const nestedSchema = new Schema({ foo: String });
+          MyModel = db.model('gh6362', new Schema({
+            name: String,
+            nested: nestedSchema
+          }));
 
           start.mongodVersion((err, version) => {
             if (err) {
@@ -5086,7 +5090,7 @@ describe('Model', function() {
 
         it('sets session when pulling a document from db', function() {
           return co(function*() {
-            yield MyModel.create({ name: 'test' });
+            yield MyModel.create({ name: 'test', nested: { foo: 'bar' } });
 
             const session = yield MyModel.startSession();
 
@@ -5097,6 +5101,7 @@ describe('Model', function() {
             let doc = yield MyModel.findOne({}, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
+            assert.strictEqual(doc.nested.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
@@ -5107,6 +5112,7 @@ describe('Model', function() {
               { session: session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
+            assert.strictEqual(doc.nested.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;

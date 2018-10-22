@@ -5,6 +5,7 @@
 'use strict';
 
 const assert = require('assert');
+const co = require('co');
 const start = require('./common');
 
 const mongoose = start.mongoose;
@@ -386,6 +387,23 @@ describe('QueryCursor', function() {
           });
         });
       });
+    });
+  });
+
+  it('handles non-boolean lean option (gh-7137)', function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('gh7137', schema);
+
+    return co(function*() {
+      yield Model.create({ name: 'test' });
+
+      let doc;
+      yield Model.find().lean({ virtuals: true }).cursor().eachAsync(_doc => {
+        assert.ok(!doc);
+        doc = _doc;
+      });
+
+      assert.ok(!doc.$__);
     });
   });
 

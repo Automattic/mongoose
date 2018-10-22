@@ -2818,6 +2818,36 @@ describe('document', function() {
       });
     });
 
+    it('manual population with refPath (gh-7070)', function() {
+      const ChildModelSchema = new mongoose.Schema({
+        name: String
+      });
+
+      const ChildModel = db.model('gh7070_Child', ChildModelSchema);
+
+      const ParentModelSchema = new mongoose.Schema({
+        model: String,
+        childId: { type: mongoose.ObjectId, refPath: 'model' }
+      });
+
+      const ParentModel = db.model('gh7070', ParentModelSchema);
+
+      return co(function*() {
+        const child = yield ChildModel.create({ name: 'test' });
+
+        let parent = yield ParentModel.create({
+          model: 'gh7070_Child',
+          childId: child._id
+        });
+
+        parent = yield ParentModel.findOne();
+
+        parent.childId = child;
+
+        assert.equal(parent.childId.name, 'test');
+      });
+    });
+
     it('doesnt skipId for single nested subdocs (gh-4008)', function(done) {
       const childSchema = new Schema({
         name: String

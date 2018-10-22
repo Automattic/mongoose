@@ -5039,7 +5039,11 @@ describe('Model', function() {
         const delay = ms => done => setTimeout(done, ms);
 
         before(function(done) {
-          MyModel = db.model('gh6362', new Schema({ name: String }));
+          const nestedSchema = new Schema({ foo: String });
+          MyModel = db.model('gh6362', new Schema({
+            name: String,
+            nested: nestedSchema
+          }));
 
           start.mongodVersion((err, version) => {
             if (err) {
@@ -5086,7 +5090,7 @@ describe('Model', function() {
 
         it('sets session when pulling a document from db', function() {
           return co(function*() {
-            yield MyModel.create({ name: 'test' });
+            yield MyModel.create({ name: 'test', nested: { foo: 'bar' } });
 
             const session = yield MyModel.startSession();
 
@@ -5097,6 +5101,7 @@ describe('Model', function() {
             let doc = yield MyModel.findOne({}, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
+            assert.strictEqual(doc.nested.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
@@ -5107,6 +5112,7 @@ describe('Model', function() {
               { session: session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
+            assert.strictEqual(doc.nested.$session(), session);
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;
@@ -5418,6 +5424,35 @@ describe('Model', function() {
         assert.ok(doc.createdAt.valueOf() >= now.valueOf());
         assert.ok(doc.updatedAt);
         assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
+    });
+
+    it('bulkWrite with child timestamps and array filters (gh-7032)', function() {
+      const childSchema = new Schema({ name: String }, { timestamps: true });
+
+      const parentSchema = new Schema({ children: [childSchema] }, {
+        timestamps: true
+      });
+
+      const Parent = db.model('gh7032_Parent', parentSchema);
+
+      return co(function*() {
+        yield Parent.create({ children: [{ name: 'foo' }] });
+
+        const end = Date.now();
+        yield new Promise(resolve => setTimeout(resolve, 100));
+
+        yield Parent.bulkWrite([
+          {
+            updateOne: {
+              filter: {},
+              update: { $set: { 'children.$[].name': 'bar' } },
+            }
+          }
+        ]);
+
+        const doc = yield Parent.findOne();
+        assert.ok(doc.children[0].updatedAt.valueOf() > end);
       });
     });
 
@@ -6039,6 +6074,27 @@ describe('Model', function() {
 
       assert.equal(indexes.length, 2);
       assert.deepEqual(indexes[1].key, { name: 1});
+    });
+  });
+
+  it('replaceOne always sets version key in top-level (gh-7138)', function() {
+    const key = 'A';
+
+    const schema = new mongoose.Schema({
+      key: String,
+      items: { type: [String], default: [] }
+    });
+
+    const Record = db.model('gh7138', schema);
+
+    const record = { key: key, items: ['A', 'B', 'C'] };
+
+    return co(function*() {
+      yield Record.replaceOne({ key: key }, record, { upsert: true });
+
+      const fetchedRecord = yield Record.findOne({ key: key });
+
+      assert.deepEqual(fetchedRecord.toObject().items, ['A', 'B', 'C']);
     });
   });
 });

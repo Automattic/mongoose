@@ -921,7 +921,8 @@ block content
 
     <h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
 
-    In mongoose 4, `update()` and `findOneAndUpdate()` only check the top-level
+    Write operations like `update()`, `updateOne()`, `updateMany()`,
+    and `findOneAndUpdate()` only check the top-level
     schema's strict mode setting.
 
     ```javascript

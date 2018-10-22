@@ -5,6 +5,7 @@
 'use strict';
 
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 
@@ -463,6 +464,43 @@ describe('document: strict mode:', function() {
         new Test({resolved: 123});
       }, /ObjectExpectedError/);
       done();
+    });
+  });
+
+  it('handles setting `schema.options.strict` (gh-7103)', function() {
+    const nestedSchema = new mongoose.Schema({
+      _id: false,
+      someProp: {
+        type: Boolean,
+        default: false,
+        required: true
+      }
+    });
+
+    nestedSchema.options.strict = 'throw';
+    nestedSchema.options.strictQuery = 'throw';
+
+    const schema = new mongoose.Schema({
+      nested: {
+        type: nestedSchema,
+        default: null
+      }
+    });
+
+    const Model = db.model('gh7103', schema);
+
+    return co(function*() {
+      const doc1 = new Model();
+      doc1.nested = { someProp: true, somethingElse: false };
+
+      let err = doc1.validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['nested']);
+
+      err = yield doc1.validate().then(() => null, err => err);
+      assert.ok(err);
+
+      assert.ok(err.errors['nested']);
     });
   });
 });

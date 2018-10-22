@@ -2818,6 +2818,36 @@ describe('document', function() {
       });
     });
 
+    it('manual population with refPath (gh-7070)', function() {
+      const ChildModelSchema = new mongoose.Schema({
+        name: String
+      });
+
+      const ChildModel = db.model('gh7070_Child', ChildModelSchema);
+
+      const ParentModelSchema = new mongoose.Schema({
+        model: String,
+        childId: { type: mongoose.ObjectId, refPath: 'model' }
+      });
+
+      const ParentModel = db.model('gh7070', ParentModelSchema);
+
+      return co(function*() {
+        const child = yield ChildModel.create({ name: 'test' });
+
+        let parent = yield ParentModel.create({
+          model: 'gh7070_Child',
+          childId: child._id
+        });
+
+        parent = yield ParentModel.findOne();
+
+        parent.childId = child;
+
+        assert.equal(parent.childId.name, 'test');
+      });
+    });
+
     it('doesnt skipId for single nested subdocs (gh-4008)', function(done) {
       const childSchema = new Schema({
         name: String
@@ -6278,5 +6308,25 @@ describe('document', function() {
       assert.ok(!err.errors['child']);
       assert.ok(!err.errors['child.child']);
     });
+  });
+
+  it('handles mixed arrays with all syntaxes (gh-7109)', function() {
+    const schema = new Schema({
+      arr1: [Schema.Types.Mixed],
+      arr2: [{}],
+      arr3: [Object]
+    });
+
+    const Test = db.model('gh7109', schema);
+
+    const test = new Test({
+      arr1: ['test1', { two: 'three' }, [4, 'five', 6]],
+      arr2: ['test2', { three: 'four' }, [5, 'six', 7]],
+      arr3: ['test3', { four: 'five' }, [6, 'seven', 8]]
+    });
+
+    assert.ok(test.validateSync() == null, test.validateSync());
+
+    return Promise.resolve();
   });
 });

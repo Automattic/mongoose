@@ -1,3 +1,16 @@
+5.3.5 / 2018-10-22
+==================
+ * fix(model): make sure versionKey on `replaceOne()` always gets set at top level to prevent cast errors #7138
+ * fix(cursor): handle non-boolean lean option in `eachAsync()` #7137
+ * fix(update): correct cast update that overwrites a map #7111
+ * fix(schema): handle arrays of mixed correctly #7109
+ * fix(query): use correct path when getting schema for child timestamp update #7106
+ * fix(document): make `$session()` propagate sessions to child docs #7104
+ * fix(document): handle user setting `schema.options.strict = 'throw'` #7103
+ * fix(types): use core Node.js buffer prototype instead of safe-buffer because safe-buffer is broken for Node.js 4.x #7102
+ * fix(document): handle setting single doc with refPath to document #7070
+ * fix(model): handle array filters when updating timestamps for subdocs #7032
+
 5.3.4 / 2018-10-15
 ==================
  * fix(schema): make `add()` and `remove()` return the schema instance #7131 [lineus](https://github.com/lineus)

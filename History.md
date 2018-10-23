@@ -1,3 +1,7 @@
+5.3.6 / 2018-10-23
+==================
+ * fix(cursor): fix undefined transforms error
+
 5.3.5 / 2018-10-22
 ==================
  * fix(model): make sure versionKey on `replaceOne()` always gets set at top level to prevent cast errors #7138

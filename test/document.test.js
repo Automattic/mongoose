@@ -6366,14 +6366,14 @@ describe('document', function() {
 
     const Test = db.model('gh7145_0', schema);
 
-    const doc = new Test({ name: 'not-a-uuid' });
+    const doc = new Test({ name: 'foo' });
     const error = doc.validateSync();
     assert.ok(error == null, error);
 
     return co(function*() {
       const error = yield doc.validate().then(() => null, err => err);
 
-      assert.ok(error == null);
+      assert.ok(error == null, error);
     });
   });
 });

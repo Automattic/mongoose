@@ -6329,4 +6329,27 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('supports validator.isUUID as a custom validator (gh-7145)', function() {
+    const schema = new Schema({
+      name: {
+        type: String,
+        validate: [validator.isUUID, 'invalid name']
+      }
+    });
+
+    const Test = db.model('gh7145', schema);
+
+    const doc = new Test({ name: 'not-a-uuid' });
+    const error = doc.validateSync();
+    assert.ok(error instanceof Error);
+    assert.ok(/invalid name/.test(error.message));
+
+    return co(function*() {
+      const error = yield doc.validate().then(() => null, err => err);
+
+      assert.ok(error instanceof Error);
+      assert.ok(/invalid name/.test(error.message));
+    });
+  });
 });

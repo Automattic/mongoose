@@ -3128,10 +3128,16 @@ describe('model: updateOne: ', function() {
     const TestModel = db.model('gh7135', ArraySchema);
 
     return co(function*() {
-      const err = yield TestModel.
+      let err = yield TestModel.
         updateOne({}, { $set: { anArray: [{}] } }, { runValidators: true }).
         then(() => null, err => err);
 
+      assert.ok(err);
+      assert.ok(err.errors['anArray.0']);
+
+      err = yield TestModel.
+        updateOne({}, { $set: { 'anArray.0': {} } }, { runValidators: true }).
+        then(() => null, err => err);
       assert.ok(err);
       assert.ok(err.errors['anArray.0']);
     });

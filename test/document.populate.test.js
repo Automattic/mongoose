@@ -638,6 +638,22 @@ describe('document.populate', function() {
     });
   });
 
+  it('doesn\'t throw when called on a doc that isn\'t populated (gh-6075)', function() {
+    const Person = db.model('gh6075', {
+      name: String
+    });
+
+    const person = new Person({ name: 'Greg Dulli' });
+    person.save(function(err, doc) {
+      assert.ifError(err);
+      try {
+        doc.depopulate();
+      } catch (e) {
+        assert.ifError(e);
+      }
+    });
+  });
+
   it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
     const EmbeddedSchema = new Schema({
       reference: {

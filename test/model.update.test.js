@@ -3044,7 +3044,7 @@ describe('model: update:', function() {
 
       Group.update({}, update, opts, function(error) {
         assert.ok(error);
-        assert.ok(error.errors['users.0.permission']);
+        assert.ok(error.errors['users.0.permission'], Object.keys(error.errors));
         done();
       });
     });
@@ -3133,13 +3133,13 @@ describe('model: updateOne: ', function() {
         then(() => null, err => err);
 
       assert.ok(err);
-      assert.ok(err.errors['anArray.0']);
+      assert.ok(err.errors['anArray.0.a']);
 
       err = yield TestModel.
         updateOne({}, { $set: { 'anArray.0': {} } }, { runValidators: true }).
         then(() => null, err => err);
       assert.ok(err);
-      assert.ok(err.errors['anArray.0']);
+      assert.ok(err.errors['anArray.0.a']);
     });
   });
 });

@@ -3122,16 +3122,16 @@ describe('model: updateOne: ', function() {
   it('overwrite an array with empty (gh-7135)', function() {
     const ElementSchema = Schema({
       a: { type: String, required: true }
-    }, { _id: false }); 
+    }, { _id: false });
     const ArraySchema = Schema({ anArray: [ElementSchema] });
 
     const TestModel = db.model('gh7135', ArraySchema);
-    
+
     return co(function*() {
-      let err = yield TestModel.
+      const err = yield TestModel.
         updateOne({}, { $set: { anArray: [{}] } }, { runValidators: true }).
         then(() => null, err => err);
-      
+
       assert.ok(err);
       assert.ok(err.errors['anArray.0']);
     });

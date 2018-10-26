@@ -1,3 +1,12 @@
+5.3.7 / 2018-10-26
+==================
+ * fix(browser): fix buffer usage in browser build #7184 #7173 [lineus](https://github.com/lineus)
+ * fix(document): make depopulate() work on populate virtuals and unpopulated docs #7180 #6075 [lineus](https://github.com/lineus)
+ * fix(document): only pass properties as 2nd arg to custom validator if `propsParameter` set #7145
+ * docs(schematypes): add note about nested paths with `type` getting converted to mixed #7143
+ * fix(update): run update validators on nested doc when $set on an array #7135
+ * fix(update): copy exact errors from array subdoc validation into top-level update validator error #7135
+
 5.3.6 / 2018-10-23
 ==================
  * fix(cursor): fix undefined transforms error

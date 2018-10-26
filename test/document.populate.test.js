@@ -565,76 +565,164 @@ describe('document.populate', function() {
     });
   });
 
-  it('can depopulate (gh-2509)', function(done) {
-    const Person = db.model('gh2509_1', {
-      name: String
+  describe('depopulate', function() {
+    it('can depopulate specific path (gh-2509)', function(done) {
+      const Person = db.model('gh2509_1', {
+        name: String
+      });
+
+      const Band = db.model('gh2509_2', {
+        name: String,
+        members: [{ type: Schema.Types.ObjectId, ref: 'gh2509_1' }],
+        lead: { type: Schema.Types.ObjectId, ref: 'gh2509_1' }
+      });
+
+      const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+      Person.create(people, function(error, docs) {
+        assert.ifError(error);
+        const band = {
+          name: 'Guns N\' Roses',
+          members: [docs[0]._id, docs[1]],
+          lead: docs[0]._id
+        };
+        Band.create(band, function(error, band) {
+          band.populate('members', function() {
+            assert.equal(band.members[0].name, 'Axl Rose');
+            band.depopulate('members');
+            assert.ok(!band.members[0].name);
+            assert.equal(band.members[0].toString(), docs[0]._id.toString());
+            assert.equal(band.members[1].toString(), docs[1]._id.toString());
+            assert.ok(!band.populated('members'));
+            assert.ok(!band.populated('lead'));
+            band.populate('lead', function() {
+              assert.equal(band.lead.name, 'Axl Rose');
+              band.depopulate('lead');
+              assert.ok(!band.lead.name);
+              assert.equal(band.lead.toString(), docs[0]._id.toString());
+              done();
+            });
+          });
+        });
+      });
     });
 
-    const Band = db.model('gh2509_2', {
-      name: String,
-      members: [{type: Schema.Types.ObjectId, ref: 'gh2509_1'}],
-      lead: {type: Schema.Types.ObjectId, ref: 'gh2509_1'}
-    });
+    it('depopulates all (gh-6073)', function(done) {
+      const Person = db.model('gh6073_1', {
+        name: String
+      });
 
-    const people = [{name: 'Axl Rose'}, {name: 'Slash'}];
-    Person.create(people, function(error, docs) {
-      assert.ifError(error);
-      const band = {
-        name: 'Guns N\' Roses',
-        members: [docs[0]._id, docs[1]],
-        lead: docs[0]._id
-      };
-      Band.create(band, function(error, band) {
-        band.populate('members', function() {
-          assert.equal(band.members[0].name, 'Axl Rose');
-          band.depopulate('members');
-          assert.ok(!band.members[0].name);
-          assert.equal(band.members[0].toString(), docs[0]._id.toString());
-          assert.equal(band.members[1].toString(), docs[1]._id.toString());
-          assert.ok(!band.populated('members'));
-          assert.ok(!band.populated('lead'));
-          band.populate('lead', function() {
-            assert.equal(band.lead.name, 'Axl Rose');
-            band.depopulate('lead');
-            assert.ok(!band.lead.name);
-            assert.equal(band.lead.toString(), docs[0]._id.toString());
+      const Band = db.model('gh6073_2', {
+        name: String,
+        members: [{type: Schema.Types.ObjectId, ref: 'gh6073_1'}],
+        lead: {type: Schema.Types.ObjectId, ref: 'gh6073_1'}
+      });
+
+      const people = [{name: 'Axl Rose'}, {name: 'Slash'}];
+      Person.create(people, function(error, docs) {
+        assert.ifError(error);
+        const band = {
+          name: 'Guns N\' Roses',
+          members: [docs[0]._id, docs[1]],
+          lead: docs[0]._id
+        };
+        Band.create(band, function(error, band) {
+          band.populate('members lead', function() {
+            assert.ok(band.populated('members'));
+            assert.ok(band.populated('lead'));
+            assert.equal(band.members[0].name, 'Axl Rose');
+            band.depopulate();
+            assert.ok(!band.populated('members'));
+            assert.ok(!band.populated('lead'));
             done();
           });
         });
       });
     });
-  });
 
-  it('depopulate all (gh-6073)', function(done) {
-    const Person = db.model('gh6073_1', {
-      name: String
+    it('doesn\'t throw when called on a doc that is not populated (gh-6075)', function(done) {
+      const Person = db.model('gh6075', {
+        name: String
+      });
+
+      const person = new Person({ name: 'Greg Dulli' });
+      person.save(function(err, doc) {
+        assert.ifError(err);
+        try {
+          doc.depopulate();
+        } catch (e) {
+          assert.ifError(e);
+        }
+        done();
+      });
     });
 
-    const Band = db.model('gh6073_2', {
-      name: String,
-      members: [{type: Schema.Types.ObjectId, ref: 'gh6073_1'}],
-      lead: {type: Schema.Types.ObjectId, ref: 'gh6073_1'}
-    });
+    it('depopulates virtuals (gh-6075)', function(done) {
+      const otherSchema = new Schema({
+        val: String,
+        prop: String
+      });
 
-    const people = [{name: 'Axl Rose'}, {name: 'Slash'}];
-    Person.create(people, function(error, docs) {
-      assert.ifError(error);
-      const band = {
-        name: 'Guns N\' Roses',
-        members: [docs[0]._id, docs[1]],
-        lead: docs[0]._id
-      };
-      Band.create(band, function(error, band) {
-        band.populate('members lead', function() {
-          assert.ok(band.populated('members'));
-          assert.ok(band.populated('lead'));
-          assert.equal(band.members[0].name, 'Axl Rose');
-          band.depopulate();
-          assert.ok(!band.populated('members'));
-          assert.ok(!band.populated('lead'));
-          done();
+      const schema = new Schema({
+        others: [String],
+        single: String
+      }, { toJSON: { virtuals: true } });
+
+      schema.virtual('$others', {
+        ref: 'gh6075_other',
+        localField: 'others',
+        foreignField: 'val'
+      });
+
+      schema.virtual('$single', {
+        ref: 'gh6075_other',
+        localField: 'single',
+        foreignField: 'val',
+        justOne: true
+      });
+
+      schema.virtual('$last', {
+        ref: 'gh6075_other',
+        localField: 'single',
+        foreignField: 'val',
+        justOne: true
+      });
+
+      const Other = db.model('gh6075_other', otherSchema);
+      const Test = db.model('gh6075_test', schema);
+
+      const others = 'abc'.split('').map(c => {
+        return new Other({
+          val: `other${c}`,
+          prop: `xyz${c}`
         });
       });
+
+      const test = new Test({
+        others: others.map(d => d.val),
+        single: others[1].val
+      });
+
+      Other.create(others).
+        then(() => {
+          return test.save();
+        }).
+        then((saved) => {
+          return saved.populate('$others $single').execPopulate();
+        }).
+        then((populated) => {
+          assert.strictEqual(populated.$others.length, 3);
+          assert.strictEqual(populated.$single.prop, 'xyzb');
+          populated.depopulate();
+          assert.strictEqual(populated.$others, null);
+          assert.strictEqual(populated.$single, null);
+          return populated.populate('$last').execPopulate();
+        }).
+        then((populatedAgain) => {
+          assert.strictEqual(populatedAgain.$last.prop, 'xyzb');
+          populatedAgain.depopulate('$last');
+          assert.strictEqual(populatedAgain.$last, null);
+          done();
+        });
     });
   });
 

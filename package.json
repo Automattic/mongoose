@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.3.6",
+  "version": "5.3.7",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -63,7 +63,7 @@
     "tbd": "0.6.4",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
-    "validator": "5.4.0",
+    "validator": "10.8.0",
     "webpack": "4.16.4"
   },
   "directories": {

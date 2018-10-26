@@ -3044,7 +3044,7 @@ describe('model: update:', function() {
 
       Group.update({}, update, opts, function(error) {
         assert.ok(error);
-        assert.ok(error.errors['users.0.permission']);
+        assert.ok(error.errors['users.0.permission'], Object.keys(error.errors));
         done();
       });
     });
@@ -3116,6 +3116,30 @@ describe('model: updateOne: ', function() {
 
       const updated = yield Test.findOne({ _id: doc._id });
       assert.strictEqual(updated.accounts.get('USD').balance, 8);
+    });
+  });
+
+  it('overwrite an array with empty (gh-7135)', function() {
+    const ElementSchema = Schema({
+      a: { type: String, required: true }
+    }, { _id: false });
+    const ArraySchema = Schema({ anArray: [ElementSchema] });
+
+    const TestModel = db.model('gh7135', ArraySchema);
+
+    return co(function*() {
+      let err = yield TestModel.
+        updateOne({}, { $set: { anArray: [{}] } }, { runValidators: true }).
+        then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors['anArray.0.a']);
+
+      err = yield TestModel.
+        updateOne({}, { $set: { 'anArray.0': {} } }, { runValidators: true }).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['anArray.0.a']);
     });
   });
 });

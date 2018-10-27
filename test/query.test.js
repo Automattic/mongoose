@@ -2773,6 +2773,21 @@ describe('Query', function() {
     });
   });
 
+  it('map (gh-7142)', function() {
+    const Model = db.model('gh7142', new Schema({ name: String }));
+
+    return co(function*() {
+      yield Model.create({ name: 'test' });
+      const now = new Date();
+      const res = yield Model.findOne().map(res => {
+        res.loadedAt = now;
+        return res;
+      });
+
+      assert.equal(res.loadedAt, now);
+    });
+  });
+
   describe('orFail (gh-6841)', function() {
     let Model;
 

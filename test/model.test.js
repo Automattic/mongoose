@@ -5091,7 +5091,7 @@ describe('Model', function() {
 
         it('sets session when pulling a document from db', function() {
           return co(function*() {
-            yield MyModel.create({ name: 'test', nested: { foo: 'bar' } });
+            let doc = yield MyModel.create({ name: 'test', nested: { foo: 'bar' } });
 
             const session = yield MyModel.startSession();
 
@@ -5099,7 +5099,7 @@ describe('Model', function() {
 
             yield delay(1);
 
-            let doc = yield MyModel.findOne({}, null, { session });
+            doc = yield MyModel.findOne({ _id: doc._id }, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
             assert.strictEqual(doc.nested.$session(), session);
@@ -5132,7 +5132,7 @@ describe('Model', function() {
 
         it('sets session on child doc when creating new doc (gh-7104)', function() {
           return co(function*() {
-            yield MyModel.create({ name: 'test', arr: [{ foo: 'bar' }] });
+            let doc = yield MyModel.create({ name: 'test', arr: [{ foo: 'bar' }] });
 
             const session = yield MyModel.startSession();
 
@@ -5140,7 +5140,7 @@ describe('Model', function() {
 
             yield delay(1);
 
-            const doc = yield MyModel.findOne({}, null, { session });
+            doc = yield MyModel.findOne({ _id: doc._id }, null, { session });
             assert.strictEqual(doc.$__.session, session);
             assert.strictEqual(doc.$session(), session);
             assert.strictEqual(doc.arr[0].$session(), session);
@@ -5200,7 +5200,7 @@ describe('Model', function() {
 
         it('supports overwriting `session` in save()', function() {
           return co(function*() {
-            yield MyModel.create({ name: 'test' });
+            let doc = yield MyModel.create({ name: 'test' });
 
             const session = yield MyModel.startSession();
 
@@ -5208,7 +5208,7 @@ describe('Model', function() {
 
             yield delay(1);
 
-            const doc = yield MyModel.findOne({}, null, { session });
+            doc = yield MyModel.findOne({ _id: doc._id }, null, { session });
 
             assert.ok(session.serverSession.lastUse > lastUse);
             lastUse = session.serverSession.lastUse;

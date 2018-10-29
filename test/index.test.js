@@ -386,6 +386,9 @@ describe('mongoose module:', function() {
     assert.strictEqual(m1.Schema.Types.T, T1);
     assert.strictEqual(m2.Schema.Types.T, T2);
 
+    new m1.Schema({ v: T1 });
+    new m2.Schema({ v: T2 });
+
     return Promise.resolve();
   });
 

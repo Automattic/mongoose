@@ -5042,7 +5042,8 @@ describe('Model', function() {
           const nestedSchema = new Schema({ foo: String });
           MyModel = db.model('gh6362', new Schema({
             name: String,
-            nested: nestedSchema
+            nested: nestedSchema,
+            arr: [nestedSchema]
           }));
 
           start.mongodVersion((err, version) => {
@@ -5126,6 +5127,43 @@ describe('Model', function() {
             assert.ok(session.serverSession.lastUse > lastUse);
 
             session.endSession();
+          });
+        });
+
+        it('sets session on child doc when creating new doc (gh-7104)', function() {
+          return co(function*() {
+            yield MyModel.create({ name: 'test', arr: [{ foo: 'bar' }] });
+
+            const session = yield MyModel.startSession();
+
+            let lastUse = session.serverSession.lastUse;
+
+            yield delay(1);
+
+            const doc = yield MyModel.findOne({}, null, { session });
+            assert.strictEqual(doc.$__.session, session);
+            assert.strictEqual(doc.$session(), session);
+            assert.strictEqual(doc.arr[0].$session(), session);
+
+            assert.ok(session.serverSession.lastUse > lastUse);
+
+            doc.arr.push({ foo: 'baz' });
+
+            assert.strictEqual(doc.arr[0].$session(), session);
+            assert.strictEqual(doc.arr[1].$session(), session);
+
+            doc.nested = { foo: 'foo' };
+            assert.strictEqual(doc.nested.$session(), session);
+
+            yield doc.save();
+
+            assert.strictEqual(doc.arr[0].$session(), session);
+            assert.strictEqual(doc.arr[1].$session(), session);
+
+            doc.$session(null);
+
+            assert.equal(doc.arr[0].$session(), null);
+            assert.equal(doc.arr[1].$session(), null);
           });
         });
 

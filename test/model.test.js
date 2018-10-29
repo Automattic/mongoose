@@ -5136,7 +5136,7 @@ describe('Model', function() {
 
             const session = yield MyModel.startSession();
 
-            let lastUse = session.serverSession.lastUse;
+            const lastUse = session.serverSession.lastUse;
 
             yield delay(1);
 

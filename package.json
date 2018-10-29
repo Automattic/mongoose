@@ -60,7 +60,6 @@
     "promise-debug": "0.1.1",
     "q": "1.5.1",
     "semver": "5.5.0",
-    "tbd": "0.6.4",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",

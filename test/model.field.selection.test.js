@@ -5,6 +5,7 @@
 'use strict';
 
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
 
@@ -448,6 +449,57 @@ describe('model field selection', function() {
           done();
         });
       });
+    });
+  });
+
+  it('sets defaults correctly in child docs with projection (gh-7159)', function() {
+    const CalendarSchema = new Schema({
+      dateFormat: {
+        type: String,
+        default: 'dd/MM/yyyy'
+      },
+      locale: {
+        type: String,
+        default: 'en-gb'
+      }
+    }, { _id: false });
+  
+    const SettingsSchema = new Schema({
+      calendar: {
+        type: CalendarSchema,
+        default: {}
+      }
+    }, { _id: false });
+  
+    const BlogPostSchema = new Schema({
+      author: String,
+      settings: {
+        type: SettingsSchema,
+        default: {}
+      }
+    });
+
+    const BlogPost = db.model('gh7159', BlogPostSchema);
+
+    return co(function*() {
+      yield BlogPost.create({
+        author: 'me',
+        settings: {
+          calendar: {
+            dateFormat: '1234'
+          }
+        }
+      });
+  
+      yield BlogPost.updateOne({}, { $unset: { 'settings.calendar.locale': 1 } });
+  
+      let doc = yield BlogPost.findOne();
+      assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
+      assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
+      
+      doc = yield BlogPost.findOne().select('settings author');
+      assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
+      assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
     });
   });
 });

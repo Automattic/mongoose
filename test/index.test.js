@@ -373,18 +373,18 @@ describe('mongoose module:', function() {
     });
   });
 
-  it('isolates custom types between mongoose instances (gh-6933)', function() {
+  it('isolates custom types between mongoose instances (gh-6933) (gh-7158)', function() {
     const m1 = new Mongoose();
     const m2 = new Mongoose();
 
     class T1 extends mongoose.SchemaType {}
     class T2 extends mongoose.SchemaType {}
 
-    m1.Schema.Types.T = T1;
-    m2.Schema.Types.T = T2;
+    m1.Schema.Types.T1 = T1;
+    m2.Schema.Types.T2 = T2;
 
-    assert.strictEqual(m1.Schema.Types.T, T1);
-    assert.strictEqual(m2.Schema.Types.T, T2);
+    assert.strictEqual(m1.Schema.Types.T1, T1);
+    assert.strictEqual(m2.Schema.Types.T2, T2);
 
     new m1.Schema({ v: T1 });
     new m2.Schema({ v: T2 });

@@ -463,14 +463,14 @@ describe('model field selection', function() {
         default: 'en-gb'
       }
     }, { _id: false });
-  
+
     const SettingsSchema = new Schema({
       calendar: {
         type: CalendarSchema,
         default: {}
       }
     }, { _id: false });
-  
+
     const BlogPostSchema = new Schema({
       author: String,
       settings: {
@@ -490,13 +490,13 @@ describe('model field selection', function() {
           }
         }
       });
-  
+
       yield BlogPost.updateOne({}, { $unset: { 'settings.calendar.locale': 1 } });
-  
+
       let doc = yield BlogPost.findOne();
       assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
       assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
-      
+
       doc = yield BlogPost.findOne().select('settings author');
       assert.strictEqual(doc.settings.calendar.locale, 'en-gb');
       assert.strictEqual(doc.settings.calendar.dateFormat, '1234');

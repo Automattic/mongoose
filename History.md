@@ -1,3 +1,11 @@
+5.3.8 / 2018-10-30
+==================
+ * fix: bump mongodb driver -> 3.1.8 to fix connecting to +srv uri with no credentials #7191 #6881 [lineus](https://github.com/lineus)
+ * fix(document): sets defaults correctly in child docs with projection #7159
+ * fix(mongoose): handle setting custom type on a separate mongoose global #7158
+ * fix: add unnecessary files to npmignore #7157
+ * fix(model): set session when creating new subdoc #7104
+
 5.3.7 / 2018-10-26
 ==================
  * fix(browser): fix buffer usage in browser build #7184 #7173 [lineus](https://github.com/lineus)

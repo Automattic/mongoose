@@ -1877,35 +1877,54 @@ describe('model: update:', function() {
       });
     });
 
-    it('updates with timestamps with $set (gh-4989)', function(done) {
+    it('updates with timestamps with $set (gh-4989) (gh-7152)', function() {
       const TagSchema = new Schema({
         name: String,
-        tags: [{
-          enum: ['test1', 'test2'],
-          type: String
-        }]
+        tags: [String]
       }, { timestamps: true });
 
       const Tag = db.model('gh4989', TagSchema);
-      let tagId;
 
-      Tag.deleteOne({}).
-        then(function() { return Tag.create({ name: 'test' }); }).
-        then(function() { return Tag.findOne(); }).
-        then(function(tag) {
-          tagId = tag._id;
-          return Tag.update({ _id: tagId }, {
-            $set: {
-              tags: ['test1']
-            }
-          });
-        }).
-        then(function() { return Tag.findById(tagId); }).
-        then(function(res) {
-          assert.deepEqual(res.tags.toObject(), ['test1']);
-          done();
-        }).
-        catch(done);
+      return co(function*() {
+        yield Tag.create({ name: 'test' });
+
+        // Test update()
+        let start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.update({}, { $set: { tags: ['test1'] } });
+
+        let tag = yield Tag.findOne();
+        assert.ok(tag.updatedAt.valueOf() > start);
+
+        // Test updateOne()
+        start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.updateOne({}, { $set: { tags: ['test1'] } });
+
+        tag = yield Tag.findOne();
+        assert.ok(tag.updatedAt.valueOf() > start);
+
+        // Test updateMany()
+        start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.updateMany({}, { $set: { tags: ['test1'] } });
+
+        tag = yield Tag.findOne();
+        assert.ok(tag.updatedAt.valueOf() > start);
+
+        // Test replaceOne
+        start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.replaceOne({}, { name: 'test', tags: ['test1'] });
+
+        tag = yield Tag.findOne();
+        assert.ok(tag.createdAt.valueOf() > start);
+        assert.ok(tag.updatedAt.valueOf() > start);
+      });
     });
 
     it('lets $currentDate go through with updatedAt (gh-5222)', function(done) {

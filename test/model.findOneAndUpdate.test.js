@@ -1655,7 +1655,7 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('strictQuery option (gh-4136) (gh-7152)', function() {
+    it('strictQuery option (gh-4136) (gh-7178)', function() {
       const modelSchema = new Schema({
         field: Number,
         nested: { path: String }
@@ -1669,7 +1669,7 @@ describe('model: findOneAndUpdate:', function() {
         assert.ok(err);
         assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
 
-        // Shouldn't throw on nested path re: gh-7152
+        // Shouldn't throw on nested path re: gh-7178
         yield Model.create({ nested: { path: 'a' } });
         const doc = yield Model.findOne({ nested: { path: 'a' } });
         assert.ok(doc);

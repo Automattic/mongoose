@@ -4,6 +4,7 @@ const assert = require('assert');
 const start = require('./common');
 
 const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 describe('timestamps', function() {
   let db;
@@ -160,6 +161,23 @@ describe('timestamps', function() {
         assert.ok(doc.ts.updatedAt.valueOf() >= startTime);
         done();
       });
+    });
+  });
+
+  it('no timestamps added when parent/child timestamps explicitly false (gh-7202)', function(done) {
+    const subSchema = new Schema({}, { timestamps: false });
+    const schema = new Schema({ sub: subSchema }, { timestamps: false });
+
+    const Test = db.model('gh7202', schema);
+    const test = new Test({ sub: {} });
+
+    test.save((err, saved) => {
+      assert.ifError(err);
+      assert.strictEqual(saved.createdAt, undefined);
+      assert.strictEqual(saved.updatedAt, undefined);
+      assert.strictEqual(saved.sub.createdAt, undefined);
+      assert.strictEqual(saved.sub.updatedAt, undefined);
+      done();
     });
   });
 });

@@ -3197,4 +3197,21 @@ describe('Query', function() {
       assert.equal(docs.length, 1);
     });
   });
+
+  it('function defaults run after query result is inited (gh-7182)', function() {
+    const schema = new Schema({ kind: String, hasDefault: String });
+    schema.path('hasDefault').default(function() {
+      return this.kind === 'test' ? 'success' : 'fail';
+    });
+
+    return co(function*() {
+      const Model = db.model('gh7182', schema);
+
+      yield Model.create({ kind: 'test' });
+      yield Model.updateOne({}, { $unset: { hasDefault: 1 } });
+
+      const doc = yield Model.findOne();
+      assert.equal(doc.hasDefault, 'success');
+    });
+  });
 });

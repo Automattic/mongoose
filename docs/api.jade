@@ -2,10 +2,22 @@ extends layout
 
 append style
   link(rel="stylesheet", href="/docs/css/api.css")
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
   h1 API Docs
+
+  div.
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
 
   div.api-nav
     div.api-nav-content

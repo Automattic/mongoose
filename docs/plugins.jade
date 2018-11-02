@@ -1,8 +1,23 @@
 extends layout
 
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
   :markdown
     ## Plugins
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
+
     Schemas are pluggable, that is, they allow for applying pre-packaged capabilities to extend their functionality. This is a very powerful feature.
 
     Suppose that we have several collections in our database and want to add last-modified functionality to each one. With plugins this is easy. Just create a plugin once and apply it to each `Schema`:

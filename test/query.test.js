@@ -3157,4 +3157,61 @@ describe('Query', function() {
       });
     });
   });
+
+  it('strictQuery option (gh-4136) (gh-7178)', function() {
+    const modelSchema = new Schema({
+      field: Number,
+      nested: { path: String }
+    }, { strictQuery: 'throw' });
+
+    const Model = db.model('gh4136', modelSchema);
+
+    return co(function*() {
+      // `find()` on a top-level path not in the schema
+      let err = yield Model.find({ notInschema: 1 }).then(() => null, e => e);
+      assert.ok(err);
+      assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+
+      // Shouldn't throw on nested path re: gh-7178
+      yield Model.create({ nested: { path: 'a' } });
+      const doc = yield Model.findOne({ nested: { path: 'a' } });
+      assert.ok(doc);
+
+      // `find()` on a nested path not in the schema
+      err = yield Model.find({ 'nested.bad': 'foo' }).then(() => null, e => e);
+      assert.ok(err);
+      assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+    });
+  });
+
+  it('strictQuery = true (gh-6032)', function() {
+    const modelSchema = new Schema({ field: Number }, { strictQuery: true });
+
+    return co(function*() {
+      const Model = db.model('gh6032', modelSchema);
+
+      yield Model.create({ field: 1 });
+
+      const docs = yield Model.find({ nonexistingField: 1 });
+
+      assert.equal(docs.length, 1);
+    });
+  });
+
+  it('function defaults run after query result is inited (gh-7182)', function() {
+    const schema = new Schema({ kind: String, hasDefault: String });
+    schema.path('hasDefault').default(function() {
+      return this.kind === 'test' ? 'success' : 'fail';
+    });
+
+    return co(function*() {
+      const Model = db.model('gh7182', schema);
+
+      yield Model.create({ kind: 'test' });
+      yield Model.updateOne({}, { $unset: { hasDefault: 1 } });
+
+      const doc = yield Model.findOne();
+      assert.equal(doc.hasDefault, 'success');
+    });
+  });
 });

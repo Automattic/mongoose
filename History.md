@@ -1,3 +1,15 @@
+5.3.9 / 2018-11-02
+==================
+ * fix: upgrade bson dep -> 1.1.0 to match mongodb-core #7213 [NewEraCracker](https://github.com/NewEraCracker)
+ * docs(api): fix broken anchor link #7210 [gfranco93](https://github.com/gfranco93)
+ * fix: don't set parent timestamps because a child has timestamps set to false #7203 #7202 [lineus](https://github.com/lineus)
+ * fix(document): run setter only once when doing `.set()` underneath a single nested subdoc #7196
+ * fix(document): surface errors in subdoc pre validate #7187
+ * fix(query): run default functions after hydrating the loaded document #7182
+ * fix(query): handle strictQuery: 'throw' with nested path correctly #7178
+ * fix(update): update timestamps on replaceOne() #7152
+ * docs(transactions): add example of aborting a transaction #7113
+
 5.3.8 / 2018-10-30
 ==================
  * fix: bump mongodb driver -> 3.1.8 to fix connecting to +srv uri with no credentials #7191 #6881 [lineus](https://github.com/lineus)

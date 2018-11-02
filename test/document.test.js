@@ -6376,4 +6376,21 @@ describe('document', function() {
       assert.ok(error == null, error);
     });
   });
+
+  it('surfaces errors in subdoc pre validate (gh-7187)', function() {
+    const InnerSchema = new Schema({ name: String });
+    
+    InnerSchema.pre('validate', function() {
+      throw new Error('Oops!');
+    });
+    
+    const TestSchema = new Schema({ subdocs: [InnerSchema] });
+
+    const Test = db.model('gh7187', TestSchema);
+
+    return Test.create({ subdocs: [{ name: 'foo' }] }).then(
+      () => { throw new Error('Fail'); },
+      err => { assert.ok(err.message.indexOf('Oops!') !== -1, err.message); }
+    );
+  });
 });

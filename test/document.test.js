@@ -6393,4 +6393,33 @@ describe('document', function() {
       err => { assert.ok(err.message.indexOf('Oops!') !== -1, err.message); }
     );
   });
+
+  it('runs setter only once when doing .set() underneath single nested (gh-7196)', function() {
+    let called = [];
+    const InnerSchema = new Schema({
+      name: String,
+      withSetter: {
+        type: String,
+        set: function(v) {
+          called.push(this);
+          return v;
+        }
+      }
+    });
+
+    const TestSchema = new Schema({ nested: InnerSchema });
+
+    const Model = db.model('gh7196', TestSchema);
+
+    const doc = new Model({ nested: { name: 'foo' } });
+
+    // Make sure setter only gets called once
+    called = [];
+    doc.set('nested.withSetter', 'bar');
+
+    assert.equal(called.length, 1);
+    assert.equal(called[0].name, 'foo');
+
+    return Promise.resolve();
+  });
 });

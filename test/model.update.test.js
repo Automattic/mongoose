@@ -2536,6 +2536,48 @@ describe('model: update:', function() {
         catch(done);
     });
 
+    it('doesn\'t skip casting the query on nested arrays (gh-7098)', function() {
+      const nestedSchema = new Schema({
+        xyz: [[Number]]
+      });
+      const schema = new Schema({
+        xyz: [[{ type: Number }]],
+        nested: nestedSchema
+      });
+
+      const Model = db.model('gh-7098', schema);
+
+      const test = new Model({
+        xyz: [
+          [0, 1],
+          [2, 3],
+          [4, 5]
+        ],
+        nested: {
+          xyz: [
+            [0, 1],
+            [2, 3],
+            [4, 5]
+          ],
+        }
+      });
+
+      const cond = { _id: test._id };
+      const update = { $set: { 'xyz.1.0': '200', 'nested.xyz.1.0': '200' } };
+      const opts = { new: true };
+
+      return co(function*() {
+        let inserted = yield test.save();
+        inserted = inserted.toObject();
+        assert.deepStrictEqual(inserted.xyz, [[0, 1], [2, 3], [4, 5]]);
+        assert.deepStrictEqual(inserted.nested.xyz, [[0, 1], [2, 3], [4, 5]]);
+        let updated = yield Model.findOneAndUpdate(cond, update, opts);
+        updated = updated.toObject();
+        assert.deepStrictEqual(updated.xyz, [[0, 1], [200, 3], [4, 5]]);
+        assert.deepStrictEqual(updated.nested.xyz, [[0, 1], [200, 3], [4, 5]]);
+      });
+    });
+
     it('defaults with overwrite and no update validators (gh-5384)', function(done) {
       const testSchema = new mongoose.Schema({
         name: String,

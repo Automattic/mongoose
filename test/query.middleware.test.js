@@ -1,6 +1,9 @@
 'use strict';
+
 const start = require('./common');
 const assert = require('power-assert');
+const co = require('co');
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
@@ -368,6 +371,58 @@ describe('query middleware', function() {
             });
           });
       });
+    });
+  });
+
+  it('deleteOne() (gh-7195)', function() {
+    let preCount = 0;
+    let postCount = 0;
+
+    schema.pre('deleteOne', function() {
+      ++preCount;
+    });
+
+    schema.post('deleteOne', function() {
+      ++postCount;
+    });
+
+    return co(function*() {
+      const Model = db.model('gh7195_deleteOne', schema);
+      yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
+
+      yield Model.deleteOne();
+
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
+
+      const count = yield Model.countDocuments();
+      assert.equal(count, 1);
+    });
+  });
+
+  it('deleteMany() (gh-7195)', function() {
+    let preCount = 0;
+    let postCount = 0;
+
+    schema.pre('deleteMany', function() {
+      ++preCount;
+    });
+
+    schema.post('deleteMany', function() {
+      ++postCount;
+    });
+
+    return co(function*() {
+      const Model = db.model('gh7195_deleteMany', schema);
+      yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
+
+      yield Model.deleteMany();
+
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
+
+      const count = yield Model.countDocuments();
+      assert.equal(count, 0);
     });
   });
 

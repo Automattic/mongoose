@@ -35,6 +35,21 @@ block content
     [require:transactions.*basic example]
     ```
 
+    ## Aborting a Transaction
+
+    The most important feature of transactions is the ability to roll back _all_
+    operations in the transaction using the [`abortTransaction()` function](https://docs.mongodb.com/manual/reference/method/Session.abortTransaction/).
+
+    Think about [modeling a bank account in Mongoose](https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html#transactions-with-mongoose).
+    To transfer money from account `A` to account `B`, you would decrement
+    `A`'s balance and increment `B`'s balance. However, if `A` only has a balance
+    of $5 and you try to transfer $10, you want to abort the transaction and undo
+    incrementing `B`'s balance.
+
+    ```javascript
+    [require:transactions.*abort]
+    ```
+
     ## With Mongoose Documents and `save()`
 
     If you get a [Mongoose document](/docs/documents.html) from [`findOne()`](/docs/api.html#findone_findOne)

@@ -1877,35 +1877,54 @@ describe('model: update:', function() {
       });
     });
 
-    it('updates with timestamps with $set (gh-4989)', function(done) {
+    it('updates with timestamps with $set (gh-4989) (gh-7152)', function() {
       const TagSchema = new Schema({
         name: String,
-        tags: [{
-          enum: ['test1', 'test2'],
-          type: String
-        }]
+        tags: [String]
       }, { timestamps: true });
 
       const Tag = db.model('gh4989', TagSchema);
-      let tagId;
 
-      Tag.deleteOne({}).
-        then(function() { return Tag.create({ name: 'test' }); }).
-        then(function() { return Tag.findOne(); }).
-        then(function(tag) {
-          tagId = tag._id;
-          return Tag.update({ _id: tagId }, {
-            $set: {
-              tags: ['test1']
-            }
-          });
-        }).
-        then(function() { return Tag.findById(tagId); }).
-        then(function(res) {
-          assert.deepEqual(res.tags.toObject(), ['test1']);
-          done();
-        }).
-        catch(done);
+      return co(function*() {
+        yield Tag.create({ name: 'test' });
+
+        // Test update()
+        let start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.update({}, { $set: { tags: ['test1'] } });
+
+        let tag = yield Tag.findOne();
+        assert.ok(tag.updatedAt.valueOf() > start);
+
+        // Test updateOne()
+        start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.updateOne({}, { $set: { tags: ['test1'] } });
+
+        tag = yield Tag.findOne();
+        assert.ok(tag.updatedAt.valueOf() > start);
+
+        // Test updateMany()
+        start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.updateMany({}, { $set: { tags: ['test1'] } });
+
+        tag = yield Tag.findOne();
+        assert.ok(tag.updatedAt.valueOf() > start);
+
+        // Test replaceOne
+        start = Date.now();
+        yield cb => setTimeout(() => cb(), 10);
+
+        yield Tag.replaceOne({}, { name: 'test', tags: ['test1'] });
+
+        tag = yield Tag.findOne();
+        assert.ok(tag.createdAt.valueOf() > start);
+        assert.ok(tag.updatedAt.valueOf() > start);
+      });
     });
 
     it('lets $currentDate go through with updatedAt (gh-5222)', function(done) {
@@ -2515,6 +2534,48 @@ describe('model: update:', function() {
           done();
         }).
         catch(done);
+    });
+
+    it('doesn\'t skip casting the query on nested arrays (gh-7098)', function() {
+      const nestedSchema = new Schema({
+        xyz: [[Number]]
+      });
+      const schema = new Schema({
+        xyz: [[{ type: Number }]],
+        nested: nestedSchema
+      });
+
+      const Model = db.model('gh-7098', schema);
+
+      const test = new Model({
+        xyz: [
+          [0, 1],
+          [2, 3],
+          [4, 5]
+        ],
+        nested: {
+          xyz: [
+            [0, 1],
+            [2, 3],
+            [4, 5]
+          ],
+        }
+      });
+
+      const cond = { _id: test._id };
+      const update = { $set: { 'xyz.1.0': '200', 'nested.xyz.1.0': '200' } };
+      const opts = { new: true };
+
+      return co(function*() {
+        let inserted = yield test.save();
+        inserted = inserted.toObject();
+        assert.deepStrictEqual(inserted.xyz, [[0, 1], [2, 3], [4, 5]]);
+        assert.deepStrictEqual(inserted.nested.xyz, [[0, 1], [2, 3], [4, 5]]);
+        let updated = yield Model.findOneAndUpdate(cond, update, opts);
+        updated = updated.toObject();
+        assert.deepStrictEqual(updated.xyz, [[0, 1], [200, 3], [4, 5]]);
+        assert.deepStrictEqual(updated.nested.xyz, [[0, 1], [200, 3], [4, 5]]);
+      });
     });
 
     it('defaults with overwrite and no update validators (gh-5384)', function(done) {

@@ -1655,31 +1655,6 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('strictQuery option (gh-4136)', function(done) {
-      const modelSchema = new Schema({ field: Number }, { strictQuery: 'throw' });
-
-      const Model = db.model('gh4136', modelSchema);
-      Model.find({ nonexistingField: 1 }).exec(function(error) {
-        assert.ok(error);
-        assert.ok(error.message.indexOf('strictQuery') !== -1, error.message);
-        done();
-      });
-    });
-
-    it('strictQuery = true (gh-6032)', function() {
-      const modelSchema = new Schema({ field: Number }, { strictQuery: true });
-
-      return co(function*() {
-        const Model = db.model('gh6032', modelSchema);
-
-        yield Model.create({ field: 1 });
-
-        const docs = yield Model.find({ nonexistingField: 1 });
-
-        assert.equal(docs.length, 1);
-      });
-    });
-
     it('strict option (gh-5108)', function(done) {
       const modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 

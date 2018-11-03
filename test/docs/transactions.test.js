@@ -75,6 +75,24 @@ describe('transactions', function() {
       then(doc => assert.ok(doc));
   });
 
+  it('abort', function() {
+    // acquit:ignore:start
+    const Customer = db.model('Customer0', new Schema({ name: String }));
+    // acquit:ignore:end
+    let session = null;
+    return Customer.createCollection().
+      then(() => Customer.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return Customer.create([{ name: 'Test' }], { session: session });
+      }).
+      then(() => Customer.create([{ name: 'Test2' }], { session: session })).
+      then(() => session.abortTransaction()).
+      then(() => Customer.countDocuments()).
+      then(count => assert.strictEqual(count, 0));
+  });
+
   it('save', function() {
     const User = db.model('User', new Schema({ name: String }));
 

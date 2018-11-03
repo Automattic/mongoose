@@ -21,3 +21,13 @@ dist/
 
 *.txt
 *.png
+
+examples/
+.github
+.vscode
+.eslintignore
+CONTRIBUTING.md
+format_deps.js
+release-items.md
+static.js
+website.js

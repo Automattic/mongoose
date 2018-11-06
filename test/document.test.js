@@ -2827,7 +2827,8 @@ describe('document', function() {
 
       const ParentModelSchema = new mongoose.Schema({
         model: String,
-        childId: { type: mongoose.ObjectId, refPath: 'model' }
+        childId: { type: mongoose.ObjectId, refPath: 'model' },
+        otherId: mongoose.ObjectId
       });
 
       const ParentModel = db.model('gh7070', ParentModelSchema);
@@ -2843,8 +2844,10 @@ describe('document', function() {
         parent = yield ParentModel.findOne();
 
         parent.childId = child;
+        parent.otherId = child;
 
         assert.equal(parent.childId.name, 'test');
+        assert.ok(parent.otherId instanceof mongoose.Types.ObjectId);
       });
     });
 

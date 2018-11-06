@@ -1035,6 +1035,28 @@ describe('model', function() {
       assert.ok(threw);
     });
 
+    it('supports using a schema that was used for another discriminator (gh-7200)', function() {
+      const schema = new Schema({
+        name: String,
+        names: [{
+          name: String
+        }]
+      });
+
+      const conA = mongoose.createConnection(start.uri);
+
+      const schemaExt = new Schema({ nameExt: String });
+      
+      const modelA = conA.model('A', schema);
+      modelA.discriminator('AExt', schemaExt);
+      
+      const conB = mongoose.createConnection(start.uri);
+      
+      const modelB = conB.model('A', schema);
+      modelB.discriminator('AExt', schemaExt);
+      
+    });
+
     describe('embedded discriminators + hooks (gh-5706)', function(){
       var counters = {
         eventPreSave: 0,
@@ -1153,8 +1175,8 @@ describe('model', function() {
             assert.equal(counters[i], 2);
           });
           done();
-        })
-      })
-    })
+        });
+      });
+    });
   });
 });

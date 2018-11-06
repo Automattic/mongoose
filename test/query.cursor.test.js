@@ -349,7 +349,7 @@ describe('QueryCursor', function() {
       let cur = 0;
       cursor.on('data', function(doc) {
         assert.equal(doc.name, expectedNames[cur++]);
-        assert.strictEqual(false, doc instanceof mongoose.Document);
+        assert.strictEqual(doc instanceof mongoose.Document, false);
       });
 
       cursor.on('error', function(error) {
@@ -360,7 +360,15 @@ describe('QueryCursor', function() {
         assert.equal(cur, 2);
         done();
       });
+    });
 
+    it('lean = false (gh-7197)', function() {
+      const cursor = Model.find().sort({ name: 1 }).lean(false).cursor();
+
+      return co(function*() {
+        const doc = yield cursor.next();
+        assert.ok(doc instanceof mongoose.Document);
+      });
     });
   });
 

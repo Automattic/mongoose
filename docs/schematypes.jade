@@ -19,7 +19,7 @@ block content
 
     You can think of a Mongoose schema as the configuration object for a
     Mongoose model. A SchemaType is then a configuration object for an individual
-    property of instances of the model. A SchemaType says what type a given
+    property. A SchemaType says what type a given
     path should have, whether it has any getters/setters, and what values are
     valid for that path.
 
@@ -29,6 +29,11 @@ block content
     schema.path('name') instanceof mongoose.Schema.Types.String; // true
     schema.path('name').instance; // 'String'
     ```
+
+    A SchemaType is different from a type. In other words, `mongoose.ObjectId !== mongoose.Types.ObjectId`.
+    A SchemaType is just a configuration object for Mongoose. An instance of
+    the `mongoose.ObjectId` SchemaType doesn't actually create MongoDB ObjectIds,
+    it is just a configuration for a path in a schema.
 
     The following are all the valid SchemaTypes in Mongoose. Mongoose plugins
     can also add custom SchemaTypes like [int32](http://plugins.mongoosejs.io/plugins/int32).

@@ -34,4 +34,25 @@ describe('schematype mixed', function() {
       done();
     });
   });
+
+  describe('mixed types with dot', function() {
+    it('should enable key with dot(.) on mixed types', function(done) {
+      const s = new Schema({ raw: { type: Schema.Types.Mixed } });
+      const M = mongoose.model('M1', s);
+
+      const raw = {
+        '@odata.etag': 'blah',
+        id: 'id',
+      };
+
+      const m1 = new M({
+        raw
+      }).save()
+        .then(data => {
+          assert.equal(data.raw).toEqual(raw);
+
+          done();
+        });
+    });
+  });
 });

@@ -1,3 +1,9 @@
+5.3.11 / 2018-11-09
+===================
+ * fix(model): make parent pointers non-enumerable so they don't crash JSON.stringify() #7220
+ * fix(document): allow saving docs with nested props with '.' using `checkKeys: false` #7144
+ * docs(lambda): use async/await with lambda example #7019
+
 5.3.10 / 2018-11-06
 ===================
  * fix(discriminator): support reusing a schema for multiple discriminators #7200

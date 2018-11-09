@@ -6138,7 +6138,7 @@ describe('Model', function() {
 
   it('can JSON.stringify(Model.schema) with nested (gh-7220)', function() {
     const nested = Schema({ name: String });
-    const Model = mongoose.model('Test', Schema({ nested }));
+    const Model = mongoose.model('gh7220', Schema({ nested }));
 
     const _schema = JSON.parse(JSON.stringify(Model.schema));
     assert.ok(_schema.obj.nested);

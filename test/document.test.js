@@ -6425,4 +6425,20 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('should enable key with dot(.) on mixed types with checkKeys (gh-7144)', function() {
+    const s = new Schema({ raw: { type: Schema.Types.Mixed } });
+    const M = db.model('gh7144', s);
+
+    const raw = { 'foo.bar': 'baz' };
+
+    return co(function*() {
+      let doc = yield M.create([{ raw: raw }], { checkKeys: false }).
+        then(res => res[0]);
+      assert.deepEqual(doc.raw, raw);
+
+      doc = yield M.findOneAndUpdate({}, { raw: { 'a.b': 2 } }, { new: true });
+      assert.deepEqual(doc.raw, { 'a.b': 2 });
+    });
+  });
 });

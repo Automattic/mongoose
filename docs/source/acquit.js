@@ -27,7 +27,7 @@ var files = [
         <i>
           Want to learn how to check whether your favorite npm modules work with
           async/await without cobbling together contradictory answers from Google
-          and Stack Overflow? Chapter 4 Mastering Async/Await, explains the
+          and Stack Overflow? Chapter 4 of Mastering Async/Await explains the
           basic principles for determining whether frameworks like React and
           Mongoose support async/await.
           <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=promises">Get your copy!</a>

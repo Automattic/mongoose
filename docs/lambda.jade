@@ -13,52 +13,39 @@ block content
     MongoDB instance and finds a single document:
 
     ```javascript
-    // Currently, Lambda only supports node v6, so no native async/await.
-    const co = require('co');
     const mongoose = require('mongoose');
 
     let conn = null;
 
     const uri = 'YOUR CONNECTION STRING HERE';
 
-    exports.handler = function(event, context, callback) {
+    exports.handler = async function(event, context) {
       // Make sure to add this so you can re-use `conn` between function calls.
       // See https://www.mongodb.com/blog/post/serverless-development-with-nodejs-aws-lambda-mongodb-atlas
       context.callbackWaitsForEmptyEventLoop = false;
 
-      run().
-        then(res => {
-          callback(null, res);
-          console.log('done');
-        }).
-        catch(error => callback(error));
+      // Because `conn` is in the global scope, Lambda may retain it between
+      // function calls thanks to `callbackWaitsForEmptyEventLoop`.
+      // This means your Lambda function doesn't have to go through the
+      // potentially expensive process of connecting to MongoDB every time.
+      if (conn == null) {
+        conn = await mongoose.createConnection(uri, {
+          // Buffering means mongoose will queue up operations if it gets
+          // disconnected from MongoDB and send them when it reconnects.
+          // With serverless, better to fail fast if not connected.
+          bufferCommands: false, // Disable mongoose buffering
+          bufferMaxEntries: 0 // and MongoDB driver buffering
+        });
+        conn.model('Test', new mongoose.Schema({ name: String }));
+      }
+
+      const M = conn.model('Test');
+
+      const doc = await M.findOne();
+      console.log(doc);
+
+      return doc;
     };
-
-    function run() {
-      return co(function*() {
-        // Because `conn` is in the global scope, Lambda may retain it between
-        // function calls thanks to `callbackWaitsForEmptyEventLoop`.
-        // This means your Lambda function doesn't have to go through the
-        // potentially expensive process of connecting to MongoDB every time.
-        if (conn == null) {
-          conn = yield mongoose.createConnection(uri, {
-            // Buffering means mongoose will queue up operations if it gets
-            // disconnected from MongoDB and send them when it reconnects.
-            // With serverless, better to fail fast if not connected.
-            bufferCommands: false, // Disable mongoose buffering
-            bufferMaxEntries: 0 // and MongoDB driver buffering
-          });
-          conn.model('Test', new mongoose.Schema({ name: String }));
-        }
-
-        const M = conn.model('Test');
-
-        const doc = yield M.findOne();
-        console.log(doc);
-
-        return doc;
-      });
-    }
     ```
 
     To import this function into Lambda, go [the AWS Lambda console](https://console.aws.amazon.com/lambda)
@@ -68,14 +55,14 @@ block content
 
     Create a function called "mongoose-test" with the below settings:
 
-    <a href="https://i.imgur.com/mEtS2Ij.png"><img src="https://i.imgur.com/mEtS2Ij.png"></a>
+    <a href="https://i.imgur.com/YOYJzeO.png"><img src="https://i.imgur.com/YOYJzeO.png"></a>
 
     Copy the source code into a file called `lambda.js`. Then run `npm install mongoose co`.
     Finally, run `zip -r mongoose-test.zip node_modules/ lambda.js` to create a
     zip that you can upload to Lambda using the "Upload a Zip File" option under "Function code".
     Make sure you also change the "Handler" input to `lambda.handler` to match the `lambda.js` file's `handler` function.
 
-    <a href="https://i.imgur.com/IO9X570.png"><img src="https://i.imgur.com/IO9X570.png"></a>
+    <a href="https://i.imgur.com/BXc9egq.png"><img src="https://i.imgur.com/BXc9egq.png"></a>
 
     Next, click the "Save" button and then the "Test" button. The "Test" button will
     ask you to create a new test event, just create one because your inputs don't matter
@@ -90,9 +77,15 @@ block content
     cannot find account after reload: could not find config for <hostname>
     ```
 
-    If you're using Mongoose with AWS Lambda to avoid the overhead of managing servers,
-    we recommend using [MongoDB Atlas](http://mbsy.co/mongodb/28365503), MongoDB's
-    hosted service, so you don't have to manage your own database services either.
+    Lambda's JavaScript framework recently added support for
+    async/await as long as you're using Node 8.x, so make sure you're not
+    using Node.js 6.x.
+
+    *Want to learn how to check whether your favorite JavaScript frameworks, like [Express](http://expressjs.com/) or [React](https://reactjs.org/), work with async/await? Spoiler alert: neither Express nor React support async/await. Chapter 4 of Mastering Async/Await explains the basic principles for determining whether a framework supports async/await. [Get your copy!](http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda)*
+
+    <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda" style="margin-left: 100px">
+      <img src="/docs/images/asyncawait.png" style="width: 650px" />
+    </a>
 
 block append layout
   script.

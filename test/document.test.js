@@ -6451,7 +6451,7 @@ describe('document', function() {
         default: [{ name: 'test' }]
       }
     });
-  
+
     const schema = new mongoose.Schema({
       sub: [subSchema]
     });

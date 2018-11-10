@@ -2827,7 +2827,8 @@ describe('document', function() {
 
       const ParentModelSchema = new mongoose.Schema({
         model: String,
-        childId: { type: mongoose.ObjectId, refPath: 'model' }
+        childId: { type: mongoose.ObjectId, refPath: 'model' },
+        otherId: mongoose.ObjectId
       });
 
       const ParentModel = db.model('gh7070', ParentModelSchema);
@@ -2843,8 +2844,10 @@ describe('document', function() {
         parent = yield ParentModel.findOne();
 
         parent.childId = child;
+        parent.otherId = child;
 
         assert.equal(parent.childId.name, 'test');
+        assert.ok(parent.otherId instanceof mongoose.Types.ObjectId);
       });
     });
 
@@ -6421,5 +6424,47 @@ describe('document', function() {
     assert.equal(called[0].name, 'foo');
 
     return Promise.resolve();
+  });
+
+  it('should enable key with dot(.) on mixed types with checkKeys (gh-7144)', function() {
+    const s = new Schema({ raw: { type: Schema.Types.Mixed } });
+    const M = db.model('gh7144', s);
+
+    const raw = { 'foo.bar': 'baz' };
+
+    return co(function*() {
+      let doc = yield M.create([{ raw: raw }], { checkKeys: false }).
+        then(res => res[0]);
+      assert.deepEqual(doc.raw, raw);
+
+      doc = yield M.findOneAndUpdate({}, { raw: { 'a.b': 2 } }, { new: true });
+      assert.deepEqual(doc.raw, { 'a.b': 2 });
+    });
+  });
+
+  it('doesnt mark array as modified on init if embedded schema has default (gh-7227)', function() {
+    const subSchema = new mongoose.Schema({
+      users: {
+        type: [{ name: { type: String } }],
+        // This test ensures the whole array won't be modified on init because
+        // of this default
+        default: [{ name: 'test' }]
+      }
+    });
+
+    const schema = new mongoose.Schema({
+      sub: [subSchema]
+    });
+    const Model = db.model('gh7227', schema);
+
+    return co(function*() {
+      let doc = new Model({ name: 'test', sub: [{}] });
+      yield doc.save();
+
+      assert.ok(!doc.isModified());
+
+      doc = yield Model.findOne();
+      assert.ok(!doc.isModified());
+    });
   });
 });

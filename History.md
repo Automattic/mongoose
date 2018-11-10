@@ -1,3 +1,17 @@
+5.3.11 / 2018-11-09
+===================
+ * fix(model): make parent pointers non-enumerable so they don't crash JSON.stringify() #7220
+ * fix(document): allow saving docs with nested props with '.' using `checkKeys: false` #7144
+ * docs(lambda): use async/await with lambda example #7019
+
+5.3.10 / 2018-11-06
+===================
+ * fix(discriminator): support reusing a schema for multiple discriminators #7200
+ * fix(cursor): handle `lean(false)` correctly with query cursors #7197
+ * fix(document): avoid manual populate if `ref` not set #7193
+ * fix(schema): handle schema without `.base` for browser build #7170
+ * docs: add further reading section
+
 5.3.9 / 2018-11-02
 ==================
  * fix: upgrade bson dep -> 1.1.0 to match mongodb-core #7213 [NewEraCracker](https://github.com/NewEraCracker)

@@ -18,6 +18,10 @@ describe('browser', function() {
     exec('node --eval "require(\'./lib/browser\')"', done);
   });
 
+  it('using schema (gh-7170)', function(done) {
+    exec('node --eval "const mongoose = require(\'./lib/browser\'); new mongoose.Schema();"', done);
+  });
+
   it('document works (gh-4987)', function(done) {
     const schema = new Schema({
       name: {type: String, required: true},

@@ -6441,4 +6441,30 @@ describe('document', function() {
       assert.deepEqual(doc.raw, { 'a.b': 2 });
     });
   });
+
+  it('doesnt mark array as modified on init if embedded schema has default (gh-7227)', function() {
+    const subSchema = new mongoose.Schema({
+      users: {
+        type: [{ name: { type: String } }],
+        // This test ensures the whole array won't be modified on init because
+        // of this default
+        default: [{ name: 'test' }]
+      }
+    });
+  
+    const schema = new mongoose.Schema({
+      sub: [subSchema]
+    });
+    const Model = db.model('gh7227', schema);
+
+    return co(function*() {
+      let doc = new Model({ name: 'test', sub: [{}] });
+      yield doc.save();
+
+      assert.ok(!doc.isModified());
+
+      doc = yield Model.findOne();
+      assert.ok(!doc.isModified());
+    });
+  });
 });

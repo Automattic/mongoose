@@ -92,6 +92,9 @@ function parse() {
               tag.types = tag.types.join('|');
             }
             ctx[tag.type].push(tag);
+            if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {
+              tag.nested = true;
+            }
             tag.description = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
               '';

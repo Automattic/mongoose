@@ -57,7 +57,15 @@ block content
         h5 Parameters
         ul.params
           each param in prop.param
-            li.param #{param.name} <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
+            - if (param.nested)
+              ul(style="margin-top: 0.5em")
+                li
+                  | #{param.name}
+                  | <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
+            - else
+              li.param
+                | #{param.name}
+                | <span class="method-type">&laquo;#{param.types}&raquo;</span> !{param.description}
       if prop.return != null
         h5 Returns:
         ul

@@ -358,3 +358,75 @@ Sport.find({ name: 'baseball' }).where({name: {$ne: 'softball'}});
 ```
 
 In Mongoose 5.x, the above code will correctly overwrite `'baseball'` with `{ $ne: 'softball' }` 
+
+### `bulkWrite()` results
+
+Mongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of
+the result of [`bulkWrite()` calls](http://localhost:8088/docs/api.html#model_Model.bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
+
+```javascript
+const Model = mongoose.model('Test', new Schema({ name: String }));
+
+const res = await Model.bulkWrite([{ insertOne: { document: { name: 'test' } } }]);
+
+console.log(res);
+```
+
+In Mongoose 4.x, the above will print:
+
+```
+BulkWriteResult {
+  ok: [Getter],
+  nInserted: [Getter],
+  nUpserted: [Getter],
+  nMatched: [Getter],
+  nModified: [Getter],
+  nRemoved: [Getter],
+  getInsertedIds: [Function],
+  getUpsertedIds: [Function],
+  getUpsertedIdAt: [Function],
+  getRawResponse: [Function],
+  hasWriteErrors: [Function],
+  getWriteErrorCount: [Function],
+  getWriteErrorAt: [Function],
+  getWriteErrors: [Function],
+  getLastOp: [Function],
+  getWriteConcernError: [Function],
+  toJSON: [Function],
+  toString: [Function],
+  isOk: [Function],
+  insertedCount: 1,
+  matchedCount: 0,
+  modifiedCount: 0,
+  deletedCount: 0,
+  upsertedCount: 0,
+  upsertedIds: {},
+  insertedIds: { '0': 5be9a3101638a066702a0d38 },
+  n: 1 }
+```
+
+In Mongoose 5.x, the script will print:
+
+```
+BulkWriteResult {
+  result: 
+   { ok: 1,
+     writeErrors: [],
+     writeConcernErrors: [],
+     insertedIds: [ [Object] ],
+     nInserted: 1,
+     nUpserted: 0,
+     nMatched: 0,
+     nModified: 0,
+     nRemoved: 0,
+     upserted: [],
+     lastOp: { ts: [Object], t: 1 } },
+  insertedCount: 1,
+  matchedCount: 0,
+  modifiedCount: 0,
+  deletedCount: 0,
+  upsertedCount: 0,
+  upsertedIds: {},
+  insertedIds: { '0': 5be9a1c87decfc6443dd9f18 },
+  n: 1 }
+```

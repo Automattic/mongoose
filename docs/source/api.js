@@ -80,6 +80,9 @@ function parse() {
             ctx.string = `${ctx.constructor}.${ctx.name}`;
             break;
           case 'return':
+            tag.description = tag.description ?
+              md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
+              '';
             ctx.return = tag;
             break;
           case 'inherits':

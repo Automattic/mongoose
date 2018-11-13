@@ -1,3 +1,11 @@
+5.3.12 / 2018-11-13
+===================
+ * docs(compatibility): don't show Mongoose 4.11 as compatible with MongoDB 3.6 re: MongoDB's official compatibility table #7238 [a-harrison](https://github.com/a-harrison)
+ * fix(populate): use `instanceof` rather than class name for comparison #7237 [ivanseidel](https://github.com/ivanseidel)
+ * docs(api): make options show up as a nested list #7232
+ * fix(document): don't mark array as modified on init if doc array has default #7227
+ * docs(api): link to bulk write result object in `bulkWrite()` docs #7225
+
 5.3.11 / 2018-11-09
 ===================
  * fix(model): make parent pointers non-enumerable so they don't crash JSON.stringify() #7220

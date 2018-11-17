@@ -121,4 +121,51 @@ describe('types.number', function() {
     }
     assert.ok(/CastError/.test(err));
   });
+
+  describe('custom caster (gh-7045)', function() {
+    let original;
+
+    beforeEach(function() {
+      original = SchemaNumber.cast();
+    });
+
+    afterEach(function() {
+      SchemaNumber.cast(original);
+    });
+
+    it('disallow empty string', function() {
+      SchemaNumber.cast(v => {
+        assert.ok(v !== '');
+        return original(v);
+      });
+
+      const num = new SchemaNumber();
+
+      let err;
+      try {
+        num.cast('');
+      } catch(e) {
+        err = e;
+      }
+      assert.ok(/CastError/.test(err));
+
+      num.cast('123'); // Should be ok
+    });
+
+    it('disable casting', function() {
+      SchemaNumber.cast(false);
+
+      const num = new SchemaNumber();
+
+      let err;
+      try {
+        num.cast('123');
+      } catch(e) {
+        err = e;
+      }
+      assert.ok(/CastError/.test(err));
+
+      num.cast(123); // Should be ok
+    });
+  });
 });

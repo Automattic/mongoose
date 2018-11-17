@@ -6484,4 +6484,42 @@ describe('document', function() {
       assert.ok(!doc.isModified());
     });
   });
+
+  it('updateOne() hooks (gh-7133)', function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    let queryCount = 0;
+    let docCount = 0;
+
+    schema.pre('updateOne', () => ++queryCount);
+    schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
+
+    let removeCount1 = 0;
+    let removeCount2 = 0;
+    schema.pre('remove', () => ++removeCount1);
+    schema.pre('remove', { document: true, query: false }, () => ++removeCount2);
+
+    const Model = db.model('gh7133', schema);
+
+    return co(function*() {
+      const doc = new Model({ name: 'test' });
+      yield doc.save();
+
+      assert.equal(queryCount, 0);
+      assert.equal(docCount, 0);
+
+      yield doc.updateOne({ name: 'test2' });
+
+      assert.equal(queryCount, 1);
+      assert.equal(docCount, 1);
+
+      assert.equal(removeCount1, 0);
+      assert.equal(removeCount2, 0);
+
+      yield doc.remove();
+
+      assert.equal(removeCount1, 1);
+      assert.equal(removeCount2, 1);
+    });
+  });
 });

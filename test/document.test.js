@@ -6165,6 +6165,23 @@ describe('document', function() {
           assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
         });
     });
+
+    it('set array to false throws ObjectExpectedError (gh-7242)', function() {
+      const Child = new mongoose.Schema({});
+      const Parent = new mongoose.Schema({
+        children: [Child]
+      });
+      const ParentModel = db.model('gh7242', Parent);
+      const doc = new ParentModel({ children: false });
+
+      return doc.save().then(
+        () => assert.ok(false),
+        err => {
+          assert.ok(err.errors['children']);
+          assert.equal(err.errors['children'].name, 'ObjectParameterError');
+        }
+      );
+    });
   });
 
   it('does not save duplicate items after two saves (gh-6900)', function() {

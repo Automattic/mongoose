@@ -144,7 +144,7 @@ describe('types.number', function() {
       let err;
       try {
         num.cast('');
-      } catch(e) {
+      } catch (e) {
         err = e;
       }
       assert.ok(/CastError/.test(err));
@@ -160,7 +160,7 @@ describe('types.number', function() {
       let err;
       try {
         num.cast('123');
-      } catch(e) {
+      } catch (e) {
         err = e;
       }
       assert.ok(/CastError/.test(err));

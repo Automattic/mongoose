@@ -540,7 +540,7 @@ describe('types.documentarray', function() {
     const childSchema = mongoose.Schema({
       name: { type: String, required: true }
     }, { _id: false });
-    
+
     const parentSchema = new mongoose.Schema({
       children: [childSchema]
     });

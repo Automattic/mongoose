@@ -3229,4 +3229,18 @@ describe('Query', function() {
       assert.equal(doc.hasDefault, 'success');
     });
   });
+
+  it('maxTimeMS() (gh-7254)', function() {
+    const Model = db.model('gh7254', new Schema({}));
+
+    return co(function*() {
+      yield Model.create({});
+
+      const res = yield Model.find({ $where: 'sleep(1000) || true' }).
+        maxTimeMS(10).
+        then(() => null, err => err);
+      assert.ok(res);
+      assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    });
+  });
 });

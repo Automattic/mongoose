@@ -1,3 +1,13 @@
+5.3.13 / 2018-11-20
+===================
+ * fix: bump mongodb driver -> 3.1.10 #7266
+ * fix(populate): support setting a model as a `ref` #7253
+ * docs(schematype): add ref() function to document what is a valid `ref` path in a schematype #7253
+ * fix(array): clean modified subpaths when calling `splice()` #7249
+ * docs(compatibility): don't show Mongoose 4.11 as compatible with MongoDB 3.6 re: MongoDB's official compatibility table #7248 [a-harrison](https://github.com/a-harrison)
+ * fix(document): report correct validation error if doc array set to primitive #7242
+ * fix(mongoose): print warning when including server-side lib with jest jsdom environment #7240
+
 5.3.12 / 2018-11-13
 ===================
  * docs(compatibility): don't show Mongoose 4.11 as compatible with MongoDB 3.6 re: MongoDB's official compatibility table #7238 [a-harrison](https://github.com/a-harrison)

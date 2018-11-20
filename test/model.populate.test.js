@@ -7923,17 +7923,20 @@ describe('model: populate:', function() {
       user: {
         type: mongoose.ObjectId,
         ref: User
-      }
+      },
+      user2: mongoose.ObjectId
     });
+    postSchema.path('user2').ref(User);
     const Post = db.model('gh7253_Post', postSchema);
 
     return co(function*() {
       const user = yield User.create({ name: 'val' });
-      yield Post.create({ user: user._id });
+      yield Post.create({ user: user._id, user2: user._id });
 
-      const post = yield Post.findOne().populate('user');
+      const post = yield Post.findOne().populate('user user2');
 
       assert.equal(post.user.name, 'val');
+      assert.equal(post.user2.name, 'val');
     });
   });
 });

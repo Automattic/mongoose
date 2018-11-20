@@ -7,6 +7,7 @@
 const DocumentArray = require('../lib/types/documentarray');
 const EmbeddedDocument = require('../lib/types/embedded');
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const setValue = require('../lib/utils').setValue;
 const start = require('./common');
@@ -532,6 +533,35 @@ describe('types.documentarray', function() {
           done();
         });
       });
+    });
+  });
+
+  it('cleans modified subpaths on splice() (gh-7249)', function() {
+    const childSchema = mongoose.Schema({
+      name: { type: String, required: true }
+    }, { _id: false });
+
+    const parentSchema = new mongoose.Schema({
+      children: [childSchema]
+    });
+
+    const Parent = db.model('gh7249', parentSchema);
+
+    return co(function*() {
+      let parent = yield Parent.create({
+        children: [{ name: '1' }, { name: '2' }]
+      });
+
+      parent = yield Parent.findOne();
+
+      parent.children[1].name = '3';
+      parent.children.splice(0, 1);
+
+      yield parent.save();
+
+      parent = yield Parent.findOne();
+
+      assert.deepEqual(parent.toObject().children, [{ name: '3' }]);
     });
   });
 });

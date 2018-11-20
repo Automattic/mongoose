@@ -7914,4 +7914,26 @@ describe('model: populate:', function() {
       assert.equal(res.friends[0].secret, 'I ate all the scooby snacks!');
     });
   });
+
+  it('set model as ref in schema (gh-7253)', function() {
+    const userSchema = new Schema({ name: String });
+    const User = db.model('gh7253_User', userSchema);
+
+    const postSchema = new Schema({
+      user: {
+        type: mongoose.ObjectId,
+        ref: User
+      }
+    });
+    const Post = db.model('gh7253_Post', postSchema);
+
+    return co(function*() {
+      const user = yield User.create({ name: 'val' });
+      yield Post.create({ user: user._id });
+
+      const post = yield Post.findOne().populate('user');
+
+      assert.equal(post.user.name, 'val');
+    });
+  });
 });

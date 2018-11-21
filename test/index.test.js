@@ -111,6 +111,16 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('allows `const { model } = mongoose` (gh-3768)', function(done) {
+    const model = mongoose.model;
+
+    model('gh3768', new Schema({ name: String }));
+
+    assert.ok(mongoose.models['gh3768']);
+
+    done();
+  });
+
   it('bufferCommands option (gh-5879)', function(done) {
     const mongoose = new Mongoose();
 

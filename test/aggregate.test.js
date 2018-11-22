@@ -1132,6 +1132,17 @@ describe('aggregate: ', function() {
     });
   });
 
+  it('catch() (gh-7267)', function() {
+    const MyModel = db.model('gh7267', {});
+
+    return co(function * () {
+      const err = yield MyModel.aggregate([{ $group: { foo: 'bar' } }]).
+        catch(err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoError');
+    });
+  });
+
   it('cursor() without options (gh-3855)', function(done) {
     const db = start();
 

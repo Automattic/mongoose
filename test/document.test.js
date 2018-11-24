@@ -6484,4 +6484,33 @@ describe('document', function() {
       assert.ok(!doc.isModified());
     });
   });
+
+  it('doesnt mark single nested doc date as modified if setting with string (gh-7264)', function() {
+    const subSchema = new mongoose.Schema({
+      date2: Date
+    });
+    
+    const schema = new mongoose.Schema({
+      date1: Date,
+      sub: subSchema
+    });
+    
+    const Model = db.model('gh7264', schema);
+
+    return co(function*() {
+      const date = '2018-11-22T09:00:00.000Z';
+
+      const doc = yield Model.create({
+        date1: date,
+        sub: { date2: date }
+      });
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+
+      doc.set('date1', date);
+      doc.set('sub.date2', date);
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+    });
+  });
 });

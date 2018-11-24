@@ -7939,4 +7939,44 @@ describe('model: populate:', function() {
       assert.equal(post.user2.name, 'val');
     });
   });
+
+  it('count option (gh-4469)', function() {
+    const childSchema = new Schema({ parentId: mongoose.ObjectId });
+
+    const parentSchema = new Schema({ name: String });
+    parentSchema.virtual('childCount', {
+      ref: 'gh4469_Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      count: true
+    });
+
+    parentSchema.virtual('children', {
+      ref: 'gh4469_Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      count: false
+    });
+
+    const Child = db.model('gh4469_Child', childSchema);
+    const Parent = db.model('gh4469_Parent', parentSchema);
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'test' });
+
+      yield Child.create([{ parentId: p._id }, { parentId: p._id }, {}]);
+
+      let doc = yield Parent.findOne().populate('children childCount');
+      assert.equal(doc.childCount, 2);
+      assert.equal(doc.children.length, 2);
+
+      doc = yield Parent.find().populate('children childCount').then(res => res[0]);
+      assert.equal(doc.childCount, 2);
+      assert.equal(doc.children.length, 2);
+
+      doc = yield Parent.find().populate('childCount').then(res => res[0]);
+      assert.equal(doc.childCount, 2);
+      assert.equal(doc.children, null);
+    });
+  });
 });

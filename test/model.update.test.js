@@ -3203,4 +3203,24 @@ describe('model: updateOne: ', function() {
       assert.ok(err.errors['anArray.0.a']);
     });
   });
+
+  it('sets child timestamps even without $set (gh-7261)', function() {
+    const childSchema = new Schema({ name: String }, { timestamps: true });
+    const parentSchema = new Schema({ child: childSchema });
+    const Parent = db.model('gh7261', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({ child: { name: 'Luke Skywalker' } });
+
+      const now = Date.now();
+      yield cb => setTimeout(cb, 10);
+
+      yield Parent.updateOne({}, { child: { name: 'Luke Skywalker' } });
+
+      const doc = yield Parent.findOne();
+
+      assert.ok(doc.child.createdAt.valueOf() >= now);
+      assert.ok(doc.child.updatedAt.valueOf() >= now);
+    });
+  });
 });

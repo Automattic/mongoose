@@ -6527,12 +6527,12 @@ describe('document', function() {
     const subSchema = new mongoose.Schema({
       date2: Date
     });
-    
+
     const schema = new mongoose.Schema({
       date1: Date,
       sub: subSchema
     });
-    
+
     const Model = db.model('gh7264', schema);
 
     return co(function*() {

@@ -14,6 +14,8 @@ const DocumentArray = require('../lib/types/documentarray');
 const Schema = mongoose.Schema;
 const ValidationError = mongoose.Document.ValidationError;
 
+const documentArrayParent = require('../lib/helpers/symbols').documentArrayParent;
+
 /**
  * Test.
  */
@@ -78,8 +80,8 @@ describe('types.document', function() {
     a.__index = 0;
 
     a.validate(function() {
-      assert.ok(a.__parent.$__.validationError instanceof ValidationError);
-      assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
+      assert.ok(a[documentArrayParent].$__.validationError instanceof ValidationError);
+      assert.equal(a[documentArrayParent].errors['jsconf.ar.0.work'].name, 'ValidatorError');
       done();
     });
   });

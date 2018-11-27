@@ -6,7 +6,7 @@
 
 const start = require('./common');
 const mongoose = start.mongoose;
-const assert = require('power-assert');
+const assert = require('assert');
 const Schema = mongoose.Schema;
 const Document = mongoose.Document;
 const VirtualType = mongoose.VirtualType;
@@ -1367,6 +1367,17 @@ describe('schema', function() {
           });
         });
       });
+    });
+
+    it('array of of schemas and objects (gh-7218)', function(done) {
+      const baseSchema = new Schema({ created: Date }, { id: true });
+      const s = new Schema([baseSchema, { name: String }], { id: false });
+
+      assert.ok(s.path('created'));
+      assert.ok(s.path('name'));
+      assert.ok(!s.options.id);
+
+      done();
     });
   });
 

@@ -1,3 +1,11 @@
+5.3.14 / 2018-11-27
+===================
+ * docs(api): use `openUri()` instead of legacy `open()` #7277 [artemjackson](https://github.com/artemjackson)
+ * fix(document): don't mark date underneath single nested as modified if setting to string #7264
+ * fix(update): set timestamps on subdocs if not using $set with no overwrite #7261
+ * fix(document): use symbol instead of `__parent` so user code doesn't conflict #7230
+ * fix(mongoose): allow using `mongoose.model()` without context, like `import {model} from 'mongoose'` #3768
+
 5.3.13 / 2018-11-20
 ===================
  * fix: bump mongodb driver -> 3.1.10 #7266

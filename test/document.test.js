@@ -6522,12 +6522,12 @@ describe('document', function() {
       },
       name: String
     });
-    
+
     const EventSchema = new Schema({
       activity: ActivityBareSchema,
       name: String
     });
-    
+
     const data = {
       name: 'Test',
       activity: {
@@ -6535,7 +6535,7 @@ describe('document', function() {
         name: 'Activity name'
       },
     };
-    
+
     const Event = db.model('gh7271', EventSchema);
     const event = new Event(data, null);
 

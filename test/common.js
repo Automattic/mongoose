@@ -178,6 +178,10 @@ before(function(done) {
   dropDBs(done);
 });
 
+after(function() {
+  dropDBs(() => {});
+});
+
 module.exports.server = server = new Server('mongod', {
   port: 27000,
   dbpath: './data/db/27000',

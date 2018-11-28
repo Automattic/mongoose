@@ -6513,4 +6513,34 @@ describe('document', function() {
       assert.deepEqual(doc.modifiedPaths(), []);
     });
   });
+
+  it('handles null fields (gh-7271)', function() {
+    const ActivityBareSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Activity',
+      },
+      name: String
+    });
+    
+    const EventSchema = new Schema({
+      activity: ActivityBareSchema,
+      name: String
+    });
+    
+    const data = {
+      name: 'Test',
+      activity: {
+        _id: '5bf606f6471b6056b3f2bfc9',
+        name: 'Activity name'
+      },
+    };
+    
+    const Event = db.model('gh7271', EventSchema);
+    const event = new Event(data, null);
+
+    assert.equal(event.activity.name, 'Activity name');
+
+    return event.validate();
+  });
 });

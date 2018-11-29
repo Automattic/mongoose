@@ -527,4 +527,40 @@ describe('Map', function() {
         assert.deepEqual(doc.toObject().arr, [new Map([['a', 1]])]);
       });
   });
+
+  it('only runs setters once on init (gh-7272)', function() {
+    let setterContext = [];
+    function set(v) {
+      setterContext.push(this);
+      return v;
+    }
+
+    const ChildSchema = new mongoose.Schema({
+      age: {
+        type: Number,
+        set: set
+      }
+    });
+  
+    const ParentSchema = new mongoose.Schema({
+      name: String,
+      children: {
+        type: Map,
+        of: ChildSchema
+      }
+    });
+
+    const Parent = db.model('gh7272', ParentSchema);
+
+    return co(function*() {
+      yield Parent.create({ children: { luke: { age: 30 } } });
+
+      setterContext = [];
+
+      yield Parent.findOne({ 'children.luke.age': 30 });
+
+      assert.equal(setterContext.length, 1);
+      assert.ok(setterContext[0] instanceof mongoose.Query);
+    });
+  });
 });

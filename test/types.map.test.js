@@ -541,7 +541,7 @@ describe('Map', function() {
         set: set
       }
     });
-  
+
     const ParentSchema = new mongoose.Schema({
       name: String,
       children: {

@@ -6514,7 +6514,7 @@ describe('document', function() {
     });
   });
 
-  it('handles null fields (gh-7271)', function() {
+  it('handles null `fields` param to constructor (gh-7271)', function() {
     const ActivityBareSchema = new Schema({
       _id: {
         type: Schema.Types.ObjectId,
@@ -6542,5 +6542,25 @@ describe('document', function() {
     assert.equal(event.activity.name, 'Activity name');
 
     return event.validate();
+  });
+
+  it('flattenMaps option for toObject() (gh-7274)', function() {
+    const schema = new Schema({
+      test: {
+        type: Map,
+        of: String,
+        default: new Map()
+      }
+    }, { versionKey: false });
+
+    const Test = mongoose.model('test', schema);
+
+    const mapTest = new Test({});
+
+    mapTest.test.set('key1', 'value1');
+
+    assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+
+    return Promise.resolve();
   });
 });

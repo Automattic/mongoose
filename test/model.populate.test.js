@@ -7943,7 +7943,6 @@ describe('model: populate:', function() {
   it('explicit option overrides refPath (gh-7273)', function() {
     const userSchema = new Schema({ name: String });
     const User1 = db.model('gh7273_User_1', userSchema);
-    const User2 = db.model('gh7273_User_2', userSchema);
 
     const postSchema = new Schema({
       user: {

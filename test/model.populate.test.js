@@ -7939,4 +7939,31 @@ describe('model: populate:', function() {
       assert.equal(post.user2.name, 'val');
     });
   });
+
+  it('explicit option overrides refPath (gh-7273)', function() {
+    const userSchema = new Schema({ name: String });
+    const User1 = db.model('gh7273_User_1', userSchema);
+    const User2 = db.model('gh7273_User_2', userSchema);
+
+    const postSchema = new Schema({
+      user: {
+        type: mongoose.ObjectId,
+        refPath: 'm'
+      },
+      m: String
+    });
+    const Post = db.model('gh7273_Post', postSchema);
+
+    return co(function*() {
+      const user = yield User1.create({ name: 'val' });
+      yield Post.create({ user: user._id, m: 'gh7273_User_2' });
+
+      let post = yield Post.findOne().populate('user');
+      assert.ok(!post.user);
+
+      post = yield Post.findOne().populate({ path: 'user', model: 'gh7273_User_1' });
+
+      assert.equal(post.user.name, 'val');
+    });
+  });
 });

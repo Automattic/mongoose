@@ -148,6 +148,26 @@ describe('transactions', function() {
       });
   });
 
+  it('create document and pass as object with session (pr-7296)', function() {
+    const User = db.model('pr7296_User', new Schema({ name: String }));
+
+    let session = null;
+    return db.createCollection('pr7296_User').
+      then(() => db.startSession()).
+      then(_session => {
+        session = _session;
+        session.startTransaction();
+        return User.create({ name: 'foo' }, { session: session });
+      }).
+      then(user => {
+        session.commitTransaction();
+      }).
+      then(() => User.findOne({ name: 'foo' })).
+      then(user => {
+        assert.ok(user);
+      });
+  });
+
   it('aggregate', function() {
     const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
 

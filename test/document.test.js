@@ -6563,4 +6563,20 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('`collection` property with strict: false (gh-7276)', function() {
+    const schema = new Schema({}, { strict: false, versionKey: false });
+    const Model = db.model('gh7276', schema);
+
+    return co(function*() {
+      let doc = new Model({ test: 'foo', collection: 'bar' });
+
+      yield doc.save();
+
+      assert.equal(doc.collection, 'bar');
+
+      doc = yield Model.findOne();
+      assert.equal(doc.toObject().collection, 'bar');
+    });
+  });
 });

@@ -6586,7 +6586,8 @@ describe('document', function() {
         name: { type: String, required: true },
         hex: { type: String, required: true }
       }]
-    }))
+    }));
+
     const model = new Model({
       colors: [
         { name: 'steelblue' },
@@ -6597,5 +6598,5 @@ describe('document', function() {
     const errors = model.validateSync().errors;
     const keys = Object.keys(errors).sort();
     assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
-});
+  });
 });

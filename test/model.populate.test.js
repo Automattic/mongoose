@@ -7979,4 +7979,87 @@ describe('model: populate:', function() {
       assert.equal(doc.children, null);
     });
   });
+
+  it('explicit option overrides refPath (gh-7273)', function() {
+    const userSchema = new Schema({ name: String });
+    const User1 = db.model('gh7273_User_1', userSchema);
+    db.model('gh7273_User_2', userSchema);
+
+    const postSchema = new Schema({
+      user: {
+        type: mongoose.ObjectId,
+        refPath: 'm'
+      },
+      m: String
+    });
+    const Post = db.model('gh7273_Post', postSchema);
+
+    return co(function*() {
+      const user = yield User1.create({ name: 'val' });
+      yield Post.create({ user: user._id, m: 'gh7273_User_2' });
+
+      let post = yield Post.findOne().populate('user');
+      assert.ok(!post.user);
+
+      post = yield Post.findOne().populate({ path: 'user', model: 'gh7273_User_1' });
+
+      assert.equal(post.user.name, 'val');
+    });
+  });
+
+  it('populate single path with numeric path underneath doc array (gh-7273)', function() {
+    const schema = new Schema({
+      arr1: [{
+        arr2: [{
+          item: { type: Schema.Types.ObjectId, refPath: 'arr1.arr2.kind' },
+          kind: String
+        }]
+      }]
+    });
+
+    const Model = db.model('gh7273', schema);
+
+    const itemSchema = new Schema({ name: String });
+    const Item1 = db.model('gh7273_Item1', itemSchema);
+    const Item2 = db.model('gh7273_Item2', itemSchema);
+
+    return co(function*() {
+      const item1 = yield Item1.create({ name: 'item1' });
+      const item2 = yield Item2.create({ name: 'item2' });
+
+      yield Model.create({
+        arr1: [{
+          arr2: [
+            { item: item1._id, kind: 'gh7273_Item1' },
+            { item: item2._id, kind: 'gh7273_Item2' }
+          ]
+        }]
+      });
+
+      let doc = yield Model.findOne().populate('arr1.arr2.item');
+      assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
+      assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
+
+      doc = yield Model.findOne().populate('arr1.0.arr2.item');
+      assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
+      assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
+
+      doc = yield Model.findOne().populate('arr1.0.arr2.0.item');
+      assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
+      assert.ok(!doc.arr1[0].arr2[1].item.name);
+
+      doc = yield Model.findOne();
+      doc.populate('arr1.0.arr2.1.item');
+      yield doc.execPopulate();
+      assert.ok(!doc.arr1[0].arr2[0].item.name);
+      assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
+
+      doc = yield Model.findOne();
+      doc.populate('arr1.0.arr2.0.item');
+      doc.populate('arr1.0.arr2.1.item');
+      yield doc.execPopulate();
+      assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
+      assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
+    });
+  });
 });

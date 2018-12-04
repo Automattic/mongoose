@@ -6579,4 +6579,23 @@ describe('document', function() {
       assert.equal(doc.toObject().collection, 'bar');
     });
   });
+
+  it('should validateSync() all elements in doc array (gh-6746)', function() {
+    const Model = db.model('gh6746', new Schema({
+      colors: [{
+        name: { type: String, required: true },
+        hex: { type: String, required: true }
+      }]
+    }))
+    const model = new Model({
+      colors: [
+        { name: 'steelblue' },
+        { hex: '#4682B4' }
+      ]
+    });
+
+    const errors = model.validateSync().errors;
+    const keys = Object.keys(errors).sort();
+    assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
+});
 });

@@ -2930,6 +2930,44 @@ describe('Query', function() {
         assert.equal(res.n, 1);
       });
     });
+
+    it('findOneAndUpdate()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.findOneAndUpdate({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        const res = yield Model.findOneAndUpdate({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        assert.equal(res.name, 'Test');
+      });
+    });
+
+    it('findOneAndDelete()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.findOneAndDelete({ name: 'na' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        const res = yield Model.findOneAndDelete({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.name, 'Test');
+      });
+    });
   });
 
   describe('getPopulatedPaths', function() {

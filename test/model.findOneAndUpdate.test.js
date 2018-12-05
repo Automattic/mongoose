@@ -1671,10 +1671,10 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('honors retainKeyOrder (gh-6484)', function() {
+    it('correct key order (gh-6484)', function() {
       const modelSchema = new Schema({
         nested: { field1: Number, field2: Number }
-      }, { retainKeyOrder: true });
+      });
 
       const Model = db.model('gh6484', modelSchema);
       const opts = { upsert: true, new: true };

@@ -6513,4 +6513,90 @@ describe('document', function() {
       assert.deepEqual(doc.modifiedPaths(), []);
     });
   });
+
+  it('handles null `fields` param to constructor (gh-7271)', function() {
+    const ActivityBareSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Activity',
+      },
+      name: String
+    });
+
+    const EventSchema = new Schema({
+      activity: ActivityBareSchema,
+      name: String
+    });
+
+    const data = {
+      name: 'Test',
+      activity: {
+        _id: '5bf606f6471b6056b3f2bfc9',
+        name: 'Activity name'
+      },
+    };
+
+    const Event = db.model('gh7271', EventSchema);
+    const event = new Event(data, null);
+
+    assert.equal(event.activity.name, 'Activity name');
+
+    return event.validate();
+  });
+
+  it('flattenMaps option for toObject() (gh-7274)', function() {
+    const schema = new Schema({
+      test: {
+        type: Map,
+        of: String,
+        default: new Map()
+      }
+    }, { versionKey: false });
+
+    const Test = mongoose.model('test', schema);
+
+    const mapTest = new Test({});
+
+    mapTest.test.set('key1', 'value1');
+
+    assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+
+    return Promise.resolve();
+  });
+
+  it('`collection` property with strict: false (gh-7276)', function() {
+    const schema = new Schema({}, { strict: false, versionKey: false });
+    const Model = db.model('gh7276', schema);
+
+    return co(function*() {
+      let doc = new Model({ test: 'foo', collection: 'bar' });
+
+      yield doc.save();
+
+      assert.equal(doc.collection, 'bar');
+
+      doc = yield Model.findOne();
+      assert.equal(doc.toObject().collection, 'bar');
+    });
+  });
+
+  it('should validateSync() all elements in doc array (gh-6746)', function() {
+    const Model = db.model('gh6746', new Schema({
+      colors: [{
+        name: { type: String, required: true },
+        hex: { type: String, required: true }
+      }]
+    }));
+
+    const model = new Model({
+      colors: [
+        { name: 'steelblue' },
+        { hex: '#4682B4' }
+      ]
+    });
+
+    const errors = model.validateSync().errors;
+    const keys = Object.keys(errors).sort();
+    assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
+  });
 });

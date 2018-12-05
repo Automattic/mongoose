@@ -2930,6 +2930,74 @@ describe('Query', function() {
         assert.equal(res.n, 1);
       });
     });
+
+    it('findOneAndUpdate()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.findOneAndUpdate({ name: 'na' }, { name: 'foo' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        const res = yield Model.findOneAndUpdate({}, { name: 'Test2' }).orFail(new Error('Oops'));
+        assert.equal(res.name, 'Test');
+      });
+    });
+
+    it('findOneAndDelete()', function() {
+      return co(function*() {
+        let threw = false;
+        try {
+          yield Model.findOneAndDelete({ name: 'na' }).
+            orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+
+        // Shouldn't throw
+        const res = yield Model.findOneAndDelete({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.name, 'Test');
+      });
+    });
+
+    it('executes before post hooks (gh-7280)', function() {
+      return co(function*() {
+        const schema = new Schema({ name: String });
+        const docs = [];
+        schema.post('findOne', function(doc, next) {
+          docs.push(doc);
+          next();
+        });
+        const Model = db.model('gh7280', schema);
+
+        yield Model.create({ name: 'Test' });
+
+        let threw = false;
+        try {
+          yield Model.findOne({ name: 'na' }).orFail(new Error('Oops!'));
+        } catch (error) {
+          assert.ok(error);
+          assert.equal(error.message, 'Oops!');
+          threw = true;
+        }
+        assert.ok(threw);
+        assert.equal(docs.length, 0);
+
+        // Shouldn't throw
+        const res = yield Model.findOne({ name: 'Test' }).orFail(new Error('Oops'));
+        assert.equal(res.name, 'Test');
+        assert.equal(docs.length, 1);
+      });
+    });
   });
 
   describe('getPopulatedPaths', function() {

@@ -6600,7 +6600,7 @@ describe('document', function() {
     assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
   });
 
-  it('handles fake __proto__ (gh-7290)', function() {
+  it('handles fake constructor (gh-7290)', function() {
     const TestSchema = new Schema({ test: String });
 
     const TestModel = db.model('gh7290', TestSchema);
@@ -6613,6 +6613,19 @@ describe('document', function() {
         }
       }
     };
+
+    return TestModel.findOne(badQuery).then(
+      () => assert.ok(false),
+      err => assert.equal(err.name, 'CastError', err.stack)
+    );
+  });
+
+  it('handles fake __proto__ (gh-7290)', function() {
+    const TestSchema = new Schema({ test: String });
+
+    const TestModel = db.model('gh7290_proto', TestSchema);
+
+    const badQuery = JSON.parse('{"test":{"length":1000000000,"__proto__":[]}}');
 
     return TestModel.findOne(badQuery).then(
       () => assert.ok(false),

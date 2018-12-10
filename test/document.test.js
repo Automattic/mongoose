@@ -6614,22 +6614,42 @@ describe('document', function() {
       }
     };
 
-    return TestModel.findOne(badQuery).then(
-      () => assert.ok(false),
-      err => assert.equal(err.name, 'CastError', err.stack)
-    );
+    return co(function*() {
+      let err = yield TestModel.findOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne(badQuery, { name: 'foo' }).
+        then(() => null, err => err);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne({}, badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+    });
   });
 
   it('handles fake __proto__ (gh-7290)', function() {
-    const TestSchema = new Schema({ test: String });
+    const TestSchema = new Schema({ test: String, name: String });
 
     const TestModel = db.model('gh7290_proto', TestSchema);
 
     const badQuery = JSON.parse('{"test":{"length":1000000000,"__proto__":[]}}');
 
-    return TestModel.findOne(badQuery).then(
-      () => assert.ok(false),
-      err => assert.equal(err.name, 'CastError', err.stack)
-    );
+    return co(function*() {
+      let err = yield TestModel.findOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne(badQuery, { name: 'foo' }).
+        then(() => null, err => err);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne({}, badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+    });
   });
 });

@@ -1,3 +1,15 @@
+5.3.15 / 2018-12-05
+===================
+ * fix(query): handle `orFail()` with `findOneAndUpdate()` and `findOneAndDelete()` #7297 #7280
+ * fix(document): make `save()` succeed if strict: false with a `collection` property #7276
+ * fix(document): add `flattenMaps` option for toObject() #7274
+ * docs(document): document flattenMaps option #7274
+ * fix(populate): support populating individual subdoc path in document array #7273
+ * fix(populate): ensure `model` option overrides `refPath` #7273
+ * fix(map): don't call subdoc setters on init #7272
+ * fix(document): use internal get() helper instead of lodash.get to support `null` projection param #7271
+ * fix(document): continue running validateSync() for all elements in doc array after first error #6746
+
 5.3.14 / 2018-11-27
 ===================
  * docs(api): use `openUri()` instead of legacy `open()` #7277 [artemjackson](https://github.com/artemjackson)

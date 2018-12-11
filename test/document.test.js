@@ -6617,4 +6617,77 @@ describe('document', function() {
       assert.equal(doc.toObject().collection, 'bar');
     });
   });
+
+  it('should validateSync() all elements in doc array (gh-6746)', function() {
+    const Model = db.model('gh6746', new Schema({
+      colors: [{
+        name: { type: String, required: true },
+        hex: { type: String, required: true }
+      }]
+    }));
+
+    const model = new Model({
+      colors: [
+        { name: 'steelblue' },
+        { hex: '#4682B4' }
+      ]
+    });
+
+    const errors = model.validateSync().errors;
+    const keys = Object.keys(errors).sort();
+    assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
+  });
+
+  it('handles fake constructor (gh-7290)', function() {
+    const TestSchema = new Schema({ test: String });
+
+    const TestModel = db.model('gh7290', TestSchema);
+
+    const badQuery = {
+      test: {
+        length: 1e10,
+        constructor: {
+          name: 'Array'
+        }
+      }
+    };
+
+    return co(function*() {
+      let err = yield TestModel.findOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne(badQuery, { name: 'foo' }).
+        then(() => null, err => err);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne({}, badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+    });
+  });
+
+  it('handles fake __proto__ (gh-7290)', function() {
+    const TestSchema = new Schema({ test: String, name: String });
+
+    const TestModel = db.model('gh7290_proto', TestSchema);
+
+    const badQuery = JSON.parse('{"test":{"length":1000000000,"__proto__":[]}}');
+
+    return co(function*() {
+      let err = yield TestModel.findOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne(badQuery, { name: 'foo' }).
+        then(() => null, err => err);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne({}, badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+    });
+  });
 });

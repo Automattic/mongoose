@@ -123,7 +123,7 @@ describe('types.number', function() {
   });
 
   describe('custom caster (gh-7045)', function() {
-    let original;
+    let original = {};
 
     beforeEach(function() {
       original = SchemaNumber.cast();

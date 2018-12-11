@@ -9,12 +9,6 @@ block content
   h1 API Docs
 
   div.
-    <script>
-      _native.init("CK7DT53U",{
-        targetClass: 'native-inline'
-      });
-    </script>
-
     <div class="native-inline">
       <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
     </div>
@@ -31,12 +25,6 @@ block content
               li
                 a(href="##{prop.anchorId}")
                   | #{prop.string}
-    script.
-      _native.init("CK7DT53U", {
-        targetClass: 'native-ad',
-        display: 'flex',
-        visibleClass: 'native-show'
-      });
 
   each item in docs
     hr.separate-api
@@ -73,6 +61,10 @@ block content
       div
         | !{prop.description}
 
+  script.
+    _native.init("CK7DT53U",{
+      targetClass: 'native-inline'
+    });
   script(type="text/javascript").
     var headers = document.querySelectorAll('.item-header');
     var navItems = document.querySelectorAll('.nav-item .nav-item-title');

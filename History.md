@@ -1,3 +1,33 @@
+5.3.15 / 2018-12-05
+===================
+ * fix(query): handle `orFail()` with `findOneAndUpdate()` and `findOneAndDelete()` #7297 #7280
+ * fix(document): make `save()` succeed if strict: false with a `collection` property #7276
+ * fix(document): add `flattenMaps` option for toObject() #7274
+ * docs(document): document flattenMaps option #7274
+ * fix(populate): support populating individual subdoc path in document array #7273
+ * fix(populate): ensure `model` option overrides `refPath` #7273
+ * fix(map): don't call subdoc setters on init #7272
+ * fix(document): use internal get() helper instead of lodash.get to support `null` projection param #7271
+ * fix(document): continue running validateSync() for all elements in doc array after first error #6746
+
+5.3.14 / 2018-11-27
+===================
+ * docs(api): use `openUri()` instead of legacy `open()` #7277 [artemjackson](https://github.com/artemjackson)
+ * fix(document): don't mark date underneath single nested as modified if setting to string #7264
+ * fix(update): set timestamps on subdocs if not using $set with no overwrite #7261
+ * fix(document): use symbol instead of `__parent` so user code doesn't conflict #7230
+ * fix(mongoose): allow using `mongoose.model()` without context, like `import {model} from 'mongoose'` #3768
+
+5.3.13 / 2018-11-20
+===================
+ * fix: bump mongodb driver -> 3.1.10 #7266
+ * fix(populate): support setting a model as a `ref` #7253
+ * docs(schematype): add ref() function to document what is a valid `ref` path in a schematype #7253
+ * fix(array): clean modified subpaths when calling `splice()` #7249
+ * docs(compatibility): don't show Mongoose 4.11 as compatible with MongoDB 3.6 re: MongoDB's official compatibility table #7248 [a-harrison](https://github.com/a-harrison)
+ * fix(document): report correct validation error if doc array set to primitive #7242
+ * fix(mongoose): print warning when including server-side lib with jest jsdom environment #7240
+
 5.3.12 / 2018-11-13
 ===================
  * docs(compatibility): don't show Mongoose 4.11 as compatible with MongoDB 3.6 re: MongoDB's official compatibility table #7238 [a-harrison](https://github.com/a-harrison)

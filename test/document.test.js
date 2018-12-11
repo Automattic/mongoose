@@ -6484,4 +6484,210 @@ describe('document', function() {
       assert.ok(!doc.isModified());
     });
   });
+
+  it('updateOne() hooks (gh-7133)', function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    let queryCount = 0;
+    let docCount = 0;
+
+    schema.pre('updateOne', () => ++queryCount);
+    schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
+
+    let removeCount1 = 0;
+    let removeCount2 = 0;
+    schema.pre('remove', () => ++removeCount1);
+    schema.pre('remove', { document: true, query: false }, () => ++removeCount2);
+
+    const Model = db.model('gh7133', schema);
+
+    return co(function*() {
+      const doc = new Model({ name: 'test' });
+      yield doc.save();
+
+      assert.equal(queryCount, 0);
+      assert.equal(docCount, 0);
+
+      yield doc.updateOne({ name: 'test2' });
+
+      assert.equal(queryCount, 1);
+      assert.equal(docCount, 1);
+
+      assert.equal(removeCount1, 0);
+      assert.equal(removeCount2, 0);
+
+      yield doc.remove();
+
+      assert.equal(removeCount1, 1);
+      assert.equal(removeCount2, 1);
+    });
+  });
+
+  it('doesnt mark single nested doc date as modified if setting with string (gh-7264)', function() {
+    const subSchema = new mongoose.Schema({
+      date2: Date
+    });
+
+    const schema = new mongoose.Schema({
+      date1: Date,
+      sub: subSchema
+    });
+
+    const Model = db.model('gh7264', schema);
+
+    return co(function*() {
+      const date = '2018-11-22T09:00:00.000Z';
+
+      const doc = yield Model.create({
+        date1: date,
+        sub: { date2: date }
+      });
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+
+      doc.set('date1', date);
+      doc.set('sub.date2', date);
+
+      assert.deepEqual(doc.modifiedPaths(), []);
+    });
+  });
+
+  it('handles null `fields` param to constructor (gh-7271)', function() {
+    const ActivityBareSchema = new Schema({
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Activity',
+      },
+      name: String
+    });
+
+    const EventSchema = new Schema({
+      activity: ActivityBareSchema,
+      name: String
+    });
+
+    const data = {
+      name: 'Test',
+      activity: {
+        _id: '5bf606f6471b6056b3f2bfc9',
+        name: 'Activity name'
+      },
+    };
+
+    const Event = db.model('gh7271', EventSchema);
+    const event = new Event(data, null);
+
+    assert.equal(event.activity.name, 'Activity name');
+
+    return event.validate();
+  });
+
+  it('flattenMaps option for toObject() (gh-7274)', function() {
+    const schema = new Schema({
+      test: {
+        type: Map,
+        of: String,
+        default: new Map()
+      }
+    }, { versionKey: false });
+
+    const Test = mongoose.model('test', schema);
+
+    const mapTest = new Test({});
+
+    mapTest.test.set('key1', 'value1');
+
+    assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+
+    return Promise.resolve();
+  });
+
+  it('`collection` property with strict: false (gh-7276)', function() {
+    const schema = new Schema({}, { strict: false, versionKey: false });
+    const Model = db.model('gh7276', schema);
+
+    return co(function*() {
+      let doc = new Model({ test: 'foo', collection: 'bar' });
+
+      yield doc.save();
+
+      assert.equal(doc.collection, 'bar');
+
+      doc = yield Model.findOne();
+      assert.equal(doc.toObject().collection, 'bar');
+    });
+  });
+
+  it('should validateSync() all elements in doc array (gh-6746)', function() {
+    const Model = db.model('gh6746', new Schema({
+      colors: [{
+        name: { type: String, required: true },
+        hex: { type: String, required: true }
+      }]
+    }));
+
+    const model = new Model({
+      colors: [
+        { name: 'steelblue' },
+        { hex: '#4682B4' }
+      ]
+    });
+
+    const errors = model.validateSync().errors;
+    const keys = Object.keys(errors).sort();
+    assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
+  });
+
+  it('handles fake constructor (gh-7290)', function() {
+    const TestSchema = new Schema({ test: String });
+
+    const TestModel = db.model('gh7290', TestSchema);
+
+    const badQuery = {
+      test: {
+        length: 1e10,
+        constructor: {
+          name: 'Array'
+        }
+      }
+    };
+
+    return co(function*() {
+      let err = yield TestModel.findOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne(badQuery, { name: 'foo' }).
+        then(() => null, err => err);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne({}, badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+    });
+  });
+
+  it('handles fake __proto__ (gh-7290)', function() {
+    const TestSchema = new Schema({ test: String, name: String });
+
+    const TestModel = db.model('gh7290_proto', TestSchema);
+
+    const badQuery = JSON.parse('{"test":{"length":1000000000,"__proto__":[]}}');
+
+    return co(function*() {
+      let err = yield TestModel.findOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne(badQuery, { name: 'foo' }).
+        then(() => null, err => err);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.updateOne({}, badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+
+      err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
+      assert.equal(err.name, 'CastError', err.stack);
+    });
+  });
 });

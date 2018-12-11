@@ -23,24 +23,24 @@ block content
     Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, plain object, multiple plain objects, or all objects returned from a query. Let's look at some examples.
 
     ```javascript
-    var mongoose = require('mongoose');
-    var Schema = mongoose.Schema;
+    const mongoose = require('mongoose');
+    const Schema = mongoose.Schema;
 
-    var personSchema = Schema({
+    const personSchema = Schema({
       _id: Schema.Types.ObjectId,
       name: String,
       age: Number,
       stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
     });
 
-    var storySchema = Schema({
+    const storySchema = Schema({
       author: { type: Schema.Types.ObjectId, ref: 'Person' },
       title: String,
       fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
     });
 
-    var Story = mongoose.model('Story', storySchema);
-    var Person = mongoose.model('Person', personSchema);
+    const Story = mongoose.model('Story', storySchema);
+    const Person = mongoose.model('Person', personSchema);
     ```
 
     So far we've created two [Models](./models.html). Our `Person` model has
@@ -59,7 +59,7 @@ block content
     properties, just assign the `_id` value:
 
     ```javascript
-    var author = new Person({
+    const author = new Person({
       _id: new mongoose.Types.ObjectId(),
       name: 'Ian Fleming',
       age: 50
@@ -68,7 +68,7 @@ block content
     author.save(function (err) {
       if (err) return handleError(err);
 
-      var story1 = new Story({
+      const story1 = new Story({
         title: 'Casino Royale',
         author: author._id    // assign the _id from the person
       });
@@ -107,7 +107,8 @@ block content
 
     <h3 id="setting-populated-fields"><a href="#setting-populated-fields">Setting Populated Fields</a></h3>
 
-    In Mongoose >= 4.0, you can manually populate a field as well.
+    You can manually populate a property by setting it to a document. The document
+    must be an instance of the model your `ref` property refers to.
 
     ```javascript
     Story.findOne({ title: 'Casino Royale' }, function(error, story) {
@@ -117,6 +118,35 @@ block content
       story.author = author;
       console.log(story.author.name); // prints "Ian Fleming"
     });
+    ```
+
+    <h3 id="doc-not-found"><a href="#doc-not-found">What If There's No Foreign Document?</a></h3>
+
+    Mongoose populate doesn't behave like conventional
+    [SQL joins](https://www.w3schools.com/sql/sql_join.asp). When there's no
+    document, `story.author` will be `null`. This is analogous to a
+    [left join](https://www.w3schools.com/sql/sql_join_left.asp) in SQL.
+
+    ```javascript
+    await Story.deleteMany({ title: 'Casino Royale' });
+
+    const story = await Story.findOne({ title: 'Casino Royale' }).populate('author');
+    story.author; // `null`
+    ```
+
+    If you have an array of `authors` in your `storySchema`, `populate()` will
+    give you an empty array instead.
+
+    ```javascript
+    const storySchema = Schema({
+      authors: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
+      title: String
+    });
+
+    // Later
+
+    const story = await Story.findOne({ title: 'Casino Royale' }).populate('authors');
+    story.authors; // `[]`
     ```
 
     <h3 id="field-selection"><a href="#field-selection">Field Selection</a></h3>
@@ -414,8 +444,6 @@ block content
 
     <h3 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h3>
 
-    _New in 4.5.0_
-
     So far you've only populated based on the `_id` field. However, that's
     sometimes not the right choice.
     In particular, [arrays that grow without bound are a MongoDB anti-pattern](https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/).
@@ -423,12 +451,12 @@ block content
     between documents.
 
     ```javascript
-    var PersonSchema = new Schema({
+    const PersonSchema = new Schema({
       name: String,
       band: String
     });
 
-    var BandSchema = new Schema({
+    const BandSchema = new Schema({
       name: String
     });
     BandSchema.virtual('members', {
@@ -441,8 +469,8 @@ block content
       options: { sort: { name: -1 }, limit: 5 } // Query options, see http://bit.ly/mongoose-query-options
     });
 
-    var Person = mongoose.model('Person', PersonSchema);
-    var Band = mongoose.model('Band', BandSchema);
+    const Person = mongoose.model('Person', PersonSchema);
+    const Band = mongoose.model('Band', BandSchema);
 
     /**
      * Suppose you have 2 bands: "Guns N' Roses" and "Motley Crue"
@@ -461,7 +489,7 @@ block content
 
     ```javascript
     // Set `virtuals: true` so `res.json()` works
-    var BandSchema = new Schema({
+    const BandSchema = new Schema({
       name: String
     }, { toJSON: { virtuals: true } });
     ```
@@ -483,6 +511,34 @@ block content
       exec(function(error, bands) {
         // Works, foreign field `band` is selected
       });
+    ```
+
+    <h3 id="count"><a href="#populate-virtuals">Populate Virtuals: The Count Option</a></h3>
+
+    Populate virtuals also support counting the number of documents with
+    matching `foreignField` as opposed to the documents themselves. Set the
+    `count` option on your virtual:
+
+    ```javascript
+    const PersonSchema = new Schema({
+      name: String,
+      band: String
+    });
+
+    const BandSchema = new Schema({
+      name: String
+    });
+    BandSchema.virtual('numMembers', {
+      ref: 'Person', // The model to use
+      localField: 'name', // Find people where `localField`
+      foreignField: 'band', // is equal to `foreignField`
+      count: true // And only get the number of docs
+    });
+
+    // Later
+    const doc = await Band.findOne({ name: 'Motley Crue' }).
+      populate('numMembers');
+    doc.numMembers; // 2
     ```
 
     <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>

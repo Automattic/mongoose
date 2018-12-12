@@ -9,10 +9,14 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
   beforeEach(function() {
     original.objectid = Schema.ObjectId.cast();
+    original.boolean = Schema.Types.Boolean.cast();
+    original.string = Schema.Types.String.cast();
   });
 
   afterEach(function() {
     Schema.ObjectId.cast(original.objectid);
+    Schema.Types.Boolean.cast(original.boolean);
+    Schema.Types.String.cast(original.string);
   });
 
   it('handles objectid', function() {
@@ -83,5 +87,28 @@ describe('SchemaType.cast() (gh-7045)', function() {
     assert.ok(threw);
 
     b.cast(true); // Should not throw
+  });
+
+  describe('string', function() {
+    it('supports custom cast functions', function() {
+      Schema.Types.String.cast(v => {
+        assert.ok(v.length < 10);
+        return original.string(v);
+      });
+
+      const s = new Schema.Types.String();
+      s.cast('short'); // Should not throw
+
+      assert.throws(() => s.cast('wayyyy too long'), /CastError/);
+    });
+
+    it('supports disabling casting', function() {
+      Schema.Types.String.cast(false);
+
+      const s = new Schema.Types.String();
+      s.cast('short'); // Should not throw
+
+      assert.throws(() => s.cast(123), /CastError/);
+    });
   });
 });

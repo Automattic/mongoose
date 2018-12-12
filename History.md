@@ -1,3 +1,10 @@
+5.3.16 / 2018-12-11
+===================
+ * fix(document): handle `__proto__` in queries #7290
+ * fix(document): use Array.isArray() instead of checking constructor name for arrays #7290
+ * docs(populate): add section about what happens when no document matches #7279
+ * fix(mongoose): avoid crash on `import mongoose, {Schema} from 'mongoose'` #5648
+
 5.3.15 / 2018-12-05
 ===================
  * fix(query): handle `orFail()` with `findOneAndUpdate()` and `findOneAndDelete()` #7297 #7280

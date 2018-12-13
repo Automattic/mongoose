@@ -6143,4 +6143,32 @@ describe('Model', function() {
     const _schema = JSON.parse(JSON.stringify(Model.schema));
     assert.ok(_schema.obj.nested);
   });
+
+  it('Model.events() (gh-7125)', function() {
+    const Model = db.model('gh7125', Schema({
+      name: { type: String, validate: () => false }
+    }));
+
+    let called = [];
+    Model.events.on('error', err => { called.push(err); });
+
+    return co(function*() {
+      yield Model.findOne({ _id: 'notanid' }).catch(() => {});
+      assert.equal(called.length, 1);
+      assert.equal(called[0].name, 'CastError');
+
+      called = [];
+
+      const doc = new Model({ name: 'fail' });
+      yield doc.save().catch(() => {});
+      assert.equal(called.length, 1);
+      assert.equal(called[0].name, 'ValidationError');
+
+      called = [];
+
+      yield Model.aggregate([{ $group: { fail: true } }]).exec().catch(() => {});
+      assert.equal(called.length, 1);
+      assert.equal(called[0].name, 'MongoError');
+    });
+  });
 });

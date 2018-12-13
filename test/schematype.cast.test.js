@@ -11,12 +11,14 @@ describe('SchemaType.cast() (gh-7045)', function() {
     original.objectid = Schema.ObjectId.cast();
     original.boolean = Schema.Types.Boolean.cast();
     original.string = Schema.Types.String.cast();
+    original.date = Schema.Types.Date.cast();
   });
 
   afterEach(function() {
     Schema.ObjectId.cast(original.objectid);
     Schema.Types.Boolean.cast(original.boolean);
     Schema.Types.String.cast(original.string);
+    Schema.Types.Date.cast(original.date);
   });
 
   it('handles objectid', function() {
@@ -109,6 +111,30 @@ describe('SchemaType.cast() (gh-7045)', function() {
       s.cast('short'); // Should not throw
 
       assert.throws(() => s.cast(123), /CastError/);
+    });
+  });
+
+  describe('date', function() {
+    it('supports custom cast functions', function() {
+      Schema.Types.Date.cast(v => {
+        assert.ok(v !== '');
+        return original.date(v);
+      });
+
+      const d = new Schema.Types.Date();
+      d.cast('2018-06-01'); // Should not throw
+      d.cast(new Date()); // Should not throw
+
+      assert.throws(() => d.cast(''), /CastError/);
+    });
+
+    it('supports disabling casting', function() {
+      Schema.Types.Date.cast(false);
+
+      const d = new Schema.Types.Date();
+      d.cast(new Date()); // Should not throw
+
+      assert.throws(() => d.cast('2018-06-01'), /CastError/);
     });
   });
 });

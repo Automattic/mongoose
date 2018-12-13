@@ -12,6 +12,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
     original.boolean = Schema.Types.Boolean.cast();
     original.string = Schema.Types.String.cast();
     original.date = Schema.Types.Date.cast();
+    original.decimal128 = Schema.Types.Decimal128.cast();
   });
 
   afterEach(function() {
@@ -19,6 +20,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
     Schema.Types.Boolean.cast(original.boolean);
     Schema.Types.String.cast(original.string);
     Schema.Types.Date.cast(original.date);
+    Schema.Types.Decimal128.cast(original.decimal128);
   });
 
   it('with inheritance', function() {
@@ -163,6 +165,30 @@ describe('SchemaType.cast() (gh-7045)', function() {
       d.cast(new Date()); // Should not throw
 
       assert.throws(() => d.cast('2018-06-01'), /CastError/);
+    });
+  });
+
+  describe('decimal128', function() {
+    it('supports custom cast functions', function() {
+      Schema.Types.Decimal128.cast(v => {
+        assert.ok(typeof v !== 'number');
+        return original.date(v);
+      });
+
+      const d = new Schema.Types.Decimal128();
+      d.cast('1000'); // Should not throw
+
+      assert.throws(() => d.cast(1000), /CastError/);
+    });
+
+    it('supports disabling casting', function() {
+      Schema.Types.Decimal128.cast(false);
+
+      const d = new Schema.Types.Decimal128();
+      assert.throws(() => d.cast('1000'), /CastError/);
+      assert.throws(() => d.cast(1000), /CastError/);
+
+      d.cast(original.decimal128('1000')); // Should not throw
     });
   });
 });

@@ -21,6 +21,34 @@ describe('SchemaType.cast() (gh-7045)', function() {
     Schema.Types.Date.cast(original.date);
   });
 
+  it('with inheritance', function() {
+    class CustomObjectId extends Schema.ObjectId {}
+
+    CustomObjectId.cast(v => {
+      assert.ok(v == null || (typeof v === 'string' && v.length === 24));
+      return original.objectid(v);
+    });
+
+    const objectid = new CustomObjectId('test', { suppressWarning: true });
+    const baseObjectId = new Schema.ObjectId('test', { suppressWarning: true });
+
+    let threw = false;
+    try {
+      objectid.cast('12charstring');
+    } catch (error) {
+      threw = true;
+      assert.equal(error.name, 'CastError');
+    }
+
+    objectid.cast('000000000000000000000000'); // Should not throw
+
+    // Base objectid shouldn't throw
+    baseObjectId.cast('12charstring');
+    baseObjectId.cast('000000000000000000000000');
+
+    assert.ok(threw);
+  });
+
   it('handles objectid', function() {
     Schema.ObjectId.cast(v => {
       assert.ok(v == null || typeof v === 'string');
@@ -31,7 +59,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
 
     let threw = false;
     try {
-      objectid.cast(123);
+      objectid.cast({ toString: () => '000000000000000000000000' });
     } catch (error) {
       threw = true;
       assert.equal(error.name, 'CastError');

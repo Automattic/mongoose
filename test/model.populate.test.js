@@ -7980,7 +7980,7 @@ describe('model: populate:', function() {
     });
   });
 
-  it('explicit option overrides refPath (gh-7273)', function() {
+  it('explicit model option overrides refPath (gh-7273)', function() {
     const userSchema = new Schema({ name: String });
     const User1 = db.model('gh7273_User_1', userSchema);
     db.model('gh7273_User_2', userSchema);
@@ -8004,6 +8004,37 @@ describe('model: populate:', function() {
       post = yield Post.findOne().populate({ path: 'user', model: 'gh7273_User_1' });
 
       assert.equal(post.user.name, 'val');
+    });
+  });
+
+  it('clone option means identical ids get separate copies of doc (gh-3258)', function() {
+    const userSchema = new Schema({ name: String });
+    const User = db.model('gh3258_User', userSchema);
+
+    const postSchema = new Schema({
+      user: {
+        type: mongoose.ObjectId,
+        ref: User
+      },
+      title: String
+    });
+
+    const Post = db.model('gh3258_Post', postSchema);
+
+    return co(function*() {
+      const user = yield User.create({ name: 'val' });
+      yield Post.create([
+        { title: 'test1', user: user },
+        { title: 'test2', user: user }
+      ]);
+
+      const posts = yield Post.find().populate({
+        path: 'user',
+        options: { clone: true }
+      });
+
+      posts[0].user.name = 'val2';
+      assert.equal(posts[1].user.name, 'val');
     });
   });
 

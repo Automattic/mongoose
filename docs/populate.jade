@@ -444,8 +444,6 @@ block content
 
     <h3 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h3>
 
-    _New in 4.5.0_
-
     So far you've only populated based on the `_id` field. However, that's
     sometimes not the right choice.
     In particular, [arrays that grow without bound are a MongoDB anti-pattern](https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/).
@@ -453,12 +451,12 @@ block content
     between documents.
 
     ```javascript
-    var PersonSchema = new Schema({
+    const PersonSchema = new Schema({
       name: String,
       band: String
     });
 
-    var BandSchema = new Schema({
+    const BandSchema = new Schema({
       name: String
     });
     BandSchema.virtual('members', {
@@ -471,8 +469,8 @@ block content
       options: { sort: { name: -1 }, limit: 5 } // Query options, see http://bit.ly/mongoose-query-options
     });
 
-    var Person = mongoose.model('Person', PersonSchema);
-    var Band = mongoose.model('Band', BandSchema);
+    const Person = mongoose.model('Person', PersonSchema);
+    const Band = mongoose.model('Band', BandSchema);
 
     /**
      * Suppose you have 2 bands: "Guns N' Roses" and "Motley Crue"
@@ -491,7 +489,7 @@ block content
 
     ```javascript
     // Set `virtuals: true` so `res.json()` works
-    var BandSchema = new Schema({
+    const BandSchema = new Schema({
       name: String
     }, { toJSON: { virtuals: true } });
     ```
@@ -513,6 +511,34 @@ block content
       exec(function(error, bands) {
         // Works, foreign field `band` is selected
       });
+    ```
+
+    <h3 id="count"><a href="#populate-virtuals">Populate Virtuals: The Count Option</a></h3>
+
+    Populate virtuals also support counting the number of documents with
+    matching `foreignField` as opposed to the documents themselves. Set the
+    `count` option on your virtual:
+
+    ```javascript
+    const PersonSchema = new Schema({
+      name: String,
+      band: String
+    });
+
+    const BandSchema = new Schema({
+      name: String
+    });
+    BandSchema.virtual('numMembers', {
+      ref: 'Person', // The model to use
+      localField: 'name', // Find people where `localField`
+      foreignField: 'band', // is equal to `foreignField`
+      count: true // And only get the number of docs
+    });
+
+    // Later
+    const doc = await Band.findOne({ name: 'Motley Crue' }).
+      populate('numMembers');
+    doc.numMembers; // 2
     ```
 
     <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>

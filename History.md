@@ -1,3 +1,22 @@
+5.4.0 / 2018-12-14
+==================
+ * feat(schematype): add `SchemaType.get()`, custom getters across all instances of a schematype #6912
+ * feat(schematype): add `SchemaType.cast()`, configure casting for individual schematypes #7045
+ * feat(schematype): add `SchemaType.checkRequired()`, configure what values pass `required` check for a schematype #7186 #7150
+ * feat(model): add `Model.findOneAndReplace()` #7162
+ * feat(model): add `Model.events` emitter that emits all `error`'s that occur with a given model #7125
+ * feat(populate): add `count` option to populate virtuals, support returning # of populated docs instead of docs themselves #4469
+ * feat(aggregate): add `.catch()` helper to make aggregations full thenables #7267
+ * feat(query): add hooks for `deleteOne()` and `deleteMany()` #7195
+ * feat(document): add hooks for `updateOne()` #7133
+ * feat(query): add `Query#map()` for synchronously transforming results before post middleware runs #7142
+ * feat(schema): support passing an array of objects or schemas to `Schema` constructor #7218
+ * feat(populate): add `clone` option to ensure multiple docs don't share the same populated doc #3258
+ * feat(query): add `Query#maxTimeMS()` helper #7254
+ * fix(query): deprecate broken `Aggregate#addCursorFlag()` #7120
+ * docs(populate): fix incorrect example #7335 [zcfan](https://github.com/zcfan)
+ * docs(middleware): add `findOneAndDelete` to middleware list #7327 [danielkesselberg](https://github.com/danielkesselberg)
+
 5.3.16 / 2018-12-11
 ===================
  * fix(document): handle `__proto__` in queries #7290

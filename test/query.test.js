@@ -2773,6 +2773,21 @@ describe('Query', function() {
     });
   });
 
+  it('map (gh-7142)', function() {
+    const Model = db.model('gh7142', new Schema({ name: String }));
+
+    return co(function*() {
+      yield Model.create({ name: 'test' });
+      const now = new Date();
+      const res = yield Model.findOne().map(res => {
+        res.loadedAt = now;
+        return res;
+      });
+
+      assert.equal(res.loadedAt, now);
+    });
+  });
+
   describe('orFail (gh-6841)', function() {
     let Model;
 
@@ -3280,6 +3295,20 @@ describe('Query', function() {
 
       const doc = yield Model.findOne();
       assert.equal(doc.hasDefault, 'success');
+    });
+  });
+
+  it('maxTimeMS() (gh-7254)', function() {
+    const Model = db.model('gh7254', new Schema({}));
+
+    return co(function*() {
+      yield Model.create({});
+
+      const res = yield Model.find({ $where: 'sleep(1000) || true' }).
+        maxTimeMS(10).
+        then(() => null, err => err);
+      assert.ok(res);
+      assert.ok(res.message.indexOf('time limit') !== -1, res.message);
     });
   });
 });

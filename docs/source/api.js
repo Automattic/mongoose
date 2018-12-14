@@ -79,6 +79,12 @@ function parse() {
             ctx.name = tag.string;
             ctx.string = `${ctx.constructor}.${ctx.name}`;
             break;
+          case 'function':
+            ctx.type = 'function';
+            ctx.static = true;
+            ctx.name = tag.string;
+            ctx.string = `${ctx.constructor}.${ctx.name}()`;
+            break;
           case 'return':
             tag.description = tag.description ?
               md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :

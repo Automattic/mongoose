@@ -128,7 +128,7 @@ block content
     [left join](https://www.w3schools.com/sql/sql_join_left.asp) in SQL.
 
     ```javascript
-    await Story.deleteMany({ title: 'Casino Royale' });
+    await Person.deleteMany({ name: 'Ian Fleming' });
 
     const story = await Story.findOne({ title: 'Casino Royale' }).populate('author');
     story.author; // `null`

@@ -6690,4 +6690,11 @@ describe('document', function() {
       assert.equal(err.name, 'CastError', err.stack);
     });
   });
+
+  it('doesnt crash if nested path with `get()` (gh-7316)', function() {
+    const schema = new mongoose.Schema({ http: { get: Number } });
+    const Model = db.model('gh7316', schema);
+
+    return Model.create({ http: { get: 400 } }); // Should succeed
+  });
 });

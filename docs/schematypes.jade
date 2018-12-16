@@ -127,6 +127,7 @@ block content
     });
 
     var schema2 = new Schema({
+      // The `test` object contains the "SchemaType options"
       test: { type: String } // `test` is a path of type string
     });
     ```
@@ -143,7 +144,13 @@ block content
     });
     ```
 
-    The `lowercase` property only works for strings. There are certain options
+    You can add any property you want to your SchemaType options. Many plugins
+    rely on custom SchemaType options. For example, the [mongoose-autopopulate](http://plugins.mongoosejs.io/plugins/autopopulate)
+    plugin automatically populates paths if you set `autopopulate: true` in your
+    SchemaType options. Mongoose comes with support for several built-in
+    SchemaType options, like `lowercase` in the above example.
+
+    The `lowercase` option only works for strings. There are certain options
     which apply for all schema types, and some that apply for specific schema
     types.
 

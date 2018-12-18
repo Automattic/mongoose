@@ -6697,4 +6697,26 @@ describe('document', function() {
 
     return Model.create({ http: { get: 400 } }); // Should succeed
   });
+
+  it('doesnt fail with custom update function (gh-7342)', function() {
+    const catalogSchema = new mongoose.Schema({
+      name: String,
+      sub: new Schema({ name: String })
+    }, { runSettersOnQuery: true });
+    
+    catalogSchema.methods.update = function(data) {
+      for (let key in data) {
+        this[key] = data[key];
+      }
+      return this.save();
+    };
+
+    const Catalog = db.model('gh7342', catalogSchema);
+
+    return co(function*() {
+      let doc = yield Catalog.create({ name: 'test', sub: { name: 'foo' } });
+      doc = yield doc.update({ name: 'test2' });
+      assert.equal(doc.name, 'test2');
+    });
+  });
 });

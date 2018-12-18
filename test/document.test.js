@@ -6703,9 +6703,9 @@ describe('document', function() {
       name: String,
       sub: new Schema({ name: String })
     }, { runSettersOnQuery: true });
-    
+
     catalogSchema.methods.update = function(data) {
-      for (let key in data) {
+      for (const key in data) {
         this[key] = data[key];
       }
       return this.save();

@@ -6485,6 +6485,36 @@ describe('document', function() {
     });
   });
 
+  it('casts defaults for doc arrays (gh-7337)', function() {
+    const accountSchema = new mongoose.Schema({
+      roles: {
+        type: [{
+          otherProperties: {
+            example: Boolean,
+          },
+          name: String,
+        }],
+        default: function() {
+          return [
+            { otherProperties: { example: true }, name: 'First' },
+            { otherProperties: { example: false }, name: 'Second' }
+          ];
+        }
+      }
+    });
+
+    const Account = db.model('gh7337', accountSchema);
+
+    return co(function*() {
+      const account = yield Account.create({});
+  
+      const doc = yield Account.findOne();
+
+      assert.ok(doc.roles[0]._id);
+      assert.ok(doc.roles[1]._id);
+    });
+  });
+
   it('updateOne() hooks (gh-7133)', function() {
     const schema = new mongoose.Schema({ name: String });
 

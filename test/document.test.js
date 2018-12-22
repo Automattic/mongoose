@@ -6506,8 +6506,8 @@ describe('document', function() {
     const Account = db.model('gh7337', accountSchema);
 
     return co(function*() {
-      const account = yield Account.create({});
-  
+      yield Account.create({});
+
       const doc = yield Account.findOne();
 
       assert.ok(doc.roles[0]._id);

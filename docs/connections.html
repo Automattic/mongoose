@@ -11,7 +11,7 @@
 </div>
 
 <p>You can connect to MongoDB with the <code>mongoose.connect()</code> method.</p>
-<pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);
+<pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp', {useNewUrlParser: true}</span>);
 </code></pre>
 <p>This is the minimum needed to connect the <code>myapp</code> database running locally
 on the default port (27017). If connecting fails on your machine, try using
@@ -24,7 +24,7 @@ on the default port (27017). If connecting fails on your machine, try using
 
 <p>Mongoose lets you start using your models immediately, without waiting for
 mongoose to establish a connection to MongoDB.</p>
-<pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);
+<pre><code class="lang-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp', {useNewUrlParser: true}</span>);
 <span class="hljs-keyword">var</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));
 <span class="hljs-comment">// Works</span>
 MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });
@@ -38,7 +38,7 @@ connecting.</p>
 MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });
 
 setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>);
+  mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp', {useNewUrlParser: true}</span>);
 }, <span class="hljs-number">60000</span>);
 </code></pre>
 <p>To disable buffering, turn off the <a href="./guide.html#bufferCommands"><code>bufferCommands</code> option on your schema</a>.

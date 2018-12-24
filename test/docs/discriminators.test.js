@@ -1,6 +1,6 @@
 'use strict';
 
-var assert = require('power-assert');
+var assert = require('assert');
 var async = require('async');
 var mongoose = require('../../');
 

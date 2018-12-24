@@ -21,7 +21,7 @@ block content
     You can connect to MongoDB with the `mongoose.connect()` method.
 
     ```javascript
-    mongoose.connect('mongodb://localhost:27017/myapp');
+    mongoose.connect('mongodb://localhost:27017/myapp', {useNewUrlParser: true});
     ```
 
     This is the minimum needed to connect the `myapp` database running locally
@@ -42,7 +42,7 @@ block content
     mongoose to establish a connection to MongoDB.
 
     ```javascript
-    mongoose.connect('mongodb://localhost:27017/myapp');
+    mongoose.connect('mongodb://localhost:27017/myapp', {useNewUrlParser: true});
     var MyModel = mongoose.model('Test', new Schema({ name: String }));
     // Works
     MyModel.findOne(function(error, result) { /* ... */ });
@@ -59,7 +59,7 @@ block content
     MyModel.findOne(function(error, result) { /* ... */ });
 
     setTimeout(function() {
-      mongoose.connect('mongodb://localhost:27017/myapp');
+      mongoose.connect('mongodb://localhost:27017/myapp', {useNewUrlParser: true});
     }, 60000);
     ```
 

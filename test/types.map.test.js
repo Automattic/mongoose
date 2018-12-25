@@ -582,7 +582,7 @@ describe('Map', function() {
           'one': {name: 'foo'}
         }
       });
-    
+
       let loaded = yield Parent.findById(first.id);
       assert.equal(loaded.get('children.one.name'), 'foo');
 

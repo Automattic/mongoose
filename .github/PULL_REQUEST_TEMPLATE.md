@@ -1,9 +1,11 @@
-<!-- Thanks for submitting a pull request! Please provide enough information so that others can review your pull request. The two fields below are mandatory. -->
+Thanks for submitting a pull request! Please provide enough information so that others can review your pull request. The two fields below are mandatory.
+
+If you're making a change to documentation, do **not** modify a `.html` file directly. Instead find the corresponding `.jade` file or test case in the `test/docs` directory.
 
 **Summary**
 
-<!-- Explain the **motivation** for making this change. What existing problem does the pull request solve? -->
+<!-- Explain the **motivation** for making this change. What problem does the pull request solve? -->
 
-**Test plan**
+**Examples**
 
-<!-- Demonstrate the code is solid. Example: The exact commands you ran and their output, screenshots / videos if the pull request changes UI. -->
+<!-- If this code fixes a bug or adds a new feature, provide an example demonstrating the change, unless you added a test. -->

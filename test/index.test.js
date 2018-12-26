@@ -521,6 +521,22 @@ describe('mongoose module:', function() {
         m.model('A', model.schema);
       });
 
+      assert.equal(model, m.model('A', model.schema));
+
+      done();
+    });
+
+    it('allows passing identical name+schema+collection args (gh-5767)', function(done) {
+      const m = new Mongoose;
+      const schema = new Schema;
+      const model = m.model('A', schema, 'AA');
+
+      assert.doesNotThrow(function() {
+        m.model('A', model.schema, 'AA');
+      });
+
+      assert.equal(model, m.model('A', model.schema, 'AA'));
+
       done();
     });
 

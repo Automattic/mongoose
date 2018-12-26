@@ -84,7 +84,7 @@ describe('Map', function() {
   it('deep set', function(done) {
     const userSchema = new mongoose.Schema({
       socialMediaHandles: {
-        type: Map,
+        type: Schema.Types.Map,
         of: String
       }
     });
@@ -561,6 +561,37 @@ describe('Map', function() {
 
       assert.equal(setterContext.length, 1);
       assert.ok(setterContext[0] instanceof mongoose.Query);
+    });
+  });
+
+  it('init then set marks correct path as modified (gh-7321)', function() {
+    const childSchema = new mongoose.Schema({ name: String });
+
+    const parentSchema = new mongoose.Schema({
+      children: {
+        type: Map,
+        of: childSchema
+      }
+    });
+
+    const Parent = db.model('gh7321', parentSchema);
+
+    return co(function*() {
+      const first = yield Parent.create({
+        children: {
+          'one': {name: 'foo'}
+        }
+      });
+
+      let loaded = yield Parent.findById(first.id);
+      assert.equal(loaded.get('children.one.name'), 'foo');
+
+      loaded.children.get('one').set('name', 'bar');
+
+      yield loaded.save();
+
+      loaded = yield Parent.findById(first.id);
+      assert.equal(loaded.get('children.one.name'), 'bar');
     });
   });
 });

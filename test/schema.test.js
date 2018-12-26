@@ -1907,4 +1907,14 @@ describe('schema', function() {
 
     return Promise.resolve();
   });
+
+  it('throws error if invalid type (gh-7303)', function() {
+    assert.throws(() => {
+      new Schema({
+        bad: true
+      });
+    }, /invalid.*true.*bad/i);
+
+    return Promise.resolve();
+  });
 });

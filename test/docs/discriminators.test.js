@@ -1,6 +1,6 @@
 'use strict';
 
-var assert = require('power-assert');
+var assert = require('assert');
 var async = require('async');
 var mongoose = require('../../');
 
@@ -353,6 +353,13 @@ describe('discriminator docs', function () {
       catch(done);
   });
 
+  /**
+   * You can also define embedded discriminators on embedded discriminators.
+   * In the below example, `sub_events` is an embedded discriminator, and
+   * for `sub_event` keys with value 'SubEvent', `sub_events.events` is an
+   * embedded discriminator.
+   */
+
   it('Recursive embedded discriminators in arrays', function(done) {
     var singleEventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
@@ -363,7 +370,8 @@ describe('discriminator docs', function () {
        sub_events: [singleEventSchema]
     }, { _id: false });
 
-    var SubEvent = subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema)
+    var SubEvent = subEventSchema.path('sub_events').
+      discriminator('SubEvent', subEventSchema);
     eventListSchema.path('events').discriminator('SubEvent', subEventSchema);
 
     var Eventlist = db.model('EventList', eventListSchema);

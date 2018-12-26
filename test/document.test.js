@@ -6485,6 +6485,36 @@ describe('document', function() {
     });
   });
 
+  it('casts defaults for doc arrays (gh-7337)', function() {
+    const accountSchema = new mongoose.Schema({
+      roles: {
+        type: [{
+          otherProperties: {
+            example: Boolean,
+          },
+          name: String,
+        }],
+        default: function() {
+          return [
+            { otherProperties: { example: true }, name: 'First' },
+            { otherProperties: { example: false }, name: 'Second' }
+          ];
+        }
+      }
+    });
+
+    const Account = db.model('gh7337', accountSchema);
+
+    return co(function*() {
+      yield Account.create({});
+
+      const doc = yield Account.findOne();
+
+      assert.ok(doc.roles[0]._id);
+      assert.ok(doc.roles[1]._id);
+    });
+  });
+
   it('updateOne() hooks (gh-7133)', function() {
     const schema = new mongoose.Schema({ name: String });
 
@@ -6688,6 +6718,35 @@ describe('document', function() {
 
       err = yield TestModel.deleteOne(badQuery).then(() => null, e => e);
       assert.equal(err.name, 'CastError', err.stack);
+    });
+  });
+
+  it('doesnt crash if nested path with `get()` (gh-7316)', function() {
+    const schema = new mongoose.Schema({ http: { get: Number } });
+    const Model = db.model('gh7316', schema);
+
+    return Model.create({ http: { get: 400 } }); // Should succeed
+  });
+
+  it('doesnt fail with custom update function (gh-7342)', function() {
+    const catalogSchema = new mongoose.Schema({
+      name: String,
+      sub: new Schema({ name: String })
+    }, { runSettersOnQuery: true });
+
+    catalogSchema.methods.update = function(data) {
+      for (const key in data) {
+        this[key] = data[key];
+      }
+      return this.save();
+    };
+
+    const Catalog = db.model('gh7342', catalogSchema);
+
+    return co(function*() {
+      let doc = yield Catalog.create({ name: 'test', sub: { name: 'foo' } });
+      doc = yield doc.update({ name: 'test2' });
+      assert.equal(doc.name, 'test2');
     });
   });
 });

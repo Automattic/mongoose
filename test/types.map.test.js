@@ -84,7 +84,7 @@ describe('Map', function() {
   it('deep set', function(done) {
     const userSchema = new mongoose.Schema({
       socialMediaHandles: {
-        type: Map,
+        type: Schema.Types.Map,
         of: String
       }
     });

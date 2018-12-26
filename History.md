@@ -1,3 +1,20 @@
+5.4.1 / 2018-12-26
+==================
+ * fix(document): ensure doc array defaults get casted #7337
+ * fix(document): make `save()` not crash if nested doc has a property 'get' #7316
+ * fix(schema): allow using Schema.Types.Map as well as Map to declare a map type #7305
+ * fix(map): make set after init mark correct path as modified #7321
+ * fix(mongoose): don't recompile model if same collection and schema passed in to `mongoose.model()` #5767
+ * fix(schema): improve error message when type is invalid #7303
+ * fix(schema): add `populated` to reserved property names #7317
+ * fix(model): don't run built-in middleware on custom methods and ensure timestamp hooks don't run if children don't have timestamps set #7342
+ * docs(schematypes): clarify that you can add arbitrary options to a SchemaType #7340
+ * docs(mongoose): clarify that passing same name+schema to `mongoose.model()` returns the model #5767
+ * docs(index): add useNewUrlParser to example #7368 [JIBIN-P](https://github.com/JIBIN-P)
+ * docs(connection): add useNewUrlParser to examples #7362 [JIBIN-P](https://github.com/JIBIN-P)
+ * docs(discriminators): add back missing example from 'recursive embedded discriminators section' #7349
+ * docs(schema): improve docs for string and boolean cast() #7351
+
 5.4.0 / 2018-12-14
 ==================
  * feat(schematype): add `SchemaType.get()`, custom getters across all instances of a schematype #6912

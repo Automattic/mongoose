@@ -6613,7 +6613,7 @@ describe('document', function() {
   });
 
   it('flattenMaps option for toObject() (gh-7274)', function() {
-    const schema = new Schema({
+    let schema = new Schema({
       test: {
         type: Map,
         of: String,
@@ -6621,13 +6621,27 @@ describe('document', function() {
       }
     }, { versionKey: false });
 
-    const Test = mongoose.model('test', schema);
+    let Test = db.model('gh7274', schema);
 
-    const mapTest = new Test({});
-
+    let mapTest = new Test({});
     mapTest.test.set('key1', 'value1');
-
     assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+
+    schema = new Schema({
+      test: {
+        type: Map,
+        of: String,
+        default: new Map()
+      }
+    }, { versionKey: false });
+    schema.set('toObject', { flattenMaps: true });
+    
+    db.deleteModel('gh7274');
+    Test = db.model('gh7274', schema);
+
+    mapTest = new Test({});
+    mapTest.test.set('key1', 'value1');
+    assert.equal(mapTest.toObject({}).test.key1, 'value1');
 
     return Promise.resolve();
   });

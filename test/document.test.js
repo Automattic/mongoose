@@ -6635,7 +6635,7 @@ describe('document', function() {
       }
     }, { versionKey: false });
     schema.set('toObject', { flattenMaps: true });
-    
+
     db.deleteModel('gh7274');
     Test = db.model('gh7274', schema);
 

@@ -3298,6 +3298,14 @@ describe('Query', function() {
     });
   });
 
+  it('merging objectids with where() (gh-7360)', function() {
+    const Test = db.model('gh7360', new Schema({}));
+
+    return Test.create({}).
+      then(doc => Test.find({ _id: doc._id.toString() }).where({ _id: doc._id })).
+      then(res => assert.equal(res.length, 1));
+  });
+
   it('maxTimeMS() (gh-7254)', function() {
     const Model = db.model('gh7254', new Schema({}));
 

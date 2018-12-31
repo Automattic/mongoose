@@ -28,4 +28,14 @@ describe('get', function() {
     const obj = { a: new Map([['b', { c: 42 }]]) };
     assert.strictEqual(get(obj, 'a.b.c', 43), 42);
   });
+
+  it('works with dotted at top level', function() {
+    const obj = { 'a.b': 42 };
+    assert.strictEqual(get(obj, 'a.b', 43), 42);
+  });
+
+  it('works with dotted nested', function() {
+    const obj = { a: { 'b.c': 42 } };
+    assert.strictEqual(get(obj, 'a.b.c', 43), 42);
+  });
 });

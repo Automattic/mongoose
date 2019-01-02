@@ -54,5 +54,27 @@ describe('Query helpers', function() {
 
       done();
     });
+
+    it('handle explicitly excluded paths (gh-7383)', function(done) {
+      const schema = new Schema({
+        name: String,
+        other: String
+      });
+
+      const q = new Query({});
+      q.schema = schema;
+
+      assert.strictEqual(q._fields, void 0);
+
+      q.select({ name: 1, other: 0 });
+      q.populate('other');
+      assert.deepEqual(q._fields, { name: 1, other: 0 });
+
+      selectPopulatedFields(q);
+
+      assert.deepEqual(q._fields, { name: 1 });
+
+      done();
+    });
   });
 });

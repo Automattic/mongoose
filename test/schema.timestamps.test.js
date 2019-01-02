@@ -176,7 +176,7 @@ describe('schema options.timestamps', function() {
         hobby: String
       }, {timestamps: true});
       Cat = conn.model('Cat', CatSchema);
-      return Cat.deleteMany({});
+      return Cat.deleteMany({}).then(() => Cat.create({name: 'newcat'}));
     });
 
     it('should have fields when create', function(done) {

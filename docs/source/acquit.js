@@ -50,7 +50,7 @@ var files = [
     title: 'Validation'
   },
   {
-    input: 'test/docs/schemas.test.es6.js',
+    input: 'test/docs/schemas.test.js',
     output: 'advanced_schemas.html',
     title: 'Advanced Schemas'
   }

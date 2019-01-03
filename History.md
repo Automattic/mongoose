@@ -1,3 +1,12 @@
+5.4.2 / 2019-01-03
+==================
+ * fix(document): ensure Document#updateOne() returns a query but still calls hooks #7366
+ * fix(query): allow explicitly projecting out populated paths that are automatically projected in #7383
+ * fix(document): support setting `flattenMaps` option for `toObject()` and `toJSON()` at schema level #7274
+ * fix(query): handle merging objectids with `.where()` #7360
+ * fix(schema): copy `.base` when cloning #7377
+ * docs: remove links to plugins.mongoosejs.com in favor of plugins.mongoosejs.io #7364
+
 5.4.1 / 2018-12-26
 ==================
  * fix(document): ensure doc array defaults get casted #7337

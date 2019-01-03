@@ -145,9 +145,14 @@ describe('document', function() {
   });
 
   describe('updateOne', function() {
-    it('updates the document', function() {
+    let Test;
+
+    before(function() {
       const schema = new Schema({ x: String, y: String });
-      const Test = db.model('gh6940_2', schema);
+      Test = db.model('gh6940_2', schema);
+    });
+
+    it('updates the document', function() {
       return co(function* () {
         const test = new Test({ x: 'test' });
         const doc = yield test.save();
@@ -155,6 +160,11 @@ describe('document', function() {
         const found = yield Test.findOne({ _id: doc._id });
         assert.strictEqual(found.y, 'test');
       });
+    });
+
+    it('returns a query', function() {
+      const doc = new Test({ x: 'test' });
+      assert.ok(doc.updateOne() instanceof Test.Query);
     });
   });
 
@@ -6520,9 +6530,11 @@ describe('document', function() {
 
     let queryCount = 0;
     let docCount = 0;
+    let docPostCount = 0;
 
     schema.pre('updateOne', () => ++queryCount);
     schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
+    schema.post('updateOne', { document: true, query: false }, () => ++docPostCount);
 
     let removeCount1 = 0;
     let removeCount2 = 0;
@@ -6537,11 +6549,13 @@ describe('document', function() {
 
       assert.equal(queryCount, 0);
       assert.equal(docCount, 0);
+      assert.equal(docPostCount, 0);
 
       yield doc.updateOne({ name: 'test2' });
 
       assert.equal(queryCount, 1);
       assert.equal(docCount, 1);
+      assert.equal(docPostCount, 1);
 
       assert.equal(removeCount1, 0);
       assert.equal(removeCount2, 0);
@@ -6613,7 +6627,7 @@ describe('document', function() {
   });
 
   it('flattenMaps option for toObject() (gh-7274)', function() {
-    const schema = new Schema({
+    let schema = new Schema({
       test: {
         type: Map,
         of: String,
@@ -6621,13 +6635,27 @@ describe('document', function() {
       }
     }, { versionKey: false });
 
-    const Test = mongoose.model('test', schema);
+    let Test = db.model('gh7274', schema);
 
-    const mapTest = new Test({});
-
+    let mapTest = new Test({});
     mapTest.test.set('key1', 'value1');
-
     assert.equal(mapTest.toObject({ flattenMaps: true }).test.key1, 'value1');
+
+    schema = new Schema({
+      test: {
+        type: Map,
+        of: String,
+        default: new Map()
+      }
+    }, { versionKey: false });
+    schema.set('toObject', { flattenMaps: true });
+
+    db.deleteModel('gh7274');
+    Test = db.model('gh7274', schema);
+
+    mapTest = new Test({});
+    mapTest.test.set('key1', 'value1');
+    assert.equal(mapTest.toObject({}).test.key1, 'value1');
 
     return Promise.resolve();
   });

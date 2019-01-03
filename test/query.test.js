@@ -6,7 +6,7 @@
 
 const start = require('./common');
 const Query = require('../lib/query');
-const assert = require('power-assert');
+const assert = require('assert');
 const async = require('async');
 const co = require('co');
 const random = require('../lib/utils').random;
@@ -2527,13 +2527,13 @@ describe('Query', function() {
         yield Activity.insertMany([
           {
             owner: {
-              id  : '5a042f742a91c1db447534d5',
+              id: '5a042f742a91c1db447534d5',
               type: 'user'
             }
           },
           {
             owner: {
-              id  : 'asdf',
+              id: 'asdf',
               type: 'tag'
             }
           }
@@ -3296,6 +3296,14 @@ describe('Query', function() {
       const doc = yield Model.findOne();
       assert.equal(doc.hasDefault, 'success');
     });
+  });
+
+  it('merging objectids with where() (gh-7360)', function() {
+    const Test = db.model('gh7360', new Schema({}));
+
+    return Test.create({}).
+      then(doc => Test.find({ _id: doc._id.toString() }).where({ _id: doc._id })).
+      then(res => assert.equal(res.length, 1));
   });
 
   it('maxTimeMS() (gh-7254)', function() {

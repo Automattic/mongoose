@@ -3397,10 +3397,10 @@ describe('document', function() {
           }
         });
 
-        assert.ok(doc.modifiedPaths().includes('name.first'));
-        assert.ok(doc.modifiedPaths().includes('name.last'));
-        assert.ok(doc.modifiedPaths().includes('relatives.aunt'));
-        assert.ok(doc.modifiedPaths().includes('relatives.uncle'));
+        assert.ok(doc.modifiedPaths().indexOf('name.first') !== -1);
+        assert.ok(doc.modifiedPaths().indexOf('name.last') !== -1);
+        assert.ok(doc.modifiedPaths().indexOf('relatives.aunt') !== -1);
+        assert.ok(doc.modifiedPaths().indexOf('relatives.uncle') !== -1);
 
         return Promise.resolve();
       });

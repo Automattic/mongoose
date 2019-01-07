@@ -3371,6 +3371,39 @@ describe('document', function() {
 
         done();
       });
+
+      it('1 level down nested paths get marked modified on initial set (gh-7313) (gh-6944)', function() {
+        const testSchema = new Schema({
+          name: {
+            first: String,
+            last: String,
+          },
+          relatives: {
+            aunt: {
+              name: String,
+            },
+            uncle: {
+              name: String,
+            },
+          },
+        });
+        const M = db.model('gh7313', testSchema);
+
+        const doc = new M({
+          name: { first: 'A', last: 'B' },
+          relatives: {
+            aunt: { name: 'foo' },
+            uncle: { name: 'bar' }
+          }
+        });
+
+        assert.ok(doc.modifiedPaths().includes('name.first'));
+        assert.ok(doc.modifiedPaths().includes('name.last'));
+        assert.ok(doc.modifiedPaths().includes('relatives.aunt'));
+        assert.ok(doc.modifiedPaths().includes('relatives.uncle'));
+
+        return Promise.resolve();
+      });
     });
 
     it('single nested isNew (gh-4369)', function(done) {

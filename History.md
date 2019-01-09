@@ -1,3 +1,11 @@
+5.4.3 / 2019-01-09
+==================
+ * fix(populate): handle `count` option when using `Document#populate()` on a virtual #7380
+ * fix(connection): set connection state to DISCONNECTED if replica set has no primary #7330
+ * fix(mongoose): apply global plugins to schemas nested underneath embedded discriminators #7370
+ * fix(document): make modifiedPaths() return nested paths 1 level down on initial set #7313
+ * fix(plugins): ensure sharding plugin works even if ObjectId has a `valueOf()` #7353
+
 5.4.2 / 2019-01-03
 ==================
  * fix(document): ensure Document#updateOne() returns a query but still calls hooks #7366

@@ -7940,7 +7940,7 @@ describe('model: populate:', function() {
     });
   });
 
-  it('count option (gh-4469)', function() {
+  it('count option (gh-4469) (gh-7380)', function() {
     const childSchema = new Schema({ parentId: mongoose.ObjectId });
 
     const parentSchema = new Schema({ name: String });
@@ -7975,6 +7975,11 @@ describe('model: populate:', function() {
       assert.equal(doc.children.length, 2);
 
       doc = yield Parent.find().populate('childCount').then(res => res[0]);
+      assert.equal(doc.childCount, 2);
+      assert.equal(doc.children, null);
+
+      doc = yield Parent.findOne();
+      yield doc.populate('childCount').execPopulate();
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children, null);
     });

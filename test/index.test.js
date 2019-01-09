@@ -341,6 +341,30 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('global plugins on nested schemas underneath embedded discriminators (gh-7370)', function() {
+    const m = new Mongoose();
+
+    const called = [];
+    m.plugin(function(s) {
+      called.push(s);
+    });
+
+    const subSchema = new m.Schema({ name: String }, { discriminatorKey: 'kind' });
+    const schema = new m.Schema({
+      test: [subSchema]
+    });
+    const discriminatorNestedSchema = new m.Schema({ other: String });
+    schema.path('test').discriminator('Foo', new m.Schema({
+      nested: discriminatorNestedSchema
+    }));
+
+    m.model('gh7370', schema);
+    assert.equal(called.length, 3);
+    assert.ok(called.indexOf(discriminatorNestedSchema) !== -1);
+
+    return Promise.resolve();
+  });
+
   it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function(done) {
     const mongoose = new Mongoose();
 

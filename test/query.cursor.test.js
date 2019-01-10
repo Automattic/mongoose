@@ -422,7 +422,7 @@ describe('QueryCursor', function() {
 
     const User = db.model('gh4814', userSchema);
 
-    const cursor = User.find().cursor().option({'noCursorTimeout': true});
+    const cursor = User.find().option({'noCursorTimeout': true});
 
     cursor.on('cursor', function() {
       assert.equal(cursor.cursor.s.cmd.noCursorTimeout, true);

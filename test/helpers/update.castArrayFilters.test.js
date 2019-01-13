@@ -20,4 +20,25 @@ describe('castArrayFilters', function() {
 
     done();
   });
+
+  it('casts multiple', function(done) {
+    const schema = new Schema({
+      comments: [{
+        text: String,
+        replies: [{ date: Date }]
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'comments.$[x].replies.$[y].date': '2018-01-01' } }, {
+      arrayFilters: [{ 'x.text': 123 }, { 'y.date': { $gte: '2018-01-01' } }]
+    });
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0]['x.text'], '123');
+    assert.ok(q.options.arrayFilters[1]['y.date'].$gte instanceof Date);
+
+    done();
+  });
 });

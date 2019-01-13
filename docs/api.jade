@@ -58,6 +58,10 @@ block content
         h5 Returns:
         ul
           li <span class="method-type">&laquo;#{prop.return.types}&raquo;</span> !{prop.return.description}
+      if prop.type != null
+        h5 Type:
+        ul
+          li <span class="method-type">&laquo;#{prop.type}&raquo;</span>
       div
         | !{prop.description}
 

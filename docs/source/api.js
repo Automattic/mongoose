@@ -70,7 +70,13 @@ function parse() {
             break;
           case 'property':
             ctx.type = 'property';
-            ctx.name = tag.string;
+            let str = tag.string;
+            const match = str.match(/^{\w+}/);
+            if (match != null) {
+              ctx.type = match[0].substring(1, match[0].length - 1);
+              str = str.replace(/^{\w+}\s*/, '');
+            }
+            ctx.name = str;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
             break;
           case 'static':

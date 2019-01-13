@@ -222,6 +222,22 @@ describe('schema options.timestamps', function() {
       });
     });
 
+    it('can skip with timestamps: false (gh-7357)', function() {
+      return co(function*() {
+        const cat = yield Cat.findOne();
+
+        const old = cat.updatedAt;
+
+        yield cb => setTimeout(() => cb(), 10);
+
+        cat.hobby = 'fishing';
+
+        yield cat.save({ timestamps: false });
+
+        assert.strictEqual(cat.updatedAt, old);
+      });
+    });
+
     it('should change updatedAt when findOneAndUpdate', function(done) {
       Cat.create({name: 'test123'}, function(err) {
         assert.ifError(err);

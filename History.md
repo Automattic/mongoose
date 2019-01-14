@@ -1,3 +1,10 @@
+5.4.4 / 2019-01-14
+==================
+ * fix(query): run casting on arrayFilters option #7079
+ * fix(document): support skipping timestamps on save() with `save({ timestamps: false })` #7357
+ * fix(model): apply custom where on `Document#remove()` so we attach the shardKey #7393
+ * docs(mongoose): document `mongoose.connections` #7338
+
 5.4.3 / 2019-01-09
 ==================
  * fix(populate): handle `count` option when using `Document#populate()` on a virtual #7380

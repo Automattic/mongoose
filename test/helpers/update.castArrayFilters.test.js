@@ -41,4 +41,25 @@ describe('castArrayFilters', function() {
 
     done();
   });
+
+  it('sane error on same filter twice', function(done) {
+    const schema = new Schema({
+      comments: [{
+        text: String,
+        replies: [{ date: Date }]
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'comments.$[x].replies.$[x].date': '2018-01-01' } }, {
+      arrayFilters: [{ 'x.text': 123 }]
+    });
+
+    assert.throws(() => {
+      castArrayFilters(q);
+    }, /same array filter/);
+
+    done();
+  });
 });

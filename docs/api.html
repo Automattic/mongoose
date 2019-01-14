@@ -4432,7 +4432,8 @@ Product.on(<span class="hljs-string">'error'</span>, handleError);</code></pre><
 <span class="method-type">&laquo;string|function&raquo;</span> the local field to populate on if this is a populated virtual.</li></ul><ul style="margin-top: 0.5em"><li>[options.foreignField]
 <span class="method-type">&laquo;string|function&raquo;</span> the foreign field to populate on if this is a populated virtual.</li></ul><ul style="margin-top: 0.5em"><li>[options.justOne=false]
 <span class="method-type">&laquo;boolean&raquo;</span> by default, a populated virtual is an array. If you set <code>justOne</code>, the populated virtual will be a single doc or <code>null</code>.</li></ul><ul style="margin-top: 0.5em"><li>[options.getters=false]
-<span class="method-type">&laquo;boolean&raquo;</span> if you set this to <code>true</code>, Mongoose will call any custom getters you defined on this virtual</li></ul></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;function&raquo;</span></li></ul><div><p>VirtualType constructor</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if you set this to <code>true</code>, Mongoose will call any custom getters you defined on this virtual</li></ul><ul style="margin-top: 0.5em"><li>[options.count=false]
+<span class="method-type">&laquo;boolean&raquo;</span> if you set this to <code>true</code>, <code>populate()</code> will set this virtual to the number of populated documents, as opposed to the documents themselves, using <a href="./api.html#query_Query-countDocuments"><code>Query#countDocuments()</code></a></li></ul></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;function&raquo;</span></li></ul><div><p>VirtualType constructor</p>
 
 <p>This is what mongoose uses to define virtual attributes via <code>Schema.prototype.virtual</code>.</p>
 

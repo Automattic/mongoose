@@ -4949,7 +4949,7 @@ describe('Model', function() {
 
       it('arrayFilter casting (gh-5965) (gh-7079)', function() {
         return co(function*() {
-          const MyModel = db.model('gh5965', new Schema({
+          const MyModel = db.model('gh7079', new Schema({
             _id: Number,
             grades: [Number]
           }));

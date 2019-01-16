@@ -3013,6 +3013,16 @@ describe('Query', function() {
         assert.equal(docs.length, 1);
       });
     });
+
+    it('throws DocumentNotFoundError by default (gh-7409)', function() {
+      return co(function*() {
+        const err = yield Model.findOne({ name: 'na' }).
+          orFail().
+          then(() => null, err => err);
+        assert.equal(err.name, 'DocumentNotFoundError', err.stack);
+        assert.deepEqual(err.filter, { name: 'na' });
+      });
+    });
   });
 
   describe('getPopulatedPaths', function() {

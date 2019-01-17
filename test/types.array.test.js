@@ -1114,25 +1114,36 @@ describe('types array', function() {
   });
 
   describe('options', function() {
-    let options;
+    let arrOptions;
+    let docArrOptions;
 
     beforeEach(function() {
-      options = Object.assign({}, mongoose.Schema.Types.Array.options);
+      arrOptions = Object.assign({}, mongoose.Schema.Types.Array.options);
+      docArrOptions = Object.assign({}, mongoose.Schema.Types.DocumentArray.options);
     });
 
     afterEach(function() {
-      mongoose.Schema.Types.Array.options = options;
+      mongoose.Schema.Types.Array.options = arrOptions;
+      mongoose.Schema.Types.DocumentArray.options = docArrOptions;
     });
 
     it('castNonArrays (gh-7371)', function() {
       mongoose.Schema.Types.Array.options.castNonArrays = false;
+      mongoose.Schema.Types.DocumentArray.options.castNonArrays = false;
 
-      const schema = new Schema({ arr: [String] });
+      const schema = new Schema({ arr: [String], docArr: [{ name: String }] });
       const Model = db.model('gh7371', schema);
 
-      const doc = new Model({ arr: 'fail' });
+      let doc = new Model({ arr: 'fail', docArr: { name: 'fail' } });
       assert.ok(doc.validateSync().errors);
       assert.equal(doc.validateSync().errors['arr'].name, 'CastError');
+      assert.equal(doc.validateSync().errors['docArr'].name, 'CastError');
+
+      doc = new Model({ arr: ['good'] });
+      assert.ifError(doc.validateSync());
+      doc.arr.push('foo');
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(doc.arr.toObject(), ['good', 'foo']);
 
       return Promise.resolve();
     });

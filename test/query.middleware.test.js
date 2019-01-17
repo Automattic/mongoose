@@ -390,7 +390,8 @@ describe('query middleware', function() {
       const Model = db.model('gh7195_deleteOne', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
-      yield Model.deleteOne();
+      const res = yield Model.deleteOne();
+      assert.equal(res.deletedCount, 1);
 
       assert.equal(preCount, 1);
       assert.equal(postCount, 1);

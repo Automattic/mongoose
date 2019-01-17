@@ -1113,6 +1113,31 @@ describe('types array', function() {
     });
   });
 
+  describe('options', function() {
+    let options;
+
+    beforeEach(function() {
+      options = Object.assign({}, mongoose.Schema.Types.Array.options);
+    });
+
+    afterEach(function() {
+      mongoose.Schema.Types.Array.options = options;
+    });
+
+    it('castNonArrays (gh-7371)', function() {
+      mongoose.Schema.Types.Array.options.castNonArrays = false;
+
+      const schema = new Schema({ arr: [String] });
+      const Model = db.model('gh7371', schema);
+
+      const doc = new Model({ arr: 'fail' });
+      assert.ok(doc.validateSync().errors);
+      assert.equal(doc.validateSync().errors['arr'].name, 'CastError');
+
+      return Promise.resolve();
+    });
+  });
+
   describe('nonAtomicPush()', function() {
     it('works', function(done) {
       const U = db.model('User');

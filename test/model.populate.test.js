@@ -8066,12 +8066,12 @@ describe('model: populate:', function() {
     const Artist = db.model('gh7374_Artist', artistSchema);
 
     return co(function*() {
-      const artists = yield Artist.create([
+      yield Artist.create([
         { _id: 1, name: 'Axl Rose' },
         { _id: 2, name: 'Slash' }
       ]);
 
-      const song = yield Song.create({
+      yield Song.create({
         title: 'November Rain',
         identifiers: [{ artists: [{ artist: 1 }, { artist: 2 }] }]
       });

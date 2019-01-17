@@ -8043,6 +8043,45 @@ describe('model: populate:', function() {
     });
   });
 
+  it('handles double nested array `foreignField` (gh-7374)', function() {
+    const songSchema = Schema({
+      title: { type: String },
+      identifiers: [{
+        _id: false,
+        artists: [{
+          _id: false,
+          artist: { type: Number }
+        }]
+      }]
+    });
+
+    const artistSchema = new Schema({ _id: Number, name: String });
+    artistSchema.virtual('songs', {
+      ref: 'gh7374_Song',
+      localField: '_id',
+      foreignField: 'identifiers.artists.artist'
+    });
+
+    const Song = db.model('gh7374_Song', songSchema);
+    const Artist = db.model('gh7374_Artist', artistSchema);
+
+    return co(function*() {
+      const artists = yield Artist.create([
+        { _id: 1, name: 'Axl Rose' },
+        { _id: 2, name: 'Slash' }
+      ]);
+
+      const song = yield Song.create({
+        title: 'November Rain',
+        identifiers: [{ artists: [{ artist: 1 }, { artist: 2 }] }]
+      });
+
+      const axl = yield Artist.findById(1).populate('songs');
+      assert.equal(axl.songs.length, 1);
+      assert.equal(axl.songs[0].title, 'November Rain');
+    });
+  });
+
   it('populate single path with numeric path underneath doc array (gh-7273)', function() {
     const schema = new Schema({
       arr1: [{

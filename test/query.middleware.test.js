@@ -568,4 +568,19 @@ describe('query middleware', function() {
       done();
     });
   });
+
+  it('doesnt double call post(regexp) with updateOne (gh-7418)', function() {
+    const schema = new Schema({ name: String });
+    let calledPost = 0;
+
+    schema.post(/.*/, function(res, next) {
+      ++calledPost;
+      next();
+    });
+
+    const Test = db.model('gh7418', schema);
+
+    return Test.updateOne({}, { name: 'bar' }).
+      then(() => assert.equal(calledPost, 1));
+  });
 });

@@ -1,3 +1,11 @@
+5.4.5 / 2019-01-18
+==================
+ * fix(populate): handle nested array `foreignField` with virtual populate #7374
+ * fix(query): support not passing any arguments to `orFail()` #7409
+ * docs(query): document what the resolved value for `deleteOne()`, `deleteMany()`, and `remove()` contains #7324
+ * fix(array): allow opting out of converting non-arrays into arrays with `castNonArrays` option #7371
+ * fix(query): ensure updateOne() doesnt unintentionally double call Schema#post(regexp) #7418
+
 5.4.4 / 2019-01-14
 ==================
  * fix(query): run casting on arrayFilters option #7079

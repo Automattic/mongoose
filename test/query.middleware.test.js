@@ -390,7 +390,8 @@ describe('query middleware', function() {
       const Model = db.model('gh7195_deleteOne', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
-      yield Model.deleteOne();
+      const res = yield Model.deleteOne();
+      assert.equal(res.deletedCount, 1);
 
       assert.equal(preCount, 1);
       assert.equal(postCount, 1);
@@ -567,5 +568,20 @@ describe('query middleware', function() {
       assert.equal(calledPost, 1);
       done();
     });
+  });
+
+  it('doesnt double call post(regexp) with updateOne (gh-7418)', function() {
+    const schema = new Schema({ name: String });
+    let calledPost = 0;
+
+    schema.post(/.*/, function(res, next) {
+      ++calledPost;
+      next();
+    });
+
+    const Test = db.model('gh7418', schema);
+
+    return Test.updateOne({}, { name: 'bar' }).
+      then(() => assert.equal(calledPost, 1));
   });
 });

@@ -243,6 +243,17 @@ describe('utils', function() {
 
       done();
     });
+
+    it('doesnt minimize empty objects in arrays to null (gh-7322)', function() {
+      const o = { arr: [{ a: 42 }, {}, {}] };
+
+      const out = utils.clone(o, { minimize: true });
+      assert.deepEqual(out.arr[0], { a: 42 });
+      assert.deepEqual(out.arr[1], {});
+      assert.deepEqual(out.arr[2], {});
+
+      return Promise.resolve();
+    });
   });
 
   it('array.flatten', function(done) {

@@ -5582,10 +5582,10 @@ describe('document', function() {
       var Book = db.model('gh7302_Book', bookSchema);
 
       return Author.create({ name: 'Victor Hugo' }).
-        then(author => Book.create({ author: author._id })).
-        then(() => Book.findOne()).
-        then(doc => doc.populate('author').execPopulate()).
-        then(doc => {
+        then(function(author) { return Book.create({ author: author._id }); }).
+        then(function() { return Book.findOne(); }).
+        then(function(doc) { return doc.populate('author').execPopulate(); }).
+        then(function(doc) {
           doc.author = {};
           assert.ok(!doc.author.name);
           assert.ifError(doc.validateSync());

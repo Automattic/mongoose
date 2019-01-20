@@ -6558,16 +6558,22 @@ describe('document', function() {
     });
   });
 
-  it('updateOne() hooks (gh-7133)', function() {
+  it('updateOne() hooks (gh-7133) (gh-7423)', function() {
     const schema = new mongoose.Schema({ name: String });
 
     let queryCount = 0;
     let docCount = 0;
     let docPostCount = 0;
 
+    let docRegexCount = 0;
+    let docPostRegexCount = 0;
+
     schema.pre('updateOne', () => ++queryCount);
     schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
     schema.post('updateOne', { document: true, query: false }, () => ++docPostCount);
+
+    schema.pre(/^updateOne$/, { document: true, query: false }, () => ++docRegexCount);
+    schema.post(/^updateOne$/, { document: true, query: false }, () => ++docPostRegexCount);
 
     let removeCount1 = 0;
     let removeCount2 = 0;
@@ -6583,12 +6589,16 @@ describe('document', function() {
       assert.equal(queryCount, 0);
       assert.equal(docCount, 0);
       assert.equal(docPostCount, 0);
+      assert.equal(docRegexCount, 0);
+      assert.equal(docPostRegexCount, 0);
 
       yield doc.updateOne({ name: 'test2' });
 
       assert.equal(queryCount, 1);
       assert.equal(docCount, 1);
       assert.equal(docPostCount, 1);
+      assert.equal(docRegexCount, 1);
+      assert.equal(docPostRegexCount, 1);
 
       assert.equal(removeCount1, 0);
       assert.equal(removeCount2, 0);

@@ -1,3 +1,16 @@
+5.4.6 / 2019-01-22
+==================
+ * fix(utils): make minimize leave empty objects in arrays instead of setting the array element to undefined #7322
+ * fix(document): support passing `{document, query}` options to Schema#pre(regex) and Schema#post(regex) #7423
+ * docs: add migrating to 5 guide to docs #7434
+ * docs(deprecations): add instructions for fixing `count()` deprecation #7419
+ * docs(middleware): add description and example for aggregate hooks #7402
+
+4.13.18 / 2019-01-21
+====================
+ * fix(model): handle setting populated path set via `Document#populate()` #7302
+ * fix(cast): backport fix from #7290 to 4.x
+
 5.4.5 / 2019-01-18
 ==================
  * fix(populate): handle nested array `foreignField` with virtual populate #7374

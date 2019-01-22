@@ -5572,6 +5572,26 @@ describe('document', function() {
       });
     });
 
+    it('Handles setting populated path set via `Document#populate()` (gh-7302)', function() {
+      var authorSchema = new Schema({ name: String });
+      var bookSchema = new Schema({
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'gh7302_Author' }
+      });
+
+      var Author = db.model('gh7302_Author', authorSchema);
+      var Book = db.model('gh7302_Book', bookSchema);
+
+      return Author.create({ name: 'Victor Hugo' }).
+        then(function(author) { return Book.create({ author: author._id }); }).
+        then(function() { return Book.findOne(); }).
+        then(function(doc) { return doc.populate('author').execPopulate(); }).
+        then(function(doc) {
+          doc.author = {};
+          assert.ok(!doc.author.name);
+          assert.ifError(doc.validateSync());
+        });
+    });
+
     it('Single nested subdocs using discriminator can be modified (gh-5693)', function(done) {
       const eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',
@@ -6558,16 +6578,22 @@ describe('document', function() {
     });
   });
 
-  it('updateOne() hooks (gh-7133)', function() {
+  it('updateOne() hooks (gh-7133) (gh-7423)', function() {
     const schema = new mongoose.Schema({ name: String });
 
     let queryCount = 0;
     let docCount = 0;
     let docPostCount = 0;
 
+    let docRegexCount = 0;
+    let docPostRegexCount = 0;
+
     schema.pre('updateOne', () => ++queryCount);
     schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
     schema.post('updateOne', { document: true, query: false }, () => ++docPostCount);
+
+    schema.pre(/^updateOne$/, { document: true, query: false }, () => ++docRegexCount);
+    schema.post(/^updateOne$/, { document: true, query: false }, () => ++docPostRegexCount);
 
     let removeCount1 = 0;
     let removeCount2 = 0;
@@ -6583,12 +6609,16 @@ describe('document', function() {
       assert.equal(queryCount, 0);
       assert.equal(docCount, 0);
       assert.equal(docPostCount, 0);
+      assert.equal(docRegexCount, 0);
+      assert.equal(docPostRegexCount, 0);
 
       yield doc.updateOne({ name: 'test2' });
 
       assert.equal(queryCount, 1);
       assert.equal(docCount, 1);
       assert.equal(docPostCount, 1);
+      assert.equal(docRegexCount, 1);
+      assert.equal(docPostRegexCount, 1);
 
       assert.equal(removeCount1, 0);
       assert.equal(removeCount2, 0);

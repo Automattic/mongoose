@@ -369,6 +369,28 @@ block content
     error. Even if you call `next()` with no error as shown above, the
     function call will still error out.
 
+    <h3 id="aggregate"><a href="#aggregate">Aggregation Hooks</a></h3>
+
+    You can also define hooks for the [`Model.aggregate()` function](api.html#model_Model.aggregate).
+    In aggregation middleware functions, `this` refers to the [Mongoose `Aggregate` object](api.html#Aggregate).
+    For example, suppose you're implementing soft deletes on a `Customer` model
+    by adding an `isDeleted` property. To make sure `aggregate()` calls only look
+    at customers that aren't soft deleted, you can use the below middleware to
+    add a [`$match` stage](api.html#aggregate_Aggregate-match) to the beginning
+    of each [aggregation pipeline](https://docs.mongodb.com/manual/core/aggregation-pipeline/).
+
+    ```javascript
+    customerSchema.pre('aggregate', function() {
+      // Add a $match state to the beginning of each pipeline.
+      this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+    });
+    ```
+
+    The [`Aggregate#pipeline()` function](api.html#aggregate_Aggregate-pipeline)
+    lets you access the MongoDB aggregation pipeline that Mongoose will send to
+    the MongoDB server. It is useful for adding stages to the beginning of the
+    pipeline from middleware.
+
     <h3 id="synchronous"><a href="#synchronous">Synchronous Hooks</a></h3>
 
     Certain Mongoose hooks are synchronous, which means they do **not** support

@@ -32,6 +32,7 @@ block content
     * `mongoose.set('useCreateIndex', true);`
     * Replace `update()` with `updateOne()`, `updateMany()`, or `replaceOne()`
     * Replace `remove()` with `deleteOne()` or `deleteMany()`.
+    * Replace `count()` with `countDocuments()`, unless you want to count how many documents are in the whole collection (no filter). In the latter case, use `estimatedDocumentCount()`.
 
     Read below for more a more detailed description of each deprecation warning.
 
@@ -193,6 +194,49 @@ block content
     MyModel.update(filter, update, { multi: true });
     // Replace with this:
     MyModel.updateMany(filter, update);
+    ```
+
+    ## `count()`
+
+    The MongoDB server has deprecated the `count()` function in favor of two
+    separate functions, [`countDocuments()`](#query_Query-countDocuments) and
+    [`estimatedDocumentCount()`](#query_Query-estimatedDocumentCount).
+
+    ```
+    DeprecationWarning: collection.count is deprecated, and will be removed in a future version. Use collection.countDocuments or collection.estimatedDocumentCount instead
+    ```
+
+    The difference between the two is `countDocuments()` can accept a filter
+    parameter like [`find()`](#query_Query-find). The `estimatedDocumentCount()`
+    function is faster, but can only tell you the total number of documents in
+    a collection. You cannot pass a `filter` to `estimatedDocumentCount()`.
+
+    To migrate, replace `count()` with `countDocuments()` _unless_ you do not
+    pass any arguments to `count()`. If you use `count()` to count all documents
+    in a collection as opposed to counting documents that match a query, use
+    `estimatedDocumentCount()` instead of `countDocuments()`.
+
+    ```javascript
+    // Replace this:
+    MyModel.count({ answer: 42 });
+    // With this:
+    MyModel.countDocuments({ answer: 42 });
+
+    // If you're counting all documents in the collection, use
+    // `estimatedDocumentCount()` instead.
+    MyModel.count();
+    // Replace with:
+    MyModel.estimatedDocumentCount();
+
+    // Replace this:
+    MyModel.find({ answer: 42 }).count().exec();
+    // With this:
+    MyModel.find({ answer: 42 }).countDocuments().exec();
+
+    // Replace this:
+    MyModel.find().count().exec();
+    // With this, since there's no filter
+    MyModel.find().estimatedDocumentCount().exec();
     ```
 
     ## `GridStore`

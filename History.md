@@ -1,3 +1,8 @@
+4.13.18 / 2019-01-21
+====================
+ * fix(model): handle setting populated path set via `Document#populate()` #7302
+ * fix(cast): backport fix from #7290 to 4.x
+
 4.13.17 / 2018-08-30
 ====================
  * fix(document): disallow setting `constructor` and `prototype` if strict mode false

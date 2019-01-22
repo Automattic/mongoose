@@ -1,3 +1,8 @@
+4.13.18 / 2019-01-21
+====================
+ * fix(model): handle setting populated path set via `Document#populate()` #7302
+ * fix(cast): backport fix from #7290 to 4.x
+
 5.4.5 / 2019-01-18
 ==================
  * fix(populate): handle nested array `foreignField` with virtual populate #7374

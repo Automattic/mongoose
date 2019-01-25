@@ -6,7 +6,8 @@
 'use strict';
 
 const Document = require('../lib/document');
-const assert = require('power-assert');
+const assert = require('assert');
+const co = require('co');
 const start = require('./common');
 const utils = require('../lib/utils');
 
@@ -774,6 +775,61 @@ describe('document.populate', function() {
           assert.equal(foo.bars[0].toString(), docs[1]._id.toString());
           done();
         });
+      });
+    });
+  });
+
+  describe('#populated() with virtuals (gh-7440)', function() {
+    let Team;
+
+    before(function() {
+      const teamSchema = mongoose.Schema({
+        name: String,
+        captain: String
+      });
+      Team = db.model('gh7440_Team', teamSchema);
+    });
+
+    it('works with justOne: false', function() {
+      const playerSchema = mongoose.Schema({
+        _id: String,
+        name: String
+      });
+      playerSchema.virtual('teams', {
+        ref: 'gh7440_Team',
+        localField: '_id',
+        foreignField: 'captain'
+      });
+      const Player = db.model('gh7440_Player_0', playerSchema);
+
+      return co(function*() {
+        const player = yield Player.create({name: 'Derek Jeter', _id: 'test1' });
+        const team = yield Team.create({name: 'Yankees', captain: 'test1'});
+
+        yield player.populate('teams').execPopulate();
+        assert.deepEqual(player.populated('teams'), ['test1']);
+      });
+    });
+
+    it('works with justOne: true', function() {
+      const playerSchema = mongoose.Schema({
+        _id: String,
+        name: String
+      });
+      playerSchema.virtual('team', {
+        ref: 'gh7440_Team',
+        localField: '_id',
+        foreignField: 'captain',
+        justOne: true
+      });
+      const Player = db.model('gh7440_Player_1', playerSchema);
+
+      return co(function*() {
+        const player = yield Player.create({name: 'Derek Jeter', _id: 'test1' });
+        const team = yield Team.create({name: 'Yankees', captain: 'test1'});
+
+        yield player.populate('team').execPopulate();
+        assert.deepEqual(player.populated('team'), 'test1');
       });
     });
   });

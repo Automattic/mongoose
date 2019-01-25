@@ -804,7 +804,7 @@ describe('document.populate', function() {
 
       return co(function*() {
         const player = yield Player.create({name: 'Derek Jeter', _id: 'test1' });
-        const team = yield Team.create({name: 'Yankees', captain: 'test1'});
+        yield Team.create({name: 'Yankees', captain: 'test1'});
 
         yield player.populate('teams').execPopulate();
         assert.deepEqual(player.populated('teams'), ['test1']);
@@ -826,7 +826,7 @@ describe('document.populate', function() {
 
       return co(function*() {
         const player = yield Player.create({name: 'Derek Jeter', _id: 'test1' });
-        const team = yield Team.create({name: 'Yankees', captain: 'test1'});
+        yield Team.create({name: 'Yankees', captain: 'test1'});
 
         yield player.populate('team').execPopulate();
         assert.deepEqual(player.populated('team'), 'test1');

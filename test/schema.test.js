@@ -1542,6 +1542,16 @@ describe('schema', function() {
         done();
       });
     });
+
+    it('handles maps (gh-7448)', function() {
+      const schema = new Schema({ map: { type: Map, of: String } });
+
+      assert.equal(schema.pathType('map.foo'), 'real');
+      assert.equal(schema.pathType('map'), 'real');
+      assert.equal(schema.pathType('fake'), 'adhocOrUndefined');
+
+      return Promise.resolve();
+    });
   });
 
   it('required() with doc arrays (gh-3199)', function(done) {

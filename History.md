@@ -1,3 +1,12 @@
+5.4.7 / 2019-01-26
+==================
+ * fix(populate): set `populated()` when using virtual populate #7440
+ * fix(discriminator): defer applying plugins to embedded discriminators until model compilation so global plugins work #7435
+ * fix(schema): report correct pathtype underneath map so setting dotted paths underneath maps works #7448
+ * fix: get debug from options using the get helper #7451 #7446 [LucGranato](https://github.com/LucGranato)
+ * fix: use correct variable name #7443 [esben-semmle](https://github.com/esben-semmle)
+ * docs: fix broken QueryCursor link #7438 [shihabmridha](https://github.com/shihabmridha)
+
 5.4.6 / 2019-01-22
 ==================
  * fix(utils): make minimize leave empty objects in arrays instead of setting the array element to undefined #7322

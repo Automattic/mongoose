@@ -4,7 +4,7 @@
  * Test dependencies.
  */
 
-const assert = require('power-assert');
+const assert = require('assert');
 const clone = require('../lib/utils').clone;
 const co = require('co');
 const random = require('../lib/utils').random;

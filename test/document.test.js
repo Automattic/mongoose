@@ -5573,13 +5573,13 @@ describe('document', function() {
     });
 
     it('Handles setting populated path set via `Document#populate()` (gh-7302)', function() {
-      var authorSchema = new Schema({ name: String });
-      var bookSchema = new Schema({
+      const authorSchema = new Schema({ name: String });
+      const bookSchema = new Schema({
         author: { type: mongoose.Schema.Types.ObjectId, ref: 'gh7302_Author' }
       });
 
-      var Author = db.model('gh7302_Author', authorSchema);
-      var Book = db.model('gh7302_Book', bookSchema);
+      const Author = db.model('gh7302_Author', authorSchema);
+      const Book = db.model('gh7302_Book', bookSchema);
 
       return Author.create({ name: 'Victor Hugo' }).
         then(function(author) { return Book.create({ author: author._id }); }).

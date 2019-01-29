@@ -36,6 +36,19 @@ block content
 
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
 
+    <ul class="toc">
+      <li><a href="#buffering">Buffering</a></li>
+      <li><a href="#options">Options</a></li>
+      <li><a href="#connection-string-options">Connection String Options</a></li>
+      <li><a href="#keepAlive">A note about keepAlive</a></li>
+      <li><a href="#replicaset_connections">Replica Set Connections</a></li>
+      <li><a href="#replicaset-hostnames">Replica Set Host Names</a></li>
+      <li><a href="#mongos_connections">Multi-mongos support</a></li>
+      <li><a href="#multiple_connections">Multiple connections</a></li>
+      <li><a href="#connection_pools">Connection Pools</a></li>
+      <li><a href="#v5-changes">Option Changes in v5.x</a></li>
+    </ul>
+
     <h3 id="buffering"><a href="#buffering">Operation Buffering</a></h3>
 
     Mongoose lets you start using your models immediately, without waiting for
@@ -261,7 +274,7 @@ block content
     Mongoose creates a _default connection_ when you call `mongoose.connect()`.
     You can access the default connection using `mongoose.connection`.
 
-    <h3 id="connection_pools"><a href="#connection_pools">Connection pools</a></h3>
+    <h3 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h3>
 
     Each `connection`, whether created with `mongoose.connect` or
     `mongoose.createConnection` are all backed by an internal configurable

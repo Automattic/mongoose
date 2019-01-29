@@ -21,6 +21,23 @@ block content
     Middleware (also called pre and post *hooks*) are functions which are passed
     control during execution of asynchronous functions. Middleware is specified
     on the schema level and is useful for writing [plugins](./plugins.html).
+
+    <ul class="toc">
+      <li><a href="#types-of-middleware">Types of Middleware</a></li>
+      <li><a href="#pre">Pre</a></li>
+      <li><a href="#error-handling">Errors in Pre Hooks</a></li>
+      <li><a href="#post">Post</a></li>
+      <li><a href="#post-async">Asynchronous Post Hooks</a></li>
+      <li><a href="#order">Save/Validate Hooks</a></li>
+      <li><a href="#naming">Naming Conflicts</a></li>
+      <li><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></li>
+      <li><a href="#error-handling-middleware">Error Handling Middleware</a></li>
+      <li><a href="#aggregate">Aggregation Hooks</a></li>
+      <li><a href="#synchronous">Synchronous Hooks</a></li>
+    </ul>
+
+    ### Types of Middleware
+
     Mongoose has 4 types
     of middleware: document middleware, model middleware, aggregate middleware, and query middleware.
     Document middleware is supported for the following document functions.
@@ -123,7 +140,7 @@ block content
     * asynchronous defaults
     * asynchronous tasks that a certain action triggers
 
-    <h4 id="error-handling">Error handling</h4>
+    <h4 id="error-handling">Errors in Pre Hooks</h4>
 
     If any pre hook errors out, mongoose will not execute subsequent middleware
     or the hooked function. Mongoose will instead pass an error to the callback
@@ -302,7 +319,7 @@ block content
     });
     ```
 
-    <h3 id="error-handling"><a href="#error-handling">Error Handling Middleware</a></h3>
+    <h3 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h3>
 
     _New in 4.5.0_
 

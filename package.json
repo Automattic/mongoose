@@ -96,7 +96,6 @@
     },
     "env": {
       "node": true,
-      "mocha": true,
       "es6": true
     },
     "rules": {
@@ -136,6 +135,10 @@
       "strict": [
         "error",
         "global"
+      ],
+      "no-restricted-globals": [
+        "error",
+        { "name": "context", "message": "Don't use Mocha's global context" }
       ]
     }
   }

@@ -1,6 +1,10 @@
 extends layout
 
 block content
+  ul.toc
+    each block in acquitBlocks[0].blocks
+      li
+        a(href="##{block.identifier}") !{block.contents}
   each block in acquitBlocks[0].blocks
     h2(id="#{block.identifier}")
       a(href="##{block.identifier}") !{block.contents}

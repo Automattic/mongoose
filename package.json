@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.4.7",
+  "version": "5.4.8",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -96,7 +96,6 @@
     },
     "env": {
       "node": true,
-      "mocha": true,
       "es6": true
     },
     "rules": {
@@ -136,6 +135,10 @@
       "strict": [
         "error",
         "global"
+      ],
+      "no-restricted-globals": [
+        "error",
+        { "name": "context", "message": "Don't use Mocha's global context" }
       ]
     }
   }

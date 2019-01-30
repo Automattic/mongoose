@@ -2599,6 +2599,36 @@ describe('Query', function() {
       });
     });
 
+    it('cast embedded discriminators with $elemMatch discriminator key (gh-7449)', function() {
+      return co(function*() {
+        const ListingLineSchema = new Schema({
+          sellerId: Number
+        });
+
+        const OrderSchema = new Schema({
+          lines: [new Schema({
+            amount: Number,
+          }, { discriminatorKey: 'kind' })]
+        });
+
+        OrderSchema.path('lines').discriminator('listing', ListingLineSchema);
+
+        const Order = db.model('gh7449', OrderSchema);
+
+        yield Order.create({ lines: { kind: 'listing', sellerId: 42 } });
+
+        let count = yield Order.countDocuments({
+          lines: { $elemMatch: { kind: 'listing', sellerId: '42' } }
+        });
+        assert.strictEqual(count, 1);
+
+        count = yield Order.countDocuments({
+          lines: { $elemMatch: { sellerId: '42' } }
+        });
+        assert.strictEqual(count, 0);
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       const areaSchema = new Schema({
         name: {type: String},

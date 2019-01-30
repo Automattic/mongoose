@@ -62,4 +62,31 @@ describe('castArrayFilters', function() {
 
     done();
   });
+
+  it('using $in (gh-7431)', function(done) {
+    const schema = new Schema({
+      itemsInfo: {
+        allUsers: { all: Number },
+        individual: [{
+          userId: String,
+          all: Number,
+        }]
+      }
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, {
+      $inc: {
+        'itemsInfo.allUsers.all': 1,
+        'itemsInfo.individual.$[element].all': 1
+      }
+    },
+    { arrayFilters: [{ 'element.userId': { $in: ['1', '2', '3'] } }] });
+    castArrayFilters(q);
+
+    assert.deepEqual(q.options.arrayFilters[0]['element.userId'].$in, ['1', '2', '3']);
+
+    done();
+  });
 });

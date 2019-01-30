@@ -1,3 +1,9 @@
+5.4.8 / 2019-01-30
+==================
+ * fix(query): fix unhandled error when casting object in array filters #7431
+ * fix(query): cast query $elemMatch to discriminator schema if discriminator key set #7449
+ * docs: add table of contents to all guides #7430
+
 5.4.7 / 2019-01-26
 ==================
  * fix(populate): set `populated()` when using virtual populate #7440

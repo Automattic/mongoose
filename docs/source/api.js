@@ -30,7 +30,8 @@ const files = [
 module.exports = {
   docs: [],
   github: 'https://github.com/Automattic/mongoose/blob/',
-  title: 'API docs'
+  title: 'API docs',
+  api: true
 };
 
 const out = module.exports.docs;
@@ -128,8 +129,6 @@ function parse() {
             break;
         }
       }
-
-      console.log(ctx);
 
       // Backwards compat
       if (typeof ctx.constructor === 'string') {

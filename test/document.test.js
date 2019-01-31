@@ -4334,7 +4334,7 @@ describe('document', function() {
       };
       mySchema.methods.baz = function(arg) {
         return Promise.resolve(arg);
-      }
+      };
 
       let preFoo = 0;
       let postFoo = 0;

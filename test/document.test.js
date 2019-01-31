@@ -5349,12 +5349,12 @@ describe('document', function() {
           }
         }
       });
-    
+
       const schema = new Schema({
         name: childSchema
       });
       const Model = db.model('gh7442', schema);
-    
+
       const doc = new Model({ 'name.value': 'test' });
 
       called = 0;

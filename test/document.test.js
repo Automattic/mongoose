@@ -4321,7 +4321,7 @@ describe('document', function() {
       done();
     });
 
-    it('hooks/middleware for custom methods (gh-6385)', function() {
+    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', function() {
       const mySchema = new Schema({
         name: String
       });
@@ -4332,6 +4332,9 @@ describe('document', function() {
       mySchema.methods.bar = function() {
         return this.name;
       };
+      mySchema.methods.baz = function(arg) {
+        return Promise.resolve(arg);
+      }
 
       let preFoo = 0;
       let postFoo = 0;
@@ -4340,6 +4343,15 @@ describe('document', function() {
       });
       mySchema.post('foo', function() {
         ++postFoo;
+      });
+
+      let preBaz = 0;
+      let postBaz = 0;
+      mySchema.pre('baz', function() {
+        ++preBaz;
+      });
+      mySchema.post('baz', function() {
+        ++postBaz;
       });
 
       const MyModel = db.model('gh6385', mySchema);
@@ -4355,6 +4367,13 @@ describe('document', function() {
         assert.equal(yield cb => doc.foo(cb), 'test');
         assert.equal(preFoo, 1);
         assert.equal(postFoo, 1);
+
+        assert.equal(preBaz, 0);
+        assert.equal(postBaz, 0);
+
+        assert.equal(yield doc.baz('foobar'), 'foobar');
+        assert.equal(preBaz, 1);
+        assert.equal(preBaz, 1);
       });
     });
 

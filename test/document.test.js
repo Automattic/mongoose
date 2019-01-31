@@ -5337,6 +5337,37 @@ describe('document', function() {
       done();
     });
 
+    it('single getters only get called once (gh-7442)', function() {
+      let called = 0;
+
+      const childSchema = new Schema({
+        value: {
+          type: String,
+          get: function(v) {
+            ++called;
+            return v;
+          }
+        }
+      });
+    
+      const schema = new Schema({
+        name: childSchema
+      });
+      const Model = db.model('gh7442', schema);
+    
+      const doc = new Model({ 'name.value': 'test' });
+
+      called = 0;
+
+      doc.toObject({ getters: true });
+      assert.equal(called, 1);
+
+      doc.toObject({ getters: false });
+      assert.equal(called, 1);
+
+      return Promise.resolve();
+    });
+
     it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
       const MainSchema = new Schema({
         name: { type: String },

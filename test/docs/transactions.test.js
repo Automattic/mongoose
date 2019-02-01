@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const co = require('co');
 const start = require('../common');
 
 const mongoose = start.mongoose;
@@ -290,10 +291,37 @@ describe('transactions', function() {
         ], { session: session });
       }).
       then(() => Character.deleteMany({ name: /Lannister/ }, { session: session })).
-      then(() => Character.find({}).session(session))
-      .then(res => {
+      then(() => Character.find({}).session(session)).
+      then(res => {
         assert.equal(res.length, 2);
         session.commitTransaction();
       });
+  });
+
+  it('remove, update, updateOne (gh-7455)', function() {
+    const Character = db.model('gh7455_Character', new Schema({ name: String, title: String }, { versionKey: false }));
+
+    return co(function*() {
+      yield Character.create({ name: 'Tyrion Lannister' });
+      const session = yield db.startSession();
+
+      session.startTransaction();
+
+      const tyrion = yield Character.findOne().session(session);
+
+      yield tyrion.updateOne({ title: 'Hand of the King' });
+
+      // Session isn't committed
+      assert.equal(yield Character.countDocuments({ title: /hand/i }), 0);
+
+      yield tyrion.remove();
+
+      // Undo both update and delete since doc should pull from `$session()`
+      yield session.abortTransaction();
+
+      const fromDb = yield Character.findOne().then(doc => doc.toObject());
+      delete fromDb._id;
+      assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
+    });
   });
 });

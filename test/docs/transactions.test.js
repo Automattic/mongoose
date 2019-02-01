@@ -24,6 +24,8 @@ describe('transactions', function() {
         if (db.client.topology.constructor.name !== 'ReplSet') {
           _skipped = true;
           this.skip();
+
+          throw new Error('skip');
         }
       }).
       then(() => new Promise((resolve, reject) => {

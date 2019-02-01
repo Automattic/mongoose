@@ -271,13 +271,13 @@ block content
 
     ```javascript
     // Only document middleware
-    schema.pre('remove', { document: true } function() {
+    schema.pre('remove', { document: true }, function() {
       console.log('Removing doc!');
     });
 
     // Only query middleware. This will get called when you do `Model.remove()`
     // but not `doc.remove()`.
-    schema.pre('remove', { query: true } function() {
+    schema.pre('remove', { query: true }, function() {
       console.log('Removing!');
     });
     ```

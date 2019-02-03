@@ -11,7 +11,7 @@ const mongoose = start.mongoose;
 
 describe('model translate aliases', function() {
   it('should translate correctly', function() {
-    const Syntax =new mongoose.Schema({
+    const Syntax = new mongoose.Schema({
       s: { type: String, alias: 'syntax' }
     });
 

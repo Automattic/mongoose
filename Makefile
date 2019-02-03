@@ -52,5 +52,3 @@ copylegacy:
 	mkdir -p ./docs/$(LEGACY_BRANCH)
 	cp -R ./tmp/* ./docs/$(LEGACY_BRANCH)/
 	rm -rf ./tmp
-
-.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable

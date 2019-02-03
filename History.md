@@ -1,3 +1,12 @@
+5.4.9 / 2019-02-01
+==================
+ * fix(document): make `remove()`, `updateOne()`, and `update()` use the document's associated session #7455
+ * fix(document): support passing args to hooked custom methods #7456
+ * fix(document): avoid double calling single nested getters on `toObject()` #7442
+ * fix(discriminator): handle global plugins modifying top-level discriminator options with applyPluginsToDiscriminators: true #7458
+ * docs(documents): improve explanation of documents and use more modern syntax #7463
+ * docs(middleware+api): fix a couple typos in examples #7474 [arniu](https://github.com/arniu)
+
 5.4.8 / 2019-01-30
 ==================
  * fix(query): fix unhandled error when casting object in array filters #7431

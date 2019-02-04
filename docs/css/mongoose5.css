@@ -143,6 +143,37 @@ pre {
   font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
+/* Search */
+
+.search input {
+  border: 1px solid #ddd;
+  margin-left: 1em;
+  padding: 0.25em;
+  width: 170px;
+  border-radius: 3px;
+}
+
+.search button {
+  background-color: #777;
+  color: white;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  height: 30px;
+  width: 30px;
+  padding: 0px;
+  position: relative;
+  top: 5px;
+  left: 1px;
+}
+
+.search button img {
+  width: 20px;
+  height: 20px;
+  margin-top: 5px;
+}
+
+/* Mobile */
+
 #mobile-menu {
   display: none;
 }

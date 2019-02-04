@@ -1,0 +1,71 @@
+extends layout
+
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+  script(type="text/javascript" src="https://unpkg.com/unfetch/polyfill")
+
+  style.
+    .search-bar {
+      margin-top: 1em;
+    }
+
+    .search-bar input {
+      width: 810px;
+      border: 1px solid #ddd;
+      padding: 0.25em;
+      border-radius: 3px;
+    }
+
+    .search-bar button {
+      background-color: #777;
+      color: white;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      height: 30px;
+      width: 30px;
+      padding: 0px;
+      position: relative;
+      top: 7px;
+      left: 1px;
+    }
+
+    .title {
+      font-size: 1.5em;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0px;
+    }
+
+    .url a {
+      font-size: 0.75em;
+      color: #777;
+      margin-top: 0.5em;
+    }
+
+    p {
+      margin-top: 0.5em;
+      line-height: 1.5em;
+    }
+
+block content
+  div
+    h2 Search
+
+    script.
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+
+    div.native-inline.
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+
+    div.search-bar
+      input#search-input(type="text", placeholder="Search")
+      button#search-button
+        img(src="/docs/images/search.svg")
+    div#results
+
+    script(type="text/javascript" src="/docs/js/search.js")

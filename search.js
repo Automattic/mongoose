@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('./.config');
 const cheerio = require('cheerio');
 const filemap = require('./docs/source');
 const fs = require('fs');
@@ -75,7 +76,7 @@ for (const filename of files) {
 run().catch(error => console.error(error.stack));
 
 async function run() {
-  await mongoose.connect('mongodb://localhost:27017/search', { useNewUrlParser: true });
+  await mongoose.connect(config.uri, { useNewUrlParser: true, dbName: 'mongoose' });
 
   await Content.deleteMany({});
   for (const content of contents) {

@@ -41,3 +41,5 @@ dist
 test/files/main.js
 
 package-lock.json
+
+.config*

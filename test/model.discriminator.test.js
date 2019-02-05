@@ -389,22 +389,53 @@ describe('model', function() {
         done();
       });
 
-      it('applyPluginsToDiscriminators (gh-4965)', function(done) {
-        var schema = new Schema({ test: String });
-        mongoose.set('applyPluginsToDiscriminators', true);
-        var called = 0;
-        mongoose.plugin(function() {
-          ++called;
-        });
-        var Model = mongoose.model('gh4965', schema);
-        var childSchema = new Schema({
-          test2: String
-        });
-        Model.discriminator('gh4965_0', childSchema);
-        assert.equal(called, 2);
+      describe('applyPluginsToDiscriminators', function() {
+        let m;
 
-        mongoose.set('applyPluginsToDiscriminators', false);
-        done();
+        beforeEach(function() {
+          m = new mongoose.Mongoose();
+          m.set('applyPluginsToDiscriminators', true);
+        });
+
+        it('works (gh-4965)', function(done) {
+          var schema = new m.Schema({ test: String });
+          var called = 0;
+          m.plugin(function() {
+            ++called;
+          });
+          var Model = m.model('gh4965', schema);
+          var childSchema = new m.Schema({
+            test2: String
+          });
+          Model.discriminator('gh4965_0', childSchema);
+          assert.equal(called, 2);
+  
+          done();
+        });
+
+        it('works with customized options (gh-7458)', function() {
+          m.plugin((schema) => {
+            schema.options.versionKey = false;
+            schema.options.minimize = false;
+          });
+          
+          const schema = new m.Schema({
+            type: {type: String},
+            something: {type: String}
+          }, {
+            discriminatorKey: 'type'
+          });
+          const Model = m.model('Test', schema);
+          
+          const subSchema = new m.Schema({
+            somethingElse: {type: String}
+          });
+
+          // Should not throw
+          const SubModel = Model.discriminator('TestSub', subSchema);
+
+          return Promise.resolve();
+        });
       });
 
       it('cloning with discriminator key (gh-4387)', function(done) {

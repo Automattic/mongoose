@@ -39,8 +39,8 @@ block content
     - [`Model.updateOne()`](/docs/api.html#model_Model.updateOne)
 
     A mongoose query can be executed in one of two ways. First, if you
-    pass in a `callback` function the operation will be executed immediately
-    with the results passed to the callback.
+    pass in a `callback` function, Mongoose will execute the query asynchronously
+    and pass the results to the `callback`.
 
     A query also has a `.then()` function, and thus can be used as a promise.
 
@@ -68,7 +68,7 @@ block content
     });
     ```
 
-    Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
+    Mongoose executed the query and passed the results passed to `callback`. All callbacks in Mongoose use the pattern:
     `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result`
     will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
 

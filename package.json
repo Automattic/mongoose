@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.4.8",
+  "version": "5.4.10",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,8 +22,8 @@
     "async": "2.6.1",
     "bson": "~1.1.0",
     "kareem": "2.3.0",
-    "mongodb": "3.1.10",
-    "mongodb-core": "3.1.9",
+    "mongodb": "3.1.13",
+    "mongodb-core": "3.1.11",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.5.1",
     "mquery": "3.2.0",
@@ -42,6 +42,7 @@
     "benchmark": "2.1.2",
     "bluebird": "3.5.0",
     "chalk": "2.4.1",
+    "cheerio": "1.0.0-rc.2",
     "co": "4.6.0",
     "dox": "0.3.1",
     "eslint": "5.3.0",
@@ -138,7 +139,10 @@
       ],
       "no-restricted-globals": [
         "error",
-        { "name": "context", "message": "Don't use Mocha's global context" }
+        {
+          "name": "context",
+          "message": "Don't use Mocha's global context"
+        }
       ]
     }
   }

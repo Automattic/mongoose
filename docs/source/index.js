@@ -31,3 +31,4 @@ exports['docs/compatibility.jade'] = {
   title: 'MongoDB Version Compatibility',
   guide: true
 };
+exports['docs/search.jade'] = { title: 'Search' };

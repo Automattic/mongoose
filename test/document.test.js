@@ -4321,7 +4321,7 @@ describe('document', function() {
       done();
     });
 
-    it('hooks/middleware for custom methods (gh-6385)', function() {
+    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', function() {
       const mySchema = new Schema({
         name: String
       });
@@ -4332,6 +4332,9 @@ describe('document', function() {
       mySchema.methods.bar = function() {
         return this.name;
       };
+      mySchema.methods.baz = function(arg) {
+        return Promise.resolve(arg);
+      };
 
       let preFoo = 0;
       let postFoo = 0;
@@ -4340,6 +4343,15 @@ describe('document', function() {
       });
       mySchema.post('foo', function() {
         ++postFoo;
+      });
+
+      let preBaz = 0;
+      let postBaz = 0;
+      mySchema.pre('baz', function() {
+        ++preBaz;
+      });
+      mySchema.post('baz', function() {
+        ++postBaz;
       });
 
       const MyModel = db.model('gh6385', mySchema);
@@ -4355,6 +4367,13 @@ describe('document', function() {
         assert.equal(yield cb => doc.foo(cb), 'test');
         assert.equal(preFoo, 1);
         assert.equal(postFoo, 1);
+
+        assert.equal(preBaz, 0);
+        assert.equal(postBaz, 0);
+
+        assert.equal(yield doc.baz('foobar'), 'foobar');
+        assert.equal(preBaz, 1);
+        assert.equal(preBaz, 1);
       });
     });
 
@@ -5316,6 +5335,37 @@ describe('document', function() {
       assert.equal(vals.length, 1);
       assert.equal(vals[0], '555.555.0123');
       done();
+    });
+
+    it('single getters only get called once (gh-7442)', function() {
+      let called = 0;
+
+      const childSchema = new Schema({
+        value: {
+          type: String,
+          get: function(v) {
+            ++called;
+            return v;
+          }
+        }
+      });
+
+      const schema = new Schema({
+        name: childSchema
+      });
+      const Model = db.model('gh7442', schema);
+
+      const doc = new Model({ 'name.value': 'test' });
+
+      called = 0;
+
+      doc.toObject({ getters: true });
+      assert.equal(called, 1);
+
+      doc.toObject({ getters: false });
+      assert.equal(called, 1);
+
+      return Promise.resolve();
     });
 
     it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
@@ -6817,6 +6867,35 @@ describe('document', function() {
     const Model = db.model('gh7316', schema);
 
     return Model.create({ http: { get: 400 } }); // Should succeed
+  });
+
+  it('copies atomics from existing document array when setting doc array (gh-7472)', function() {
+    const Dog = db.model('gh7472', new mongoose.Schema({
+      name: String,
+      toys: [{
+        name: String
+      }]
+    }));
+
+    return co(function*() {
+      const dog = new Dog({ name: 'Dash' });
+
+      dog.toys.push({ name: '1' });
+      dog.toys.push({ name: '2' });
+      dog.toys.push({ name: '3' });
+
+      yield dog.save();
+
+      for (const toy of ['4', '5', '6']) {
+        dog.toys = dog.toys || [];
+        dog.toys.push({ name: toy, count: 1 });
+      }
+
+      yield dog.save();
+
+      const fromDb = yield Dog.findOne();
+      assert.deepEqual(fromDb.toys.map(t => t.name), ['1', '2', '3', '4', '5', '6']);
+    });
   });
 
   it('doesnt fail with custom update function (gh-7342)', function() {

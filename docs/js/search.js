@@ -15,7 +15,10 @@ if (q != null) {
     then(function(res) { return res.json(); }).
     then(
       function(result) {
-        console.log(result)
+        if (result.results.length === 0) {
+          document.getElementById('results').innerHTML = '<h1>No Results</h1>';
+          return;
+        }
         var html = '';
         for (var i = 0; i < result.results.length; ++i) {
           var res = result.results[i];

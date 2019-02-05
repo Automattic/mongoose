@@ -1,3 +1,12 @@
+5.4.10 / 2019-02-05
+===================
+ * docs: add search bar and /search page #6706
+ * fix: support dotted aliases #7478 [chrischen](https://github.com/chrischen)
+ * fix(document): copy atomics when setting document array to an existing document array #7472
+ * chore: upgrade to mongodb driver 3.1.13 #7488
+ * docs: remove confusing references to executing a query "immediately" #7461
+ * docs(guides+schematypes): link to custom schematypes docs #7407
+
 5.4.9 / 2019-02-01
 ==================
  * fix(document): make `remove()`, `updateOne()`, and `update()` use the document's associated session #7455

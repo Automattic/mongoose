@@ -2276,6 +2276,57 @@ describe('document', function() {
       });
     });
 
+    it('does not filter validation on unmodified paths when validateModifiedOnly not set (gh-7421)', function(done) {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+
+      const Test = db.model('gh7421_1', testSchema);
+
+      Test.create([{}], {validateBeforeSave: false}, function(createError, docs) {
+        assert.equal(createError, null);
+        const doc = docs[0];
+        doc.other = 'something';
+        assert.ok(doc.validateSync().errors);
+        doc.save(function(error) {
+          assert.ok(error.errors);
+          done();
+        });
+      });
+    });
+
+    it('filters out validation on unmodified paths when validateModifiedOnly set (gh-7421)', function(done) {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+
+      const Test = db.model('gh7421_2', testSchema);
+
+      Test.create([{}], {validateBeforeSave: false}, function(createError, docs) {
+        assert.equal(createError, null);
+        const doc = docs[0];
+        doc.other = 'something';
+        assert.equal(doc.validateSync(undefined, {validateModifiedOnly: true}), null);
+        doc.save({validateModifiedOnly: true}, function(error) {
+          assert.equal(error, null);
+          done();
+        });
+      });
+    });
+
+    it('does not filter validation on modified paths when validateModifiedOnly set (gh-7421)', function(done) {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+
+      const Test = db.model('gh7421_3', testSchema);
+
+      Test.create([{title: 'title'}], {validateBeforeSave: false}, function(createError, docs) {
+        assert.equal(createError, null);
+        const doc = docs[0];
+        doc.title = '';
+        assert.ok(doc.validateSync(undefined, {validateModifiedOnly: true}).errors);
+        doc.save({validateModifiedOnly: true}, function(error) {
+          assert.ok(error.errors);
+          done();
+        });
+      });
+    });
+
     it('handles non-errors', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }

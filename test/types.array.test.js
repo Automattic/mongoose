@@ -1122,7 +1122,7 @@ describe('types array', function() {
     beforeEach(function() {
       arrOptions = Object.assign({}, mongoose.Schema.Types.Array.options);
       docArrOptions = Object.assign({}, mongoose.Schema.Types.DocumentArray.options);
-    
+
       mongoose.Schema.Types.Array.options.castNonArrays = false;
       mongoose.Schema.Types.DocumentArray.options.castNonArrays = false;
     });

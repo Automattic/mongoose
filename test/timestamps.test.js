@@ -180,4 +180,25 @@ describe('timestamps', function() {
       done();
     });
   });
+
+  it('avoids calling createdAt getters when setting updatedAt (gh-7496)', function() {
+    const modelSchema = new Schema({
+      createdAt: {
+        type: Date,
+        get: (date) => date && date.valueOf() / 1000,
+      },
+      updatedAt: {
+        type: Date,
+        get: (date) => date && date.valueOf() / 1000,
+      },
+    }, { timestamps: true });
+
+    const Model = db.model('gh7496', modelSchema);
+
+    const start = new Date();
+    return Model.create({}).then(doc => {
+      assert.ok(doc._doc.createdAt.valueOf() >= start.valueOf());
+      assert.ok(doc._doc.updatedAt.valueOf() >= start.valueOf());
+    });
+  });
 });

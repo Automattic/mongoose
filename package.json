@@ -27,7 +27,7 @@
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.5.1",
     "mquery": "3.2.0",
-    "ms": "2.0.0",
+    "ms": "2.1.1",
     "regexp-clone": "0.0.1",
     "safe-buffer": "5.1.2",
     "sliced": "1.0.1"

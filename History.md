@@ -1,3 +1,12 @@
+5.4.11 / 2019-02-09
+===================
+ * fix(schema): handle `_id: false` in schema paths as a shortcut for setting the `_id` option to `false` #7480
+ * fix(update): handle $addToSet and $push with ObjectIds and castNonArrays=false #7479
+ * docs(model): document `session` option to `save()` #7484
+ * chore: fix gitignore syntax #7498 [JulioJu](https://github.com/JulioJu)
+ * docs: document that Document#validateSync returns ValidationError #7499
+ * refactor: use consolidated `isPOJO()` function instead of constructor checks #7500
+
 5.4.10 / 2019-02-05
 ===================
  * docs: add search bar and /search page #6706

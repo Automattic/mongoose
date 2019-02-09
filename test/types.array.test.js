@@ -4,14 +4,16 @@
 
 'use strict';
 
-const start = require('./common');
-const assert = require('power-assert');
-const mongoose = require('./common').mongoose;
-const Schema = mongoose.Schema;
-const random = require('../lib/utils').random;
-const mongodb = require('mongodb');
-const MongooseArray = mongoose.Types.Array;
 const Buffer = require('safe-buffer').Buffer;
+const assert = require('assert');
+const co = require('co');
+const mongodb = require('mongodb');
+const mongoose = require('./common').mongoose;
+const random = require('../lib/utils').random;
+const start = require('./common');
+
+const MongooseArray = mongoose.Types.Array;
+const Schema = mongoose.Schema;
 const collection = 'avengers_' + random();
 
 /**
@@ -1120,6 +1122,9 @@ describe('types array', function() {
     beforeEach(function() {
       arrOptions = Object.assign({}, mongoose.Schema.Types.Array.options);
       docArrOptions = Object.assign({}, mongoose.Schema.Types.DocumentArray.options);
+
+      mongoose.Schema.Types.Array.options.castNonArrays = false;
+      mongoose.Schema.Types.DocumentArray.options.castNonArrays = false;
     });
 
     afterEach(function() {
@@ -1127,10 +1132,7 @@ describe('types array', function() {
       mongoose.Schema.Types.DocumentArray.options = docArrOptions;
     });
 
-    it('castNonArrays (gh-7371)', function() {
-      mongoose.Schema.Types.Array.options.castNonArrays = false;
-      mongoose.Schema.Types.DocumentArray.options.castNonArrays = false;
-
+    it('castNonArrays (gh-7371) (gh-7479)', function() {
       const schema = new Schema({ arr: [String], docArr: [{ name: String }] });
       const Model = db.model('gh7371', schema);
 
@@ -1146,6 +1148,29 @@ describe('types array', function() {
       assert.deepEqual(doc.arr.toObject(), ['good', 'foo']);
 
       return Promise.resolve();
+    });
+
+    it('works with $addToSet and $push (gh-7479)', function() {
+      return co(function*() {
+        const schema = new Schema({
+          arr: [mongoose.Schema.Types.ObjectId]
+        });
+        const Model = db.model('gh7479', schema);
+        yield Model.create({ arr: [] });
+
+        const oid = new mongoose.Types.ObjectId();
+        yield Model.updateMany({}, {
+          $addToSet: { arr: oid }
+        });
+        let raw = yield Model.collection.findOne();
+        assert.equal(raw.arr[0].toHexString(), oid.toHexString());
+
+        yield Model.updateMany({}, {
+          $push: { arr: oid }
+        });
+        raw = yield Model.collection.findOne();
+        assert.equal(raw.arr[1].toHexString(), oid.toHexString());
+      });
     });
   });
 

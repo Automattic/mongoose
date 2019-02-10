@@ -3370,14 +3370,14 @@ describe('Query', function() {
           ref: 'gh1790_Person'
         }
       });
-      
+
       const Person = db.model('gh1790_Person', {
         name: String
       });
 
       return co(function*() {
         const val = yield Person.create({ name: 'Val' });
-        const car = yield Car.create({ color: 'Brown', model: 'Subaru', owner: val._id });
+        yield Car.create({ color: 'Brown', model: 'Subaru', owner: val._id });
 
         const q = Car.findOne().populate('owner');
 

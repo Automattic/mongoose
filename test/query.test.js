@@ -3359,4 +3359,32 @@ describe('Query', function() {
       assert.ok(res.message.indexOf('time limit') !== -1, res.message);
     });
   });
+
+  describe('merge()', function() {
+    it('copies populate() (gh-1790)', function() {
+      const Car = db.model('gh1790_Car', {
+        color: String,
+        model: String,
+        owner: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh1790_Person'
+        }
+      });
+      
+      const Person = db.model('gh1790_Person', {
+        name: String
+      });
+
+      return co(function*() {
+        const val = yield Person.create({ name: 'Val' });
+        const car = yield Car.create({ color: 'Brown', model: 'Subaru', owner: val._id });
+
+        const q = Car.findOne().populate('owner');
+
+        const res = yield Car.findOne().merge(q);
+
+        assert.equal(res.owner.name, 'Val');
+      });
+    });
+  });
 });

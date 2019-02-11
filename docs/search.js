@@ -1,11 +1,11 @@
 'use strict';
 
-const config = require('./.config');
+const config = require('../.config');
 const cheerio = require('cheerio');
-const filemap = require('./docs/source');
+const filemap = require('./source');
 const fs = require('fs');
 const jade = require('jade');
-const mongoose = require('./');
+const mongoose = require('../');
 
 mongoose.set('useCreateIndex', true);
 

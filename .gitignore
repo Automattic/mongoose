@@ -1,5 +1,5 @@
 lib-cov
-**.swp
+*.swp
 *.sw*
 node_modules/
 *.orig
@@ -41,3 +41,5 @@ dist
 test/files/main.js
 
 package-lock.json
+
+.config*

@@ -6869,6 +6869,35 @@ describe('document', function() {
     return Model.create({ http: { get: 400 } }); // Should succeed
   });
 
+  it('copies atomics from existing document array when setting doc array (gh-7472)', function() {
+    const Dog = db.model('gh7472', new mongoose.Schema({
+      name: String,
+      toys: [{
+        name: String
+      }]
+    }));
+
+    return co(function*() {
+      const dog = new Dog({ name: 'Dash' });
+
+      dog.toys.push({ name: '1' });
+      dog.toys.push({ name: '2' });
+      dog.toys.push({ name: '3' });
+
+      yield dog.save();
+
+      for (const toy of ['4', '5', '6']) {
+        dog.toys = dog.toys || [];
+        dog.toys.push({ name: toy, count: 1 });
+      }
+
+      yield dog.save();
+
+      const fromDb = yield Dog.findOne();
+      assert.deepEqual(fromDb.toys.map(t => t.name), ['1', '2', '3', '4', '5', '6']);
+    });
+  });
+
   it('doesnt fail with custom update function (gh-7342)', function() {
     const catalogSchema = new mongoose.Schema({
       name: String,

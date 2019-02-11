@@ -31,3 +31,7 @@ format_deps.js
 release-items.md
 static.js
 website.js
+
+.config*
+
+search.js

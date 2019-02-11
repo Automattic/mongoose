@@ -109,12 +109,17 @@ html(lang='en')
                 a.pure-menu-link(href="/docs/faq.html") FAQ
               li.pure-menu-item
                 a.pure-menu-link(href="/docs/further_reading.html") Further Reading
+              li.pure-menu-item.search
+                input#search-input-nav(type="text", placeholder="Search")
+                button#search-button-nav
+                  img(src="/docs/images/search.svg")
               <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
         .container
           #content
             block content
         include includes/keen
 
+        script(type="text/javascript" src="/docs/js/navbar-search.js")
         script(type="text/javascript").
           (function (window, document) {
             var layout   = document.getElementById('layout'),

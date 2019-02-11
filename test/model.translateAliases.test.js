@@ -26,6 +26,7 @@ describe('model translate aliases', function() {
     assert.deepEqual(
       // Translate aliases
       Character.translateAliases({
+        '_id': '1',
         '名': 'Stark',
         '年齢': 30,
         'dot.syntax': 'DotSyntax'
@@ -33,6 +34,7 @@ describe('model translate aliases', function() {
       // How translated aliases suppose to look like
       {
         name: 'Stark',
+        '_id': '1',
         'bio.age': 30,
         'd.s': 'DotSyntax'
       }

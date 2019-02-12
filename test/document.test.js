@@ -5034,7 +5034,7 @@ describe('document', function() {
         },
         department: String
       });
-      const Employee = mongoose.model('Test', employeeSchema);
+      const Employee = mongoose.model('gh5470', employeeSchema);
 
       const employee = new Employee({
         name: {

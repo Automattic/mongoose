@@ -1011,13 +1011,13 @@ describe('document', function() {
   });
 
   describe('Errors', function() {
-    it('MongooseErrors should be instances of Error (gh-209)', function(done) {
+    it('MongooseError should be instances of Error (gh-209)', function(done) {
       const MongooseError = require('../lib/error');
       const err = new MongooseError('Some message');
       assert.ok(err instanceof Error);
       done();
     });
-    it('ValidationErrors should be instances of Error', function(done) {
+    it('ValidationError should be instances of Error', function(done) {
       const ValidationError = Document.ValidationError;
       const err = new ValidationError(new TestDocument);
       assert.ok(err instanceof Error);

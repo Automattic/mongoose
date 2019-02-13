@@ -4292,6 +4292,29 @@ describe('document', function() {
       });
     });
 
+    it('runs schema type validator on single nested if parent has default (gh-7493)', function() {
+      const childSchema = new Schema({
+        test: String
+      });
+      const parentSchema = new Schema({
+        child: {
+          type: childSchema,
+          default: {},
+          validate: () => false
+        }
+      });
+      const Parent = mongoose.model('Test', parentSchema);
+
+      const parentDoc = new Parent({});
+
+      parentDoc.child.test = 'foo';
+
+      const err = parentDoc.validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['child']);
+      return Promise.resolve();
+    });
+
     it('does not overwrite when setting nested (gh-4793)', function(done) {
       const grandchildSchema = new mongoose.Schema();
       grandchildSchema.method({
@@ -5011,7 +5034,7 @@ describe('document', function() {
         },
         department: String
       });
-      const Employee = mongoose.model('Test', employeeSchema);
+      const Employee = mongoose.model('gh5470', employeeSchema);
 
       const employee = new Employee({
         name: {

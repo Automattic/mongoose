@@ -1,0 +1,6 @@
+{
+  "extends": ["config:base", ":rebaseStalePrs", ":preserveSemverRanges"],
+  "devDependencies": {
+    "enabled": false
+  }
+}

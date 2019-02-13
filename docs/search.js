@@ -89,4 +89,6 @@ async function run() {
     limit(10);
 
   console.log(results.map(res => res.url));
+
+  process.exit(0);
 }

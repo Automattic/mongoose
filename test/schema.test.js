@@ -1950,12 +1950,4 @@ describe('schema', function() {
 
     return Promise.resolve();
   });
-
-  it('throws if any property other than `_id` is `false` (gh-7480)', function() {
-    assert.throws(() => {
-      new Schema({ name: false });
-    }, /invalid.*name/i);
-
-    return Promise.resolve();
-  });
 });

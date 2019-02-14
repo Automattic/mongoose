@@ -3360,6 +3360,15 @@ describe('Query', function() {
     });
   });
 
+  it('throws error with updateOne() and overwrite (gh-7475)', function() {
+    const Model = db.model('gh7475', new Schema({ name: String }));
+
+    return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
+      () => { throw new Error('Should have failed') },
+      err => assert.ok(err.message.indexOf('updateOne') !== -1)
+    );
+  });
+
   describe('merge()', function() {
     it('copies populate() (gh-1790)', function() {
       const Car = db.model('gh1790_Car', {

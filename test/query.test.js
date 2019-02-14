@@ -3364,7 +3364,7 @@ describe('Query', function() {
     const Model = db.model('gh7475', new Schema({ name: String }));
 
     return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
-      () => { throw new Error('Should have failed') },
+      () => { throw new Error('Should have failed'); },
       err => assert.ok(err.message.indexOf('updateOne') !== -1)
     );
   });

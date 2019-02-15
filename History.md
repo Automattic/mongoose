@@ -1,3 +1,9 @@
+5.4.13 / 2019-02-15
+===================
+ * fix(query): throw handy error when using updateOne() with overwrite: true and no dollar keys #7475
+ * fix(schema): support inheriting existing schema types using Node.js `util.inherits` like mongoose-float #7486
+ * docs(connections): add list of connection events #7477
+
 5.4.12 / 2019-02-13
 ===================
  * fix(connection): dont emit reconnected due to socketTimeoutMS #7452

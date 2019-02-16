@@ -1,3 +1,20 @@
+5.4.13 / 2019-02-15
+===================
+ * fix(query): throw handy error when using updateOne() with overwrite: true and no dollar keys #7475
+ * fix(schema): support inheriting existing schema types using Node.js `util.inherits` like mongoose-float #7486
+ * docs(connections): add list of connection events #7477
+
+5.4.12 / 2019-02-13
+===================
+ * fix(connection): dont emit reconnected due to socketTimeoutMS #7452
+ * fix(schema): revert check for `false` schema paths #7516 #7512
+ * fix(model): don't delete unaliased keys in translateAliases #7510 [chrischen](https://github.com/chrischen)
+ * fix(document): run single nested schematype validator if nested path has a default and subpath is modified #7493
+ * fix(query): copy mongoose options when using `Query#merge()` #1790
+ * fix(timestamps): don't call createdAt getters when setting updatedAt on new doc #7496
+ * docs: improve description of ValidationError #7515 [JulioJu](https://github.com/JulioJu)
+ * docs: add an asterisk before comment, otherwise the comment line is not generated #7513 [JulioJu](https://github.com/JulioJu)
+
 5.4.11 / 2019-02-09
 ===================
  * fix(schema): handle `_id: false` in schema paths as a shortcut for setting the `_id` option to `false` #7480

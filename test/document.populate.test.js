@@ -876,7 +876,7 @@ describe('document.populate', function() {
 
     it('works with populate', function() {
       return co(function*() {
-        const player1 = yield Player.create({ _id: 'John' });
+        yield Player.create({ _id: 'John' });
         yield Player.create({ _id: 'Foo' });
         const createdTeam = yield Team.create({ captain: 'John Doe', players: [{ player: 'John Doe' }, { player: 'Foo Bar' }] });
 
@@ -885,8 +885,6 @@ describe('document.populate', function() {
           .populate({ path: 'players.player', options: { getters: true } })
           .exec();
 
-        console.log(team);
-        console.log(player1);
         assert.ok(team.captain);
         assert.strictEqual(team.captain._id, 'John');
         assert.strictEqual(team.players.length, 2);

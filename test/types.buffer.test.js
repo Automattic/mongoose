@@ -5,7 +5,7 @@
  */
 
 const Buffer = require('safe-buffer').Buffer;
-const assert = require('power-assert');
+const assert = require('assert');
 const mongoose = require('./common').mongoose;
 const random = require('../lib/utils').random;
 const start = require('./common');

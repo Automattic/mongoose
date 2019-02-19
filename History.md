@@ -1,3 +1,11 @@
+5.4.14 / 2019-02-19
+===================
+ * fix(populate): make `getters` option handle nested paths #7521
+ * fix(documentarray): report validation errors that occur in an array subdoc created using `create()` and then `set()` #7504
+ * docs(schema): add examples for schema functions that didn't have any #7525
+ * docs: add MongooseError to API docs and add list of error names
+ * docs(CONTRIBUTING): fix link #7530 [sarpik](https://github.com/sarpik)
+
 5.4.13 / 2019-02-15
 ===================
  * fix(query): throw handy error when using updateOne() with overwrite: true and no dollar keys #7475

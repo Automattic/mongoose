@@ -501,7 +501,6 @@ describe('model', function() {
       });
 
       it('supports clone() (gh-4983)', function(done) {
-        console.log('-----------');
         var childSchema = new Schema({
           name: String
         });

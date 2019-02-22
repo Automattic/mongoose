@@ -1876,6 +1876,20 @@ describe('schema', function() {
         assert.equal(otherSchema.path('name').validators.length, 1);
         assert.equal(schema.path('name').validators.length, 0);
       });
+
+      it('correctly copies all child schemas (gh-7537)', function() {
+        const l3Schema = new Schema({ name: String });
+        const l2Schema = new Schema({ l3: l3Schema });
+        const l1Schema = new Schema({ l2: l2Schema });
+
+        assert.equal(l1Schema.childSchemas.length, 1);
+        assert.ok(l1Schema.childSchemas[0].schema.path('l3'));
+
+        const otherSchema = l1Schema.clone();
+
+        assert.equal(otherSchema.childSchemas.length, 1);
+        assert.ok(otherSchema.childSchemas[0].schema.path('l3'));
+      });
     });
 
     it('TTL index with timestamps (gh-5656)', function(done) {

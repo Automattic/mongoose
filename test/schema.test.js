@@ -1864,6 +1864,18 @@ describe('schema', function() {
         // Should not throw
         otherSchema.add({ name2: MyType });
       });
+
+      it('clones schema types (gh-7537)', function() {
+        const schema = new Schema({ name: String });
+
+        assert.equal(schema.path('name').validators.length, 0);
+        const otherSchema = schema.clone();
+
+        otherSchema.path('name').required();
+
+        assert.equal(otherSchema.path('name').validators.length, 1);
+        assert.equal(schema.path('name').validators.length, 0);
+      });
     });
 
     it('TTL index with timestamps (gh-5656)', function(done) {

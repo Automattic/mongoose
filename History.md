@@ -1,3 +1,10 @@
+5.4.15 / 2019-02-22
+===================
+ * fix(update): don't call schematype validators on array if using $pull with runValidators #6971
+ * fix(schema): clone all schema types when cloning an array #7537
+ * docs(connections): improve connectTimeoutMS docs and socketTimeoutMS docs to link to Node.js net.setTimeout() #5169
+ * docs: fix setters example in migration guide #7546 [freewil](https://github.com/freewil)
+
 5.4.14 / 2019-02-19
 ===================
  * fix(populate): make `getters` option handle nested paths #7521

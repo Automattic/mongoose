@@ -63,7 +63,7 @@ the <code>Model</code> prototype and exposed on each document instance:</p>
 fluffy.speak(); <span class="hljs-comment">// "Meow name is fluffy"</span>
 </code></pre>
 <p>We have talking kittens! But we still haven&#39;t saved anything to MongoDB.
-Each document can be saved to the database by calling its <a href="/docs/api.html#model_Model-save">save</a> method. The first argument to the callback will be an error if any occurred.</p>
+Each document can be saved to the database by calling its <a href="/docs/api.html#model_Model-save">save</a> method. The first argument to the callback will be an error if any occured.</p>
 <pre><code class="lang-javascript">  fluffy.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, fluffy</span>) </span>{
     <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-built_in">console</span>.error(err);
     fluffy.speak();

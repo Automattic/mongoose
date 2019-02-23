@@ -126,8 +126,8 @@ block content
     ```javascript
     const schema = new Schema({ name: String });
     schema.path('name').
-      get(() => console.log('This will print 2nd')).
-      get(() => console.log('This will print first'));
+      set(() => console.log('This will print 2nd')).
+      set(() => console.log('This will print first'));
     ```
 
     In 5.x, setters run in the order they're declared.
@@ -135,8 +135,8 @@ block content
     ```javascript
     const schema = new Schema({ name: String });
     schema.path('name').
-      get(() => console.log('This will print first')).
-      get(() => console.log('This will print 2nd'));
+      set(() => console.log('This will print first')).
+      set(() => console.log('This will print 2nd'));
     ```
 
     <h3 id="id-getter"><a href="#id-getter">

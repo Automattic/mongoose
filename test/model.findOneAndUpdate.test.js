@@ -2206,12 +2206,12 @@ describe('model: findOneAndUpdate:', function() {
       );
     });
 
-    it('consistent array with $pull on doc array (gh-6889)', function() {
+    it('avoid calling $pull in doc array (gh-6971) (gh-6889)', function() {
       const schema = new Schema({
         arr: {
           type: [{ x: String }],
           validate: {
-            validator: v => assert.ok(Array.isArray(v))
+            validator: () => assert.ok(false)
           }
         }
       });

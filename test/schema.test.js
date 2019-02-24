@@ -1969,10 +1969,14 @@ describe('schema', function() {
     return Promise.resolve();
   });
 
-  it('supports _id: false in paths definition (gh-7480)', function() {
+  it('supports _id: false in paths definition (gh-7480) (gh-7524)', function() {
     const schema = new Schema({ _id: false, name: String });
     assert.ok(schema.path('_id') == null);
     assert.equal(schema.options._id, false);
+
+    const otherSchema = new Schema({ name: String, nested: { _id: false, name: String } });
+    assert.ok(otherSchema.path('_id'));
+    assert.equal(otherSchema.options._id, true);
 
     return Promise.resolve();
   });

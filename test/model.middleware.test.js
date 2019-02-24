@@ -4,8 +4,9 @@
  * Test dependencies.
  */
 
+const assert = require('assert');
+const co = require('co');
 const start = require('./common');
-const assert = require('power-assert');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -394,6 +395,40 @@ describe('model middleware', function() {
         assert.equal(postRemove, 1);
         done();
       });
+    });
+  });
+
+  it('static hooks (gh-5982)', function() {
+    const schema = new Schema({
+      name: String
+    });
+
+    schema.statics.findByName = function(name) {
+      return this.find({ name: name });
+    };
+
+    let preCalled = 0;
+    schema.pre('findByName', function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('findByName', function(docs) {
+      ++postCalled;
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'foo');
+    });
+
+    const Model = db.model('gh5982', schema);
+
+    return co(function*() {
+      yield Model.create({ name: 'foo' });
+
+      const docs = yield Model.findByName('foo');
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'foo');
+      assert.equal(preCalled, 1);
+      assert.equal(postCalled, 1);
     });
   });
 });

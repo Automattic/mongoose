@@ -506,10 +506,11 @@ describe('model', function() {
         });
         var childCalls = 0;
         var childValidateCalls = 0;
-        childSchema.pre('validate', function(next) {
+        var preValidate = function preValidate(next) {
           ++childValidateCalls;
           next();
-        });
+        };
+        childSchema.pre('validate', preValidate);
         childSchema.pre('save', function(next) {
           ++childCalls;
           next();
@@ -537,7 +538,9 @@ describe('model', function() {
           heir: { name: 'Robb Stark' },
           children: [{ name: 'Jon Snow' }]
         };
-        Parent.create(obj, function(error, doc) {
+        var doc = new Parent(obj);
+
+        doc.save(function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.name, 'Ned Stark');
           assert.equal(doc.heir.name, 'Robb Stark');

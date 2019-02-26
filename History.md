@@ -1,3 +1,13 @@
+5.4.16 / 2019-02-26
+===================
+ * fix(schema): handle nested objects with `_id: false` #7524
+ * fix(schema): don't throw error if declaring a virtual that starts with a map path name #7464
+ * fix(browser): add stubbed `model()` function so code that uses model doesn't throw #7541 [caub](https://github.com/caub)
+ * fix(schema): merge virtuals correctly #7563 [yoursdearboy](https://github.com/yoursdearboy)
+ * docs(connections): add reconnectFailed to connection docs #7477
+ * docs(index): fix typo #7553 [DenrizSusam](https://github.com/DenrizSusam)
+ * refactor(schema): iterate over paths instead of depending on childSchemas #7554
+
 5.4.15 / 2019-02-22
 ===================
  * fix(update): don't call schematype validators on array if using $pull with runValidators #6971

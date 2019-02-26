@@ -1543,11 +1543,12 @@ describe('schema', function() {
       });
     });
 
-    it('handles maps (gh-7448)', function() {
+    it('handles maps (gh-7448) (gh-7464)', function() {
       const schema = new Schema({ map: { type: Map, of: String } });
 
       assert.equal(schema.pathType('map.foo'), 'real');
       assert.equal(schema.pathType('map'), 'real');
+      assert.equal(schema.pathType('mapfoo'), 'adhocOrUndefined');
       assert.equal(schema.pathType('fake'), 'adhocOrUndefined');
 
       return Promise.resolve();
@@ -1969,10 +1970,14 @@ describe('schema', function() {
     return Promise.resolve();
   });
 
-  it('supports _id: false in paths definition (gh-7480)', function() {
+  it('supports _id: false in paths definition (gh-7480) (gh-7524)', function() {
     const schema = new Schema({ _id: false, name: String });
     assert.ok(schema.path('_id') == null);
     assert.equal(schema.options._id, false);
+
+    const otherSchema = new Schema({ name: String, nested: { _id: false, name: String } });
+    assert.ok(otherSchema.path('_id'));
+    assert.equal(otherSchema.options._id, true);
 
     return Promise.resolve();
   });

@@ -376,7 +376,7 @@ describe('model: populate:', function() {
         assert.ifError(err);
         BlogPost
           .findById(post._id)
-          .populate('_creator', 'name', User)
+          .populate({ path: '_creator', select: 'name', model: User })
           .exec(function(err, post) {
             db2.db.dropDatabase(function() {
               db.close();

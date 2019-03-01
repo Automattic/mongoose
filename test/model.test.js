@@ -5573,6 +5573,30 @@ describe('Model', function() {
       });
     });
 
+    it('bulkWrite with nested and setOnInsert (gh-7534)', function() {
+      const nested = new Schema({ name: String });
+      const schema = new Schema({ nested: nested });
+
+      const Model = db.model('gh7534', schema);
+
+      return Model.
+        bulkWrite([{
+          updateOne: {
+            filter: {},
+            update: {
+              $setOnInsert: {
+                nested: {
+                  name: 'foo'
+                }
+              }
+            },
+            upsert: true
+          }
+        }]).
+        then(() => Model.findOne()).
+        then(doc => assert.equal(doc.nested.name, 'foo'));
+    });
+
     it('insertMany with Decimal (gh-5190)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

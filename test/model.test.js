@@ -5380,221 +5380,223 @@ describe('Model', function() {
       });
     });
 
-    it('bulkWrite casting (gh-3998)', function(done) {
-      const schema = new Schema({
-        str: String,
-        num: Number
-      });
-
-      const M = db.model('gh3998', schema);
-
-      const ops = [
-        {
-          insertOne: {
-            document: { str: 1, num: '1' }
-          }
-        },
-        {
-          updateOne: {
-            filter: { str: 1 },
-            update: {
-              $set: { num: '2' }
-            }
-          }
-        }
-      ];
-      M.bulkWrite(ops, function(error) {
-        assert.ifError(error);
-        M.findOne({}, function(error, doc) {
-          assert.ifError(error);
-          assert.strictEqual(doc.str, '1');
-          assert.strictEqual(doc.num, 2);
-          done();
+    describe('bulkWrite casting', function() {
+      it('basic casting (gh-3998)', function(done) {
+        const schema = new Schema({
+          str: String,
+          num: Number
         });
-      });
-    });
 
-    it('bulkWrite with setDefaultsOnInsert (gh-5708)', function(done) {
-      const schema = new Schema({
-        str: { type: String, default: 'test' },
-        num: Number
-      });
+        const M = db.model('gh3998', schema);
 
-      const M = db.model('gh5708', schema);
-
-      const ops = [
-        {
-          updateOne: {
-            filter: { num: 0 },
-            update: {
-              $inc: { num: 1 }
-            },
-            upsert: true,
-            setDefaultsOnInsert: true
-          }
-        }
-      ];
-      M.bulkWrite(ops, function(error) {
-        assert.ifError(error);
-        M.findOne({}).lean().exec(function(error, doc) {
-          assert.ifError(error);
-          assert.strictEqual(doc.str, 'test');
-          assert.strictEqual(doc.num, 1);
-          done();
-        });
-      });
-    });
-
-    it('bulkWrite with timestamps (gh-5708)', function() {
-      const schema = new Schema({
-        str: { type: String, default: 'test' },
-        num: Number
-      }, { timestamps: true });
-
-      const M = db.model('gh5708_ts', schema);
-
-      const ops = [
-        {
-          insertOne: {
-            document: {
-              num: 42
+        const ops = [
+          {
+            insertOne: {
+              document: { str: 1, num: '1' }
             }
-          }
-        },
-        {
-          updateOne: {
-            filter: { num: 0 },
-            update: {
-              $inc: { num: 1 }
-            },
-            upsert: true
-          }
-        }
-      ];
-
-      const now = Date.now();
-
-      return co(function*() {
-        yield M.bulkWrite(ops);
-
-        let doc = yield M.findOne({ num: 42 });
-        assert.ok(doc.createdAt);
-        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
-
-        doc = yield M.findOne({ num: 1 });
-        assert.ok(doc.createdAt);
-        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
-      });
-    });
-
-    it('bulkWrite with child timestamps and array filters (gh-7032)', function() {
-      const childSchema = new Schema({ name: String }, { timestamps: true });
-
-      const parentSchema = new Schema({ children: [childSchema] }, {
-        timestamps: true
-      });
-
-      const Parent = db.model('gh7032_Parent', parentSchema);
-
-      return co(function*() {
-        yield Parent.create({ children: [{ name: 'foo' }] });
-
-        const end = Date.now();
-        yield new Promise(resolve => setTimeout(resolve, 100));
-
-        yield Parent.bulkWrite([
+          },
           {
             updateOne: {
-              filter: {},
-              update: { $set: { 'children.$[].name': 'bar' } },
+              filter: { str: 1 },
+              update: {
+                $set: { num: '2' }
+              }
             }
           }
-        ]);
-
-        const doc = yield Parent.findOne();
-        assert.ok(doc.children[0].updatedAt.valueOf() > end);
+        ];
+        M.bulkWrite(ops, function(error) {
+          assert.ifError(error);
+          M.findOne({}, function(error, doc) {
+            assert.ifError(error);
+            assert.strictEqual(doc.str, '1');
+            assert.strictEqual(doc.num, 2);
+            done();
+          });
+        });
       });
-    });
 
-    it('bulkWrite with timestamps and replaceOne (gh-5708)', function() {
-      const schema = new Schema({ num: Number }, { timestamps: true });
+      it('setDefaultsOnInsert (gh-5708)', function(done) {
+        const schema = new Schema({
+          str: { type: String, default: 'test' },
+          num: Number
+        });
 
-      const M = db.model('gh5708_ts2', schema);
+        const M = db.model('gh5708', schema);
 
-      return co(function*() {
-        yield M.create({ num: 42 });
-
-        yield cb => setTimeout(cb, 10);
-        const now = Date.now();
-
-        yield M.bulkWrite([{
-          replaceOne: {
-            filter: { num: 42 },
-            replacement: { num: 100 }
+        const ops = [
+          {
+            updateOne: {
+              filter: { num: 0 },
+              update: {
+                $inc: { num: 1 }
+              },
+              upsert: true,
+              setDefaultsOnInsert: true
+            }
           }
-        }]);
-
-        const doc = yield M.findOne({ num: 100 });
-        assert.ok(doc.createdAt);
-        assert.ok(doc.createdAt.valueOf() >= now.valueOf());
-        assert.ok(doc.updatedAt);
-        assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+        ];
+        M.bulkWrite(ops, function(error) {
+          assert.ifError(error);
+          M.findOne({}).lean().exec(function(error, doc) {
+            assert.ifError(error);
+            assert.strictEqual(doc.str, 'test');
+            assert.strictEqual(doc.num, 1);
+            done();
+          });
+        });
       });
-    });
 
-    it('bulkWrite with child timestamps (gh-7032)', function() {
-      const nested = new Schema({ name: String }, { timestamps: true });
-      const schema = new Schema({ nested: [nested] }, { timestamps: true });
+      it('timestamps (gh-5708)', function() {
+        const schema = new Schema({
+          str: { type: String, default: 'test' },
+          num: Number
+        }, { timestamps: true });
 
-      const M = db.model('gh7032', schema);
+        const M = db.model('gh5708_ts', schema);
 
-      return co(function*() {
-        yield M.create({ nested: [] });
-
-        yield cb => setTimeout(cb, 10);
-        const now = Date.now();
-
-        yield M.bulkWrite([{
-          updateOne: {
-            filter: {},
-            update: { $push: { nested: { name: 'test' } } }
-          }
-        }]);
-
-        const doc = yield M.findOne({});
-        assert.ok(doc.nested[0].createdAt);
-        assert.ok(doc.nested[0].createdAt.valueOf() >= now.valueOf());
-        assert.ok(doc.nested[0].updatedAt);
-        assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
-      });
-    });
-
-    it('bulkWrite with nested and setOnInsert (gh-7534)', function() {
-      const nested = new Schema({ name: String });
-      const schema = new Schema({ nested: nested });
-
-      const Model = db.model('gh7534', schema);
-
-      return Model.
-        bulkWrite([{
-          updateOne: {
-            filter: {},
-            update: {
-              $setOnInsert: {
-                nested: {
-                  name: 'foo'
-                }
+        const ops = [
+          {
+            insertOne: {
+              document: {
+                num: 42
               }
-            },
-            upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: { num: 0 },
+              update: {
+                $inc: { num: 1 }
+              },
+              upsert: true
+            }
           }
-        }]).
-        then(() => Model.findOne()).
-        then(doc => assert.equal(doc.nested.name, 'foo'));
+        ];
+
+        const now = Date.now();
+
+        return co(function*() {
+          yield M.bulkWrite(ops);
+
+          let doc = yield M.findOne({ num: 42 });
+          assert.ok(doc.createdAt);
+          assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+          assert.ok(doc.updatedAt);
+          assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+
+          doc = yield M.findOne({ num: 1 });
+          assert.ok(doc.createdAt);
+          assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+          assert.ok(doc.updatedAt);
+          assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+        });
+      });
+
+      it('with child timestamps and array filters (gh-7032)', function() {
+        const childSchema = new Schema({ name: String }, { timestamps: true });
+
+        const parentSchema = new Schema({ children: [childSchema] }, {
+          timestamps: true
+        });
+
+        const Parent = db.model('gh7032_Parent', parentSchema);
+
+        return co(function*() {
+          yield Parent.create({ children: [{ name: 'foo' }] });
+
+          const end = Date.now();
+          yield new Promise(resolve => setTimeout(resolve, 100));
+
+          yield Parent.bulkWrite([
+            {
+              updateOne: {
+                filter: {},
+                update: { $set: { 'children.$[].name': 'bar' } },
+              }
+            }
+          ]);
+
+          const doc = yield Parent.findOne();
+          assert.ok(doc.children[0].updatedAt.valueOf() > end);
+        });
+      });
+
+      it('with timestamps and replaceOne (gh-5708)', function() {
+        const schema = new Schema({ num: Number }, { timestamps: true });
+
+        const M = db.model('gh5708_ts2', schema);
+
+        return co(function*() {
+          yield M.create({ num: 42 });
+
+          yield cb => setTimeout(cb, 10);
+          const now = Date.now();
+
+          yield M.bulkWrite([{
+            replaceOne: {
+              filter: { num: 42 },
+              replacement: { num: 100 }
+            }
+          }]);
+
+          const doc = yield M.findOne({ num: 100 });
+          assert.ok(doc.createdAt);
+          assert.ok(doc.createdAt.valueOf() >= now.valueOf());
+          assert.ok(doc.updatedAt);
+          assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+        });
+      });
+
+      it('with child timestamps (gh-7032)', function() {
+        const nested = new Schema({ name: String }, { timestamps: true });
+        const schema = new Schema({ nested: [nested] }, { timestamps: true });
+
+        const M = db.model('gh7032', schema);
+
+        return co(function*() {
+          yield M.create({ nested: [] });
+
+          yield cb => setTimeout(cb, 10);
+          const now = Date.now();
+
+          yield M.bulkWrite([{
+            updateOne: {
+              filter: {},
+              update: { $push: { nested: { name: 'test' } } }
+            }
+          }]);
+
+          const doc = yield M.findOne({});
+          assert.ok(doc.nested[0].createdAt);
+          assert.ok(doc.nested[0].createdAt.valueOf() >= now.valueOf());
+          assert.ok(doc.nested[0].updatedAt);
+          assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
+        });
+      });
+
+      it('with single nested and setOnInsert (gh-7534)', function() {
+        const nested = new Schema({ name: String });
+        const schema = new Schema({ nested: nested });
+
+        const Model = db.model('gh7534', schema);
+
+        return Model.
+          bulkWrite([{
+            updateOne: {
+              filter: {},
+              update: {
+                $setOnInsert: {
+                  nested: {
+                    name: 'foo'
+                  }
+                }
+              },
+              upsert: true
+            }
+          }]).
+          then(() => Model.findOne()).
+          then(doc => assert.equal(doc.nested.name, 'foo'));
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {

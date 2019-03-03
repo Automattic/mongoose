@@ -5805,6 +5805,40 @@ describe('document', function() {
       });
     });
 
+    it('doc array: modify then sort (gh-7556)', function() {
+      const assetSchema = new Schema({
+        name: { type: String, required: true },
+        namePlural: { type: String, required: true }
+      });
+      assetSchema.pre('validate', function() {
+        if (this.isNew) {
+          this.namePlural = this.name + 's';
+        }
+      });
+      const personSchema = new Schema({
+        name: String,
+        assets: [assetSchema]
+      })
+  
+      const Person = db.model('gh7556', personSchema);
+
+      return co(function*() {
+        yield Person.create({
+          name: 'test',
+          assets: [{ name: 'Cash', namePlural: 'Cash' }]
+        });
+        const p = yield Person.findOne();
+
+        p.assets.push({ name: 'Home' });
+        p.assets.id(p.assets[0].id).set('name', 'Cash');
+        p.assets.id(p.assets[0].id).set('namePlural', 'Cash');
+
+        p.assets.sort((doc1, doc2) => doc1.name > doc2.name ? -1 : 1);
+
+        yield p.save();
+      });
+    });
+
     it('modifying unselected nested object (gh-5800)', function() {
       const MainSchema = new mongoose.Schema({
         a: {

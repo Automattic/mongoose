@@ -1236,6 +1236,27 @@ describe('model: update:', function() {
         });
     });
 
+    it('validators handle arrayFilters (gh-7536)', function() {
+      const s = new Schema({
+        toppings: [{name: {type: String, enum: ['bacon', 'cheese']}}]
+      });
+      const Breakfast = db.model('gh-7536', s);
+
+      const updateOptions = {
+        runValidators: true,
+        arrayFilters: [{ 't.name': 'bacon' }]
+      };
+      return Breakfast.
+        update({}, {'toppings.$[t].name': 'tofu'}, updateOptions).
+        then(
+          () => assert.ok(false),
+          err => {
+            assert.ok(err);
+            assert.equal(Object.keys(err.errors).length, 1);
+            assert.ok(/toppings.*name/.test(Object.keys(err.errors)[0]));
+          });
+    });
+
     it('required and single nested (gh-4479)', function(done) {
       const FileSchema = new Schema({
         name: {

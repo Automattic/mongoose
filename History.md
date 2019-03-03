@@ -1,3 +1,12 @@
+5.4.17 / 2019-03-03
+===================
+ * fix(update): handle all positional operator when casting array filters #7540
+ * fix(populate): handle populating nested path where top-level path is a primitive in the db #7545
+ * fix(update): run update validators on array filters #7536
+ * fix(document): clean modified subpaths when sorting an array #7556
+ * fix(model): cast $setOnInsert correctly with nested docs #7534
+ * docs: remove extra curly brace from example #7569 [kolya182](https://github.com/kolya182)
+
 5.4.16 / 2019-02-26
 ===================
  * fix(schema): handle nested objects with `_id: false` #7524

@@ -97,7 +97,7 @@ describe('castArrayFilters', function() {
           suggestedAppointment: [{ key: String, isDeleted: Boolean }]
         }]
       }
-    });  
+    });
     const q = new Query();
     q.schema = schema;
 

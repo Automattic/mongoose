@@ -5818,8 +5818,8 @@ describe('document', function() {
       const personSchema = new Schema({
         name: String,
         assets: [assetSchema]
-      })
-  
+      });
+
       const Person = db.model('gh7556', personSchema);
 
       return co(function*() {

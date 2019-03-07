@@ -102,6 +102,21 @@ describe('Query', function() {
     });
   });
 
+  describe('projection() (gh-7384)', function() {
+    it('gets current projection', function() {
+      const query = new Query({}, {}, null, p1.collection);
+      query.select('a');
+      assert.deepEqual(query.projection(), { a: 1 });
+    });
+
+    it('overwrites current projection', function() {
+      const query = new Query({}, {}, null, p1.collection);
+      query.select('a');
+      assert.deepEqual(query.projection({ b: 1 }), { b: 1 });
+      assert.deepEqual(query.projection(), { b: 1 });
+    });
+  });
+
   describe('where', function() {
     it('works', function(done) {
       const query = new Query({}, {}, null, p1.collection);

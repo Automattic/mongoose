@@ -4720,7 +4720,7 @@ describe('document', function() {
 
       const Child = db.model('gh7491_Child', childSchema);
       const Parent = db.model('gh7491_Parent', parentSchema);
-      
+
       return co(function*() {
         yield Child.create({
           _id: 1,

@@ -1275,10 +1275,9 @@ describe('model', function() {
       const eventModelUser2 =
         mongoose.model('gh7547_Event', eventSchema, 'user2_events');
     
-      const clickEventUser1 = eventModelUser1.discriminator(
-        'gh7547_ClickedEvent',
-        new mongoose.Schema({ url: String }, options),
-      );
+      const discSchema = new mongoose.Schema({ url: String }, options);
+      const clickEventUser1 = eventModelUser1.
+        discriminator('gh7547_ClickedEvent', discSchema);
       const clickEventUser2 =
         eventModelUser2.discriminators['gh7547_ClickedEvent'];
 

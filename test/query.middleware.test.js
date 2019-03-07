@@ -427,6 +427,28 @@ describe('query middleware', function() {
     });
   });
 
+  it('distinct (gh-5938)', function() {
+    let preCount = 0;
+    let postCount = 0;
+
+    schema.pre('distinct', function() {
+      ++preCount;
+    });
+
+    schema.post('distinct', function(res) {
+      assert.deepEqual(res, ['foo', 'bar']);
+      ++postCount;
+    });
+
+    return co(function*() {
+      const Model = db.model('gh7195_distinct', schema);
+      yield Model.create([{ title: 'foo' }, { title: 'bar' }, { title: 'bar' }]);
+
+      const res = yield Model.distinct('title');
+      assert.deepEqual(res, ['foo', 'bar']);
+    });
+  });
+
   it('error handlers (gh-2284)', function(done) {
     const testSchema = new Schema({ title: { type: String, unique: true } });
 

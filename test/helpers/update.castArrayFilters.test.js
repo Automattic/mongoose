@@ -89,4 +89,26 @@ describe('castArrayFilters', function() {
 
     done();
   });
+
+  it('all positional operator works (gh-7540)', function(done) {
+    const schema = new Schema({
+      doctorsAppointment: {
+        queries: [{
+          suggestedAppointment: [{ key: String, isDeleted: Boolean }]
+        }]
+      }
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    const path = 'doctorsAppointment.queries.$[].suggestedAppointment.$[u].isDeleted';
+    const update = { $set: { [path]: true } };
+    q.updateOne({}, update, { arrayFilters: [{ 'u.key': 123 }] });
+
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0]['u.key'], '123');
+
+    done();
+  });
 });

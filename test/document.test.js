@@ -4752,6 +4752,41 @@ describe('document', function() {
       done();
     });
 
+    it('nested virtual when populating with parent projected out (gh-7491)', function() {
+      const childSchema = Schema({
+        _id: Number,
+        nested: { childPath: String },
+        otherPath: String
+      }, { toObject: { virtuals: true } });
+
+      childSchema.virtual('nested.childVirtual').get(() => true);
+
+      const parentSchema = Schema({
+        child: { type: Number, ref: 'gh7491_Child' }
+      }, { toObject: { virtuals: true } });
+
+      parentSchema.virtual('_nested').get(function() {
+        return this.child.nested;
+      });
+
+      const Child = db.model('gh7491_Child', childSchema);
+      const Parent = db.model('gh7491_Parent', parentSchema);
+
+      return co(function*() {
+        yield Child.create({
+          _id: 1,
+          nested: { childPath: 'foo' },
+          otherPath: 'bar'
+        });
+        yield Parent.create({ child: 1 });
+
+        const doc = yield Parent.findOne().populate('child', 'otherPath').
+          then(doc => doc.toObject());
+
+        assert.ok(!doc.child.nested.childPath);
+      });
+    });
+
     it('JSON.stringify nested errors (gh-5208)', function(done) {
       const AdditionalContactSchema = new Schema({
         contactName: {
@@ -5853,6 +5888,40 @@ describe('document', function() {
             });
           });
         });
+      });
+    });
+
+    it('doc array: modify then sort (gh-7556)', function() {
+      const assetSchema = new Schema({
+        name: { type: String, required: true },
+        namePlural: { type: String, required: true }
+      });
+      assetSchema.pre('validate', function() {
+        if (this.isNew) {
+          this.namePlural = this.name + 's';
+        }
+      });
+      const personSchema = new Schema({
+        name: String,
+        assets: [assetSchema]
+      });
+
+      const Person = db.model('gh7556', personSchema);
+
+      return co(function*() {
+        yield Person.create({
+          name: 'test',
+          assets: [{ name: 'Cash', namePlural: 'Cash' }]
+        });
+        const p = yield Person.findOne();
+
+        p.assets.push({ name: 'Home' });
+        p.assets.id(p.assets[0].id).set('name', 'Cash');
+        p.assets.id(p.assets[0].id).set('namePlural', 'Cash');
+
+        p.assets.sort((doc1, doc2) => doc1.name > doc2.name ? -1 : 1);
+
+        yield p.save();
       });
     });
 

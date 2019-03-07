@@ -1,3 +1,22 @@
+5.4.17 / 2019-03-03
+===================
+ * fix(update): handle all positional operator when casting array filters #7540
+ * fix(populate): handle populating nested path where top-level path is a primitive in the db #7545
+ * fix(update): run update validators on array filters #7536
+ * fix(document): clean modified subpaths when sorting an array #7556
+ * fix(model): cast $setOnInsert correctly with nested docs #7534
+ * docs: remove extra curly brace from example #7569 [kolya182](https://github.com/kolya182)
+
+5.4.16 / 2019-02-26
+===================
+ * fix(schema): handle nested objects with `_id: false` #7524
+ * fix(schema): don't throw error if declaring a virtual that starts with a map path name #7464
+ * fix(browser): add stubbed `model()` function so code that uses model doesn't throw #7541 [caub](https://github.com/caub)
+ * fix(schema): merge virtuals correctly #7563 [yoursdearboy](https://github.com/yoursdearboy)
+ * docs(connections): add reconnectFailed to connection docs #7477
+ * docs(index): fix typo #7553 [DenrizSusam](https://github.com/DenrizSusam)
+ * refactor(schema): iterate over paths instead of depending on childSchemas #7554
+
 5.4.15 / 2019-02-22
 ===================
  * fix(update): don't call schematype validators on array if using $pull with runValidators #6971

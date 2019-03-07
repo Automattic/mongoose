@@ -376,7 +376,7 @@ describe('model: populate:', function() {
         assert.ifError(err);
         BlogPost
           .findById(post._id)
-          .populate('_creator', 'name', User)
+          .populate({ path: '_creator', select: 'name', model: User })
           .exec(function(err, post) {
             db2.db.dropDatabase(function() {
               db.close();
@@ -8135,6 +8135,39 @@ describe('model: populate:', function() {
       yield doc.execPopulate();
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
+    });
+  });
+
+  it('handles populating deeply nested path if value in db is a primitive (gh-7545)', function() {
+    const personSchema = new Schema({ _id: Number, name: String });
+    const PersonModel = db.model('gh7545_People', personSchema);
+
+    // Create Event Model
+    const teamSchema = new Schema({
+      nested: { members: [{ type: Number, ref: 'gh7545_People' }] }
+    });
+    const eventSchema = new Schema({
+      _id: Number,
+      title: String,
+      teams: [teamSchema]
+    });
+    const EventModel = db.model('gh7545_Event', eventSchema);
+
+    return co(function*() {
+      yield PersonModel.create({ _id: 1, name: 'foo' });
+      yield EventModel.collection.insertMany([
+        { _id: 2, title: 'Event 1', teams: false },
+        { _id: 3, title: 'Event 2', teams: [{ nested: { members: [1] } }] }
+      ]);
+
+      const docs = yield EventModel.find().
+        sort({ _id: 1 }).
+        lean().
+        populate('teams.nested.members');
+      assert.strictEqual(docs[0].teams, false);
+
+      assert.equal(docs[1].teams.length, 1);
+      assert.deepEqual(docs[1].teams[0].nested.members.map(m => m.name), ['foo']);
     });
   });
 });

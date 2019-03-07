@@ -4701,6 +4701,41 @@ describe('document', function() {
       done();
     });
 
+    it('nested virtual when populating with parent projected out (gh-7491)', function() {
+      const childSchema = Schema({
+        _id: Number,
+        nested: { childPath: String },
+        otherPath: String
+      }, { toObject: { virtuals: true } });
+
+      childSchema.virtual('nested.childVirtual').get(() => true);
+
+      const parentSchema = Schema({
+        child: { type: Number, ref: 'gh7491_Child' }
+      }, { toObject: { virtuals: true } });
+
+      parentSchema.virtual('_nested').get(function() {
+        return this.child.nested;
+      });
+
+      const Child = db.model('gh7491_Child', childSchema);
+      const Parent = db.model('gh7491_Parent', parentSchema);
+      
+      return co(function*() {
+        yield Child.create({
+          _id: 1,
+          nested: { childPath: 'foo' },
+          otherPath: 'bar'
+        });
+        yield Parent.create({ child: 1 });
+
+        const doc = yield Parent.findOne().populate('child', 'otherPath').
+          then(doc => doc.toObject());
+
+        assert.ok(!doc.child.nested.childPath);
+      });
+    });
+
     it('JSON.stringify nested errors (gh-5208)', function(done) {
       const AdditionalContactSchema = new Schema({
         contactName: {

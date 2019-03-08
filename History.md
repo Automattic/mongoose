@@ -1,3 +1,9 @@
+5.4.18 / 2019-03-08
+===================
+ * fix(document): handle nested virtuals in populated docs when parent path is projected out #7491
+ * fix(model): make subclassed models handle discriminators correctly #7547
+ * fix(model): remove $versionError from save options for better debug output #7570
+
 5.4.17 / 2019-03-03
 ===================
  * fix(update): handle all positional operator when casting array filters #7540

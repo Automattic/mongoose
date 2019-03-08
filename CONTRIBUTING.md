@@ -21,7 +21,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Fixing bugs / Adding features
 
 - Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. You can create a new issue [here](https://github.com/learnboost/mongoose/issues/new).
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_.
+  - _The source of this project is written in javascript, not coffeescript or typescript. Please write your bug reports in JavaScript that can run in vanilla Node.js_.
 - Fork the [repo](https://github.com/Automattic/mongoose) _or_ for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 - Follow the general coding style of the rest of the project:
   - 2 space tabs

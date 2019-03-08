@@ -436,7 +436,7 @@ describe('query middleware', function() {
     });
 
     schema.post('distinct', function(res) {
-      assert.deepEqual(res, ['foo', 'bar']);
+      assert.deepEqual(res.sort(), ['bar', 'foo']);
       ++postCount;
     });
 
@@ -445,7 +445,10 @@ describe('query middleware', function() {
       yield Model.create([{ title: 'foo' }, { title: 'bar' }, { title: 'bar' }]);
 
       const res = yield Model.distinct('title');
-      assert.deepEqual(res, ['foo', 'bar']);
+      assert.deepEqual(res.sort(), ['bar', 'foo']);
+
+      assert.equal(preCount, 1);
+      assert.equal(postCount, 1);
     });
   });
 

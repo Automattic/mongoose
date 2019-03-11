@@ -2,12 +2,13 @@
 
 const assert = require('assert');
 const co = require('co');
-const mongoose = require('../../');
 const start = require('../common');
 
 describe('Date Tutorial', function() {
   let User;
   let db;
+
+  const mongoose = new start.mongoose.Mongoose();
 
   before(function() {
     const userSchema = new mongoose.Schema({
@@ -16,6 +17,10 @@ describe('Date Tutorial', function() {
       lastActiveAt: Date
     });
     User = mongoose.model('User', userSchema);
+
+    return mongoose.connect('mongodb://localhost:27017/mongoose', {
+      useNewUrlParser: true
+    });
   });
 
   it('Example 1.2: casts strings to dates', function() {

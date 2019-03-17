@@ -1269,6 +1269,26 @@ describe('schema', function() {
       });
     });
 
+    it('handles function for date min/max (gh-7600)', function() {
+      const s = mongoose.Schema({
+        minDate: String,
+        date: {
+          type: Date,
+          min: function() { return this.minDate; }
+        }
+      });
+      const M = mongoose.model('gh7600', s);
+
+      let m = new M({ minDate: '2018-06-01', date: '2018-05-01' });
+      let err = m.validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['date']);
+
+      m = new M({ minDate: '2018-06-01', date: '2018-07-01' });
+      err = m.validateSync();
+      assert.ifError(err);
+    });
+
     it('evaluate message function gh6523', function(done) {
       const s = mongoose.Schema({
         n: {

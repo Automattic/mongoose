@@ -31,7 +31,7 @@ block content
     You can also specify several more parameters in the `uri`:
 
     ```javascript
-    mongoose.connect('mongodb://username:password@host:port/database?options...');
+    mongoose.connect('mongodb://username:password@host:port/database?options...', {useNewUrlParser: true});
     ```
 
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.

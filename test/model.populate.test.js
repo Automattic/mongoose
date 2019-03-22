@@ -7993,18 +7993,18 @@ describe('model: populate:', function() {
       localField: '_id',
       foreignField: 's1'
     });
-  
+
     const s2 = new mongoose.Schema({
       s1: {type: mongoose.Schema.Types.ObjectId, ref: 'schema1'}
     });
-  
+
     s2.virtual('numS3', {
       ref: 'gh7573_s3',
       localField: '_id',
       foreignField: 's2',
       count: true
     });
-  
+
     const s3 = new mongoose.Schema({
       s2: {type: mongoose.Schema.Types.ObjectId, ref: 'schema2'}
     });

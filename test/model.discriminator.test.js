@@ -1284,5 +1284,18 @@ describe('model', function() {
       assert.equal(clickEventUser1.collection.name, 'user1_events');
       assert.equal(clickEventUser2.collection.name, 'user2_events');
     });
+
+    it('uses correct discriminator when using `new BaseModel` (gh-7586)', function() {
+      const options = { discriminatorKey: 'kind' };
+
+      const BaseModel = mongoose.model('gh7586_Base',
+        Schema({ name: String }, options));
+      const ChildModel = BaseModel.discriminator('gh7586_Child',
+        Schema({ test: String }, options));
+
+      const doc = new BaseModel({ kind: 'gh7586_Child', name: 'a', test: 'b' });
+      assert.ok(doc instanceof ChildModel);
+      assert.equal(doc.test, 'b');
+    });
   });
 });

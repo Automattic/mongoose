@@ -69,6 +69,10 @@ describe('model', function() {
     db = start();
   });
 
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('discriminator()', function() {
     var Person, Employee;
 
@@ -76,10 +80,6 @@ describe('model', function() {
       db = start();
       Person = db.model('model-discriminator-person', PersonSchema);
       Employee = Person.discriminator('model-discriminator-employee', EmployeeSchema);
-    });
-
-    after(function(done) {
-      db.close(done);
     });
 
     it('model defaults without discriminator', function(done) {

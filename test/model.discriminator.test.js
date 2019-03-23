@@ -63,8 +63,14 @@ EmployeeSchema.set('toObject', {getters: true, virtuals: false});
 EmployeeSchema.set('toJSON', {getters: false, virtuals: true});
 
 describe('model', function() {
+  let db;
+
+  before(function() {
+    db = start();
+  });
+
   describe('discriminator()', function() {
-    var db, Person, Employee;
+    var Person, Employee;
 
     before(function() {
       db = start();
@@ -1296,6 +1302,41 @@ describe('model', function() {
       const doc = new BaseModel({ kind: 'gh7586_Child', name: 'a', test: 'b' });
       assert.ok(doc instanceof ChildModel);
       assert.equal(doc.test, 'b');
+    });
+
+    it('does not project in embedded discriminator key if it is the only selected field (gh-7574)', function() {
+      const sectionSchema = Schema({ title: String }, { discriminatorKey: 'kind' });
+      const imageSectionSchema = Schema({ href: String });
+      const textSectionSchema = Schema({ text: String });
+
+      const documentSchema = Schema({
+        title: String,
+        sections: [ sectionSchema ]
+      });
+
+      const sectionsType = documentSchema.path('sections');
+      sectionsType.discriminator('image', imageSectionSchema);
+      sectionsType.discriminator('text', textSectionSchema);
+
+      const Model = db.model('gh7574', documentSchema);
+
+      return co(function*() {
+        yield Model.create({
+          title: 'example',
+          sections: [
+            { kind: 'image', title: 'image', href: 'foo' },
+            { kind: 'text', title: 'text', text: 'bar' }
+          ]
+        });
+
+        let doc = yield Model.findOne({}).select('title');
+        assert.ok(!doc.sections);
+
+        doc = yield Model.findOne({}).select('title sections.title');
+        assert.ok(doc.sections);
+        assert.equal(doc.sections[0].kind, 'image');
+        assert.equal(doc.sections[1].kind, 'text');
+      });
     });
   });
 });

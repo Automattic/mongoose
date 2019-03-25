@@ -1,3 +1,17 @@
+5.4.20 / 2019-03-25
+===================
+ * docs(tutorials): add tutorial about `lean()` #7640
+ * fix(discriminator): fix wrong modelName being used as value to partialFilterExpression index #7635 #7634 [egorovli](https://github.com/egorovli)
+ * fix(document): allow setters to modify `this` when overwriting single nested subdoc #7585
+ * fix(discriminator): avoid projecting in embedded discriminator if only auto-selected path is discriminator key #7574
+ * fix(populate): handle count option correctly with multiple docs #7573
+ * fix(discriminator): use discriminator model when using `new BaseModel()` with discriminator key #7586
+ * fix(timestamps): avoid throwing if doc array has timestamps and array is undefined #7625 [serg33v](https://github.com/serg33v)
+ * docs(query): fix .all() param type and add example #7612 [720degreeLotus](https://github.com/720degreeLotus)
+ * docs: add useNewUrlParser to mongoose.connect for some pages #7615 [YC](https://github.com/YC)
+ * fix(date): support declaring min/max validators as functions #7600 [ChienDevIT](https://github.com/ChienDevIT)
+ * docs(document): explain DocumentNotFoundError in save() docs #7580
+
 5.4.19 / 2019-03-11
 ===================
  * fix(mongoose): ensure virtuals set on subdocs in global plugins get applied #7592

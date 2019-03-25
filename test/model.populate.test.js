@@ -8020,6 +8020,7 @@ describe('model: populate:', function() {
 
       const doc = yield S1.findOne({}).populate({
         path: 's2',
+        sort: { _id: 1 },
         populate: {
           path: 'numS3'
         }

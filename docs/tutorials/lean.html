@@ -163,7 +163,10 @@ groupSchema.virtual(<span class="hljs-string">'members'</span>, {
 ]);
 
 <span class="hljs-comment">// Execute a lean query</span>
-<span class="hljs-keyword">const</span> group = <span class="hljs-keyword">await</span> Group.findOne().lean().populate(<span class="hljs-string">'members'</span>);
+<span class="hljs-keyword">const</span> group = <span class="hljs-keyword">await</span> Group.findOne().lean().populate({
+  path: <span class="hljs-string">'members'</span>,
+  sort: { name: <span class="hljs-number">1</span> }
+});
 group.members[<span class="hljs-number">0</span>].name; <span class="hljs-comment">// 'Benjamin Sisko'</span>
 group.members[<span class="hljs-number">1</span>].name; <span class="hljs-comment">// 'Kira Nerys'</span>
 

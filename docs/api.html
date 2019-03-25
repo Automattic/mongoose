@@ -2365,7 +2365,7 @@ query.$where(<span class="hljs-function"><span class="hljs-keyword">function</sp
 
 <p><strong>Note:</strong> This function is not if <code>Symbol.asyncIterator</code> is undefined. If <code>Symbol.asyncIterator</code> is undefined, that means your Node.js version does not support async iterators.</p></div><hr class="separate-api-elements"><h3 id="query_Query-all"><a href="#query_Query-all">Query.prototype.all()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Specifies an $all query condition.</p>
+<span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Specifies an <code>$all</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
 
@@ -2389,7 +2389,7 @@ MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-s
 
 <p>Cannot be used with <code>distinct()</code></p></div><hr class="separate-api-elements"><h3 id="query_Query-box"><a href="#query_Query-box">Query.prototype.box()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">Upper
-<span class="method-type">&laquo;[Array]&raquo;</span> Right Coords</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a $box condition</p>
+<span class="method-type">&laquo;[Array]&raquo;</span> Right Coords</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$box</code> condition</p>
 
 <h4>Example</h4>
 
@@ -2408,7 +2408,7 @@ query.box({ ll : lowerLeft, ur : upperRight })</code></pre></div><hr class="sepa
 
 <p><strong>Deprecated.</strong> Use <a href="#query_Query-circle">circle</a> instead.</p></div><hr class="separate-api-elements"><h3 id="query_Query-centerSphere"><a href="#query_Query-centerSphere">Query.prototype.centerSphere()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p><em>DEPRECATED</em> Specifies a $centerSphere condition</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p><em>DEPRECATED</em> Specifies a <code>$centerSphere</code> condition</p>
 
 <p><strong>Deprecated.</strong> Use <a href="#query_Query-circle">circle</a> instead.</p>
 
@@ -2417,7 +2417,7 @@ query.box({ ll : lowerLeft, ur : upperRight })</code></pre></div><hr class="sepa
 <pre><code><span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span> };
 query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-circle"><a href="#query_Query-circle">Query.prototype.circle()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">area
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a $center or $centerSphere condition.</p>
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$center</code> or <code>$centerSphere</code> condition.</p>
 
 <h4>Example</h4>
 
@@ -2432,7 +2432,7 @@ query.where(<span class="hljs-string">'loc'</span>).within().circle(area)
 <span class="hljs-comment">// alternatively</span>
 query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-collation"><a href="#query_Query-collation">Query.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Adds a collation to this op (MongoDB 3.4 and up)</p></div><hr class="separate-api-elements"><h3 id="query_Query-comment"><a href="#query_Query-comment">Query.prototype.comment()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies the <code>comment</code> option.</p>
+<span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Specifies the <code>comment</code> option.</p>
 
 <h4>Example</h4>
 
@@ -2946,7 +2946,7 @@ query.getQuery(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-gt"><a href="#query_Query-gt">Query.prototype.gt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $gt query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$gt</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
 
@@ -2957,7 +2957,7 @@ query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code
 <span class="hljs-comment">// or</span>
 Thing.find().gt(<span class="hljs-string">'age'</span>, <span class="hljs-number">21</span>)</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-gte"><a href="#query_Query-gte">Query.prototype.gte()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $gte query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$gte</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-hint"><a href="#query_Query-hint">Query.prototype.hint()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> a hint object</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets query hints.</p>
@@ -2970,7 +2970,7 @@ Thing.find().gt(<span class="hljs-string">'age'</span>, <span class="hljs-number
 
 <p>Cannot be used with <code>distinct()</code></p></div><hr class="separate-api-elements"><h3 id="query_Query-in"><a href="#query_Query-in">Query.prototype.in()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies an $in query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies an <code>$in</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-intersects"><a href="#query_Query-intersects">Query.prototype.intersects()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[arg]
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declares an intersects query for <code>geometry()</code>.</p>
@@ -3040,11 +3040,11 @@ Model.find().lean().exec(<span class="hljs-function"><span class="hljs-keyword">
 
 <p>Cannot be used with <code>distinct()</code></p></div><hr class="separate-api-elements"><h3 id="query_Query-lt"><a href="#query_Query-lt">Query.prototype.lt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $lt query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$lt</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-lte"><a href="#query_Query-lte">Query.prototype.lte()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $lte query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$lte</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-map"><a href="#query_Query-map">Query.prototype.map()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> function to run to transform the query result</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Runs a function <code>fn</code> and treats the return value of <code>fn</code> as the new value for the query to resolve to.</p>
@@ -3061,7 +3061,7 @@ Model.find().lean().exec(<span class="hljs-function"><span class="hljs-keyword">
     <span class="hljs-built_in">Object</span>.assign(res, { loadedAt: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>() });
 });</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-maxDistance"><a href="#query_Query-maxDistance">Query.prototype.maxDistance()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $maxDistance query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>maxDistance</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-maxScan"><a href="#query_Query-maxScan">Query.prototype.maxScan()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies the maxScan option.</p>
@@ -3113,7 +3113,7 @@ Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span cla
 
 <p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p></div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $ne query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-near"><a href="#query_Query-near">Query.prototype.near()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
@@ -3138,7 +3138,7 @@ query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-
 
 <pre><code>query.where(<span class="hljs-string">'loc'</span>).near({ center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], spherical: <span class="hljs-literal">true</span> });</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-nin"><a href="#query_Query-nin">Query.prototype.nin()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies an $nin query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies an <code>$nin</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-nor"><a href="#query_Query-nor">Query.prototype.nor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies arguments for a <code>$nor</code> condition.</p>
@@ -3168,7 +3168,7 @@ query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-
 <span class="hljs-keyword">await</span> Model.findOneAndUpdate({ foo: <span class="hljs-string">'bar'</span> }, { name: <span class="hljs-string">'test'</span> }).
   orFail(() =&gt; <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Not found'</span>));</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-polygon"><a href="#query_Query-polygon">Query.prototype.polygon()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String|Array&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[coordinatePairs...]
-<span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a $polygon condition</p>
+<span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$polygon</code> condition</p>
 
 <h4>Example</h4>
 
@@ -3278,7 +3278,7 @@ s   snapshot</code></pre>
 
 <p>Read more about how to use read concern <a href="https://docs.mongodb.com/manual/reference/read-concern/">here</a>.</p></div><hr class="separate-api-elements"><h3 id="query_Query-regex"><a href="#query_Query-regex">Query.prototype.regex()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;String|RegExp&raquo;</span> </li></ul><div><p>Specifies a $regex query condition.</p>
+<span class="method-type">&laquo;String|RegExp&raquo;</span> </li></ul><div><p>Specifies a <code>$regex</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p></div><hr class="separate-api-elements"><h3 id="query_Query-remove"><a href="#query_Query-remove">Query.prototype.remove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</li><li class="param">[callback]
@@ -3443,7 +3443,7 @@ query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.setUpdate({ $set: { b: <span class="hljs-number">6</span> } });
 query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-size"><a href="#query_Query-size">Query.prototype.size()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a $size query condition.</p>
+<span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$size</code> query condition.</p>
 
 <p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>
 
@@ -3474,7 +3474,7 @@ query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code
 query.slaveOk(<span class="hljs-literal">true</span>)
 query.slaveOk(<span class="hljs-literal">false</span>)</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-slice"><a href="#query_Query-slice">Query.prototype.slice()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
-<span class="method-type">&laquo;Number&raquo;</span> number/range of elements to slice</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a $slice projection for an array.</p>
+<span class="method-type">&laquo;Number&raquo;</span> number/range of elements to slice</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$slice</code> projection for an array.</p>
 
 <h4>Example</h4>
 
@@ -3563,7 +3563,7 @@ Adventure().highlyRated.startsWith(<span class="hljs-string">'Life'</span>).exec
 <span class="method-type">&laquo;Boolean&raquo;</span> by default, mongoose only returns the first error that occurred in casting the query. Turn on this option to aggregate all the cast errors.</li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional, params are (error, writeOpResult)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declare and/or execute this query as an update() operation.</p>
 
-<p><em>All paths passed that are not $atomic operations will become $set ops.</em></p>
+<p><em>All paths passed that are not $atomic operations will become <code>$set</code> ops.</em></p>
 
 <p>This function triggers the following middleware.</p>
 
@@ -3606,7 +3606,7 @@ q.update({ $set: { name: 'bob' }}).update(); // not executed
 
 q.update({ $set: { name: 'bob' }}).exec(); // executed
 
-// keys that are not $atomic ops become $set.
+// keys that are not $atomic ops become `$set`.
 // this executes the same command as the previous example.
 q.update({ name: 'bob' }).exec();
 
@@ -3679,7 +3679,7 @@ update()</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query
 
 <pre><code>mongoose.Query.use$geoWithin = <span class="hljs-literal">false</span>;</code></pre>
 
-<p>MongoDB 2.4 deprecated the use of <code>$within</code>, replacing it with <code>$geoWithin</code>. Mongoose uses <code>$geoWithin</code> by default (which is 100% backward compatible with $within). If you are running an older version of MongoDB, set this flag to <code>false</code> so your <code>within()</code> queries continue to work.</p></div><hr class="separate-api-elements"><h3 id="query_Query-w"><a href="#query_Query-w">Query.prototype.w()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p>MongoDB 2.4 deprecated the use of <code>$within</code>, replacing it with <code>$geoWithin</code>. Mongoose uses <code>$geoWithin</code> by default (which is 100% backward compatible with <code>$within</code>). If you are running an older version of MongoDB, set this flag to <code>false</code> so your <code>within()</code> queries continue to work.</p></div><hr class="separate-api-elements"><h3 id="query_Query-w"><a href="#query_Query-w">Query.prototype.w()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;String|number&raquo;</span> 0 for fire-and-forget, 1 for acknowledged by one server, &#39;majority&#39; for majority of the replica set, or <a href="https://docs.mongodb.com/manual/reference/write-concern/#w-option">any of the more advanced options</a>.</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the specified number of <code>mongod</code> servers, or tag set of <code>mongod</code> servers, that must acknowledge this write before this write is considered successful.</p>
 
 <h2>This option is only valid for operations that write to the database</h2>

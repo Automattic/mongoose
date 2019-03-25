@@ -431,4 +431,48 @@ describe('model middleware', function() {
       assert.equal(postCalled, 1);
     });
   });
+
+  it('deleteOne hooks (gh-7538)', function() {
+    const schema = new Schema({
+      name: String
+    });
+
+    let queryPreCalled = 0;
+    let preCalled = 0;
+    schema.pre('deleteOne', { document: false, query: true }, function() {
+      ++queryPreCalled;
+    });
+    schema.pre('deleteOne', { document: true, query: false }, function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('deleteOne', { document: true, query: false }, function() {
+      assert.equal(this.name, 'foo');
+      ++postCalled;
+    });
+
+    const Model = db.model('gh7538', schema);
+
+    return co(function*() {
+      yield Model.create({ name: 'foo' });
+
+      const doc = yield Model.findOne();
+
+      assert.equal(preCalled, 0);
+      assert.equal(postCalled, 0);
+
+      yield doc.deleteOne();
+
+      assert.equal(queryPreCalled, 0);
+      assert.equal(preCalled, 1);
+      assert.equal(postCalled, 1);
+
+      yield Model.deleteOne();
+
+      assert.equal(queryPreCalled, 1);
+      assert.equal(preCalled, 1);
+      assert.equal(postCalled, 1);
+    });
+  });
 });

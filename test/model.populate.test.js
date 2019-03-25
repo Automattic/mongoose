@@ -4924,6 +4924,39 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('with functions for match (gh-7397)', function() {
+        const ASchema = new Schema({
+          name: String,
+          createdAt: Date
+        });
+
+        const BSchema = new Schema({
+          as: [{ type: ObjectId, ref: 'gh7397_A' }],
+          minDate: Date
+        });
+
+        const A = db.model('gh7397_A', ASchema);
+        const B = db.model('gh7397_B', BSchema);
+
+        return co(function*() {
+          const as = yield A.create([
+            { name: 'old', createdAt: '2015-06-01' },
+            { name: 'newer', createdAt: '2017-06-01' },
+            { name: 'newest', createdAt: '2019-06-01' }
+          ]);
+
+          yield B.create({ as: as.map(a => a._id), minDate: '2016-01-01' });
+
+          const b = yield B.findOne().populate({
+            path: 'as',
+            match: doc => ({ createdAt: { $gte: doc.minDate } })
+          });
+
+          assert.equal(b.as.length, 2);
+          assert.deepEqual(b.as.map(a => a.name), ['newer', 'newest']);
+        });
+      });
+
       it('with function for refPath (gh-6669)', function() {
         const connectionSchema = new Schema({
           destination: String

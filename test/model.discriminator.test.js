@@ -63,17 +63,23 @@ EmployeeSchema.set('toObject', {getters: true, virtuals: false});
 EmployeeSchema.set('toJSON', {getters: false, virtuals: true});
 
 describe('model', function() {
+  let db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('discriminator()', function() {
-    var db, Person, Employee;
+    var Person, Employee;
 
     before(function() {
       db = start();
       Person = db.model('model-discriminator-person', PersonSchema);
       Employee = Person.discriminator('model-discriminator-employee', EmployeeSchema);
-    });
-
-    after(function(done) {
-      db.close(done);
     });
 
     it('model defaults without discriminator', function(done) {
@@ -1283,6 +1289,54 @@ describe('model', function() {
 
       assert.equal(clickEventUser1.collection.name, 'user1_events');
       assert.equal(clickEventUser2.collection.name, 'user2_events');
+    });
+
+    it('uses correct discriminator when using `new BaseModel` (gh-7586)', function() {
+      const options = { discriminatorKey: 'kind' };
+
+      const BaseModel = mongoose.model('gh7586_Base',
+        Schema({ name: String }, options));
+      const ChildModel = BaseModel.discriminator('gh7586_Child',
+        Schema({ test: String }, options));
+
+      const doc = new BaseModel({ kind: 'gh7586_Child', name: 'a', test: 'b' });
+      assert.ok(doc instanceof ChildModel);
+      assert.equal(doc.test, 'b');
+    });
+
+    it('does not project in embedded discriminator key if it is the only selected field (gh-7574)', function() {
+      const sectionSchema = Schema({ title: String }, { discriminatorKey: 'kind' });
+      const imageSectionSchema = Schema({ href: String });
+      const textSectionSchema = Schema({ text: String });
+
+      const documentSchema = Schema({
+        title: String,
+        sections: [ sectionSchema ]
+      });
+
+      const sectionsType = documentSchema.path('sections');
+      sectionsType.discriminator('image', imageSectionSchema);
+      sectionsType.discriminator('text', textSectionSchema);
+
+      const Model = db.model('gh7574', documentSchema);
+
+      return co(function*() {
+        yield Model.create({
+          title: 'example',
+          sections: [
+            { kind: 'image', title: 'image', href: 'foo' },
+            { kind: 'text', title: 'text', text: 'bar' }
+          ]
+        });
+
+        let doc = yield Model.findOne({}).select('title');
+        assert.ok(!doc.sections);
+
+        doc = yield Model.findOne({}).select('title sections.title');
+        assert.ok(doc.sections);
+        assert.equal(doc.sections[0].kind, 'image');
+        assert.equal(doc.sections[1].kind, 'text');
+      });
     });
   });
 });

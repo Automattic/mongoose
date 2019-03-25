@@ -1548,7 +1548,7 @@ describe('model: update:', function() {
       Parent.findOne({}, function(error, doc) {
         assert.ifError(error);
         assert.equal(doc.children.length, 1);
-        assert.ok(!doc.children[0].bar);
+        assert.ok(!doc.toObject({ virtuals: false }).children[0].bar);
         done();
       });
     });

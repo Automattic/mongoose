@@ -76,9 +76,22 @@ block content
     await doc.save();
     ```
 
-    The [`save()`](api.html#model_Model-save) function is generally the right way to update a document with
-    Mongoose. With `save()`, you get full [validation](validation.html)
-    and [middleware](middleware.html).
+    If the document with the corresponding `_id` is not found, Mongoose will
+    report a `DocumentNotFoundError`:
+
+    ```javascript
+    const doc = await MyModel.findOne();
+
+    // Delete the document so Mongoose won't be able to save changes
+    await MyModel.deleteOne({ _id: doc._id });
+
+    doc.name = 'foo';
+    await doc.save(); // Throws DocumentNotFoundError
+    ```
+
+    The [`save()`](api.html#model_Model-save) function is generally the right
+    way to update a document with Mongoose. With `save()`, you get full
+    [validation](validation.html) and [middleware](middleware.html).
 
     For cases when `save()` isn't flexible enough, Mongoose lets you create
     your own [MongoDB updates](https://docs.mongodb.com/manual/reference/operator/update/)

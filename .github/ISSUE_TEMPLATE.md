@@ -9,4 +9,6 @@
 
 **What is the expected behavior?**
 
-**Please mention your node.js, mongoose and MongoDB version.**
+**What are the versions of Node.js, Mongoose and MongoDB you are using? Note that "latest" is not a version.**
+
+<!-- You can print `mongoose.version` to get your current version of Mongoose: https://mongoosejs.com/docs/api.html#mongoose_Mongoose-version -->

@@ -820,6 +820,26 @@ block content
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
     ```
 
+    Note that Mongoose versioning is **not** a full [optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control)
+    solution. Use [mongoose-update-if-current](https://github.com/eoin-obrien/mongoose-update-if-current)
+    for OCC support. Mongoose versioning only operates on arrays:
+
+    ```javascript
+    // 2 copies of the same document
+    const doc1 = await Model.findOne({ _id });
+    const doc2 = await Model.findOne({ _id });
+
+    // Delete first 3 comments from `doc1`
+    doc1.comments.splice(0, 3);
+    await doc1.save();
+
+    // The below `save()` will throw a VersionError, because you're trying to
+    // modify the comment at index 1, and the above `splice()` removed that
+    // comment.
+    doc2.set('comments.1.body', 'new comment');
+    await doc2.save();
+    ```
+
     Document versioning can also be disabled by setting the `versionKey` to
     `false`.
     _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning)._

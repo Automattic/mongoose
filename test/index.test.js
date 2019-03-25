@@ -402,6 +402,32 @@ describe('mongoose module:', function() {
     return Promise.resolve();
   });
 
+  it('global plugins recompile schemas (gh-7572)', function() {
+    function helloPlugin(schema) {
+      schema.virtual('greeting').get(() => 'hello');
+    }
+
+    const m = new Mongoose();
+
+    m.plugin(helloPlugin);
+
+    const nested = new m.Schema({
+      baz: String
+    });
+    const outer = new m.Schema({
+      foo: String,
+      bar: nested
+    });
+
+    const Test = m.model('Test', outer);
+    const doc = new Test({ foo: 'abc', bar: { baz: 'def' } });
+
+    assert.equal(doc.greeting, 'hello');
+    assert.equal(doc.bar.greeting, 'hello');
+
+    return Promise.resolve();
+  });
+
   it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function(done) {
     const mongoose = new Mongoose();
 

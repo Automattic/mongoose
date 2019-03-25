@@ -27,7 +27,8 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/docs/transactions.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/model.middleware.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/docs/date.test.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/docs/date.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/es-next/lean.test.es6.js').toString())
 ];
 
 function getVersion() {
@@ -63,6 +64,8 @@ extends ../layout
 append style
   link(rel="stylesheet", href="/docs/css/inlinecpc.css")
   script(type="text/javascript" src="/docs/js/native.js")
+  style.
+    p { line-height: 1.5em }
 
 block content
   :markdown

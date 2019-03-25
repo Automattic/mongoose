@@ -7985,6 +7985,50 @@ describe('model: populate:', function() {
     });
   });
 
+  it('count with deeply nested (gh-7573)', function() {
+    const s1 = new mongoose.Schema({});
+
+    s1.virtual('s2', {
+      ref: 'gh7573_s2',
+      localField: '_id',
+      foreignField: 's1'
+    });
+
+    const s2 = new mongoose.Schema({
+      s1: {type: mongoose.Schema.Types.ObjectId, ref: 'schema1'}
+    });
+
+    s2.virtual('numS3', {
+      ref: 'gh7573_s3',
+      localField: '_id',
+      foreignField: 's2',
+      count: true
+    });
+
+    const s3 = new mongoose.Schema({
+      s2: {type: mongoose.Schema.Types.ObjectId, ref: 'schema2'}
+    });
+
+    return co(function*() {
+      const S1 = db.model('gh7573_s1', s1);
+      const S2 = db.model('gh7573_s2', s2);
+      const S3 = db.model('gh7573_s3', s3);
+
+      const s1doc = yield S1.create({});
+      const s2docs = yield S2.create([{ s1: s1doc }, { s1: s1doc }]);
+      yield S3.create([{ s2: s2docs[0] }, { s2: s2docs[0] }, { s2: s2docs[1] }]);
+
+      const doc = yield S1.findOne({}).populate({
+        path: 's2',
+        populate: {
+          path: 'numS3'
+        }
+      });
+
+      assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [1, 2]);
+    });
+  });
+
   it('explicit model option overrides refPath (gh-7273)', function() {
     const userSchema = new Schema({ name: String });
     const User1 = db.model('gh7273_User_1', userSchema);

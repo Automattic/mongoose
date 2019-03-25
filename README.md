@@ -66,7 +66,7 @@ Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 ```js
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/my_database');
+mongoose.connect('mongodb://localhost/my_database', {useNewUrlParser: true});
 ```
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.

@@ -5157,7 +5157,7 @@ describe('document', function() {
 
       const noteSchema = new Schema({
         title: { type: String, required: true },
-        body: { type: contentSchema }
+        body: contentSchema
       });
 
       const Note = db.model('gh5363', noteSchema);
@@ -7010,5 +7010,35 @@ describe('document', function() {
       doc = yield doc.update({ name: 'test2' });
       assert.equal(doc.name, 'test2');
     });
+  });
+
+  it('setters that modify `this` should work on single nested when overwriting (gh-7585)', function() {
+    const NameSchema = new Schema({
+      full: {
+        type: String,
+        set: function(v) {
+          this.first = 'foo';
+          this.last = 'bar';
+          return v + ' baz';
+        }
+      },
+      first: String,
+      last: String
+    }, { _id: false });
+
+    const User = db.model('gh7585', new Schema({
+      name: {
+        type: NameSchema,
+        default: {}
+      }
+    }));
+
+    const s = new User();
+    s.name = { full: 'test' };
+    assert.equal(s.name.first, 'foo');
+    assert.equal(s.name.last, 'bar');
+    assert.equal(s.name.full, 'test baz');
+
+    return Promise.resolve();
   });
 });

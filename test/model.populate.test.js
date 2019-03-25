@@ -8020,14 +8020,12 @@ describe('model: populate:', function() {
 
       const doc = yield S1.findOne({}).populate({
         path: 's2',
-        sort: { _id: 1 },
         populate: {
           path: 'numS3'
         }
       });
 
-      assert.equal(doc.s2[0].numS3, 2);
-      assert.equal(doc.s2[1].numS3, 1);
+      assert.deepEqual(doc.s2.map(s => s.numS3).sort(), [1, 2]);
     });
   });
 

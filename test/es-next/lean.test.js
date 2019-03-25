@@ -182,7 +182,10 @@ describe('Lean Tutorial', function() {
     ]);
 
     // Execute a lean query
-    const group = await Group.findOne().lean().populate('members');
+    const group = await Group.findOne().lean().populate({
+      path: 'members',
+      sort: { name: 1 }
+    });
     group.members[0].name; // 'Benjamin Sisko'
     group.members[1].name; // 'Kira Nerys'
 

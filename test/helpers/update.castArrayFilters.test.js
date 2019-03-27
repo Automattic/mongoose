@@ -122,10 +122,7 @@ describe('castArrayFilters', function() {
     const q = new Query();
     q.schema = schema;
 
-    const p = {
-      'arr.$[arr].nestedArr.$[nArr].code': true
-    }
-  
+    const p = { 'arr.$[arr].nestedArr.$[nArr].code': true };
     const opts = {
       arrayFilters: [
         { 'arr.nestedArr.nestedId': '2' },

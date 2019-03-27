@@ -7041,4 +7041,23 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('handles setting embedded doc to Object.assign() from another doc (gh-7645)', function() {
+    const profileSchema = new Schema({ name: String, email: String });
+    const companyUserSchema = new Schema({
+      profile: {
+        type: profileSchema,
+        default: {}
+      }
+    });
+
+    const CompanyUser = db.model('gh7645', companyUserSchema);
+
+    const cu = new CompanyUser({ profile: { name: 'foo', email: 'bar' } });
+    cu.profile = Object.assign({}, cu.profile);
+
+    assert.equal(cu.profile.name, 'foo');
+    assert.equal(cu.profile.email, 'bar');
+    assert.doesNotThrow(() => cu.toObject());
+  });
 });

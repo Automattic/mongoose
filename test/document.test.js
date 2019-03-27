@@ -7058,6 +7058,6 @@ describe('document', function() {
 
     assert.equal(cu.profile.name, 'foo');
     assert.equal(cu.profile.email, 'bar');
-    assert.doesNotThrow(() => cu.toObject());
+    cu.toObject(); // shouldn't throw
   });
 });

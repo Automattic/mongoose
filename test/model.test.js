@@ -3372,15 +3372,17 @@ describe('Model', function() {
         });
     });
 
-    it.skip('update()', function(done) {
+    it('update()', function(done) {
       const col = 'BlogPost' + random();
       const BlogPost = db.model(col, bpSchema);
 
       BlogPost.create({title: 'interoperable update as promise'}, function(err) {
         assert.ifError(err);
         const query = BlogPost.update({title: 'interoperable update as promise'}, {title: 'interoperable update as promise delta'});
-        query.exec(function(err) {
+        query.exec(function(err, res) {
           assert.ifError(err);
+          assert.equal(res.n, 1);
+          assert.equal(res.nModified, 1);
           BlogPost.count({title: 'interoperable update as promise delta'}, function(err, count) {
             assert.ifError(err);
             assert.equal(count, 1);

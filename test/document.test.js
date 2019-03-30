@@ -7060,4 +7060,36 @@ describe('document', function() {
     assert.equal(cu.profile.email, 'bar');
     cu.toObject(); // shouldn't throw
   });
+
+  it('setting single nested subdoc with custom date types and getters/setters (gh-7601)', function() {
+    const moment = require('moment');
+
+    const schema = new Schema({
+      start: { type: Date, get: get, set: set, required: true },
+      end: { type: Date, get: get, set: set, required: true }
+    }, { toObject: { getters: true } });
+    function get(v) {
+      return moment(v);
+    }
+    function set(v) {
+      return v.toDate();
+    }
+    const parentSchema = new Schema({
+      nested: schema
+    });
+    const Model = db.model('gh7601', parentSchema);
+
+    return co(function*() {
+      const doc = yield Model.create({
+        nested: { start: moment('2019-01-01'), end: moment('2019-01-02') }
+      });
+
+      doc.nested = { start: moment('2019-03-01'), end: moment('2019-04-01') };
+      yield doc.save();
+
+      const _doc = yield Model.collection.findOne();
+      assert.ok(_doc.nested.start instanceof Date);
+      assert.ok(_doc.nested.end instanceof Date);
+    });
+  });
 });

@@ -7092,4 +7092,22 @@ describe('document', function() {
       assert.ok(_doc.nested.end instanceof Date);
     });
   });
+
+  it('get() underneath alias (gh-7592)', function() {
+    const photoSchema = new Schema({
+      foo: String
+    });
+
+    const pageSchema = new Schema({
+      p: { type: [photoSchema], alias: 'photos' }
+    });
+    const Page = db.model('gh7592', pageSchema);
+
+    return co(function*() {
+      const doc = yield Page.create({ p: [{ foo: 'test' }] });
+
+      assert.equal(doc.p[0].foo, 'test');
+      assert.equal(doc.get('photos.0.foo'), 'test');
+    });
+  });
 });

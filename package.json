@@ -30,7 +30,8 @@
     "ms": "2.1.1",
     "regexp-clone": "0.0.1",
     "safe-buffer": "5.1.2",
-    "sliced": "1.0.1"
+    "sliced": "1.0.1",
+    "sift": "7.0.1"
   },
   "devDependencies": {
     "acorn": "5.7.3",

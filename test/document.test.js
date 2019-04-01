@@ -7093,7 +7093,7 @@ describe('document', function() {
     });
   });
 
-  it('get() underneath alias (gh-7592)', function() {
+  it('get() and set() underneath alias (gh-7592)', function() {
     const photoSchema = new Schema({
       foo: String
     });
@@ -7108,6 +7108,10 @@ describe('document', function() {
 
       assert.equal(doc.p[0].foo, 'test');
       assert.equal(doc.get('photos.0.foo'), 'test');
+
+      doc.set('photos.0.foo', 'bar');
+      assert.equal(doc.p[0].foo, 'bar');
+      assert.equal(doc.get('photos.0.foo'), 'bar');
     });
   });
 });

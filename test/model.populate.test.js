@@ -4995,7 +4995,7 @@ describe('model: populate:', function() {
             { minDate: '2016-01-01' },
             { minDate: '2016-01-01', alternateProperty: true }
           ]);
-          const as = yield A.create([
+          yield A.create([
             { name: 'old', createdAt: '2015-06-01', b: bs[0]._id, b2: bs[1]._id },
             { name: 'newer', createdAt: '2017-06-01', b: bs[0]._id, b2: bs[1]._id },
             { name: 'newest', createdAt: '2019-06-01', b: bs[0]._id, b2: bs[1]._id }
@@ -5005,11 +5005,11 @@ describe('model: populate:', function() {
 
           let b = bs[0];
           assert.equal(b.as.length, 2);
-          assert.deepEqual(b.as.map(a => a.name), ['newer', 'newest']);
+          assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
 
           b = bs[1];
           assert.equal(b.as.length, 2);
-          assert.deepEqual(b.as.map(a => a.name), ['newer', 'newest']);
+          assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
         });
       });
 

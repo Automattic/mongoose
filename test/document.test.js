@@ -7092,4 +7092,77 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('handles setting embedded doc to Object.assign() from another doc (gh-7645)', function() {
+    const profileSchema = new Schema({ name: String, email: String });
+    const companyUserSchema = new Schema({
+      profile: {
+        type: profileSchema,
+        default: {}
+      }
+    });
+
+    const CompanyUser = db.model('gh7645', companyUserSchema);
+
+    const cu = new CompanyUser({ profile: { name: 'foo', email: 'bar' } });
+    cu.profile = Object.assign({}, cu.profile);
+
+    assert.equal(cu.profile.name, 'foo');
+    assert.equal(cu.profile.email, 'bar');
+    cu.toObject(); // shouldn't throw
+  });
+
+  it('setting single nested subdoc with custom date types and getters/setters (gh-7601)', function() {
+    const moment = require('moment');
+
+    const schema = new Schema({
+      start: { type: Date, get: get, set: set, required: true },
+      end: { type: Date, get: get, set: set, required: true }
+    }, { toObject: { getters: true } });
+    function get(v) {
+      return moment(v);
+    }
+    function set(v) {
+      return v.toDate();
+    }
+    const parentSchema = new Schema({
+      nested: schema
+    });
+    const Model = db.model('gh7601', parentSchema);
+
+    return co(function*() {
+      const doc = yield Model.create({
+        nested: { start: moment('2019-01-01'), end: moment('2019-01-02') }
+      });
+
+      doc.nested = { start: moment('2019-03-01'), end: moment('2019-04-01') };
+      yield doc.save();
+
+      const _doc = yield Model.collection.findOne();
+      assert.ok(_doc.nested.start instanceof Date);
+      assert.ok(_doc.nested.end instanceof Date);
+    });
+  });
+
+  it('get() and set() underneath alias (gh-7592)', function() {
+    const photoSchema = new Schema({
+      foo: String
+    });
+
+    const pageSchema = new Schema({
+      p: { type: [photoSchema], alias: 'photos' }
+    });
+    const Page = db.model('gh7592', pageSchema);
+
+    return co(function*() {
+      const doc = yield Page.create({ p: [{ foo: 'test' }] });
+
+      assert.equal(doc.p[0].foo, 'test');
+      assert.equal(doc.get('photos.0.foo'), 'test');
+
+      doc.set('photos.0.foo', 'bar');
+      assert.equal(doc.p[0].foo, 'bar');
+      assert.equal(doc.get('photos.0.foo'), 'bar');
+    });
+  });
 });

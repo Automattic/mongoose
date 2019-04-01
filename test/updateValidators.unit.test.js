@@ -1,5 +1,7 @@
 'use strict';
-const assert = require('power-assert');
+
+const Schema = require('../lib/schema');
+const assert = require('assert');
 const updateValidators = require('../lib/helpers/updateValidators');
 const emitter = require('events').EventEmitter;
 
@@ -71,6 +73,18 @@ describe('updateValidators', function() {
         assert.equal(schema.doValidate.calls.length, 1);
         assert.equal(schema._getSchema.calls[0], 'test');
         assert.deepEqual(schema.doValidate.calls[0].v, []);
+        done();
+      });
+    });
+
+    it('doesnt flatten decimal128 (gh-7561)', function(done) {
+      const Decimal128Type = require('../lib/types/decimal128');
+      const schema = new Schema({ test: { type: 'Decimal128', required: true } });
+      const fn = updateValidators({}, schema, {
+        test: new Decimal128Type('33.426')
+      }, {});
+      fn(function(err) {
+        assert.ifError(err);
         done();
       });
     });

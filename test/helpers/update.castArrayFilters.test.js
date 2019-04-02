@@ -111,4 +111,30 @@ describe('castArrayFilters', function() {
 
     done();
   });
+
+  it('handles deeply nested arrays (gh-7603)', function() {
+    const schema = new Schema({
+      arr: [{
+        id: Number,
+        nestedArr: [{ nestedId: Number, code: Boolean }]
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    const p = { 'arr.$[arr].nestedArr.$[nArr].code': true };
+    const opts = {
+      arrayFilters: [
+        { 'arr.nestedArr.nestedId': '2' },
+        { 'nArr.nestedId': '2' }
+      ]
+    };
+
+    q.updateOne({}, p, opts);
+
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0]['arr.nestedArr.nestedId'], 2);
+    assert.strictEqual(q.options.arrayFilters[1]['nArr.nestedId'], 2);
+  });
 });

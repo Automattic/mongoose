@@ -1,3 +1,14 @@
+5.4.21 / 2019-04-02
+===================
+ * fix(updateValidators): run update validators correctly on Decimal128 paths #7561
+ * fix(update): cast array filters in nested doc arrays correctly #7603
+ * fix(document): allow .get() + .set() with aliased paths #7592
+ * fix(document): ensure custom getters on single nested subdocs don't get persisted if toObject.getters = true #7601
+ * fix(document): support setting subdoc path to subdoc copied using object rest `{...doc}` #7645
+ * docs(schema): correct out-of-date list of reserved words #7593
+ * docs(model+query): add link to update results docs and examples of using results of updateOne(), etc. #7582
+ * docs: use atomic as opposed to $atomic consistently #7649 [720degreeLotus](https://github.com/720degreeLotus)
+
 5.4.20 / 2019-03-25
 ===================
  * docs(tutorials): add tutorial about `lean()` #7640

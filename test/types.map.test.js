@@ -605,11 +605,11 @@ describe('Map', function() {
     });
 
     const GoodsInfo = db.model('gh7630', schema);
-  
+
     let goodsInfo = new GoodsInfo();
     goodsInfo.describe = new Map();
     goodsInfo.describe.set('brand', new Map([['en', 'Hermes']]));
-  
+
     return co(function*() {
       yield goodsInfo.save();
 

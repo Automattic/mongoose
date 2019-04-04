@@ -148,6 +148,24 @@ describe('connections:', function() {
       }).catch(done);
     });
 
+    it('connection plugins (gh-7378)', function() {
+      const conn1 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
+        { useNewUrlParser: true });
+      const conn2 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
+        { useNewUrlParser: true });
+
+      const called = [];
+      conn1.plugin(schema => called.push(schema));
+
+      conn2.model('Test', new Schema({}));
+      assert.equal(called.length, 0);
+
+      const schema = new Schema({});
+      conn1.model('Test', schema);
+      assert.equal(called.length, 1);
+      assert.equal(called[0], schema);
+    });
+
     describe('connection events', function() {
       beforeEach(function() {
         this.timeout(60000);

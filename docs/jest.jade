@@ -42,11 +42,17 @@ block content
     ## Timer Mocks
 
     Absolutely do **not** use [timer mocks](https://jestjs.io/docs/en/timer-mocks.html)
-    when testing Mongoose apps. Mongoose devs have already refactored out code
+    when testing Mongoose apps. Fake timers stub out global functions like
+    `setTimeout()` and `setInterval()`, which causes problems when an underlying
+    library uses these functions. The MongoDB Node.js driver uses these functions
+    for deferring work until the next tick of the event loop and for monitoring
+    connections to the MongoDB server.
+    
+    Mongoose devs have already refactored out code
     to [avoid using `setImmediate()`](https://github.com/Automattic/mongoose/issues/6074)
     to defer work to the next tick of the event loop, but we can't reasonably
     ensure that every library Mongoose depends on doesn't use `setImmediate()`.
-    
+
     Mongoose uses `nextTick()`, which [Jest's underlying dependency explicitly doesn't stub by default](https://sinonjs.org/releases/latest/fake-timers/).
     But, `process.nextTick()` isn't the same as `setImmediate()` because of
     [microtasks vs macrotasks](https://abc.danch.me/microtasks-macrotasks-more-on-the-event-loop-881557d7af6f#2261),

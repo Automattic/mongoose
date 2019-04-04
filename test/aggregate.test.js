@@ -8,9 +8,10 @@ const assert = require('assert');
 const co = require('co');
 const start = require('./common');
 
+const Aggregate = require('../lib/aggregate');
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
-const Aggregate = require('../lib/aggregate');
 
 /**
  * Test data
@@ -1000,6 +1001,26 @@ describe('aggregate: ', function() {
           assert.deepEqual(res, []);
           assert.equal(called, 1);
           done();
+        });
+      });
+
+      it('setting option in pre (gh-7606)', function() {
+        const s = new Schema({ name: String });
+
+        s.pre('aggregate', function(next) {
+          this.options.collation = { locale: 'en_US', strength: 1 };
+          next();
+        });
+
+        const M = db.model('gh7606', s);
+
+        return co(function*() {
+          yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+
+          const docs = yield M.aggregate([{ $sort: { name: 1 } }]);
+
+          assert.equal(docs[0].name, 'alpha');
+          assert.equal(docs[1].name, 'Zeta');
         });
       });
 

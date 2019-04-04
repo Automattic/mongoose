@@ -6,3 +6,5 @@ tools/
 test/es-next/
 test/files/
 dist/
+
+search.js

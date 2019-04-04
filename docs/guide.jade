@@ -21,8 +21,21 @@ block content
   .important
     :markdown
       If you haven't yet done so, please take a minute to read the [quickstart](./index.html) to get an idea of how Mongoose works.
-      If you are migrating from 4.x to 5.x please take a moment to read the [migration guide](https://github.com/Automattic/mongoose/blob/master/migrating_to_5.md).
+      If you are migrating from 4.x to 5.x please take a moment to read the [migration guide](/docs/migrating_to_5.html).
   :markdown
+    <ul class="toc">
+      <li><a href="#models">Defining your schema</a></li>
+      <li><a href="#models">Creating a model</a></li>
+      <li><a href="#methods">Instance methods</a></li>
+      <li><a href="#statics">Statics</a></li>
+      <li><a href="#query-helpers">Query Helpers</a></li>
+      <li><a href="#indexes">Indexes</a></li>
+      <li><a href="#virtuals">Virtuals</a></li>
+      <li><a href="#aliases">Aliases</a></li>
+      <li><a href="#options">Options</a></li>
+      <li><a href="#plugins">Pluggable</a></li>
+    </ul>
+
     <h3 id="definition"><a href="#definition">Defining your schema</a></h3>
 
     Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB
@@ -805,6 +818,26 @@ block content
     const Thing = mongoose.model('Thing', schema);
     const thing = new Thing({ name: 'mongoose v3' });
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
+    ```
+
+    Note that Mongoose versioning is **not** a full [optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control)
+    solution. Use [mongoose-update-if-current](https://github.com/eoin-obrien/mongoose-update-if-current)
+    for OCC support. Mongoose versioning only operates on arrays:
+
+    ```javascript
+    // 2 copies of the same document
+    const doc1 = await Model.findOne({ _id });
+    const doc2 = await Model.findOne({ _id });
+
+    // Delete first 3 comments from `doc1`
+    doc1.comments.splice(0, 3);
+    await doc1.save();
+
+    // The below `save()` will throw a VersionError, because you're trying to
+    // modify the comment at index 1, and the above `splice()` removed that
+    // comment.
+    doc2.set('comments.1.body', 'new comment');
+    await doc2.save();
     ```
 
     Document versioning can also be disabled by setting the `versionKey` to

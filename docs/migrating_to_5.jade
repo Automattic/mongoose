@@ -6,9 +6,24 @@ block append style
       padding-right: 15px;
     }
 
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
-  h2 Migrating from 4.x to 5.x
   :markdown
+    ## Migrating from 4.x to 5.x
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
+
     There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/blob/master/History.md)
     you should be aware of when migrating from Mongoose 4.x to Mongoose 5.x.
 
@@ -111,8 +126,8 @@ block content
     ```javascript
     const schema = new Schema({ name: String });
     schema.path('name').
-      get(() => console.log('This will print 2nd')).
-      get(() => console.log('This will print first'));
+      set(() => console.log('This will print 2nd')).
+      set(() => console.log('This will print first'));
     ```
 
     In 5.x, setters run in the order they're declared.
@@ -120,8 +135,8 @@ block content
     ```javascript
     const schema = new Schema({ name: String });
     schema.path('name').
-      get(() => console.log('This will print first')).
-      get(() => console.log('This will print 2nd'));
+      set(() => console.log('This will print first')).
+      set(() => console.log('This will print 2nd'));
     ```
 
     <h3 id="id-getter"><a href="#id-getter">

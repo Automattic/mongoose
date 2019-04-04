@@ -22,79 +22,125 @@ block content
     to documents as stored in MongoDB. Each document is an instance of its
     [Model](./models.html).
 
+    <ul class="toc">
+      <li><a href="#documents-vs-models">Documents vs Models</a></li>
+      <li><a href="#retrieving">Retrieving</a></li>
+      <li><a href="#updating">Updating</a></li>
+      <li><a href="#validating">Validating</a></li>
+      <li><a href="#overwriting">Overwriting</a></li>
+    </ul>
+
+    ### Documents vs Models
+
+    [Document](api.html#Document) and [Model](api.html#Model) are distinct
+    classes in Mongoose. The Model class is a subclass of the Document class.
+    When you use the [Model constructor](api.html#Model), you create a
+    new document.
+
+    ```javascript
+    const MyModel = mongoose.model('Test', new Schema({ name: String }));
+    const doc = new MyModel();
+
+    doc instanceof MyModel; // true
+    doc instanceof mongoose.Model; // true
+    doc instanceof mongoose.Document; // true
+    ```
+
+    In Mongoose, a "document" generally means an instance of a model.
+    You should not have to create an instance of the Document class without
+    going through a model.
+
     ### Retrieving
 
-    There are many ways to retrieve documents from MongoDB. We won't cover that
-    in this section. See the chapter on [querying](./queries.html) for detail.
+    When you load documents from MongoDB using model functions like [`findOne()`](api.html#model_Model.findOne),
+    you get a Mongoose document back.
+
+    ```javascript
+    const doc = await MyModel.findOne();
+
+    doc instanceof MyModel; // true
+    doc instanceof mongoose.Model; // true
+    doc instanceof mongoose.Document; // true
+    ```
 
     ### Updating
 
-    There are a number of ways to update documents. We'll first look at a
-    traditional approach using [findById](./api.html#model_Model.findById):
+    Mongoose documents track changes. You can modify a document using vanilla
+    JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://docs.mongodb.com/manual/reference/operator/update/).
 
     ```javascript
-    Tank.findById(id, function (err, tank) {
-      if (err) return handleError(err);
+    doc.name = 'foo';
 
-      tank.size = 'large';
-      tank.save(function (err, updatedTank) {
-        if (err) return handleError(err);
-        res.send(updatedTank);
-      });
-    });
+    // Mongoose sends a `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`
+    // to MongoDB.
+    await doc.save();
     ```
 
-    You can also use [`.set()`](./api.html#document_Document-set)
-    to modify documents. Under the hood, `tank.size = 'large';` becomes
-    `tank.set({ size: 'large' })`.
+    If the document with the corresponding `_id` is not found, Mongoose will
+    report a `DocumentNotFoundError`:
 
     ```javascript
-    Tank.findById(id, function (err, tank) {
-      if (err) return handleError(err);
+    const doc = await MyModel.findOne();
 
-      tank.set({ size: 'large' });
-      tank.save(function (err, updatedTank) {
-        if (err) return handleError(err);
-        res.send(updatedTank);
-      });
-    });
+    // Delete the document so Mongoose won't be able to save changes
+    await MyModel.deleteOne({ _id: doc._id });
+
+    doc.name = 'foo';
+    await doc.save(); // Throws DocumentNotFoundError
     ```
 
-    This approach involves first retrieving the document from Mongo, then
-    issuing an update command (triggered by calling `save`). However, if we
-    don't need the document returned in our application and merely want to
-    update a property in the database directly,
-    [Model#update](./api.html#model_Model.update) is right for us:
+    The [`save()`](api.html#model_Model-save) function is generally the right
+    way to update a document with Mongoose. With `save()`, you get full
+    [validation](validation.html) and [middleware](middleware.html).
+
+    For cases when `save()` isn't flexible enough, Mongoose lets you create
+    your own [MongoDB updates](https://docs.mongodb.com/manual/reference/operator/update/)
+    with casting, [middleware](middleware.html#notes), and [limited validation](validation.html#update-validators).
 
     ```javascript
-    Tank.update({ _id: id }, { $set: { size: 'large' }}, callback);
+    // Update all documents in the `mymodels` collection
+    await MyModel.updateMany({}, { $set: { name: 'foo' } });
     ```
 
-    If we do need the document returned in our application there is another,
-    often [better](./api.html#model_Model.findByIdAndUpdate), option:
-
-    ```javascript
-    Tank.findByIdAndUpdate(id, { $set: { size: 'large' }}, { new: true }, function (err, tank) {
-      if (err) return handleError(err);
-      res.send(tank);
-    });
-    ```
-
-    The `findAndUpdate/Remove` static methods all make a change to at most one
-    document, and return it with just one call to the database. There
-    [are](./api.html#model_Model.findByIdAndRemove)
-    [several](./api.html#model_Model.findOneAndUpdate)
-    [variations](./api.html#model_Model.findOneAndRemove) on the
-    [findAndModify](http://www.mongodb.org/display/DOCS/findAndModify+Command)
-    theme. Read the [API](./api.html) docs for more detail.
-
-    _Note that `findAndUpdate/Remove` do *not* execute any hooks or validation before making the change in the database. You can use the [`runValidators` option](/docs/validation.html#update-validators) to access a limited subset of document validation. However, if you need hooks and full document validation, first query for the document and then `save()` it._
+    _Note that `update()`, `updateMany()`, `findOneAndUpdate()`, etc. do *not*
+    execute `save()` middleware. If you need save middleware and full validation,
+    first query for the document and then `save()` it._
 
     ### Validating
 
-    Documents are validated before they are saved. Read the
-    [api](./api.html#document_Document-validate) docs or the
-    [validation](./validation.html) chapter for detail.
+    Documents are casted validated before they are saved. Mongoose first casts
+    values to the specified type and then validates them. Internally, Mongoose
+    calls the document's [`validate()` method](api.html#document_Document-validate)
+    before saving.
+
+    ```javascript
+    const schema = new Schema({ name: String, age: { type: Number, min: 0 } });
+    const Person = mongoose.model('Person', schema);
+
+    let p = new Person({ name: 'foo', age: 'bar' });
+    // Cast to Number failed for value "bar" at path "age"
+    await p.validate();
+
+    let p2 = new Person({ name: 'foo', age: -1 });
+    // Path `age` (-1) is less than minimum allowed value (0).
+    await p2.validate();
+    ```
+
+    Mongoose also supports limited validation on updates using the [`runValidators` option](validation.html#update-validators).
+    Mongoose casts parameters to query functions like `findOne()`, `updateOne()`
+    by default. However, Mongoose does _not_ run validation on query function
+    parameters by default. You need to set `runValidators: true` for Mongoose
+    to validate.
+
+    ```javascript
+    // Cast to number failed for value "bar" at path "age"
+    await Person.updateOne({}, { age: 'bar' });
+
+    // Path `age` (-1) is less than minimum allowed value (0).
+    await Person.updateOne({}, { age: -1 }, { runValidators: true });
+    ```
+
+    Read the [validation](./validation.html) guide for more details.
 
     ### Overwriting
 

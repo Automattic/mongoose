@@ -30,4 +30,41 @@ describe('schematype', function() {
     assert.deepEqual(s.path('name')._index, {sparse: true});
     done();
   });
+
+  describe('checkRequired()', function() {
+    it('with inherits (gh-7486)', function() {
+      const m = new mongoose.Mongoose();
+
+      function CustomNumber(path, options) {
+        m.Schema.Types.Number.call(this, path, options);
+      }
+      CustomNumber.prototype.cast = v => v;
+      require('util').inherits(CustomNumber, m.Schema.Types.Number);
+      mongoose.Schema.Types.CustomNumber = CustomNumber;
+
+      function CustomString(path, options) {
+        m.Schema.Types.String.call(this, path, options);
+      }
+      CustomString.prototype.cast = v => v;
+      require('util').inherits(CustomString, m.Schema.Types.String);
+      mongoose.Schema.Types.CustomString = CustomString;
+
+      function CustomObjectId(path, options) {
+        m.Schema.Types.ObjectId.call(this, path, options);
+      }
+      CustomObjectId.prototype.cast = v => v;
+      require('util').inherits(CustomObjectId, m.Schema.Types.ObjectId);
+      mongoose.Schema.Types.CustomObjectId = CustomObjectId;
+
+      const s = new Schema({
+        foo: { type: CustomNumber, required: true },
+        bar: { type: CustomString, required: true },
+        baz: { type: CustomObjectId, required: true }
+      });
+      const M = m.model('Test', s);
+      const doc = new M({ foo: 1, bar: '2', baz: new mongoose.Types.ObjectId() });
+      const err = doc.validateSync();
+      assert.ifError(err);
+    });
+  });
 });

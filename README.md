@@ -12,7 +12,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 [mongoosejs.com](http://mongoosejs.com/)
 
-[Mongoose 5.0.0](https://github.com/Automattic/mongoose/blob/master/History.md#500--2018-01-17) was released on January 17, 2018. You can find more details on backwards breaking changes in 5.0.0 on [GitHub](https://github.com/Automattic/mongoose/blob/master/migrating_to_5.md).
+[Mongoose 5.0.0](https://github.com/Automattic/mongoose/blob/master/History.md#500--2018-01-17) was released on January 17, 2018. You can find more details on [backwards breaking changes in 5.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_5.html).
 
 ## Support
 
@@ -66,7 +66,7 @@ Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 ```js
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/my_database');
+mongoose.connect('mongodb://localhost/my_database', {useNewUrlParser: true});
 ```
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.

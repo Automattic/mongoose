@@ -139,13 +139,8 @@ block content
 
     <hr id="destructured-imports" />
 
-    **Q**. When I use destructuring imports like `import { model } from 'mongoose'`, I get an error:
-
-    ```
-    TypeError: Cannot read property 'modelSchemas' of undefined
-    ```
-
-    What causes this issue and how can I fix it?
+    **Q**. When I use named imports like `import { set } from 'mongoose'`, I
+    get a `TypeError`. What causes this issue and how can I fix it?
 
     **A**. The only import syntax Mongoose supports is `import mongoose from 'mongoose'`.
     Syntaxes like `import * from 'mongoose'` or `import { model } from 'mongoose'` do **not** work.

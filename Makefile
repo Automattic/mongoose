@@ -8,8 +8,11 @@ LEGACY_BRANCH = 4.x
 test:
 	./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
-docs: ghpages merge_stable docclean gendocs
+docs: ghpages merge_stable docclean gendocs search
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
+
+search:
+	node docs/search.js
 
 gendocs:
 	node website.js
@@ -52,5 +55,3 @@ copylegacy:
 	mkdir -p ./docs/$(LEGACY_BRANCH)
 	cp -R ./tmp/* ./docs/$(LEGACY_BRANCH)/
 	rm -rf ./tmp
-
-.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable

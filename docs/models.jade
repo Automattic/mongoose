@@ -39,14 +39,22 @@ block content
 
   h3(id="compiling") Compiling your first model
   :markdown
+    When you call `mongoose.model()` on a schema, Mongoose _compiles_ a model
+    for you.
+
     ```javascript
     var schema = new mongoose.Schema({ name: 'string', size: 'string' });
     var Tank = mongoose.model('Tank', schema);
     ```
   :markdown
-    The first argument is the _singular_ name of the collection your model is for. ** Mongoose automatically looks for the _plural_ version of your model name. **
-    Thus, for the example above, the model Tank is for the **tanks** collection in the database.
-    The `.model()` function makes a copy of `schema`. Make sure that you've added everything you want to `schema` before calling `.model()`!
+    The first argument is the _singular_ name of the collection your model is
+    for. ** Mongoose automatically looks for the plural, lowercased version of your model name. **
+    Thus, for the example above, the model Tank is for the **tanks** collection
+    in the database.
+
+    **Note:** The `.model()` function makes a copy of `schema`. Make sure that
+    you've added everything you want to `schema`, including hooks,
+    before calling `.model()`!
 
   h3(id="constructing-documents") Constructing Documents
   :markdown
@@ -79,7 +87,7 @@ block content
     uses is open. Every model has an associated connection. When you use
     `mongoose.model()`, your model will use the default mongoose connection.
     ```javascript
-    mongoose.connect('localhost', 'gettingstarted');
+    mongoose.connect('mongodb://localhost/gettingstarted', {useNewUrlParser: true});
     ```
   :markdown
     If you create a custom connection, use that connection's `model()` function

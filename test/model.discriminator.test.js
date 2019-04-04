@@ -4,7 +4,7 @@
  * Test dependencies.
  */
 
-const assert = require('power-assert');
+const assert = require('assert');
 const clone = require('../lib/utils').clone;
 const co = require('co');
 const random = require('../lib/utils').random;
@@ -63,17 +63,23 @@ EmployeeSchema.set('toObject', {getters: true, virtuals: false});
 EmployeeSchema.set('toJSON', {getters: false, virtuals: true});
 
 describe('model', function() {
+  let db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   describe('discriminator()', function() {
-    var db, Person, Employee;
+    var Person, Employee;
 
     before(function() {
       db = start();
       Person = db.model('model-discriminator-person', PersonSchema);
       Employee = Person.discriminator('model-discriminator-employee', EmployeeSchema);
-    });
-
-    after(function(done) {
-      db.close(done);
     });
 
     it('model defaults without discriminator', function(done) {
@@ -389,22 +395,53 @@ describe('model', function() {
         done();
       });
 
-      it('applyPluginsToDiscriminators (gh-4965)', function(done) {
-        var schema = new Schema({ test: String });
-        mongoose.set('applyPluginsToDiscriminators', true);
-        var called = 0;
-        mongoose.plugin(function() {
-          ++called;
-        });
-        var Model = mongoose.model('gh4965', schema);
-        var childSchema = new Schema({
-          test2: String
-        });
-        Model.discriminator('gh4965_0', childSchema);
-        assert.equal(called, 2);
+      describe('applyPluginsToDiscriminators', function() {
+        let m;
 
-        mongoose.set('applyPluginsToDiscriminators', false);
-        done();
+        beforeEach(function() {
+          m = new mongoose.Mongoose();
+          m.set('applyPluginsToDiscriminators', true);
+        });
+
+        it('works (gh-4965)', function(done) {
+          var schema = new m.Schema({ test: String });
+          var called = 0;
+          m.plugin(function() {
+            ++called;
+          });
+          var Model = m.model('gh4965', schema);
+          var childSchema = new m.Schema({
+            test2: String
+          });
+          Model.discriminator('gh4965_0', childSchema);
+          assert.equal(called, 2);
+  
+          done();
+        });
+
+        it('works with customized options (gh-7458)', function() {
+          m.plugin((schema) => {
+            schema.options.versionKey = false;
+            schema.options.minimize = false;
+          });
+          
+          const schema = new m.Schema({
+            type: {type: String},
+            something: {type: String}
+          }, {
+            discriminatorKey: 'type'
+          });
+          const Model = m.model('Test', schema);
+          
+          const subSchema = new m.Schema({
+            somethingElse: {type: String}
+          });
+
+          // Should not throw
+          const SubModel = Model.discriminator('TestSub', subSchema);
+
+          return Promise.resolve();
+        });
       });
 
       it('cloning with discriminator key (gh-4387)', function(done) {
@@ -475,10 +512,11 @@ describe('model', function() {
         });
         var childCalls = 0;
         var childValidateCalls = 0;
-        childSchema.pre('validate', function(next) {
+        var preValidate = function preValidate(next) {
           ++childValidateCalls;
           next();
-        });
+        };
+        childSchema.pre('validate', preValidate);
         childSchema.pre('save', function(next) {
           ++childCalls;
           next();
@@ -506,7 +544,9 @@ describe('model', function() {
           heir: { name: 'Robb Stark' },
           children: [{ name: 'Jon Snow' }]
         };
-        Parent.create(obj, function(error, doc) {
+        var doc = new Parent(obj);
+
+        doc.save(function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.name, 'Ned Stark');
           assert.equal(doc.heir.name, 'Robb Stark');
@@ -1230,6 +1270,73 @@ describe('model', function() {
       assert.equal(circle.radius, 3);
 
       done();
+    });
+
+    it('with subclassing (gh-7547)', function() {
+      const options = { discriminatorKey: "kind" };
+
+      const eventSchema = new mongoose.Schema({ time: Date }, options);
+      const eventModelUser1 =
+        mongoose.model('gh7547_Event', eventSchema, 'user1_events');
+      const eventModelUser2 =
+        mongoose.model('gh7547_Event', eventSchema, 'user2_events');
+
+      const discSchema = new mongoose.Schema({ url: String }, options);
+      const clickEventUser1 = eventModelUser1.
+        discriminator('gh7547_ClickedEvent', discSchema);
+      const clickEventUser2 =
+        eventModelUser2.discriminators['gh7547_ClickedEvent'];
+
+      assert.equal(clickEventUser1.collection.name, 'user1_events');
+      assert.equal(clickEventUser2.collection.name, 'user2_events');
+    });
+
+    it('uses correct discriminator when using `new BaseModel` (gh-7586)', function() {
+      const options = { discriminatorKey: 'kind' };
+
+      const BaseModel = mongoose.model('gh7586_Base',
+        Schema({ name: String }, options));
+      const ChildModel = BaseModel.discriminator('gh7586_Child',
+        Schema({ test: String }, options));
+
+      const doc = new BaseModel({ kind: 'gh7586_Child', name: 'a', test: 'b' });
+      assert.ok(doc instanceof ChildModel);
+      assert.equal(doc.test, 'b');
+    });
+
+    it('does not project in embedded discriminator key if it is the only selected field (gh-7574)', function() {
+      const sectionSchema = Schema({ title: String }, { discriminatorKey: 'kind' });
+      const imageSectionSchema = Schema({ href: String });
+      const textSectionSchema = Schema({ text: String });
+
+      const documentSchema = Schema({
+        title: String,
+        sections: [ sectionSchema ]
+      });
+
+      const sectionsType = documentSchema.path('sections');
+      sectionsType.discriminator('image', imageSectionSchema);
+      sectionsType.discriminator('text', textSectionSchema);
+
+      const Model = db.model('gh7574', documentSchema);
+
+      return co(function*() {
+        yield Model.create({
+          title: 'example',
+          sections: [
+            { kind: 'image', title: 'image', href: 'foo' },
+            { kind: 'text', title: 'text', text: 'bar' }
+          ]
+        });
+
+        let doc = yield Model.findOne({}).select('title');
+        assert.ok(!doc.sections);
+
+        doc = yield Model.findOne({}).select('title sections.title');
+        assert.ok(doc.sections);
+        assert.equal(doc.sections[0].kind, 'image');
+        assert.equal(doc.sections[1].kind, 'text');
+      });
     });
   });
 });

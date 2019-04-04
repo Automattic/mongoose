@@ -6,7 +6,8 @@
 'use strict';
 
 const Document = require('../lib/document');
-const assert = require('power-assert');
+const assert = require('assert');
+const co = require('co');
 const start = require('./common');
 const utils = require('../lib/utils');
 
@@ -774,6 +775,123 @@ describe('document.populate', function() {
           assert.equal(foo.bars[0].toString(), docs[1]._id.toString());
           done();
         });
+      });
+    });
+  });
+
+  describe('#populated() with virtuals (gh-7440)', function() {
+    let Team;
+
+    before(function() {
+      const teamSchema = mongoose.Schema({
+        name: String,
+        captain: String
+      });
+      Team = db.model('gh7440_Team', teamSchema);
+    });
+
+    it('works with justOne: false', function() {
+      const playerSchema = mongoose.Schema({
+        _id: String,
+        name: String
+      });
+      playerSchema.virtual('teams', {
+        ref: 'gh7440_Team',
+        localField: '_id',
+        foreignField: 'captain'
+      });
+      const Player = db.model('gh7440_Player_0', playerSchema);
+
+      return co(function*() {
+        const player = yield Player.create({name: 'Derek Jeter', _id: 'test1' });
+        yield Team.create({name: 'Yankees', captain: 'test1'});
+
+        yield player.populate('teams').execPopulate();
+        assert.deepEqual(player.populated('teams'), ['test1']);
+      });
+    });
+
+    it('works with justOne: true', function() {
+      const playerSchema = mongoose.Schema({
+        _id: String,
+        name: String
+      });
+      playerSchema.virtual('team', {
+        ref: 'gh7440_Team',
+        localField: '_id',
+        foreignField: 'captain',
+        justOne: true
+      });
+      const Player = db.model('gh7440_Player_1', playerSchema);
+
+      return co(function*() {
+        const player = yield Player.create({name: 'Derek Jeter', _id: 'test1' });
+        yield Team.create({name: 'Yankees', captain: 'test1'});
+
+        yield player.populate('team').execPopulate();
+        assert.deepEqual(player.populated('team'), 'test1');
+      });
+    });
+  });
+
+  describe('#populated() with getters on embedded schema (gh-7521)', function() {
+    let Team;
+    let Player;
+
+    before(function() {
+      const playerSchema = mongoose.Schema({
+        _id: String,
+      });
+
+      const teamSchema = mongoose.Schema({
+        captain: {
+          type: String,
+          ref: 'gh7521_Player',
+          get: (v) => {
+            if (!v || typeof v !== 'string') {
+              return v;
+            }
+
+            return v.split(' ')[0];
+          }
+        },
+        players: [new mongoose.Schema({
+          player: {
+            type: String,
+            ref: 'gh7521_Player',
+            get: (v) => {
+              if (!v || typeof v !== 'string') {
+                return v;
+              }
+
+              return v.split(' ')[0];
+            }
+          }
+        })],
+      });
+
+      Player = db.model('gh7521_Player', playerSchema);
+      Team = db.model('gh7521_Team', teamSchema);
+    });
+
+    it('works with populate', function() {
+      return co(function*() {
+        yield Player.create({ _id: 'John' });
+        yield Player.create({ _id: 'Foo' });
+        const createdTeam = yield Team.create({ captain: 'John Doe', players: [{ player: 'John Doe' }, { player: 'Foo Bar' }] });
+
+        const team = yield Team.findOne({ _id: createdTeam._id })
+          .populate({ path: 'captain', options: { getters: true } })
+          .populate({ path: 'players.player', options: { getters: true } })
+          .exec();
+
+        assert.ok(team.captain);
+        assert.strictEqual(team.captain._id, 'John');
+        assert.strictEqual(team.players.length, 2);
+        assert.ok(team.players[0].player);
+        assert.ok(team.players[1].player);
+        assert.strictEqual(team.players[0].player._id, 'John');
+        assert.strictEqual(team.players[1].player._id, 'Foo');
       });
     });
   });

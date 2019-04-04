@@ -31,10 +31,24 @@ block content
     You can also specify several more parameters in the `uri`:
 
     ```javascript
-    mongoose.connect('mongodb://username:password@host:port/database?options...');
+    mongoose.connect('mongodb://username:password@host:port/database?options...', {useNewUrlParser: true});
     ```
 
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
+
+    <ul class="toc">
+      <li><a href="#buffering">Buffering</a></li>
+      <li><a href="#options">Options</a></li>
+      <li><a href="#connection-string-options">Connection String Options</a></li>
+      <li><a href="#connection-events">Connection Events</a></li>
+      <li><a href="#keepAlive">A note about keepAlive</a></li>
+      <li><a href="#replicaset_connections">Replica Set Connections</a></li>
+      <li><a href="#replicaset-hostnames">Replica Set Host Names</a></li>
+      <li><a href="#mongos_connections">Multi-mongos support</a></li>
+      <li><a href="#multiple_connections">Multiple connections</a></li>
+      <li><a href="#connection_pools">Connection Pools</a></li>
+      <li><a href="#v5-changes">Option Changes in v5.x</a></li>
+    </ul>
 
     <h3 id="buffering"><a href="#buffering">Operation Buffering</a></h3>
 
@@ -101,8 +115,8 @@ block content
     * `promiseLibrary`    - sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html)
     * `poolSize`          - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `poolSize` is 5. Keep in mind that, as of MongoDB 3.4, MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding.
     * `bufferMaxEntries`  - The MongoDB driver also has its own buffering mechanism that kicks in when the driver is disconnected. Set this option to 0 and set `bufferCommands` to `false` on your schemas if you want your database operations to fail immediately when the driver is not connected, as opposed to waiting for reconnection.
-    * `connectTimeoutMS`  - How long the MongoDB driver will wait before failing its initial connection attempt. Once Mongoose has successfully connected, `connectTimeoutMS` is no longer relevant.
-    * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing an inactive socket. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds.
+    * `connectTimeoutMS`  - How long the MongoDB driver will wait before killing a socket due to inactivity _during initial connection_. Defaults to 30000. This option is passed transparently to [Node.js' `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback).
+    * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
     * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 
     Example:
@@ -171,6 +185,25 @@ block content
 
     The MongoDB docs have a full list of
     [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/)
+
+    <h3 id="connection-events"><a href="#connection-events">Connection Events</a></h3>
+
+    Connections inherit from [Node.js' `EventEmitter` class](https://nodejs.org/api/events.html#events_class_eventemitter),
+    and emit events when something happens to the connection, like losing
+    connectivity to the MongoDB server. Below is a list of events that a
+    connection may emit.
+
+    * `connecting`: Emitted when Mongoose starts making its initial connection to the MongoDB server
+    * `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server
+    * `open`: Equivalent to `connected`
+    * `disconnecting`: Your app called [`Connection#close()`](api.html#connection_Connection-close) to disconnect from MongoDB
+    * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
+    * `close`: Emitted after [`Connection#close()`](api.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.
+    * `reconnected`: Emitted if Mongoose lost connectivity to MongoDB and successfully reconnected. Mongoose attempts to [automatically reconnect](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html) when it loses connection to the database.
+    * `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://docs.mongodb.com/manual/reference/limits/#BSON-Document-Size).
+    * `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
+    * `all`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.
+    * `reconnectFailed`: Emitted when you're connected to a standalone server and Mongoose has run out of [`reconnectTries`](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html#handling-single-server-outages). The [MongoDB driver](http://npmjs.com/package/mongodb) will no longer attempt to reconnect after this event is emitted. This event will never be emitted if you're connected to a replica set.
 
     <h3 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h3>
 
@@ -261,7 +294,7 @@ block content
     Mongoose creates a _default connection_ when you call `mongoose.connect()`.
     You can access the default connection using `mongoose.connection`.
 
-    <h3 id="connection_pools"><a href="#connection_pools">Connection pools</a></h3>
+    <h3 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h3>
 
     Each `connection`, whether created with `mongoose.connect` or
     `mongoose.createConnection` are all backed by an internal configurable

@@ -1,8 +1,23 @@
 extends layout
 
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
 block content
-  h2 Sub Docs
   :markdown
+    ## Subdocuments
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
+
     Subdocuments are documents embedded in other documents. In Mongoose, this
     means you can nest schemas in other schemas. Mongoose has two
     distinct notions of subdocuments: arrays of subdocuments and single nested
@@ -19,6 +34,16 @@ block content
     });
     ```
   :markdown
+    <ul class="toc">
+      <li><a href="#what-is-a-subdocument-">What is a Subdocument?</a></li>
+      <li><a href="#finding-a-subdocument">Finding a Subdocument</a></li>
+      <li><a href="#adding-subdocs-to-arrays">Adding Subdocs to Arrays</a></li>
+      <li><a href="#removing-subdocs">Removing Subdocs</a></li>
+      <li><a href="#altsyntax">Alternate declaration syntax for arrays</a></li>
+    </ul>
+
+    ### What is a Subdocument?
+
     Subdocuments are similar to normal documents. Nested schemas can have
     [middleware](./middleware.html), [custom validation logic](./validation.html),
     virtuals, and any other feature top-level schemas can use. The major
@@ -89,7 +114,7 @@ block content
     });
     ```
 
-  h3 Finding a subdocument
+  h3#finding-a-subdocument Finding a Subdocument
   :markdown
     Each subdocument has an `_id` by default. Mongoose document arrays have a
     special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
@@ -97,7 +122,7 @@ block content
     ```javascript
     var doc = parent.children.id(_id);
     ```
-  h3 Adding subdocs to arrays
+  h3#adding-subdocs-to-arrays Adding Subdocs to Arrays
   :markdown
     MongooseArray methods such as
     [push](./api.html#mongoosearray_MongooseArray-push),
@@ -126,7 +151,7 @@ block content
     ```javascript
     var newdoc = parent.children.create({ name: 'Aaron' });
     ```
-  h3 Removing subdocs
+  h3#removing-subdocs Removing Subdocs
   :markdown
     Each subdocument has it's own
     [remove](./api.html#types_embedded_EmbeddedDocument-remove) method. For

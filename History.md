@@ -1,3 +1,142 @@
+5.4.21 / 2019-04-02
+===================
+ * fix(updateValidators): run update validators correctly on Decimal128 paths #7561
+ * fix(update): cast array filters in nested doc arrays correctly #7603
+ * fix(document): allow .get() + .set() with aliased paths #7592
+ * fix(document): ensure custom getters on single nested subdocs don't get persisted if toObject.getters = true #7601
+ * fix(document): support setting subdoc path to subdoc copied using object rest `{...doc}` #7645
+ * docs(schema): correct out-of-date list of reserved words #7593
+ * docs(model+query): add link to update results docs and examples of using results of updateOne(), etc. #7582
+ * docs: use atomic as opposed to $atomic consistently #7649 [720degreeLotus](https://github.com/720degreeLotus)
+
+5.4.20 / 2019-03-25
+===================
+ * docs(tutorials): add tutorial about `lean()` #7640
+ * fix(discriminator): fix wrong modelName being used as value to partialFilterExpression index #7635 #7634 [egorovli](https://github.com/egorovli)
+ * fix(document): allow setters to modify `this` when overwriting single nested subdoc #7585
+ * fix(populate): handle count option correctly with multiple docs #7573
+ * fix(date): support declaring min/max validators as functions #7600 [ChienDevIT](https://github.com/ChienDevIT)
+ * fix(discriminator): avoid projecting in embedded discriminator if only auto-selected path is discriminator key #7574
+ * fix(discriminator): use discriminator model when using `new BaseModel()` with discriminator key #7586
+ * fix(timestamps): avoid throwing if doc array has timestamps and array is undefined #7625 [serg33v](https://github.com/serg33v)
+ * docs(document): explain DocumentNotFoundError in save() docs #7580
+ * docs(query): fix .all() param type and add example #7612 [720degreeLotus](https://github.com/720degreeLotus)
+ * docs: add useNewUrlParser to mongoose.connect for some pages #7615 [YC](https://github.com/YC)
+
+5.4.19 / 2019-03-11
+===================
+ * fix(mongoose): ensure virtuals set on subdocs in global plugins get applied #7592
+ * docs(tutorials): add "Working With Dates" tutorial #7597
+ * docs(guide): clarify that versioning only affects array fields #7555
+ * docs(model): list out all bulkWrite() options #7550
+
+5.4.18 / 2019-03-08
+===================
+ * fix(document): handle nested virtuals in populated docs when parent path is projected out #7491
+ * fix(model): make subclassed models handle discriminators correctly #7547
+ * fix(model): remove $versionError from save options for better debug output #7570
+
+5.4.17 / 2019-03-03
+===================
+ * fix(update): handle all positional operator when casting array filters #7540
+ * fix(populate): handle populating nested path where top-level path is a primitive in the db #7545
+ * fix(update): run update validators on array filters #7536
+ * fix(document): clean modified subpaths when sorting an array #7556
+ * fix(model): cast $setOnInsert correctly with nested docs #7534
+ * docs: remove extra curly brace from example #7569 [kolya182](https://github.com/kolya182)
+
+5.4.16 / 2019-02-26
+===================
+ * fix(schema): handle nested objects with `_id: false` #7524
+ * fix(schema): don't throw error if declaring a virtual that starts with a map path name #7464
+ * fix(browser): add stubbed `model()` function so code that uses model doesn't throw #7541 [caub](https://github.com/caub)
+ * fix(schema): merge virtuals correctly #7563 [yoursdearboy](https://github.com/yoursdearboy)
+ * docs(connections): add reconnectFailed to connection docs #7477
+ * docs(index): fix typo #7553 [DenrizSusam](https://github.com/DenrizSusam)
+ * refactor(schema): iterate over paths instead of depending on childSchemas #7554
+
+5.4.15 / 2019-02-22
+===================
+ * fix(update): don't call schematype validators on array if using $pull with runValidators #6971
+ * fix(schema): clone all schema types when cloning an array #7537
+ * docs(connections): improve connectTimeoutMS docs and socketTimeoutMS docs to link to Node.js net.setTimeout() #5169
+ * docs: fix setters example in migration guide #7546 [freewil](https://github.com/freewil)
+
+5.4.14 / 2019-02-19
+===================
+ * fix(populate): make `getters` option handle nested paths #7521
+ * fix(documentarray): report validation errors that occur in an array subdoc created using `create()` and then `set()` #7504
+ * docs(schema): add examples for schema functions that didn't have any #7525
+ * docs: add MongooseError to API docs and add list of error names
+ * docs(CONTRIBUTING): fix link #7530 [sarpik](https://github.com/sarpik)
+
+5.4.13 / 2019-02-15
+===================
+ * fix(query): throw handy error when using updateOne() with overwrite: true and no dollar keys #7475
+ * fix(schema): support inheriting existing schema types using Node.js `util.inherits` like mongoose-float #7486
+ * docs(connections): add list of connection events #7477
+
+5.4.12 / 2019-02-13
+===================
+ * fix(connection): dont emit reconnected due to socketTimeoutMS #7452
+ * fix(schema): revert check for `false` schema paths #7516 #7512
+ * fix(model): don't delete unaliased keys in translateAliases #7510 [chrischen](https://github.com/chrischen)
+ * fix(document): run single nested schematype validator if nested path has a default and subpath is modified #7493
+ * fix(query): copy mongoose options when using `Query#merge()` #1790
+ * fix(timestamps): don't call createdAt getters when setting updatedAt on new doc #7496
+ * docs: improve description of ValidationError #7515 [JulioJu](https://github.com/JulioJu)
+ * docs: add an asterisk before comment, otherwise the comment line is not generated #7513 [JulioJu](https://github.com/JulioJu)
+
+5.4.11 / 2019-02-09
+===================
+ * fix(schema): handle `_id: false` in schema paths as a shortcut for setting the `_id` option to `false` #7480
+ * fix(update): handle $addToSet and $push with ObjectIds and castNonArrays=false #7479
+ * docs(model): document `session` option to `save()` #7484
+ * chore: fix gitignore syntax #7498 [JulioJu](https://github.com/JulioJu)
+ * docs: document that Document#validateSync returns ValidationError #7499
+ * refactor: use consolidated `isPOJO()` function instead of constructor checks #7500
+
+5.4.10 / 2019-02-05
+===================
+ * docs: add search bar and /search page #6706
+ * fix: support dotted aliases #7478 [chrischen](https://github.com/chrischen)
+ * fix(document): copy atomics when setting document array to an existing document array #7472
+ * chore: upgrade to mongodb driver 3.1.13 #7488
+ * docs: remove confusing references to executing a query "immediately" #7461
+ * docs(guides+schematypes): link to custom schematypes docs #7407
+
+5.4.9 / 2019-02-01
+==================
+ * fix(document): make `remove()`, `updateOne()`, and `update()` use the document's associated session #7455
+ * fix(document): support passing args to hooked custom methods #7456
+ * fix(document): avoid double calling single nested getters on `toObject()` #7442
+ * fix(discriminator): handle global plugins modifying top-level discriminator options with applyPluginsToDiscriminators: true #7458
+ * docs(documents): improve explanation of documents and use more modern syntax #7463
+ * docs(middleware+api): fix a couple typos in examples #7474 [arniu](https://github.com/arniu)
+
+5.4.8 / 2019-01-30
+==================
+ * fix(query): fix unhandled error when casting object in array filters #7431
+ * fix(query): cast query $elemMatch to discriminator schema if discriminator key set #7449
+ * docs: add table of contents to all guides #7430
+
+5.4.7 / 2019-01-26
+==================
+ * fix(populate): set `populated()` when using virtual populate #7440
+ * fix(discriminator): defer applying plugins to embedded discriminators until model compilation so global plugins work #7435
+ * fix(schema): report correct pathtype underneath map so setting dotted paths underneath maps works #7448
+ * fix: get debug from options using the get helper #7451 #7446 [LucGranato](https://github.com/LucGranato)
+ * fix: use correct variable name #7443 [esben-semmle](https://github.com/esben-semmle)
+ * docs: fix broken QueryCursor link #7438 [shihabmridha](https://github.com/shihabmridha)
+
+5.4.6 / 2019-01-22
+==================
+ * fix(utils): make minimize leave empty objects in arrays instead of setting the array element to undefined #7322
+ * fix(document): support passing `{document, query}` options to Schema#pre(regex) and Schema#post(regex) #7423
+ * docs: add migrating to 5 guide to docs #7434
+ * docs(deprecations): add instructions for fixing `count()` deprecation #7419
+ * docs(middleware): add description and example for aggregate hooks #7402
+
 4.13.18 / 2019-01-21
 ====================
  * fix(model): handle setting populated path set via `Document#populate()` #7302

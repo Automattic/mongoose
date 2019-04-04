@@ -16,6 +16,7 @@ const files = [
   'lib/schema.js',
   'lib/connection.js',
   'lib/document.js',
+  'lib/error/mongooseError.js',
   'lib/model.js',
   'lib/query.js',
   'lib/cursor/QueryCursor.js',
@@ -30,7 +31,8 @@ const files = [
 module.exports = {
   docs: [],
   github: 'https://github.com/Automattic/mongoose/blob/',
-  title: 'API docs'
+  title: 'API docs',
+  api: true
 };
 
 const out = module.exports.docs;
@@ -53,7 +55,7 @@ function parse() {
     const lastSlash = name.lastIndexOf('/');
     name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
     const data = {
-      name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : _.capitalize(name),
+      name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
       props: []
     };
 
@@ -129,8 +131,9 @@ function parse() {
         }
       }
 
-      console.log(ctx);
-
+      if (/\.prototype[^.]/.test(ctx.string)) {
+        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+      }
       // Backwards compat
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;

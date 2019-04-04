@@ -357,14 +357,30 @@ describe('types.documentarray', function() {
         });
       });
     });
-    it('corrects #ownerDocument() if value was created with array.create() (gh-1385)', function(done) {
+
+    it('corrects #ownerDocument() and index if value was created with array.create() (gh-1385)', function(done) {
       const mg = new mongoose.Mongoose;
       const M = mg.model('1385', {docs: [{name: String}]});
       const m = new M;
       const doc = m.docs.create({name: 'test 1385'});
-      assert.notEqual(String(doc.ownerDocument()._id), String(m._id));
+      assert.equal(String(doc.ownerDocument()._id), String(m._id));
       m.docs.push(doc);
       assert.equal(doc.ownerDocument()._id, String(m._id));
+      assert.strictEqual(doc.__index, 0);
+      done();
+    });
+
+    it('corrects #ownerDocument() if value was created with array.create() and set() (gh-7504)', function(done) {
+      const M = db.model('gh7504', {
+        docs: [{name: { type: String, validate: () => false } }]
+      });
+      const m = new M({});
+      const doc = m.docs.create({name: 'test'});
+      m.set('docs', [doc]);
+      assert.equal(doc.ownerDocument()._id.toString(), String(m._id));
+      assert.strictEqual(doc.__index, 0);
+
+      assert.ok(m.validateSync().errors['docs.0.name']);
       done();
     });
   });

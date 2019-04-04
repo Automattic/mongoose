@@ -4292,6 +4292,29 @@ describe('document', function() {
       });
     });
 
+    it('runs schema type validator on single nested if parent has default (gh-7493)', function() {
+      const childSchema = new Schema({
+        test: String
+      });
+      const parentSchema = new Schema({
+        child: {
+          type: childSchema,
+          default: {},
+          validate: () => false
+        }
+      });
+      const Parent = mongoose.model('Test', parentSchema);
+
+      const parentDoc = new Parent({});
+
+      parentDoc.child.test = 'foo';
+
+      const err = parentDoc.validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['child']);
+      return Promise.resolve();
+    });
+
     it('does not overwrite when setting nested (gh-4793)', function(done) {
       const grandchildSchema = new mongoose.Schema();
       grandchildSchema.method({
@@ -4321,7 +4344,7 @@ describe('document', function() {
       done();
     });
 
-    it('hooks/middleware for custom methods (gh-6385)', function() {
+    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', function() {
       const mySchema = new Schema({
         name: String
       });
@@ -4332,6 +4355,9 @@ describe('document', function() {
       mySchema.methods.bar = function() {
         return this.name;
       };
+      mySchema.methods.baz = function(arg) {
+        return Promise.resolve(arg);
+      };
 
       let preFoo = 0;
       let postFoo = 0;
@@ -4340,6 +4366,15 @@ describe('document', function() {
       });
       mySchema.post('foo', function() {
         ++postFoo;
+      });
+
+      let preBaz = 0;
+      let postBaz = 0;
+      mySchema.pre('baz', function() {
+        ++preBaz;
+      });
+      mySchema.post('baz', function() {
+        ++postBaz;
       });
 
       const MyModel = db.model('gh6385', mySchema);
@@ -4355,6 +4390,13 @@ describe('document', function() {
         assert.equal(yield cb => doc.foo(cb), 'test');
         assert.equal(preFoo, 1);
         assert.equal(postFoo, 1);
+
+        assert.equal(preBaz, 0);
+        assert.equal(postBaz, 0);
+
+        assert.equal(yield doc.baz('foobar'), 'foobar');
+        assert.equal(preBaz, 1);
+        assert.equal(preBaz, 1);
       });
     });
 
@@ -4657,6 +4699,41 @@ describe('document', function() {
       assert.equal(t.a.b.c, 5);
 
       done();
+    });
+
+    it('nested virtual when populating with parent projected out (gh-7491)', function() {
+      const childSchema = Schema({
+        _id: Number,
+        nested: { childPath: String },
+        otherPath: String
+      }, { toObject: { virtuals: true } });
+
+      childSchema.virtual('nested.childVirtual').get(() => true);
+
+      const parentSchema = Schema({
+        child: { type: Number, ref: 'gh7491_Child' }
+      }, { toObject: { virtuals: true } });
+
+      parentSchema.virtual('_nested').get(function() {
+        return this.child.nested;
+      });
+
+      const Child = db.model('gh7491_Child', childSchema);
+      const Parent = db.model('gh7491_Parent', parentSchema);
+
+      return co(function*() {
+        yield Child.create({
+          _id: 1,
+          nested: { childPath: 'foo' },
+          otherPath: 'bar'
+        });
+        yield Parent.create({ child: 1 });
+
+        const doc = yield Parent.findOne().populate('child', 'otherPath').
+          then(doc => doc.toObject());
+
+        assert.ok(!doc.child.nested.childPath);
+      });
     });
 
     it('JSON.stringify nested errors (gh-5208)', function(done) {
@@ -4992,7 +5069,7 @@ describe('document', function() {
         },
         department: String
       });
-      const Employee = mongoose.model('Test', employeeSchema);
+      const Employee = mongoose.model('gh5470', employeeSchema);
 
       const employee = new Employee({
         name: {
@@ -5080,7 +5157,7 @@ describe('document', function() {
 
       const noteSchema = new Schema({
         title: { type: String, required: true },
-        body: { type: contentSchema }
+        body: contentSchema
       });
 
       const Note = db.model('gh5363', noteSchema);
@@ -5316,6 +5393,37 @@ describe('document', function() {
       assert.equal(vals.length, 1);
       assert.equal(vals[0], '555.555.0123');
       done();
+    });
+
+    it('single getters only get called once (gh-7442)', function() {
+      let called = 0;
+
+      const childSchema = new Schema({
+        value: {
+          type: String,
+          get: function(v) {
+            ++called;
+            return v;
+          }
+        }
+      });
+
+      const schema = new Schema({
+        name: childSchema
+      });
+      const Model = db.model('gh7442', schema);
+
+      const doc = new Model({ 'name.value': 'test' });
+
+      called = 0;
+
+      doc.toObject({ getters: true });
+      assert.equal(called, 1);
+
+      doc.toObject({ getters: false });
+      assert.equal(called, 1);
+
+      return Promise.resolve();
     });
 
     it('setting doc array to array of top-level docs works (gh-5632)', function(done) {
@@ -5573,13 +5681,13 @@ describe('document', function() {
     });
 
     it('Handles setting populated path set via `Document#populate()` (gh-7302)', function() {
-      var authorSchema = new Schema({ name: String });
-      var bookSchema = new Schema({
+      const authorSchema = new Schema({ name: String });
+      const bookSchema = new Schema({
         author: { type: mongoose.Schema.Types.ObjectId, ref: 'gh7302_Author' }
       });
 
-      var Author = db.model('gh7302_Author', authorSchema);
-      var Book = db.model('gh7302_Book', bookSchema);
+      const Author = db.model('gh7302_Author', authorSchema);
+      const Book = db.model('gh7302_Book', bookSchema);
 
       return Author.create({ name: 'Victor Hugo' }).
         then(function(author) { return Book.create({ author: author._id }); }).
@@ -5729,6 +5837,40 @@ describe('document', function() {
             });
           });
         });
+      });
+    });
+
+    it('doc array: modify then sort (gh-7556)', function() {
+      const assetSchema = new Schema({
+        name: { type: String, required: true },
+        namePlural: { type: String, required: true }
+      });
+      assetSchema.pre('validate', function() {
+        if (this.isNew) {
+          this.namePlural = this.name + 's';
+        }
+      });
+      const personSchema = new Schema({
+        name: String,
+        assets: [assetSchema]
+      });
+
+      const Person = db.model('gh7556', personSchema);
+
+      return co(function*() {
+        yield Person.create({
+          name: 'test',
+          assets: [{ name: 'Cash', namePlural: 'Cash' }]
+        });
+        const p = yield Person.findOne();
+
+        p.assets.push({ name: 'Home' });
+        p.assets.id(p.assets[0].id).set('name', 'Cash');
+        p.assets.id(p.assets[0].id).set('namePlural', 'Cash');
+
+        p.assets.sort((doc1, doc2) => doc1.name > doc2.name ? -1 : 1);
+
+        yield p.save();
       });
     });
 
@@ -6819,6 +6961,35 @@ describe('document', function() {
     return Model.create({ http: { get: 400 } }); // Should succeed
   });
 
+  it('copies atomics from existing document array when setting doc array (gh-7472)', function() {
+    const Dog = db.model('gh7472', new mongoose.Schema({
+      name: String,
+      toys: [{
+        name: String
+      }]
+    }));
+
+    return co(function*() {
+      const dog = new Dog({ name: 'Dash' });
+
+      dog.toys.push({ name: '1' });
+      dog.toys.push({ name: '2' });
+      dog.toys.push({ name: '3' });
+
+      yield dog.save();
+
+      for (const toy of ['4', '5', '6']) {
+        dog.toys = dog.toys || [];
+        dog.toys.push({ name: toy, count: 1 });
+      }
+
+      yield dog.save();
+
+      const fromDb = yield Dog.findOne();
+      assert.deepEqual(fromDb.toys.map(t => t.name), ['1', '2', '3', '4', '5', '6']);
+    });
+  });
+
   it('doesnt fail with custom update function (gh-7342)', function() {
     const catalogSchema = new mongoose.Schema({
       name: String,
@@ -6838,6 +7009,109 @@ describe('document', function() {
       let doc = yield Catalog.create({ name: 'test', sub: { name: 'foo' } });
       doc = yield doc.update({ name: 'test2' });
       assert.equal(doc.name, 'test2');
+    });
+  });
+
+  it('setters that modify `this` should work on single nested when overwriting (gh-7585)', function() {
+    const NameSchema = new Schema({
+      full: {
+        type: String,
+        set: function(v) {
+          this.first = 'foo';
+          this.last = 'bar';
+          return v + ' baz';
+        }
+      },
+      first: String,
+      last: String
+    }, { _id: false });
+
+    const User = db.model('gh7585', new Schema({
+      name: {
+        type: NameSchema,
+        default: {}
+      }
+    }));
+
+    const s = new User();
+    s.name = { full: 'test' };
+    assert.equal(s.name.first, 'foo');
+    assert.equal(s.name.last, 'bar');
+    assert.equal(s.name.full, 'test baz');
+
+    return Promise.resolve();
+  });
+
+  it('handles setting embedded doc to Object.assign() from another doc (gh-7645)', function() {
+    const profileSchema = new Schema({ name: String, email: String });
+    const companyUserSchema = new Schema({
+      profile: {
+        type: profileSchema,
+        default: {}
+      }
+    });
+
+    const CompanyUser = db.model('gh7645', companyUserSchema);
+
+    const cu = new CompanyUser({ profile: { name: 'foo', email: 'bar' } });
+    cu.profile = Object.assign({}, cu.profile);
+
+    assert.equal(cu.profile.name, 'foo');
+    assert.equal(cu.profile.email, 'bar');
+    cu.toObject(); // shouldn't throw
+  });
+
+  it('setting single nested subdoc with custom date types and getters/setters (gh-7601)', function() {
+    const moment = require('moment');
+
+    const schema = new Schema({
+      start: { type: Date, get: get, set: set, required: true },
+      end: { type: Date, get: get, set: set, required: true }
+    }, { toObject: { getters: true } });
+    function get(v) {
+      return moment(v);
+    }
+    function set(v) {
+      return v.toDate();
+    }
+    const parentSchema = new Schema({
+      nested: schema
+    });
+    const Model = db.model('gh7601', parentSchema);
+
+    return co(function*() {
+      const doc = yield Model.create({
+        nested: { start: moment('2019-01-01'), end: moment('2019-01-02') }
+      });
+
+      doc.nested = { start: moment('2019-03-01'), end: moment('2019-04-01') };
+      yield doc.save();
+
+      const _doc = yield Model.collection.findOne();
+      assert.ok(_doc.nested.start instanceof Date);
+      assert.ok(_doc.nested.end instanceof Date);
+    });
+  });
+
+  it('get() and set() underneath alias (gh-7592)', function() {
+    const photoSchema = new Schema({
+      foo: String
+    });
+
+    const pageSchema = new Schema({
+      p: { type: [photoSchema], alias: 'photos' }
+    });
+    const Page = db.model('gh7592', pageSchema);
+
+    return co(function*() {
+      const doc = yield Page.create({ p: [{ foo: 'test' }] });
+
+      assert.equal(doc.p[0].foo, 'test');
+      assert.equal(doc.get('photos.0.foo'), 'test');
+
+      doc.set('photos.0.foo', 'bar');
+      assert.equal(doc.p[0].foo, 'bar');
+      assert.equal(doc.get('photos.0.foo'), 'bar');
     });
   });
 });

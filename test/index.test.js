@@ -365,6 +365,69 @@ describe('mongoose module:', function() {
     return Promise.resolve();
   });
 
+  it('global plugins with applyPluginsToDiscriminators (gh-7435)', function() {
+    const m = new Mongoose();
+    m.set('applyPluginsToDiscriminators', true);
+
+    const called = [];
+    m.plugin(function(s) {
+      called.push(s);
+    });
+
+    const eventSchema = new m.Schema({
+      kind: {type: String}
+    }, { discriminatorKey: 'kind' });
+
+    const testEventSchema = new m.Schema({
+      inner: {
+        type: new mongoose.Schema({
+          _id: false,
+          bool: {type: Boolean, required: true}
+        })
+      }
+    });
+
+    const schema = new m.Schema({
+      events: {
+        type: [eventSchema]
+      }
+    });
+
+    schema.path('events').discriminator('test-event', testEventSchema);
+
+    m.model('gh7435', schema);
+    assert.equal(called.length, 4);
+    assert.ok(called.indexOf(testEventSchema) !== -1);
+
+    return Promise.resolve();
+  });
+
+  it('global plugins recompile schemas (gh-7572)', function() {
+    function helloPlugin(schema) {
+      schema.virtual('greeting').get(() => 'hello');
+    }
+
+    const m = new Mongoose();
+
+    m.plugin(helloPlugin);
+
+    const nested = new m.Schema({
+      baz: String
+    });
+    const outer = new m.Schema({
+      foo: String,
+      bar: nested
+    });
+
+    const Test = m.model('Test', outer);
+    const doc = new Test({ foo: 'abc', bar: { baz: 'def' } });
+
+    assert.equal(doc.greeting, 'hello');
+    assert.equal(doc.bar.greeting, 'hello');
+
+    return Promise.resolve();
+  });
+
   it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function(done) {
     const mongoose = new Mongoose();
 

@@ -2599,6 +2599,36 @@ describe('Query', function() {
       });
     });
 
+    it('cast embedded discriminators with $elemMatch discriminator key (gh-7449)', function() {
+      return co(function*() {
+        const ListingLineSchema = new Schema({
+          sellerId: Number
+        });
+
+        const OrderSchema = new Schema({
+          lines: [new Schema({
+            amount: Number,
+          }, { discriminatorKey: 'kind' })]
+        });
+
+        OrderSchema.path('lines').discriminator('listing', ListingLineSchema);
+
+        const Order = db.model('gh7449', OrderSchema);
+
+        yield Order.create({ lines: { kind: 'listing', sellerId: 42 } });
+
+        let count = yield Order.countDocuments({
+          lines: { $elemMatch: { kind: 'listing', sellerId: '42' } }
+        });
+        assert.strictEqual(count, 1);
+
+        count = yield Order.countDocuments({
+          lines: { $elemMatch: { sellerId: '42' } }
+        });
+        assert.strictEqual(count, 0);
+      });
+    });
+
     it('handles geoWithin with mongoose docs (gh-4392)', function(done) {
       const areaSchema = new Schema({
         name: {type: String},
@@ -3327,6 +3357,43 @@ describe('Query', function() {
         then(() => null, err => err);
       assert.ok(res);
       assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    });
+  });
+
+  it('throws error with updateOne() and overwrite (gh-7475)', function() {
+    const Model = db.model('gh7475', new Schema({ name: String }));
+
+    return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
+      () => { throw new Error('Should have failed'); },
+      err => assert.ok(err.message.indexOf('updateOne') !== -1)
+    );
+  });
+
+  describe('merge()', function() {
+    it('copies populate() (gh-1790)', function() {
+      const Car = db.model('gh1790_Car', {
+        color: String,
+        model: String,
+        owner: {
+          type: Schema.Types.ObjectId,
+          ref: 'gh1790_Person'
+        }
+      });
+
+      const Person = db.model('gh1790_Person', {
+        name: String
+      });
+
+      return co(function*() {
+        const val = yield Person.create({ name: 'Val' });
+        yield Car.create({ color: 'Brown', model: 'Subaru', owner: val._id });
+
+        const q = Car.findOne().populate('owner');
+
+        const res = yield Car.findOne().merge(q);
+
+        assert.equal(res.owner.name, 'Val');
+      });
     });
   });
 });

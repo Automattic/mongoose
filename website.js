@@ -26,7 +26,9 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/docs/transactions.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/model.middleware.test.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/model.middleware.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/date.test.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/es-next/lean.test.es6.js').toString())
 ];
 
 function getVersion() {
@@ -53,8 +55,34 @@ pkg.version = getVersion();
 pkg.latest4x = getLatestLegacyVersion('4.');
 pkg.latest38x = getLatestLegacyVersion('3.8');
 
-const filemap = require('./docs/source');
+const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'));
 const files = Object.keys(filemap);
+
+const wrapMarkdown = md => `
+extends ../layout
+
+append style
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+  style.
+    p { line-height: 1.5em }
+
+block content
+  :markdown
+${md.split('\n').map(line => '    ' + line).join('\n')}
+`;
+
+const cpc = `
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+`;
 
 function jadeify(filename, options, newfile) {
   options = options || {};
@@ -67,6 +95,13 @@ function jadeify(filename, options, newfile) {
 
   if (options.acquit) {
     contents = transform(contents, tests);
+  }
+  if (options.markdown) {
+    const lines = contents.split('\n');
+    lines.splice(2, 0, cpc);
+    contents = lines.join('\n');
+    contents = wrapMarkdown(contents);
+    newfile = filename.replace('.md', '.html');
   }
 
   options.filename = filename;

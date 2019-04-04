@@ -12,8 +12,6 @@ CNAME
 index.html
 index.jade
 bin/
-karma.*.js
-format_deps.js
 tools/31*
 *.key
 data/
@@ -31,3 +29,8 @@ format_deps.js
 release-items.md
 static.js
 website.js
+
+.config*
+
+migrating_to_5.md
+renovate.json

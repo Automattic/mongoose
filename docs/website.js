@@ -8,7 +8,10 @@ const klass = require('./docs/helpers/klass');
 // clean up version for ui
 package.version = package.version.replace(/-pre$/, '');
 
-const filemap = require('./docs/source');
+const filemap = require('./tutorials'); //require('./docs/source');
+
+Object.assign(filemap, require('./tutorials'));
+
 const files = Object.keys(filemap);
 
 files.forEach(function (file) {

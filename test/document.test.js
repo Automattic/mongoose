@@ -3333,6 +3333,21 @@ describe('document', function() {
       done();
     });
 
+    it('directModifiedPaths() (gh-7373)', function() {
+      const schema = new Schema({ foo: String, nested: { bar: String } });
+      const Model = db.model('gh7373', schema);
+
+      return co(function*() {
+        yield Model.create({ foo: 'original', nested: { bar: 'original' } });
+
+        let doc = yield Model.findOne();
+        doc.nested.bar = 'modified';
+
+        assert.deepEqual(doc.directModifiedPaths(), ['nested.bar']);
+        assert.deepEqual(doc.modifiedPaths().sort(), ['nested', 'nested.bar']);
+      });
+    });
+
     describe('modifiedPaths', function() {
       it('doesnt markModified child paths if parent is modified (gh-4224)', function(done) {
         const childSchema = new Schema({

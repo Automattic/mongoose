@@ -131,7 +131,9 @@ function parse() {
         }
       }
 
-      console.log(ctx);
+      if (/\.prototype[^.]/.test(ctx.string)) {
+        ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+      }
       // Backwards compat
       if (typeof ctx.constructor === 'string') {
         ctx.anchorId = `${ctx.constructor.toLowerCase()}_${ctx.constructor}-${ctx.name}`;

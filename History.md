@@ -1,3 +1,23 @@
+5.4.22 / 2019-04-04
+===================
+ * fix(aggregate): allow modifying options in pre('aggregate') hook #7606
+ * fix(map): correctly init maps of maps when loading from MongoDB #7630
+ * docs(model+query): add `omitUndefined` option to docs for updateX() and findOneAndX() #3486
+ * docs: removed duplicate Query.prototype.merge() reference from doc #7684 [shihabmridha](https://github.com/shihabmridha)
+ * docs(schema): fix shardKey type to object instead of bool #7668 [kyletsang](https://github.com/kyletsang)
+ * docs(api): fix `Model.prototypedelete` link #7665 [pixcai](https://github.com/pixcai)
+
+5.4.21 / 2019-04-02
+===================
+ * fix(updateValidators): run update validators correctly on Decimal128 paths #7561
+ * fix(update): cast array filters in nested doc arrays correctly #7603
+ * fix(document): allow .get() + .set() with aliased paths #7592
+ * fix(document): ensure custom getters on single nested subdocs don't get persisted if toObject.getters = true #7601
+ * fix(document): support setting subdoc path to subdoc copied using object rest `{...doc}` #7645
+ * docs(schema): correct out-of-date list of reserved words #7593
+ * docs(model+query): add link to update results docs and examples of using results of updateOne(), etc. #7582
+ * docs: use atomic as opposed to $atomic consistently #7649 [720degreeLotus](https://github.com/720degreeLotus)
+
 5.4.20 / 2019-03-25
 ===================
  * docs(tutorials): add tutorial about `lean()` #7640

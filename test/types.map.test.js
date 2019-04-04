@@ -594,4 +594,27 @@ describe('Map', function() {
       assert.equal(loaded.get('children.one.name'), 'bar');
     });
   });
+
+  it('nested maps (gh-7630)', function() {
+    const schema = new mongoose.Schema({
+      describe: {
+        type: Map,
+        of: Map,
+        default: {}
+      }
+    });
+
+    const GoodsInfo = db.model('gh7630', schema);
+
+    let goodsInfo = new GoodsInfo();
+    goodsInfo.describe = new Map();
+    goodsInfo.describe.set('brand', new Map([['en', 'Hermes']]));
+
+    return co(function*() {
+      yield goodsInfo.save();
+
+      goodsInfo = yield GoodsInfo.findById(goodsInfo);
+      assert.equal(goodsInfo.get('describe.brand.en'), 'Hermes');
+    });
+  });
 });

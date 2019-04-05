@@ -7181,6 +7181,22 @@ describe('document', function() {
     });
   });
 
+  it('get() with getters: false (gh-7233)', function() {
+    const testSchema = new Schema({
+      foo: { type: String, get: v => v.toLowerCase() }
+    });
+    const Test = db.model('gh7233', testSchema);
+
+    const doc = new Test({ foo: 'Bar' });
+    assert.equal(doc.foo, 'bar');
+    assert.equal(doc._doc.foo, 'Bar');
+
+    assert.equal(doc.get('foo'), 'bar');
+    assert.equal(doc.get('foo', null, { getters: false }), 'Bar');
+
+    return Promise.resolve();
+  });
+
   it('$isEmpty() (gh-5369)', function() {
     const schema = new Schema({
       nested: { foo: String },

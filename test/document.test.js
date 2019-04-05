@@ -7180,4 +7180,59 @@ describe('document', function() {
       assert.equal(doc.get('photos.0.foo'), 'bar');
     });
   });
+
+  it('$isEmpty() (gh-5369)', function() {
+    const schema = new Schema({
+      nested: { foo: String },
+      subdoc: new Schema({ bar: String }, { _id: false }),
+      docArr: [new Schema({ baz: String }, { _id: false })],
+      mixed: {}
+    });
+
+    const Model = db.model('gh5369', schema);
+    const doc = new Model({ subdoc: {}, docArr: [{}] });
+
+    assert.ok(doc.nested.$isEmpty());
+    assert.ok(doc.subdoc.$isEmpty());
+    assert.ok(doc.docArr[0].$isEmpty());
+    assert.ok(doc.$isEmpty('nested'));
+    assert.ok(doc.$isEmpty('subdoc'));
+    assert.ok(doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.nested.foo = 'test';
+    assert.ok(!doc.nested.$isEmpty());
+    assert.ok(doc.subdoc.$isEmpty());
+    assert.ok(doc.docArr[0].$isEmpty());
+    assert.ok(!doc.$isEmpty('nested'));
+    assert.ok(doc.$isEmpty('subdoc'));
+    assert.ok(doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.subdoc.bar = 'test';
+    assert.ok(!doc.nested.$isEmpty());
+    assert.ok(!doc.subdoc.$isEmpty());
+    assert.ok(doc.docArr[0].$isEmpty());
+    assert.ok(!doc.$isEmpty('nested'));
+    assert.ok(!doc.$isEmpty('subdoc'));
+    assert.ok(doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.docArr[0].baz = 'test';
+    assert.ok(!doc.nested.$isEmpty());
+    assert.ok(!doc.subdoc.$isEmpty());
+    assert.ok(!doc.docArr[0].$isEmpty());
+    assert.ok(!doc.$isEmpty('nested'));
+    assert.ok(!doc.$isEmpty('subdoc'));
+    assert.ok(!doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.mixed = {};
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.mixed.test = 1;
+    assert.ok(!doc.$isEmpty('mixed'));
+
+    return Promise.resolve();
+  });
 });

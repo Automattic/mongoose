@@ -523,34 +523,44 @@ block content
     Mongoose will, by default, "minimize" schemas by removing empty objects.
 
     ```javascript
-    var schema = new Schema({ name: String, inventory: {} });
-    var Character = mongoose.model('Character', schema);
+    const schema = new Schema({ name: String, inventory: {} });
+    const Character = mongoose.model('Character', schema);
 
     // will store `inventory` field if it is not empty
-    var frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 }});
-    Character.findOne({ name: 'Frodo' }, function(err, character) {
-      console.log(character); // { name: 'Frodo', inventory: { ringOfPower: 1 }}
-    });
+    const frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 }});
+    await frodo.save();
+    let doc = await Character.findOne({ name: 'Frodo' }).lean();
+    doc.inventory; // { ringOfPower: 1 }
 
     // will not store `inventory` field if it is empty
-    var sam = new Character({ name: 'Sam', inventory: {}});
-    Character.findOne({ name: 'Sam' }, function(err, character) {
-      console.log(character); // { name: 'Sam' }
-    });
+    const sam = new Character({ name: 'Sam', inventory: {}});
+    await sam.save();
+    doc = await Character.findOne({ name: 'Sam' }).lean();
+    doc.inventory; // undefined
     ```
 
     This behavior can be overridden by setting `minimize` option to `false`. It
     will then store empty objects.
 
     ```javascript
-    var schema = new Schema({ name: String, inventory: {} }, { minimize: false });
-    var Character = mongoose.model('Character', schema);
+    const schema = new Schema({ name: String, inventory: {} }, { minimize: false });
+    const Character = mongoose.model('Character', schema);
 
     // will store `inventory` if empty
-    var sam = new Character({ name: 'Sam', inventory: {}});
-    Character.findOne({ name: 'Sam' }, function(err, character) {
-      console.log(character); // { name: 'Sam', inventory: {}}
-    });
+    const sam = new Character({ name: 'Sam', inventory: {} });
+    await sam.save();
+    doc = await Character.findOne({ name: 'Sam' }).lean();
+    doc.inventory; // {}
+    ```
+
+    To check whether an object is empty, you can use the `$isEmpty()` helper:
+
+    ```javascript
+    const sam = new Character({ name: 'Sam', inventory: {} });
+    sam.$isEmpty('inventory'); // true
+
+    sam.inventory.barrowBlade = 1;
+    sam.$isEmpty('inventory'); // false
     ```
 
     <h3 id="read"><a href="#read">option: read</a></h3>

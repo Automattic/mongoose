@@ -3340,7 +3340,7 @@ describe('document', function() {
       return co(function*() {
         yield Model.create({ foo: 'original', nested: { bar: 'original' } });
 
-        let doc = yield Model.findOne();
+        const doc = yield Model.findOne();
         doc.nested.bar = 'modified';
 
         assert.deepEqual(doc.directModifiedPaths(), ['nested.bar']);

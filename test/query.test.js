@@ -3369,6 +3369,22 @@ describe('Query', function() {
     );
   });
 
+  it('sets deletedCount on result of remove() (gh-7629)', function() {
+    const schema = new Schema({ name: String });
+
+    const Model = db.model('gh7629', schema);
+
+    return co(function*() {
+      yield Model.create({ name: 'foo' });
+
+      let res = yield Model.remove({});
+      assert.equal(res.deletedCount, 1);
+
+      res = yield Model.remove({});
+      assert.strictEqual(res.deletedCount, 0);
+    });
+  });
+
   describe('merge()', function() {
     it('copies populate() (gh-1790)', function() {
       const Car = db.model('gh1790_Car', {

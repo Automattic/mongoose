@@ -394,7 +394,7 @@ describe('schema', function() {
         });
       });
 
-      it.only('array required custom required', function(done) {
+      it('array required custom required', function(done) {
         const requiredOrig = mongoose.Schema.Types.Array.checkRequired();
         mongoose.Schema.Types.Array.checkRequired(v => Array.isArray(v) && v.length);
         const doneWrapper = (err = null) => {

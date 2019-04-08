@@ -397,7 +397,7 @@ describe('schema', function() {
       it('array required custom required', function(done) {
         const requiredOrig = mongoose.Schema.Types.Array.checkRequired();
         mongoose.Schema.Types.Array.checkRequired(v => Array.isArray(v) && v.length);
-        const doneWrapper = (err = null) => {
+        const doneWrapper = (err) => {
           mongoose.Schema.Types.Array.checkRequired(requiredOrig);
           done(err);
         };

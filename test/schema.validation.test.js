@@ -394,6 +394,31 @@ describe('schema', function() {
         });
       });
 
+      it.only('array required custom required', function(done) {
+        const requiredOrig = mongoose.Schema.Types.Array.checkRequired();
+        mongoose.Schema.Types.Array.checkRequired(v => Array.isArray(v) && v.length);
+        const doneWrapper = (err = null) => {
+          mongoose.Schema.Types.Array.checkRequired(requiredOrig);
+          done(err);
+        };
+
+        const Loki = new Schema({
+          likes: {type: Array, required: true}
+        });
+
+        let remaining = 2;
+
+        Loki.path('likes').doValidate([], function(err) {
+          assert.ok(err instanceof ValidatorError);
+          --remaining || doneWrapper();
+        });
+
+        Loki.path('likes').doValidate(['cake'], function(err) {
+          assert(!err);
+          --remaining || doneWrapper();
+        });
+      });
+
       it('boolean required', function(done) {
         const Animal = new Schema({
           isFerret: {type: Boolean, required: true}

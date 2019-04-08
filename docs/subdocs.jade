@@ -39,6 +39,7 @@ block content
       <li><a href="#finding-a-subdocument">Finding a Subdocument</a></li>
       <li><a href="#adding-subdocs-to-arrays">Adding Subdocs to Arrays</a></li>
       <li><a href="#removing-subdocs">Removing Subdocs</a></li>
+      <li><a href="#subdoc-parents">Parents of Subdocs</a></li>
       <li><a href="#altsyntax">Alternate declaration syntax for arrays</a></li>
     </ul>
 
@@ -168,6 +169,48 @@ block content
       console.log('the subdocs were removed');
     });
     ```
+
+  h3#subdoc-parents Parents of Subdocs
+  :markdown
+    Sometimes, you need to get the parent of a subdoc. You can access the
+    parent using the `parent()` function.
+
+    ```javascript
+    const schema = new Schema({
+      docArr: [{ name: String }],
+      singleNested: new Schema({ name: String })
+    });
+    const Model = mongoose.model('Test', schema);
+
+    const doc = new Model({
+      docArr: [{ name: 'foo' }],
+      singleNested: { name: 'bar' }
+    });
+
+    doc.singleNested.parent() === doc; // true
+    doc.docArr[0].parent() === doc; // true
+    ```
+
+    If you have a deeply nested subdoc, you can access the top-level document
+    using the `ownerDocument()` function.
+
+    ```javascript
+    const schema = new Schema({
+      level1: new Schema({
+        level2: new Schema({
+          test: String
+        })
+      })
+    });
+    const Model = mongoose.model('Test', schema);
+
+    const doc = new Model({ level1: { level2: 'test' } });
+
+    doc.level1.level2.parent() === doc; // false
+    doc.level1.level2.parent() === doc.level1; // true
+    doc.level1.level2.ownerDocument() === doc; // true
+    ```
+
   h4#altsyntax Alternate declaration syntax for arrays
   :markdown
     If you create a schema with an array of objects, mongoose will automatically

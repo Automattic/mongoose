@@ -4,8 +4,9 @@
  * Test dependencies.
  */
 
+const assert = require('assert');
+const co = require('co');
 const start = require('./common');
-const assert = require('power-assert');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -394,6 +395,84 @@ describe('model middleware', function() {
         assert.equal(postRemove, 1);
         done();
       });
+    });
+  });
+
+  it('static hooks (gh-5982)', function() {
+    const schema = new Schema({
+      name: String
+    });
+
+    schema.statics.findByName = function(name) {
+      return this.find({ name: name });
+    };
+
+    let preCalled = 0;
+    schema.pre('findByName', function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('findByName', function(docs) {
+      ++postCalled;
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'foo');
+    });
+
+    const Model = db.model('gh5982', schema);
+
+    return co(function*() {
+      yield Model.create({ name: 'foo' });
+
+      const docs = yield Model.findByName('foo');
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'foo');
+      assert.equal(preCalled, 1);
+      assert.equal(postCalled, 1);
+    });
+  });
+
+  it('deleteOne hooks (gh-7538)', function() {
+    const schema = new Schema({
+      name: String
+    });
+
+    let queryPreCalled = 0;
+    let preCalled = 0;
+    schema.pre('deleteOne', { document: false, query: true }, function() {
+      ++queryPreCalled;
+    });
+    schema.pre('deleteOne', { document: true, query: false }, function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('deleteOne', { document: true, query: false }, function() {
+      assert.equal(this.name, 'foo');
+      ++postCalled;
+    });
+
+    const Model = db.model('gh7538', schema);
+
+    return co(function*() {
+      yield Model.create({ name: 'foo' });
+
+      const doc = yield Model.findOne();
+
+      assert.equal(preCalled, 0);
+      assert.equal(postCalled, 0);
+
+      yield doc.deleteOne();
+
+      assert.equal(queryPreCalled, 0);
+      assert.equal(preCalled, 1);
+      assert.equal(postCalled, 1);
+
+      yield Model.deleteOne();
+
+      assert.equal(queryPreCalled, 1);
+      assert.equal(preCalled, 1);
+      assert.equal(postCalled, 1);
     });
   });
 });

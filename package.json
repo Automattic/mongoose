@@ -20,17 +20,18 @@
   "license": "MIT",
   "dependencies": {
     "async": "2.6.1",
-    "bson": "~1.1.0",
+    "bson": "~1.1.1",
     "kareem": "2.3.0",
-    "mongodb": "3.1.13",
-    "mongodb-core": "3.1.11",
+    "mongodb": "3.2.2",
+    "mongodb-core": "3.2.2",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.5.1",
     "mquery": "3.2.0",
     "ms": "2.1.1",
     "regexp-clone": "0.0.1",
     "safe-buffer": "5.1.2",
-    "sliced": "1.0.1"
+    "sliced": "1.0.1",
+    "sift": "7.0.1"
   },
   "devDependencies": {
     "acorn": "5.7.3",

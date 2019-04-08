@@ -2276,6 +2276,57 @@ describe('document', function() {
       });
     });
 
+    it('does not filter validation on unmodified paths when validateModifiedOnly not set (gh-7421)', function(done) {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+
+      const Test = db.model('gh7421_1', testSchema);
+
+      Test.create([{}], {validateBeforeSave: false}, function(createError, docs) {
+        assert.equal(createError, null);
+        const doc = docs[0];
+        doc.other = 'something';
+        assert.ok(doc.validateSync().errors);
+        doc.save(function(error) {
+          assert.ok(error.errors);
+          done();
+        });
+      });
+    });
+
+    it('filters out validation on unmodified paths when validateModifiedOnly set (gh-7421)', function(done) {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+
+      const Test = db.model('gh7421_2', testSchema);
+
+      Test.create([{}], {validateBeforeSave: false}, function(createError, docs) {
+        assert.equal(createError, null);
+        const doc = docs[0];
+        doc.other = 'something';
+        assert.equal(doc.validateSync(undefined, {validateModifiedOnly: true}), null);
+        doc.save({validateModifiedOnly: true}, function(error) {
+          assert.equal(error, null);
+          done();
+        });
+      });
+    });
+
+    it('does not filter validation on modified paths when validateModifiedOnly set (gh-7421)', function(done) {
+      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+
+      const Test = db.model('gh7421_3', testSchema);
+
+      Test.create([{title: 'title'}], {validateBeforeSave: false}, function(createError, docs) {
+        assert.equal(createError, null);
+        const doc = docs[0];
+        doc.title = '';
+        assert.ok(doc.validateSync(undefined, {validateModifiedOnly: true}).errors);
+        doc.save({validateModifiedOnly: true}, function(error) {
+          assert.ok(error.errors);
+          done();
+        });
+      });
+    });
+
     it('handles non-errors', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }
@@ -3280,6 +3331,21 @@ describe('document', function() {
         assert.ifError(error);
       }
       done();
+    });
+
+    it('directModifiedPaths() (gh-7373)', function() {
+      const schema = new Schema({ foo: String, nested: { bar: String } });
+      const Model = db.model('gh7373', schema);
+
+      return co(function*() {
+        yield Model.create({ foo: 'original', nested: { bar: 'original' } });
+
+        const doc = yield Model.findOne();
+        doc.nested.bar = 'modified';
+
+        assert.deepEqual(doc.directModifiedPaths(), ['nested.bar']);
+        assert.deepEqual(doc.modifiedPaths().sort(), ['nested', 'nested.bar']);
+      });
     });
 
     describe('modifiedPaths', function() {
@@ -7131,5 +7197,76 @@ describe('document', function() {
       assert.equal(doc.p[0].foo, 'bar');
       assert.equal(doc.get('photos.0.foo'), 'bar');
     });
+  });
+
+  it('get() with getters: false (gh-7233)', function() {
+    const testSchema = new Schema({
+      foo: { type: String, get: v => v.toLowerCase() }
+    });
+    const Test = db.model('gh7233', testSchema);
+
+    const doc = new Test({ foo: 'Bar' });
+    assert.equal(doc.foo, 'bar');
+    assert.equal(doc._doc.foo, 'Bar');
+
+    assert.equal(doc.get('foo'), 'bar');
+    assert.equal(doc.get('foo', null, { getters: false }), 'Bar');
+
+    return Promise.resolve();
+  });
+
+  it('$isEmpty() (gh-5369)', function() {
+    const schema = new Schema({
+      nested: { foo: String },
+      subdoc: new Schema({ bar: String }, { _id: false }),
+      docArr: [new Schema({ baz: String }, { _id: false })],
+      mixed: {}
+    });
+
+    const Model = db.model('gh5369', schema);
+    const doc = new Model({ subdoc: {}, docArr: [{}] });
+
+    assert.ok(doc.nested.$isEmpty());
+    assert.ok(doc.subdoc.$isEmpty());
+    assert.ok(doc.docArr[0].$isEmpty());
+    assert.ok(doc.$isEmpty('nested'));
+    assert.ok(doc.$isEmpty('subdoc'));
+    assert.ok(doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.nested.foo = 'test';
+    assert.ok(!doc.nested.$isEmpty());
+    assert.ok(doc.subdoc.$isEmpty());
+    assert.ok(doc.docArr[0].$isEmpty());
+    assert.ok(!doc.$isEmpty('nested'));
+    assert.ok(doc.$isEmpty('subdoc'));
+    assert.ok(doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.subdoc.bar = 'test';
+    assert.ok(!doc.nested.$isEmpty());
+    assert.ok(!doc.subdoc.$isEmpty());
+    assert.ok(doc.docArr[0].$isEmpty());
+    assert.ok(!doc.$isEmpty('nested'));
+    assert.ok(!doc.$isEmpty('subdoc'));
+    assert.ok(doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.docArr[0].baz = 'test';
+    assert.ok(!doc.nested.$isEmpty());
+    assert.ok(!doc.subdoc.$isEmpty());
+    assert.ok(!doc.docArr[0].$isEmpty());
+    assert.ok(!doc.$isEmpty('nested'));
+    assert.ok(!doc.$isEmpty('subdoc'));
+    assert.ok(!doc.$isEmpty('docArr.0'));
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.mixed = {};
+    assert.ok(doc.$isEmpty('mixed'));
+
+    doc.mixed.test = 1;
+    assert.ok(!doc.$isEmpty('mixed'));
+
+    return Promise.resolve();
   });
 });

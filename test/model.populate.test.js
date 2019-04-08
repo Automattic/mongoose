@@ -4924,6 +4924,95 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('with functions for match (gh-7397)', function() {
+        const ASchema = new Schema({
+          name: String,
+          createdAt: Date
+        });
+
+        const BSchema = new Schema({
+          as: [{ type: ObjectId, ref: 'gh7397_A' }],
+          minDate: Date
+        });
+
+        const A = db.model('gh7397_A', ASchema);
+        const B = db.model('gh7397_B', BSchema);
+
+        return co(function*() {
+          const as = yield A.create([
+            { name: 'old', createdAt: '2015-06-01' },
+            { name: 'newer', createdAt: '2017-06-01' },
+            { name: 'newest', createdAt: '2019-06-01' }
+          ]);
+
+          yield B.create({ as: as.map(a => a._id), minDate: '2016-01-01' });
+          const b = yield B.findOne().populate({
+            path: 'as',
+            match: doc => ({ createdAt: { $gte: doc.minDate } })
+          });
+          assert.equal(b.as.length, 2);
+          assert.deepEqual(b.as.map(a => a.name), ['newer', 'newest']);
+
+          yield B.create({ as: as.map(a => a._id), minDate: '2018-01-01' });
+          const bs = yield B.find().sort({ minDate: 1 }).populate({
+            path: 'as',
+            match: doc => ({ createdAt: { $gte: doc.minDate } })
+          });
+          assert.equal(bs[0].minDate.toString(), new Date('2016-01-01').toString());
+          assert.equal(bs[1].minDate.toString(), new Date('2018-01-01').toString());
+          assert.equal(bs[0].as.length, 2);
+          assert.deepEqual(bs[0].as.map(a => a.name), ['newer', 'newest']);
+          assert.equal(bs[1].as.length, 1);
+          assert.deepEqual(bs[1].as.map(a => a.name), ['newest']);
+        });
+      });
+
+      it('with functions for match and foreignField (gh-7397)', function() {
+        const ASchema = new Schema({
+          name: String,
+          createdAt: Date,
+          b: ObjectId,
+          b2: ObjectId
+        });
+
+        const BSchema = new Schema({
+          alternateProperty: Boolean,
+          minDate: Date
+        });
+
+        BSchema.virtual('as', {
+          ref: 'gh7397_A1',
+          localField: '_id',
+          foreignField: function() { return this.alternateProperty ? 'b2' : 'b'; },
+          options: { match: doc => ({ createdAt: { $gte: doc.minDate } }) }
+        });
+
+        const A = db.model('gh7397_A1', ASchema);
+        const B = db.model('gh7397_B1', BSchema);
+
+        return co(function*() {
+          let bs = yield B.create([
+            { minDate: '2016-01-01' },
+            { minDate: '2016-01-01', alternateProperty: true }
+          ]);
+          yield A.create([
+            { name: 'old', createdAt: '2015-06-01', b: bs[0]._id, b2: bs[1]._id },
+            { name: 'newer', createdAt: '2017-06-01', b: bs[0]._id, b2: bs[1]._id },
+            { name: 'newest', createdAt: '2019-06-01', b: bs[0]._id, b2: bs[1]._id }
+          ]);
+
+          bs = yield B.find().sort({ minDate: 1 }).populate('as');
+
+          let b = bs[0];
+          assert.equal(b.as.length, 2);
+          assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
+
+          b = bs[1];
+          assert.equal(b.as.length, 2);
+          assert.deepEqual(b.as.map(a => a.name).sort(), ['newer', 'newest']);
+        });
+      });
+
       it('with function for refPath (gh-6669)', function() {
         const connectionSchema = new Schema({
           destination: String

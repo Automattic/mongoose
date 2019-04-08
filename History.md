@@ -1,3 +1,23 @@
+5.5.0 / 2019-04-08
+==================
+ * feat(model): support applying hooks to custom static functions #5982
+ * feat(populate): support specifying a function as `match` #7397
+ * perf(buffer): avoid calling `defineProperties()` in Buffer constructor #7331
+ * feat(connection): add `plugin()` for connection-scoped plugins #7378
+ * feat(model): add Model#deleteOne() and corresponding hooks #7538
+ * feat(query): support hooks for `Query#distinct()` #5938
+ * feat(model): print warning when calling create() incorrectly with a session #7535
+ * feat(document): add Document#isEmpty() and corresponding helpers for nested paths #5369
+ * feat(document): add `getters` option to Document#get() #7233
+ feat(query): add Query#projection() to get or overwrite the current projection #7384
+ * fix(document): set full validator path on validatorProperties if `propsParameter` set on validator #7447
+ * feat(document): add Document#directModifiedPaths() #7373
+ * feat(document): add $locals property #7691
+ * feat(document): add validateUpdatedOnly option that only validates modified paths in `save()` #7492 [captaincaius](https://github.com/captaincaius)
+ * chore: upgrade MongoDB driver to v3.2.0 #7641
+ * fix(schematype): deprecate `isAsync` option for custom validators #6700
+ * chore(mongoose): deprecate global.MONGOOSE_DRIVER_PATH so we can be webpack-warning-free in 6.0 #7501
+
 5.4.23 / 2019-04-08
 ===================
  * fix(document): report cast error when string path in schema is an array in MongoDB #7619

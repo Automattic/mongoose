@@ -817,10 +817,10 @@ describe('schema', function() {
           assert.ok(error);
           assert.ok(error.errors['foods.0']);
           assert.equal(error.errors['foods.0'].message,
-            '`tofu` is not a valid enum value for path `foods`.');
+            '`tofu` is not a valid enum value for path `foods.0`.');
           assert.ok(error.errors['foods.1']);
           assert.equal(error.errors['foods.1'].message,
-            '`waffles` is not a valid enum value for path `foods`.');
+            '`waffles` is not a valid enum value for path `foods.1`.');
           assert.ok(!error.errors['foods.2']);
 
           done();

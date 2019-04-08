@@ -617,4 +617,35 @@ describe('Map', function() {
       assert.equal(goodsInfo.get('describe.brand.en'), 'Hermes');
     });
   });
+
+  it('get full path in validator with `propsParameter` (gh-7447)', function() {
+    const calls = [];
+    const schema = new mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: {
+          type: String,
+          validate: {
+            validator: (v, props) => {
+              calls.push(props.path);
+              return v === 'bar';
+            },
+            propsParameter: true
+          }
+        }
+      }
+    });
+    const Model = db.model('gh7447', schema);
+
+    const doc = new Model({ myMap: { foo: 'bar' } });
+    assert.equal(calls.length, 0);
+
+    assert.ifError(doc.validateSync());
+    assert.deepEqual(calls, ['myMap.foo']);
+
+    return doc.validate().
+      then(() => {
+        assert.deepEqual(calls, ['myMap.foo', 'myMap.foo']);
+      });
+  });
 });

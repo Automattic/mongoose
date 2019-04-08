@@ -6960,7 +6960,7 @@ describe('document', function() {
     const TestModel = db.model('gh7619', TestSchema);
 
     return co(function*() {
-      yield db;
+      yield TestModel.findOne();
 
       yield TestModel.collection.insertOne({ name: ['foo', 'bar'] });
 

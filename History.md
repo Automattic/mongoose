@@ -1,3 +1,9 @@
+5.4.23 / 2019-04-08
+===================
+ * fix(document): report cast error when string path in schema is an array in MongoDB #7619
+ * fix(query): set deletedCount on result of remove() #7629
+ * docs(subdocs): add note about parent() and ownerDocument() to subdocument docs #7576
+
 5.4.22 / 2019-04-04
 ===================
  * fix(aggregate): allow modifying options in pre('aggregate') hook #7606

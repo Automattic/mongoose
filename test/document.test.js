@@ -6954,6 +6954,24 @@ describe('document', function() {
     });
   });
 
+  it('cast error with string path set to array in db (gh-7619)', function() {
+    const TestSchema = new Schema({ name: String });
+
+    const TestModel = db.model('gh7619', TestSchema);
+
+    return co(function*() {
+      yield TestModel.findOne();
+
+      yield TestModel.collection.insertOne({ name: ['foo', 'bar'] });
+
+      const doc = yield TestModel.findOne();
+      assert.ok(!doc.name);
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.ok(err.errors['name']);
+    });
+  });
+
   it('doesnt crash if nested path with `get()` (gh-7316)', function() {
     const schema = new mongoose.Schema({ http: { get: Number } });
     const Model = db.model('gh7316', schema);

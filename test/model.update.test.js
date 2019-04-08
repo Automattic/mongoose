@@ -2948,6 +2948,7 @@ describe('model: update:', function() {
         const update = { $push: { arr: data } };
         const opts = { new: true };
         const doc = yield Test.findOneAndUpdate(cond, update, opts);
+
         assert.strictEqual(doc.arr.length, 1);
         assert.strictEqual(doc.arr[0][0], 'one');
         assert.strictEqual(doc.arr[0][1], 'two');

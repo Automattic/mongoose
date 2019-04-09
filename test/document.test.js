@@ -7219,13 +7219,13 @@ describe('document', function() {
     const childSchema = new mongoose.Schema({
       foo: String,
       bar: Number
-    }, { _id: false, id: false, });
-    
+    }, { _id: false, id: false });
+
     const parentSchema = new mongoose.Schema({
       child: childSchema
     });
     const Test = db.model('gh7660', parentSchema);
-    
+
     const test = new Test({
       child: {
         foo: 'test',

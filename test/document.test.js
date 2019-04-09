@@ -7215,6 +7215,39 @@ describe('document', function() {
     return Promise.resolve();
   });
 
+  it('overwriting single nested (gh-7660)', function() {
+    const childSchema = new mongoose.Schema({
+      foo: String,
+      bar: Number
+    }, { _id: false, id: false, });
+    
+    const parentSchema = new mongoose.Schema({
+      child: childSchema
+    });
+    const Test = db.model('gh7660', parentSchema);
+    
+    const test = new Test({
+      child: {
+        foo: 'test',
+        bar: 42
+      }
+    });
+
+    test.set({
+      child: {
+        foo: 'modified',
+        bar: 43
+      }
+    });
+
+    assert.deepEqual(test.toObject().child, {
+      foo: 'modified',
+      bar: 43
+    });
+
+    return Promise.resolve();
+  });
+
   it('$isEmpty() (gh-5369)', function() {
     const schema = new Schema({
       nested: { foo: String },

@@ -455,38 +455,64 @@ describe('model', function() {
         });
       });
 
-      it('embedded discriminators with create() (gh-5001)', function(done) {
-        var eventSchema = new Schema({ message: String },
-          { discriminatorKey: 'kind', _id: false });
-        var batchSchema = new Schema({ events: [eventSchema] });
-        var docArray = batchSchema.path('events');
+      it('embedded discriminators with array defaults (gh-7687)', function() {
+        const abstractSchema = new Schema({}, {
+          discriminatorKey: 'kind',
+          _id: false
+        });
+        const concreteSchema = new Schema({ foo: { type: Number } });
+        const defaultValue = [{ kind: 'concrete', foo: 42 }];
 
-        var Clicked = docArray.discriminator('Clicked', new Schema({
+        const schema = new Schema({
+          items: {
+            type: [abstractSchema],
+            default: defaultValue
+          },
+        });
+
+        schema.path('items').discriminator('concrete', concreteSchema);
+
+        const Thing = mongoose.model('Thing', schema);
+        const doc = new Thing();
+
+        assert.equal(doc.items[0].foo, 42);
+        assert.equal(doc.items[0].constructor.name, 'concrete');
+
+        return Promise.resolve();
+      });
+
+      it('embedded discriminators with create() (gh-5001)', function() {
+        const eventSchema = new Schema({ message: String },
+          { discriminatorKey: 'kind', _id: false });
+        const batchSchema = new Schema({ events: [eventSchema] });
+        const docArray = batchSchema.path('events');
+
+        const Clicked = docArray.discriminator('Clicked', new Schema({
           element: {
             type: String,
             required: true
           }
         }, { _id: false }));
 
-        var Purchased = docArray.discriminator('Purchased', new Schema({
+        const Purchased = docArray.discriminator('Purchased', new Schema({
           product: {
             type: String,
             required: true
           }
         }, { _id: false }));
 
-        var Batch = db.model('EventBatch', batchSchema);
+        const Batch = db.model('EventBatch', batchSchema);
 
-        var batch = {
+        const batch = {
           events: [
             { kind: 'Clicked', element: '#hero' }
           ]
         };
 
-        Batch.create(batch).
+        return Batch.create(batch).
           then(function(doc) {
             assert.equal(doc.events.length, 1);
-            var newDoc = doc.events.create({
+            const newDoc = doc.events.create({
               kind: 'Purchased',
               product: 'action-figure-1'
             });
@@ -500,10 +526,7 @@ describe('model', function() {
             assert.equal(doc.events[1].product, 'action-figure-1');
             assert.ok(newDoc instanceof Purchased);
             assert.ok(newDoc === doc.events[1]);
-
-            done();
-          }).
-          catch(done);
+          });
       });
 
       it('supports clone() (gh-4983)', function(done) {

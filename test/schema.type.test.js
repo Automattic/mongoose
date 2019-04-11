@@ -31,6 +31,25 @@ describe('schematype', function() {
     done();
   });
 
+  it('handles index: false with unique, sparse, text set to false (gh-7620)', function(done) {
+    let s = new Schema({name: {type: String, index: false, unique: false}});
+    assert.equal(s.path('name')._index, false);
+    s = new Schema({name: {type: String, unique: false, index: false}});
+    assert.equal(s.path('name')._index, false);
+
+    s = new Schema({name: {type: String, index: false, sparse: false}});
+    assert.equal(s.path('name')._index, false);
+    s = new Schema({name: {type: String, sparse: false, index: false}});
+    assert.equal(s.path('name')._index, false);
+
+    s = new Schema({name: {type: String, index: false, text: false}});
+    assert.equal(s.path('name')._index, false);
+    s = new Schema({name: {type: String, text: false, index: false}});
+    assert.equal(s.path('name')._index, false);
+
+    done();
+  });
+
   describe('checkRequired()', function() {
     it('with inherits (gh-7486)', function() {
       const m = new mongoose.Mongoose();

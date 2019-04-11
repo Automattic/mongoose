@@ -37,6 +37,19 @@ describe('collections:', function() {
     });
   });
 
+  it('returns a promise if buffering and no callback (gh-7676)', function(done) {
+    const db = mongoose.createConnection();
+    const collection = db.collection('gh7676');
+
+    const promise = collection.insertOne({}, {});
+
+    const uri = 'mongodb://localhost:27017/mongoose_test';
+    db.openUri(process.env.MONGOOSE_TEST_URI || uri, { useNewUrlParser: true }, function(err) {
+      assert.ifError(err);
+      promise.then(() => done(), done);
+    });
+  });
+
   it('methods should that throw (unimplemented)', function(done) {
     const collection = new Collection('test', mongoose.connection);
     let thrown = false;

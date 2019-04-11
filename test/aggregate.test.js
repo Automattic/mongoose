@@ -398,13 +398,17 @@ describe('aggregate: ', function() {
     });
   });
 
-  describe('bind', function() {
+  describe('model()', function() {
     it('works', function(done) {
       const aggregate = new Aggregate();
       const model = { foo: 42 };
 
+      assert.equal(aggregate._model, null);
+      assert.equal(aggregate.model(), null);
+
       assert.equal(aggregate.model(model), aggregate);
       assert.equal(aggregate._model, model);
+      assert.equal(aggregate.model(), model);
 
       done();
     });

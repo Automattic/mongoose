@@ -1,3 +1,12 @@
+5.5.1 / 2019-04-11
+==================
+ * fix(document): correctly overwrite all properties when setting a single nested subdoc #7660 #7681
+ * fix(array): allow customization of array required validator #7696 [freewil](https://github.com/freewil)
+ * fix(discriminator): handle embedded discriminators when casting array defaults #7687
+ * fix(collection): ensure collection functions return a promise even if disconnected #7676
+ * fix(schematype): avoid indexing properties with `{ unique: false, index: false }` #7620
+ * fix(aggregate): make `Aggregate#model()` with no arguments return the aggregation's model #7608
+
 5.5.0 / 2019-04-08
 ==================
  * feat(model): support applying hooks to custom static functions #5982

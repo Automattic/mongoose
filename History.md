@@ -18,7 +18,7 @@
  * feat(model): print warning when calling create() incorrectly with a session #7535
  * feat(document): add Document#isEmpty() and corresponding helpers for nested paths #5369
  * feat(document): add `getters` option to Document#get() #7233
- feat(query): add Query#projection() to get or overwrite the current projection #7384
+ * feat(query): add Query#projection() to get or overwrite the current projection #7384
  * fix(document): set full validator path on validatorProperties if `propsParameter` set on validator #7447
  * feat(document): add Document#directModifiedPaths() #7373
  * feat(document): add $locals property #7691

@@ -7248,6 +7248,48 @@ describe('document', function() {
     return Promise.resolve();
   });
 
+  it('handles .set() on doc array within embedded discriminator (gh-7656)', function() {
+    const pageElementSchema = new Schema({
+      type: { type: String, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const textElementSchema = new Schema({
+      body: { type: String }
+    });
+
+    const blockElementSchema = new Schema({
+      elements: [pageElementSchema]
+    });
+
+    blockElementSchema.path('elements').discriminator('block', blockElementSchema);
+    blockElementSchema.path('elements').discriminator('text', textElementSchema);
+
+    const pageSchema = new Schema({ elements: [pageElementSchema] });
+
+    pageSchema.path('elements').discriminator('block', blockElementSchema);
+    pageSchema.path('elements').discriminator('text', textElementSchema);
+
+    const Page = db.model('gh7656', pageSchema);
+    const page = new Page({
+      elements: [
+        { type: 'text', body: 'Page Title' },
+        { type: 'block', elements: [{ type: 'text', body: 'Page Content' }] }
+      ]
+    });
+
+    page.set('elements.0.body', 'Page Heading');
+    assert.equal(page.elements[0].body, 'Page Heading');
+    assert.equal(page.get('elements.0.body'), 'Page Heading');
+
+    page.set('elements.1.elements.0.body', 'Page Body');
+    assert.equal(page.elements[1].elements[0].body, 'Page Body');
+    assert.equal(page.get('elements.1.elements.0.body'), 'Page Body');
+
+    page.elements[1].elements[0].body = 'Page Body';
+    assert.equal(page.elements[1].elements[0].body, 'Page Body');
+    assert.equal(page.get('elements.1.elements.0.body'), 'Page Body');
+  });
+
   it('$isEmpty() (gh-5369)', function() {
     const schema = new Schema({
       nested: { foo: String },

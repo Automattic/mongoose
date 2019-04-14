@@ -204,7 +204,7 @@ describe('timestamps', function() {
 
   it('handles custom statics that conflict with built-in functions (gh-7698)', function() {
     const schema = new mongoose.Schema({ name: String }, { timestamps: true });
-    
+
     let called = 0;
     schema.statics.updateOne = function() {
       ++called;

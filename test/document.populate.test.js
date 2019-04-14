@@ -900,8 +900,8 @@ describe('document.populate', function() {
     const schema = mongoose.Schema({ a: { type: String, default: 'TEST' } });
     const schema2 = mongoose.Schema({
       g: {
-          type: mongoose.ObjectId,
-          ref: 'gh7685_1'
+        type: mongoose.ObjectId,
+        ref: 'gh7685_1'
       }
     });
     const schema3 = mongoose.Schema({

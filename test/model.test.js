@@ -6154,7 +6154,7 @@ describe('Model', function() {
       try {
         yield Model.listIndexes();
       } catch (err) {
-        assert.ok(err.message.indexOf('Database mongoose_test') !== -1,
+        assert.ok(err.message.indexOf('_6967') !== -1,
           err.message);
         threw = true;
       }

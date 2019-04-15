@@ -7248,6 +7248,25 @@ describe('document', function() {
     return Promise.resolve();
   });
 
+  it('setting path to non-POJO object (gh-7639)', function() {
+    class Nested {
+      constructor(prop) {
+        this.prop = prop;
+      }
+    }
+
+    const schema = new Schema({ nested: { prop: String } });
+    const Model = db.model('gh7639', schema);
+
+    const doc = new Model({ nested: { prop: '1' } });
+
+    doc.set('nested', new Nested('2'));
+    assert.equal(doc.nested.prop, '2');
+
+    doc.set({ nested: new Nested('3') });
+    assert.equal(doc.nested.prop, '3');
+  });
+
   it('handles .set() on doc array within embedded discriminator (gh-7656)', function() {
     const pageElementSchema = new Schema({
       type: { type: String, required: true }

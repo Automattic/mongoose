@@ -1,3 +1,11 @@
+5.5.2 / 2019-04-16
+==================
+ * fix(document): support setting nested path to non-POJO object #7639
+ * perf(connection): remove leaked event handler in `Model.init()` so `deleteModel()` frees all memory #7682
+ * fix(timestamps): handle custom statics that conflict with built-in functions (like mongoose-delete plugin) #7698
+ * fix(populate): make `Document#populated()` work for populated subdocs #7685
+ * fix(document): support `.set()` on document array underneath embedded discriminator path #7656
+
 5.5.1 / 2019-04-11
 ==================
  * fix(document): correctly overwrite all properties when setting a single nested subdoc #7660 #7681

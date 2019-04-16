@@ -1,3 +1,11 @@
+5.5.2 / 2019-04-16
+==================
+ * fix(document): support setting nested path to non-POJO object #7639
+ * perf(connection): remove leaked event handler in `Model.init()` so `deleteModel()` frees all memory #7682
+ * fix(timestamps): handle custom statics that conflict with built-in functions (like mongoose-delete plugin) #7698
+ * fix(populate): make `Document#populated()` work for populated subdocs #7685
+ * fix(document): support `.set()` on document array underneath embedded discriminator path #7656
+
 5.5.1 / 2019-04-11
 ==================
  * fix(document): correctly overwrite all properties when setting a single nested subdoc #7660 #7681
@@ -18,7 +26,7 @@
  * feat(model): print warning when calling create() incorrectly with a session #7535
  * feat(document): add Document#isEmpty() and corresponding helpers for nested paths #5369
  * feat(document): add `getters` option to Document#get() #7233
- feat(query): add Query#projection() to get or overwrite the current projection #7384
+ * feat(query): add Query#projection() to get or overwrite the current projection #7384
  * fix(document): set full validator path on validatorProperties if `propsParameter` set on validator #7447
  * feat(document): add Document#directModifiedPaths() #7373
  * feat(document): add $locals property #7691

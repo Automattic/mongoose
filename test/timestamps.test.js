@@ -201,4 +201,21 @@ describe('timestamps', function() {
       assert.ok(doc._doc.updatedAt.valueOf() >= start.valueOf());
     });
   });
+
+  it('handles custom statics that conflict with built-in functions (gh-7698)', function() {
+    const schema = new mongoose.Schema({ name: String }, { timestamps: true });
+
+    let called = 0;
+    schema.statics.updateOne = function() {
+      ++called;
+      return mongoose.Model.updateOne.apply(this, arguments);
+    };
+    const M = db.model('gh7698', schema);
+
+    const startTime = Date.now();
+    return M.updateOne({}, { name: 'foo' }, { upsert: true }).
+      then(() => assert.equal(called, 1)).
+      then(() => M.findOne()).
+      then(doc => assert.ok(doc.createdAt.valueOf() >= startTime));
+  });
 });

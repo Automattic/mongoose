@@ -895,4 +895,36 @@ describe('document.populate', function() {
       });
     });
   });
+
+  it('populated() works with nested subdocs (gh-7685)', function() {
+    const schema = mongoose.Schema({ a: { type: String, default: 'TEST' } });
+    const schema2 = mongoose.Schema({
+      g: {
+        type: mongoose.ObjectId,
+        ref: 'gh7685_1'
+      }
+    });
+    const schema3 = mongoose.Schema({
+      i: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gh7685_2'
+      }
+    });
+
+    const M = db.model('gh7685_1', schema);
+    const N = db.model('gh7685_2', schema2);
+    const O = db.model('gh7685_3', schema3);
+
+    return co(function*() {
+      const m = yield M.create({a: 'TEST'});
+      const n = yield N.create({g: m._id});
+      const o = yield O.create({i: n._id});
+
+      const doc = yield O.findOne({_id: o._id}).populate('i').exec();
+      const finalDoc = yield doc.populate('i.g').execPopulate();
+
+      assert.ok(finalDoc.populated('i.g'));
+      assert.ok(finalDoc.i.populated('g'));
+    });
+  });
 });

@@ -7363,4 +7363,35 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('push() onto discriminator doc array (gh-7704)', function() {
+    const opts = {
+      minimize: false, // So empty objects are returned
+      strict: true,
+      typeKey: '$type', // So that we can use fields named `type`
+      discriminatorKey: 'type',
+    };
+  
+    const IssueSchema = new mongoose.Schema({
+      _id: String,
+      text: String,
+      type: String,
+    }, opts);
+  
+    const IssueModel = mongoose.model('gh7704', IssueSchema);
+
+    const SubIssueSchema = new mongoose.Schema({
+      checklist: [{
+        completed: {$type: Boolean, default: false},
+      }]
+    }, opts);
+    IssueModel.discriminator('gh7704_sub', SubIssueSchema);
+
+    const doc = new IssueModel({ _id: 'foo', text: 'text', type: 'gh7704_sub' });
+    doc.checklist.push({ completed: true });
+
+    assert.ifError(doc.validateSync());
+
+    return Promise.resolve();
+  });
 });

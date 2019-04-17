@@ -11,7 +11,7 @@ describe('collections:', function() {
     const db = mongoose.createConnection();
     const collection = db.collection('test-buffering-collection');
     let connected = false;
-    let inserted = false;
+    let insertedId = undefined;
     let pending = 2;
 
     function finish() {
@@ -19,14 +19,17 @@ describe('collections:', function() {
         return;
       }
       assert.ok(connected);
-      assert.ok(inserted);
-      done();
+      assert.ok(insertedId !== undefined);
+      collection.findOne({_id: insertedId}).then(doc => {
+        assert.strictEqual(doc.foo, 'bar');
+        db.close();
+        done();
+      });
     }
 
-    collection.insertOne({}, {}, function() {
+    collection.insertOne({foo:'bar'}, {}, function(err, result) {
       assert.ok(connected);
-      inserted = true;
-      db.close();
+      insertedId = result.insertedId;
       finish();
     });
 
@@ -41,7 +44,12 @@ describe('collections:', function() {
     const db = mongoose.createConnection();
     const collection = db.collection('gh7676');
 
-    const promise = collection.insertOne({}, {});
+    const promise = collection.insertOne({foo:'bar'}, {})
+      .then(result =>
+        collection.findOne({_id: result.insertedId})
+      ).then(doc => {
+        assert.strictEqual(doc.foo, 'bar');
+      });
 
     const uri = 'mongodb://localhost:27017/mongoose_test';
     db.openUri(process.env.MONGOOSE_TEST_URI || uri, { useNewUrlParser: true }, function(err) {

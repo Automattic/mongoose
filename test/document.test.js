@@ -7371,13 +7371,13 @@ describe('document', function() {
       typeKey: '$type', // So that we can use fields named `type`
       discriminatorKey: 'type',
     };
-  
+
     const IssueSchema = new mongoose.Schema({
       _id: String,
       text: String,
       type: String,
     }, opts);
-  
+
     const IssueModel = mongoose.model('gh7704', IssueSchema);
 
     const SubIssueSchema = new mongoose.Schema({

@@ -2215,9 +2215,9 @@ describe('model: findOneAndUpdate:', function() {
           }]
         }
       });
-    
+
       const Book = db.model('gh7679', bookSchema);
-    
+
       return Book.findOneAndUpdate({}, { genres: ['Sci-Fi'] }, { upsert: true }).
         then(() => Book.findOne()).
         then(doc => assert.equal(doc.genres[0], 'sci-fi'));

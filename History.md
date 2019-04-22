@@ -1,3 +1,16 @@
+5.5.3 / 2019-04-22
+==================
+ * fix: add findAndModify deprecation warning that references the useFindAndModify option #7644
+ * fix(document): handle pushing a doc onto a discriminator that contains a doc array #7704
+ * fix(update): run setters on array elements when doing $set #7679
+ * fix: correct usage of arguments while buffering commands #7718 [rzymek](https://github.com/rzymek)
+ * fix(document): avoid error clearing modified subpaths if doc not defined #7715 [bitflower](https://github.com/bitflower)
+ * refactor(array): move `_parent` property behind a symbol #7726 #7700
+ * docs(model): list out all operations and options for `bulkWrite()` #7055
+ * docs(aggregate): use `eachAsync()` instead of nonexistent `each()` #7699
+ * docs(validation): add CastError validation example #7514
+ * docs(query+model): list out all options and callback details for Model.updateX() and Query#updateX() #7646
+
 5.5.2 / 2019-04-16
 ==================
  * fix(document): support setting nested path to non-POJO object #7639

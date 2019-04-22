@@ -337,6 +337,36 @@ describe('validation docs', function() {
   });
 
   /**
+   * Before running validators, Mongoose attempts to coerce values to the
+   * correct type. This process is called _casting_ the document. If
+   * casting fails for a given path, the `error.errors` object will contain
+   * a `CastError` object.
+   *
+   * Casting runs before validation, and validation does not run if casting
+   * fails. That means your custom validators may assume `v` is `null`,
+   * `undefined`, or an instance of the type specified in your schema.
+   */
+
+  it('Cast Errors', function() {
+    const vehicleSchema = new mongoose.Schema({
+      numWheels: { type: Number, max: 18 }
+    });
+    const Vehicle = db.model('Vehicle', vehicleSchema);
+
+    const doc = new Vehicle({ numWheels: 'not a number' });
+    const err = doc.validateSync();
+
+    err.errors['numWheels'].name; // 'CastError'
+    // 'Cast to Number failed for value "not a number" at path "numWheels"'
+    err.errors['numWheels'].message;
+    // acquit:ignore:start
+    assert.equal(err.errors['numWheels'].name, 'CastError');
+    assert.equal(err.errors['numWheels'].message,
+      'Cast to Number failed for value "not a number" at path "numWheels"');
+    // acquit:ignore:end
+  });
+
+  /**
    * Defining validators on nested objects in mongoose is tricky, because
    * nested objects are not fully fledged paths.
    */

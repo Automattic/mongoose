@@ -2206,6 +2206,23 @@ describe('model: findOneAndUpdate:', function() {
       );
     });
 
+    it('runs setters on array elements (gh-7679)', function() {
+      const bookSchema = new Schema({
+        genres: {
+          type: [{
+            type: String,
+            lowercase: true
+          }]
+        }
+      });
+
+      const Book = db.model('gh7679', bookSchema);
+
+      return Book.findOneAndUpdate({}, { genres: ['Sci-Fi'] }, { upsert: true }).
+        then(() => Book.findOne()).
+        then(doc => assert.equal(doc.genres[0], 'sci-fi'));
+    });
+
     it('avoid calling $pull in doc array (gh-6971) (gh-6889)', function() {
       const schema = new Schema({
         arr: {

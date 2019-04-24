@@ -218,4 +218,28 @@ describe('timestamps', function() {
       then(() => M.findOne()).
       then(doc => assert.ok(doc.createdAt.valueOf() >= startTime));
   });
+
+  it('timestamps handle reusing child schemas (gh-7712)', function() {
+    const childSchema = new mongoose.Schema({ name: String }, {
+      timestamps: true
+    });
+    const M1 = db.model('gh7712', new mongoose.Schema({ child: childSchema }));
+    const M2 = db.model('gh7712_1', new mongoose.Schema({
+      children: [childSchema]
+    }));
+
+    let startTime = null;
+    return M1.create({ child: { name: 'foo' } }).
+      then(() => new Promise(resolve => setTimeout(resolve, 25))).
+      then(() => M1.findOne()).
+      then(doc => {
+        assert.ok(doc.child.updatedAt);
+        startTime = Date.now();
+        return M1.findOneAndUpdate({}, { $set: { 'child.name': 'bar' } }, { new: true });
+      }).
+      then(doc => {
+        assert.ok(doc.child.updatedAt.valueOf() >= startTime,
+          `Timestamp not updated: ${doc.child.updatedAt}`);
+      });
+  });
 });

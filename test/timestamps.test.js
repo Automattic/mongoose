@@ -224,7 +224,7 @@ describe('timestamps', function() {
       timestamps: true
     });
     const M1 = db.model('gh7712', new mongoose.Schema({ child: childSchema }));
-    const M2 = db.model('gh7712_1', new mongoose.Schema({
+    db.model('gh7712_1', new mongoose.Schema({
       children: [childSchema]
     }));
 

@@ -126,6 +126,47 @@ describe('types array', function() {
     });
   });
 
+  describe('includes()', function() {
+    it('works', function(done) {
+      const User = db.model('User', 'users_' + random());
+      const Pet = db.model('Pet', 'pets' + random());
+
+      const tj = new User({name: 'tj'});
+      const tobi = new Pet({name: 'tobi'});
+      const loki = new Pet({name: 'loki'});
+      const jane = new Pet({name: 'jane'});
+
+      tj.pets.push(tobi);
+      tj.pets.push(loki);
+      tj.pets.push(jane);
+
+      let pending = 3;
+
+      function cb() {
+        Pet.find({}, function(err) {
+          assert.ifError(err);
+          tj.save(function(err) {
+            assert.ifError(err);
+            User.findOne({name: 'tj'}, function(err, user) {
+              assert.ifError(err);
+              assert.equal(user.pets.length, 3);
+              assert.equal(user.pets.includes(tobi.id), true);
+              assert.equal(user.pets.includes(loki.id), true);
+              assert.equal(user.pets.includes(jane.id), true);
+              done();
+            });
+          });
+        });
+      }
+
+      [tobi, loki, jane].forEach(function(pet) {
+        pet.save(function() {
+          --pending || cb();
+        });
+      });
+    });
+  });
+
   describe('push()', function() {
     let N, S, B, M, D, ST;
 

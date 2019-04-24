@@ -103,7 +103,7 @@ describe('model: findOneAndReplace:', function() {
     let query;
 
     // Model.findOneAndReplace
-    query = M.findOneAndReplace({author: 'aaron'}, {select: 'author'});
+    query = M.findOneAndReplace({author: 'aaron'}, {}, {select: 'author'});
     assert.equal(query._fields.author, 1);
     assert.equal(query._conditions.author, 'aaron');
 
@@ -122,7 +122,7 @@ describe('model: findOneAndReplace:', function() {
     assert.equal(query._conditions.date, now);
     assert.equal(query._conditions.author, 'aaron');
 
-    query = M.find().findOneAndReplace({author: 'aaron'}, {select: 'author'});
+    query = M.find().findOneAndReplace({author: 'aaron'}, {}, {select: 'author'});
     assert.equal(query._fields.author, 1);
     assert.equal(query._conditions.author, 'aaron');
 
@@ -237,15 +237,8 @@ describe('model: findOneAndReplace:', function() {
 
   it('supports v3 select string syntax', function(done) {
     const M = db.model(modelname, collection);
-    const _id = new DocumentObjectId();
 
-    let query;
-
-    query = M.findByIdAndDelete(_id, {select: 'author -title'});
-    assert.strictEqual(1, query._fields.author);
-    assert.strictEqual(0, query._fields.title);
-
-    query = M.findOneAndReplace({}, {select: 'author -title'});
+    const query = M.findOneAndReplace({}, {}, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
@@ -253,15 +246,8 @@ describe('model: findOneAndReplace:', function() {
 
   it('supports v3 select object syntax', function(done) {
     const M = db.model(modelname, collection);
-    const _id = new DocumentObjectId;
 
-    let query;
-
-    query = M.findByIdAndDelete(_id, {select: {author: 1, title: 0}});
-    assert.strictEqual(1, query._fields.author);
-    assert.strictEqual(0, query._fields.title);
-
-    query = M.findOneAndReplace({}, {select: {author: 1, title: 0}});
+    const query = M.findOneAndReplace({}, {}, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
@@ -269,16 +255,8 @@ describe('model: findOneAndReplace:', function() {
 
   it('supports v3 sort string syntax', function(done) {
     const M = db.model(modelname, collection);
-    const _id = new DocumentObjectId();
 
-    let query;
-
-    query = M.findByIdAndDelete(_id, {sort: 'author -title'});
-    assert.equal(Object.keys(query.options.sort).length, 2);
-    assert.equal(query.options.sort.author, 1);
-    assert.equal(query.options.sort.title, -1);
-
-    query = M.findOneAndReplace({}, {sort: 'author -title'});
+    const query = M.findOneAndReplace({}, {}, {sort: 'author -title'});
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);
@@ -287,16 +265,8 @@ describe('model: findOneAndReplace:', function() {
 
   it('supports v3 sort object syntax', function(done) {
     const M = db.model(modelname, collection);
-    const _id = new DocumentObjectId();
 
-    let query;
-
-    query = M.findByIdAndDelete(_id, {sort: {author: 1, title: -1}});
-    assert.equal(Object.keys(query.options.sort).length, 2);
-    assert.equal(query.options.sort.author, 1);
-    assert.equal(query.options.sort.title, -1);
-
-    query = M.findOneAndReplace(_id, {sort: {author: 1, title: -1}});
+    const query = M.findOneAndReplace({}, {}, {sort: {author: 1, title: -1}});
     assert.equal(Object.keys(query.options.sort).length, 2);
     assert.equal(query.options.sort.author, 1);
     assert.equal(query.options.sort.title, -1);

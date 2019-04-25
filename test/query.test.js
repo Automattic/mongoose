@@ -3206,7 +3206,7 @@ describe('Query', function() {
         assert.ok(doc.children[1].updatedAt && doc.children[1].createdAt);
         assert.ok(doc.children[2].updatedAt && doc.children[2].createdAt);
 
-        const start = Date.now();
+        const start = new Date();
         yield cb => setTimeout(cb, 10);
 
         const cond = {};
@@ -3214,10 +3214,11 @@ describe('Query', function() {
         yield Parent.updateOne(cond, update);
 
         const found = yield Parent.findOne({});
-        const updatedAt = found.children[0].updatedAt.valueOf();
+        const updatedAt = found.children[0].updatedAt;
         const name = found.children[0].name;
         assert.ok(name, 'Luke');
-        assert.ok(updatedAt > start, `Expected ${updatedAt} > ${start}`);
+        assert.ok(updatedAt.valueOf() > start.valueOf(),
+          `Expected ${updatedAt} > ${start}`);
       });
     });
 

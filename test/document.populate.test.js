@@ -464,6 +464,7 @@ describe('document.populate', function() {
   describe('sub-level properties', function() {
     it('with string arg', function(done) {
       B.findById(post, function(err, post) {
+        assert.ifError(err);
         const id0 = post.comments[0]._creator;
         const id1 = post.comments[1]._creator;
         post.populate('comments._creator', function(err, post) {
@@ -724,6 +725,37 @@ describe('document.populate', function() {
           assert.strictEqual(populatedAgain.$last, null);
           done();
         });
+    });
+
+    it('depopulates field with empty array (gh-7740)', function() {
+      db.model(
+        'gh_7740_1',
+        new mongoose.Schema({
+          name: String,
+          chapters: Number
+        })
+      );
+      const Author = db.model(
+        'gh_7740_2',
+        new mongoose.Schema({
+          name: String,
+          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh_7740_1' }], default: [] },
+        })
+      );
+
+      return co(function*() {
+        const author = new Author({
+          name: 'Fonger',
+          books: []
+        });
+        yield author.save();
+        yield author.populate('books').execPopulate();
+        assert.ok(author.books);
+        assert.strictEqual(author.books.length, 0);
+        author.depopulate('books');
+        assert.ok(author.books);
+        assert.strictEqual(author.books.length, 0);
+      });
     });
   });
 

@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const co = require('co');
 const start = require('./common');
 
 const mongoose = start.mongoose;
@@ -217,5 +218,38 @@ describe('timestamps', function() {
       then(() => assert.equal(called, 1)).
       then(() => M.findOne()).
       then(doc => assert.ok(doc.createdAt.valueOf() >= startTime));
+  });
+
+  it('timestamps handle reusing child schemas (gh-7712)', function() {
+    const childSchema = new mongoose.Schema({ name: String }, {
+      timestamps: true
+    });
+    const M1 = db.model('gh7712', new mongoose.Schema({ child: childSchema }));
+    const M2 = db.model('gh7712_1', new mongoose.Schema({
+      children: [childSchema]
+    }));
+
+    return co(function*() {
+      let startTime = null;
+      let doc = yield M1.create({ child: { name: 'foo' } });
+      assert.ok(doc.child.updatedAt);
+      yield new Promise(resolve => setTimeout(resolve, 25));
+      startTime = Date.now();
+
+      doc = yield M1.findOneAndUpdate({}, { $set: { 'child.name': 'bar' } },
+        { new: true });
+      assert.ok(doc.child.updatedAt.valueOf() >= startTime,
+        `Timestamp not updated: ${doc.child.updatedAt}`);
+
+      doc = yield M2.create({ children: [{ name: 'foo' }] });
+      assert.ok(doc.children[0].updatedAt);
+      yield new Promise(resolve => setTimeout(resolve, 25));
+      startTime = Date.now();
+
+      doc = yield M2.findOneAndUpdate({ 'children.name': 'foo' },
+        { $set: { 'children.$.name': 'bar' } }, { new: true });
+      assert.ok(doc.children[0].updatedAt.valueOf() >= startTime,
+        `Timestamp not updated: ${doc.children[0].updatedAt}`);
+    });
   });
 });

@@ -7394,4 +7394,21 @@ describe('document', function() {
 
     return Promise.resolve();
   });
+
+  it('doesnt call getter when saving (gh-7719)', function() {
+    let called = 0;
+    const kittySchema = new mongoose.Schema({
+      name: {
+        type: String,
+        get: function(v) {
+          ++called;
+          return v;
+        }
+      }
+    })
+    const Kitten = db.model('gh7719', kittySchema)
+
+    const k = new Kitten({ name: 'Mr Sprinkles' });
+    return k.save().then(() => assert.equal(called, 0));
+  });
 });

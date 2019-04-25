@@ -101,6 +101,43 @@ describe('Map', function() {
     done();
   });
 
+  it('supports delete() (gh-7743)', function() {
+    const Person = db.model('gh7743', new mongoose.Schema({
+      name: String,
+      fact: {
+        type: Map,
+        default: {},
+        of: Boolean
+      }
+    }));
+
+    return co(function*() {
+      const person = new Person({
+        name: 'Arya Stark',
+        fact: {
+          cool: true,
+          girl: true,
+          killer: true
+        }
+      });
+
+      yield person.save();
+
+      assert.strictEqual(person.fact.get('killer'), true);
+
+      person.fact.delete('killer');
+
+      assert.deepStrictEqual(person.$__delta()[1], { '$unset': { 'fact.killer': 1 } });
+      assert.deepStrictEqual(Array.from(person.fact.keys()).sort(), ['cool', 'girl']);
+      assert.strictEqual(person.fact.get('killer'), undefined);
+
+      yield person.save();
+
+      const queryPerson = yield Person.findOne({ name: 'Arya Stark' });
+      assert.strictEqual(queryPerson.fact.get('killer'), undefined);
+    });
+  });
+
   it('query casting', function() {
     const TestSchema = new mongoose.Schema({
       v: {

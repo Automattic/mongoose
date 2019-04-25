@@ -7405,8 +7405,8 @@ describe('document', function() {
           return v;
         }
       }
-    })
-    const Kitten = db.model('gh7719', kittySchema)
+    });
+    const Kitten = db.model('gh7719', kittySchema);
 
     const k = new Kitten({ name: 'Mr Sprinkles' });
     return k.save().then(() => assert.equal(called, 0));

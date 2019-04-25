@@ -725,6 +725,37 @@ describe('document.populate', function() {
           done();
         });
     });
+
+    it('depopulates field with empty array (gh-7740)', function() {
+      db.model(
+        'gh_7740_1',
+        new mongoose.Schema({
+          name: String,
+          chapters: Number
+        })
+      );
+      const Author = db.model(
+        'gh_7740_2',
+        new mongoose.Schema({
+          name: String,
+          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh_7740_1' }], default: [] },
+        })
+      );
+
+      return co(function*() {
+        const author = new Author({
+          name: 'Fonger',
+          books: []
+        });
+        yield author.save();
+        yield author.populate('books').execPopulate();
+        assert.ok(author.books);
+        assert.strictEqual(author.books.length, 0);
+        author.depopulate('books');
+        assert.ok(author.books);
+        assert.strictEqual(author.books.length, 0);
+      });
+    });
   });
 
   it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {

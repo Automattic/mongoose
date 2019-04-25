@@ -464,6 +464,7 @@ describe('document.populate', function() {
   describe('sub-level properties', function() {
     it('with string arg', function(done) {
       B.findById(post, function(err, post) {
+        assert.ifError(err);
         const id0 = post.comments[0]._creator;
         const id1 = post.comments[1]._creator;
         post.populate('comments._creator', function(err, post) {

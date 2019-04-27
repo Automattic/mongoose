@@ -7411,4 +7411,21 @@ describe('document', function() {
     const k = new Kitten({ name: 'Mr Sprinkles' });
     return k.save().then(() => assert.equal(called, 0));
   });
+
+  it('skips malformed validators property (gh-7720)', function() {
+    const NewSchema = new Schema({
+      object: {
+        type: 'string',
+        validators: ['string'] // This caused the issue
+      }
+    });
+
+    const TestModel = db.model('gh7720', NewSchema);
+    const instance = new TestModel();
+    instance.object = 'value';
+
+    assert.ifError(instance.validateSync());
+
+    return instance.validate();
+  });
 });

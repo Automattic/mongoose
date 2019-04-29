@@ -7441,7 +7441,7 @@ describe('document', function() {
       },
       properties: { type: Object }
     });
-    
+
     const userSchema = new Schema({
       position: geojsonSchema
     });
@@ -7459,7 +7459,7 @@ describe('document', function() {
           a: 'b'
         }
       });
-    
+
       const newUser = new User({
         position: position
       });

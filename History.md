@@ -1,3 +1,10 @@
+5.5.5 / 2019-04-30
+==================
+ * fix(document): ensure nested properties within single nested subdocs get set correctly when overwriting single nested subdoc #7748
+ * fix(document): skip non-object `validators` in schema types #7720
+ * fix: bump mongodb driver -> 3.2.3 #7752
+ * fix(map): disallow setting map key with special properties #7750 [Fonger](https://github.com/Fonger)
+
 5.5.4 / 2019-04-25
 ==================
  * fix(document): avoid calling custom getters when saving #7719

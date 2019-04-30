@@ -7411,4 +7411,69 @@ describe('document', function() {
     const k = new Kitten({ name: 'Mr Sprinkles' });
     return k.save().then(() => assert.equal(called, 0));
   });
+
+  it('skips malformed validators property (gh-7720)', function() {
+    const NewSchema = new Schema({
+      object: {
+        type: 'string',
+        validators: ['string'] // This caused the issue
+      }
+    });
+
+    const TestModel = db.model('gh7720', NewSchema);
+    const instance = new TestModel();
+    instance.object = 'value';
+
+    assert.ifError(instance.validateSync());
+
+    return instance.validate();
+  });
+
+  it('nested set on subdocs works (gh-7748)', function() {
+    const geojsonSchema = new Schema({
+      type: { type: String, default: 'Feature' },
+      geometry: {
+        type: {
+          type: String,
+          required: true
+        },
+        coordinates: { type: [] }
+      },
+      properties: { type: Object }
+    });
+
+    const userSchema = new Schema({
+      position: geojsonSchema
+    });
+
+    const GeoJson = db.model('gh7748_0', geojsonSchema);
+    const User = db.model('gh7748', userSchema);
+
+    return co(function*() {
+      const position = new GeoJson({
+        geometry: {
+          type: 'Point',
+          coordinates: [1.11111, 2.22222]
+        },
+        properties: {
+          a: 'b'
+        }
+      });
+
+      const newUser = new User({
+        position: position
+      });
+      yield newUser.save();
+
+      const editUser = yield User.findById(newUser._id);
+      editUser.position = position;
+
+      yield editUser.validate();
+      yield editUser.save();
+
+      const fromDb = yield User.findById(newUser._id);
+      assert.equal(fromDb.position.properties.a, 'b');
+      assert.equal(fromDb.position.geometry.coordinates[0], 1.11111);
+    });
+  });
 });

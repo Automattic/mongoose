@@ -37,7 +37,7 @@ describe('types.document', function() {
 
     function _Subdocument() {
       const arr = new DocumentArray;
-      arr._path = 'jsconf.ar';
+      arr.$path = () => 'jsconf.ar';
       arr.$parent = () => new Dummy;
       arr[0] = this;
       EmbeddedDocument.call(this, {}, arr);

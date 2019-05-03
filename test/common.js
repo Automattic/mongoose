@@ -7,7 +7,7 @@
 const Server = require('mongodb-topology-manager').Server;
 const mongoose = require('../');
 const Collection = mongoose.Collection;
-const assert = require('power-assert');
+const assert = require('assert');
 
 let server;
 

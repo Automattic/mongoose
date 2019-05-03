@@ -4,7 +4,7 @@
  * Test dependencies.
  */
 
-const assert = require('power-assert');
+const assert = require('assert');
 const co = require('co');
 const start = require('./common');
 

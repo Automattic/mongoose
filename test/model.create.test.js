@@ -5,7 +5,7 @@
  */
 
 const start = require('./common');
-const assert = require('power-assert');
+const assert = require('assert');
 const mongoose = start.mongoose;
 const random = require('../lib/utils').random;
 const Schema = mongoose.Schema;

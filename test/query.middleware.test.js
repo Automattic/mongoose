@@ -1,7 +1,7 @@
 'use strict';
 
 const start = require('./common');
-const assert = require('power-assert');
+const assert = require('assert');
 const co = require('co');
 
 const mongoose = start.mongoose;

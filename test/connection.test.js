@@ -6,7 +6,7 @@
 
 const Promise = require('bluebird');
 const Q = require('q');
-const assert = require('power-assert');
+const assert = require('assert');
 const co = require('co');
 const server = require('./common').server;
 const start = require('./common');

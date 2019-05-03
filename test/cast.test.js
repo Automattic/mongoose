@@ -5,7 +5,7 @@
 'use strict';
 
 const Schema = require('../lib/schema');
-const assert = require('power-assert');
+const assert = require('assert');
 const cast = require('../lib/cast');
 const ObjectId = require('bson').ObjectId;
 const Buffer = require('safe-buffer').Buffer;

@@ -1,6 +1,6 @@
 'use strict';
 
-const assert = require('power-assert');
+const assert = require('assert');
 const chalk = require('chalk');
 const random = require('../lib/utils').random;
 const start = require('./common');

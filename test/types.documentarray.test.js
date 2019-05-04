@@ -68,7 +68,7 @@ describe('types.documentarray', function() {
     assert.ok(a.isMongooseDocumentArray);
     assert.ok(Array.isArray(a));
 
-    assert.deepEqual(a._atomics.constructor, Object);
+    assert.deepEqual(a.$atomics().constructor, Object);
 
     done();
   });

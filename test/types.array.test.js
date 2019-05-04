@@ -52,7 +52,16 @@ describe('types array', function() {
     assert.ok(a.isMongooseArray);
     assert.equal(Array.isArray(a), true);
 
-    assert.deepEqual(a._atomics.constructor, Object);
+    assert.deepEqual(a.$atomics().constructor, Object);
+    done();
+  });
+
+  it('is `deepEqual()` another array (gh-7700)', function(done) {
+    const Test = db.model('gh7700', new Schema({ arr: [String] }));
+    const doc = new Test({ arr: ['test'] });
+
+    assert.deepEqual(doc.arr, new MongooseArray(['test']));
+
     done();
   });
 
@@ -839,7 +848,7 @@ describe('types array', function() {
           color = doc.colors.$pop();
           assert.equal(color, undefined);
           assert.equal(doc.colors.length, 2);
-          assert.ok(!('$set' in doc.colors._atomics), 'invalid $atomic op used');
+          assert.ok(!('$set' in doc.colors.$atomics()), 'invalid $atomic op used');
           doc.save(function(err) {
             assert.equal(err, null);
             const color = doc.colors.$pop();

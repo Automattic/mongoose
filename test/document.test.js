@@ -7476,4 +7476,17 @@ describe('document', function() {
       assert.equal(fromDb.position.geometry.coordinates[0], 1.11111);
     });
   });
+
+  it('does not convert array to object with strict: false (gh-7733)', function() {
+    const ProductSchema = new mongoose.Schema({}, { strict: false });
+    const Product = db.model('gh7733', ProductSchema);
+
+    return co(function*() {
+      yield Product.create({ arr: [{ test: 1 }, { test: 2 }] });
+
+      const doc = yield Product.collection.findOne();
+      assert.ok(Array.isArray(doc.arr));
+      assert.deepEqual(doc.arr, [{ test: 1 }, { test: 2 }]);
+    });
+  });
 });

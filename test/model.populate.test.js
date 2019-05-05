@@ -8337,16 +8337,16 @@ describe('model: populate:', function() {
       localField: 'roles.roleId',
       foreignField: '_id',
       count: true
-    })
-  
+    });
+
     const RoleSchema = new Schema({});
-  
+
     const GroupModel = db.model('gh7731_Group', GroupSchema);
-    const RoleModel = db.model('gh7731_Role', RoleSchema);
-  
+    db.model('gh7731_Role', RoleSchema);
+
     return co(function*() {
       yield GroupModel.create({ roles: [] });
-  
+
       const res = yield GroupModel.findOne({}).populate('rolesCount');
       assert.strictEqual(res.rolesCount, 0);
     });

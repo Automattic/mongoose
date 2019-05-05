@@ -8325,4 +8325,30 @@ describe('model: populate:', function() {
       assert.deepEqual(docs[1].teams[0].nested.members.map(m => m.name), ['foo']);
     });
   });
+
+  it('sets populate virtual with count to 0 if local field empty (gh-7731)', function() {
+    const GroupSchema = new Schema({
+      roles: [{
+        roleId: String
+      }]
+    });
+    GroupSchema.virtual('rolesCount', {
+      ref: 'gh7731_Role',
+      localField: 'roles.roleId',
+      foreignField: '_id',
+      count: true
+    })
+  
+    const RoleSchema = new Schema({});
+  
+    const GroupModel = db.model('gh7731_Group', GroupSchema);
+    const RoleModel = db.model('gh7731_Role', RoleSchema);
+  
+    return co(function*() {
+      yield GroupModel.create({ roles: [] });
+  
+      const res = yield GroupModel.findOne({}).populate('rolesCount');
+      assert.strictEqual(res.rolesCount, 0);
+    });
+  });
 });

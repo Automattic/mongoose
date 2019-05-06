@@ -4,7 +4,7 @@
  * Test dependencies.
  */
 
-const assert = require('power-assert');
+const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
@@ -3611,7 +3611,6 @@ describe('Model', function() {
       assert.deepEqual(out.numbers, Array.prototype.slice.call(post.numbers));
       assert.equal(out.date.valueOf(), post.date.valueOf());
       assert.equal(out.activePaths, undefined);
-      assert.equal(out._atomics, undefined);
       done();
     });
   });

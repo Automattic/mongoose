@@ -5,7 +5,7 @@
 
 'use strict';
 
-const assert = require('power-assert');
+const assert = require('assert');
 const start = require('./common');
 const mongoose = start.mongoose;
 const EmbeddedDocument = require('../lib/types/embedded');

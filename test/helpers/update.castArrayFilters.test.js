@@ -137,4 +137,31 @@ describe('castArrayFilters', function() {
     assert.strictEqual(q.options.arrayFilters[0]['arr.nestedArr.nestedId'], 2);
     assert.strictEqual(q.options.arrayFilters[1]['nArr.nestedId'], 2);
   });
+
+  it('respects `strictQuery` option (gh-7728)', function() {
+    const schema = new Schema({
+      arr: [{
+        id: Number
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    const p = { 'arr.$[arr].id': 42 };
+    const opts = {
+      arrayFilters: [
+        { 'arr.notInSchema': '42' }
+      ]
+    };
+
+    q.updateOne({}, p, opts);
+
+    castArrayFilters(q);
+    assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
+
+    q.schema.options.strictQuery = true;
+    assert.throws(function() {
+      castArrayFilters(q);
+    }, /Could not find path.*in schema/);
+  });
 });

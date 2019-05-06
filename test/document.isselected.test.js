@@ -6,7 +6,7 @@
 
 const start = require('./common');
 const mongoose = start.mongoose;
-const assert = require('power-assert');
+const assert = require('assert');
 const EventEmitter = require('events').EventEmitter;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;

@@ -8271,6 +8271,28 @@ describe('model: populate:', function() {
     });
   });
 
+  it('supports populating a path in a document array embedded in an array (gh-7647)', function() {
+    const schema = new Schema({
+      recordings: [[{
+        file: { type: Schema.ObjectId, ref: 'gh7647_Asset' }
+      }]]
+    });
+    const Song = db.model('gh7647_Song', schema);
+    const Asset = db.model('gh7647_Asset', Schema({ name: String }));
+
+    return co(function*() {
+      const a = yield Asset.create({ name: 'foo' });
+      yield Song.create({ recordings: [[{ file: a._id }]] });
+
+      const doc = yield Song.findOne().populate('recordings.file');
+
+      assert.equal(doc.recordings.length, 1);
+      assert.equal(doc.recordings[0].length, 1);
+      assert.equal(doc.recordings[0][0].file.name, 'foo');
+      assert.ok(doc.populated('recordings.file'));
+    });
+  });
+
   it('handles populating deeply nested path if value in db is a primitive (gh-7545)', function() {
     const personSchema = new Schema({ _id: Number, name: String });
     const PersonModel = db.model('gh7545_People', personSchema);
@@ -8301,6 +8323,32 @@ describe('model: populate:', function() {
 
       assert.equal(docs[1].teams.length, 1);
       assert.deepEqual(docs[1].teams[0].nested.members.map(m => m.name), ['foo']);
+    });
+  });
+
+  it('sets populate virtual with count to 0 if local field empty (gh-7731)', function() {
+    const GroupSchema = new Schema({
+      roles: [{
+        roleId: String
+      }]
+    });
+    GroupSchema.virtual('rolesCount', {
+      ref: 'gh7731_Role',
+      localField: 'roles.roleId',
+      foreignField: '_id',
+      count: true
+    });
+
+    const RoleSchema = new Schema({});
+
+    const GroupModel = db.model('gh7731_Group', GroupSchema);
+    db.model('gh7731_Role', RoleSchema);
+
+    return co(function*() {
+      yield GroupModel.create({ roles: [] });
+
+      const res = yield GroupModel.findOne({}).populate('rolesCount');
+      assert.strictEqual(res.rolesCount, 0);
     });
   });
 });

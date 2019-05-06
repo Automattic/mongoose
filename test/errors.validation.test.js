@@ -6,7 +6,7 @@
 'use strict';
 
 const ValidationError = require('../lib/error/validation');
-const assert = require('power-assert');
+const assert = require('assert');
 const start = require('./common');
 
 const mongoose = start.mongoose;

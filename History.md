@@ -1,3 +1,12 @@
+5.5.6 / 2019-05-06
+==================
+ * fix(document): stop converting arrays to objects when setting non-schema path to array with strict: false #7733
+ * fix(array): make two Mongoose arrays `assert.deepEqual()` each other if they have the same values #7700
+ * fix(populate): support populating a path in a document array embedded in an array #7647
+ * fix(populate): set populate virtual count to 0 if local field is empty #7731
+ * fix(update): avoid throwing cast error if casting array filter that isn't in schema with strictQuery = false #7728
+ * docs: fix typo in `distinct()` description #7767 [phil-r](https://github.com/phil-r)
+
 5.5.5 / 2019-04-30
 ==================
  * fix(document): ensure nested properties within single nested subdocs get set correctly when overwriting single nested subdoc #7748

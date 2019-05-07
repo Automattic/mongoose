@@ -396,7 +396,7 @@ describe('Map', function() {
       const Scene = db.model('gh7745_Scene', new mongoose.Schema({
         name: String
       }));
-      
+
       const Event = db.model('gh7745_Event', new mongoose.Schema({
         scenes: {
           type: Map,

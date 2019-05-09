@@ -6231,9 +6231,9 @@ describe('Model', function() {
     schema.pre('save', function() {
       sessions.push(this.$session());
     });
-  
+
     const SampleModel = db.model('gh7742', schema);
-  
+
     return co(function*() {
       yield SampleModel.create({ name: 'foo' });
       // start session

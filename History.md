@@ -1,3 +1,12 @@
+5.5.7 / 2019-05-09
+==================
+ * fix(model): set $session() before pre save middleware runs when calling save() with options #7742
+ * fix(model): set $session before pre remove hooks run when calling remove() with options #7742
+ * fix(schema): support `remove()` on nested path #2398
+ * fix(map): handle setting populated map element to doc #7745
+ * fix(query): return rawResult when inserting with options `{new:false,upsert:true,rawResult:true}` #7774 #7770 [LiaanM](https://github.com/LiaanM)
+ * fix(schematype): remove internal `validators` option because it conflicts with Backbone #7720
+
 5.5.6 / 2019-05-06
 ==================
  * fix(document): stop converting arrays to objects when setting non-schema path to array with strict: false #7733

@@ -7489,4 +7489,19 @@ describe('document', function() {
       assert.deepEqual(doc.arr, [{ test: 1 }, { test: 2 }]);
     });
   });
+
+  it('does not crash with array property named "undefined" (gh-7756)', function() {
+    const schema = new Schema({ 'undefined': [String] });
+    const Model = db.model('gh7756_undefined', schema);
+
+    return co(function*() {
+      const doc = yield Model.create({ 'undefined': ['foo'] });
+
+      doc['undefined'].push('bar');
+      yield doc.save();
+
+      const _doc = yield Model.collection.findOne();
+      assert.equal(_doc['undefined'][0], 'foo');
+    });
+  });
 });

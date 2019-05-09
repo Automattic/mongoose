@@ -838,6 +838,30 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
   });
+  it('return rawResult when doing an upsert & new=false gh-7770', function(done) {
+    const thingSchema = new Schema({
+      _id: String,
+      flag: {
+        type: Boolean,
+        default: false
+      }
+    });
+
+    const Thing = db.model('gh-7770', thingSchema);
+    const key = 'some-new-id';
+
+    Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false, rawResult:true}).exec(function(err, rawResult) {
+      assert.ifError(err);
+      assert.equal(rawResult.lastErrorObject.updatedExisting, false );
+      Thing.findOneAndUpdate({_id: key}, {$set: {flag: true}}, {upsert: true, new: false, rawResult: true}).exec(function(err, rawResult2) {
+        assert.ifError(err);
+        assert.equal(rawResult2.lastErrorObject.updatedExisting, true );
+        assert.equal(rawResult2.value._id, key);
+        assert.equal(rawResult2.value.flag, false);
+        done();
+      });
+    });
+  });
 
   it('allows properties to be set to null gh-1643', function(done) {
     const thingSchema = new Schema({

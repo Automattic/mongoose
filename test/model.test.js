@@ -6224,4 +6224,59 @@ describe('Model', function() {
       assert.equal(called[0].name, 'MongoError');
     });
   });
+
+  it('sets $session() before pre save hooks run (gh-7742)', function() {
+    const schema = new Schema({ name: String });
+    let sessions = [];
+    schema.pre('save', function() {
+      sessions.push(this.$session());
+    });
+
+    const SampleModel = db.model('gh7742', schema);
+
+    return co(function*() {
+      yield SampleModel.create({ name: 'foo' });
+      // start session
+      const session = yield db.startSession();
+
+      // get doc
+      const doc = yield SampleModel.findOne();
+      doc.foo = 'bar';
+
+      sessions = [];
+      yield doc.save({ session });
+      assert.equal(sessions.length, 1);
+      assert.strictEqual(sessions[0], session);
+
+      sessions = [];
+      yield doc.save({ session: null });
+      assert.equal(sessions.length, 1);
+      assert.strictEqual(sessions[0], null);
+    });
+  });
+
+  it('sets $session() before pre remove hooks run (gh-7742)', function() {
+    const schema = new Schema({ name: String });
+    let sessions = [];
+    schema.pre('remove', function() {
+      sessions.push(this.$session());
+    });
+
+    const SampleModel = db.model('gh7742_remove', schema);
+
+    return co(function*() {
+      yield SampleModel.create({ name: 'foo' });
+      // start session
+      const session = yield db.startSession();
+
+      // get doc
+      const doc = yield SampleModel.findOne();
+      doc.foo = 'bar';
+
+      sessions = [];
+      yield doc.remove({ session });
+      assert.equal(sessions.length, 1);
+      assert.strictEqual(sessions[0], session);
+    });
+  });
 });

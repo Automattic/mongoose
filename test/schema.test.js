@@ -1689,6 +1689,14 @@ describe('schema', function() {
       done();
     });
 
+    it('removes all children of a nested path (gh-2398)', function(done) {
+      this.schema.remove('b');
+      assert.strictEqual(this.schema.nested['b'], undefined);
+      assert.strictEqual(this.schema.nested['b.c'], undefined);
+      assert.strictEqual(this.schema.path('b.c.d'), undefined);
+      done();
+    });
+
     it('removes an array of paths', function(done) {
       this.schema.remove(['e', 'f', 'g']);
       assert.strictEqual(this.schema.path('e'), undefined);

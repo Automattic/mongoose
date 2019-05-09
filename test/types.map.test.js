@@ -391,6 +391,37 @@ describe('Map', function() {
         assert.ok(!(populated.apiKeys instanceof Map));
       });
     });
+
+    it('handles setting populated path to doc and then saving (gh-7745)', function() {
+      const Scene = db.model('gh7745_Scene', new mongoose.Schema({
+        name: String
+      }));
+
+      const Event = db.model('gh7745_Event', new mongoose.Schema({
+        scenes: {
+          type: Map,
+          default: {},
+          of: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'gh7745_Scene'
+          }
+        }
+      }));
+
+      return co(function*() {
+        const foo = yield Scene.create({ name: 'foo' });
+        let event = yield Event.create({ scenes: { foo: foo._id } });
+
+        event = yield Event.findOne().populate('scenes');
+        const bar = yield Scene.create({ name: 'bar' });
+        event.scenes.set('bar', bar);
+        yield event.save();
+
+        event = yield Event.findOne().populate('scenes');
+        assert.ok(event.scenes.has('bar'));
+        assert.equal(event.scenes.get('bar').name, 'bar');
+      });
+    });
   });
 
   it('discriminators', function() {

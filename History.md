@@ -32,7 +32,7 @@
  * fix(map): make `delete()` unset the key in the database #7746 [Fonger](https://github.com/Fonger)
  * fix(array): use symbol for `_schema` property to avoid confusing deep equality checks #7700
  * fix(document): prevent `depopulate()` from removing fields with empty array #7741 #7740 [Fonger](https://github.com/Fonger)
- * fix: make `MongooseArray#includes` support ObjectIds #7732 #6354 [Fonger](https://github.com/Fonger)
+ * fix: make `MongooseArray#includes` support ObjectIds #7732 #6354 [hansemannn](https://github.com/hansemannn)
  * fix(document): report correct validation error index when pushing onto doc array #7744 [Fonger](https://github.com/Fonger)
 
 5.5.3 / 2019-04-22

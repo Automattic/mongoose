@@ -3108,6 +3108,26 @@ describe('Query', function() {
         yield Test.findOne({}).populate('other');
       });
     });
+
+    it('returns deep populated paths (gh-7757)', function() {
+      db.model('gh7757_L3', new Schema({ name: String }));
+      db.model('gh7757_L2', new Schema({ level3: { type: String, ref: 'L3' } }));
+      const L1 = db.model('gh7757_L1',
+        new Schema({ level1: { type: String, ref: 'L2' } }));
+
+      const query = L1.find().populate({
+        path: 'level1',
+        populate: {
+          path: 'level2',
+          populate: {
+            path: 'level3'
+          }
+        }
+      });
+
+      assert.deepEqual(query.getPopulatedPaths(),
+        ['level1', 'level1.level2', 'level1.level2.level3']);
+    });
   });
 
   describe('setUpdate', function() {

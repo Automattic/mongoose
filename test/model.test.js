@@ -6279,4 +6279,37 @@ describe('Model', function() {
       assert.strictEqual(sessions[0], session);
     });
   });
+
+  it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', function() {
+    const schema = new Schema({ name: String });
+    const sessions = [];
+    schema.pre('validate', function() {
+      sessions.push(this.$session());
+    });
+
+    const SampleModel = db.model('gh7769_validate', schema);
+
+    return co(function*() {
+      // start session
+      const session = yield db.startSession();
+
+      yield SampleModel.insertMany([{ name: 'foo' }, { name: 'bar' }], { session });
+      assert.strictEqual(sessions[0], session);
+      assert.strictEqual(sessions[1], session);
+
+      yield SampleModel.bulkWrite([{
+        insertOne: {
+          doc: { name: 'Samwell Tarly' }
+        },
+      }, {
+        replaceOne: {
+          filter: { name: 'bar' },
+          replacement: { name: 'Gilly' }
+        }
+      }], { session });
+
+      assert.strictEqual(sessions[2], session);
+      assert.strictEqual(sessions[3], session);
+    });
+  });
 });

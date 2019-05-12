@@ -44,9 +44,9 @@ describe('discriminator docs', function () {
    * collection. Every event will have a timestamp, but events that
    * represent clicked links should have a URL. You can achieve this
    * using the `model.discriminator()` function. This function takes
-   * 2 parameters, a model name and a discriminator schema. It returns a
-   * model whose schema is the union of the base schema and the
-   * discriminator schema.
+   * 3 parameters, a model name, a discriminator schema and an optional
+   * key (defaults to the model name). It returns a model whose schema
+   * is the union of the base schema and the discriminator schema.
    */
   it('The `model.discriminator()` function', function (done) {
     var options = {discriminatorKey: 'kind'};

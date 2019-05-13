@@ -1,3 +1,13 @@
+5.5.8 / 2019-05-13
+==================
+ * fix(document): run pre save hooks on nested child schemas #7792
+ * fix(model): set $session() before validation middleware for bulkWrite/insertMany #7785 #7769 [Fonger](https://github.com/Fonger)
+ * fix(query): make `getPopulatedPaths()` return deeply populated paths #7757
+ * fix(query): suppress findAndModify deprecation warning when using `Model.findOneAndUpdate()` #7794
+ * fix: upgrade mongodb -> 3.2.4 #7794
+ * fix(document): handle a couple edge cases with atomics that happen when schema defines an array property named 'undefined' #7756
+ * docs(discriminator): correct function parameters #7786 [gfpacheco](https://github.com/gfpacheco)
+
 5.5.7 / 2019-05-09
 ==================
  * fix(model): set $session() before pre save middleware runs when calling save() with options #7742
@@ -32,7 +42,7 @@
  * fix(map): make `delete()` unset the key in the database #7746 [Fonger](https://github.com/Fonger)
  * fix(array): use symbol for `_schema` property to avoid confusing deep equality checks #7700
  * fix(document): prevent `depopulate()` from removing fields with empty array #7741 #7740 [Fonger](https://github.com/Fonger)
- * fix: make `MongooseArray#includes` support ObjectIds #7732 #6354 [Fonger](https://github.com/Fonger)
+ * fix: make `MongooseArray#includes` support ObjectIds #7732 #6354 [hansemannn](https://github.com/hansemannn)
  * fix(document): report correct validation error index when pushing onto doc array #7744 [Fonger](https://github.com/Fonger)
 
 5.5.3 / 2019-04-22

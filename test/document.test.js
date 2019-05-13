@@ -7489,4 +7489,48 @@ describe('document', function() {
       assert.deepEqual(doc.arr, [{ test: 1 }, { test: 2 }]);
     });
   });
+
+  it('does not crash with array property named "undefined" (gh-7756)', function() {
+    const schema = new Schema({ 'undefined': [String] });
+    const Model = db.model('gh7756_undefined', schema);
+
+    return co(function*() {
+      const doc = yield Model.create({ 'undefined': ['foo'] });
+
+      doc['undefined'].push('bar');
+      yield doc.save();
+
+      const _doc = yield Model.collection.findOne();
+      assert.equal(_doc['undefined'][0], 'foo');
+    });
+  });
+
+  it('fires pre save hooks on nested child schemas (gh-7792)', function() {
+    const childSchema1 = new mongoose.Schema({ name: String });
+    let called1 = 0;
+    childSchema1.pre('save', function() {
+      ++called1;
+    });
+
+    const childSchema2 = new mongoose.Schema({ name: String });
+    let called2 = 0;
+    childSchema2.pre('save', function() {
+      ++called2;
+    });
+
+    const parentSchema = new mongoose.Schema({
+      nested: {
+        child: childSchema1,
+        arr: [childSchema2]
+      }
+    });
+
+    const Parent = db.model('gh7792', parentSchema);
+
+    const obj = { nested: { child: { name: 'foo' }, arr: [{ name: 'bar' }] } };
+    return Parent.create(obj).then(() => {
+      assert.equal(called1, 1);
+      assert.equal(called2, 1);
+    });
+  });
 });

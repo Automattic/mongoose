@@ -1,3 +1,13 @@
+5.5.8 / 2019-05-13
+==================
+ * fix(document): run pre save hooks on nested child schemas #7792
+ * fix(model): set $session() before validation middleware for bulkWrite/insertMany #7785 #7769 [Fonger](https://github.com/Fonger)
+ * fix(query): make `getPopulatedPaths()` return deeply populated paths #7757
+ * fix(query): suppress findAndModify deprecation warning when using `Model.findOneAndUpdate()` #7794
+ * fix: upgrade mongodb -> 3.2.4 #7794
+ * fix(document): handle a couple edge cases with atomics that happen when schema defines an array property named 'undefined' #7756
+ * docs(discriminator): correct function parameters #7786 [gfpacheco](https://github.com/gfpacheco)
+
 5.5.7 / 2019-05-09
 ==================
  * fix(model): set $session() before pre save middleware runs when calling save() with options #7742

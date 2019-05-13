@@ -35,9 +35,9 @@
   },
   "devDependencies": {
     "acorn": "5.7.3",
-    "acquit": "1.0.2",
-    "acquit-ignore": "0.1.0",
-    "acquit-require": "0.1.1",
+    "acquit": "1.x",
+    "acquit-ignore": "0.1.x",
+    "acquit-require": "0.1.x",
     "babel-loader": "7.1.4",
     "babel-preset-es2015": "6.24.1",
     "benchmark": "2.1.2",

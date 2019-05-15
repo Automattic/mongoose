@@ -5131,6 +5131,27 @@ describe('model: populate:', function() {
         });
       });
 
+      it('virtual is undefined when not populated (gh-7795)', function() {
+        const BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: 'gh7795_Author',
+          localField: '_id',
+          foreignField: 'authored'
+        });
+
+        const BlogPost = db.model('gh7795_BlogPost', BlogPostSchema);
+
+        return co(function*() {
+          yield BlogPost.create({ _id: 1, title: 'test' });
+
+          const doc = yield BlogPost.findOne();
+          assert.strictEqual(doc.authors, void 0);
+        });
+      });
+
       it('deep populate virtual -> conventional (gh-4261)', function(done) {
         const PersonSchema = new Schema({
           name: String

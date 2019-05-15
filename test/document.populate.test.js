@@ -715,14 +715,14 @@ describe('document.populate', function() {
           assert.strictEqual(populated.$others.length, 3);
           assert.strictEqual(populated.$single.prop, 'xyzb');
           populated.depopulate();
-          assert.strictEqual(populated.$others, null);
-          assert.strictEqual(populated.$single, null);
+          assert.equal(populated.$others, null);
+          assert.equal(populated.$single, null);
           return populated.populate('$last').execPopulate();
         }).
         then((populatedAgain) => {
           assert.strictEqual(populatedAgain.$last.prop, 'xyzb');
           populatedAgain.depopulate('$last');
-          assert.strictEqual(populatedAgain.$last, null);
+          assert.equal(populatedAgain.$last, null);
           done();
         });
     });

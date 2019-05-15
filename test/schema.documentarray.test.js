@@ -73,4 +73,28 @@ describe('schema.documentarray', function() {
     assert.ok(!schema2.childSchemas[0].schema.$implicitlyCreated);
     done();
   });
+
+  it('supports set with array of document arrays (gh-7799)', function() {
+    const subSchema = new Schema({
+      title: String
+    });
+
+    const nestedSchema = new Schema({
+      nested: [[ subSchema ]]
+    });
+
+    const Nested = mongoose.model('gh7799', nestedSchema);
+
+    const doc = new Nested({nested: [[{ title: 'cool' }, { title: 'not cool' }]]});
+    assert.equal(doc.nested[0].length, 2);
+    assert.equal(doc.nested[0][0].title, 'cool');
+
+    doc.set({nested: [[{ title: 'new' }]]});
+    assert.equal(doc.nested[0].length, 1);
+    assert.equal(doc.nested[0][0].title, 'new');
+
+    doc.nested = [[{ title: 'first' }, { title: 'second' },{ title: 'third' }]];
+    assert.equal(doc.nested[0].length, 3);
+    assert.equal(doc.nested[0][1].title, 'second');
+  });
 });

@@ -8351,4 +8351,26 @@ describe('model: populate:', function() {
       assert.strictEqual(res.rolesCount, 0);
     });
   });
+
+  it('can populate an array property whose name conflicts with array method (gh-7782)', function() {
+    const Child = db.model('gh7782_Child', Schema({ name: String }));
+
+    const Parent = db.model('gh7782_Parent', Schema({
+      list: [{
+        fill: {
+          child: { type:ObjectId, ref:'gh7782_Child' }
+        }
+      }]
+    }));
+
+    return co(function*() {
+      const c = yield Child.create({ name: 'test' });
+      yield Parent.create({ list: [{ fill: { child: c._id } }] });
+
+      const doc = yield Parent.findOne().populate('list.fill.child');
+
+      assert.equal(doc.list.length, 1);
+      assert.strictEqual(doc.list[0].fill.child.name, 'test');
+    });
+  });
 });

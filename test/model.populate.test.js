@@ -5131,6 +5131,27 @@ describe('model: populate:', function() {
         });
       });
 
+      it('virtual is undefined when not populated (gh-7795)', function() {
+        const BlogPostSchema = new Schema({
+          _id: Number,
+          title: String
+        });
+        BlogPostSchema.virtual('authors', {
+          ref: 'gh7795_Author',
+          localField: '_id',
+          foreignField: 'authored'
+        });
+
+        const BlogPost = db.model('gh7795_BlogPost', BlogPostSchema);
+
+        return co(function*() {
+          yield BlogPost.create({ _id: 1, title: 'test' });
+
+          const doc = yield BlogPost.findOne();
+          assert.strictEqual(doc.authors, void 0);
+        });
+      });
+
       it('deep populate virtual -> conventional (gh-4261)', function(done) {
         const PersonSchema = new Schema({
           name: String
@@ -8349,6 +8370,28 @@ describe('model: populate:', function() {
 
       const res = yield GroupModel.findOne({}).populate('rolesCount');
       assert.strictEqual(res.rolesCount, 0);
+    });
+  });
+
+  it('can populate an array property whose name conflicts with array method (gh-7782)', function() {
+    const Child = db.model('gh7782_Child', Schema({ name: String }));
+
+    const Parent = db.model('gh7782_Parent', Schema({
+      list: [{
+        fill: {
+          child: { type:ObjectId, ref:'gh7782_Child' }
+        }
+      }]
+    }));
+
+    return co(function*() {
+      const c = yield Child.create({ name: 'test' });
+      yield Parent.create({ list: [{ fill: { child: c._id } }] });
+
+      const doc = yield Parent.findOne().populate('list.fill.child');
+
+      assert.equal(doc.list.length, 1);
+      assert.strictEqual(doc.list[0].fill.child.name, 'test');
     });
   });
 });

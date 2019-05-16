@@ -28,7 +28,8 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/model.middleware.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/docs/date.test.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/es-next/lean.test.es6.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/es-next/lean.test.es6.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/es-next/cast.test.es6.js').toString())
 ];
 
 function getVersion() {

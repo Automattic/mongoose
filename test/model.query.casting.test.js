@@ -802,6 +802,17 @@ describe('model query casting', function() {
       assert.equal(result.tags.$options, 'img');
       done();
     });
+    it('does not cast with uppercase (gh-7800)', function(done) {
+      const testSchema = new Schema({
+        name: { type: String, uppercase: true }
+      });
+
+      const Model = db.model('gh7800', testSchema);
+      const result = Model.find({}).cast(Model, {name: {$regex: /a/, $options: 'i'}});
+
+      assert.equal(result.name.$options, 'i');
+      done();
+    });
   });
 
   describe('$elemMatch', function() {

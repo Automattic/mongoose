@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose ODM v5.4.20-pre</title><link href="//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="docs/css/default.css" rel="stylesheet"><link href="docs/css/style.css" rel="stylesheet"><link href="/docs/css/github.css" rel="stylesheet"><style>code {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose ODM v5.5.9</title><link href="//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="docs/css/default.css" rel="stylesheet"><link href="docs/css/style.css" rel="stylesheet"><link href="/docs/css/github.css" rel="stylesheet"><style>code {
   font-size: 1em;
 }
 
@@ -55,7 +55,7 @@ img.sponsor {
 }
 </style></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="wrap" class="homepage"><div id="header"><h1><a href="https://github.com/Automattic/mongoose" target="blank"><div class="mongoose">Mongoose</div></a></h1></div><div class="tagline"><p>Elegant <a href="https://www.mongodb.com/">MongoDB</a> object modeling for
 <a href="https://nodejs.org/en/">Node.js</a></p>
-</div><div id="links"><ul><li><a href="docs/guide.html">Read the Docs</a></li><li><a href="http://plugins.mongoosejs.io">Discover Plugins</a></li></ul></div><div id="follow"><ul><li><iframe src="//ghbtns.com/github-btn.html?user=Automattic&amp;repo=mongoose&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px" class="github-btn"></iframe></li><li id="version"><span>Version 5.4.20-pre</span></li><li><iframe src="//ghbtns.com/github-btn.html?user=Automattic&amp;repo=mongoose&amp;type=fork&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px" class="github-btn"></iframe></li></ul></div><div id="inner"><div id="what"><p class="what">Let's face it,&nbsp;<strong>writing MongoDB validation, casting and business logic boilerplate is a drag</strong>. That's why we wrote Mongoose.</p></div><pre><code class="lang-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+</div><div id="links"><ul><li><a href="docs/guide.html">Read the Docs</a></li><li><a href="http://plugins.mongoosejs.io">Discover Plugins</a></li></ul></div><div id="follow"><ul><li><iframe src="//ghbtns.com/github-btn.html?user=Automattic&amp;repo=mongoose&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px" class="github-btn"></iframe></li><li id="version"><span>Version 5.5.9</span></li><li><iframe src="//ghbtns.com/github-btn.html?user=Automattic&amp;repo=mongoose&amp;type=fork&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px" class="github-btn"></iframe></li></ul></div><div id="inner"><div id="what"><p class="what">Let's face it,&nbsp;<strong>writing MongoDB validation, casting and business logic boilerplate is a drag</strong>. That's why we wrote Mongoose.</p></div><pre><code class="lang-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
 mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>, {useNewUrlParser: <span class="hljs-literal">true</span>});
 
 <span class="hljs-keyword">const</span> Cat = mongoose.model(<span class="hljs-string">'Cat'</span>, { name: <span class="hljs-built_in">String</span> });
@@ -98,9 +98,6 @@ query building, business logic hooks and more, out of the box.</p>
     <a href="https://localizejs.com/">
       <img class="sponsor" src="//ww1.prweb.com/prfiles/2015/10/28/13050459/localize-logo-black.png">
     </a>
-    <a href="https://frontendmasters.com/">
-      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F5e18b6b0-83b4-11e8-97c9-03259cc8bf2b.png&height=100" alt="Frontend Masters">
-    </a>
     <a href="https://www.codefirst.co.uk/">
       <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2Fdde88120-e914-11e8-a662-278259d35390.png&height=100">
     </a>
@@ -122,14 +119,32 @@ query building, business logic hooks and more, out of the box.</p>
     <a href="https://domainwheel.com/">
       <img class="sponsor" src="https://s25990.pcdn.co/wp-content/themes/namegenerator/img/logo_dw.jpg" style="height:100px">
     </a>
-    <a href="https://views.guru/">
-      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F3f5383a0-2bba-11e9-ab5d-8fd7c8a252c0.jpg&height=100" style="height:100px">
-    </a>
     <a href="https://uiuxagencies.top/">
       <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F62223ab0-f4f7-11e8-919f-53f2ea21a967.png&height=100" style="height:100px">
     </a>
-    <a href="https://www.gameserverkings.com/">
-      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Flogo.clearbit.com%2Fgameserverkings.com&height=100" style="height:100px">
+    <a href="https://www.promocodewatch.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2Fbd0053f0-4f64-11e9-8022-91853c58485e.png&height=100" style="height:100px">
+    </a>
+    <a href="https://www.vpnranks.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Flogo.clearbit.com%2Fvpnranks.com&height=100" style="height:100px">
+    </a>
+    <a href="https://www.bestvpn.co/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Flogo.clearbit.com%2Fwww.bestvpn.co&height=100" style="height:100px">
+    </a>
+    <a href="https://blokt.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Flogo.clearbit.com%2Fblokt.com&height=100" style="height:100px">
+    </a>
+    <a href="https://paperleaf.ca/">
+      <img class="sponsor" src="https://s3.amazonaws.com/codebarbarian-images/paperleaf.jpg">
+    </a>
+    <a href="https://usave.co.uk/utilities/broadband/">
+      <img class="sponsor" title="Compare broadband deals with usave" src="https://usave.co.uk/img/brand/brand-logo.png" style="height:100px">
+    </a>
+    <a href="http://clay.global/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F09d57c90-637c-11e7-9ed2-bfa12b0351e8.jpg&height=100" style="height: 100px">
+    </a>
+    <a href="https://tekhattan.com/">
+      <img class="sponsor" src="https://images.opencollective.com/proxy/images?src=https%3A%2F%2Fopencollective-production.s3-us-west-1.amazonaws.com%2F31835450-5a98-11e9-adb1-e17fccd4c65e.png&height=80" style="height:80px">
     </a>
   </div>
 </div>

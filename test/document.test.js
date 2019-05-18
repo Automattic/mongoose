@@ -7533,4 +7533,23 @@ describe('document', function() {
       assert.equal(called2, 1);
     });
   });
+
+  it('takes message from async custom validator promise rejection (gh-4913)', function() {
+    const schema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          return co(function*() {
+            throw new Error('Oops!');
+          });
+        }
+      }
+    });
+    const Model = db.model('gh4913', schema);
+
+    return Model.create({ name: 'foo' }).then(() => assert.ok(false), err => {
+      assert.equal(err.errors['name'].message, 'Oops!');
+      assert.ok(err.message.indexOf('Oops!') !== -1, err.message);
+    });
+  });
 });

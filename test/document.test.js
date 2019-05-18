@@ -1751,6 +1751,30 @@ describe('document', function() {
         done();
       });
     });
+
+    it('passes doc as third param for arrow functions (gh-4143)', function() {
+      const schema = new mongoose.Schema({
+        name: {
+          first: String,
+          last: String
+        }
+      });
+      schema.virtual('fullname').
+        get((v, virtual, doc) => `${doc.name.first} ${doc.name.last}`).
+        set((v, virtual, doc) => {
+          const parts = v.split(' ');
+          doc.name.first = parts.slice(0, parts.length - 1).join(' ');
+          doc.name.last = parts[parts.length - 1];
+        });
+      const Model = db.model('gh4143', schema);
+
+      const doc = new Model({ name: { first: 'Jean-Luc', last: 'Picard' } });
+      assert.equal(doc.fullname, 'Jean-Luc Picard');
+
+      doc.fullname = 'Will Riker';
+      assert.equal(doc.name.first, 'Will');
+      assert.equal(doc.name.last, 'Riker');
+    });
   });
 
   describe('gh-2082', function() {
@@ -7540,6 +7564,7 @@ describe('document', function() {
         type: String,
         validate: function() {
           return co(function*() {
+            yield cb => setImmediate(cb);
             throw new Error('Oops!');
           });
         }

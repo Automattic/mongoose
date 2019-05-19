@@ -56,7 +56,7 @@ describe('cast: ', function() {
       done();
     });
 
-    it('casts $in with empty array (gh-5913)', function(done) {
+    it('casts $in and $nin with empty array (gh-5913) (gh-7806)', function(done) {
       const schema = new Schema({
         v: Number,
         arr: [Number]
@@ -65,6 +65,12 @@ describe('cast: ', function() {
         { v: { $in: [1, []] } });
       assert.deepEqual(cast(schema, { arr: { $in: [1, []] } }),
         { arr: { $in: [1, []] } });
+
+      assert.deepEqual(cast(schema, { v: { $nin: [1, []] } }),
+        { v: { $nin: [1, []] } });
+      assert.deepEqual(cast(schema, { arr: { $nin: [1, []] } }),
+        { arr: { $nin: [1, []] } });
+
       done();
     });
 

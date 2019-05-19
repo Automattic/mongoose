@@ -4264,6 +4264,28 @@ describe('Model', function() {
       });
     });
 
+    it('2dsphere indexed field with geojson without value is saved (gh-3233)', function() {
+      const LocationSchema = new Schema({
+        name: { type: String, required: true },
+        location: {
+          type: { type: String, enum: ['Point'] },
+          coordinates: [Number]
+        }
+      });
+
+      LocationSchema.index({ 'location': '2dsphere' });
+
+      const Location = db.model('gh3233', LocationSchema);
+
+      return co(function*() {
+        yield Location.init();
+
+        yield Location.create({
+          name: 'Undefined location'
+        });
+      });
+    });
+
     it('Doc with 2dsphere indexed field without initial value can be updated', function() {
       const PersonSchema = new Schema({
         name: String,

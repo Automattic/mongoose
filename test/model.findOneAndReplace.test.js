@@ -390,4 +390,22 @@ describe('model: findOneAndReplace:', function() {
       });
     });
   });
+
+  it('works (gh-7654)', function() {
+    const schema = new Schema({ name: String, age: Number });
+    const Model = db.model('gh7654', schema);
+
+    return co(function*() {
+      yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, { upsert: true });
+
+      const doc = yield Model.findOne();
+      assert.equal(doc.name, 'Jean-Luc Picard');
+
+      const err = yield Model.findOneAndReplace({}, { age: 'not a number' }, {}).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['age'].message.indexOf('not a number') !== -1,
+        err.errors['age'].message);
+    });
+  });
 });

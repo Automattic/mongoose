@@ -1327,6 +1327,26 @@ describe('model', function() {
       assert.equal(doc.test, 'b');
     });
 
+    it('allows setting custom discriminator key in schema (gh-7807)', function() {
+      const eventSchema = Schema({
+        title: String,
+        kind: { type: String, required: true }
+      }, { discriminatorKey: 'kind' });
+      
+      const Event = db.model('gh7807', eventSchema);
+      const Clicked = Event.discriminator('gh7807_Clicked',
+        Schema({ url: String }));
+
+      const doc = new Event({ title: 'foo' });
+
+      return doc.validate().then(() => assert.ok(false), err => {
+        assert.ok(err);
+        assert.ok(err.errors['kind']);
+        assert.ok(err.errors['kind'].message.indexOf('required') !== -1,
+          err.errors['kind'].message);
+      });
+    });
+
     it('does not project in embedded discriminator key if it is the only selected field (gh-7574)', function() {
       const sectionSchema = Schema({ title: String }, { discriminatorKey: 'kind' });
       const imageSectionSchema = Schema({ href: String });

@@ -1,3 +1,11 @@
+5.5.10 / 2019-05-20
+===================
+ * fix(discriminator): allow user-defined discriminator path in schema #7807
+ * fix(query): ensure `findOneAndReplace()` sends `replacement` to server #7654
+ * fix(cast): allow `[]` as a value when casting `$nin` #7806
+ * docs(model): clarify that setters do run on `update()` by default #7801
+ * docs: fix typo in FAQ #7821 [jaona](https://github.com/jaona)
+
 5.5.9 / 2019-05-16
 ==================
  * fix(query): skip schema setters when casting $regexp $options #7802 [Fonger](https://github.com/Fonger)

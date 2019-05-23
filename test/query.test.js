@@ -846,39 +846,37 @@ describe('Query', function() {
 
     it('overwrites duplicate paths', function(done) {
       const q = new Query({}, {}, null, p1.collection);
-      const o = {
+      let o = {
         path: 'yellow.brick',
         match: {bricks: {$lt: 1000}},
-        select: undefined,
-        model: undefined,
-        options: undefined,
         _docs: {}
       };
-      q.populate(o);
+      q.populate(Object.assign({}, o));
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
-      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
+      assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], o);
+
       q.populate('yellow.brick');
+      o = {
+        path: 'yellow.brick',
+        _docs: {}
+      };
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
-      o.match = undefined;
-      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
+      assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], o);
       done();
     });
 
     it('accepts space delimited strings', function(done) {
       const q = new Query({}, {}, null, p1.collection);
       q.populate('yellow.brick dirt');
-      const o = {
-        path: 'yellow.brick',
-        match: undefined,
-        select: undefined,
-        model: undefined,
-        options: undefined,
-        _docs: {}
-      };
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
-      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
-      o.path = 'dirt';
-      assert.deepEqual(o, q._mongooseOptions.populate.dirt);
+      assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], {
+        path: 'yellow.brick',
+        _docs: {}
+      });
+      assert.deepEqual(q._mongooseOptions.populate['dirt'], {
+        path: 'dirt',
+        _docs: {}
+      });
       done();
     });
   });

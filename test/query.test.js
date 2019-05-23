@@ -1607,7 +1607,7 @@ describe('Query', function() {
       q.setOptions({read: ['s', [{dc: 'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q._mongooseOptions.populate.fans, {path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {}});
+      assert.deepEqual(q._mongooseOptions.populate.fans, {path: 'fans', _docs: {}});
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);

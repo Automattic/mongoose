@@ -1,3 +1,8 @@
+5.5.11 / 2019-05-23
+===================
+ * fix(discriminator): allow numeric discriminator keys for embedded discriminators #7808
+ * chore: add Node.js 12 to travis build matrix #7784
+
 5.5.10 / 2019-05-20
 ===================
  * fix(discriminator): allow user-defined discriminator path in schema #7807

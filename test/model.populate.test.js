@@ -6502,7 +6502,7 @@ describe('model: populate:', function() {
         const dateActivitySchema = new Schema({
           postedBy: {
             type: Schema.Types.ObjectId,
-            ref: 'gh5858',
+            ref: 'gh5858_User',
             required: true
           }
         }, options);
@@ -6519,7 +6519,7 @@ describe('model: populate:', function() {
           kind: String
         }, options);
 
-        const User = db.model('gh5858', { name: String });
+        const User = db.model('gh5858_User', { name: String });
         const Activity = db.model('gh5858_0', activitySchema);
         const DateActivity = Activity.discriminator('gh5858_1', dateActivitySchema);
         const EventActivity = Activity.discriminator('gh5858_2', eventActivitySchema);

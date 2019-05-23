@@ -529,6 +529,33 @@ describe('model', function() {
           });
       });
 
+      it('embedded discriminator with numeric type (gh-7808)', function() {
+        const typesSchema = Schema({
+          type: { type: Number }
+        }, { discriminatorKey:'type',_id:false });
+
+        const mainSchema = Schema({
+          types:[typesSchema]
+        });
+
+        mainSchema.path('types').discriminator(1,
+          Schema({ foo: { type: String, default: 'bar' } }));
+        mainSchema.path('types').discriminator(2,
+          Schema({ hello: { type: String, default: 'world' } }));
+
+        const Model = db.model('gh7808', mainSchema);
+
+        return co(function*() {
+          yield Model.create({
+            types: [{ type: 1 }, { type: 2 }]
+          });
+          const fromDb = yield Model.collection.findOne();
+          assert.equal(fromDb.types.length, 2);
+          assert.equal(fromDb.types[0].foo, 'bar');
+          assert.equal(fromDb.types[1].hello, 'world');
+        });
+      });
+
       it('supports clone() (gh-4983)', function(done) {
         var childSchema = new Schema({
           name: String

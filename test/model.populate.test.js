@@ -8394,4 +8394,41 @@ describe('model: populate:', function() {
       assert.strictEqual(doc.list[0].fill.child.name, 'test');
     });
   });
+
+  it('supports cross-db populate with refPath (gh-6520)', function() {
+    return co(function*() {
+      const db2 = yield mongoose.createConnection(start.uri2);
+
+      const bookSchema = new Schema({ title: String });
+      const movieSchema = new Schema({ title: String });
+
+      const userSchema = new Schema({
+        name: String,
+        kind: String,
+        hobby: {
+          type: Schema.Types.ObjectId,
+          refPath: 'kind'
+        }
+      });
+
+      const User = db.model('gh6520_User', userSchema);
+      const Book = db2.model('Book', bookSchema);
+      const Movie = db2.model('Movie', movieSchema);
+
+      const book = yield Book.create({ title: 'Legacy of the Force: Revelation' });
+      const movie = yield Movie.create({ title: 'A New Hope' });
+
+      yield User.create([
+        { name: 'test1', kind: 'Book', hobby: book._id },
+        { name: 'test2', kind: 'Movie', hobby: movie._id }
+      ]);
+
+      const docs = yield User.find().sort({ name: 1 }).populate({
+        path: 'hobby',
+        connection: db2
+      });
+      assert.equal(docs[0].hobby.title, 'Legacy of the Force: Revelation');
+      assert.equal(docs[1].hobby.title, 'A New Hope');
+    });
+  });
 });

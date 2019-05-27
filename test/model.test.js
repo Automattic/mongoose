@@ -6327,13 +6327,11 @@ describe('Model', function() {
       });
       const Model = db.model('gh7790', schema);
 
-      return co(function*() {
-        yield Model.create({ name: 'foo' });
+      yield Model.create({ name: 'foo' });
 
-        const res = yield Model.findOne();
-        assert.ok(res.loadedAt);
-        assert.equal(called, 0);
-      });
+      const res = yield Model.findOne();
+      assert.ok(res.loadedAt);
+      assert.equal(called, 0);
     });
   });
 });

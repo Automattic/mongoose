@@ -113,7 +113,7 @@ li.version ul.pure-menu-children {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
+  bottom: 231px;
   background-color: #eee;
   width: 250px;
   border-right: 1px solid #ddd;
@@ -278,7 +278,7 @@ pre {
 }
 
 .pure-menu-item:last-of-type {
-  padding-bottom: 200px;
+  padding-bottom: 20px;
 }
 
 /* CPM ads */

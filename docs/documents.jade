@@ -142,19 +142,6 @@ block content
 
     Read the [validation](./validation.html) guide for more details.
 
-    ### Overwriting
-
-    You can overwrite an entire document using `.set()`. This is handy if you
-    want to change what document is being saved in [middleware](./middleware.html).
-
-    ```javascript
-    Tank.findById(id, function (err, tank) {
-      if (err) return handleError(err);
-      // Now `otherTank` is a copy of `tank`
-      otherTank.set(tank);
-    });
-    ```
-
     ### Next Up
 
     Now that we've covered Documents, let's take a look at

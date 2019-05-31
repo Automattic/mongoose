@@ -1,3 +1,13 @@
+5.5.12 / 2019-05-31
+===================
+ * fix(document): fix unexpected error when loading a document with a nested property named `schema` #7831
+ * fix(model): skip applying static hooks by default if static name conflicts with query middleware (re: mongoose-delete plugin) #7790
+ * fix(query): apply schema-level projections to the result of `findOneAndReplace()` #7654
+ * fix: upgrade mongodb driver -> 3.2.6
+ * docs(tutorials): add findOneAndUpdate() tutorial #7847
+ * docs(validation): add `updateOne()` and `updateMany()` to list of update validator operations #7845
+ * docs(model): make sure options lists in `update()` API line up #7842
+
 5.5.11 / 2019-05-23
 ===================
  * fix(discriminator): allow numeric discriminator keys for embedded discriminators #7808

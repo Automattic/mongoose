@@ -7577,4 +7577,16 @@ describe('document', function() {
       assert.ok(err.message.indexOf('Oops!') !== -1, err.message);
     });
   });
+
+  it('handles nested properties named `schema` (gh-7831)', function() {
+    const schema = new mongoose.Schema({ nested: { schema: String } });
+    const Model = db.model('gh7831', schema);
+
+    return co(function*() {
+      yield Model.collection.insertOne({ nested: { schema: 'test' } });
+
+      const doc = yield Model.findOne();
+      assert.strictEqual(doc.nested.schema, 'test');
+    });
+  });
 });

@@ -408,4 +408,18 @@ describe('model: findOneAndReplace:', function() {
         err.errors['age'].message);
     });
   });
+
+  it('schema-level projection (gh-7654)', function() {
+    const schema = new Schema({ name: String, age: { type: Number, select: false } });
+    const Model = db.model('gh7654_0', schema);
+
+    return co(function*() {
+      const doc = yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
+        upsert: true,
+        returnOriginal: false
+      });
+
+      assert.ok(!doc.age);
+    });
+  });
 });

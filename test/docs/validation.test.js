@@ -409,13 +409,17 @@ describe('validation docs', function() {
 
   /**
    * In the above examples, you learned about document validation. Mongoose also
-   * supports validation for `update()` and `findOneAndUpdate()` operations.
+   * supports validation for [`update()`](/docs/api.html#query_Query-update),
+   * [`updateOne()`](/docs/api.html#query_Query-updateOne),
+   * [`updateMany()`](/docs/api.html#query_Query-updateMany),
+   * and [`findOneAndUpdate()`](/docs/api.html#query_Query-findOneAndUpdate) operations.
    * Update validators are off by default - you need to specify
    * the `runValidators` option.
    *
    * To turn on update validators, set the `runValidators` option for
-   * `update()` or `findOneAndUpdate()`. Be careful: update validators
-   * are off by default because they have several caveats.
+   * `update()`, `updateOne()`, `updateMany()`, or `findOneAndUpdate()`.
+   * Be careful: update validators are off by default because they have several
+   * caveats.
    */
   it('Update Validators', function(done) {
     var toySchema = new Schema({
@@ -426,11 +430,11 @@ describe('validation docs', function() {
     var Toy = db.model('Toys', toySchema);
 
     Toy.schema.path('color').validate(function (value) {
-      return /blue|green|white|red|orange|periwinkle/i.test(value);
+      return /red|green|blue/i.test(value);
     }, 'Invalid color');
 
     var opts = { runValidators: true };
-    Toy.updateOne({}, { color: 'bacon' }, opts, function (err) {
+    Toy.updateOne({}, { color: 'not a color' }, opts, function (err) {
       assert.equal(err.errors.color.message,
         'Invalid color');
       // acquit:ignore:start

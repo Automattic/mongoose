@@ -6334,4 +6334,26 @@ describe('Model', function() {
       assert.strictEqual(sessions[3], session);
     });
   });
+
+  it('custom statics that overwrite query functions dont get hooks by default (gh-7790)', function() {
+    return co(function*() {
+      const schema = new Schema({ name: String, loadedAt: Date });
+
+      schema.statics.findOne = function() {
+        return this.findOneAndUpdate({}, { loadedAt: new Date() }, { new: true });
+      };
+
+      let called = 0;
+      schema.pre('findOne', function() {
+        ++called;
+      });
+      const Model = db.model('gh7790', schema);
+
+      yield Model.create({ name: 'foo' });
+
+      const res = yield Model.findOne();
+      assert.ok(res.loadedAt);
+      assert.equal(called, 0);
+    });
+  });
 });

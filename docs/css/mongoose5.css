@@ -113,7 +113,7 @@ li.version ul.pure-menu-children {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
+  bottom: 231px;
   background-color: #eee;
   width: 250px;
   border-right: 1px solid #ddd;
@@ -278,7 +278,7 @@ pre {
 }
 
 .pure-menu-item:last-of-type {
-  padding-bottom: 200px;
+  padding-bottom: 20px;
 }
 
 /* CPM ads */
@@ -287,13 +287,15 @@ pre {
   position: fixed;
   bottom: 0;
   display: block;
+  height: 191px;
   overflow: hidden;
   padding: 20px 10px;
-  max-width: 230px;
+  width: 230px;
   background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) #eeeeee;
   text-align: center;
   font-size: 14px;
   line-height: 1.5;
+  border-right: 1px solid #ddd;
 }
 
 #carbonads a:hover {

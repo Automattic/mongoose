@@ -8431,4 +8431,36 @@ describe('model: populate:', function() {
       assert.equal(docs[1].hobby.title, 'A New Hope');
     });
   });
+
+  it('ref function for conventional populate (gh-7669)', function() {
+    const schema = new mongoose.Schema({
+      kind: String,
+      media: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: doc => doc.kind
+      }
+    });
+    const Model = db.model('gh7669', schema);
+    const Movie = db.model('gh7669_Movie', new Schema({ name: String }));
+    const Book = db.model('gh7669_Book', new Schema({ title: String }));
+
+    return co(function*() {
+      const docs = yield [
+        Movie.create({ name: 'The Empire Strikes Back' }),
+        Book.create({ title: 'New Jedi Order' })
+      ];
+
+      yield Model.create([
+        { kind: 'gh7669_Movie', media: docs[0]._id },
+        { kind: 'gh7669_Book', media: docs[1]._id }
+      ]);
+
+      const res = yield Model.find().sort({ kind: -1 }).populate('media');
+
+      assert.equal(res[0].kind, 'gh7669_Movie');
+      assert.equal(res[0].media.name, 'The Empire Strikes Back');
+      assert.equal(res[1].kind, 'gh7669_Book');
+      assert.equal(res[1].media.title, 'New Jedi Order');
+    });
+  });
 });

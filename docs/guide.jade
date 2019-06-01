@@ -135,19 +135,25 @@ block content
 
     <h3 id="statics"><a href="#statics">Statics</a></h3>
 
-    Adding static methods to a `Model` is simple as well. Continuing with our
-    `animalSchema`:
+    You can also add static functions to your model. There are 2 equivalent
+    ways to add a static:
+
+    - Add a function property to `schema.statics`
+    - Call the [`Schema#static()` function](/docs/api.html#schema_Schema-static)
 
     ```javascript
-      // assign a function to the "statics" object of our animalSchema
-      animalSchema.statics.findByName = function(name, cb) {
-        return this.find({ name: new RegExp(name, 'i') }, cb);
+      // Assign a function to the "statics" object of our animalSchema
+      animalSchema.statics.findByName = function(name) {
+        return this.find({ name: new RegExp(name, 'i') });
       };
-
-      var Animal = mongoose.model('Animal', animalSchema);
-      Animal.findByName('fido', function(err, animals) {
-        console.log(animals);
+      // Or, equivalently, you can call `animalSchema.static()`.
+      animalSchema.static('findByBreed', function(breed) {
+        return this.find({ breed });
       });
+
+      const Animal = mongoose.model('Animal', animalSchema);
+      let animals = await Animal.findByName('fido');
+      animls = animals.concat(await Animal.findByBreed('Poodle'));
     ```
 
     Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.

@@ -4859,6 +4859,32 @@ describe('Model', function() {
       });
     });
 
+    it('deleteOne() with options (gh-7857)', function(done) {
+      const schema = new Schema({
+        name: String
+      });
+      const Character = db.model('gh7857', schema);
+
+      const arr = [
+        { name: 'Tyrion Lannister' },
+        { name: 'Cersei Lannister' },
+        { name: 'Jon Snow' },
+        { name: 'Daenerys Targaryen' }
+      ];
+      Character.insertMany(arr, function(err, docs) {
+        assert.ifError(err);
+        assert.equal(docs.length, 4);
+        Character.deleteOne({ name: 'Jon Snow' }, { w: 1 }, function(err) {
+          assert.ifError(err);
+          Character.find({}, function(err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 3);
+            done();
+          });
+        });
+      });
+    });
+
     it('deleteMany() with options (gh-6805)', function(done) {
       const schema = new Schema({
         name: String

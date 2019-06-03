@@ -7605,6 +7605,26 @@ describe('document', function() {
       Model = db.model('gh7671', schema);
     });
 
+    it('SchemaType#immutable()', function() {
+      const schema = new Schema({
+        createdAt: {
+          type: Date,
+          default: new Date('6/1/2019')
+        },
+        name: String
+      });
+
+      assert.ok(!schema.path('createdAt').$immutable);
+
+      schema.path('createdAt').immutable(true);
+      assert.ok(schema.path('createdAt').$immutable);
+      assert.equal(schema.path('createdAt').setters.length, 1);
+
+      schema.path('createdAt').immutable(false);
+      assert.ok(!schema.path('createdAt').$immutable);
+      assert.equal(schema.path('createdAt').setters.length, 0);
+    });
+
     it('with save()', function() {
       let doc = new Model({ name: 'Foo' });
       return co(function*() {
@@ -7614,6 +7634,10 @@ describe('document', function() {
         doc = yield Model.findOne({ createdAt: new Date('6/1/2019') });
         doc.createdAt = new Date('6/1/2017');
         assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+
+        doc.set({ createdAt: new Date('6/1/2021') });
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+
         yield doc.save();
 
         doc = yield Model.findOne({ createdAt: new Date('6/1/2019') });
@@ -7637,7 +7661,6 @@ describe('document', function() {
         const err = yield Model.updateOne({}, update, { strict: 'throw' }).
           then(() => null, err => err);
         assert.equal(err.name, 'StrictModeError');
-        console.log(err)
         assert.ok(err.message.indexOf('createdAt') !== -1, err.message);
       });
     });

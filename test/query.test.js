@@ -2091,8 +2091,8 @@ describe('Query', function() {
         const q = Test.find({ test: void 0 });
         const res = yield q.exec();
 
-        assert.strictEqual(q.getQuery().test, void 0);
-        assert.ok('test' in q.getQuery());
+        assert.strictEqual(q.getFilter().test, void 0);
+        assert.ok('test' in q.getFilter());
         assert.equal(res.length, 1);
       });
     });

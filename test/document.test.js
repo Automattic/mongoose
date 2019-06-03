@@ -7590,6 +7590,66 @@ describe('document', function() {
     });
   });
 
+  describe('overwrite() (gh-7830)', function() {
+    let Model;
+
+    before(function() {
+      const schema = new Schema({
+        _id: Number,
+        name: String,
+        nested: {
+          prop: String
+        },
+        arr: [Number],
+        immutable: {
+          type: String,
+          immutable: true
+        }
+      });
+      Model = db.model('gh7830', schema);
+    });
+
+    it('works', function() {
+      return co(function*() {
+        const doc = yield Model.create({
+          _id: 1,
+          name: 'test',
+          nested: { prop: 'foo' },
+          immutable: 'bar'
+        });
+        doc.overwrite({ name: 'test2' });
+
+        assert.deepEqual(doc.toObject(), {
+          _id: 1,
+          __v: 0,
+          name: 'test2',
+          immutable: 'bar'
+        });
+      });
+    });
+
+    it('skips version key', function() {
+      return co(function*() {
+        yield Model.collection.insertOne({
+          _id: 2,
+          __v: 5,
+          name: 'test',
+          nested: { prop: 'foo' },
+          immutable: 'bar'
+        });
+        const doc = yield Model.findOne({ _id: 2 });
+        doc.overwrite({ _id: 2, name: 'test2' });
+
+        assert.deepEqual(doc.toObject(), {
+          _id: 2,
+          __v: 5,
+          name: 'test2',
+          immutable: 'bar'
+        });
+      });
+    });
+  });
+
   describe('immutable properties (gh-7671)', function() {
     let Model;
 

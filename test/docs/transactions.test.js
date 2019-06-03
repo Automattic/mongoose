@@ -276,7 +276,7 @@ describe('transactions', function() {
     });
   });
 
-  it('deleteMany (gh-6805)', function() {
+  it('deleteOne and deleteMany (gh-7857)(gh-6805)', function() {
     const Character = db.model('Character', new Schema({ name: String }), 'Character');
 
     let session = null;
@@ -293,9 +293,10 @@ describe('transactions', function() {
         ], { session: session });
       }).
       then(() => Character.deleteMany({ name: /Lannister/ }, { session: session })).
+      then(() => Character.deleteOne({ name: 'Jon Snow' }, { session: session })).
       then(() => Character.find({}).session(session)).
       then(res => {
-        assert.equal(res.length, 2);
+        assert.equal(res.length, 1);
         session.commitTransaction();
       });
   });

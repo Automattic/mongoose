@@ -116,6 +116,7 @@ li.version ul.pure-menu-children {
   bottom: 231px;
   background-color: #eee;
   width: 250px;
+  height: 100%;
   border-right: 1px solid #ddd;
   overflow-y: auto;
 }

@@ -2314,4 +2314,19 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(doc.name, 'test');
     });
   });
+
+  it('runs lowercase on $addToSet, $push, etc (gh-4185)', function() {
+    const Cat = db.model('gh4185', {
+      _id: String,
+      myArr: { type: [{type: String, lowercase: true}], default: undefined }
+    });
+
+    return co(function*() {
+      yield Cat.create({ _id: 'test' });
+      const res = yield Cat.findOneAndUpdate({}, {
+        $addToSet: { myArr: ['Case SenSiTive'] }
+      }, { new: true });
+      assert.equal(res.myArr[0], 'case sensitive');
+    });
+  });
 });

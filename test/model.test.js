@@ -1829,7 +1829,7 @@ describe('Model', function() {
       let num = a.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
-      assert.equal(a.getValue('number').valueOf(), 50);
+      assert.equal(a.$__getValue('number').valueOf(), 50);
 
       called = false;
       const b = new A;
@@ -1838,7 +1838,7 @@ describe('Model', function() {
       num = b.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
-      assert.equal(b.getValue('number').valueOf(), 50);
+      assert.equal(b.$__getValue('number').valueOf(), 50);
       done();
     });
 

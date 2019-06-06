@@ -3065,6 +3065,8 @@ describe('Query', function() {
           orFail().
           then(() => null, err => err);
         assert.equal(err.name, 'DocumentNotFoundError', err.stack);
+        assert.ok(err.message.indexOf('na') !== -1, err.message);
+        assert.ok(err.message.indexOf('gh6841') !== -1, err.message);
         assert.deepEqual(err.filter, { name: 'na' });
       });
     });

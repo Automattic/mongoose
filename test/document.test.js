@@ -4159,9 +4159,10 @@ describe('document', function() {
       });
 
       schema.post('save', function(error, res, next) {
-        if (error instanceof MongooseError.DocumentNotFoundError) {
-          error = new Error('Somebody else updated the document!');
-        }
+        assert.ok(error instanceof MongooseError.DocumentNotFoundError);
+        assert.ok(error.message.indexOf('gh4004') !== -1, error.message);
+
+        error = new Error('Somebody else updated the document!');
         next(error);
       });
 

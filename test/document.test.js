@@ -211,7 +211,7 @@ describe('document', function() {
       doc.nested.setAge = 10;
       assert.equal(doc.nested.age, 10);
       doc.nested.setr = 'set it';
-      assert.equal(doc.getValue('nested.setr'), 'set it setter');
+      assert.equal(doc.$__getValue('nested.setr'), 'set it setter');
 
       const doc2 = new TestDocument();
       doc2.init({

@@ -3396,6 +3396,38 @@ describe('Query', function() {
     });
   });
 
+  it('connection-level maxTimeMS() (gh-4066)', function() {
+    db.options = db.options || {};
+    db.options.maxTimeMS = 10;
+    const Model = db.model('gh4066_conn', new Schema({}));
+
+    return co(function*() {
+      yield Model.create({});
+
+      const res = yield Model.find({ $where: 'sleep(250) || true' }).
+        then(() => null, err => err);
+      assert.ok(res);
+      assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+      delete db.options.maxTimeMS;
+    });
+  });
+
+  it('mongoose-level maxTimeMS() (gh-4066)', function() {
+    db.base.options = db.base.options || {};
+    db.base.options.maxTimeMS = 10;
+    const Model = db.model('gh4066_global', new Schema({}));
+
+    return co(function*() {
+      yield Model.create({});
+
+      const res = yield Model.find({ $where: 'sleep(250) || true' }).
+        then(() => null, err => err);
+      assert.ok(res);
+      assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+      delete db.options.maxTimeMS;
+    });
+  });
+
   it('throws error with updateOne() and overwrite (gh-7475)', function() {
     const Model = db.model('gh7475', new Schema({ name: String }));
 

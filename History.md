@@ -1,3 +1,13 @@
+5.5.13 / 2019-06-05
+===================
+ * fix(model): support passing deleteOne options #7860 #7857 [Fonger](https://github.com/Fonger)
+ * fix(update): run setters on array elements when doing $addToSet, $push, etc #4185
+ * fix(model): support getting discriminator by value when creating a new model #7851
+ * docs(transactions): add section about the `withTransaction()` helper #7598
+ * docs(schema): clarify relationship between Schema#static() and Schema#statics #7827
+ * docs(model): fix typo `projetion` to `projection` #7868 [dfdeagle47](https://github.com/dfdeagle47)
+ * docs(schema): correct schema options lists #7828
+
 5.5.12 / 2019-05-31
 ===================
  * fix(document): fix unexpected error when loading a document with a nested property named `schema` #7831

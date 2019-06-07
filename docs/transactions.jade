@@ -50,6 +50,18 @@ block content
     [require:transactions.*abort]
     ```
 
+    ## The `withTransaction()` Helper
+
+    The previous examples explicitly create a transaction and commits it. In
+    practice, you'll want to use the `session.withTransaction()` helper
+    instead. The `session.withTransaction()` helper handles creating a
+    transaction, committing the transaction if it succeeds, aborting the transaction
+    if your operation throws. It also handles [transient transaction errors](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
+
+    ```javascript
+    [require:transactions.*withTransaction]
+    ```
+
     ## With Mongoose Documents and `save()`
 
     If you get a [Mongoose document](/docs/documents.html) from [`findOne()`](/docs/api.html#findone_findOne)

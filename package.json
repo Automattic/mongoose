@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.5.13-pre",
+  "version": "5.5.14-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,8 +22,8 @@
     "async": "2.6.2",
     "bson": "~1.1.1",
     "kareem": "2.3.0",
-    "mongodb": "3.2.6",
-    "mongodb-core": "3.2.6",
+    "mongodb": "3.2.7",
+    "mongodb-core": "3.2.7",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.6.0",
     "mquery": "3.2.0",
@@ -51,7 +51,7 @@
     "jade": "1.11.0",
     "lodash": "4.17.11",
     "markdown": "0.5.0",
-    "marked": "0.3.9",
+    "marked": "0.6.2",
     "mocha": "5.x",
     "moment": "2.x",
     "mongodb-topology-manager": "1.0.11",

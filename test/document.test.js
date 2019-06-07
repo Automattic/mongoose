@@ -211,7 +211,7 @@ describe('document', function() {
       doc.nested.setAge = 10;
       assert.equal(doc.nested.age, 10);
       doc.nested.setr = 'set it';
-      assert.equal(doc.getValue('nested.setr'), 'set it setter');
+      assert.equal(doc.$__getValue('nested.setr'), 'set it setter');
 
       const doc2 = new TestDocument();
       doc2.init({
@@ -4183,9 +4183,10 @@ describe('document', function() {
       });
 
       schema.post('save', function(error, res, next) {
-        if (error instanceof MongooseError.DocumentNotFoundError) {
-          error = new Error('Somebody else updated the document!');
-        }
+        assert.ok(error instanceof MongooseError.DocumentNotFoundError);
+        assert.ok(error.message.indexOf('gh4004') !== -1, error.message);
+
+        error = new Error('Somebody else updated the document!');
         next(error);
       });
 

@@ -1829,7 +1829,7 @@ describe('Model', function() {
       let num = a.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
-      assert.equal(a.getValue('number').valueOf(), 50);
+      assert.equal(a.$__getValue('number').valueOf(), 50);
 
       called = false;
       const b = new A;
@@ -1838,7 +1838,7 @@ describe('Model', function() {
       num = b.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
-      assert.equal(b.getValue('number').valueOf(), 50);
+      assert.equal(b.$__getValue('number').valueOf(), 50);
       done();
     });
 
@@ -4878,6 +4878,23 @@ describe('Model', function() {
         assert.ok(threw);
         assert.equal(postCalled, 0);
         assert.equal(postErrorCalled, 1);
+      });
+    });
+
+    it('insertMany() return docs with empty modifiedPaths (gh-7852)', function() {
+      const schema = new Schema({
+        name: { type: String }
+      });
+
+      const Food = db.model('gh7852', schema);
+
+      return co(function*() {
+        const foods = yield Food.insertMany([
+          { name: 'Rice dumplings' },
+          { name: 'Beef noodle' }
+        ]);
+        assert.equal(foods[0].modifiedPaths().length, 0);
+        assert.equal(foods[1].modifiedPaths().length, 0);
       });
     });
 

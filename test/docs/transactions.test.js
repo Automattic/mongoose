@@ -78,6 +78,21 @@ describe('transactions', function() {
       then(doc => assert.ok(doc));
   });
 
+  it('withTransaction', function() {
+    // acquit:ignore:start
+    const Customer = db.model('Customer_withTrans', new Schema({ name: String }));
+    // acquit:ignore:end
+    return Customer.createCollection().
+      then(() => Customer.startSession()).
+      // The `withTransaction()` function's first parameter is a function
+      // that returns a promise.
+      then(session => session.withTransaction(() => {
+        return Customer.create([{ name: 'Test' }], { session: session });
+      })).
+      then(() => Customer.countDocuments()).
+      then(count => assert.strictEqual(count, 1));
+  });
+
   it('abort', function() {
     // acquit:ignore:start
     const Customer = db.model('Customer0', new Schema({ name: String }));

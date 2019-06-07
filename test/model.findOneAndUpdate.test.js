@@ -838,6 +838,24 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
   });
+  it('return hydrated document (gh-7734 gh-7735)', function() {
+    const fruitSchema = new Schema({
+      name: { type: String }
+    });
+
+    const Fruit = db.model('gh-7734', fruitSchema);
+    return co(function*() {
+      let fruit = yield Fruit.create({ name: 'Apple' });
+
+      fruit = yield Fruit.findOneAndUpdate({}, { $set: { name: 'Banana' }},
+        { new: true, useFindAndModify: false });
+      assert.ok(fruit instanceof mongoose.Document);
+
+      fruit = yield Fruit.findOneAndUpdate({}, { $set: { name: 'Cherry' }},
+        { new: true, useFindAndModify: true });
+      assert.ok(fruit instanceof mongoose.Document);
+    });
+  });
   it('return rawResult when doing an upsert & new=false gh-7770', function(done) {
     const thingSchema = new Schema({
       _id: String,

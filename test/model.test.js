@@ -4859,6 +4859,23 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() return docs with empty modifiedPaths (gh-7852)', function() {
+      const schema = new Schema({
+        name: { type: String }
+      });
+
+      const Food = db.model('gh7852', schema);
+
+      return co(function*() {
+        const foods = yield Food.insertMany([
+          { name: 'Rice dumplings' },
+          { name: 'Beef noodle' }
+        ]);
+        assert.equal(foods[0].modifiedPaths().length, 0);
+        assert.equal(foods[1].modifiedPaths().length, 0);
+      });
+    });
+
     it('deleteOne() with options (gh-7857)', function(done) {
       const schema = new Schema({
         name: String

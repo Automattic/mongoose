@@ -51,7 +51,7 @@
     "jade": "1.11.0",
     "lodash": "4.17.11",
     "markdown": "0.5.0",
-    "marked": "0.3.9",
+    "marked": "0.6.2",
     "mocha": "5.x",
     "moment": "2.x",
     "mongodb-topology-manager": "1.0.11",

@@ -3,7 +3,7 @@
 const assert = require('assert');
 const Mongoose = require('../../lib');
 
-const mongoose = new Mongoose();
+const mongoose = new Mongoose.Mongoose();
 
 describe('custom casting', function() {
   let originalCast;

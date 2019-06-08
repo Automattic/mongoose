@@ -1,7 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const mongoose = require('../../lib');
+const Mongoose = require('../../lib');
+
+const mongoose = new Mongoose();
 
 describe('custom casting', function() {
   let originalCast;

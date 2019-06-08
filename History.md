@@ -1,3 +1,15 @@
+5.5.14 / 2019-06-08
+===================
+ * fix(query): correct this scope of setters in update query #7876 [Fonger](https://github.com/Fonger)
+ * fix(model): reset modifiedPaths after successful insertMany #7852 #7873 [Fonger](https://github.com/Fonger)
+ * fix(populate): allow using `refPath` with virtual populate #7848
+ * fix(document): prepend private methods getValue and setValue with $ #7870 [Fonger](https://github.com/Fonger)
+ * fix: update mongodb driver -> 3.2.7 #7871 [Fonger](https://github.com/Fonger)
+ * docs(tutorials): add tutorial about custom casting functions #7045
+ * docs(connection): fix outdated events document #7874 [Fonger](https://github.com/Fonger)
+ * docs: fix typo in lean docs #7875 [tannakartikey](https://github.com/tannakartikey)
+ * docs: move off of KeenIO for tracking and use self-hosted analytics instead
+
 5.5.13 / 2019-06-05
 ===================
  * fix(model): support passing deleteOne options #7860 #7857 [Fonger](https://github.com/Fonger)

@@ -1354,6 +1354,19 @@ describe('model', function() {
       assert.equal(doc.test, 'b');
     });
 
+    it('uses correct discriminator when using `new BaseModel` with value (gh-7851)', function() {
+      const options = { discriminatorKey: 'kind' };
+
+      const BaseModel = mongoose.model('gh7851_Base',
+        Schema({ name: String }, options));
+      const ChildModel = BaseModel.discriminator('gh7851_Child',
+        Schema({ test: String }, options), 'child');
+
+      const doc = new BaseModel({ kind: 'child', name: 'a', test: 'b' });
+      assert.ok(doc instanceof ChildModel);
+      assert.equal(doc.test, 'b');
+    });
+
     it('allows setting custom discriminator key in schema (gh-7807)', function() {
       const eventSchema = Schema({
         title: String,

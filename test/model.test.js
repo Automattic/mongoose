@@ -1829,7 +1829,7 @@ describe('Model', function() {
       let num = a.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
-      assert.equal(a.getValue('number').valueOf(), 50);
+      assert.equal(a.$__getValue('number').valueOf(), 50);
 
       called = false;
       const b = new A;
@@ -1838,7 +1838,7 @@ describe('Model', function() {
       num = b.number;
       assert.equal(called, true);
       assert.equal(num.valueOf(), 100);
-      assert.equal(b.getValue('number').valueOf(), 50);
+      assert.equal(b.$__getValue('number').valueOf(), 50);
       done();
     });
 
@@ -4881,6 +4881,49 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() return docs with empty modifiedPaths (gh-7852)', function() {
+      const schema = new Schema({
+        name: { type: String }
+      });
+
+      const Food = db.model('gh7852', schema);
+
+      return co(function*() {
+        const foods = yield Food.insertMany([
+          { name: 'Rice dumplings' },
+          { name: 'Beef noodle' }
+        ]);
+        assert.equal(foods[0].modifiedPaths().length, 0);
+        assert.equal(foods[1].modifiedPaths().length, 0);
+      });
+    });
+
+    it('deleteOne() with options (gh-7857)', function(done) {
+      const schema = new Schema({
+        name: String
+      });
+      const Character = db.model('gh7857', schema);
+
+      const arr = [
+        { name: 'Tyrion Lannister' },
+        { name: 'Cersei Lannister' },
+        { name: 'Jon Snow' },
+        { name: 'Daenerys Targaryen' }
+      ];
+      Character.insertMany(arr, function(err, docs) {
+        assert.ifError(err);
+        assert.equal(docs.length, 4);
+        Character.deleteOne({ name: 'Jon Snow' }, { w: 1 }, function(err) {
+          assert.ifError(err);
+          Character.find({}, function(err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 3);
+            done();
+          });
+        });
+      });
+    });
+
     it('deleteMany() with options (gh-6805)', function(done) {
       const schema = new Schema({
         name: String
@@ -6332,6 +6375,28 @@ describe('Model', function() {
 
       assert.strictEqual(sessions[2], session);
       assert.strictEqual(sessions[3], session);
+    });
+  });
+
+  it('custom statics that overwrite query functions dont get hooks by default (gh-7790)', function() {
+    return co(function*() {
+      const schema = new Schema({ name: String, loadedAt: Date });
+
+      schema.statics.findOne = function() {
+        return this.findOneAndUpdate({}, { loadedAt: new Date() }, { new: true });
+      };
+
+      let called = 0;
+      schema.pre('findOne', function() {
+        ++called;
+      });
+      const Model = db.model('gh7790', schema);
+
+      yield Model.create({ name: 'foo' });
+
+      const res = yield Model.findOne();
+      assert.ok(res.loadedAt);
+      assert.equal(called, 0);
     });
   });
 });

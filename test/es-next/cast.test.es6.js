@@ -27,16 +27,16 @@ describe('Cast Tutorial', function() {
 
   it('get and set', async function() {
     const query = Character.find({ name: 'Jean-Luc Picard' });
-    query.getQuery(); // `{ name: 'Jean-Luc Picard' }`
+    query.getFilter(); // `{ name: 'Jean-Luc Picard' }`
     // acquit:ignore:start
-    assert.deepStrictEqual(query.getQuery(), { name: 'Jean-Luc Picard' });
+    assert.deepStrictEqual(query.getFilter(), { name: 'Jean-Luc Picard' });
     // acquit:ignore:end
 
     // Subsequent chained calls merge new properties into the filter
     query.find({ age: { $gt: 50 } });
-    query.getQuery(); // `{ name: 'Jean-Luc Picard', age: { $gt: 50 } }`
+    query.getFilter(); // `{ name: 'Jean-Luc Picard', age: { $gt: 50 } }`
     // acquit:ignore:start
-    assert.deepStrictEqual(query.getQuery(), {
+    assert.deepStrictEqual(query.getFilter(), {
       name: 'Jean-Luc Picard',
       age: { $gt: 50 }
     });
@@ -53,9 +53,9 @@ describe('Cast Tutorial', function() {
 
     // `{ _id: '5cdc267dd56b5662b7b7cc0c', age: { $gt: '50' } }`
     // Query hasn't been executed yet, so Mongoose hasn't casted the filter.
-    query.getQuery();
+    query.getFilter();
     // acquit:ignore:start
-    assert.deepStrictEqual(query.getQuery(), {
+    assert.deepStrictEqual(query.getFilter(), {
       _id: '5cdc267dd56b5662b7b7cc0c',
       age: { $gt: '50' }
     });
@@ -69,11 +69,11 @@ describe('Cast Tutorial', function() {
 
     // Mongoose casted the filter, so `_id` became an ObjectId and `age.$gt`
     // became a number.
-    query.getQuery()._id instanceof mongoose.Types.ObjectId; // true
-    typeof query.getQuery().age.$gt === 'number'; // true
+    query.getFilter()._id instanceof mongoose.Types.ObjectId; // true
+    typeof query.getFilter().age.$gt === 'number'; // true
     // acquit:ignore:start
-    assert.ok(query.getQuery()._id instanceof mongoose.Types.ObjectId);
-    assert.equal(typeof query.getQuery().age.$gt, 'number');
+    assert.ok(query.getFilter()._id instanceof mongoose.Types.ObjectId);
+    assert.equal(typeof query.getFilter().age.$gt, 'number');
     // acquit:ignore:end
   });
 
@@ -109,9 +109,9 @@ describe('Cast Tutorial', function() {
     const query = Character.findOne({ notInSchema: { $lt: 'not a number' } });
 
     await query.exec();
-    query.getQuery(); // Empty object `{}`, Mongoose removes `notInSchema`
+    query.getFilter(); // Empty object `{}`, Mongoose removes `notInSchema`
     // acquit:ignore:start
-    assert.deepEqual(query.getQuery(), {});
+    assert.deepEqual(query.getFilter(), {});
     // acquit:ignore:end
   });
 
@@ -144,10 +144,10 @@ describe('Cast Tutorial', function() {
     doc.name; // "Jean-Luc Picard"
 
     // `{ name: { $in: ['Jean-Luc Picard', 'Will Riker'] } }`
-    query.getQuery();
+    query.getFilter();
     // acquit:ignore:start
     assert.equal(doc.name, 'Jean-Luc Picard');
-    assert.deepEqual(query.getQuery(), {
+    assert.deepEqual(query.getFilter(), {
       name: { $in: ['Jean-Luc Picard', 'Will Riker'] }
     });
     // acquit:ignore:end

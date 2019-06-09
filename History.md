@@ -1,3 +1,35 @@
+5.5.14 / 2019-06-08
+===================
+ * fix(query): correct this scope of setters in update query #7876 [Fonger](https://github.com/Fonger)
+ * fix(model): reset modifiedPaths after successful insertMany #7852 #7873 [Fonger](https://github.com/Fonger)
+ * fix(populate): allow using `refPath` with virtual populate #7848
+ * fix(document): prepend private methods getValue and setValue with $ #7870 [Fonger](https://github.com/Fonger)
+ * fix: update mongodb driver -> 3.2.7 #7871 [Fonger](https://github.com/Fonger)
+ * docs(tutorials): add tutorial about custom casting functions #7045
+ * docs(connection): fix outdated events document #7874 [Fonger](https://github.com/Fonger)
+ * docs: fix typo in lean docs #7875 [tannakartikey](https://github.com/tannakartikey)
+ * docs: move off of KeenIO for tracking and use self-hosted analytics instead
+
+5.5.13 / 2019-06-05
+===================
+ * fix(model): support passing deleteOne options #7860 #7857 [Fonger](https://github.com/Fonger)
+ * fix(update): run setters on array elements when doing $addToSet, $push, etc #4185
+ * fix(model): support getting discriminator by value when creating a new model #7851
+ * docs(transactions): add section about the `withTransaction()` helper #7598
+ * docs(schema): clarify relationship between Schema#static() and Schema#statics #7827
+ * docs(model): fix typo `projetion` to `projection` #7868 [dfdeagle47](https://github.com/dfdeagle47)
+ * docs(schema): correct schema options lists #7828
+
+5.5.12 / 2019-05-31
+===================
+ * fix(document): fix unexpected error when loading a document with a nested property named `schema` #7831
+ * fix(model): skip applying static hooks by default if static name conflicts with query middleware (re: mongoose-delete plugin) #7790
+ * fix(query): apply schema-level projections to the result of `findOneAndReplace()` #7654
+ * fix: upgrade mongodb driver -> 3.2.6
+ * docs(tutorials): add findOneAndUpdate() tutorial #7847
+ * docs(validation): add `updateOne()` and `updateMany()` to list of update validator operations #7845
+ * docs(model): make sure options lists in `update()` API line up #7842
+
 5.5.11 / 2019-05-23
 ===================
  * fix(discriminator): allow numeric discriminator keys for embedded discriminators #7808

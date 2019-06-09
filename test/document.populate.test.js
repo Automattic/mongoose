@@ -319,7 +319,7 @@ describe('document.populate', function() {
         assert.ifError(err);
 
         // stuff an ad-hoc value in
-        post.setValue('idontexist', user1._id);
+        post.$__setValue('idontexist', user1._id);
 
         // populate the non-schema value by passing an explicit model
         post.populate({path: 'idontexist', model: 'doc.populate.u'}, function(err, post) {

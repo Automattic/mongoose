@@ -1,0 +1,114 @@
+extends layout
+
+block append style
+  link(rel="stylesheet" href="/docs/css/flexcpc.css")
+  script(type="text/javascript" src="/docs/js/native.js")
+
+block content
+  :markdown
+    <h1>Mongoose in the Browser</h1>
+
+    Mongoose supports creating schemas and validating documents in the browser.
+    Mongoose's browser library does **not** support saving documents, [queries](http://mongoosejs.com/docs/queries.html),
+    [populate](http://mongoosejs.com/docs/populate.html),
+    [discriminators](http://mongoosejs.com/docs/discriminators.html),
+    or any other Mongoose feature other than schemas and validating documents.
+
+    Use the below syntax to access the Mongoose browser library.
+
+    ```javascript
+    // Using `require()`
+    const mongoose = require('mongoose/browser');
+
+    // Using ES6 imports
+    import mongoose from 'mongoose/browser';
+    ```
+
+    <ul class="toc">
+      <li><a href="#usage">Using the Browser Library</a></li>
+      <li><a href="#webpack">Building With Webpack</a></li>
+    </ul>
+
+
+    <h2 id="usage">Using the Browser Library</h2>
+
+    Mongoose's browser library is very limited. The only use case it supports
+    is validating documents as shown below.
+
+    ```javascript
+    import mongoose from 'mongoose/browser';
+
+    // Mongoose's browser library does **not** have models. It only supports
+    // schemas and documents. The primary use case is validating documents
+    // against Mongoose schemas.
+    const doc = new mongoose.Document({}, new mongoose.Schema({
+      name: { type: String, required: true }
+    }));
+    // Prints an error because `name` is required.
+    console.log(doc.validateSync());
+    ```
+
+    <h2 id="webpack">Building With Webpack</h2>
+
+    Mongoose uses [ES2015 (also known as ES6)](https://www.ecma-international.org/ecma-262/6.0/)
+    syntax, so in order to use Mongoose with older browsers you'll need to use
+    a tool like [Babel](https://www.npmjs.com/package/babel-cli). As of version
+    5.x, Mongoose no longer has an officially supported pre-built browser bundle,
+    you need to compile the browser library yourself.
+
+    To build Mongoose's browser library using Webpack, you'll need to use
+    [`babel-loader`](https://www.npmjs.com/package/babel-loader). Because of
+    how Webpack loads `require()` statements, it pulls in a lot of built-in
+    Node.js modules. In order to avoid this, you need to use the
+    [`node` Webpack config option](https://webpack.js.org/configuration/node/)
+    as shown below.
+
+    ```javascript
+    [require:webpack.*browser build$]
+    ```
+
+block append layout
+  script.
+    _native.init("CK7DT53U", {
+      targetClass: 'native-js',
+      display: 'flex',
+      visibleClass: 'native-show'
+    });
+
+  div(class="native-js").
+    <div class="native-sponsor">Sponsored by #native_company# — Learn More</div>
+    <a href="#native_link#" class="native-flex">
+      <style>
+      .native-js {
+        background: linear-gradient(-30deg, #native_bg_color#E5, #native_bg_color#E5 45%, #native_bg_color# 45%) #fff;
+      }
+
+      .native-details,
+      .native-sponsor,
+      .native-bsa {
+        color: #native_color# !important;
+      }
+
+      .native-details:hover {
+        color: #native_color_hover# !important;
+      }
+
+      .native-cta {
+        color: #native_cta_color#;
+        background-color: #native_cta_bg_color#;
+      }
+
+      .native-cta:hover {
+        color: #native_cta_color_hover;
+        background-color: #native_cta_bg_color_hover#;
+      }
+      </style>
+      <div class="native-main">
+        <img class="native-img" src="#native_logo#">
+        <div class="native-details">
+          <span class="native-company">#native_title#</span>
+          <span class="native-desc">#native_desc#</span>
+        </div>
+      </div>
+      <span class="native-cta">#native_cta#</span>
+    </a>

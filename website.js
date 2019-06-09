@@ -120,7 +120,7 @@ function jadeify(filename, options, newfile) {
       return;
     }
 
-    newfile = newfile || filename.replace('.jade', '.html');
+    newfile = newfile || filename.replace('.pug', '.html');
 
     fs.writeFile(newfile, str, function(err) {
       if (err) {

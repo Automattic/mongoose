@@ -9,7 +9,11 @@ block content
     h2(id="#{block.identifier}")
       a(href="##{block.identifier}") !{block.contents}
     if block.comments && block.comments.length
-      | !{marked(block.comments[block.comments.length - 1])}
-      | !{markedCode(block.code)}
+      :markdown
+        !{block.comments[block.comments.length - 1]}
+        ```javascript
+        !{block.code}
+        ```
   
-  div.suffix !{suffix}
+  div.suffix
+    !{suffix}

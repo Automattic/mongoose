@@ -25,31 +25,31 @@ block content
   div.api-nav
     div.api-nav-content
       each item in docs
-        div.nav-item(id="nav-#{item.name}")
+        div.nav-item(id='nav-' + item.name)
           - if (item.name === name)
             div.nav-item-title(style="font-weight: bold")
-              a(href="#{item.name.toLowerCase()}.html")
+              a(href=item.name.toLowerCase() + '.html')
                 | #{item.name}
             ul.nav-item-sub
               each prop in item.props
                 li
-                  a(href="##{prop.anchorId}")
+                  a(href='#' + prop.anchorId)
                     | #{prop.string}
           - else
             div.nav-item-title
-              a(href="#{item.name.toLowerCase()}.html")
+              a(href=item.name.toLowerCase() + '.html')
                 | #{item.name}
 
   div.api-content
     ul
       each prop in props
         li
-          a(href="##{prop.anchorId}")
+          a(href='#' + prop.anchorId)
             | #{prop.string}
     each prop in props
       hr.separate-api-elements
-      h3(id="#{prop.anchorId}")
-        a(href="##{prop.anchorId}")
+      h3(id=prop.anchorId)
+        a(href='#' + prop.anchorId)
           | #{prop.string}
       if prop.param != null
         h5 Parameters

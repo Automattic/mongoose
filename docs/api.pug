@@ -16,30 +16,30 @@ block content
   div.api-nav
     div.api-nav-content
       each item in docs
-        div.nav-item(id="nav-#{item.name}")
+        div.nav-item(id='nav-' + item.name)
           div.nav-item-title
-            a(href="##{item.name}")
+            a(href='#' + item.name)
               | #{item.name}
           ul.nav-item-sub
             each prop in item.props
               li
-                a(href="##{prop.anchorId}")
+                a(href='#' + prop.anchorId)
                   | #{prop.string}
 
   each item in docs
     hr.separate-api
-    h2(id="#{item.name}", class="item-header")
-      a(href="##{item.name}")
+    h2(id=item.name, class="item-header")
+      a(href='#' + item.name)
         | #{item.name}
     ul
       each prop in item.props
         li
-          a(href="##{prop.anchorId}")
+          a(href='#' + prop.anchorId)
             | #{prop.string}
     each prop in item.props
       hr.separate-api-elements
-      h3(id="#{prop.anchorId}")
-        a(href="##{prop.anchorId}")
+      h3(id=prop.anchorId)
+        a(href='#' + prop.anchorId)
           | #{prop.string}
       if prop.param != null
         h5 Parameters

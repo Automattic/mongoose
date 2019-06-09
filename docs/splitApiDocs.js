@@ -7,7 +7,7 @@ const pkg = require('../package.json');
 
 api.docs.forEach(file => {
   if (file.name === 'Index') {
-    return;
+    file.name = 'Mongoose';
   }
 
   const options = Object.assign({}, file, {

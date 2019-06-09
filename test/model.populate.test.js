@@ -8463,4 +8463,32 @@ describe('model: populate:', function() {
       assert.equal(res[1].media.title, 'New Jedi Order');
     });
   });
+
+  it('virtual refPath (gh-7848)', function() {
+    const Child = db.model('gh7848_Child', Schema({
+      name: String,
+      parentId: Number
+    }));
+
+    const parentSchema = Schema({
+      _id: Number,
+      kind: String
+    });
+    parentSchema.virtual('childDocs', {
+      refPath: 'kind',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: false
+    });
+    const Parent = db.model('gh7848_Parent', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({ _id: 1, kind: 'gh7848_Child' });
+      yield Child.create({ name: 'test', parentId: 1 });
+
+      const doc = yield Parent.findOne().populate('childDocs');
+      assert.equal(doc.childDocs.length, 1);
+      assert.equal(doc.childDocs[0].name, 'test');
+    });
+  });
 });

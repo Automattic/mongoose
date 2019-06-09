@@ -30,7 +30,8 @@ const tests = [
   ...acquit.parse(fs.readFileSync('./test/docs/date.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/es-next/lean.test.es6.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/es-next/cast.test.es6.js').toString()),
-  ...acquit.parse(fs.readFileSync('./test/es-next/findoneandupdate.test.es6.js').toString())
+  ...acquit.parse(fs.readFileSync('./test/es-next/findoneandupdate.test.es6.js').toString()),
+  ...acquit.parse(fs.readFileSync('./test/docs/custom-casting.test.js').toString())
 ];
 
 function getVersion() {

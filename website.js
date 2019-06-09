@@ -2,7 +2,7 @@
 
 const acquit = require('acquit');
 const fs = require('fs');
-const jade = require('jade');
+const jade = require('pug');
 const pkg = require('./package');
 const linktype = require('./docs/helpers/linktype');
 const href = require('./docs/helpers/href');
@@ -144,6 +144,6 @@ files.forEach(function(file) {
 const _acquit = require('./docs/source/acquit');
 const acquitFiles = Object.keys(_acquit);
 acquitFiles.forEach(function(file) {
-  const filename = __dirname + '/docs/acquit.jade';
+  const filename = __dirname + '/docs/acquit.pug';
   jadeify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

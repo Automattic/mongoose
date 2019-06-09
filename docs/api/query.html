@@ -5,10 +5,10 @@
 .api-content {
   margin-top: 3em;
 }
-</style></head><body><div id="layout"><div id="mobile-menu"><a id="menuLink" href="#menu" class="menu-link"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div id="logo-container" class="pure-menu-heading"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul id="navbar" class="pure-menu-list"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a href="#" class="pure-menu-link">Version 5.5.14</a><ul class="pure-menu-children"><li class="pure-menu-item"><a href="/docs/4.x" class="pure-menu-link">Version 4.13.18</a></li><li class="pure-menu-item"><a href="/docs/3.8.x" class="pure-menu-link">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a href="/docs/index.html" class="pure-menu-link">Quick Start</a></li><li class="pure-menu-item"><a href="/docs/guides.html" class="pure-menu-link">Guides</a></li><li class="pure-menu-item sub-item"><a href="/docs/guide.html" class="pure-menu-link">Schemas</a></li><li class="pure-menu-item sub-item"><a href="/docs/schematypes.html" class="pure-menu-link">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a href="/docs/connections.html" class="pure-menu-link">Connections</a></li><li class="pure-menu-item sub-item"><a href="/docs/models.html" class="pure-menu-link">Models</a></li><li class="pure-menu-item sub-item"><a href="/docs/documents.html" class="pure-menu-link">Documents</a></li><li class="pure-menu-item sub-item"><a href="/docs/subdocs.html" class="pure-menu-link">Subdocuments</a></li><li class="pure-menu-item sub-item"><a href="/docs/queries.html" class="pure-menu-link">Queries</a></li><li class="pure-menu-item sub-item"><a href="/docs/validation.html" class="pure-menu-link">Validation</a></li><li class="pure-menu-item sub-item"><a href="/docs/middleware.html" class="pure-menu-link">Middleware</a></li><li class="pure-menu-item sub-item"><a href="/docs/populate.html" class="pure-menu-link">Populate</a></li><li class="pure-menu-item sub-item"><a href="/docs/discriminators.html" class="pure-menu-link">Discriminators</a></li><li class="pure-menu-item sub-item"><a href="/docs/plugins.html" class="pure-menu-link">Plugins</a></li><li class="pure-menu-item"><a href="/docs/api.html" class="pure-menu-link">API</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/mongoose.html" class="pure-menu-link">Mongoose</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/schema.html" class="pure-menu-link">Schema</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/connection.html" class="pure-menu-link">Connection</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/document.html" class="pure-menu-link">Document</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/model.html" class="pure-menu-link">Model</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/query.html" class="pure-menu-link">Query</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/aggregate.html" class="pure-menu-link">Aggregate</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/schematype.html" class="pure-menu-link">SchemaType</a></li><li class="pure-menu-item sub-item"><a href="/docs/api/virtualtype.html" class="pure-menu-link">VirtualType</a></li><li class="pure-menu-item"><a href="/docs/compatibility.html" class="pure-menu-link">Version Compatibility</a></li><li class="pure-menu-item"><a href="/docs/faq.html" class="pure-menu-link">FAQ</a></li><li class="pure-menu-item"><a href="/docs/further_reading.html" class="pure-menu-link">Further Reading</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><h1>Query</h1><div><div class="native-inline">
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.5.14</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.18</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><h1>Query</h1><div><div class="native-inline">
   <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
 </div>
-</div><div class="api-nav"><div class="api-nav-content"><div id="nav-Mongoose" class="nav-item"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div id="nav-Schema" class="nav-item"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div id="nav-Connection" class="nav-item"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div id="nav-Document" class="nav-item"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div id="nav-MongooseError" class="nav-item"><div class="nav-item-title"><a href="mongooseerror.html">MongooseError</a></div></div><div id="nav-Model" class="nav-item"><div class="nav-item-title"><a href="model.html">Model</a></div></div><div id="nav-Query" class="nav-item"><div style="font-weight: bold" class="nav-item-title"><a href="query.html">Query</a></div><ul class="nav-item-sub"><li><a href="#query_Query">Query()</a></li><li><a href="#query_Query-$where">Query.prototype.$where()</a></li><li><a href="#query_Query-Symbol.asyncIterator">Query.prototype.Symbol.asyncIterator()</a></li><li><a href="#query_Query-all">Query.prototype.all()</a></li><li><a href="#query_Query-and">Query.prototype.and()</a></li><li><a href="#query_Query-batchSize">Query.prototype.batchSize()</a></li><li><a href="#query_Query-box">Query.prototype.box()</a></li><li><a href="#query_Query-cast">Query.prototype.cast()</a></li><li><a href="#query_Query-catch">Query.prototype.catch()</a></li><li><a href="#query_Query-center">Query.prototype.center()</a></li><li><a href="#query_Query-centerSphere">Query.prototype.centerSphere()</a></li><li><a href="#query_Query-circle">Query.prototype.circle()</a></li><li><a href="#query_Query-collation">Query.prototype.collation()</a></li><li><a href="#query_Query-comment">Query.prototype.comment()</a></li><li><a href="#query_Query-count">Query.prototype.count()</a></li><li><a href="#query_Query-countDocuments">Query.prototype.countDocuments()</a></li><li><a href="#query_Query-cursor">Query.prototype.cursor()</a></li><li><a href="#query_Query-deleteMany">Query.prototype.deleteMany()</a></li><li><a href="#query_Query-deleteOne">Query.prototype.deleteOne()</a></li><li><a href="#query_Query-distinct">Query.prototype.distinct()</a></li><li><a href="#query_Query-elemMatch">Query.prototype.elemMatch()</a></li><li><a href="#query_Query-equals">Query.prototype.equals()</a></li><li><a href="#query_Query-error">Query.prototype.error()</a></li><li><a href="#query_Query-estimatedDocumentCount">Query.prototype.estimatedDocumentCount()</a></li><li><a href="#query_Query-exec">Query.prototype.exec()</a></li><li><a href="#query_Query-exists">Query.prototype.exists()</a></li><li><a href="#query_Query-explain">Query.prototype.explain()</a></li><li><a href="#query_Query-find">Query.prototype.find()</a></li><li><a href="#query_Query-findOne">Query.prototype.findOne()</a></li><li><a href="#query_Query-findOneAndDelete">Query.prototype.findOneAndDelete()</a></li><li><a href="#query_Query-findOneAndRemove">Query.prototype.findOneAndRemove()</a></li><li><a href="#query_Query-findOneAndReplace">Query.prototype.findOneAndReplace()</a></li><li><a href="#query_Query-findOneAndUpdate">Query.prototype.findOneAndUpdate()</a></li><li><a href="#query_Query-geometry">Query.prototype.geometry()</a></li><li><a href="#query_Query-getFilter">Query.prototype.getFilter()</a></li><li><a href="#query_Query-getOptions">Query.prototype.getOptions()</a></li><li><a href="#query_Query-getPopulatedPaths">Query.prototype.getPopulatedPaths()</a></li><li><a href="#query_Query-getQuery">Query.prototype.getQuery()</a></li><li><a href="#query_Query-getUpdate">Query.prototype.getUpdate()</a></li><li><a href="#query_Query-gt">Query.prototype.gt()</a></li><li><a href="#query_Query-gte">Query.prototype.gte()</a></li><li><a href="#query_Query-hint">Query.prototype.hint()</a></li><li><a href="#query_Query-in">Query.prototype.in()</a></li><li><a href="#query_Query-intersects">Query.prototype.intersects()</a></li><li><a href="#query_Query-j">Query.prototype.j()</a></li><li><a href="#query_Query-lean">Query.prototype.lean()</a></li><li><a href="#query_Query-limit">Query.prototype.limit()</a></li><li><a href="#query_Query-lt">Query.prototype.lt()</a></li><li><a href="#query_Query-lte">Query.prototype.lte()</a></li><li><a href="#query_Query-map">Query.prototype.map()</a></li><li><a href="#query_Query-maxDistance">Query.prototype.maxDistance()</a></li><li><a href="#query_Query-maxScan">Query.prototype.maxScan()</a></li><li><a href="#query_Query-maxTimeMS">Query.prototype.maxTimeMS()</a></li><li><a href="#query_Query-maxscan">Query.prototype.maxscan()</a></li><li><a href="#query_Query-merge">Query.prototype.merge()</a></li><li><a href="#query_Query-mod">Query.prototype.mod()</a></li><li><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></li><li><a href="#query_Query-ne">Query.prototype.ne()</a></li><li><a href="#query_Query-near">Query.prototype.near()</a></li><li><a href="#query_Query-nearSphere">Query.prototype.nearSphere()</a></li><li><a href="#query_Query-nin">Query.prototype.nin()</a></li><li><a href="#query_Query-nor">Query.prototype.nor()</a></li><li><a href="#query_Query-or">Query.prototype.or()</a></li><li><a href="#query_Query-orFail">Query.prototype.orFail()</a></li><li><a href="#query_Query-polygon">Query.prototype.polygon()</a></li><li><a href="#query_Query-populate">Query.prototype.populate()</a></li><li><a href="#query_Query-projection">Query.prototype.projection()</a></li><li><a href="#query_Query-read">Query.prototype.read()</a></li><li><a href="#query_Query-readConcern">Query.prototype.readConcern()</a></li><li><a href="#query_Query-regex">Query.prototype.regex()</a></li><li><a href="#query_Query-remove">Query.prototype.remove()</a></li><li><a href="#query_Query-replaceOne">Query.prototype.replaceOne()</a></li><li><a href="#query_Query-select">Query.prototype.select()</a></li><li><a href="#query_Query-selected">Query.prototype.selected()</a></li><li><a href="#query_Query-selectedExclusively">Query.prototype.selectedExclusively()</a></li><li><a href="#query_Query-selectedInclusively">Query.prototype.selectedInclusively()</a></li><li><a href="#query_Query-session">Query.prototype.session()</a></li><li><a href="#query_Query-set">Query.prototype.set()</a></li><li><a href="#query_Query-setOptions">Query.prototype.setOptions()</a></li><li><a href="#query_Query-setQuery">Query.prototype.setQuery()</a></li><li><a href="#query_Query-setUpdate">Query.prototype.setUpdate()</a></li><li><a href="#query_Query-size">Query.prototype.size()</a></li><li><a href="#query_Query-skip">Query.prototype.skip()</a></li><li><a href="#query_Query-slaveOk">Query.prototype.slaveOk()</a></li><li><a href="#query_Query-slice">Query.prototype.slice()</a></li><li><a href="#query_Query-snapshot">Query.prototype.snapshot()</a></li><li><a href="#query_Query-sort">Query.prototype.sort()</a></li><li><a href="#query_Query-tailable">Query.prototype.tailable()</a></li><li><a href="#query_Query-then">Query.prototype.then()</a></li><li><a href="#query_Query-toConstructor">Query.prototype.toConstructor()</a></li><li><a href="#query_Query-update">Query.prototype.update()</a></li><li><a href="#query_Query-updateMany">Query.prototype.updateMany()</a></li><li><a href="#query_Query-updateOne">Query.prototype.updateOne()</a></li><li><a href="#query_Query-use$geoWithin">Query.prototype.use$geoWithin</a></li><li><a href="#query_Query-w">Query.prototype.w()</a></li><li><a href="#query_Query-where">Query.prototype.where()</a></li><li><a href="#query_Query-within">Query.prototype.within()</a></li><li><a href="#query_Query-wtimeout">Query.prototype.wtimeout()</a></li></ul></div><div id="nav-QueryCursor" class="nav-item"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div id="nav-Aggregate" class="nav-item"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div id="nav-AggregationCursor" class="nav-item"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div id="nav-Schematype" class="nav-item"><div class="nav-item-title"><a href="schematype.html">Schematype</a></div></div><div id="nav-Virtualtype" class="nav-item"><div class="nav-item-title"><a href="virtualtype.html">Virtualtype</a></div></div><div id="nav-Error" class="nav-item"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div id="nav-Array" class="nav-item"><div class="nav-item-title"><a href="array.html">Array</a></div></div></div></div><div class="api-content"><ul><li><a href="#query_Query">Query()</a></li><li><a href="#query_Query-$where">Query.prototype.$where()</a></li><li><a href="#query_Query-Symbol.asyncIterator">Query.prototype.Symbol.asyncIterator()</a></li><li><a href="#query_Query-all">Query.prototype.all()</a></li><li><a href="#query_Query-and">Query.prototype.and()</a></li><li><a href="#query_Query-batchSize">Query.prototype.batchSize()</a></li><li><a href="#query_Query-box">Query.prototype.box()</a></li><li><a href="#query_Query-cast">Query.prototype.cast()</a></li><li><a href="#query_Query-catch">Query.prototype.catch()</a></li><li><a href="#query_Query-center">Query.prototype.center()</a></li><li><a href="#query_Query-centerSphere">Query.prototype.centerSphere()</a></li><li><a href="#query_Query-circle">Query.prototype.circle()</a></li><li><a href="#query_Query-collation">Query.prototype.collation()</a></li><li><a href="#query_Query-comment">Query.prototype.comment()</a></li><li><a href="#query_Query-count">Query.prototype.count()</a></li><li><a href="#query_Query-countDocuments">Query.prototype.countDocuments()</a></li><li><a href="#query_Query-cursor">Query.prototype.cursor()</a></li><li><a href="#query_Query-deleteMany">Query.prototype.deleteMany()</a></li><li><a href="#query_Query-deleteOne">Query.prototype.deleteOne()</a></li><li><a href="#query_Query-distinct">Query.prototype.distinct()</a></li><li><a href="#query_Query-elemMatch">Query.prototype.elemMatch()</a></li><li><a href="#query_Query-equals">Query.prototype.equals()</a></li><li><a href="#query_Query-error">Query.prototype.error()</a></li><li><a href="#query_Query-estimatedDocumentCount">Query.prototype.estimatedDocumentCount()</a></li><li><a href="#query_Query-exec">Query.prototype.exec()</a></li><li><a href="#query_Query-exists">Query.prototype.exists()</a></li><li><a href="#query_Query-explain">Query.prototype.explain()</a></li><li><a href="#query_Query-find">Query.prototype.find()</a></li><li><a href="#query_Query-findOne">Query.prototype.findOne()</a></li><li><a href="#query_Query-findOneAndDelete">Query.prototype.findOneAndDelete()</a></li><li><a href="#query_Query-findOneAndRemove">Query.prototype.findOneAndRemove()</a></li><li><a href="#query_Query-findOneAndReplace">Query.prototype.findOneAndReplace()</a></li><li><a href="#query_Query-findOneAndUpdate">Query.prototype.findOneAndUpdate()</a></li><li><a href="#query_Query-geometry">Query.prototype.geometry()</a></li><li><a href="#query_Query-getFilter">Query.prototype.getFilter()</a></li><li><a href="#query_Query-getOptions">Query.prototype.getOptions()</a></li><li><a href="#query_Query-getPopulatedPaths">Query.prototype.getPopulatedPaths()</a></li><li><a href="#query_Query-getQuery">Query.prototype.getQuery()</a></li><li><a href="#query_Query-getUpdate">Query.prototype.getUpdate()</a></li><li><a href="#query_Query-gt">Query.prototype.gt()</a></li><li><a href="#query_Query-gte">Query.prototype.gte()</a></li><li><a href="#query_Query-hint">Query.prototype.hint()</a></li><li><a href="#query_Query-in">Query.prototype.in()</a></li><li><a href="#query_Query-intersects">Query.prototype.intersects()</a></li><li><a href="#query_Query-j">Query.prototype.j()</a></li><li><a href="#query_Query-lean">Query.prototype.lean()</a></li><li><a href="#query_Query-limit">Query.prototype.limit()</a></li><li><a href="#query_Query-lt">Query.prototype.lt()</a></li><li><a href="#query_Query-lte">Query.prototype.lte()</a></li><li><a href="#query_Query-map">Query.prototype.map()</a></li><li><a href="#query_Query-maxDistance">Query.prototype.maxDistance()</a></li><li><a href="#query_Query-maxScan">Query.prototype.maxScan()</a></li><li><a href="#query_Query-maxTimeMS">Query.prototype.maxTimeMS()</a></li><li><a href="#query_Query-maxscan">Query.prototype.maxscan()</a></li><li><a href="#query_Query-merge">Query.prototype.merge()</a></li><li><a href="#query_Query-mod">Query.prototype.mod()</a></li><li><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></li><li><a href="#query_Query-ne">Query.prototype.ne()</a></li><li><a href="#query_Query-near">Query.prototype.near()</a></li><li><a href="#query_Query-nearSphere">Query.prototype.nearSphere()</a></li><li><a href="#query_Query-nin">Query.prototype.nin()</a></li><li><a href="#query_Query-nor">Query.prototype.nor()</a></li><li><a href="#query_Query-or">Query.prototype.or()</a></li><li><a href="#query_Query-orFail">Query.prototype.orFail()</a></li><li><a href="#query_Query-polygon">Query.prototype.polygon()</a></li><li><a href="#query_Query-populate">Query.prototype.populate()</a></li><li><a href="#query_Query-projection">Query.prototype.projection()</a></li><li><a href="#query_Query-read">Query.prototype.read()</a></li><li><a href="#query_Query-readConcern">Query.prototype.readConcern()</a></li><li><a href="#query_Query-regex">Query.prototype.regex()</a></li><li><a href="#query_Query-remove">Query.prototype.remove()</a></li><li><a href="#query_Query-replaceOne">Query.prototype.replaceOne()</a></li><li><a href="#query_Query-select">Query.prototype.select()</a></li><li><a href="#query_Query-selected">Query.prototype.selected()</a></li><li><a href="#query_Query-selectedExclusively">Query.prototype.selectedExclusively()</a></li><li><a href="#query_Query-selectedInclusively">Query.prototype.selectedInclusively()</a></li><li><a href="#query_Query-session">Query.prototype.session()</a></li><li><a href="#query_Query-set">Query.prototype.set()</a></li><li><a href="#query_Query-setOptions">Query.prototype.setOptions()</a></li><li><a href="#query_Query-setQuery">Query.prototype.setQuery()</a></li><li><a href="#query_Query-setUpdate">Query.prototype.setUpdate()</a></li><li><a href="#query_Query-size">Query.prototype.size()</a></li><li><a href="#query_Query-skip">Query.prototype.skip()</a></li><li><a href="#query_Query-slaveOk">Query.prototype.slaveOk()</a></li><li><a href="#query_Query-slice">Query.prototype.slice()</a></li><li><a href="#query_Query-snapshot">Query.prototype.snapshot()</a></li><li><a href="#query_Query-sort">Query.prototype.sort()</a></li><li><a href="#query_Query-tailable">Query.prototype.tailable()</a></li><li><a href="#query_Query-then">Query.prototype.then()</a></li><li><a href="#query_Query-toConstructor">Query.prototype.toConstructor()</a></li><li><a href="#query_Query-update">Query.prototype.update()</a></li><li><a href="#query_Query-updateMany">Query.prototype.updateMany()</a></li><li><a href="#query_Query-updateOne">Query.prototype.updateOne()</a></li><li><a href="#query_Query-use$geoWithin">Query.prototype.use$geoWithin</a></li><li><a href="#query_Query-w">Query.prototype.w()</a></li><li><a href="#query_Query-where">Query.prototype.where()</a></li><li><a href="#query_Query-within">Query.prototype.within()</a></li><li><a href="#query_Query-wtimeout">Query.prototype.wtimeout()</a></li></ul><hr class="separate-api-elements"><h3 id="query_Query"><a href="#query_Query">Query()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
+</div><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Mongoose</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Schema</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Connection</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Document</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">MongooseError</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Model</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title" style="font-weight: bold"><a href="#{item.name.toLowerCase()}.html">Query</a></div><ul class="nav-item-sub"><li><a href="##{prop.anchorId}">Query()</a></li><li><a href="##{prop.anchorId}">Query.prototype.$where()</a></li><li><a href="##{prop.anchorId}">Query.prototype.Symbol.asyncIterator()</a></li><li><a href="##{prop.anchorId}">Query.prototype.all()</a></li><li><a href="##{prop.anchorId}">Query.prototype.and()</a></li><li><a href="##{prop.anchorId}">Query.prototype.batchSize()</a></li><li><a href="##{prop.anchorId}">Query.prototype.box()</a></li><li><a href="##{prop.anchorId}">Query.prototype.cast()</a></li><li><a href="##{prop.anchorId}">Query.prototype.catch()</a></li><li><a href="##{prop.anchorId}">Query.prototype.center()</a></li><li><a href="##{prop.anchorId}">Query.prototype.centerSphere()</a></li><li><a href="##{prop.anchorId}">Query.prototype.circle()</a></li><li><a href="##{prop.anchorId}">Query.prototype.collation()</a></li><li><a href="##{prop.anchorId}">Query.prototype.comment()</a></li><li><a href="##{prop.anchorId}">Query.prototype.count()</a></li><li><a href="##{prop.anchorId}">Query.prototype.countDocuments()</a></li><li><a href="##{prop.anchorId}">Query.prototype.cursor()</a></li><li><a href="##{prop.anchorId}">Query.prototype.deleteMany()</a></li><li><a href="##{prop.anchorId}">Query.prototype.deleteOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.distinct()</a></li><li><a href="##{prop.anchorId}">Query.prototype.elemMatch()</a></li><li><a href="##{prop.anchorId}">Query.prototype.equals()</a></li><li><a href="##{prop.anchorId}">Query.prototype.error()</a></li><li><a href="##{prop.anchorId}">Query.prototype.estimatedDocumentCount()</a></li><li><a href="##{prop.anchorId}">Query.prototype.exec()</a></li><li><a href="##{prop.anchorId}">Query.prototype.exists()</a></li><li><a href="##{prop.anchorId}">Query.prototype.explain()</a></li><li><a href="##{prop.anchorId}">Query.prototype.find()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndDelete()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndRemove()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndReplace()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndUpdate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.geometry()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getFilter()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getOptions()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getPopulatedPaths()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getQuery()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getUpdate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.gt()</a></li><li><a href="##{prop.anchorId}">Query.prototype.gte()</a></li><li><a href="##{prop.anchorId}">Query.prototype.hint()</a></li><li><a href="##{prop.anchorId}">Query.prototype.in()</a></li><li><a href="##{prop.anchorId}">Query.prototype.intersects()</a></li><li><a href="##{prop.anchorId}">Query.prototype.j()</a></li><li><a href="##{prop.anchorId}">Query.prototype.lean()</a></li><li><a href="##{prop.anchorId}">Query.prototype.limit()</a></li><li><a href="##{prop.anchorId}">Query.prototype.lt()</a></li><li><a href="##{prop.anchorId}">Query.prototype.lte()</a></li><li><a href="##{prop.anchorId}">Query.prototype.map()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxDistance()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxScan()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxTimeMS()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxscan()</a></li><li><a href="##{prop.anchorId}">Query.prototype.merge()</a></li><li><a href="##{prop.anchorId}">Query.prototype.mod()</a></li><li><a href="##{prop.anchorId}">Query.prototype.mongooseOptions()</a></li><li><a href="##{prop.anchorId}">Query.prototype.ne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.near()</a></li><li><a href="##{prop.anchorId}">Query.prototype.nearSphere()</a></li><li><a href="##{prop.anchorId}">Query.prototype.nin()</a></li><li><a href="##{prop.anchorId}">Query.prototype.nor()</a></li><li><a href="##{prop.anchorId}">Query.prototype.or()</a></li><li><a href="##{prop.anchorId}">Query.prototype.orFail()</a></li><li><a href="##{prop.anchorId}">Query.prototype.polygon()</a></li><li><a href="##{prop.anchorId}">Query.prototype.populate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.projection()</a></li><li><a href="##{prop.anchorId}">Query.prototype.read()</a></li><li><a href="##{prop.anchorId}">Query.prototype.readConcern()</a></li><li><a href="##{prop.anchorId}">Query.prototype.regex()</a></li><li><a href="##{prop.anchorId}">Query.prototype.remove()</a></li><li><a href="##{prop.anchorId}">Query.prototype.replaceOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.select()</a></li><li><a href="##{prop.anchorId}">Query.prototype.selected()</a></li><li><a href="##{prop.anchorId}">Query.prototype.selectedExclusively()</a></li><li><a href="##{prop.anchorId}">Query.prototype.selectedInclusively()</a></li><li><a href="##{prop.anchorId}">Query.prototype.session()</a></li><li><a href="##{prop.anchorId}">Query.prototype.set()</a></li><li><a href="##{prop.anchorId}">Query.prototype.setOptions()</a></li><li><a href="##{prop.anchorId}">Query.prototype.setQuery()</a></li><li><a href="##{prop.anchorId}">Query.prototype.setUpdate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.size()</a></li><li><a href="##{prop.anchorId}">Query.prototype.skip()</a></li><li><a href="##{prop.anchorId}">Query.prototype.slaveOk()</a></li><li><a href="##{prop.anchorId}">Query.prototype.slice()</a></li><li><a href="##{prop.anchorId}">Query.prototype.snapshot()</a></li><li><a href="##{prop.anchorId}">Query.prototype.sort()</a></li><li><a href="##{prop.anchorId}">Query.prototype.tailable()</a></li><li><a href="##{prop.anchorId}">Query.prototype.then()</a></li><li><a href="##{prop.anchorId}">Query.prototype.toConstructor()</a></li><li><a href="##{prop.anchorId}">Query.prototype.update()</a></li><li><a href="##{prop.anchorId}">Query.prototype.updateMany()</a></li><li><a href="##{prop.anchorId}">Query.prototype.updateOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.use$geoWithin</a></li><li><a href="##{prop.anchorId}">Query.prototype.w()</a></li><li><a href="##{prop.anchorId}">Query.prototype.where()</a></li><li><a href="##{prop.anchorId}">Query.prototype.within()</a></li><li><a href="##{prop.anchorId}">Query.prototype.wtimeout()</a></li></ul></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">QueryCursor</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Aggregate</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Schematype</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Virtualtype</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Error</a></div></div><div class="nav-item" id="nav-#{item.name}"><div class="nav-item-title"><a href="#{item.name.toLowerCase()}.html">Array</a></div></div></div></div><div class="api-content"><ul><li><a href="##{prop.anchorId}">Query()</a></li><li><a href="##{prop.anchorId}">Query.prototype.$where()</a></li><li><a href="##{prop.anchorId}">Query.prototype.Symbol.asyncIterator()</a></li><li><a href="##{prop.anchorId}">Query.prototype.all()</a></li><li><a href="##{prop.anchorId}">Query.prototype.and()</a></li><li><a href="##{prop.anchorId}">Query.prototype.batchSize()</a></li><li><a href="##{prop.anchorId}">Query.prototype.box()</a></li><li><a href="##{prop.anchorId}">Query.prototype.cast()</a></li><li><a href="##{prop.anchorId}">Query.prototype.catch()</a></li><li><a href="##{prop.anchorId}">Query.prototype.center()</a></li><li><a href="##{prop.anchorId}">Query.prototype.centerSphere()</a></li><li><a href="##{prop.anchorId}">Query.prototype.circle()</a></li><li><a href="##{prop.anchorId}">Query.prototype.collation()</a></li><li><a href="##{prop.anchorId}">Query.prototype.comment()</a></li><li><a href="##{prop.anchorId}">Query.prototype.count()</a></li><li><a href="##{prop.anchorId}">Query.prototype.countDocuments()</a></li><li><a href="##{prop.anchorId}">Query.prototype.cursor()</a></li><li><a href="##{prop.anchorId}">Query.prototype.deleteMany()</a></li><li><a href="##{prop.anchorId}">Query.prototype.deleteOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.distinct()</a></li><li><a href="##{prop.anchorId}">Query.prototype.elemMatch()</a></li><li><a href="##{prop.anchorId}">Query.prototype.equals()</a></li><li><a href="##{prop.anchorId}">Query.prototype.error()</a></li><li><a href="##{prop.anchorId}">Query.prototype.estimatedDocumentCount()</a></li><li><a href="##{prop.anchorId}">Query.prototype.exec()</a></li><li><a href="##{prop.anchorId}">Query.prototype.exists()</a></li><li><a href="##{prop.anchorId}">Query.prototype.explain()</a></li><li><a href="##{prop.anchorId}">Query.prototype.find()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndDelete()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndRemove()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndReplace()</a></li><li><a href="##{prop.anchorId}">Query.prototype.findOneAndUpdate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.geometry()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getFilter()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getOptions()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getPopulatedPaths()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getQuery()</a></li><li><a href="##{prop.anchorId}">Query.prototype.getUpdate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.gt()</a></li><li><a href="##{prop.anchorId}">Query.prototype.gte()</a></li><li><a href="##{prop.anchorId}">Query.prototype.hint()</a></li><li><a href="##{prop.anchorId}">Query.prototype.in()</a></li><li><a href="##{prop.anchorId}">Query.prototype.intersects()</a></li><li><a href="##{prop.anchorId}">Query.prototype.j()</a></li><li><a href="##{prop.anchorId}">Query.prototype.lean()</a></li><li><a href="##{prop.anchorId}">Query.prototype.limit()</a></li><li><a href="##{prop.anchorId}">Query.prototype.lt()</a></li><li><a href="##{prop.anchorId}">Query.prototype.lte()</a></li><li><a href="##{prop.anchorId}">Query.prototype.map()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxDistance()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxScan()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxTimeMS()</a></li><li><a href="##{prop.anchorId}">Query.prototype.maxscan()</a></li><li><a href="##{prop.anchorId}">Query.prototype.merge()</a></li><li><a href="##{prop.anchorId}">Query.prototype.mod()</a></li><li><a href="##{prop.anchorId}">Query.prototype.mongooseOptions()</a></li><li><a href="##{prop.anchorId}">Query.prototype.ne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.near()</a></li><li><a href="##{prop.anchorId}">Query.prototype.nearSphere()</a></li><li><a href="##{prop.anchorId}">Query.prototype.nin()</a></li><li><a href="##{prop.anchorId}">Query.prototype.nor()</a></li><li><a href="##{prop.anchorId}">Query.prototype.or()</a></li><li><a href="##{prop.anchorId}">Query.prototype.orFail()</a></li><li><a href="##{prop.anchorId}">Query.prototype.polygon()</a></li><li><a href="##{prop.anchorId}">Query.prototype.populate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.projection()</a></li><li><a href="##{prop.anchorId}">Query.prototype.read()</a></li><li><a href="##{prop.anchorId}">Query.prototype.readConcern()</a></li><li><a href="##{prop.anchorId}">Query.prototype.regex()</a></li><li><a href="##{prop.anchorId}">Query.prototype.remove()</a></li><li><a href="##{prop.anchorId}">Query.prototype.replaceOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.select()</a></li><li><a href="##{prop.anchorId}">Query.prototype.selected()</a></li><li><a href="##{prop.anchorId}">Query.prototype.selectedExclusively()</a></li><li><a href="##{prop.anchorId}">Query.prototype.selectedInclusively()</a></li><li><a href="##{prop.anchorId}">Query.prototype.session()</a></li><li><a href="##{prop.anchorId}">Query.prototype.set()</a></li><li><a href="##{prop.anchorId}">Query.prototype.setOptions()</a></li><li><a href="##{prop.anchorId}">Query.prototype.setQuery()</a></li><li><a href="##{prop.anchorId}">Query.prototype.setUpdate()</a></li><li><a href="##{prop.anchorId}">Query.prototype.size()</a></li><li><a href="##{prop.anchorId}">Query.prototype.skip()</a></li><li><a href="##{prop.anchorId}">Query.prototype.slaveOk()</a></li><li><a href="##{prop.anchorId}">Query.prototype.slice()</a></li><li><a href="##{prop.anchorId}">Query.prototype.snapshot()</a></li><li><a href="##{prop.anchorId}">Query.prototype.sort()</a></li><li><a href="##{prop.anchorId}">Query.prototype.tailable()</a></li><li><a href="##{prop.anchorId}">Query.prototype.then()</a></li><li><a href="##{prop.anchorId}">Query.prototype.toConstructor()</a></li><li><a href="##{prop.anchorId}">Query.prototype.update()</a></li><li><a href="##{prop.anchorId}">Query.prototype.updateMany()</a></li><li><a href="##{prop.anchorId}">Query.prototype.updateOne()</a></li><li><a href="##{prop.anchorId}">Query.prototype.use$geoWithin</a></li><li><a href="##{prop.anchorId}">Query.prototype.w()</a></li><li><a href="##{prop.anchorId}">Query.prototype.where()</a></li><li><a href="##{prop.anchorId}">Query.prototype.within()</a></li><li><a href="##{prop.anchorId}">Query.prototype.wtimeout()</a></li></ul><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[model]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[conditions]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[collection]
@@ -23,7 +23,7 @@ query.where(<span class="hljs-string">'age'</span>).gte(<span class="hljs-number
 
 <span class="hljs-comment">// You can instantiate a query directly. There is no need to do</span>
 <span class="hljs-comment">// this unless you're an advanced user with a very good reason to.</span>
-<span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> mongoose.Query();</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-$where"><a href="#query_Query-$where">Query.prototype.$where()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">js
+<span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> mongoose.Query();</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.$where()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">js
 <span class="method-type">&laquo;String|Function&raquo;</span> javascript string or function</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a javascript function or expression to pass to MongoDBs query system.</p>
 
 <h4>Example</h4>
@@ -38,7 +38,7 @@ query.$where(<span class="hljs-function"><span class="hljs-keyword">function</sp
 
 <h4>NOTE:</h4>
 
-<p>Only use <code>$where</code> when you have a condition that cannot be met using other MongoDB operators like <code>$lt</code>. <strong>Be sure to read about all of <a href="http://docs.mongodb.org/manual/reference/operator/where/">its caveats</a> before using.</strong></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-Symbol.asyncIterator"><a href="#query_Query-Symbol.asyncIterator">Query.prototype.Symbol.asyncIterator()</a></h3><div><p>Returns an asyncIterator for use with <a href="http://bit.ly/async-iterators"><code>for/await/of</code> loops</a> This function <em>only</em> works for <code>find()</code> queries. You do not need to call this function explicitly, the JavaScript runtime will call it for you.</p>
+<p>Only use <code>$where</code> when you have a condition that cannot be met using other MongoDB operators like <code>$lt</code>. <strong>Be sure to read about all of <a href="http://docs.mongodb.org/manual/reference/operator/where/">its caveats</a> before using.</strong></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.Symbol.asyncIterator()</a></h3><div><p>Returns an asyncIterator for use with <a href="http://bit.ly/async-iterators"><code>for/await/of</code> loops</a> This function <em>only</em> works for <code>find()</code> queries. You do not need to call this function explicitly, the JavaScript runtime will call it for you.</p>
 
 <h4>Example</h4>
 
@@ -48,7 +48,7 @@ query.$where(<span class="hljs-function"><span class="hljs-keyword">function</sp
 
 <p>Node.js 10.x supports async iterators natively without any flags. You can enable async iterators in Node.js 8.x using the <a href="https://github.com/tc39/proposal-async-iteration/issues/117#issuecomment-346695187"><code>--harmony_async_iteration</code> flag</a>.</p>
 
-<p><strong>Note:</strong> This function is not if <code>Symbol.asyncIterator</code> is undefined. If <code>Symbol.asyncIterator</code> is undefined, that means your Node.js version does not support async iterators.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-all"><a href="#query_Query-all">Query.prototype.all()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p><strong>Note:</strong> This function is not if <code>Symbol.asyncIterator</code> is undefined. If <code>Symbol.asyncIterator</code> is undefined, that means your Node.js version does not support async iterators.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.all()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Specifies an <code>$all</code> query condition.</p>
 
@@ -58,12 +58,12 @@ query.$where(<span class="hljs-function"><span class="hljs-keyword">function</sp
 
 <pre><code>MyModel.find().where(<span class="hljs-string">'pets'</span>).all([<span class="hljs-string">'dog'</span>, <span class="hljs-string">'cat'</span>, <span class="hljs-string">'ferret'</span>]);
 <span class="hljs-comment">// Equivalent:</span>
-MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-string">'dog'</span>, <span class="hljs-string">'cat'</span>, <span class="hljs-string">'ferret'</span>]);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-and"><a href="#query_Query-and">Query.prototype.and()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
+MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-string">'dog'</span>, <span class="hljs-string">'cat'</span>, <span class="hljs-string">'ferret'</span>]);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.and()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies arguments for a <code>$and</code> condition.</p>
 
 <h4>Example</h4>
 
-<pre><code>query.and([{ color: <span class="hljs-string">'green'</span> }, { status: <span class="hljs-string">'ok'</span> }])</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-batchSize"><a href="#query_Query-batchSize">Query.prototype.batchSize()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<pre><code>query.and([{ color: <span class="hljs-string">'green'</span> }, { status: <span class="hljs-string">'ok'</span> }])</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.batchSize()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies the batchSize option.</p>
 
 <h4>Example</h4>
@@ -72,7 +72,7 @@ MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-s
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-box"><a href="#query_Query-box">Query.prototype.box()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.box()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">Upper
 <span class="method-type">&laquo;[Array]&raquo;</span> Right Coords</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$box</code> condition</p>
 
@@ -82,16 +82,16 @@ MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-s
 <span class="hljs-keyword">var</span> upperRight= [<span class="hljs-number">40.741404</span>,  <span class="hljs-number">-73.988135</span>]
 
 query.where(<span class="hljs-string">'loc'</span>).within().box(lowerLeft, upperRight)
-query.box({ ll : lowerLeft, ur : upperRight })</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-cast"><a href="#query_Query-cast">Query.prototype.cast()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[model]
+query.box({ ll : lowerLeft, ur : upperRight })</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.cast()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[model]
 <span class="method-type">&laquo;Model&raquo;</span> the model to cast to. If not set, defaults to <code>this.model</code></li><li class="param">[obj]
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Casts this query to the schema of <code>model</code></p>
 
 <h4>Note</h4>
 
-<p>If <code>obj</code> is present, it is cast instead of this query.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-catch"><a href="#query_Query-catch">Query.prototype.catch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[reject]
-<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error. Like <code>.then()</code>, but only takes a rejection handler.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-center"><a href="#query_Query-center">Query.prototype.center()</a></h3><div><p><em>DEPRECATED</em> Alias for <a href="#query_Query-circle">circle</a></p>
+<p>If <code>obj</code> is present, it is cast instead of this query.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.catch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[reject]
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error. Like <code>.then()</code>, but only takes a rejection handler.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.center()</a></h3><div><p><em>DEPRECATED</em> Alias for <a href="#query_Query-circle">circle</a></p>
 
-<p><strong>Deprecated.</strong> Use <a href="#query_Query-circle">circle</a> instead.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-centerSphere"><a href="#query_Query-centerSphere">Query.prototype.centerSphere()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p><strong>Deprecated.</strong> Use <a href="#query_Query-circle">circle</a> instead.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.centerSphere()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p><em>DEPRECATED</em> Specifies a <code>$centerSphere</code> condition</p>
 
@@ -100,7 +100,7 @@ query.box({ ll : lowerLeft, ur : upperRight })</code></pre>  </div><hr class="se
 <h4>Example</h4>
 
 <pre><code><span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span> };
-query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-circle"><a href="#query_Query-circle">Query.prototype.circle()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.circle()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">area
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$center</code> or <code>$centerSphere</code> condition.</p>
 
@@ -115,8 +115,8 @@ query.circle(<span class="hljs-string">'loc'</span>, area);
 <span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span>, spherical: <span class="hljs-literal">true</span> }
 query.where(<span class="hljs-string">'loc'</span>).within().circle(area)
 <span class="hljs-comment">// alternatively</span>
-query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-collation"><a href="#query_Query-collation">Query.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Adds a collation to this op (MongoDB 3.4 and up)</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-comment"><a href="#query_Query-comment">Query.prototype.comment()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
+<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Adds a collation to this op (MongoDB 3.4 and up)</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.comment()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;String&raquo;</span> </li></ul><div><p>Specifies the <code>comment</code> option.</p>
 
 <h4>Example</h4>
@@ -125,7 +125,7 @@ query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre>  </div>
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-count"><a href="#query_Query-count">Query.prototype.count()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.count()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> count documents that match this object</li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>count</code> query.</p>
 
@@ -150,7 +150,7 @@ query.count({ color: <span class="hljs-string">'black'</span> }, callback)
 query.where(<span class="hljs-string">'color'</span>, <span class="hljs-string">'black'</span>).count(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, count</span>) </span>{
   <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'there are %d kittens'</span>, count);
-})</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-countDocuments"><a href="#query_Query-countDocuments">Query.prototype.countDocuments()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+})</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.countDocuments()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> mongodb selector</li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>countDocuments()</code> query. Behaves like <code>count()</code>, except it always does a full collection scan when passed an empty filter <code>{}</code>.</p>
 
@@ -183,7 +183,7 @@ query.where(<span class="hljs-string">'color'</span>, <span class="hljs-string">
 <li><code>$where</code>: <a href="https://docs.mongodb.com/manual/reference/operator/query/expr/"><code>$expr</code></a></li>
 <li><code>$near</code>: <a href="https://docs.mongodb.com/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://docs.mongodb.com/manual/reference/operator/query/center/#op._S_center"><code>$center</code></a></li>
 <li><code>$nearSphere</code>: <a href="https://docs.mongodb.com/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://docs.mongodb.com/manual/reference/operator/query/centerSphere/#op._S_centerSphere"><code>$centerSphere</code></a></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-cursor"><a href="#query_Query-cursor">Query.prototype.cursor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
+</ul>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.cursor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;QueryCursor&raquo;</span> </li></ul><div><p>Returns a wrapper around a <a href="http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html">mongodb driver cursor</a>. A QueryCursor exposes a Streams3 interface, as well as a <code>.next()</code> function.</p>
 
 <p>The <code>.cursor()</code> function triggers pre find hooks, but <strong>not</strong> post find hooks.</p>
@@ -218,7 +218,7 @@ co(<span class="hljs-function"><span class="hljs-keyword">function</span>*(<span
 
 <ul>
 <li><code>transform</code>: optional function which accepts a mongoose document. The return value of the function will be emitted on <code>data</code> and returned by <code>.next()</code>.</li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-deleteMany"><a href="#query_Query-deleteMany">Query.prototype.deleteMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+</ul>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.deleteMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declare and/or execute this query as a <code>deleteMany()</code> operation. Works like remove, except it deletes <em>every</em> document that matches <code>filter</code> in the collection, regardless of the value of <code>single</code>.</p>
 
@@ -241,7 +241,7 @@ Character.deleteMany({ name: <span class="hljs-regexp">/Stark/</span>, age: { $g
 
 <pre><code><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> Character.deleteMany({ name: <span class="hljs-regexp">/Stark/</span>, age: { $gte: <span class="hljs-number">18</span> } });
 <span class="hljs-comment">// `0` if no docs matched the filter, number of docs deleted otherwise</span>
-res.deletedCount;</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-deleteOne"><a href="#query_Query-deleteOne">Query.prototype.deleteOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+res.deletedCount;</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.deleteOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declare and/or execute this query as a <code>deleteOne()</code> operation. Works like remove, except it deletes at most one document regardless of the <code>single</code> option.</p>
 
@@ -264,7 +264,7 @@ Character.deleteOne({ name: <span class="hljs-string">'Eddard Stark'</span> }).t
 
 <pre><code><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> Character.deleteOne({ name: <span class="hljs-string">'Eddard Stark'</span> });
 <span class="hljs-comment">// `1` if MongoDB deleted a doc, `0` if no docs matched the filter `{ name: ... }`</span>
-res.deletedCount;</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-distinct"><a href="#query_Query-distinct">Query.prototype.distinct()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[field]
+res.deletedCount;</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.distinct()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[field]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">[filter]
 <span class="method-type">&laquo;Object|Query&raquo;</span> </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, arr)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declares or executes a distinct() operation.</p>
@@ -280,7 +280,7 @@ distinct(field, conditions)
 distinct(field, callback)
 distinct(field)
 distinct(callback)
-distinct()</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-elemMatch"><a href="#query_Query-elemMatch">Query.prototype.elemMatch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
+distinct()</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.elemMatch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;String|Object|Function&raquo;</span> </li><li class="param">filter
 <span class="method-type">&laquo;Object|Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies an <code>$elemMatch</code> condition</p>
 
@@ -298,7 +298,7 @@ query.elemMatch(<span class="hljs-string">'comment'</span>, <span class="hljs-fu
 query.where(<span class="hljs-string">'comment'</span>).elemMatch(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">elem</span>) </span>{
   elem.where({ author: <span class="hljs-string">'autobot'</span> });
   elem.where(<span class="hljs-string">'votes'</span>).gte(<span class="hljs-number">5</span>);
-})</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-equals"><a href="#query_Query-equals">Query.prototype.equals()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+})</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.equals()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies the complementary comparison value for paths specified with <code>where()</code></p>
 
 <h4>Example</h4>
@@ -307,7 +307,7 @@ query.where(<span class="hljs-string">'comment'</span>).elemMatch(<span class="h
 
 <span class="hljs-comment">// is the same as</span>
 
-User.where(<span class="hljs-string">'age'</span>, <span class="hljs-number">49</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-error"><a href="#query_Query-error">Query.prototype.error()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">err
+User.where(<span class="hljs-string">'age'</span>, <span class="hljs-number">49</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.error()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">err
 <span class="method-type">&laquo;Error|null&raquo;</span> if set, <code>exec()</code> will fail fast before sending the query to MongoDB</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Gets/sets the error flag on this query. If this flag is not null or undefined, the <code>exec()</code> promise will reject without executing.</p>
 
 <h4>Example:</h4>
@@ -329,7 +329,7 @@ Schema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function">
 <span class="hljs-keyword">var</span> TestModel = db.model(<span class="hljs-string">'Test'</span>, TestSchema);
 TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'woops'</span>)).exec(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// `error` will be a cast error because `num` failed to cast</span>
-});</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-estimatedDocumentCount"><a href="#query_Query-estimatedDocumentCount">Query.prototype.estimatedDocumentCount()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
+});</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.estimatedDocumentCount()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> passed transparently to the <a href="http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#estimatedDocumentCount">MongoDB driver</a></li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, count)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>estimatedDocumentCount()</code> query. Faster than using <code>countDocuments()</code> for large collections because <code>estimatedDocumentCount()</code> uses collection metadata rather than scanning the entire collection.</p>
 
@@ -343,7 +343,7 @@ TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">await</span> Model.find().estimatedDocumentCount();</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-exec"><a href="#query_Query-exec">Query.prototype.exec()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[operation]
+<pre><code><span class="hljs-keyword">await</span> Model.find().estimatedDocumentCount();</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.exec()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[operation]
 <span class="method-type">&laquo;String|Function&raquo;</span> </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params depend on the function being called</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query</p>
 
@@ -353,7 +353,7 @@ TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<
 <span class="hljs-keyword">var</span> promise = query.exec(<span class="hljs-string">'update'</span>);
 
 query.exec(callback);
-query.exec(<span class="hljs-string">'find'</span>, callback);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-exists"><a href="#query_Query-exists">Query.prototype.exists()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+query.exec(<span class="hljs-string">'find'</span>, callback);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.exists()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies an <code>$exists</code> condition</p>
 
@@ -366,7 +366,7 @@ Thing.find().exists(<span class="hljs-string">'name'</span>)
 
 <span class="hljs-comment">// { name: { $exists: false }}</span>
 Thing.where(<span class="hljs-string">'name'</span>).exists(<span class="hljs-literal">false</span>);
-Thing.find().exists(<span class="hljs-string">'name'</span>, <span class="hljs-literal">false</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-explain"><a href="#query_Query-explain">Query.prototype.explain()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[verbose]
+Thing.find().exists(<span class="hljs-string">'name'</span>, <span class="hljs-literal">false</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.explain()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[verbose]
 <span class="method-type">&laquo;String&raquo;</span> The verbosity mode. Either &#39;queryPlanner&#39;, &#39;executionStats&#39;, or &#39;allPlansExecution&#39;. The default is &#39;queryPlanner&#39;</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/method/cursor.explain/"><code>explain</code> option</a>, which makes this query return detailed execution stats instead of the actual query result. This method is useful for determining what index your queries use.</p>
 
 <p>Calling <code>query.explain(v)</code> is equivalent to <code>query.setOption({ explain: v })</code></p>
@@ -375,7 +375,7 @@ Thing.find().exists(<span class="hljs-string">'name'</span>, <span class="hljs-l
 
 <pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> query.find({ a: <span class="hljs-number">1</span> }).explain(<span class="hljs-string">'queryPlanner'</span>);
-<span class="hljs-built_in">console</span>.log(res);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-find"><a href="#query_Query-find">Query.prototype.find()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+<span class="hljs-built_in">console</span>.log(res);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.find()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> mongodb selector. If not specified, returns all documents.</li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Find all documents that match <code>selector</code>. The result will be an array of documents.</p>
 
@@ -387,7 +387,7 @@ Thing.find().exists(<span class="hljs-string">'name'</span>, <span class="hljs-l
 <span class="hljs-keyword">const</span> arr = <span class="hljs-keyword">await</span> Movie.find({ year: { $gte: <span class="hljs-number">1980</span>, $lte: <span class="hljs-number">1989</span> } });
 
 <span class="hljs-comment">// Using callbacks</span>
-Movie.find({ year: { $gte: <span class="hljs-number">1980</span>, $lte: <span class="hljs-number">1989</span> } }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, arr</span>) </span>{});</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-findOne"><a href="#query_Query-findOne">Query.prototype.findOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+Movie.find({ year: { $gte: <span class="hljs-number">1980</span>, $lte: <span class="hljs-number">1989</span> } }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, arr</span>) </span>{});</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.findOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> mongodb selector</li><li class="param">[projection]
 <span class="method-type">&laquo;Object&raquo;</span> optional fields to return</li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>setOptions()</code></a></li><li class="param">[callback]
@@ -416,7 +416,7 @@ query.findOne(<span class="hljs-function"><span class="hljs-keyword">function</s
   <span class="hljs-keyword">if</span> (kitten) {
     <span class="hljs-comment">// doc may be null if no document matched</span>
   }
-});</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndDelete"><a href="#query_Query-findOneAndDelete">Query.prototype.findOneAndDelete()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[conditions]
+});</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.findOneAndDelete()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[conditions]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.rawResult]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
@@ -455,7 +455,7 @@ A.where().findOneAndDelete(conditions, options)  <span class="hljs-comment">// r
 A.where().findOneAndDelete(conditions, callback) <span class="hljs-comment">// executes</span>
 A.where().findOneAndDelete(conditions) <span class="hljs-comment">// returns Query</span>
 A.where().findOneAndDelete(callback)   <span class="hljs-comment">// executes</span>
-A.where().findOneAndDelete()           <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndRemove"><a href="#query_Query-findOneAndRemove">Query.prototype.findOneAndRemove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[conditions]
+A.where().findOneAndDelete()           <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.findOneAndRemove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[conditions]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.rawResult]
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
@@ -492,7 +492,7 @@ A.where().findOneAndRemove(conditions, options)  <span class="hljs-comment">// r
 A.where().findOneAndRemove(conditions, callback) <span class="hljs-comment">// executes</span>
 A.where().findOneAndRemove(conditions) <span class="hljs-comment">// returns Query</span>
 A.where().findOneAndRemove(callback)   <span class="hljs-comment">// executes</span>
-A.where().findOneAndRemove()           <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndReplace"><a href="#query_Query-findOneAndReplace">Query.prototype.findOneAndReplace()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+A.where().findOneAndRemove()           <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.findOneAndReplace()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[replacement]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.rawResult]
@@ -532,7 +532,7 @@ A.where().findOneAndReplace(filter, replacement, options); <span class="hljs-com
 A.where().findOneAndReplace(filter, replacement, callback); <span class="hljs-comment">// executes</span>
 A.where().findOneAndReplace(filter); <span class="hljs-comment">// returns Query</span>
 A.where().findOneAndReplace(callback); <span class="hljs-comment">// executes</span>
-A.where().findOneAndReplace(); <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-findOneAndUpdate"><a href="#query_Query-findOneAndUpdate">Query.prototype.findOneAndUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+A.where().findOneAndReplace(); <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.findOneAndUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object|Query&raquo;</span> </li><li class="param">[doc]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.rawResult]
@@ -581,7 +581,7 @@ query.findOneAndUpdate(conditions, update)           <span class="hljs-comment">
 query.findOneAndUpdate(update, callback)             <span class="hljs-comment">// returns Query</span>
 query.findOneAndUpdate(update)                       <span class="hljs-comment">// returns Query</span>
 query.findOneAndUpdate(callback)                     <span class="hljs-comment">// executes</span>
-query.findOneAndUpdate()                             <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-geometry"><a href="#query_Query-geometry">Query.prototype.geometry()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">object
+query.findOneAndUpdate()                             <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.geometry()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">object
 <span class="method-type">&laquo;Object&raquo;</span> Must contain a <code>type</code> property which is a String and a <code>coordinates</code> property which is an Array. See the examples.</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$geometry</code> condition</p>
 
 <h4>Example</h4>
@@ -606,20 +606,20 @@ query.where(<span class="hljs-string">'loc'</span>).intersects().geometry({ type
 
 <p><code>geometry()</code> <strong>must</strong> come after either <code>intersects()</code> or <code>within()</code>.</p>
 
-<p>The <code>object</code> argument must contain <code>type</code> and <code>coordinates</code> properties. - type {String} - coordinates {Array}</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-getFilter"><a href="#query_Query-getFilter">Query.prototype.getFilter()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current query filter</li></ul><div><p>Returns the current query filter (also known as conditions) as a POJO.</p>
+<p>The <code>object</code> argument must contain <code>type</code> and <code>coordinates</code> properties. - type {String} - coordinates {Array}</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.getFilter()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current query filter</li></ul><div><p>Returns the current query filter (also known as conditions) as a POJO.</p>
 
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> }).where(<span class="hljs-string">'b'</span>).gt(<span class="hljs-number">2</span>);
-query.getFilter(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-getOptions"><a href="#query_Query-getOptions">Query.prototype.getOptions()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</li></ul><div><p>Gets query options.</p>
+query.getFilter(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.getOptions()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</li></ul><div><p>Gets query options.</p>
 
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
 query.limit(<span class="hljs-number">10</span>);
 query.setOptions({ maxTimeMS: <span class="hljs-number">1000</span> })
-query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-getPopulatedPaths"><a href="#query_Query-getPopulatedPaths">Query.prototype.getPopulatedPaths()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> an array of strings representing populated paths</li></ul><div><p>Gets a list of paths to be populated by this query</p>
+query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.getPopulatedPaths()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> an array of strings representing populated paths</li></ul><div><p>Gets a list of paths to be populated by this query</p>
 
 <h4>Example:</h4>
 
@@ -636,7 +636,7 @@ query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }
    path: <span class="hljs-string">'level2'</span>,
    populate: { path: <span class="hljs-string">'level3'</span> }
  });
- q.getPopulatedPaths(); <span class="hljs-comment">// ['level2', 'level2.level3']</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-getQuery"><a href="#query_Query-getQuery">Query.prototype.getQuery()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current query filter</li></ul><div><p>Returns the current query filter. Equivalent to <code>getFilter()</code>.</p>
+ q.getPopulatedPaths(); <span class="hljs-comment">// ['level2', 'level2.level3']</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.getQuery()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current query filter</li></ul><div><p>Returns the current query filter. Equivalent to <code>getFilter()</code>.</p>
 
 <p>You should use <code>getFilter()</code> instead of <code>getQuery()</code> where possible. <code>getQuery()</code> will likely be deprecated in a future release.</p>
 
@@ -644,13 +644,13 @@ query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }
 
 <pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> }).where(<span class="hljs-string">'b'</span>).gt(<span class="hljs-number">2</span>);
-query.getQuery(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-getUpdate"><a href="#query_Query-getUpdate">Query.prototype.getUpdate()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current update operations</li></ul><div><p>Returns the current update operations as a JSON object.</p>
+query.getQuery(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.getUpdate()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current update operations</li></ul><div><p>Returns the current update operations as a JSON object.</p>
 
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
-query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-gt"><a href="#query_Query-gt">Query.prototype.gt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.gt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$gt</code> query condition.</p>
 
@@ -661,11 +661,11 @@ query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code
 <pre><code>Thing.find().where(<span class="hljs-string">'age'</span>).gt(<span class="hljs-number">21</span>)
 
 <span class="hljs-comment">// or</span>
-Thing.find().gt(<span class="hljs-string">'age'</span>, <span class="hljs-number">21</span>)</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-gte"><a href="#query_Query-gte">Query.prototype.gte()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+Thing.find().gt(<span class="hljs-string">'age'</span>, <span class="hljs-number">21</span>)</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.gte()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$gte</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-hint"><a href="#query_Query-hint">Query.prototype.hint()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.hint()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> a hint object</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets query hints.</p>
 
 <h4>Example</h4>
@@ -674,11 +674,11 @@ Thing.find().gt(<span class="hljs-string">'age'</span>, <span class="hljs-number
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-in"><a href="#query_Query-in">Query.prototype.in()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.in()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies an <code>$in</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-intersects"><a href="#query_Query-intersects">Query.prototype.intersects()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[arg]
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.intersects()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[arg]
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declares an intersects query for <code>geometry()</code>.</p>
 
 <h4>Example</h4>
@@ -699,7 +699,7 @@ query.where(<span class="hljs-string">'path'</span>).intersects({
 
 <h4>NOTE:</h4>
 
-<p>In Mongoose 3.7, <code>intersects</code> changed from a getter to a function. If you need the old syntax, use <a href="https://github.com/ebensing/mongoose-within">this</a>.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-j"><a href="#query_Query-j">Query.prototype.j()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p>In Mongoose 3.7, <code>intersects</code> changed from a getter to a function. If you need the old syntax, use <a href="https://github.com/ebensing/mongoose-within">this</a>.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.j()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Requests acknowledgement that this operation has been persisted to MongoDB's on-disk journal.</p>
 
 <h2>This option is only valid for operations that write to the database</h2>
@@ -720,7 +720,7 @@ query.where(<span class="hljs-string">'path'</span>).intersects({
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">await</span> mongoose.model(<span class="hljs-string">'Person'</span>).deleteOne({ name: <span class="hljs-string">'Ned Stark'</span> }).j(<span class="hljs-literal">true</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-lean"><a href="#query_Query-lean">Query.prototype.lean()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">bool
+<pre><code><span class="hljs-keyword">await</span> mongoose.model(<span class="hljs-string">'Person'</span>).deleteOne({ name: <span class="hljs-string">'Ned Stark'</span> }).j(<span class="hljs-literal">true</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.lean()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">bool
 <span class="method-type">&laquo;Boolean|Object&raquo;</span> defaults to true</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the lean option.</p>
 
 <p>Documents returned from queries with the <code>lean</code> option enabled are plain javascript objects, not <a href="#document-js">Mongoose Documents</a>. They have no <code>save</code> method, getters/setters, virtuals, or other Mongoose features.</p>
@@ -734,7 +734,7 @@ query.where(<span class="hljs-string">'path'</span>).intersects({
 <span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> Model.find().lean();
 docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</span> mongoose.Document; <span class="hljs-comment">// false</span></code></pre>
 
-<p><a href="/docs/tutorials/lean.html">Lean is great for high-performance, read-only cases</a>, especially when combined with <a href="/docs/queries.html#streaming">cursors</a>.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-limit"><a href="#query_Query-limit">Query.prototype.limit()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p><a href="/docs/tutorials/lean.html">Lean is great for high-performance, read-only cases</a>, especially when combined with <a href="/docs/queries.html#streaming">cursors</a>.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.limit()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies the maximum number of documents the query will return.</p>
 
 <h4>Example</h4>
@@ -743,15 +743,15 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-lt"><a href="#query_Query-lt">Query.prototype.lt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.lt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$lt</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-lte"><a href="#query_Query-lte">Query.prototype.lte()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.lte()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$lte</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-map"><a href="#query_Query-map">Query.prototype.map()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.map()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> function to run to transform the query result</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Runs a function <code>fn</code> and treats the return value of <code>fn</code> as the new value for the query to resolve to.</p>
 
 <p>Any functions you pass to <code>map()</code> will run <strong>after</strong> any post hooks.</p>
@@ -764,11 +764,11 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
   <span class="hljs-keyword">return</span> res == <span class="hljs-literal">null</span> ?
     res :
     <span class="hljs-built_in">Object</span>.assign(res, { loadedAt: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>() });
-});</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-maxDistance"><a href="#query_Query-maxDistance">Query.prototype.maxDistance()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+});</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.maxDistance()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>maxDistance</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-maxScan"><a href="#query_Query-maxScan">Query.prototype.maxScan()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.maxScan()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies the maxScan option.</p>
 
 <h4>Example</h4>
@@ -777,7 +777,7 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-maxTimeMS"><a href="#query_Query-maxTimeMS">Query.prototype.maxTimeMS()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[ms]
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.maxTimeMS()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[ms]
 <span class="method-type">&laquo;Number&raquo;</span> The number of milliseconds</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/method/cursor.maxTimeMS/">maxTimeMS</a> option. This will tell the MongoDB server to abort if the query or write op has been running for more than <code>ms</code> milliseconds.</p>
 
 <p>Calling <code>query.maxTimeMS(v)</code> is equivalent to <code>query.setOption({ maxTimeMS: v })</code></p>
@@ -787,10 +787,10 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 <pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 <span class="hljs-comment">// Throws an error 'operation exceeded time limit' as long as there's</span>
 <span class="hljs-comment">// &gt;= 1 doc in the queried collection</span>
-<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> query.find({ $where: <span class="hljs-string">'sleep(1000) || true'</span> }).maxTimeMS(<span class="hljs-number">100</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-maxscan"><a href="#query_Query-maxscan">Query.prototype.maxscan()</a></h3><div><p><em>DEPRECATED</em> Alias of <code>maxScan</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-merge"><a href="#query_Query-merge">Query.prototype.merge()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">source
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> query.find({ $where: <span class="hljs-string">'sleep(1000) || true'</span> }).maxTimeMS(<span class="hljs-number">100</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.maxscan()</a></h3><div><p><em>DEPRECATED</em> Alias of <code>maxScan</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.merge()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">source
 <span class="method-type">&laquo;Query|Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Merges another Query or conditions object into this one.</p>
 
-<p>When a Query is passed, conditions, field selection and options are merged.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-mod"><a href="#query_Query-mod">Query.prototype.mod()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>When a Query is passed, conditions, field selection and options are merged.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.mod()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Array&raquo;</span> must be of length 2, first element is <code>divisor</code>, 2nd element is <code>remainder</code>.</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$mod</code> condition, filters documents for documents whose <code>path</code> property is a number that is equal to <code>remainder</code> modulo <code>divisor</code>.</p>
 
@@ -800,7 +800,7 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 Product.find().mod(<span class="hljs-string">'inventory'</span>, [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 Product.find().where(<span class="hljs-string">'inventory'</span>).mod([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 <span class="hljs-comment">// This syntax is a little strange, but supported.</span>
-Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
 <span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
 
 <ul>
@@ -813,11 +813,11 @@ Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span cla
 <li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
 </ul>
 
-<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-near"><a href="#query_Query-near">Query.prototype.near()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.near()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$near</code> or <code>$nearSphere</code> condition</p>
 
@@ -828,7 +828,7 @@ Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span cla
 <pre><code>query.where(<span class="hljs-string">'loc'</span>).near({ center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>] });
 query.where(<span class="hljs-string">'loc'</span>).near({ center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], maxDistance: <span class="hljs-number">5</span> });
 query.where(<span class="hljs-string">'loc'</span>).near({ center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], maxDistance: <span class="hljs-number">5</span>, spherical: <span class="hljs-literal">true</span> });
-query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], maxDistance: <span class="hljs-number">5</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-nearSphere"><a href="#query_Query-nearSphere">Query.prototype.nearSphere()</a></h3><div><p><em>DEPRECATED</em> Specifies a <code>$nearSphere</code> condition</p>
+query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], maxDistance: <span class="hljs-number">5</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.nearSphere()</a></h3><div><p><em>DEPRECATED</em> Specifies a <code>$nearSphere</code> condition</p>
 
 <h4>Example</h4>
 
@@ -838,21 +838,21 @@ query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-
 
 <h4>Example</h4>
 
-<pre><code>query.where(<span class="hljs-string">'loc'</span>).near({ center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], spherical: <span class="hljs-literal">true</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-nin"><a href="#query_Query-nin">Query.prototype.nin()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<pre><code>query.where(<span class="hljs-string">'loc'</span>).near({ center: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], spherical: <span class="hljs-literal">true</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.nin()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies an <code>$nin</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-nor"><a href="#query_Query-nor">Query.prototype.nor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.nor()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies arguments for a <code>$nor</code> condition.</p>
 
 <h4>Example</h4>
 
-<pre><code>query.nor([{ color: <span class="hljs-string">'green'</span> }, { status: <span class="hljs-string">'ok'</span> }])</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-or"><a href="#query_Query-or">Query.prototype.or()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
+<pre><code>query.nor([{ color: <span class="hljs-string">'green'</span> }, { status: <span class="hljs-string">'ok'</span> }])</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.or()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">array
 <span class="method-type">&laquo;Array&raquo;</span> array of conditions</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies arguments for an <code>$or</code> condition.</p>
 
 <h4>Example</h4>
 
-<pre><code>query.or([{ color: <span class="hljs-string">'red'</span> }, { status: <span class="hljs-string">'emergency'</span> }])</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-orFail"><a href="#query_Query-orFail">Query.prototype.orFail()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[err]
+<pre><code>query.or([{ color: <span class="hljs-string">'red'</span> }, { status: <span class="hljs-string">'emergency'</span> }])</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.orFail()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[err]
 <span class="method-type">&laquo;Function|Error&raquo;</span> optional error to throw if no docs match <code>filter</code>. If not specified, <code>orFail()</code> will throw a <code>DocumentNotFoundError</code></li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Make this query throw an error if no documents match the given <code>filter</code>. This is handy for integrating with async/await, because <code>orFail()</code> saves you an extra <code>if</code> statement to check if no document was found.</p>
 
 <h4>Example:</h4>
@@ -868,14 +868,14 @@ query.near(<span class="hljs-string">'loc'</span>, { center: [<span class="hljs-
 
 <span class="hljs-comment">// Throws "Not found" error if no document was found</span>
 <span class="hljs-keyword">await</span> Model.findOneAndUpdate({ foo: <span class="hljs-string">'bar'</span> }, { name: <span class="hljs-string">'test'</span> }).
-  orFail(() =&gt; <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Not found'</span>));</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-polygon"><a href="#query_Query-polygon">Query.prototype.polygon()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+  orFail(() =&gt; <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Not found'</span>));</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.polygon()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String|Array&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[coordinatePairs...]
 <span class="method-type">&laquo;Array|Object&raquo;</span> </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$polygon</code> condition</p>
 
 <h4>Example</h4>
 
 <pre><code>query.where(<span class="hljs-string">'loc'</span>).within().polygon([<span class="hljs-number">10</span>,<span class="hljs-number">20</span>], [<span class="hljs-number">13</span>, <span class="hljs-number">25</span>], [<span class="hljs-number">7</span>,<span class="hljs-number">15</span>])
-query.polygon(<span class="hljs-string">'loc'</span>, [<span class="hljs-number">10</span>,<span class="hljs-number">20</span>], [<span class="hljs-number">13</span>, <span class="hljs-number">25</span>], [<span class="hljs-number">7</span>,<span class="hljs-number">15</span>])</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-populate"><a href="#query_Query-populate">Query.prototype.populate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
+query.polygon(<span class="hljs-string">'loc'</span>, [<span class="hljs-number">10</span>,<span class="hljs-number">20</span>], [<span class="hljs-number">13</span>, <span class="hljs-number">25</span>], [<span class="hljs-number">7</span>,<span class="hljs-number">15</span>])</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.populate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;Object|String&raquo;</span> either the path to populate or an object specifying all parameters</li><li class="param">[select]
 <span class="method-type">&laquo;Object|String&raquo;</span> Field selection for the population query</li><li class="param">[model]
 <span class="method-type">&laquo;Model&raquo;</span> The model you wish to use for population. If not specified, populate will look up the model by the name in the Schema&#39;s <code>ref</code> field.</li><li class="param">[match]
@@ -907,7 +907,7 @@ Kitten.find().populate(<span class="hljs-string">'owner'</span>, <span class="hl
   <span class="hljs-built_in">console</span>.log(kittens[<span class="hljs-number">0</span>].owner.name) <span class="hljs-comment">// Zoopa</span>
 })</code></pre>
 
-<p>Paths are populated after the query executes and a response is received. A separate query is then executed for each path specified for population. After a response for each query has also been returned, the results are passed to the callback.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-projection"><a href="#query_Query-projection">Query.prototype.projection()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<p>Paths are populated after the query executes and a response is received. A separate query is then executed for each path specified for population. After a response for each query has also been returned, the results are passed to the callback.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.projection()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
 <span class="method-type">&laquo;Object|null&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the current projection</li></ul><div><p>Get/set the current projection (AKA fields). Pass <code>null</code> to remove the current projection.</p>
 
 <p>Unlike <code>projection()</code>, the <code>select()</code> function modifies the current projection in place. This function overwrites the existing projection.</p>
@@ -924,7 +924,7 @@ q.projection({ c: <span class="hljs-number">1</span> });
 q.projection(); <span class="hljs-comment">// { c: 1 }</span>
 
 q.projection(<span class="hljs-literal">null</span>);
-q.projection(); <span class="hljs-comment">// null</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-read"><a href="#query_Query-read">Query.prototype.read()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">pref
+q.projection(); <span class="hljs-comment">// null</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.read()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">pref
 <span class="method-type">&laquo;String&raquo;</span> one of the listed preference options or aliases</li><li class="param">[tags]
 <span class="method-type">&laquo;Array&raquo;</span> optional tags for this query</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Determines the MongoDB nodes from which to read.</p>
 
@@ -964,7 +964,7 @@ n   nearest</code></pre>
 <span class="hljs-comment">// read from secondaries with matching tags</span>
 <span class="hljs-keyword">new</span> Query().read(<span class="hljs-string">'s'</span>, [{ dc:<span class="hljs-string">'sf'</span>, s: <span class="hljs-number">1</span> },{ dc:<span class="hljs-string">'ma'</span>, s: <span class="hljs-number">2</span> }])</code></pre>
 
-<p>Read more about how to use read preferrences <a href="http://docs.mongodb.org/manual/applications/replication/#read-preference">here</a> and <a href="http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences">here</a>.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-readConcern"><a href="#query_Query-readConcern">Query.prototype.readConcern()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">level
+<p>Read more about how to use read preferrences <a href="http://docs.mongodb.org/manual/applications/replication/#read-preference">here</a> and <a href="http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences">here</a>.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.readConcern()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">level
 <span class="method-type">&laquo;String&raquo;</span> one of the listed read concern level or their aliases</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the readConcern option for the query.</p>
 
 <h4>Example:</h4>
@@ -1000,11 +1000,11 @@ m   majority
 lz  linearizable
 s   snapshot</code></pre>
 
-<p>Read more about how to use read concern <a href="https://docs.mongodb.com/manual/reference/read-concern/">here</a>.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-regex"><a href="#query_Query-regex">Query.prototype.regex()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+<p>Read more about how to use read concern <a href="https://docs.mongodb.com/manual/reference/read-concern/">here</a>.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.regex()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;String|RegExp&raquo;</span> </li></ul><div><p>Specifies a <code>$regex</code> query condition.</p>
 
-<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-remove"><a href="#query_Query-remove">Query.prototype.remove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+<p>When called with one argument, the most recent path passed to <code>where()</code> is used.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.remove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> optional params are (error, mongooseDeleteResult)</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Declare and/or execute this query as a remove() operation. <code>remove()</code> is deprecated, you should use <a href="#query_Query-deleteOne"><code>deleteOne()</code></a> or <a href="#query_Query-deleteMany"><code>deleteMany()</code></a> instead.</p>
 
@@ -1040,7 +1040,7 @@ Character.remove({ name: <span class="hljs-regexp">/Stark/</span> }, callback);
 Character.remove({ name: <span class="hljs-regexp">/Stark/</span> }).remove(callback);
 
 <span class="hljs-comment">// executed without a callback</span>
-Character.exec();</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-replaceOne"><a href="#query_Query-replaceOne">Query.prototype.replaceOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+Character.exec();</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.replaceOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[doc]
 <span class="method-type">&laquo;Object&raquo;</span> the update command</li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.multipleCastError]
@@ -1065,7 +1065,7 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 
 <ul>
 <li><code>replaceOne()</code></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-select"><a href="#query_Query-select">Query.prototype.select()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+</ul>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.select()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
 <span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies which document fields to include or exclude (also known as the query "projection")</p>
 
 <p>When using string syntax, prefixing a path with <code>-</code> will flag that path as excluded. When a path does not have the <code>-</code> prefix, it is included. Lastly, if a path is prefixed with <code>+</code>, it forces inclusion of the path, which is useful for paths excluded at the <a href="/docs/api.html#schematype_SchemaType-select">schema level</a>.</p>
@@ -1092,16 +1092,16 @@ query.select(<span class="hljs-string">'+foo'</span>); <span class="hljs-comment
 <span class="hljs-comment">// or you may use object notation, useful when</span>
 <span class="hljs-comment">// you have keys already prefixed with a "-"</span>
 query.select({ a: <span class="hljs-number">1</span>, b: <span class="hljs-number">1</span> });
-query.select({ c: <span class="hljs-number">0</span>, d: <span class="hljs-number">0</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-selected"><a href="#query_Query-selected">Query.prototype.selected()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Determines if field selection has been made.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-selectedExclusively"><a href="#query_Query-selectedExclusively">Query.prototype.selectedExclusively()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Determines if exclusive field selection has been made.</p>
+query.select({ c: <span class="hljs-number">0</span>, d: <span class="hljs-number">0</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.selected()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Determines if field selection has been made.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.selectedExclusively()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Determines if exclusive field selection has been made.</p>
 
 <pre><code>query.selectedExclusively() <span class="hljs-comment">// false</span>
 query.select(<span class="hljs-string">'-name'</span>)
 query.selectedExclusively() <span class="hljs-comment">// true</span>
-query.selectedInclusively() <span class="hljs-comment">// false</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-selectedInclusively"><a href="#query_Query-selectedInclusively">Query.prototype.selectedInclusively()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Determines if inclusive field selection has been made.</p>
+query.selectedInclusively() <span class="hljs-comment">// false</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.selectedInclusively()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><div><p>Determines if inclusive field selection has been made.</p>
 
 <pre><code>query.selectedInclusively() <span class="hljs-comment">// false</span>
 query.select(<span class="hljs-string">'name'</span>)
-query.selectedInclusively() <span class="hljs-comment">// true</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-session"><a href="#query_Query-session">Query.prototype.session()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[session]
+query.selectedInclusively() <span class="hljs-comment">// true</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.session()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[session]
 <span class="method-type">&laquo;ClientSession&raquo;</span> from <code>await conn.startSession()</code></li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the <a href="https://docs.mongodb.com/manual/reference/server-sessions/">MongoDB session</a> associated with this query. Sessions are how you mark a query as part of a <a href="/docs/transactions.html">transaction</a>.</p>
 
 <p>Calling <code>session(null)</code> removes the session from this query.</p>
@@ -1109,7 +1109,7 @@ query.selectedInclusively() <span class="hljs-comment">// true</span></code></pr
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">await</span> mongoose.startSession();
-<span class="hljs-keyword">await</span> mongoose.model(<span class="hljs-string">'Person'</span>).findOne({ name: <span class="hljs-string">'Axl Rose'</span> }).session(s);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-set"><a href="#query_Query-set">Query.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
+<span class="hljs-keyword">await</span> mongoose.model(<span class="hljs-string">'Person'</span>).findOne({ name: <span class="hljs-string">'Axl Rose'</span> }).session(s);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;String|Object&raquo;</span> path or object of key/value pairs to set</li><li class="param">[val]
 <span class="method-type">&laquo;Any&raquo;</span> the value to set</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Adds a <code>$set</code> to this query's update without changing the operation. This is useful for query middleware so you can add an update regardless of whether you use <code>updateOne()</code>, <code>updateMany()</code>, <code>findOneAndUpdate()</code>, etc.</p>
 
@@ -1117,7 +1117,7 @@ query.selectedInclusively() <span class="hljs-comment">// true</span></code></pr
 
 <pre><code><span class="hljs-comment">// Updates `{ $set: { updatedAt: new Date() } }`</span>
 <span class="hljs-keyword">new</span> Query().updateOne({}, {}).set(<span class="hljs-string">'updatedAt'</span>, <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>());
-<span class="hljs-keyword">new</span> Query().updateMany({}, {}).set({ updatedAt: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>() });</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-setOptions"><a href="#query_Query-setOptions">Query.prototype.setOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="hljs-keyword">new</span> Query().updateMany({}, {}).set({ updatedAt: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>() });</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.setOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets query options. Some options only make sense for certain operations.</p>
 
 <h4>Options:</h4>
@@ -1163,7 +1163,7 @@ query.selectedInclusively() <span class="hljs-comment">// true</span></code></pr
 <ul>
 <li><a href="https://docs.mongodb.com/manual/reference/collation/">collation</a></li>
 <li><a href="https://docs.mongodb.com/manual/reference/server-sessions/">session</a></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-setQuery"><a href="#query_Query-setQuery">Query.prototype.setQuery()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">new
+</ul>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.setQuery()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">new
 <span class="method-type">&laquo;Object&raquo;</span> query conditions</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;undefined&raquo;</span> </li></ul><div><p>Sets the query conditions to the provided JSON object.</p>
 
 <h4>Example:</h4>
@@ -1171,7 +1171,7 @@ query.selectedInclusively() <span class="hljs-comment">// true</span></code></pr
 <pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> })
 query.setQuery({ a: <span class="hljs-number">2</span> });
-query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-setUpdate"><a href="#query_Query-setUpdate">Query.prototype.setUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">new
+query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.setUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">new
 <span class="method-type">&laquo;Object&raquo;</span> update operation</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;undefined&raquo;</span> </li></ul><div><p>Sets the current update operation to new value.</p>
 
 <h4>Example:</h4>
@@ -1179,7 +1179,7 @@ query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre>  </
 <pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.setUpdate({ $set: { b: <span class="hljs-number">6</span> } });
-query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-size"><a href="#query_Query-size">Query.prototype.size()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.size()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$size</code> query condition.</p>
 
@@ -1192,7 +1192,7 @@ query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code
 
   assert(<span class="hljs-built_in">Array</span>.isArray(docs));
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'documents with 0 tags'</span>, docs);
-})</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-skip"><a href="#query_Query-skip">Query.prototype.skip()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+})</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.skip()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies the number of documents to skip.</p>
 
 <h4>Example</h4>
@@ -1201,7 +1201,7 @@ query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-slaveOk"><a href="#query_Query-slaveOk">Query.prototype.slaveOk()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">v
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.slaveOk()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">v
 <span class="method-type">&laquo;Boolean&raquo;</span> defaults to true</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p><em>DEPRECATED</em> Sets the slaveOk option.</p>
 
 <p><strong>Deprecated</strong> in MongoDB 2.2 in favor of <a href="#query_Query-read">read preferences</a>.</p>
@@ -1210,7 +1210,7 @@ query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code
 
 <pre><code>query.slaveOk() <span class="hljs-comment">// true</span>
 query.slaveOk(<span class="hljs-literal">true</span>)
-query.slaveOk(<span class="hljs-literal">false</span>)</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-slice"><a href="#query_Query-slice">Query.prototype.slice()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+query.slaveOk(<span class="hljs-literal">false</span>)</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.slice()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> number/range of elements to slice</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>$slice</code> projection for an array.</p>
 
@@ -1220,7 +1220,7 @@ query.slaveOk(<span class="hljs-literal">false</span>)</code></pre>  </div><hr c
 query.slice(<span class="hljs-string">'comments'</span>, <span class="hljs-number">-5</span>)
 query.slice(<span class="hljs-string">'comments'</span>, [<span class="hljs-number">10</span>, <span class="hljs-number">5</span>])
 query.where(<span class="hljs-string">'comments'</span>).slice(<span class="hljs-number">5</span>)
-query.where(<span class="hljs-string">'comments'</span>).slice([<span class="hljs-number">-10</span>, <span class="hljs-number">5</span>])</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-snapshot"><a href="#query_Query-snapshot">Query.prototype.snapshot()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>snapshot</code> query.</p>
+query.where(<span class="hljs-string">'comments'</span>).slice([<span class="hljs-number">-10</span>, <span class="hljs-number">5</span>])</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.snapshot()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies this query as a <code>snapshot</code> query.</p>
 
 <h4>Example</h4>
 
@@ -1230,7 +1230,7 @@ query.snapshot(<span class="hljs-literal">false</span>)</code></pre>
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-sort"><a href="#query_Query-sort">Query.prototype.sort()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.sort()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
 <span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the sort order</p>
 
 <p>If an object is passed, values allowed are <code>asc</code>, <code>desc</code>, <code>ascending</code>, <code>descending</code>, <code>1</code>, and <code>-1</code>.</p>
@@ -1247,7 +1247,7 @@ query.sort(<span class="hljs-string">'field -test'</span>);</code></pre>
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-tailable"><a href="#query_Query-tailable">Query.prototype.tailable()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">bool
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.tailable()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">bool
 <span class="method-type">&laquo;Boolean&raquo;</span> defaults to true</li><li class="param">[opts]
 <span class="method-type">&laquo;Object&raquo;</span> options to set</li><ul style="margin-top: 0.5em"><li>[opts.numberOfRetries]
 <span class="method-type">&laquo;Number&raquo;</span> if cursor is exhausted, retry this many times before giving up</li></ul><ul style="margin-top: 0.5em"><li>[opts.tailableRetryInterval]
@@ -1261,9 +1261,9 @@ query.tailable(<span class="hljs-literal">false</span>)</code></pre>
 
 <h4>Note</h4>
 
-<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="query_Query-then"><a href="#query_Query-then">Query.prototype.then()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[resolve]
+<p>Cannot be used with <code>distinct()</code></p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.then()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[resolve]
 <span class="method-type">&laquo;Function&raquo;</span> </li><li class="param">[reject]
-<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-toConstructor"><a href="#query_Query-toConstructor">Query.prototype.toConstructor()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> subclass-of-Query</li></ul><div><p>Converts this query to a customized, reusable query constructor with all arguments and options retained.</p>
+<span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.toConstructor()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> subclass-of-Query</li></ul><div><p>Converts this query to a customized, reusable query constructor with all arguments and options retained.</p>
 
 <h4>Example</h4>
 
@@ -1294,7 +1294,7 @@ Adventure.prototype.startsWith = <span class="hljs-function"><span class="hljs-k
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
   }
 })
-Adventure().highlyRated.startsWith(<span class="hljs-string">'Life'</span>).exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-update"><a href="#query_Query-update">Query.prototype.update()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+Adventure().highlyRated.startsWith(<span class="hljs-string">'Life'</span>).exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.update()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[doc]
 <span class="method-type">&laquo;Object&raquo;</span> the update command</li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.multipleCastError]
@@ -1388,7 +1388,7 @@ update(doc, cb) <span class="hljs-comment">// executes</span>
 update(doc)
 update(cb) <span class="hljs-comment">// executes</span>
 update(<span class="hljs-literal">true</span>) <span class="hljs-comment">// executes</span>
-update()</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-updateMany"><a href="#query_Query-updateMany">Query.prototype.updateMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+update()</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.updateMany()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[doc]
 <span class="method-type">&laquo;Object&raquo;</span> the update command</li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.multipleCastError]
@@ -1413,7 +1413,7 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 
 <ul>
 <li><code>updateMany()</code></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-updateOne"><a href="#query_Query-updateOne">Query.prototype.updateOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
+</ul>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.updateOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[filter]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[doc]
 <span class="method-type">&laquo;Object&raquo;</span> the update command</li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.multipleCastError]
@@ -1443,11 +1443,11 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 
 <ul>
 <li><code>updateOne()</code></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-use$geoWithin"><a href="#query_Query-use$geoWithin">Query.prototype.use$geoWithin</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Flag to opt out of using <code>$geoWithin</code>.</p>
+</ul>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.use$geoWithin</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Flag to opt out of using <code>$geoWithin</code>.</p>
 
 <pre><code>mongoose.Query.use$geoWithin = <span class="hljs-literal">false</span>;</code></pre>
 
-<p>MongoDB 2.4 deprecated the use of <code>$within</code>, replacing it with <code>$geoWithin</code>. Mongoose uses <code>$geoWithin</code> by default (which is 100% backward compatible with <code>$within</code>). If you are running an older version of MongoDB, set this flag to <code>false</code> so your <code>within()</code> queries continue to work.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-w"><a href="#query_Query-w">Query.prototype.w()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
+<p>MongoDB 2.4 deprecated the use of <code>$within</code>, replacing it with <code>$geoWithin</code>. Mongoose uses <code>$geoWithin</code> by default (which is 100% backward compatible with <code>$within</code>). If you are running an older version of MongoDB, set this flag to <code>false</code> so your <code>within()</code> queries continue to work.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.w()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
 <span class="method-type">&laquo;String|number&raquo;</span> 0 for fire-and-forget, 1 for acknowledged by one server, &#39;majority&#39; for majority of the replica set, or <a href="https://docs.mongodb.com/manual/reference/write-concern/#w-option">any of the more advanced options</a>.</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Sets the specified number of <code>mongod</code> servers, or tag set of <code>mongod</code> servers, that must acknowledge this write before this write is considered successful.</p>
 
 <h2>This option is only valid for operations that write to the database</h2>
@@ -1472,7 +1472,7 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 <span class="hljs-comment">// until the `deleteOne()` has propagated to the majority of the replica set</span>
 <span class="hljs-keyword">await</span> mongoose.model(<span class="hljs-string">'Person'</span>).
   deleteOne({ name: <span class="hljs-string">'Ned Stark'</span> }).
-  w(<span class="hljs-string">'majority'</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-where"><a href="#query_Query-where">Query.prototype.where()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+  w(<span class="hljs-string">'majority'</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.where()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String|Object&raquo;</span> </li><li class="param">[val]
 <span class="method-type">&laquo;any&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Specifies a <code>path</code> for use with chaining.</p>
 
@@ -1492,7 +1492,7 @@ User
 .where(<span class="hljs-string">'age'</span>).gte(<span class="hljs-number">21</span>).lte(<span class="hljs-number">65</span>)
 .where(<span class="hljs-string">'name'</span>, <span class="hljs-regexp">/^vonderful/i</span>)
 .where(<span class="hljs-string">'friends'</span>).slice(<span class="hljs-number">10</span>)
-.exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-within"><a href="#query_Query-within">Query.prototype.within()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Defines a <code>$within</code> or <code>$geoWithin</code> argument for geo-spatial queries.</p>
+.exec(callback)</code></pre>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.within()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>Defines a <code>$within</code> or <code>$geoWithin</code> argument for geo-spatial queries.</p>
 
 <h4>Example</h4>
 
@@ -1516,7 +1516,7 @@ query.where(<span class="hljs-string">'loc'</span>).within({ type: <span class="
 
 <h4>NOTE:</h4>
 
-<p>In Mongoose 3.7, <code>within</code> changed from a getter to a function. If you need the old syntax, use <a href="https://github.com/ebensing/mongoose-within">this</a>.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-wtimeout"><a href="#query_Query-wtimeout">Query.prototype.wtimeout()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">ms
+<p>In Mongoose 3.7, <code>within</code> changed from a getter to a function. If you need the old syntax, use <a href="https://github.com/ebensing/mongoose-within">this</a>.</p>  </div><hr class="separate-api-elements"><h3 id="#{prop.anchorId}"><a href="##{prop.anchorId}">Query.prototype.wtimeout()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">ms
 <span class="method-type">&laquo;number&raquo;</span> number of milliseconds to wait</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><div><p>If <a href="/docs/api.html#query_Query-w"><code>w > 1</code></a>, the maximum amount of time to wait for this write to propagate through the replica set before this operation fails. The default is <code>0</code>, which means no timeout.</p>
 
 <h2>This option is only valid for operations that write to the database</h2>

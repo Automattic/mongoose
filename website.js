@@ -108,6 +108,11 @@ function jadeify(filename, options, newfile) {
     newfile = filename.replace('.md', '.html');
   }
 
+  console.log('AA', options.acquitBlocks && options.acquitBlocks[0].blocks)
+  options.marked = markdown;
+  options.markedCode = function(v) {
+    return markdown('```javascript\n' + v + '\n```');
+  };
   options.filename = filename;
 
   jade.render(contents, options, function(err, str) {

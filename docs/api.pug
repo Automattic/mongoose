@@ -18,12 +18,12 @@ block content
       each item in docs
         div.nav-item(id='nav-' + item.name)
           div.nav-item-title
-            a(href='#' + item.name)
+            a(href='./api/' + item.name + '.html')
               | #{item.name}
           ul.nav-item-sub
             each prop in item.props
               li
-                a(href='#' + prop.anchorId)
+                a(href='./api/' + item.name.toLowerCase() + '.html#' + prop.anchorId)
                   | #{prop.string}
 
   each item in docs

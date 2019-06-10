@@ -6,7 +6,7 @@
 
 .api-nav {
   position: fixed;
-  left: 1200px;
+  left: 1160px;
   top: 0px;
   width: 300px;
   height: 100%;
@@ -42,7 +42,7 @@
   list-style-type: none;
 }
 
-@media (max-width: 1500px) {
+@media (max-width: 1785px) {
   .api-nav {
     display: none;
   }

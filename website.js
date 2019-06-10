@@ -2,7 +2,7 @@
 
 const acquit = require('acquit');
 const fs = require('fs');
-const jade = require('jade');
+const jade = require('pug');
 const pkg = require('./package');
 const linktype = require('./docs/helpers/linktype');
 const href = require('./docs/helpers/href');
@@ -58,6 +58,7 @@ pkg.version = getVersion();
 pkg.latest4x = getLatestLegacyVersion('4.');
 pkg.latest38x = getLatestLegacyVersion('3.8');
 
+require('./docs/splitApiDocs');
 const filemap = Object.assign({}, require('./docs/source'), require('./docs/tutorials'));
 const files = Object.keys(filemap);
 
@@ -107,6 +108,10 @@ function jadeify(filename, options, newfile) {
     newfile = filename.replace('.md', '.html');
   }
 
+  options.marked = markdown;
+  options.markedCode = function(v) {
+    return markdown('```javascript\n' + v + '\n```');
+  };
   options.filename = filename;
 
   jade.render(contents, options, function(err, str) {
@@ -115,7 +120,7 @@ function jadeify(filename, options, newfile) {
       return;
     }
 
-    newfile = newfile || filename.replace('.jade', '.html');
+    newfile = newfile || filename.replace('.pug', '.html');
 
     fs.writeFile(newfile, str, function(err) {
       if (err) {
@@ -143,6 +148,6 @@ files.forEach(function(file) {
 const _acquit = require('./docs/source/acquit');
 const acquitFiles = Object.keys(_acquit);
 acquitFiles.forEach(function(file) {
-  const filename = __dirname + '/docs/acquit.jade';
+  const filename = __dirname + '/docs/acquit.pug';
   jadeify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

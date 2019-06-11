@@ -2,7 +2,7 @@
 
 const acquit = require('acquit');
 const fs = require('fs');
-const jade = require('pug');
+const pug = require('pug');
 const pkg = require('./package');
 const linktype = require('./docs/helpers/linktype');
 const href = require('./docs/helpers/href');
@@ -19,7 +19,7 @@ markdown.setOptions({
   }
 });
 
-jade.filters.markdown = markdown;
+pug.filters.markdown = markdown;
 
 const tests = [
   ...acquit.parse(fs.readFileSync('./test/webpack.test.js').toString()),
@@ -88,7 +88,7 @@ const cpc = `
 </div>
 `;
 
-function jadeify(filename, options, newfile) {
+function pugify(filename, options, newfile) {
   options = options || {};
   options.package = pkg;
   options.linktype = linktype;
@@ -114,7 +114,7 @@ function jadeify(filename, options, newfile) {
   };
   options.filename = filename;
 
-  jade.render(contents, options, function(err, str) {
+  pug.render(contents, options, function(err, str) {
     if (err) {
       console.error(err.stack);
       return;
@@ -134,12 +134,12 @@ function jadeify(filename, options, newfile) {
 
 files.forEach(function(file) {
   const filename = __dirname + '/' + file;
-  jadeify(filename, filemap[file]);
+  pugify(filename, filemap[file]);
 
   if (process.argv[2] === '--watch') {
     fs.watchFile(filename, {interval: 1000}, function(cur, prev) {
       if (cur.mtime > prev.mtime) {
-        jadeify(filename, filemap[file]);
+        pugify(filename, filemap[file]);
       }
     });
   }
@@ -149,5 +149,5 @@ const _acquit = require('./docs/source/acquit');
 const acquitFiles = Object.keys(_acquit);
 acquitFiles.forEach(function(file) {
   const filename = __dirname + '/docs/acquit.pug';
-  jadeify(filename, _acquit[file], __dirname + '/docs/' + file);
+  pugify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

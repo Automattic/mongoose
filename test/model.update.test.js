@@ -3251,15 +3251,15 @@ describe('model: updateOne: ', function() {
       title: { type: String, required: true },
       kind: { type: String, required: true }
     }, { discriminatorKey: 'kind' });
-    
+
     const Test = db.model('gh7843', testSchema);
-    
+
     const testSchemaChild = new mongoose.Schema({
       label: String
     });
-    
-    const TestChild = Test.discriminator('gh7843_child', testSchemaChild, 'testchild');
-  
+
+    Test.discriminator('gh7843_child', testSchemaChild, 'testchild');
+
     const filter = { label: 'bar', kind: 'testchild' };
     const update = { label: 'updated' };
     return Test.create({ title: 'foo', kind: 'testchild', label: 'bar' }).

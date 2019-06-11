@@ -10,7 +10,7 @@ test/
 Makefile
 CNAME
 index.html
-index.jade
+index.pug
 bin/
 tools/31*
 *.key

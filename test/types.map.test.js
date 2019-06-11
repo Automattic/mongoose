@@ -716,4 +716,23 @@ describe('Map', function() {
         assert.deepEqual(calls, ['myMap.foo', 'myMap.foo']);
       });
   });
+
+  it('treats `of` as a schema if typeKey is not set (gh-7859)', function() {
+    const schema = new mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: {
+          test: { type: String, required: true }
+        }
+      }
+    });
+    const Model = db.model('gh7859', schema);
+
+    const doc = new Model({ myMap: { foo: {} } });
+
+    const err = doc.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['myMap.foo.test'].message.indexOf('required') !== -1,
+      err.errors['myMap.foo.test'].message);
+  });
 });

@@ -1200,8 +1200,15 @@ describe('schema', function() {
 
     it('returns the schema instance', function() {
       const schema = new Schema({ name: String });
-      const ret = schema.clone().add({ age: Number });
-      assert.ok(ret instanceof Schema);
+      const ret = schema.add({ age: Number });
+      assert.strictEqual(ret, schema);
+    });
+
+    it('returns the schema instance when schema instance is passed', function() {
+      const schemaA = new Schema({ name: String });
+      const schemaB = new Schema({ age: Number });
+      const ret = schemaB.add(schemaA);
+      assert.strictEqual(ret, schemaB);
     });
 
     it('merging nested objects (gh-662)', function(done) {

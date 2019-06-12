@@ -1,3 +1,12 @@
+5.5.15 / 2019-06-12
+===================
+ * fix(connection): reject initial connect promise even if there is an on('error') listener #7850
+ * fix(map): make `of` automatically convert POJOs to schemas unless typeKey is set #7859
+ * fix(update): use discriminator schema to cast update if discriminator key specified in filter #7843
+ * fix(array): copy atomics from source array #7891 #7889 [jyrkive](https://github.com/jyrkive)
+ * fix(schema): return this when Schema.prototype.add is called with Schema #7887 [Mickael-van-der-Beek](https://github.com/Mickael-van-der-Beek)
+ * fix(document): add `numAffected` and `result` to DocumentNotFoundError for better debugging #7892 #7844
+
 5.5.14 / 2019-06-08
 ===================
  * fix(query): correct this scope of setters in update query #7876 [Fonger](https://github.com/Fonger)

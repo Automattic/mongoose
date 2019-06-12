@@ -462,6 +462,21 @@ describe('connections:', function() {
       });
     });
 
+    it('promise is rejected even if there is an error event listener (gh-7850)', function(done) {
+      const db = mongoose.createConnection();
+
+      let called = 0;
+      db.on('error', () => ++called);
+
+      db.openUri('fail connection').catch(function(error) {
+        assert.ok(error);
+        setTimeout(() => {
+          assert.equal(called, 1);
+          done();
+        }, 0);
+      });
+    });
+
     it('readyState is disconnected if initial connection fails (gh-6244)', function() {
       const db = mongoose.createConnection();
 

@@ -3245,4 +3245,26 @@ describe('model: updateOne: ', function() {
       assert.ok(doc.child.updatedAt.valueOf() >= now);
     });
   });
+
+  it('supports discriminators if key is specified in conditions (gh-7843)', function() {
+    const testSchema = new mongoose.Schema({
+      title: { type: String, required: true },
+      kind: { type: String, required: true }
+    }, { discriminatorKey: 'kind' });
+
+    const Test = db.model('gh7843', testSchema);
+
+    const testSchemaChild = new mongoose.Schema({
+      label: String
+    });
+
+    Test.discriminator('gh7843_child', testSchemaChild, 'testchild');
+
+    const filter = { label: 'bar', kind: 'testchild' };
+    const update = { label: 'updated' };
+    return Test.create({ title: 'foo', kind: 'testchild', label: 'bar' }).
+      then(() => Test.updateOne(filter, update)).
+      then(() => Test.collection.findOne()).
+      then(doc => assert.equal(doc.label, 'updated'));
+  });
 });

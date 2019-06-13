@@ -567,6 +567,44 @@ describe('document.populate', function() {
     });
   });
 
+  describe('gh-7889', function() {
+    it('should save item added to array after populating the array', function(done) {
+      const Car = db.model('gh-7889-1', {
+        model: Number
+      });
+
+      const Player = db.model('gh-7889-2', {
+        cars: [{ type: Schema.Types.ObjectId, ref: 'gh-7889-1' }]
+      });
+
+      let player;
+
+      Car.create({ model: 0 }).then(car => {
+        return Player.create({ cars: [car._id] });
+      }).then(() => {
+        return Player.findOne({});
+      }).then(p => {
+        player = p;
+        return player.populate('cars').execPopulate();
+      }).then(() => {
+        return Car.create({ model: 1 });
+      }).then(car => {
+        player.cars.push(car);
+        return player.populate('cars').execPopulate();
+      }).then(() => {
+        return Car.create({ model: 2 });
+      }).then(car => {
+        player.cars.push(car);
+        return player.save();
+      }).then(() => {
+        return Player.findOne({});
+      }).then(player => {
+        assert.equal(player.cars.length, 3);
+        done();
+      });
+    });
+  });
+
   describe('depopulate', function() {
     it('can depopulate specific path (gh-2509)', function(done) {
       const Person = db.model('gh2509_1', {

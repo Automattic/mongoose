@@ -6399,4 +6399,28 @@ describe('Model', function() {
       assert.equal(called, 0);
     });
   });
+
+  describe('exists() (gh-6872)', function() {
+    it('returns true if document exists', function() {
+      const Model = db.model('gh6872_exists', new Schema({ name: String }));
+
+      return Model.create({ name: 'foo' }).
+        then(() => Model.exists({ name: 'foo' })).
+        then(res => assert.strictEqual(res, true)).
+        then(() => Model.exists({})).
+        then(res => assert.strictEqual(res, true)).
+        then(() => Model.exists()).
+        then(res => assert.strictEqual(res, true));
+    });
+
+    it('returns false if no doc exists', function() {
+      const Model = db.model('gh6872_false', new Schema({ name: String }));
+
+      return Model.create({ name: 'foo' }).
+        then(() => Model.exists({ name: 'bar' })).
+        then(res => assert.strictEqual(res, false)).
+        then(() => Model.exists({ otherProp: 'foo' })).
+        then(res => assert.strictEqual(res, false));
+    });
+  });
 });

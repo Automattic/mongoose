@@ -115,6 +115,7 @@ function pugify(filename, options, newfile) {
     return markdown('```javascript\n' + v + '\n```');
   };
   options.filename = filename;
+  options.filters = { markdown };
 
   pug.render(contents, options, function(err, str) {
     if (err) {

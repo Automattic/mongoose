@@ -1,5 +1,7 @@
 'use strict';
 
+Error.stackTraceLimit = Infinity;
+
 const acquit = require('acquit');
 const fs = require('fs');
 const pug = require('pug');

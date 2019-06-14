@@ -127,7 +127,7 @@ Comment.pre('save', function (next) {
 });
 ```
 
-Take a look at the example in `examples/schema.js` for an end-to-end example of a typical setup.
+Take a look at the example in [`examples/schema/schema.js`](https://github.com/Automattic/mongoose/blob/master/examples/schema/schema.js) for an end-to-end example of a typical setup.
 
 ### Accessing a Model
 

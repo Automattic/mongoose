@@ -43,9 +43,9 @@ branch and follow the [contributing guide](https://github.com/Automattic/mongoos
 
 If your pull requests makes documentation changes, please do **not**
 modify any `.html` files. The `.html` files are compiled code, so please make
-your changes in `docs/*.jade`, `lib/*.js`, or `test/docs/*.js`.
+your changes in `docs/*.pug`, `lib/*.js`, or `test/docs/*.js`.
 
-View all 300+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors).
+View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors).
 
 ## Installation
 
@@ -127,14 +127,14 @@ Comment.pre('save', function (next) {
 });
 ```
 
-Take a look at the example in `examples/schema.js` for an end-to-end example of a typical setup.
+Take a look at the example in [`examples/schema/schema.js`](https://github.com/Automattic/mongoose/blob/master/examples/schema/schema.js) for an end-to-end example of a typical setup.
 
 ### Accessing a Model
 
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can access it through the same function
 
 ```js
-const myModel = mongoose.model('ModelName');
+const MyModel = mongoose.model('ModelName');
 ```
 
 Or just do it all at once
@@ -201,10 +201,10 @@ Where `Comment` is a `Schema` we created. This means that creating embedded docu
 
 ```js
 // retrieve my model
-var BlogPost = mongoose.model('BlogPost');
+const BlogPost = mongoose.model('BlogPost');
 
 // create a blog post
-var post = new BlogPost();
+const post = new BlogPost();
 
 // create a comment
 post.comments.push({ title: 'My comment' });

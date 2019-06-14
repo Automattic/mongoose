@@ -1751,6 +1751,30 @@ describe('document', function() {
         done();
       });
     });
+
+    it('passes doc as third param for arrow functions (gh-4143)', function() {
+      const schema = new mongoose.Schema({
+        name: {
+          first: String,
+          last: String
+        }
+      });
+      schema.virtual('fullname').
+        get((v, virtual, doc) => `${doc.name.first} ${doc.name.last}`).
+        set((v, virtual, doc) => {
+          const parts = v.split(' ');
+          doc.name.first = parts.slice(0, parts.length - 1).join(' ');
+          doc.name.last = parts[parts.length - 1];
+        });
+      const Model = db.model('gh4143', schema);
+
+      const doc = new Model({ name: { first: 'Jean-Luc', last: 'Picard' } });
+      assert.equal(doc.fullname, 'Jean-Luc Picard');
+
+      doc.fullname = 'Will Riker';
+      assert.equal(doc.name.first, 'Will');
+      assert.equal(doc.name.last, 'Riker');
+    });
   });
 
   describe('gh-2082', function() {
@@ -7535,6 +7559,26 @@ describe('document', function() {
     });
   });
 
+  it('takes message from async custom validator promise rejection (gh-4913)', function() {
+    const schema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          return co(function*() {
+            yield cb => setImmediate(cb);
+            throw new Error('Oops!');
+          });
+        }
+      }
+    });
+    const Model = db.model('gh4913', schema);
+
+    return Model.create({ name: 'foo' }).then(() => assert.ok(false), err => {
+      assert.equal(err.errors['name'].message, 'Oops!');
+      assert.ok(err.message.indexOf('Oops!') !== -1, err.message);
+    });
+  });
+
   it('handles nested properties named `schema` (gh-7831)', function() {
     const schema = new mongoose.Schema({ nested: { schema: String } });
     const Model = db.model('gh7831', schema);
@@ -7544,6 +7588,142 @@ describe('document', function() {
 
       const doc = yield Model.findOne();
       assert.strictEqual(doc.nested.schema, 'test');
+    });
+  });
+
+  describe('overwrite() (gh-7830)', function() {
+    let Model;
+
+    before(function() {
+      const schema = new Schema({
+        _id: Number,
+        name: String,
+        nested: {
+          prop: String
+        },
+        arr: [Number],
+        immutable: {
+          type: String,
+          immutable: true
+        }
+      });
+      Model = db.model('gh7830', schema);
+    });
+
+    it('works', function() {
+      return co(function*() {
+        const doc = yield Model.create({
+          _id: 1,
+          name: 'test',
+          nested: { prop: 'foo' },
+          immutable: 'bar'
+        });
+        doc.overwrite({ name: 'test2' });
+
+        assert.deepEqual(doc.toObject(), {
+          _id: 1,
+          __v: 0,
+          name: 'test2',
+          immutable: 'bar'
+        });
+      });
+    });
+
+    it('skips version key', function() {
+      return co(function*() {
+        yield Model.collection.insertOne({
+          _id: 2,
+          __v: 5,
+          name: 'test',
+          nested: { prop: 'foo' },
+          immutable: 'bar'
+        });
+        const doc = yield Model.findOne({ _id: 2 });
+        doc.overwrite({ _id: 2, name: 'test2' });
+
+        assert.deepEqual(doc.toObject(), {
+          _id: 2,
+          __v: 5,
+          name: 'test2',
+          immutable: 'bar'
+        });
+      });
+    });
+  });
+
+  describe('immutable properties (gh-7671)', function() {
+    let Model;
+
+    before(function() {
+      const schema = new Schema({
+        createdAt: {
+          type: Date,
+          immutable: true,
+          default: new Date('6/1/2019')
+        },
+        name: String
+      });
+      Model = db.model('gh7671', schema);
+    });
+
+    it('SchemaType#immutable()', function() {
+      const schema = new Schema({
+        createdAt: {
+          type: Date,
+          default: new Date('6/1/2019')
+        },
+        name: String
+      });
+
+      assert.ok(!schema.path('createdAt').$immutable);
+
+      schema.path('createdAt').immutable(true);
+      assert.ok(schema.path('createdAt').$immutable);
+      assert.equal(schema.path('createdAt').setters.length, 1);
+
+      schema.path('createdAt').immutable(false);
+      assert.ok(!schema.path('createdAt').$immutable);
+      assert.equal(schema.path('createdAt').setters.length, 0);
+    });
+
+    it('with save()', function() {
+      let doc = new Model({ name: 'Foo' });
+      return co(function*() {
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+        yield doc.save();
+
+        doc = yield Model.findOne({ createdAt: new Date('6/1/2019') });
+        doc.createdAt = new Date('6/1/2017');
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+
+        doc.set({ createdAt: new Date('6/1/2021') });
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+
+        yield doc.save();
+
+        doc = yield Model.findOne({ createdAt: new Date('6/1/2019') });
+        assert.ok(doc);
+      });
+    });
+
+    it('with update', function() {
+      let doc = new Model({ name: 'Foo' });
+      return co(function*() {
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+        yield doc.save();
+
+        const update = { createdAt: new Date('6/1/2020') };
+
+        yield Model.updateOne({}, update);
+
+        doc = yield Model.findOne();
+        assert.equal(doc.createdAt.toLocaleDateString('en-us'), '6/1/2019');
+
+        const err = yield Model.updateOne({}, update, { strict: 'throw' }).
+          then(() => null, err => err);
+        assert.equal(err.name, 'StrictModeError');
+        assert.ok(err.message.indexOf('createdAt') !== -1, err.message);
+      });
     });
   });
 });

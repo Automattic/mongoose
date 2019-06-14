@@ -846,39 +846,37 @@ describe('Query', function() {
 
     it('overwrites duplicate paths', function(done) {
       const q = new Query({}, {}, null, p1.collection);
-      const o = {
+      let o = {
         path: 'yellow.brick',
         match: {bricks: {$lt: 1000}},
-        select: undefined,
-        model: undefined,
-        options: undefined,
         _docs: {}
       };
-      q.populate(o);
+      q.populate(Object.assign({}, o));
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
-      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
+      assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], o);
+
       q.populate('yellow.brick');
+      o = {
+        path: 'yellow.brick',
+        _docs: {}
+      };
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
-      o.match = undefined;
-      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
+      assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], o);
       done();
     });
 
     it('accepts space delimited strings', function(done) {
       const q = new Query({}, {}, null, p1.collection);
       q.populate('yellow.brick dirt');
-      const o = {
-        path: 'yellow.brick',
-        match: undefined,
-        select: undefined,
-        model: undefined,
-        options: undefined,
-        _docs: {}
-      };
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
-      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
-      o.path = 'dirt';
-      assert.deepEqual(o, q._mongooseOptions.populate.dirt);
+      assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], {
+        path: 'yellow.brick',
+        _docs: {}
+      });
+      assert.deepEqual(q._mongooseOptions.populate['dirt'], {
+        path: 'dirt',
+        _docs: {}
+      });
       done();
     });
   });
@@ -1609,7 +1607,7 @@ describe('Query', function() {
       q.setOptions({read: ['s', [{dc: 'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q._mongooseOptions.populate.fans, {path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {}});
+      assert.deepEqual(q._mongooseOptions.populate.fans, {path: 'fans', _docs: {}});
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);
@@ -2093,8 +2091,8 @@ describe('Query', function() {
         const q = Test.find({ test: void 0 });
         const res = yield q.exec();
 
-        assert.strictEqual(q.getQuery().test, void 0);
-        assert.ok('test' in q.getQuery());
+        assert.strictEqual(q.getFilter().test, void 0);
+        assert.ok('test' in q.getFilter());
         assert.equal(res.length, 1);
       });
     });
@@ -3395,6 +3393,38 @@ describe('Query', function() {
         then(() => null, err => err);
       assert.ok(res);
       assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    });
+  });
+
+  it('connection-level maxTimeMS() (gh-4066)', function() {
+    db.options = db.options || {};
+    db.options.maxTimeMS = 10;
+    const Model = db.model('gh4066_conn', new Schema({}));
+
+    return co(function*() {
+      yield Model.create({});
+
+      const res = yield Model.find({ $where: 'sleep(250) || true' }).
+        then(() => null, err => err);
+      assert.ok(res);
+      assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+      delete db.options.maxTimeMS;
+    });
+  });
+
+  it('mongoose-level maxTimeMS() (gh-4066)', function() {
+    db.base.options = db.base.options || {};
+    db.base.options.maxTimeMS = 10;
+    const Model = db.model('gh4066_global', new Schema({}));
+
+    return co(function*() {
+      yield Model.create({});
+
+      const res = yield Model.find({ $where: 'sleep(250) || true' }).
+        then(() => null, err => err);
+      assert.ok(res);
+      assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+      delete db.options.maxTimeMS;
     });
   });
 

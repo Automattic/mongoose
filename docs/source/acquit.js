@@ -80,9 +80,6 @@ files.forEach(function(file) {
         var last = b.comments.length - 1;
         b.comments[last] = marked(acquit.trimEachLine(b.comments[last]));
       }
-      if (b.code) {
-        b.code = hl.highlight('javascript', b.code).value;
-      }
     }
   }
 

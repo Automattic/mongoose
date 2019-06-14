@@ -1,12 +1,22 @@
 extends layout
 
 block append style
-  link(rel="stylesheet" href="/docs/css/flexcpc.css")
+  link(rel="stylesheet" href="/docs/css/inlinecpc.css")
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
   h2 Using Mongoose With AWS Lambda
   :markdown
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
+
     [AWS Lambda](https://aws.amazon.com/lambda/) is a popular service for running
     arbitrary functions without managing individual servers. Using Mongoose in your
     AWS Lambda functions is easy. Here's a sample function that connects to a
@@ -85,50 +95,4 @@ block content
 
     <a href="http://asyncawait.net/?utm_source=mongoosejs&utm_campaign=lambda" style="margin-left: 100px">
       <img src="/docs/images/asyncawait.png" style="width: 650px" />
-    </a>
-
-block append layout
-  script.
-    _native.init("CK7DT53U", {
-      targetClass: 'native-js',
-      display: 'flex',
-      visibleClass: 'native-show'
-    });
-
-  div(class="native-js").
-    <div class="native-sponsor">Sponsored by #native_company# — Learn More</div>
-    <a href="#native_link#" class="native-flex">
-      <style>
-      .native-js {
-        background: linear-gradient(-30deg, #native_bg_color#E5, #native_bg_color#E5 45%, #native_bg_color# 45%) #fff;
-      }
-
-      .native-details,
-      .native-sponsor,
-      .native-bsa {
-        color: #native_color# !important;
-      }
-
-      .native-details:hover {
-        color: #native_color_hover# !important;
-      }
-
-      .native-cta {
-        color: #native_cta_color#;
-        background-color: #native_cta_bg_color#;
-      }
-
-      .native-cta:hover {
-        color: #native_cta_color_hover;
-        background-color: #native_cta_bg_color_hover#;
-      }
-      </style>
-      <div class="native-main">
-        <img class="native-img" src="#native_logo#">
-        <div class="native-details">
-          <span class="native-company">#native_title#</span>
-          <span class="native-desc">#native_desc#</span>
-        </div>
-      </div>
-      <span class="native-cta">#native_cta#</span>
     </a>

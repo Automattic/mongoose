@@ -1,7 +1,7 @@
 
-var package = require('./../../package.json')
+var package = require('./../../package.json');
 
 module.exports = {
-    package: package
-  , title: 'ODM'
-}
+  package: package,
+  title: 'ODM'
+};

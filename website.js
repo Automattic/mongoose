@@ -21,8 +21,6 @@ markdown.setOptions({
   }
 });
 
-pug.filters.markdown = markdown;
-
 const tests = [
   ...acquit.parse(fs.readFileSync('./test/webpack.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),
@@ -115,7 +113,11 @@ function pugify(filename, options, newfile) {
     return markdown('```javascript\n' + v + '\n```');
   };
   options.filename = filename;
-  options.filters = { markdown };
+  options.filters = {
+    markdown: function(block) {
+      return markdown(block);
+    }
+  };
 
   pug.render(contents, options, function(err, str) {
     if (err) {

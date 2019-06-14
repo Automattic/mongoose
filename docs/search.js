@@ -7,6 +7,14 @@ const fs = require('fs');
 const jade = require('pug');
 const mongoose = require('../');
 
+const markdown = require('marked');
+const highlight = require('highlight.js');
+markdown.setOptions({
+  highlight: function(code) {
+    return highlight.highlight('JavaScript', code).value;
+  }
+});
+
 mongoose.set('useCreateIndex', true);
 
 const contentSchema = new mongoose.Schema({
@@ -42,7 +50,7 @@ for (const filename of files) {
   } else if (file.guide) {
     let text = fs.readFileSync(filename, 'utf8');
     text = text.substr(text.indexOf('block content') + 'block content\n'.length);
-    text = jade.render(`div\n${text}`);
+    text = jade.render(`div\n${text}`, { filters: { markdown } });
 
     const content = new Content({
       title: file.title,

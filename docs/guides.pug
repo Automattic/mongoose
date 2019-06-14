@@ -1,12 +1,22 @@
 extends layout
 
 block append style
-  link(rel="stylesheet" href="/docs/css/flexcpc.css")
+  link(rel="stylesheet", href="/docs/css/inlinecpc.css")
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
   :markdown
     ## Guides
+
+    <script>
+      _native.init("CK7DT53U",{
+        targetClass: 'native-inline'
+      });
+    </script>
+
+    <div class="native-inline">
+      <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+    </div>
 
     Mongoose guides provide detailed tutorials on Mongoose's core concepts and
     integrating Mongoose with external tools and frameworks.
@@ -46,48 +56,3 @@ block content
     * [Mongoose 4.x to 5.x](/docs/migrating_to_5.html)
     * [Mongoose 3.x to 4.x](/docs/migration.html)
 
-block append layout
-  script.
-    _native.init("CK7DT53U", {
-      targetClass: 'native-js',
-      display: 'flex',
-      visibleClass: 'native-show'
-    });
-
-  div(class="native-js").
-    <div class="native-sponsor">Sponsored by #native_company# — Learn More</div>
-    <a href="#native_link#" class="native-flex">
-      <style>
-      .native-js {
-        background: linear-gradient(-30deg, #native_bg_color#E5, #native_bg_color#E5 45%, #native_bg_color# 45%) #fff;
-      }
-
-      .native-details,
-      .native-sponsor,
-      .native-bsa {
-        color: #native_color# !important;
-      }
-
-      .native-details:hover {
-        color: #native_color_hover# !important;
-      }
-
-      .native-cta {
-        color: #native_cta_color#;
-        background-color: #native_cta_bg_color#;
-      }
-
-      .native-cta:hover {
-        color: #native_cta_color_hover;
-        background-color: #native_cta_bg_color_hover#;
-      }
-      </style>
-      <div class="native-main">
-        <img class="native-img" src="#native_logo#">
-        <div class="native-details">
-          <span class="native-company">#native_title#</span>
-          <span class="native-desc">#native_desc#</span>
-        </div>
-      </div>
-      <span class="native-cta">#native_cta#</span>
-    </a>

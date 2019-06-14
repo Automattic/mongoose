@@ -6502,7 +6502,7 @@ describe('model: populate:', function() {
         const dateActivitySchema = new Schema({
           postedBy: {
             type: Schema.Types.ObjectId,
-            ref: 'gh5858',
+            ref: 'gh5858_User',
             required: true
           }
         }, options);
@@ -6519,7 +6519,7 @@ describe('model: populate:', function() {
           kind: String
         }, options);
 
-        const User = db.model('gh5858', { name: String });
+        const User = db.model('gh5858_User', { name: String });
         const Activity = db.model('gh5858_0', activitySchema);
         const DateActivity = Activity.discriminator('gh5858_1', dateActivitySchema);
         const EventActivity = Activity.discriminator('gh5858_2', eventActivitySchema);
@@ -8392,6 +8392,75 @@ describe('model: populate:', function() {
 
       assert.equal(doc.list.length, 1);
       assert.strictEqual(doc.list[0].fill.child.name, 'test');
+    });
+  });
+
+  it('supports cross-db populate with refPath (gh-6520)', function() {
+    return co(function*() {
+      const db2 = yield mongoose.createConnection(start.uri2);
+
+      const bookSchema = new Schema({ title: String });
+      const movieSchema = new Schema({ title: String });
+
+      const userSchema = new Schema({
+        name: String,
+        kind: String,
+        hobby: {
+          type: Schema.Types.ObjectId,
+          refPath: 'kind'
+        }
+      });
+
+      const User = db.model('gh6520_User', userSchema);
+      const Book = db2.model('Book', bookSchema);
+      const Movie = db2.model('Movie', movieSchema);
+
+      const book = yield Book.create({ title: 'Legacy of the Force: Revelation' });
+      const movie = yield Movie.create({ title: 'A New Hope' });
+
+      yield User.create([
+        { name: 'test1', kind: 'Book', hobby: book._id },
+        { name: 'test2', kind: 'Movie', hobby: movie._id }
+      ]);
+
+      const docs = yield User.find().sort({ name: 1 }).populate({
+        path: 'hobby',
+        connection: db2
+      });
+      assert.equal(docs[0].hobby.title, 'Legacy of the Force: Revelation');
+      assert.equal(docs[1].hobby.title, 'A New Hope');
+    });
+  });
+
+  it('ref function for conventional populate (gh-7669)', function() {
+    const schema = new mongoose.Schema({
+      kind: String,
+      media: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: doc => doc.kind
+      }
+    });
+    const Model = db.model('gh7669', schema);
+    const Movie = db.model('gh7669_Movie', new Schema({ name: String }));
+    const Book = db.model('gh7669_Book', new Schema({ title: String }));
+
+    return co(function*() {
+      const docs = yield [
+        Movie.create({ name: 'The Empire Strikes Back' }),
+        Book.create({ title: 'New Jedi Order' })
+      ];
+
+      yield Model.create([
+        { kind: 'gh7669_Movie', media: docs[0]._id },
+        { kind: 'gh7669_Book', media: docs[1]._id }
+      ]);
+
+      const res = yield Model.find().sort({ kind: -1 }).populate('media');
+
+      assert.equal(res[0].kind, 'gh7669_Movie');
+      assert.equal(res[0].media.name, 'The Empire Strikes Back');
+      assert.equal(res[1].kind, 'gh7669_Book');
+      assert.equal(res[1].media.title, 'New Jedi Order');
     });
   });
 

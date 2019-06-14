@@ -113,7 +113,7 @@ li.version ul.pure-menu-children {
   position: fixed;
   top: 0;
   left: 0;
-  bottom: 231px;
+  bottom: 0px;
   background-color: #eee;
   width: 250px;
   border-right: 1px solid #ddd;
@@ -144,6 +144,11 @@ pre {
 }
 
 /* Search */
+
+.search {
+  margin-top: 0.25em;
+  margin-bottom: 0.75em;
+}
 
 .search input {
   border: 1px solid #ddd;
@@ -283,45 +288,33 @@ pre {
 
 /* CPM ads */
 
+.carbonad{
+  margin-top:0!important;
+  margin-bottom:-3rem!important
+}
+
 #carbonads {
-  position: fixed;
-  bottom: 0;
-  display: block;
-  height: 191px;
-  overflow: hidden;
-  padding: 20px 10px;
-  width: 230px;
-  background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) #eeeeee;
-  text-align: center;
-  font-size: 14px;
-  line-height: 1.5;
-  border-right: 1px solid #ddd;
+  position:fixed;
+  right: 0px;
+  bottom: 0px;
+  display:block;
+  width:160px;
+  padding:15px 15px 15px 150px;
+  overflow:hidden;
+  font-size:13px;
+  line-height:1.4;
+  text-align:left;
+  background-color: #fafafa;
 }
 
-#carbonads a:hover {
-  color: inherit;
+@media (max-width: 1485px) {
+  #carbonads {
+    display: none !important;
+  }
 }
 
-#carbonads span {
-  display: block;
-  overflow: hidden;
-}
+#carbonads a{color:#333;text-decoration:none}
 
-.carbon-img {
-  display: block;
-  margin: 0 auto 8px;
-  line-height: 1;
-}
+.carbon-img{float:left;margin-left:-145px}
 
-.carbon-text {
-  display: block;
-  margin-bottom: 8px;
-}
-
-.carbon-poweredby {
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 10px;
-  line-height: 1;
-}
+.carbon-poweredby{display:block;color:#777!important}

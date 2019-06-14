@@ -4264,6 +4264,28 @@ describe('Model', function() {
       });
     });
 
+    it('2dsphere indexed field with geojson without value is saved (gh-3233)', function() {
+      const LocationSchema = new Schema({
+        name: { type: String, required: true },
+        location: {
+          type: { type: String, enum: ['Point'] },
+          coordinates: [Number]
+        }
+      });
+
+      LocationSchema.index({ 'location': '2dsphere' });
+
+      const Location = db.model('gh3233', LocationSchema);
+
+      return co(function*() {
+        yield Location.init();
+
+        yield Location.create({
+          name: 'Undefined location'
+        });
+      });
+    });
+
     it('Doc with 2dsphere indexed field without initial value can be updated', function() {
       const PersonSchema = new Schema({
         name: String,
@@ -6375,6 +6397,30 @@ describe('Model', function() {
       const res = yield Model.findOne();
       assert.ok(res.loadedAt);
       assert.equal(called, 0);
+    });
+  });
+
+  describe('exists() (gh-6872)', function() {
+    it('returns true if document exists', function() {
+      const Model = db.model('gh6872_exists', new Schema({ name: String }));
+
+      return Model.create({ name: 'foo' }).
+        then(() => Model.exists({ name: 'foo' })).
+        then(res => assert.strictEqual(res, true)).
+        then(() => Model.exists({})).
+        then(res => assert.strictEqual(res, true)).
+        then(() => Model.exists()).
+        then(res => assert.strictEqual(res, true));
+    });
+
+    it('returns false if no doc exists', function() {
+      const Model = db.model('gh6872_false', new Schema({ name: String }));
+
+      return Model.create({ name: 'foo' }).
+        then(() => Model.exists({ name: 'bar' })).
+        then(res => assert.strictEqual(res, false)).
+        then(() => Model.exists({ otherProp: 'foo' })).
+        then(res => assert.strictEqual(res, false));
     });
   });
 });

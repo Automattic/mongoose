@@ -123,6 +123,12 @@ before(function(done) {
 
 module.exports.uri = 'mongodb://localhost:27017/mongoose_test';
 
+/*!
+ * testing uri for 2nd db
+ */
+
+module.exports.uri2 = 'mongodb://localhost:27017/mongoose_test_2';
+
 /**
  * expose mongoose
  */

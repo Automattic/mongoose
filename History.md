@@ -1,3 +1,26 @@
+5.6.0 / 2019-06-14
+==================
+ * feat(schematype): add `immutable` option to disallow changing a given field #7671
+ * docs: split API docs into separate pages to make API documentation more Google-able #7812
+ * perf(array): remove all mixins in favor of ES6 classes, ~20% faster in basic benchmarks #7798
+ * feat(document): use promise rejection error message when async custom validator throws an error #4913
+ * feat(virtual): pass document as 3rd parameter to virtual getters and setters to enable using arrow functions #4143
+ * feat(model): add `Model.exists()` function to quickly check whether a document matching `filter` exists #6872
+ * feat(index+connection): support setting global and connection-level `maxTimeMS`
+ * feat(populate): support setting `ref` to a function for conventional populate #7669
+ * feat(document): add overwrite() function that overwrites all values in a document #7830
+ * feat(populate): support `PopulateOptions#connection` option to allow cross-db populate with refPath #6520
+ * feat(populate): add skipInvalidIds option to silently skip population if id is invalid, instead of throwing #7706
+ * feat(array): skip empty array default if there's a 2dsphere index on a geojson path #3233
+ * feat(query): add `getFilter()` as an alias of `getQuery()` to be more in line with API docs #7839
+ * feat(model): add Model.inspect() to make models not clutter `util.inspect()` #7836
+ * perf(discriminator): skip calling `createIndex()` on indexes that are defined in the base schema #7379
+ * docs: upgrade from Jade to latest Pug #7812
+ * docs(README): update reference to example schema.js #7899 [sharils](https://github.com/sharils)
+ * docs(README): improve variable name #7900 [sharils](https://github.com/sharils)
+ * chore: replace charAt(0) with startsWith #7897 [Fonger](https://github.com/Fonger)
+ * chore: replace indexOf with includes, startsWith and endsWith for String #7897 [Fonger](https://github.com/Fonger)
+
 5.5.15 / 2019-06-12
 ===================
  * fix(connection): reject initial connect promise even if there is an on('error') listener #7850

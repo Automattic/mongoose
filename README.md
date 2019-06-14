@@ -134,7 +134,7 @@ Take a look at the example in `examples/schema.js` for an end-to-end example of 
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can access it through the same function
 
 ```js
-const myModel = mongoose.model('ModelName');
+const MyModel = mongoose.model('ModelName');
 ```
 
 Or just do it all at once

@@ -16,7 +16,6 @@ const files = [
   'lib/schema.js',
   'lib/connection.js',
   'lib/document.js',
-  'lib/error/mongooseError.js',
   'lib/model.js',
   'lib/query.js',
   'lib/cursor/QueryCursor.js',
@@ -128,6 +127,8 @@ function parse() {
               ctx.string += '()';
             }
             break;
+          case 'constructor':
+            ctx.string = tag.string + '()';
         }
       }
 

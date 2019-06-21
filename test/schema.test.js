@@ -1906,6 +1906,38 @@ describe('schema', function() {
         assert.equal(otherSchema.childSchemas.length, 1);
         assert.ok(otherSchema.childSchemas[0].schema.path('l3'));
       });
+
+      it('copies single embedded discriminators (gh-7894)', function() {
+        const colorSchema = new Schema({}, { discriminatorKey: 'type' });
+        colorSchema.methods.isYellow = () => false;
+
+        const yellowSchema = new Schema();
+        yellowSchema.methods.isYellow = () => true;
+
+        const fruitSchema = new Schema({}, { discriminatorKey: 'type' });
+
+        const bananaSchema = new Schema({ color: { type: colorSchema } });
+        bananaSchema.path('color').discriminator('yellow', yellowSchema);
+        bananaSchema.methods.isYellow = function() { return this.color.isYellow(); };
+
+        const schema = new Schema({ fruits: [fruitSchema] });
+
+        const clone = bananaSchema.clone();
+        schema.path('fruits').discriminator('banana', clone);
+        assert.ok(clone.path('color').caster.discriminators);
+
+        const Basket = db.model('gh7894', schema);
+        const b = new Basket({
+          fruits: [
+            {
+              type: 'banana',
+              color: { type: 'yellow' }
+            }
+          ]
+        });
+
+        assert.ok(b.fruits[0].isYellow());
+      });
     });
 
     it('TTL index with timestamps (gh-5656)', function(done) {

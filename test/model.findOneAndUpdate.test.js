@@ -1227,6 +1227,26 @@ describe('model: findOneAndUpdate:', function() {
         });
     });
 
+    it('skips setting defaults within maps (gh-7909)', function() {
+      const socialMediaHandleSchema = Schema({ links: [String] });      
+      const profileSchema = Schema({
+        username: String,
+        socialMediaHandles: {
+          type: Map,
+          of: socialMediaHandleSchema,
+        }
+      });
+
+      const Profile = db.model('gh7909', profileSchema);
+
+      return co(function*() {
+        const update = { $setOnInsert: { username: 'test' } };
+        const opts = { upsert: true, setDefaultsOnInsert: true, new: true };
+        const doc = yield Profile.findOneAndUpdate({}, update, opts);
+        assert.equal(doc.socialMediaHandles, undefined);
+      });
+    });
+
     it('runs validators if theyre set', function(done) {
       const s = new Schema({
         topping: {

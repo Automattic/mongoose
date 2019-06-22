@@ -7292,6 +7292,22 @@ describe('document', function() {
     assert.equal(doc.nested.prop, '3');
   });
 
+  it('supports setting date properties with strict: false (gh-7907)', function() {
+    const schema = Schema({}, { strict: false });
+    const SettingsModel = db.model('gh7907', schema);
+
+    const date = new Date();
+    const obj = new SettingsModel({
+      timestamp: date,
+      subDoc: {
+        timestamp: date
+      }
+    });
+
+    assert.strictEqual(obj.timestamp, date);
+    assert.strictEqual(obj.subDoc.timestamp, date);
+  });
+
   it('handles .set() on doc array within embedded discriminator (gh-7656)', function() {
     const pageElementSchema = new Schema({
       type: { type: String, required: true }

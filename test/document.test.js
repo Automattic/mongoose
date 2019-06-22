@@ -7651,6 +7651,35 @@ describe('document', function() {
     });
   });
 
+  it('copies virtuals from array subdocs when casting array of docs with same schema (gh-7898)', function() {
+    const ChildSchema = new Schema({ name: String },
+      { _id: false, id: false });
+
+    ChildSchema.virtual('foo').
+      set(function(foo) { this.__foo = foo; }).
+      get(function() { return this.__foo || 0; });
+
+    const ParentSchema = new Schema({
+      name: String,
+      children: [ChildSchema]
+    }, { _id: false, id: false });
+
+    const WrapperSchema = new Schema({
+      name: String,
+      parents: [ParentSchema]
+    }, { _id: false, id: false });
+
+    const Parent = db.model('gh7898_Parent', ParentSchema);
+    const Wrapper = db.model('gh7898_Wrapper', WrapperSchema);
+
+    const data = { name: 'P1', children: [{ name: 'C1' }, { name: 'C2' }] };
+    const parent = new Parent(data);
+    parent.children[0].foo = 123;
+
+    const wrapper = new Wrapper({ name: 'test', parents: [parent] });
+    assert.equal(wrapper.parents[0].children[0].foo, 123);
+  });
+
   describe('immutable properties (gh-7671)', function() {
     let Model;
 

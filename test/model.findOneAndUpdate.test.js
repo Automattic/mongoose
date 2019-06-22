@@ -1228,7 +1228,7 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('skips setting defaults within maps (gh-7909)', function() {
-      const socialMediaHandleSchema = Schema({ links: [String] });      
+      const socialMediaHandleSchema = Schema({ links: [String] });
       const profileSchema = Schema({
         username: String,
         socialMediaHandles: {

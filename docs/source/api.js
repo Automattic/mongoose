@@ -129,6 +129,7 @@ function parse() {
             break;
           case 'constructor':
             ctx.string = tag.string + '()';
+            ctx.name = tag.string;
         }
       }
 

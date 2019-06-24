@@ -1421,5 +1421,29 @@ describe('model', function() {
         assert.equal(doc.sections[1].kind, 'text');
       });
     });
+
+    it('merges schemas instead of overwriting (gh-7884)', function() {
+      const opts = { discriminatorKey: 'kind' };
+
+      const eventSchema = Schema({ lookups: [{ name: String }] }, opts);
+      const Event = db.model('gh7884_event', eventSchema);
+
+      const ClickedLinkEvent = Event.discriminator('gh7844_clicked', Schema({
+        lookups: [{ hi: String }],
+        url: String
+      }, opts));
+
+      const e = new ClickedLinkEvent({
+        lookups: [{
+          hi: 'address1',
+          name: 'address2',
+        }],
+        url: 'google.com'
+      });
+      assert.equal(e.lookups.length, 1);
+      assert.equal(e.lookups[0].hi, 'address1');
+      assert.equal(e.get('lookups.0.name'), 'address2');
+      assert.equal(e.lookups[0].name, 'address2');
+    });
   });
 });

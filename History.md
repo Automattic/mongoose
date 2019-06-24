@@ -1,3 +1,17 @@
+5.6.1 / 2019-06-24
+==================
+ * fix(update): skip setting defaults for single embedded subdocs underneath maps #7909
+ * fix(document): copy date objects correctly when strict = false #7907
+ * feat(mongoose): throw an error if calling `mongoose.connect()` multiple times while connected #7905 [Fonger](https://github.com/Fonger)
+ * fix(document): copies virtuals from array subdocs when casting array of docs with same schema #7898
+ * fix(schema): ensure clone() copies single embedded discriminators correctly #7894
+ * fix(discriminator): merge instead of overwriting conflicting nested schemas in discriminator schema #7884
+ * fix(populate): ignore nullish arguments when calling `populate()` #7913 [rayhatfield](https://github.com/rayhatfield)
+ * docs: add getters/setters tutorial #7919
+ * docs: clean up error docs so they refer to `Error` rather than `MongooseError` #7867
+ * docs: fix a couple broken links #7921 [kizmo04](https://github.com/kizmo04)
+ * refactor: remove unnecessary if #7911 [rayhatfield](https://github.com/rayhatfield)
+
 5.6.0 / 2019-06-14
 ==================
  * feat(schematype): add `immutable` option to disallow changing a given field #7671

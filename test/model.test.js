@@ -6400,6 +6400,34 @@ describe('Model', function() {
     });
   });
 
+  it('error handling middleware passes saved doc (gh-7832)', function() {
+    const schema = new Schema({ _id: Number });
+
+    const errs = [];
+    const docs = [];
+    schema.post('save', (err, doc, next) => {
+      errs.push(err);
+      docs.push(doc);
+      next();
+    });
+    const Model = db.model('gh7832', schema);
+
+    return co(function*() {
+      yield Model.create({ _id: 1 });
+
+      const doc = new Model({ _id: 1 });
+      const err = yield doc.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.code, 11000);
+
+      assert.equal(errs.length, 1);
+      assert.equal(errs[0].code, 11000);
+
+      assert.equal(docs.length, 1);
+      assert.strictEqual(docs[0], doc);
+    });
+  });
+
   describe('exists() (gh-6872)', function() {
     it('returns true if document exists', function() {
       const Model = db.model('gh6872_exists', new Schema({ name: String }));

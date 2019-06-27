@@ -236,7 +236,7 @@
 
 5.4.19 / 2019-03-11
 ===================
- * fix(mongoose): ensure virtuals set on subdocs in global plugins get applied #7592
+ * fix(mongoose): ensure virtuals set on subdocs in global plugins get applied #7572
  * docs(tutorials): add "Working With Dates" tutorial #7597
  * docs(guide): clarify that versioning only affects array fields #7555
  * docs(model): list out all bulkWrite() options #7550

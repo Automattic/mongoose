@@ -1,3 +1,11 @@
+5.6.2 / 2019-06-28
+==================
+ * fix(update): allow using `update()` with immutable `createdAt` #7917
+ * fix(model): pass `doc` parameter to save() error handling middleware #7832
+ * fix(mongoose): add applyPluginsToChildSchemas option to allow opting out of global plugins for child schemas #7916
+ * docs(connection): document `useCache` option for `useDb()` #7923
+ * docs: fix broken link in FAQ #7925 [christophergeiger3](https://github.com/christophergeiger3)
+
 5.6.1 / 2019-06-24
 ==================
  * fix(update): skip setting defaults for single embedded subdocs underneath maps #7909

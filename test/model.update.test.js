@@ -3267,4 +3267,24 @@ describe('model: updateOne: ', function() {
       then(() => Test.collection.findOne()).
       then(doc => assert.equal(doc.label, 'updated'));
   });
+
+  it('immutable createdAt (gh-7917)', function() {
+    const start = new Date().valueOf();
+    const schema = Schema({
+      createdAt: {
+        type: mongoose.Schema.Types.Date,
+        immutable: true
+      },
+      name: String
+    }, { timestamps: true });
+
+    const Model = db.model('gh7917', schema);
+
+    return co(function*() {
+      yield Model.updateOne({}, { name: 'foo' }, { upsert: true });
+
+      const doc = yield Model.collection.findOne();
+      assert.ok(doc.createdAt.valueOf() >= start);
+    });
+  });
 });

@@ -4,7 +4,7 @@ const config = require('../.config');
 const cheerio = require('cheerio');
 const filemap = require('./source');
 const fs = require('fs');
-const jade = require('pug');
+const pug = require('pug');
 const mongoose = require('../');
 
 const markdown = require('marked');
@@ -50,12 +50,12 @@ for (const filename of files) {
   } else if (file.guide) {
     let text = fs.readFileSync(filename, 'utf8');
     text = text.substr(text.indexOf('block content') + 'block content\n'.length);
-    text = jade.render(`div\n${text}`, { filters: { markdown } });
+    text = pug.render(`div\n${text}`, { filters: { markdown } });
 
     const content = new Content({
       title: file.title,
       body: text,
-      url: filename.replace('.jade', '.html').replace(/^docs/, '')
+      url: filename.replace('.pug', '.html').replace(/^docs/, '')
     });
 
     content.validateSync();
@@ -72,7 +72,7 @@ for (const filename of files) {
       const content = new Content({
         title: `${file.title}: ${title}`,
         body: html,
-        url: `${filename.replace('.jade', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+        url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
       });
   
       content.validateSync();

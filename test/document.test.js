@@ -7771,4 +7771,21 @@ describe('document', function() {
       });
     });
   });
+
+  it('consistent post order traversal for array subdocs (gh-7929)', function() {
+    const Grandchild = Schema({ value: Number });
+    const Child = Schema({ children: [Grandchild] });
+    const Parent = Schema({ children: [Child] });
+
+    const calls = [];
+    Grandchild.pre('save', () => calls.push(1));
+    Child.pre('save', () => calls.push(2));
+    Parent.pre('save', () => calls.push(3));
+
+    const Model = db.model('gh7929', Parent);
+
+    return Model.create({ children: [{ children: [{ value: 3 }] }] }).then(() => {
+      assert.deepEqual(calls, [1, 2, 3]);
+    });
+  });
 });

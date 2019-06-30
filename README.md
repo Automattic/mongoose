@@ -308,6 +308,25 @@ return a cursor.
 Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](https://github.com/tj/dox)
 and [acquit](https://github.com/vkarpov15/acquit).
 
+## Related Projects
+
+#### MongoDB Runners
+
+- [run-rs](https://www.npmjs.com/package/run-rs)
+- [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server)
+- [mongodb-topology-manager](https://www.npmjs.com/package/mongodb-topology-manager)
+
+#### Data Seeding
+
+- [dookie](https://www.npmjs.com/package/dookie)
+- [seedgoose](https://www.npmjs.com/package/seedgoose)
+- [mongoose-data-seed](https://www.npmjs.com/package/mongoose-data-seed)
+
+#### Express Session Stores
+
+- [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session)
+- [connect-mongo](https://www.npmjs.com/package/connect-mongo)
+
 ## License
 
 Copyright (c) 2010 LearnBoost &lt;dev@learnboost.com&gt;

@@ -2028,4 +2028,16 @@ describe('schema', function() {
 
     return Promise.resolve();
   });
+
+  it('schema.pathType() with positional path that isnt in schema (gh-7935)', function() {
+    const subdocSchema = Schema({
+      list: { type: [String], default: ['a'] }
+    }, { minimize: false });
+    const testSchema = Schema({
+      lists: subdocSchema
+    });
+
+    assert.strictEqual(testSchema.pathType('subpaths.list.0.options'),
+      'adhocOrUndefined');
+  });
 });

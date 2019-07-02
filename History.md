@@ -1,3 +1,7 @@
+4.13.19 / 2019-07-02
+====================
+ * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)
+
 4.13.18 / 2019-01-21
 ====================
  * fix(model): handle setting populated path set via `Document#populate()` #7302

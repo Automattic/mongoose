@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.11.9</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="validation"><p>Validation</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Validation v4.13.19</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li><li class="custom-schema-types"><a href="./customschematypes.html">custom schema types</a></li><li class="advanced-schemas"><a href="./advanced_schemas.html">advanced usage</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li><li class="defaults"><a href="./defaults.html">defaults</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="./promises.html">promises</a></li><li><a href="./discriminators.html">discriminators</a></li><li><a href="https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./harmony.html">ES2015 integration</a></li><li><a href="./browser.html">schemas in the browser</a></li><li><a href="./compatibility.html">MongoDB Version Compatibility</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.6-Release-Notes">3.6 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/3.8-Release-Notes">3.8 release notes</a></li><li><a href="https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes">4.0 release notes</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="validation"><p>Validation</p>
 </h2><p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
 <ul>
 <li>Validation is defined in the <a href="./schematypes.html">SchemaType</a></li>
@@ -101,7 +101,20 @@ See the <a href="/docs/faq.html">FAQ</a> for more information.</p>
     U2.on(<span class="string">'index'</span>, <span class="keyword">function</span>(error) {
       assert.ifError(error);
       U2.create(dup, <span class="keyword">function</span>(error) {
-        <span class="comment">// Will error, but will *not* be a mongoose validation error, but</span>
+        <span class="comment">// Will error, but will *not* be a mongoose validation error, it will be</span>
+        <span class="comment">// a duplicate key error.</span>
+        assert.ok(error);
+        assert.ok(!error.errors);
+        assert.ok(error.message.indexOf(<span class="string">'duplicate key error'</span>) !== -<span class="number">1</span>);
+      });
+    });
+
+    <span class="comment">// There's also a promise-based equivalent to the event emitter API.</span>
+    <span class="comment">// The `init()` function is idempotent and returns a promise that</span>
+    <span class="comment">// will resolve once indexes are done building;</span>
+    U2.init().then(<span class="keyword">function</span>() {
+      U2.create(dup, <span class="keyword">function</span>(error) {
+        <span class="comment">// Will error, but will *not* be a mongoose validation error, it will be</span>
         <span class="comment">// a duplicate key error.</span>
         assert.ok(error);
         assert.ok(!error.errors);
@@ -208,32 +221,47 @@ it off by specifying <code>isAsync: false</code> on your custom validator.</p>
     });
   </code></pre><h2 id="validation-errors"><p>Validation Errors</p>
 </h2><p>Errors returned after failed validation contain an <code>errors</code> object
-holding the actual <code>ValidatorError</code> objects. Each
+whose values are <code>ValidatorError</code> objects. Each
 <a href="./api.html#error-validation-js">ValidatorError</a> has <code>kind</code>, <code>path</code>,
-<code>value</code>, and <code>message</code> properties.</p>
+<code>value</code>, and <code>message</code> properties.
+A ValidatorError also may have a <code>reason</code> property. If an error was
+thrown in the validator, this property will contain the error that was
+thrown.</p>
 <pre><code class="javascript">
     <span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema({
       color: String,
       name: String
     });
 
+    <span class="keyword">var</span> validator = <span class="keyword">function</span>(value) {
+      <span class="keyword">return</span> <span class="regexp">/red|white|gold/i</span>.test(value);
+    };
+    toySchema.path(<span class="string">'color'</span>).validate(validator,
+      <span class="string">'Color `{VALUE}` not valid'</span>, <span class="string">'Invalid color'</span>);
+    toySchema.path(<span class="string">'name'</span>).validate(<span class="keyword">function</span>(v) {
+      <span class="keyword">if</span> (v !== <span class="string">'Turbo Man'</span>) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Need to get a Turbo Man for Christmas'</span>);
+      }
+      <span class="keyword">return</span> <span class="literal">true</span>;
+    }, <span class="string">'Name `{VALUE}` is not valid'</span>);
+
     <span class="keyword">var</span> Toy = db.model(<span class="string">'Toy'</span>, toySchema);
 
-    <span class="keyword">var</span> validator = <span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-      <span class="keyword">return</span> <span class="regexp">/blue|green|white|red|orange|periwinkle/i</span>.test(value);
-    };
-    Toy.schema.path(<span class="string">'color'</span>).validate(validator,
-      <span class="string">'Color `{VALUE}` not valid'</span>, <span class="string">'Invalid color'</span>);
-
-    <span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'grease'</span>});
+    <span class="keyword">var</span> toy = <span class="keyword">new</span> Toy({ color: <span class="string">'Green'</span>, name: <span class="string">'Power Ranger'</span> });
 
     toy.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-      <span class="comment">// err is our ValidationError object</span>
-      <span class="comment">// err.errors.color is a ValidatorError object</span>
-      assert.equal(err.errors.color.message, <span class="string">'Color `grease` not valid'</span>);
+      <span class="comment">// `err` is a ValidationError object</span>
+      <span class="comment">// `err.errors.color` is a ValidatorError object</span>
+      assert.equal(err.errors.color.message, <span class="string">'Color `Green` not valid'</span>);
       assert.equal(err.errors.color.kind, <span class="string">'Invalid color'</span>);
       assert.equal(err.errors.color.path, <span class="string">'color'</span>);
-      assert.equal(err.errors.color.value, <span class="string">'grease'</span>);
+      assert.equal(err.errors.color.value, <span class="string">'Green'</span>);
+
+      assert.equal(err.errors.name.message, <span class="string">'Name `Power Ranger` is not valid'</span>);
+      assert.equal(err.errors.name.value, <span class="string">'Power Ranger'</span>);
+      assert.equal(err.errors.name.reason.message,
+        <span class="string">'Need to get a Turbo Man for Christmas'</span>);
+
       assert.equal(err.name, <span class="string">'ValidationError'</span>);
     });
   </code></pre><h2 id="required-validators-on-nested-objects"><p>Required Validators On Nested Objects</p>
@@ -384,13 +412,30 @@ you try to explicitly <code>$unset</code> the key.</p>
       assert.ok(err.errors[<span class="string">'name'</span>]);
     });
   </code></pre><h2 id="update-validators-only-run-on-specified-paths"><p>Update Validators Only Run On Specified Paths</p>
-</h2><p>One final detail worth noting: update validators <strong>only</strong> run on <code>$set</code>
-and <code>$unset</code> operations (and <code>$push</code> and <code>$addToSet</code> in &gt;= 4.8.0).
-For instance, the below update will succeed, regardless of the value of
-<code>number</code>, because update validators ignore <code>$inc</code>.</p>
+</h2><p>One final detail worth noting: update validators <strong>only</strong> run on the
+following update operators:</p>
+<ul>
+<li><code>$set</code></li>
+<li><code>$unset</code></li>
+<li><code>$push</code> (&gt;= 4.8.0)</li>
+<li><code>$addToSet</code> (&gt;= 4.8.0)</li>
+<li><code>$pull</code> (&gt;= 4.12.0)</li>
+<li><code>$pullAll</code> (&gt;= 4.12.0)</li>
+</ul>
+<p>For instance, the below update will succeed, regardless of the value of
+<code>number</code>, because update validators ignore <code>$inc</code>. Also, <code>$push</code>,
+<code>$addToSet</code>, <code>$pull</code>, and <code>$pullAll</code> validation does <strong>not</strong> run any
+validation on the array itself, only individual elements of the array.</p>
 <pre><code class="javascript">
     <span class="keyword">var</span> testSchema = <span class="keyword">new</span> Schema({
       number: { type: Number, max: <span class="number">0</span> },
+      arr: [{ message: { type: String, maxLength: <span class="number">10</span> } }]
+    });
+
+    <span class="comment">// Update validators won't check this, so you can still `$push` 2 elements</span>
+    <span class="comment">// onto the array, so long as they don't have a `message` that's too long.</span>
+    testSchema.path(<span class="string">'arr'</span>).validate(<span class="keyword">function</span>(v) {
+      <span class="keyword">return</span> v.length &lt; <span class="number">2</span>;
     });
 
     <span class="keyword">var</span> Test = db.model(<span class="string">'Test'</span>, testSchema);
@@ -399,6 +444,11 @@ For instance, the below update will succeed, regardless of the value of
     <span class="keyword">var</span> opts = { runValidators: <span class="literal">true</span> };
     Test.update({}, update, opts, <span class="keyword">function</span>(error) {
       <span class="comment">// There will never be a validation error here</span>
+      update = { $push: [{ message: <span class="string">'hello'</span> }, { message: <span class="string">'world'</span> }] };
+      Test.update({}, update, opts, <span class="keyword">function</span>(error) {
+        <span class="comment">// This will never error either even though the array will have at</span>
+        <span class="comment">// least 2 elements.</span>
+      });
     });
   </code></pre><h2 id="on-$push-and-$addtoset"><p>On $push and $addToSet</p>
 </h2><p>New in 4.8.0: update validators also run on <code>$push</code> and <code>$addToSet</code></p>

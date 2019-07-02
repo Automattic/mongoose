@@ -7788,4 +7788,26 @@ describe('document', function() {
       assert.deepEqual(calls, [1, 2, 3]);
     });
   });
+
+  it('respects projection for getters (gh-7940)', function() {
+    const schema = new Schema({
+      foo: String,
+      bar: {
+        type: String,
+        get: () => {
+          return 'getter value';
+        }
+      }
+    }, { toObject : { getters: true } });
+
+    const Model = db.model('gh7940', schema);
+
+    return co(function*() {
+      yield Model.create({ foo: 'test', bar: 'baz' });
+
+      const doc = yield Model.findOne({ foo: 'test' }, 'foo');
+
+      assert.ok(!doc.toObject().bar);
+    });
+  });
 });

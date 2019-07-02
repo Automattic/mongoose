@@ -32,3 +32,5 @@ exports['docs/compatibility.pug'] = {
   guide: true
 };
 exports['docs/search.pug'] = { title: 'Search' };
+exports['docs/async-await.pug'] = { guide: true, title: 'Async-Await' };
+

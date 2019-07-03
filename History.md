@@ -1,3 +1,19 @@
+5.6.3 / 2019-07-03
+==================
+ * fix(document): respect projection when running getters #7940
+ * fix(model): call createCollection() in syncIndexes() to ensure the collection exists #7931
+ * fix(document): consistently use post-order traversal for gathering subdocs for hooks #7929
+ * fix(schema): ensure `Schema#pathType()` returns correct path type given non-existent positional path #7935
+ * fix(ChangeStream): set `closed` if emitting close event #7930
+ * fix(connection): bubble up 'attemptReconnect' event from MongoDB connection #7872
+ * docs: fix broken .jade links on search page #7932
+ * docs: correct link to `Query#select()` #7953 [rayhatfield](https://github.com/rayhatfield)
+ * docs(README): add list of related projects #7773
+
+4.13.19 / 2019-07-02
+====================
+ * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)
+
 5.6.2 / 2019-06-28
 ==================
  * fix(update): allow using `update()` with immutable `createdAt` #7917
@@ -355,6 +371,10 @@
  * docs: add migrating to 5 guide to docs #7434
  * docs(deprecations): add instructions for fixing `count()` deprecation #7419
  * docs(middleware): add description and example for aggregate hooks #7402
+=======
+4.13.19 / 2019-07-02
+====================
+ * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)
 
 4.13.18 / 2019-01-21
 ====================

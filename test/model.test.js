@@ -6025,15 +6025,10 @@ describe('Model', function() {
           name: { type: String, index: true }
         }, { autoIndex: false }), 'gh6281');
 
-        yield M.db.createCollection('gh6281');
-
-        let indexes = yield M.listIndexes();
-        assert.deepEqual(indexes.map(i => i.key), [{ _id: 1 }]);
-
         let dropped = yield M.syncIndexes();
         assert.deepEqual(dropped, []);
 
-        indexes = yield M.listIndexes();
+        let indexes = yield M.listIndexes();
         assert.deepEqual(indexes.map(i => i.key), [
           { _id: 1 },
           { name: 1 }

@@ -305,7 +305,7 @@ describe('schema select option', function() {
         }
       });
       const M = db.model('gh7945', selected);
-  
+
       const query = M.findOne();
       query._applyPaths();
       assert.equal(Object.keys(query._fields).length, 1);

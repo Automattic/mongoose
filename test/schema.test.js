@@ -1938,6 +1938,28 @@ describe('schema', function() {
 
         assert.ok(b.fruits[0].isYellow());
       });
+
+      it('copies array discriminators (gh-7954)', function() {
+        const eventSchema = Schema({ message: String }, {
+          discriminatorKey: 'kind',
+          _id: false
+        });
+
+        const batchSchema = Schema({ events: [eventSchema] }, {
+          _id: false
+        });
+
+        const docArray = batchSchema.path('events');
+        docArray.discriminator('gh7954_Clicked',
+          Schema({ element: String }, { _id: false }));
+        docArray.discriminator('gh7954_Purchased',
+          Schema({ product: String }, { _id: false }));
+
+        const clone = batchSchema.clone();
+        assert.ok(clone.path('events').Constructor.discriminators);
+        assert.ok(clone.path('events').Constructor.discriminators['gh7954_Clicked']);
+        assert.ok(clone.path('events').Constructor.discriminators['gh7954_Purchased']);
+      });
     });
 
     it('TTL index with timestamps (gh-5656)', function(done) {

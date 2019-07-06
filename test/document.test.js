@@ -7810,4 +7810,16 @@ describe('document', function() {
       assert.ok(!doc.toObject().bar);
     });
   });
+
+  it('loads doc with a `once` property successfully (gh-7958)', function() {
+    const eventSchema = Schema({ once: { prop: String } });
+    const Event = db.model('gh7958', eventSchema);
+
+    return co(function*() {
+      yield Event.create({ once: { prop: 'test' } });
+
+      const doc = yield Event.findOne();
+      assert.equal(doc.once.prop, 'test');
+    });
+  });
 });

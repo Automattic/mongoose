@@ -1,0 +1,215 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.6.4-pre: Mongoose Tutorials: Virtuals</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.6.4-pre</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.19</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><h1 id="virtuals">Virtuals</h1>
+<script>
+  _native.init("CK7DT53U",{
+    targetClass: 'native-inline'
+  });
+</script>
+
+<div class="native-inline">
+  <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
+</div>
+
+<p>In Mongoose, a virtual is a property that is <strong>not</strong> stored in MongoDB. 
+Virtuals are typically used for computed properties on documents.</p>
+<ul>
+<li><a href="#your-first-virtual">Your First Virtual</a></li>
+<li><a href="#virtual-setters">Virtual Setters</a></li>
+<li><a href="#virtuals-in-json">Virtuals in JSON</a></li>
+<li><a href="#virtuals-with-lean">Virtuals with Lean</a></li>
+<li><a href="#limitations">Limitations</a></li>
+<li><a href="#populate">Populate</a></li>
+<li><a href="#further-reading">Further Reading</a></li>
+</ul>
+<h2 id="your-first-virtual">Your First Virtual</h2>
+<p>Suppose you have a <code>User</code> model. Every user has an <code>email</code>, but you also
+want the email&#39;s domain. For example, the domain portion of 
+&#39;test@gmail.com&#39; is &#39;gmail.com&#39;.</p>
+<p>Below is one way to implement the <code>domain</code> property using a virtual.
+You define virtuals on a schema using the <a href="/docs/api/schema.html#schema_Schema-virtual"><code>Schema#virtual()</code> function</a>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = mongoose.Schema({
+  email: <span class="hljs-built_in">String</span>
+});
+<span class="hljs-comment">// Create a virtual property `domain` that's computed from `email`.</span>
+userSchema.virtual(<span class="hljs-string">'domain'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.email.slice(<span class="hljs-keyword">this</span>.email.indexOf(<span class="hljs-string">'@'</span>) + <span class="hljs-number">1</span>);
+});
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+
+<span class="hljs-keyword">let</span> doc = <span class="hljs-keyword">await</span> User.create({ email: <span class="hljs-string">'test@gmail.com'</span> });
+<span class="hljs-comment">// `domain` is now a property on User documents.</span>
+doc.domain; <span class="hljs-comment">// 'gmail.com'</span></code></pre>
+<p>The <code>Schema#virtual()</code> function returns a <a href="/docs/api/virtualtype.html"><code>VirtualType</code> object</a>. Unlike normal document properties,
+virtuals do not have any underlying value and Mongoose does not do
+any type coercion on virtuals. However, virtuals do have
+<a href="/docs/tutorials/getters-setters.html">getters and setters</a>, which make 
+them ideal for computed properties, like the <code>domain</code> example above.</p>
+<h2 id="virtual-setters">Virtual Setters</h2>
+<p>You can also use virtuals to set multiple properties at once as an
+alternative to <a href="/docs/tutorials/getters-setters.html#setters">custom setters on normal properties</a>. For example, suppose
+you have two string properties: <code>firstName</code> and <code>lastName</code>. You can
+create a virtual property <code>fullName</code> that lets you set both of
+these properties at once. The key detail is that, in virtual getters and
+setters, <code>this</code> refers to the document the virtual is attached to.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = mongoose.Schema({
+  firstName: <span class="hljs-built_in">String</span>,
+  lastName: <span class="hljs-built_in">String</span>
+});
+<span class="hljs-comment">// Create a virtual property `fullName` with a getter and setter.</span>
+userSchema.virtual(<span class="hljs-string">'fullName'</span>).
+  get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${this.firstName}</span> <span class="hljs-subst">${this.lastName}</span>`</span>; }).
+  set(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) </span>{
+    <span class="hljs-comment">// `v` is the value being set, so use the value to set</span>
+    <span class="hljs-comment">// `firstName` and `lastName`.</span>
+    <span class="hljs-keyword">const</span> firstName = v.substring(<span class="hljs-number">0</span>, v.indexOf(<span class="hljs-string">' '</span>));
+    <span class="hljs-keyword">const</span> lastName = v.substring(v.indexOf(<span class="hljs-string">' '</span>) + <span class="hljs-number">1</span>);
+    <span class="hljs-keyword">this</span>.set({ firstName, lastName });
+  });
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> User();
+<span class="hljs-comment">// Vanilla JavaScript assignment triggers the setter</span>
+doc.fullName = <span class="hljs-string">'Jean-Luc Picard'</span>;
+
+doc.fullName; <span class="hljs-comment">// 'Jean-Luc Picard'</span>
+doc.firstName; <span class="hljs-comment">// 'Jean-Luc'</span>
+doc.lastName; <span class="hljs-comment">// 'Picard'</span></code></pre>
+<h2 id="virtuals-in-json">Virtuals in JSON</h2>
+<p>By default, Mongoose does not include virtuals when you convert a document to 
+JSON. For example, if you pass a document to <a href="http://expressjs.com/en/4x/api.html#res.json">Express&#39;  <code>res.json()</code> function</a>,
+virtuals will <strong>not</strong> be included by default.</p>
+<p>To include virtuals in <code>res.json()</code>, you need to set the
+<a href="/docs/guide.html#toJSON"><code>toJSON</code> schema option</a> to <code>{ virtuals: true }</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> opts = { toJSON: { virtuals: <span class="hljs-literal">true</span> } };
+<span class="hljs-keyword">const</span> userSchema = mongoose.Schema({
+  _id: <span class="hljs-built_in">Number</span>,
+  email: <span class="hljs-built_in">String</span>
+}, opts);
+<span class="hljs-comment">// Create a virtual property `domain` that's computed from `email`.</span>
+userSchema.virtual(<span class="hljs-string">'domain'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.email.slice(<span class="hljs-keyword">this</span>.email.indexOf(<span class="hljs-string">'@'</span>) + <span class="hljs-number">1</span>);
+});
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> User({ _id: <span class="hljs-number">1</span>, email: <span class="hljs-string">'test@gmail.com'</span> });
+
+doc.toJSON().domain; <span class="hljs-comment">// 'gmail.com'</span>
+<span class="hljs-comment">// {"_id":1,"email":"test@gmail.com","domain":"gmail.com","id":"1"}</span>
+<span class="hljs-built_in">JSON</span>.stringify(doc); 
+
+<span class="hljs-comment">// To skip applying virtuals, pass `virtuals: false` to `toJSON()`</span>
+doc.toJSON({ virtuals: <span class="hljs-literal">false</span> }).domain; <span class="hljs-comment">// undefined</span></code></pre>
+<h2 id="virtuals-with-lean">Virtuals with Lean</h2>
+<p>Virtuals are properties on Mongoose documents. If you use the
+<a href="/docs/tutorials/lean.html">lean option</a>, that means your queries return POJOs
+rather than full Mongoose documents. That means no virtuals if you use
+<a href="/docs/api/query.html#query_Query-lean"><code>lean()</code></a>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> fullDoc = <span class="hljs-keyword">await</span> User.findOne();
+fullDoc.domain; <span class="hljs-comment">// 'gmail.com'</span>
+
+<span class="hljs-keyword">const</span> leanDoc = <span class="hljs-keyword">await</span> User.findOne().lean();
+leanDoc.domain; <span class="hljs-comment">// undefined</span></code></pre>
+<p>If you use <code>lean()</code> for performance, but still need virtuals, Mongoose
+has an
+<a href="https://plugins.mongoosejs.io/plugins/lean-virtuals">officially supported <code>mongoose-lean-virtuals</code> plugin</a>
+that decorates lean documents with virtuals.</p>
+<h2 id="limitations">Limitations</h2>
+<p>Mongoose virtuals are <strong>not</strong> stored in MongoDB, which means you can&#39;t query
+based on Mongoose virtuals.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Will **not** find any results, because `domain` is not stored in</span>
+<span class="hljs-comment">// MongoDB.</span>
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> User.findOne({ domain: <span class="hljs-string">'gmail.com'</span> });
+doc; <span class="hljs-comment">// undefined</span></code></pre>
+<p>If you want to query by a computed property, you should set the property using
+a <a href="/docs/tutorials/getters-setters.html">custom setter</a> or <a href="/docs/middleware.html">pre save middleware</a>.</p>
+<h2 id="populate">Populate</h2>
+<p>Mongoose also supports <a href="/docs/populate.html">populating virtuals</a>. A populated
+virtual contains documents from another collection. To define a populated
+virtual, you need to specify:</p>
+<ul>
+<li>The <code>ref</code> option, which tells Mongoose which model to populate documents from.</li>
+<li>The <code>localField</code> and <code>foreignField</code> options. Mongoose will populate documents from the model in <code>ref</code> whose <code>foreignField</code> matches this document&#39;s <code>localField</code>.</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = mongoose.Schema({ _id: <span class="hljs-built_in">Number</span>, email: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> blogPostSchema = mongoose.Schema({
+  title: <span class="hljs-built_in">String</span>,
+  authorId: <span class="hljs-built_in">Number</span>
+});
+<span class="hljs-comment">// When you `populate()` the `author` virtual, Mongoose will find the</span>
+<span class="hljs-comment">// first document in the User model whose `_id` matches this document's</span>
+<span class="hljs-comment">// `authorId` property.</span>
+blogPostSchema.virtual(<span class="hljs-string">'author'</span>, {
+  ref: <span class="hljs-string">'User'</span>,
+  localField: <span class="hljs-string">'authorId'</span>,
+  foreignField: <span class="hljs-string">'_id'</span>,
+  justOne: <span class="hljs-literal">true</span>
+});
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+<span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, blogPostSchema);
+
+<span class="hljs-keyword">await</span> BlogPost.create({ title: <span class="hljs-string">'Introduction to Mongoose'</span>, authorId: <span class="hljs-number">1</span> });
+<span class="hljs-keyword">await</span> User.create({ _id: <span class="hljs-number">1</span>, email: <span class="hljs-string">'test@gmail.com'</span> });
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> BlogPost.findOne().populate(<span class="hljs-string">'author'</span>);
+doc.author.email; <span class="hljs-comment">// 'test@gmail.com'</span></code></pre>
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="/docs/guide.html#virtuals">Virtuals in Mongoose Schemas</a></li>
+<li><a href="/docs/populate.html#populate-virtuals">Populate Virtuals</a></li>
+<li><a href="https://plugins.mongoosejs.io/plugins/lean-virtuals">Mongoose Lean Virtuals plugin</a></li>
+<li><a href="https://masteringjs.io/tutorials/mongoose/virtuals">Getting Started With Mongoose Virtuals</a></li>
+<li><a href="https://futurestud.io/tutorials/understanding-virtuals-in-mongoose">Understanding Virtuals in Mongoose</a></li>
+</ul>
+</div></div><script type="text/javascript">var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://g0a3nbw0xa.execute-api.us-east-1.amazonaws.com/prod/track', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {};
+xhr.send(JSON.stringify({
+  path: window.location.pathname,
+  hostname: window.location.hostname,
+  hash: window.location.hash
+}));</script><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript">(function (window, document) {
+  var layout   = document.getElementById('layout'),
+      menu     = document.getElementById('menu'),
+      menuLink = document.getElementById('menuLink'),
+      content  = document.getElementById('content');
+
+  function toggleClass(element, className) {
+      var classes = element.className.split(/\s+/),
+          length = classes.length,
+          i = 0;
+
+      for(; i < length; i++) {
+        if (classes[i] === className) {
+          classes.splice(i, 1);
+          break;
+        }
+      }
+      // The className is not found
+      if (length === classes.length) {
+          classes.push(className);
+      }
+
+      element.className = classes.join(' ');
+  }
+
+  function toggleAll(e) {
+      var active = 'active';
+
+      e.preventDefault();
+      toggleClass(layout, active);
+      toggleClass(menu, active);
+      toggleClass(menuLink, active);
+  }
+
+  menuLink.onclick = function (e) {
+      toggleAll(e);
+  };
+
+  content.onclick = function(e) {
+      if (menu.className.indexOf('active') !== -1) {
+          toggleAll(e);
+      }
+  };
+
+}(this, this.document));</script></div></body></html>

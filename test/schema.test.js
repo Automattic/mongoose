@@ -2062,4 +2062,23 @@ describe('schema', function() {
     assert.strictEqual(testSchema.pathType('subpaths.list.0.options'),
       'adhocOrUndefined');
   });
+
+  it('supports pre(Array, Function) and post(Array, Function) (gh-7803)', function() {
+    const schema = Schema({ name: String });
+    schema.pre(['save', 'remove'], testMiddleware);
+    function testMiddleware() {
+      console.log('foo');
+    }
+
+    assert.equal(schema.s.hooks._pres.get('save').length, 1);
+    assert.equal(schema.s.hooks._pres.get('save')[0].fn, testMiddleware);
+    assert.equal(schema.s.hooks._pres.get('remove').length, 1);
+    assert.equal(schema.s.hooks._pres.get('remove')[0].fn, testMiddleware);
+
+    schema.post(['save', 'remove'], testMiddleware);
+    assert.equal(schema.s.hooks._posts.get('save').length, 1);
+    assert.equal(schema.s.hooks._posts.get('save')[0].fn, testMiddleware);
+    assert.equal(schema.s.hooks._posts.get('remove').length, 1);
+    assert.equal(schema.s.hooks._posts.get('remove')[0].fn, testMiddleware);
+  });
 });

@@ -88,7 +88,6 @@ block content
 
   h3(id="async-functions") Async Functions
   :markdown
-<<<<<<< HEAD
     Adding the keyword *async* to a JavaScript function automatically causes it to return a native JavaScript promise.  This is true [regardless of the return value we specify in the function body](http://thecodebarbarian.com/async-functions-in-javascript.html#an-async-function-always-returns-a-promise).     
 
     ```javascript
@@ -111,24 +110,6 @@ block content
     Instead, treat the return value of an async function as you would any other promise.  Await its fulfillment inside another async function, or chain onto it using ‘.then’ blocks.
 
     ```javascript
-=======
-    All JavaScript functions earmarked with the keyword ‘async’ must return a native JavaScript promise that will fulfill with whatever value the async function returns.  It is never possible to synchronously return a value from an async function, even if that value is awaited in the function body.
-
-    ```javascript
-    async function getUser() {
-      const foundUser = await User.findOne({name: 'bill'});
-      return foundUser;
-    }
-
-    console.log(foundUser)  //Oops.  Prints '[Promise]'
-    ```
-  :markdown
-    Instead, treat the return value of an async function as you would any other promise.  Await its result inside another async function, or chain onto it using ‘.then’ blocks.
-
-    ```javascript
-    //This function returns a promise that will fulfill with the 
-    //first database entry that satisfies the search criteria.
->>>>>>> 3678aed5fd0ae0c47508ad3525963af26e5f12c1
     async function getUser() {
       const foundUser = await User.findOne({name: 'bill'});
       return foundUser;

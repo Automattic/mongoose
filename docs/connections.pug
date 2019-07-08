@@ -38,6 +38,7 @@ block content
 
     <ul class="toc">
       <li><a href="#buffering">Buffering</a></li>
+      <li><a href="#error-handling">Error Handling</a></li>
       <li><a href="#options">Options</a></li>
       <li><a href="#connection-string-options">Connection String Options</a></li>
       <li><a href="#connection-events">Connection Events</a></li>
@@ -84,6 +85,37 @@ block content
 
     ```javascript
     mongoose.set('bufferCommands', false);
+    ```
+
+    <h3 id="error-handling"><a href="#error-handling">Error Handling</a></h3>
+
+    There are two classes of errors that can occur with a Mongoose connection.
+
+    - Error on initial connection. If initial connection fails, Mongoose will **not** attempt to reconnect, it will emit an 'error' event, and the promise `mongoose.connect()` returns will reject.
+    - Error after initial connection was established. Mongoose will attempt to reconnect, and it will emit an 'error' event.
+
+    To handle initial connection errors, you should use `.catch()` or `try/catch` with async/await.
+    
+    ```javascript
+    mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true }).
+      catch(error => handleError(error));
+
+    // Or:
+    try {
+      await mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true });
+    } catch (error) {
+      handleError(error);
+    }
+    ```
+
+    To handle errors after initial connection was established, you should
+    listen for error events on the connection. However, you still need to
+    handle initial connection errors as shown above.
+
+    ```javascript
+    mongoose.connection.on('error', err => {
+      logError(err);
+    });
     ```
 
     <h3 id="options"><a href="#options">Options</a></h3>

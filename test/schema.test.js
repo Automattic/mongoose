@@ -1938,6 +1938,28 @@ describe('schema', function() {
 
         assert.ok(b.fruits[0].isYellow());
       });
+
+      it('copies array discriminators (gh-7954)', function() {
+        const eventSchema = Schema({ message: String }, {
+          discriminatorKey: 'kind',
+          _id: false
+        });
+
+        const batchSchema = Schema({ events: [eventSchema] }, {
+          _id: false
+        });
+
+        const docArray = batchSchema.path('events');
+        docArray.discriminator('gh7954_Clicked',
+          Schema({ element: String }, { _id: false }));
+        docArray.discriminator('gh7954_Purchased',
+          Schema({ product: String }, { _id: false }));
+
+        const clone = batchSchema.clone();
+        assert.ok(clone.path('events').Constructor.discriminators);
+        assert.ok(clone.path('events').Constructor.discriminators['gh7954_Clicked']);
+        assert.ok(clone.path('events').Constructor.discriminators['gh7954_Purchased']);
+      });
     });
 
     it('TTL index with timestamps (gh-5656)', function(done) {
@@ -2039,5 +2061,24 @@ describe('schema', function() {
 
     assert.strictEqual(testSchema.pathType('subpaths.list.0.options'),
       'adhocOrUndefined');
+  });
+
+  it('supports pre(Array, Function) and post(Array, Function) (gh-7803)', function() {
+    const schema = Schema({ name: String });
+    schema.pre(['save', 'remove'], testMiddleware);
+    function testMiddleware() {
+      console.log('foo');
+    }
+
+    assert.equal(schema.s.hooks._pres.get('save').length, 1);
+    assert.equal(schema.s.hooks._pres.get('save')[0].fn, testMiddleware);
+    assert.equal(schema.s.hooks._pres.get('remove').length, 1);
+    assert.equal(schema.s.hooks._pres.get('remove')[0].fn, testMiddleware);
+
+    schema.post(['save', 'remove'], testMiddleware);
+    assert.equal(schema.s.hooks._posts.get('save').length, 1);
+    assert.equal(schema.s.hooks._posts.get('save')[0].fn, testMiddleware);
+    assert.equal(schema.s.hooks._posts.get('remove').length, 1);
+    assert.equal(schema.s.hooks._posts.get('remove')[0].fn, testMiddleware);
   });
 });

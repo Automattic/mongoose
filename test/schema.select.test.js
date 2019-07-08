@@ -293,6 +293,32 @@ describe('schema select option', function() {
       assert.equal(query._fields.docs, 0);
       done();
     });
+
+    it('with nested (gh-7945)', function() {
+      const child = new Schema({
+        name1: {type: String, select: false},
+        name2: {type: String, select: true}
+      });
+      const selected = new Schema({
+        parent: {
+          docs: {type: [child], select: false}
+        }
+      });
+      const M = db.model('gh7945', selected);
+
+      const query = M.findOne();
+      query._applyPaths();
+      assert.equal(Object.keys(query._fields).length, 1);
+      assert.equal(query._fields['parent.docs.name1'], undefined);
+      assert.equal(query._fields['parent.docs.name2'], undefined);
+      assert.equal(query._fields['parent.docs'], 0);
+
+      return M.create({ parent: { docs: [{ name1: 'foo', name2: 'bar' }] } }).
+        then(() => query).
+        then(doc => {
+          assert.ok(!doc.parent.docs);
+        });
+    });
   });
 
   describe('forcing inclusion of a deselected schema path', function() {

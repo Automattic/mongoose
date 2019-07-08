@@ -125,34 +125,19 @@ block content
   h3(id="queries") Async/Await with Mongoose Queries
   :markdown
     Under the hood, [*async/await* is syntactic sugar](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await)
-<<<<<<< HEAD
     over the Promise API.  Due to the surprisingly simple way promises are implemented in JavaScript, the keyword *await* will try to unwrap any object with a property whose key is the string ‘then’ and whose value is a function.  Such objects belong to a broader class of objects called thenables.  If the thenable being unwrapped is a genuine promise, e.g. an instance of the [Promise constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), we enjoy several guarantees about how the object’s ‘then’ function will behave.  However, Mongoose provides several static helper methods that return a different class of thenable object called a [Query](./queries.html)--and [Queries are not promises](./queries.html#queries-are-not-promises).  Because Queries are also *thenables*, we can interact with a Query using async/await just as we would interact with a genuine promise, with one key difference: observing the fulfillment value of a genuine promise cannot under any circumstances change that value, but trying to re-observe the value of a Query may cause the Query to be re-executed.
 
     ```javascript
     function isPromise(thenable) {
         return thenable instanceof Promise;
-=======
-    over the Promise API.  Due to the surprisingly simple way promises are implemented in JavaScript, the keyword *await* will try to unwrap any object with a property whose key is the string ‘then’ and whose value is a function.  Such objects belong to a broader class of objects often called thenables.  If the thenable being unwrapped is a genuine promise, i.e. an instance of the [Promise constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), we enjoy several guarantees about how the object’s ‘then’ function will behave.  However, Mongoose provides several static helper methods that return a different class of thenable object called a [Query](./queries.html)--and [Queries are not promises](./queries.html#queries-are-not-promises).  Because Queries are also *thenables*, we can interact with a Query using async/await just as we would interact with a genuine promise, with one key difference: observing the fulfillment value of a genuine promise cannot under any circumstances change that value, whereas re-observing the value of a Query may cause the Query to be re-executed.
-
-    ```javascript
-    // Idiomatic way to determine if a thenable is a genuine promise
-    function isPromise(thenable) {
-        return Promise.resolve(thenable) === thenable;
->>>>>>> 3678aed5fd0ae0c47508ad3525963af26e5f12c1
     };
 
     // The fulfillment value of the promise returned by user.save() will always be the same,
     // regardless of how, or how often, we observe it.
     async function observePromise() {
-<<<<<<< HEAD
         const user = await User.findOne({firstName: 'franklin', lastName:'roosevelt'});
 
         user.middleName = 'delano';
-=======
-        const user = await User.findOne({firstName: 'bill', lastName:'brasky'});
-
-        user.deceased = true;
->>>>>>> 3678aed5fd0ae0c47508ad3525963af26e5f12c1
 
         // Document.prototype.save() returns a *genuine* promise
         const realPromise = user.save();
@@ -164,13 +149,8 @@ block content
         realPromise.then(chainedValue => console.log(chainedValue === awaitedValue));   //true
     }
 
-<<<<<<< HEAD
     // By contrast, the value we receive when we try to observe the same Query more than 
     // once is different every time.  The Query is re-executing.
-=======
-    // By contrast, the value returned when observing the same Query is different every time.
-    // The Query is re-executing.
->>>>>>> 3678aed5fd0ae0c47508ad3525963af26e5f12c1
     async function observeQuery() {
         const query = User.findOne({firstname: 'leroy', lastName: 'jenkins'});
 
@@ -182,11 +162,7 @@ block content
     }
     ```
   :markdown
-<<<<<<< HEAD
     You are most likely to accidentally re-execute queries in this way when mixing callbacks with async/await.  This is never necessary and should be avoided.  If you need a Query to return a fully-fleged promise instead of a thenable, you can use [Query#exec()](./api/query.html#query_Query-exec).
     
     
-=======
-    You are most likely to accidentally re-execute queries in this way when mixing callbacks with async/await.  This is never necessary and should be avoided.  If for some reason you need a Query to return a genuine promise, [Query.prototype.exec](./api/query.html#query_Query-exec) can meet that need.
->>>>>>> 3678aed5fd0ae0c47508ad3525963af26e5f12c1
   

@@ -1287,13 +1287,13 @@ describe('schema', function() {
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message, 'Invalid value for schema path `name.first`');
+    assert.ok(err.message.indexOf('Invalid value for schema path `name.first`') !== -1, err.message);
     try {
       new Schema({ age: undefined });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message, 'Invalid value for schema path `age`');
+    assert.ok(err.message.indexOf('Invalid value for schema path `age`') !== -1, err.message);
     done();
   });
 

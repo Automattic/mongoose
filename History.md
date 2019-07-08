@@ -1,3 +1,14 @@
+5.6.4 / 2019-07-08
+==================
+ * fix(schema): support pre(Array, Function) and post(Array, Function) #7803
+ * fix(document): load docs with a `once` property successfully #7958
+ * fix(queryhelpers): ensure parent `select` overwrites child path `select` if parent is nested #7945
+ * fix(schema): make `clone()` correctly copy array embedded discriminators #7954
+ * fix(update): fix error when update property gets casted to null #7949
+ * fix(connection): bubble up attemptReconnect event for now #7872
+ * docs(tutorials): add virtuals tutorial #7965
+ * docs(connection): add section on connection handling #6997
+
 5.6.3 / 2019-07-03
 ==================
  * fix(document): respect projection when running getters #7940

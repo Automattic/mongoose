@@ -8,11 +8,11 @@ const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
 const EmbeddedDocument = require('../lib/types/embedded');
 const Query = require('../lib/query');
-const _ = require('lodash');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
+const utils = require('../lib/utils');
 const validator = require('validator');
 const Buffer = require('safe-buffer').Buffer;
 
@@ -2858,7 +2858,7 @@ describe('document', function() {
 
       MyModel.create({ pre: 'test', post: 'test' }, function(error, doc) {
         assert.ifError(error);
-        assert.deepEqual(_.omit(doc.toObject(), '_id'),
+        assert.deepEqual(utils.omit(doc.toObject(), '_id'),
           { pre: 'test', post: 'test' });
         done();
       });
@@ -4756,7 +4756,7 @@ describe('document', function() {
       });
 
       schema.virtual('tests').get(function() {
-        return _.map(this.nested, function(v) {
+        return this.nested.map(function(v) {
           return v;
         });
       });

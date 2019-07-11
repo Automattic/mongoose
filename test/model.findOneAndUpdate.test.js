@@ -13,8 +13,9 @@ const Utils = require('../lib/utils');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const _ = require('lodash');
 const co = require('co');
+const isEqual = require('lodash.isequal');
+const isEqualWith = require('lodash.isequalwith');
 const uuid = require('uuid');
 
 describe('model: findOneAndUpdate:', function() {
@@ -946,20 +947,20 @@ describe('model: findOneAndUpdate:', function() {
           function(error, doc) {
             assert.ifError(error);
             assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
-            assert.ok(_.isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
+            assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
             // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
             // Deep equality checks no longer work as expected with node 0.10.
             // Please file an issue if this is a problem for you
             if (!/^v0.10.\d+$/.test(process.version)) {
-              assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+              assert.ok(isEqual(doc.contacts[0].account, a2._id));
             }
 
             Account.findOne({name: 'parent'}, function(error, doc) {
               assert.ifError(error);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
-              assert.ok(_.isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
+              assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
               if (!/^v0.10.\d+$/.test(process.version)) {
-                assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+                assert.ok(isEqual(doc.contacts[0].account, a2._id));
               }
               done();
             });

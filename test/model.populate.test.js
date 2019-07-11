@@ -4,7 +4,6 @@
  * Test dependencies.
  */
 
-const _ = require('lodash');
 const assert = require('assert');
 const async = require('async');
 const co = require('co');
@@ -3841,7 +3840,7 @@ describe('model: populate:', function() {
         });
         query.exec(function(error, doc) {
           assert.ifError(error);
-          const arr = _.map(doc.toObject().team.members, function(v) {
+          const arr = doc.toObject().team.members.map(function(v) {
             return v.name;
           });
           assert.deepEqual(arr, ['Shaq', 'Kobe', 'Horry']);
@@ -3910,7 +3909,7 @@ describe('model: populate:', function() {
           assert.ifError(error);
           const players = doc.toObject().teams[0].members.
             concat(doc.toObject().teams[1].members);
-          const arr = _.map(players, function(v) {
+          const arr = players.map(function(v) {
             return v.name;
           });
           assert.deepEqual(arr,
@@ -4321,7 +4320,7 @@ describe('model: populate:', function() {
         const Person = db.model('gh2562', PersonSchema);
         const Band = db.model('gh2562_0', BandSchema);
 
-        const people = _.map(['Axl Rose', 'Slash'], function(v) {
+        const people = ['Axl Rose', 'Slash'].map(function(v) {
           return { name: v, band: 'Guns N\' Roses' };
         });
         Person.create(people, function(error) {
@@ -4353,7 +4352,7 @@ describe('model: populate:', function() {
         const Person = db.model('gh6787_Person', PersonSchema);
         const Band = db.model('gh6787_Band', BandSchema);
 
-        const people = _.map(['BB', 'AA', 'AB', 'BA'], function(v) {
+        const people = ['BB', 'AA', 'AB', 'BA'].map(function(v) {
           return { name: v, band: 'Test' };
         });
 
@@ -4384,10 +4383,10 @@ describe('model: populate:', function() {
         const Person = db.model('gh2562_a0', PersonSchema);
         const Band = db.model('gh2562_a1', BandSchema);
 
-        let people = _.map(['Axl Rose', 'Slash'], function(v) {
+        let people = ['Axl Rose', 'Slash'].map(function(v) {
           return { name: v, band: 'Guns N\' Roses' };
         });
-        people = people.concat(_.map(['Vince Neil', 'Nikki Sixx'], function(v) {
+        people = people.concat(['Vince Neil', 'Nikki Sixx'].map(function(v) {
           return { name: v, band: 'Motley Crue' };
         }));
         Person.create(people, function(error) {
@@ -4408,12 +4407,12 @@ describe('model: populate:', function() {
                 assert.equal(bands.length, 2);
                 assert.equal(bands[0].name, 'Guns N\' Roses');
                 assert.equal(bands[0].members.length, 2);
-                assert.deepEqual(_.map(bands[0].members, 'name'),
+                assert.deepEqual(bands[0].members.map(v => v.name),
                   ['Axl Rose', 'Slash']);
 
                 assert.equal(bands[1].name, 'Motley Crue');
                 assert.equal(bands[1].members.length, 2);
-                assert.deepEqual(_.map(bands[1].members, 'name'),
+                assert.deepEqual(bands[1].members.map(v => v.name),
                   ['Nikki Sixx', 'Vince Neil']);
                 done();
               });
@@ -4479,12 +4478,12 @@ describe('model: populate:', function() {
                 assert.equal(bands.length, 2);
                 assert.equal(bands[0].name, 'Guns N\' Roses');
                 assert.equal(bands[0].members.length, 2);
-                assert.deepEqual(_.map(bands[0].members, 'name'),
+                assert.deepEqual(bands[0].members.map(v => v.name),
                   ['Axl Rose', 'Slash']);
 
                 assert.equal(bands[1].name, 'Motley Crue');
                 assert.equal(bands[1].members.length, 2);
-                assert.deepEqual(_.map(bands[1].members, 'name'),
+                assert.deepEqual(bands[1].members.map(v => v.name),
                   ['Nikki Sixx', 'Vince Neil']);
 
                 done();

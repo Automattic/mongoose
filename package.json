@@ -48,7 +48,7 @@
     "dox": "0.3.1",
     "eslint": "5.16.0",
     "highlight.js": "9.1.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.13",
     "markdown": "0.5.0",
     "marked": "0.6.2",
     "mocha": "5.x",

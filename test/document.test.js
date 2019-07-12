@@ -4756,9 +4756,7 @@ describe('document', function() {
       });
 
       schema.virtual('tests').get(function() {
-        return this.nested.map(function(v) {
-          return v;
-        });
+        return Object.keys(this.nested).map(key => this.nested[key]);
       });
 
       const M = db.model('gh5078', schema);
@@ -7820,6 +7818,27 @@ describe('document', function() {
 
       const doc = yield Event.findOne();
       assert.equal(doc.once.prop, 'test');
+    });
+  });
+
+  it('handles objectids and decimals with strict: false (gh-7973)', function() {
+    const testSchema = Schema({}, { strict: false });
+    const Test = db.model('gh7973', testSchema);
+
+    let doc = new Test({
+      testId: new mongoose.Types.ObjectId(),
+      testDecimal: new mongoose.Types.Decimal128('1.23')
+    });
+
+    assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
+    assert.ok(doc.testDecimal instanceof mongoose.Types.Decimal128);
+
+    return co(function*() {
+      yield doc.save();
+
+      doc = yield Test.collection.findOne();
+      assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
+      assert.ok(doc.testDecimal instanceof mongoose.Types.Decimal128);
     });
   });
 });

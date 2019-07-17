@@ -679,28 +679,7 @@ describe('mongoose module:', function() {
     const Model = mongoose.model('gh6813', new Schema({ name: String }));
     assert.ok(Model);
   });
-  it('throws an error if calling `mongoose.connect()` multiple times while connected (gh-7814)', function() {
-    const mong = new Mongoose();
-    return co(function*() {
-      const errorRegex = /multiple times while connected/;
 
-      // throws while connecting
-      const connectPromise = mong.connect(uri, options);
-      assert.throws(() => mong.connect(uri, options), errorRegex);
-
-      // throws after connected
-      yield connectPromise;
-      assert.throws(() => mong.connect(uri, options), errorRegex);
-
-      // throws while disconnecting
-      const disconnectPromise = mong.disconnect();
-      assert.throws(() => mong.connect(uri, options), errorRegex);
-
-      // does not throw after disconnected
-      yield disconnectPromise;
-      yield mong.connect(uri, options);
-    });
-  });
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
       const mong = new Mongoose();

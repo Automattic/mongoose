@@ -4,7 +4,6 @@
  * Module dependencies
  */
 
-const _ = require('lodash');
 const dox = require('dox');
 const fs = require('fs');
 const link = require('../helpers/linktype');

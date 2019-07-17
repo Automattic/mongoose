@@ -48,8 +48,10 @@ copytmp:
 	cp index.html ./tmp
 
 gitreset:
-	git checkout -- ./docs
-	git checkout -- ./index.html
+	git checkout docs/*.html
+	git checkout docs/tutorials/*.html
+	git checkout docs/api/*.html
+	git checkout index.html
 
 copylegacy:
 	mkdir -p ./docs/$(LEGACY_BRANCH)

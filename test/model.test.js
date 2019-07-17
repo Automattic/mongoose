@@ -6423,6 +6423,20 @@ describe('Model', function() {
     });
   });
 
+  it('throws readable error if calling Model function with bad context (gh-7957)', function() {
+    const Model = db.model('gh7957_new', Schema({ name: String }));
+
+    assert.throws(() => {
+      new Model.discriminator('gh5957_fail', Schema({ doesntMatter: String }));
+    }, /Model\.discriminator.*new Model/);
+
+    const discriminator = Model.discriminator;
+
+    assert.throws(() => {
+      discriminator('gh5957_fail', Schema({ doesntMatter: String }));
+    }, /Model\.discriminator.*MyModel/);
+  });
+
   describe('exists() (gh-6872)', function() {
     it('returns true if document exists', function() {
       const Model = db.model('gh6872_exists', new Schema({ name: String }));

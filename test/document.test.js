@@ -8,11 +8,11 @@ const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
 const EmbeddedDocument = require('../lib/types/embedded');
 const Query = require('../lib/query');
-const _ = require('lodash');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const start = require('./common');
+const utils = require('../lib/utils');
 const validator = require('validator');
 const Buffer = require('safe-buffer').Buffer;
 
@@ -2858,7 +2858,7 @@ describe('document', function() {
 
       MyModel.create({ pre: 'test', post: 'test' }, function(error, doc) {
         assert.ifError(error);
-        assert.deepEqual(_.omit(doc.toObject(), '_id'),
+        assert.deepEqual(utils.omit(doc.toObject(), '_id'),
           { pre: 'test', post: 'test' });
         done();
       });
@@ -4756,9 +4756,7 @@ describe('document', function() {
       });
 
       schema.virtual('tests').get(function() {
-        return _.map(this.nested, function(v) {
-          return v;
-        });
+        return Object.keys(this.nested).map(key => this.nested[key]);
       });
 
       const M = db.model('gh5078', schema);
@@ -7820,6 +7818,27 @@ describe('document', function() {
 
       const doc = yield Event.findOne();
       assert.equal(doc.once.prop, 'test');
+    });
+  });
+
+  it('handles objectids and decimals with strict: false (gh-7973)', function() {
+    const testSchema = Schema({}, { strict: false });
+    const Test = db.model('gh7973', testSchema);
+
+    let doc = new Test({
+      testId: new mongoose.Types.ObjectId(),
+      testDecimal: new mongoose.Types.Decimal128('1.23')
+    });
+
+    assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
+    assert.ok(doc.testDecimal instanceof mongoose.Types.Decimal128);
+
+    return co(function*() {
+      yield doc.save();
+
+      doc = yield Test.collection.findOne();
+      assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
+      assert.ok(doc.testDecimal instanceof mongoose.Types.Decimal128);
     });
   });
 });

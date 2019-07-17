@@ -1,3 +1,15 @@
+5.6.5 / 2019-07-17
+==================
+ * fix(document): handle setting non-schema path to ObjectId or Decimal128 if strict: false #7973
+ * fix(connection): remove backwards-breaking multiple mongoose.connect() call for now #7977
+ * fix(schema): print invalid value in error message when a schema path is set to undefined or null #7956
+ * fix(model): throw readable error if calling `new Model.discriminator()` #7957
+ * fix(mongoose): export `cast()` function #7975 [perfectstorm88](https://github.com/perfectstorm88)
+ * docs(model): fix link to Model.inspect() and add example #7990
+ * docs: fix broken anchor links on validation tutorial #7966
+ * docs(api): fix broken links to split API pages #7978
+ * chore: create LICENSE.md #7989 [Fonger](https://github.com/Fonger)
+
 5.6.4 / 2019-07-08
 ==================
  * fix(schema): support pre(Array, Function) and post(Array, Function) #7803

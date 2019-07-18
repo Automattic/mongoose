@@ -23,7 +23,7 @@ const files = [
   'lib/schematype.js',
   'lib/virtualtype.js',
   'lib/error/index.js',
-  'lib/types/array.js'
+  'lib/types/core_array.js'
 ];
 
 module.exports = {
@@ -52,6 +52,9 @@ function parse() {
       replace('/index', '');
     const lastSlash = name.lastIndexOf('/');
     name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
+    if (name === 'core_array') {
+      name = 'array';
+    }
     const data = {
       name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
       props: []

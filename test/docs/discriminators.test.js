@@ -409,4 +409,36 @@ describe('discriminator docs', function () {
       }).
       catch(done);
   });
+
+  /**
+   * You can also define discriminators on single nested subdocuments, similar
+   * to how you can define discriminators on arrays of subdocuments.
+   *
+   * As a general best practice, make sure you declare any hooks on your
+   * schemas **before** you use them. You should **not** call `pre()` or
+   * `post()` after calling `discriminator()`
+   */
+  it('Single nested discriminators', function() {
+    const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
+    const schema = Schema({ shape: shapeSchema });
+
+    schema.path('shape').discriminator('Circle', Schema({ radius: String }));
+    schema.path('shape').discriminator('Square', Schema({ side: Number }));
+
+    const MyModel = mongoose.model('ShapeTest', schema);
+
+    // If `kind` is set to 'Circle', then `shape` will have a `radius` property
+    let doc = new MyModel({ shape: { kind: 'Circle', radius: 5 } });
+    doc.shape.radius; // 5
+    // acquit:ignore:start
+    assert.equal(doc.shape.radius, 5);
+    // acquit:ignore:end
+
+    // If `kind` is set to 'Square', then `shape` will have a `side` property
+    doc = new MyModel({ shape: { kind: 'Square', side: 10 } });
+    doc.shape.side; // 10
+    // acquit:ignore:start
+    assert.equal(doc.shape.side, 10);
+    // acquit:ignore:end
+  });
 });

@@ -72,6 +72,10 @@ block content
         h5 Type:
         ul
           li <span class="method-type">&laquo;#{prop.type}&raquo;</span>
+      if prop.inherits != null
+        h5 Inherits:
+        ul
+          li <span class="method-type">&laquo;#{prop.inherits}&raquo;</span>
       div
         | !{prop.description}  
 

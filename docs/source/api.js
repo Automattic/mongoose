@@ -23,7 +23,8 @@ const files = [
   'lib/schematype.js',
   'lib/virtualtype.js',
   'lib/error/index.js',
-  'lib/types/core_array.js'
+  'lib/types/core_array.js',
+  'lib/schema/SingleNestedPath.js'
 ];
 
 module.exports = {

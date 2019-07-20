@@ -1,13 +1,19 @@
-const { Schema, model } = require('mongoose')
+const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
+const { Schema, model } = mongoose
+
 const userSchema = new Schema({
   name: { type: String, required: true },
-  username: { type: String, unique: false, required: true }, // TODO: change this to true
-  email: { type: String, unique: false, required: true },
-  password: { type: String, required: true }
+  username: { type: String, unique: true, required: true },
+  email: { type: String, unique: true, required: true },
+  passwordId: { type: mongoose.Types.ObjectId, ref: 'Password' }
 }, { timestamps: true, versionKey: false })
+
+const userPasswordSchema = new Schema({
+  password: { type: String, required: true }
+})
 
 userSchema.methods.toJSON = function () {
   const user = this.toObject() // this = user
@@ -22,8 +28,19 @@ userSchema.methods.genAuthToken = function () {
 }
 
 // password hasing
-userSchema.statics.hashPassword = function (password) {
-  return bcrypt.hashSync(password, 8)
-}
+userPasswordSchema.pre('save', async function (next) {
+  try {
+    if (this.isModified('password')) {
+      this.password = await bcrypt.hashSync(this.password, 8)
+      return next()
+    }
+    next()
+  } catch (err) {
+    return next(err)
+  }
+})
 
-module.exports = model('User', userSchema)
+module.exports = {
+  User: model('User', userSchema),
+  Password: model('Password', userPasswordSchema)
+}

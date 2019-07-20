@@ -11,6 +11,6 @@ module.exports = async function (req, res, next) {
     req.userId = decodedValue.userId
     next()
   } catch (err) {
-    res.status(401).send({ msg: 'Invalid Authenication', err })
+    res.status(401).send({ msg: 'Invalid Authentication:' + err })
   }
 }

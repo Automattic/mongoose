@@ -8496,7 +8496,7 @@ describe('model: populate:', function() {
     const Post = db.model('gh5109_Post', new Schema({ time: Date, text: String }, options));
 
     const MediaPost = Post.discriminator('gh5109_MediaPost', new Schema({
-      media: { type: Schema.Types.ObjectId, refPath: 'mediaType'  },
+      media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
       mediaType: String // either 'Image' or 'Video'
     }, options));
     const Image = db.model('gh5109_Image',

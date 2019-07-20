@@ -1228,7 +1228,7 @@ describe('model', function() {
           assert.equal(doc.event.message, 'Test')
           assert.equal(doc.event.kind, 'Purchased')
           Object.keys(counters).forEach(function(i) {
-            assert.equal(counters[i], 1);
+            assert.equal(counters[i], 1, 'Counter ' + i + ' incorrect');
           });
           done();
         });

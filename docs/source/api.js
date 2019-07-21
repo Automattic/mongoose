@@ -8,7 +8,7 @@ const dox = require('dox');
 const fs = require('fs');
 const link = require('../helpers/linktype');
 const hl = require('highlight.js');
-const md = require('markdown');
+const md = require('marked');
 
 const files = [
   'lib/index.js',

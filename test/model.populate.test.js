@@ -8524,4 +8524,37 @@ describe('model: populate:', function() {
       assert.equal(docs[1].media.duration, 42);
     });
   });
+
+  it('refPath with virtual (gh-7341)', function() {
+    const options = { discriminatorKey: 'kind' };
+    const postSchema = new Schema({
+      media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
+      _mediaType: String // either 'Image' or 'Video'
+    }, options);
+
+    postSchema.virtual('mediaType').get(function() { return this._mediaType; });
+
+    const Post = db.model('gh7341_Post', postSchema);
+    const Image = db.model('gh7341_Image', new Schema({ url: String }));
+    const Video = db.model('gh7341_Video', new Schema({ url: String, duration: Number }));
+
+    return co(function*() {
+      const image = yield Image.create({ url: 'test' });
+      const video = yield Video.create({ url: 'foo', duration: 42 });
+
+      yield Post.create([
+        { media: image._id, _mediaType: 'gh7341_Image' },
+        { media: video._id, _mediaType: 'gh7341_Video' }
+      ]);
+
+      const docs = yield Post.find().populate('media').sort({ _mediaType: 1 });
+
+      assert.ok(docs[0].populated('media'));
+      assert.ok(docs[1].populated('media'));
+
+      assert.equal(docs[0].media.url, 'test');
+      assert.equal(docs[1].media.url, 'foo');
+      assert.equal(docs[1].media.duration, 42);
+    });
+  });
 });

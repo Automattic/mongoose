@@ -3424,7 +3424,7 @@ describe('Query', function() {
         then(() => null, err => err);
       assert.ok(res);
       assert.ok(res.message.indexOf('time limit') !== -1, res.message);
-      delete db.options.maxTimeMS;
+      delete db.base.options.maxTimeMS;
     });
   });
 

@@ -1,3 +1,18 @@
+5.6.6 / 2019-07-22
+==================
+ * fix(populate): handle refPath returning a virtual with `Query#populate()` #7341
+ * fix(populate): handle `refPath` in discriminator when populating top-level model #5109
+ * fix(mongoose): ensure destucturing and named imports work for Mongoose singleton methods like `set()`, etc. #6039
+ * fix(query): add missing options for deleteOne and deleteMany in Query #8004 [Fonger](https://github.com/Fonger)
+ * fix(schema): make embedded discriminators `instanceof` their parent types #5005
+ * fix(array): make `validators` a private property that doesn't show up in for/in #6572
+ * docs(api): fix array API docs that vanished because of #7798 #7979
+ * docs(discriminators+api): add single nested discriminator to discriminator docs and API docs #7983
+ * docs(connection+mongoose): make option lists consistent between `mongoose.connect()`, `mongoose.createConnection()`, and `conn.openUri()` #7976
+ * docs(validation): clarify resolve(false) vs reject() for promise-based async custom validators #7761
+ * docs(guide): use correct `mongoose.set()` instead of `mongoose.use()` #7998
+ * docs: add redis cache example #7997 [usama-asfar](https://github.com/usama-asfar)
+
 5.6.5 / 2019-07-17
 ==================
  * fix(document): handle setting non-schema path to ObjectId or Decimal128 if strict: false #7973

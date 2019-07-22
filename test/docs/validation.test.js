@@ -232,14 +232,20 @@ describe('validation docs', function() {
         type: String,
         // You can also make a validator async by returning a promise. If you
         // return a promise, do **not** specify the `isAsync` option.
-        validate: function(v) {
-          return new Promise(function(resolve, reject) {
-            setTimeout(function() {
-              resolve(false);
-            }, 5);
-          });
+        validate: () => Promise.reject(new Error('Oops!'))
+      },
+      email: {
+        type: String,
+        // There are two ways for an promise-based async validator to fail:
+        // 1) If the promise rejects, Mongoose assumes the validator failed with the given error.
+        // 2) If the promise resolves to `false`, Mongoose assumes the validator failed and creates an error with the given `message`.
+        validate: {
+          validator: () => Promise.resolve(false),
+          message: 'Email validation failed'
         }
       },
+      // Your async validator may use callbacks as an alternative to promises,
+      // but only if you specify `isAsync: true`.
       phone: {
         type: String,
         validate: {
@@ -265,13 +271,14 @@ describe('validation docs', function() {
     var error;
 
     user.phone = '555.0123';
+    user.email = 'test@test.co';
     user.name = 'test';
     user.validate(function(error) {
       assert.ok(error);
+      assert.equal(error.errors['name'].message, 'Oops!');
+      assert.equal(error.errors['email'].message, 'Email validation failed');
       assert.equal(error.errors['phone'].message,
         '555.0123 is not a valid phone number!');
-      assert.equal(error.errors['name'].message,
-        'Validator failed for path `name` with value `test`');
       // acquit:ignore:start
       done();
       // acquit:ignore:end

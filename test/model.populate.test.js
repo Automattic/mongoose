@@ -8490,4 +8490,71 @@ describe('model: populate:', function() {
       assert.equal(doc.childDocs[0].name, 'test');
     });
   });
+
+  it('handles refPath on discriminator when populating top-level model (gh-5109)', function() {
+    const options = { discriminatorKey: 'kind' };
+    const Post = db.model('gh5109_Post', new Schema({ time: Date, text: String }, options));
+
+    const MediaPost = Post.discriminator('gh5109_MediaPost', new Schema({
+      media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
+      mediaType: String // either 'Image' or 'Video'
+    }, options));
+    const Image = db.model('gh5109_Image',
+      new Schema({ url: String }));
+    const Video = db.model('gh5109_Video',
+      new Schema({ url: String, duration: Number }));
+
+    return co(function*() {
+      const image = yield Image.create({ url: 'test' });
+      const video = yield Video.create({ url: 'foo', duration: 42 });
+
+      yield MediaPost.create([
+        { media: image._id, mediaType: 'gh5109_Image' },
+        { media: video._id, mediaType: 'gh5109_Video' }
+      ]);
+
+      const docs = yield Post.find().populate('media').sort({ mediaType: 1 });
+
+      assert.equal(docs.length, 2);
+      assert.ok(docs[0].populated('media'));
+      assert.ok(docs[1].populated('media'));
+
+      assert.equal(docs[0].media.url, 'test');
+      assert.equal(docs[1].media.url, 'foo');
+      assert.equal(docs[1].media.duration, 42);
+    });
+  });
+
+  it('refPath with virtual (gh-7341)', function() {
+    const options = { discriminatorKey: 'kind' };
+    const postSchema = new Schema({
+      media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
+      _mediaType: String // either 'Image' or 'Video'
+    }, options);
+
+    postSchema.virtual('mediaType').get(function() { return this._mediaType; });
+
+    const Post = db.model('gh7341_Post', postSchema);
+    const Image = db.model('gh7341_Image', new Schema({ url: String }));
+    const Video = db.model('gh7341_Video', new Schema({ url: String, duration: Number }));
+
+    return co(function*() {
+      const image = yield Image.create({ url: 'test' });
+      const video = yield Video.create({ url: 'foo', duration: 42 });
+
+      yield Post.create([
+        { media: image._id, _mediaType: 'gh7341_Image' },
+        { media: video._id, _mediaType: 'gh7341_Video' }
+      ]);
+
+      const docs = yield Post.find().populate('media').sort({ _mediaType: 1 });
+
+      assert.ok(docs[0].populated('media'));
+      assert.ok(docs[1].populated('media'));
+
+      assert.equal(docs[0].media.url, 'test');
+      assert.equal(docs[1].media.url, 'foo');
+      assert.equal(docs[1].media.duration, 42);
+    });
+  });
 });

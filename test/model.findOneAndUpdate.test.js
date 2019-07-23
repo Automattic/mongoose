@@ -2368,4 +2368,18 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(res.myArr[0], 'case sensitive');
     });
   });
+
+  it('returnOriginal (gh-7846)', function() {
+    const Cat = db.model('gh7846_update', {
+      name: String
+    });
+
+    return co(function*() {
+      yield Cat.create({ name: 'test' });
+      const res = yield Cat.findOneAndUpdate({}, {
+        name: 'test2'
+      }, { returnOriginal: false, useFindAndModify: false });
+      assert.equal(res.name, 'test2');
+    });
+  });
 });

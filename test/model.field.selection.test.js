@@ -439,12 +439,12 @@ describe('model field selection', function() {
 
       Route.findById(i.id).select('-stations').exec(function(err, res) {
         assert.ifError(err);
-        assert.ok(res.stations.toString() === 'undefined');
+        assert.equal(res.stations.toString(), 'MongooseDocument { undefined }');
 
         Route.findById(i.id).select('-stations.start -stations.end').exec(function(err, res) {
           assert.ifError(err);
-          assert.equal(res.stations.start.toString(), 'undefined');
-          assert.equal(res.stations.end.toString(), 'undefined');
+          assert.equal(res.stations.start.toString(), 'MongooseDocument { undefined }');
+          assert.equal(res.stations.end.toString(), 'MongooseDocument { undefined }');
           assert.ok(Array.isArray(res.stations.points));
           done();
         });

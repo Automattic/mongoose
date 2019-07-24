@@ -56,7 +56,7 @@
     "mongodb-topology-manager": "1.0.11",
     "mongoose-long": "0.2.1",
     "node-static": "0.7.11",
-    "nyc": "11.8.0",
+    "nyc": "^14.1.1",
     "object-sizeof": "1.3.0",
     "promise-debug": "0.1.1",
     "pug": "2.0.3",
@@ -88,7 +88,7 @@
     "type": "git",
     "url": "git://github.com/Automattic/mongoose.git"
   },
-  "homepage": "http://mongoosejs.com",
+  "homepage": "https://mongoosejs.com",
   "browser": "./browser.js",
   "eslintConfig": {
     "extends": [

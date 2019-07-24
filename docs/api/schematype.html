@@ -350,8 +350,8 @@ Schema.path(<span class="hljs-string">'name'</span>).index({ sparse: <span class
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }});
-Schema.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hljs-literal">true</span> });</code></pre>
+<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }});
+schema.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hljs-literal">true</span> });</code></pre>
 
 <p><em>NOTE: violating the constraint returns an <code>E11000</code> error from MongoDB when saving, not a Mongoose validation error.</em></p>  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-validate"><a href="#schematype_SchemaType-validate">SchemaType.prototype.validate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
 <span class="method-type">&laquo;RegExp|Function|Object&raquo;</span> validator function, or hash describing options</li><ul style="margin-top: 0.5em"><li>[obj.validator]

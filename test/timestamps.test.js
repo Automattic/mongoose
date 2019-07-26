@@ -261,7 +261,7 @@ describe('timestamps', function() {
 
     return co(function*() {
       let res = yield Model.create({ data: {} });
-    
+
       yield Model.bulkWrite([
         {
           updateOne: {
@@ -274,7 +274,7 @@ describe('timestamps', function() {
           }
         }
       ]);
-    
+
       res = yield Model.findOne({}).lean();
       assert.deepEqual(res.data, { name: 'foo' });
     });

@@ -9,6 +9,7 @@ In this tutorial, you'll learn more about the tradeoffs of using `lean()`.
 * [Using Lean](#using-lean)
 * [Lean and Populate](#lean-and-populate)
 * [When to Use Lean](#when-to-use-lean)
+* [Plugins](#plugins)
 
 <h2 id="using-lean"><a href="#using-lean">Using Lean</a></h2>
 
@@ -114,3 +115,28 @@ app.put('/person/:id', function(req, res) {
 Remember that virtuals do **not** end up in `lean()` query results. Use the
 [mongoose-lean-virtuals plugin](http://plugins.mongoosejs.io/plugins/lean-virtuals)
 to add virtuals to your lean query results.
+
+## Plugins
+
+Using `lean()` bypasses all Mongoose features, including [virtuals](/docs/tutorials/virtuals.html), [getters/setters](/docs/tutorials/getters-setters.html),
+and [defaults](/docs/api.html#schematype_SchemaType-default). If you want to
+use these features with `lean()`, you need to use the corresponding plugin:
+
+- [mongoose-lean-virtuals](https://plugins.mongoosejs.io/plugins/lean-virtuals)
+- [mongoose-lean-getters](https://plugins.mongoosejs.io/plugins/lean-getters)
+- [mongoose-lean-defaults](https://www.npmjs.com/package/mongoose-lean-defaults)
+
+However, you need to keep in mind that Mongoose does not hydrate lean documents,
+so `this` will be a POJO in virtuals, getters, and default functions.
+
+```javascript
+const schema = new Schema({ name: String });
+schema.plugin(require('mongoose-lean-virtuals'));
+
+schema.virtual('lowercase', function() {
+  this instanceof mongoose.Document; // false
+
+  this.name; // Works
+  this.get('name'); // Crashes because `this` is not a Mongoose document.
+});
+```

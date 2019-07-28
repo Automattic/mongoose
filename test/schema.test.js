@@ -407,11 +407,11 @@ describe('schema', function() {
       assert.ok(mixed[5] instanceof DocumentObjectId);
 
       // gh-6405
-      assert.ok(Loki.path('dates.$') instanceof mongoose.Schema.Date);
-      assert.ok(Loki.path('numbers.$') instanceof mongoose.Schema.Number);
-      assert.ok(Loki.path('strings.$') instanceof mongoose.Schema.String);
-      assert.ok(Loki.path('buffers.$') instanceof mongoose.Schema.Buffer);
-      assert.ok(Loki.path('mixed.$') instanceof mongoose.Schema.Mixed);
+      assert.ok(Loki.path('dates.$') instanceof SchemaTypes.Date);
+      assert.ok(Loki.path('numbers.$') instanceof SchemaTypes.Number);
+      assert.ok(Loki.path('strings.$') instanceof SchemaTypes.String);
+      assert.ok(Loki.path('buffers.$') instanceof SchemaTypes.Buffer);
+      assert.ok(Loki.path('mixed.$') instanceof SchemaTypes.Mixed);
 
       done();
     });

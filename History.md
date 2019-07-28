@@ -1,3 +1,14 @@
+5.6.7 / 2019-07-26
+==================
+ * fix(document): support validators on nested arrays #7926
+ * fix(timestamps): handle `timestamps: false` in child schema #8007
+ * fix(query): consistently support `new` option to `findOneAndX()` as an alternative to `returnOriginal` #7846
+ * fix(document): make `inspect()` never return `null`, because a document or nested path is never `== null` #7942
+ * docs(query+lean): add links to mongoose-lean-virtuals, mongoose-lean-getters, mongoose-lean-defaults #5606
+ * docs: add example for `Schema#pre(Array)` #8022 [Mangosteen-Yang](https://github.com/Mangosteen-Yang)
+ * docs(schematype): updated comment from Schema.path to proper s.path #8013 [chrisweilacker](https://github.com/chrisweilacker)
+ * chore: upgrade nyc #8015 [kolya182](https://github.com/kolya182)
+
 5.6.6 / 2019-07-22
 ==================
  * fix(populate): handle refPath returning a virtual with `Query#populate()` #7341

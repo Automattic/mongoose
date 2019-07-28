@@ -252,4 +252,31 @@ describe('timestamps', function() {
         `Timestamp not updated: ${doc.children[0].updatedAt}`);
     });
   });
+
+  it('respects timestamps: false in child schema (gh-8007)', function() {
+    const sub = Schema({ name: String }, { timestamps: false, _id: false });
+    const schema = Schema({ data: sub });
+
+    const Model = db.model('gh8007', schema);
+
+    return co(function*() {
+      let res = yield Model.create({ data: {} });
+
+      yield Model.bulkWrite([
+        {
+          updateOne: {
+            filter: {
+              _id: res._id
+            },
+            update: {
+              'data.name': 'foo'
+            }
+          }
+        }
+      ]);
+
+      res = yield Model.findOne({}).lean();
+      assert.deepEqual(res.data, { name: 'foo' });
+    });
+  });
 });

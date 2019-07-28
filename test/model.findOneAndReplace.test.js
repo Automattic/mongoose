@@ -422,4 +422,18 @@ describe('model: findOneAndReplace:', function() {
       assert.ok(!doc.age);
     });
   });
+
+  it('supports `new` in addition to `returnOriginal` (gh-7846)', function() {
+    const schema = new Schema({ name: String, age: Number });
+    const Model = db.model('gh7846', schema);
+
+    return co(function*() {
+      const doc = yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
+        upsert: true,
+        new: true
+      });
+
+      assert.equal(doc.age, 59);
+    });
+  });
 });

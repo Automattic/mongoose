@@ -7841,4 +7841,22 @@ describe('document', function() {
       assert.ok(doc.testDecimal instanceof mongoose.Types.Decimal128);
     });
   });
+
+  it('allows enum on array of array of strings (gh-7926)', function() {
+    const schema = new Schema({
+      test: {
+        type: [[String]],
+        enum: ['bar']
+      }
+    });
+
+    const Model = db.model('gh7926', schema);
+
+    return Model.create({ test: [['foo']] }).then(() => assert.ok(false), err => {
+      assert.ok(err);
+      assert.ok(err.errors['test.0.0']);
+      assert.ok(err.errors['test.0.0'].message.indexOf('foo') !== -1,
+        err.errors['test.0.0'].message);
+    });
+  });
 });

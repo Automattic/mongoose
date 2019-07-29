@@ -420,10 +420,6 @@
  * docs: add migrating to 5 guide to docs #7434
  * docs(deprecations): add instructions for fixing `count()` deprecation #7419
  * docs(middleware): add description and example for aggregate hooks #7402
-=======
-4.13.19 / 2019-07-02
-====================
- * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)
 
 4.13.18 / 2019-01-21
 ====================

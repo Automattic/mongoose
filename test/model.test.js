@@ -4149,12 +4149,13 @@ describe('Model', function() {
   });
 
   it('setters trigger on null values (gh-1445)', function(done) {
+    const calls = [];
     const OrderSchema = new Schema({
       total: {
         type: Number,
         default: 0,
         set: function(value) {
-          assert.strictEqual(null, value);
+          calls.push(value);
           return 10;
         }
       }
@@ -4162,6 +4163,8 @@ describe('Model', function() {
 
     const Order = db.model('order' + random(), OrderSchema);
     const o = new Order({total: null});
+
+    assert.deepEqual(calls, [0, null]);
     assert.equal(o.total, 10);
     done();
   });

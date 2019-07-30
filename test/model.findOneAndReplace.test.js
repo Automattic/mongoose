@@ -436,4 +436,24 @@ describe('model: findOneAndReplace:', function() {
       assert.equal(doc.age, 59);
     });
   });
+
+  it('orFail() (gh-8030)', function() {
+    const schema = Schema({ name: String, age: Number });
+    const Model = db.model('gh8030', schema);
+
+    return co(function*() {
+      let err = yield Model.findOneAndReplace({}, { name: 'test' }).orFail().
+        then(() => assert.ok(false), err => err);
+
+      assert.ok(err);
+      assert.equal(err.name, 'DocumentNotFoundError');
+
+      yield Model.create({ name: 'test' });
+      err = yield Model.findOneAndReplace({ name: 'test' }, { name: 'test2' }).
+        orFail().
+        then(() => null, err => err);
+
+      assert.ifError(err);
+    });
+  });
 });

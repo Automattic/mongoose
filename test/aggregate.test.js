@@ -1036,7 +1036,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh7606', s);
+        const M = db.model('gh8017', s);
 
         return co(function*() {
           yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);

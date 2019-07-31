@@ -90,7 +90,6 @@ describe('schema.documentarray', function() {
     assert.equal(doc.nested[0][0].title, 'cool');
 
     doc.set({nested: [[{ title: 'new' }]]});
-    console.log(doc.nested)
     assert.equal(doc.nested[0].length, 1);
     assert.equal(doc.nested[0][0].title, 'new');
 

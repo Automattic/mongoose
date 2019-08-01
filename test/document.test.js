@@ -7860,7 +7860,7 @@ describe('document', function() {
     });
   });
 
-  it('allows saving an unchanged document if populated path is null (gh-8018)', function() {
+  it('allows saving an unchanged document if required populated path is null (gh-8018)', function() {
     const schema = Schema({ test: String });
     const schema2 = Schema({
       keyToPopulate: {

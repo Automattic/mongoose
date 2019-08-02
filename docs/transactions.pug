@@ -45,6 +45,11 @@ block content
     [require:transactions.*basic example]
     ```
 
+    In the above example, `session` is an instance of the
+    [MongoDB Node.js driver's `ClientSession` class](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html).
+    Please refer to the [MongoDB driver docs](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html)
+    for more information on what methods `session` has.
+
     ## Aborting a Transaction
 
     The most important feature of transactions is the ability to roll back _all_
@@ -63,14 +68,20 @@ block content
     ## The `withTransaction()` Helper
 
     The previous examples explicitly create a transaction and commits it. In
-    practice, you'll want to use the `session.withTransaction()` helper
-    instead. The `session.withTransaction()` helper handles creating a
-    transaction, committing the transaction if it succeeds, aborting the transaction
-    if your operation throws. It also handles [transient transaction errors](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
+    practice, you'll want to use the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction)
+    instead. The `session.withTransaction()` helper handles:
+    
+    - Creating a transaction
+    - Committing the transaction if it succeeds
+    - Aborting the transaction if your operation throws
+    - Retrying in the event of a [transient transaction error](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
 
     ```javascript
     [require:transactions.*withTransaction]
     ```
+
+    For more information on the `ClientSession#withTransaction()` function, please see
+    [the MongoDB Node.js driver docs](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction). 
 
     ## With Mongoose Documents and `save()`
 

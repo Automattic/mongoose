@@ -1028,6 +1028,26 @@ describe('aggregate: ', function() {
         });
       });
 
+      it('adding to pipeline in pre (gh-8017)', function() {
+        const s = new Schema({ name: String });
+
+        s.pre('aggregate', function(next) {
+          this.append({ $limit: 1 });
+          next();
+        });
+
+        const M = db.model('gh8017', s);
+
+        return co(function*() {
+          yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
+
+          const docs = yield M.aggregate([{ $sort: { name: 1 } }]);
+
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].name, 'Zeta');
+        });
+      });
+
       it('post', function(done) {
         const s = new Schema({ name: String });
 

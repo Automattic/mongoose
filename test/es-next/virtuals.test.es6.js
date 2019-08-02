@@ -158,6 +158,10 @@ describe('Virtuals', function() {
     const User = mongoose.model('User', userSchema);
     const BlogPost = mongoose.model('BlogPost', blogPostSchema);
 
+    // acquit:ignore:start
+    await BlogPost.deleteMany({});
+    await User.deleteMany({});
+    // acquit:ignore:end
     await BlogPost.create({ title: 'Introduction to Mongoose', authorId: 1 });
     await User.create({ _id: 1, email: 'test@gmail.com' });
 

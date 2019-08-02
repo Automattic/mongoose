@@ -7859,4 +7859,30 @@ describe('document', function() {
         err.errors['test.0.0'].message);
     });
   });
+
+  it('allows saving an unchanged document if required populated path is null (gh-8018)', function() {
+    const schema = Schema({ test: String });
+    const schema2 = Schema({
+      keyToPopulate: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gh8018_child',
+        required: true
+      }
+    });
+
+    const Child = db.model('gh8018_child', schema);
+    const Parent = db.model('gh8018_parent', schema2);
+
+    return co(function*() {
+      const child = yield Child.create({ test: 'test' });
+      yield Parent.create({ keyToPopulate: child._id });
+
+      yield child.deleteOne();
+
+      const doc = yield Parent.findOne().populate('keyToPopulate');
+
+      // Should not throw
+      yield doc.save();
+    });
+  });
 });

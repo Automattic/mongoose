@@ -1,3 +1,13 @@
+5.6.8 / 2019-08-02
+==================
+ * fix(aggregate): allow modifying pipeline in pre('aggregate') hooks #8017
+ * fix(query): make `findOneAndReplace()` work with `orFail()` #8030
+ * fix(document): allow saving an unchanged document if required populated path is null #8018
+ * fix(debug): support disabling colors in debug mode #8033 [Mangosteen-Yang](https://github.com/Mangosteen-Yang)
+ * docs: add async-await guide #8028 [Rossh87](https://github.com/Rossh87)
+ * docs(plugins): rewrite plugins docs to be more modern and not use strange `= exports` syntax #8026
+ * docs(transactions): clarify relationship between `session` in docs and MongoDB driver ClientSession class, link to driver docs #8009
+
 5.6.7 / 2019-07-26
 ==================
  * fix(document): support validators on nested arrays #7926
@@ -420,10 +430,6 @@
  * docs: add migrating to 5 guide to docs #7434
  * docs(deprecations): add instructions for fixing `count()` deprecation #7419
  * docs(middleware): add description and example for aggregate hooks #7402
-=======
-4.13.19 / 2019-07-02
-====================
- * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)
 
 4.13.18 / 2019-01-21
 ====================

@@ -6,5 +6,6 @@ tools/
 test/es-next/
 test/files/
 dist/
+benchmarks/
 
 search.js

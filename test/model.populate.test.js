@@ -8582,7 +8582,7 @@ describe('model: populate:', function() {
     return co(function*() {
       yield Team.create({
         name: 'Rocket',
-        developers: [{ name: 'Jessie' }, { name: 'James' }]
+        developers: [{ name: 'Jessie' }, { name: 'James' }, { name: 'Meowth' }]
       });
       yield Ticket.create([
         { assigned: 'Jessie', description: 'test1' },
@@ -8593,6 +8593,7 @@ describe('model: populate:', function() {
       const team = yield Team.findOne().populate('developers.ticketCount');
       assert.equal(team.developers[0].ticketCount, 2);
       assert.equal(team.developers[1].ticketCount, 1);
+      assert.equal(team.developers[2].ticketCount, 0);
     });
   });
 });

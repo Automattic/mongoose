@@ -460,4 +460,19 @@ describe('QueryCursor', function() {
       });
     });
   });
+
+  it('batchSize option (gh-8039)', function() {
+    const User = db.model('gh8039', Schema({ name: String }));
+    let cursor = User.find().cursor({ batchSize: 2000 });
+
+    return new Promise(resolve => cursor.once('cursor', () => resolve())).
+      then(() => assert.equal(cursor.cursor.cursorState.batchSize, 2000)).
+      then(() => {
+        cursor = User.find().batchSize(2001).cursor();
+      }).
+      then(() => new Promise(resolve => cursor.once('cursor', () => resolve()))).
+      then(() => {
+        assert.equal(cursor.cursor.cursorState.batchSize, 2001);
+      });
+  });
 });

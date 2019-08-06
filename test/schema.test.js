@@ -2088,4 +2088,11 @@ describe('schema', function() {
     assert.equal(schema.s.hooks._posts.get('remove').length, 1);
     assert.equal(schema.s.hooks._posts.get('remove')[0].fn, testMiddleware);
   });
+
+  it('supports array with { type: ObjectID } (gh-8034)', function() {
+    const schema = Schema({ testId: [{ type: 'ObjectID' }] });
+    const path = schema.path('testId');
+    assert.ok(path);
+    assert.ok(path.caster instanceof Schema.ObjectId);
+  });
 });

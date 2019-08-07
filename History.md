@@ -1,3 +1,10 @@
+5.6.9 / 2019-08-07
+==================
+ * fix(model): delete versionError after saving to prevent memory leak #8048
+ * fix(cursor): correctly handle batchSize option with query cursor #8039
+ * fix(populate): handle virtual populate with count = 0 if virtual embedded in doc array #7573
+ * fix(schema): allow declaring ObjectId array with `{ type: 'ObjectID' }`, last 'D' case insensitive #8034
+
 5.6.8 / 2019-08-02
 ==================
  * fix(aggregate): allow modifying pipeline in pre('aggregate') hooks #8017

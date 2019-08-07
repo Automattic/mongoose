@@ -8557,4 +8557,43 @@ describe('model: populate:', function() {
       assert.equal(docs[1].media.duration, 42);
     });
   });
+
+  it('count with subdocs (gh-7573)', function() {
+    const DeveloperSchema = Schema({ name: String });
+    const TeamSchema = Schema({
+      name: String,
+      developers: [DeveloperSchema]
+    });
+    const TicketSchema = Schema({
+      assigned: String,
+      description: String
+    });
+
+    DeveloperSchema.virtual('ticketCount', {
+      ref: 'gh7573_Ticket',
+      localField: 'name',
+      foreignField: 'assigned',
+      count: true
+    });
+
+    const Ticket = db.model('gh7573_Ticket', TicketSchema);
+    const Team = db.model('gh7573_Team', TeamSchema);
+
+    return co(function*() {
+      yield Team.create({
+        name: 'Rocket',
+        developers: [{ name: 'Jessie' }, { name: 'James' }, { name: 'Meowth' }]
+      });
+      yield Ticket.create([
+        { assigned: 'Jessie', description: 'test1' },
+        { assigned: 'James', description: 'test2' },
+        { assigned: 'Jessie', description: 'test3' }
+      ]);
+
+      const team = yield Team.findOne().populate('developers.ticketCount');
+      assert.equal(team.developers[0].ticketCount, 2);
+      assert.equal(team.developers[1].ticketCount, 1);
+      assert.equal(team.developers[2].ticketCount, 0);
+    });
+  });
 });

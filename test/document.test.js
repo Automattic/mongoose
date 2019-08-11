@@ -7768,6 +7768,32 @@ describe('document', function() {
         assert.ok(err.message.indexOf('createdAt') !== -1, err.message);
       });
     });
+
+    it('conditional immutable (gh-8001)', function() {
+      const schema = new Schema({
+        name: String,
+        test: {
+          type: String,
+          immutable: doc => doc.name === 'foo'
+        }
+      });
+      const Model = db.model('gh8001', schema);
+
+      return co(function*() {
+        const doc1 = yield Model.create({ name: 'foo', test: 'before' });
+        const doc2 = yield Model.create({ name: 'bar', test: 'before' });
+
+        doc1.set({ test: 'after' });
+        doc2.set({ test: 'after' });
+        yield doc1.save();
+        yield doc2.save();
+
+        const fromDb1 = yield Model.collection.findOne({ name: 'foo' });
+        const fromDb2 = yield Model.collection.findOne({ name: 'bar' });
+        assert.equal(fromDb1.test, 'before');
+        assert.equal(fromDb2.test, 'after');
+      });
+    });
   });
 
   it('consistent post order traversal for array subdocs (gh-7929)', function() {

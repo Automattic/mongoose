@@ -3302,13 +3302,17 @@ describe('model: updateOne: ', function() {
     const Model = db.model('gh8001', schema);
 
     return co(function*() {
-      yield Model.updateOne({}, { test: 'test', name: 'foo' }, { upsert: true });
+      yield Model.updateOne({}, { test: 'before', name: 'foo' }, { upsert: true });
       let doc = yield Model.collection.findOne();
-      assert.equal(doc.test, 'test');
+      assert.equal(doc.test, 'before');
 
-      yield Model.updateOne({ name: 'foo' }, { test: 'test2' }, { upsert: true });
+      yield Model.updateOne({ name: 'foo' }, { test: 'after' }, { upsert: true });
       doc = yield Model.collection.findOne();
-      assert.equal(doc.test, 'test');
+      assert.equal(doc.test, 'before');
+
+      yield Model.updateOne({}, { test: 'after' }, { upsert: true });
+      doc = yield Model.collection.findOne();
+      assert.equal(doc.test, 'after');
     });
   });
 });

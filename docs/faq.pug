@@ -269,6 +269,9 @@ block content
 
     ```javascript
     mongoose.set('debug', true)
+    
+    // disable colors in debug mode
+    mongoose.set('debug', { color: false })
     ```
 
     All executed collection methods will log output of their arguments to your

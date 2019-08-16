@@ -7903,7 +7903,7 @@ describe('document', function() {
         }
       }
     });
-    
+
     const schema = new Schema({
       items: [itemArray]
     });

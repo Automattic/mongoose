@@ -7885,4 +7885,37 @@ describe('document', function() {
       yield doc.save();
     });
   });
+
+  it('only calls validator once on mixed validator (gh-8067)', function() {
+    let called = 0;
+    function validator() {
+      ++called;
+      return true;
+    }
+
+    const itemArray = new Schema({
+      timer: {
+        time: {
+          type: {},
+          validate: {
+            validator: validator
+          }
+        }
+      }
+    });
+    
+    const schema = new Schema({
+      items: [itemArray]
+    });
+    const Model = db.model('gh8067', schema);
+
+    const obj = new Model({
+      items: [
+        { timer: { time: { type: { hours: 24, allowed: true } } } }
+      ]
+    });
+
+    obj.validateSync();
+    assert.equal(called, 1);
+  });
 });

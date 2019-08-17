@@ -7918,4 +7918,31 @@ describe('document', function() {
     obj.validateSync();
     assert.equal(called, 1);
   });
+
+  it('handles populate() with custom type that does not cast to doc (gh-8062)', function() {
+    class Gh8062 extends mongoose.SchemaType {
+      cast(val) {
+        if (typeof val === 'string') {
+          return val;
+        }
+        throw new Error('Failed!');
+      }
+    }
+
+    mongoose.Schema.Types.Gh8062 = Gh8062;
+
+    const schema = new Schema({ arr: [{ type: Gh8062, ref: 'gh8062_child' }] });
+    const Model = db.model('gh8062', schema);
+    const Child = db.model('gh8062_child', Schema({ _id: Gh8062 }));
+
+    return co(function*() {
+      yield Child.create({ _id: 'test' });
+      yield Model.create({ arr: ['test'] });
+
+      const doc = yield Model.findOne().populate('arr');
+      assert.ok(doc.populated('arr'));
+      assert.equal(doc.arr[0]._id, 'test');
+      assert.ok(doc.arr[0].$__ != null);
+    });
+  });
 });

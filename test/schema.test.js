@@ -2095,4 +2095,10 @@ describe('schema', function() {
     assert.ok(path);
     assert.ok(path.caster instanceof Schema.ObjectId);
   });
+
+  it('supports getting path under array (gh-8057)', function() {
+    const schema = new Schema({ arr: [{ name: String }] });
+    assert.ok(schema.path('arr.name') instanceof SchemaTypes.String);
+    assert.ok(schema.path('arr.0.name') instanceof SchemaTypes.String);
+  });
 });

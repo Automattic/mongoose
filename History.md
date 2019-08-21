@@ -1,3 +1,12 @@
+5.6.10 / 2019-08-20
+===================
+ * fix(schema): fix require() path to work around yet another bug in Jest #8053
+ * fix(document): skip casting when initing a populated path #8062
+ * fix(document): prevent double-calling validators on mixed objects with nested properties #8067
+ * fix(query): handle schematype with `null` options when checking immutability #8070 [rich-earth](https://github.com/rich-earth)
+ * fix(schema): support `Schema#path()` to get schema path underneath doc array #8057
+ * docs(faq): add disable color instruction #8066
+
 5.6.9 / 2019-08-07
 ==================
  * fix(model): delete versionError after saving to prevent memory leak #8048

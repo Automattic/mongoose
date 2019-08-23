@@ -6459,5 +6459,16 @@ describe('Model', function() {
         then(() => Model.exists({ otherProp: 'foo' })).
         then(res => assert.strictEqual(res, false));
     });
+
+    it('options (gh-8075)', function() {
+      const Model = db.model('gh8075', new Schema({ name: String }));
+
+      return Model.create({ name: 'foo' }).
+        then(() => Model.exists({ $where: 'sleep(100) || true' }, { maxTimeMS: 10 })).
+        then(
+          () => assert.ok(false),
+          err => assert.ok(err.message.includes('time limit'), err.message)
+        );
+    });
   });
 });

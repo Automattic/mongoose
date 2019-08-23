@@ -6463,12 +6463,10 @@ describe('Model', function() {
     it('options (gh-8075)', function() {
       const Model = db.model('gh8075', new Schema({ name: String }));
 
-      return Model.create({ name: 'foo' }).
-        then(() => Model.exists({ $where: 'sleep(1000) || true' }, { maxTimeMS: 10 })).
-        then(
-          () => assert.ok(false),
-          err => assert.ok(err.message.includes('time limit'), err.message)
-        );
+      return Model.exists({}).
+        then(res => assert.ok(!res)).
+        then(() => Model.exists({}, { explain: true })).
+        then(res => assert.ok(res));
     });
   });
 });

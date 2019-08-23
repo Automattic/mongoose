@@ -28,6 +28,7 @@ block content
       <li><a href="#error-handling">Errors in Pre Hooks</a></li>
       <li><a href="#post">Post</a></li>
       <li><a href="#post-async">Asynchronous Post Hooks</a></li>
+      <li><a href="#defining">Define Middleware Before Compiling Models</a></li>
       <li><a href="#order">Save/Validate Hooks</a></li>
       <li><a href="#naming">Naming Conflicts</a></li>
       <li><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></li>
@@ -225,6 +226,54 @@ block content
       console.log('post2');
       next();
     });
+    ```
+
+    <h3 id="defining"><a href="#defining">Define Middleware Before Compiling Models</a></h3>
+
+    Calling `pre()` or `post()` after [compiling a model](/docs/models.html#compiling)
+    does **not** work in Mongoose in general. For example, the below `pre('save')`
+    middleware will not fire.
+
+    ```javascript
+    const schema = new mongoose.Schema({ name: String });
+
+    // Compile a model from the schema
+    const User = mongoose.model('User', schema);
+
+    // Mongoose will **not** call the middleware function, because
+    // this middleware was defined after the model was compiled
+    schema.pre('save', () => console.log('Hello from pre save'));
+
+    new User({ name: 'test' }).save();
+    ```
+
+    This means that you must add all middleware and [plugins](/docs/plugins.html)
+    **before** calling [`mongoose.model()](/docs/api/mongoose.html#mongoose_Mongoose-model).
+    The below script will print out "Hello from pre save":
+
+    ```javascript
+    const schema = new mongoose.Schema({ name: String });
+    // Mongoose will call this middleware function, because this script adds
+    // the middleware to the schema before compiling the model.
+    schema.pre('save', () => console.log('Hello from pre save'));
+
+    // Compile a model from the schema
+    const User = mongoose.model('User', schema);
+
+    new User({ name: 'test' }).save();
+    ```
+
+    As a consequence, be careful about exporting Mongoose models from the same
+    file that you define your schema. If you choose to use this pattern, you
+    must define [global plugins](/docs/api/mongoose.html#mongoose_Mongoose-plugin)
+    **before** calling `require()` on your model file.
+
+    ```javascript
+    const schema = new mongoose.Schema({ name: String });
+
+    // Once you `require()` this file, you can no longer add any middleware
+    // to this schema.
+    module.exports = mongoose.model('User', schema);
     ```
 
     <h3 id="order"><a href="#order">Save/Validate Hooks</a></h3>

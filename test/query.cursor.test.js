@@ -425,7 +425,7 @@ describe('QueryCursor', function() {
     const cursor = User.find().cursor().addCursorFlag('noCursorTimeout', true);
 
     cursor.on('cursor', function() {
-      assert.equal(cursor.cursor.s.cmd.noCursorTimeout, true);
+      assert.equal(cursor.cursor.cursorState.cmd.noCursorTimeout, true);
       done();
     });
   });

@@ -6459,5 +6459,14 @@ describe('Model', function() {
         then(() => Model.exists({ otherProp: 'foo' })).
         then(res => assert.strictEqual(res, false));
     });
+
+    it('options (gh-8075)', function() {
+      const Model = db.model('gh8075', new Schema({ name: String }));
+
+      return Model.exists({}).
+        then(res => assert.ok(!res)).
+        then(() => Model.exists({}, { explain: true })).
+        then(res => assert.ok(res));
+    });
   });
 });

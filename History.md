@@ -1,3 +1,12 @@
+5.6.11 / 2019-08-25
+===================
+ * fix(model): allow passing options to `exists()` #8075
+ * fix(document): make `validateUpdatedOnly` option handle pre-existing errors #8091
+ * fix: throw readable error if middleware callback isnt a function #8087
+ * fix: don't throw error if calling `find()` on a nested array #8089
+ * docs(middleware): clarify that you must add middleware before compiling your model #5087
+ * docs(query): add missing options to `setOptions()` #8099
+
 5.6.10 / 2019-08-20
 ===================
  * fix(schema): fix require() path to work around yet another bug in Jest #8053

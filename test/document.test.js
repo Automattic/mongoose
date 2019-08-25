@@ -2351,6 +2351,24 @@ describe('document', function() {
       });
     });
 
+    it('validateModifiedOnly with pre existing validation error (gh-8091)', function() {
+      const schema = mongoose.Schema({
+        title: String,
+        coverId: Number
+      }, { validateModifiedOnly: true });
+
+      const Model = db.model('gh8091', schema);
+
+      return co(function*() {
+        yield Model.collection.insertOne({ title: 'foo', coverId: parseFloat('not a number') });
+
+        const doc = yield Model.findOne();
+        doc.title = 'bar';
+        // Should not throw
+        yield doc.save();
+      });
+    });
+
     it('handles non-errors', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }

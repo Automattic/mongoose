@@ -7997,6 +7997,6 @@ describe('document', function() {
     const data = { _id: new mongoose.Types.ObjectId(), subdocs: [{a: 'a'}] };
     const doc = new Model();
     doc.init(data);
-    require('util').inspect(doc);
+    require('util').inspect(doc.subdocs);
   });
 });

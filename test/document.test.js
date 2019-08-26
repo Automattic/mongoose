@@ -7989,4 +7989,14 @@ describe('document', function() {
       assert.ok(doc.arr[0].$__ != null);
     });
   });
+
+  it('can inspect() on a document array (gh-8037)', function() {
+    const subdocSchema = mongoose.Schema({ a: String });
+    const schema = mongoose.Schema({ subdocs: { type: [subdocSchema] } });
+    const Model = db.model('gh8037', schema);
+    const data = { _id: new mongoose.Types.ObjectId(), subdocs: [{a: 'a'}] };
+    const doc = new Model();
+    doc.init(data);
+    require('util').inspect(doc);
+  });
 });

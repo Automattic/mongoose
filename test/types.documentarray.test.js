@@ -558,26 +558,6 @@ describe('types.documentarray', function() {
 
       return m.save();
     });
-
-    it('removes attached event listeners when creating new doc array', function(done) {
-      const nested = new Schema({v: {type: Number}});
-      const schema = new Schema({
-        docs: [nested]
-      }, {collection: 'gh-2159'});
-      const M = db.model('gh-2159', schema);
-      M.create({docs: [{v: 900}]}, function(error, m) {
-        m.shouldPrint = true;
-        assert.ifError(error);
-        const numListeners = m.listeners('save').length;
-        assert.ok(numListeners > 0);
-        m.docs = [{v: 9000}];
-        m.save(function(error, m) {
-          assert.ifError(error);
-          assert.equal(numListeners, m.listeners('save').length);
-          done();
-        });
-      });
-    });
   });
 
   it('cleans modified subpaths on splice() (gh-7249)', function() {

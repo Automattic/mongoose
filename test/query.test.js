@@ -3140,6 +3140,43 @@ describe('Query', function() {
     });
   });
 
+  describe('get() (gh-7312)', function() {
+    it('works with using $set', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.updateOne({}, { $set: { name: 'Jean-Luc Picard' } });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+    });
+
+    it('works with $set syntactic sugar', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.updateOne({}, { name: 'Jean-Luc Picard' });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+    });
+
+    it('works with mixed', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.updateOne({}, { name: 'Jean-Luc Picard', $set: { age: 59 } });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+    });
+
+    it('$set overwrites existing', function() {
+      const M = db.model('gh7312', new Schema({ name: String }));
+      const q = M.updateOne({}, {
+        name: 'Jean-Luc Picard',
+        $set: { name: 'William Riker' }
+      }, { upsert: true });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+
+      return q.exec().
+        then(() => M.findOne()).
+        then(doc => assert.equal(doc.name, 'Jean-Luc Picard'));
+    });
+  });
+
   it('allows skipping timestamps in updateOne() (gh-6980)', function() {
     const schema = new Schema({ name: String }, { timestamps: true });
 

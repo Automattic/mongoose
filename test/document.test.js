@@ -500,6 +500,29 @@ describe('document', function() {
     });
   });
 
+  it('disabling aliases in toObject options (gh-7548)', function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        alias: 'nameAlias'
+      },
+      age: Number
+    });
+    schema.virtual('answer').get(() => 42);
+
+    const Model = db.model('gh7548', schema);
+
+    const doc = new Model({ name: 'Jean-Luc Picard', age: 59 });
+
+    let obj = doc.toObject({ virtuals: true });
+    assert.equal(obj.nameAlias, 'Jean-Luc Picard');
+    assert.equal(obj.answer, 42);
+
+    obj = doc.toObject({ virtuals: true, aliases: false });
+    assert.ok(!obj.nameAlias);
+    assert.equal(obj.answer, 42);
+  });
+
   it('saves even if `_id` is null (gh-6406)', function() {
     const schema = new Schema({ _id: Number, val: String });
     const Model = db.model('gh6406', schema);

@@ -249,14 +249,15 @@ block content
     ```
 
     If you pass an element that has a `toString()` function, Mongoose will call it,
-    unless the `toString()` function is strictly equal to `Object.prototype.toString()`.
+    unless the element is an array or `toString()` function is strictly equal to
+    `Object.prototype.toString()`.
 
     ```javascript
     new Person({ name: 42 }).name; // "42" as a string
     new Person({ name: { toString: () => 42 } }).name; // "42" as a string
 
-    // "undefined", will get a cast error if you `save()` this document 
-    new Person({ name: { foo: 42 } }).name; 
+    // "undefined", will get a cast error if you `save()` this document
+    new Person({ name: { foo: 42 } }).name;
     ```
 
     <h4 id="numbers">Number</h4>

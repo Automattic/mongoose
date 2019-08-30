@@ -3517,4 +3517,37 @@ describe('Query', function() {
       });
     });
   });
+
+  describe('Query#validate() (gh-7984)', function() {
+    it('middleware', function() {
+      const schema = new Schema({
+        password: {
+          type: String,
+          validate: v => v.length >= 6,
+          required: true
+        }
+      });
+
+      let docCalls = 0;
+      schema.post('validate', function() {
+        ++docCalls;
+      });
+      let queryCalls = 0;
+      schema.post('validate', { query: true }, function() {
+        ++queryCalls;
+        const pw = this.get('password');
+        assert.equal(pw, '6chars');
+        this.set('password', 'encryptedpassword');
+      });
+
+      const M = db.model('gh7984', schema);
+
+      const opts = { runValidators: true, upsert: true, new: true };
+      return M.findOneAndUpdate({}, { password: '6chars' }, opts).then(doc => {
+        assert.equal(docCalls, 0);
+        assert.equal(queryCalls, 1);
+        assert.equal(doc.password, 'encryptedpassword');
+      });
+    });
+  });
 });

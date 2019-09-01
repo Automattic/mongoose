@@ -2354,6 +2354,27 @@ describe('model: findOneAndUpdate:', function() {
     });
   });
 
+  it('skipping updatedAt and createdAt (gh-3934)', function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+    const Model = db.model('gh3934', schema);
+
+    return co(function*() {
+      let doc = yield Model.findOneAndUpdate({}, { name: 'test' }, {
+        upsert: true,
+        new: true,
+        timestamps: { createdAt: false }
+      });
+      assert.ok(!doc.createdAt);
+      assert.ok(doc.updatedAt);
+      const start = doc.updatedAt;
+      doc = yield Model.findOneAndUpdate({ _id: doc._id }, { name: 'test2' }, {
+        new: true,
+        timestamps: { updatedAt: false }
+      });
+      assert.equal(doc.updatedAt.valueOf(), start.valueOf());
+    });
+  });
+
   it('runs lowercase on $addToSet, $push, etc (gh-4185)', function() {
     const Cat = db.model('gh4185', {
       _id: String,

@@ -1,3 +1,13 @@
+5.6.12 / 2019-09-03
+===================
+ * fix(schema): handle required validator correctly with `clone()` #8111
+ * fix(schema): copy schematype getters and setters when cloning #8124 [StphnDamon](https://github.com/StphnDamon)
+ * fix(discriminator): avoid unnecessarily cloning schema to avoid leaking memory on repeated `discriminator()` calls #2874
+ * docs(schematypes): clarify when Mongoose uses `toString()` to convert an object to a string #8112 [TheTrueRandom](https://github.com/TheTrueRandom)
+ * docs(plugins): fix out of date link to npm docs #8100
+ * docs(deprecations): fix typo #8109 [jgcmarins](https://github.com/jgcmarins)
+ * refactor(model): remove dependency on `async.parallelLimit()` for `insertMany()` #8073
+
 5.6.11 / 2019-08-25
 ===================
  * fix(model): allow passing options to `exists()` #8075

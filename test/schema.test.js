@@ -2101,4 +2101,29 @@ describe('schema', function() {
     assert.ok(schema.path('arr.name') instanceof SchemaTypes.String);
     assert.ok(schema.path('arr.0.name') instanceof SchemaTypes.String);
   });
+
+  it('required paths with clone() (gh-8111)', function() {
+    const schema = Schema({ field: { type: String, required: true } });
+    const Model = db.model('gh8111', schema.clone());
+
+    const doc = new Model({});
+
+    return doc.validate().then(() => assert.ok(false), err => {
+      assert.ok(err);
+      assert.ok(err.errors['field']);
+    });
+  });
+
+  it('getters/setters with clone() (gh-8124)', function() {
+    const schema = new mongoose.Schema({
+      field: {type: String, required: true}
+    });
+
+    schema.path('field').set(value => value ? value.toUpperCase() : value);
+
+    const TestKo = db.model('gh8124', schema.clone());
+
+    const testKo = new TestKo({field: 'upper'});
+    assert.equal(testKo.field, 'UPPER');
+  });
 });

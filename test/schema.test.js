@@ -2113,4 +2113,17 @@ describe('schema', function() {
       assert.ok(err.errors['field']);
     });
   });
+
+  it('getters/setters with clone() (gh-8124)', function() {
+    const schema = new mongoose.Schema({
+      field: {type: String, required: true}
+    });
+
+    schema.path('field').set(value => value ? value.toUpperCase() : value);
+
+    const TestKo = db.model('gh8124', schema.clone());
+
+    const testKo = new TestKo({field: 'upper'});
+    assert.equal(testKo.field, 'UPPER');
+  });
 });

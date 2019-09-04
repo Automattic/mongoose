@@ -7823,7 +7823,7 @@ describe('model: populate:', function() {
     });
   });
 
-  it.only('handles virtual justOne if it is not set, is lean, and subfields are selected', function() {
+  it('handles virtual justOne if it is not set, is lean, and subfields are selected', function() {
     const postSchema = new Schema({
       name: String
     });

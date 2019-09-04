@@ -7823,6 +7823,37 @@ describe('model: populate:', function() {
     });
   });
 
+  it.only('handles virtual justOne if it is not set, is lean, and subfields are selected', function() {
+    const postSchema = new Schema({
+      name: String
+    });
+
+    postSchema.virtual('comments', {
+      ref: 'gh6988_Comment',
+      localField: '_id',
+      foreignField: 'postId'
+    });
+
+    const commentSchema = new Schema({
+      postId: { type: Schema.Types.ObjectId },
+      text: String,
+    });
+
+    const Post = db.model('gh6988_Post', postSchema);
+    const Comment = db.model('gh6988_Comment', commentSchema);
+
+    return co(function*() {
+      const post = yield Post.create({ name: 'n1'});
+      const comment = yield Comment.create({ postId: post._id, text: "a comment" });
+
+      const doc = yield Post.find({}).populate('comments', 'text').lean();
+      assert.ok(Array.isArray(doc[0].comments));
+      assert.equal(doc[0].comments.length, 1);
+      assert.equal(doc[0].comments[0]._id.toHexString(),
+        comment._id.toHexString());
+    });
+  });
+
   it('does not set `justOne` if underneath Mixed (gh-6985)', function() {
     const articleSchema = new Schema({
       title: String,

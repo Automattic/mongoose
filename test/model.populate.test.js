@@ -7829,7 +7829,7 @@ describe('model: populate:', function() {
     });
 
     postSchema.virtual('comments', {
-      ref: 'gh6988_Comment',
+      ref: 'gh8125_Comment',
       localField: '_id',
       foreignField: 'postId'
     });
@@ -7839,12 +7839,12 @@ describe('model: populate:', function() {
       text: String,
     });
 
-    const Post = db.model('gh6988_Post', postSchema);
-    const Comment = db.model('gh6988_Comment', commentSchema);
+    const Post = db.model('gh8125_Post', postSchema);
+    const Comment = db.model('gh8125_Comment', commentSchema);
 
     return co(function*() {
       const post = yield Post.create({ name: 'n1'});
-      const comment = yield Comment.create({ postId: post._id, text: "a comment" });
+      const comment = yield Comment.create({ postId: post._id, text: 'a comment' });
 
       const doc = yield Post.find({}).populate('comments', 'text').lean();
       assert.ok(Array.isArray(doc[0].comments));

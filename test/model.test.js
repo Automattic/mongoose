@@ -4776,6 +4776,11 @@ describe('Model', function() {
       });
     });
 
+    it('returns empty array if no documents (gh-8130)', function() {
+      const Movie = db.model('gh8130', Schema({ name: String }));
+      return Movie.insertMany([]).then(docs => assert.deepEqual(docs, []));
+    });
+
     it('insertMany() multi validation error with ordered false (gh-5337)', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }

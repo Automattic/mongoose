@@ -1,3 +1,9 @@
+5.6.13 / 2019-09-04
+===================
+ * fix(parallel): fix parallelLimit when fns is empty #8130 #8128 [sibelius](https://github.com/sibelius)
+ * fix(document): ensure nested mixed validator gets called exactly once #8117
+ * fix(populate): handle `justOne = undefined` #8125 [taxilian](https://github.com/taxilian)
+
 5.6.12 / 2019-09-03
 ===================
  * fix(schema): handle required validator correctly with `clone()` #8111

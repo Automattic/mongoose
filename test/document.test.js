@@ -7937,6 +7937,31 @@ describe('document', function() {
     assert.equal(called, 1);
   });
 
+  it('only calls validator once on nested mixed validator (gh-8117)', function() {
+    const called = [];
+    const Model = db.model('gh8117', Schema({
+      name: { type: String },
+      level1: {
+        level2: {
+          type: Object,
+          validate: {
+            validator: v => {
+              called.push(v);
+              return true;
+            }
+          }
+        }
+      }
+    }));
+
+    const doc = new Model({ name: 'bob' });
+    doc.level1 = { level2: { a: 'one', b: 'two', c: 'three' } };
+    return doc.validate().then(() => {
+      assert.equal(called.length, 1);
+      assert.deepEqual(called[0], { a: 'one', b: 'two', c: 'three' });
+    });
+  });
+
   it('handles populate() with custom type that does not cast to doc (gh-8062)', function() {
     class Gh8062 extends mongoose.SchemaType {
       cast(val) {

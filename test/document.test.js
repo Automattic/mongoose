@@ -7938,7 +7938,7 @@ describe('document', function() {
   });
 
   it('only calls validator once on nested mixed validator (gh-8117)', function() {
-    let called = [];
+    const called = [];
     const Model = db.model('gh8117', Schema({
       name: { type: String },
       level1: {

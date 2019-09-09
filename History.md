@@ -1,3 +1,16 @@
+5.7.0 / 2019-09-09
+==================
+ * feat(document+query): support conditionally immutable schema paths #8001
+ * perf(documentarray): refactor to use ES6 classes instead of mixins, ~30% speedup #7895
+ * feat: use MongoDB driver 3.3.x for MongoDB 4.2 support #8083 #8078
+ * feat(schema+query): add pre('validate') and post('validate') hooks for update validation #7984
+ * fix(timestamps): ensure updatedAt gets incremented consistently using update with and without $set #4768
+ * feat(query): add `Query#get()` to make writing custom setters that handle both queries and documents easier #7312
+ * feat(document): run setters on defaults #8012
+ * feat(document): add `aliases: false` option to `Document#toObject()` #7548
+ * feat(timestamps): support skipping updatedAt and createdAt for individual save() and update() #3934
+ * docs: fix index creation link in guide #8138 [joebowbeer](https://github.com/joebowbeer)
+
 5.6.13 / 2019-09-04
 ===================
  * fix(parallel): fix parallelLimit when fns is empty #8130 #8128 [sibelius](https://github.com/sibelius)

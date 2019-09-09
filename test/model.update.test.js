@@ -3287,4 +3287,32 @@ describe('model: updateOne: ', function() {
       assert.ok(doc.createdAt.valueOf() >= start);
     });
   });
+
+  it('conditional immutable (gh-8001)', function() {
+    const schema = Schema({
+      test: {
+        type: String,
+        immutable: ctx => {
+          return ctx.getQuery().name != null;
+        }
+      },
+      name: String
+    }, { timestamps: true });
+
+    const Model = db.model('gh8001', schema);
+
+    return co(function*() {
+      yield Model.updateOne({}, { test: 'before', name: 'foo' }, { upsert: true });
+      let doc = yield Model.collection.findOne();
+      assert.equal(doc.test, 'before');
+
+      yield Model.updateOne({ name: 'foo' }, { test: 'after' }, { upsert: true });
+      doc = yield Model.collection.findOne();
+      assert.equal(doc.test, 'before');
+
+      yield Model.updateOne({}, { test: 'after' }, { upsert: true });
+      doc = yield Model.collection.findOne();
+      assert.equal(doc.test, 'after');
+    });
+  });
 });

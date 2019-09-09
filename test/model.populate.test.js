@@ -7478,7 +7478,7 @@ describe('model: populate:', function() {
 
       const eventSchema = new Schema({
         message: String
-      },{ discriminatorKey: 'kind' });
+      }, { discriminatorKey: 'kind' });
 
       const batchSchema = new Schema({
         events: [eventSchema]

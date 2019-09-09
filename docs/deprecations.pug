@@ -30,6 +30,7 @@ block content
     * `mongoose.set('useNewUrlParser', true);`
     * `mongoose.set('useFindAndModify', false);`
     * `mongoose.set('useCreateIndex', true);`
+    * `mongoose.set('useUnifiedTopology', true);`
     * Replace `update()` with `updateOne()`, `updateMany()`, or `replaceOne()`
     * Replace `remove()` with `deleteOne()` or `deleteMany()`.
     * Replace `count()` with `countDocuments()`, unless you want to count how many documents are in the whole collection (no filter). In the latter case, use `estimatedDocumentCount()`.
@@ -168,6 +169,30 @@ block content
     // With this:
     MyModel.deleteOne({ answer: 42 });
     ```
+
+    ## `useUnifiedTopology`
+
+    By default, `mongoose.connect()` will print out the below warning:
+
+    ```
+    DeprecationWarning: current Server Discovery and Monitoring engine is
+    deprecated, and will be removed in a future version. To use the new Server
+    Discover and Monitoring engine, pass option { useUnifiedTopology: true } to
+    the MongoClient constructor.
+    ```
+
+    Mongoose 5.7 uses MongoDB driver 3.3.x, which introduced a significant
+    refactor of how it handles monitoring all the servers in a replica set
+    or sharded cluster. In MongoDB parlance, this is known as
+    [server discovery and monitoring](https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst).
+
+    To opt in to using the new topology engine, use the below line:
+
+    ```javascript
+    mongoose.set('useUnifiedTopology', true);
+    ```
+
+    If you find any unexpected behavior, please [open up an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
     ## `update()`
 

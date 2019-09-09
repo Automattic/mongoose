@@ -698,7 +698,6 @@ describe('connections:', function() {
       setTimeout(function() {
         coll.insertOne({x:1}, function(error) {
           assert.ok(error);
-          assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
           done();
         });
       }, 100);
@@ -723,7 +722,7 @@ describe('connections:', function() {
 
         let threw = false;
         try {
-          db.collection('Test').insertOne({x:1}, function() {});
+          db.collection('Test').insertOne({x:1});
         } catch (error) {
           threw = true;
           assert.ok(error);

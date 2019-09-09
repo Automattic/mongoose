@@ -500,6 +500,29 @@ describe('document', function() {
     });
   });
 
+  it('disabling aliases in toObject options (gh-7548)', function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        alias: 'nameAlias'
+      },
+      age: Number
+    });
+    schema.virtual('answer').get(() => 42);
+
+    const Model = db.model('gh7548', schema);
+
+    const doc = new Model({ name: 'Jean-Luc Picard', age: 59 });
+
+    let obj = doc.toObject({ virtuals: true });
+    assert.equal(obj.nameAlias, 'Jean-Luc Picard');
+    assert.equal(obj.answer, 42);
+
+    obj = doc.toObject({ virtuals: true, aliases: false });
+    assert.ok(!obj.nameAlias);
+    assert.equal(obj.answer, 42);
+  });
+
   it('saves even if `_id` is null (gh-6406)', function() {
     const schema = new Schema({ _id: Number, val: String });
     const Model = db.model('gh6406', schema);
@@ -7786,6 +7809,32 @@ describe('document', function() {
         assert.ok(err.message.indexOf('createdAt') !== -1, err.message);
       });
     });
+
+    it('conditional immutable (gh-8001)', function() {
+      const schema = new Schema({
+        name: String,
+        test: {
+          type: String,
+          immutable: doc => doc.name === 'foo'
+        }
+      });
+      const Model = db.model('gh8001', schema);
+
+      return co(function*() {
+        const doc1 = yield Model.create({ name: 'foo', test: 'before' });
+        const doc2 = yield Model.create({ name: 'bar', test: 'before' });
+
+        doc1.set({ test: 'after' });
+        doc2.set({ test: 'after' });
+        yield doc1.save();
+        yield doc2.save();
+
+        const fromDb1 = yield Model.collection.findOne({ name: 'foo' });
+        const fromDb2 = yield Model.collection.findOne({ name: 'bar' });
+        assert.equal(fromDb1.test, 'before');
+        assert.equal(fromDb2.test, 'after');
+      });
+    });
   });
 
   it('consistent post order traversal for array subdocs (gh-7929)', function() {
@@ -7987,5 +8036,15 @@ describe('document', function() {
       assert.equal(doc.arr[0]._id, 'test');
       assert.ok(doc.arr[0].$__ != null);
     });
+  });
+
+  it('can inspect() on a document array (gh-8037)', function() {
+    const subdocSchema = mongoose.Schema({ a: String });
+    const schema = mongoose.Schema({ subdocs: { type: [subdocSchema] } });
+    const Model = db.model('gh8037', schema);
+    const data = { _id: new mongoose.Types.ObjectId(), subdocs: [{a: 'a'}] };
+    const doc = new Model();
+    doc.init(data);
+    require('util').inspect(doc.subdocs);
   });
 });

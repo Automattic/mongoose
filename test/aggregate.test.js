@@ -1311,7 +1311,7 @@ describe('aggregate: ', function() {
       exec();
 
     cursor.once('cursor', cursor => {
-      assert.ok(cursor.s.cmd.noCursorTimeout);
+      assert.ok(cursor.cursorState.cmd.noCursorTimeout);
       done();
     });
   });

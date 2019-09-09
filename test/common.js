@@ -19,6 +19,8 @@ if (process.env.D === '1') {
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
+// 3.3.x deprecations
+mongoose.set('useUnifiedTopology', true);
 
 /**
  * Override all Collection related queries to keep count

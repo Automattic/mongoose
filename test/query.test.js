@@ -3140,6 +3140,43 @@ describe('Query', function() {
     });
   });
 
+  describe('get() (gh-7312)', function() {
+    it('works with using $set', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.updateOne({}, { $set: { name: 'Jean-Luc Picard' } });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+    });
+
+    it('works with $set syntactic sugar', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.updateOne({}, { name: 'Jean-Luc Picard' });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+    });
+
+    it('works with mixed', function() {
+      const q = new Query({}, {}, null, p1.collection);
+      q.updateOne({}, { name: 'Jean-Luc Picard', $set: { age: 59 } });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+    });
+
+    it('$set overwrites existing', function() {
+      const M = db.model('gh7312', new Schema({ name: String }));
+      const q = M.updateOne({}, {
+        name: 'Jean-Luc Picard',
+        $set: { name: 'William Riker' }
+      }, { upsert: true });
+
+      assert.equal(q.get('name'), 'Jean-Luc Picard');
+
+      return q.exec().
+        then(() => M.findOne()).
+        then(doc => assert.equal(doc.name, 'Jean-Luc Picard'));
+    });
+  });
+
   it('allows skipping timestamps in updateOne() (gh-6980)', function() {
     const schema = new Schema({ name: String }, { timestamps: true });
 
@@ -3477,6 +3514,39 @@ describe('Query', function() {
         const res = yield Car.findOne().merge(q);
 
         assert.equal(res.owner.name, 'Val');
+      });
+    });
+  });
+
+  describe('Query#validate() (gh-7984)', function() {
+    it('middleware', function() {
+      const schema = new Schema({
+        password: {
+          type: String,
+          validate: v => v.length >= 6,
+          required: true
+        }
+      });
+
+      let docCalls = 0;
+      schema.post('validate', function() {
+        ++docCalls;
+      });
+      let queryCalls = 0;
+      schema.post('validate', { query: true }, function() {
+        ++queryCalls;
+        const pw = this.get('password');
+        assert.equal(pw, '6chars');
+        this.set('password', 'encryptedpassword');
+      });
+
+      const M = db.model('gh7984', schema);
+
+      const opts = { runValidators: true, upsert: true, new: true };
+      return M.findOneAndUpdate({}, { password: '6chars' }, opts).then(doc => {
+        assert.equal(docCalls, 0);
+        assert.equal(queryCalls, 1);
+        assert.equal(doc.password, 'encryptedpassword');
       });
     });
   });

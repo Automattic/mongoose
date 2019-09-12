@@ -7835,6 +7835,22 @@ describe('document', function() {
         assert.equal(fromDb2.test, 'after');
       });
     });
+
+    it('immutable with strict mode (gh-8149)', function() {
+      return co(function*() {
+        const schema = new mongoose.Schema({
+          name: String,
+          yearOfBirth: { type: Number, immutable: true }
+        }, { strict: 'throw' });
+        const Person = db.model('gh8149', schema);
+        const joe = yield Person.create({ name: 'Joe', yearOfBirth: 2001 });
+
+        joe.set({ yearOfBirth: 2002 });
+        const err = yield joe.save().then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.errors['yearOfBirth'].name, 'StrictModeError');
+      });
+    });
   });
 
   it('consistent post order traversal for array subdocs (gh-7929)', function() {

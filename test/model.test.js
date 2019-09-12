@@ -6076,6 +6076,32 @@ describe('Model', function() {
       });
     });
 
+    it('syncIndexes() with different key order (gh-8135)', function() {
+      return co(function*() {
+        const opts = { autoIndex: false };
+        let schema = new Schema({ name: String, age: Number }, opts);
+        schema.index({ name: 1, age: -1 });
+        let M = db.model('gh8135', schema, 'gh8135');
+
+        let dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, []);
+
+        const indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { name: 1, age: -1 }
+        ]);
+
+        // New model, same collection, different key order
+        schema = new Schema({ name: String, age: Number }, opts);
+        schema.index({ age: -1, name: 1 });
+        M = db.model('gh8135_0', schema, 'gh8135');
+
+        dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, ['name_1_age_-1']);
+      });
+    });
+
     it('using `new db.model()()` (gh-6698)', function(done) {
       db.model('gh6698', new Schema({
         name: String

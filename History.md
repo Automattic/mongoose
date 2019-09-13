@@ -1,3 +1,12 @@
+5.7.1 / 2019-09-13
+==================
+ * fix(query): fix TypeError when calling `findOneAndUpdate()` with `runValidators` #8151 [fernandolguevara](https://github.com/fernandolguevara)
+ * fix(document): throw strict mode error if setting an immutable path with strict mode: false #8149
+ * fix(mongoose): support passing options object to Mongoose constructor #8144
+ * fix(model): make syncIndexes() handle changes in index key order #8135
+ * fix(error): export StrictModeError as a static property of MongooseError #8148 [ouyuran](https://github.com/ouyuran)
+ * docs(connection+mongoose): add `useUnifiedTopology` option to `connect()` and `openUri()` docs #8146
+
 5.7.0 / 2019-09-09
 ==================
  * feat(document+query): support conditionally immutable schema paths #8001

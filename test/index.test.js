@@ -121,6 +121,12 @@ describe('mongoose module:', function() {
     done();
   });
 
+  it('options object (gh-8144)', function() {
+    const mongoose = new Mongoose({ bufferCommands: false });
+
+    assert.strictEqual(mongoose.options.bufferCommands, false);
+  });
+
   it('bufferCommands option (gh-5879)', function(done) {
     const mongoose = new Mongoose();
 

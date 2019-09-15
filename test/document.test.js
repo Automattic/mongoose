@@ -7904,6 +7904,24 @@ describe('document', function() {
     });
   });
 
+  it('caster that converts to Number class works (gh-8150)', function() {
+    return co(function*() {
+        const mySchema = new Schema({
+          id: {
+            type: Number,
+            set: value => new Number(value.valueOf())
+          }
+        });
+      
+        const MyModel = db.model('gh8150', mySchema);
+      
+        yield MyModel.create({ id: 12345 });
+      
+        const doc = yield MyModel.findOne({ id: 12345 });
+        assert.ok(doc);
+    });
+  });
+
   it('handles objectids and decimals with strict: false (gh-7973)', function() {
     const testSchema = Schema({}, { strict: false });
     const Test = db.model('gh7973', testSchema);

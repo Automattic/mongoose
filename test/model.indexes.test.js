@@ -282,6 +282,48 @@ describe('model', function() {
       });
     });
 
+    it('when one index creation errors', function(done) {
+      const User = new Schema({
+        name: { type: String },
+        secondValue: { type: Boolean }
+      });
+      User.index({ name: 1 });
+
+      const User2 = new Schema({
+        name: {type: String, index: true, unique: true},
+        secondValue: {type: Boolean, index: true}
+      });
+      User2.index({ name: 1 }, { unique: true });
+      User2.index({ secondValue: 1 });
+
+      const collectionName = 'deepindexedmodel' + random();
+      const UserModel = db.model('SingleIndexedModel', User, collectionName);
+      const UserModel2 = db.model('DuplicateIndexedModel', User2, collectionName);
+      let assertions = 0;
+
+      UserModel2.on('index', function() {
+        UserModel2.collection.getIndexes(function(err, indexes) {
+          assert.ifError(err);
+
+          function iter(index) {
+            if (index[0] === 'name') {
+              assertions++;
+            }
+            if (index[0] === 'secondValue') {
+              assertions++;
+            }
+          }
+
+          for (const i in indexes) {
+            indexes[i].forEach(iter);
+          }
+
+          assert.equal(assertions, 2);
+          done();
+        });
+      });
+    });
+
     describe('auto creation', function() {
       it('can be disabled', function(done) {
         const schema = new Schema({name: {type: String, index: true}});

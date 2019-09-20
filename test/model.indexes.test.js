@@ -283,21 +283,23 @@ describe('model', function() {
     });
 
     it('when one index creation errors', function(done) {
-      const User = new Schema({
-        name: { type: String },
-        secondValue: { type: Boolean }
-      });
+      const userSchema = {
+        name: {type: String},
+        secondValue: {type: Boolean}
+      };
+
+      const User = new Schema(userSchema);
       User.index({ name: 1 });
 
-      const User2 = new Schema({
-        name: {type: String, index: true, unique: true},
-        secondValue: {type: Boolean, index: true}
-      });
+      const User2 = new Schema(userSchema);
       User2.index({ name: 1 }, { unique: true });
       User2.index({ secondValue: 1 });
 
       const collectionName = 'deepindexedmodel' + random();
-      const UserModel = db.model('SingleIndexedModel', User, collectionName);
+      // Create model with first schema to initialize indexes
+      db.model('SingleIndexedModel', User, collectionName);
+
+      // Create model with second schema in same collection to add new indexes
       const UserModel2 = db.model('DuplicateIndexedModel', User2, collectionName);
       let assertions = 0;
 

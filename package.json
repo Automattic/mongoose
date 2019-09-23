@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.7.1",
+  "version": "5.7.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -25,7 +25,7 @@
     "mongodb": "3.3.2",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.6.0",
-    "mquery": "3.2.1",
+    "mquery": "3.2.2",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
     "safe-buffer": "5.1.2",

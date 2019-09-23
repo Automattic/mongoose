@@ -1,3 +1,14 @@
+5.7.2 / 2019-09-23
+==================
+ * fix(mongoose): support `mongoose.set('autoIndex', false)` #8158
+ * fix(discriminator): support `tiedValue` parameter for embedded discriminators analagous to top-level discriminators #8164
+ * fix(query): handle `toConstructor()` with entries-style sort syntax #8159
+ * fix(populate): avoid converting mixed paths into arrays if populating an object path under `Mixed` #8157
+ * fix: use $wrapCallback when using promises for mongoose-async-hooks
+ * fix: handle queries with setter that converts value to Number instance #8150
+ * docs: add mongoosejs-cli to readme #8142
+ * docs: fix example typo for Schema.prototype.plugin() #8175 [anaethoss](https://github.com/anaethoss)
+
 5.7.1 / 2019-09-13
 ==================
  * fix(query): fix TypeError when calling `findOneAndUpdate()` with `runValidators` #8151 [fernandolguevara](https://github.com/fernandolguevara)

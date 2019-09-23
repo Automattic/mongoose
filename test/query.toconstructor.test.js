@@ -214,5 +214,14 @@ describe('Query:', function() {
         assert.strictEqual(called, 1);
       });
     });
+
+    it('works with entries-style sort() syntax (gh-8159)', function() {
+      const Model = mongoose.model('gh8159', Schema({ name: String }));
+
+      const query = Model.find().sort([['name', 1]]);
+      const Query = query.toConstructor();
+      const q = new Query();
+      assert.deepEqual(q.options.sort, [['name', 1]]);
+    });
   });
 });

@@ -1080,6 +1080,46 @@ describe('model', function() {
         catch(done);
     });
 
+    it('embedded with single nested subdocs and tied value (gh-8164)', function() {
+      const eventSchema = new Schema({ message: String },
+        { discriminatorKey: 'kind', _id: false });
+
+        const trackSchema = new Schema({ event: eventSchema });
+      trackSchema.path('event').discriminator('Clicked', new Schema({
+        element: String
+      }, { _id: false }), 'click');
+      trackSchema.path('event').discriminator('Purchased', new Schema({
+        product: String
+      }, { _id: false }), 'purchase');
+
+      const MyModel = db.model('gh8164', trackSchema);
+      const doc1 = {
+        event: {
+          kind: 'click',
+          element: 'Amazon Link'
+        }
+      };
+      const doc2 = {
+        event: {
+          kind: 'purchase',
+          product: 'Professional AngularJS'
+        }
+      };
+      return MyModel.create([doc1, doc2]).
+        then(function(docs) {
+          const doc1 = docs[0];
+          const doc2 = docs[1];
+
+          assert.equal(doc1.event.kind, 'click');
+          assert.equal(doc1.event.element, 'Amazon Link');
+          assert.ok(!doc1.event.product);
+
+          assert.equal(doc2.event.kind, 'purchase');
+          assert.equal(doc2.event.product, 'Professional AngularJS');
+          assert.ok(!doc2.event.element);
+        });
+    });
+
     it('Embedded discriminators in nested doc arrays (gh-6202)', function() {
       const eventSchema = new Schema({ message: String }, {
         discriminatorKey: 'kind',

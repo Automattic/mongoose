@@ -319,6 +319,10 @@ and [acquit](https://github.com/vkarpov15/acquit).
 - [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server)
 - [mongodb-topology-manager](https://www.npmjs.com/package/mongodb-topology-manager)
 
+#### Unofficial CLIs
+
+- [mongoosejs-cli](https://www.npmjs.com/package/mongoosejs-cli)
+
 #### Data Seeding
 
 - [dookie](https://www.npmjs.com/package/dookie)

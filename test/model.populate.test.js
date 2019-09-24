@@ -8628,7 +8628,7 @@ describe('model: populate:', function() {
     });
   });
 
-  it('handles virtual populate underneath embedded discriminator nested path (gh-6488) (gh-8173)', function() {
+  it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', function() {
     return co(function*() {
       const UserModel = db.model('gh6488_User', Schema({
         employeeId: Number,
@@ -8646,10 +8646,8 @@ describe('model: populate:', function() {
       });
 
       const docArray = batchSchema.path('nested.events');
-      const Clicked = docArray.
-        discriminator('gh6488_Clicked', Schema({ nestedLayer: nestedLayerSchema }));
-      const Purchased = docArray.
-        discriminator('gh6488_Purchased', Schema({ purchased: String }));
+      docArray.discriminator('gh6488_Clicked', Schema({ nestedLayer: nestedLayerSchema }));
+      docArray.discriminator('gh6488_Purchased', Schema({ purchased: String }));
 
       const Batch = db.model('gh6488', batchSchema);
 

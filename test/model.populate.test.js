@@ -8627,4 +8627,50 @@ describe('model: populate:', function() {
       assert.equal(team.developers[2].ticketCount, 0);
     });
   });
+
+  it('handles virtual populate underneath embedded discriminator nested path (gh-6488) (gh-8173)', function() {
+    return co(function*() {
+      const UserModel = db.model('gh6488_User', Schema({
+        employeeId: Number,
+        name: String
+      }));
+
+      const eventSchema = Schema({ message: String }, { discriminatorKey: 'kind' });
+      const batchSchema = Schema({ nested: { events: [eventSchema] } });
+
+      const nestedLayerSchema = Schema({ users: [ Number ] });
+      nestedLayerSchema.virtual('users_$', {
+        ref: 'gh6488_User',
+        localField: 'users',
+        foreignField: 'employeeId'
+      });
+
+      const docArray = batchSchema.path('nested.events');
+      const Clicked = docArray.
+        discriminator('gh6488_Clicked', Schema({ nestedLayer: nestedLayerSchema }));
+      const Purchased = docArray.
+        discriminator('gh6488_Purchased', Schema({ purchased: String }));
+
+      const Batch = db.model('gh6488', batchSchema);
+
+      yield UserModel.create({ employeeId: 1, name: 'test' });
+      yield Batch.create({
+        nested: {
+          events: [
+            { kind: 'gh6488_Clicked', nestedLayer: { users: [1] } },
+            { kind: 'gh6488_Purchased', purchased: 'test' }
+          ]
+        }
+      });
+
+      let res = yield Batch.findOne().
+        populate('nested.events.nestedLayer.users_$');
+      assert.equal(res.nested.events[0].nestedLayer.users_$.length, 1);
+      assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
+
+      res = res.toObject({ virtuals: true });
+      assert.equal(res.nested.events[0].nestedLayer.users_$.length, 1);
+      assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
+    });
+  });
 });

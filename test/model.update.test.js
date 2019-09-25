@@ -3315,4 +3315,37 @@ describe('model: updateOne: ', function() {
       assert.equal(doc.test, 'after');
     });
   });
+
+  it('allow $pull with non-existent schema field (gh-8166)', function() {
+    const Model = db.model('gh8166', Schema({
+      name: String,
+      arr: [{
+        status: String,
+        values: [{ text: String }]
+      }]
+    }));
+
+    return co(function*() {
+      yield Model.collection.insertMany([
+        {
+          name: 'a',
+          arr: [{ values: [{ text: '123' }] }]
+        },
+        {
+          name: 'b',
+          arr: [{ values: [{ text: '123', coords: 'test' }] }]
+        }
+      ]);
+
+      yield Model.updateMany({}, {
+        $pull: { arr: { 'values.0.coords': { $exists: false } } }
+      });
+
+      const docs = yield Model.find().sort({ name: 1 });
+      assert.equal(docs[0].name, 'a');
+      assert.equal(docs[0].arr.length, 0);
+      assert.equal(docs[1].name, 'b');
+      assert.equal(docs[1].arr.length, 1);
+    });
+  });
 });

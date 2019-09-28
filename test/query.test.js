@@ -2408,6 +2408,7 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
+        const async = require('async');
         const schema = new Schema({});
         const Test = db.model('gh6178', schema);
 

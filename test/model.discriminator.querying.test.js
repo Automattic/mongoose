@@ -10,8 +10,6 @@ const Schema = mongoose.Schema;
 const assert = require('assert');
 const random = require('../lib/utils').random;
 const util = require('util');
-const async = require('async');
-
 
 /**
  * Setup
@@ -47,21 +45,10 @@ describe('model', function() {
       SecretEvent = BaseEvent.discriminator('model-discriminator-querying-secret', SecretEventSchema);
     });
 
-    afterEach(function(done) {
-      async.series(
-        [
-          function removeBaseEvent(next) {
-            BaseEvent.deleteMany({}, next);
-          },
-          function removeImpressionEvent(next) {
-            ImpressionEvent.deleteMany({}, next);
-          },
-          function removeConversionEvent(next) {
-            ConversionEvent.deleteMany({}, next);
-          }
-        ],
-        done
-      );
+    afterEach(function() {
+      return BaseEvent.deleteMany({}).
+        then(() => ImpressionEvent.deleteMany({})).
+        then(() => ConversionEvent.deleteMany({}));
     });
 
     after(function(done) {
@@ -86,7 +73,7 @@ describe('model', function() {
         ContainerModel = db.model('container-event-model', ContainerSchema);
       });
 
-      it('into non-discriminated arrays works', function(done) {
+      it('into non-discriminated arrays works', function() {
         const c = new ContainerModel({
           title: 'events-group-1'
         });
@@ -95,32 +82,25 @@ describe('model', function() {
         const d3 = new DiscCustomEvent();
         c.events.push(d1);
         c.events.push(d2);
-        async.series(
-          [
-            function(next) { d1.save(next); },
-            function(next) { d2.save(next); },
-            function(next) { d3.save(next); },
-            function(next) { c.save(next); },
-            function(next) {
-              ContainerModel.findOne({}).populate('events').exec(function(err, doc) {
-                assert.ifError(err);
-                assert.ok(doc.events && doc.events.length);
-                assert.equal(doc.events.length, 2);
-                doc.events.push(d3);
-                let hasDisc = false;
-                const discKey = DiscCustomEvent.schema.discriminatorMapping.key;
-                doc.events.forEach(function(subDoc) {
-                  if (discKey in subDoc) {
-                    hasDisc = true;
-                  }
-                });
-                assert.ok(hasDisc);
-                next();
-              });
-            }
-          ],
-          done
-        );
+
+        return d1.save().
+          then(() => d2.save()).
+          then(() => d3.save()).
+          then(() => c.save()).
+          then(() => ContainerModel.findOne({}).populate('events')).
+          then(doc => {
+            assert.ok(doc.events && doc.events.length);
+            assert.equal(doc.events.length, 2);
+            doc.events.push(d3);
+            let hasDisc = false;
+            const discKey = DiscCustomEvent.schema.discriminatorMapping.key;
+            doc.events.forEach(function(subDoc) {
+              if (discKey in subDoc) {
+                hasDisc = true;
+              }
+            });
+            assert.ok(hasDisc);
+          });
       });
     });
 
@@ -879,18 +859,12 @@ describe('model', function() {
     describe('aggregate', function() {
       let impressionEvent, conversionEvent, ignoredImpressionEvent;
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         impressionEvent = new ImpressionEvent({name: 'Test Event'});
         conversionEvent = new ConversionEvent({name: 'Test Event', revenue: 10});
         ignoredImpressionEvent = new ImpressionEvent({name: 'Ignored Event'});
 
-        async.forEach(
-          [impressionEvent, conversionEvent, ignoredImpressionEvent],
-          function(doc, cb) {
-            doc.save(cb);
-          },
-          done
-        );
+        return Promise.all([impressionEvent, conversionEvent, ignoredImpressionEvent].map(d => d.save()));
       });
 
       describe('using "RootModel#aggregate"', function() {

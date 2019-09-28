@@ -1,7 +1,6 @@
 'use strict';
 
 var assert = require('assert');
-var async = require('async');
 var mongoose = require('../../');
 
 var Schema = mongoose.Schema;
@@ -90,21 +89,14 @@ describe('discriminator docs', function () {
       });
     };
 
-    async.map([event1, event2, event3], save, function (error) {
-      // acquit:ignore:start
-      assert.ifError(error);
-      // acquit:ignore:end
-
-      Event.countDocuments({}, function (error, count) {
-        // acquit:ignore:start
-        assert.ifError(error);
-        // acquit:ignore:end
+    Promise.all([event1.save(), event2.save(), event3.save()]).
+      then(() => Event.countDocuments()).
+      then(count => {
         assert.equal(count, 3);
         // acquit:ignore:start
         done();
         // acquit:ignore:end
       });
-    });
   });
 
   /**
@@ -138,21 +130,9 @@ describe('discriminator docs', function () {
     var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
     var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
 
-    var save = function (doc, callback) {
-      doc.save(function (error, doc) {
-        callback(error, doc);
-      });
-    };
-
-    async.map([event1, event2, event3], save, function (error) {
-      // acquit:ignore:start
-      assert.ifError(error);
-      // acquit:ignore:end
-
-      ClickedLinkEvent.find({}, function (error, docs) {
-        // acquit:ignore:start
-        assert.ifError(error);
-        // acquit:ignore:end
+    Promise.all([event1.save(), event2.save(), event3.save()]).
+      then(() => ClickedLinkEvent.find({})).
+      then(docs => {
         assert.equal(docs.length, 1);
         assert.equal(docs[0]._id.toString(), event2._id.toString());
         assert.equal(docs[0].url, 'google.com');
@@ -160,7 +140,6 @@ describe('discriminator docs', function () {
         done();
         // acquit:ignore:end
       });
-    });
   });
 
   /**

@@ -7,7 +7,6 @@
 const start = require('./common');
 const Query = require('../lib/query');
 const assert = require('assert');
-const async = require('async');
 const co = require('co');
 const random = require('../lib/utils').random;
 

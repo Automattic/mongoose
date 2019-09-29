@@ -222,16 +222,14 @@ describe('validation docs', function() {
   /**
    * Custom validators can also be asynchronous. If your validator function
    * returns a promise (like an `async` function), mongoose will wait for that
-   * promise to settle. If you prefer callbacks, set the `isAsync` option,
-   * and mongoose will pass a callback as the 2nd argument to your validator
-   * function.
+   * promise to settle. If the returned promise rejects, or fulfills with
+   * the value `false`, Mongoose will consider that a validation error.
    */
   it('Async Custom Validators', function(done) {
-    var userSchema = new Schema({
+    const userSchema = new Schema({
       name: {
         type: String,
-        // You can also make a validator async by returning a promise. If you
-        // return a promise, do **not** specify the `isAsync` option.
+        // You can also make a validator async by returning a promise.
         validate: () => Promise.reject(new Error('Oops!'))
       },
       email: {
@@ -243,42 +241,18 @@ describe('validation docs', function() {
           validator: () => Promise.resolve(false),
           message: 'Email validation failed'
         }
-      },
-      // Your async validator may use callbacks as an alternative to promises,
-      // but only if you specify `isAsync: true`.
-      phone: {
-        type: String,
-        validate: {
-          isAsync: true,
-          validator: function(v, cb) {
-            setTimeout(function() {
-              var phoneRegex = /\d{3}-\d{3}-\d{4}/;
-              var msg = v + ' is not a valid phone number!';
-              // First argument is a boolean, whether validator succeeded
-              // 2nd argument is an optional error message override
-              cb(phoneRegex.test(v), msg);
-            }, 5);
-          },
-          // Default error message, overridden by 2nd argument to `cb()` above
-          message: 'Default error message'
-        },
-        required: [true, 'User phone number required']
       }
     });
 
-    var User = db.model('User', userSchema);
-    var user = new User();
-    var error;
+    const User = db.model('User', userSchema);
+    const user = new User();
 
-    user.phone = '555.0123';
     user.email = 'test@test.co';
     user.name = 'test';
-    user.validate(function(error) {
+    user.validate().catch(error => {
       assert.ok(error);
       assert.equal(error.errors['name'].message, 'Oops!');
       assert.equal(error.errors['email'].message, 'Email validation failed');
-      assert.equal(error.errors['phone'].message,
-        '555.0123 is not a valid phone number!');
       // acquit:ignore:start
       done();
       // acquit:ignore:end

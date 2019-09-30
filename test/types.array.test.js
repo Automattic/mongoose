@@ -162,6 +162,8 @@ describe('types array', function() {
               assert.equal(user.pets.includes(tobi.id), true);
               assert.equal(user.pets.includes(loki.id), true);
               assert.equal(user.pets.includes(jane.id), true);
+              assert.equal(user.pets.includes(tobi.id, 1), false);
+              assert.equal(user.pets.includes(loki.id, 1), true);
               done();
             });
           });

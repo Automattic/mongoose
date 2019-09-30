@@ -5,7 +5,6 @@
  */
 
 const assert = require('assert');
-const async = require('async');
 const co = require('co');
 const start = require('./common');
 const utils = require('../lib/utils');
@@ -4035,7 +4034,7 @@ describe('model: populate:', function() {
       });
     });
 
-    it('out-of-order discriminators (gh-4073)', function(done) {
+    it('out-of-order discriminators (gh-4073)', function() {
       const UserSchema = new Schema({
         name: String
       });
@@ -4094,54 +4093,23 @@ describe('model: populate:', function() {
       const be2 = new BlogPostEvent({ blogpost: b2 });
       const be3 = new BlogPostEvent({ blogpost: b3 });
 
-      async.series(
-        [
-          u1.save.bind(u1),
-          u2.save.bind(u2),
-          u3.save.bind(u3),
+      const docs = [u1, u2, u3, c1, c2, c3, b1, b2, b3, ce1, ue1, be1, ce2, ue2, be2, ce3, ue3, be3];
 
-          c1.save.bind(c1),
-          c2.save.bind(c2),
-          c3.save.bind(c3),
-
-          b1.save.bind(b1),
-          b2.save.bind(b2),
-          b3.save.bind(b3),
-
-          ce1.save.bind(ce1),
-          ue1.save.bind(ue1),
-          be1.save.bind(be1),
-
-          ce2.save.bind(ce2),
-          ue2.save.bind(ue2),
-          be2.save.bind(be2),
-
-          ce3.save.bind(ce3),
-          ue3.save.bind(ue3),
-          be3.save.bind(be3),
-
-          function(next) {
-            Event.
-              find({}).
-              populate('user comment blogpost').
-              exec(function(err, docs) {
-                docs.forEach(function(doc) {
-                  if (doc.__t === 'User4073') {
-                    assert.ok(doc.user.name.indexOf('user') !== -1);
-                  } else if (doc.__t === 'Comment4073') {
-                    assert.ok(doc.comment.content.indexOf('comment') !== -1);
-                  } else if (doc.__t === 'BlogPost4073') {
-                    assert.ok(doc.blogpost.title.indexOf('blog post') !== -1);
-                  } else {
-                    assert.ok(false);
-                  }
-                });
-                next();
-              });
-          }
-        ],
-        done
-      );
+      return Promise.all(docs.map(d => d.save())).
+        then(() => Event.find({}).populate('user comment blogpost')).
+        then(docs => {
+          docs.forEach(function(doc) {
+            if (doc.__t === 'User4073') {
+              assert.ok(doc.user.name.indexOf('user') !== -1);
+            } else if (doc.__t === 'Comment4073') {
+              assert.ok(doc.comment.content.indexOf('comment') !== -1);
+            } else if (doc.__t === 'BlogPost4073') {
+              assert.ok(doc.blogpost.title.indexOf('blog post') !== -1);
+            } else {
+              assert.ok(false);
+            }
+          });
+        });
     });
 
     it('dynref bug (gh-4104)', function(done) {
@@ -8625,6 +8593,50 @@ describe('model: populate:', function() {
       assert.equal(team.developers[0].ticketCount, 2);
       assert.equal(team.developers[1].ticketCount, 1);
       assert.equal(team.developers[2].ticketCount, 0);
+    });
+  });
+
+  it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', function() {
+    return co(function*() {
+      const UserModel = db.model('gh6488_User', Schema({
+        employeeId: Number,
+        name: String
+      }));
+
+      const eventSchema = Schema({ message: String }, { discriminatorKey: 'kind' });
+      const batchSchema = Schema({ nested: { events: [eventSchema] } });
+
+      const nestedLayerSchema = Schema({ users: [ Number ] });
+      nestedLayerSchema.virtual('users_$', {
+        ref: 'gh6488_User',
+        localField: 'users',
+        foreignField: 'employeeId'
+      });
+
+      const docArray = batchSchema.path('nested.events');
+      docArray.discriminator('gh6488_Clicked', Schema({ nestedLayer: nestedLayerSchema }));
+      docArray.discriminator('gh6488_Purchased', Schema({ purchased: String }));
+
+      const Batch = db.model('gh6488', batchSchema);
+
+      yield UserModel.create({ employeeId: 1, name: 'test' });
+      yield Batch.create({
+        nested: {
+          events: [
+            { kind: 'gh6488_Clicked', nestedLayer: { users: [1] } },
+            { kind: 'gh6488_Purchased', purchased: 'test' }
+          ]
+        }
+      });
+
+      let res = yield Batch.findOne().
+        populate('nested.events.nestedLayer.users_$');
+      assert.equal(res.nested.events[0].nestedLayer.users_$.length, 1);
+      assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
+
+      res = res.toObject({ virtuals: true });
+      assert.equal(res.nested.events[0].nestedLayer.users_$.length, 1);
+      assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
     });
   });
 });

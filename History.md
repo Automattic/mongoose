@@ -1,3 +1,14 @@
+5.7.3 / 2019-09-30
+==================
+ * fix: make CoreMongooseArray#includes() handle `fromIndex` parameter #8203
+ * fix(update): cast right hand side of `$pull` as a query instead of an update for document arrays #8166
+ * fix(populate): handle virtual populate of an embedded discriminator nested path #8173
+ * docs(validation): remove deprecated `isAsync` from validation docs in favor of emphasizing promises #8184
+ * docs(documents): add overwriting section #8178
+ * docs(promises): add note about queries being thenable #8110
+ * perf: avoid update validators going into Mixed types #8192 [birdofpreyru](https://github.com/birdofpreyru)
+ * refactor: remove async as a prod dependency #8073
+
 5.7.2 / 2019-09-23
 ==================
  * fix(mongoose): support `mongoose.set('autoIndex', false)` #8158

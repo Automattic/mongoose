@@ -7,7 +7,6 @@
 const start = require('./common');
 const Query = require('../lib/query');
 const assert = require('assert');
-const async = require('async');
 const co = require('co');
 const random = require('../lib/utils').random;
 
@@ -2408,6 +2407,7 @@ describe('Query', function() {
       });
 
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
+        const async = require('async');
         const schema = new Schema({});
         const Test = db.model('gh6178', schema);
 

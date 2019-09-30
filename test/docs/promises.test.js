@@ -85,6 +85,21 @@ describe('promises docs', function () {
   });
 
   /**
+   * Although queries are not promises, queries are [thenables](https://promisesaplus.com/#terminology).
+   * That means they have a `.then()` function, so you can use queries as promises with either
+   * promise chaining or [async await](https://asyncawait.net)
+   */
+  it('Queries are thenable', function (done) {
+    Band.findOne({name: "Guns N' Roses"}).then(function(doc) {
+      // use doc
+      // acquit:ignore:start
+      assert.ok(!doc);
+      done();
+      // acquit:ignore:end
+    });
+  });
+  
+  /**
    * If you're an advanced user, you may want to plug in your own promise
    * library like [bluebird](https://www.npmjs.com/package/bluebird). Just set
    * `mongoose.Promise` to your favorite

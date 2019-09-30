@@ -39,7 +39,7 @@ describe('getVirtual', function() {
       product: { type: String }
     }));
 
-    assert.equal(getVirtual(batchSchema, 'nested.events.users_$').options.ref,
+    assert.equal(getVirtual(batchSchema, 'nested.events.users_$').virtual.options.ref,
       'Users');
 
     done();
@@ -80,8 +80,8 @@ describe('getVirtual', function() {
     // Second embedded discriminator
     docArray.discriminator('Purchased', new Schema({ product: String }));
 
-    const virtual = getVirtual(batchSchema, 'nested.events.nestedLayer.users_$');
-    assert.equal(virtual.options.ref, 'Users');
+    const res = getVirtual(batchSchema, 'nested.events.nestedLayer.users_$');
+    assert.equal(res.virtual.options.ref, 'Users');
 
     done();
   });
@@ -106,13 +106,13 @@ describe('getVirtual', function() {
 
     docArray.discriminator('Clicked', clickedSchema);
 
-    let virtual = getVirtual(batchSchema, 'events.users_$');
-    assert.equal(virtual.options.ref, 'Users');
-    assert.equal(virtual.$nestedSchemaPath, 'events');
+    let res = getVirtual(batchSchema, 'events.users_$');
+    assert.equal(res.virtual.options.ref, 'Users');
+    assert.equal(res.nestedSchemaPath, 'events');
 
-    virtual = getVirtual(batchSchema, 'events.users_$');
-    assert.equal(virtual.options.ref, 'Users');
-    assert.equal(virtual.$nestedSchemaPath, 'events');
+    res = getVirtual(batchSchema, 'events.users_$');
+    assert.equal(res.virtual.options.ref, 'Users');
+    assert.equal(res.nestedSchemaPath, 'events');
 
     done();
   });

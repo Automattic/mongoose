@@ -8103,12 +8103,11 @@ describe('document', function() {
       });
 
       const person = yield Person.findOne();
-      person.set({
+      const obj = {
         name: 'John Smythe',
-        address: { street: 'Fake Street' } },
-        undefined,
-        { merge: true }
-      );
+        address: { street: 'Fake Street' }
+      };
+      person.set(obj, undefined, { merge: true });
 
       assert.equal(person.address.city, 'Somewhere');
       yield person.save();

@@ -8081,4 +8081,37 @@ describe('document', function() {
     doc.init(data);
     require('util').inspect(doc.subdocs);
   });
+
+  it('set() merge option with single nested (gh-8201)', function() {
+    const AddressSchema = Schema({
+      street: { type: String, required: true },
+      city: { type: String, required: true }
+    });
+    const PersonSchema = Schema({
+      name: { type: String, required: true },
+      address: { type: AddressSchema, required: true }
+    });
+    const Person = db.model('gh8201', PersonSchema);
+
+    return co(function*() {
+      yield Person.create({
+        name: 'John Smith',
+        address: {
+          street: 'Real Street',
+          city: 'Somewhere'
+        }
+      });
+
+      const person = yield Person.findOne();
+      person.set({
+        name: 'John Smythe',
+        address: { street: 'Fake Street' } },
+        undefined,
+        { merge: true }
+      );
+
+      assert.equal(person.address.city, 'Somewhere');
+      yield person.save();
+    });
+  });
 });

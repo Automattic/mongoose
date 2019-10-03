@@ -8639,4 +8639,32 @@ describe('model: populate:', function() {
       assert.equal(res.nested.events[0].nestedLayer.users_$[0].name, 'test');
     });
   });
+
+  it('accessing populate virtual prop (gh-8198)', function() {
+    const FooSchema = new Schema({
+      name: String,
+      children: [{
+        barId: { type: Schema.Types.ObjectId, ref: 'gh8198_Bar' },
+        quantity: Number,
+      }]
+    });
+    FooSchema.virtual('children.bar', {
+      ref: 'gh8198_Bar',
+      localField: 'children.barId',
+      foreignField: '_id',
+      justOne: true
+    });
+    const BarSchema = Schema({ name: String });
+    const Foo = db.model('gh8198_FooSchema', FooSchema);
+    const Bar = db.model('gh8198_Bar', BarSchema);
+    return co(function*() {
+      const bar = yield Bar.create({ name: 'bar' });
+      const foo = yield Foo.create({
+        name: 'foo',
+        children: [{ barId: bar._id, quantity: 1 }]
+      });
+      const foo2 = yield Foo.findById(foo._id).populate('children.bar');
+      assert.equal(foo2.children[0].bar.name, 'bar');
+    });
+  });
 });

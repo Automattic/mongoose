@@ -3348,4 +3348,38 @@ describe('model: updateOne: ', function() {
       assert.equal(docs[1].arr.length, 1);
     });
   });
+
+  it('update embedded discriminator path if key in $elemMatch (gh-8063)', function() {
+    const slideSchema = new Schema({
+      type: { type: String },
+      commonField: String
+    }, { discriminatorKey: 'type' });
+    const schema = new Schema({ slides: [slideSchema] });
+
+    const slidesSchema = schema.path('slides');
+    slidesSchema.discriminator('typeA', new Schema({ a: String }));
+    slidesSchema.discriminator('typeB', new Schema({ b: String }));
+
+    const MyModel = db.model('gh8063', schema);
+    return co(function*() {
+      const doc = yield MyModel.create({
+        slides: [{ type: 'typeA', a: 'oldValue1', commonField: 'oldValue2' }]
+      });
+
+      const filter = {
+        slides: { $elemMatch: { _id: doc.slides[0]._id, type: 'typeA' } }
+      };
+      const update = {
+        'slides.$.a': 'newValue1',
+        'slides.$.commonField': 'newValue2'
+      };
+      yield MyModel.updateOne(filter, update);
+
+      const updatedDoc = yield MyModel.findOne();
+      assert.equal(updatedDoc.slides.length, 1);
+      assert.equal(updatedDoc.slides[0].type, 'typeA');
+      assert.equal(updatedDoc.slides[0].a, 'newValue1');
+      assert.equal(updatedDoc.slides[0].commonField, 'newValue2');
+    });
+  });
 });

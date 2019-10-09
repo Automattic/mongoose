@@ -2126,4 +2126,13 @@ describe('schema', function() {
     const testKo = new TestKo({field: 'upper'});
     assert.equal(testKo.field, 'UPPER');
   });
+
+  it('required with nullish value (gh-8219)', function() {
+    const schema = Schema({
+      name: { type: String, required: void 0 },
+      age: { type: Number, required: null }
+    });
+    assert.strictEqual(schema.path('name').isRequired, false);
+    assert.strictEqual(schema.path('age').isRequired, false);
+  });
 });

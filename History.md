@@ -1,3 +1,12 @@
+5.7.4 / 2019-10-09
+==================
+ * fix(schema): handle `required: null` and `required: undefined` as `required: false` #8219
+ * fix(update): support updating array embedded discriminator props if discriminator key in $elemMatch #8063
+ * fix(populate): allow accessing populate virtual prop underneath array when virtual defined on top level #8198
+ * fix(model): support passing `options` to `Model.remove()` #8211
+ * fix(document): handle `Document#set()` merge option when setting underneath single nested schema #8201
+ * fix: use options constructor class for all schematypes #8012
+
 5.7.3 / 2019-09-30
 ==================
  * fix: make CoreMongooseArray#includes() handle `fromIndex` parameter #8203

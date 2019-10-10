@@ -53,7 +53,7 @@ describe('types.embeddeddocumentdeclarative', function() {
       const ParentSchema = new mongoose.Schema(ParentSchemaDef, {typePojoToMixed: false});
       it('interprets the POJO as a subschema (gh-7494)', function(done) {
         assert.equal(ParentSchema.paths.child.instance, 'Embedded');
-        assert.equal(ParentSchema.paths.child['$isSingleNested'], true);
+        assert.strictEqual(ParentSchema.paths.child['$isSingleNested'], true);
         done();
       });
       it('enforces provided schema on the child path, unlike Mixed (gh-7494)', function(done) {
@@ -68,7 +68,7 @@ describe('types.embeddeddocumentdeclarative', function() {
         const princessZelda = kingDaphnes.child.toObject();
 
         assert.equal(princessZelda.name, 'Princess Zelda');
-        assert.equal(princessZelda.mixedUp, undefined);
+        assert.strictEqual(princessZelda.mixedUp, undefined);
         done();
       });
     });
@@ -112,16 +112,16 @@ describe('types.embeddeddocumentdeclarative', function() {
         child: {
           name: 'Prince Komali',
           type: 'Medli',
-          confidence: 0,
+          confidence: 1,
         }
       });
 
       assert.equal(grandmother.child.name, 'Rito Chieftan');
       assert.equal(grandmother.child.type, 'Mother');
-      assert.equal(grandmother.child.confidence, undefined);
+      assert.strictEqual(grandmother.child.confidence, undefined);
       assert.equal(ritoChieftan.child.name, 'Prince Komali');
       assert.equal(ritoChieftan.child.type, 'Medli');
-      assert.equal(ritoChieftan.child.confidence, undefined);
+      assert.strictEqual(ritoChieftan.child.confidence, undefined);
       done();
     });
   });

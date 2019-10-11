@@ -18,56 +18,52 @@ describe('webpack', function() {
     const webpack = require('webpack');
     this.timeout(45000);
     // acquit:ignore:end
-    const config = {
-      entry: ['./test/files/sample.js'],
-      // acquit:ignore:start
+    const webpackBundle = require('../webpack.config.js');
+    const webpackBundleForTest = {
+      ...webpackBundle,
       output: {
-        path: `${__dirname}/files`
+        ...webpackBundle.output,
+        path: `${__dirname}/files`,
       },
-      // acquit:ignore:end
-      module: {
-        rules: [
-          {
-            test: /\.js$/,
-            include: [
-              /\/mongoose\//i,
-              /\/kareem\//i
-            ],
-            loader: 'babel-loader',
-            options: {
-              presets: ['es2015']
-            }
-          }
-        ]
-      },
-      node: {
-        // Replace these Node.js native modules with empty objects, Mongoose's
-        // browser library does not use them.
-        // See https://webpack.js.org/configuration/node/
-        dns: 'empty',
-        fs: 'empty',
-        'module': 'empty',
-        net: 'empty',
-        tls: 'empty'
-      },
-      target: 'web',
-      mode: 'production'
     };
-    // acquit:ignore:start
-    webpack(config, utils.tick(function(error, stats) {
-      assert.ifError(error);
-      assert.deepEqual(stats.compilation.errors, []);
+    webpack(webpackBundleForTest, utils.tick(function(bundleBuildError, bundleBuildStats) {
+      assert.ifError(bundleBuildError);
+      assert.deepEqual(bundleBuildStats.compilation.errors, []);
 
       // Avoid expressions in `require()` because that scares webpack (gh-6705)
-      assert.ok(!stats.compilation.warnings.
+      assert.ok(!bundleBuildStats.compilation.warnings.
         find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
 
-      const content = fs.readFileSync(`${__dirname}/files/main.js`, 'utf8');
+      const bundleContent = fs.readFileSync(`${__dirname}/files/dist/browser.umd.js`, 'utf8');
 
-      acorn.parse(content, { ecmaVersion: 5 });
+      acorn.parse(bundleContent, { ecmaVersion: 5 });
 
-      done();
+      const baseConfig = require('../webpack.base.config.js');
+      const config = {
+        ...baseConfig,
+        entry: ['./test/files/sample.js'],
+        // acquit:ignore:start
+        output: {
+          path: `${__dirname}/files`
+        },
+        // acquit:ignore:end
+      };
+      // acquit:ignore:start
+      webpack(config, utils.tick(function(error, stats) {
+        assert.ifError(error);
+        assert.deepEqual(stats.compilation.errors, []);
+
+        // Avoid expressions in `require()` because that scares webpack (gh-6705)
+        assert.ok(!stats.compilation.warnings.
+          find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
+
+        const content = fs.readFileSync(`${__dirname}/files/main.js`, 'utf8');
+
+        acorn.parse(content, { ecmaVersion: 5 });
+
+        done();
+      }));
+      // acquit:ignore:end
     }));
-    // acquit:ignore:end
   });
 });

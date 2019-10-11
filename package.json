@@ -64,13 +64,16 @@
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",
-    "webpack": "4.16.4"
+    "webpack": "4.16.4",
+    "webpack-cli": "^3.3.9"
   },
   "directories": {
     "lib": "./lib/mongoose"
   },
   "scripts": {
     "lint": "eslint .",
+    "build-browser": "webpack",
+    "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
     "test": "mocha --exit test/*.test.js test/**/*.test.js",
@@ -88,7 +91,7 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "https://mongoosejs.com",
-  "browser": "./browser.js",
+  "browser": "./dist/browser.umd.js",
   "eslintConfig": {
     "extends": [
       "eslint:recommended"

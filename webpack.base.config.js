@@ -1,4 +1,4 @@
-const paths = require('path');
+'use strict';
 
 module.exports = {
   module: {

@@ -16,16 +16,12 @@ describe('webpack', function() {
       this.skip();
     }
     const webpack = require('webpack');
-    this.timeout(45000);
+    this.timeout(90000);
     // acquit:ignore:end
     const webpackBundle = require('../webpack.config.js');
-    const webpackBundleForTest = {
-      ...webpackBundle,
-      output: {
-        ...webpackBundle.output,
-        path: `${__dirname}/files`,
-      },
-    };
+    const webpackBundleForTest = Object.assign({}, webpackBundle, {
+      output: Object.assign({}, webpackBundle.output, { path: `${__dirname}/files` })
+    });
     webpack(webpackBundleForTest, utils.tick(function(bundleBuildError, bundleBuildStats) {
       assert.ifError(bundleBuildError);
       assert.deepEqual(bundleBuildStats.compilation.errors, []);
@@ -39,15 +35,14 @@ describe('webpack', function() {
       acorn.parse(bundleContent, { ecmaVersion: 5 });
 
       const baseConfig = require('../webpack.base.config.js');
-      const config = {
-        ...baseConfig,
+      const config = Object.assign({}, baseConfig, {
         entry: ['./test/files/sample.js'],
         // acquit:ignore:start
         output: {
           path: `${__dirname}/files`
         },
         // acquit:ignore:end
-      };
+      });
       // acquit:ignore:start
       webpack(config, utils.tick(function(error, stats) {
         assert.ifError(error);

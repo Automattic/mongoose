@@ -1,9 +1,10 @@
+'use strict';
+
 const paths = require('path');
 
 const base = require('./webpack.base.config.js');
 
-const webpackConfig = {
-  ...base,
+const webpackConfig = Object.assign({}, base, {
   entry: require.resolve('./browser.js'),
   output: {
     filename: './dist/browser.umd.js',
@@ -17,7 +18,7 @@ const webpackConfig = {
   externals: [
     /^node_modules\/.+$/
   ],
-}
+});
 
 module.exports = webpackConfig;
 

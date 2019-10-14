@@ -188,7 +188,10 @@ describe('connections:', function() {
         let numReconnected = 0;
         let numReconnect = 0;
         let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', { useNewUrlParser: true });
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        });
 
         conn.on('connected', function() {
           ++numConnected;
@@ -255,7 +258,8 @@ describe('connections:', function() {
         const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
           reconnectTries: 3,
           reconnectInterval: 100,
-          useNewUrlParser: true
+          useNewUrlParser: true,
+          useUnifiedTopology: true
         });
 
         conn.on('connected', function() {

@@ -92,4 +92,16 @@ describe('types.subdocument', function() {
         }, {$set: thingy2});
       });
   });
+
+  describe('#isModified', function() {
+    it('defers to parent isModified (gh-8223)', function() {
+      const childSchema = Schema({ id: Number, text: String });
+      const parentSchema = Schema({ child: childSchema });
+      const Model = db.model('gh8223', parentSchema);
+
+      const doc = new Model({ child: { text: 'foo' } });
+      assert.ok(doc.isModified('child.id'));
+      assert.ok(doc.child.isModified('id'));
+    });
+  });
 });

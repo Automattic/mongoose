@@ -3549,6 +3549,24 @@ describe('Query', function() {
         assert.equal(doc.password, 'encryptedpassword');
       });
     });
+
+    it('pre("validate") errors (gh-7187)', function() {
+      const addressSchema = Schema({ countryId: String });
+      addressSchema.pre('validate', { query: true }, function() {
+        throw new Error('Oops!');
+      });
+      const contactSchema = Schema({ addresses: [addressSchema] });
+      const Contact = db.model('gh7187', contactSchema);
+
+      const update = { addresses: [{ countryId: 'foo' }] };
+      return Contact.updateOne({}, update, { runValidators: true }).then(
+        () => assert.ok(false),
+        err => {
+          assert.ok(err.errors['addresses.0']);
+          assert.equal(err.errors['addresses.0'].message, 'Oops!');
+        }
+      );
+    });
   });
 
   it('query with top-level _bsontype (gh-8222)', function() {

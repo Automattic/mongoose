@@ -1,3 +1,13 @@
+5.7.5 / 2019-10-14
+==================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+ * fix(update): handle subdocument pre('validate') errors in update validation #7187
+ * fix(subdocument): make subdocument#isModified use parent document's isModified #8223
+ * docs(index): add favicon to home page #8226
+ * docs: add schema options to API docs #8012
+ * docs(middleware): add note about accessing the document being updated in pre('findOneAndUpdate') #8218
+ * refactor: remove redundant code in ValidationError #8244 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.7.4 / 2019-10-09
 ==================
  * fix(schema): handle `required: null` and `required: undefined` as `required: false` #8219

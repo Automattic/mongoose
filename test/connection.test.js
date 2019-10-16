@@ -500,31 +500,6 @@ describe('connections:', function() {
   });
 
   describe('connect callbacks', function() {
-    it('execute with user:pwd connection strings', function(done) {
-      const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { useNewUrlParser: true }, function() {
-        done();
-      });
-      db.catch(() => {});
-      db.on('error', function(err) {
-        assert.ok(err);
-      });
-      db.close();
-    });
-    it('execute without user:pwd connection strings', function(done) {
-      const db = mongoose.createConnection('mongodb://localhost/fake', { useNewUrlParser: true }, function() {
-      });
-      db.on('error', function(err) {
-        assert.ok(err);
-      });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(db.user, undefined);
-      assert.equal(db.name, 'fake');
-      assert.equal(db.host, 'localhost');
-      assert.equal(db.port, 27017);
-      db.close();
-      setTimeout(done, 10);
-    });
-
     it('should return an error if malformed uri passed', function(done) {
       const db = mongoose.createConnection('mongodb:///fake', { useNewUrlParser: true }, function(err) {
         assert.ok(/hostname/.test(err.message));
@@ -532,16 +507,6 @@ describe('connections:', function() {
       });
       db.close();
       assert.ok(!db.options);
-    });
-    it('should use admin db if not specified and user/pass specified', function(done) {
-      const db = mongoose.createConnection('mongodb://u:p@localhost/admin', { useNewUrlParser: true }, function() {
-        done();
-      });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(db.name, 'admin');
-      assert.equal(db.host, 'localhost');
-      assert.equal(db.port, 27017);
-      db.close();
     });
   });
 

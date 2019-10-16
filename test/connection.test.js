@@ -434,7 +434,7 @@ describe('connections:', function() {
   });
 
   it('should accept mongodb://aaron:psw@localhost:27017/fake', function(done) {
-    const opts = { useNewUrlParser: true };
+    const opts = { useNewUrlParser: true, useUnifiedTopology: false };
     const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27017/fake', opts, () => {
       db.close(done);
     });

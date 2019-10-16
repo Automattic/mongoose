@@ -1074,33 +1074,6 @@ describe('connections:', function() {
           done();
         });
       });
-      describe('when only username is defined', function() {
-        let listeners;
-
-        beforeEach(function() {
-          listeners = process.listeners('uncaughtException');
-          process.removeAllListeners('uncaughtException');
-        });
-
-        afterEach(function() {
-          process.on('uncaughtException', listeners[0]);
-        });
-
-        it('should return true', function(done) {
-          const db = mongoose.createConnection();
-          db.openUri('mongodb://localhost:27017/fake', {
-            user: 'user'
-          });
-          process.once('uncaughtException', err => {
-            err.uncaught = false;
-            assert.ok(err.message.includes('password must be a string'));
-            done();
-          });
-
-          assert.equal(db.shouldAuthenticate(), true);
-          db.close(done);
-        });
-      });
       describe('when both username and password are defined', function() {
         it('should return true', function(done) {
           const db = mongoose.createConnection('mongodb://localhost:27017/fake', {

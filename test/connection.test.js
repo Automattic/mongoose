@@ -433,15 +433,16 @@ describe('connections:', function() {
     db.close(done);
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
-    const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { useNewUrlParser: true }, () => {
+  it('should accept mongodb://aaron:psw@localhost:27017/fake', function(done) {
+    const opts = { useNewUrlParser: true };
+    const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27017/fake', opts, () => {
       db.close(done);
     });
     assert.equal(db.pass, 'psw');
     assert.equal(db.user, 'aaron');
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
-    assert.equal(db.port, 27000);
+    assert.equal(db.port, 27017);
   });
 
   it('should accept unix domain sockets', function(done) {
@@ -513,7 +514,10 @@ describe('connections:', function() {
   describe('errors', function() {
     it('event fires with one listener', function(done) {
       this.timeout(1500);
-      const db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100');
+      const db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100', {
+        useNewUrlParser: true,
+        useUnifiedTopology: false // Workaround re: NODE-2250
+      });
       db.catch(() => {});
       db.on('error', function() {
         // this callback has no params which triggered the bug #759
@@ -523,7 +527,11 @@ describe('connections:', function() {
     });
 
     it('should occur without hanging when password with special chars is used (gh-460)', function(done) {
-      mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function(err) {
+      const opts = {
+        useNewUrlParser: true,
+        useUnifiedTopology: false
+      };
+      mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', opts, function(err) {
         assert.ok(err);
         done();
       });

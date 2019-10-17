@@ -24,6 +24,7 @@ const files = [
   'lib/virtualtype.js',
   'lib/error/index.js',
   'lib/types/core_array.js',
+  'lib/schema/documentarray.js',
   'lib/schema/SingleNestedPath.js',
   'lib/options/SchemaTypeOptions.js',
   'lib/options/SchemaArrayOptions.js',
@@ -62,6 +63,9 @@ function parse() {
     name = name.substr(lastSlash === -1 ? 0 : lastSlash + 1);
     if (name === 'core_array') {
       name = 'array';
+    }
+    if (name === 'documentarray') {
+      name = 'DocumentArrayPath';
     }
     const data = {
       name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),

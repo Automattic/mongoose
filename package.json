@@ -64,15 +64,14 @@
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",
-    "webpack": "4.16.4",
-    "webpack-cli": "^3.3.9"
+    "webpack": "4.16.4"
   },
   "directories": {
     "lib": "./lib/mongoose"
   },
   "scripts": {
     "lint": "eslint .",
-    "build-browser": "webpack",
+    "build-browser": "node build-browser.js",
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",

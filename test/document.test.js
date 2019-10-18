@@ -8113,4 +8113,21 @@ describe('document', function() {
       yield person.save();
     });
   });
+
+  it('setting single nested subdoc with timestamps (gh-8251)', function() {
+    const ActivitySchema = Schema({ description: String }, { timestamps: true });
+    const RequestSchema = Schema({ activity: ActivitySchema });
+    const Request = db.model('gh8251', RequestSchema);
+
+    return co(function*() {
+      const doc = yield Request.create({
+        activity: { description: 'before' }
+      });
+      doc.activity.set({ description: 'after' });
+      yield doc.save();
+
+      const fromDb = yield Request.findOne().lean();
+      assert.equal(fromDb.activity.description, 'after');
+    });
+  });
 });

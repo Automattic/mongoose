@@ -6,7 +6,7 @@ const eachAsync = require('../../lib/helpers/cursor/eachAsync');
 describe('eachAsync()', function() {
   it('exhausts large cursor without parallel calls (gh-8235)', function() {
     this.timeout(10000);
-    
+
     let numInProgress = 0;
     let num = 0;
     const max = 1000;

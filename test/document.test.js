@@ -130,6 +130,15 @@ describe('document', function() {
     db.close(done);
   });
 
+  describe('constructor', function() {
+    it('supports passing in schema directly (gh-8237)', function() {
+      const myUserDoc = new Document({}, { name: String });
+      assert.ok(!myUserDoc.name);
+      myUserDoc.name = 123;
+      assert.strictEqual(myUserDoc.name, '123');
+    });
+  });
+
   describe('delete', function() {
     it('deletes the document', function() {
       const schema = new Schema({ x: String });

@@ -8667,4 +8667,27 @@ describe('model: populate:', function() {
       assert.equal(foo2.children[0].bar.name, 'bar');
     });
   });
+
+  it('checking `populated()` on a document array element (gh-8247)', function() {
+    const authorSchema = Schema({ name: String });
+    const subSchema = Schema({
+      author: { type: Schema.Types.ObjectId, ref: 'gh8247_Author' },
+      comment: String
+    });
+    const pageSchema = Schema({ title: String, comments: [subSchema] });
+    const Author = db.model('gh8247_Author', authorSchema);
+    const Page = db.model('gh8247_Page', pageSchema);
+
+    return co(function*() {
+      const doc = yield Author.create({ name: 'test author' });
+      yield Page.create({ comments: [{ author: doc._id }] });
+
+      const fromDb = yield Page.findOne().populate('comments.author');
+      assert.ok(Array.isArray(fromDb.populated('comments.author')));
+      assert.equal(fromDb.populated('comments.author').length, 1);
+      assert.equal(fromDb.comments[0].author.name, 'test author');
+
+      assert.ok(fromDb.comments[0].populated('author'));
+    });
+  });
 });

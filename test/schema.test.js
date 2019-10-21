@@ -2141,7 +2141,7 @@ describe('schema', function() {
     const keys = Object.keys(SchemaStringOptions.prototype).
       filter(key => key !== 'constructor');
     const functions = Object.keys(Schema.Types.String.prototype).
-      filter(key => !['constructor', 'cast', 'castForQuery', 'checkRequired'].includes(key));
+      filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired'].indexOf(key) === -1);
     assert.deepEqual(keys.sort(), functions.sort());
   });
 });

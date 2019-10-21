@@ -8668,26 +8668,70 @@ describe('model: populate:', function() {
     });
   });
 
-  it('checking `populated()` on a document array element (gh-8247)', function() {
-    const authorSchema = Schema({ name: String });
-    const subSchema = Schema({
-      author: { type: Schema.Types.ObjectId, ref: 'gh8247_Author' },
-      comment: String
+  describe('gh-8247', function() {
+    let Author;
+    let Page;
+
+    before(function() {
+      const authorSchema = Schema({ name: String });
+      const subSchema = Schema({
+        author: { type: Schema.Types.ObjectId, ref: 'gh8247_Author' },
+        comment: String
+      });
+      const pageSchema = Schema({ title: String, comments: [subSchema] });
+      Author = db.model('gh8247_Author', authorSchema);
+      Page = db.model('gh8247_Page', pageSchema);
     });
-    const pageSchema = Schema({ title: String, comments: [subSchema] });
-    const Author = db.model('gh8247_Author', authorSchema);
-    const Page = db.model('gh8247_Page', pageSchema);
 
-    return co(function*() {
-      const doc = yield Author.create({ name: 'test author' });
-      yield Page.create({ comments: [{ author: doc._id }] });
+    this.beforeEach(() => co(function*() {
+      yield Author.deleteMany({});
+      yield Page.deleteMany({});
+    }));
 
-      const fromDb = yield Page.findOne().populate('comments.author');
-      assert.ok(Array.isArray(fromDb.populated('comments.author')));
-      assert.equal(fromDb.populated('comments.author').length, 1);
-      assert.equal(fromDb.comments[0].author.name, 'test author');
+    it('checking `populated()` on a document array element (gh-8247)', function() {
+      return co(function*() {
+        const doc = yield Author.create({ name: 'test author' });
+        yield Page.create({ comments: [{ author: doc._id }] });
 
-      assert.ok(fromDb.comments[0].populated('author'));
+        const fromDb = yield Page.findOne().populate('comments.author');
+        assert.ok(Array.isArray(fromDb.populated('comments.author')));
+        assert.equal(fromDb.populated('comments.author').length, 1);
+        assert.equal(fromDb.comments[0].author.name, 'test author');
+
+        assert.ok(fromDb.comments[0].populated('author'));
+      });
+    });
+
+    it('updates top-level populated() when pushing elements onto a document array with single populated path (gh-8247)', function() {
+      return co(function*() {
+        const docs = yield Author.create([
+          { name: 'test1' },
+          { name: 'test2' }
+        ]);
+        yield Page.create({ comments: [{ author: docs[0]._id }] });
+
+        // Try setting to non-manually populated path...
+        let fromDb = yield Page.findOne().populate('comments.author');
+        assert.ok(Array.isArray(fromDb.populated('comments.author')));
+        assert.equal(fromDb.populated('comments.author').length, 1);
+        assert.equal(fromDb.comments[0].author.name, 'test1');
+
+        fromDb.comments.push({ author: docs[1]._id });
+        let pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 2);
+        assert.equal(pop[0].toHexString(), docs[0]._id.toHexString());
+        assert.equal(pop[1], null);
+
+        // And try setting to populated path
+        fromDb = yield Page.findOne().populate('comments.author');
+        assert.ok(Array.isArray(fromDb.populated('comments.author')));
+        assert.equal(fromDb.populated('comments.author').length, 1);
+        assert.equal(fromDb.comments[0].author.name, 'test1');
+
+        fromDb.comments.push({ author: docs[1] });
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 2);
+      });
     });
   });
 });

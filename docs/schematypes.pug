@@ -34,6 +34,14 @@ block content
       <li><a href="#path">The `schema.path()` Function</a></li>
     </ul>
 
+    * [What is a SchemaType?](#what-is-a-schematype)
+    * [The `type` Key](#type-key)
+    * [SchemaType Options](#schematype-options)
+    * [Usage Notes](#usage-notes)
+    * [Getters](#getters)
+    * [Custom Types](#customtypes)
+    * [The `schema.path()` Function](#path)
+
     <h3 id="what-is-a-schematype"><a href="#what-is-a-schematype">What is a SchemaType?</a></h3>
 
     You can think of a Mongoose schema as the configuration object for a
@@ -123,6 +131,57 @@ block content
     m.nested.stuff = 'good';
     m.map = new Map([['key', 'value']]);
     m.save(callback);
+    ```
+
+    <h3 id="type-key"><a href="#type-key">The `type` Key</a></h3>
+
+    `type` is a special property in Mongoose schemas. When Mongoose finds
+    a nested property named `type` in your schema, Mongoose assumes that
+    it needs to define a SchemaType with the given type.
+
+    ```javascript
+    // 3 string SchemaTypes: 'name', 'nested.firstName', 'nested.lastName'
+    const schema = new Schema({
+      name: { type: String },
+      nested: {
+        firstName: { type: String },
+        lastName: { type: String }
+      }
+    });
+    ```
+
+    As a consequence, [you need a little extra work to define a property named `type` in your schema](/docs/faq.html#type-key).
+    For example, suppose you're building a stock portfolio app, and you
+    want to store the asset's `type` (stock, bond, ETF, etc.). Naively,
+    you might define your schema as shown below:
+
+    ```javascript
+    const holdingSchema = new Schema({
+      // You might expect `asset` to be an object that has 2 properties,
+      // but unfortunately `type` is special in Mongoose so mongoose
+      // interprets this schema to mean that `asset` is a string
+      asset: {
+        type: String,
+        ticker: String
+      }
+    });
+    ```
+
+    However, when Mongoose sees `type: String`, it assumes that you mean
+    `asset` should be a string, not an object with a property `type`.
+    The correct way to define an object with a property `type` is shown
+    below.
+
+    ```javascript
+    const holdingSchema = new Schema({
+      asset: {
+        // Workaround to make sure Mongoose knows `asset` is an object
+        // and `asset.type` is a string, rather than thinking `asset`
+        // is a string.
+        type: { type: String },
+        ticker: String
+      }
+    });
     ```
 
     <h3 id="schematype-options"><a href="#schematype-options">SchemaType Options</a></h3>
@@ -234,7 +293,7 @@ block content
     * `min`: Date
     * `max`: Date
 
-    <h3 id="usage-notes"><a href="#usage-notes">Usage notes</a></h3>
+    <h3 id="usage-notes"><a href="#usage-notes">Usage Notes</a></h3>
 
     <h4 id="strings">String</h4>
 

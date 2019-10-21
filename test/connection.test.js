@@ -433,15 +433,16 @@ describe('connections:', function() {
     db.close(done);
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
-    const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { useNewUrlParser: true }, () => {
+  it('should accept mongodb://aaron:psw@localhost:27017/fake', function(done) {
+    const opts = { useNewUrlParser: true, useUnifiedTopology: false };
+    const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27017/fake', opts, () => {
       db.close(done);
     });
     assert.equal(db.pass, 'psw');
     assert.equal(db.user, 'aaron');
     assert.equal(db.name, 'fake');
     assert.equal(db.host, 'localhost');
-    assert.equal(db.port, 27000);
+    assert.equal(db.port, 27017);
   });
 
   it('should accept unix domain sockets', function(done) {
@@ -500,31 +501,6 @@ describe('connections:', function() {
   });
 
   describe('connect callbacks', function() {
-    it('execute with user:pwd connection strings', function(done) {
-      const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { useNewUrlParser: true }, function() {
-        done();
-      });
-      db.catch(() => {});
-      db.on('error', function(err) {
-        assert.ok(err);
-      });
-      db.close();
-    });
-    it('execute without user:pwd connection strings', function(done) {
-      const db = mongoose.createConnection('mongodb://localhost/fake', { useNewUrlParser: true }, function() {
-      });
-      db.on('error', function(err) {
-        assert.ok(err);
-      });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(db.user, undefined);
-      assert.equal(db.name, 'fake');
-      assert.equal(db.host, 'localhost');
-      assert.equal(db.port, 27017);
-      db.close();
-      setTimeout(done, 10);
-    });
-
     it('should return an error if malformed uri passed', function(done) {
       const db = mongoose.createConnection('mongodb:///fake', { useNewUrlParser: true }, function(err) {
         assert.ok(/hostname/.test(err.message));
@@ -533,22 +509,15 @@ describe('connections:', function() {
       db.close();
       assert.ok(!db.options);
     });
-    it('should use admin db if not specified and user/pass specified', function(done) {
-      const db = mongoose.createConnection('mongodb://u:p@localhost/admin', { useNewUrlParser: true }, function() {
-        done();
-      });
-      assert.equal(typeof db.options, 'object');
-      assert.equal(db.name, 'admin');
-      assert.equal(db.host, 'localhost');
-      assert.equal(db.port, 27017);
-      db.close();
-    });
   });
 
   describe('errors', function() {
     it('event fires with one listener', function(done) {
       this.timeout(1500);
-      const db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100');
+      const db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100', {
+        useNewUrlParser: true,
+        useUnifiedTopology: false // Workaround re: NODE-2250
+      });
       db.catch(() => {});
       db.on('error', function() {
         // this callback has no params which triggered the bug #759
@@ -558,7 +527,11 @@ describe('connections:', function() {
     });
 
     it('should occur without hanging when password with special chars is used (gh-460)', function(done) {
-      mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function(err) {
+      const opts = {
+        useNewUrlParser: true,
+        useUnifiedTopology: false
+      };
+      mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', opts, function(err) {
         assert.ok(err);
         done();
       });
@@ -1072,33 +1045,6 @@ describe('connections:', function() {
 
           db.close();
           done();
-        });
-      });
-      describe('when only username is defined', function() {
-        let listeners;
-
-        beforeEach(function() {
-          listeners = process.listeners('uncaughtException');
-          process.removeAllListeners('uncaughtException');
-        });
-
-        afterEach(function() {
-          process.on('uncaughtException', listeners[0]);
-        });
-
-        it('should return true', function(done) {
-          const db = mongoose.createConnection();
-          db.openUri('mongodb://localhost:27017/fake', {
-            user: 'user'
-          });
-          process.once('uncaughtException', err => {
-            err.uncaught = false;
-            assert.ok(err.message.includes('password must be a string'));
-            done();
-          });
-
-          assert.equal(db.shouldAuthenticate(), true);
-          db.close(done);
         });
       });
       describe('when both username and password are defined', function() {

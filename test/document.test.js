@@ -130,6 +130,15 @@ describe('document', function() {
     db.close(done);
   });
 
+  describe('constructor', function() {
+    it('supports passing in schema directly (gh-8237)', function() {
+      const myUserDoc = new Document({}, { name: String });
+      assert.ok(!myUserDoc.name);
+      myUserDoc.name = 123;
+      assert.strictEqual(myUserDoc.name, '123');
+    });
+  });
+
   describe('delete', function() {
     it('deletes the document', function() {
       const schema = new Schema({ x: String });
@@ -8111,6 +8120,23 @@ describe('document', function() {
 
       assert.equal(person.address.city, 'Somewhere');
       yield person.save();
+    });
+  });
+
+  it('setting single nested subdoc with timestamps (gh-8251)', function() {
+    const ActivitySchema = Schema({ description: String }, { timestamps: true });
+    const RequestSchema = Schema({ activity: ActivitySchema });
+    const Request = db.model('gh8251', RequestSchema);
+
+    return co(function*() {
+      const doc = yield Request.create({
+        activity: { description: 'before' }
+      });
+      doc.activity.set({ description: 'after' });
+      yield doc.save();
+
+      const fromDb = yield Request.findOne().lean();
+      assert.equal(fromDb.activity.description, 'after');
     });
   });
 });

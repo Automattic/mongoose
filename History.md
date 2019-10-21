@@ -1,3 +1,17 @@
+5.7.6 / 2019-10-21
+==================
+ * fix: upgrade mongodb driver -> 3.3.3 to fix issue with failing to connect to a replica set if one member is down #8209
+ * fix(document): fix TypeError when setting a single nested subdoc with timestamps #8251
+ * fix(cursor): fix issue with long-running `eachAsync()` cursor #8249 #8235
+ * fix(connection): ensure repeated `close` events from useUnifiedTopology don't disconnect Mongoose from replica set #8224
+ * fix(document): support calling `Document` constructor directly in Node.js #8237
+ * fix(populate): add document array subpaths to parent doc `populated()` when calling `DocumentArray#push()` #8247
+ * fix(options): add missing minlength and maxlength to SchemaStringOptions #8256
+ * docs: add documentarraypath to API docs, including DocumentArrayPath#discriminator() #8164
+ * docs(schematypes): add a section about the `type` property #8227
+ * docs(api): fix Connection.close return param #8258 [gosuhiman](https://github.com/gosuhiman)
+ * docs: update link to broken image on home page #8253 [krosenk729](https://github.com/krosenk729)
+
 5.7.5 / 2019-10-14
 ==================
  * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222

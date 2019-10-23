@@ -8345,6 +8345,31 @@ describe('model: populate:', function() {
     });
   });
 
+  it('sets populate virtual to empty array if local field empty (gh-8230)', function() {
+    const GroupSchema = new Schema({
+      roles: [{
+        roleId: String
+      }]
+    });
+    GroupSchema.virtual('roles$', {
+      ref: 'gh8230_Role',
+      localField: 'roles.roleId',
+      foreignField: '_id'
+    });
+
+    const RoleSchema = new Schema({});
+
+    const GroupModel = db.model('gh8230_Group', GroupSchema);
+    db.model('gh8230_Role', RoleSchema);
+
+    return co(function*() {
+      yield GroupModel.create({ roles: [] });
+
+      const res = yield GroupModel.findOne({}).populate('roles$');
+      assert.deepEqual(res.roles$, []);
+    });
+  });
+
   it('sets populate virtual with count to 0 if local field empty (gh-7731)', function() {
     const GroupSchema = new Schema({
       roles: [{

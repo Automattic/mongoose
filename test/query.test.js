@@ -3569,12 +3569,18 @@ describe('Query', function() {
     });
   });
 
-  it('query with top-level _bsontype (gh-8222)', function() {
+  it('query with top-level _bsontype (gh-8222) (gh-8268)', function() {
     const userSchema = Schema({ token: String });
     const User = db.model('gh8222', userSchema);
 
-    return User.create({ token: 'rightToken' }).
-      then(() => User.findOne({ token: 'wrongToken', _bsontype: 'a' })).
-      then(doc => assert.ok(!doc));
+    return co(function*() {
+      const original = yield User.create({ token: 'rightToken' });
+      let doc = yield User.findOne({ token: 'wrongToken', _bsontype: 'a' });
+      assert.ok(!doc);
+
+      doc = yield User.findOne(original._id);
+      assert.ok(doc);
+      assert.equal(doc.token, 'rightToken');
+    });
   });
 });

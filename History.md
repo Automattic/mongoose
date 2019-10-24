@@ -1,3 +1,8 @@
+5.7.7 / 2019-10-24
+==================
+ * fix(populate): make populate virtual consistently an empty array if local field is only empty arrays #8230
+ * fix(query): allow findOne(objectid) and find(objectid) #8268
+
 5.7.6 / 2019-10-21
 ==================
  * fix: upgrade mongodb driver -> 3.3.3 to fix issue with failing to connect to a replica set if one member is down #8209

@@ -1485,5 +1485,28 @@ describe('model', function() {
       assert.equal(e.get('lookups.0.name'), 'address2');
       assert.equal(e.lookups[0].name, 'address2');
     });
+
+    it('_id: false in discriminator nested schema (gh-8274)', function() {
+      const schema = new Schema({
+        operations: {
+          type: [{ _id: Number, action: String }]
+        }
+      });
+      schema.path('operations').discriminator('gh8274_test', new Schema({
+        pitchPath: Schema({
+          _id: Number,
+          path: [{ _id: false, x: Number, y: Number }]
+        })
+      }));
+      const Model = db.model('gh8274', schema);
+
+      const doc = new Model();
+      doc.operations.push({
+        _id: 42,
+        __t: 'gh8274_test',
+        pitchPath: { path: [{ x: 1, y: 2 }] }
+      });
+      assert.strictEqual(doc.operations[0].pitchPath.path[0]._id, void 0);
+    });
   });
 });

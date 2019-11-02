@@ -136,6 +136,8 @@ describe('document', function() {
       assert.ok(!myUserDoc.name);
       myUserDoc.name = 123;
       assert.strictEqual(myUserDoc.name, '123');
+
+      assert.ifError(myUserDoc.validateSync());
     });
   });
 

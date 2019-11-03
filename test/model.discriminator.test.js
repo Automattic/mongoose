@@ -1508,5 +1508,37 @@ describe('model', function() {
       });
       assert.strictEqual(doc.operations[0].pitchPath.path[0]._id, void 0);
     });
+
+    it('with discriminators in embedded arrays (gh-8273)', function(done) {
+      const ProductSchema = new Schema({
+        title: String
+      });
+      const Product = mongoose.model('gh8273_Product', ProductSchema);
+      const ProductItemSchema = new Schema({
+        product: { type: Schema.Types.ObjectId, ref: 'gh8273_Product' }
+      });
+
+      const OrderItemSchema = new Schema({}, {discriminatorKey: '__t'});
+
+      const OrderSchema = new Schema({
+        items: [OrderItemSchema],
+      });
+
+      OrderSchema.path('items').discriminator('ProductItem', ProductItemSchema);
+      const Order = mongoose.model('Order', OrderSchema);
+
+      const product = new Product({title: 'Product title'});
+
+      const order = new Order({
+        items: [{
+          __t: 'ProductItem',
+          product: product
+        }]
+      });
+      assert.ok(order.items[0].product.title);
+      assert.equal(order.populated('items.product').length, 1);
+
+      done();
+    });
   });
 });

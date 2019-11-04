@@ -1,3 +1,14 @@
+5.7.8 / 2019-11-04
+==================
+ * fix(document): allow manually populating path within document array #8273
+ * fix(populate): update top-level `populated()` when updating document array with populated subpaths #8265
+ * fix(cursor): throw error when using aggregation cursor as async iterator #8280
+ * fix(schema): retain `_id: false` in schema after nesting in another schema #8274
+ * fix(document): make Document class an event emitter to support defining documents without models in node #8272
+ * docs: document return types for `.discriminator()` #8287
+ * docs(connection): add note about exporting schemas, not models, in multi connection paradigm #8275
+ * docs: clarify that transforms defined in `toObject()` options are applied to subdocs #8260
+
 5.7.7 / 2019-10-24
 ==================
  * fix(populate): make populate virtual consistently an empty array if local field is only empty arrays #8230

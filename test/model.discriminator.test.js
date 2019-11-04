@@ -1485,5 +1485,60 @@ describe('model', function() {
       assert.equal(e.get('lookups.0.name'), 'address2');
       assert.equal(e.lookups[0].name, 'address2');
     });
+
+    it('_id: false in discriminator nested schema (gh-8274)', function() {
+      const schema = new Schema({
+        operations: {
+          type: [{ _id: Number, action: String }]
+        }
+      });
+      schema.path('operations').discriminator('gh8274_test', new Schema({
+        pitchPath: Schema({
+          _id: Number,
+          path: [{ _id: false, x: Number, y: Number }]
+        })
+      }));
+      const Model = db.model('gh8274', schema);
+
+      const doc = new Model();
+      doc.operations.push({
+        _id: 42,
+        __t: 'gh8274_test',
+        pitchPath: { path: [{ x: 1, y: 2 }] }
+      });
+      assert.strictEqual(doc.operations[0].pitchPath.path[0]._id, void 0);
+    });
+
+    it('with discriminators in embedded arrays (gh-8273)', function(done) {
+      const ProductSchema = new Schema({
+        title: String
+      });
+      const Product = mongoose.model('gh8273_Product', ProductSchema);
+      const ProductItemSchema = new Schema({
+        product: { type: Schema.Types.ObjectId, ref: 'gh8273_Product' }
+      });
+
+      const OrderItemSchema = new Schema({}, {discriminatorKey: '__t'});
+
+      const OrderSchema = new Schema({
+        items: [OrderItemSchema],
+      });
+
+      OrderSchema.path('items').discriminator('ProductItem', ProductItemSchema);
+      const Order = mongoose.model('Order', OrderSchema);
+
+      const product = new Product({title: 'Product title'});
+
+      const order = new Order({
+        items: [{
+          __t: 'ProductItem',
+          product: product
+        }]
+      });
+      assert.ok(order.items[0].product.title);
+      assert.equal(order.populated('items.product').length, 1);
+
+      done();
+    });
   });
 });

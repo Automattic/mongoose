@@ -8727,7 +8727,7 @@ describe('model: populate:', function() {
       });
     });
 
-    it('updates top-level populated() when pushing elements onto a document array with single populated path (gh-8247)', function() {
+    it('updates top-level populated() when pushing elements onto a document array with single populated path (gh-8247) (gh-8265)', function() {
       return co(function*() {
         const docs = yield Author.create([
           { name: 'test1' },
@@ -8747,6 +8747,14 @@ describe('model: populate:', function() {
         assert.equal(pop[0].toHexString(), docs[0]._id.toHexString());
         assert.equal(pop[1], null);
 
+        fromDb.comments.pull({ _id: fromDb.comments[1]._id });
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 1);
+
+        fromDb.comments.shift();
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 0);
+
         // And try setting to populated path
         fromDb = yield Page.findOne().populate('comments.author');
         assert.ok(Array.isArray(fromDb.populated('comments.author')));
@@ -8756,6 +8764,10 @@ describe('model: populate:', function() {
         fromDb.comments.push({ author: docs[1] });
         pop = fromDb.populated('comments.author');
         assert.equal(pop.length, 2);
+
+        fromDb.comments.splice(1, 1);
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 1);
       });
     });
   });

@@ -2510,7 +2510,7 @@ describe('model: update:', function() {
         catch(done);
     });
 
-    it('$pullAll with null (gh-5164)', function(done) {
+    it('$pullAll with null (gh-5164)', function() {
       const schema = new Schema({
         name: String,
         arr: [{ name: String }]
@@ -2519,7 +2519,7 @@ describe('model: update:', function() {
 
       const doc = new Test({ name: 'Test', arr: [null, {name: 'abc'}] });
 
-      doc.save().
+      return doc.save().
         then(function(doc) {
           return Test.update({ _id: doc._id }, {
             $pullAll: { arr: [null] }
@@ -2531,9 +2531,7 @@ describe('model: update:', function() {
         then(function(doc) {
           assert.equal(doc.arr.length, 1);
           assert.equal(doc.arr[0].name, 'abc');
-          done();
-        }).
-        catch(done);
+        });
     });
 
     it('$set array (gh-5403)', function(done) {

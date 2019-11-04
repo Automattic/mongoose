@@ -159,6 +159,7 @@ function parse() {
       } else if (typeof ctx.receiver === 'string') {
         ctx.anchorId = `${ctx.receiver.toLowerCase()}_${ctx.receiver}.${ctx.name}`;
       } else {
+        console.log('TT', ctx, prop)
         ctx.anchorId = `${ctx.name.toLowerCase()}_${ctx.name}`;
       }
 

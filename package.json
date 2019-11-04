@@ -102,10 +102,6 @@
     },
     "rules": {
       "comma-style": "error",
-      "consistent-this": [
-        "error",
-        "_this"
-      ],
       "indent": [
         "error",
         2,
@@ -118,6 +114,7 @@
       "no-buffer-constructor": "warn",
       "no-console": "off",
       "no-multi-spaces": "error",
+      "no-constant-condition": "off",
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
       "quotes": [

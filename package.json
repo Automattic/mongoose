@@ -115,6 +115,7 @@
       "no-console": "off",
       "no-constant-condition": "off",
       "no-multi-spaces": "error",
+      "no-constant-condition": "off",
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
       "quotes": [

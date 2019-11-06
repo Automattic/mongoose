@@ -2144,4 +2144,14 @@ describe('schema', function() {
       filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired'].indexOf(key) === -1);
     assert.deepEqual(keys.sort(), functions.sort());
   });
+
+  it('supports passing schema options to `Schema#path()` (gh-8292)', function() {
+    const schema = Schema({ title: String });
+    const path = schema.path('title');
+
+    const newSchema = Schema({});
+    newSchema.add({ title: path.options });
+
+    assert.equal(newSchema.path('title').options.type, String);
+  });
 });

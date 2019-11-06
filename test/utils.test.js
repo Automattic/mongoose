@@ -254,6 +254,22 @@ describe('utils', function() {
 
       return Promise.resolve();
     });
+
+    it('invokes cloneOf method on object before valueOf if exists', function(done) {
+      const o = Object.create({
+        cloneOf() {
+          this.cloneOfCalled = true;
+          return this;
+        },
+      });
+
+      const out = utils.clone(o);
+      assert.deepEqual(out, o);
+      assert.equal(o.cloneOfCalled, true);
+      assert.equal(out.valueOfCalled, undefined);
+
+      done();
+    });
   });
 
   it('array.flatten', function(done) {

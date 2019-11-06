@@ -8795,6 +8795,9 @@ describe('model: populate:', function() {
         });
         assert.equal(doc.troops.length, 4);
         assert.equal(doc.troops[0], null);
+        assert.equal(doc.troops[1].name, 'Card 2');
+        assert.equal(doc.troops[2].name, 'Card 3');
+        assert.equal(doc.troops[3].name, 'Card 4');
       });
     });
   });

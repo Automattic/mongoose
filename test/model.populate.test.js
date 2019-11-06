@@ -8770,5 +8770,32 @@ describe('model: populate:', function() {
         assert.equal(pop.length, 1);
       });
     });
+
+    it('retainNullValues stores `null` in array if foreign doc not found (gh-8293)', function() {
+      const schema = Schema({ troops: [{ type: Number, ref: 'gh8293_Card' }] });
+      const Team = db.model('gh8293_Team', schema);
+
+      const Card = db.model('gh8293_Card', Schema({
+        _id: { type: Number },
+        name: { type: String, unique: true },
+        entityType: { type: String }
+      }));
+
+      return co(function*() {
+        yield Card.create([
+          { _id: 2, name: 'Card 2' },
+          { _id: 3, name: 'Card 3' },
+          { _id: 4, name: 'Card 4' }
+        ]);
+        yield Team.create({ troops: [1, 2, 3, 4] });
+
+        const doc = yield Team.findOne().populate({
+          path: 'troops',
+          options: { retainNullValues: true }
+        });
+        assert.equal(doc.troops.length, 4);
+        assert.equal(doc.troops[0], null);
+      });
+    });
   });
 });

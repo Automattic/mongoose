@@ -1,3 +1,10 @@
+5.7.9 / 2019-11-08
+==================
+ * fix(schema): support setting schema path to an instance of SchemaTypeOptions to fix integration with mongoose-i18n-localize #8297 #8292
+ * fix(populate): make `retainNullValues` set array element to `null` if foreign doc with that id was not found #8293
+ * fix(document): support getter setting virtual on manually populated doc when calling toJSON() #8295
+ * fix(model): allow objects with `toBSON()` to make it to `save()` #8299
+
 5.7.8 / 2019-11-04
 ==================
  * fix(document): allow manually populating path within document array #8273

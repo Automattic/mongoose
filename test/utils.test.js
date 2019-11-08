@@ -340,5 +340,19 @@ describe('utils', function() {
 
       done();
     });
+
+    it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function() {
+      const o = {
+        toBSON() {
+          return 'toBSON';
+        },
+        valueOf() {
+          return 'valueOf()';
+        }
+      };
+
+      const out = utils.clone(o, { bson: true });
+      assert.deepEqual(out, o);
+    });
   });
 });

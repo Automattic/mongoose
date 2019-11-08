@@ -8141,4 +8141,21 @@ describe('document', function() {
       assert.equal(fromDb.activity.description, 'after');
     });
   });
+
+  it('passing an object with toBSON() into `save()` (gh-8299)', function() {
+    const ActivitySchema = Schema({ description: String });
+    const RequestSchema = Schema({ activity: ActivitySchema });
+    const Request = db.model('gh8299', RequestSchema);
+
+    return co(function*() {
+      const doc = yield Request.create({
+        activity: { description: 'before' }
+      });
+      doc.activity.set({ description: 'after' });
+      yield doc.save();
+
+      const fromDb = yield Request.findOne().lean();
+      assert.equal(fromDb.activity.description, 'after');
+    });
+  });
 });

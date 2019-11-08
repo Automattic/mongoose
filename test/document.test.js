@@ -8167,7 +8167,7 @@ describe('document', function() {
     const Child = db.model('gh8295_Child', childSchema);
 
     const parentSchema = Schema({
-      child: { type: mongoose.ObjectId, ref: 'gh8295_Child', get }
+      child: { type: mongoose.ObjectId, ref: 'gh8295_Child', get: get }
     }, { toJSON: { getters: true } });
     const Parent = db.model('gh8295_Parent', parentSchema);
 

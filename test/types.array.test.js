@@ -4,13 +4,14 @@
 
 'use strict';
 
+const start = require('./common');
+
 const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const co = require('co');
 const mongodb = require('mongodb');
 const mongoose = require('./common').mongoose;
 const random = require('../lib/utils').random;
-const start = require('./common');
 
 const MongooseArray = mongoose.Types.Array;
 const Schema = mongoose.Schema;

@@ -5,6 +5,7 @@
  */
 
 const mongoose = require('./common').mongoose;
+
 const assert = require('assert');
 
 const Schema = mongoose.Schema;

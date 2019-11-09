@@ -6,9 +6,10 @@
 
 'use strict';
 
+const start = require('./common');
+
 const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
-const start = require('./common');
 const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;

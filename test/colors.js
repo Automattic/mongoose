@@ -4,10 +4,11 @@
 
 'use strict';
 
+const start = require('./common');
+
 const DocumentArray = require('../lib/types/documentarray');
 const EmbeddedDocument = require('../lib/types/embedded');
 const assert = require('assert');
-const start = require('./common');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

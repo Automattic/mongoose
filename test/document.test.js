@@ -4,6 +4,8 @@
  * Module dependencies.
  */
 
+const start = require('./common');
+
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
 const EmbeddedDocument = require('../lib/types/embedded');
@@ -11,7 +13,6 @@ const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
-const start = require('./common');
 const utils = require('../lib/utils');
 const validator = require('validator');
 const Buffer = require('safe-buffer').Buffer;

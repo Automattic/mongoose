@@ -5,8 +5,9 @@
 
 'use strict';
 
-const assert = require('assert');
 const start = require('./common');
+
+const assert = require('assert');
 const mongoose = start.mongoose;
 const EmbeddedDocument = require('../lib/types/embedded');
 const EventEmitter = require('events').EventEmitter;

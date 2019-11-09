@@ -4,9 +4,10 @@
  * Test dependencies.
  */
 
+const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
-const start = require('./common');
 const utils = require('../lib/utils');
 const Buffer = require('safe-buffer').Buffer;
 

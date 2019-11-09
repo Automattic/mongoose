@@ -1,5 +1,7 @@
 'use strict';
 
+require('./common');
+
 const Schema = require('../lib/schema');
 const assert = require('assert');
 const updateValidators = require('../lib/helpers/updateValidators');

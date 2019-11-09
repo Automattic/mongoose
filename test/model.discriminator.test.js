@@ -4,11 +4,12 @@
  * Test dependencies.
  */
 
+const start = require('./common');
+
 const assert = require('assert');
 const clone = require('../lib/utils').clone;
 const co = require('co');
 const random = require('../lib/utils').random;
-const start = require('./common');
 const util = require('util');
 
 const mongoose = start.mongoose;

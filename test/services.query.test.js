@@ -1,5 +1,7 @@
 'use strict';
 
+require('./common');
+
 const Query = require('../lib/query');
 const Schema = require('../lib/schema');
 const assert = require('assert');

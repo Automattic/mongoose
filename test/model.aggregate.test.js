@@ -5,10 +5,11 @@
 
 'use strict';
 
+const start = require('./common');
+
 const Aggregate = require('../lib/aggregate');
 const assert = require('assert');
 const random = require('../lib/utils').random;
-const start = require('./common');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

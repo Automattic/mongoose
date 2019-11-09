@@ -4756,24 +4756,26 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() with timestamps (gh-723)', function(done) {
-      const schema = new Schema({
-        name: String
-      });
+    it('insertMany() with timestamps (gh-723)', function() {
+      const schema = new Schema({ name: String }, { timestamps: true });
       const Movie = db.model('gh723_0', schema);
+      const start = Date.now();
 
       const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-      Movie.insertMany(arr, function(error, docs) {
-        assert.ifError(error);
-        assert.equal(docs.length, 2);
-        assert.ok(!docs[0].isNew);
-        assert.ok(!docs[1].isNew);
-        Movie.find({}, function(error, docs) {
-          assert.ifError(error);
+      return Movie.insertMany(arr).
+        then(docs => {
           assert.equal(docs.length, 2);
-          done();
+          assert.ok(!docs[0].isNew);
+          assert.ok(!docs[1].isNew);
+          assert.ok(docs[0].createdAt.valueOf() >= start);
+          assert.ok(docs[1].createdAt.valueOf() >= start);
+        }).
+        then(() => Movie.find()).
+        then(docs => {
+          assert.equal(docs.length, 2);
+          assert.ok(docs[0].createdAt.valueOf() >= start);
+          assert.ok(docs[1].createdAt.valueOf() >= start);
         });
-      });
     });
 
     it('returns empty array if no documents (gh-8130)', function() {

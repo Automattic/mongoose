@@ -1146,6 +1146,30 @@ describe('aggregate: ', function() {
             done();
           });
       });
+
+      it('with explain() (gh-5887)', function() {
+        const s = new Schema({ name: String });
+
+        let calledPre = 0;
+        const calledPost = [];
+        s.pre('aggregate', function(next) {
+          ++calledPre;
+          next();
+        });
+        s.post('aggregate', function(res, next) {
+          calledPost.push(res);
+          next();
+        });
+
+        const M = db.model('gh5887_cursor', s);
+
+        return M.aggregate([{ $match: { name: 'test' } }]).explain().
+          then(() => {
+            assert.equal(calledPre, 1);
+            assert.equal(calledPost.length, 1);
+            assert.ok(calledPost[0].queryPlanner);
+          });
+      });
     });
 
     it('readPref from schema (gh-5522)', function(done) {

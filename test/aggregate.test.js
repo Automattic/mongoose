@@ -900,7 +900,7 @@ describe('aggregate: ', function() {
             assert.ifError(err1);
             assert.ok(output);
             // make sure we got explain output
-            assert.ok(output.stages);
+            assert.ok(output.stages || output.queryPlanner);
 
             done();
           });
@@ -1167,7 +1167,7 @@ describe('aggregate: ', function() {
           then(() => {
             assert.equal(calledPre, 1);
             assert.equal(calledPost.length, 1);
-            assert.ok(calledPost[0].queryPlanner);
+            assert.ok(calledPost[0].stages || calledPost[0].queryPlanner);
           });
       });
     });

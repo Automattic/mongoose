@@ -1,6 +1,6 @@
 # Mongoose
 
-Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. It has both a callbacks and Promise-style API.
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
 
 [![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)

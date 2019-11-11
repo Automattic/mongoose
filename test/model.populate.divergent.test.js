@@ -5,8 +5,9 @@
 
 'use strict';
 
-const assert = require('assert');
 const start = require('./common');
+
+const assert = require('assert');
 const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;

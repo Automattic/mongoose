@@ -5,6 +5,7 @@
  */
 
 const start = require('./common');
+
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');

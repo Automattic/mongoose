@@ -4,9 +4,10 @@
  * Module dependencies
  */
 
+const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
-const start = require('./common');
 
 const Aggregate = require('../lib/aggregate');
 

@@ -4,8 +4,9 @@
  * Module dependencies.
  */
 
-const assert = require('assert');
 const start = require('./common');
+
+const assert = require('assert');
 
 const mongoose = new start.mongoose.Mongoose;
 const Schema = mongoose.Schema;

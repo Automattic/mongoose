@@ -1,3 +1,9 @@
+5.7.10 / 2019-11-11
+===================
+ * perf(cursor): remove unnecessary `setTimeout()` in `eachAsync()`, 4x speedup in basic benchmarks #8310
+ * docs(README): re-order sections for better readability #8321 [dandv](https://github.com/dandv)
+ * chore: make npm test not hard-code file paths #8322 [stieg](https://github.com/stieg)
+
 5.7.9 / 2019-11-08
 ==================
  * fix(schema): support setting schema path to an instance of SchemaTypeOptions to fix integration with mongoose-i18n-localize #8297 #8292

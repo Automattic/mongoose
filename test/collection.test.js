@@ -1,8 +1,9 @@
 'use strict';
 
+const start = require('./common');
+
 const Collection = require('../lib/collection');
 const assert = require('assert');
-const start = require('./common');
 
 const mongoose = start.mongoose;
 

@@ -1,5 +1,7 @@
 'use strict';
 
+require('./common');
+
 const ObjectId = require('bson').ObjectId;
 const Schema = require('../lib/schema');
 const assert = require('assert');

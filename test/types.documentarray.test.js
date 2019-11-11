@@ -4,13 +4,14 @@
  * Module dependencies.
  */
 
+const start = require('./common');
+
 const DocumentArray = require('../lib/types/documentarray');
 const EmbeddedDocument = require('../lib/types/embedded');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
 const setValue = require('../lib/utils').setValue;
-const start = require('./common');
 
 const mongoose = require('./common').mongoose;
 const Schema = mongoose.Schema;

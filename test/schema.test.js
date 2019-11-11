@@ -845,6 +845,19 @@ describe('schema', function() {
         done();
       });
 
+      it('compound based on name (gh-6499)', function() {
+        const testSchema = new Schema({
+          prop1: { type: String, index: { name: 'test1' } },
+          prop2: { type: Number, index: true },
+          prop3: { type: String, index: { name: 'test1' } }
+        });
+
+        const indexes = testSchema.indexes();
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[0][0], { prop1: 1, prop3: 1 });
+        assert.deepEqual(indexes[1][0], { prop2: 1 });
+      });
+
       it('with single nested doc (gh-6113)', function(done) {
         const pointSchema = new Schema({
           type: {

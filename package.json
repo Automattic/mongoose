@@ -89,6 +89,14 @@
   },
   "homepage": "https://mongoosejs.com",
   "browser": "./browser.js",
+  "mocha": {
+    "extension": [
+      "test.js"
+    ],
+    "watch-files": [
+      "test/**/*.js"
+    ]
+  },
   "eslintConfig": {
     "extends": [
       "eslint:recommended"
@@ -142,10 +150,6 @@
           "message": "Don't use Mocha's global context"
         }
       ]
-    },
-    "mocha": {
-      "extension": ["test.js"],
-      "watch-files": ["test/**/*.js"]
     }
   }
 }

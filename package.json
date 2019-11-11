@@ -73,7 +73,7 @@
     "lint": "eslint .",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
-    "test": "mocha --exit test/*.test.js test/**/*.test.js",
+    "test": "mocha --exit",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
@@ -142,6 +142,10 @@
           "message": "Don't use Mocha's global context"
         }
       ]
+    },
+    "mocha": {
+      "extension": ["test.js"],
+      "watch-files": ["test/**/*.js"]
     }
   }
 }

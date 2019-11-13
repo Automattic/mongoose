@@ -495,6 +495,20 @@ describe('mongoose module:', function() {
     return Promise.resolve();
   });
 
+  it('throws errors on setting invalid options (gh-6899)', function() {
+    let threw = false;
+    try {
+      mongoose.set('someInvalidOption', true);
+    }
+    catch (err) {
+      assert.equal(err.message, '`someInvalidOption` is an invalid option.');
+      threw = true;
+    }
+    finally {
+      assert.equal(threw, true);
+    }
+  });
+
   describe('disconnection of all connections', function() {
     this.timeout(10000);
 

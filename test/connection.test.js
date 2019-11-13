@@ -189,7 +189,7 @@ describe('connections:', function() {
         let numReconnected = 0;
         let numReconnect = 0;
         let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest?heartbeatfrequencyms=1000', {
           useNewUrlParser: true,
           useUnifiedTopology: true
         });

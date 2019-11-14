@@ -3816,6 +3816,23 @@ describe('Model', function() {
         });
       });
     });
+    it('should clear $versionError and saveOptions after saved (gh-8040)', function(done) {
+      const schema = new Schema({name: String});
+      const Model = db.model('gh8040', schema);
+      const doc = new Model({
+        name: 'Fonger'
+      });
+
+      const savePromise = doc.save();
+      assert.ok(doc.$__.$versionError);
+      assert.ok(doc.$__.saveOptions);
+
+      savePromise.then(function() {
+        assert.ok(!doc.$__.$versionError);
+        assert.ok(!doc.$__.saveOptions);
+        done();
+      }).catch(done);
+    });
   });
 
 

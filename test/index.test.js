@@ -495,7 +495,7 @@ describe('mongoose module:', function() {
     return Promise.resolve();
   });
 
-  xit('throws an error on setting invalid options (gh-6899)', function() {
+  it('throws an error on setting invalid options (gh-6899)', function() {
     let threw = false;
     try {
       mongoose.set('someInvalidOption', true);

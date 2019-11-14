@@ -3816,6 +3816,23 @@ describe('Model', function() {
         });
       });
     });
+    it('should clear $versionError and saveOptions after saved (gh-8040)', function(done) {
+      const schema = new Schema({name: String});
+      const Model = db.model('gh8040', schema);
+      const doc = new Model({
+        name: 'Fonger'
+      });
+
+      const savePromise = doc.save();
+      assert.ok(doc.$__.$versionError);
+      assert.ok(doc.$__.saveOptions);
+
+      savePromise.then(function() {
+        assert.ok(!doc.$__.$versionError);
+        assert.ok(!doc.$__.saveOptions);
+        done();
+      }).catch(done);
+    });
   });
 
 
@@ -5673,6 +5690,34 @@ describe('Model', function() {
           }]).
           then(() => Model.findOne()).
           then(doc => assert.equal(doc.nested.name, 'foo'));
+      });
+
+      it('throws an error if no update object is provided (gh-8331)', function() {
+        const userSchema = new Schema({ name: { type: String, required: true } });
+        const User = db.model('gh8331', userSchema);
+
+        return co(function*() {
+          const createdUser = yield User.create({ name: 'Hafez' });
+          let threw = false;
+          try {
+            yield User.bulkWrite([{
+              updateOne: {
+                filter: { _id: createdUser._id }
+              }
+            }]);
+          }
+          catch (err) {
+            threw = true;
+            assert.equal(err.message, 'Must provide an update object.');
+          }
+          finally {
+            assert.equal(threw, true);
+
+            const userAfterUpdate = yield User.findOne({ _id: createdUser._id });
+
+            assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
+          }
+        });
       });
     });
 

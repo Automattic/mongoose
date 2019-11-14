@@ -1,3 +1,11 @@
+5.7.11 / 2019-11-14
+===================
+ * fix: update mongodb driver -> 3.3.4 #8276
+ * fix(model): throw readable error when casting bulkWrite update without a 'filter' or 'update' #8332 #8331 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): bubble up connected/disconnected events with unified topology #8338 #8337
+ * fix(model): delete $versionError after saving #8326 #8048 [Fonger](https://github.com/Fonger)
+ * test(model): add test for issue #8040 #8341 [Fonger](https://github.com/Fonger)
+
 5.7.10 / 2019-11-11
 ===================
  * perf(cursor): remove unnecessary `setTimeout()` in `eachAsync()`, 4x speedup in basic benchmarks #8310

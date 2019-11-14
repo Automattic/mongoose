@@ -260,7 +260,7 @@ describe('connections:', function() {
           reconnectTries: 3,
           reconnectInterval: 100,
           useNewUrlParser: true,
-          useUnifiedTopology: true
+          useUnifiedTopology: false // reconnectFailed doesn't get emitted with 'useUnifiedTopology'
         });
 
         conn.on('connected', function() {

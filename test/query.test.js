@@ -5,6 +5,7 @@
  */
 
 const start = require('./common');
+
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
@@ -3548,6 +3549,39 @@ describe('Query', function() {
         assert.equal(queryCalls, 1);
         assert.equal(doc.password, 'encryptedpassword');
       });
+    });
+
+    it('pre("validate") errors (gh-7187)', function() {
+      const addressSchema = Schema({ countryId: String });
+      addressSchema.pre('validate', { query: true }, function() {
+        throw new Error('Oops!');
+      });
+      const contactSchema = Schema({ addresses: [addressSchema] });
+      const Contact = db.model('gh7187', contactSchema);
+
+      const update = { addresses: [{ countryId: 'foo' }] };
+      return Contact.updateOne({}, update, { runValidators: true }).then(
+        () => assert.ok(false),
+        err => {
+          assert.ok(err.errors['addresses.0']);
+          assert.equal(err.errors['addresses.0'].message, 'Oops!');
+        }
+      );
+    });
+  });
+
+  it('query with top-level _bsontype (gh-8222) (gh-8268)', function() {
+    const userSchema = Schema({ token: String });
+    const User = db.model('gh8222', userSchema);
+
+    return co(function*() {
+      const original = yield User.create({ token: 'rightToken' });
+      let doc = yield User.findOne({ token: 'wrongToken', _bsontype: 'a' });
+      assert.ok(!doc);
+
+      doc = yield User.findOne(original._id);
+      assert.ok(doc);
+      assert.equal(doc.token, 'rightToken');
     });
   });
 });

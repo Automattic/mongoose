@@ -21,7 +21,8 @@ describe('transactions', function() {
     return db.
       then(() => {
         // Skip if not a repl set
-        if (db.client.topology.constructor.name !== 'ReplSet') {
+        if (db.client.topology.constructor.name !== 'ReplSet' &&
+            !db.client.topology.s.description.type.includes('ReplicaSet')) {
           _skipped = true;
           this.skip();
 

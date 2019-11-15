@@ -4,8 +4,9 @@
  * Module dependencies.
  */
 
-const assert = require('assert');
 const start = require('./common');
+
+const assert = require('assert');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;

@@ -5,12 +5,14 @@
 'use strict';
 
 const start = require('./common');
-const mongoose = start.mongoose;
-const assert = require('assert');
+
+const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
+const assert = require('assert');
+
+const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
-const Document = require('../lib/document');
 const DocumentObjectId = mongoose.Types.ObjectId;
 
 /**

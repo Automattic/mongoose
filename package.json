@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.7.4-pre",
+  "version": "5.7.11",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -21,7 +21,7 @@
   "dependencies": {
     "bson": "~1.1.1",
     "kareem": "2.3.1",
-    "mongodb": "3.3.2",
+    "mongodb": "3.3.4",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.6.0",
     "mquery": "3.2.2",
@@ -75,7 +75,7 @@
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
-    "test": "mocha --exit test/*.test.js test/**/*.test.js",
+    "test": "mocha --exit",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
@@ -90,7 +90,16 @@
     "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "https://mongoosejs.com",
+
   "browser": "./dist/browser.umd.js",
+  "mocha": {
+    "extension": [
+      "test.js"
+    ],
+    "watch-files": [
+      "test/**/*.js"
+    ]
+  },
   "eslintConfig": {
     "extends": [
       "eslint:recommended"
@@ -104,10 +113,6 @@
     },
     "rules": {
       "comma-style": "error",
-      "consistent-this": [
-        "error",
-        "_this"
-      ],
       "indent": [
         "error",
         2,
@@ -120,6 +125,7 @@
       "no-buffer-constructor": "warn",
       "no-console": "off",
       "no-multi-spaces": "error",
+      "no-constant-condition": "off",
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
       "quotes": [

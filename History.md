@@ -1,3 +1,73 @@
+5.7.11 / 2019-11-14
+===================
+ * fix: update mongodb driver -> 3.3.4 #8276
+ * fix(model): throw readable error when casting bulkWrite update without a 'filter' or 'update' #8332 #8331 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): bubble up connected/disconnected events with unified topology #8338 #8337
+ * fix(model): delete $versionError after saving #8326 #8048 [Fonger](https://github.com/Fonger)
+ * test(model): add test for issue #8040 #8341 [Fonger](https://github.com/Fonger)
+
+5.7.10 / 2019-11-11
+===================
+ * perf(cursor): remove unnecessary `setTimeout()` in `eachAsync()`, 4x speedup in basic benchmarks #8310
+ * docs(README): re-order sections for better readability #8321 [dandv](https://github.com/dandv)
+ * chore: make npm test not hard-code file paths #8322 [stieg](https://github.com/stieg)
+
+5.7.9 / 2019-11-08
+==================
+ * fix(schema): support setting schema path to an instance of SchemaTypeOptions to fix integration with mongoose-i18n-localize #8297 #8292
+ * fix(populate): make `retainNullValues` set array element to `null` if foreign doc with that id was not found #8293
+ * fix(document): support getter setting virtual on manually populated doc when calling toJSON() #8295
+ * fix(model): allow objects with `toBSON()` to make it to `save()` #8299
+
+5.7.8 / 2019-11-04
+==================
+ * fix(document): allow manually populating path within document array #8273
+ * fix(populate): update top-level `populated()` when updating document array with populated subpaths #8265
+ * fix(cursor): throw error when using aggregation cursor as async iterator #8280
+ * fix(schema): retain `_id: false` in schema after nesting in another schema #8274
+ * fix(document): make Document class an event emitter to support defining documents without models in node #8272
+ * docs: document return types for `.discriminator()` #8287
+ * docs(connection): add note about exporting schemas, not models, in multi connection paradigm #8275
+ * docs: clarify that transforms defined in `toObject()` options are applied to subdocs #8260
+
+5.7.7 / 2019-10-24
+==================
+ * fix(populate): make populate virtual consistently an empty array if local field is only empty arrays #8230
+ * fix(query): allow findOne(objectid) and find(objectid) #8268
+
+5.7.6 / 2019-10-21
+==================
+ * fix: upgrade mongodb driver -> 3.3.3 to fix issue with failing to connect to a replica set if one member is down #8209
+ * fix(document): fix TypeError when setting a single nested subdoc with timestamps #8251
+ * fix(cursor): fix issue with long-running `eachAsync()` cursor #8249 #8235
+ * fix(connection): ensure repeated `close` events from useUnifiedTopology don't disconnect Mongoose from replica set #8224
+ * fix(document): support calling `Document` constructor directly in Node.js #8237
+ * fix(populate): add document array subpaths to parent doc `populated()` when calling `DocumentArray#push()` #8247
+ * fix(options): add missing minlength and maxlength to SchemaStringOptions #8256
+ * docs: add documentarraypath to API docs, including DocumentArrayPath#discriminator() #8164
+ * docs(schematypes): add a section about the `type` property #8227
+ * docs(api): fix Connection.close return param #8258 [gosuhiman](https://github.com/gosuhiman)
+ * docs: update link to broken image on home page #8253 [krosenk729](https://github.com/krosenk729)
+
+5.7.5 / 2019-10-14
+==================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+ * fix(update): handle subdocument pre('validate') errors in update validation #7187
+ * fix(subdocument): make subdocument#isModified use parent document's isModified #8223
+ * docs(index): add favicon to home page #8226
+ * docs: add schema options to API docs #8012
+ * docs(middleware): add note about accessing the document being updated in pre('findOneAndUpdate') #8218
+ * refactor: remove redundant code in ValidationError #8244 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+5.7.4 / 2019-10-09
+==================
+ * fix(schema): handle `required: null` and `required: undefined` as `required: false` #8219
+ * fix(update): support updating array embedded discriminator props if discriminator key in $elemMatch #8063
+ * fix(populate): allow accessing populate virtual prop underneath array when virtual defined on top level #8198
+ * fix(model): support passing `options` to `Model.remove()` #8211
+ * fix(document): handle `Document#set()` merge option when setting underneath single nested schema #8201
+ * fix: use options constructor class for all schematypes #8012
+
 5.7.3 / 2019-09-30
 ==================
  * fix: make CoreMongooseArray#includes() handle `fromIndex` parameter #8203

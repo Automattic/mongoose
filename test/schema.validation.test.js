@@ -4,10 +4,11 @@
  * Module dependencies.
  */
 
+const start = require('./common');
+
 const Promise = require('bluebird');
 const assert = require('assert');
 const random = require('../lib/utils').random;
-const start = require('./common');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

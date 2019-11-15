@@ -4,11 +4,12 @@
  * Module dependencies.
  */
 
+const start = require('./common');
+
 const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const mongoose = require('./common').mongoose;
 const random = require('../lib/utils').random;
-const start = require('./common');
 
 const MongooseBuffer = mongoose.Types.Buffer;
 const Schema = mongoose.Schema;

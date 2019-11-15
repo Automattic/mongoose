@@ -4,6 +4,8 @@
 
 'use strict';
 
+require('./common');
+
 const Schema = require('../lib/schema');
 const assert = require('assert');
 const cast = require('../lib/cast');

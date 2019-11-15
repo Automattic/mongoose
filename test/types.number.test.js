@@ -4,8 +4,9 @@
  * Module dependencies.
  */
 
-const assert = require('assert');
 const mongoose = require('./common').mongoose;
+
+const assert = require('assert');
 
 const SchemaNumber = mongoose.Schema.Types.Number;
 

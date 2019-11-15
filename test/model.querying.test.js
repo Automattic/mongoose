@@ -4,11 +4,12 @@
  * Test dependencies.
  */
 
+const start = require('./common');
+
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
-const start = require('./common');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;

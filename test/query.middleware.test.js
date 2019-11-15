@@ -1,6 +1,7 @@
 'use strict';
 
 const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
 

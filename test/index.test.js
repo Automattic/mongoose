@@ -1,9 +1,10 @@
 'use strict';
 
+const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
-const start = require('./common');
 const stream = require('stream');
 
 const collection = 'blogposts_' + random();

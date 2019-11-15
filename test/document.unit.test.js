@@ -4,8 +4,9 @@
 
 'use strict';
 
-const assert = require('assert');
 const start = require('./common');
+
+const assert = require('assert');
 const storeShard = require('../lib/plugins/sharding').storeShard;
 
 const mongoose = start.mongoose;

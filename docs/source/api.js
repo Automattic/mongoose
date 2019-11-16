@@ -24,7 +24,15 @@ const files = [
   'lib/virtualtype.js',
   'lib/error/index.js',
   'lib/types/core_array.js',
-  'lib/schema/SingleNestedPath.js'
+  'lib/schema/documentarray.js',
+  'lib/schema/SingleNestedPath.js',
+  'lib/options/SchemaTypeOptions.js',
+  'lib/options/SchemaArrayOptions.js',
+  'lib/options/SchemaBufferOptions.js',
+  'lib/options/SchemaDateOptions.js',
+  'lib/options/SchemaNumberOptions.js',
+  'lib/options/SchemaObjectIdOptions.js',
+  'lib/options/SchemaStringOptions.js'
 ];
 
 module.exports = {
@@ -56,6 +64,9 @@ function parse() {
     if (name === 'core_array') {
       name = 'array';
     }
+    if (name === 'documentarray') {
+      name = 'DocumentArrayPath';
+    }
     const data = {
       name: name.charAt(0).toUpperCase() === name.charAt(0) ? name : name.charAt(0).toUpperCase() + name.substr(1),
       props: []
@@ -82,6 +93,9 @@ function parse() {
             }
             ctx.name = str;
             ctx.string = `${ctx.constructor}.prototype.${ctx.name}`;
+            break;
+          case 'type':
+            ctx.type = Array.isArray(tag.types) ? tag.types.join('|') : tag.types;
             break;
           case 'static':
             ctx.type = 'property';
@@ -163,6 +177,10 @@ function parse() {
         return 1;
       }
     });
+
+    if (props.file.startsWith('lib/options')) {
+      data.hideFromNav = true;
+    }
 
     out.push(data);
   }

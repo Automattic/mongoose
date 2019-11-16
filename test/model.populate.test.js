@@ -4,9 +4,10 @@
  * Test dependencies.
  */
 
+const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
-const start = require('./common');
 const utils = require('../lib/utils');
 const Buffer = require('safe-buffer').Buffer;
 
@@ -8345,6 +8346,31 @@ describe('model: populate:', function() {
     });
   });
 
+  it('sets populate virtual to empty array if local field empty (gh-8230)', function() {
+    const GroupSchema = new Schema({
+      roles: [{
+        roleId: String
+      }]
+    });
+    GroupSchema.virtual('roles$', {
+      ref: 'gh8230_Role',
+      localField: 'roles.roleId',
+      foreignField: '_id'
+    });
+
+    const RoleSchema = new Schema({});
+
+    const GroupModel = db.model('gh8230_Group', GroupSchema);
+    db.model('gh8230_Role', RoleSchema);
+
+    return co(function*() {
+      yield GroupModel.create({ roles: [] });
+
+      const res = yield GroupModel.findOne({}).populate('roles$');
+      assert.deepEqual(res.roles$, []);
+    });
+  });
+
   it('sets populate virtual with count to 0 if local field empty (gh-7731)', function() {
     const GroupSchema = new Schema({
       roles: [{
@@ -8665,6 +8691,115 @@ describe('model: populate:', function() {
       });
       const foo2 = yield Foo.findById(foo._id).populate('children.bar');
       assert.equal(foo2.children[0].bar.name, 'bar');
+    });
+  });
+
+  describe('gh-8247', function() {
+    let Author;
+    let Page;
+
+    before(function() {
+      const authorSchema = Schema({ name: String });
+      const subSchema = Schema({
+        author: { type: Schema.Types.ObjectId, ref: 'gh8247_Author' },
+        comment: String
+      });
+      const pageSchema = Schema({ title: String, comments: [subSchema] });
+      Author = db.model('gh8247_Author', authorSchema);
+      Page = db.model('gh8247_Page', pageSchema);
+    });
+
+    this.beforeEach(() => co(function*() {
+      yield Author.deleteMany({});
+      yield Page.deleteMany({});
+    }));
+
+    it('checking `populated()` on a document array element (gh-8247)', function() {
+      return co(function*() {
+        const doc = yield Author.create({ name: 'test author' });
+        yield Page.create({ comments: [{ author: doc._id }] });
+
+        const fromDb = yield Page.findOne().populate('comments.author');
+        assert.ok(Array.isArray(fromDb.populated('comments.author')));
+        assert.equal(fromDb.populated('comments.author').length, 1);
+        assert.equal(fromDb.comments[0].author.name, 'test author');
+
+        assert.ok(fromDb.comments[0].populated('author'));
+      });
+    });
+
+    it('updates top-level populated() when pushing elements onto a document array with single populated path (gh-8247) (gh-8265)', function() {
+      return co(function*() {
+        const docs = yield Author.create([
+          { name: 'test1' },
+          { name: 'test2' }
+        ]);
+        yield Page.create({ comments: [{ author: docs[0]._id }] });
+
+        // Try setting to non-manually populated path...
+        let fromDb = yield Page.findOne().populate('comments.author');
+        assert.ok(Array.isArray(fromDb.populated('comments.author')));
+        assert.equal(fromDb.populated('comments.author').length, 1);
+        assert.equal(fromDb.comments[0].author.name, 'test1');
+
+        fromDb.comments.push({ author: docs[1]._id });
+        let pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 2);
+        assert.equal(pop[0].toHexString(), docs[0]._id.toHexString());
+        assert.equal(pop[1], null);
+
+        fromDb.comments.pull({ _id: fromDb.comments[1]._id });
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 1);
+
+        fromDb.comments.shift();
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 0);
+
+        // And try setting to populated path
+        fromDb = yield Page.findOne().populate('comments.author');
+        assert.ok(Array.isArray(fromDb.populated('comments.author')));
+        assert.equal(fromDb.populated('comments.author').length, 1);
+        assert.equal(fromDb.comments[0].author.name, 'test1');
+
+        fromDb.comments.push({ author: docs[1] });
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 2);
+
+        fromDb.comments.splice(1, 1);
+        pop = fromDb.populated('comments.author');
+        assert.equal(pop.length, 1);
+      });
+    });
+
+    it('retainNullValues stores `null` in array if foreign doc not found (gh-8293)', function() {
+      const schema = Schema({ troops: [{ type: Number, ref: 'gh8293_Card' }] });
+      const Team = db.model('gh8293_Team', schema);
+
+      const Card = db.model('gh8293_Card', Schema({
+        _id: { type: Number },
+        name: { type: String, unique: true },
+        entityType: { type: String }
+      }));
+
+      return co(function*() {
+        yield Card.create([
+          { _id: 2, name: 'Card 2' },
+          { _id: 3, name: 'Card 3' },
+          { _id: 4, name: 'Card 4' }
+        ]);
+        yield Team.create({ troops: [1, 2, 3, 4] });
+
+        const doc = yield Team.findOne().populate({
+          path: 'troops',
+          options: { retainNullValues: true }
+        });
+        assert.equal(doc.troops.length, 4);
+        assert.equal(doc.troops[0], null);
+        assert.equal(doc.troops[1].name, 'Card 2');
+        assert.equal(doc.troops[2].name, 'Card 3');
+        assert.equal(doc.troops[3].name, 'Card 4');
+      });
     });
   });
 });

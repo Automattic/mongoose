@@ -4,12 +4,13 @@
  * Module dependencies.
  */
 
+const start = require('./common');
+
 const Buffer = require('safe-buffer').Buffer;
 const MongooseBuffer = require('../lib/types/buffer');
 const ObjectId = require('../lib/types/objectid');
 const StateMachine = require('../lib/statemachine');
 const assert = require('assert');
-const start = require('./common');
 const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
@@ -339,6 +340,20 @@ describe('utils', function() {
       assert.ok(to.val instanceof Date);
 
       done();
+    });
+
+    it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function() {
+      const o = {
+        toBSON() {
+          return 'toBSON';
+        },
+        valueOf() {
+          return 'valueOf()';
+        }
+      };
+
+      const out = utils.clone(o, { bson: true });
+      assert.deepEqual(out, o);
     });
   });
 });

@@ -323,6 +323,35 @@ block content
     create and retrieve [models](./api.html#model_Model). Models are
     **always** scoped to a single connection.
 
+    ```javascript
+    const UserModel = conn.model('User', userSchema);
+    ```
+
+    If you use multiple connections, you should make sure you export schemas,
+    **not** models.
+
+    ```javascript
+    const userSchema = new Schema({ name: String, email: String });
+
+    // The correct pattern is to export a schema
+    module.exports = userSchema;
+
+    // Because if you export a model as shown below, the model will be scoped
+    // to Mongoose's default connection.
+    // module.exports = mongoose.model('User', userSchema);
+    ```
+
+    In addition, you should define a factory function that registers models on a
+    connection to make it easy to register all your models on a given connection.
+
+    ```javascript
+    const userSchema = require('./userSchema');
+
+    module.exports = conn => {
+      conn.model('User', userSchema);
+    };
+    ```
+
     Mongoose creates a _default connection_ when you call `mongoose.connect()`.
     You can access the default connection using `mongoose.connection`.
 

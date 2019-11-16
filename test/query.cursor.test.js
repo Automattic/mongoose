@@ -4,9 +4,10 @@
 
 'use strict';
 
+const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
-const start = require('./common');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -319,22 +320,21 @@ describe('QueryCursor', function() {
       const cursor = Model.find().sort({ name: 1 }).cursor();
 
       const names = [];
-      const startedAt = [];
+      const resolves = [];
       const checkDoc = function(doc) {
         names.push(doc.name);
-        startedAt.push(Date.now());
-        return {
-          then: function(resolve) {
-            setTimeout(function() {
-              resolve();
-            }, 100);
-          }
-        };
+        const p = new Promise(resolve => {
+          resolves.push(resolve);
+        });
+
+        if (names.length === 2) {
+          setTimeout(() => resolves.forEach(r => r()), 0);
+        }
+
+        return p;
       };
       cursor.eachAsync(checkDoc, { parallel: 2 }).then(function() {
-        assert.ok(Date.now() - startedAt[1] >= 100);
-        assert.equal(startedAt.length, 2);
-        assert.ok(startedAt[1] - startedAt[0] < 50);
+        assert.equal(names.length, 2);
         assert.deepEqual(names.sort(), ['Axl', 'Slash']);
         done();
       }).catch(done);

@@ -4,10 +4,11 @@
  * Test dependencies.
  */
 
+const start = require('./common');
+
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
-const start = require('./common');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
@@ -3815,6 +3816,23 @@ describe('Model', function() {
         });
       });
     });
+    it('should clear $versionError and saveOptions after saved (gh-8040)', function(done) {
+      const schema = new Schema({name: String});
+      const Model = db.model('gh8040', schema);
+      const doc = new Model({
+        name: 'Fonger'
+      });
+
+      const savePromise = doc.save();
+      assert.ok(doc.$__.$versionError);
+      assert.ok(doc.$__.saveOptions);
+
+      savePromise.then(function() {
+        assert.ok(!doc.$__.$versionError);
+        assert.ok(!doc.$__.saveOptions);
+        done();
+      }).catch(done);
+    });
   });
 
 
@@ -4756,24 +4774,26 @@ describe('Model', function() {
       });
     });
 
-    it('insertMany() with timestamps (gh-723)', function(done) {
-      const schema = new Schema({
-        name: String
-      });
+    it('insertMany() with timestamps (gh-723)', function() {
+      const schema = new Schema({ name: String }, { timestamps: true });
       const Movie = db.model('gh723_0', schema);
+      const start = Date.now();
 
       const arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-      Movie.insertMany(arr, function(error, docs) {
-        assert.ifError(error);
-        assert.equal(docs.length, 2);
-        assert.ok(!docs[0].isNew);
-        assert.ok(!docs[1].isNew);
-        Movie.find({}, function(error, docs) {
-          assert.ifError(error);
+      return Movie.insertMany(arr).
+        then(docs => {
           assert.equal(docs.length, 2);
-          done();
+          assert.ok(!docs[0].isNew);
+          assert.ok(!docs[1].isNew);
+          assert.ok(docs[0].createdAt.valueOf() >= start);
+          assert.ok(docs[1].createdAt.valueOf() >= start);
+        }).
+        then(() => Movie.find()).
+        then(docs => {
+          assert.equal(docs.length, 2);
+          assert.ok(docs[0].createdAt.valueOf() >= start);
+          assert.ok(docs[1].createdAt.valueOf() >= start);
         });
-      });
     });
 
     it('returns empty array if no documents (gh-8130)', function() {
@@ -5670,6 +5690,34 @@ describe('Model', function() {
           }]).
           then(() => Model.findOne()).
           then(doc => assert.equal(doc.nested.name, 'foo'));
+      });
+
+      it('throws an error if no update object is provided (gh-8331)', function() {
+        const userSchema = new Schema({ name: { type: String, required: true } });
+        const User = db.model('gh8331', userSchema);
+
+        return co(function*() {
+          const createdUser = yield User.create({ name: 'Hafez' });
+          let threw = false;
+          try {
+            yield User.bulkWrite([{
+              updateOne: {
+                filter: { _id: createdUser._id }
+              }
+            }]);
+          }
+          catch (err) {
+            threw = true;
+            assert.equal(err.message, 'Must provide an update object.');
+          }
+          finally {
+            assert.equal(threw, true);
+
+            const userAfterUpdate = yield User.findOne({ _id: createdUser._id });
+
+            assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
+          }
+        });
       });
     });
 

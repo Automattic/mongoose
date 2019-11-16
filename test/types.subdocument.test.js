@@ -5,8 +5,9 @@
 
 'use strict';
 
-const assert = require('assert');
 const start = require('./common');
+
+const assert = require('assert');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -91,5 +92,17 @@ describe('types.subdocument', function() {
           _id: id
         }, {$set: thingy2});
       });
+  });
+
+  describe('#isModified', function() {
+    it('defers to parent isModified (gh-8223)', function() {
+      const childSchema = Schema({ id: Number, text: String });
+      const parentSchema = Schema({ child: childSchema });
+      const Model = db.model('gh8223', parentSchema);
+
+      const doc = new Model({ child: { text: 'foo' } });
+      assert.ok(doc.isModified('child.id'));
+      assert.ok(doc.child.isModified('id'));
+    });
   });
 });

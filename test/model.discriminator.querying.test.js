@@ -5,6 +5,7 @@
 'use strict';
 
 const start = require('./common');
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const assert = require('assert');

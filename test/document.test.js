@@ -4,6 +4,8 @@
  * Module dependencies.
  */
 
+const start = require('./common');
+
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
 const EmbeddedDocument = require('../lib/types/embedded');
@@ -11,7 +13,6 @@ const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
-const start = require('./common');
 const utils = require('../lib/utils');
 const validator = require('validator');
 const Buffer = require('safe-buffer').Buffer;
@@ -128,6 +129,17 @@ describe('document', function() {
 
   after(function(done) {
     db.close(done);
+  });
+
+  describe('constructor', function() {
+    it('supports passing in schema directly (gh-8237)', function() {
+      const myUserDoc = new Document({}, { name: String });
+      assert.ok(!myUserDoc.name);
+      myUserDoc.name = 123;
+      assert.strictEqual(myUserDoc.name, '123');
+
+      assert.ifError(myUserDoc.validateSync());
+    });
   });
 
   describe('delete', function() {
@@ -857,19 +869,19 @@ describe('document', function() {
       userSchema.virtual('hello').get(function() {
         return 'Hello, ' + this.name;
       });
-      const User = db.model('User', userSchema);
+      const User = db.model('gh1376_User', userSchema);
 
       const groupSchema = new Schema({
         name: String,
-        _users: [{type: Schema.ObjectId, ref: 'User'}]
+        _users: [{type: Schema.ObjectId, ref: 'gh1376_User'}]
       });
 
-      const Group = db.model('Group', groupSchema);
+      const Group = db.model('gh1376_Group', groupSchema);
 
       User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
         assert.ifError(err);
 
-        new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
+        Group.create({name: 'mongoose', _users: [alice, bob]}, function(err, group) {
           Group.findById(group).populate('_users').exec(function(err, group) {
             assert.ifError(err);
             assert.ok(group.toJSON()._users[0].hello);
@@ -8112,5 +8124,63 @@ describe('document', function() {
       assert.equal(person.address.city, 'Somewhere');
       yield person.save();
     });
+  });
+
+  it('setting single nested subdoc with timestamps (gh-8251)', function() {
+    const ActivitySchema = Schema({ description: String }, { timestamps: true });
+    const RequestSchema = Schema({ activity: ActivitySchema });
+    const Request = db.model('gh8251', RequestSchema);
+
+    return co(function*() {
+      const doc = yield Request.create({
+        activity: { description: 'before' }
+      });
+      doc.activity.set({ description: 'after' });
+      yield doc.save();
+
+      const fromDb = yield Request.findOne().lean();
+      assert.equal(fromDb.activity.description, 'after');
+    });
+  });
+
+  it('passing an object with toBSON() into `save()` (gh-8299)', function() {
+    const ActivitySchema = Schema({ description: String });
+    const RequestSchema = Schema({ activity: ActivitySchema });
+    const Request = db.model('gh8299', RequestSchema);
+
+    return co(function*() {
+      const doc = yield Request.create({
+        activity: { description: 'before' }
+      });
+      doc.activity.set({ description: 'after' });
+      yield doc.save();
+
+      const fromDb = yield Request.findOne().lean();
+      assert.equal(fromDb.activity.description, 'after');
+    });
+  });
+
+  it('handles getter setting virtual on manually populated doc when calling toJSON (gh-8295)', function() {
+    const childSchema = Schema({}, { toJSON: { getters: true } });
+    childSchema.virtual('field').
+      get(function() { return this._field; }).
+      set(function(v) { return this._field = v; });
+    const Child = db.model('gh8295_Child', childSchema);
+
+    const parentSchema = Schema({
+      child: { type: mongoose.ObjectId, ref: 'gh8295_Child', get: get }
+    }, { toJSON: { getters: true } });
+    const Parent = db.model('gh8295_Parent', parentSchema);
+
+    function get(child) {
+      child.field = true;
+      return child;
+    }
+
+    let p = new Parent({ child: new Child({}) });
+    assert.strictEqual(p.toJSON().child.field, true);
+
+    p = new Parent({ child: new Child({}) });
+    assert.strictEqual(p.child.toJSON().field, true);
   });
 });

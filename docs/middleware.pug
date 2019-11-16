@@ -44,10 +44,12 @@ block content
     Document middleware is supported for the following document functions.
     In document middleware functions, `this` refers to the document.
 
-    * [validate](./api.html#document_Document-validate)
-    * [save](./api.html#model_Model-save)
-    * [remove](./api.html#model_Model-remove)
-    * [init](./api.html#document_Document-init) (note: init hooks are [synchronous](#synchronous))
+    * [validate](/docs/api/document.html#document_Document-validate)
+    * [save](/docs/api/model.html#model_Model-save)
+    * [remove](/docs/api/model.html#model_Model-remove)
+    * [updateOne](/docs/api/document.html#document_Document-updateOne)
+    * [deleteOne](/docs/api/model.html#model_Model-deleteOne)
+    * [init](/docs/api/document.html#document_Document-init) (note: init hooks are [synchronous](#synchronous))
 
     Query middleware is supported for the following Model and Query functions.
     In query middleware functions, `this` refers to the query.
@@ -360,11 +362,22 @@ block content
     **query** object rather than the document being updated.
 
     For instance, if you wanted to add an `updatedAt` timestamp to every
-    `update()` call, you would use the following pre hook.
+    `updateOne()` call, you would use the following pre hook.
 
     ```javascript
-    schema.pre('update', function() {
-      this.update({},{ $set: { updatedAt: new Date() } });
+    schema.pre('updateOne', function() {
+      this.set({ updatedAt: new Date() });
+    });
+    ```
+
+    You **cannot** access the document being updated in `pre('updateOne')` or
+    `pre('findOneAndUpdate')` middleware. If you need to access the document
+    that will be updated, you need to execute an explicit query for the document.
+
+    ```javascript
+    schema.pre('findOneAndUpdate', async function() {
+      const docToUpdate = await this.model.findOne(this.getQuery());
+      console.log(docToUpdate); // The document that `findOneAndUpdate()` will modify
     });
     ```
 

@@ -1,9 +1,10 @@
 'use strict';
 
+const start = require('./common');
+
 const assert = require('assert');
 const chalk = require('chalk');
 const random = require('../lib/utils').random;
-const start = require('./common');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

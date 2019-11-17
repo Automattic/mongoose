@@ -546,7 +546,7 @@ describe('types.documentarray', function() {
     });
 
     it('clears listeners on cast error (gh-6723)', function() {
-      const nested = new Schema({v: {type: Number}});
+      const nested = new Schema({ v: Number });
       const schema = new Schema({
         docs: [nested]
       });
@@ -558,6 +558,22 @@ describe('types.documentarray', function() {
       m.docs.push({ v: 50 });
 
       return m.save();
+    });
+
+    it('slice() copies parent and path (gh-8317)', function() {
+      const nested = new Schema({ v: Number });
+      const schema = new Schema({
+        docs: [nested]
+      });
+      const M = db.model('gh8317', schema);
+
+      const doc = M.hydrate({ docs: [{ v: 1 }, { v: 2 }]});
+      let arr = doc.docs;
+      arr = arr.slice();
+      arr.splice(0, 1);
+
+      assert.equal(arr.length, 1);
+      assert.equal(doc.docs.length, 2);
     });
   });
 

@@ -575,6 +575,20 @@ describe('types.documentarray', function() {
       assert.equal(arr.length, 1);
       assert.equal(doc.docs.length, 2);
     });
+
+    it('map() copies parent and path ()', function() {
+      const personSchema = new Schema({ friends: [{ name: { type: String } }]});
+      const Person = mongoose.model('Person', personSchema);
+
+      const person = new Person({ friends: [{ name: 'Hafez' }] });
+
+      const friendsNames = person.friends.map(friend => friend.name);
+
+      friendsNames.push('Sam');
+
+      assert.equal(friendsNames.length, 2);
+      assert.equal(friendsNames[1], 'Sam');
+    });
   });
 
   it('cleans modified subpaths on splice() (gh-7249)', function() {

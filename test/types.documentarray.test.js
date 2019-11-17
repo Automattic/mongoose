@@ -578,7 +578,7 @@ describe('types.documentarray', function() {
 
     it('map() copies parent and path ()', function() {
       const personSchema = new Schema({ friends: [{ name: { type: String } }]});
-      const Person = mongoose.model('Person', personSchema);
+      const Person = mongoose.model('gh8317-map', personSchema);
 
       const person = new Person({ friends: [{ name: 'Hafez' }] });
 

@@ -744,6 +744,13 @@ describe('connections:', function() {
     });
   });
 
+  it('uses default database in uri if options.dbName is not provided', function() {
+    return mongoose.createConnection('mongodb://localhost:27017/default-db-name').then(db => {
+      assert.equal(db.name, 'default-db-name');
+      db.close();
+    });
+  });
+
   it('startSession() (gh-6653)', function() {
     const conn = mongoose.createConnection('mongodb://localhost:27017/test');
 

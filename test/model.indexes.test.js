@@ -112,7 +112,7 @@ describe('model', function() {
       });
       const otherSchema = Schema({
         name: { type: String, index: true }
-      }, { excludeIndexes: true })
+      }, { excludeIndexes: true });
 
       const User = new Schema({
         name: {type: String, index: true},

@@ -576,15 +576,13 @@ describe('types.documentarray', function() {
       assert.equal(doc.docs.length, 2);
     });
 
-    it('map() works and does not return a mongoose array', function() {
+    it('map() works', function() {
       const personSchema = new Schema({ friends: [{ name: { type: String } }]});
       const Person = mongoose.model('gh8317-map', personSchema);
 
       const person = new Person({ friends: [{ name: 'Hafez' }] });
 
       const friendsNames = person.friends.map(friend => friend.name);
-      assert.deepEqual(friendsNames.constructor, Array);
-
       friendsNames.push('Sam');
 
       assert.equal(friendsNames.length, 2);

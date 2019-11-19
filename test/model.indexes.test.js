@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
@@ -429,6 +430,32 @@ describe('model', function() {
       return User.init().
         then(() => User.syncIndexes()).
         then(dropped => assert.equal(dropped.length, 0));
+    });
+
+    it('cleanIndexes (gh-6676)', function() {
+      return co(function*() {
+        let M = db.model('gh6676', new Schema({
+          name: { type: String, index: true }
+        }, { autoIndex: false }), 'gh6676');
+
+        yield M.createIndexes();
+
+        let indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 },
+          { name: 1 }
+        ]);
+
+        M = db.model('gh6676_2', new Schema({
+          name: String
+        }, { autoIndex: false }), 'gh6676');
+
+        yield M.cleanIndexes();
+        indexes = yield M.listIndexes();
+        assert.deepEqual(indexes.map(i => i.key), [
+          { _id: 1 }
+        ]);
+      });
     });
   });
 });

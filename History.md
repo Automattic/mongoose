@@ -1,3 +1,17 @@
+5.7.11 / 2019-11-14
+===================
+ * fix: update mongodb driver -> 3.3.4 #8276
+ * fix(model): throw readable error when casting bulkWrite update without a 'filter' or 'update' #8332 #8331 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): bubble up connected/disconnected events with unified topology #8338 #8337
+ * fix(model): delete $versionError after saving #8326 #8048 [Fonger](https://github.com/Fonger)
+ * test(model): add test for issue #8040 #8341 [Fonger](https://github.com/Fonger)
+
+5.7.10 / 2019-11-11
+===================
+ * perf(cursor): remove unnecessary `setTimeout()` in `eachAsync()`, 4x speedup in basic benchmarks #8310
+ * docs(README): re-order sections for better readability #8321 [dandv](https://github.com/dandv)
+ * chore: make npm test not hard-code file paths #8322 [stieg](https://github.com/stieg)
+
 5.7.9 / 2019-11-08
 ==================
  * fix(schema): support setting schema path to an instance of SchemaTypeOptions to fix integration with mongoose-i18n-localize #8297 #8292

@@ -8801,5 +8801,32 @@ describe('model: populate:', function() {
         assert.equal(doc.troops[3].name, 'Card 4');
       });
     });
+
+    it('virtual populate with discriminator that has a custom discriminator value (gh-8324)', function() {
+      const mainSchema = new Schema({ title: { type: String } },
+        { discriminatorKey: 'type' });
+      
+      mainSchema.virtual('virtualField', {
+        ref: 'gh8324_Model',
+        localField: '_id',
+        foreignField: 'main',
+      });
+      
+      const discriminatedSchema = new Schema({ description: String });
+      const Main = db.model('gh8324_Main', mainSchema);
+      const Discriminator = Main.discriminator('gh8324_Discriminator',
+        discriminatedSchema, 'customValue');
+      const Model = db.model('gh8324_Model', Schema({
+        main: 'ObjectId'
+      }));
+
+      return co(function*() {
+        const d = yield Discriminator.create({ title: 'test', description: 'test' });
+        yield Model.create({ main: d._id });
+
+        const docs = yield Main.find().populate('virtualField').exec();
+        assert.ok(docs[0].virtualField[0].main);
+      });
+    });
   });
 });

@@ -1,6 +1,6 @@
 # Mongoose
 
-Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
 
 [![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)
@@ -21,16 +21,6 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
   - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
   - [Help Forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB Support](https://docs.mongodb.org/manual/support/)
-
-## Importing
-
-```javascript
-// Using Node.js `require()`
-const mongoose = require('mongoose');
-
-// Using ES6 imports
-import mongoose from 'mongoose';
-```
 
 ## Plugins
 
@@ -55,6 +45,16 @@ First install [node.js](http://nodejs.org/) and [mongodb](https://www.mongodb.or
 $ npm install mongoose
 ```
 
+## Importing
+
+```javascript
+// Using Node.js `require()`
+const mongoose = require('mongoose');
+
+// Using ES6 imports
+import mongoose from 'mongoose';
+```
+
 ## Overview
 
 ### Connecting to MongoDB
@@ -64,9 +64,7 @@ First, we need to define a connection. If your app uses only one database, you s
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters `host, database, port, options`.
 
 ```js
-const mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost/my_database', {
+await mongoose.connect('mongodb://localhost/my_database', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -172,7 +170,14 @@ MyModel.find({}, function (err, docs) {
 });
 ```
 
-You can also `findOne`, `findById`, `update`, etc. For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
+You can also `findOne`, `findById`, `update`, etc.
+
+```js
+const instance = await MyModel.findOne({ ... });
+console.log(instance.my.key);  // 'hello'
+```
+
+For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
 
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 

@@ -712,6 +712,12 @@ describe('mongoose module:', function() {
     });
   });
 
+  it('isValidObjectId (gh-3823)', function() {
+    assert.ok(mongoose.isValidObjectId('0123456789ab'));
+    assert.ok(mongoose.isValidObjectId(new mongoose.Types.ObjectId()));
+    assert.ok(!mongoose.isValidObjectId(6));
+  });
+
   describe('exports', function() {
     function test(mongoose) {
       assert.equal(typeof mongoose.version, 'string');

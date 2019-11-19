@@ -189,7 +189,7 @@ describe('connections:', function() {
         let numReconnected = 0;
         let numReconnect = 0;
         let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest?heartbeatfrequencyms=1000', {
           useNewUrlParser: true,
           useUnifiedTopology: true
         });
@@ -260,7 +260,7 @@ describe('connections:', function() {
           reconnectTries: 3,
           reconnectInterval: 100,
           useNewUrlParser: true,
-          useUnifiedTopology: true
+          useUnifiedTopology: false // reconnectFailed doesn't get emitted with 'useUnifiedTopology'
         });
 
         conn.on('connected', function() {
@@ -740,6 +740,13 @@ describe('connections:', function() {
     const opts = { dbName: 'bacon' };
     return mongoose.createConnection('mongodb://localhost:27017/test', opts).then(db => {
       assert.equal(db.name, 'bacon');
+      db.close();
+    });
+  });
+
+  it('uses default database in uri if options.dbName is not provided', function() {
+    return mongoose.createConnection('mongodb://localhost:27017/default-db-name').then(db => {
+      assert.equal(db.name, 'default-db-name');
       db.close();
     });
   });

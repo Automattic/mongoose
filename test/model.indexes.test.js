@@ -105,12 +105,15 @@ describe('model', function() {
       });
     });
 
-    it('of embedded documents unless excludeIndexes (gh-5575)', function(done) {
-      const BlogPost = new Schema({
-        _id: {type: ObjectId},
-        title: {type: String, index: true},
+    it('of embedded documents unless excludeIndexes (gh-5575) (gh-8343)', function(done) {
+      const BlogPost = Schema({
+        _id: { type: ObjectId },
+        title: { type: String, index: true },
         desc: String
       });
+      const otherSchema = Schema({
+        name: { type: String, index: true }
+      }, { excludeIndexes: true });
 
       const User = new Schema({
         name: {type: String, index: true},
@@ -122,7 +125,8 @@ describe('model', function() {
         blogpost: {
           type: BlogPost,
           excludeIndexes: true
-        }
+        },
+        otherArr: [otherSchema]
       });
 
       const UserModel = db.model('gh5575', User);

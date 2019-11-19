@@ -588,25 +588,6 @@ describe('types.documentarray', function() {
       assert.equal(friendsNames.length, 2);
       assert.equal(friendsNames[1], 'Sam');
     });
-
-    it('filter() copies parent and path (gh-8317)', function() {
-      const personSchema = new Schema({ friends: [{ name: { type: String }, age: { type: Number } }] });
-      const Person = mongoose.model('gh8317-filter', personSchema);
-
-      const person = new Person({ friends: [
-        { name: 'Hafez', age: 25 },
-        { name: 'Sam', age: 27 }
-      ] });
-
-      const filteredFriends = person.friends.filter(friend => friend.age > 26);
-      assert.ok(filteredFriends.isMongooseArray);
-      assert.equal(filteredFriends.constructor.name, 'CoreDocumentArray');
-
-      filteredFriends.push({ name: 'John', age: 30 });
-
-      assert.equal(filteredFriends.length, 2);
-      assert.equal(filteredFriends[1].name, 'John');
-    });
   });
 
   it('cleans modified subpaths on splice() (gh-7249)', function() {

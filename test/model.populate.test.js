@@ -8825,7 +8825,6 @@ describe('model: populate:', function() {
         yield Model.create({ main: d._id });
 
         const docs = yield Main.find().populate('virtualField').exec();
-        console.log(docs.map(d => d.virtualField))
         assert.ok(docs[0].virtualField[0].main);
       });
     });

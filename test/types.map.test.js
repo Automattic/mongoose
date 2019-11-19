@@ -6,6 +6,7 @@
 
 const start = require('./common');
 
+const SchemaMapOptions = require('../lib/options/SchemaMapOptions');
 const assert = require('assert');
 const co = require('co');
 
@@ -46,6 +47,8 @@ describe('Map', function() {
         }
       }
     });
+
+    assert.ok(TestSchema.path('v').options instanceof SchemaMapOptions);
 
     const Test = db.model('MapTest', TestSchema);
 

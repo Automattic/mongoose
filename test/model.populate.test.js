@@ -8805,13 +8805,13 @@ describe('model: populate:', function() {
     it('virtual populate with discriminator that has a custom discriminator value (gh-8324)', function() {
       const mainSchema = new Schema({ title: { type: String } },
         { discriminatorKey: 'type' });
-      
+
       mainSchema.virtual('virtualField', {
         ref: 'gh8324_Model',
         localField: '_id',
         foreignField: 'main',
       });
-      
+
       const discriminatedSchema = new Schema({ description: String });
       const Main = db.model('gh8324_Main', mainSchema);
       const Discriminator = Main.discriminator('gh8324_Discriminator',

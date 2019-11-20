@@ -8183,4 +8183,27 @@ describe('document', function() {
     p = new Parent({ child: new Child({}) });
     assert.strictEqual(p.child.toJSON().field, true);
   });
+
+  it('enum validator for document (gh-8139)', function() {
+    const schema = Schema({
+      num: {
+        type: Number,
+        enum: [1, 2, 3]
+      }
+    });
+    const Model = mongoose.model('gh8139', schema);
+
+    let doc = new Model({});
+    let err = doc.validateSync();
+    assert.ifError(err);
+
+    doc = new Model({ num: 4 });
+    err = doc.validateSync();
+    assert.ok(err);
+    assert.equal(err.errors['num'].name, 'ValidatorError');
+
+    doc = new Model({ num: 2 });
+    err = doc.validateSync();
+    assert.ifError(err);
+  });
 });

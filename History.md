@@ -1,3 +1,15 @@
+5.7.12 / 2019-11-19
+===================
+ * fix: avoid throwing error if calling `push()` on a doc array with no parent #8351 #8317 #8312 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): only buffer for "open" events when calling connection helper while connecting #8319
+ * fix(connection): pull default database from connection string if specified #8355 #8354 [zachazar](https://github.com/zachazar)
+ * fix(populate+discriminator): handle populating document whose discriminator value is different from discriminator model name #8324
+ * fix: add `mongoose.isValidObjectId()` function to test whether Mongoose can cast a value to an objectid #3823
+ * fix(model): support setting `excludeIndexes` as schema option for subdocs #8343
+ * fix: add SchemaMapOptions class for options to map schematype #8318
+ * docs(query): remove duplicate omitUndefined options #8349 [mdumandag](https://github.com/mdumandag)
+ * docs(schema): add Schema#paths docs to public API docs #8340
+
 5.7.11 / 2019-11-14
 ===================
  * fix: update mongodb driver -> 3.3.4 #8276

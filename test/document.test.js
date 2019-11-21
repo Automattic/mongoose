@@ -178,6 +178,24 @@ describe('document', function() {
       const doc = new Test({ x: 'test' });
       assert.ok(doc.updateOne() instanceof Test.Query);
     });
+
+    it('middleware (gh-8262)', function() {
+      const schema = new Schema({ x: String, y: String });
+      const docs = [];
+      schema.post('updateOne', { document: true, query: false }, function(doc, next) {
+        docs.push(doc);
+        next();
+      });
+      const Model = db.model('gh6940_3', schema);
+
+      return co(function*() {
+        const doc = yield Model.create({ x: 2, y: 4 });
+
+        yield doc.updateOne({ x: 4 });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0], doc);
+      });
+    });
   });
 
   describe('replaceOne', function() {

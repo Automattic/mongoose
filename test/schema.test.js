@@ -2171,6 +2171,41 @@ describe('schema', function() {
     assert.equal(newSchema.path('title').options.type, String);
   });
 
+  it('supports defining `_id: false` on single nested paths (gh-8137)', function() {
+    let childSchema = Schema({ name: String });
+    let parentSchema = Schema({
+      child: {
+        type: childSchema,
+        _id: false
+      }
+    });
+
+    assert.ok(!parentSchema.path('child').schema.options._id);
+    assert.ok(childSchema.options._id);
+
+    let Parent = mongoose.model('gh8137', parentSchema);
+    let doc = new Parent({ child: { name: 'test' } });
+    assert.equal(doc.child._id, null);
+
+    childSchema = Schema({ name: String }, { _id: false });
+    parentSchema = Schema({
+      child: {
+        type: childSchema,
+        _id: true
+      }
+    });
+
+    assert.ok(parentSchema.path('child').schema.options._id);
+    assert.ok(parentSchema.path('child').schema.paths['_id']);
+    assert.ok(!childSchema.options._id);
+    assert.ok(!childSchema.paths['_id']);
+
+    mongoose.deleteModel(/gh8137/);
+    Parent = mongoose.model('gh8137', parentSchema);
+    doc = new Parent({ child: { name: 'test' } });
+    assert.ok(doc.child._id);
+  });
+
   describe('pick() (gh-8207)', function() {
     it('works with nested paths', function() {
       const schema = Schema({

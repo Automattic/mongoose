@@ -8209,7 +8209,7 @@ describe('document', function() {
         enum: [1, 2, 3]
       }
     });
-    const Model = mongoose.model('gh8139', schema);
+    const Model = db.model('gh8139', schema);
 
     let doc = new Model({});
     let err = doc.validateSync();
@@ -8223,5 +8223,38 @@ describe('document', function() {
     doc = new Model({ num: 2 });
     err = doc.validateSync();
     assert.ifError(err);
+  });
+
+  it('array push with $position (gh-4322)', function() {
+    const schema = Schema({
+      nums: [Number]
+    });
+    const Model = db.model('gh4322', schema);
+
+    return co(function*() {
+      const doc = yield Model.create({ nums: [3, 4] });
+
+      doc.nums.push({
+        $each: [1, 2],
+        $position: 0
+      });
+      assert.deepEqual(doc.toObject().nums, [1, 2, 3, 4]);
+
+      yield doc.save();
+
+      const fromDb = yield Model.findOne({ _id: doc._id });
+      assert.deepEqual(fromDb.toObject().nums, [1, 2, 3, 4]);
+
+      doc.nums.push({
+        $each: [0],
+        $position: 0
+      });
+      assert.throws(() => {
+        doc.nums.push({ $each: [5] });
+      }, /Cannot call.*multiple times/);
+      assert.throws(() => {
+        doc.nums.push(5);
+      }, /Cannot call.*multiple times/);
+    });
   });
 });

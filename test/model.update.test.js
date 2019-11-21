@@ -829,7 +829,7 @@ describe('model: update:', function() {
       m.save(function(error, m) {
         assert.ifError(error);
         assert.equal(m.n.length, 1);
-        M.update(
+        M.updateOne(
           {name: '2.6'},
           {$push: {n: {$each: [{x: 2}, {x: 1}], $position: 0}}},
           function(error) {

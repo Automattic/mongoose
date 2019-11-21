@@ -8202,7 +8202,7 @@ describe('document', function() {
     assert.strictEqual(p.child.toJSON().field, true);
   });
 
-  it('enum validator for document (gh-8139)', function() {
+  it('enum validator for number (gh-8139)', function() {
     const schema = Schema({
       num: {
         type: Number,
@@ -8223,6 +8223,31 @@ describe('document', function() {
     doc = new Model({ num: 2 });
     err = doc.validateSync();
     assert.ifError(err);
+  });
+
+  it('support `pathsToValidate()` option for `validate()` (gh-7587)', function() {
+    const schema = Schema({
+      name: {
+        type: String,
+        required: true
+      },
+      age: {
+        type: Number,
+        required: true
+      },
+      rank: String
+    });
+    const Model = db.model('gh7587_0', schema);
+
+    return co(function*() {
+      const doc = new Model({});
+
+      let err = yield doc.validate(['name', 'rank']).catch(err => err);
+      assert.deepEqual(Object.keys(err.errors), ['name']);
+
+      err = yield doc.validate(['age', 'rank']).catch(err => err);
+      assert.deepEqual(Object.keys(err.errors), ['age']);
+    });
   });
 
   it('array push with $position (gh-4322)', function() {

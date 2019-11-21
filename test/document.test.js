@@ -186,7 +186,7 @@ describe('document', function() {
         docs.push(doc);
         next();
       });
-      const Model = db.model('gh6940_3', schema);
+      const Model = db.model('gh8262', schema);
 
       return co(function*() {
         const doc = yield Model.create({ x: 2, y: 4 });

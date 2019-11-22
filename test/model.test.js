@@ -6551,4 +6551,55 @@ describe('Model', function() {
         then(res => assert.ok(res));
     });
   });
+
+  it('Model.validate() (gh-7587)', function() {
+    const Model = db.model('gh7587', new Schema({
+      name: {
+        first: {
+          type: String,
+          required: true
+        },
+        last: {
+          type: String,
+          required: true
+        }
+      },
+      age: {
+        type: Number,
+        required: true
+      },
+      comments: [{ name: { type: String, required: true } }]
+    }));
+
+    return co(function*() {
+      let err = null;
+      let obj = null;
+
+      err = yield Model.validate({ age: null }, ['age']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['age']);
+
+      err = yield Model.validate({ name: {} }, ['name']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['name.first', 'name.last']);
+
+      obj = { name: { first: 'foo' } };
+      err = yield Model.validate(obj, ['name']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['name.last']);
+
+      obj = { comments: [{ name: 'test' }, {}] };
+      err = yield Model.validate(obj, ['comments']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['comments.name']);
+
+      obj = { age: '42' };
+      yield Model.validate(obj, ['age']);
+      assert.strictEqual(obj.age, 42);
+    });
+  });
 });

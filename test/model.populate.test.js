@@ -8858,13 +8858,13 @@ describe('model: populate:', function() {
           { locationId: 'New York', department: 'Engineering', name: 'Test 2' }
         ]);
 
-        const [dept] = yield Department.create([
+        const depts = yield Department.create([
           { locationId: 'Miami', name: 'Engineering' },
           { locationId: 'Miami', name: 'Accounting' },
           { locationId: 'New York', name: 'Engineering' }
         ]);
+        const dept = depts[0];
 
-        console.log('--------');
         const doc = yield Employee.findOne({ name: 'Valeri Karpov' }).
           populate('department');
         assert.equal(doc.department._id.toHexString(), dept._id.toHexString());

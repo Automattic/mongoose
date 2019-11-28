@@ -205,7 +205,7 @@ describe('connections:', function() {
           ++numReconnect;
         });
         conn.on('timeout', function() {
-          ++timeout;
+          ++numTimeout;
         });
         // Same as `reconnect`, just for backwards compat
         conn.on('reconnected', function() {

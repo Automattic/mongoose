@@ -341,7 +341,6 @@ describe('connections:', function() {
         });
 
         conn.on('disconnected', function() {
-          console.log('Disconnected', new Error().stack);
           ++numDisconnected;
         });
 

@@ -1,3 +1,11 @@
+5.7.13 / 2019-11-29
+===================
+ * fix: upgrade mongodb driver -> 3.3.5 #8383
+ * fix(model): catch the error when insertMany fails to initialize the document #8365 #8363 [Fonger](https://github.com/Fonger)
+ * fix(schema): add array.$, array.$.$ subpaths for nested arrays #6405
+ * docs(error): add more detail about the ValidatorError class, including properties #8346
+ * docs(connection): document `Connection#models` property #8314
+
 5.7.12 / 2019-11-19
 ===================
  * fix: avoid throwing error if calling `push()` on a doc array with no parent #8351 #8317 #8312 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

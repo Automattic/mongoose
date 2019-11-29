@@ -4909,6 +4909,18 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() with non object array error can be catched (gh-8363)', function(done) {
+      const schema = mongoose.Schema({
+        _id: mongoose.Schema.Types.ObjectId,
+        url: { type: String }
+      });
+      const Image = db.model('gh8363', schema);
+      Image.insertMany(['a', 'b', 'c']).catch((error) => {
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
+      });
+    });
+
     it('insertMany() return docs with empty modifiedPaths (gh-7852)', function() {
       const schema = new Schema({
         name: { type: String }

@@ -188,6 +188,7 @@ describe('connections:', function() {
         let numDisconnected = 0;
         let numReconnected = 0;
         let numReconnect = 0;
+        let numTimeout = 0;
         let numClose = 0;
         const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest?heartbeatfrequencyms=1000', {
           useNewUrlParser: true,
@@ -202,6 +203,9 @@ describe('connections:', function() {
         });
         conn.on('reconnect', function() {
           ++numReconnect;
+        });
+        conn.on('timeout', function() {
+          ++numTimeout;
         });
         // Same as `reconnect`, just for backwards compat
         conn.on('reconnected', function() {
@@ -241,6 +245,7 @@ describe('connections:', function() {
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
             assert.equal(numReconnect, 1);
+            assert.equal(numTimeout, 0);
             assert.equal(numClose, 0);
 
             conn.close();

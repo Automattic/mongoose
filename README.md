@@ -10,7 +10,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 ## Documentation
 
-[mongoosejs.com](http://mongoosejs.com/)
+The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
 
 [Mongoose 5.0.0](https://github.com/Automattic/mongoose/blob/master/History.md#500--2018-01-17) was released on January 17, 2018. You can find more details on [backwards breaking changes in 5.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_5.html).
 
@@ -39,7 +39,7 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 
 ## Installation
 
-First install [node.js](http://nodejs.org/) and [mongodb](https://www.mongodb.org/downloads). Then:
+First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
 
 ```sh
 $ npm install mongoose
@@ -54,6 +54,12 @@ const mongoose = require('mongoose');
 // Using ES6 imports
 import mongoose from 'mongoose';
 ```
+
+## Mongoose for Enterprise
+
+Available as part of the Tidelift Subscription
+
+The maintainers of mongoose and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-mongoose?utm_source=npm-mongoose&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
 ## Overview
 

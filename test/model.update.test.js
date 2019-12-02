@@ -3403,9 +3403,18 @@ describe('model: updateOne: ', function() {
           { $set: { newProp: 'test2' } },
           { $unset: ['oldProp'] }
         ]);
-        const doc = yield Model.findOne();
+        let doc = yield Model.findOne();
         assert.equal(doc.newProp, 'test2');
         assert.strictEqual(doc.oldProp, void 0);
+
+        // Aliased fields
+        yield Model.updateOne({}, [
+          { $addFields: { oldProp: 'test3' } },
+          { $project: { newProp: 0 } }
+        ]);
+        doc = yield Model.findOne();
+        assert.equal(doc.oldProp, 'test3');
+        assert.strictEqual(doc.newProp, void 0);
       });
     });
   });

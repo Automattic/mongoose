@@ -743,4 +743,20 @@ describe('Map', function() {
     assert.ok(err.errors['myMap.foo.test'].message.indexOf('required') !== -1,
       err.errors['myMap.foo.test'].message);
   });
+
+  it('works with clone() (gh-8357)', function() {
+    const childSchema = mongoose.Schema({ name: String });
+    const schema = mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: childSchema
+      }
+    });
+    const Model = db.model('gh8357', schema.clone());
+
+    const doc = new Model({ myMap: { foo: { name: 'bar' } } });
+
+    const err = doc.validateSync();
+    assert.ifError(err);
+  });
 });

@@ -2280,4 +2280,63 @@ describe('schema', function() {
       assert.ok(!newSchema.path('age'));
     });
   });
+
+  describe('path-level custom cast (gh-8300)', function() {
+    it('with numbers', function() {
+      const schema = Schema({
+        num: {
+          type: Number,
+          cast: '{VALUE} is not a number'
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('num').cast('horseradish');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, '"horseradish" is not a number');
+      }
+      assert.ok(threw);
+    });
+
+    it('with objectids', function() {
+      const schema = Schema({
+        userId: {
+          type: mongoose.ObjectId,
+          cast: 'Invalid user ID'
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('userId').cast('foo');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, 'Invalid user ID');
+      }
+      assert.ok(threw);
+    });
+
+    it('with boolean', function() {
+      const schema = Schema({
+        vote: {
+          type: Boolean,
+          cast: '{VALUE} is invalid at path {PATH}'
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('vote').cast('nay');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, '"nay" is invalid at path vote');
+      }
+      assert.ok(threw);
+    });
+  });
 });

@@ -188,8 +188,9 @@ describe('connections:', function() {
         let numDisconnected = 0;
         let numReconnected = 0;
         let numReconnect = 0;
+        let numTimeout = 0;
         let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest?heartbeatfrequencyms=1000', {
           useNewUrlParser: true,
           useUnifiedTopology: true
         });
@@ -202,6 +203,9 @@ describe('connections:', function() {
         });
         conn.on('reconnect', function() {
           ++numReconnect;
+        });
+        conn.on('timeout', function() {
+          ++numTimeout;
         });
         // Same as `reconnect`, just for backwards compat
         conn.on('reconnected', function() {
@@ -241,6 +245,7 @@ describe('connections:', function() {
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 1);
             assert.equal(numReconnect, 1);
+            assert.equal(numTimeout, 0);
             assert.equal(numClose, 0);
 
             conn.close();
@@ -260,7 +265,7 @@ describe('connections:', function() {
           reconnectTries: 3,
           reconnectInterval: 100,
           useNewUrlParser: true,
-          useUnifiedTopology: true
+          useUnifiedTopology: false // reconnectFailed doesn't get emitted with 'useUnifiedTopology'
         });
 
         conn.on('connected', function() {
@@ -740,6 +745,13 @@ describe('connections:', function() {
     const opts = { dbName: 'bacon' };
     return mongoose.createConnection('mongodb://localhost:27017/test', opts).then(db => {
       assert.equal(db.name, 'bacon');
+      db.close();
+    });
+  });
+
+  it('uses default database in uri if options.dbName is not provided', function() {
+    return mongoose.createConnection('mongodb://localhost:27017/default-db-name').then(db => {
+      assert.equal(db.name, 'default-db-name');
       db.close();
     });
   });

@@ -1,3 +1,37 @@
+5.7.13 / 2019-11-29
+===================
+ * fix: upgrade mongodb driver -> 3.3.5 #8383
+ * fix(model): catch the error when insertMany fails to initialize the document #8365 #8363 [Fonger](https://github.com/Fonger)
+ * fix(schema): add array.$, array.$.$ subpaths for nested arrays #6405
+ * docs(error): add more detail about the ValidatorError class, including properties #8346
+ * docs(connection): document `Connection#models` property #8314
+
+5.7.12 / 2019-11-19
+===================
+ * fix: avoid throwing error if calling `push()` on a doc array with no parent #8351 #8317 #8312 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): only buffer for "open" events when calling connection helper while connecting #8319
+ * fix(connection): pull default database from connection string if specified #8355 #8354 [zachazar](https://github.com/zachazar)
+ * fix(populate+discriminator): handle populating document whose discriminator value is different from discriminator model name #8324
+ * fix: add `mongoose.isValidObjectId()` function to test whether Mongoose can cast a value to an objectid #3823
+ * fix(model): support setting `excludeIndexes` as schema option for subdocs #8343
+ * fix: add SchemaMapOptions class for options to map schematype #8318
+ * docs(query): remove duplicate omitUndefined options #8349 [mdumandag](https://github.com/mdumandag)
+ * docs(schema): add Schema#paths docs to public API docs #8340
+
+5.7.11 / 2019-11-14
+===================
+ * fix: update mongodb driver -> 3.3.4 #8276
+ * fix(model): throw readable error when casting bulkWrite update without a 'filter' or 'update' #8332 #8331 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): bubble up connected/disconnected events with unified topology #8338 #8337
+ * fix(model): delete $versionError after saving #8326 #8048 [Fonger](https://github.com/Fonger)
+ * test(model): add test for issue #8040 #8341 [Fonger](https://github.com/Fonger)
+
+5.7.10 / 2019-11-11
+===================
+ * perf(cursor): remove unnecessary `setTimeout()` in `eachAsync()`, 4x speedup in basic benchmarks #8310
+ * docs(README): re-order sections for better readability #8321 [dandv](https://github.com/dandv)
+ * chore: make npm test not hard-code file paths #8322 [stieg](https://github.com/stieg)
+
 5.7.9 / 2019-11-08
 ==================
  * fix(schema): support setting schema path to an instance of SchemaTypeOptions to fix integration with mongoose-i18n-localize #8297 #8292

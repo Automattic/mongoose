@@ -3816,6 +3816,23 @@ describe('Model', function() {
         });
       });
     });
+    it('should clear $versionError and saveOptions after saved (gh-8040)', function(done) {
+      const schema = new Schema({name: String});
+      const Model = db.model('gh8040', schema);
+      const doc = new Model({
+        name: 'Fonger'
+      });
+
+      const savePromise = doc.save();
+      assert.ok(doc.$__.$versionError);
+      assert.ok(doc.$__.saveOptions);
+
+      savePromise.then(function() {
+        assert.ok(!doc.$__.$versionError);
+        assert.ok(!doc.$__.saveOptions);
+        done();
+      }).catch(done);
+    });
   });
 
 
@@ -4892,6 +4909,18 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() with non object array error can be catched (gh-8363)', function(done) {
+      const schema = mongoose.Schema({
+        _id: mongoose.Schema.Types.ObjectId,
+        url: { type: String }
+      });
+      const Image = db.model('gh8363', schema);
+      Image.insertMany(['a', 'b', 'c']).catch((error) => {
+        assert.equal(error.name, 'ObjectParameterError');
+        done();
+      });
+    });
+
     it('insertMany() return docs with empty modifiedPaths (gh-7852)', function() {
       const schema = new Schema({
         name: { type: String }
@@ -5673,6 +5702,34 @@ describe('Model', function() {
           }]).
           then(() => Model.findOne()).
           then(doc => assert.equal(doc.nested.name, 'foo'));
+      });
+
+      it('throws an error if no update object is provided (gh-8331)', function() {
+        const userSchema = new Schema({ name: { type: String, required: true } });
+        const User = db.model('gh8331', userSchema);
+
+        return co(function*() {
+          const createdUser = yield User.create({ name: 'Hafez' });
+          let threw = false;
+          try {
+            yield User.bulkWrite([{
+              updateOne: {
+                filter: { _id: createdUser._id }
+              }
+            }]);
+          }
+          catch (err) {
+            threw = true;
+            assert.equal(err.message, 'Must provide an update object.');
+          }
+          finally {
+            assert.equal(threw, true);
+
+            const userAfterUpdate = yield User.findOne({ _id: createdUser._id });
+
+            assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
+          }
+        });
       });
     });
 
@@ -6504,6 +6561,57 @@ describe('Model', function() {
         then(res => assert.ok(!res)).
         then(() => Model.exists({}, { explain: true })).
         then(res => assert.ok(res));
+    });
+  });
+
+  it('Model.validate() (gh-7587)', function() {
+    const Model = db.model('gh7587', new Schema({
+      name: {
+        first: {
+          type: String,
+          required: true
+        },
+        last: {
+          type: String,
+          required: true
+        }
+      },
+      age: {
+        type: Number,
+        required: true
+      },
+      comments: [{ name: { type: String, required: true } }]
+    }));
+
+    return co(function*() {
+      let err = null;
+      let obj = null;
+
+      err = yield Model.validate({ age: null }, ['age']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['age']);
+
+      err = yield Model.validate({ name: {} }, ['name']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['name.first', 'name.last']);
+
+      obj = { name: { first: 'foo' } };
+      err = yield Model.validate(obj, ['name']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['name.last']);
+
+      obj = { comments: [{ name: 'test' }, {}] };
+      err = yield Model.validate(obj, ['comments']).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.deepEqual(Object.keys(err.errors), ['comments.name']);
+
+      obj = { age: '42' };
+      yield Model.validate(obj, ['age']);
+      assert.strictEqual(obj.age, 42);
     });
   });
 });

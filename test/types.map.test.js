@@ -6,6 +6,7 @@
 
 const start = require('./common');
 
+const SchemaMapOptions = require('../lib/options/SchemaMapOptions');
 const assert = require('assert');
 const co = require('co');
 
@@ -46,6 +47,8 @@ describe('Map', function() {
         }
       }
     });
+
+    assert.ok(TestSchema.path('v').options instanceof SchemaMapOptions);
 
     const Test = db.model('MapTest', TestSchema);
 
@@ -739,5 +742,21 @@ describe('Map', function() {
     assert.ok(err);
     assert.ok(err.errors['myMap.foo.test'].message.indexOf('required') !== -1,
       err.errors['myMap.foo.test'].message);
+  });
+
+  it('works with clone() (gh-8357)', function() {
+    const childSchema = mongoose.Schema({ name: String });
+    const schema = mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: childSchema
+      }
+    });
+    const Model = db.model('gh8357', schema.clone());
+
+    const doc = new Model({ myMap: { foo: { name: 'bar' } } });
+
+    const err = doc.validateSync();
+    assert.ifError(err);
   });
 });

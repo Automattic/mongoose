@@ -178,6 +178,24 @@ describe('document', function() {
       const doc = new Test({ x: 'test' });
       assert.ok(doc.updateOne() instanceof Test.Query);
     });
+
+    it('middleware (gh-8262)', function() {
+      const schema = new Schema({ x: String, y: String });
+      const docs = [];
+      schema.post('updateOne', { document: true, query: false }, function(doc, next) {
+        docs.push(doc);
+        next();
+      });
+      const Model = db.model('gh8262', schema);
+
+      return co(function*() {
+        const doc = yield Model.create({ x: 2, y: 4 });
+
+        yield doc.updateOne({ x: 4 });
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0], doc);
+      });
+    });
   });
 
   describe('replaceOne', function() {
@@ -8182,5 +8200,86 @@ describe('document', function() {
 
     p = new Parent({ child: new Child({}) });
     assert.strictEqual(p.child.toJSON().field, true);
+  });
+
+  it('enum validator for number (gh-8139)', function() {
+    const schema = Schema({
+      num: {
+        type: Number,
+        enum: [1, 2, 3]
+      }
+    });
+    const Model = db.model('gh8139', schema);
+
+    let doc = new Model({});
+    let err = doc.validateSync();
+    assert.ifError(err);
+
+    doc = new Model({ num: 4 });
+    err = doc.validateSync();
+    assert.ok(err);
+    assert.equal(err.errors['num'].name, 'ValidatorError');
+
+    doc = new Model({ num: 2 });
+    err = doc.validateSync();
+    assert.ifError(err);
+  });
+
+  it('support `pathsToValidate()` option for `validate()` (gh-7587)', function() {
+    const schema = Schema({
+      name: {
+        type: String,
+        required: true
+      },
+      age: {
+        type: Number,
+        required: true
+      },
+      rank: String
+    });
+    const Model = db.model('gh7587_0', schema);
+
+    return co(function*() {
+      const doc = new Model({});
+
+      let err = yield doc.validate(['name', 'rank']).catch(err => err);
+      assert.deepEqual(Object.keys(err.errors), ['name']);
+
+      err = yield doc.validate(['age', 'rank']).catch(err => err);
+      assert.deepEqual(Object.keys(err.errors), ['age']);
+    });
+  });
+
+  it('array push with $position (gh-4322)', function() {
+    const schema = Schema({
+      nums: [Number]
+    });
+    const Model = db.model('gh4322', schema);
+
+    return co(function*() {
+      const doc = yield Model.create({ nums: [3, 4] });
+
+      doc.nums.push({
+        $each: [1, 2],
+        $position: 0
+      });
+      assert.deepEqual(doc.toObject().nums, [1, 2, 3, 4]);
+
+      yield doc.save();
+
+      const fromDb = yield Model.findOne({ _id: doc._id });
+      assert.deepEqual(fromDb.toObject().nums, [1, 2, 3, 4]);
+
+      doc.nums.push({
+        $each: [0],
+        $position: 0
+      });
+      assert.throws(() => {
+        doc.nums.push({ $each: [5] });
+      }, /Cannot call.*multiple times/);
+      assert.throws(() => {
+        doc.nums.push(5);
+      }, /Cannot call.*multiple times/);
+    });
   });
 });

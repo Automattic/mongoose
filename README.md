@@ -1,6 +1,6 @@
 # Mongoose
 
-Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
 
 [![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)
@@ -10,7 +10,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 ## Documentation
 
-[mongoosejs.com](http://mongoosejs.com/)
+The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
 
 [Mongoose 5.0.0](https://github.com/Automattic/mongoose/blob/master/History.md#500--2018-01-17) was released on January 17, 2018. You can find more details on [backwards breaking changes in 5.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_5.html).
 
@@ -21,16 +21,6 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
   - [Mongoose Slack Channel](http://slack.mongoosejs.io/)
   - [Help Forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB Support](https://docs.mongodb.org/manual/support/)
-
-## Importing
-
-```javascript
-// Using Node.js `require()`
-const mongoose = require('mongoose');
-
-// Using ES6 imports
-import mongoose from 'mongoose';
-```
 
 ## Plugins
 
@@ -49,11 +39,27 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 
 ## Installation
 
-First install [node.js](http://nodejs.org/) and [mongodb](https://www.mongodb.org/downloads). Then:
+First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
 
 ```sh
 $ npm install mongoose
 ```
+
+## Importing
+
+```javascript
+// Using Node.js `require()`
+const mongoose = require('mongoose');
+
+// Using ES6 imports
+import mongoose from 'mongoose';
+```
+
+## Mongoose for Enterprise
+
+Available as part of the Tidelift Subscription
+
+The maintainers of mongoose and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-mongoose?utm_source=npm-mongoose&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
 ## Overview
 
@@ -64,9 +70,7 @@ First, we need to define a connection. If your app uses only one database, you s
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters `host, database, port, options`.
 
 ```js
-const mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost/my_database', {
+await mongoose.connect('mongodb://localhost/my_database', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -172,7 +176,14 @@ MyModel.find({}, function (err, docs) {
 });
 ```
 
-You can also `findOne`, `findById`, `update`, etc. For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
+You can also `findOne`, `findById`, `update`, etc.
+
+```js
+const instance = await MyModel.findOne({ ... });
+console.log(instance.my.key);  // 'hello'
+```
+
+For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
 
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 

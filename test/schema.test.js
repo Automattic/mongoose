@@ -1704,8 +1704,10 @@ describe('schema', function() {
     });
 
     it('removes a single path', function(done) {
+      assert.ok(this.schema.paths.a);
       this.schema.remove('a');
       assert.strictEqual(this.schema.path('a'), undefined);
+      assert.strictEqual(this.schema.paths.a, void 0);
       done();
     });
 
@@ -2167,5 +2169,174 @@ describe('schema', function() {
     newSchema.add({ title: path.options });
 
     assert.equal(newSchema.path('title').options.type, String);
+  });
+
+  it('supports defining `_id: false` on single nested paths (gh-8137)', function() {
+    let childSchema = Schema({ name: String });
+    let parentSchema = Schema({
+      child: {
+        type: childSchema,
+        _id: false
+      }
+    });
+
+    assert.ok(!parentSchema.path('child').schema.options._id);
+    assert.ok(childSchema.options._id);
+
+    let Parent = mongoose.model('gh8137', parentSchema);
+    let doc = new Parent({ child: { name: 'test' } });
+    assert.equal(doc.child._id, null);
+
+    childSchema = Schema({ name: String }, { _id: false });
+    parentSchema = Schema({
+      child: {
+        type: childSchema,
+        _id: true
+      }
+    });
+
+    assert.ok(parentSchema.path('child').schema.options._id);
+    assert.ok(parentSchema.path('child').schema.paths['_id']);
+    assert.ok(!childSchema.options._id);
+    assert.ok(!childSchema.paths['_id']);
+
+    mongoose.deleteModel(/gh8137/);
+    Parent = mongoose.model('gh8137', parentSchema);
+    doc = new Parent({ child: { name: 'test' } });
+    assert.ok(doc.child._id);
+  });
+
+  describe('pick() (gh-8207)', function() {
+    it('works with nested paths', function() {
+      const schema = Schema({
+        name: {
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        },
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.pick(['age']);
+      assert.ok(!newSchema.path('name.first'));
+      assert.ok(newSchema.path('age'));
+      assert.ok(newSchema.path('age').index);
+
+      newSchema = schema.pick(['name']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.pick(['name.first']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+
+    it('with single nested paths', function() {
+      const schema = Schema({
+        name: Schema({
+          first: {
+            type: String,
+            required: true
+          },
+          last: {
+            type: String,
+            required: true
+          }
+        }),
+        age: {
+          type: Number,
+          index: true
+        }
+      });
+      assert.ok(schema.path('name.first'));
+      assert.ok(schema.path('name.last'));
+
+      let newSchema = schema.pick(['name']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(newSchema.path('name.last'));
+      assert.ok(newSchema.path('name.last').required);
+      assert.ok(!newSchema.path('age'));
+
+      newSchema = schema.pick(['name.first']);
+      assert.ok(newSchema.path('name.first'));
+      assert.ok(newSchema.path('name.first').required);
+      assert.ok(!newSchema.path('name.last'));
+      assert.ok(!newSchema.path('age'));
+    });
+  });
+
+  describe('path-level custom cast (gh-8300)', function() {
+    it('with numbers', function() {
+      const schema = Schema({
+        num: {
+          type: Number,
+          cast: '{VALUE} is not a number'
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('num').cast('horseradish');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, '"horseradish" is not a number');
+      }
+      assert.ok(threw);
+    });
+
+    it('with objectids', function() {
+      const schema = Schema({
+        userId: {
+          type: mongoose.ObjectId,
+          cast: 'Invalid user ID'
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('userId').cast('foo');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, 'Invalid user ID');
+      }
+      assert.ok(threw);
+    });
+
+    it('with boolean', function() {
+      const schema = Schema({
+        vote: {
+          type: Boolean,
+          cast: '{VALUE} is invalid at path {PATH}'
+        }
+      });
+
+      let threw = false;
+      try {
+        schema.path('vote').cast('nay');
+      } catch (err) {
+        threw = true;
+        assert.equal(err.name, 'CastError');
+        assert.equal(err.message, '"nay" is invalid at path vote');
+      }
+      assert.ok(threw);
+    });
   });
 });

@@ -2404,4 +2404,36 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(res.name, 'test2');
     });
   });
+
+  it('updating embedded discriminator with discriminator key in update (gh-8378)', function() {
+    const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
+    const schema = Schema({ shape: shapeSchema });
+
+    schema.path('shape').discriminator('gh8378_Circle',
+      Schema({ radius: String, color: String }));
+    schema.path('shape').discriminator('gh8378_Square',
+      Schema({ side: Number, color: String }));
+
+    const MyModel = db.model('gh8378_Shape', schema);
+
+    return co(function*() {
+      let doc = yield MyModel.create({
+        shape: {
+          kind: 'gh8378_Circle',
+          name: 'before',
+          radius: 5,
+          color: 'red'
+        }
+      });
+
+      doc = yield MyModel.findByIdAndUpdate(doc._id, {
+        'shape.kind': 'gh8378_Circle',
+        'shape.name': 'after',
+        'shape.radius': 10
+      }, { new: true });
+
+      assert.equal(doc.shape.name, 'after');
+      assert.equal(doc.shape.radius, 10);
+    });
+  });
 });

@@ -1,3 +1,11 @@
+5.7.14 / 2019-12-06
+===================
+ * fix(cursor): wait until all `eachAsync()` functions finish before resolving the promise #8352
+ * fix(update): handle embedded discriminator paths when discriminator key is defined in the update #8378
+ * fix(schematype): handle passing `message` function to `SchemaType#validate()` as positional arg #8360
+ * fix(map): handle cloning a schema that has a map of subdocuments #8357
+ * docs(schema): clarify that `uppercase`, `lowercase`, and `trim` options for SchemaString don't affect RegExp queries #8333
+
 5.7.13 / 2019-11-29
 ===================
  * fix: upgrade mongodb driver -> 3.3.5 #8383

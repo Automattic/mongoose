@@ -13,30 +13,36 @@ describe('parallelLimit', function() {
   });
 
   it('executes functions in parallel', function(done) {
-    let called = 0;
+    let started = 0;
+    let finished = 0;
     const fns = [
       cb => {
+        ++started;
         setTimeout(() => {
-          ++called;
+          ++finished;
           setTimeout(cb, 0);
         }, 100);
       },
       cb => {
+        ++started;
         setTimeout(() => {
-          ++called;
+          ++finished;
           setTimeout(cb, 0);
         }, 100);
       },
       cb => {
-        assert.equal(called, 2);
-        ++called;
-        setTimeout(cb, 100);
+        assert.equal(started, 2);
+        assert.ok(finished > 0);
+        ++started;
+        ++finished;
+        setTimeout(cb, 0);
       }
     ];
 
     parallelLimit(fns, 2, (err) => {
       assert.ifError(err);
-      assert.equal(called, 3);
+      assert.equal(started, 3);
+      assert.equal(finished, 3);
       done();
     });
   });

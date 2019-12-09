@@ -8828,5 +8828,48 @@ describe('model: populate:', function() {
         assert.ok(docs[0].virtualField[0].main);
       });
     });
+
+    it.skip('virtual populate with multiple `localField` and `foreignField` (gh-6608)', function() {
+      const employeeSchema = Schema({
+        locationId: String,
+        departmentId: String,
+        name: String
+      });
+
+      employeeSchema.virtual('department', {
+        ref: 'gh6608_Department',
+        localField: ['locationId', 'departmentId'],
+        foreignField: ['locationId', 'name'],
+        justOne: true
+      });
+
+      const departmentSchema = Schema({
+        locationId: String,
+        name: String
+      });
+
+      return co(function*() {
+        const Employee = db.model('gh6608_Employee', employeeSchema);
+        const Department = db.model('gh6608_Department', departmentSchema);
+
+        yield Employee.create([
+          { locationId: 'Miami', department: 'Engineering', name: 'Valeri Karpov' },
+          { locationId: 'Miami', department: 'Accounting', name: 'Test 1' },
+          { locationId: 'New York', department: 'Engineering', name: 'Test 2' }
+        ]);
+
+        const depts = yield Department.create([
+          { locationId: 'Miami', name: 'Engineering' },
+          { locationId: 'Miami', name: 'Accounting' },
+          { locationId: 'New York', name: 'Engineering' }
+        ]);
+        const dept = depts[0];
+
+        const doc = yield Employee.findOne({ name: 'Valeri Karpov' }).
+          populate('department');
+        assert.equal(doc.department._id.toHexString(), dept._id.toHexString());
+        assert.equal(doc.department.name, 'Engineering');
+      });
+    });
   });
 });

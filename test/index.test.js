@@ -103,12 +103,12 @@ describe('mongoose module:', function() {
   it('{g,s}etting options', function(done) {
     const mongoose = new Mongoose();
 
-    mongoose.set('a', 'b');
-    mongoose.set('long option', 'c');
+    mongoose.set('runValidators', 'b');
+    mongoose.set('useNewUrlParser', 'c');
 
-    assert.equal(mongoose.get('a'), 'b');
-    assert.equal(mongoose.set('a'), 'b');
-    assert.equal(mongoose.get('long option'), 'c');
+    assert.equal(mongoose.get('runValidators'), 'b');
+    assert.equal(mongoose.set('runValidators'), 'b');
+    assert.equal(mongoose.get('useNewUrlParser'), 'c');
     done();
   });
 
@@ -494,6 +494,20 @@ describe('mongoose module:', function() {
     new m2.Schema({ v: T2 });
 
     return Promise.resolve();
+  });
+
+  it('throws an error on setting invalid options (gh-6899)', function() {
+    let threw = false;
+    try {
+      mongoose.set('someInvalidOption', true);
+    }
+    catch (err) {
+      assert.equal(err.message, '`someInvalidOption` is an invalid option.');
+      threw = true;
+    }
+    finally {
+      assert.equal(threw, true);
+    }
   });
 
   describe('disconnection of all connections', function() {

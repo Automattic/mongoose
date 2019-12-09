@@ -900,7 +900,7 @@ describe('aggregate: ', function() {
             assert.ifError(err1);
             assert.ok(output);
             // make sure we got explain output
-            assert.ok(output.stages);
+            assert.ok(output.stages || output.queryPlanner);
 
             done();
           });
@@ -1144,6 +1144,30 @@ describe('aggregate: ', function() {
             assert.equal(calledPre, 1);
             assert.equal(calledPost, 0);
             done();
+          });
+      });
+
+      it('with explain() (gh-5887)', function() {
+        const s = new Schema({ name: String });
+
+        let calledPre = 0;
+        const calledPost = [];
+        s.pre('aggregate', function(next) {
+          ++calledPre;
+          next();
+        });
+        s.post('aggregate', function(res, next) {
+          calledPost.push(res);
+          next();
+        });
+
+        const M = db.model('gh5887_cursor', s);
+
+        return M.aggregate([{ $match: { name: 'test' } }]).explain().
+          then(() => {
+            assert.equal(calledPre, 1);
+            assert.equal(calledPost.length, 1);
+            assert.ok(calledPost[0].stages || calledPost[0].queryPlanner);
           });
       });
     });

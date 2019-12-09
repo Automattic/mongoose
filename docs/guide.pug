@@ -47,7 +47,7 @@ block content
       var Schema = mongoose.Schema;
 
       var blogSchema = new Schema({
-        title:  String,
+        title:  String, // String is shorthand for {type: String}
         author: String,
         body:   String,
         comments: [{ body: String, date: Date }],
@@ -67,9 +67,21 @@ block content
     will be cast to its associated [SchemaType](./api.html#schematype_SchemaType).
     For example, we've defined a property `title` which will be cast to the
     [String](./api.html#schema-string-js) SchemaType and property `date`
-    which will be cast to a `Date` SchemaType. Keys may also be assigned
-    nested objects containing further key/type definitions like
-    the `meta` property above.
+    which will be cast to a `Date` SchemaType.
+
+    Notice above that if a property only requires a type, it can be specified using
+    a shorthand notation (contrast the `title` property above with the `date`
+    property).
+    
+    Keys may also be assigned nested objects containing further key/type definitions
+    like the `meta` property above.  This will happen whenever a key's value is a POJO
+    that lacks a bona-fide `type` property.  In these cases, only the leaves in a tree
+    are given actual paths in the schema (like `meta.votes` and `meta.favs` above),
+    and the branches do not have actual paths.  A side-effect of this is that `meta`
+    above cannot have its own validation.  If validation is needed up the tree, a path
+    needs to be created up the tree - see the [Subdocuments](./subdocs.html) section
+    for more information no how to do this.  Also read the [Mixed](./schematypes.html)
+    subsection of the SchemaTypes guide for some gotchas.
 
     The permitted SchemaTypes are:
 

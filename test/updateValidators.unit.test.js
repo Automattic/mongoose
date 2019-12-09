@@ -81,12 +81,29 @@ describe('updateValidators', function() {
 
     it('doesnt flatten decimal128 (gh-7561)', function(done) {
       const Decimal128Type = require('../lib/types/decimal128');
-      const schema = new Schema({ test: { type: 'Decimal128', required: true } });
+      const schema = Schema({ test: { type: 'Decimal128', required: true } });
       const fn = updateValidators({}, schema, {
         test: new Decimal128Type('33.426')
       }, {});
       fn(function(err) {
         assert.ifError(err);
+        done();
+      });
+    });
+
+    it('handles nested paths correctly (gh-3587)', function(done) {
+      const schema = Schema({
+        nested: {
+          a: { type: String, required: true },
+          b: { type: String, required: true }
+        }
+      });
+      const fn = updateValidators({}, schema, {
+        nested: { b: 'test' }
+      }, {});
+      fn(function(err) {
+        assert.ok(err);
+        assert.deepEqual(Object.keys(err.errors), ['nested.a']);
         done();
       });
     });

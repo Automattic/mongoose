@@ -602,10 +602,12 @@ describe('types.documentarray', function() {
       myArray = myArray.map(val => ({ name: `${val.name} mapped` }));
 
       myArray.splice(1, 1, { name: 'c' });
+      myArray.splice(2, 0, { name: 'd' });
 
       assert.deepEqual(myArray.map(v => v.name), [
         'a mapped',
         'c',
+        'd'
       ]);
     });
   });

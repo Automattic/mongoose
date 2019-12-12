@@ -1,3 +1,39 @@
+5.8.1 / 2019-12-12
+==================
+ * fix(documentarray): dont attempt to cast when modifying array returned from map() #8399
+ * fix(document): update single nested subdoc parent when setting to existing single nested doc #8400
+ * fix(schema): add `$embeddedSchemaType` property to arrays for consistency with document arrays #8389
+
+5.8.0 / 2019-12-09
+==================
+ * feat: wrap server selection timeout errors in `MongooseTimeoutError` to retain original stack trace #8259
+ * feat(model): add `Model.validate()` function that validates a POJO against the model's schema #7587
+ * feat(schema): add `Schema#pick()` function to create a new schema with a picked subset of the original schema's paths #8207
+ * feat(schema): add ability to change CastError message using `cast` option to SchemaType #8300
+ * feat(schema): group indexes defined in schema path with the same name #6499
+ * fix(model): build all indexes even if one index fails #8185 [unusualbob](https://github.com/unusualbob)
+ * feat(browser): pre-compile mongoose/browser #8350 [captaincaius](https://github.com/captaincaius)
+ * fix(connection): throw error when setting unsupported option #8335 #6899 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(schema): support `enum` validator for number type #8139
+ * feat(update): allow using MongoDB 4.2 update aggregation pipelines, with no Mongoose casting #8225
+ * fix(update): make update validators run on all subpaths when setting a nested path, even omitted subpaths #3587
+ * feat(schema): support setting `_id` as an option to single nested schema paths #8137
+ * feat(query): add Query#mongooseOptions() function #8296
+ * feat(array): make `MongooseArray#push()` support using `$position` #4322
+ * feat(schema): make pojo paths optionally become subdoc instead of Mixed #8228 [captaincaius](https://github.com/captaincaius)
+ * feat(model): add Model.cleanIndexes() to drop non-schema indexes #6676
+ * feat(document): make `updateOne()` document middleware pass `this` to post hooks #8262
+ * feat(aggregate): run pre/post aggregate hooks on `explain()` #5887
+ * docs(model+query): add `session` option to docs for findOneAndX() methods #8396
+
+5.7.14 / 2019-12-06
+===================
+ * fix(cursor): wait until all `eachAsync()` functions finish before resolving the promise #8352
+ * fix(update): handle embedded discriminator paths when discriminator key is defined in the update #8378
+ * fix(schematype): handle passing `message` function to `SchemaType#validate()` as positional arg #8360
+ * fix(map): handle cloning a schema that has a map of subdocuments #8357
+ * docs(schema): clarify that `uppercase`, `lowercase`, and `trim` options for SchemaString don't affect RegExp queries #8333
+
 5.7.13 / 2019-11-29
 ===================
  * fix: upgrade mongodb driver -> 3.3.5 #8383

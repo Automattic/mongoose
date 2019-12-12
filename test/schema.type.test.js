@@ -87,4 +87,17 @@ describe('schematype', function() {
       assert.ifError(err);
     });
   });
+
+  it('handles function as positional message arg (gh-8360)', function() {
+    const schema = Schema({
+      name: {
+        type: String,
+        validate: [() => false, err => `${err.path} is invalid!`]
+      }
+    });
+
+    const err = schema.path('name').doValidateSync('test');
+    assert.equal(err.name, 'ValidatorError');
+    assert.equal(err.message, 'name is invalid!');
+  });
 });

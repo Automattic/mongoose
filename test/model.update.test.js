@@ -829,7 +829,7 @@ describe('model: update:', function() {
       m.save(function(error, m) {
         assert.ifError(error);
         assert.equal(m.n.length, 1);
-        M.update(
+        M.updateOne(
           {name: '2.6'},
           {$push: {n: {$each: [{x: 2}, {x: 1}], $position: 0}}},
           function(error) {
@@ -3379,6 +3379,43 @@ describe('model: updateOne: ', function() {
       assert.equal(updatedDoc.slides[0].type, 'typeA');
       assert.equal(updatedDoc.slides[0].a, 'newValue1');
       assert.equal(updatedDoc.slides[0].commonField, 'newValue2');
+    });
+  });
+
+  describe('mongodb 42 features', function() {
+    before(function(done) {
+      start.mongodVersion((err, version) => {
+        assert.ifError(err);
+        if (version[0] < 4 || (version[0] === 4 && version[1] < 2)) {
+          this.skip();
+        }
+        done();
+      });
+    });
+
+    it('update pipeline (gh-8225)', function() {
+      const schema = Schema({ oldProp: String, newProp: String });
+      const Model = db.model('gh8225', schema);
+
+      return co(function*() {
+        yield Model.create({ oldProp: 'test' });
+        yield Model.updateOne({}, [
+          { $set: { newProp: 'test2' } },
+          { $unset: ['oldProp'] }
+        ]);
+        let doc = yield Model.findOne();
+        assert.equal(doc.newProp, 'test2');
+        assert.strictEqual(doc.oldProp, void 0);
+
+        // Aliased fields
+        yield Model.updateOne({}, [
+          { $addFields: { oldProp: 'test3' } },
+          { $project: { newProp: 0 } }
+        ]);
+        doc = yield Model.findOne();
+        assert.equal(doc.oldProp, 'test3');
+        assert.strictEqual(doc.newProp, void 0);
+      });
     });
   });
 });

@@ -394,19 +394,29 @@ block content
     const Any = new Schema({ any: Object });
     const Any = new Schema({ any: Schema.Types.Mixed });
     const Any = new Schema({ any: mongoose.Mixed });
-    // Note that if you're using `type`, putting _any_ POJO as the `type` will
+    // Note that by default, if you're using `type`, putting _any_ POJO as the `type` will
     // make the path mixed.
     const Any = new Schema({
       any: {
         type: { foo: String }
-      }
+      } // "any" will be Mixed - everything inside is ignored.
     });
+    // However, as of Mongoose 5.8.0, this behavior can be overridden with typePojoToMixed.
+    // In that case, it will create a single nested subdocument type instead.
+    const Any = new Schema({
+      any: {
+        type: { foo: String }
+      } // "any" will be a single nested subdocument.
+    }, {typePojoToMixed: false});
     ```
 
-    Since it is a schema-less type, you can change the value to anything else you
+    Since Mixed is a schema-less type, you can change the value to anything else you
     like, but Mongoose loses the ability to auto detect and save those changes.
     To tell Mongoose that the value of a Mixed type has changed, you need to
     call `doc.markModified(path)`, passing the path to the Mixed type you just changed.
+
+    To avoid these side-effects, a [Subdocument](./subdocs.html) path may be used
+    instead.
 
     ```javascript
     person.anything = { x: [3, 4, { y: "changed" }] };

@@ -1,5 +1,5 @@
 'use strict';
-import mongoose from '../../browser.js';
+import mongoose from './dist/browser.umd.js';
 
 const doc = new mongoose.Document({}, new mongoose.Schema({
   name: String

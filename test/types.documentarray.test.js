@@ -588,6 +588,28 @@ describe('types.documentarray', function() {
       assert.equal(friendsNames.length, 2);
       assert.equal(friendsNames[1], 'Sam');
     });
+
+    it('slice() after map() works (gh-8399)', function() {
+      const MyModel = db.model('gh8399', Schema({
+        myArray: [{ name: String }]
+      }));
+
+      const doc = new MyModel({
+        myArray: [{ name: 'a' }, { name: 'b' }]
+      });
+      let myArray = doc.myArray;
+
+      myArray = myArray.map(val => ({ name: `${val.name} mapped` }));
+
+      myArray.splice(1, 1, { name: 'c' });
+      myArray.splice(2, 0, { name: 'd' });
+
+      assert.deepEqual(myArray.map(v => v.name), [
+        'a mapped',
+        'c',
+        'd'
+      ]);
+    });
   });
 
   it('cleans modified subpaths on splice() (gh-7249)', function() {

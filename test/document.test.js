@@ -2571,7 +2571,7 @@ describe('document', function() {
       velvetRevolver.guitarist = gnr.guitarist;
       velvetRevolver.save(function(error) {
         assert.ifError(error);
-        assert.equal(velvetRevolver.guitarist, gnr.guitarist);
+        assert.equal(velvetRevolver.guitarist.name, 'Slash');
         done();
       });
     });
@@ -8281,5 +8281,24 @@ describe('document', function() {
         doc.nums.push(5);
       }, /Cannot call.*multiple times/);
     });
+  });
+
+  it('setting a path to a single nested document should update the single nested doc parent (gh-8400)', function() {
+    const schema = Schema({
+      name: String,
+      subdoc: new Schema({
+        name: String
+      })
+    });
+    const Model = db.model('gh8400', schema);
+
+    const doc1 = new Model({ name: 'doc1', subdoc: { name: 'subdoc1' } });
+    const doc2 = new Model({ name: 'doc2', subdoc: { name: 'subdoc2' } });
+
+    doc1.subdoc = doc2.subdoc;
+    assert.equal(doc1.subdoc.name, 'subdoc2');
+    assert.equal(doc2.subdoc.name, 'subdoc2');
+    assert.strictEqual(doc1.subdoc.ownerDocument(), doc1);
+    assert.strictEqual(doc2.subdoc.ownerDocument(), doc2);
   });
 });

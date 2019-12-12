@@ -1,3 +1,9 @@
+5.8.1 / 2019-12-12
+==================
+ * fix(documentarray): dont attempt to cast when modifying array returned from map() #8399
+ * fix(document): update single nested subdoc parent when setting to existing single nested doc #8400
+ * fix(schema): add `$embeddedSchemaType` property to arrays for consistency with document arrays #8389
+
 5.8.0 / 2019-12-09
 ==================
  * feat: wrap server selection timeout errors in `MongooseTimeoutError` to retain original stack trace #8259

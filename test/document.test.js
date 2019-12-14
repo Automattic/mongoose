@@ -1939,6 +1939,27 @@ describe('document', function() {
     });
   });
 
+  describe('gh-8371', function() {
+    it('seting isNew to true makes save tries to insert a new document (gh-8371)', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+
+        const Person = db.model('gh8371-A', personSchema);
+
+        const createdPerson = yield Person.create({name:'Hafez'});
+
+        const removedPerson = yield Person.findOneAndRemove({_id:createdPerson._id});
+
+        removedPerson.isNew = true;
+
+        yield removedPerson.save();
+
+        const foundPerson = yield Person.findOne({_id:removedPerson._id});
+        assert.ok(foundPerson);
+      });
+    });
+  });
+
   it('properly calls queue functions (gh-2856)', function(done) {
     const personSchema = new mongoose.Schema({
       name: String

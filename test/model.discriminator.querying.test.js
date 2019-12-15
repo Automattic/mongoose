@@ -177,16 +177,10 @@ describe('model', function() {
       });
 
       describe('discriminator model only finds documents of its type', function() {
-        let impressionEvent, conversionEvent1, conversionEvent2;
-
-        before(function() {
-          impressionEvent = new ImpressionEvent({name: 'Impression event'});
-          conversionEvent1 = new ConversionEvent({name: 'Conversion event 1', revenue: 1});
-          conversionEvent2 = new ConversionEvent({name: 'Conversion event 2', revenue: 2});
-        });
 
         describe('using "ModelDiscriminator#findById"', function() {
           it('to find a document of the appropriate discriminator', function(done) {
+            const impressionEvent = new ImpressionEvent({name: 'Impression event'});
             impressionEvent.save(function(err) {
               assert.ifError(err);
 
@@ -217,6 +211,9 @@ describe('model', function() {
 
         describe('using "ModelDiscriminator#find"', function() {
           it('to find documents of the appropriate discriminator', function(done) {
+            const impressionEvent = new ImpressionEvent({name: 'Impression event'});
+            const conversionEvent1 = new ConversionEvent({name: 'Conversion event 1', revenue: 1});
+            const conversionEvent2 = new ConversionEvent({name: 'Conversion event 2', revenue: 2});
             impressionEvent.save(function(err) {
               assert.ifError(err);
               conversionEvent1.save(function(err) {

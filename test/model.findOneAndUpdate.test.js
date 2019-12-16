@@ -2436,4 +2436,21 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(doc.shape.radius, 10);
     });
   });
+
+  it('setDefaultsOnInsert with doubly nested subdocs (gh-8392)', function() {
+    const nestedSchema = Schema({ name: String });
+    const Model = db.model('gh8392', Schema({
+      L1: Schema({
+        L2: {
+          type: nestedSchema,
+          default: () => ({ name: 'foo' })
+        }
+      }),
+      prop: String
+    }));
+
+    const opts = { upsert: true, setDefaultsOnInsert: true, new: true };
+    return Model.findOneAndUpdate({}, { prop: 'foo', L1: {} }, opts).lean().
+      then(doc => assert.equal(doc.L1.L2.name, 'foo'));
+  });
 });

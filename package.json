@@ -21,7 +21,7 @@
   "dependencies": {
     "bson": "~1.1.1",
     "kareem": "2.3.1",
-    "mongodb": "3.3.5",
+    "mongodb": "3.4.0",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.6.0",
     "mquery": "3.2.2",

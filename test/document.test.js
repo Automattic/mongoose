@@ -1958,10 +1958,32 @@ describe('document', function() {
       });
     });
 
-    it('saving a document with no changes, throws an error when document is not found', function() {
+    it('setting isNew to true throws an error when a document already exists (gh-8371)', function() {
       return co(function*() {
         const personSchema = new Schema({ name: String });
         const Person = db.model('gh8371-B', personSchema);
+
+        const createdPerson = yield Person.create({name:'Hafez'});
+
+        createdPerson.isNew = true;
+
+        let threw = false;
+        try {
+          yield createdPerson.save();
+        }
+        catch (err) {
+          threw = true;
+          assert.equal(err.code, 11000);
+        }
+
+        assert.equal(threw,true);
+      });
+    });
+
+    it('saving a document with no changes, throws an error when document is not found', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-C', personSchema);
 
         const person = yield Person.create({name:'Hafez'});
 
@@ -1973,7 +1995,7 @@ describe('document', function() {
         }
         catch (err) {
           assert.equal(err instanceof DocumentNotFoundError, true);
-          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-B"`);
+          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-C"`);
           threw = true;
         }
 
@@ -1984,7 +2006,7 @@ describe('document', function() {
     it('saving a document with changes, throws an error when document is not found', function() {
       return co(function*() {
         const personSchema = new Schema({ name: String });
-        const Person = db.model('gh8371-C', personSchema);
+        const Person = db.model('gh8371-D', personSchema);
 
         const person = yield Person.create({name:'Hafez'});
 
@@ -1998,7 +2020,7 @@ describe('document', function() {
         }
         catch (err) {
           assert.equal(err instanceof DocumentNotFoundError,true);
-          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-C"`);
+          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-D"`);
           threw = true;
         }
 

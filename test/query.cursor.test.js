@@ -475,4 +475,12 @@ describe('QueryCursor', function() {
         assert.equal(cursor.cursor.cursorState.batchSize, 2001);
       });
   });
+
+  it('pulls schema-level readPreference (gh-8421)', function() {
+    const read = 'secondaryPreferred';
+    const User = db.model('gh8421', Schema({ name: String }, { read }));
+    const cursor = User.find().cursor();
+
+    assert.equal(cursor.options.readPreference.mode, read);
+  });
 });

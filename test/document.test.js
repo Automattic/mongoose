@@ -8315,7 +8315,6 @@ describe('document', function() {
       yield A.create({ name: 'testa', rel: [b._id] });
 
       const a = yield A.findOne().populate('rel');
-      console.log(a.populated('rel'), a.rel);
 
       const b2 = yield B.create({ name: 'testb2' });
       a.rel = [a.rel[0], b2._id];

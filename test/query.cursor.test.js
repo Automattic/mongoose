@@ -494,15 +494,15 @@ describe('QueryCursor', function() {
         { name: 'Ip Man' },
         { name: 'Enter the Dragon' }
       ]);
-  
+
       let numDone = 0;
-  
+
       const test = co.wrap(function*() {
         yield new Promise((resolve) => setTimeout(resolve, 100));
         ++numDone;
       });
-  
-      yield Movie.find().cursor().eachAsync(test, { parallel: 4 })
+
+      yield Movie.find().cursor().eachAsync(test, { parallel: 4 });
       assert.equal(numDone, 3);
     });
   });

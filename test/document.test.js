@@ -25,6 +25,7 @@ const SchemaType = mongoose.SchemaType;
 const ValidatorError = SchemaType.ValidatorError;
 const ValidationError = mongoose.Document.ValidationError;
 const MongooseError = mongoose.Error;
+const DocumentNotFoundError = mongoose.Error.DocumentNotFoundError;
 
 /**
  * Test Document constructor.
@@ -1935,6 +1936,95 @@ describe('document', function() {
             done();
           });
         });
+      });
+    });
+  });
+
+  describe('gh-8371', function() {
+    it('setting isNew to true makes save tries to insert a new document (gh-8371)', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-A', personSchema);
+
+        const createdPerson = yield Person.create({name:'Hafez'});
+        const removedPerson = yield Person.findOneAndRemove({_id:createdPerson._id});
+
+        removedPerson.isNew = true;
+
+        yield removedPerson.save();
+
+        const foundPerson = yield Person.findOne({_id:removedPerson._id});
+        assert.ok(foundPerson);
+      });
+    });
+
+    it('setting isNew to true throws an error when a document already exists (gh-8371)', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-B', personSchema);
+
+        const createdPerson = yield Person.create({name:'Hafez'});
+
+        createdPerson.isNew = true;
+
+        let threw = false;
+        try {
+          yield createdPerson.save();
+        }
+        catch (err) {
+          threw = true;
+          assert.equal(err.code, 11000);
+        }
+
+        assert.equal(threw,true);
+      });
+    });
+
+    it('saving a document with no changes, throws an error when document is not found', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-C', personSchema);
+
+        const person = yield Person.create({name:'Hafez'});
+
+        yield Person.deleteOne({_id:person._id});
+
+        let threw = false;
+        try {
+          yield person.save();
+        }
+        catch (err) {
+          assert.equal(err instanceof DocumentNotFoundError, true);
+          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-C"`);
+          threw = true;
+        }
+
+        assert.equal(threw,true);
+      });
+    });
+
+    it('saving a document with changes, throws an error when document is not found', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-D', personSchema);
+
+        const person = yield Person.create({name:'Hafez'});
+
+        yield Person.deleteOne({_id:person._id});
+
+        person.name = 'Different Name';
+
+        let threw = false;
+        try {
+          yield person.save();
+        }
+        catch (err) {
+          assert.equal(err instanceof DocumentNotFoundError,true);
+          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-D"`);
+          threw = true;
+        }
+
+        assert.equal(threw,true);
       });
     });
   });

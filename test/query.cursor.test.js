@@ -483,4 +483,27 @@ describe('QueryCursor', function() {
 
     assert.equal(cursor.options.readPreference.mode, read);
   });
+
+  it('eachAsync() with parallel > numDocs (gh-8422)', function() {
+    const schema = new mongoose.Schema({ name: String });
+    const Movie = db.model('gh8422', schema);
+
+    return co(function*() {
+      yield Movie.create([
+        { name: 'Kickboxer' },
+        { name: 'Ip Man' },
+        { name: 'Enter the Dragon' }
+      ]);
+  
+      let numDone = 0;
+  
+      const test = co.wrap(function*() {
+        yield new Promise((resolve) => setTimeout(resolve, 100));
+        ++numDone;
+      });
+  
+      yield Movie.find().cursor().eachAsync(test, { parallel: 4 })
+      assert.equal(numDone, 3);
+    });
+  });
 });

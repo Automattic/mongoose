@@ -2348,5 +2348,8 @@ describe('schema', function() {
     TurboManSchema.add(ToySchema).add({ year: Number });
 
     assert.equal(TurboManSchema.path('name').instance, 'String');
+    assert.equal(TurboManSchema.path('color').instance, 'String');
+    assert.equal(TurboManSchema.path('price').instance, 'Number');
+    assert.equal(TurboManSchema.path('year').instance, 'Number');
   });
 });

@@ -218,20 +218,60 @@ block content
 
     <h3 id="query-conditions"><a href="#query-conditions">Query conditions and other options</a></h3>
 
-    What if we wanted to populate our fans array based on their age, select
-    just their names, and return at most, any 5 of them?
+    What if we wanted to populate our fans array based on their age and
+    select just their names?
 
     ```javascript
     Story.
       find(...).
       populate({
         path: 'fans',
-        match: { age: { $gte: 21 }},
+        match: { age: { $gte: 21 } },
         // Explicitly exclude `_id`, see http://bit.ly/2aEfTdB
-        select: 'name -_id',
-        options: { limit: 5 }
+        select: 'name -_id'
       }).
       exec();
+    ```
+
+    Populate does support a `limit` option, however, it currently
+    does **not** limit on a per-document basis. For example, suppose
+    you have 2 stories:
+
+    ```javascript
+    Story.create([
+      { title: 'Casino Royale', fans: [1, 2, 3, 4, 5, 6, 7, 8] },
+      { title: 'Live and Let Die', fans: [9, 10] }
+    ]);
+    ```
+
+    If you were to `populate()` using the `limit` option, you
+    would find that the 2nd story has 0 fans:
+
+    ```javascript
+    const stories = Story.find().sort({ name: 1 }).populate({
+      path: 'fans',
+      options: { limit: 2 }
+    });
+
+    stories[0].fans.length; // 2
+    stories[1].fans.length; // 0
+    ```
+
+    That's because, in order to avoid executing a separate query
+    for each document, Mongoose instead queries for fans using
+    `numDocuments * limit` as the limit. As a workaround, you
+    should populate each document individually:
+
+    ```javascript
+    const stories = await Story.find().sort({ name: 1 });
+    for (const story of stories) {
+      await story.
+        populate({ path: 'fans', options: { limit: 2 } }).
+        execPopulate();
+    }
+
+    stories[0].fans.length; // 2
+    stories[1].fans.length; // 2
     ```
 
     <h3 id="refs-to-children"><a href="#refs-to-children">Refs to children</a></h3>

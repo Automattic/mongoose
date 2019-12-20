@@ -2339,4 +2339,14 @@ describe('schema', function() {
       assert.ok(threw);
     });
   });
+
+  it('copies `.add()`-ed paths when calling `.add()` with a schema argument (gh-8429)', function() {
+    const ToySchema = Schema();
+    ToySchema.add({ name: String, color: String, price: Number });
+
+    const TurboManSchema = Schema();
+    TurboManSchema.add(ToySchema).add({ year: Number });
+
+    assert.equal(TurboManSchema.path('name').instance, 'String');
+  });
 });

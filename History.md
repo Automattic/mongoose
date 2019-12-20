@@ -1,3 +1,15 @@
+5.8.2 / 2019-12-20
+==================
+ * fix(schema): copy `.add()`-ed paths when calling `.add()` with schema argument #8429
+ * fix(cursor): pull schema-level readPreference when using `Query#cursor()` #8421
+ * fix(cursor): wait for all promises to resolve if `parallel` is greater than number of documents #8422
+ * fix(document): depopulate entire array when setting array path to a partially populated array #8443
+ * fix: handle setDefaultsOnInsert with deeply nested subdocs #8392
+ * fix(document): report `DocumentNotFoundError` if underlying document deleted but no changes made #8428 #8371 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(populate): clarify limitations of `limit` option for populate and suggest workaround #8409
+ * docs(deprecations): explain which connection options are no longer relevant with useUnifiedTopology #8411
+ * chore: allow browser build to be published #8435 #8427 [captaincaius](https://github.com/captaincaius)
+
 5.8.1 / 2019-12-12
 ==================
  * fix(documentarray): dont attempt to cast when modifying array returned from map() #8399

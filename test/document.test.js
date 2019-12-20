@@ -8301,4 +8301,29 @@ describe('document', function() {
     assert.strictEqual(doc1.subdoc.ownerDocument(), doc1);
     assert.strictEqual(doc2.subdoc.ownerDocument(), doc2);
   });
+
+  it('setting an array to an array with some populated documents depopulates the whole array (gh-8443)', function() {
+    const A = db.model('gh8443_A', Schema({
+      name: String,
+      rel: [{ type: mongoose.ObjectId, ref: 'gh8443_B' }]
+    }));
+
+    const B = db.model('gh8443_B', Schema({ name: String }));
+
+    return co(function*() {
+      const b = yield B.create({ name: 'testb' });
+      yield A.create({ name: 'testa', rel: [b._id] });
+
+      const a = yield A.findOne().populate('rel');
+      console.log(a.populated('rel'), a.rel);
+
+      const b2 = yield B.create({ name: 'testb2' });
+      a.rel = [a.rel[0], b2._id];
+      yield a.save();
+
+      assert.ok(!a.populated('rel'));
+      assert.ok(a.rel[0] instanceof mongoose.Types.ObjectId);
+      assert.ok(a.rel[1] instanceof mongoose.Types.ObjectId);
+    });
+  });
 });

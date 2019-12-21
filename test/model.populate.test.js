@@ -8878,7 +8878,7 @@ describe('model: populate:', function() {
       name: String
     });
     const Company = db.model('gh8432_Companies', companySchema);
-    
+
     const userSchema = new mongoose.Schema({
       fullName: String,
       companyId: {
@@ -8887,7 +8887,7 @@ describe('model: populate:', function() {
       }
     });
     const User = db.model('gh8432_Users', userSchema);
-    
+
     const fileSchema = new mongoose.Schema({
       _id: String,
       uploaderId: {
@@ -8901,7 +8901,7 @@ describe('model: populate:', function() {
       foreignField: '_id',
       justOne: true
     });
-    
+
     const rideSchema = new mongoose.Schema({
       title: String,
       files: { type: [fileSchema], default: [] }
@@ -8918,7 +8918,7 @@ describe('model: populate:', function() {
           files: [{ _id: '123', uploaderId: user._id }]
         }
       ]);
-      yield Ride.updateMany({}, { $unset: { files: 1 } });  
+      yield Ride.updateMany({}, { $unset: { files: 1 } });
 
       const populatedRides = yield Ride.find({}).populate({
         path: 'files.uploadedBy',

@@ -8872,4 +8872,64 @@ describe('model: populate:', function() {
       });
     });
   });
+
+  it('doesnt insert empty document when populating a path within a non-existent document array (gh-8432)', function() {
+    const companySchema = new mongoose.Schema({
+      name: String
+    });
+    const Company = db.model('gh8432_Companies', companySchema);
+    
+    const userSchema = new mongoose.Schema({
+      fullName: String,
+      companyId: {
+        type: mongoose.ObjectId,
+        ref: 'gh8432_Companies'
+      }
+    });
+    const User = db.model('gh8432_Users', userSchema);
+    
+    const fileSchema = new mongoose.Schema({
+      _id: String,
+      uploaderId: {
+        type: mongoose.ObjectId,
+        ref: 'gh8432_Users'
+      }
+    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+    fileSchema.virtual('uploadedBy', {
+      ref: 'gh8432_Users',
+      localField: 'uploaderId',
+      foreignField: '_id',
+      justOne: true
+    });
+    
+    const rideSchema = new mongoose.Schema({
+      title: String,
+      files: { type: [fileSchema], default: [] }
+    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+    const Ride = db.model('gh8432_Ride', rideSchema);
+
+    return co(function*() {
+      const company = yield Company.create({ name: 'Apple' });
+      const user = yield User.create({ fullName: 'John Doe', companyId: company._id });
+      yield Ride.create([
+        { title: 'London-Paris' },
+        {
+          title: 'Berlin-Moscow',
+          files: [{ _id: '123', uploaderId: user._id }]
+        }
+      ]);
+      yield Ride.updateMany({}, { $unset: { files: 1 } });  
+
+      const populatedRides = yield Ride.find({}).populate({
+        path: 'files.uploadedBy',
+        justOne: true,
+        populate: {
+          path: 'companyId',
+          justOne: true
+        }
+      });
+      assert.deepEqual(populatedRides[0].files, []);
+      assert.deepEqual(populatedRides[1].files, []);
+    });
+  });
 });

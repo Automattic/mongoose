@@ -759,4 +759,23 @@ describe('Map', function() {
     const err = doc.validateSync();
     assert.ifError(err);
   });
+
+  it('maps of single nested docs with inline _id (gh-8424)', function() {
+    const childSchema = mongoose.Schema({ name: String });
+    const schema = mongoose.Schema({
+      myMap: {
+        type: Map,
+        of: {
+          type: childSchema,
+          _id: false
+        }
+      }
+    });
+    const Model = db.model('gh8424', schema);
+
+    const doc = new Model({ myMap: { foo: { name: 'bar' } } });
+
+    assert.equal(doc.myMap.get('foo').name, 'bar');
+    assert.ok(!doc.myMap.get('foo')._id);
+  });
 });

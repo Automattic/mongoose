@@ -475,4 +475,35 @@ describe('QueryCursor', function() {
         assert.equal(cursor.cursor.cursorState.batchSize, 2001);
       });
   });
+
+  it('pulls schema-level readPreference (gh-8421)', function() {
+    const read = 'secondaryPreferred';
+    const User = db.model('gh8421', Schema({ name: String }, { read }));
+    const cursor = User.find().cursor();
+
+    assert.equal(cursor.options.readPreference.mode, read);
+  });
+
+  it('eachAsync() with parallel > numDocs (gh-8422)', function() {
+    const schema = new mongoose.Schema({ name: String });
+    const Movie = db.model('gh8422', schema);
+
+    return co(function*() {
+      yield Movie.create([
+        { name: 'Kickboxer' },
+        { name: 'Ip Man' },
+        { name: 'Enter the Dragon' }
+      ]);
+
+      let numDone = 0;
+
+      const test = co.wrap(function*() {
+        yield new Promise((resolve) => setTimeout(resolve, 100));
+        ++numDone;
+      });
+
+      yield Movie.find().cursor().eachAsync(test, { parallel: 4 });
+      assert.equal(numDone, 3);
+    });
+  });
 });

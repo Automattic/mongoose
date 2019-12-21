@@ -192,6 +192,18 @@ block content
     mongoose.set('useUnifiedTopology', true);
     ```
 
+    The `useUnifiedTopology` option removes support for several
+    [connection options](/docs/connections.html#options) that are
+    no longer relevant with the new topology engine:
+
+    - `autoReconnect`
+    - `reconnectTries`
+    - `reconnectInterval`
+
+    When you enable `useUnifiedTopology`, please remove those options
+    from your [`mongoose.connect()`](/docs/api/mongoose.html#mongoose_Mongoose-connect) or
+    [`createConnection()`](/docs/api/mongoose.html#mongoose_Mongoose-createConnection) calls.
+
     If you find any unexpected behavior, please [open up an issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
     ## `update()`

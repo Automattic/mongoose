@@ -25,6 +25,7 @@ const SchemaType = mongoose.SchemaType;
 const ValidatorError = SchemaType.ValidatorError;
 const ValidationError = mongoose.Document.ValidationError;
 const MongooseError = mongoose.Error;
+const DocumentNotFoundError = mongoose.Error.DocumentNotFoundError;
 
 /**
  * Test Document constructor.
@@ -1939,6 +1940,95 @@ describe('document', function() {
     });
   });
 
+  describe('gh-8371', function() {
+    it('setting isNew to true makes save tries to insert a new document (gh-8371)', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-A', personSchema);
+
+        const createdPerson = yield Person.create({name:'Hafez'});
+        const removedPerson = yield Person.findOneAndRemove({_id:createdPerson._id});
+
+        removedPerson.isNew = true;
+
+        yield removedPerson.save();
+
+        const foundPerson = yield Person.findOne({_id:removedPerson._id});
+        assert.ok(foundPerson);
+      });
+    });
+
+    it('setting isNew to true throws an error when a document already exists (gh-8371)', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-B', personSchema);
+
+        const createdPerson = yield Person.create({name:'Hafez'});
+
+        createdPerson.isNew = true;
+
+        let threw = false;
+        try {
+          yield createdPerson.save();
+        }
+        catch (err) {
+          threw = true;
+          assert.equal(err.code, 11000);
+        }
+
+        assert.equal(threw,true);
+      });
+    });
+
+    it('saving a document with no changes, throws an error when document is not found', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-C', personSchema);
+
+        const person = yield Person.create({name:'Hafez'});
+
+        yield Person.deleteOne({_id:person._id});
+
+        let threw = false;
+        try {
+          yield person.save();
+        }
+        catch (err) {
+          assert.equal(err instanceof DocumentNotFoundError, true);
+          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-C"`);
+          threw = true;
+        }
+
+        assert.equal(threw,true);
+      });
+    });
+
+    it('saving a document with changes, throws an error when document is not found', function() {
+      return co(function*() {
+        const personSchema = new Schema({ name: String });
+        const Person = db.model('gh8371-D', personSchema);
+
+        const person = yield Person.create({name:'Hafez'});
+
+        yield Person.deleteOne({_id:person._id});
+
+        person.name = 'Different Name';
+
+        let threw = false;
+        try {
+          yield person.save();
+        }
+        catch (err) {
+          assert.equal(err instanceof DocumentNotFoundError,true);
+          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "gh8371-D"`);
+          threw = true;
+        }
+
+        assert.equal(threw,true);
+      });
+    });
+  });
+
   it('properly calls queue functions (gh-2856)', function(done) {
     const personSchema = new mongoose.Schema({
       name: String
@@ -2571,7 +2661,7 @@ describe('document', function() {
       velvetRevolver.guitarist = gnr.guitarist;
       velvetRevolver.save(function(error) {
         assert.ifError(error);
-        assert.equal(velvetRevolver.guitarist, gnr.guitarist);
+        assert.equal(velvetRevolver.guitarist.name, 'Slash');
         done();
       });
     });
@@ -8280,6 +8370,49 @@ describe('document', function() {
       assert.throws(() => {
         doc.nums.push(5);
       }, /Cannot call.*multiple times/);
+    });
+  });
+
+  it('setting a path to a single nested document should update the single nested doc parent (gh-8400)', function() {
+    const schema = Schema({
+      name: String,
+      subdoc: new Schema({
+        name: String
+      })
+    });
+    const Model = db.model('gh8400', schema);
+
+    const doc1 = new Model({ name: 'doc1', subdoc: { name: 'subdoc1' } });
+    const doc2 = new Model({ name: 'doc2', subdoc: { name: 'subdoc2' } });
+
+    doc1.subdoc = doc2.subdoc;
+    assert.equal(doc1.subdoc.name, 'subdoc2');
+    assert.equal(doc2.subdoc.name, 'subdoc2');
+    assert.strictEqual(doc1.subdoc.ownerDocument(), doc1);
+    assert.strictEqual(doc2.subdoc.ownerDocument(), doc2);
+  });
+
+  it('setting an array to an array with some populated documents depopulates the whole array (gh-8443)', function() {
+    const A = db.model('gh8443_A', Schema({
+      name: String,
+      rel: [{ type: mongoose.ObjectId, ref: 'gh8443_B' }]
+    }));
+
+    const B = db.model('gh8443_B', Schema({ name: String }));
+
+    return co(function*() {
+      const b = yield B.create({ name: 'testb' });
+      yield A.create({ name: 'testa', rel: [b._id] });
+
+      const a = yield A.findOne().populate('rel');
+
+      const b2 = yield B.create({ name: 'testb2' });
+      a.rel = [a.rel[0], b2._id];
+      yield a.save();
+
+      assert.ok(!a.populated('rel'));
+      assert.ok(a.rel[0] instanceof mongoose.Types.ObjectId);
+      assert.ok(a.rel[1] instanceof mongoose.Types.ObjectId);
     });
   });
 });

@@ -15,7 +15,6 @@ bin/
 tools/31*
 *.key
 data/
-dist/
 
 *.txt
 *.png

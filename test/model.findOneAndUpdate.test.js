@@ -2453,4 +2453,38 @@ describe('model: findOneAndUpdate:', function() {
     return Model.findOneAndUpdate({}, { prop: 'foo', L1: {} }, opts).lean().
       then(doc => assert.equal(doc.L1.L2.name, 'foo'));
   });
+
+  it('calls setters on mixed type (gh-8444)', function() {
+    const userSchema = new Schema({
+      jobCategory: {
+        type: Object,
+        set: () => {
+          return {
+            name: 'from setter 1',
+            value: 'from setter 2'
+          };
+        }
+      },
+      num: {
+        type: Number,
+        set: () => 42
+      }
+    });
+
+    const User = db.model('gh8444', userSchema);
+
+    return co(function*() {
+      const doc = yield User.findOneAndUpdate({}, {
+        num: 5,
+        jobCategory: {
+          name: 2,
+          value: 2
+        }
+      }, { new: true, upsert: true }).lean();
+
+      assert.equal(doc.num, 42);
+      assert.equal(doc.jobCategory.name, 'from setter 1');
+      assert.equal(doc.jobCategory.value, 'from setter 2');
+    });
+  });
 });

@@ -43,6 +43,7 @@ block content
       <li><a href="#connection-string-options">Connection String Options</a></li>
       <li><a href="#connection-events">Connection Events</a></li>
       <li><a href="#keepAlive">A note about keepAlive</a></li>
+      <li><a href="#server-selection">Server Selection</a></li>
       <li><a href="#replicaset_connections">Replica Set Connections</a></li>
       <li><a href="#replicaset-hostnames">Replica Set Host Names</a></li>
       <li><a href="#mongos_connections">Multi-mongos support</a></li>
@@ -277,6 +278,47 @@ block content
 
     ```javascript
     mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
+    ```
+
+    <h3 id="server-selection"><a href="#server-selection">Server Selection</a></h3>
+
+    If you enable the `useUnifiedTopology` option, the underlying MongoDB driver
+    will use [server selection](https://github.com/mongodb/specifications/blob/master/source/server-selection/server-selection.rst)
+    to connect to MongoDB and send operations to MongoDB. If the MongoDB
+    driver can't find a server to send an operation to after `serverSelectionTimeoutMS`,
+    you'll get the below error:
+    
+    ```
+    MongoTimeoutError: Server selection timed out after 30000 ms
+    ```
+
+    You can configure the timeout using the `serverSelectionTimeoutMS` option
+    to `mongoose.connect()`:
+
+    ```javascript
+    mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
+    });
+    ```
+
+    A `MongoTimeoutError` has a `reason` property that explains why
+    server selection timed out. For example, if you're connecting to
+    a standalone server with an incorrect password, `reason`
+    will contain an "Authentication failed" error.
+
+    ```javascript
+    const mongoose = require('mongoose');
+
+    const uri = 'mongodb+srv://username:badpw@cluster0-OMITTED.mongodb.net/' +
+      'test?retryWrites=true&w=majority';
+    // Prints "MongoError: bad auth Authentication failed."
+    mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000
+    }).catch(err => console.log(err.reason));
     ```
 
     <h3 id="replicaset-hostnames"><a href="#replicaset-hostnames">Replica Set Host Names</a></h3>

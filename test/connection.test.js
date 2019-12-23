@@ -509,7 +509,7 @@ describe('connections:', function() {
   describe('connect callbacks', function() {
     it('should return an error if malformed uri passed', function(done) {
       const db = mongoose.createConnection('mongodb:///fake', { useNewUrlParser: true }, function(err) {
-        assert.ok(/hostname/.test(err.message));
+        assert.equal(err.name, 'MongoParseError');
         done();
       });
       db.close();

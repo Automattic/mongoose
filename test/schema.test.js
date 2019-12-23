@@ -2206,6 +2206,41 @@ describe('schema', function() {
     assert.ok(doc.child._id);
   });
 
+  it('supports defining `_id: false` on document arrays (gh-8450)', function() {
+    const nestedSchema = Schema({ some: String });
+    let parentSchema = Schema({
+      arrayed: {
+        type: [{
+          type: nestedSchema,
+          _id: false
+        }]
+      }
+    });
+
+    assert.ok(!parentSchema.path('arrayed').schema.path('_id'));
+
+    parentSchema = Schema({
+      arrayed: {
+        type: [{
+          type: nestedSchema
+        }],
+        _id: false
+      }
+    });
+
+    assert.ok(!parentSchema.path('arrayed').schema.path('_id'));
+
+    parentSchema = Schema({
+      arrayed: {
+        type: [{
+          type: nestedSchema
+        }]
+      }
+    });
+
+    assert.ok(parentSchema.path('arrayed').schema.path('_id').auto);
+  });
+
   describe('pick() (gh-8207)', function() {
     it('works with nested paths', function() {
       const schema = Schema({

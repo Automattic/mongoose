@@ -1,3 +1,11 @@
+5.8.3 / 2019-12-23
+==================
+ * fix: upgrade mongodb -> 3.4.1 #8430 [jaschaio](https://github.com/jaschaio)
+ * fix(populate): don't add empty subdocument to array when populating path underneath a non-existent document array #8432
+ * fix(schema): handle `_id` option for document array schematypes #8450
+ * fix(update): call setters when updating mixed type #8444
+ * docs(connections): add note about MongoTimeoutError.reason #8402
+
 5.8.2 / 2019-12-20
 ==================
  * fix(schema): copy `.add()`-ed paths when calling `.add()` with schema argument #8429

@@ -1253,29 +1253,41 @@ describe('schema', function() {
       });
     });
 
-    it('enums on arrays (gh-6102)', function() {
+    it('enums on arrays (gh-6102) (gh-8449)', function() {
       assert.throws(function() {
         new Schema({
           array: {
-            type: [Number],
-            enum: [1]
+            type: [Boolean],
+            enum: [true]
           }
         });
-      }, /`enum` can only be set on an array of strings/);
+      }, /`enum` can only be set on an array of strings or numbers/);
 
-      const MySchema = new Schema({
+      let MySchema = new Schema({
         array: {
           type: [String],
           enum: ['qwerty']
         }
       });
 
-      const Model = mongoose.model('gh6102', MySchema);
-      const doc = new Model({ array: ['test'] });
+      let Model = mongoose.model('gh6102', MySchema);
+      const doc1 = new Model({ array: ['test'] });
 
-      return doc.validate().
-        then(() => assert.ok(false)).
-        catch(err => assert.equal(err.name, 'ValidationError'));
+      MySchema = new Schema({
+        array: {
+          type: [Number],
+          enum: [3, 5, 7]
+        }
+      });
+
+      mongoose.deleteModel('gh6102');
+      Model = mongoose.model('gh6102', MySchema);
+      const doc2 = new Model({ array: [1, 2, 3] });
+
+      return doc1.validate().
+        then(() => assert.ok(false), err => assert.equal(err.name, 'ValidationError')).
+        then(() => doc2.validate()).
+        then(() => assert.ok(false), err => assert.equal(err.name, 'ValidationError'));
     });
 
     it('skips conditional required (gh-3539)', function(done) {

@@ -1146,4 +1146,18 @@ describe('connections:', function() {
     assert.ok(Model);
     return Model.create({ name: 'test' });
   });
+
+  it('throws a MongooseTimeoutError on server selection timeout (gh-8451)', () => {
+    const opts = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 100
+    };
+    const uri = 'mongodb://baddomain:27017/test';
+
+    return mongoose.createConnection(uri, opts).then(() => assert.ok(false), err => {
+      assert.equal(err.message, 'Server selection timed out after 100 ms');
+      assert.equal(err.name, 'MongooseTimeoutError');
+    });
+  });
 });

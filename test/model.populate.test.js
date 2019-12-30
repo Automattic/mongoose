@@ -8937,16 +8937,16 @@ describe('model: populate:', function() {
     const TestSchema = new Schema({
       thingIds: [mongoose.ObjectId]
     });
-    
+
     TestSchema.virtual('things', {
       ref: 'gh8455_Thing',
       localField: 'thingIds',
       foreignField: '_id',
       justOne: false
     });
-    
+
     const Test = db.model('gh8455_Test', TestSchema);
-    const Thing = db.model('gh8455_Thing', mongoose.Schema({ name: String }));
+    db.model('gh8455_Thing', mongoose.Schema({ name: String }));
 
     return co(function*() {
       yield Test.collection.insertOne({});

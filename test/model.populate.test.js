@@ -8932,4 +8932,27 @@ describe('model: populate:', function() {
       assert.deepEqual(populatedRides[1].files, []);
     });
   });
+
+  it('sets empty array if populating undefined path (gh-8455)', function() {
+    const TestSchema = new Schema({
+      thingIds: [mongoose.ObjectId]
+    });
+    
+    TestSchema.virtual('things', {
+      ref: 'gh8455_Thing',
+      localField: 'thingIds',
+      foreignField: '_id',
+      justOne: false
+    });
+    
+    const Test = db.model('gh8455_Test', TestSchema);
+    const Thing = db.model('gh8455_Thing', mongoose.Schema({ name: String }));
+
+    return co(function*() {
+      yield Test.collection.insertOne({});
+
+      const doc = yield Test.findOne().populate('things');
+      assert.deepEqual(doc.toObject({ virtuals: true }).things, []);
+    });
+  });
 });

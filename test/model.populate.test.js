@@ -8955,4 +8955,48 @@ describe('model: populate:', function() {
       assert.deepEqual(doc.toObject({ virtuals: true }).things, []);
     });
   });
+
+  it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452)', function() {
+    const ImageSchema = Schema({ imageName: String });
+    const Image = db.model('gh8452_Image', ImageSchema);
+  
+    const TextSchema = Schema({ textName: String });
+    const Text = db.model('gh8452_Text', TextSchema);
+  
+    const opts = { _id: false };
+    const ItemSchema = Schema({ objectType: String }, opts);
+    const ItemSchemaA = Schema({
+      data: { 
+        type: ObjectId,
+        refPath: 'list.objectType'
+      },
+      objectType: String,
+    }, opts);
+    const ItemSchemaB = Schema({
+      data: { sourceId: Number },
+      objectType: String,
+    }, opts);
+  
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+    ExampleSchema.path('list').discriminator('gh8452_ExtendA', ItemSchemaA);
+    ExampleSchema.path('list').discriminator('gh8452_ExtendB', ItemSchemaB);
+    const Example = db.model('gh8452_Example', ExampleSchema);
+
+    return co(function*() {
+      const image = yield Image.create({ imageName: 'image' });
+      const text = yield Text.create({ textName: 'text' });
+      yield Example.create({
+        test: '02',
+        list: [
+          { __t: 'gh8452_ExtendA', data: image._id, objectType: 'gh8452_Image' },
+          { __t: 'gh8452_ExtendA', data: text._id, objectType: 'gh8452_Text' },
+          { __t: 'gh8452_ExtendB', data: { sourceId: 123 }, objectType: 'ExternalSourceA' }
+        ]
+      });
+
+      const res = yield Example.findOne().populate('list.data').lean();
+      assert.equal(res.list[0].data.imageName, 'image');
+      assert.equal(res.list[1].data.textName, 'text');
+    });
+  });
 });

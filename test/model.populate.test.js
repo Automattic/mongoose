@@ -8959,14 +8959,14 @@ describe('model: populate:', function() {
   it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452)', function() {
     const ImageSchema = Schema({ imageName: String });
     const Image = db.model('gh8452_Image', ImageSchema);
-  
+
     const TextSchema = Schema({ textName: String });
     const Text = db.model('gh8452_Text', TextSchema);
-  
+
     const opts = { _id: false };
     const ItemSchema = Schema({ objectType: String }, opts);
     const ItemSchemaA = Schema({
-      data: { 
+      data: {
         type: ObjectId,
         refPath: 'list.objectType'
       },
@@ -8976,7 +8976,7 @@ describe('model: populate:', function() {
       data: { sourceId: Number },
       objectType: String,
     }, opts);
-  
+
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
     ExampleSchema.path('list').discriminator('gh8452_ExtendA', ItemSchemaA);
     ExampleSchema.path('list').discriminator('gh8452_ExtendB', ItemSchemaB);

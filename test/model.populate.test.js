@@ -8997,6 +8997,7 @@ describe('model: populate:', function() {
       const res = yield Example.findOne().populate('list.data').lean();
       assert.equal(res.list[0].data.imageName, 'image');
       assert.equal(res.list[1].data.textName, 'text');
+      assert.equal(res.list[2].data.sourceId, 123);
     });
   });
 });

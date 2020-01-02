@@ -8932,4 +8932,104 @@ describe('model: populate:', function() {
       assert.deepEqual(populatedRides[1].files, []);
     });
   });
+
+  it('sets empty array if populating undefined path (gh-8455)', function() {
+    const TestSchema = new Schema({
+      thingIds: [mongoose.ObjectId]
+    });
+
+    TestSchema.virtual('things', {
+      ref: 'gh8455_Thing',
+      localField: 'thingIds',
+      foreignField: '_id',
+      justOne: false
+    });
+
+    const Test = db.model('gh8455_Test', TestSchema);
+    db.model('gh8455_Thing', mongoose.Schema({ name: String }));
+
+    return co(function*() {
+      yield Test.collection.insertOne({});
+
+      const doc = yield Test.findOne().populate('things');
+      assert.deepEqual(doc.toObject({ virtuals: true }).things, []);
+    });
+  });
+
+  it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452)', function() {
+    const ImageSchema = Schema({ imageName: String });
+    const Image = db.model('gh8452_Image', ImageSchema);
+
+    const TextSchema = Schema({ textName: String });
+    const Text = db.model('gh8452_Text', TextSchema);
+
+    const opts = { _id: false };
+    const ItemSchema = Schema({ objectType: String }, opts);
+    const ItemSchemaA = Schema({
+      data: {
+        type: ObjectId,
+        refPath: 'list.objectType'
+      },
+      objectType: String,
+    }, opts);
+    const ItemSchemaB = Schema({
+      data: { sourceId: Number },
+      objectType: String,
+    }, opts);
+
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+    ExampleSchema.path('list').discriminator('gh8452_ExtendA', ItemSchemaA);
+    ExampleSchema.path('list').discriminator('gh8452_ExtendB', ItemSchemaB);
+    const Example = db.model('gh8452_Example', ExampleSchema);
+
+    return co(function*() {
+      const image = yield Image.create({ imageName: 'image' });
+      const text = yield Text.create({ textName: 'text' });
+      yield Example.create({
+        test: '02',
+        list: [
+          { __t: 'gh8452_ExtendA', data: image._id, objectType: 'gh8452_Image' },
+          { __t: 'gh8452_ExtendA', data: text._id, objectType: 'gh8452_Text' },
+          { __t: 'gh8452_ExtendB', data: { sourceId: 123 }, objectType: 'ExternalSourceA' }
+        ]
+      });
+
+      const res = yield Example.findOne().populate('list.data').lean();
+      assert.equal(res.list[0].data.imageName, 'image');
+      assert.equal(res.list[1].data.textName, 'text');
+      assert.equal(res.list[2].data.sourceId, 123);
+    });
+  });
+
+  it('excluding foreignField using minus path deselects foreignField (gh-8460)', function() {
+    const schema = Schema({ specialId: String });
+
+    schema.virtual('searchResult', {
+      ref: 'gh8460_Result',
+      localField: 'specialId',
+      foreignField: 'specialId',
+      options: { select: 'name -_id -specialId' },
+      justOne: true
+    });
+    const Model = db.model('gh8460_Model', schema);
+    const Result = db.model('gh8460_Result', Schema({
+      name: String,
+      specialId: String,
+      other: String
+    }));
+
+    return co(function*() {
+      yield Result.create({ name: 'foo', specialId: 'secret', other: 'test' });
+      yield Model.create({ specialId: 'secret' });
+
+      let doc = yield Model.findOne().populate('searchResult');
+      assert.strictEqual(doc.searchResult.specialId, void 0);
+
+      doc = yield Model.findOne().populate({
+        path: 'searchResult',
+        select: 'name -_id'
+      });
+      assert.strictEqual(doc.searchResult.specialId, 'secret');
+    });
+  });
 });

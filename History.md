@@ -1,3 +1,11 @@
+5.8.4 / 2020-01-02
+==================
+ * fix(populate): ensure populate virtual gets set to empty array if `localField` is undefined in the database #8455
+ * fix(connection): wrap `mongoose.connect()` server selection timeouts in MongooseTimeoutError for more readable stack traces #8451
+ * fix(populate): allow deselecting `foreignField` from projection by prefixing with `-` #8460
+ * fix(populate): support embedded discriminators with `refPath` when not all discriminator schemas have `refPath` #8452
+ * fix(array): allow defining `enum` on array if an array of numbers #8449
+
 5.8.3 / 2019-12-23
 ==================
  * fix: upgrade mongodb -> 3.4.1 #8430 [jaschaio](https://github.com/jaschaio)

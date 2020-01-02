@@ -9021,7 +9021,7 @@ describe('model: populate:', function() {
     return co(function*() {
       yield Result.create({ name: 'foo', specialId: 'secret', other: 'test' });
       yield Model.create({ specialId: 'secret' });
-  
+
       let doc = yield Model.findOne().populate('searchResult');
       assert.strictEqual(doc.searchResult.specialId, void 0);
 

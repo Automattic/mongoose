@@ -9000,4 +9000,36 @@ describe('model: populate:', function() {
       assert.equal(res.list[2].data.sourceId, 123);
     });
   });
+
+  it('excluding foreignField using minus path deselects foreignField (gh-8460)', function() {
+    const schema = Schema({ specialId: String });
+
+    schema.virtual('searchResult', {
+      ref: 'gh8460_Result',
+      localField: 'specialId',
+      foreignField: 'specialId',
+      options: { select: 'name -_id -specialId' },
+      justOne: true
+    });
+    const Model = db.model('gh8460_Model', schema);
+    const Result = db.model('gh8460_Result', Schema({
+      name: String,
+      specialId: String,
+      other: String
+    }));
+
+    return co(function*() {
+      yield Result.create({ name: 'foo', specialId: 'secret', other: 'test' });
+      yield Model.create({ specialId: 'secret' });
+  
+      let doc = yield Model.findOne().populate('searchResult');
+      assert.strictEqual(doc.searchResult.specialId, void 0);
+
+      doc = yield Model.findOne().populate({
+        path: 'searchResult',
+        select: 'name -_id'
+      });
+      assert.strictEqual(doc.searchResult.specialId, 'secret');
+    });
+  });
 });

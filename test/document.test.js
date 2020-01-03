@@ -8440,4 +8440,16 @@ describe('document', function() {
       assert.equal(err.errors['children'].message, 'invalid name');
     });
   });
+
+  it('throws an error if running validate() multiple times in parallel (gh-8468)', () => {
+    const Model = db.model('gh8468', Schema({ name: String }));
+
+    const doc = new Model({ name: 'test' });
+
+    doc.validate();
+
+    return doc.save().then(() => assert.ok(false), err => {
+      assert.equal(err.name, 'ParallelValidateError');
+    });
+  });
 });

@@ -3382,6 +3382,22 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('moves $set of immutable properties to $setOnInsert (gh-8467)', function() {
+    const Model = db.model('gh8467', Schema({
+      name: String,
+      age: { type: Number, default: 25, immutable: true }
+    }));
+
+    const _opts = { upsert: true, setDefaultsOnInsert: true };
+
+    return co(function*() {
+      yield Model.findOneAndUpdate({ name: 'John' }, { name: 'John', age: 20 }, _opts);
+
+      const doc = yield Model.findOne().lean();
+      assert.equal(doc.age, 20);
+    });
+  });
+
   describe('mongodb 42 features', function() {
     before(function(done) {
       start.mongodVersion((err, version) => {

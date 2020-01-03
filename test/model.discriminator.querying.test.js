@@ -860,12 +860,12 @@ describe('model', function() {
       it('adds discriminator filter if no conditions passed', () => {
         const PeopleSchema = Schema({ job: String, name: String },
           { discriminatorKey: 'job' });
-        
+
         const People = db.model('gh8471_People', PeopleSchema);
-        
+
         const DesignerSchema = Schema({ badge: String });
         const Designer = People.discriminator('gh8471_Designer', DesignerSchema, 'Designer');
-        
+
         const DeveloperSchema = Schema({ coffeeAmount: Number });
         const Developer = People.discriminator('gh8471_Developer', DeveloperSchema, 'Developer');
 

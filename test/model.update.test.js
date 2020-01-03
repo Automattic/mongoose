@@ -3391,7 +3391,7 @@ describe('model: updateOne: ', function() {
     const _opts = { upsert: true, setDefaultsOnInsert: true };
 
     return co(function*() {
-      yield Model.findOneAndUpdate({ name: 'John' }, { name: 'John', age: 20 }, _opts);
+      yield Model.updateOne({ name: 'John' }, { name: 'John', age: 20 }, _opts);
 
       const doc = yield Model.findOne().lean();
       assert.equal(doc.age, 20);

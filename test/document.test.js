@@ -8415,4 +8415,29 @@ describe('document', function() {
       assert.ok(a.rel[1] instanceof mongoose.Types.ObjectId);
     });
   });
+
+  it('handles errors with name set to "ValidationError" (gh-8466)', () => {
+    const childSchema = Schema({ name: String });
+
+    childSchema.pre('validate', function() {
+      if (this.name === 'Invalid') {
+        const error = new Error('invalid name');
+        error.name = 'ValidationError';
+        throw error;
+      }
+    });
+
+    const fatherSchema = Schema({ children: [childSchema] });
+    const Father = db.model('gh8466', fatherSchema);
+
+    const doc = new Father({
+      children: [{ name: 'Valid' }, { name: 'Invalid' }]
+    });
+
+    return doc.validate().then(() => assert.ok(false), err => {
+      assert.ok(err);
+      assert.ok(err.errors['children']);
+      assert.equal(err.errors['children'].message, 'invalid name');
+    });
+  });
 });

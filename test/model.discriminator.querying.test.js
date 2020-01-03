@@ -6,11 +6,13 @@
 
 const start = require('./common');
 
-const mongoose = start.mongoose;
-const Schema = mongoose.Schema;
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 const util = require('util');
+
+const mongoose = start.mongoose;
+const Schema = mongoose.Schema;
 
 /**
  * Setup
@@ -850,6 +852,66 @@ describe('model', function() {
               done();
             });
           });
+        });
+      });
+    });
+
+    describe('deleteOne and deleteMany (gh-8471)', function() {
+      it('adds discriminator filter if no conditions passed', () => {
+        const PeopleSchema = Schema({ job: String, name: String },
+          { discriminatorKey: 'job' });
+        
+        const People = db.model('gh8471_People', PeopleSchema);
+        
+        const DesignerSchema = Schema({ badge: String });
+        const Designer = People.discriminator('gh8471_Designer', DesignerSchema, 'Designer');
+        
+        const DeveloperSchema = Schema({ coffeeAmount: Number });
+        const Developer = People.discriminator('gh8471_Developer', DeveloperSchema, 'Developer');
+
+        return co(function*() {
+          yield Designer.create({
+            name: 'John',
+            job: 'Designer',
+            badge: 'green'
+          });
+
+          let numDesigners = yield Designer.countDocuments();
+          let numDevelopers = yield Developer.countDocuments();
+          let total = yield People.countDocuments();
+          assert.equal(numDesigners, 1);
+          assert.equal(numDevelopers, 0);
+          assert.equal(total, 1);
+
+          yield Developer.deleteOne();
+
+          numDesigners = yield Designer.countDocuments();
+          numDevelopers = yield Developer.countDocuments();
+          total = yield People.countDocuments();
+          assert.equal(numDesigners, 1);
+          assert.equal(numDevelopers, 0);
+          assert.equal(total, 1);
+
+          yield Developer.create([
+            { name: 'Mike', job: 'Developer', coffeeAmount: 25 },
+            { name: 'Joe', job: 'Developer', coffeeAmount: 14 }
+          ]);
+
+          numDesigners = yield Designer.countDocuments();
+          numDevelopers = yield Developer.countDocuments();
+          total = yield People.countDocuments();
+          assert.equal(numDesigners, 1);
+          assert.equal(numDevelopers, 2);
+          assert.equal(total, 3);
+
+          yield Developer.deleteMany();
+
+          numDesigners = yield Designer.countDocuments();
+          numDevelopers = yield Developer.countDocuments();
+          total = yield People.countDocuments();
+          assert.equal(numDesigners, 1);
+          assert.equal(numDevelopers, 0);
+          assert.equal(total, 1);
         });
       });
     });

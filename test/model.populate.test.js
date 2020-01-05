@@ -8094,6 +8094,31 @@ describe('model: populate:', function() {
     });
   });
 
+  it('count option ignores skip (gh-4469) (gh-8476)', function() {
+    const childSchema = new Schema({ parentId: mongoose.ObjectId });
+
+    const parentSchema = new Schema({ name: String });
+    parentSchema.virtual('childCount', {
+      ref: 'gh8476_Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      count: true,
+      options: { skip: 2 }
+    });
+
+    const Child = db.model('gh8476_Child', childSchema);
+    const Parent = db.model('gh8476_Parent', parentSchema);
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'test' });
+
+      yield Child.create([{ parentId: p._id }, { parentId: p._id }, {}]);
+
+      const doc = yield Parent.findOne().populate('childCount');
+      assert.equal(doc.childCount, 2);
+    });
+  });
+
   it('count with deeply nested (gh-7573)', function() {
     const s1 = new mongoose.Schema({});
 

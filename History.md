@@ -1,3 +1,13 @@
+5.8.5 / 2020-01-06
+==================
+ * fix(document): throw error when running `validate()` multiple times on the same document #8468
+ * fix(model): ensure deleteOne() and deleteMany() set discriminator filter even if no conditions passed #8471
+ * fix(document): allow pre('validate') hooks to throw errors with `name = 'ValidationError'` #8466
+ * fix(update): move top level $set of immutable properties to $setOnInsert so upserting with immutable properties actually sets the property #8467
+ * fix(document): avoid double-running validators on single nested subdocs within single nested subdocs #8468
+ * fix(populate): support top-level match option for virtual populate #8475
+ * fix(model): avoid applying skip when populating virtual with count #8476
+
 5.8.4 / 2020-01-02
 ==================
  * fix(populate): ensure populate virtual gets set to empty array if `localField` is undefined in the database #8455

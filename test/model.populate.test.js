@@ -9057,4 +9057,37 @@ describe('model: populate:', function() {
       assert.strictEqual(doc.searchResult.specialId, 'secret');
     });
   });
+
+  it('supports top-level match option (gh-8475)', function() {
+    const childSchema = Schema({ parentId: 'ObjectId', deleted: Boolean });
+
+    const parentSchema = Schema({ name: String });
+    parentSchema.virtual('childCount', {
+      ref: 'gh8475_Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      count: true,
+      match: { deleted: { $ne: true } }
+    });
+
+    const Child = db.model('gh8475_Child', childSchema);
+    const Parent = db.model('gh8475_Parent', parentSchema);
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'test' });
+
+      yield Child.create([
+        { parentId: p._id },
+        { parentId: p._id, deleted: true },
+        { parentId: p._id, deleted: false }
+      ]);
+
+      let doc = yield Parent.findOne().populate('childCount');
+      assert.equal(doc.childCount, 2);
+
+      doc = yield Parent.findOne().
+        populate({ path: 'childCount', match: { deleted: true } });
+      assert.equal(doc.childCount, 1);
+    });
+  });
 });

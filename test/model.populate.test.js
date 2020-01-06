@@ -6886,6 +6886,7 @@ describe('model: populate:', function() {
           justOne: false
         });
 
+        db.deleteModel(/.*/);
         const User = db.model('User', userSchema);
         const Teacher = db.model('gh6528_Teacher', teachSchema);
         const Post = db.model('Post', postSchema);
@@ -7095,6 +7096,7 @@ describe('model: populate:', function() {
       it('handles virtual embedded discriminator underneath single nested (gh-6571)', co.wrap(function*() {
         // Generate Users Model
         const userSchema = new Schema({ id: Number, name: String });
+        db.deleteModel(/.*/);
         const User = db.model('User', userSchema);
 
         // Generate Product Model
@@ -7304,7 +7306,8 @@ describe('model: populate:', function() {
       user.roomId = room._id;
       room.officeId = office._id;
 
-      return Promise.all([user.save(), office.save(), room.save()]);
+      return User.deleteMany({}).
+        then(() => Promise.all([user.save(), office.save(), room.save()]));
     });
 
     it('document, and subdocuments are not lean by default', function() {

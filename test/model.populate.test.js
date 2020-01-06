@@ -17,8 +17,6 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 const DocObjectId = mongoose.Types.ObjectId;
 
-const collectionName = 'model.populate';
-
 /**
  * Tests.
  */

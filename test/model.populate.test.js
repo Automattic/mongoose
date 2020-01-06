@@ -5884,6 +5884,7 @@ describe('model: populate:', function() {
           justOne: true
         });
 
+        db.deleteModel(/.*/);
         const Author = db.model('Author', AuthorSchema);
         const Book = db.model('Book', BookSchema);
 
@@ -8742,7 +8743,7 @@ describe('model: populate:', function() {
     let Author;
     let Page;
 
-    before(function() {
+    beforeEach(function() {
       const authorSchema = Schema({ name: String });
       const subSchema = Schema({
         author: { type: Schema.Types.ObjectId, ref: 'Author' },
@@ -8753,7 +8754,7 @@ describe('model: populate:', function() {
       Page = db.model('gh8247_Page', pageSchema);
     });
 
-    this.beforeEach(() => co(function*() {
+    beforeEach(() => co(function*() {
       yield Author.deleteMany({});
       yield Page.deleteMany({});
     }));

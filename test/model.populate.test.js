@@ -17,6 +17,8 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 const DocObjectId = mongoose.Types.ObjectId;
 
+const collectionName = 'model.populate';
+
 /**
  * Tests.
  */
@@ -73,6 +75,21 @@ describe('model: populate:', function() {
 
   after(function(done) {
     db.close(done);
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => {
+    const arr = [];
+
+    if (db.models == null) {
+      return;
+    }
+    for (const model of Object.keys(db.models)) {
+      arr.push(db.models[model].deleteMany({}));
+    }
+
+    return Promise.all(arr);
   });
 
   it('populating array of object', function(done) {
@@ -1887,7 +1904,7 @@ describe('model: populate:', function() {
   });
 
   it('refs should cast to ObjectId from hexstrings', function(done) {
-    const BP = mongoose.model('RefBlogPost');
+    const BP = db.model('RefBlogPost', posts);
     const bp = new BP;
     bp._creator = new DocObjectId().toString();
     assert.ok(bp._creator instanceof DocObjectId);
@@ -2047,6 +2064,7 @@ describe('model: populate:', function() {
 
     const M1 = db.model('_idAndid', S1);
     const M2 = db.model('populateWorksWith_idAndidSchemas', S2);
+    db.model('StringRefRequired', Schema({_id: String, val: String}), random());
 
     M1.create(
       {id: 'The Tiger That Isn\'t'}
@@ -3249,8 +3267,8 @@ describe('model: populate:', function() {
         }]
       });
 
-      const Post = db.model('gh6913_Post', PostSchema);
-      const User = db.model('gh6913_User', UserSchema);
+      const Post = db.model('Post', PostSchema);
+      const User = db.model('User', UserSchema);
 
       const user = {
         _id: mongoose.Types.ObjectId(),
@@ -3264,7 +3282,7 @@ describe('model: populate:', function() {
           {
             references: [{
               item: user._id,
-              kind: 'gh6913_User'
+              kind: 'User'
             }]
           }
         ]
@@ -5105,12 +5123,12 @@ describe('model: populate:', function() {
           title: String
         });
         BlogPostSchema.virtual('authors', {
-          ref: 'gh7795_Author',
+          ref: 'Author',
           localField: '_id',
           foreignField: 'authored'
         });
 
-        const BlogPost = db.model('gh7795_BlogPost', BlogPostSchema);
+        const BlogPost = db.model('BlogPost', BlogPostSchema);
 
         return co(function*() {
           yield BlogPost.create({ _id: 1, title: 'test' });
@@ -5463,7 +5481,7 @@ describe('model: populate:', function() {
           title: String,
           author: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'gh6115_Author'
+            ref: 'Author'
           }
         });
         const authorSchema = new Schema({
@@ -5471,7 +5489,7 @@ describe('model: populate:', function() {
         });
 
         const Article = db.model('gh6115_Article', articleSchema);
-        const Author = db.model('gh6115_Author', authorSchema);
+        const Author = db.model('Author', authorSchema);
 
         const author = new Author({ name: 'Val' });
         const article = new Article({
@@ -6470,7 +6488,7 @@ describe('model: populate:', function() {
         const dateActivitySchema = new Schema({
           postedBy: {
             type: Schema.Types.ObjectId,
-            ref: 'gh5858_User',
+            ref: 'User',
             required: true
           }
         }, options);
@@ -6487,7 +6505,7 @@ describe('model: populate:', function() {
           kind: String
         }, options);
 
-        const User = db.model('gh5858_User', { name: String });
+        const User = db.model('User', { name: String });
         const Activity = db.model('gh5858_0', activitySchema);
         const DateActivity = Activity.discriminator('gh5858_1', dateActivitySchema);
         const EventActivity = Activity.discriminator('gh5858_2', eventActivitySchema);
@@ -6846,7 +6864,7 @@ describe('model: populate:', function() {
           content: String,
           user: {
             type: Schema.Types.ObjectId,
-            ref: 'gh6528_User'
+            ref: 'User'
           }
         });
 
@@ -6863,16 +6881,16 @@ describe('model: populate:', function() {
         }, { timestamps: true });
 
         postSchema.virtual('comments', {
-          ref: 'gh6528_Comment',
+          ref: 'Comment',
           localField: 'commentIds',
           foreignField: '_id',
           justOne: false
         });
 
-        const User = db.model('gh6528_User', userSchema);
+        const User = db.model('User', userSchema);
         const Teacher = db.model('gh6528_Teacher', teachSchema);
-        const Post = db.model('gh6528_Post', postSchema);
-        const Comment = db.model('gh6528_Comment', commentSchema);
+        const Post = db.model('Post', postSchema);
+        const Comment = db.model('Comment', commentSchema);
 
         const users = [];
         const teachers = [];
@@ -7078,7 +7096,7 @@ describe('model: populate:', function() {
       it('handles virtual embedded discriminator underneath single nested (gh-6571)', co.wrap(function*() {
         // Generate Users Model
         const userSchema = new Schema({ id: Number, name: String });
-        const User = db.model('gh6571_Users', userSchema);
+        const User = db.model('User', userSchema);
 
         // Generate Product Model
         const productSchema = new Schema({ id: Number, name: String });
@@ -7100,12 +7118,12 @@ describe('model: populate:', function() {
         const flexibleUserSchema = new Schema({ users: [{}] });
 
         flexibleUserSchema.virtual('users_$', {
-          ref: 'gh6571_Users',
+          ref: 'User',
           localField: 'users.id',
           foreignField: 'id'
         });
 
-        docArray.discriminator('6571_UserDisc', flexibleUserSchema);
+        docArray.discriminator('UserDisc', flexibleUserSchema);
 
         const flexibleProductSchema = new Schema({ products: [{}] });
 
@@ -7126,7 +7144,7 @@ describe('model: populate:', function() {
           outer: {
             inner: {
               flexible: [
-                { kind: '6571_UserDisc', users: [{ id: 111, refKey: 'Users' }] },
+                { kind: 'UserDisc', users: [{ id: 111, refKey: 'Users' }] },
                 { kind: '6571_ProductDisc', products: [{ id: 222, refKey: 'Products' }] }
               ]
             }
@@ -7266,7 +7284,7 @@ describe('model: populate:', function() {
   describe('lean + deep populate (gh-6498)', function() {
     const isLean = v => v != null && !(v instanceof mongoose.Document);
 
-    before(function() {
+    beforeEach(function() {
       const userSchema = new Schema({
         name: String,
         roomId: { type: Schema.ObjectId, ref: 'gh6498_Room' }
@@ -7276,7 +7294,7 @@ describe('model: populate:', function() {
         officeId: { type: Schema.ObjectId, ref: 'gh6498_Office' }
       });
 
-      const User = db.model('gh6498_User', userSchema);
+      const User = db.model('User', userSchema);
       const Office = db.model('gh6498_Office', officeSchema);
       const Room = db.model('gh6498_Room', roomSchema);
 
@@ -7292,7 +7310,7 @@ describe('model: populate:', function() {
 
     it('document, and subdocuments are not lean by default', function() {
       return co(function*() {
-        const user = yield db.model('gh6498_User').findOne().populate({
+        const user = yield db.model('User').findOne().populate({
           path: 'roomId',
           populate: {
             path: 'officeId'
@@ -7307,7 +7325,7 @@ describe('model: populate:', function() {
 
     it('.lean() makes query result, and all populated fields lean', function() {
       return co(function*() {
-        const user = yield db.model('gh6498_User').findOne().
+        const user = yield db.model('User').findOne().
           populate({
             path: 'roomId',
             populate: {
@@ -7324,7 +7342,7 @@ describe('model: populate:', function() {
 
     it('disabling lean at some populating level reflects on it, and descendants', function() {
       return co(function*() {
-        const user = yield db.model('gh6498_User').findOne().
+        const user = yield db.model('User').findOne().
           populate({
             path: 'roomId',
             options: { lean: false },
@@ -7342,7 +7360,7 @@ describe('model: populate:', function() {
 
     it('enabling lean at some populating level reflects on it, and descendants', function() {
       return co(function*() {
-        const user = yield db.model('gh6498_User').findOne().populate({
+        const user = yield db.model('User').findOne().populate({
           path: 'roomId',
           options: { lean: true },
           populate: {
@@ -7358,7 +7376,7 @@ describe('model: populate:', function() {
 
     it('disabling lean on nested population overwrites parent lean', function() {
       return co(function*() {
-        const user = yield db.model('gh6498_User').findOne().populate({
+        const user = yield db.model('User').findOne().populate({
           path: 'roomId',
           options: { lean: true },
           populate: {
@@ -7372,229 +7390,230 @@ describe('model: populate:', function() {
         assert.equal(isLean(user.roomId.officeId), false);
       });
     });
-    it('populates virtual of embedded discriminator with dynamic ref (gh-6554)', function() {
-      const userSchema = new Schema({
-        employeeId: Number,
-        name: String
-      });
+  });
 
-      const UserModel = db.model('gh6554_Users', userSchema, 'users');
+  it('populates virtual of embedded discriminator with dynamic ref (gh-6554)', function() {
+    const userSchema = new Schema({
+      employeeId: Number,
+      name: String
+    });
 
-      const eventSchema = new Schema({
-        message: String
-      },{ discriminatorKey: 'kind' });
+    const UserModel = db.model('User', userSchema, 'users');
 
-      const batchSchema = new Schema({
-        events: [eventSchema]
-      });
+    const eventSchema = new Schema({
+      message: String
+    },{ discriminatorKey: 'kind' });
 
-      const docArray = batchSchema.path('events');
+    const batchSchema = new Schema({
+      events: [eventSchema]
+    });
 
-      const clickedSchema = new Schema({
-        element: { type: String },
-        users: [{}]
+    const docArray = batchSchema.path('events');
+
+    const clickedSchema = new Schema({
+      element: { type: String },
+      users: [{}]
+    },
+    {
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true }
+    });
+
+    clickedSchema.virtual('users_$', {
+      ref: function(doc) {
+        return doc.events[0].users[0].refKey;
       },
-      {
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true }
-      });
-
-      clickedSchema.virtual('users_$', {
-        ref: function(doc) {
-          return doc.events[0].users[0].refKey;
-        },
-        localField: 'users.ID',
-        foreignField: 'employeeId'
-      });
-
-      docArray.discriminator('Clicked', clickedSchema);
-      const Batch = db.model('gh6554_EventBatch', batchSchema);
-
-      const user = { employeeId: 1, name: 'Test name' };
-      const batch = {
-        events: [
-          {
-            kind: 'Clicked',
-            element: '#hero',
-            message: 'hello',
-            users: [{ ID: 1, refKey: 'gh6554_Users' }]
-          }
-        ]
-      };
-
-      return co(function*() {
-        yield UserModel.create(user);
-        yield Batch.create(batch);
-        const doc = yield Batch.findOne({}).populate('events.users_$');
-        assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
-      });
+      localField: 'users.ID',
+      foreignField: 'employeeId'
     });
 
-    it('populates virtual of embedded discriminator with dynamic ref when more than one model name is returned (gh-6612)', function() {
-      const userSchema = new Schema({
-        employeeId: Number,
-        name: String
-      });
+    docArray.discriminator('Clicked', clickedSchema);
+    const Batch = db.model('gh6554_EventBatch', batchSchema);
 
-      const UserModel = db.model('gh6612_Users', userSchema);
+    const user = { employeeId: 1, name: 'Test name' };
+    const batch = {
+      events: [
+        {
+          kind: 'Clicked',
+          element: '#hero',
+          message: 'hello',
+          users: [{ ID: 1, refKey: 'User' }]
+        }
+      ]
+    };
 
-      const authorSchema = new Schema({
-        employeeId: Number,
-        name: String
-      });
+    return co(function*() {
+      yield UserModel.create(user);
+      yield Batch.create(batch);
+      const doc = yield Batch.findOne({}).populate('events.users_$');
+      assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
+    });
+  });
 
-      const AuthorModel = db.model('gh6612_Author', authorSchema);
+  it('populates virtual of embedded discriminator with dynamic ref when more than one model name is returned (gh-6612)', function() {
+    const userSchema = new Schema({
+      employeeId: Number,
+      name: String
+    });
 
-      const eventSchema = new Schema({
-        message: String
-      }, { discriminatorKey: 'kind' });
+    const UserModel = db.model('User', userSchema);
 
-      const batchSchema = new Schema({
-        events: [eventSchema]
-      });
+    const authorSchema = new Schema({
+      employeeId: Number,
+      name: String
+    });
 
-      const docArray = batchSchema.path('events');
+    const AuthorModel = db.model('Author', authorSchema);
 
-      const clickedSchema = new Schema({
-        element: { type: String },
-        users: [{}]
+    const eventSchema = new Schema({
+      message: String
+    }, { discriminatorKey: 'kind' });
+
+    const batchSchema = new Schema({
+      events: [eventSchema]
+    });
+
+    const docArray = batchSchema.path('events');
+
+    const clickedSchema = new Schema({
+      element: { type: String },
+      users: [{}]
+    },
+    {
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true }
+    });
+
+    clickedSchema.virtual('users_$', {
+      ref: function(doc) {
+        const refKeys = doc.events[0].users.map(user => user.refKey);
+        return refKeys;
       },
-      {
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true }
-      });
-
-      clickedSchema.virtual('users_$', {
-        ref: function(doc) {
-          const refKeys = doc.events[0].users.map(user => user.refKey);
-          return refKeys;
-        },
-        localField: 'users.ID',
-        foreignField: 'employeeId'
-      });
-
-      docArray.discriminator('Clicked', clickedSchema);
-      const Batch = db.model('gh6612_EventBatch', batchSchema);
-
-      const user = { employeeId: 1, name: 'Test name' };
-      const author = { employeeId: 2, name: 'Author Name' };
-      const batch = {
-        events: [
-          {
-            kind: 'Clicked',
-            element: '#hero',
-            message: 'hello',
-            users: [
-              { ID: 1, refKey: 'gh6612_Users' },
-              { ID: 2, refKey: 'gh6612_Author' }
-            ]
-          }
-        ]
-      };
-
-      return co(function*() {
-        yield UserModel.create(user);
-        yield AuthorModel.create(author);
-        yield Batch.create(batch);
-        const doc = yield Batch.findOne({}).populate('events.users_$');
-        assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
-        assert.strictEqual(doc.events[0].users_$[1].name, 'Author Name');
-      });
+      localField: 'users.ID',
+      foreignField: 'employeeId'
     });
 
-    it('uses getter if one is defined on the localField (gh-6618)', function() {
-      const userSchema = new Schema({
-        name: String
-      });
+    docArray.discriminator('Clicked', clickedSchema);
+    const Batch = db.model('gh6612_EventBatch', batchSchema);
 
-      const schema = new Schema({
-        referrer: {
-          type: String,
-          get: function(val) {
-            return val.slice(6);
-          }
+    const user = { employeeId: 1, name: 'Test name' };
+    const author = { employeeId: 2, name: 'Author Name' };
+    const batch = {
+      events: [
+        {
+          kind: 'Clicked',
+          element: '#hero',
+          message: 'hello',
+          users: [
+            { ID: 1, refKey: 'User' },
+            { ID: 2, refKey: 'Author' }
+          ]
         }
-      }, { toObject: { virtuals: true } });
+      ]
+    };
 
-      schema.virtual('referrerUser', {
-        ref: 'gh6618_user',
-        localField: 'referrer',
-        foreignField: 'name',
-        justOne: false,
-        getters: true
-      });
+    return co(function*() {
+      yield UserModel.create(user);
+      yield AuthorModel.create(author);
+      yield Batch.create(batch);
+      const doc = yield Batch.findOne({}).populate('events.users_$');
+      assert.strictEqual(doc.events[0].users_$[0].name, 'Test name');
+      assert.strictEqual(doc.events[0].users_$[1].name, 'Author Name');
+    });
+  });
 
-      const User = db.model('gh6618_user', userSchema);
-      const Test = db.model('gh6618_test', schema);
-
-      const user = new User({ name: 'billy' });
-      const test = new Test({ referrer: 'Model$' + user.name });
-
-      return co(function*() {
-        yield user.save();
-        yield test.save();
-        const pop = yield Test.findOne().populate('referrerUser');
-        assert.strictEqual(pop.referrerUser[0].name, 'billy');
-
-        const pop2 = yield Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
-        assert.strictEqual(pop2.referrerUser.length, 0);
-      });
+  it('uses getter if one is defined on the localField (gh-6618)', function() {
+    const userSchema = new Schema({
+      name: String
     });
 
-    it('populate child with same name as parent (gh-6839) (gh-6908)', function() {
-      const parentFieldsToPopulate = [
-        {path: 'children.child'},
-        {path: 'child'}
-      ];
-
-      const childSchema = new mongoose.Schema({ name: String });
-      const Child = db.model('gh6839_Child', childSchema);
-
-      const parentSchema = new mongoose.Schema({
-        child: {type: mongoose.Schema.Types.ObjectId, ref: 'gh6839_Child'},
-        children: [{
-          child: {type: mongoose.Schema.Types.ObjectId, ref: 'gh6839_Child' }
-        }]
-      });
-      const Parent = db.model('gh6839_Parent', parentSchema);
-
-      return co(function*() {
-        let child = yield Child.create({ name: 'test' });
-        let p = yield Parent.create({ child: child });
-
-        child = yield Child.findById(child._id);
-        p = yield Parent.findById(p._id).populate(parentFieldsToPopulate);
-        p.children.push({ child: child });
-        yield p.save();
-
-        p = yield p.populate(parentFieldsToPopulate).execPopulate();
-        assert.ok(p.children[0].child);
-        assert.equal(p.children[0].child.name, 'test');
-      });
-    });
-
-    it('passes scope as Model instance (gh-6726)', function() {
-      const otherSchema = new Schema({ name: String });
-      const Other = db.model('gh6726_Other', otherSchema);
-      const schema = new Schema({
-        x: {
-          type: Schema.Types.ObjectId,
-          ref: 'gh6726_Other',
-          get: function(v) {
-            assert.strictEqual(this.constructor.name, 'model');
-            return v;
-          }
+    const schema = new Schema({
+      referrer: {
+        type: String,
+        get: function(val) {
+          return val.slice(6);
         }
-      });
-      const Test = db.model('gh6726_Test', schema);
-      const other = new Other({ name: 'Max' });
-      const test = new Test({ x: other._id });
-      return co(function*() {
-        yield other.save();
-        yield test.save();
-        const doc = yield Test.findOne({}).populate('x');
-        assert.strictEqual(doc.x.name, 'Max');
-      });
+      }
+    }, { toObject: { virtuals: true } });
+
+    schema.virtual('referrerUser', {
+      ref: 'User',
+      localField: 'referrer',
+      foreignField: 'name',
+      justOne: false,
+      getters: true
+    });
+
+    const User = db.model('User', userSchema);
+    const Test = db.model('gh6618_test', schema);
+
+    const user = new User({ name: 'billy' });
+    const test = new Test({ referrer: 'Model$' + user.name });
+
+    return co(function*() {
+      yield user.save();
+      yield test.save();
+      const pop = yield Test.findOne().populate('referrerUser');
+      assert.strictEqual(pop.referrerUser[0].name, 'billy');
+
+      const pop2 = yield Test.findOne().populate({ path: 'referrerUser', options: { getters: false } });
+      assert.strictEqual(pop2.referrerUser.length, 0);
+    });
+  });
+
+  it('populate child with same name as parent (gh-6839) (gh-6908)', function() {
+    const parentFieldsToPopulate = [
+      {path: 'children.child'},
+      {path: 'child'}
+    ];
+
+    const childSchema = new mongoose.Schema({ name: String });
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new mongoose.Schema({
+      child: {type: mongoose.Schema.Types.ObjectId, ref: 'Child'},
+      children: [{
+        child: {type: mongoose.Schema.Types.ObjectId, ref: 'Child' }
+      }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    return co(function*() {
+      let child = yield Child.create({ name: 'test' });
+      let p = yield Parent.create({ child: child });
+
+      child = yield Child.findById(child._id);
+      p = yield Parent.findById(p._id).populate(parentFieldsToPopulate);
+      p.children.push({ child: child });
+      yield p.save();
+
+      p = yield p.populate(parentFieldsToPopulate).execPopulate();
+      assert.ok(p.children[0].child);
+      assert.equal(p.children[0].child.name, 'test');
+    });
+  });
+
+  it('passes scope as Model instance (gh-6726)', function() {
+    const otherSchema = new Schema({ name: String });
+    const Other = db.model('gh6726_Other', otherSchema);
+    const schema = new Schema({
+      x: {
+        type: Schema.Types.ObjectId,
+        ref: 'gh6726_Other',
+        get: function(v) {
+          assert.strictEqual(this.constructor.name, 'model');
+          return v;
+        }
+      }
+    });
+    const Test = db.model('gh6726_Test', schema);
+    const other = new Other({ name: 'Max' });
+    const test = new Test({ x: other._id });
+    return co(function*() {
+      yield other.save();
+      yield test.save();
+      const doc = yield Test.findOne({}).populate('x');
+      assert.strictEqual(doc.x.name, 'Max');
     });
   });
 
@@ -7666,7 +7685,7 @@ describe('model: populate:', function() {
       text: String,
       author: {
         type: Schema.Types.ObjectId,
-        ref: 'gh6978_Author'
+        ref: 'Author'
       }
     });
 
@@ -7674,13 +7693,13 @@ describe('model: populate:', function() {
       content: String,
       comments: [{
         type: Schema.Types.ObjectId,
-        ref: 'gh6978_Comment'
+        ref: 'Comment'
       }]
     });
 
-    const Author = db.model('gh6978_Author', authorSchema);
-    const Comment = db.model('gh6978_Comment', commentSchema);
-    const Post = db.model('gh6978_Post', postSchema);
+    const Author = db.model('Author', authorSchema);
+    const Comment = db.model('Comment', commentSchema);
+    const Post = db.model('Post', postSchema);
 
     const authors = '123'.split('').map(n => {
       return new Author({ name: `author${n}`});
@@ -7768,7 +7787,7 @@ describe('model: populate:', function() {
     });
 
     postSchema.virtual('comments', {
-      ref: 'gh6988_Comment',
+      ref: 'Comment',
       localField: '_id',
       foreignField: 'postId'
     });
@@ -7777,8 +7796,8 @@ describe('model: populate:', function() {
       postId: { type: Schema.Types.ObjectId }
     });
 
-    const Post = db.model('gh6988_Post', postSchema);
-    const Comment = db.model('gh6988_Comment', commentSchema);
+    const Post = db.model('Post', postSchema);
+    const Comment = db.model('Comment', commentSchema);
 
     return co(function*() {
       const post = yield Post.create({ name: 'n1'});
@@ -7798,7 +7817,7 @@ describe('model: populate:', function() {
     });
 
     postSchema.virtual('comments', {
-      ref: 'gh8125_Comment',
+      ref: 'Comment',
       localField: '_id',
       foreignField: 'postId'
     });
@@ -7808,8 +7827,8 @@ describe('model: populate:', function() {
       text: String,
     });
 
-    const Post = db.model('gh8125_Post', postSchema);
-    const Comment = db.model('gh8125_Comment', commentSchema);
+    const Post = db.model('Post', postSchema);
+    const Comment = db.model('Comment', commentSchema);
 
     return co(function*() {
       const post = yield Post.create({ name: 'n1'});
@@ -7830,12 +7849,12 @@ describe('model: populate:', function() {
     });
 
     const schema = new Schema({
-      title: String,
+      name: String,
       data: Schema.Types.Mixed
     });
 
-    const Article = db.model('gh6985_Article', articleSchema);
-    const Test = db.model('gh6985_Test', schema);
+    const Article = db.model('Article', articleSchema);
+    const Test = db.model('User', schema);
 
     return co(function*() {
       const articles = yield Article.create([
@@ -7844,7 +7863,7 @@ describe('model: populate:', function() {
       ]);
 
       yield Test.create({
-        title: 'test',
+        name: 'Val',
         data: { articles: articles.map(a => a._id) }
       });
 
@@ -7852,7 +7871,7 @@ describe('model: populate:', function() {
       const popObj = {
         path: 'data.articles',
         select: 'title',
-        model: 'gh6985_Article',
+        model: 'Article',
         options: { lean: true }
       };
 
@@ -8026,7 +8045,7 @@ describe('model: populate:', function() {
 
   it('set model as ref in schema (gh-7253)', function() {
     const userSchema = new Schema({ name: String });
-    const User = db.model('gh7253_User', userSchema);
+    const User = db.model('User', userSchema);
 
     const postSchema = new Schema({
       user: {
@@ -8036,7 +8055,7 @@ describe('model: populate:', function() {
       user2: mongoose.ObjectId
     });
     postSchema.path('user2').ref(User);
-    const Post = db.model('gh7253_Post', postSchema);
+    const Post = db.model('Post', postSchema);
 
     return co(function*() {
       const user = yield User.create({ name: 'val' });
@@ -8054,21 +8073,21 @@ describe('model: populate:', function() {
 
     const parentSchema = new Schema({ name: String });
     parentSchema.virtual('childCount', {
-      ref: 'gh4469_Child',
+      ref: 'Child',
       localField: '_id',
       foreignField: 'parentId',
       count: true
     });
 
     parentSchema.virtual('children', {
-      ref: 'gh4469_Child',
+      ref: 'Child',
       localField: '_id',
       foreignField: 'parentId',
       count: false
     });
 
-    const Child = db.model('gh4469_Child', childSchema);
-    const Parent = db.model('gh4469_Parent', parentSchema);
+    const Child = db.model('Child', childSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
       const p = yield Parent.create({ name: 'test' });
@@ -8099,15 +8118,15 @@ describe('model: populate:', function() {
 
     const parentSchema = new Schema({ name: String });
     parentSchema.virtual('childCount', {
-      ref: 'gh8476_Child',
+      ref: 'Child',
       localField: '_id',
       foreignField: 'parentId',
       count: true,
       options: { skip: 2 }
     });
 
-    const Child = db.model('gh8476_Child', childSchema);
-    const Parent = db.model('gh8476_Parent', parentSchema);
+    const Child = db.model('Child', childSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
       const p = yield Parent.create({ name: 'test' });
@@ -8165,8 +8184,8 @@ describe('model: populate:', function() {
 
   it('explicit model option overrides refPath (gh-7273)', function() {
     const userSchema = new Schema({ name: String });
-    const User1 = db.model('gh7273_User_1', userSchema);
-    db.model('gh7273_User_2', userSchema);
+    const User1 = db.model('User', userSchema);
+    db.model('User2', userSchema);
 
     const postSchema = new Schema({
       user: {
@@ -8175,16 +8194,16 @@ describe('model: populate:', function() {
       },
       m: String
     });
-    const Post = db.model('gh7273_Post', postSchema);
+    const Post = db.model('Post', postSchema);
 
     return co(function*() {
       const user = yield User1.create({ name: 'val' });
-      yield Post.create({ user: user._id, m: 'gh7273_User_2' });
+      yield Post.create({ user: user._id, m: 'User2' });
 
       let post = yield Post.findOne().populate('user');
       assert.ok(!post.user);
 
-      post = yield Post.findOne().populate({ path: 'user', model: 'gh7273_User_1' });
+      post = yield Post.findOne().populate({ path: 'user', model: 'User' });
 
       assert.equal(post.user.name, 'val');
     });
@@ -8192,7 +8211,7 @@ describe('model: populate:', function() {
 
   it('clone option means identical ids get separate copies of doc (gh-3258)', function() {
     const userSchema = new Schema({ name: String });
-    const User = db.model('gh3258_User', userSchema);
+    const User = db.model('User', userSchema);
 
     const postSchema = new Schema({
       user: {
@@ -8202,7 +8221,7 @@ describe('model: populate:', function() {
       title: String
     });
 
-    const Post = db.model('gh3258_Post', postSchema);
+    const Post = db.model('Post', postSchema);
 
     return co(function*() {
       const user = yield User.create({ name: 'val' });
@@ -8423,12 +8442,12 @@ describe('model: populate:', function() {
   });
 
   it('can populate an array property whose name conflicts with array method (gh-7782)', function() {
-    const Child = db.model('gh7782_Child', Schema({ name: String }));
+    const Child = db.model('Child', Schema({ name: String }));
 
-    const Parent = db.model('gh7782_Parent', Schema({
+    const Parent = db.model('Parent', Schema({
       list: [{
         fill: {
-          child: { type:ObjectId, ref:'gh7782_Child' }
+          child: { type:ObjectId, ref:'Child' }
         }
       }]
     }));
@@ -8460,7 +8479,7 @@ describe('model: populate:', function() {
         }
       });
 
-      const User = db.model('gh6520_User', userSchema);
+      const User = db.model('User', userSchema);
       const Book = db2.model('Book', bookSchema);
       const Movie = db2.model('Movie', movieSchema);
 
@@ -8514,7 +8533,7 @@ describe('model: populate:', function() {
   });
 
   it('virtual refPath (gh-7848)', function() {
-    const Child = db.model('gh7848_Child', Schema({
+    const Child = db.model('Child', Schema({
       name: String,
       parentId: Number
     }));
@@ -8529,10 +8548,10 @@ describe('model: populate:', function() {
       foreignField: 'parentId',
       justOne: false
     });
-    const Parent = db.model('gh7848_Parent', parentSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
-      yield Parent.create({ _id: 1, kind: 'gh7848_Child' });
+      yield Parent.create({ _id: 1, kind: 'Child' });
       yield Child.create({ name: 'test', parentId: 1 });
 
       const doc = yield Parent.findOne().populate('childDocs');
@@ -8543,7 +8562,7 @@ describe('model: populate:', function() {
 
   it('handles refPath on discriminator when populating top-level model (gh-5109)', function() {
     const options = { discriminatorKey: 'kind' };
-    const Post = db.model('gh5109_Post', new Schema({ time: Date, text: String }, options));
+    const Post = db.model('Post', new Schema({ time: Date, text: String }, options));
 
     const MediaPost = Post.discriminator('gh5109_MediaPost', new Schema({
       media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
@@ -8584,7 +8603,7 @@ describe('model: populate:', function() {
 
     postSchema.virtual('mediaType').get(function() { return this._mediaType; });
 
-    const Post = db.model('gh7341_Post', postSchema);
+    const Post = db.model('Post', postSchema);
     const Image = db.model('gh7341_Image', new Schema({ url: String }));
     const Video = db.model('gh7341_Video', new Schema({ url: String, duration: Number }));
 
@@ -8649,7 +8668,7 @@ describe('model: populate:', function() {
 
   it('handles virtual populate of an embedded discriminator nested path (gh-6488) (gh-8173)', function() {
     return co(function*() {
-      const UserModel = db.model('gh6488_User', Schema({
+      const UserModel = db.model('User', Schema({
         employeeId: Number,
         name: String
       }));
@@ -8659,14 +8678,14 @@ describe('model: populate:', function() {
 
       const nestedLayerSchema = Schema({ users: [ Number ] });
       nestedLayerSchema.virtual('users_$', {
-        ref: 'gh6488_User',
+        ref: 'User',
         localField: 'users',
         foreignField: 'employeeId'
       });
 
       const docArray = batchSchema.path('nested.events');
-      docArray.discriminator('gh6488_Clicked', Schema({ nestedLayer: nestedLayerSchema }));
-      docArray.discriminator('gh6488_Purchased', Schema({ purchased: String }));
+      docArray.discriminator('Clicked', Schema({ nestedLayer: nestedLayerSchema }));
+      docArray.discriminator('Purchased', Schema({ purchased: String }));
 
       const Batch = db.model('gh6488', batchSchema);
 
@@ -8674,8 +8693,8 @@ describe('model: populate:', function() {
       yield Batch.create({
         nested: {
           events: [
-            { kind: 'gh6488_Clicked', nestedLayer: { users: [1] } },
-            { kind: 'gh6488_Purchased', purchased: 'test' }
+            { kind: 'Clicked', nestedLayer: { users: [1] } },
+            { kind: 'Purchased', purchased: 'test' }
           ]
         }
       });
@@ -8726,11 +8745,11 @@ describe('model: populate:', function() {
     before(function() {
       const authorSchema = Schema({ name: String });
       const subSchema = Schema({
-        author: { type: Schema.Types.ObjectId, ref: 'gh8247_Author' },
+        author: { type: Schema.Types.ObjectId, ref: 'Author' },
         comment: String
       });
       const pageSchema = Schema({ title: String, comments: [subSchema] });
-      Author = db.model('gh8247_Author', authorSchema);
+      Author = db.model('Author', authorSchema);
       Page = db.model('gh8247_Page', pageSchema);
     });
 
@@ -8911,17 +8930,17 @@ describe('model: populate:', function() {
         ref: 'gh8432_Companies'
       }
     });
-    const User = db.model('gh8432_Users', userSchema);
+    const User = db.model('User', userSchema);
 
     const fileSchema = new mongoose.Schema({
       _id: String,
       uploaderId: {
         type: mongoose.ObjectId,
-        ref: 'gh8432_Users'
+        ref: 'User'
       }
     }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
     fileSchema.virtual('uploadedBy', {
-      ref: 'gh8432_Users',
+      ref: 'User',
       localField: 'uploaderId',
       foreignField: '_id',
       justOne: true
@@ -9063,15 +9082,15 @@ describe('model: populate:', function() {
 
     const parentSchema = Schema({ name: String });
     parentSchema.virtual('childCount', {
-      ref: 'gh8475_Child',
+      ref: 'Child',
       localField: '_id',
       foreignField: 'parentId',
       count: true,
       match: { deleted: { $ne: true } }
     });
 
-    const Child = db.model('gh8475_Child', childSchema);
-    const Parent = db.model('gh8475_Parent', parentSchema);
+    const Child = db.model('Child', childSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
       const p = yield Parent.create({ name: 'test' });

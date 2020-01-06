@@ -186,8 +186,11 @@ before(function(done) {
   dropDBs(done);
 });
 
-after(function() {
+after(function(done) {
   dropDBs(() => {});
+
+  // Give `dropDatabase()` some time to run
+  setTimeout(() => done(), 250);
 });
 
 module.exports.server = server = new Server('mongod', {

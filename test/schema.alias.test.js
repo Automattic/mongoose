@@ -54,17 +54,14 @@ describe('schema alias option', function() {
 
     var schema = new Schema({
       nested: {
-        type: {
-          string:   { type: String, alias: 'StringAlias' },
-          number:   { type: Number, alias: 'NumberAlias' },
-          date:     { type: Date, alias: 'DateAlias' },
-          buffer:   { type: Buffer, alias: 'BufferAlias' },
-          boolean:  { type: Boolean, alias: 'BooleanAlias' },
-          mixed:    { type: Schema.Types.Mixed, alias: 'MixedAlias' },
-          objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
-          array:    { type: [], alias: 'ArrayAlias' }
-        },
-        alias: 'NestedAlias'
+        string:   { type: String, alias: 'StringAlias' },
+        number:   { type: Number, alias: 'NumberAlias' },
+        date:     { type: Date, alias: 'DateAlias' },
+        buffer:   { type: Buffer, alias: 'BufferAlias' },
+        boolean:  { type: Boolean, alias: 'BooleanAlias' },
+        mixed:    { type: Schema.Types.Mixed, alias: 'MixedAlias' },
+        objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
+        array:    { type: [], alias: 'ArrayAlias' }
       }
     });
 
@@ -84,7 +81,6 @@ describe('schema alias option', function() {
       assert.ifError(err);
 
       // Comparing with aliases
-      assert.equal(s.nested, s.NestedAlias);
       assert.equal(s.nested.string, s.StringAlias);
       assert.equal(s.nested.number, s.NumberAlias);
       assert.equal(s.nested.date, s.DateAlias);

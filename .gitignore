@@ -36,3 +36,5 @@ tools/31*
 docs/*.html
 
 test/files/main.js
+
+.config.js

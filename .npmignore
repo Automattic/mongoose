@@ -19,3 +19,5 @@ tools/31*
 data/
 
 test/files
+
+.config.js

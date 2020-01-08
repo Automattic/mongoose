@@ -17,6 +17,7 @@ before_script:
   - mkdir -p ./data/db/27000
   - printf "\n--timeout 8000" >> ./test/mocha.opts
   - ./mongodb-linux-x86_64-2.6.11/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+  - export PATH=`pwd`/mongodb-linux-x86_64-2.6.11/bin/:$PATH
   - sleep 3
 script:
   - npm test

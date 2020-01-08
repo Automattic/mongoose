@@ -9,7 +9,7 @@ var start = require('./common'),
     Schema = mongoose.Schema;
 
 describe('schema alias option', function() {
-  it('works with all basic schema types', function() {
+  it('works with all basic schema types', function(done) {
     var db = start();
 
     var schema = new Schema({
@@ -45,10 +45,11 @@ describe('schema alias option', function() {
       assert.equal(s.mixed, s.MixedAlias);
       assert.equal(s.objectId, s.ObjectIdAlias);
       assert.equal(s.array, s.ArrayAlias);
+      done();
     });
   });
 
-  it('works with nested schema types', function() {
+  it('works with nested schema types', function(done) {
     var db = start();
 
     var schema = new Schema({
@@ -92,6 +93,8 @@ describe('schema alias option', function() {
       assert.equal(s.nested.mixed, s.MixedAlias);
       assert.equal(s.nested.objectId, s.ObjectIdAlias);
       assert.equal(s.nested.array, s.ArrayAlias);
+
+      done();
     });
   });
 

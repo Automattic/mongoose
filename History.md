@@ -1,3 +1,7 @@
+5.8.6 / 2020-01-07
+====================
+ * chore: merge changes from 4.13.20 and override mistaken publish to latest tag
+
 4.13.20 / 2020-01-07
 ====================
  * fix(schema): make aliases handle mongoose-lean-virtuals #6069

@@ -1,3 +1,7 @@
+4.13.20 / 2020-01-07
+====================
+ * fix(schema): make aliases handle mongoose-lean-virtuals #6069
+
 4.13.19 / 2019-07-02
 ====================
  * fix(aggregate): make `setOptions()` work as advertised #7950 #6011 [cdimitroulas](https://github.com/cdimitroulas)

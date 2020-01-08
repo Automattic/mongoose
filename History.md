@@ -1,3 +1,7 @@
+4.13.20 / 2020-01-07
+====================
+ * fix(schema): make aliases handle mongoose-lean-virtuals #6069
+
 5.8.5 / 2020-01-06
 ==================
  * fix(document): throw error when running `validate()` multiple times on the same document #8468

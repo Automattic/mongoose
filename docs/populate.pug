@@ -363,48 +363,52 @@ block content
       });
     ```
 
-    <h3 id="cross-db-populate"><a href="#cross-db-populate">Populating across Databases</a></h3>
+    <h3 id="cross-db-populate"><a href="#cross-db-populate">Cross Database Populate</a></h3>
 
     Let's say you have a schema representing events, and a schema representing
     conversations. Each event has a corresponding conversation thread.
 
     ```javascript
-    var eventSchema = new Schema({
+    const db1 = mongoose.createConnection('mongodb://localhost:27000/db1');
+    const db2 = mongoose.createConnection('mongodb://localhost:27001/db2');
+
+    const conversationSchema = new Schema({ numMessages: Number });
+    const Conversation = db2.model('Conversation', conversationSchema);
+
+    const eventSchema = new Schema({
       name: String,
-      // The id of the corresponding conversation
-      // Notice there's no ref here!
-      conversation: ObjectId
+      conversation: {
+        type: ObjectId,
+        ref: Conversation // `ref` is a **Model class**, not a string
+      }
     });
-    var conversationSchema = new Schema({
-      numMessages: Number
-    });
+    const Event = db1.model('Event', eventSchema);
     ```
 
-    Also, suppose that events and conversations are stored in separate MongoDB
-    instances.
+    In the above example, events and conversations are stored in separate MongoDB
+    databases. String `ref` will not work in this situation, because Mongoose
+    assumes a string `ref` refers to a model name on the same connection. In
+    the above example, the conversation model is registered on `db2`, not `db1`.
 
     ```javascript
-    var db1 = mongoose.createConnection('localhost:27000/db1');
-    var db2 = mongoose.createConnection('localhost:27001/db2');
-
-    var Event = db1.model('Event', eventSchema);
-    var Conversation = db2.model('Conversation', conversationSchema);
-    ```
-
-    In this situation, you will **not** be able to `populate()` normally.
-    The `conversation` field will always be null, because `populate()` doesn't
-    know which model to use. However,
-    [you can specify the model explicitly](./api.html#model_Model.populate).
-
-    ```javascript
-    Event.
+    // Works
+    const events = await Event.
       find().
-      populate({ path: 'conversation', model: Conversation }).
-      exec(function(error, docs) { /* ... */ });
+      populate('conversation');
     ```
 
     This is known as a "cross-database populate," because it enables you to
     populate across MongoDB databases and even across MongoDB instances.
+
+    If you don't have access to the model instance when defining your `eventSchema`,
+    you can also pass [the model instance as an option to `populate()`](/docs/api/model.html#model_Model.populate).
+
+    ```javascript
+    const events = await Event.
+      find().
+      // The `model` option specifies the model to use for populating.
+      populate({ path: 'conversation', model: Conversation });
+    ```
 
     <h3 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via `refPath`</a></h3>
 

@@ -2071,7 +2071,7 @@ describe('document', function() {
   describe('bug fixes', function() {
     it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
       const parentSchema = mongoose.Schema({
-        c: {type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1'}
+        c: {type: mongoose.Schema.Types.ObjectId, ref: 'Child'}
       });
 
       let called = [];

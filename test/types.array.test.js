@@ -1653,6 +1653,20 @@ describe('types array', function() {
     });
   });
 
+  describe('slice', function() {
+    it('copies schema correctly (gh-8482)', function() {
+      const M = db.model('Test', Schema({ arr: [Number] }));
+
+      const doc = new M({ arr: [1, 2, 3] });
+
+      const arr = doc.arr.slice(2);
+
+      arr.splice(1, 0, 5, 7, 11);
+
+      assert.deepEqual(arr, [3, 5, 7, 11]);
+    });
+  });
+
   describe('setting a doc array', function() {
     it('should adjust path positions', function(done) {
       const D = db.model('subDocPositions', new Schema({

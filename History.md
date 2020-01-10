@@ -1,3 +1,17 @@
+5.8.7 / 2020-01-10
+==================
+ * fix(documentarray): modify ownerDocument when setting doc array to a doc array thats part of another document #8479
+ * fix(document): ensure that you can call `splice()` after `slice()` on an array #8482
+ * docs(populate): improve cross-db populate docs to include model refs #8497
+
+5.8.6 / 2020-01-07
+====================
+ * chore: merge changes from 4.13.20 and override mistaken publish to latest tag
+
+4.13.20 / 2020-01-07
+====================
+ * fix(schema): make aliases handle mongoose-lean-virtuals #6069
+
 5.8.5 / 2020-01-06
 ==================
  * fix(document): throw error when running `validate()` multiple times on the same document #8468

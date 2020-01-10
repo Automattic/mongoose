@@ -1659,7 +1659,7 @@ describe('types array', function() {
 
       const doc = new M({ arr: [1, 2, 3] });
 
-      let arr = doc.arr.slice(2);
+      const arr = doc.arr.slice(2);
 
       arr.splice(1, 0, 5, 7, 11);
 

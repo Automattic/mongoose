@@ -640,4 +640,31 @@ describe('types.documentarray', function() {
       assert.deepEqual(parent.toObject().children, [{ name: '3' }]);
     });
   });
+
+  it('modifies ownerDocument() on set (gh-8479)', function() {
+    const nestedArraySchema = Schema({
+      name: String,
+      subDocArray: [{ name: String }]
+    });
+
+    const Model = db.model('Test', nestedArraySchema);
+
+    const doc1 = new Model({
+      name: 'doc1',
+      subDocArray: [{
+        name: 'subDoc'
+      }]
+    });
+    const doc2 = new Model({
+      name: 'doc2',
+      subDocArray: [{
+        name: 'subDoc'
+      }]
+    });
+
+    doc1.subDocArray = doc2.subDocArray;
+
+    assert.equal(doc2.subDocArray[0].ownerDocument().name, 'doc2');
+    assert.equal(doc1.subDocArray[0].ownerDocument().name, 'doc1');
+  });
 });

@@ -1,3 +1,9 @@
+5.8.7 / 2020-01-10
+==================
+ * fix(documentarray): modify ownerDocument when setting doc array to a doc array thats part of another document #8479
+ * fix(document): ensure that you can call `splice()` after `slice()` on an array #8482
+ * docs(populate): improve cross-db populate docs to include model refs #8497
+
 5.8.6 / 2020-01-07
 ====================
  * chore: merge changes from 4.13.20 and override mistaken publish to latest tag

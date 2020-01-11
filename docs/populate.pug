@@ -56,6 +56,7 @@ block content
     <ul class="toc">
       <li><a href="#saving-refs">Saving Refs</a></li>
       <li><a href="#population">Population</a></li>
+      <li><a href="#checking-populated">Checking Whether a Field is Populated</a></li>
       <li><a href="#setting-populated-fields">Setting Populated Fields</a></li>
       <li><a href="#doc-not-found">What If There's No Foreign Document?</a></li>
       <li><a href="#field-selection">Field Selection</a></li>
@@ -137,6 +138,34 @@ block content
       story.author = author;
       console.log(story.author.name); // prints "Ian Fleming"
     });
+    ```
+
+    <h3 id="checking-populated"><a href="#checking-populated">Checking Whether a Field is Populated</a></h3>
+
+    You can call the `populated()` function to check whether a field is populated.
+    If `populated()` returns a [truthy value](https://masteringjs.io/tutorials/fundamentals/truthy),
+    you can assume the field is populated.
+
+    ```javascript
+    story.populated('author'); // truthy
+
+    story.depopulate('author'); // Make `author` not populated anymore
+    story.populated('author'); // falsy
+    ```
+
+    A common reason for checking whether a path is populated is getting the `author`
+    id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](/docs/api/mongoose.html#mongoose_Mongoose-set)
+    so you can use `story.author._id` regardless of whether `author` is populated.
+
+    ```javascript
+    story.populated('author'); // truthy
+    story.author._id; // ObjectId
+
+    story.depopulate('author'); // Make `author` not populated anymore
+    story.populated('author'); // falsy
+
+    story.author instanceof ObjectId; // true
+    story.author._id; // ObjectId, because Mongoose adds a special getter
     ```
 
     <h3 id="doc-not-found"><a href="#doc-not-found">What If There's No Foreign Document?</a></h3>

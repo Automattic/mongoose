@@ -1,3 +1,10 @@
+5.8.8 / 2020-01-14
+==================
+ * fix(model): allow using `lean` with `insertMany()` #8507 #8234 [ntsekouras](https://github.com/ntsekouras)
+ * fix(document): don't throw parallel validate error when validating subdoc underneath modified nested path #8486
+ * fix: allow `typePojoToMixed` as top-level option #8501 #8500 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(populate+schematypes): make note of `_id` getter for ObjectIds in populate docs #8483
+
 5.8.7 / 2020-01-10
 ==================
  * fix(documentarray): modify ownerDocument when setting doc array to a doc array thats part of another document #8479

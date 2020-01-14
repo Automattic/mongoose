@@ -8486,7 +8486,7 @@ describe('document', function() {
       }
     });
     const Test = db.model('gh8486', testSchema);
-    
+
     return co(function*() {
       const doc = yield Test.create({});
 
@@ -8497,6 +8497,8 @@ describe('document', function() {
           }
         }
       };
+
+      // Should not throw
       yield doc.save();
 
       const raw = yield Test.collection.findOne();

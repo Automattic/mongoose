@@ -1113,33 +1113,31 @@ describe('Query', function() {
   });
 
   describe('deleteOne/deleteMany', function() {
-    it('handles deleteOne', function(done) {
+    it('handles deleteOne', function() {
       const M = db.model('Person', new Schema({ name: 'String' }));
-      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        M.deleteOne({ name: /Stark/ }, function(error) {
-          assert.ifError(error);
-          M.estimatedDocumentCount(function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 1);
-            done();
-          });
-        });
+
+      return co(function*() {
+        yield M.deleteMany({});
+        yield M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }]);
+
+        yield M.deleteOne({ name: /Stark/ });
+
+        const count = yield M.countDocuments();
+        assert.equal(count, 1);
       });
     });
 
-    it('handles deleteMany', function(done) {
+    it('handles deleteMany', function() {
       const M = db.model('Person', new Schema({ name: 'String' }));
-      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        M.deleteMany({ name: /Stark/ }, function(error) {
-          assert.ifError(error);
-          M.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
+
+      return co(function*() {
+        yield M.deleteMany({});
+        yield M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }]);
+
+        yield M.deleteMany({ name: /Stark/ });
+
+        const count = yield M.countDocuments();
+        assert.equal(count, 0);
       });
     });
   });
@@ -2848,6 +2846,7 @@ describe('Query', function() {
     let Model;
 
     before(function() {
+      db.deleteModel(/Test/);
       Model = db.model('Test', new Schema({ name: String }));
     });
 

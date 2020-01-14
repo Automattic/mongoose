@@ -1076,10 +1076,8 @@ describe('Query', function() {
 
   describe('distinct', function() {
     it('op', function() {
-      const Product = db.model('Product', productSchema);
-      const prod = new Product({});
       const q = new Query({});
-      
+
       q.distinct('blah');
 
       assert.equal(q.op, 'distinct');

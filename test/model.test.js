@@ -4661,6 +4661,53 @@ describe('Model', function() {
       }
     });
 
+    describe('insertMany() lean option to bypass validation (gh-8234)', () => {
+      const gh8234Schema = new Schema({
+        name: String,
+        age: { type: Number, required: true }
+      });
+      const arrGh8234 = [{ name: 'Rigas' }, { name: 'Tonis', age: 9 }];
+      let Gh8234;
+      before('init model', () => {
+        Gh8234 = db.model('gh8234', gh8234Schema);
+      });
+      afterEach('delete inserted data', function() {
+        return Gh8234.deleteMany({});
+      });
+
+      it('insertMany() should bypass validation if lean option set to `true`', (done) => {
+        Gh8234.insertMany(arrGh8234, { lean: true }, (error, docs) => {
+          assert.ifError(error);
+          assert.equal(docs.length, 2);
+          Gh8234.find({}, (error, docs) => {
+            assert.ifError(error);
+            assert.equal(docs.length, 2);
+            assert.equal(arrGh8234[0].age, undefined);
+            assert.equal(arrGh8234[1].age, 9);
+            done();
+          });
+        });
+      });
+
+      it('insertMany() should validate if lean option not set', (done) => {
+        Gh8234.insertMany(arrGh8234, (error) => {
+          assert.ok(error);
+          assert.equal(error.name, 'ValidationError');
+          assert.equal(error.errors.age.kind, 'required');
+          done();
+        });
+      });
+
+      it('insertMany() should validate if lean option set to `false`', (done) => {
+        Gh8234.insertMany(arrGh8234, { lean: false }, (error) => {
+          assert.ok(error);
+          assert.equal(error.name, 'ValidationError');
+          assert.equal(error.errors.age.kind, 'required');
+          done();
+        });
+      });
+    });
+
     it('insertMany() ordered option for validation errors (gh-5068)', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

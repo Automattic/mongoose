@@ -8474,4 +8474,35 @@ describe('document', function() {
       assert.equal(err.name, 'ParallelValidateError');
     });
   });
+
+  it('avoids parallel validate error when validating nested path with double nested subdocs (gh-8486)', function() {
+    const testSchema = new Schema({
+      foo: {
+        bar: Schema({
+          baz: Schema({
+            num: Number
+          })
+        })
+      }
+    });
+    const Test = db.model('gh8486', testSchema);
+
+    return co(function*() {
+      const doc = yield Test.create({});
+
+      doc.foo = {
+        bar: {
+          baz: {
+            num: 1
+          }
+        }
+      };
+
+      // Should not throw
+      yield doc.save();
+
+      const raw = yield Test.collection.findOne();
+      assert.equal(raw.foo.bar.baz.num, 1);
+    });
+  });
 });

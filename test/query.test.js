@@ -9,7 +9,6 @@ const start = require('./common');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -20,32 +19,23 @@ const DocumentObjectId = mongoose.Types.ObjectId;
  */
 
 describe('Query', function() {
-  let Comment;
-  let Product;
-  let p1;
+  let commentSchema;
+  let productSchema;
   let db;
 
   before(function() {
-    Comment = new Schema({
+    commentSchema = new Schema({
       text: String
     });
 
-    Product = new Schema({
+    productSchema = new Schema({
       tags: {}, // mixed
       array: Array,
       ids: [Schema.ObjectId],
       strings: [String],
       numbers: [Number],
-      comments: [Comment]
+      comments: [commentSchema]
     });
-
-    mongoose.model('Product', Product);
-    mongoose.model('Comment', Comment);
-  });
-
-  before(function() {
-    const Prod = mongoose.model('Product');
-    p1 = new Prod();
   });
 
   before(function() {
@@ -56,10 +46,25 @@ describe('Query', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => {
+    const arr = [];
+
+    if (db.models == null) {
+      return;
+    }
+    for (const model of Object.keys(db.models)) {
+      arr.push(db.models[model].deleteMany({}));
+    }
+
+    return Promise.all(arr);
+  });
+
   describe('constructor', function() {
     it('should not corrupt options', function(done) {
       const opts = {};
-      const query = new Query({}, opts, null, p1.collection);
+      const query = new Query({}, opts);
       assert.notEqual(opts, query._mongooseOptions);
       done();
     });
@@ -67,14 +72,14 @@ describe('Query', function() {
 
   describe('select', function() {
     it('(object)', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.select({a: 1, b: 1, c: 0});
       assert.deepEqual(query._fields, {a: 1, b: 1, c: 0});
       done();
     });
 
     it('(string)', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.select(' a  b -c ');
       assert.deepEqual(query._fields, {a: 1, b: 1, c: 0});
       done();
@@ -82,14 +87,14 @@ describe('Query', function() {
 
     it('("a","b","c")', function(done) {
       assert.throws(function() {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.select('a', 'b', 'c');
       }, /Invalid select/);
       done();
     });
 
     it('should not overwrite fields set in prior calls', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.select('a');
       assert.deepEqual(query._fields, {a: 1});
       query.select('b');
@@ -104,13 +109,13 @@ describe('Query', function() {
 
   describe('projection() (gh-7384)', function() {
     it('gets current projection', function() {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.select('a');
       assert.deepEqual(query.projection(), { a: 1 });
     });
 
     it('overwrites current projection', function() {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.select('a');
       assert.deepEqual(query.projection({ b: 1 }), { b: 1 });
       assert.deepEqual(query.projection(), { b: 1 });
@@ -119,7 +124,7 @@ describe('Query', function() {
 
   describe('where', function() {
     it('works', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('name', 'guillermo');
       assert.deepEqual(query._conditions, {name: 'guillermo'});
       query.where('a');
@@ -128,7 +133,7 @@ describe('Query', function() {
       done();
     });
     it('throws if non-string or non-object path is passed', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       assert.throws(function() {
         query.where(50);
       });
@@ -138,7 +143,7 @@ describe('Query', function() {
       done();
     });
     it('does not throw when 0 args passed', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       assert.doesNotThrow(function() {
         query.where();
       });
@@ -148,7 +153,7 @@ describe('Query', function() {
 
   describe('equals', function() {
     it('works', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('name').equals('guillermo');
       assert.deepEqual(query._conditions, {name: 'guillermo'});
       done();
@@ -157,13 +162,13 @@ describe('Query', function() {
 
   describe('gte', function() {
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.gte('age', 18);
       assert.deepEqual(query._conditions, {age: {$gte: 18}});
       done();
     });
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').gte(18);
       assert.deepEqual(query._conditions, {age: {$gte: 18}});
       done();
@@ -172,13 +177,13 @@ describe('Query', function() {
 
   describe('gt', function() {
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').gt(17);
       assert.deepEqual(query._conditions, {age: {$gt: 17}});
       done();
     });
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.gt('age', 17);
       assert.deepEqual(query._conditions, {age: {$gt: 17}});
       done();
@@ -187,13 +192,13 @@ describe('Query', function() {
 
   describe('lte', function() {
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').lte(65);
       assert.deepEqual(query._conditions, {age: {$lte: 65}});
       done();
     });
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.lte('age', 65);
       assert.deepEqual(query._conditions, {age: {$lte: 65}});
       done();
@@ -202,13 +207,13 @@ describe('Query', function() {
 
   describe('lt', function() {
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').lt(66);
       assert.deepEqual(query._conditions, {age: {$lt: 66}});
       done();
     });
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.lt('age', 66);
       assert.deepEqual(query._conditions, {age: {$lt: 66}});
       done();
@@ -218,7 +223,7 @@ describe('Query', function() {
   describe('combined', function() {
     describe('lt and gt', function() {
       it('works', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('age').lt(66).gt(17);
         assert.deepEqual(query._conditions, {age: {$lt: 66, $gt: 17}});
         done();
@@ -228,7 +233,7 @@ describe('Query', function() {
 
   describe('tl on one path and gt on another', function() {
     it('works', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query
         .where('age').lt(66)
         .where('height').gt(5);
@@ -239,13 +244,13 @@ describe('Query', function() {
 
   describe('ne', function() {
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').ne(21);
       assert.deepEqual(query._conditions, {age: {$ne: 21}});
       done();
     });
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.ne('age', 21);
       assert.deepEqual(query._conditions, {age: {$ne: 21}});
       done();
@@ -254,25 +259,25 @@ describe('Query', function() {
 
   describe('in', function() {
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').in([21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$in: [21, 25, 30]}});
       done();
     });
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.in('age', [21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$in: [21, 25, 30]}});
       done();
     });
     it('where a non-array value no via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.in('age', 21);
       assert.deepEqual(query._conditions, {age: {$in: 21}});
       done();
     });
     it('where a non-array value via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').in(21);
       assert.deepEqual(query._conditions, {age: {$in: 21}});
       done();
@@ -281,25 +286,25 @@ describe('Query', function() {
 
   describe('nin', function() {
     it('with 1 arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').nin([21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$nin: [21, 25, 30]}});
       done();
     });
     it('with 2 args', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.nin('age', [21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$nin: [21, 25, 30]}});
       done();
     });
     it('with a non-array value not via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.nin('age', 21);
       assert.deepEqual(query._conditions, {age: {$nin: 21}});
       done();
     });
     it('with a non-array value via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').nin(21);
       assert.deepEqual(query._conditions, {age: {$nin: 21}});
       done();
@@ -308,25 +313,25 @@ describe('Query', function() {
 
   describe('mod', function() {
     it('not via where, where [a, b] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.mod('age', [5, 2]);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done();
     });
     it('not via where, where a and b params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.mod('age', 5, 2);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done();
     });
     it('via where, where [a, b] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').mod([5, 2]);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done();
     });
     it('via where, where a and b params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('age').mod(5, 2);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done();
@@ -335,46 +340,46 @@ describe('Query', function() {
 
   describe('near', function() {
     it('via where, where { center :[lat, long]} param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').near({center: [40, -72]});
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     });
     it('via where, where [lat, long] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').near([40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     });
     it('via where, where lat and long params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').near(40, -72);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     });
     it('not via where, where [lat, long] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.near('checkin', [40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     });
     it('not via where, where lat and long params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.near('checkin', 40, -72);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     });
     it('via where, where GeoJSON param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('numbers').near({center: {type: 'Point', coordinates: [40, -72]}});
       assert.deepEqual(query._conditions, {numbers: {$near: {$geometry: {type: 'Point', coordinates: [40, -72]}}}});
       assert.doesNotThrow(function() {
-        query.cast(p1.constructor);
+        query.cast(db.model('Product', productSchema));
       });
       done();
     });
     it('with path, where GeoJSON param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.near('loc', {center: {type: 'Point', coordinates: [40, -72]}});
       assert.deepEqual(query._conditions, {loc: {$near: {$geometry: {type: 'Point', coordinates: [40, -72]}}}});
       done();
@@ -383,53 +388,53 @@ describe('Query', function() {
 
   describe('nearSphere', function() {
     it('via where, where [lat, long] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').nearSphere([40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
     });
     it('via where, where lat and long params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').nearSphere(40, -72);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
     });
     it('not via where, where [lat, long] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.nearSphere('checkin', [40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
     });
     it('not via where, where lat and long params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.nearSphere('checkin', 40, -72);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
     });
 
     it('via where, with object', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').nearSphere({center: [20, 23], maxDistance: 2});
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [20, 23], $maxDistance: 2}});
       done();
     });
 
     it('via where, where GeoJSON param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('numbers').nearSphere({center: {type: 'Point', coordinates: [40, -72]}});
       assert.deepEqual(query._conditions, {numbers: {$nearSphere: {$geometry: {type: 'Point', coordinates: [40, -72]}}}});
       assert.doesNotThrow(function() {
-        query.cast(p1.constructor);
+        query.cast(db.model('Product', productSchema));
       });
       done();
     });
 
     it('with path, with GeoJSON', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.nearSphere('numbers', {center: {type: 'Point', coordinates: [40, -72]}});
       assert.deepEqual(query._conditions, {numbers: {$nearSphere: {$geometry: {type: 'Point', coordinates: [40, -72]}}}});
       assert.doesNotThrow(function() {
-        query.cast(p1.constructor);
+        query.cast(db.model('Product', productSchema));
       });
       done();
     });
@@ -437,7 +442,7 @@ describe('Query', function() {
 
   describe('maxDistance', function() {
     it('via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('checkin').near([40, -72]).maxDistance(1);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72], $maxDistance: 1}});
       done();
@@ -447,7 +452,7 @@ describe('Query', function() {
   describe('within', function() {
     describe('box', function() {
       it('via where', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('gps').within().box({ll: [5, 25], ur: [10, 30]});
         const match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
         if (Query.use$geoWithin) {
@@ -458,7 +463,7 @@ describe('Query', function() {
         done();
       });
       it('via where, no object', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('gps').within().box([5, 25], [10, 30]);
         const match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
         if (Query.use$geoWithin) {
@@ -472,7 +477,7 @@ describe('Query', function() {
 
     describe('center', function() {
       it('via where', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('gps').within().center({center: [5, 25], radius: 5});
         const match = {gps: {$within: {$center: [[5, 25], 5]}}};
         if (Query.use$geoWithin) {
@@ -486,7 +491,7 @@ describe('Query', function() {
 
     describe('centerSphere', function() {
       it('via where', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('gps').within().centerSphere({center: [5, 25], radius: 5});
         const match = {gps: {$within: {$centerSphere: [[5, 25], 5]}}};
         if (Query.use$geoWithin) {
@@ -500,7 +505,7 @@ describe('Query', function() {
 
     describe('polygon', function() {
       it('via where', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('gps').within().polygon({a: {x: 10, y: 20}, b: {x: 15, y: 25}, c: {x: 20, y: 20}});
         const match = {gps: {$within: {$polygon: [{a: {x: 10, y: 20}, b: {x: 15, y: 25}, c: {x: 20, y: 20}}]}}};
         if (Query.use$geoWithin) {
@@ -515,26 +520,26 @@ describe('Query', function() {
 
   describe('exists', function() {
     it('0 args via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('username').exists();
       assert.deepEqual(query._conditions, {username: {$exists: true}});
       done();
     });
     it('1 arg via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('username').exists(false);
       assert.deepEqual(query._conditions, {username: {$exists: false}});
       done();
     });
     it('where 1 argument not via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.exists('username');
       assert.deepEqual(query._conditions, {username: {$exists: true}});
       done();
     });
 
     it('where 2 args not via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.exists('username', false);
       assert.deepEqual(query._conditions, {username: {$exists: false}});
       done();
@@ -543,13 +548,13 @@ describe('Query', function() {
 
   describe('all', function() {
     it('via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('pets').all(['dog', 'cat', 'ferret']);
       assert.deepEqual(query._conditions, {pets: {$all: ['dog', 'cat', 'ferret']}});
       done();
     });
     it('not via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.all('pets', ['dog', 'cat', 'ferret']);
       assert.deepEqual(query._conditions, {pets: {$all: ['dog', 'cat', 'ferret']}});
       done();
@@ -558,14 +563,14 @@ describe('Query', function() {
 
   describe('find', function() {
     it('strict array equivalence condition v', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.find({pets: ['dog', 'cat', 'ferret']});
       assert.deepEqual(query._conditions, {pets: ['dog', 'cat', 'ferret']});
       done();
     });
     it('with no args', function(done) {
       let threw = false;
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
 
       try {
         q.find();
@@ -578,7 +583,7 @@ describe('Query', function() {
     });
 
     it('works with overwriting previous object args (1176)', function(done) {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       assert.doesNotThrow(function() {
         q.find({age: {$lt: 30}});
         q.find({age: 20}); // overwrite
@@ -590,13 +595,13 @@ describe('Query', function() {
 
   describe('size', function() {
     it('via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').size(5);
       assert.deepEqual(query._conditions, {collection: {$size: 5}});
       done();
     });
     it('not via where', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.size('collection', 5);
       assert.deepEqual(query._conditions, {collection: {$size: 5}});
       done();
@@ -605,73 +610,73 @@ describe('Query', function() {
 
   describe('slice', function() {
     it('where and positive limit param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice(5);
       assert.deepEqual(query._fields, {collection: {$slice: 5}});
       done();
     });
     it('where just negative limit param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice(-5);
       assert.deepEqual(query._fields, {collection: {$slice: -5}});
       done();
     });
     it('where [skip, limit] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice([14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     });
     it('where skip and limit params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice(14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     });
     it('where just positive limit param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice(5);
       assert.deepEqual(query._fields, {collection: {$slice: 5}});
       done();
     });
     it('where just negative limit param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice(-5);
       assert.deepEqual(query._fields, {collection: {$slice: -5}});
       done();
     });
     it('where the [skip, limit] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice([14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     });
     it('where the skip and limit params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.where('collection').slice(14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     });
     it('not via where, with just positive limit param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.slice('collection', 5);
       assert.deepEqual(query._fields, {collection: {$slice: 5}});
       done();
     });
     it('not via where, where just negative limit param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.slice('collection', -5);
       assert.deepEqual(query._fields, {collection: {$slice: -5}});
       done();
     });
     it('not via where, where [skip, limit] param', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.slice('collection', [14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     });
     it('not via where, where skip and limit params', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.slice('collection', 14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
@@ -681,13 +686,13 @@ describe('Query', function() {
   describe('elemMatch', function() {
     describe('not via where', function() {
       it('works', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.elemMatch('comments', {author: 'bnoguchi', votes: {$gte: 5}});
         assert.deepEqual(query._conditions, {comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
         done();
       });
       it('where block notation', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.elemMatch('comments', function(elem) {
           elem.where('author', 'bnoguchi');
           elem.where('votes').gte(5);
@@ -698,13 +703,13 @@ describe('Query', function() {
     });
     describe('via where', function() {
       it('works', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('comments').elemMatch({author: 'bnoguchi', votes: {$gte: 5}});
         assert.deepEqual(query._conditions, {comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
         done();
       });
       it('where block notation', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.where('comments').elemMatch(function(elem) {
           elem.where('author', 'bnoguchi');
           elem.where('votes').gte(5);
@@ -717,7 +722,7 @@ describe('Query', function() {
 
   describe('$where', function() {
     it('function arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
 
       function filter() {
         return this.lastName === this.firstName;
@@ -728,7 +733,7 @@ describe('Query', function() {
       done();
     });
     it('string arg', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.$where('this.lastName === this.firstName');
       assert.deepEqual(query._conditions, {$where: 'this.lastName === this.firstName'});
       done();
@@ -737,7 +742,7 @@ describe('Query', function() {
 
   describe('limit', function() {
     it('works', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.limit(5);
       assert.equal(query.options.limit, 5);
       done();
@@ -746,7 +751,7 @@ describe('Query', function() {
 
   describe('skip', function() {
     it('works', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
+      const query = new Query({});
       query.skip(9);
       assert.equal(query.options.skip, 9);
       done();
@@ -755,21 +760,21 @@ describe('Query', function() {
 
   describe('sort', function() {
     it('works', function(done) {
-      let query = new Query({}, {}, null, p1.collection);
+      let query = new Query({});
       query.sort('a -c b');
       assert.deepEqual(query.options.sort, {a: 1, c: -1, b: 1});
-      query = new Query({}, {}, null, p1.collection);
+      query = new Query({});
       query.sort({a: 1, c: -1, b: 'asc', e: 'descending', f: 'ascending'});
       assert.deepEqual(query.options.sort, {a: 1, c: -1, b: 1, e: -1, f: 1});
 
       if (typeof global.Map !== 'undefined') {
-        query = new Query({}, {}, null, p1.collection);
+        query = new Query({});
         query.sort(new global.Map().set('a', 1).set('b', 1));
         assert.equal(query.options.sort.get('a'), 1);
         assert.equal(query.options.sort.get('b'), 1);
       }
 
-      query = new Query({}, {}, null, p1.collection);
+      query = new Query({});
       let e;
 
       try {
@@ -830,7 +835,7 @@ describe('Query', function() {
 
   describe('populate', function() {
     it('converts to PopulateOptions objects', function(done) {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       const o = {
         path: 'yellow.brick',
         match: {bricks: {$lt: 1000}},
@@ -845,7 +850,7 @@ describe('Query', function() {
     });
 
     it('overwrites duplicate paths', function(done) {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       let o = {
         path: 'yellow.brick',
         match: {bricks: {$lt: 1000}},
@@ -866,7 +871,7 @@ describe('Query', function() {
     });
 
     it('accepts space delimited strings', function(done) {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       q.populate('yellow.brick dirt');
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
       assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], {
@@ -883,8 +888,8 @@ describe('Query', function() {
 
   describe('casting', function() {
     it('to an array of mixed', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
-      const Product = db.model('Product');
+      const query = new Query({});
+      const Product = db.model('Product', productSchema);
       const params = {_id: new DocumentObjectId, tags: {$in: [4, 8, 15, 16]}};
       query.cast(Product, params);
       assert.deepEqual(params.tags.$in, [4, 8, 15, 16]);
@@ -901,7 +906,7 @@ describe('Query', function() {
         props: [embeddedSchema]
       });
 
-      const Cat = db.model('gh6439', catSchema);
+      const Cat = db.model('Cat', catSchema);
       const kitty = new Cat({
         name: 'Zildjian',
         props: [
@@ -931,9 +936,9 @@ describe('Query', function() {
     });
 
     it('find $ne should not cast single value to array for schematype of Array', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
-      const Product = db.model('Product');
-      const Comment = db.model('Comment');
+      const query = new Query({});
+      const Product = db.model('Product', productSchema);
+      const Comment = db.model('Comment', commentSchema);
 
       const id = new DocumentObjectId;
       const castedComment = {_id: id, text: 'hello there'};
@@ -975,8 +980,8 @@ describe('Query', function() {
     });
 
     it('subdocument array with $ne: null should not throw', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
-      const Product = db.model('Product');
+      const query = new Query({});
+      const Product = db.model('Product', productSchema);
 
       const params = {
         comments: {$ne: null}
@@ -988,9 +993,9 @@ describe('Query', function() {
     });
 
     it('find should not cast single value to array for schematype of Array', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
-      const Product = db.model('Product');
-      const Comment = db.model('Comment');
+      const query = new Query({});
+      const Product = db.model('Product', productSchema);
+      const Comment = db.model('Comment', commentSchema);
 
       const id = new DocumentObjectId;
       const castedComment = {_id: id, text: 'hello there'};
@@ -1032,8 +1037,8 @@ describe('Query', function() {
     });
 
     it('an $elemMatch with $in works (gh-1100)', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
-      const Product = db.model('Product');
+      const query = new Query({});
+      const Product = db.model('Product', productSchema);
       const ids = [String(new DocumentObjectId), String(new DocumentObjectId)];
       const params = {ids: {$elemMatch: {$in: ids}}};
       query.cast(Product, params);
@@ -1045,9 +1050,9 @@ describe('Query', function() {
     });
 
     it('inequality operators for an array', function(done) {
-      const query = new Query({}, {}, null, p1.collection);
-      const Product = db.model('Product');
-      const Comment = db.model('Comment');
+      const query = new Query({});
+      const Product = db.model('Product', productSchema);
+      const Comment = db.model('Comment', commentSchema);
 
       const id = new DocumentObjectId;
       const castedComment = {_id: id, text: 'hello there'};
@@ -1070,19 +1075,18 @@ describe('Query', function() {
   });
 
   describe('distinct', function() {
-    it('op', function(done) {
-      const Product = db.model('Product');
-      const prod = new Product({});
-      const q = new Query({}, {}, Product, prod.collection).distinct('blah', function() {
-        assert.equal(q.op, 'distinct');
-        done();
-      });
+    it('op', function() {
+      const q = new Query({});
+
+      q.distinct('blah');
+
+      assert.equal(q.op, 'distinct');
     });
   });
 
   describe('findOne', function() {
     it('sets the op', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
       const prod = new Product({});
       const q = new Query(prod.collection, {}, Product).distinct();
       // use a timeout here because we have to wait for the connection to start
@@ -1096,7 +1100,7 @@ describe('Query', function() {
     });
 
     it('works as a promise', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
       const promise = Product.findOne();
 
       promise.then(function() {
@@ -1108,40 +1112,38 @@ describe('Query', function() {
   });
 
   describe('deleteOne/deleteMany', function() {
-    it('handles deleteOne', function(done) {
-      const M = db.model('deleteOne', new Schema({ name: 'String' }));
-      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        M.deleteOne({ name: /Stark/ }, function(error) {
-          assert.ifError(error);
-          M.estimatedDocumentCount(function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 1);
-            done();
-          });
-        });
+    it('handles deleteOne', function() {
+      const M = db.model('Person', new Schema({ name: 'String' }));
+
+      return co(function*() {
+        yield M.deleteMany({});
+        yield M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }]);
+
+        yield M.deleteOne({ name: /Stark/ });
+
+        const count = yield M.countDocuments();
+        assert.equal(count, 1);
       });
     });
 
-    it('handles deleteMany', function(done) {
-      const M = db.model('deleteMany', new Schema({ name: 'String' }));
-      M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        M.deleteMany({ name: /Stark/ }, function(error) {
-          assert.ifError(error);
-          M.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
+    it('handles deleteMany', function() {
+      const M = db.model('Person', new Schema({ name: 'String' }));
+
+      return co(function*() {
+        yield M.deleteMany({});
+        yield M.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }]);
+
+        yield M.deleteMany({ name: /Stark/ });
+
+        const count = yield M.countDocuments();
+        assert.equal(count, 0);
       });
     });
   });
 
   describe('remove', function() {
     it('handles cast errors async', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
 
       assert.doesNotThrow(function() {
         Product.where({numbers: [[[]]]}).deleteMany(function(err) {
@@ -1152,7 +1154,7 @@ describe('Query', function() {
     });
 
     it('supports a single conditions arg', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
 
       Product.create({strings: ['remove-single-condition']}).then(function() {
         const q = Product.where().deleteMany({strings: 'remove-single-condition'});
@@ -1162,7 +1164,7 @@ describe('Query', function() {
     });
 
     it('supports a single callback arg', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
       const val = 'remove-single-callback';
 
       Product.create({strings: [val]}).then(function() {
@@ -1178,7 +1180,7 @@ describe('Query', function() {
     });
 
     it('supports conditions and callback args', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
       const val = 'remove-cond-and-callback';
 
       Product.create({strings: [val]}).then(function() {
@@ -1194,7 +1196,7 @@ describe('Query', function() {
     });
 
     it('single option, default', function(done) {
-      const Test = db.model('Test_single', new Schema({ name: String }));
+      const Test = db.model('Person', new Schema({ name: String }));
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
@@ -1211,7 +1213,7 @@ describe('Query', function() {
     });
 
     it.skip('single option, false', function(done) {
-      const Test = db.model('Test_single_false', new Schema({ name: String }));
+      const Test = db.model('Person', new Schema({ name: String }));
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
@@ -1228,7 +1230,7 @@ describe('Query', function() {
     });
 
     it.skip('single option, true', function(done) {
-      const Test = db.model('Test_single_true', new Schema({ name: String }));
+      const Test = db.model('Person', new Schema({ name: String }));
 
       Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
         assert.ifError(error);
@@ -1247,7 +1249,7 @@ describe('Query', function() {
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {
     it('works', function(done) {
-      const Product = db.model('Product');
+      const Product = db.model('Product', productSchema);
 
       const proddoc = {comments: [{text: 'hello'}]};
       const prod2doc = {comments: [{text: 'goodbye'}]};
@@ -1330,7 +1332,7 @@ describe('Query', function() {
   describe('options', function() {
     describe('maxscan', function() {
       it('works', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.maxscan(100);
         assert.equal(query.options.maxScan, 100);
         done();
@@ -1339,15 +1341,15 @@ describe('Query', function() {
 
     describe('slaveOk', function() {
       it('works', function(done) {
-        let query = new Query({}, {}, null, p1.collection);
+        let query = new Query({});
         query.slaveOk();
         assert.equal(query.options.slaveOk, true);
 
-        query = new Query({}, {}, null, p1.collection);
+        query = new Query({});
         query.slaveOk(true);
         assert.equal(query.options.slaveOk, true);
 
-        query = new Query({}, {}, null, p1.collection);
+        query = new Query({});
         query.slaveOk(false);
         assert.equal(query.options.slaveOk, false);
         done();
@@ -1356,21 +1358,21 @@ describe('Query', function() {
 
     describe('tailable', function() {
       it('works', function(done) {
-        let query = new Query({}, {}, null, p1.collection);
+        let query = new Query({});
         query.tailable();
         assert.equal(query.options.tailable, true);
 
-        query = new Query({}, {}, null, p1.collection);
+        query = new Query({});
         query.tailable(true);
         assert.equal(query.options.tailable, true);
 
-        query = new Query({}, {}, null, p1.collection);
+        query = new Query({});
         query.tailable(false);
         assert.equal(query.options.tailable, false);
         done();
       });
       it('supports passing the `await` option', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.tailable({awaitdata: true});
         assert.equal(query.options.tailable, true);
         assert.equal(query.options.awaitdata, true);
@@ -1390,11 +1392,11 @@ describe('Query', function() {
 
     describe('hint', function() {
       it('works', function(done) {
-        const query2 = new Query({}, {}, null, p1.collection);
+        const query2 = new Query({});
         query2.hint({indexAttributeA: 1, indexAttributeB: -1});
         assert.deepEqual(query2.options.hint, {indexAttributeA: 1, indexAttributeB: -1});
 
-        const query3 = new Query({}, {}, null, p1.collection);
+        const query3 = new Query({});
         query3.hint('indexAttributeA_1');
         assert.deepEqual(query3.options.hint, 'indexAttributeA_1');
 
@@ -1404,7 +1406,7 @@ describe('Query', function() {
 
     describe('snapshot', function() {
       it('works', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.snapshot(true);
         assert.equal(query.options.snapshot, true);
         done();
@@ -1413,7 +1415,7 @@ describe('Query', function() {
 
     describe('batchSize', function() {
       it('works', function(done) {
-        const query = new Query({}, {}, null, p1.collection);
+        const query = new Query({});
         query.batchSize(10);
         assert.equal(query.options.batchSize, 10);
         done();
@@ -1425,7 +1427,7 @@ describe('Query', function() {
 
       describe('without tags', function() {
         it('works', function(done) {
-          const query = new Query({}, {}, null, p1.collection);
+          const query = new Query({});
           query.read('primary');
           assert.ok(query.options.readPreference instanceof P);
           assert.ok(query.options.readPreference.isValid());
@@ -1482,7 +1484,7 @@ describe('Query', function() {
 
       describe('with tags', function() {
         it('works', function(done) {
-          const query = new Query({}, {}, null, p1.collection);
+          const query = new Query({});
           const tags = [{dc: 'sf', s: 1}, {dc: 'jp', s: 2}];
 
           query.read('pp', tags);
@@ -1522,7 +1524,7 @@ describe('Query', function() {
         it('and sends it though the driver', function(done) {
           const options = {read: 'secondary', safe: {w: 'majority'}};
           const schema = new Schema({name: String}, options);
-          const M = db.model(random(), schema);
+          const M = db.model('Test', schema);
           const q = M.find();
 
           // stub the internal query options call
@@ -1558,7 +1560,7 @@ describe('Query', function() {
             nested: subSchema
           }, { strict: 'throw' });
 
-          const Test = db.model('gh5144', schema);
+          const Test = db.model('Test', schema);
           const test = new Test({ name: 'Test1' });
           return co(function*() {
             yield test.save();
@@ -1577,7 +1579,7 @@ describe('Query', function() {
             nested: subSchema
           }, { strict: 'throw', useNestedStrict: true });
 
-          const Test = db.model('gh5144_2', schema);
+          const Test = db.model('Test', schema);
           const test = new Test({ name: 'Test1' });
           return co(function* () {
             yield test.save();
@@ -1619,7 +1621,7 @@ describe('Query', function() {
       assert.equal(q.options.readPreference.mode, 'secondary');
       assert.equal(q.options.readPreference.tags[0].dc, 'eu');
 
-      const Product = db.model('Product', 'Product_setOptions_test');
+      const Product = db.model('Product', productSchema);
       Product.create(
         {numbers: [3, 4, 5]},
         {strings: 'hi there'.split(' ')}, function(err, doc1, doc2) {
@@ -1683,7 +1685,7 @@ describe('Query', function() {
           name: String
         });
 
-        const MyModel = db.model('gh4839', schema);
+        const MyModel = db.model('Test', schema);
         const collation = { locale: 'en_US', strength: 1 };
 
         MyModel.create([{ name: 'a' }, { name: 'A' }]).
@@ -1712,28 +1714,33 @@ describe('Query', function() {
           catch(done);
       });
 
-      it('set on schema (gh-5295)', function(done) {
-        const schema = new Schema({
-          name: String
-        }, { collation: { locale: 'en_US', strength: 1 } });
+      it('set on schema (gh-5295)', function() {
+        return co(function*() {
+          yield db.db.collection('tests').drop().catch(err => {
+            if (err.message === 'ns not found') {
+              return;
+            }
+            throw err;
+          });
 
-        const MyModel = db.model('gh5295', schema);
+          const schema = new Schema({
+            name: String
+          }, { collation: { locale: 'en_US', strength: 1 } });
 
-        MyModel.create([{ name: 'a' }, { name: 'A' }]).
-          then(function() {
-            return MyModel.find({ name: 'a' });
-          }).
-          then(function(docs) {
-            assert.equal(docs.length, 2);
-            done();
-          }).
-          catch(done);
+          const MyModel = db.model('Test', schema, 'tests');
+
+          yield MyModel.create([{ name: 'a' }, { name: 'A' }]);
+
+          const docs = yield MyModel.find({ name: 'a' });
+
+          assert.equal(docs.length, 2);
+        });
       });
     });
 
     describe('gh-1950', function() {
       it.skip('ignores sort when passed to count', function(done) {
-        const Product = db.model('Product', 'Product_setOptions_test');
+        const Product = db.model('Product', productSchema);
         Product.find().sort({_id: 1}).count({}).exec(function(error) {
           assert.ifError(error);
           done();
@@ -1741,13 +1748,13 @@ describe('Query', function() {
       });
 
       it('ignores sort when passed to countDocuments', function() {
-        const Product = db.model('Product', 'Product_setOptions_test');
+        const Product = db.model('Product', productSchema);
         return Product.create({}).
           then(() => Product.find().sort({_id: 1}).countDocuments({}).exec());
       });
 
       it.skip('ignores count when passed to sort', function(done) {
-        const Product = db.model('Product', 'Product_setOptions_test');
+        const Product = db.model('Product', productSchema);
         Product.find().count({}).sort({_id: 1}).exec(function(error) {
           assert.ifError(error);
           done();
@@ -1756,7 +1763,7 @@ describe('Query', function() {
     });
 
     it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
-      const User = db.model('gh3010', {
+      const User = db.model('User', {
         _id: {
           select: false,
           type: Schema.Types.ObjectId,
@@ -1778,7 +1785,7 @@ describe('Query', function() {
     });
 
     it('doesnt reverse key order for update docs (gh-3215)', function(done) {
-      const Test = db.model('gh3215', {
+      const Test = db.model('Test', {
         arr: [{date: Date, value: Number}]
       });
 
@@ -1798,7 +1805,7 @@ describe('Query', function() {
 
     it('timestamps with $each (gh-4805)', function(done) {
       const nestedSchema = new Schema({ value: Number }, { timestamps: true });
-      const Test = db.model('gh4805', new Schema({
+      const Test = db.model('Test', new Schema({
         arr: [nestedSchema]
       }, { timestamps: true }));
 
@@ -1815,7 +1822,7 @@ describe('Query', function() {
     });
 
     it.skip('allows sort with count (gh-3914)', function(done) {
-      const Post = db.model('gh3914_0', {
+      const Post = db.model('Post', {
         title: String
       });
 
@@ -1827,7 +1834,7 @@ describe('Query', function() {
     });
 
     it.skip('allows sort with select (gh-3914)', function(done) {
-      const Post = db.model('gh3914_1', {
+      const Post = db.model('Post', {
         title: String
       });
 
@@ -1839,7 +1846,7 @@ describe('Query', function() {
     });
 
     it('handles nested $ (gh-3265)', function(done) {
-      const Post = db.model('gh3265', {
+      const Post = db.model('Post', {
         title: String,
         answers: [{
           details: String,
@@ -1872,7 +1879,7 @@ describe('Query', function() {
       });
       schema.index({ location: '2dsphere' });
 
-      const Model = db.model('gh4044', schema);
+      const Model = db.model('Test', schema);
 
       const query = {
         location:{
@@ -1896,7 +1903,7 @@ describe('Query', function() {
         name: String
       });
 
-      const MyModel = db.model('gh3825', schema);
+      const MyModel = db.model('Test', schema);
 
       const opts = { setDefaultsOnInsert: true, upsert: true };
       MyModel.updateOne({}, {}, opts, function(error) {
@@ -1920,7 +1927,7 @@ describe('Query', function() {
         return this.find({ name: name });
       };
 
-      const MyModel = db.model('gh3714', schema);
+      const MyModel = db.model('Test', schema);
 
       MyModel.create({ name: 'Val' }, function(error) {
         assert.ifError(error);
@@ -1938,7 +1945,7 @@ describe('Query', function() {
         name: String
       });
 
-      const MyModel = db.model('gh4378', schema);
+      const MyModel = db.model('Test', schema);
 
       MyModel.findOne('', function(error) {
         assert.ok(error);
@@ -1952,7 +1959,7 @@ describe('Query', function() {
         name: String,
         circle: Array
       });
-      const Area = db.model('gh4419', areaSchema);
+      const Area = db.model('Test', areaSchema);
 
       const placeSchema = new Schema({
         name: String,
@@ -1966,7 +1973,7 @@ describe('Query', function() {
         }
       });
       placeSchema.index({ geometry: '2dsphere' });
-      const Place = db.model('gh4419_0', placeSchema);
+      const Place = db.model('Place', placeSchema);
 
       const tromso = new Area({
         name: 'Tromso, Norway',
@@ -2006,7 +2013,7 @@ describe('Query', function() {
         createdAt: Date
       });
 
-      const M = db.model('gh4495', schema);
+      const M = db.model('Test', schema);
       const q = M.find({
         createdAt:{
           $not:{
@@ -2031,7 +2038,7 @@ describe('Query', function() {
         }
       });
 
-      const LineString = db.model('gh4408', lineStringSchema);
+      const LineString = db.model('Test', lineStringSchema);
 
       const ls = {
         name: 'test',
@@ -2070,7 +2077,7 @@ describe('Query', function() {
         test: String
       });
 
-      const Test = db.model('gh4592', TestSchema);
+      const Test = db.model('Test', TestSchema);
 
       Test.findOne({ test: { $not: /test/ } }, function(error) {
         assert.ifError(error);
@@ -2084,7 +2091,7 @@ describe('Query', function() {
           test: String
         });
 
-        const Test = db.model('gh6236', TestSchema);
+        const Test = db.model('Test', TestSchema);
 
         yield Test.create({});
 
@@ -2102,7 +2109,7 @@ describe('Query', function() {
         val: { type: String }
       });
 
-      const Test = db.model('gh5351', testSchema);
+      const Test = db.model('Test', testSchema);
       Test.create({ val: 'A string' }).
         then(function() {
           return Test.findOne({});
@@ -2134,7 +2141,7 @@ describe('Query', function() {
           }
         }
       });
-      const Model = db.model('gh6277', schema);
+      const Model = db.model('Test', schema);
 
       return co(function*() {
         yield Model.find({ strings: 'test' });
@@ -2151,7 +2158,7 @@ describe('Query', function() {
         test: String
       });
 
-      const Test = db.model('gh4933', TestSchema);
+      const Test = db.model('Test', TestSchema);
 
       Test.findOne({ test: { $not: { $exists: true } } }, function(error) {
         assert.ifError(error);
@@ -2173,7 +2180,7 @@ describe('Query', function() {
       });
       storySchema.index({ 'gallery.location': '2dsphere' });
 
-      const Story = db.model('gh5467', storySchema);
+      const Story = db.model('Story', storySchema);
 
       const q = {
         'gallery.location': {
@@ -2204,7 +2211,7 @@ describe('Query', function() {
         },
         arr: [Number]
       });
-      const Game = db.model('gh5450', gameSchema);
+      const Game = db.model('Test', gameSchema);
 
       Game.create({ name: 'Mass Effect', developer: 'BioWare', arr: [1, 2, 3] }, function(error) {
         assert.ifError(error);
@@ -2221,7 +2228,7 @@ describe('Query', function() {
     it('overwrites when passing an object when path already set to primitive (gh-6097)', function() {
       const schema = new mongoose.Schema({ status: String });
 
-      const Model = db.model('gh6097', schema);
+      const Model = db.model('Test', schema);
 
       return Model.
         where({ status: 'approved' }).
@@ -2237,7 +2244,7 @@ describe('Query', function() {
         sub: subSchema
       });
 
-      const Test = db.model('gh4937', TestSchema);
+      const Test = db.model('Test', TestSchema);
 
       const q = { test: { $exists: true }, sub: { $exists: false } };
       Test.findOne(q, function(error) {
@@ -2268,7 +2275,7 @@ describe('Query', function() {
         });
       });
 
-      const TestModel = db.model('gh5520', TestSchema);
+      const TestModel = db.model('Test', TestSchema);
 
       let numOps = ops.length;
 
@@ -2284,7 +2291,7 @@ describe('Query', function() {
     it('cast error with custom error (gh-5520)', function(done) {
       const TestSchema = new Schema({ name: Number });
 
-      const TestModel = db.model('gh5520_0', TestSchema);
+      const TestModel = db.model('Test', TestSchema);
 
       TestModel.
         find({ name: 'not a number' }).
@@ -2312,7 +2319,7 @@ describe('Query', function() {
         });
       });
 
-      const M = db.model('gh4428', schema);
+      const M = db.model('Test', schema);
 
       M.create({ name: 'test' }, function(error, doc) {
         assert.ifError(error);
@@ -2341,7 +2348,7 @@ describe('Query', function() {
         child: ChildSchema,
         child2: ChildSchema
       });
-      const Parent = db.model('gh5603', ParentSchema);
+      const Parent = db.model('Parent', ParentSchema);
       const ogParent = new Parent();
       ogParent.child = { field: 'test' };
       ogParent.child2 = { field: 'test' };
@@ -2364,7 +2371,7 @@ describe('Query', function() {
         throw new Error('Failed! ' + (count++));
       });
 
-      const TestModel = db.model('gh5592', TestSchema);
+      const TestModel = db.model('Test', TestSchema);
 
       const docs = [];
       for (let i = 0; i < 10; ++i) {
@@ -2386,7 +2393,7 @@ describe('Query', function() {
       const schema = new mongoose.Schema({
         email: String
       });
-      const M = db.model('gh1698', schema);
+      const M = db.model('Test', schema);
 
       M.find(42, function(error) {
         assert.ok(error);
@@ -2410,7 +2417,7 @@ describe('Query', function() {
       it('throw on sync exceptions in callbacks (gh-6178)', function(done) {
         const async = require('async');
         const schema = new Schema({});
-        const Test = db.model('gh6178', schema);
+        const Test = db.model('Test', schema);
 
         process.once('uncaughtException', err => {
           assert.equal(err.message, 'woops');
@@ -2435,7 +2442,7 @@ describe('Query', function() {
 
     it.skip('set overwrite after update() (gh-4740)', function() {
       const schema = new Schema({ name: String, age: Number });
-      const User = db.model('4740', schema);
+      const User = db.model('User', schema);
 
       return co(function*() {
         yield User.create({ name: 'Bar', age: 29 });
@@ -2457,7 +2464,7 @@ describe('Query', function() {
         email: String
       });
 
-      const model = db.model('gh5812', schema);
+      const model = db.model('Test', schema);
       const bigData = new Array(800000);
 
       for (let i = 0; i < bigData.length; ++i) {
@@ -2480,7 +2487,7 @@ describe('Query', function() {
         n: Number
       });
 
-      const Model = db.model('gh6271', schema);
+      const Model = db.model('Test', schema);
 
       Model.create({ n: 0 }, (err, doc) => {
         assert.ifError(err);
@@ -2498,7 +2505,7 @@ describe('Query', function() {
       return co(function*() {
         const schema = new mongoose.Schema({ n: Number });
 
-        const Model = db.model('gh6625', schema);
+        const Model = db.model('Test', schema);
 
         yield Model.create({ n: 42 });
 
@@ -2536,7 +2543,7 @@ describe('Query', function() {
         activitySchema.path('owner').discriminator('user', userOwnerSchema);
         activitySchema.path('owner').discriminator('tag', tagOwnerSchema);
 
-        const Activity = db.model('gh6027', activitySchema);
+        const Activity = db.model('Test', activitySchema);
 
         yield Activity.insertMany([
           {
@@ -2585,7 +2592,7 @@ describe('Query', function() {
         activitySchema.path('owner').discriminator('user', userOwnerSchema);
         activitySchema.path('owner').discriminator('tag', tagOwnerSchema);
 
-        const Activity = db.model('gh6027_0', activitySchema);
+        const Activity = db.model('Test', activitySchema);
 
         yield Activity.insertMany([
           {
@@ -2627,7 +2634,7 @@ describe('Query', function() {
 
         OrderSchema.path('lines').discriminator('listing', ListingLineSchema);
 
-        const Order = db.model('gh7449', OrderSchema);
+        const Order = db.model('Order', OrderSchema);
 
         yield Order.create({ lines: { kind: 'listing', sellerId: 42 } });
 
@@ -2656,7 +2663,7 @@ describe('Query', function() {
         }
       });
 
-      const Area = db.model('gh4392_0', areaSchema);
+      const Area = db.model('Test', areaSchema);
 
       const observationSchema = new Schema({
         geometry: {
@@ -2673,7 +2680,7 @@ describe('Query', function() {
       });
       observationSchema.index({ geometry: '2dsphere' });
 
-      const Observation = db.model('gh4392_1', observationSchema);
+      const Observation = db.model('Test1', observationSchema);
 
       Observation.on('index', function(error) {
         assert.ifError(error);
@@ -2725,7 +2732,8 @@ describe('Query', function() {
         dependents: [String]
       });
 
-      const m = db.model('gh3256', PersonSchema, 'gh3256');
+      db.deleteModel(/Person/);
+      const m = db.model('Person', PersonSchema);
 
       const obj = {
         name: 'John',
@@ -2742,7 +2750,8 @@ describe('Query', function() {
           salary: {type: Number, default: 25000}
         });
 
-        MyModel = db.model('gh3256-salary', PersonSchema, 'gh3256');
+        db.deleteModel(/Person/);
+        MyModel = db.model('Person', PersonSchema);
 
         done();
       });
@@ -2783,7 +2792,7 @@ describe('Query', function() {
           price: Number
         });
 
-        const Model = db.model('gh6323', priceSchema);
+        const Model = db.model('Test', priceSchema);
 
         const tests = [];
 
@@ -2810,7 +2819,7 @@ describe('Query', function() {
 
   describe('setQuery', function() {
     it('replaces existing query with new value (gh-6854)', function() {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       q.where('userName').exists();
       q.setQuery({ a: 1 });
       assert.deepStrictEqual(q._conditions, { a: 1 });
@@ -2818,7 +2827,7 @@ describe('Query', function() {
   });
 
   it('map (gh-7142)', function() {
-    const Model = db.model('gh7142', new Schema({ name: String }));
+    const Model = db.model('Test', new Schema({ name: String }));
 
     return co(function*() {
       yield Model.create({ name: 'test' });
@@ -2836,7 +2845,8 @@ describe('Query', function() {
     let Model;
 
     before(function() {
-      Model = db.model('gh6841', new Schema({ name: String }));
+      db.deleteModel(/Test/);
+      Model = db.model('Test', new Schema({ name: String }));
     });
 
     beforeEach(function() {
@@ -3036,7 +3046,7 @@ describe('Query', function() {
           docs.push(doc);
           next();
         });
-        const Model = db.model('gh7280', schema);
+        const Model = db.model('Test', schema);
 
         yield Model.create({ name: 'Test' });
 
@@ -3065,7 +3075,7 @@ describe('Query', function() {
           then(() => null, err => err);
         assert.equal(err.name, 'DocumentNotFoundError', err.stack);
         assert.ok(err.message.indexOf('na') !== -1, err.message);
-        assert.ok(err.message.indexOf('gh6841') !== -1, err.message);
+        assert.ok(err.message.indexOf('"Test"') !== -1, err.message);
         assert.deepEqual(err.filter, { name: 'na' });
       });
     });
@@ -3078,7 +3088,7 @@ describe('Query', function() {
         assert.deepStrictEqual(this.getPopulatedPaths(), []);
       });
 
-      const Model = db.model('gh6677_model', schema);
+      const Model = db.model('Test', schema);
 
       return co(function*() {
         yield Model.findOne({});
@@ -3090,15 +3100,15 @@ describe('Query', function() {
       const schema = new Schema({
         other: {
           type: Schema.Types.ObjectId,
-          ref: 'gh6677_other'
+          ref: 'Other'
         }
       });
       schema.pre('findOne', function() {
         assert.deepStrictEqual(this.getPopulatedPaths(), ['other']);
       });
 
-      const Other = db.model('gh6677_other', otherSchema);
-      const Test = db.model('gh6677_test', schema);
+      const Other = db.model('Other', otherSchema);
+      const Test = db.model('Test', schema);
 
       const other = new Other({ name: 'one' });
       const test = new Test({ other: other._id });
@@ -3111,10 +3121,10 @@ describe('Query', function() {
     });
 
     it('returns deep populated paths (gh-7757)', function() {
-      db.model('gh7757_L3', new Schema({ name: String }));
-      db.model('gh7757_L2', new Schema({ level3: { type: String, ref: 'L3' } }));
-      const L1 = db.model('gh7757_L1',
-        new Schema({ level1: { type: String, ref: 'L2' } }));
+      db.model('Test3', new Schema({ name: String }));
+      db.model('Test2', new Schema({ level3: { type: String, ref: 'Test3' } }));
+      const L1 = db.model('Test',
+        new Schema({ level1: { type: String, ref: 'Test2' } }));
 
       const query = L1.find().populate({
         path: 'level1',
@@ -3133,7 +3143,7 @@ describe('Query', function() {
 
   describe('setUpdate', function() {
     it('replaces existing update doc with new value', function() {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       q.set('testing', '123');
       q.setUpdate({ $set: { newPath: 'newValue' } });
       assert.strictEqual(q._update.$set.testing, undefined);
@@ -3143,28 +3153,28 @@ describe('Query', function() {
 
   describe('get() (gh-7312)', function() {
     it('works with using $set', function() {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       q.updateOne({}, { $set: { name: 'Jean-Luc Picard' } });
 
       assert.equal(q.get('name'), 'Jean-Luc Picard');
     });
 
     it('works with $set syntactic sugar', function() {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       q.updateOne({}, { name: 'Jean-Luc Picard' });
 
       assert.equal(q.get('name'), 'Jean-Luc Picard');
     });
 
     it('works with mixed', function() {
-      const q = new Query({}, {}, null, p1.collection);
+      const q = new Query({});
       q.updateOne({}, { name: 'Jean-Luc Picard', $set: { age: 59 } });
 
       assert.equal(q.get('name'), 'Jean-Luc Picard');
     });
 
     it('$set overwrites existing', function() {
-      const M = db.model('gh7312', new Schema({ name: String }));
+      const M = db.model('Test', new Schema({ name: String }));
       const q = M.updateOne({}, {
         name: 'Jean-Luc Picard',
         $set: { name: 'William Riker' }
@@ -3181,7 +3191,7 @@ describe('Query', function() {
   it('allows skipping timestamps in updateOne() (gh-6980)', function() {
     const schema = new Schema({ name: String }, { timestamps: true });
 
-    const M = db.model('gh6980', schema);
+    const M = db.model('Test', schema);
 
     return co(function*() {
       const doc = yield M.create({ name: 'foo' });
@@ -3209,7 +3219,7 @@ describe('Query', function() {
       // timestamps: true,
       versionKey: false
     });
-    const Parent = db.model('gh4412', parentSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
       let doc = yield Parent.create({ child: { name: 'foo' } });
@@ -3253,7 +3263,7 @@ describe('Query', function() {
       });
       const parentSchema = new Schema({ children: [childSchema] }, {
         versionKey: false });
-      Parent = db.model('gh4412_arr', parentSchema);
+      Parent = db.model('Parent', parentSchema);
     });
 
     it('$set nested property with numeric position', function() {
@@ -3334,7 +3344,7 @@ describe('Query', function() {
           timestamps: true
         });
 
-        const Test = db.model('gh7106', schema);
+        const Test = db.model('Test', schema);
 
         const cond = { arr: { $elemMatch: { name: 'abc' } } };
         const set = { $set: { 'arr.$.subArr': [{ x: 'b' }] } };
@@ -3361,7 +3371,7 @@ describe('Query', function() {
       nested: { path: String }
     }, { strictQuery: 'throw' });
 
-    const Model = db.model('gh4136', modelSchema);
+    const Model = db.model('Test', modelSchema);
 
     return co(function*() {
       // `find()` on a top-level path not in the schema
@@ -3385,7 +3395,7 @@ describe('Query', function() {
     const modelSchema = new Schema({ field: Number }, { strictQuery: true });
 
     return co(function*() {
-      const Model = db.model('gh6032', modelSchema);
+      const Model = db.model('Test', modelSchema);
 
       yield Model.create({ field: 1 });
 
@@ -3402,7 +3412,7 @@ describe('Query', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7182', schema);
+      const Model = db.model('Test', schema);
 
       yield Model.create({ kind: 'test' });
       yield Model.updateOne({}, { $unset: { hasDefault: 1 } });
@@ -3413,7 +3423,7 @@ describe('Query', function() {
   });
 
   it('merging objectids with where() (gh-7360)', function() {
-    const Test = db.model('gh7360', new Schema({}));
+    const Test = db.model('Test', new Schema({}));
 
     return Test.create({}).
       then(doc => Test.find({ _id: doc._id.toString() }).where({ _id: doc._id })).
@@ -3421,7 +3431,7 @@ describe('Query', function() {
   });
 
   it('maxTimeMS() (gh-7254)', function() {
-    const Model = db.model('gh7254', new Schema({}));
+    const Model = db.model('Test', new Schema({}));
 
     return co(function*() {
       yield Model.create({});
@@ -3437,7 +3447,7 @@ describe('Query', function() {
   it('connection-level maxTimeMS() (gh-4066)', function() {
     db.options = db.options || {};
     db.options.maxTimeMS = 10;
-    const Model = db.model('gh4066_conn', new Schema({}));
+    const Model = db.model('Test', new Schema({}));
 
     return co(function*() {
       yield Model.create({});
@@ -3453,7 +3463,7 @@ describe('Query', function() {
   it('mongoose-level maxTimeMS() (gh-4066)', function() {
     db.base.options = db.base.options || {};
     db.base.options.maxTimeMS = 10;
-    const Model = db.model('gh4066_global', new Schema({}));
+    const Model = db.model('Test', new Schema({}));
 
     return co(function*() {
       yield Model.create({});
@@ -3467,7 +3477,7 @@ describe('Query', function() {
   });
 
   it('throws error with updateOne() and overwrite (gh-7475)', function() {
-    const Model = db.model('gh7475', new Schema({ name: String }));
+    const Model = db.model('Test', Schema({ name: String }));
 
     return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
       () => { throw new Error('Should have failed'); },
@@ -3478,7 +3488,7 @@ describe('Query', function() {
   it('sets deletedCount on result of remove() (gh-7629)', function() {
     const schema = new Schema({ name: String });
 
-    const Model = db.model('gh7629', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       yield Model.create({ name: 'foo' });
@@ -3493,16 +3503,16 @@ describe('Query', function() {
 
   describe('merge()', function() {
     it('copies populate() (gh-1790)', function() {
-      const Car = db.model('gh1790_Car', {
+      const Car = db.model('Car', {
         color: String,
         model: String,
         owner: {
           type: Schema.Types.ObjectId,
-          ref: 'gh1790_Person'
+          ref: 'Person'
         }
       });
 
-      const Person = db.model('gh1790_Person', {
+      const Person = db.model('Person', {
         name: String
       });
 
@@ -3541,7 +3551,7 @@ describe('Query', function() {
         this.set('password', 'encryptedpassword');
       });
 
-      const M = db.model('gh7984', schema);
+      const M = db.model('Test', schema);
 
       const opts = { runValidators: true, upsert: true, new: true };
       return M.findOneAndUpdate({}, { password: '6chars' }, opts).then(doc => {
@@ -3557,7 +3567,7 @@ describe('Query', function() {
         throw new Error('Oops!');
       });
       const contactSchema = Schema({ addresses: [addressSchema] });
-      const Contact = db.model('gh7187', contactSchema);
+      const Contact = db.model('Test', contactSchema);
 
       const update = { addresses: [{ countryId: 'foo' }] };
       return Contact.updateOne({}, update, { runValidators: true }).then(
@@ -3572,7 +3582,7 @@ describe('Query', function() {
 
   it('query with top-level _bsontype (gh-8222) (gh-8268)', function() {
     const userSchema = Schema({ token: String });
-    const User = db.model('gh8222', userSchema);
+    const User = db.model('Test', userSchema);
 
     return co(function*() {
       const original = yield User.create({ token: 'rightToken' });

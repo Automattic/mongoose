@@ -427,13 +427,29 @@ block content
 
     <h4 id="objectids">ObjectIds</h4>
 
-    To specify a type of ObjectId, use `Schema.Types.ObjectId` in your declaration.
+    An [ObjectId](https://docs.mongodb.com/manual/reference/method/ObjectId/)
+    is a special type typically used for unique identifiers. Here's how
+    you declare a schema with a path `driver` that is an ObjectId:
 
     ```javascript
-    var mongoose = require('mongoose');
-    var ObjectId = mongoose.Schema.Types.ObjectId;
-    var Car = new Schema({ driver: ObjectId });
-    // or just Schema.ObjectId for backwards compatibility with v2
+    const mongoose = require('mongoose');
+    const carSchema = new mongoose.Schema({ driver: mongoose.ObjectId });
+    ```
+
+    `ObjectId` is a class, and ObjectIds are objects. However, they are
+    often represented as strings. When you convert an ObjectId to a string
+    using `toString()`, you get a 24-character hexadecimal string:
+
+    ```javascript
+    const Car = mongoose.model('Car', carSchema);
+
+    const car = new Car();
+    car.driver = new mongoose.Types.ObjectId();
+
+    typeof car.driver; // 'object'
+    car.driver instanceof mongoose.Types.ObjectId; // true
+
+    car.driver.toString(); // Something like "5e1a0651741b255ddda996c4"
     ```
 
     <h4 id="booleans">Boolean</h4>

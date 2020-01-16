@@ -18,13 +18,6 @@ const Schema = mongoose.Schema;
 const DocObjectId = mongoose.Types.ObjectId;
 
 /**
- * Setup.
- */
-
-const posts = 'blogposts_' + random();
-const users = 'users_' + random();
-
-/**
  * Tests.
  */
 
@@ -49,24 +42,21 @@ describe('model: populate:', function() {
 
     Object.keys(types).forEach(function(id) {
       describe('should not cast to _id of type ' + id, function() {
-        let refuser;
         let db;
         let B, U;
         let u1;
         let b1, b2;
 
         before(function(done) {
-          refuser = 'RefUser-' + id;
-
           const bSchema = new Schema({
             title: String,
-            fans: [{type: id, ref: refuser}],
+            fans: [{type: id, ref: 'User'}],
             adhoc: [{subdoc: id, subarray: [{things: [id]}]}],
-            _creator: {type: id, ref: refuser},
+            _creator: {type: id, ref: 'User'},
             embed: [{
-              other: {type: id, ref: refuser},
-              array: [{type: id, ref: refuser}],
-              nested: [{subdoc: {type: id, ref: refuser}}]
+              other: {type: id, ref: 'User'},
+              array: [{type: id, ref: 'User'}],
+              nested: [{subdoc: {type: id, ref: 'User'}}]
             }]
           });
 
@@ -77,8 +67,8 @@ describe('model: populate:', function() {
           });
 
           db = start();
-          B = db.model('RefBlogPost-' + id, bSchema, posts + random());
-          U = db.model(refuser, uSchema, users + random());
+          B = db.model('BlogPost', bSchema);
+          U = db.model('User', uSchema);
 
           U.create({
             _id: construct[id](),
@@ -128,8 +118,8 @@ describe('model: populate:', function() {
         it('if a document', function(done) {
           const query = B.findById(b1).
             populate('fans _creator embed.other embed.array embed.nested.subdoc').
-            populate({path: 'adhoc.subdoc', model: refuser}).
-            populate({path: 'adhoc.subarray.things', model: refuser});
+            populate({path: 'adhoc.subdoc', model: 'User'}).
+            populate({path: 'adhoc.subarray.things', model: 'User'});
           query.exec(function(err, doc) {
             assert.ifError(err);
 
@@ -229,8 +219,8 @@ describe('model: populate:', function() {
         it('if an object', function(done) {
           B.findById(b2)
             .populate('fans _creator embed.other embed.array embed.nested.subdoc')
-            .populate({path: 'adhoc.subdoc', model: refuser})
-            .populate({path: 'adhoc.subarray.things', model: refuser})
+            .populate({path: 'adhoc.subdoc', model: 'User'})
+            .populate({path: 'adhoc.subarray.things', model: 'User'})
             .exec(function(err, doc) {
               assert.ifError(err);
 

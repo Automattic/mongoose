@@ -9002,7 +9002,7 @@ describe('model: populate:', function() {
     });
   });
 
-  it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452)', function() {
+  it('succeeds with refPath if embedded discriminator has path with same name but no refPath (gh-8452) (gh-8499)', function() {
     const ImageSchema = Schema({ imageName: String });
     const Image = db.model('gh8452_Image', ImageSchema);
 
@@ -9029,14 +9029,16 @@ describe('model: populate:', function() {
     const Example = db.model('gh8452_Example', ExampleSchema);
 
     return co(function*() {
-      const image = yield Image.create({ imageName: 'image' });
+      const images = yield Image.create([{ imageName: 'image' }, { imageName: 'image2' }]);
       const text = yield Text.create({ textName: 'text' });
       yield Example.create({
         test: '02',
         list: [
-          { __t: 'gh8452_ExtendA', data: image._id, objectType: 'gh8452_Image' },
+          { __t: 'gh8452_ExtendA', data: images[0]._id, objectType: 'gh8452_Image' },
           { __t: 'gh8452_ExtendA', data: text._id, objectType: 'gh8452_Text' },
-          { __t: 'gh8452_ExtendB', data: { sourceId: 123 }, objectType: 'ExternalSourceA' }
+          { __t: 'gh8452_ExtendB', data: { sourceId: 123 }, objectType: 'ExternalSourceA' },
+          { __t: 'gh8452_ExtendA', data: images[1]._id, objectType: 'gh8452_Image' },
+          { __t: 'gh8452_ExtendB', data: { sourceId: 456 }, objectType: 'ExternalSourceB' }
         ]
       });
 
@@ -9044,6 +9046,8 @@ describe('model: populate:', function() {
       assert.equal(res.list[0].data.imageName, 'image');
       assert.equal(res.list[1].data.textName, 'text');
       assert.equal(res.list[2].data.sourceId, 123);
+      assert.equal(res.list[3].data.imageName, 'image2');
+      assert.equal(res.list[4].data.sourceId, 456);
     });
   });
 

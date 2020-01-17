@@ -215,7 +215,7 @@ describe('schematype', function() {
         const schema = new mongoose.Schema({test: type});
 
         // Assert
-        assert.equal(schema.path('test').options.required, true);
+        assert.equal(schema.path('test').options.someRandomOption, true);
       });
     });
   });

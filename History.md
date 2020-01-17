@@ -1,3 +1,8 @@
+5.8.9 / 2020-01-17
+==================
+ * fix(populate): skip populating embedded discriminator array values that don't have a `refPath` #8499
+ * docs(queries): clarify when to use queries versus aggregations #8494
+
 5.8.8 / 2020-01-14
 ==================
  * fix(model): allow using `lean` with `insertMany()` #8507 #8234 [ntsekouras](https://github.com/ntsekouras)

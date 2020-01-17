@@ -100,4 +100,36 @@ describe('schematype', function() {
     assert.equal(err.name, 'ValidatorError');
     assert.equal(err.message, 'name is invalid!');
   });
+
+  describe('set()', function() {
+    describe('SchemaType.set()', function() {
+      it('SchemaType.set, is a function', () => {
+        assert.equal(typeof mongoose.SchemaType.set, 'function');
+      });
+    });
+
+    const mongooseInstance = new mongoose.Mongoose();
+
+    [
+      mongoose.SchemaTypes.String,
+      mongoose.SchemaTypes.Number,
+      mongoose.SchemaTypes.Boolean,
+      mongoose.SchemaTypes.Array,
+      mongoose.SchemaTypes.Buffer,
+      mongoose.SchemaTypes.Date,
+      mongoose.SchemaTypes.ObjectId,
+      mongoose.SchemaTypes.Mixed,
+      mongoose.SchemaTypes.Decimal128,
+      mongoose.SchemaTypes.Map
+    ].forEach((type) => {
+      it(type.name + ', when given a default option, set its', () => {
+        // Act
+        type.set('required', true);
+        const schema = new mongooseInstance.Schema({test: type});
+
+        // Assert
+        assert.equal(schema.path('test').options.required, true);
+      });
+    });
+  });
 });

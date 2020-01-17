@@ -123,11 +123,11 @@ describe('schematype', function() {
     ].forEach((type) => {
       it(type.name + ', when given a default option, set its', () => {
         // Act
-        type.set('required', true);
+        type.set('someRandomOption', true);
         const schema = new mongooseInstance.Schema({test: type});
 
         // Assert
-        assert.equal(schema.path('test').options.required, true);
+        assert.equal(schema.path('test').options.someRandomOption, true);
       });
     });
   });

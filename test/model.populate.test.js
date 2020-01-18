@@ -9027,4 +9027,38 @@ describe('model: populate:', function() {
       assert.equal(doc.childCount, 1);
     });
   });
+
+  it.skip('supports top-level skip and limit options (gh-8445)', function() {
+    const childSchema = Schema({ parentId: 'ObjectId', deleted: Boolean });
+
+    const parentSchema = Schema({ name: String });
+    parentSchema.virtual('childCount', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: false,
+      skip: 1,
+      limit: 2
+    });
+
+    const Child = db.model('Child', childSchema);
+    const Parent = db.model('Parent', parentSchema);
+
+    return co(function*() {
+      const p = yield Parent.create({ name: 'test' });
+
+      yield Child.create([
+        { parentId: p._id },
+        { parentId: p._id, deleted: true },
+        { parentId: p._id, deleted: false }
+      ]);
+
+      let doc = yield Parent.findOne().populate('childCount');
+      assert.equal(doc.childCount, 2);
+
+      doc = yield Parent.findOne().
+        populate({ path: 'childCount', match: { deleted: true } });
+      assert.equal(doc.childCount, 1);
+    });
+  });
 });

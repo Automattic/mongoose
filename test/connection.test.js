@@ -1148,7 +1148,7 @@ describe('connections:', function() {
     return Model.create({ name: 'test' });
   });
 
-  it('throws a MongooseTimeoutError on server selection timeout (gh-8451)', () => {
+  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', () => {
     const opts = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -1157,8 +1157,8 @@ describe('connections:', function() {
     const uri = 'mongodb://baddomain:27017/test';
 
     return mongoose.createConnection(uri, opts).then(() => assert.ok(false), err => {
-      assert.equal(err.message, 'getaddrinfo ENOTFOUND baddomain baddomain:27017');
-      assert.equal(err.name, 'MongooseTimeoutError');
+      assert.ok(err.message.indexOf('baddomain') !== -1, err.message);
+      assert.equal(err.name, 'MongooseServerSelectionError');
     });
   });
 });

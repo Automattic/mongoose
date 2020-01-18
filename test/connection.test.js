@@ -326,13 +326,13 @@ describe('connections:', function() {
           catch(done);
       });
 
-      it('timeout (gh-4513)', function(done) {
+      it('timeout (gh-4513)', function() {
         this.timeout(60000);
 
         let numTimeout = 0;
         let numDisconnected = 0;
         const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          socketTimeoutMS: 100,
+          socketTimeoutMS: 5000,
           poolSize: 1,
           useNewUrlParser: true
         });
@@ -347,29 +347,25 @@ describe('connections:', function() {
 
         const Model = conn.model('gh4513', new Schema());
 
-        conn.
-          then(function() {
-            assert.equal(conn.readyState, conn.states.connected);
-            return Model.create({});
-          }).
-          then(function() {
-            return Model.find({ $where: 'sleep(250) || true' });
-          }).
-          then(function() {
-            done(new Error('expected timeout'));
-          }).
-          catch(function(error) {
-            assert.ok(error);
-            assert.ok(error.message.indexOf('timed out'), error.message);
-            // TODO: if autoReconnect is false, we might not actually be
-            // connected. See gh-5634
-            assert.equal(conn.readyState, conn.states.connected);
-            assert.equal(numTimeout, 1);
-            assert.equal(numDisconnected, 0);
+        return co(function*() {
+          yield conn;
 
-            conn.close();
-            done();
-          });
+          assert.equal(conn.readyState, conn.states.connected);
+
+          yield Model.create({});
+
+          const error = yield Model.find({ $where: 'sleep(10000) || true' }).
+            then(() => assert.ok(false), err => err);
+          assert.ok(error);
+          assert.ok(error.message.indexOf('timed out'), error.message);
+          // TODO: if autoReconnect is false, we might not actually be
+          // connected. See gh-5634
+          assert.equal(conn.readyState, conn.states.connected);
+          assert.equal(numTimeout, 1);
+          assert.equal(numDisconnected, 0);
+
+          yield conn.close();
+        });
       });
     });
   });
@@ -1157,7 +1153,6 @@ describe('connections:', function() {
     const uri = 'mongodb://baddomain:27017/test';
 
     return mongoose.createConnection(uri, opts).then(() => assert.ok(false), err => {
-      assert.ok(err.message.indexOf('baddomain') !== -1, err.message);
       assert.equal(err.name, 'MongooseServerSelectionError');
     });
   });

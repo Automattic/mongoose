@@ -190,7 +190,8 @@ describe('connections:', function() {
         let numReconnect = 0;
         let numTimeout = 0;
         let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest?heartbeatfrequencyms=1000', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          heartbeatFrequencyMS: 500,
           useNewUrlParser: true,
           useUnifiedTopology: true
         });
@@ -223,7 +224,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 100);
+              setTimeout(function() { resolve(); }, 1000);
             });
           }).
           then(function() {

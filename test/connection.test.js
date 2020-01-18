@@ -228,6 +228,7 @@ describe('connections:', function() {
           }).
           then(function() {
             assert.equal(conn.readyState, conn.states.disconnected);
+            assert.equal(numConnected, 1);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 0);
             assert.equal(numReconnect, 0);
@@ -1156,7 +1157,7 @@ describe('connections:', function() {
     const uri = 'mongodb://baddomain:27017/test';
 
     return mongoose.createConnection(uri, opts).then(() => assert.ok(false), err => {
-      assert.equal(err.message, 'Server selection timed out after 100 ms');
+      assert.equal(err.message, 'getaddrinfo ENOTFOUND baddomain baddomain:27017');
       assert.equal(err.name, 'MongooseTimeoutError');
     });
   });

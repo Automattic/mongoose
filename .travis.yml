@@ -10,8 +10,9 @@ before_script:
   - mkdir -p ./data/db/27000
   - printf "\n--timeout 8000" >> ./test/mocha.opts
   - ./mongodb-linux-x86_64-ubuntu1604-4.0.2/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
-  - export PATH=`pwd`:$PATH
+  - export PATH=`pwd`/mongodb-linux-x86_64-ubuntu1604-4.0.2/bin/:$PATH
   - sleep 2
+  - mongod --version
 matrix:
   include:
     - name: "👕Linter"

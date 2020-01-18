@@ -8505,4 +8505,22 @@ describe('document', function() {
       assert.equal(raw.foo.bar.baz.num, 1);
     });
   });
+
+  it('supports function for date min/max validator error (gh-8512)', function() {
+    const schema = Schema({
+      startDate: {
+        type: Date,
+        required: true,
+        min: [new Date('2020-01-01'), () => 'test'],
+      }
+    });
+
+    db.deleteModel(/Test/);
+    const Model = db.model('Test', schema);
+    const doc = new Model({ startDate: new Date('2019-06-01') });
+
+    const err = doc.validateSync();
+    assert.ok(err.errors['startDate']);
+    assert.equal(err.errors['startDate'].message, 'test');
+  });
 });

@@ -8516,4 +8516,41 @@ describe('document', function() {
     assert.ok(err.errors['startDate']);
     assert.equal(err.errors['startDate'].message, 'test');
   });
+
+  it('sets parent and ownerDocument correctly with document array default (gh-8509)', function() {
+    const locationSchema = Schema({
+      name: String,
+      city: String
+    });
+    const owners = [];
+      
+    // Middleware to set a default location name derived from the parent organization doc
+    locationSchema.pre('validate', function(next) {
+      const owner = this.ownerDocument();
+      owners.push(owner);
+      if (this.isNew && !this.get('name') && owner.get('name')) {
+        this.set('name', `${owner.get('name')} Office`);
+      }
+      next();
+    }); 
+
+    const organizationSchema = Schema({
+      name: String,
+      // Having a default doc this way causes issues
+      locations: { type: [locationSchema], default: [{}] }
+    });
+    const Organization = db.model('Test', organizationSchema);
+
+    return co(function*() {
+      const org = new Organization();
+      org.set('name', 'MongoDB');
+
+      yield org.save();
+
+      assert.equal(owners.length, 1);
+      assert.ok(owners[0] === org);
+
+      assert.equal(org.locations[0].name, 'MongoDB Office');
+    });
+  });
 });

@@ -8553,4 +8553,31 @@ describe('document', function() {
       assert.equal(org.locations[0].name, 'MongoDB Office');
     });
   });
+
+  it('doesnt add `null` if property is undefined with minimize false (gh-8504)', function() {
+    const minimize = false;
+    const schema = Schema({
+      num: Number,
+      beta: { type: String }
+    },
+    {
+      toObject: { virtuals: true, minimize: minimize },
+      toJSON: { virtuals: true, minimize: minimize }
+    }
+    );
+    const Test = db.model('Test', schema);
+
+    const dummy1 = new Test({ num: 1, beta: null });
+    const dummy2 = new Test({ num: 2, beta: void 0 });
+
+    return co(function*() {
+      yield dummy1.save();
+      yield dummy2.save();
+
+      const res = yield Test.find().lean().sort({ num: 1 });
+
+      assert.strictEqual(res[0].beta, null);
+      assert.ok(!res[1].hasOwnProperty('beta'));
+    });
+  });
 });

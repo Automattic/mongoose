@@ -8523,7 +8523,7 @@ describe('document', function() {
       city: String
     });
     const owners = [];
-      
+
     // Middleware to set a default location name derived from the parent organization doc
     locationSchema.pre('validate', function(next) {
       const owner = this.ownerDocument();
@@ -8532,7 +8532,7 @@ describe('document', function() {
         this.set('name', `${owner.get('name')} Office`);
       }
       next();
-    }); 
+    });
 
     const organizationSchema = Schema({
       name: String,

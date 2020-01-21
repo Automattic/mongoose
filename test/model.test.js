@@ -3321,7 +3321,7 @@ describe('Model', function() {
           embeds: [EmbeddedSchema]
         });
 
-        mongoose.model('Parent', ParentSchema);
+        db.model('Parent', ParentSchema);
 
         const Parent = db.model('Parent');
 

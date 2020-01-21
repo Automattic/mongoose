@@ -1788,12 +1788,13 @@ describe('document', function() {
       let val;
       let M;
 
-      before(function(done) {
+      beforeEach(function(done) {
         const schema = new mongoose.Schema({v: Number});
         schema.virtual('thang').set(function(v) {
           val = v;
         });
 
+        db.deleteModel(/Test/);
         M = db.model('Test', schema);
         done();
       });
@@ -2557,15 +2558,7 @@ describe('document', function() {
   });
 
   describe('bug fixes', function() {
-    let db;
-
-    before(function() {
-      db = start();
-    });
-
-    after(function(done) {
-      db.close(done);
-    });
+    beforeEach(() => db.deleteModel(/.*/));
 
     it('single embedded schemas with populate (gh-3501)', function(done) {
       const PopulateMeSchema = new Schema({});
@@ -2610,7 +2603,7 @@ describe('document', function() {
       };
 
       const bandSchema = new Schema({leadSinger: personSchema});
-      const Band = db.model('gh3534', bandSchema);
+      const Band = db.model('Band', bandSchema);
 
       const gnr = new Band({leadSinger: {name: 'Axl Rose'}});
       assert.equal(gnr.leadSinger.firstName(), 'Axl');
@@ -2619,10 +2612,10 @@ describe('document', function() {
 
     it('single embedded schemas with models (gh-3535)', function(done) {
       const personSchema = new Schema({name: String});
-      const Person = db.model('gh3535_0', personSchema);
+      const Person = db.model('Person', personSchema);
 
       const bandSchema = new Schema({leadSinger: personSchema});
-      const Band = db.model('gh3535', bandSchema);
+      const Band = db.model('Band', bandSchema);
 
       const axl = new Person({name: 'Axl Rose'});
       const gnr = new Band({leadSinger: axl});
@@ -2650,7 +2643,7 @@ describe('document', function() {
       const personSchema = new Schema({name: String});
 
       const bandSchema = new Schema({guitarist: personSchema, name: String});
-      const Band = db.model('gh3596', bandSchema);
+      const Band = db.model('Band', bandSchema);
 
       const gnr = new Band({
         name: 'Guns N\' Roses',
@@ -2671,7 +2664,7 @@ describe('document', function() {
       const personSchema = new Schema({name: String});
 
       const bandSchema = new Schema({guitarist: personSchema, name: String});
-      const Band = db.model('gh3601', bandSchema);
+      const Band = db.model('Band', bandSchema);
 
       const gnr = new Band({
         name: 'Guns N\' Roses',
@@ -2692,7 +2685,7 @@ describe('document', function() {
       const personSchema = new Schema({name: String});
 
       const bandSchema = new Schema({guitarist: personSchema, name: String});
-      const Band = db.model('gh3642', bandSchema);
+      const Band = db.model('Band', bandSchema);
 
       const velvetRevolver = new Band({
         name: 'Velvet Revolver',
@@ -2718,7 +2711,7 @@ describe('document', function() {
       });
 
       const bandSchema = new Schema({guitarist: personSchema, name: String});
-      const Band = db.model('gh3679', bandSchema);
+      const Band = db.model('Band', bandSchema);
       const obj = {name: 'Guns N\' Roses', guitarist: {name: 'Slash'}};
 
       Band.create(obj, function(error) {
@@ -2738,7 +2731,7 @@ describe('document', function() {
         guitarist: personSchema,
         name: String
       });
-      const Band = db.model('gh3686', bandSchema);
+      const Band = db.model('Band', bandSchema);
       const obj = {
         name: 'Guns N\' Roses',
         guitarist: {name: 'Slash', realName: 'Saul Hudson'}
@@ -2772,7 +2765,7 @@ describe('document', function() {
         singleNested: SingleNestedSchema
       });
 
-      const Parent = db.model('gh3680', ParentSchema);
+      const Parent = db.model('Parent', ParentSchema);
       const obj = {singleNested: {children: [{count: 0}]}};
       Parent.create(obj, function(error) {
         assert.ifError(error);
@@ -2786,7 +2779,7 @@ describe('document', function() {
       const childSchema = new Schema({child: childChildSchema});
       const parentSchema = new Schema({child: childSchema});
 
-      const Parent = db.model('gh3702', parentSchema);
+      const Parent = db.model('Parent', parentSchema);
       const obj = {child: {child: {count: 0}}};
       Parent.create(obj, function(error) {
         assert.ok(error);
@@ -2801,7 +2794,7 @@ describe('document', function() {
         return true;
       });
 
-      const Test = db.model('gh3618', testSchema);
+      const Test = db.model('Test', testSchema);
 
       const test = new Test();
 
@@ -2832,7 +2825,7 @@ describe('document', function() {
         }]
       });
 
-      const MyModel = db.model('gh3623', schema);
+      const MyModel = db.model('Test', schema);
 
       const doc = {array: [{2: {}}]};
       MyModel.collection.insertOne(doc, function(error) {
@@ -4577,7 +4570,7 @@ describe('document', function() {
           validate: () => false
         }
       });
-      const Parent = mongoose.model('Test', parentSchema);
+      const Parent = db.model('Test', parentSchema);
 
       const parentDoc = new Parent({});
 
@@ -5955,11 +5948,11 @@ describe('document', function() {
     it('Handles setting populated path set via `Document#populate()` (gh-7302)', function() {
       const authorSchema = new Schema({ name: String });
       const bookSchema = new Schema({
-        author: { type: mongoose.Schema.Types.ObjectId, ref: 'gh7302_Author' }
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' }
       });
 
-      const Author = db.model('gh7302_Author', authorSchema);
-      const Book = db.model('gh7302_Book', bookSchema);
+      const Author = db.model('Author', authorSchema);
+      const Book = db.model('Book', bookSchema);
 
       return Author.create({ name: 'Victor Hugo' }).
         then(function(author) { return Book.create({ author: author._id }); }).
@@ -5988,7 +5981,7 @@ describe('document', function() {
         product: String
       }, { _id: false }));
 
-      const MyModel = db.model('gh5693', trackSchema);
+      const MyModel = db.model('Test', trackSchema);
 
       const doc = new MyModel({
         event: {
@@ -6031,13 +6024,13 @@ describe('document', function() {
           }
         }
       });
-      const Child = mongoose.model('gh6801_Child', childSchema);
+      const Child = mongoose.model('Child', childSchema);
 
       const parentSchema = new Schema({
         name: String,
         child: childSchema
       });
-      const Parent = mongoose.model('gh6801_Parent', parentSchema);
+      const Parent = mongoose.model('Parent', parentSchema);
 
       const child = new Child(/* name is required */);
       const parent = new Parent({ child: child });
@@ -6059,7 +6052,7 @@ describe('document', function() {
           required: function() { return this && this.field === undefined; }
         }
       });
-      const Model = db.model('gh6892', schema);
+      const Model = db.model('Test', schema);
 
       return co(function*() {
         yield Model.create({});
@@ -6083,7 +6076,7 @@ describe('document', function() {
         children: [ItemChildSchema]
       });
 
-      const ItemParent = db.model('gh3511', ItemParentSchema);
+      const ItemParent = db.model('Parent', ItemParentSchema);
 
       const p = new ItemParent({
         children: [{ name: 'test1' }, { name: 'test2' }]
@@ -6127,7 +6120,7 @@ describe('document', function() {
         assets: [assetSchema]
       });
 
-      const Person = db.model('gh7556', personSchema);
+      const Person = db.model('Person', personSchema);
 
       return co(function*() {
         yield Person.create({
@@ -6163,7 +6156,7 @@ describe('document', function() {
         next();
       });
 
-      const Main = db.model('gh5800', MainSchema);
+      const Main = db.model('Test', MainSchema);
 
       const doc = { a: { b: 'not the default', d: 'some value' }, e: 'e' };
       return Main.create(doc).
@@ -6194,7 +6187,7 @@ describe('document', function() {
 
       pageSchema.path('media').discriminator('photo', photoSchema);
 
-      const Page = db.model('gh6482_Page', pageSchema);
+      const Page = db.model('Test', pageSchema);
 
       return co(function*() {
         let doc = yield Page.create({
@@ -6230,7 +6223,7 @@ describe('document', function() {
 
       pageSchema.path('media').discriminator('photo', photoSchema);
 
-      const Page = db.model('gh6526_Page', pageSchema);
+      const Page = db.model('Test', pageSchema);
 
       return co(function*() {
         let doc = yield Page.create({
@@ -6268,7 +6261,7 @@ describe('document', function() {
         children: [childSchema]
       });
 
-      const Parent = db.model('gh5347', parentSchema);
+      const Parent = db.model('Parent', parentSchema);
 
       Parent.create({
         name: 'test',
@@ -6310,7 +6303,7 @@ describe('document', function() {
         keywords: [String]
       });
 
-      const Artist = db.model('gh6155', artistSchema);
+      const Artist = db.model('Test', artistSchema);
 
       const artist = new Artist({ name: 'Motley Crue' });
       assert.deepEqual(artist.toObject().keywords, ['Motley', 'Crue']);
@@ -6348,7 +6341,7 @@ describe('document', function() {
         return called;
       }
 
-      const TestDefaultsWithFunction = db.model('gh6410', new Schema({
+      const TestDefaultsWithFunction = db.model('Test', new Schema({
         randomID: {type: Number, default: generateRandomID}
       }));
 
@@ -6367,7 +6360,7 @@ describe('document', function() {
 
     it('convertToFalse and convertToTrue (gh-6758)', function() {
       const TestSchema = new Schema({ b: Boolean });
-      const Test = db.model('gh6758', TestSchema);
+      const Test = db.model('Test', TestSchema);
 
       mongoose.Schema.Types.Boolean.convertToTrue.add('aye');
       mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
@@ -6398,7 +6391,7 @@ describe('document', function() {
         return 'foobar' + v;
       });
 
-      const M = db.model('gh6779', schema);
+      const M = db.model('Test', schema);
       const test = new M();
 
       test.nested.arr.push({ key: 'value' });
@@ -6420,7 +6413,7 @@ describe('document', function() {
         child: child
       });
 
-      const M = db.model('gh6925', parent);
+      const M = db.model('Test', parent);
       const test = new M({
         child: {
           nested: {
@@ -6449,7 +6442,7 @@ describe('document', function() {
         }
       });
 
-      const TestModel = db.model('gh3793', TestSchema);
+      const TestModel = db.model('Test', TestSchema);
 
       return co(function*() {
         yield Promise.resolve(db);
@@ -6481,7 +6474,7 @@ describe('document', function() {
         child: ChildObjectSchema
       });
 
-      const Parent = db.model('gh4405', ParentObjectSchema);
+      const Parent = db.model('Parent', ParentObjectSchema);
 
       const p = new Parent({
         parentProperty1: 'abc',
@@ -6533,15 +6526,15 @@ describe('document', function() {
         sub: subSchema
       });
 
-      const Other = db.model('gh6390', otherSchema);
-      const Test = db.model('6h6390_2', schema);
+      const Other = db.model('Test1', otherSchema);
+      const Test = db.model('Test', schema);
 
       const other = new Other({ name: 'Nicole' });
 
       const test = new Test({
         name: 'abc',
         sub: {
-          my: 'gh6390',
+          my: 'Test1',
           other: other._id
         }
       });
@@ -6555,6 +6548,8 @@ describe('document', function() {
   });
 
   describe('clobbered Array.prototype', function() {
+    beforeEach(() => db.deleteModel(/.*/));
+
     afterEach(function() {
       delete Array.prototype.remove;
     });
@@ -6567,7 +6562,7 @@ describe('document', function() {
       });
 
       const schema = new Schema({ arr: [{ name: String }] });
-      const MyModel = db.model('gh6431', schema);
+      const MyModel = db.model('Test', schema);
 
       const doc = new MyModel();
       assert.deepEqual(doc.toObject().arr, []);
@@ -6586,7 +6581,7 @@ describe('document', function() {
           }]
         }
       });
-      const Model = db.model('gh6818', schema);
+      const Model = db.model('Test', schema);
 
       return co(function*() {
         yield Model.create({
@@ -6621,7 +6616,7 @@ describe('document', function() {
         })
       });
 
-      const Test = mongoose.model('gh6710', schema);
+      const Test = db.model('Test', schema);
 
       const doc = new Test({ nested: { num: 123 } });
       doc.nested = 123;
@@ -6648,7 +6643,7 @@ describe('document', function() {
       const Parent = new mongoose.Schema({
         children: [Child]
       });
-      const ParentModel = db.model('gh7242', Parent);
+      const ParentModel = db.model('Parent', Parent);
       const doc = new ParentModel({ children: false });
 
       return doc.save().then(
@@ -6662,7 +6657,7 @@ describe('document', function() {
   });
 
   it('does not save duplicate items after two saves (gh-6900)', function() {
-    const M = db.model('gh6900', {items: [{name: String}]});
+    const M = db.model('Test', {items: [{name: String}]});
     const doc = new M();
     doc.items.push({ name: '1' });
 
@@ -6692,7 +6687,7 @@ describe('document', function() {
       inner: [innerSchema]
     });
 
-    const Model = db.model('gh6931', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       const doc2 = new Model();
@@ -6721,7 +6716,7 @@ describe('document', function() {
       }
     });
 
-    const Model = db.model('gh6944', schema);
+    const Model = db.model('Test', schema);
 
     const doc = new Model({ _id: 'test', foo: 'hello', bar: { a: 'world' } });
 
@@ -6735,7 +6730,7 @@ describe('document', function() {
     const BarSchema = new Schema({ bar: String }, { _id: false });
     const FooNestedSchema = new Schema({ foo: BarSchema });
 
-    const Model = db.model('gh7048', FooNestedSchema);
+    const Model = db.model('Test', FooNestedSchema);
 
     return co(function*() {
       const doc = yield Model.create({ foo: { bar: 'test' } });
@@ -6755,7 +6750,7 @@ describe('document', function() {
         error: mongoose.Schema.Types.Mixed,
         name: { type: String, required: true }
       });
-      const Model = db.model('gh7127', schema);
+      const Model = db.model('Test', schema);
 
       const doc = new Model();
 
@@ -6789,7 +6784,7 @@ describe('document', function() {
         name: String,
         child: ChildSchema
       });
-      const Parent = db.model('gh6802', ParentSchema);
+      const Parent = db.model('Parent', ParentSchema);
 
       const parent = new Parent({ child: { child: {} } });
 
@@ -6814,7 +6809,7 @@ describe('document', function() {
       arr3: [Object]
     });
 
-    const Test = db.model('gh7109', schema);
+    const Test = db.model('Test', schema);
 
     const test = new Test({
       arr1: ['test1', { two: 'three' }, [4, 'five', 6]],
@@ -6835,7 +6830,7 @@ describe('document', function() {
       }
     });
 
-    const Test = db.model('gh7145', schema);
+    const Test = db.model('Test', schema);
 
     const doc = new Test({ name: 'not-a-uuid' });
     const error = doc.validateSync();
@@ -6861,7 +6856,7 @@ describe('document', function() {
       }
     });
 
-    const Test = db.model('gh7145_0', schema);
+    const Test = db.model('Test', schema);
 
     const doc = new Test({ name: 'foo' });
     const error = doc.validateSync();
@@ -6883,7 +6878,7 @@ describe('document', function() {
 
     const TestSchema = new Schema({ subdocs: [InnerSchema] });
 
-    const Test = db.model('gh7187', TestSchema);
+    const Test = db.model('Test', TestSchema);
 
     return Test.create({ subdocs: [{ name: 'foo' }] }).then(
       () => { throw new Error('Fail'); },
@@ -6906,7 +6901,7 @@ describe('document', function() {
 
     const TestSchema = new Schema({ nested: InnerSchema });
 
-    const Model = db.model('gh7196', TestSchema);
+    const Model = db.model('Test', TestSchema);
 
     const doc = new Model({ nested: { name: 'foo' } });
 
@@ -6922,7 +6917,7 @@ describe('document', function() {
 
   it('should enable key with dot(.) on mixed types with checkKeys (gh-7144)', function() {
     const s = new Schema({ raw: { type: Schema.Types.Mixed } });
-    const M = db.model('gh7144', s);
+    const M = db.model('Test', s);
 
     const raw = { 'foo.bar': 'baz' };
 
@@ -6949,7 +6944,7 @@ describe('document', function() {
     const schema = new mongoose.Schema({
       sub: [subSchema]
     });
-    const Model = db.model('gh7227', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       let doc = new Model({ name: 'test', sub: [{}] });
@@ -6980,7 +6975,7 @@ describe('document', function() {
       }
     });
 
-    const Account = db.model('gh7337', accountSchema);
+    const Account = db.model('Test', accountSchema);
 
     return co(function*() {
       yield Account.create({});
@@ -7014,7 +7009,7 @@ describe('document', function() {
     schema.pre('remove', () => ++removeCount1);
     schema.pre('remove', { document: true, query: false }, () => ++removeCount2);
 
-    const Model = db.model('gh7133', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       const doc = new Model({ name: 'test' });
@@ -7054,7 +7049,7 @@ describe('document', function() {
       sub: subSchema
     });
 
-    const Model = db.model('gh7264', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       const date = '2018-11-22T09:00:00.000Z';
@@ -7095,7 +7090,7 @@ describe('document', function() {
       },
     };
 
-    const Event = db.model('gh7271', EventSchema);
+    const Event = db.model('Test', EventSchema);
     const event = new Event(data, null);
 
     assert.equal(event.activity.name, 'Activity name');
@@ -7112,7 +7107,7 @@ describe('document', function() {
       }
     }, { versionKey: false });
 
-    let Test = db.model('gh7274', schema);
+    let Test = db.model('Test', schema);
 
     let mapTest = new Test({});
     mapTest.test.set('key1', 'value1');
@@ -7127,8 +7122,8 @@ describe('document', function() {
     }, { versionKey: false });
     schema.set('toObject', { flattenMaps: true });
 
-    db.deleteModel('gh7274');
-    Test = db.model('gh7274', schema);
+    db.deleteModel('Test');
+    Test = db.model('Test', schema);
 
     mapTest = new Test({});
     mapTest.test.set('key1', 'value1');
@@ -7139,7 +7134,7 @@ describe('document', function() {
 
   it('`collection` property with strict: false (gh-7276)', function() {
     const schema = new Schema({}, { strict: false, versionKey: false });
-    const Model = db.model('gh7276', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       let doc = new Model({ test: 'foo', collection: 'bar' });
@@ -7154,7 +7149,7 @@ describe('document', function() {
   });
 
   it('should validateSync() all elements in doc array (gh-6746)', function() {
-    const Model = db.model('gh6746', new Schema({
+    const Model = db.model('Test', new Schema({
       colors: [{
         name: { type: String, required: true },
         hex: { type: String, required: true }
@@ -7176,7 +7171,7 @@ describe('document', function() {
   it('handles fake constructor (gh-7290)', function() {
     const TestSchema = new Schema({ test: String });
 
-    const TestModel = db.model('gh7290', TestSchema);
+    const TestModel = db.model('Test', TestSchema);
 
     const badQuery = {
       test: {
@@ -7206,7 +7201,7 @@ describe('document', function() {
   it('handles fake __proto__ (gh-7290)', function() {
     const TestSchema = new Schema({ test: String, name: String });
 
-    const TestModel = db.model('gh7290_proto', TestSchema);
+    const TestModel = db.model('Test', TestSchema);
 
     const badQuery = JSON.parse('{"test":{"length":1000000000,"__proto__":[]}}');
 
@@ -7229,7 +7224,7 @@ describe('document', function() {
   it('cast error with string path set to array in db (gh-7619)', function() {
     const TestSchema = new Schema({ name: String });
 
-    const TestModel = db.model('gh7619', TestSchema);
+    const TestModel = db.model('Test', TestSchema);
 
     return co(function*() {
       yield TestModel.findOne();
@@ -7246,13 +7241,13 @@ describe('document', function() {
 
   it('doesnt crash if nested path with `get()` (gh-7316)', function() {
     const schema = new mongoose.Schema({ http: { get: Number } });
-    const Model = db.model('gh7316', schema);
+    const Model = db.model('Test', schema);
 
     return Model.create({ http: { get: 400 } }); // Should succeed
   });
 
   it('copies atomics from existing document array when setting doc array (gh-7472)', function() {
-    const Dog = db.model('gh7472', new mongoose.Schema({
+    const Dog = db.model('Test', new mongoose.Schema({
       name: String,
       toys: [{
         name: String
@@ -7293,7 +7288,7 @@ describe('document', function() {
       return this.save();
     };
 
-    const Catalog = db.model('gh7342', catalogSchema);
+    const Catalog = db.model('Test', catalogSchema);
 
     return co(function*() {
       let doc = yield Catalog.create({ name: 'test', sub: { name: 'foo' } });
@@ -7316,7 +7311,7 @@ describe('document', function() {
       last: String
     }, { _id: false });
 
-    const User = db.model('gh7585', new Schema({
+    const User = db.model('User', new Schema({
       name: {
         type: NameSchema,
         default: {}
@@ -7341,7 +7336,7 @@ describe('document', function() {
       }
     });
 
-    const CompanyUser = db.model('gh7645', companyUserSchema);
+    const CompanyUser = db.model('User', companyUserSchema);
 
     const cu = new CompanyUser({ profile: { name: 'foo', email: 'bar' } });
     cu.profile = Object.assign({}, cu.profile);
@@ -7367,7 +7362,7 @@ describe('document', function() {
     const parentSchema = new Schema({
       nested: schema
     });
-    const Model = db.model('gh7601', parentSchema);
+    const Model = db.model('Parent', parentSchema);
 
     return co(function*() {
       const doc = yield Model.create({
@@ -7391,7 +7386,7 @@ describe('document', function() {
     const pageSchema = new Schema({
       p: { type: [photoSchema], alias: 'photos' }
     });
-    const Page = db.model('gh7592', pageSchema);
+    const Page = db.model('Test', pageSchema);
 
     return co(function*() {
       const doc = yield Page.create({ p: [{ foo: 'test' }] });
@@ -7409,7 +7404,7 @@ describe('document', function() {
     const testSchema = new Schema({
       foo: { type: String, get: v => v.toLowerCase() }
     });
-    const Test = db.model('gh7233', testSchema);
+    const Test = db.model('Test', testSchema);
 
     const doc = new Test({ foo: 'Bar' });
     assert.equal(doc.foo, 'bar');
@@ -7430,7 +7425,7 @@ describe('document', function() {
     const parentSchema = new mongoose.Schema({
       child: childSchema
     });
-    const Test = db.model('gh7660', parentSchema);
+    const Test = db.model('Test', parentSchema);
 
     const test = new Test({
       child: {
@@ -7462,7 +7457,7 @@ describe('document', function() {
     }
 
     const schema = new Schema({ nested: { prop: String } });
-    const Model = db.model('gh7639', schema);
+    const Model = db.model('Test', schema);
 
     const doc = new Model({ nested: { prop: '1' } });
 
@@ -7475,7 +7470,7 @@ describe('document', function() {
 
   it('supports setting date properties with strict: false (gh-7907)', function() {
     const schema = Schema({}, { strict: false });
-    const SettingsModel = db.model('gh7907', schema);
+    const SettingsModel = db.model('Test', schema);
 
     const date = new Date();
     const obj = new SettingsModel({
@@ -7510,7 +7505,7 @@ describe('document', function() {
     pageSchema.path('elements').discriminator('block', blockElementSchema);
     pageSchema.path('elements').discriminator('text', textElementSchema);
 
-    const Page = db.model('gh7656', pageSchema);
+    const Page = db.model('Test', pageSchema);
     const page = new Page({
       elements: [
         { type: 'text', body: 'Page Title' },
@@ -7539,7 +7534,7 @@ describe('document', function() {
       mixed: {}
     });
 
-    const Model = db.model('gh5369', schema);
+    const Model = db.model('Test', schema);
     const doc = new Model({ subdoc: {}, docArr: [{}] });
 
     assert.ok(doc.nested.$isEmpty());
@@ -7600,7 +7595,7 @@ describe('document', function() {
       type: String,
     }, opts);
 
-    const IssueModel = mongoose.model('gh7704', IssueSchema);
+    const IssueModel = mongoose.model('Test', IssueSchema);
 
     const SubIssueSchema = new mongoose.Schema({
       checklist: [{
@@ -7628,7 +7623,7 @@ describe('document', function() {
         }
       }
     });
-    const Kitten = db.model('gh7719', kittySchema);
+    const Kitten = db.model('Test', kittySchema);
 
     const k = new Kitten({ name: 'Mr Sprinkles' });
     return k.save().then(() => assert.equal(called, 0));
@@ -7642,7 +7637,7 @@ describe('document', function() {
       }
     });
 
-    const TestModel = db.model('gh7720', NewSchema);
+    const TestModel = db.model('Test', NewSchema);
     const instance = new TestModel();
     instance.object = 'value';
 
@@ -7668,11 +7663,10 @@ describe('document', function() {
       position: geojsonSchema
     });
 
-    const GeoJson = db.model('gh7748_0', geojsonSchema);
-    const User = db.model('gh7748', userSchema);
+    const User = db.model('User', userSchema);
 
     return co(function*() {
-      const position = new GeoJson({
+      const position = {
         geometry: {
           type: 'Point',
           coordinates: [1.11111, 2.22222]
@@ -7680,7 +7674,7 @@ describe('document', function() {
         properties: {
           a: 'b'
         }
-      });
+      };
 
       const newUser = new User({
         position: position
@@ -7701,7 +7695,7 @@ describe('document', function() {
 
   it('does not convert array to object with strict: false (gh-7733)', function() {
     const ProductSchema = new mongoose.Schema({}, { strict: false });
-    const Product = db.model('gh7733', ProductSchema);
+    const Product = db.model('Test', ProductSchema);
 
     return co(function*() {
       yield Product.create({ arr: [{ test: 1 }, { test: 2 }] });
@@ -7714,7 +7708,7 @@ describe('document', function() {
 
   it('does not crash with array property named "undefined" (gh-7756)', function() {
     const schema = new Schema({ 'undefined': [String] });
-    const Model = db.model('gh7756_undefined', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       const doc = yield Model.create({ 'undefined': ['foo'] });
@@ -7747,7 +7741,7 @@ describe('document', function() {
       }
     });
 
-    const Parent = db.model('gh7792', parentSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     const obj = { nested: { child: { name: 'foo' }, arr: [{ name: 'bar' }] } };
     return Parent.create(obj).then(() => {
@@ -7768,7 +7762,7 @@ describe('document', function() {
         }
       }
     });
-    const Model = db.model('gh4913', schema);
+    const Model = db.model('Test', schema);
 
     return Model.create({ name: 'foo' }).then(() => assert.ok(false), err => {
       assert.equal(err.errors['name'].message, 'Oops!');
@@ -7778,7 +7772,7 @@ describe('document', function() {
 
   it('handles nested properties named `schema` (gh-7831)', function() {
     const schema = new mongoose.Schema({ nested: { schema: String } });
-    const Model = db.model('gh7831', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       yield Model.collection.insertOne({ nested: { schema: 'test' } });

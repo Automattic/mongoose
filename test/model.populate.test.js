@@ -562,13 +562,13 @@ describe('model: populate:', function() {
         assert.ifError(error);
         sample.save(function(error) {
           assert.ifError(error);
-          next();
+          next(sample._id);
         });
       });
     });
 
-    function next() {
-      Sample.findOne({}, function(error, sample) {
+    function next(_id) {
+      Sample.findOne({ _id }, function(error, sample) {
         assert.ifError(error);
         const opts = { path: 'items.company', options: { lean: true } };
         Company.populate(sample, opts, function(error) {

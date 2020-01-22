@@ -30,8 +30,9 @@ const doc = JSON.parse(fs.readFileSync(__dirname + '/bigboard.json'));
 // console.error('reading from disk and parsing JSON took %d ms', time1);
 
 const start2 = new Date();
-for (let i = 0; i < 1000; ++i) {
+const iterations = 1000;
+for (let i = 0; i < iterations; ++i) {
   new Board(doc);
 }
 const time2 = (new Date - start2);
-console.error('creation of large object took %d ms', time2);
+console.error('creation of large object took %d ms, %d ms per object', time2, time2 / iterations);

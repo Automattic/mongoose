@@ -1310,7 +1310,7 @@ describe('model', function() {
       });
     });
 
-    it.only('should copy plugins', function () {
+    it('should copy plugins', function () {
       const plugin = (schema) => { };
 
       const schema = new Schema({ value: String });

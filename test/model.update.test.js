@@ -3433,5 +3433,19 @@ describe('model: updateOne: ', function() {
         assert.strictEqual(doc.newProp, void 0);
       });
     });
+
+    it('update pipeline timestamps (gh-8524)', function() {
+      const Cat = db.model('Cat', Schema({ name: String }, { timestamps: true }));
+
+      return co(function*() {
+        const cat = yield Cat.create({ name: 'Entei' });
+        const updatedAt = cat.updatedAt;
+
+        yield new Promise(resolve => setTimeout(resolve), 50);
+        const updated = yield Cat.findOneAndUpdate({ _id: cat._id },
+          [{ $set: { name: 'Raikou' } }], { new: true });
+        assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
+      });
+    });
   });
 });

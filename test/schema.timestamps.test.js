@@ -356,18 +356,6 @@ describe('schema options.timestamps', function() {
       });
     });
 
-    it('with update pipeline (gh-8524)', function() {
-      return co(function*() {
-        const cat = yield Cat.create({ name: 'Entei' });
-        const updatedAt = cat.updatedAt;
-
-        yield new Promise(resolve => setTimeout(resolve), 50);
-        const updated = yield Cat.findOneAndUpdate({ _id: cat._id },
-          [{ $set: { name: 'Raikou' } }], { new: true });
-        assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
-      });
-    });
-
     after(function() {
       return Cat.deleteMany({});
     });

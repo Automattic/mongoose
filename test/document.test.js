@@ -8621,4 +8621,15 @@ describe('document', function() {
       assert.ok(!res[1].hasOwnProperty('beta'));
     });
   });
+
+  it('creates document array defaults in forward order, not reverse (gh-8514)', function() {
+    let num = 0;
+    const schema = Schema({
+      arr: [{ val: { type: Number, default: () => ++num } }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ arr: [{}, {}, {}] });
+    assert.deepEqual(doc.toObject().arr.map(v => v.val), [1, 2, 3]);
+  });
 });

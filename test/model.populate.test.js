@@ -9041,14 +9041,14 @@ describe('model: populate:', function() {
     const NestedDataSchema = Schema({
       data: Schema({ title: String, description: String }, noId),
     }, noId);
-  
+
     const InternalItemSchemaGen = () => Schema({
-      data: { 
+      data: {
         type: ObjectId,
         refPath: 'list.objectType',
       }
     }, noId);
-  
+
     const externalSchema = Schema({ data: { sourceId: Number } }, noId);
 
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });

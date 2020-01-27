@@ -1309,6 +1309,19 @@ describe('model', function() {
         });
       });
     });
+
+    it('should copy plugins', function () {
+      const plugin = (schema) => { };
+
+      const schema = new Schema({ value: String });
+      schema.plugin(plugin)
+      const model = mongoose.model('Model', schema);
+
+      const discriminator = model.discriminator('Desc', new Schema({ anotherValue: String }));
+
+      const copiedPlugin = discriminator.schema.plugins.find(p => p.fn === plugin);
+      assert.ok(!!copiedPlugin);
+    });
   });
 
   describe('bug fixes', function() {

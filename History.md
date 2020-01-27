@@ -1,3 +1,18 @@
+5.8.10 / 2020-01-27
+===================
+ * perf(document): improve performance of document creation by skipping unnecessary split() calls #8533 [igrunert-atlassian](https://github.com/igrunert-atlassian)
+ * fix(document): only call validate once for deeply nested subdocuments #8532 #8531 [taxilian](https://github.com/taxilian)
+ * fix(document): create document array defaults in forward order, not reverse #8514
+ * fix(document): allow function as message for date min/max validator #8512
+ * fix(populate): don't try to populate embedded discriminator that has populated path but no `refPath` #8527
+ * fix(document): plugins from base schema when creating a discriminator #8536 [samgladstone](https://github.com/samgladstone)
+ * fix(document): ensure parent and ownerDocument are set for subdocs in document array defaults #8509
+ * fix(document): dont set undefined keys to null if minimize is false #8504
+ * fix(update): bump timestamps when using update aggregation pipelines #8524
+ * fix(model): ensure `cleanIndexes()` drops indexes with different collations #8521
+ * docs(model): document `insertMany` `lean` option #8522
+ * docs(connections): document `authSource` option #8517
+
 5.8.9 / 2020-01-17
 ==================
  * fix(populate): skip populating embedded discriminator array values that don't have a `refPath` #8499

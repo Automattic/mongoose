@@ -586,7 +586,7 @@ describe('document', function() {
     const Model = db.model('gh8468-2', Schema({
       name: String,
       keys: [keySchema],
-    }));
+    }, {deepStackTrace: true}));
     const doc = new Model({
       name: 'test',
       keys: [

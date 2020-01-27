@@ -26,11 +26,11 @@ describe('model: update:', function() {
   let id1;
   let Comments;
   let BlogPost;
-  let collection;
-  let strictSchema;
   let db;
 
-  before(function() {
+  beforeEach(function() {
+    db = start();
+
     Comments = new Schema({});
 
     Comments.add({
@@ -40,7 +40,7 @@ describe('model: update:', function() {
       comments: [Comments]
     });
 
-    BlogPost = new Schema({
+    const schema = new Schema({
       title: String,
       author: String,
       slug: String,
@@ -56,7 +56,7 @@ describe('model: update:', function() {
       comments: [Comments]
     }, {strict: false});
 
-    BlogPost.virtual('titleWithAuthor')
+    schema.virtual('titleWithAuthor')
       .get(function() {
         return this.get('title') + ' by ' + this.get('author');
       })
@@ -66,35 +66,22 @@ describe('model: update:', function() {
         this.set('author', split[1]);
       });
 
-    BlogPost.method('cool', function() {
+    schema.method('cool', function() {
       return this;
     });
 
-    BlogPost.static('woot', function() {
+    schema.static('woot', function() {
       return this;
     });
 
-    mongoose.model('BlogPostForUpdates', BlogPost);
-
-    collection = 'blogposts_' + random();
-
-    strictSchema = new Schema({name: String, x: {nested: String}});
-    strictSchema.virtual('foo').get(function() {
-      return 'i am a virtual FOO!';
-    });
-    mongoose.model('UpdateStrictSchema', strictSchema);
-
-    db = start();
+    BlogPost = db.model('BlogPost', schema);
   });
 
   after(function(done) {
     db.close(done);
   });
 
-  beforeEach(function(done) {
-    const db = start();
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
+  beforeEach(function() {
     id0 = new DocumentObjectId;
     id1 = new DocumentObjectId;
 
@@ -109,15 +96,25 @@ describe('model: update:', function() {
     post.owners = [id0, id1];
     post.comments = [{body: 'been there'}, {body: 'done that'}];
 
-    post.save(function(err) {
-      assert.ifError(err);
-      db.close(done);
-    });
+    return post.save();
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => {
+    const arr = [];
+
+    if (db.models == null) {
+      return;
+    }
+    for (const model of Object.keys(db.models)) {
+      arr.push(db.models[model].deleteMany({}));
+    }
+
+    return Promise.all(arr);
   });
 
   it('works', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     BlogPost.findById(post._id, function(err, cf) {
       assert.ifError(err);
       assert.equal(cf.title, title);
@@ -228,8 +225,6 @@ describe('model: update:', function() {
   });
 
   it('casts doc arrays', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     const update = {
       comments: [{body: 'worked great'}],
       $set: {'numbers.1': 100},
@@ -255,8 +250,6 @@ describe('model: update:', function() {
   });
 
   it('makes copy of conditions and update options', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     const conditions = {'_id': post._id.toString()};
     const update = {'$set': {'some_attrib': post._id.toString()}};
     BlogPost.update(conditions, update, function(err) {
@@ -267,8 +260,6 @@ describe('model: update:', function() {
   });
 
   it('$addToSet with $ (gh-479)', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     function a() {
     }
 
@@ -298,15 +289,10 @@ describe('model: update:', function() {
   });
 
   describe('using last', function() {
-    let BlogPost;
     let last;
 
-    before(function() {
-      BlogPost = db.model('BlogPostForUpdates', collection);
-    });
-
     beforeEach(function(done) {
-      BlogPost.findOne({}, function(error, doc) {
+      BlogPost.findOne({ 'owners.1': { $exists: true } }, function(error, doc) {
         assert.ifError(error);
         last = doc;
         done();
@@ -335,6 +321,7 @@ describe('model: update:', function() {
 
     it('handles $addToSet (gh-545)', function(done) {
       const owner = last.owners[0];
+      assert.ok(owner);
       const numOwners = last.owners.length;
       const update = {
         $addToSet: {owners: owner}
@@ -395,8 +382,6 @@ describe('model: update:', function() {
   });
 
   it('works with nested positional notation', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     const update = {
       $set: {
         'comments.0.comments.0.date': '11/5/2011',
@@ -419,8 +404,6 @@ describe('model: update:', function() {
   });
 
   it('handles $pull with obj literal (gh-542)', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     BlogPost.findById(post, function(err, doc) {
       assert.ifError(err);
 
@@ -441,8 +424,6 @@ describe('model: update:', function() {
   });
 
   it('handles $pull of obj literal and nested $in', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     const update = {
       $pull: {comments: {body: {$in: ['been there']}}}
     };
@@ -460,8 +441,6 @@ describe('model: update:', function() {
   });
 
   it('handles $pull and nested $nin', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
-
     BlogPost.findById(post, function(err, doc) {
       assert.ifError(err);
 
@@ -491,7 +470,6 @@ describe('model: update:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    const BlogPost = db.model('BlogPostForUpdates', collection);
     let totalDocs = 4;
 
     const post = new BlogPost;
@@ -518,64 +496,18 @@ describe('model: update:', function() {
     });
   });
 
-  describe('honors strict schemas', function() {
-    it('(gh-699)', function(done) {
-      const S = db.model('UpdateStrictSchema');
+  it('passes number of affected docs', function() {
+    return co(function*() {
+      yield BlogPost.deleteMany({});
+      yield BlogPost.create({title: 'one'}, {title: 'two'}, {title: 'three'});
 
-      let doc = S.find()._castUpdate({ignore: true});
-      assert.equal(doc, false);
-      doc = S.find()._castUpdate({$unset: {x: 1}});
-      assert.equal(Object.keys(doc.$unset).length, 1);
-      done();
-    });
-
-    it('works', function(done) {
-      const S = db.model('UpdateStrictSchema');
-      const s = new S({name: 'orange crush'});
-
-      s.save(function(err) {
-        assert.ifError(err);
-
-        S.update({_id: s._id}, {ignore: true}, function(err, affected) {
-          assert.ifError(err);
-          assert.equal(affected.n, 0);
-
-          S.findById(s._id, function(err, doc) {
-            assert.ifError(err);
-            assert.ok(!doc.ignore);
-            assert.ok(!doc._doc.ignore);
-
-            S.update({_id: s._id}, {name: 'Drukqs', foo: 'fooey'}, function(err, affected) {
-              assert.ifError(err);
-              assert.equal(affected.n, 1);
-
-              S.findById(s._id, function(err, doc) {
-                assert.ifError(err);
-                assert.ok(!doc._doc.foo);
-                done();
-              });
-            });
-          });
-        });
-      });
-    });
-  });
-
-  it('passes number of affected docs', function(done) {
-    const B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
-
-    B.create({title: 'one'}, {title: 'two'}, {title: 'three'}, function(err) {
-      assert.ifError(err);
-      B.update({}, {title: 'newtitle'}, {multi: true}, function(err, affected) {
-        assert.ifError(err);
-        assert.equal(affected.n, 3);
-        done();
-      });
+      const res = yield BlogPost.update({}, {title: 'newtitle'}, {multi: true});
+      assert.equal(res.n, 3);
     });
   });
 
   it('updates a number to null (gh-640)', function(done) {
-    const B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
+    const B = BlogPost;
     const b = new B({meta: {visitors: null}});
     b.save(function(err) {
       assert.ifError(err);
@@ -3431,6 +3363,20 @@ describe('model: updateOne: ', function() {
         doc = yield Model.findOne();
         assert.equal(doc.oldProp, 'test3');
         assert.strictEqual(doc.newProp, void 0);
+      });
+    });
+
+    it('update pipeline timestamps (gh-8524)', function() {
+      const Cat = db.model('Cat', Schema({ name: String }, { timestamps: true }));
+
+      return co(function*() {
+        const cat = yield Cat.create({ name: 'Entei' });
+        const updatedAt = cat.updatedAt;
+
+        yield new Promise(resolve => setTimeout(resolve), 50);
+        const updated = yield Cat.findOneAndUpdate({ _id: cat._id },
+          [{ $set: { name: 'Raikou' } }], { new: true });
+        assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
       });
     });
   });

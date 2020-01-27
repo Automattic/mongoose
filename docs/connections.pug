@@ -148,6 +148,7 @@ block content
     * `connectTimeoutMS`  - How long the MongoDB driver will wait before killing a socket due to inactivity _during initial connection_. Defaults to 30000. This option is passed transparently to [Node.js' `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback).
     * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
     * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
+    * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 
     The following options are important for tuning Mongoose only if you are
     running **without** [the `useUnifiedTopology` option](/docs/deprecations.html#useunifiedtopology):
@@ -205,7 +206,7 @@ block content
     in the query string.
 
     ```javascript
-    mongoose.connect('mongodb://localhost:27017/test?connectTimeoutMS=1000&bufferCommands=false');
+    mongoose.connect('mongodb://localhost:27017/test?connectTimeoutMS=1000&bufferCommands=false&authSource=otherdb');
     // The above is equivalent to:
     mongoose.connect('mongodb://localhost:27017/test', {
       connectTimeoutMS: 1000
@@ -222,7 +223,12 @@ block content
     like `connectTimeoutMS` or `poolSize`, in the options object.
 
     The MongoDB docs have a full list of
-    [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/)
+    [supported connection string options](https://docs.mongodb.com/manual/reference/connection-string/).
+    Below are some options that are often useful to set in the connection string because they
+    are closely associated with the hostname and authentication information.
+
+    * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
+    * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 
     <h3 id="connection-events"><a href="#connection-events">Connection Events</a></h3>
 

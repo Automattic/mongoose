@@ -101,7 +101,7 @@ describe('schematype', function() {
     assert.equal(err.message, 'name is invalid!');
   });
 
-  describe.only('clone()', function() {
+  describe('clone()', function() {
     let schemaType;
     beforeEach(function() {
       schemaType = Schema({ value: String }).path('value');
@@ -125,15 +125,14 @@ describe('schematype', function() {
     it('clones added immutable', function() {
       // Note: cannot compare with deep equals due to the immutable function
       schemaType.immutable(true);
-      const clonePath = schemaType.clone();
+      let clonePath = schemaType.clone();
+      assert.equal(schemaType.$immutable, clonePath.$immutable);
+      assert.equal(schemaType.setters.length, clonePath.setters.length);
 
-      try {
-        assert.deepStrictEqual(clonePath, schemaType);
-      }
-      catch (err) {
-        if (!err.message.startsWith('Values have same structure but are not reference-equal:'))
-          throw err;
-      }
+      schemaType.immutable(false);
+      clonePath = schemaType.clone();
+      assert.equal(schemaType.$immutable, clonePath.$immutable);
+      assert.equal(schemaType.setters.length, clonePath.setters.length);
     });
 
     it('clones added index', function() {

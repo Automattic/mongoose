@@ -101,7 +101,7 @@ describe('schematype', function() {
     assert.equal(err.message, 'name is invalid!');
   });
 
-  describe.only('clone()', function () {
+  describe('clone()', function () {
     let schemaType;
     beforeEach(function () {
       schemaType = Schema({ value: String }).path('value');

@@ -6095,7 +6095,7 @@ describe('Model', function() {
       try {
         yield Model.listIndexes();
       } catch (err) {
-        assert.ok(err.message.indexOf('tests') !== -1,
+        assert.ok(err.message.indexOf('test') !== -1,
           err.message);
         threw = true;
       }

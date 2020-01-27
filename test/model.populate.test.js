@@ -9027,4 +9027,53 @@ describe('model: populate:', function() {
       assert.equal(doc.childCount, 1);
     });
   });
+
+  it('works when embedded discriminator array has populated path but not refPath (gh-8527)', function() {
+    const Image = db.model('Image', Schema({ imageName: String }));
+    const Text = db.model('Text', Schema({ textName: String }));
+    const ItemSchema = Schema({ objectType: String }, {
+      discriminatorKey: 'objectType',
+      _id: false
+    });
+
+    const noId = { _id: false };
+
+    const NestedDataSchema = Schema({
+      data: Schema({ title: String, description: String }, noId),
+    }, noId);
+  
+    const InternalItemSchemaGen = () => Schema({
+      data: { 
+        type: ObjectId,
+        refPath: 'list.objectType',
+      }
+    }, noId);
+  
+    const externalSchema = Schema({ data: { sourceId: Number } }, noId);
+
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+    ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
+    ExampleSchema.path('list').discriminator('Text', InternalItemSchemaGen());
+    ExampleSchema.path('list').discriminator('ExternalSource', externalSchema);
+    ExampleSchema.path('list').discriminator('NestedData', NestedDataSchema);
+    const Example = db.model('Test', ExampleSchema);
+
+    return co(function*() {
+      const image1 = yield Image.create({ imageName: '01image' });
+      const text1 = yield Text.create({ textName: '01text' });
+
+      const example = yield Example.create({
+        test: 'example',
+        list: [
+          { data: image1._id, objectType: 'Image' },
+          { data: text1._id, objectType: 'Text' },
+          { data: { sourceId: 123 }, objectType: 'ExternalSource' },
+          { data: { title: 'test' }, objectType: 'NestedData' }
+        ]
+      });
+
+      const res = yield Example.findById(example).populate('list.data').lean();
+      assert.deepEqual(res.list[3].data, { title: 'test' });
+    });
+  });
 });

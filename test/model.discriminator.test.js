@@ -1324,6 +1324,22 @@ describe('model', function() {
 
       mongoose.deleteModel(/Model/);
     });
+
+    describe('does not have unintended side effects', function() {
+      // Delete every model
+      afterEach(function() { mongoose.deleteModel(/.+/); });
+
+      function throwErrorOnClone() { throw new Error('clone() was called on the unrelated schema'); };
+
+      it('when the base schema has an _id that is not auto generated', function() {
+        const unrelatedSchema = new mongoose.Schema({});
+        unrelatedSchema.clone = throwErrorOnClone;
+        mongoose.model('UnrelatedModel', unrelatedSchema);
+
+        const model = mongoose.model('Model', new mongoose.Schema({ _id: mongoose.Types.ObjectId }, { _id: false }));
+        model.discriminator('Discrimintaor', new mongoose.Schema({}).clone());
+      });
+    });
   });
 
   describe('bug fixes', function() {

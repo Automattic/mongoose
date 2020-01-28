@@ -100,4 +100,94 @@ describe('schematype', function() {
     assert.equal(err.name, 'ValidatorError');
     assert.equal(err.message, 'name is invalid!');
   });
+
+  describe('clone()', function() {
+    let schemaType;
+    beforeEach(function() {
+      schemaType = Schema({ value: String }).path('value');
+    });
+
+    function cloneAndTestDeepEquals() {
+      const clone = schemaType.clone();
+      assert.deepStrictEqual(clone, schemaType);
+    }
+
+    it('clones added default', function() {
+      schemaType.default(() => 'abc');
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added getters', function() {
+      schemaType.get(v => v.trim());
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added immutable', function() {
+      // Note: cannot compare with deep equals due to the immutable function
+      schemaType.immutable(true);
+      let clonePath = schemaType.clone();
+      assert.equal(schemaType.$immutable, clonePath.$immutable);
+      assert.equal(schemaType.setters.length, clonePath.setters.length);
+
+      schemaType.immutable(false);
+      clonePath = schemaType.clone();
+      assert.equal(schemaType.$immutable, clonePath.$immutable);
+      assert.equal(schemaType.setters.length, clonePath.setters.length);
+    });
+
+    it('clones added index', function() {
+      schemaType.index(true);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added ref', function() {
+      schemaType.ref('User');
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added required', function() {
+      schemaType.required(true);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added select: false', function() {
+      schemaType.select(false);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added setter', function() {
+      schemaType.set(v => v.trim());
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added sparse', function() {
+      schemaType.sparse(true);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added sparse (index option)', function() {
+      schemaType.sparse(true);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added text (index option)', function() {
+      schemaType.text(true);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added unique (index option)', function() {
+      schemaType.unique(true);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones added validator', function() {
+      schemaType.validate(v => v.length > 3);
+      cloneAndTestDeepEquals();
+    });
+
+    it('clones updated caster', function() {
+      schemaType.cast(v => v.length > 3 ? v : v.trim());
+      cloneAndTestDeepEquals();
+    });
+  });
 });

@@ -1329,6 +1329,13 @@ describe('model', function() {
       // Delete every model
       afterEach(function() { mongoose.deleteModel(/.+/); });
 
+      it('does not modify _id path of the passed in schema the _id is not auto generated', function() {
+        const model = mongoose.model('Model', new mongoose.Schema({ _id: Number }));
+        const passedInSchema = new mongoose.Schema({});
+        model.discriminator('Discrimintaor', passedInSchema);
+        assert.equal(passedInSchema.path('_id').instance, 'ObjectID');
+      });
+
       function throwErrorOnClone() { throw new Error('clone() was called on the unrelated schema'); };
 
       it('when the base schema has an _id that is not auto generated', function() {

@@ -312,7 +312,7 @@ describe('model', function() {
       });
 
       it('inherits statics', function(done) {
-        assert.strictEqual(Employee.findByGender, EmployeeSchema.statics.findByGender);
+        assert.strictEqual(Employee.findByGender, PersonSchema.statics.findByGender);
         assert.strictEqual(Employee.findByDepartment, EmployeeSchema.statics.findByDepartment);
         assert.equal(Person.findByDepartment, undefined);
         done();
@@ -1329,7 +1329,7 @@ describe('model', function() {
       // Delete every model
       afterEach(function() { mongoose.deleteModel(/.+/); });
 
-      it('does not modify _id path of the passed in schema the _id is not auto generated', function() {
+      it('does not modify _id path of the passed in schema the _id is not auto generated (gh-8543)', function() {
         const model = mongoose.model('Model', new mongoose.Schema({ _id: Number }));
         const passedInSchema = new mongoose.Schema({});
         model.discriminator('Discrimintaor', passedInSchema);
@@ -1338,7 +1338,7 @@ describe('model', function() {
 
       function throwErrorOnClone() { throw new Error('clone() was called on the unrelated schema'); };
 
-      it('when the base schema has an _id that is not auto generated', function() {
+      it('when the base schema has an _id that is not auto generated (gh-8543) (gh-8546)', function() {
         const unrelatedSchema = new mongoose.Schema({});
         unrelatedSchema.clone = throwErrorOnClone;
         mongoose.model('UnrelatedModel', unrelatedSchema);

@@ -213,8 +213,8 @@ describe('discriminator docs', function () {
     var event1 = new ClickedLinkEvent({ _id: 'custom id', time: '4pm' });
     // Woops, clickedLinkSchema overwrites the `time` path, but **not**
     // the `_id` path because that was implicitly added.
-    assert.ok(typeof event1._id === 'string');
-    assert.ok(typeof event1.time === 'string');
+    assert.strictEqual(typeof event1._id, 'string');
+    assert.strictEqual(typeof event1.time, 'string');
 
     // acquit:ignore:start
     done();

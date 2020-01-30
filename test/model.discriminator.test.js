@@ -1333,7 +1333,7 @@ describe('model', function() {
         const model = mongoose.model('Model', new mongoose.Schema({ _id: Number }));
         const passedInSchema = new mongoose.Schema({});
         model.discriminator('Discrimintaor', passedInSchema);
-        assert.equal(passedInSchema.path('_id').instance, 'ObjectID');
+        assert.equal(passedInSchema.path('_id').instance, 'Number');
       });
 
       function throwErrorOnClone() { throw new Error('clone() was called on the unrelated schema'); };

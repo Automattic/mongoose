@@ -23,12 +23,12 @@ describe('SingleNestedPath', function() {
         }, {_id: false});
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
-          
+
         let currentEventLevel = subEventSchema;
         for (let i = 0; i < 5; i++) {
           const subEventSchemaDiscriminators = currentEventLevel.path('sub_events').schema.discriminators;
           assert.ok(subEventSchemaDiscriminators);
-          assert.ok(subEventSchemaDiscriminators.SubEvent)
+          assert.ok(subEventSchemaDiscriminators.SubEvent);
           currentEventLevel = subEventSchemaDiscriminators.SubEvent;
         }
       });
@@ -49,26 +49,26 @@ describe('SingleNestedPath', function() {
           // To create a recursive document, the schema was modified, so kind & message are added
           kind: 'SubEvent',
           message: 'level 1',
-          sub_events: [{ 
-            kind: 'SubEvent', 
+          sub_events: [{
+            kind: 'SubEvent',
             message: 'level 2',
-            sub_events: [{ 
+            sub_events: [{
               kind: 'SubEvent',
               message: 'level 3',
-              sub_events: [{ 
-                kind: 'SubEvent', 
+              sub_events: [{
+                kind: 'SubEvent',
                 message: 'level 4',
-                sub_events: [{ 
-                  kind: 'SubEvent', 
+                sub_events: [{
+                  kind: 'SubEvent',
                   message: 'level 5',
-                  sub_events: [], 
-                }], 
+                  sub_events: [],
+                }],
               }],
             }],
           }]
         };
         const subEvent = SubEvent(multiLevel);
-        
+
         assert.deepStrictEqual(multiLevel, subEvent.toJSON());
       });
 
@@ -77,21 +77,21 @@ describe('SingleNestedPath', function() {
           _id: { type: Number, required: true },
           message: String,
         }, { discriminatorKey: 'kind' });
-          
+
         const subEventSchema = new Schema({
           sub_events: [singleEventSchema]
         });
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
-        
+
         // To create a recursive document, the schema was modified, so the _id property is now a number
         assert.equal(subEventSchema.path('_id').instance, 'Number');
-          
+
         let currentEventLevel = subEventSchema;
         for (let i = 0; i < 5; i++) {
           const subEventSchemaDiscriminators = currentEventLevel.path('sub_events').schema.discriminators;
           assert.ok(subEventSchemaDiscriminators);
-          assert.ok(subEventSchemaDiscriminators.SubEvent)
+          assert.ok(subEventSchemaDiscriminators.SubEvent);
           currentEventLevel = subEventSchemaDiscriminators.SubEvent;
           assert.equal(currentEventLevel.path('_id').instance, 'Number');
         }
@@ -102,13 +102,13 @@ describe('SingleNestedPath', function() {
           _id: { type: Number, required: true },
           message: String,
         }, { discriminatorKey: 'kind' });
-          
+
         const subEventSchema = new Schema({
           sub_events: [singleEventSchema]
         });
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
-        
+
         const SubEvent = mongoose.model('MultiLevelDataWithIdDoc', subEventSchema);
         const multiLevel = {
           // To create a recursive document, the schema was modified, so kind & message are added & _id is now Number
@@ -117,22 +117,22 @@ describe('SingleNestedPath', function() {
           message: 'level 1',
           sub_events: [{
             _id: 1,
-            kind: 'SubEvent', 
+            kind: 'SubEvent',
             message: 'level 2',
-            sub_events: [{ 
+            sub_events: [{
               _id: 1,
               kind: 'SubEvent',
               message: 'level 3',
-              sub_events: [{ 
+              sub_events: [{
                 _id: 1,
-                kind: 'SubEvent', 
+                kind: 'SubEvent',
                 message: 'level 4',
-                sub_events: [{ 
+                sub_events: [{
                   _id: 1,
-                  kind: 'SubEvent', 
+                  kind: 'SubEvent',
                   message: 'level 5',
-                  sub_events: [], 
-                }], 
+                  sub_events: [],
+                }],
               }],
             }],
           }]
@@ -141,6 +141,6 @@ describe('SingleNestedPath', function() {
 
         assert.deepStrictEqual(multiLevel, subEvent.toJSON());
       });
-    })
+    });
   });
 });

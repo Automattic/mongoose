@@ -585,8 +585,8 @@ describe('document', function() {
     const keySchema = Schema({ql: [questionSchema]}, {_id: false, id: false});
     const Model = db.model('gh8468-2', Schema({
       name: String,
-      keys: [keySchema],
-    }, {deepStackTrace: true}));
+      keys: [keySchema]
+    }));
     const doc = new Model({
       name: 'test',
       keys: [
@@ -8631,5 +8631,20 @@ describe('document', function() {
 
     const doc = new Model({ arr: [{}, {}, {}] });
     assert.deepEqual(doc.toObject().arr.map(v => v.val), [1, 2, 3]);
+  });
+
+  it('can call subdocument validate multiple times in parallel (gh-8539)', function() {
+    const schema = Schema({
+      arr: [{ val: String }],
+      single: Schema({ val: String })
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = new Model({ arr: [{ val: 'test' }], single: { val: 'test' } });
+
+      yield [doc.arr[0].validate(), doc.arr[0].validate()];
+      yield [doc.single.validate(), doc.single.validate()];
+    });
   });
 });

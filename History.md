@@ -1,3 +1,12 @@
+5.8.11 / 2020-01-31
+===================
+ * fix(document): allow calling `validate()` multiple times in parallel on subdocs to avoid errors if Mongoose double-validates [taxilian](https://github.com/taxilian) #8548 #8539
+ * fix(connection): allow calling initial `mongoose.connect()` after connection helpers on the same tick #8534
+ * fix(connection): throw helpful error when callback param to `mongoose.connect()` or `mongoose.createConnection()` is not a function #8556
+ * fix(drivers): avoid unnecessary caught error when importing #8528
+ * fix(discriminator): remove unnecessary `utils.merge()` [samgladstone](https://github.com/samgladstone) #8542
+ * docs: add "built with mongoose" page #8540
+
 5.8.10 / 2020-01-27
 ===================
  * perf(document): improve performance of document creation by skipping unnecessary split() calls #8533 [igrunert-atlassian](https://github.com/igrunert-atlassian)

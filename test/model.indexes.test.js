@@ -480,6 +480,43 @@ describe('model', function() {
         then(dropped => assert.equal(dropped.length, 0));
     });
 
+    it('different collation with syncIndexes() (gh-8521)', function() {
+      return co(function*() {
+        yield db.db.collection('users').drop().catch(() => {});
+
+        let userSchema = new mongoose.Schema({ username: String });
+        userSchema.index({ username: 1 }, { unique: true });
+        let User = db.model('User', userSchema);
+
+        yield User.init();
+        let indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[1].key, { username: 1 });
+        assert.ok(!indexes[1].collation);
+
+        userSchema = new mongoose.Schema({ username: String });
+        userSchema.index({ username: 1 }, {
+          unique: true,
+          collation: {
+            locale: 'en',
+            strength: 2
+          }
+        });
+        db.deleteModel('User');
+        User = db.model('User', userSchema);
+
+        yield User.init();
+        yield User.syncIndexes();
+
+        indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[1].key, { username: 1 });
+        assert.ok(!!indexes[1].collation);
+
+        yield User.collection.drop();
+      });
+    });
+
     it('cleanIndexes (gh-6676)', function() {
       return co(function*() {
         let M = db.model('gh6676', new Schema({

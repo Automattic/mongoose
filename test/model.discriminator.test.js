@@ -312,7 +312,7 @@ describe('model', function() {
       });
 
       it('inherits statics', function(done) {
-        assert.strictEqual(Employee.findByGender, EmployeeSchema.statics.findByGender);
+        assert.strictEqual(Employee.findByGender, PersonSchema.statics.findByGender);
         assert.strictEqual(Employee.findByDepartment, EmployeeSchema.statics.findByDepartment);
         assert.equal(Person.findByDepartment, undefined);
         done();
@@ -1307,6 +1307,44 @@ describe('model', function() {
           });
           done();
         });
+      });
+    });
+
+    it('should copy plugins', function () {
+      const plugin = (schema) => { };
+
+      const schema = new Schema({ value: String });
+      schema.plugin(plugin);
+      const model = mongoose.model('Model', schema);
+
+      const discriminator = model.discriminator('Desc', new Schema({ anotherValue: String }));
+
+      const copiedPlugin = discriminator.schema.plugins.find(p => p.fn === plugin);
+      assert.ok(!!copiedPlugin);
+
+      mongoose.deleteModel(/Model/);
+    });
+
+    describe('does not have unintended side effects', function() {
+      // Delete every model
+      afterEach(function() { mongoose.deleteModel(/.+/); });
+
+      it('does not modify _id path of the passed in schema the _id is not auto generated (gh-8543)', function() {
+        const model = mongoose.model('Model', new mongoose.Schema({ _id: Number }));
+        const passedInSchema = new mongoose.Schema({});
+        model.discriminator('Discrimintaor', passedInSchema);
+        assert.equal(passedInSchema.path('_id').instance, 'Number');
+      });
+
+      function throwErrorOnClone() { throw new Error('clone() was called on the unrelated schema'); };
+
+      it('when the base schema has an _id that is not auto generated (gh-8543) (gh-8546)', function() {
+        const unrelatedSchema = new mongoose.Schema({});
+        unrelatedSchema.clone = throwErrorOnClone;
+        mongoose.model('UnrelatedModel', unrelatedSchema);
+
+        const model = mongoose.model('Model', new mongoose.Schema({ _id: mongoose.Types.ObjectId }, { _id: false }));
+        model.discriminator('Discrimintaor', new mongoose.Schema({}).clone());
       });
     });
   });

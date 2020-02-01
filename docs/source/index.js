@@ -33,3 +33,4 @@ exports['docs/compatibility.pug'] = {
 };
 exports['docs/search.pug'] = { title: 'Search' };
 exports['docs/enterprise.pug'] = { title: 'Mongoose for Enterprise' };
+exports['docs/built-with-mongoose.pug'] = { title: 'Built with Mongoose' };

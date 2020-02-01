@@ -90,6 +90,21 @@ describe('model: findOneAndUpdate:', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => {
+    const arr = [];
+
+    if (db.models == null) {
+      return;
+    }
+    for (const model of Object.keys(db.models)) {
+      arr.push(db.models[model].deleteMany({}));
+    }
+
+    return Promise.all(arr);
+  });
+
   it('WWW returns the edited document', function(done) {
     const M = db.model(modelname, collection);
     const title = 'Tobi ' + random();
@@ -768,7 +783,7 @@ describe('model: findOneAndUpdate:', function() {
       title: String
     });
 
-    const B = db.model('gh-1091+1100', postSchema);
+    const B = db.model('BlogPost', postSchema);
     const _id1 = new mongoose.Types.ObjectId;
     const _id2 = new mongoose.Types.ObjectId;
 
@@ -845,7 +860,7 @@ describe('model: findOneAndUpdate:', function() {
       name: { type: String }
     });
 
-    const Fruit = db.model('gh-7734', fruitSchema);
+    const Fruit = db.model('Test', fruitSchema);
     return co(function*() {
       let fruit = yield Fruit.create({ name: 'Apple' });
 
@@ -867,7 +882,7 @@ describe('model: findOneAndUpdate:', function() {
       }
     });
 
-    const Thing = db.model('gh-7770', thingSchema);
+    const Thing = db.model('Test', thingSchema);
     const key = 'some-new-id';
 
     Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false, rawResult:true}).exec(function(err, rawResult) {
@@ -1006,7 +1021,7 @@ describe('model: findOneAndUpdate:', function() {
       name: String
     });
 
-    const Account = db.model('gh5973', accountSchema);
+    const Account = db.model('Test', accountSchema);
 
     const update = { $set: { name: 'test', __v: 1 } };
     return Account.
@@ -1020,7 +1035,7 @@ describe('model: findOneAndUpdate:', function() {
       name: String
     });
 
-    const Account = db.model('gh5973_Update', accountSchema);
+    const Account = db.model('Test', accountSchema);
 
     const update = { $set: { name: 'test', __v: 1 } };
     return Account.
@@ -1033,7 +1048,7 @@ describe('model: findOneAndUpdate:', function() {
     const TickSchema = new Schema({name: String});
     const TestSchema = new Schema({a: Number, b: Number, ticks: [TickSchema]});
 
-    const TestModel = db.model('gh-1932', TestSchema, 'gh-1932');
+    const TestModel = db.model('Test', TestSchema);
 
     TestModel.create({a: 1, b: 0, ticks: [{name: 'eggs'}, {name: 'bacon'}, {name: 'coffee'}]}, function(error) {
       assert.ifError(error);
@@ -1056,7 +1071,7 @@ describe('model: findOneAndUpdate:', function() {
       base: String
     });
 
-    const Breakfast = db.model('gh-2272', s);
+    const Breakfast = db.model('Test', s);
 
     Breakfast.
       findOneAndUpdate({}, {time: undefined, base: undefined}, {}).
@@ -1071,7 +1086,7 @@ describe('model: findOneAndUpdate:', function() {
       base: ObjectId
     });
 
-    const Breakfast = db.model('gh2732', s);
+    const Breakfast = db.model('Test', s);
 
     Breakfast.
       findOneAndUpdate({}, {base: {}}, {}).
@@ -1086,7 +1101,7 @@ describe('model: findOneAndUpdate:', function() {
       test: String
     }, {strict: true});
 
-    const Breakfast = db.model('gh2947', s);
+    const Breakfast = db.model('Test', s);
     const q = Breakfast.findOneAndUpdate({},
       {notInSchema: {a: 1}, test: 'abc'},
       {new: true, strict: true, upsert: true});
@@ -1115,7 +1130,7 @@ describe('model: findOneAndUpdate:', function() {
         ++postCount;
       });
 
-      const Breakfast = db.model('gh-964', s);
+      const Breakfast = db.model('Test', s);
 
       Breakfast.findOneAndUpdate(
         {},
@@ -1145,7 +1160,7 @@ describe('model: findOneAndUpdate:', function() {
         ++postCount;
       });
 
-      const Breakfast = db.model('gh-964-2', s);
+      const Breakfast = db.model('Test', s);
 
       Breakfast.
         findOneAndUpdate({}, {base: 'eggs'}, {}).
@@ -1239,7 +1254,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      const Profile = db.model('gh7909', profileSchema);
+      const Profile = db.model('Test', profileSchema);
 
       return co(function*() {
         const update = { $setOnInsert: { username: 'test' } };
@@ -1415,7 +1430,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      const TestModel = db.model('gh3035', testSchema);
+      const TestModel = db.model('Test', testSchema);
       TestModel.create({id: '1'}, function(error) {
         assert.ifError(error);
         TestModel.findOneAndUpdate({id: '1'}, {$set: {name: 'Joe'}}, {upsert: true, setDefaultsOnInsert: true},
@@ -1433,7 +1448,7 @@ describe('model: findOneAndUpdate:', function() {
         status: String
       });
 
-      const TestModel = db.model('gh3135', testSchema);
+      const TestModel = db.model('Test', testSchema);
       TestModel.create({blob: null, status: 'active'}, function(error) {
         assert.ifError(error);
         TestModel.findOneAndUpdate({id: '1', blob: null}, {$set: {status: 'inactive'}}, {upsert: true, setDefaultsOnInsert: true},
@@ -1457,7 +1472,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      const TestModel = db.model('gh3034', testSchema);
+      const TestModel = db.model('Test', testSchema);
       TestModel.create({id: '1'}, function(error) {
         assert.ifError(error);
         TestModel.findOneAndUpdate({id: '1'}, {$set: {name: 'Joe'}}, {upsert: true, setDefaultsOnInsert: true},
@@ -1477,7 +1492,7 @@ describe('model: findOneAndUpdate:', function() {
         b: [Number]
       });
 
-      const TestModel = db.model('gh3107', testSchema);
+      const TestModel = db.model('Test', testSchema);
       const update = { $setOnInsert: { a: [{foo: 'bar'}], b: [2] } };
       const opts = {upsert: true, new: true, setDefaultsOnInsert: true};
       TestModel
@@ -1506,7 +1521,7 @@ describe('model: findOneAndUpdate:', function() {
         records: [recordSchema]
       });
 
-      const Shift = db.model('gh3468', shiftSchema);
+      const Shift = db.model('Test', shiftSchema);
 
       Shift.create({
         userId: 'tom',
@@ -1529,7 +1544,7 @@ describe('model: findOneAndUpdate:', function() {
       const nested = new Schema({num: Number});
       const s = new Schema({nested: nested});
 
-      const MyModel = db.model('gh3580', s);
+      const MyModel = db.model('Test', s);
 
       const update = {nested: {num: 'Not a Number'}};
       MyModel.findOneAndUpdate({}, update, function(error) {
@@ -1542,7 +1557,7 @@ describe('model: findOneAndUpdate:', function() {
       const nested = new Schema({arr: [{num: Number}]});
       const s = new Schema({nested: nested});
 
-      const MyModel = db.model('gh3616', s);
+      const MyModel = db.model('Test', s);
 
       MyModel.create({nested: {arr: [{num: 5}]}}, function(error) {
         assert.ifError(error);
@@ -1559,7 +1574,7 @@ describe('model: findOneAndUpdate:', function() {
     it('setting nested schema (gh-3889)', function(done) {
       const nested = new Schema({ test: String });
       const s = new Schema({ nested: nested });
-      const MyModel = db.model('gh3889', s);
+      const MyModel = db.model('Test', s);
       MyModel.findOneAndUpdate(
         {},
         { $set: { nested: { test: 'abc' } } },
@@ -1576,7 +1591,7 @@ describe('model: findOneAndUpdate:', function() {
         test: String
       });
 
-      const TestModel = db.model('gh4925', testSchema);
+      const TestModel = db.model('Test', testSchema);
       const options = { upsert: true, new: true, rawResult: true };
       const update = { $set: { test: 'abc' } };
 
@@ -1602,7 +1617,7 @@ describe('model: findOneAndUpdate:', function() {
         for: String
       });
 
-      const TestModel = db.model('gh4281', breakfastSchema);
+      const TestModel = db.model('Test', breakfastSchema);
       const options = { upsert: true, new: true };
       const update = { $set: { main: null, for: 'Val' } };
 
@@ -1636,7 +1651,7 @@ describe('model: findOneAndUpdate:', function() {
           }
         }
       });
-      const Board = db.model('gh4305', boardSchema);
+      const Board = db.model('Test', boardSchema);
 
       const update = {
         structure: [
@@ -1677,7 +1692,7 @@ describe('model: findOneAndUpdate:', function() {
         addresses: [AddressSchema]
       });
 
-      const Person = db.model('gh3602', PersonSchema);
+      const Person = db.model('Person', PersonSchema);
 
       const update = { $push: { addresses: { street: 'not a num' } } };
       Person.findOneAndUpdate({}, update, function(error) {
@@ -1693,7 +1708,7 @@ describe('model: findOneAndUpdate:', function() {
         test1: String,
         test2: String
       });
-      const Test = db.model('gh4315', TestSchema);
+      const Test = db.model('Test', TestSchema);
       const update = { $set: { test1: 'a', test2: 'b' } };
       const options = { projection: { test2: 0 }, new: true, upsert: true };
       Test.findOneAndUpdate({}, update, options, function(error, doc) {
@@ -1707,7 +1722,7 @@ describe('model: findOneAndUpdate:', function() {
     it('handles upserting a non-existing field (gh-4757)', function(done) {
       const modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 
-      const Model = db.model('gh4757', modelSchema);
+      const Model = db.model('Test', modelSchema);
       Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
         upsert: true,
         setDefaultsOnInsert: true,
@@ -1722,7 +1737,7 @@ describe('model: findOneAndUpdate:', function() {
     it('strict option (gh-5108)', function(done) {
       const modelSchema = new Schema({ field: Number }, { strict: 'throw' });
 
-      const Model = db.model('gh5108', modelSchema);
+      const Model = db.model('Test', modelSchema);
       Model.findOneAndUpdate({}, { field: 2, otherField: 3 }, {
         upsert: true,
         strict: false,
@@ -1740,7 +1755,7 @@ describe('model: findOneAndUpdate:', function() {
         nested: { field1: Number, field2: Number }
       });
 
-      const Model = db.model('gh6484', modelSchema);
+      const Model = db.model('Test', modelSchema);
       const opts = { upsert: true, new: true };
       return Model.findOneAndUpdate({}, { nested: { field1: 1, field2: 2 } }, opts).exec().
         then(function() {
@@ -1791,7 +1806,7 @@ describe('model: findOneAndUpdate:', function() {
         },
         otherName: String
       });
-      const Test = db.model('gh3556', testSchema);
+      const Test = db.model('Test', testSchema);
 
       const opts = { overwrite: true, runValidators: true };
       Test.findOneAndUpdate({}, { otherName: 'test' }, opts, function(error) {
@@ -1809,7 +1824,7 @@ describe('model: findOneAndUpdate:', function() {
         elems: [String]
       });
 
-      const Model = db.model('gh5628', schema);
+      const Model = db.model('Test', schema);
       Model.create({ elems: ['a', 'b'] }, function(error, doc) {
         assert.ifError(error);
         const query = { _id: doc._id, elems: 'a' };
@@ -1831,7 +1846,7 @@ describe('model: findOneAndUpdate:', function() {
         arr: [{ tag: String }]
       });
 
-      const Model = db.model('gh5661', schema);
+      const Model = db.model('Test', schema);
       const doc = { arr: [{ tag: 't1' }, { tag: 't2' }] };
       Model.create(doc, function(error) {
         assert.ifError(error);
@@ -1857,7 +1872,7 @@ describe('model: findOneAndUpdate:', function() {
         num2: Number
       });
 
-      const Model = db.model('gh5609', schema);
+      const Model = db.model('Test', schema);
 
       const opts = { multipleCastError: true };
       Model.findOneAndUpdate({}, { num1: 'fail', num2: 'fail' }, opts, function(error) {
@@ -1876,7 +1891,7 @@ describe('model: findOneAndUpdate:', function() {
         arr: [String]
       });
 
-      const Model = db.model('gh5710', schema);
+      const Model = db.model('Test', schema);
 
       const update = { $addToSet: { arr: null } };
       const options = { runValidators: true };
@@ -1899,7 +1914,7 @@ describe('model: findOneAndUpdate:', function() {
             }
           }
         });
-        const Model = db.model('gh6203', userSchema);
+        const Model = db.model('Test', userSchema);
 
         yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' });
 
@@ -1920,7 +1935,7 @@ describe('model: findOneAndUpdate:', function() {
             }
           }
         });
-        const Model = db.model('gh6203_0', userSchema);
+        const Model = db.model('User', userSchema);
 
         yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' }, {
           useFindAndModify: false
@@ -1944,13 +1959,13 @@ describe('model: findOneAndUpdate:', function() {
         arr: [String]
       });
 
-      const Model = m.model('gh5616', schema);
+      const Model = m.model('Test', schema);
 
       const update = { $push: { arr: 'test' } };
       const options = { useFindAndModify: false };
       Model.findOneAndUpdate({}, update, options, function() {
         assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'gh5616');
+        assert.equal(calls[0].collection, 'tests');
         assert.equal(calls[0].fnName, 'findOneAndUpdate');
         m.disconnect();
         done();
@@ -1972,13 +1987,13 @@ describe('model: findOneAndUpdate:', function() {
         arr: [String]
       });
 
-      const Model = m.model('gh5616', schema);
+      const Model = m.model('Test', schema);
 
       const update = { $push: { arr: 'test' } };
       const options = {};
       Model.findOneAndUpdate({}, update, options, function() {
         assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'gh5616');
+        assert.equal(calls[0].collection, 'tests');
         assert.equal(calls[0].fnName, 'findOneAndUpdate');
         m.disconnect();
         done();
@@ -1994,11 +2009,11 @@ describe('model: findOneAndUpdate:', function() {
         calls.push({ collection: collection, fnName: fnName });
       });
 
-      const Model = m.model('gh7108', { name: String });
+      const Model = m.model('Test', { name: String });
       const update = { name: 'test' };
       Model.findOneAndUpdate({}, update, {}, function() {
         assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'gh7108');
+        assert.equal(calls[0].collection, 'tests');
         assert.equal(calls[0].fnName, 'findOneAndUpdate');
         m.disconnect();
         done();
@@ -2023,7 +2038,7 @@ describe('model: findOneAndUpdate:', function() {
           location: String
         });
 
-        const Model = m.model('gh6887', schema);
+        const Model = m.model('Test', schema);
 
         const options = { overwrite: true, new: true };
         const doc = yield Model.create({ name: 'Jennifer', location: 'Taipei' });
@@ -2039,8 +2054,8 @@ describe('model: findOneAndUpdate:', function() {
         assert.strictEqual(newDoc2.location, 'Hsinchu');
 
         assert.equal(calls.length, 3);
-        assert.equal(calls[1].collection, 'gh6887');
-        assert.equal(calls[1].collection, 'gh6887');
+        assert.equal(calls[1].collection, 'tests');
+        assert.equal(calls[1].collection, 'tests');
         assert.equal(calls[2].fnName, 'findOneAndReplace');
         assert.equal(calls[2].fnName, 'findOneAndReplace');
 
@@ -2078,7 +2093,7 @@ describe('model: findOneAndUpdate:', function() {
         highlights: [highlightSchema]
       });
 
-      const Model = db.model('gh6240', schema);
+      const Model = db.model('Test', schema);
 
       return co(function*() {
         yield Model.create({
@@ -2144,7 +2159,7 @@ describe('model: findOneAndUpdate:', function() {
         this.update({},{ $set: {lastUpdate: new Date()} });
       });
 
-      const User = db.model('gh5702', UserSchema);
+      const User = db.model('User', UserSchema);
 
       const friendId = uuid.v4();
       const user = {
@@ -2190,7 +2205,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      const User = db.model('gh5551', UserSchema);
+      const User = db.model('User', UserSchema);
 
       const user = { name: 'upsert', foo: uuid.v4() };
       const opts = {
@@ -2221,7 +2236,7 @@ describe('model: findOneAndUpdate:', function() {
         locations: [locationSchema]
       });
 
-      const T = db.model('gh4724', testSchema);
+      const T = db.model('Test', testSchema);
 
       const t = new T({
         locations: [{
@@ -2256,7 +2271,7 @@ describe('model: findOneAndUpdate:', function() {
         return true;
       });
 
-      B = db.model('b', B);
+      B = db.model('Test', B);
 
       B.findOneAndUpdate(
         {foo: 'bar'},
@@ -2280,7 +2295,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      const Book = db.model('gh7679', bookSchema);
+      const Book = db.model('Book', bookSchema);
 
       return Book.findOneAndUpdate({}, { genres: ['Sci-Fi'] }, { upsert: true }).
         then(() => Book.findOne()).
@@ -2297,7 +2312,7 @@ describe('model: findOneAndUpdate:', function() {
         }
       });
 
-      const Model = db.model('gh6889', schema);
+      const Model = db.model('Test', schema);
 
       const opts = { runValidators: true };
       return Model.findOneAndUpdate({}, { $pull: { arr: { x: 'three' } } }, opts);
@@ -2316,7 +2331,7 @@ describe('model: findOneAndUpdate:', function() {
       });
 
       return co(function*() {
-        const Model = db.model('gh6972', schema);
+        const Model = db.model('Test', schema);
         yield Model.findOneAndUpdate({}, {
           $pull: {someArray: {innerField: '507f191e810c19729de860ea'}}
         }, {
@@ -2328,7 +2343,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('with versionKey in top-level and a `$` key (gh-7003)', function() {
     const schema = new Schema({ name: String });
-    const Model = db.model('gh7003', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       let doc = yield Model.create({ name: 'test', __v: 10 });
@@ -2345,7 +2360,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('empty update with timestamps (gh-7041)', function() {
     const schema = new Schema({ name: String }, { timestamps: true });
-    const Model = db.model('gh7041', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       let doc = yield Model.create({ name: 'test' });
@@ -2357,7 +2372,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('skipping updatedAt and createdAt (gh-3934)', function() {
     const schema = new Schema({ name: String }, { timestamps: true });
-    const Model = db.model('gh3934', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       let doc = yield Model.findOneAndUpdate({}, { name: 'test' }, {
@@ -2377,7 +2392,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('runs lowercase on $addToSet, $push, etc (gh-4185)', function() {
-    const Cat = db.model('gh4185', {
+    const Cat = db.model('Test', {
       _id: String,
       myArr: { type: [{type: String, lowercase: true}], default: undefined }
     });
@@ -2392,7 +2407,7 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returnOriginal (gh-7846)', function() {
-    const Cat = db.model('gh7846_update', {
+    const Cat = db.model('Cat', {
       name: String
     });
 
@@ -2414,7 +2429,7 @@ describe('model: findOneAndUpdate:', function() {
     schema.path('shape').discriminator('gh8378_Square',
       Schema({ side: Number, color: String }));
 
-    const MyModel = db.model('gh8378_Shape', schema);
+    const MyModel = db.model('Test', schema);
 
     return co(function*() {
       let doc = yield MyModel.create({
@@ -2439,7 +2454,7 @@ describe('model: findOneAndUpdate:', function() {
 
   it('setDefaultsOnInsert with doubly nested subdocs (gh-8392)', function() {
     const nestedSchema = Schema({ name: String });
-    const Model = db.model('gh8392', Schema({
+    const Model = db.model('Test', Schema({
       L1: Schema({
         L2: {
           type: nestedSchema,
@@ -2471,7 +2486,7 @@ describe('model: findOneAndUpdate:', function() {
       }
     });
 
-    const User = db.model('gh8444', userSchema);
+    const User = db.model('User', userSchema);
 
     return co(function*() {
       const doc = yield User.findOneAndUpdate({}, {

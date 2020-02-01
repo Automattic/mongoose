@@ -9038,7 +9038,8 @@ describe('model: populate:', function() {
       foreignField: 'parentId',
       justOne: false,
       skip: 1,
-      options: { limit: 2, sort: { _id: 1 } }
+      limit: 2,
+      options: { sort: { _id: 1 } }
     });
 
     const Child = db.model('Child', childSchema);
@@ -9065,6 +9066,25 @@ describe('model: populate:', function() {
         options: { skip: 1 }
       });
       assert.deepEqual(doc.children.map(c => c._id), [2, 3]);
+
+      doc = yield Parent.findOne().populate({ path: 'children', skip: 0 });
+      assert.deepEqual(doc.children.map(c => c._id), [1, 2]);
+
+      doc = yield Parent.findOne().populate({ path: 'children', skip: 0, limit: 1 });
+      assert.deepEqual(doc.children.map(c => c._id), [1]);
+
+      const p2 = yield Parent.create({ name: 'test2' });
+      yield Child.create([
+        { _id: 4, parentId: p2._id },
+        { _id: 5, parentId: p2._id }
+      ]);
+
+      const docs = yield Parent.find().sort({ _id: 1 }).
+        populate({ path: 'children', skip: 0, limit: 2 });
+      assert.equal(docs[0]._id.toString(), p._id.toString());
+      assert.equal(docs[1]._id.toString(), p2._id.toString());
+      assert.deepEqual(docs[0].children.map(c => c._id), [1, 2, 3]);
+      assert.deepEqual(docs[1].children.map(c => c._id), [4]);
     });
   });
 

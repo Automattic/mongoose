@@ -9028,17 +9028,17 @@ describe('model: populate:', function() {
     });
   });
 
-  it.skip('supports top-level skip and limit options (gh-8445)', function() {
-    const childSchema = Schema({ parentId: 'ObjectId', deleted: Boolean });
+  it('supports top-level skip and limit options (gh-8445)', function() {
+    const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
 
     const parentSchema = Schema({ name: String });
-    parentSchema.virtual('childCount', {
+    parentSchema.virtual('children', {
       ref: 'Child',
       localField: '_id',
       foreignField: 'parentId',
       justOne: false,
       skip: 1,
-      limit: 2
+      options: { limit: 2, sort: { _id: 1 } }
     });
 
     const Child = db.model('Child', childSchema);
@@ -9048,17 +9048,23 @@ describe('model: populate:', function() {
       const p = yield Parent.create({ name: 'test' });
 
       yield Child.create([
-        { parentId: p._id },
-        { parentId: p._id, deleted: true },
-        { parentId: p._id, deleted: false }
+        { _id: 1, parentId: p._id },
+        { _id: 2, parentId: p._id },
+        { _id: 3, parentId: p._id }
       ]);
 
-      let doc = yield Parent.findOne().populate('childCount');
-      assert.equal(doc.childCount, 2);
+      let doc = yield Parent.findOne().populate('children');
+      assert.deepEqual(doc.children.map(c => c._id), [2, 3]);
 
-      doc = yield Parent.findOne().
-        populate({ path: 'childCount', match: { deleted: true } });
-      assert.equal(doc.childCount, 1);
+      doc = yield Parent.findOne().populate({ path: 'children', skip: 2 });
+      assert.deepEqual(doc.children.map(c => c._id), [3]);
+
+      doc = yield Parent.findOne().populate({
+        path: 'children',
+        skip: 2,
+        options: { skip: 1 }
+      });
+      assert.deepEqual(doc.children.map(c => c._id), [2, 3]);
     });
   });
 

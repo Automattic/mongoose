@@ -191,7 +191,7 @@ describe('schematype', function() {
     });
   });
 
-  describe('set()', () => {
+  describe('set()', function() {
     describe('SchemaType.set()', function() {
       it('SchemaType.set, is a function', () => {
         assert.equal(typeof mongoose.SchemaType.set, 'function');
@@ -212,7 +212,7 @@ describe('schematype', function() {
     ].forEach((type) => {
       it(type.name + ', when given a default option, set its', () => {
         // Act
-        type.set('required', true);
+        type.set('someRandomOption', true);
         const schema = new mongoose.Schema({test: type});
 
         // Assert

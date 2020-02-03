@@ -199,15 +199,16 @@ describe('schematype', function() {
     });
 
     [
-      mongooseInstance.SchemaTypes.String,
-      mongooseInstance.SchemaTypes.Number,
-      mongooseInstance.SchemaTypes.Boolean,
-      mongooseInstance.SchemaTypes.Buffer,
-      mongooseInstance.SchemaTypes.Date,
-      mongooseInstance.SchemaTypes.ObjectId,
-      mongooseInstance.SchemaTypes.Mixed,
-      mongooseInstance.SchemaTypes.Decimal128,
-      mongooseInstance.SchemaTypes.Map
+      mongoose.SchemaTypes.String,
+      mongoose.SchemaTypes.Number,
+      mongoose.SchemaTypes.Boolean,
+      mongoose.SchemaTypes.Array,
+      mongoose.SchemaTypes.Buffer,
+      mongoose.SchemaTypes.Date,
+      mongoose.SchemaTypes.ObjectId,
+      mongoose.SchemaTypes.Mixed,
+      mongoose.SchemaTypes.Decimal128,
+      mongoose.SchemaTypes.Map
     ].forEach((type) => {
       it(type.name + ', when given a default option, set its', () => {
         // Act

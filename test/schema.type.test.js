@@ -108,23 +108,22 @@ describe('schematype', function() {
       });
     });
 
-    const mongooseInstance = new mongoose.Mongoose();
-
     [
-      mongooseInstance.SchemaTypes.String,
-      mongooseInstance.SchemaTypes.Number,
-      mongooseInstance.SchemaTypes.Boolean,
-      mongooseInstance.SchemaTypes.Buffer,
-      mongooseInstance.SchemaTypes.Date,
-      mongooseInstance.SchemaTypes.ObjectId,
-      mongooseInstance.SchemaTypes.Mixed,
-      mongooseInstance.SchemaTypes.Decimal128,
-      mongooseInstance.SchemaTypes.Map
+      mongoose.SchemaTypes.String,
+      mongoose.SchemaTypes.Number,
+      mongoose.SchemaTypes.Boolean,
+      mongoose.SchemaTypes.Array,
+      mongoose.SchemaTypes.Buffer,
+      mongoose.SchemaTypes.Date,
+      mongoose.SchemaTypes.ObjectId,
+      mongoose.SchemaTypes.Mixed,
+      mongoose.SchemaTypes.Decimal128,
+      mongoose.SchemaTypes.Map
     ].forEach((type) => {
       it(type.name + ', when given a default option, set its', () => {
         // Act
         type.set('someRandomOption', true);
-        const schema = new mongooseInstance.Schema({test: type});
+        const schema = new mongoose.Schema({test: type});
 
         // Assert
         assert.equal(schema.path('test').options.someRandomOption, true);

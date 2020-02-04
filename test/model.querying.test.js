@@ -26,7 +26,24 @@ describe('model: querying:', function() {
   let geoSchema;
   let db;
 
-  before(function() {
+  before(() => { db = start(); });
+
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => {
+    const arr = [];
+
+    if (db.models == null) {
+      return;
+    }
+    for (const model of Object.keys(db.models)) {
+      arr.push(db.models[model].deleteMany({}));
+    }
+
+    return Promise.all(arr);
+  });
+
+  beforeEach(function() {
     Comments = new Schema;
 
     Comments.add({
@@ -55,14 +72,11 @@ describe('model: querying:', function() {
       def: {type: String, default: 'kandinsky'}
     });
 
-    mongoose.model('BlogPostB', BlogPostB);
+    BlogPostB = db.model('BlogPost', BlogPostB);
 
-    ModSchema = new Schema({
-      num: Number,
-      str: String
+    ModSchema = Schema({
+      num: Number, str: String
     });
-    mongoose.model('Mod', ModSchema);
-    db = start();
 
     geoSchema = new Schema({loc: {type: [Number], index: '2d'}});
   });
@@ -91,8 +105,6 @@ describe('model: querying:', function() {
   });
 
   it('find returns a Query', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
-
     // query
     assert.ok(BlogPostB.find({}) instanceof Query);
 
@@ -112,8 +124,6 @@ describe('model: querying:', function() {
   });
 
   it('findOne returns a Query', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
-
     // query
     assert.ok(BlogPostB.findOne({}) instanceof Query);
 
@@ -133,8 +143,6 @@ describe('model: querying:', function() {
   });
 
   it('an empty find does not hang', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
-
     function fn() {
       done();
     }
@@ -143,7 +151,6 @@ describe('model: querying:', function() {
   });
 
   it('a query is executed when a callback is passed', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
     let count = 5;
     const q = {_id: new DocumentObjectId}; // make sure the query is fast
 
@@ -171,7 +178,6 @@ describe('model: querying:', function() {
   });
 
   it('query is executed where a callback for findOne', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
     let count = 5;
     const q = {_id: new DocumentObjectId}; // make sure the query is fast
 
@@ -200,13 +206,11 @@ describe('model: querying:', function() {
 
   describe.skip('count', function() {
     it('returns a Query', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       assert.ok(BlogPostB.count({}) instanceof Query);
       done();
     });
 
     it('Query executes when you pass a callback', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       let pending = 2;
 
       function fn() {
@@ -221,7 +225,6 @@ describe('model: querying:', function() {
     });
 
     it('counts documents', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
@@ -251,15 +254,13 @@ describe('model: querying:', function() {
 
   describe('distinct', function() {
     it('returns a Query', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       assert.ok(BlogPostB.distinct('title', {}) instanceof Query);
       done();
     });
 
     it('executes when you pass a callback', function(done) {
       let Address = new Schema({zip: String});
-      Address = db.model('Address', Address, 'addresses_' + random());
+      Address = db.model('Test', Address);
 
       Address.create({zip: '10010'}, {zip: '10010'}, {zip: '99701'}, function(err) {
         assert.strictEqual(null, err);
@@ -276,7 +277,7 @@ describe('model: querying:', function() {
 
     it('permits excluding conditions gh-1541', function(done) {
       let Address = new Schema({zip: String});
-      Address = db.model('Address', Address, 'addresses_' + random());
+      Address = db.model('Test', Address);
       Address.create({zip: '10010'}, {zip: '10010'}, {zip: '99701'}, function(err) {
         assert.ifError(err);
         Address.distinct('zip', function(err, results) {
@@ -292,15 +293,12 @@ describe('model: querying:', function() {
 
   describe('update', function() {
     it('returns a Query', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       assert.ok(BlogPostB.update({}, {}) instanceof Query);
       assert.ok(BlogPostB.update({}, {}, {}) instanceof Query);
       done();
     });
 
     it('Query executes when you pass a callback', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       let count = 2;
 
       function fn() {
@@ -315,7 +313,7 @@ describe('model: querying:', function() {
     });
 
     it('can handle minimize option (gh-3381)', function() {
-      const Model = db.model('gh3381', {
+      const Model = db.model('Test', {
         name: String,
         mixed: Schema.Types.Mixed
       });
@@ -334,7 +332,6 @@ describe('model: querying:', function() {
 
   describe('findOne', function() {
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
@@ -354,7 +351,6 @@ describe('model: querying:', function() {
     });
 
     it('casts $modifiers', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const post = new BlogPostB({
         meta: {
           visitors: -10
@@ -377,8 +373,6 @@ describe('model: querying:', function() {
     });
 
     it('querying if an array contains one of multiple members $in a set', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       const post = new BlogPostB();
 
       post.tags.push('football');
@@ -400,8 +394,7 @@ describe('model: querying:', function() {
     });
 
     it('querying if an array contains one of multiple members $in a set 2', function(done) {
-      const BlogPostA = db.model('BlogPostB', collection);
-
+      const BlogPostA = BlogPostB;
       const post = new BlogPostA({tags: ['gooberOne']});
 
       post.save(function(err) {
@@ -438,8 +431,6 @@ describe('model: querying:', function() {
     });
 
     it('querying via $where a string', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({title: 'Steve Jobs', author: 'Steve Jobs'}, function(err, created) {
         assert.ifError(err);
 
@@ -453,8 +444,6 @@ describe('model: querying:', function() {
     });
 
     it('querying via $where a function', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({author: 'Atari', slug: 'Atari'}, function(err, created) {
         assert.ifError(err);
 
@@ -472,7 +461,6 @@ describe('model: querying:', function() {
     });
 
     it('based on nested fields', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const post = new BlogPostB({
         meta: {
           visitors: 5678
@@ -493,8 +481,6 @@ describe('model: querying:', function() {
     });
 
     it('based on embedded doc fields (gh-242, gh-463)', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({comments: [{title: 'i should be queryable'}], numbers: [1, 2, 33333], tags: ['yes', 'no']}, function(err, created) {
         assert.ifError(err);
         BlogPostB.findOne({'comments.title': 'i should be queryable'}, function(err, found) {
@@ -522,8 +508,6 @@ describe('model: querying:', function() {
     });
 
     it('works with nested docs and string ids (gh-389)', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title: 'me too me too!'}]}, function(err, created) {
         assert.ifError(err);
         const id = created.comments[1]._id.toString();
@@ -537,8 +521,7 @@ describe('model: querying:', function() {
     });
 
     it('using #all with nested #elemMatch', function(done) {
-      const P = db.model('BlogPostB', collection + '_nestedElemMatch');
-
+      const P = BlogPostB;
       const post = new P({title: 'nested elemMatch'});
       post.comments.push({title: 'comment A'}, {title: 'comment B'}, {title: 'comment C'});
 
@@ -560,8 +543,7 @@ describe('model: querying:', function() {
     });
 
     it('using #or with nested #elemMatch', function(done) {
-      const P = db.model('BlogPostB', collection);
-
+      const P = BlogPostB;
       const post = new P({title: 'nested elemMatch'});
       post.comments.push({title: 'comment D'}, {title: 'comment E'}, {title: 'comment F'});
 
@@ -582,8 +564,6 @@ describe('model: querying:', function() {
     });
 
     it('buffer $in array', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({
         sigs: [Buffer.from([1, 2, 3]),
           Buffer.from([4, 5, 6]),
@@ -604,8 +584,7 @@ describe('model: querying:', function() {
     });
 
     it('regex with Array (gh-599)', function(done) {
-      const B = db.model('BlogPostB', random());
-
+      const B = BlogPostB;
       B.create({tags: 'wooof baaaark meeeeow'.split(' ')}, function(err) {
         assert.ifError(err);
         B.findOne({tags: /ooof$/}, function(err, doc) {
@@ -624,8 +603,7 @@ describe('model: querying:', function() {
     });
 
     it('regex with options', function(done) {
-      const B = db.model('BlogPostB', collection);
-
+      const B = BlogPostB;
       const post = new B({title: '$option queries'});
       post.save(function(err) {
         assert.ifError(err);
@@ -638,7 +616,6 @@ describe('model: querying:', function() {
     });
 
     it('works with $elemMatch and $in combo (gh-1100)', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const id1 = new DocumentObjectId;
       const id2 = new DocumentObjectId;
 
@@ -656,7 +633,6 @@ describe('model: querying:', function() {
 
   describe('findById', function() {
     it('handles undefined', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Edwald ' + random();
 
       const post = new BlogPostB();
@@ -674,7 +650,6 @@ describe('model: querying:', function() {
     });
 
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Edwald ' + random();
 
       const post = new BlogPostB();
@@ -708,7 +683,6 @@ describe('model: querying:', function() {
     });
 
     it('works with partial initialization', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       let queries = 5;
 
       const post = new BlogPostB();
@@ -795,8 +769,6 @@ describe('model: querying:', function() {
     });
 
     it('querying if an array contains at least a certain single member (gh-220)', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       const post = new BlogPostB();
 
       post.tags.push('cat');
@@ -814,8 +786,6 @@ describe('model: querying:', function() {
 
 
     it('where an array where the $slice operator', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({numbers: [500, 600, 700, 800]}, function(err, created) {
         assert.ifError(err);
         BlogPostB.findById(created._id, {numbers: {$slice: 2}}, function(err, found) {
@@ -846,7 +816,6 @@ describe('model: querying:', function() {
 
   describe('find', function() {
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
@@ -878,7 +847,6 @@ describe('model: querying:', function() {
     });
 
     it('returns docs where an array that contains one specific member', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       BlogPostB.create({numbers: [100, 101, 102]}, function(err, created) {
         assert.ifError(err);
         BlogPostB.find({numbers: 100}, function(err, found) {
@@ -932,7 +900,6 @@ describe('model: querying:', function() {
     });
 
     it('with partial initialization', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       let queries = 4;
 
       const post = new BlogPostB();
@@ -995,8 +962,7 @@ describe('model: querying:', function() {
 
     it('where $exists', function() {
       const ExistsSchema = new Schema({ a: Number, b: String });
-      mongoose.model('Exists', ExistsSchema);
-      const Exists = db.model('Exists');
+      const Exists = db.model('Test', ExistsSchema);
 
       return co(function*() {
         yield Exists.create({ a: 1 }, { b: 'hi' });
@@ -1022,7 +988,6 @@ describe('model: querying:', function() {
     });
 
     it('works with $elemMatch (gh-1100)', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const id1 = new DocumentObjectId;
       const id2 = new DocumentObjectId;
 
@@ -1037,7 +1002,7 @@ describe('model: querying:', function() {
     });
 
     it('where $mod', function(done) {
-      const Mod = db.model('Mod', 'mods_' + random());
+      const Mod = db.model('Test', ModSchema);
       Mod.create({num: 1}, function(err, one) {
         assert.ifError(err);
         Mod.create({num: 2}, function(err) {
@@ -1053,7 +1018,7 @@ describe('model: querying:', function() {
     });
 
     it('where $not', function(done) {
-      const Mod = db.model('Mod', 'mods_' + random());
+      const Mod = db.model('Test', ModSchema);
       Mod.create({num: 1}, function(err) {
         assert.ifError(err);
         Mod.create({num: 2}, function(err, two) {
@@ -1069,7 +1034,7 @@ describe('model: querying:', function() {
     });
 
     it('where or()', function(done) {
-      const Mod = db.model('Mod', 'mods_' + random());
+      const Mod = db.model('Test', ModSchema);
 
       Mod.create({num: 1}, {num: 2, str: 'two'}, function(err, one, two) {
         assert.ifError(err);
@@ -1142,7 +1107,7 @@ describe('model: querying:', function() {
     });
 
     it('using $or with array of Document', function(done) {
-      const Mod = db.model('Mod', 'mods_' + random());
+      const Mod = db.model('Test', ModSchema);
 
       Mod.create({num: 1}, function(err, one) {
         assert.ifError(err);
@@ -1159,7 +1124,7 @@ describe('model: querying:', function() {
     });
 
     it('where $ne', function(done) {
-      const Mod = db.model('Mod', 'mods_' + random());
+      const Mod = db.model('Test', ModSchema);
       Mod.create({num: 1}, function(err) {
         assert.ifError(err);
         Mod.create({num: 2}, function(err, two) {
@@ -1180,7 +1145,7 @@ describe('model: querying:', function() {
     });
 
     it('where $nor', function(done) {
-      const Mod = db.model('Mod', 'nor_' + random());
+      const Mod = db.model('Test', ModSchema);
 
       Mod.create({num: 1}, {num: 2, str: 'two'}, function(err, one, two) {
         assert.ifError(err);
@@ -1227,8 +1192,6 @@ describe('model: querying:', function() {
     });
 
     it('STRICT null matches', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection + random());
-
       const a = {title: 'A', author: null};
       const b = {title: 'B'};
       BlogPostB.create(a, b, function(err, createdA) {
@@ -1243,8 +1206,6 @@ describe('model: querying:', function() {
     });
 
     it('null matches null and undefined', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection + random());
-
       BlogPostB.create(
         {title: 'A', author: null},
         {title: 'B'}, function(err) {
@@ -1258,8 +1219,6 @@ describe('model: querying:', function() {
     });
 
     it('a document whose arrays contain at least $all string values', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       const post = new BlogPostB({title: 'Aristocats'});
 
       post.tags.push('onex');
@@ -1302,12 +1261,12 @@ describe('model: querying:', function() {
     });
 
     it('using #nor with nested #elemMatch', function(done) {
-      const P = db.model('BlogPostB', collection + '_norWithNestedElemMatch');
-
       const p0 = {title: 'nested $nor elemMatch1', comments: []};
 
       const p1 = {title: 'nested $nor elemMatch0', comments: []};
       p1.comments.push({title: 'comment X'}, {title: 'comment Y'}, {title: 'comment W'});
+
+      const P = BlogPostB;
 
       P.create(p0, p1, function(err, post0, post1) {
         assert.ifError(err);
@@ -1327,8 +1286,6 @@ describe('model: querying:', function() {
     });
 
     it('strings via regexp', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({title: 'Next to Normal'}, function(err, created) {
         assert.ifError(err);
         BlogPostB.findOne({title: /^Next/}, function(err, found) {
@@ -1363,7 +1320,6 @@ describe('model: querying:', function() {
     });
 
     it('a document whose arrays contain at least $all values', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const a1 = {numbers: [-1, -2, -3, -4], meta: {visitors: 4}};
       const a2 = {numbers: [0, -1, -2, -3, -4]};
       BlogPostB.create(a1, a2, function(err, whereoutZero, whereZero) {
@@ -1388,8 +1344,6 @@ describe('model: querying:', function() {
     });
 
     it('where $size', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}, function(err) {
         assert.ifError(err);
         BlogPostB.create({numbers: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]}, function(err) {
@@ -1411,7 +1365,7 @@ describe('model: querying:', function() {
     });
 
     it('$gt, $lt, $lte, $gte work on strings', function(done) {
-      const D = db.model('D', new Schema({dt: String}), collection);
+      const D = db.model('Test', new Schema({dt: String}));
 
       D.create({dt: '2011-03-30'}, cb);
       D.create({dt: '2011-03-31'}, cb);
@@ -1467,7 +1421,7 @@ describe('model: querying:', function() {
           return done();
         }
 
-        const blogPost = db.model('BlogPostB', collection);
+        const blogPost = BlogPostB;
 
         blogPost.collection.createIndex({title: 'text'}, function(error) {
           assert.ifError(error);
@@ -1508,7 +1462,7 @@ describe('model: querying:', function() {
           tag: String
         });
 
-        const Example = db.model('gh3824', exampleSchema);
+        const Example = db.model('Test', exampleSchema);
 
         return co(function*() {
           yield Example.init(); // Wait for index build
@@ -1539,8 +1493,6 @@ describe('model: querying:', function() {
 
   describe('limit', function() {
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({title: 'first limit'}, function(err, first) {
         assert.ifError(err);
         BlogPostB.create({title: 'second limit'}, function(err, second) {
@@ -1562,8 +1514,6 @@ describe('model: querying:', function() {
 
   describe('skip', function() {
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({title: '1 skip'}, function(err) {
         assert.ifError(err);
         BlogPostB.create({title: '2 skip'}, function(err, second) {
@@ -1585,8 +1535,6 @@ describe('model: querying:', function() {
 
   describe('sort', function() {
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.create({meta: {visitors: 100}}, function(err, least) {
         assert.ifError(err);
         BlogPostB.create({meta: {visitors: 300}}, function(err, largest) {
@@ -1613,7 +1561,7 @@ describe('model: querying:', function() {
         return done();
       }
 
-      const blogPost = db.model('BlogPostB', collection);
+      const blogPost = BlogPostB;
 
       blogPost.collection.createIndex({title: 'text'}, function(error) {
         assert.ifError(error);
@@ -1642,8 +1590,6 @@ describe('model: querying:', function() {
 
   describe('nested mixed "x.y.z"', function() {
     it('works', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
-
       BlogPostB.find({'mixed.nested.stuff': 'skynet'}, function(err) {
         assert.ifError(err);
         done();
@@ -1799,8 +1745,7 @@ describe('model: querying:', function() {
 
   describe('and', function() {
     it('works with queries gh-1188', function(done) {
-      const B = db.model('BlogPostB');
-
+      const B = BlogPostB;
       B.create({title: 'and operator', published: false, author: 'Me'}, function(err) {
         assert.ifError(err);
 
@@ -1996,7 +1941,6 @@ describe('model: querying:', function() {
   });
 
   it('with previously existing null values in the db', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
     const post = new BlogPostB();
 
     post.collection.insertOne({meta: {visitors: 9898, a: null}}, {}, function(err, b) {
@@ -2011,7 +1955,6 @@ describe('model: querying:', function() {
   });
 
   it('with unused values in the db', function(done) {
-    const BlogPostB = db.model('BlogPostB', collection);
     const post = new BlogPostB();
 
     post.collection.insertOne({meta: {visitors: 9898, color: 'blue'}}, {}, function(err, b) {
@@ -2508,7 +2451,6 @@ describe('model: querying:', function() {
 
   describe('lean', function() {
     it('find', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
@@ -2531,7 +2473,6 @@ describe('model: querying:', function() {
     });
 
     it('findOne', function(done) {
-      const BlogPostB = db.model('BlogPostB', collection);
       const title = 'Wooooot ' + random();
 
       const post = new BlogPostB();
@@ -2648,8 +2589,6 @@ describe('model: querying:', function() {
       });
 
       it('casts $eq (gh-2752)', function(done) {
-        const BlogPostB = db.model('BlogPostB', collection);
-
         BlogPostB.findOne(
           {_id: {$eq: '000000000000000000000001'}, numbers: {$eq: [1, 2]}},
           function(err, doc) {

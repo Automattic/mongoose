@@ -6402,4 +6402,28 @@ describe('Model', function() {
       assert.strictEqual(obj.age, 42);
     });
   });
+
+  it('sets correct `Document#op` with `save()` (gh-8439)', function() {
+    const schema = Schema({ name: String });
+    const ops = [];
+    schema.pre('validate', function() {
+      ops.push(this.$op);
+    });
+    schema.pre('save', function() {
+      ops.push(this.$op);
+    });
+    schema.post('validate', function() {
+      ops.push(this.$op);
+    });
+    schema.post('save', function() {
+      ops.push(this.$op);
+    });
+
+    const Model = db.model('Test', schema);
+    const doc = new Model({ name: 'test' });
+
+    return doc.save().then(() => {
+      assert.deepEqual(ops, ['validate', 'validate', 'save', 'save']);
+    });
+  });
 });

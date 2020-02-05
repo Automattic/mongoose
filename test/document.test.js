@@ -8647,4 +8647,23 @@ describe('document', function() {
       yield [doc.single.validate(), doc.single.validate()];
     });
   });
+
+  it('sets `Document#op` when calling `validate()` (gh-8439)', function() {
+    const schema = Schema({ name: String });
+    const ops = [];
+    schema.pre('validate', function() {
+      ops.push(this.$op);
+    });
+    schema.post('validate', function() {
+      ops.push(this.$op);
+    });
+
+    const Model = db.model('Test', schema);
+    const doc = new Model({ name: 'test' });
+
+    const promise = doc.validate();
+    assert.equal(doc.$op, 'validate');
+
+    return promise.then(() => assert.deepEqual(ops, ['validate', 'validate']));
+  });
 });

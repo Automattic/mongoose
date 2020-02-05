@@ -288,16 +288,18 @@ block content
 
     That's because, in order to avoid executing a separate query
     for each document, Mongoose instead queries for fans using
-    `numDocuments * limit` as the limit. As a workaround, you
-    should populate each document individually:
+    `numDocuments * limit` as the limit. If you need the correct
+    `limit`, you should use the `perDocumentLimit` option (new in Mongoose 5.9.0).
+    Just keep in mind that `populate()` will execute a separate query
+    for each story.
 
     ```javascript
-    const stories = await Story.find().sort({ name: 1 });
-    for (const story of stories) {
-      await story.
-        populate({ path: 'fans', options: { limit: 2 } }).
-        execPopulate();
-    }
+    const stories = await Story.find().sort({ name: 1 }).populate({
+      path: 'fans',
+      // Special option that tells Mongoose to execute a separate query
+      // for each `story` to make sure we get 2 fans for each story.
+      perDocumentLimit: 2
+    });
 
     stories[0].fans.length; // 2
     stories[1].fans.length; // 2

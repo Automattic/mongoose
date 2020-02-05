@@ -1157,4 +1157,39 @@ describe('connections:', function() {
       assert.equal(err.name, 'MongooseServerSelectionError');
     });
   });
+
+  it('`watch()` on a whole collection (gh-8425)', function() {
+    this.timeout(10000);
+    if (!process.env.REPLICA_SET) {
+      this.skip();
+    }
+
+    return co(function*() {
+      const opts = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        replicaSet: process.env.REPLICA_SET
+      };
+      const conn = yield mongoose.createConnection('mongodb://localhost:27017/gh8425', opts);
+
+      const Model = conn.model('Test', Schema({ name: String }));
+      yield Model.create({ name: 'test' });
+
+      const changeStream = conn.watch();
+
+      const changes = [];
+      changeStream.on('change', data => {
+        changes.push(data);
+      });
+
+      yield cb => changeStream.on('ready', () => cb());
+
+      const nextChange = new Promise(resolve => changeStream.on('change', resolve));
+      yield Model.create({ name: 'test2' });
+
+      yield nextChange;
+      assert.equal(changes.length, 1);
+      assert.equal(changes[0].operationType, 'insert');
+    });
+  });
 });

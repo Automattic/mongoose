@@ -150,7 +150,7 @@ block content
     story.populated('author'); // truthy
 
     story.depopulate('author'); // Make `author` not populated anymore
-    story.populated('author'); // falsy
+    story.populated('author'); // undefined
     ```
 
     A common reason for checking whether a path is populated is getting the `author`
@@ -162,7 +162,7 @@ block content
     story.author._id; // ObjectId
 
     story.depopulate('author'); // Make `author` not populated anymore
-    story.populated('author'); // falsy
+    story.populated('author'); // undefined
 
     story.author instanceof ObjectId; // true
     story.author._id; // ObjectId, because Mongoose adds a special getter

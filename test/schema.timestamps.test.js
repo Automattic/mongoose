@@ -360,4 +360,43 @@ describe('schema options.timestamps', function() {
       return Cat.deleteMany({});
     });
   });
+
+  it('timestamps with number types (gh-3957)', function() {
+    const schema = Schema({
+      createdAt: Number,
+      updatedAt: Number,
+      name: String
+    }, { timestamps: true });
+    const Model = conn.model('gh3957', schema);
+    const start = Date.now();
+
+    return co(function*() {
+      const doc = yield Model.create({ name: 'test' });
+
+      assert.equal(typeof doc.createdAt, 'number');
+      assert.equal(typeof doc.updatedAt, 'number');
+      assert.ok(doc.createdAt >= start);
+      assert.ok(doc.updatedAt >= start);
+    });
+  });
+
+  it('timestamps with custom timestamp (gh-3957)', function() {
+    const schema = Schema({
+      createdAt: Number,
+      updatedAt: Number,
+      name: String
+    }, {
+      timestamps: { currentTime: () => 42 }
+    });
+    const Model = conn.model('gh3957_0', schema);
+
+    return co(function*() {
+      const doc = yield Model.create({ name: 'test' });
+
+      assert.equal(typeof doc.createdAt, 'number');
+      assert.equal(typeof doc.updatedAt, 'number');
+      assert.equal(doc.createdAt, 42);
+      assert.equal(doc.updatedAt, 42);
+    });
+  });
 });

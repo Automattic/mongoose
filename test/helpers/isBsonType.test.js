@@ -17,7 +17,6 @@ describe('isBsonType', () => {
   });
 
   it('false for any object without _bsontype property', () => {
-    // I can't say it's expected behavior, but is how it's behave.
     assert.ok(!isBsonType({ }, 'OtherType'));
   });
 });

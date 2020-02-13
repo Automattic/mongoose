@@ -1,3 +1,7 @@
+5.8.13 / 2020-02-13
+===================
+ * fix(populate): use safe get to avoid crash if schematype doesn't have options #8586
+
 5.8.12 / 2020-02-12
 ===================
  * fix(query): correctly cast dbref `$id` with `$elemMatch` #8577

@@ -1,3 +1,14 @@
+5.9.0 / 2020-02-13
+==================
+ * fix: upgrade to MongoDB driver 3.5 #8520 #8563
+ * feat(schematype): support setting default options for schema type (`trim` on all strings, etc.) #8487
+ * feat(populate): add `perDocumentLimit` option that limits per document in `find()` result, rather than across all documents #7318
+ * feat(schematype): enable setting `transform` option on individual schematypes #8403
+ * feat(timestamps): allow setting `currentTime` option for setting custom function to get the current time #3957
+ * feat(connection): add `Connection#watch()` to watch for changes on an entire database #8425
+ * feat(document): add `Document#$op` property to make it easier to tell what operation is running in middleware #8439
+ * feat(populate): support `limit` as top-level populate option #8445
+
 5.8.13 / 2020-02-13
 ===================
  * fix(populate): use safe get to avoid crash if schematype doesn't have options #8586

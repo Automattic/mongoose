@@ -190,4 +190,34 @@ describe('schematype', function() {
       cloneAndTestDeepEquals();
     });
   });
+
+  describe('set()', function() {
+    describe('SchemaType.set()', function() {
+      it('SchemaType.set, is a function', () => {
+        assert.equal(typeof mongoose.SchemaType.set, 'function');
+      });
+    });
+
+    [
+      mongoose.SchemaTypes.String,
+      mongoose.SchemaTypes.Number,
+      mongoose.SchemaTypes.Boolean,
+      mongoose.SchemaTypes.Array,
+      mongoose.SchemaTypes.Buffer,
+      mongoose.SchemaTypes.Date,
+      mongoose.SchemaTypes.ObjectId,
+      mongoose.SchemaTypes.Mixed,
+      mongoose.SchemaTypes.Decimal128,
+      mongoose.SchemaTypes.Map
+    ].forEach((type) => {
+      it(type.name + ', when given a default option, set its', () => {
+        // Act
+        type.set('someRandomOption', true);
+        const schema = new mongoose.Schema({test: type});
+
+        // Assert
+        assert.equal(schema.path('test').options.someRandomOption, true);
+      });
+    });
+  });
 });

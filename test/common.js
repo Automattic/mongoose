@@ -195,8 +195,7 @@ after(function(done) {
 
 module.exports.server = server = new Server('mongod', {
   port: 27000,
-  dbpath: './data/db/27000',
-  storageEngine: 'mmapv1'
+  dbpath: './data/db/27000'
 });
 
 beforeEach(function() {

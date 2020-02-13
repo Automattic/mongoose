@@ -190,7 +190,8 @@ describe('connections:', function() {
         let numReconnect = 0;
         let numTimeout = 0;
         let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest?heartbeatfrequencyms=1000', {
+        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
+          heartbeatFrequencyMS: 500,
           useNewUrlParser: true,
           useUnifiedTopology: true
         });
@@ -223,11 +224,12 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 100);
+              setTimeout(function() { resolve(); }, 1000);
             });
           }).
           then(function() {
             assert.equal(conn.readyState, conn.states.disconnected);
+            assert.equal(numConnected, 1);
             assert.equal(numDisconnected, 1);
             assert.equal(numReconnected, 0);
             assert.equal(numReconnect, 0);
@@ -325,13 +327,13 @@ describe('connections:', function() {
           catch(done);
       });
 
-      it('timeout (gh-4513)', function(done) {
+      it('timeout (gh-4513)', function() {
         this.timeout(60000);
 
         let numTimeout = 0;
         let numDisconnected = 0;
         const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          socketTimeoutMS: 100,
+          socketTimeoutMS: 5000,
           poolSize: 1,
           useNewUrlParser: true
         });
@@ -346,29 +348,25 @@ describe('connections:', function() {
 
         const Model = conn.model('gh4513', new Schema());
 
-        conn.
-          then(function() {
-            assert.equal(conn.readyState, conn.states.connected);
-            return Model.create({});
-          }).
-          then(function() {
-            return Model.find({ $where: 'sleep(250) || true' });
-          }).
-          then(function() {
-            done(new Error('expected timeout'));
-          }).
-          catch(function(error) {
-            assert.ok(error);
-            assert.ok(error.message.indexOf('timed out'), error.message);
-            // TODO: if autoReconnect is false, we might not actually be
-            // connected. See gh-5634
-            assert.equal(conn.readyState, conn.states.connected);
-            assert.equal(numTimeout, 1);
-            assert.equal(numDisconnected, 0);
+        return co(function*() {
+          yield conn;
 
-            conn.close();
-            done();
-          });
+          assert.equal(conn.readyState, conn.states.connected);
+
+          yield Model.create({});
+
+          const error = yield Model.find({ $where: 'sleep(10000) || true' }).
+            then(() => assert.ok(false), err => err);
+          assert.ok(error);
+          assert.ok(error.message.indexOf('timed out'), error.message);
+          // TODO: if autoReconnect is false, we might not actually be
+          // connected. See gh-5634
+          assert.equal(conn.readyState, conn.states.connected);
+          assert.equal(numTimeout, 1);
+          assert.equal(numDisconnected, 0);
+
+          yield conn.close();
+        });
       });
     });
   });
@@ -1147,7 +1145,7 @@ describe('connections:', function() {
     return Model.create({ name: 'test' });
   });
 
-  it('throws a MongooseTimeoutError on server selection timeout (gh-8451)', () => {
+  it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', () => {
     const opts = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -1156,8 +1154,42 @@ describe('connections:', function() {
     const uri = 'mongodb://baddomain:27017/test';
 
     return mongoose.createConnection(uri, opts).then(() => assert.ok(false), err => {
-      assert.equal(err.message, 'Server selection timed out after 100 ms');
-      assert.equal(err.name, 'MongooseTimeoutError');
+      assert.equal(err.name, 'MongooseServerSelectionError');
+    });
+  });
+
+  it('`watch()` on a whole collection (gh-8425)', function() {
+    this.timeout(10000);
+    if (!process.env.REPLICA_SET) {
+      this.skip();
+    }
+
+    return co(function*() {
+      const opts = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        replicaSet: process.env.REPLICA_SET
+      };
+      const conn = yield mongoose.createConnection('mongodb://localhost:27017/gh8425', opts);
+
+      const Model = conn.model('Test', Schema({ name: String }));
+      yield Model.create({ name: 'test' });
+
+      const changeStream = conn.watch();
+
+      const changes = [];
+      changeStream.on('change', data => {
+        changes.push(data);
+      });
+
+      yield cb => changeStream.on('ready', () => cb());
+
+      const nextChange = new Promise(resolve => changeStream.on('change', resolve));
+      yield Model.create({ name: 'test2' });
+
+      yield nextChange;
+      assert.equal(changes.length, 1);
+      assert.equal(changes[0].operationType, 'insert');
     });
   });
 });

@@ -977,6 +977,24 @@ block content
     ]);
     ```
 
+    By default, Mongoose uses the current time `new Date()` to get
+    the current time. But if you want to overwrite the function
+    Mongoose uses to get the current time, you can set the
+    `timestamps.currentTime` option. Mongoose will call the
+    `timestamps.currentTime` function whenever it needs to get
+    the current time.
+
+    ```javascript
+    const schema = Schema({
+      createdAt: Number,
+      updatedAt: Number,
+      name: String
+    }, {
+      // Make Mongoose use Unix time (seconds since Jan 1, 1970)
+      timestamps: { currentTime: () => Math.floor(Date.now() / 1000) }
+    });
+    ```
+
     <h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
 
     Write operations like `update()`, `updateOne()`, `updateMany()`,

@@ -4,13 +4,15 @@ node_js: [12, 11, 10, 9, 8, 7, 6, 5, 4]
 install:
   - travis_retry npm install
 before_script:
-  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.6.6.tgz
-  - tar -zxvf mongodb-linux-x86_64-3.6.6.tgz
+  - wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
+  - tar -zxvf mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
   - mkdir -p ./data/db/27017
   - mkdir -p ./data/db/27000
   - printf "\n--timeout 8000" >> ./test/mocha.opts
-  - ./mongodb-linux-x86_64-3.6.6/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+  - ./mongodb-linux-x86_64-ubuntu1604-4.0.2/bin/mongod --fork --dbpath ./data/db/27017 --syslog --port 27017
+  - export PATH=`pwd`/mongodb-linux-x86_64-ubuntu1604-4.0.2/bin/:$PATH
   - sleep 2
+  - mongod --version
 matrix:
   include:
     - name: "👕Linter"

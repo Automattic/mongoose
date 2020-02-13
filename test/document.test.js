@@ -8647,4 +8647,52 @@ describe('document', function() {
       yield [doc.single.validate(), doc.single.validate()];
     });
   });
+
+  it('sets `Document#op` when calling `validate()` (gh-8439)', function() {
+    const schema = Schema({ name: String });
+    const ops = [];
+    schema.pre('validate', function() {
+      ops.push(this.$op);
+    });
+    schema.post('validate', function() {
+      ops.push(this.$op);
+    });
+
+    const Model = db.model('Test', schema);
+    const doc = new Model({ name: 'test' });
+
+    const promise = doc.validate();
+    assert.equal(doc.$op, 'validate');
+
+    return promise.then(() => assert.deepEqual(ops, ['validate', 'validate']));
+  });
+
+  it('schema-level transform (gh-8403)', function() {
+    const schema = Schema({
+      myDate: {
+        type: Date,
+        transform: v => v.getFullYear()
+      },
+      dates: [{
+        type: Date,
+        transform: v => v.getFullYear()
+      }],
+      arr: [{
+        myDate: {
+          type: Date,
+          transform: v => v.getFullYear()
+        }
+      }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({
+      myDate: new Date('2015/06/01'),
+      dates: [new Date('2016/06/01')],
+      arr: [{ myDate: new Date('2017/06/01') }]
+    });
+    assert.equal(doc.toObject({ transform: true }).myDate, '2015');
+    assert.equal(doc.toObject({ transform: true }).dates[0], '2016');
+    //assert.equal(doc.toObject({ transform: true }).arr[0].myDate, '2017');
+  });
 });

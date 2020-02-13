@@ -1,3 +1,14 @@
+5.8.13 / 2020-02-13
+===================
+ * fix(populate): use safe get to avoid crash if schematype doesn't have options #8586
+
+5.8.12 / 2020-02-12
+===================
+ * fix(query): correctly cast dbref `$id` with `$elemMatch` #8577
+ * fix(populate): handle populating when some embedded discriminator schemas have `refPath` but none of the subdocs have `refPath` #8553
+ * docs: add useUnifiedTopology to homepage example #8558 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * refactor(utils): moving promiseOrCallback to helpers/promiseOrCallback #8573 [hugosenari](https://github.com/hugosenari)
+
 5.8.11 / 2020-01-31
 ===================
  * fix(document): allow calling `validate()` multiple times in parallel on subdocs to avoid errors if Mongoose double-validates [taxilian](https://github.com/taxilian) #8548 #8539

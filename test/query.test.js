@@ -3594,4 +3594,26 @@ describe('Query', function() {
       assert.equal(doc.token, 'rightToken');
     });
   });
+
+  it('casts $elemMatch with dbrefs (gh-8577)', function() {
+    const ChatSchema = new Schema({
+      members: [{
+        $ref: String,
+        $id: mongoose.ObjectId,
+        $db: String
+      }]
+    });
+    const Chat = db.model('Test', ChatSchema);
+
+    return co(function*() {
+      const doc = yield Chat.create({
+        members: [{ $ref: 'foo', $id: new mongoose.Types.ObjectId(), $db: 'foo' }]
+      });
+
+      const res = yield Chat.findOne({
+        members: { $elemMatch: { $id: doc.members[0].$id } }
+      });
+      assert.ok(res);
+    });
+  });
 });

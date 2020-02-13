@@ -9183,4 +9183,31 @@ describe('model: populate:', function() {
       assert.deepEqual(res.list[3].data, { title: 'test' });
     });
   });
+
+  it('handles populating embedded discriminators with `refPath` when none of the subdocs have `refPath` (gh-8553)', function() {
+    const ItemSchema = new Schema({ objectType: String },
+      { discriminatorKey: 'objectType', _id: false });
+    const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
+
+    ExampleSchema.path('list').discriminator('Text', Schema({
+      data: { type: ObjectId, refPath: 'list.objectType' }
+    }, { _id: false }));
+    ExampleSchema.path('list').discriminator('ExternalSource', Schema({
+      data: { sourceId: Number }
+    }));
+
+    const Example = db.model('Test', ExampleSchema);
+
+    return co(function*() {
+      yield Example.create({
+        test: 'example',
+        list: [
+          { data: { sourceId: 123 }, objectType: 'ExternalSource' }
+        ]
+      });
+
+      const res = yield Example.find().populate('list.data');
+      assert.deepEqual(res[0].toObject().list[0].data, { sourceId: 123 });
+    });
+  });
 });

@@ -6,7 +6,7 @@ const symbols = require('../../lib/helpers/symbols');
 const ObjectId = require('../../lib/types/objectid');
 const Decimal = require('../../lib/types/decimal128');
 
-describe.only('clone', () => {
+describe('clone', () => {
   describe('falsy', () => {
     it('is null when null', () => {
       assert.deepStrictEqual(clone(null), null);

@@ -351,7 +351,7 @@ describe('transactions', function() {
       yield Test.createCollection();
       const session = yield db.startSession();
       yield session.withTransaction(() => co(function*() {
-        const [test] = yield Test.create([{}], { session });
+        const test = yield Test.create([{}], { session }).then(res => res[0]);
         yield test.save(); // throws DocumentNotFoundError
       }));
     });

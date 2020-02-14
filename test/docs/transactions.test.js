@@ -343,4 +343,17 @@ describe('transactions', function() {
       assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
     });
   });
+
+  it('save() with no changes (gh-8571)', function() {
+    return co(function*() {
+      const Test = db.model('Test', Schema({ name: String }));
+
+      yield Test.createCollection();
+      const session = yield db.startSession();
+      yield session.withTransaction(() => co(function*() {
+        const [test] = yield Test.create([{}], { session });
+        yield test.save(); // throws DocumentNotFoundError
+      }));
+    });
+  });
 });

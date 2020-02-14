@@ -8698,7 +8698,7 @@ describe('document', function() {
 
   it('handles setting numeric paths with single nested subdocs (gh-8583)', function() {
     const placedItemSchema = Schema({ image: String }, { _id: false });
-    
+
     const subdocumentSchema = Schema({
       placedItems: {
         '1': placedItemSchema,

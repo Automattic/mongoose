@@ -610,4 +610,25 @@ describe('query middleware', function() {
     return Test.updateOne({}, { name: 'bar' }).
       then(() => assert.equal(calledPost, 1));
   });
+
+  it('deleteOne with `document: true` but no `query` (gh-8555)', function() {
+    const mySchema = Schema({ name: String });
+
+    const docs = [];
+    mySchema.pre('deleteOne', { document: true }, function() {
+      docs.push(this);
+    });
+  
+    const Model = db.model('Test', mySchema);
+
+    return co(function*() {
+      const doc = yield Model.create({ name: 'test' });
+      yield doc.deleteOne();
+      assert.equal(docs.length, 1);
+      assert.strictEqual(docs[0], doc);
+
+      yield Model.deleteOne();
+      assert.equal(docs.length, 1);
+    });
+  });
 });

@@ -31,12 +31,12 @@ describe('collections: capped:', function() {
     db = start();
   });
 
-  after(function(done) {
-    db.close(done);
-  });
-
   afterEach(function() {
     return db.dropDatabase();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   it('schemas should have option size', function(done) {

@@ -35,6 +35,10 @@ describe('collections: capped:', function() {
     db.close(done);
   });
 
+  afterEach(function() {
+    return db.dropDatabase();
+  });
+
   it('schemas should have option size', function(done) {
     assert.ok(capped.options.capped);
     assert.equal(capped.options.capped.size, 1000);

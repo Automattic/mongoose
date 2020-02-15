@@ -31,10 +31,6 @@ describe('collections: capped:', function() {
     db = start();
   });
 
-  afterEach(function() {
-    return db.dropDatabase();
-  });
-
   after(function(done) {
     db.close(done);
   });
@@ -120,6 +116,8 @@ describe('collections: capped:', function() {
 
       // Should not throw
       yield Model.create({ name: 'test' });
+
+      yield db.dropDatabase();
     });
   });
 });

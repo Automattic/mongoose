@@ -618,7 +618,7 @@ describe('query middleware', function() {
     mySchema.pre('deleteOne', { document: true }, function() {
       docs.push(this);
     });
-  
+
     const Model = db.model('Test', mySchema);
 
     return co(function*() {

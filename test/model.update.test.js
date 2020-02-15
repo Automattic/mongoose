@@ -3330,6 +3330,21 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('updates buffers with `runValidators` successfully (gh-8580)', function() {
+    const Test = db.model('Test', Schema({
+      data: { type: Buffer, required: true }
+    }));
+
+    const opts = { runValidators: true, upsert: true };
+    return co(function*() {
+      yield Test.updateOne({}, { data: Buffer.from('test') }, opts);
+
+      const doc = yield Test.findOne();
+      assert.ok(doc.data);
+      assert.equal(doc.data.toString('utf8'), 'test');
+    });
+  });
+
   describe('mongodb 42 features', function() {
     before(function(done) {
       start.mongodVersion((err, version) => {

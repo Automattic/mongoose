@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
@@ -90,6 +91,33 @@ describe('collections: capped:', function() {
           throw new Error('capped test timeout');
         }, 900);
       });
+    });
+  });
+
+  it('skips when setting autoCreate to false (gh-8566)', function() {
+    const db = start();
+    this.timeout(30000);
+
+    return co(function*() {
+      yield db.dropDatabase();
+
+      const schema = new mongoose.Schema({
+        name: String
+      }, {
+        capped: { size: 1024 },
+        bufferCommands: false,
+        autoCreate: false // disable `autoCreate` since `bufferCommands` is false
+      });
+
+      const Model = db.model('Test', schema);
+      // Explicitly create the collection before using it
+      // so the collection is capped.
+      yield Model.createCollection({ capped: true, size: 1024 });
+
+      // Should not throw
+      yield Model.create({ name: 'test' });
+
+      yield db.dropDatabase();
     });
   });
 });

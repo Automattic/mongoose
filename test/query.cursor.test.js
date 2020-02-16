@@ -506,4 +506,22 @@ describe('QueryCursor', function() {
       assert.equal(numDone, 3);
     });
   });
+
+  it('eachAsync() with sort, parallel, and sync function (gh-8557)', function() {
+    const User = db.model('User', Schema({ order: Number }));
+
+    return co(function*() {
+      yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
+
+      const cursor = User.aggregate([{ $sort: { order: 1 } }]).
+        cursor().
+        exec();
+
+      const docs = [];
+
+      yield cursor.eachAsync((doc) => docs.push(doc), { parallel: 3 });
+
+      assert.deepEqual(docs.map(d => d.order), [1, 2, 3]);
+    });
+  });
 });

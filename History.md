@@ -1,3 +1,11 @@
+5.9.1 / 2020-02-14
+==================
+ * fix(model): set session when calling `save()` with no changes #8571
+ * fix(schema): return correct pathType when single nested path is embedded under a nested path with a numeric name #8583
+ * fix(queryhelpers): remove `Object.values()` for Node.js 4.x-6.x support #8596
+ * fix(cursor): respect sort order when using `eachAsync()` with `parallel` and a sync callback #8577
+ * docs: update documentation of custom _id overriding in discriminators #8591 [sam-mfb](https://github.com/sam-mfb)
+
 5.9.0 / 2020-02-13
 ==================
  * fix: upgrade to MongoDB driver 3.5 #8520 #8563

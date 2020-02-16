@@ -88,6 +88,28 @@ block content
     mongoose.set('bufferCommands', false);
     ```
 
+    Note that buffering is also responsible for waiting until Mongoose
+    creates collections if you use the [`autoCreate` option](/docs/guide.html#autoCreate).
+    If you disable buffering, you should also disable the `autoCreate`
+    option and use [`createCollection()`](/docs/api/model.html#model_Model.createCollection)
+    to create [capped collections](/docs/guide.html#capped) or
+    [collections with collations](/docs/guide.html#collation).
+
+    ```javascript
+    const schema = new Schema({
+      name: String
+    }, {
+      capped: { size: 1024 },
+      bufferCommands: false,
+      autoCreate: false // disable `autoCreate` since `bufferCommands` is false
+    });
+
+    const Model = mongoose.model('Test', schema);
+    // Explicitly create the collection before using it
+    // so the collection is capped.
+    await Model.createCollection();
+    ```
+
     <h3 id="error-handling"><a href="#error-handling">Error Handling</a></h3>
 
     There are two classes of errors that can occur with a Mongoose connection.

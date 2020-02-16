@@ -186,15 +186,14 @@ describe('discriminator docs', function () {
   /**
    * A discriminator's fields are the union of the base schema's fields and
    * the discriminator schema's fields, and the discriminator schema's fields
-   * take precedence. There is one exception: the default `_id` field.
-   *
-   * You can work around this by setting the `_id` option to false in the
-   * discriminator schema as shown below.
+   * take precedence. There is one exception: the `_id` field.
+   * If a custom _id field is set on the base schema, that will always
+   * override the discriminator's _id field, as shown below.
    */
   it('Handling custom _id fields', function (done) {
     var options = {discriminatorKey: 'kind'};
 
-    // Base schema has a String `_id` and a Date `time`...
+    // Base schema has a custom String `_id` and a Date `time`...
     var eventSchema = new mongoose.Schema({_id: String, time: Date},
       options);
     var Event = mongoose.model('BaseEvent', eventSchema);
@@ -203,16 +202,16 @@ describe('discriminator docs', function () {
       url: String,
       time: String
     }, options);
-    // But the discriminator schema has a String `time`, and an implicitly added
-    // ObjectId `_id`.
+    // The discriminator schema has a String `time` and an
+    // implicitly added ObjectId `_id`.
     assert.ok(clickedLinkSchema.path('_id'));
     assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectID');
     var ClickedLinkEvent = Event.discriminator('ChildEventBad',
       clickedLinkSchema);
 
-    var event1 = new ClickedLinkEvent({ _id: 'custom id', time: '4pm' });
-    // Woops, clickedLinkSchema overwrites the `time` path, but **not**
-    // the `_id` path because that was implicitly added.
+    var event1 = new ClickedLinkEvent({_id: 'custom id', time: '4pm'});
+    // clickedLinkSchema overwrites the `time` path, but **not**
+    // the `_id` path.
     assert.strictEqual(typeof event1._id, 'string');
     assert.strictEqual(typeof event1.time, 'string');
 

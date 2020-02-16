@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.9.0",
+  "version": "5.9.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -46,6 +46,7 @@
     "co": "4.6.0",
     "dox": "0.3.1",
     "eslint": "5.16.0",
+    "eslint-plugin-mocha-no-only": "1.1.0",
     "highlight.js": "9.1.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
@@ -102,6 +103,9 @@
     "extends": [
       "eslint:recommended"
     ],
+    "plugins": [
+      "mocha-no-only"
+    ],
     "parserOptions": {
       "ecmaVersion": 2015
     },
@@ -151,6 +155,9 @@
           "name": "context",
           "message": "Don't use Mocha's global context"
         }
+      ],
+      "mocha-no-only/mocha-no-only": [
+        "error"
       ]
     }
   },

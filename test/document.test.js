@@ -8693,6 +8693,36 @@ describe('document', function() {
     });
     assert.equal(doc.toObject({ transform: true }).myDate, '2015');
     assert.equal(doc.toObject({ transform: true }).dates[0], '2016');
-    //assert.equal(doc.toObject({ transform: true }).arr[0].myDate, '2017');
+    assert.equal(doc.toObject({ transform: true }).arr[0].myDate, '2017');
+  });
+
+  it('handles setting numeric paths with single nested subdocs (gh-8583)', function() {
+    const placedItemSchema = Schema({ image: String }, { _id: false });
+
+    const subdocumentSchema = Schema({
+      placedItems: {
+        '1': placedItemSchema,
+        first: placedItemSchema
+      }
+    });
+    const Model = db.model('Test', subdocumentSchema);
+
+    return co(function*() {
+      const doc = yield Model.create({
+        placedItems: { '1': { image: 'original' }, first: { image: 'original' } }
+      });
+
+      doc.set({
+        'placedItems.1.image': 'updated',
+        'placedItems.first.image': 'updated'
+      });
+
+      yield doc.save();
+
+      assert.equal(doc.placedItems['1'].image, 'updated');
+
+      const fromDb = yield Model.findById(doc);
+      assert.equal(fromDb.placedItems['1'].image, 'updated');
+    });
   });
 });

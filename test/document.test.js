@@ -8725,4 +8725,27 @@ describe('document', function() {
       assert.equal(fromDb.placedItems['1'].image, 'updated');
     });
   });
+
+  it('setting nested array path to non-nested array wraps values top-down (gh-8544)', function() {
+    const positionSchema = mongoose.Schema({
+      coordinates: {
+        type: [[Number]],
+        required: true
+      },
+      lines: {
+        type: [[[Number]]],
+        required: true
+      }
+    });
+
+    const Position = db.model('Test', positionSchema);
+    const position = new Position();
+
+    position.coordinates = [1, 2];
+    position.lines = [3, 4];
+
+    const obj = position.toObject();
+    assert.deepEqual(obj.coordinates, [[1, 2]]);
+    assert.deepEqual(obj.lines, [[[3, 4]]]);
+  });
 });

@@ -8748,4 +8748,25 @@ describe('document', function() {
     assert.deepEqual(obj.coordinates, [[1, 2]]);
     assert.deepEqual(obj.lines, [[[3, 4]]]);
   });
+
+  it('doesnt wipe out nested keys when setting nested key to empty object with minimize (gh-8565)', function() {
+    const opts = { autoIndex: false, autoCreate: false };
+    const schema1 = Schema({ plaid: { nestedKey: String } }, opts);
+    const schema2 = Schema({ plaid: { nestedKey: String } }, opts);
+    const schema3 = Schema({ plaid: { nestedKey: String } }, opts);
+
+    const Test1 = db.model('Test1', schema1);
+    const Test2 = db.model('Test2', schema2);
+    const Test3 = db.model('Test3', schema3);
+
+    const doc1 = new Test1({});
+    assert.deepEqual(doc1.toObject({ minimize: false }).plaid, {});
+
+    const doc2 = new Test2({ plaid: doc1.plaid });
+    assert.deepEqual(doc2.toObject({ minimize: false }).plaid, {});
+
+    const doc3 = new Test3({});
+    doc3.set({ plaid: doc2.plaid });
+    assert.deepEqual(doc3.toObject({ minimize: false }).plaid, {});
+  });
 });

@@ -8769,4 +8769,33 @@ describe('document', function() {
     doc3.set({ plaid: doc2.plaid });
     assert.deepEqual(doc3.toObject({ minimize: false }).plaid, {});
   });
+
+  it('allows calling `validate()` in post validate hook without causing parallel validation error (gh-8597)', function() {
+    const EmployeeSchema = Schema({
+      name: String,
+      employeeNumber: {
+        type: String,
+        validate: v => v.length > 5
+      }
+    });
+    let called = 0;
+
+    EmployeeSchema.post('validate', function() {
+      ++called;
+      if (!this.employeeNumber && !this._employeeNumberRetrieved) {
+        this.employeeNumber = '123456';
+        this._employeeNumberRetrieved = true;
+        return this.validate();
+      }
+    });
+
+    const Employee = db.model('Test', EmployeeSchema);
+
+    return co(function*() {
+      const e = yield Employee.create({ name: 'foo' });
+      assert.equal(e.employeeNumber, '123456');
+      assert.ok(e._employeeNumberRetrieved);
+      assert.equal(called, 2);
+    });
+  });
 });

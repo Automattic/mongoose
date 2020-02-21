@@ -1,3 +1,17 @@
+5.9.2 / 2020-02-21
+==================
+ * fix(model): add discriminator key to bulkWrite filters #8590
+ * fix(document): when setting nested array path to non-nested array, wrap values top-down rather than bottom up when possible #8544
+ * fix(document): dont leave nested key as undefined when setting nested key to empty object with minimize #8565
+ * fix(document): avoid throwing error if setting path to Mongoose document with nullish `_doc` #8565
+ * fix(update): handle Binary type correctly with `runValidators` #8580
+ * fix(query): run `deleteOne` hooks only on `Document#deleteOne()` when setting `options.document = true` for `Schema#pre()` #8555
+ * fix(document): allow calling `validate()` in post validate hook without causing parallel validation error #8597
+ * fix(virtualtype): correctly copy options when cloning #8587
+ * fix(collection): skip creating capped collection if `autoCreate` set to `false` #8566
+ * docs(middleware): clarify that updateOne and deleteOne hooks are query middleware by default, not document middleware #8581
+ * docs(aggregate): clarify that `Aggregate#unwind()` can take object parameters as well as strings #8594
+
 5.9.1 / 2020-02-14
 ==================
  * fix(model): set session when calling `save()` with no changes #8571

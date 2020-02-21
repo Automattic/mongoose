@@ -6426,4 +6426,22 @@ describe('Model', function() {
       assert.deepEqual(ops, ['validate', 'validate', 'save', 'save']);
     });
   });
+
+  it('bulkWrite sets discriminator filters (gh-8590)', function() {
+    const Animal = db.model('Test', Schema({ name: String }));
+    const Dog = Animal.discriminator('Dog', Schema({ breed: String }));
+
+    return co(function*() {
+      yield Dog.bulkWrite([{
+        updateOne: {
+          filter: { name: 'Pooka' },
+          update: { $set: { breed: 'Chorkie' } },
+          upsert: true
+        }
+      }]);
+      const res = yield Animal.findOne();
+      assert.ok(res instanceof Dog);
+      assert.strictEqual(res.breed, 'Chorkie');
+    });
+  });
 });

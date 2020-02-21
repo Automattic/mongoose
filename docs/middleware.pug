@@ -86,6 +86,13 @@ block content
     want to your middleware to run on [`Query.remove()`](./api.html#query_Query-remove)
     use [`schema.pre('remove', { query: true, document: false }, fn)`](./api.html#schema_Schema-pre).
 
+    **Note:** Unlike `schema.pre('remove')`, Mongoose registers `updateOne` and
+    `deleteOne` middleware on `Query#updateOne()` and `Query#deleteOne()` by default.
+    This means that both `doc.updateOne()` and `Model.updateOne()` trigger
+    `updateOne` hooks, but `this` refers to a query, not a document. To register
+    `updateOne` or `deleteOne` middleware as document middleware, use
+    `schema.pre('updateOne', { document: true, query: false })`.
+
     **Note:** The [`create()`](./api.html#model_Model.create) function fires `save()` hooks.
 
     <h3 id="pre"><a href="#pre">Pre</a></h3>
@@ -371,7 +378,7 @@ block content
     ```
 
     You **cannot** access the document being updated in `pre('updateOne')` or
-    `pre('findOneAndUpdate')` middleware. If you need to access the document
+    `pre('findOneAndUpdate')` query middleware. If you need to access the document
     that will be updated, you need to execute an explicit query for the document.
 
     ```javascript
@@ -379,6 +386,25 @@ block content
       const docToUpdate = await this.model.findOne(this.getQuery());
       console.log(docToUpdate); // The document that `findOneAndUpdate()` will modify
     });
+    ```
+
+    However, if you define `pre('updateOne')` document middleware,
+    `this` will be the document being updated. That's because `pre('updateOne')`
+    document middleware hooks into [`Document#updateOne()`](/docs/api/document.html#document_Document-updateOne)
+    rather than `Query#updateOne()`.
+
+    ```javascript
+    schema.pre('updateOne', { document: true, query: false }, function() {
+      console.log('Updating');
+    });
+    const Model = mongoose.model('Test', schema);
+
+    const doc = new Model();
+    await doc.updateOne({ $set: { name: 'test' } }); // Prints "Updating"
+
+    // Doesn't print "Updating", because `Query#updateOne()` doesn't fire
+    // document middleware.
+    await Model.updateOne({}, { $set: { name: 'test' } });
     ```
 
     <h3 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h3>

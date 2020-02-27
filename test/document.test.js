@@ -8798,4 +8798,30 @@ describe('document', function() {
       assert.equal(called, 2);
     });
   });
+
+  it('sets defaults when setting single nested subdoc (gh-8603)', function() {
+    const nestedSchema = Schema({
+      name: String,
+      status: { type: String, default: 'Pending' }
+    });
+
+    const Test = db.model('Test', {
+      nested: nestedSchema
+    });
+
+    return co(function*() {
+      let doc = yield Test.create({ nested: { name: 'foo' } });
+      assert.equal(doc.nested.status, 'Pending');
+
+      doc = yield Test.findById(doc);
+      assert.equal(doc.nested.status, 'Pending');
+
+      Object.assign(doc, { nested: { name: 'bar' } });
+      assert.equal(doc.nested.status, 'Pending');
+      yield doc.save();
+
+      doc = yield Test.findById(doc);
+      assert.equal(doc.nested.status, 'Pending');
+    });
+  });
 });

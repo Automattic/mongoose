@@ -5963,6 +5963,32 @@ describe('Model', function() {
       });
     });
 
+    it('syncIndexes() with different key order (gh-8559)', function() {
+      this.timeout(5000);
+
+      return co(function*() {
+        yield db.dropDatabase();
+
+        const opts = { autoIndex: false };
+        let schema = new Schema({ name: String, age: Number }, opts);
+        schema.index({ name: 1, _id: 1 });
+
+        let M = db.model('Test', schema);
+
+        let dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, []);
+
+        // New model, same collection, different key order
+        schema = new Schema({ name: String, age: Number }, opts);
+        schema.index({ name: 1 });
+        db.deleteModel(/Test/);
+        M = db.model('Test', schema);
+
+        dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, ['name_1__id_1']);
+      });
+    });
+
     it('using `new db.model()()` (gh-6698)', function(done) {
       db.model('Test', new Schema({
         name: String

@@ -6084,7 +6084,7 @@ describe('Model', function() {
       const Model = db.model('User', userSchema);
 
       return co(function*() {
-        yield Model.collection.drop();
+        yield Model.collection.drop().catch(err => {});
         yield Model.createCollection();
 
         // If the collection is not created, the following will throw

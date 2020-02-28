@@ -8824,4 +8824,17 @@ describe('document', function() {
       assert.equal(doc.nested.status, 'Pending');
     });
   });
+
+  it('handles validating single nested paths when specified in `pathsToValidate` (gh-8626)', function() {
+    const nestedSchema = Schema({
+      name: { type: String, validate: v => v.length > 2 }
+    });
+    const schema = Schema({ nested: nestedSchema });
+    const Model = mongoose.model('Test', schema);
+
+    const doc = new Model({ nested: { name: 'a' } });
+    return doc.validate(['nested.name']).then(() => assert.ok(false), err => {
+      assert.ok(err.errors['nested.name']);
+    });
+  });
 });

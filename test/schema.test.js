@@ -54,6 +54,9 @@ describe('schema', function() {
     }));
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
   describe('nested fields with same name', function() {
     let NestedModel;
 
@@ -67,7 +70,7 @@ describe('schema', function() {
         },
         b: { $type: String }
       }, { typeKey: '$type' });
-      NestedModel = db.model('Nested', NestedSchema);
+      NestedModel = db.model('Test', NestedSchema);
     });
 
     it('don\'t disappear', function(done) {
@@ -1247,9 +1250,8 @@ describe('schema', function() {
         }
       });
 
-      mongoose.model('Merged', MergedSchema);
-
-      const Merged = db.model('Merged', 'merged_' + Math.random());
+      db.deleteModel(/Test/);
+      const Merged = db.model('Test', MergedSchema);
 
       const merged = new Merged({
         a: {
@@ -1375,11 +1377,11 @@ describe('schema', function() {
       const el = new Schema({ title: String });
       const so = new Schema({
         title: String,
-        obj: { type: Schema.Types.ObjectId, ref: 'Element' }
+        obj: { type: Schema.Types.ObjectId, ref: 'Test' }
       });
 
-      const Element = db.model('Element', el);
-      const Some = db.model('Some', so);
+      const Element = db.model('Test', el);
+      const Some = db.model('Test1', so);
 
       const ele = new Element({ title: 'thing' });
 
@@ -1497,10 +1499,9 @@ describe('schema', function() {
 
     it('permit _scope to be used (gh-1184)', function(done) {
       const child = new Schema({ _scope: Schema.ObjectId });
-      const C = db.model('scope', child);
+      const C = db.model('Test', child);
       const c = new C;
       c.save(function(err) {
-        db.close();
         assert.ifError(err);
         try {
           c._scope;
@@ -1859,7 +1860,7 @@ describe('schema', function() {
             this.set('name.last', split[1]);
           });
 
-        const M = db.model('gh6274', PersonSchema.clone());
+        const M = db.model('Test', PersonSchema.clone());
 
         const doc = new M({ name: { first: 'Axl', last: 'Rose' } });
         assert.equal(doc.name.full, 'Axl Rose');
@@ -1881,7 +1882,7 @@ describe('schema', function() {
           _id: false,
           id: false
         });
-        const M = db.model('gh6274_option', clone);
+        const M = db.model('Test', clone);
 
         const doc = new M({});
 
@@ -1949,7 +1950,7 @@ describe('schema', function() {
         schema.path('fruits').discriminator('banana', clone);
         assert.ok(clone.path('color').caster.discriminators);
 
-        const Basket = db.model('gh7894', schema);
+        const Basket = db.model('Test', schema);
         const b = new Basket({
           fruits: [
             {
@@ -2120,7 +2121,7 @@ describe('schema', function() {
 
   it('required paths with clone() (gh-8111)', function() {
     const schema = Schema({ field: { type: String, required: true } });
-    const Model = db.model('gh8111', schema.clone());
+    const Model = db.model('Test', schema.clone());
 
     const doc = new Model({});
 
@@ -2137,7 +2138,7 @@ describe('schema', function() {
 
     schema.path('field').set(value => value ? value.toUpperCase() : value);
 
-    const TestKo = db.model('gh8124', schema.clone());
+    const TestKo = db.model('Test', schema.clone());
 
     const testKo = new TestKo({field: 'upper'});
     assert.equal(testKo.field, 'UPPER');

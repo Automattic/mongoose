@@ -9,6 +9,7 @@ const start = require('./common');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
+const util = require('./util');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -48,18 +49,7 @@ describe('Query', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   describe('constructor', function() {
     it('should not corrupt options', function(done) {

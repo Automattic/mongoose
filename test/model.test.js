@@ -9,6 +9,7 @@ const start = require('./common');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
+const util = require('./util');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
@@ -84,18 +85,7 @@ describe('Model', function() {
     db.close();
   });
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   it('can be created using _id as embedded document', function(done) {
     const Test = db.model('Test', Schema({

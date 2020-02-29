@@ -13,6 +13,7 @@ const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
+const util = require('./util');
 const utils = require('../lib/utils');
 const validator = require('validator');
 const Buffer = require('safe-buffer').Buffer;
@@ -134,18 +135,7 @@ describe('document', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   describe('constructor', function() {
     it('supports passing in schema directly (gh-8237)', function() {

@@ -17,6 +17,7 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 const co = require('co');
 const isEqual = require('lodash.isequal');
 const isEqualWith = require('lodash.isequalwith');
+const util = require('./util');
 const uuid = require('uuid');
 
 describe('model: findOneAndUpdate:', function() {
@@ -92,18 +93,7 @@ describe('model: findOneAndUpdate:', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   it('WWW returns the edited document', function(done) {
     const M = db.model(modelname, collection);

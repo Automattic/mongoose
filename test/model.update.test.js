@@ -8,7 +8,7 @@ const start = require('./common');
 
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
+const util = require('./util');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
@@ -17,7 +17,7 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const CastError = mongoose.Error.CastError;
 
-describe('model: update: XYZ', function() {
+describe('model: update:', function() {
   let post;
   const title = 'Tobi';
   const author = 'Brian';
@@ -103,19 +103,7 @@ describe('model: update: XYZ', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(function() {
-    this.timeout(5000);
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   it('works', function(done) {
     BlogPost.findById(post._id, function(err, cf) {
@@ -3113,6 +3101,9 @@ describe('model: updateOne: ', function() {
   after(function(done) {
     db.close(done);
   });
+
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => util.clearTestData(db));
 
   it('updating a map (gh-7111)', function() {
     const accountSchema = new Schema({ balance: Number });

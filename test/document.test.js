@@ -13,6 +13,7 @@ const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
+const util = require('./util');
 const utils = require('../lib/utils');
 const validator = require('validator');
 const Buffer = require('safe-buffer').Buffer;
@@ -134,18 +135,7 @@ describe('document', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   describe('constructor', function() {
     it('supports passing in schema directly (gh-8237)', function() {
@@ -8796,6 +8786,47 @@ describe('document', function() {
       assert.equal(e.employeeNumber, '123456');
       assert.ok(e._employeeNumberRetrieved);
       assert.equal(called, 2);
+    });
+  });
+
+  it('sets defaults when setting single nested subdoc (gh-8603)', function() {
+    const nestedSchema = Schema({
+      name: String,
+      status: { type: String, default: 'Pending' }
+    });
+
+    const Test = db.model('Test', {
+      nested: nestedSchema
+    });
+
+    return co(function*() {
+      let doc = yield Test.create({ nested: { name: 'foo' } });
+      assert.equal(doc.nested.status, 'Pending');
+
+      doc = yield Test.findById(doc);
+      assert.equal(doc.nested.status, 'Pending');
+
+      Object.assign(doc, { nested: { name: 'bar' } });
+      assert.equal(doc.nested.status, 'Pending');
+      yield doc.save();
+
+      doc = yield Test.findById(doc);
+      assert.equal(doc.nested.status, 'Pending');
+    });
+  });
+
+  it('handles validating single nested paths when specified in `pathsToValidate` (gh-8626)', function() {
+    const nestedSchema = Schema({
+      name: { type: String, validate: v => v.length > 2 },
+      age: { type: Number, validate: v => v < 200 }
+    });
+    const schema = Schema({ nested: nestedSchema });
+    const Model = mongoose.model('Test', schema);
+
+    const doc = new Model({ nested: { name: 'a', age: 9001 } });
+    return doc.validate(['nested.name']).then(() => assert.ok(false), err => {
+      assert.ok(err.errors['nested.name']);
+      assert.ok(!err.errors['nested.age']);
     });
   });
 });

@@ -1,3 +1,14 @@
+5.9.3 / 2020-03-02
+==================
+ * fix: upgrade mongodb driver -> 3.5.4 #8620
+ * fix(document): set subpath defaults when overwriting single nested subdoc #8603
+ * fix(document): make calling `validate()` with single nested subpath only validate that single nested subpath #8626
+ * fix(browser): make `mongoose.model()` return a class in the browser to allow hydrating populated data in the browser #8605
+ * fix(model): make `syncIndexes()` and `cleanIndexes()` drop compound indexes with `_id` that aren't in the schema #8559
+ * docs(connection+index): add warnings to explain that bufferMaxEntries does nothing with `useUnifiedTopology` #8604
+ * docs(document+model+query): add `options.timestamps` parameter docs to `findOneAndUpdate()` and `findByIdAndUpdate()` #8619
+ * docs: fix out of date links to tumblr #8599
+
 5.9.2 / 2020-02-21
 ==================
  * fix(model): add discriminator key to bulkWrite filters #8590

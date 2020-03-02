@@ -8,7 +8,7 @@ const start = require('./common');
 
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
+const util = require('./util');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
@@ -28,9 +28,11 @@ describe('model: update:', function() {
   let BlogPost;
   let db;
 
-  beforeEach(function() {
+  before(function() {
     db = start();
+  });
 
+  beforeEach(function() {
     Comments = new Schema({});
 
     Comments.add({
@@ -101,18 +103,7 @@ describe('model: update:', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   it('works', function(done) {
     BlogPost.findById(post._id, function(err, cf) {
@@ -525,7 +516,7 @@ describe('model: update:', function() {
 
   it('handles $pull from Mixed arrays (gh-735)', function(done) {
     const schema = new Schema({comments: []});
-    const M = db.model('gh-735', schema, 'gh-735_' + random());
+    const M = db.model('Test', schema);
     M.create({comments: [{name: 'node 0.8'}]}, function(err, doc) {
       assert.ifError(err);
       M.update({_id: doc._id}, {$pull: {comments: {name: 'node 0.8'}}}, function(err, affected) {
@@ -551,7 +542,7 @@ describe('model: update:', function() {
       components: [componentSchema]
     });
 
-    const Project = db.model('1057-project', projectSchema, '1057-' + random());
+    const Project = db.model('Test', projectSchema);
 
     Project.create({name: 'my project'}, function(err, project) {
       assert.ifError(err);
@@ -580,7 +571,7 @@ describe('model: update:', function() {
 
   it('handles nested paths starting with numbers (gh-1062)', function(done) {
     const schema = new Schema({counts: Schema.Types.Mixed});
-    const M = db.model('gh-1062', schema, '1062-' + random());
+    const M = db.model('Test', schema);
     M.create({counts: {}}, function(err, m) {
       assert.ifError(err);
       M.update({}, {$inc: {'counts.1': 1, 'counts.1a': 10}}, function(err) {
@@ -597,7 +588,7 @@ describe('model: update:', function() {
 
   it('handles positional operators with referenced docs (gh-1572)', function(done) {
     const so = new Schema({title: String, obj: [String]});
-    const Some = db.model('Some' + random(), so);
+    const Some = db.model('Test', so);
 
     Some.create({obj: ['a', 'b', 'c']}, function(err, s) {
       assert.ifError(err);
@@ -617,7 +608,7 @@ describe('model: update:', function() {
 
   it('use .where for update condition (gh-2170)', function(done) {
     const so = new Schema({num: Number});
-    const Some = db.model('gh-2170' + random(), so);
+    const Some = db.model('Test', so);
 
     Some.create([{num: 1}, {num: 1}], function(err, docs) {
       assert.ifError(err);
@@ -660,7 +651,7 @@ describe('model: update:', function() {
       }
 
       const schema = new Schema({name: String, age: Number, x: String});
-      const M = db.model('setoninsert-' + random(), schema);
+      const M = db.model('Test', schema);
 
       const match = {name: 'set on insert'};
       const op = {$setOnInsert: {age: '47'}, x: 'inserted'};
@@ -693,7 +684,7 @@ describe('model: update:', function() {
       }
 
       const schema = new Schema({name: String, n: [{x: Number}]});
-      const M = db.model('setoninsert-' + random(), schema);
+      const M = db.model('Test', schema);
 
       M.create({name: '2.4'}, function(err, created) {
         assert.ifError(err);
@@ -755,7 +746,7 @@ describe('model: update:', function() {
       }
 
       const schema = new Schema({name: String, n: [{x: Number}]});
-      const M = db.model('setoninsert-' + random(), schema);
+      const M = db.model('Test', schema);
 
       const m = new M({name: '2.6', n: [{x: 0}]});
       m.save(function(error, m) {
@@ -784,7 +775,7 @@ describe('model: update:', function() {
       }
 
       const schema = new Schema({name: String, lastModified: Date, lastModifiedTS: Date});
-      const M = db.model('gh-2019', schema);
+      const M = db.model('Test', schema);
 
       const m = new M({name: '2.6'});
       m.save(function(error) {
@@ -810,7 +801,7 @@ describe('model: update:', function() {
   describe('{overwrite: true}', function() {
     it('overwrite works', function(done) {
       const schema = new Schema({mixed: {}}, { minimize: false });
-      const M = db.model('updatesmixed-' + random(), schema);
+      const M = db.model('Test', schema);
 
       M.create({mixed: 'something'}, function(err, created) {
         assert.ifError(err);
@@ -831,7 +822,7 @@ describe('model: update:', function() {
     it('overwrites all properties', function(done) {
       const sch = new Schema({title: String, subdoc: {name: String, num: Number}});
 
-      const M = db.model('updateover' + random(), sch);
+      const M = db.model('Test', sch);
 
       M.create({subdoc: {name: 'that', num: 1}}, function(err, doc) {
         assert.ifError(err);
@@ -852,7 +843,7 @@ describe('model: update:', function() {
     it('allows users to blow it up', function(done) {
       const sch = new Schema({title: String, subdoc: {name: String, num: Number}});
 
-      const M = db.model('updateover' + random(), sch);
+      const M = db.model('Test', sch);
 
       M.create({subdoc: {name: 'that', num: 1, title: 'hello'}}, function(err, doc) {
         assert.ifError(err);
@@ -873,7 +864,7 @@ describe('model: update:', function() {
 
   it('casts empty arrays', function(done) {
     const so = new Schema({arr: []});
-    const Some = db.model('1838-' + random(), so);
+    const Some = db.model('Test', so);
 
     Some.create({arr: ['a']}, function(err, s) {
       if (err) {
@@ -899,7 +890,7 @@ describe('model: update:', function() {
   describe('defaults and validators (gh-860)', function() {
     it('applies defaults on upsert', function(done) {
       const s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
-      const Breakfast = db.model('gh-860-0', s);
+      const Breakfast = db.model('Test', s);
       const updateOptions = {upsert: true, setDefaultsOnInsert: true};
       Breakfast.update({}, {base: 'eggs'}, updateOptions, function(error) {
         assert.ifError(error);
@@ -921,7 +912,7 @@ describe('model: update:', function() {
         embedded: EmbeddedSchema
       });
 
-      const Parent = db.model('gh4911', ParentSchema);
+      const Parent = db.model('Parent', ParentSchema);
 
       const newDoc = {
         _id: new mongoose.Types.ObjectId(),
@@ -938,7 +929,7 @@ describe('model: update:', function() {
 
     it('doesnt set default on upsert if query sets it', function(done) {
       const s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
-      const Breakfast = db.model('gh-860-1', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {upsert: true, setDefaultsOnInsert: true};
       Breakfast.update({topping: 'sausage'}, {base: 'eggs'}, updateOptions, function(error) {
@@ -954,7 +945,7 @@ describe('model: update:', function() {
 
     it('properly sets default on upsert if query wont set it', function(done) {
       const s = new Schema({topping: {type: String, default: 'bacon'}, base: String});
-      const Breakfast = db.model('gh-860-2', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {upsert: true, setDefaultsOnInsert: true};
       Breakfast.update({topping: {$ne: 'sausage'}}, {base: 'eggs'}, updateOptions, function(error) {
@@ -976,7 +967,7 @@ describe('model: update:', function() {
         }
       });
 
-      const M = db.model('gh4456', schema);
+      const M = db.model('Test', schema);
 
       const opts = { upsert: true, setDefaultsOnInsert: true };
       M.update({}, {}, opts, function(error) {
@@ -997,7 +988,7 @@ describe('model: update:', function() {
         }
       });
 
-      const M = db.model('gh6034', schema);
+      const M = db.model('Test', schema);
 
       const opts = { upsert: true, setDefaultsOnInsert: true, omitUndefined: true };
       M.update({}, {}, opts, function(error) {
@@ -1025,7 +1016,7 @@ describe('model: update:', function() {
           }
         }
       });
-      const Breakfast = db.model('gh-860-3', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {upsert: true, setDefaultsOnInsert: true, runValidators: true};
       Breakfast.update({}, {topping: 'bacon', base: 'eggs'}, updateOptions, function(error) {
@@ -1053,7 +1044,7 @@ describe('model: update:', function() {
           }
         }
       });
-      const Breakfast = db.model('gh-860-4', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {runValidators: true, context: 'query'};
       Breakfast.update({}, {$unset: {steak: ''}, $setOnInsert: {eggs: 'softboiled'}}, updateOptions, function(error) {
@@ -1092,7 +1083,7 @@ describe('model: update:', function() {
         eggs: {type: Number, min: 4, max: 6},
         bacon: {type: String, match: /strips/}
       });
-      const Breakfast = db.model('gh-860-5', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {runValidators: true};
       Breakfast.update({}, {$set: {steak: 'ribeye', eggs: 3, bacon: '3 strips'}}, updateOptions, function(error) {
@@ -1125,7 +1116,7 @@ describe('model: update:', function() {
         eggs: {type: Number, min: 4, max: 6},
         bacon: {type: String, match: /strips/}
       });
-      const Breakfast = db.model('gh-860-6', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {runValidators: true};
       Breakfast.update({}, {$set: {steak: 'tofu', eggs: 2, bacon: '3 strips'}}, updateOptions, function(error) {
@@ -1142,7 +1133,7 @@ describe('model: update:', function() {
         steak: {type: String, required: true},
         eggs: {type: Number, min: 4}
       });
-      const Breakfast = db.model('gh-860-7', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {runValidators: true};
       Breakfast.update({}, {$inc: {eggs: 1}}, updateOptions, function(error) {
@@ -1155,7 +1146,7 @@ describe('model: update:', function() {
       const s = new Schema({
         toppings: [{name: {type: String, enum: ['bacon', 'cheese']}}]
       });
-      const Breakfast = db.model('gh-860-8', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {runValidators: true};
       Breakfast.update(
@@ -1173,7 +1164,7 @@ describe('model: update:', function() {
       const s = new Schema({
         toppings: [{name: {type: String, enum: ['bacon', 'cheese']}}]
       });
-      const Breakfast = db.model('gh-7536', s);
+      const Breakfast = db.model('Test', s);
 
       const updateOptions = {
         runValidators: true,
@@ -1202,7 +1193,7 @@ describe('model: update:', function() {
         file: FileSchema
       });
 
-      const Company = db.model('gh4479', CompanySchema);
+      const Company = db.model('Test', CompanySchema);
       const update = { file: { name: '' } };
       const options = { runValidators: true };
       Company.update({}, update, options, function(error) {
@@ -1216,7 +1207,7 @@ describe('model: update:', function() {
 
   it('works with $set and overwrite (gh-2515)', function(done) {
     const schema = new Schema({breakfast: String});
-    const M = db.model('gh-2515', schema);
+    const M = db.model('Test', schema);
 
     M.create({breakfast: 'bacon'}, function(error, doc) {
       assert.ifError(error);
@@ -1237,7 +1228,7 @@ describe('model: update:', function() {
 
   it('successfully casts set with nested mixed objects (gh-2796)', function(done) {
     const schema = new Schema({breakfast: {}});
-    const M = db.model('gh-2796', schema);
+    const M = db.model('Test', schema);
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
@@ -1259,7 +1250,7 @@ describe('model: update:', function() {
 
   it('handles empty update with promises (gh-2796)', function(done) {
     const schema = new Schema({eggs: Number});
-    const M = db.model('Breakfast', schema);
+    const M = db.model('Test', schema);
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
@@ -1285,7 +1276,7 @@ describe('model: update:', function() {
       band.post('update', function() {
         ++numPosts;
       });
-      const Band = db.model('gh-964', band);
+      const Band = db.model('Band', band);
 
       const gnr = new Band({members: ['Axl', 'Slash', 'Izzy', 'Duff', 'Adler']});
       gnr.save(function(error) {
@@ -1316,7 +1307,7 @@ describe('model: update:', function() {
       bandSchema.pre('update', function() {
         this.options.runValidators = true;
       });
-      const Band = db.model('gh2706', bandSchema, 'gh2706');
+      const Band = db.model('Band', bandSchema);
 
       Band.update({}, {$set: {lead: 'Not Axl'}}, function(err) {
         assert.ok(err);
@@ -1335,7 +1326,7 @@ describe('model: update:', function() {
         bandSchema.pre('update', function() {
           this.options.runValidators = true;
         });
-        const Band = db.model('gh2706', bandSchema, 'gh2706');
+        const Band = db.model('Band', bandSchema);
 
         Band.update({}, {$set: {singer: {firstName: 'Not', lastName: 'Axl'}}}, function(err) {
           assert.ok(err);
@@ -1349,7 +1340,7 @@ describe('model: update:', function() {
           role: {type: String, required: true, enum: ['singer', 'guitar', 'drums', 'bass']}
         });
         const band = new Schema({members: [member], name: String});
-        const Band = db.model('band', band, 'bands');
+        const Band = db.model('Band', band);
         const members = [
           {name: 'Axl Rose', role: 'singer'},
           {name: 'Slash', role: 'guitar'},
@@ -1375,7 +1366,7 @@ describe('model: update:', function() {
           return false;
         });
 
-        const M = db.model('gh3724', schema);
+        const M = db.model('Test', schema);
         const options = {runValidators: true};
         M.findOneAndUpdate({}, {arr: ['test']}, options, function(error) {
           assert.ok(error);
@@ -1396,7 +1387,7 @@ describe('model: update:', function() {
       author: String,
       id: Number
     };
-    const Book = db.model('gh2568', bookSchema);
+    const Book = db.model('Book', bookSchema);
 
     const jsonObject = {
       chapters: [{name: 'Ursus'}, {name: 'The Comprachicos'}],
@@ -1422,7 +1413,7 @@ describe('model: update:', function() {
     const dateSchema = {
       d: Date
     };
-    const D = db.model('gh2833', dateSchema);
+    const D = db.model('Test', dateSchema);
 
     assert.doesNotThrow(function() {
       D.update({}, {d: undefined}, function() {
@@ -1438,7 +1429,7 @@ describe('model: update:', function() {
       schema.pre('update', function() {
         this.set('updatedAt', date);
       });
-      const M = db.model('gh5770_0', schema);
+      const M = db.model('Test', schema);
 
       return M.update({}, { name: 'Test' }, { upsert: true }).
         then(() => M.findOne()).
@@ -1453,7 +1444,7 @@ describe('model: update:', function() {
       schema.pre('update', function() {
         this.set({ updatedAt: date });
       });
-      const M = db.model('gh5770_1', schema);
+      const M = db.model('Test', schema);
 
       return M.update({}, { name: 'Test' }, { upsert: true }).
         then(() => M.findOne()).
@@ -1471,7 +1462,7 @@ describe('model: update:', function() {
       return 'bar';
     });
 
-    const Parent = db.model('gh2046', parentSchema, 'gh2046');
+    const Parent = db.model('Parent', parentSchema);
 
     const update = Parent.update({}, {$push: {children: {foo: 'foo'}}}, {upsert: true});
     assert.equal(update._update.$push.children.bar, undefined);
@@ -1492,7 +1483,7 @@ describe('model: update:', function() {
       key: Number,
       value: String
     });
-    const Model = db.model('gh3008', FooSchema);
+    const Model = db.model('Test', FooSchema);
 
     const update = {$set: {values: 2, value: 2}};
     Model.update({key: 1}, update, function() {
@@ -1504,7 +1495,7 @@ describe('model: update:', function() {
   describe('bug fixes', function() {
     it('can $rename (gh-1845)', function(done) {
       const schema = new Schema({ foo: Date, bar: Date });
-      const Model = db.model('gh1845', schema, 'gh1845');
+      const Model = db.model('Test', schema);
 
       const update = { $rename: { foo: 'bar'} };
       Model.create({ foo: Date.now() }, function(error) {
@@ -1520,7 +1511,7 @@ describe('model: update:', function() {
 
     it('allows objects with positional operator (gh-3185)', function(done) {
       const schema = new Schema({children: [{_id: Number}]});
-      const MyModel = db.model('gh3185', schema, 'gh3185');
+      const MyModel = db.model('Test', schema);
 
       MyModel.create({children: [{_id: 1}]}, function(error, doc) {
         assert.ifError(error);
@@ -1538,7 +1529,7 @@ describe('model: update:', function() {
 
     it('mixed type casting (gh-3305)', function(done) {
       const Schema = mongoose.Schema({}, {strict: false});
-      const Model = db.model('gh3305', Schema);
+      const Model = db.model('Test', Schema);
 
       Model.create({}, function(error, m) {
         assert.ifError(error);
@@ -1556,7 +1547,7 @@ describe('model: update:', function() {
       const schema = mongoose.Schema({ name: String, age: Number }, {
         versionKey: false
       });
-      const Model = db.model('gh3998_r1', schema);
+      const Model = db.model('Test', schema);
 
       Model.create({ name: 'abc', age: 1 }, function(error, m) {
         assert.ifError(error);
@@ -1576,7 +1567,7 @@ describe('model: update:', function() {
 
     it('mixed nested type casting (gh-3337)', function(done) {
       const Schema = mongoose.Schema({attributes: {}}, {strict: true});
-      const Model = db.model('gh3337', Schema);
+      const Model = db.model('Test', Schema);
 
       Model.create({}, function(error, m) {
         assert.ifError(error);
@@ -1641,7 +1632,7 @@ describe('model: update:', function() {
         field2: SubdocSchema
       });
 
-      const Collection = db.model('gh4621', CollectionSchema);
+      const Collection = db.model('Test', CollectionSchema);
 
       Collection.create({}, function(error, doc) {
         assert.ifError(error);
@@ -1661,7 +1652,7 @@ describe('model: update:', function() {
 
     it('works with buffers (gh-3496)', function(done) {
       const Schema = mongoose.Schema({myBufferField: Buffer});
-      const Model = db.model('gh3496', Schema);
+      const Model = db.model('Test', Schema);
 
       Model.update({}, {myBufferField: Buffer.alloc(1)}, function(error) {
         assert.ifError(error);
@@ -1671,7 +1662,7 @@ describe('model: update:', function() {
 
     it('.update(doc) (gh-3221)', function() {
       const Schema = mongoose.Schema({name: String});
-      const Model = db.model('gh3221', Schema);
+      const Model = db.model('Test', Schema);
 
       let query = Model.update({name: 'Val'});
       assert.equal(query.getUpdate().name, 'Val');
@@ -1694,7 +1685,7 @@ describe('model: update:', function() {
         regions: [OrderSchema]
       }, { useNestedStrict: true });
 
-      const Season = db.model('gh3883', SeasonSchema);
+      const Season = db.model('Test', SeasonSchema);
       const obj = { regions: [{ r: 'test', action: { order: 'hold' } }] };
       Season.create(obj, function(error) {
         assert.ifError(error);
@@ -1717,7 +1708,7 @@ describe('model: update:', function() {
         next();
       });
 
-      const Model = db.model('gh3549', Schema);
+      const Model = db.model('Test', Schema);
 
       Model.create({}, function(error, doc) {
         assert.ifError(error);
@@ -1745,7 +1736,7 @@ describe('model: update:', function() {
         followers: [500]
       };
 
-      const M = db.model('gh-3564', schema);
+      const M = db.model('Test', schema);
 
       M.create(doc, function(err) {
         assert.ifError(err);
@@ -1774,7 +1765,7 @@ describe('model: update:', function() {
         infoList: { type: [InfoSchema] }
       });
 
-      const ModelA = db.model('gh3890', ModelASchema);
+      const ModelA = db.model('Test', ModelASchema);
 
       const propValue = Buffer.from('aa267824dc1796f265ab47870e279780', 'base64');
 
@@ -1795,7 +1786,7 @@ describe('model: update:', function() {
         name: Buffer
       };
 
-      const Model = db.model('gh3961', schema);
+      const Model = db.model('Test', schema);
 
       const value = Buffer.from('aa267824dc1796f265ab47870e279780', 'base64');
       const instance = new Model({ name: null });
@@ -1817,7 +1808,7 @@ describe('model: update:', function() {
         arr: [{ num: Number }]
       });
 
-      const Model = db.model('gh2593', schema);
+      const Model = db.model('Test', schema);
       const update = { $inc: { num: 1 }, $push: { arr: { num: 5 } } };
       const options = {
         upsert: true,
@@ -1837,7 +1828,7 @@ describe('model: update:', function() {
         tags: [String]
       }, { timestamps: true });
 
-      const Tag = db.model('gh4989', TagSchema);
+      const Tag = db.model('Test', TagSchema);
 
       return co(function*() {
         yield Tag.create({ name: 'test' });
@@ -1886,7 +1877,7 @@ describe('model: update:', function() {
         name: String
       }, { timestamps: true });
 
-      const Test = db.model('gh5222', testSchema);
+      const Test = db.model('Test', testSchema);
 
       Test.create({ name: 'test' }, function(error) {
         assert.ifError(error);
@@ -1915,7 +1906,7 @@ describe('model: update:', function() {
         }
       });
 
-      const Company = mongoose.model('Company', CompanySchema);
+      const Company = db.model('Company', CompanySchema);
 
       const update = {
         area: {
@@ -1953,7 +1944,7 @@ describe('model: update:', function() {
         children: [childSchema]
       }, opts);
 
-      const Parent = db.model('gh4049', parentSchema);
+      const Parent = db.model('Parent', parentSchema);
 
       const b2 = new Parent();
       b2.save(function(err, doc) {
@@ -1991,7 +1982,7 @@ describe('model: update:', function() {
         child: childSchema
       }, opts);
 
-      const Parent = db.model('gh4049_0', parentSchema);
+      const Parent = db.model('Parent', parentSchema);
 
       const b2 = new Parent();
       b2.save(function(err, doc) {
@@ -2025,7 +2016,7 @@ describe('model: update:', function() {
         }]
       }, { timestamps: true });
 
-      const Model = db.model('gh4418', schema);
+      const Model = db.model('Test', schema);
       const query = { 'thing.thing2': 'test' };
       const update = { $set: { 'thing.$.test': 'test' } };
       Model.update(query, update, function(error) {
@@ -2041,7 +2032,7 @@ describe('model: update:', function() {
         }]
       }, { timestamps: true });
 
-      const sampleModel = db.model('gh4514', sampleSchema);
+      const sampleModel = db.model('Test', sampleSchema);
       const newRecord = new sampleModel({
         sampleArray: [{ values: ['record1'] }]
       });
@@ -2075,7 +2066,7 @@ describe('model: update:', function() {
         children: [childSchema]
       });
 
-      const Model = db.model('gh4953', parentSchema);
+      const Model = db.model('Test', parentSchema);
 
       const update = {
         $addToSet: { children: { name: 'Test' } }
@@ -2094,7 +2085,7 @@ describe('model: update:', function() {
         something: Number
       }, { timestamps: true });
 
-      const TestModel = db.model('gh4054', testSchema);
+      const TestModel = db.model('Test', testSchema);
       const options = { overwrite: true, upsert: true };
       const update = {
         user: 'John',
@@ -2120,7 +2111,7 @@ describe('model: update:', function() {
         arr: [arrSchema]
       });
 
-      const M = db.model('gh4609', schema);
+      const M = db.model('Test', schema);
 
       const m = new M({ arr: [{ ip: Buffer.alloc(1) }] });
       m.save(function(error, m) {
@@ -2135,7 +2126,7 @@ describe('model: update:', function() {
     it('update handles casting with mongoose-long (gh-4283)', function(done) {
       require('mongoose-long')(mongoose);
 
-      const Model = db.model('gh4283', {
+      const Model = db.model('Test', {
         number: { type: mongoose.Types.Long }
       });
 
@@ -2186,7 +2177,7 @@ describe('model: update:', function() {
         }]
       });
 
-      const User = db.model('gh4960', UserSchema);
+      const User = db.model('User', UserSchema);
 
       User.create({}).
         then(function(user) {
@@ -2214,7 +2205,7 @@ describe('model: update:', function() {
         geo: {type: [Number], index: '2dsphere'}
       }, { _id : false });
       const containerSchema = new Schema({ address: addressSchema });
-      const Container = db.model('gh4465', containerSchema);
+      const Container = db.model('Test', containerSchema);
 
       Container.update({}, { address: { geo: [-120.24, 39.21] } }).
         exec(function(error) {
@@ -2233,7 +2224,7 @@ describe('model: update:', function() {
 
       let B = new Schema({a: [A]});
 
-      B = db.model('b', B);
+      B = db.model('Test', B);
 
       B.findOneAndUpdate(
         {foo: 'bar'},
@@ -2266,7 +2257,7 @@ describe('model: update:', function() {
       });
 
 
-      const User = db.model('gh4655', UserSchema);
+      const User = db.model('User', UserSchema);
 
       User.create({ profiles: [] }, function(error, user) {
         assert.ifError(error);
@@ -2287,7 +2278,7 @@ describe('model: update:', function() {
         name: String,
         meta: { age: { type: Number } }
       });
-      const User = db.model('gh4749', schema);
+      const User = db.model('User', schema);
 
       const filter = { name: 'Bar' };
       const update = { name: 'Bar', meta: { age: 33 } };
@@ -2331,7 +2322,7 @@ describe('model: update:', function() {
         username: String,
         isDeleted: Boolean
       }, { timestamps: true });
-      const User = db.model('gh5045', schema);
+      const User = db.model('Test', schema);
 
       User.findOneAndUpdate(
         { username: 'test', isDeleted: false },
@@ -2366,7 +2357,7 @@ describe('model: update:', function() {
         }]
       });
 
-      const User = db.model('gh5041', UserSchema);
+      const User = db.model('User', UserSchema);
 
       User.findOneAndUpdate({}, { foos: [{ foo: '13.57' }] }, function(error) {
         assert.ifError(error);
@@ -2383,7 +2374,7 @@ describe('model: update:', function() {
         },
         otherName: String
       });
-      const Test = db.model('gh3556', testSchema);
+      const Test = db.model('Test', testSchema);
 
       const opts = { overwrite: true, runValidators: true };
       Test.update({}, { otherName: 'test' }, opts, function(error) {
@@ -2401,7 +2392,7 @@ describe('model: update:', function() {
         username: String,
         x: String
       }, { timestamps: true });
-      const User = db.model('gh5088', schema);
+      const User = db.model('User', schema);
 
       User.create({ username: 'test' }).
         then(function(user) {
@@ -2420,7 +2411,7 @@ describe('model: update:', function() {
       const schema = new Schema({
         fieldOne: String
       }, { strict: true });
-      const Test = db.model('gh5111', schema);
+      const Test = db.model('Test', schema);
 
       Test.create({ fieldOne: 'Test' }).
         then(function() {
@@ -2448,7 +2439,7 @@ describe('model: update:', function() {
         name: String,
         arr: [{ name: String }]
       }, { strict: true });
-      const Test = db.model('gh5164', schema);
+      const Test = db.model('Test', schema);
 
       const doc = new Test({ name: 'Test', arr: [null, {name: 'abc'}] });
 
@@ -2472,7 +2463,7 @@ describe('model: update:', function() {
         colors: [{type: String}]
       });
 
-      const Model = db.model('gh5403', Schema);
+      const Model = db.model('Test', Schema);
 
       Model.create({ colors: ['green'] }).
         then(function() {
@@ -2497,7 +2488,7 @@ describe('model: update:', function() {
         nested: nestedSchema
       });
 
-      const Model = db.model('gh-7098', schema);
+      const Model = db.model('Test', schema);
 
       const test = new Model({
         xyz: [
@@ -2536,7 +2527,7 @@ describe('model: update:', function() {
         something: { type: Number, default: 2 }
       });
 
-      const TestModel = db.model('gh5384', testSchema);
+      const TestModel = db.model('Test', testSchema);
       const options = {
         overwrite: true,
         upsert: true,
@@ -2569,7 +2560,7 @@ describe('model: update:', function() {
         d: childSchema
       });
 
-      const Parent = db.model('gh5269', parentSchema);
+      const Parent = db.model('Parent', parentSchema);
 
       Parent.update({}, { d: { d2: 'test' } }, { runValidators: true }, function(error) {
         assert.ok(error);
@@ -2586,7 +2577,7 @@ describe('model: update:', function() {
         data: String
       }, { timestamps: true });
 
-      const Model = db.model('gh5413', schema);
+      const Model = db.model('Test', schema);
 
       Model.
         where({ _id: 'test' }).
@@ -2604,13 +2595,13 @@ describe('model: update:', function() {
         message: String
       });
 
-      const Notification = db.model('gh5430_0', notificationSchema);
+      const Notification = db.model('Test', notificationSchema);
 
       const userSchema = new mongoose.Schema({
         notifications: [notificationSchema]
       });
 
-      const User = db.model('gh5430', userSchema);
+      const User = db.model('User', userSchema);
 
       User.update({}, {
         $push: {
@@ -2636,7 +2627,7 @@ describe('model: update:', function() {
         notifications: [notificationSchema]
       });
 
-      const User = db.model('gh5555', userSchema);
+      const User = db.model('User', userSchema);
 
       const opts = { multi: true, runValidators: true };
       const update = {
@@ -2672,7 +2663,7 @@ describe('model: update:', function() {
           name: String
         }]
       });
-      const ExampleModel = db.model('gh5744', exampleSchema);
+      const ExampleModel = db.model('Test', exampleSchema);
       const exampleDocument = {
         subdocuments: [{ name: 'First' }, { name: 'Second' }]
       };
@@ -2706,7 +2697,7 @@ describe('model: update:', function() {
         }
       });
 
-      const Item = db.model('gh6431', ItemSchema);
+      const Item = db.model('Test', ItemSchema);
 
       const opts = {
         runValidators: true,
@@ -2749,7 +2740,7 @@ describe('model: update:', function() {
           }]
         });
 
-        const Person = db.model('gh5361', schema);
+        const Person = db.model('Person', schema);
 
         const data = {
           name: 'Jack',
@@ -2779,7 +2770,7 @@ describe('model: update:', function() {
         date: { type: Date, required: true }
       }, { strict: true });
 
-      const Model = db.model('gh5453', schema);
+      const Model = db.model('Test', schema);
       const q = { notInSchema: true };
       const u = { $set: { smth: 1 } };
       const o = { strict: false, upsert: true };
@@ -2789,7 +2780,7 @@ describe('model: update:', function() {
     });
 
     it('replaceOne with buffer (gh-6124)', function() {
-      const SomeModel = db.model('gh6124', new Schema({
+      const SomeModel = db.model('Test', new Schema({
         name: String,
         binaryProp: Buffer
       }));
@@ -2813,7 +2804,7 @@ describe('model: update:', function() {
         name: String
       });
 
-      const Model = db.model('gh3677', schema);
+      const Model = db.model('Test', schema);
       Model.updateMany(['foo'], { name: 'bar' }, function(error) {
         assert.ok(error);
         assert.equal(error.name, 'ObjectParameterError');
@@ -2828,7 +2819,7 @@ describe('model: update:', function() {
         name: String
       });
 
-      const Model = db.model('gh5839', schema);
+      const Model = db.model('Test', schema);
 
       const opts = { upsert: 1 };
       Model.update({ name: 'Test' }, { name: 'Test2' }, opts, function(error) {
@@ -2846,7 +2837,7 @@ describe('model: update:', function() {
         numbers: [Number]
       });
 
-      const Model = db.model('gh6086', schema);
+      const Model = db.model('Test', schema);
 
       return Model.create({ numbers: [1, 2] }).
         then(function(doc) {
@@ -2868,7 +2859,7 @@ describe('model: update:', function() {
         arr: [[String]]
       });
 
-      const Test = db.model('gh6768', schema);
+      const Test = db.model('Test', schema);
 
       const test = new Test;
 
@@ -2900,7 +2891,7 @@ describe('model: update:', function() {
         const textSchema = new Schema({ text: String }, { _id: false });
         sectionArray.discriminator('text', textSchema);
 
-        const Site = db.model('gh5841', siteSchema);
+        const Site = db.model('Test', siteSchema);
 
         let doc = yield Site.create({
           sections: [
@@ -2929,7 +2920,7 @@ describe('model: update:', function() {
         strict: true
       });
 
-      const Test = db.model('gh5640', testSchema);
+      const Test = db.model('Test', testSchema);
 
       const doc = {
         _id: {
@@ -2955,7 +2946,7 @@ describe('model: update:', function() {
 
     it('$inc cast errors (gh-6770)', function() {
       const testSchema = new mongoose.Schema({ num: Number });
-      const Test = db.model('gh6770', testSchema);
+      const Test = db.model('Test', testSchema);
 
       return co(function*() {
         yield Test.create({ num: 1 });
@@ -2992,7 +2983,7 @@ describe('model: update:', function() {
         return this.total * 0.15;
       });
 
-      const Test = db.model('gh6731', schema);
+      const Test = db.model('Test', schema);
 
       // Shouldn't throw an error because `capitalGainsTax` is a virtual
       return Test.update({}, { total: 10000, capitalGainsTax: 1500 });
@@ -3003,7 +2994,7 @@ describe('model: update:', function() {
         name: String
       }, { strict: true });
 
-      const Model = db.model('gh5477', schema);
+      const Model = db.model('Test', schema);
       const q = { notAField: true };
       const u = { $set: { name: 'Test' } };
       const o = { upsert: true };
@@ -3072,7 +3063,7 @@ describe('model: update:', function() {
         arr: [sub]
       });
 
-      const Test = db.model('gh6532', schema);
+      const Test = db.model('Test', schema);
 
       const test = {
         name: 'Xyz',
@@ -3111,6 +3102,9 @@ describe('model: updateOne: ', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => util.clearTestData(db));
+
   it('updating a map (gh-7111)', function() {
     const accountSchema = new Schema({ balance: Number });
 
@@ -3121,7 +3115,7 @@ describe('model: updateOne: ', function() {
       }
     });
 
-    const Test = db.model('gh7111', schema);
+    const Test = db.model('Test', schema);
 
     return co(function*() {
       const doc = yield Test.create({ accounts: { USD: { balance: 345 } } });
@@ -3139,7 +3133,7 @@ describe('model: updateOne: ', function() {
     }, { _id: false });
     const ArraySchema = Schema({ anArray: [ElementSchema] });
 
-    const TestModel = db.model('gh7135', ArraySchema);
+    const TestModel = db.model('Test', ArraySchema);
 
     return co(function*() {
       let err = yield TestModel.
@@ -3160,7 +3154,7 @@ describe('model: updateOne: ', function() {
   it('sets child timestamps even without $set (gh-7261)', function() {
     const childSchema = new Schema({ name: String }, { timestamps: true });
     const parentSchema = new Schema({ child: childSchema });
-    const Parent = db.model('gh7261', parentSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
       yield Parent.create({ child: { name: 'Luke Skywalker' } });
@@ -3183,7 +3177,7 @@ describe('model: updateOne: ', function() {
       kind: { type: String, required: true }
     }, { discriminatorKey: 'kind' });
 
-    const Test = db.model('gh7843', testSchema);
+    const Test = db.model('Test', testSchema);
 
     const testSchemaChild = new mongoose.Schema({
       label: String
@@ -3209,7 +3203,7 @@ describe('model: updateOne: ', function() {
       name: String
     }, { timestamps: true });
 
-    const Model = db.model('gh7917', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       yield Model.updateOne({}, { name: 'foo' }, { upsert: true });
@@ -3230,7 +3224,7 @@ describe('model: updateOne: ', function() {
       name: String
     }, { timestamps: true });
 
-    const Model = db.model('gh8001', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       yield Model.updateOne({}, { test: 'before', name: 'foo' }, { upsert: true });
@@ -3248,7 +3242,7 @@ describe('model: updateOne: ', function() {
   });
 
   it('allow $pull with non-existent schema field (gh-8166)', function() {
-    const Model = db.model('gh8166', Schema({
+    const Model = db.model('Test', Schema({
       name: String,
       arr: [{
         status: String,
@@ -3291,7 +3285,7 @@ describe('model: updateOne: ', function() {
     slidesSchema.discriminator('typeA', new Schema({ a: String }));
     slidesSchema.discriminator('typeB', new Schema({ b: String }));
 
-    const MyModel = db.model('gh8063', schema);
+    const MyModel = db.model('Test', schema);
     return co(function*() {
       const doc = yield MyModel.create({
         slides: [{ type: 'typeA', a: 'oldValue1', commonField: 'oldValue2' }]
@@ -3315,7 +3309,7 @@ describe('model: updateOne: ', function() {
   });
 
   it('moves $set of immutable properties to $setOnInsert (gh-8467)', function() {
-    const Model = db.model('gh8467', Schema({
+    const Model = db.model('Test', Schema({
       name: String,
       age: { type: Number, default: 25, immutable: true }
     }));
@@ -3358,7 +3352,7 @@ describe('model: updateOne: ', function() {
 
     it('update pipeline (gh-8225)', function() {
       const schema = Schema({ oldProp: String, newProp: String });
-      const Model = db.model('gh8225', schema);
+      const Model = db.model('Test', schema);
 
       return co(function*() {
         yield Model.create({ oldProp: 'test' });
@@ -3382,7 +3376,7 @@ describe('model: updateOne: ', function() {
     });
 
     it('update pipeline timestamps (gh-8524)', function() {
-      const Cat = db.model('Cat', Schema({ name: String }, { timestamps: true }));
+      const Cat = db.model('Test', Schema({ name: String }, { timestamps: true }));
 
       return co(function*() {
         const cat = yield Cat.create({ name: 'Entei' });

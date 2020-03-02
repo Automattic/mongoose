@@ -9,6 +9,7 @@ const start = require('./common');
 const assert = require('assert');
 const co = require('co');
 const utils = require('../lib/utils');
+const util = require('./util');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
@@ -68,18 +69,7 @@ describe('model: populate:', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   it('populating array of object', function(done) {
     const BlogPost = db.model('BlogPost', blogPostSchema);

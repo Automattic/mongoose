@@ -9,6 +9,7 @@ const start = require('./common');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
+const util = require('./util');
 const Buffer = require('safe-buffer').Buffer;
 
 const mongoose = start.mongoose;
@@ -84,18 +85,7 @@ describe('Model', function() {
     db.close();
   });
 
-  afterEach(() => {
-    const arr = [];
-
-    if (db.models == null) {
-      return;
-    }
-    for (const model of Object.keys(db.models)) {
-      arr.push(db.models[model].deleteMany({}));
-    }
-
-    return Promise.all(arr);
-  });
+  afterEach(() => util.clearTestData(db));
 
   it('can be created using _id as embedded document', function(done) {
     const Test = db.model('Test', Schema({
@@ -5963,6 +5953,32 @@ describe('Model', function() {
       });
     });
 
+    it('syncIndexes() with different key order (gh-8559)', function() {
+      this.timeout(5000);
+
+      return co(function*() {
+        yield db.dropDatabase();
+
+        const opts = { autoIndex: false };
+        let schema = new Schema({ name: String, age: Number }, opts);
+        schema.index({ name: 1, _id: 1 });
+
+        let M = db.model('Test', schema);
+
+        let dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, []);
+
+        // New model, same collection, different key order
+        schema = new Schema({ name: String, age: Number }, opts);
+        schema.index({ name: 1 });
+        db.deleteModel(/Test/);
+        M = db.model('Test', schema);
+
+        dropped = yield M.syncIndexes();
+        assert.deepEqual(dropped, ['name_1__id_1']);
+      });
+    });
+
     it('using `new db.model()()` (gh-6698)', function(done) {
       db.model('Test', new Schema({
         name: String
@@ -6058,7 +6074,7 @@ describe('Model', function() {
       const Model = db.model('User', userSchema);
 
       return co(function*() {
-        yield Model.collection.drop();
+        yield Model.collection.drop().catch(() => {});
         yield Model.createCollection();
 
         // If the collection is not created, the following will throw

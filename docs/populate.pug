@@ -576,6 +576,36 @@ block content
     });
     ```
 
+    You can also use [the populate `match` option](http://thecodebarbarian.com/mongoose-5-5-static-hooks-and-populate-match-functions.html#populate-match-function)
+    to add an additional filter to the `populate()` query. This is useful
+    if you need to split up `populate()` data:
+
+    ```javascript
+    const PersonSchema = new Schema({
+      name: String,
+      band: String,
+      isActive: Boolean
+    });
+
+    const BandSchema = new Schema({
+      name: String
+    });
+    BandSchema.virtual('activeMembers', {
+      ref: 'Person',
+      localField: 'name',
+      foreignField: 'band',
+      justOne: false,
+      match: { isActive: true }
+    });
+    BandSchema.virtual('formerMembers', {
+      ref: 'Person',
+      localField: 'name',
+      foreignField: 'band',
+      justOne: false,
+      match: { isActive: false }
+    });
+    ```
+
     Keep in mind that virtuals are _not_ included in `toJSON()` output by default. If you want populate virtuals to show up when using functions
     that rely on `JSON.stringify()`, like Express'
     [`res.json()` function](http://expressjs.com/en/4x/api.html#res.json),

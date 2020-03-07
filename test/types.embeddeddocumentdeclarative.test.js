@@ -82,6 +82,23 @@ describe('types.embeddeddocumentdeclarative', function() {
         assert.ok(schema.path('arr').schema.path('nested').instance !== 'Mixed');
         assert.ok(schema.path('arr').schema.path('nested.test') instanceof mongoose.Schema.Types.String);
       });
+
+      it('nested array (gh-8627)', function() {
+        const schema = new Schema({
+          l1: {
+            type: {
+              l2: {
+                type: {
+                  test: String
+                }
+              }
+            }
+          }
+        }, { typePojoToMixed: false });
+
+        assert.ok(schema.path('l1').instance !== 'Mixed');
+        assert.ok(schema.path('l1.l2').instance !== 'Mixed');
+      });
     });
   });
   describe('with a parent with a POJO field with a field "type" with a type set to "String"', function() {

@@ -5983,7 +5983,7 @@ describe('Model', function() {
         yield db.dropDatabase();
 
         const opts = { autoIndex: false };
-        let schema = new Schema({ name: String }, opts);
+        const schema = new Schema({ name: String }, opts);
         schema.index({ name: 1 }, { background: true });
 
         const M = db.model('Test', schema);

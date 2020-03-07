@@ -1658,6 +1658,18 @@ describe('types array', function() {
 
       assert.deepEqual(arr, [3, 5, 7, 11]);
     });
+
+    it('with unshift (gh-8482)', function() {
+      const M = db.model('Test', Schema({ arr: [Number] }));
+
+      const doc = new M({ arr: [1, 2, 3] });
+
+      const arr = doc.arr.slice(2);
+
+      arr.unshift(10);
+
+      assert.deepEqual(arr, [10, 3]);
+    });
   });
 
   describe('setting a doc array', function() {

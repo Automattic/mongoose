@@ -59,6 +59,7 @@ describe('ValidationError', function() {
       // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'min Date validation failed.');
+        assert.ok(err.message.startsWith('MinSchema validation failed'));
         model.appointmentDate = new Date(Date.now().valueOf() + 10000);
 
         // should pass validation
@@ -85,6 +86,7 @@ describe('ValidationError', function() {
       // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'max Date validation failed');
+        assert.ok(err.message.startsWith('MaxSchema validation failed'));
         model.birthdate = Date.now();
 
         // should pass validation
@@ -111,6 +113,7 @@ describe('ValidationError', function() {
       // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'String minlegth validation failed.');
+        assert.ok(err.message.startsWith('MinLengthAddress validation failed'));
         model.postalCode = '95125';
 
         // should pass validation
@@ -142,6 +145,7 @@ describe('ValidationError', function() {
       // should fail validation
       model.validate(function(err) {
         assert.equal(err.errors['postalCode'].message, 'woops!');
+        assert.ok(err.message.startsWith('gh4207 validation failed'));
         mongoose.Error.messages = old;
         done();
       });
@@ -163,6 +167,7 @@ describe('ValidationError', function() {
       // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'String maxlegth validation failed.');
+        assert.ok(err.message.startsWith('MaxLengthAddress validation failed'));
         model.postalCode = '95125';
 
         // should pass validation
@@ -198,17 +203,16 @@ describe('ValidationError', function() {
   });
 
   describe('formatMessage', function() {
-    it('replaces properties in a message', function(done) {
+    it('replaces properties in a message', function() {
       const props = {base: 'eggs', topping: 'bacon'};
       const message = 'I had {BASE} and {TOPPING} for breakfast';
 
       const result = ValidatorError.prototype.formatMessage(message, props);
       assert.equal(result, 'I had eggs and bacon for breakfast');
-      done();
     });
   });
 
-  it('JSON.stringify() with message (gh-5309)', function(done) {
+  it('JSON.stringify() with message (gh-5309)', function() {
     model.modelName = 'TestClass';
     const err = new ValidationError(new model());
 
@@ -220,8 +224,12 @@ describe('ValidationError', function() {
     assert.ok(obj.message.indexOf('test: Fail') !== -1,
       obj.message);
 
-    done();
-
     function model() {}
+  });
+
+  it('default error message', function() {
+    const err = new ValidationError();
+
+    assert.equal(err.message, 'Validation failed');
   });
 });

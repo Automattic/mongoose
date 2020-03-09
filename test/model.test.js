@@ -5874,7 +5874,6 @@ describe('Model', function() {
         let M = db.model('Test', new Schema({
           name: { type: String, index: true }
         }, { autoIndex: false }), coll);
-
         let dropped = yield M.syncIndexes();
         assert.deepEqual(dropped, []);
 
@@ -5976,6 +5975,23 @@ describe('Model', function() {
 
         dropped = yield M.syncIndexes();
         assert.deepEqual(dropped, ['name_1__id_1']);
+      });
+    });
+
+    it('syncIndexes() allows overwriting `background` option (gh-8645)', function() {
+      return co(function*() {
+        yield db.dropDatabase();
+
+        const opts = { autoIndex: false };
+        const schema = new Schema({ name: String }, opts);
+        schema.index({ name: 1 }, { background: true });
+
+        const M = db.model('Test', schema);
+        yield M.syncIndexes({ background: false });
+
+        const indexes = yield M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.strictEqual(indexes[1].background, false);
       });
     });
 

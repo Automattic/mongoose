@@ -8829,4 +8829,15 @@ describe('document', function() {
       assert.ok(!err.errors['nested.age']);
     });
   });
+
+  it('copies immutable fields when constructing new doc from old doc (gh-8642)', function() {
+    const schema = Schema({ name: { type: String, immutable: true } });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ name: 'test' });
+    doc.isNew = false;
+
+    const newDoc = new Model(doc);
+    assert.equal(newDoc.name, 'test');
+  });
 });

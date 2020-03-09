@@ -16,14 +16,12 @@ const Schema = mongoose.Schema;
 
 describe('types.embeddeddocumentdeclarative', function() {
   describe('with a parent with a field with type set to a POJO', function() {
-    const ChildSchemaDef = {
-      name: String,
-    };
-
     const ParentSchemaDef = {
       name: String,
       child: {
-        type: ChildSchemaDef,
+        type: {
+          name: String
+        }
       }
     };
 
@@ -70,6 +68,36 @@ describe('types.embeddeddocumentdeclarative', function() {
         assert.equal(princessZelda.name, 'Princess Zelda');
         assert.strictEqual(princessZelda.mixedUp, undefined);
         done();
+      });
+
+      it('underneath array (gh-8627)', function() {
+        const schema = new Schema({
+          arr: [{
+            nested: {
+              type: { test: String }
+            }
+          }]
+        }, { typePojoToMixed: false });
+
+        assert.ok(schema.path('arr').schema.path('nested').instance !== 'Mixed');
+        assert.ok(schema.path('arr').schema.path('nested.test') instanceof mongoose.Schema.Types.String);
+      });
+
+      it('nested array (gh-8627)', function() {
+        const schema = new Schema({
+          l1: {
+            type: {
+              l2: {
+                type: {
+                  test: String
+                }
+              }
+            }
+          }
+        }, { typePojoToMixed: false });
+
+        assert.ok(schema.path('l1').instance !== 'Mixed');
+        assert.ok(schema.path('l1.l2').instance !== 'Mixed');
       });
     });
   });

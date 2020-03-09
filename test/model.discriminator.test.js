@@ -392,7 +392,7 @@ describe('model', function() {
       it('with typeKey (gh-4339)', function(done) {
         var options = { typeKey: '$type', discriminatorKey: '_t' };
         var schema = new Schema({ test: { $type: String } }, options);
-        var Model = mongoose.model('Test', schema);
+        var Model = db.model('Test', schema);
         Model.discriminator('D', new Schema({
           test2: String
         }, { typeKey: '$type' }));
@@ -465,7 +465,7 @@ describe('model', function() {
 
         schema.path('items').discriminator('concrete', concreteSchema);
 
-        const Thing = mongoose.model('Thing', schema);
+        const Thing = db.model('Test', schema);
         const doc = new Thing();
 
         assert.equal(doc.items[0].foo, 42);
@@ -1325,7 +1325,7 @@ describe('model', function() {
       afterEach(function() { mongoose.deleteModel(/.+/); });
 
       it('does not modify _id path of the passed in schema the _id is not auto generated (gh-8543)', function() {
-        const model = mongoose.model('Model', new mongoose.Schema({ _id: Number }));
+        const model = db.model('Model', new mongoose.Schema({ _id: Number }));
         const passedInSchema = new mongoose.Schema({});
         model.discriminator('Discrimintaor', passedInSchema);
         assert.equal(passedInSchema.path('_id').instance, 'Number');
@@ -1336,9 +1336,9 @@ describe('model', function() {
       it('when the base schema has an _id that is not auto generated (gh-8543) (gh-8546)', function() {
         const unrelatedSchema = new mongoose.Schema({});
         unrelatedSchema.clone = throwErrorOnClone;
-        mongoose.model('UnrelatedModel', unrelatedSchema);
+        db.model('UnrelatedModel', unrelatedSchema);
 
-        const model = mongoose.model('Model', new mongoose.Schema({ _id: mongoose.Types.ObjectId }, { _id: false }));
+        const model = db.model('Model', new mongoose.Schema({ _id: mongoose.Types.ObjectId }, { _id: false }));
         model.discriminator('Discrimintaor', new mongoose.Schema({}).clone());
       });
     });
@@ -1401,9 +1401,9 @@ describe('model', function() {
 
       const eventSchema = new mongoose.Schema({ time: Date }, options);
       const eventModelUser1 =
-        mongoose.model('Test', eventSchema);
+        db.model('Test', eventSchema);
       const eventModelUser2 =
-        mongoose.model('Test1', eventSchema);
+        db.model('Test1', eventSchema);
 
       const discSchema = new mongoose.Schema({ url: String }, options);
       const clickEventUser1 = eventModelUser1.
@@ -1431,7 +1431,7 @@ describe('model', function() {
     it('uses correct discriminator when using `new BaseModel` with value (gh-7851)', function() {
       const options = { discriminatorKey: 'kind' };
 
-      const BaseModel = mongoose.model('Parent',
+      const BaseModel = db.model('Parent',
         Schema({ name: String }, options));
       const ChildModel = BaseModel.discriminator('Child',
         Schema({ test: String }, options), 'child');
@@ -1547,7 +1547,7 @@ describe('model', function() {
       const ProductSchema = new Schema({
         title: String
       });
-      const Product = mongoose.model('Product', ProductSchema);
+      const Product = db.model('Product', ProductSchema);
       const ProductItemSchema = new Schema({
         product: { type: Schema.Types.ObjectId, ref: 'Product' }
       });
@@ -1559,7 +1559,7 @@ describe('model', function() {
       });
 
       OrderSchema.path('items').discriminator('ProductItem', ProductItemSchema);
-      const Order = mongoose.model('Order', OrderSchema);
+      const Order = db.model('Order', OrderSchema);
 
       const product = new Product({title: 'Product title'});
 

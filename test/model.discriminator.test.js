@@ -1400,6 +1400,7 @@ describe('model', function() {
       const options = { discriminatorKey: 'kind' };
 
       const eventSchema = new mongoose.Schema({ time: Date }, options);
+      mongoose.deleteModel(/Test/);
       const eventModelUser1 =
         mongoose.model('Test', eventSchema, 'tests');
       const eventModelUser2 =

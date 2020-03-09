@@ -1397,13 +1397,13 @@ describe('model', function() {
     });
 
     it('with subclassing (gh-7547)', function() {
-      const options = { discriminatorKey: "kind" };
+      const options = { discriminatorKey: 'kind' };
 
       const eventSchema = new mongoose.Schema({ time: Date }, options);
       const eventModelUser1 =
-        db.model('Test', eventSchema);
+        mongoose.model('Test', eventSchema, 'tests');
       const eventModelUser2 =
-        db.model('Test1', eventSchema);
+        mongoose.model('Test', eventSchema, 'test1');
 
       const discSchema = new mongoose.Schema({ url: String }, options);
       const clickEventUser1 = eventModelUser1.

@@ -1,3 +1,14 @@
+5.9.4 / 2020-03-09
+==================
+ * fix(document): allow `new Model(doc)` to set immutable properties when doc is a mongoose document #8642
+ * fix(array): make sure you can call `unshift()` after `slice()` #8482
+ * fix(schema): propagate `typePojoToMixed` to implicitly created arrays #8627
+ * fix(schema): also propagate `typePojoToMixed` option to schemas implicitly created because of `typePojoToMixed` #8627
+ * fix(model): support passing `background` option to `syncIndexes()` #8645
+ * docs(schema): add a section about the `_id` path in schemas #8625
+ * docs(virtualtype+populate): document using `match` with virtual populate #8616
+ * docs(guide): fix typo #8648 [sauzy34](https://github.com/sauzy34)
+
 5.9.3 / 2020-03-02
 ==================
  * fix: upgrade mongodb driver -> 3.5.4 #8620

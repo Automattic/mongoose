@@ -1861,10 +1861,10 @@ describe('Query', function() {
       const locationSchema = new Schema({
         type: { type: String },
         coordinates: []
-      }, { _id:false });
+      }, { _id: false });
 
       const schema = new Schema({
-        title : String,
+        title: String,
         location: { type: locationSchema, required: true }
       });
       schema.index({ location: '2dsphere' });
@@ -1872,9 +1872,9 @@ describe('Query', function() {
       const Model = db.model('Test', schema);
 
       const query = {
-        location:{
-          $geoWithin:{
-            $geometry:{
+        location: {
+          $geoWithin: {
+            $geometry: {
               type: 'Polygon',
               coordinates: [[[-1,0],[-1,3],[4,3],[4,0],[-1,0]]]
             }
@@ -2005,8 +2005,8 @@ describe('Query', function() {
 
       const M = db.model('Test', schema);
       const q = M.find({
-        createdAt:{
-          $not:{
+        createdAt: {
+          $not: {
             $gte: '2016/09/02 00:00:00',
             $lte: '2016/09/02 23:59:59'
           }
@@ -2587,13 +2587,13 @@ describe('Query', function() {
         yield Activity.insertMany([
           {
             owner: {
-              id  : '5a042f742a91c1db447534d5',
+              id: '5a042f742a91c1db447534d5',
               type: 'user'
             }
           },
           {
             owner: {
-              id  : 'asdf',
+              id: 'asdf',
               type: 'tag'
             }
           }

@@ -677,7 +677,7 @@ describe('connections:', function() {
     const coll = db.collection('Test');
     db.then(function() {
       setTimeout(function() {
-        coll.insertOne({x:1}, function(error) {
+        coll.insertOne({x: 1}, function(error) {
           assert.ok(error);
           done();
         });
@@ -703,7 +703,7 @@ describe('connections:', function() {
 
         let threw = false;
         try {
-          db.collection('Test').insertOne({x:1});
+          db.collection('Test').insertOne({x: 1});
         } catch (error) {
           threw = true;
           assert.ok(error);

@@ -2203,7 +2203,7 @@ describe('model: update:', function() {
     it('single nested schema with geo (gh-4465)', function(done) {
       const addressSchema = new Schema({
         geo: {type: [Number], index: '2dsphere'}
-      }, { _id : false });
+      }, { _id: false });
       const containerSchema = new Schema({ address: addressSchema });
       const Container = db.model('Test', containerSchema);
 
@@ -3039,8 +3039,8 @@ describe('model: update:', function() {
 
       const Group = db.model('Group', GroupSchema);
       const update = {
-        users:[{
-          permission:{}
+        users: [{
+          permission: {}
         }]
       };
       const opts = {

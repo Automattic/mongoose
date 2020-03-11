@@ -130,6 +130,10 @@
       "no-constant-condition": "off",
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
+      "key-spacing": [2, {
+        "beforeColon": false,
+        "afterColon": true
+      }],
       "quotes": [
         "error",
         "single"

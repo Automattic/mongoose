@@ -2000,14 +2000,14 @@ describe('document', function() {
         const personSchema = new Schema({ name: String });
         const Person = db.model('Person', personSchema);
 
-        const createdPerson = yield Person.create({name:'Hafez'});
-        const removedPerson = yield Person.findOneAndRemove({_id:createdPerson._id});
+        const createdPerson = yield Person.create({name: 'Hafez'});
+        const removedPerson = yield Person.findOneAndRemove({_id: createdPerson._id});
 
         removedPerson.isNew = true;
 
         yield removedPerson.save();
 
-        const foundPerson = yield Person.findOne({_id:removedPerson._id});
+        const foundPerson = yield Person.findOne({_id: removedPerson._id});
         assert.ok(foundPerson);
       });
     });
@@ -2017,7 +2017,7 @@ describe('document', function() {
         const personSchema = new Schema({ name: String });
         const Person = db.model('Person', personSchema);
 
-        const createdPerson = yield Person.create({name:'Hafez'});
+        const createdPerson = yield Person.create({name: 'Hafez'});
 
         createdPerson.isNew = true;
 
@@ -2039,9 +2039,9 @@ describe('document', function() {
         const personSchema = new Schema({ name: String });
         const Person = db.model('Person', personSchema);
 
-        const person = yield Person.create({name:'Hafez'});
+        const person = yield Person.create({name: 'Hafez'});
 
-        yield Person.deleteOne({_id:person._id});
+        yield Person.deleteOne({_id: person._id});
 
         let threw = false;
         try {
@@ -2062,9 +2062,9 @@ describe('document', function() {
         const personSchema = new Schema({ name: String });
         const Person = db.model('Person', personSchema);
 
-        const person = yield Person.create({name:'Hafez'});
+        const person = yield Person.create({name: 'Hafez'});
 
-        yield Person.deleteOne({_id:person._id});
+        yield Person.deleteOne({_id: person._id});
 
         person.name = 'Different Name';
 
@@ -2956,13 +2956,13 @@ describe('document', function() {
 
     it('populate with lean (gh-3873)', function(done) {
       const companySchema = new mongoose.Schema({
-        name:  String,
-        description:  String,
+        name: String,
+        description: String,
         userCnt: { type: Number, default: 0, select: false }
       });
 
       const userSchema = new mongoose.Schema({
-        name:  String,
+        name: String,
         company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' }
       });
 
@@ -3253,7 +3253,7 @@ describe('document', function() {
           assert.ok(doc);
           doc.items[0] = {
             month: 5,
-            date : new Date()
+            date: new Date()
           };
           doc.markModified('items');
           doc.save(function(error) {
@@ -4075,7 +4075,7 @@ describe('document', function() {
       });
 
       const userSchema = new mongoose.Schema({
-        name:  String,
+        name: String,
         company: companySchema
       });
 
@@ -4196,7 +4196,7 @@ describe('document', function() {
         createdAt: { type: Date, required: true }
       });
       const RootSchema = new mongoose.Schema({
-        rootName:  String,
+        rootName: String,
         nested: { type: [ NestedSchema ] }
       });
 
@@ -8045,7 +8045,7 @@ describe('document', function() {
           return 'getter value';
         }
       }
-    }, { toObject : { getters: true } });
+    }, { toObject: { getters: true } });
 
     const Model = db.model('Test', schema);
 

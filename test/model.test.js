@@ -5580,11 +5580,11 @@ describe('Model', function() {
 
       function test() {
         const schema = new mongoose.Schema({
-          amount : mongoose.Schema.Types.Decimal
+          amount: mongoose.Schema.Types.Decimal
         });
         const Money = db.model('Test', schema);
 
-        Money.insertMany([{ amount : '123.45' }], function(error) {
+        Money.insertMany([{ amount: '123.45' }], function(error) {
           assert.ifError(error);
           done();
         });

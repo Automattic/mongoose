@@ -209,12 +209,12 @@ describe('model: populate:', function() {
 
     it('multiple paths with same options (gh-3808)', function(done) {
       const companySchema = new Schema({
-        name:  String,
-        description:  String
+        name: String,
+        description: String
       });
 
       const userSchema = new Schema({
-        name:  String,
+        name: String,
         company: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Company',
@@ -223,7 +223,7 @@ describe('model: populate:', function() {
       });
 
       const messageSchema = new Schema({
-        message:  String,
+        message: String,
         author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         target: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
       });
@@ -4688,7 +4688,7 @@ describe('model: populate:', function() {
           a_id: { type: ObjectId }
         }, {
           toObject: { virtuals: true },
-          toJSON:   { virtuals: true }
+          toJSON: { virtuals: true }
         });
 
         BSchema.virtual('a', {
@@ -4724,7 +4724,7 @@ describe('model: populate:', function() {
           secondId: ObjectId
         }, {
           toObject: { virtuals: true },
-          toJSON:   { virtuals: true }
+          toJSON: { virtuals: true }
         });
 
         BSchema.virtual('a', {
@@ -5151,9 +5151,9 @@ describe('model: populate:', function() {
         });
 
         const blogPostSchema = new mongoose.Schema({
-          name : String,
+          name: String,
           body: String,
-          tags : [String]
+          tags: [String]
         });
 
         blogPostSchema.virtual('tagsDocuments', {
@@ -5167,16 +5167,16 @@ describe('model: populate:', function() {
 
         const tags = [
           {
-            name : 'angular.js',
-            tagId : 'angular'
+            name: 'angular.js',
+            tagId: 'angular'
           },
           {
-            name : 'node.js',
-            tagId : 'node'
+            name: 'node.js',
+            tagId: 'node'
           },
           {
-            name : 'javascript',
-            tagId : 'javascript'
+            name: 'javascript',
+            tagId: 'javascript'
           }
         ];
 
@@ -5731,7 +5731,7 @@ describe('model: populate:', function() {
 
       it('handles circular virtual -> regular (gh-5128)', function(done) {
         const ASchema = new Schema({
-          title: { type: String, required: true, trim : true }
+          title: { type: String, required: true, trim: true }
         });
 
         ASchema.virtual('brefs', {
@@ -5982,7 +5982,7 @@ describe('model: populate:', function() {
         const myModelSchema = new Schema({
           virtualRefKey: {type: String, ref: 'gh5331'}
         });
-        myModelSchema.set('toJSON', {virtuals:true});
+        myModelSchema.set('toJSON', {virtuals: true});
         myModelSchema.virtual('populatedVirtualRef', {
           ref: 'gh5331',
           localField: 'virtualRefKey',
@@ -6434,7 +6434,7 @@ describe('model: populate:', function() {
                 path: 'activity',
                 populate: { path: 'postedBy' }
               }).
-              sort({ seq:-1 });
+              sort({ seq: -1 });
           }).
           then(function(results) {
             assert.equal(results.length, 2);
@@ -7522,7 +7522,7 @@ describe('model: populate:', function() {
 
   it('respects schema array even if underlying doc doesnt use array (gh-6908)', function() {
     const jobSchema = new Schema({
-      company : [{ type: Schema.Types.ObjectId, ref: 'gh6908_Company' }]
+      company: [{ type: Schema.Types.ObjectId, ref: 'gh6908_Company' }]
     });
     const Job = db.model('gh6908_Job', jobSchema);
 
@@ -8350,7 +8350,7 @@ describe('model: populate:', function() {
     const Parent = db.model('Parent', Schema({
       list: [{
         fill: {
-          child: { type:ObjectId, ref:'Child' }
+          child: { type: ObjectId, ref: 'Child' }
         }
       }]
     }));

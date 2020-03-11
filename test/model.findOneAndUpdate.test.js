@@ -875,7 +875,7 @@ describe('model: findOneAndUpdate:', function() {
     const Thing = db.model('Test', thingSchema);
     const key = 'some-new-id';
 
-    Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false, rawResult:true}).exec(function(err, rawResult) {
+    Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, new: false, rawResult: true}).exec(function(err, rawResult) {
       assert.ifError(err);
       assert.equal(rawResult.lastErrorObject.updatedExisting, false );
       Thing.findOneAndUpdate({_id: key}, {$set: {flag: true}}, {upsert: true, new: false, rawResult: true}).exec(function(err, rawResult2) {
@@ -1770,7 +1770,7 @@ describe('model: findOneAndUpdate:', function() {
 
       const CollectionSchema = new Schema({
         field1: { type: String },
-        field2 : {
+        field2: {
           arrayField: [SubdocSchema]
         }
       }, options);
@@ -2100,7 +2100,7 @@ describe('model: findOneAndUpdate:', function() {
           $pull: {
             highlights: {
               _id: {
-                $in:  ['1', '2', '3', '4']
+                $in: ['1', '2', '3', '4']
               }
             }
           }

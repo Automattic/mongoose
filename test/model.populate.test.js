@@ -9218,7 +9218,7 @@ describe('model: populate:', function() {
       }
 
       assert(err);
-      assert.equal(err.message,'Can not use `limit` and `perDocumentLimit` at the same time. Model `BlogPost`.');
+      assert.equal(err.message,'Can not use `limit` and `perDocumentLimit` at the same time. Path: `blogposts`.');
     });
   });
 });

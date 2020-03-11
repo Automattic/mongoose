@@ -31,7 +31,7 @@ describe('schema alias option', function() {
       buffer: { type: Buffer, alias: 'BufferAlias' },
       boolean: { type: Boolean, alias: 'BooleanAlias' },
       mixed: { type: Schema.Types.Mixed, alias: 'MixedAlias' },
-      objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
+      objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias' },
       array: { type: [], alias: 'ArrayAlias' }
     });
 
@@ -70,7 +70,7 @@ describe('schema alias option', function() {
         buffer: { type: Buffer, alias: 'BufferAlias' },
         boolean: { type: Boolean, alias: 'BooleanAlias' },
         mixed: { type: Schema.Types.Mixed, alias: 'MixedAlias' },
-        objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
+        objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias' },
         array: { type: [], alias: 'ArrayAlias' }
       }
     });

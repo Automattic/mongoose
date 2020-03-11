@@ -561,14 +561,14 @@ describe('connections:', function() {
       assert.ok(MyModel.schema instanceof Schema);
       assert.ok(MyModel.prototype.schema instanceof Schema);
 
-      const m = new MyModel({name: 'aaron'});
+      const m = new MyModel({ name: 'aaron' });
       assert.equal(m.name, 'aaron');
       done();
     });
 
     it('should properly assign the db', function(done) {
-      const A = mongoose.model('testing853a', new Schema({x: String}), 'testing853-1');
-      const B = mongoose.model('testing853b', new Schema({x: String}), 'testing853-2');
+      const A = mongoose.model('testing853a', new Schema({ x: String }), 'testing853-1');
+      const B = mongoose.model('testing853b', new Schema({ x: String }), 'testing853-2');
       const C = B.model('testing853a');
       assert.ok(C === A);
       done();
@@ -604,8 +604,8 @@ describe('connections:', function() {
     });
 
     it('uses the passed schema when global model exists with same name (gh-1209)', function(done) {
-      const s1 = new Schema({one: String});
-      const s2 = new Schema({two: Number});
+      const s1 = new Schema({ one: String });
+      const s2 = new Schema({ two: Number });
 
       const db = start();
 
@@ -629,7 +629,7 @@ describe('connections:', function() {
 
     describe('get existing model with not existing collection in db', function() {
       it('must return exiting collection with all collection options', function(done) {
-        mongoose.model('some-th-1458', new Schema({test: String}, {capped: {size: 1000, max: 10}}));
+        mongoose.model('some-th-1458', new Schema({ test: String }, { capped: { size: 1000, max: 10 } }));
         const m = db.model('some-th-1458');
         assert.equal(1000, m.collection.opts.capped.size);
         assert.equal(10, m.collection.opts.capped.max);
@@ -640,7 +640,7 @@ describe('connections:', function() {
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {
-          const s1 = new Schema({a: []});
+          const s1 = new Schema({ a: [] });
           const name = 'non-cached-collection-name';
           const A = db.model(name, s1);
           const B = db.model(name);
@@ -656,8 +656,8 @@ describe('connections:', function() {
 
     describe('passing object literal schemas', function() {
       it('works', function(done) {
-        const A = db.model('A', {n: [{age: 'number'}]});
-        const a = new A({n: [{age: '47'}]});
+        const A = db.model('A', { n: [{ age: 'number' }] });
+        const a = new A({ n: [{ age: '47' }] });
         assert.strictEqual(47, a.n[0].age);
         a.save(function(err) {
           assert.ifError(err);
@@ -677,7 +677,7 @@ describe('connections:', function() {
     const coll = db.collection('Test');
     db.then(function() {
       setTimeout(function() {
-        coll.insertOne({x: 1}, function(error) {
+        coll.insertOne({ x: 1 }, function(error) {
           assert.ok(error);
           done();
         });
@@ -703,7 +703,7 @@ describe('connections:', function() {
 
         let threw = false;
         try {
-          db.collection('Test').insertOne({x: 1});
+          db.collection('Test').insertOne({ x: 1 });
         } catch (error) {
           threw = true;
           assert.ok(error);
@@ -777,12 +777,12 @@ describe('connections:', function() {
   describe('modelNames()', function() {
     it('returns names of all models registered on it', function(done) {
       const m = new mongoose.Mongoose;
-      m.model('root', {x: String});
-      const another = m.model('another', {x: String});
-      another.discriminator('discriminated', new Schema({x: String}));
+      m.model('root', { x: String });
+      const another = m.model('another', { x: String });
+      another.discriminator('discriminated', new Schema({ x: String }));
 
       const db = m.createConnection();
-      db.model('something', {x: String});
+      db.model('something', { x: String });
 
       let names = db.modelNames();
       assert.ok(Array.isArray(names));
@@ -833,9 +833,9 @@ describe('connections:', function() {
       const m1 = db.model('testMod', schema);
       const m2 = db2.model('testMod', schema);
 
-      m1.create({body: 'this is some text', thing: 1}, function(err, i1) {
+      m1.create({ body: 'this is some text', thing: 1 }, function(err, i1) {
         assert.ifError(err);
-        m2.create({body: 'this is another body', thing: 2}, function(err, i2) {
+        m2.create({ body: 'this is another body', thing: 2 }, function(err, i2) {
           assert.ifError(err);
 
           m1.findById(i1.id, function(err, item1) {
@@ -1090,7 +1090,7 @@ describe('connections:', function() {
         it('should return false', function(done) {
           const db = mongoose.createConnection('mongodb://localhost:27017/fake', {
             user: 'user',
-            auth: {authMechanism: 'MONGODB-X509'}
+            auth: { authMechanism: 'MONGODB-X509' }
           });
           db.catch(() => {});
           assert.equal(db.shouldAuthenticate(), true);
@@ -1104,7 +1104,7 @@ describe('connections:', function() {
           const db = mongoose.createConnection('mongodb://localhost:27017/fake', {
             user: 'user',
             pass: 'pass',
-            auth: {authMechanism: 'MONGODB-X509'}
+            auth: { authMechanism: 'MONGODB-X509' }
           });
           db.catch(() => {});
 

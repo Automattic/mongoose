@@ -382,14 +382,14 @@ describe('mongoose module:', function() {
     });
 
     const eventSchema = new m.Schema({
-      kind: {type: String}
+      kind: { type: String }
     }, { discriminatorKey: 'kind' });
 
     const testEventSchema = new m.Schema({
       inner: {
         type: new mongoose.Schema({
           _id: false,
-          bool: {type: Boolean, required: true}
+          bool: { type: Boolean, required: true }
         })
       }
     });
@@ -596,15 +596,15 @@ describe('mongoose module:', function() {
     });
 
     it('returns the model at creation', function(done) {
-      const Named = mongoose.model('Named', new Schema({name: String}));
+      const Named = mongoose.model('Named', new Schema({ name: String }));
       const n1 = new Named();
       assert.equal(n1.name, null);
-      const n2 = new Named({name: 'Peter Bjorn'});
+      const n2 = new Named({ name: 'Peter Bjorn' });
       assert.equal(n2.name, 'Peter Bjorn');
 
-      const schema = new Schema({number: Number});
+      const schema = new Schema({ number: Number });
       const Numbered = mongoose.model('Numbered', schema, collection);
-      const n3 = new Numbered({number: 1234});
+      const n3 = new Numbered({ number: 1234 });
       assert.equal(n3.number.valueOf(), 1234);
       done();
     });
@@ -660,7 +660,7 @@ describe('mongoose module:', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {
           const m = new Mongoose;
-          const s1 = new Schema({a: []});
+          const s1 = new Schema({ a: [] });
           const name = 'non-cached-collection-name';
           const A = m.model(name, s1);
           const B = m.model(name);
@@ -677,8 +677,8 @@ describe('mongoose module:', function() {
     describe('passing object literal schemas', function() {
       it('works', function(done) {
         const m = new Mongoose;
-        const A = m.model('A', {n: [{age: 'number'}]});
-        const a = new A({n: [{age: '47'}]});
+        const A = m.model('A', { n: [{ age: 'number' }] });
+        const a = new A({ n: [{ age: '47' }] });
         assert.strictEqual(47, a.n[0].age);
         done();
       });

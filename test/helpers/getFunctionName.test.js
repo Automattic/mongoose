@@ -5,7 +5,7 @@ const getFunctionName = require('../../lib/helpers/getFunctionName');
 
 describe('getFunctionName', () => {
   it('return fn.name', () => {
-    assert.equal(getFunctionName({ name: 'fnName'}), 'fnName');
+    assert.equal(getFunctionName({ name: 'fnName' }), 'fnName');
   });
 
   it('return function name', () => {

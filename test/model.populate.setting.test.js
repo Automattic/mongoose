@@ -50,13 +50,13 @@ describe('model: populate:', function() {
         before(function(done) {
           const bSchema = new Schema({
             title: String,
-            fans: [{type: id, ref: 'User'}],
-            adhoc: [{subdoc: id, subarray: [{things: [id]}]}],
-            _creator: {type: id, ref: 'User'},
+            fans: [{ type: id, ref: 'User' }],
+            adhoc: [{ subdoc: id, subarray: [{ things: [id] }] }],
+            _creator: { type: id, ref: 'User' },
             embed: [{
-              other: {type: id, ref: 'User'},
-              array: [{type: id, ref: 'User'}],
-              nested: [{subdoc: {type: id, ref: 'User'}}]
+              other: { type: id, ref: 'User' },
+              array: [{ type: id, ref: 'User' }],
+              nested: [{ subdoc: { type: id, ref: 'User' } }]
             }]
           });
 
@@ -85,15 +85,15 @@ describe('model: populate:', function() {
             B.create({
               title: 'Woot',
               fans: [fan1, fan2],
-              adhoc: [{subdoc: fan2, subarray: [{things: [fan1]}]}],
+              adhoc: [{ subdoc: fan2, subarray: [{ things: [fan1] }] }],
               _creator: fan1,
-              embed: [{other: fan1, array: [fan1, fan2]}, {other: fan2, array: [fan2, fan1]}]
+              embed: [{ other: fan1, array: [fan1, fan2] }, { other: fan2, array: [fan2, fan1] }]
             }, {
               title: 'Woot2',
               fans: [fan2, fan1],
-              adhoc: [{subdoc: fan1, subarray: [{things: [fan2]}]}],
+              adhoc: [{ subdoc: fan1, subarray: [{ things: [fan2] }] }],
               _creator: fan2,
-              embed: [{other: fan2, array: [fan2, fan1]}, {other: fan1, array: [fan1, fan2]}]
+              embed: [{ other: fan2, array: [fan2, fan1] }, { other: fan1, array: [fan1, fan2] }]
             }, function(err, post1, post2) {
               assert.ifError(err);
               b1 = post1;
@@ -108,7 +108,7 @@ describe('model: populate:', function() {
         });
 
         function userLiteral(name) {
-          return {_id: construct[id](), name: name};
+          return { _id: construct[id](), name: name };
         }
 
         function user(name) {
@@ -118,8 +118,8 @@ describe('model: populate:', function() {
         it('if a document', function(done) {
           const query = B.findById(b1).
             populate('fans _creator embed.other embed.array embed.nested.subdoc').
-            populate({path: 'adhoc.subdoc', model: 'User'}).
-            populate({path: 'adhoc.subarray.things', model: 'User'});
+            populate({ path: 'adhoc.subdoc', model: 'User' }).
+            populate({ path: 'adhoc.subarray.things', model: 'User' });
           query.exec(function(err, doc) {
             assert.ifError(err);
 
@@ -182,7 +182,7 @@ describe('model: populate:', function() {
             assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
             const user1c = user('user2c');
-            doc.embed[0].nested = [{subdoc: user1c}];
+            doc.embed[0].nested = [{ subdoc: user1c }];
             assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
 
             // embedded without declared ref in schema
@@ -219,8 +219,8 @@ describe('model: populate:', function() {
         it('if an object', function(done) {
           B.findById(b2)
             .populate('fans _creator embed.other embed.array embed.nested.subdoc')
-            .populate({path: 'adhoc.subdoc', model: 'User'})
-            .populate({path: 'adhoc.subarray.things', model: 'User'})
+            .populate({ path: 'adhoc.subdoc', model: 'User' })
+            .populate({ path: 'adhoc.subarray.things', model: 'User' })
             .exec(function(err, doc) {
               assert.ifError(err);
 
@@ -283,7 +283,7 @@ describe('model: populate:', function() {
 
               name = 'user1c';
               const user1c = userLiteral(name);
-              doc.embed[0].nested = [{subdoc: user1c}];
+              doc.embed[0].nested = [{ subdoc: user1c }];
               assert.equal(doc.embed[0].nested[0].subdoc.name, name);
               const user1cId = doc.embed[0].nested[0].subdoc._id;
 

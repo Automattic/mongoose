@@ -54,7 +54,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     }
 
     // create a promise (get one from the query builder)
-    const prom = Person.find({age: {$lt: 1000}}).exec();
+    const prom = Person.find({ age: { $lt: 1000 } }).exec();
 
     // add a callback on the promise. This will be called on both error and
     // complete
@@ -82,7 +82,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
       });
 
       // return the next promise
-      return Person.find({_id: {$nin: ids}}).exec();
+      return Person.find({ _id: { $nin: ids } }).exec();
     }).then(function(oldest) {
       console.log('Oldest person is: %s', oldest);
     }).then(cleanup);

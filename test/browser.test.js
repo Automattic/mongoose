@@ -24,9 +24,9 @@ describe('browser', function() {
 
   it('document works (gh-4987)', function(done) {
     const schema = new Schema({
-      name: {type: String, required: true},
-      quest: {type: String, match: /Holy Grail/i, required: true},
-      favoriteColor: {type: String, enum: ['Red', 'Blue'], required: true}
+      name: { type: String, required: true },
+      quest: { type: String, match: /Holy Grail/i, required: true },
+      favoriteColor: { type: String, enum: ['Red', 'Blue'], required: true }
     });
 
     new Document({}, schema);

@@ -9,7 +9,7 @@ describe('getVirtual', function() {
     // Generate Embedded Discriminators
     const eventSchema = new Schema(
       { message: String },
-      { discriminatorKey: 'kind'}
+      { discriminatorKey: 'kind' }
     );
 
     const batchSchema = new Schema({
@@ -56,7 +56,7 @@ describe('getVirtual', function() {
 
     // *** Adding Nested Layer and adding virtual to schema of nestedLayer
     const nestedLayerSchema = new Schema({ users: [Number] }, {
-      toJSON: { virtuals: true},
+      toJSON: { virtuals: true },
       toObject: { virtuals: true }
     });
 
@@ -71,8 +71,8 @@ describe('getVirtual', function() {
       element: { type: String },
       nestedLayer: nestedLayerSchema
     }, {
-      toJSON: { virtuals: true},
-      toObject: { virtuals: true}
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true }
     });
 
     docArray.discriminator('Clicked', clickedSchema);
@@ -87,15 +87,15 @@ describe('getVirtual', function() {
   });
 
   it('handles multiple calls with discriminator under doc array (gh-6644)', function(done) {
-    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind'});
+    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind' });
 
     const batchSchema = new Schema({ events: [eventSchema] });
 
     const docArray = batchSchema.path('events');
 
     const clickedSchema = new Schema({ element: { type: String }, users: [{}] }, {
-      toJSON: { virtuals: true},
-      toObject: { virtuals: true}
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true }
     });
 
     clickedSchema.virtual('users_$', {

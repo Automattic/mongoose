@@ -48,7 +48,7 @@ describe('types.embeddeddocumentdeclarative', function() {
       });
     });
     describe('with the optional subschema behavior (typePojoToMixed=false)', function() {
-      const ParentSchema = new mongoose.Schema(ParentSchemaDef, {typePojoToMixed: false});
+      const ParentSchema = new mongoose.Schema(ParentSchemaDef, { typePojoToMixed: false });
       it('interprets the POJO as a subschema (gh-7494)', function(done) {
         assert.equal(ParentSchema.paths.child.instance, 'Embedded');
         assert.strictEqual(ParentSchema.paths.child['$isSingleNested'], true);
@@ -112,7 +112,7 @@ describe('types.embeddeddocumentdeclarative', function() {
       }
     };
     const ParentSchemaNotMixed = new Schema(ParentSchemaDef);
-    const ParentSchemaNotSubdoc = new Schema(ParentSchemaDef, {typePojoToMixed: false});
+    const ParentSchemaNotSubdoc = new Schema(ParentSchemaDef, { typePojoToMixed: false });
     it('does not create a path for child in either option', function(done) {
       assert.equal(ParentSchemaNotMixed.paths['child.name'].instance, 'String');
       assert.equal(ParentSchemaNotSubdoc.paths['child.name'].instance, 'String');

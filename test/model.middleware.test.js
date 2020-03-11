@@ -53,7 +53,7 @@ describe('model middleware', function() {
 
     const TestMiddleware = db.model('TestPostSaveMiddleware', schema);
 
-    const test = new TestMiddleware({title: 'Little Green Running Hood'});
+    const test = new TestMiddleware({ title: 'Little Green Running Hood' });
 
     test.save(function(err) {
       assert.ifError(err);
@@ -274,8 +274,8 @@ describe('model middleware', function() {
     const parent = new Parent({
       name: 'Han',
       children: [
-        {name: 'Jaina'},
-        {name: 'Jacen'}
+        { name: 'Jaina' },
+        { name: 'Jacen' }
       ]
     });
 
@@ -380,7 +380,7 @@ describe('model middleware', function() {
 
     const Test = db.model('TestPostValidateMiddleware', schema);
 
-    const test = new Test({title: 'banana'});
+    const test = new Test({ title: 'banana' });
 
     test.save(function(err) {
       assert.ifError(err);

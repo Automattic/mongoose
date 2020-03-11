@@ -15,7 +15,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     throw err;
   }
 
-  Person.create({name: 'bill', age: 25, birthday: new Date().setFullYear((new Date().getFullYear() - 25))},
+  Person.create({ name: 'bill', age: 25, birthday: new Date().setFullYear((new Date().getFullYear() - 25)) },
     function(err, bill) {
       if (err) {
         throw err;

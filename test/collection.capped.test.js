@@ -16,8 +16,8 @@ const Schema = mongoose.Schema;
 /**
  * setup
  */
-const capped = new Schema({key: 'string', val: 'number'});
-capped.set('capped', {size: 1000});
+const capped = new Schema({ key: 'string', val: 'number' });
+capped.set('capped', { size: 1000 });
 const coll = 'capped_' + random();
 
 /**
@@ -57,7 +57,7 @@ describe('collections: capped:', function() {
     });
   });
   it('creation using a number', function(done) {
-    const schema = new Schema({key: 'string'}, {capped: 8192});
+    const schema = new Schema({ key: 'string' }, { capped: 8192 });
     const Capped = db.model('Capped3', schema);
     Capped.collection.options(function(err, options) {
       assert.ifError(err);

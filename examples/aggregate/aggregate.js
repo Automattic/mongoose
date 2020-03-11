@@ -67,15 +67,15 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     // framework, see http://docs.mongodb.org/manual/core/aggregation/
     Person.aggregate(
       // select the fields we want to deal with
-      {$project: {name: 1, likes: 1}},
+      { $project: { name: 1, likes: 1 } },
       // unwind 'likes', which will create a document for each like
-      {$unwind: '$likes'},
+      { $unwind: '$likes' },
       // group everything by the like and then add each name with that like to
       // the set for the like
-      {$group: {
-        _id: {likes: '$likes'},
-        likers: {$addToSet: '$name'}
-      }},
+      { $group: {
+        _id: { likes: '$likes' },
+        likers: { $addToSet: '$name' }
+      } },
       function(err, result) {
         if (err) throw err;
         console.log(result);

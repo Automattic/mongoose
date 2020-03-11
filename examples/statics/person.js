@@ -15,7 +15,7 @@ module.exports = function() {
 
   // define a static
   PersonSchema.statics.findPersonByName = function(name, cb) {
-    this.find({name: new RegExp(name, 'i')}, cb);
+    this.find({ name: new RegExp(name, 'i') }, cb);
   };
 
   mongoose.model('Person', PersonSchema);

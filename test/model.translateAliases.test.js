@@ -31,7 +31,7 @@ describe('model translate aliases', function() {
         名: 'Stark',
         年齢: 30,
         'dot.syntax': 'DotSyntax',
-        $and: [{$or: [{名: 'Stark'}, {年齢: 30}]}, {'dot.syntax': 'DotSyntax'}]
+        $and: [{ $or: [{ 名: 'Stark' }, { 年齢: 30 }] }, { 'dot.syntax': 'DotSyntax' }]
       }),
       // How translated aliases suppose to look like
       {
@@ -39,7 +39,7 @@ describe('model translate aliases', function() {
         _id: '1',
         'bio.age': 30,
         'd.s': 'DotSyntax',
-        $and: [{$or: [{name: 'Stark'}, {'bio.age': 30}]}, {'d.s': 'DotSyntax'}]
+        $and: [{ $or: [{ name: 'Stark' }, { 'bio.age': 30 }] }, { 'd.s': 'DotSyntax' }]
       }
     );
 

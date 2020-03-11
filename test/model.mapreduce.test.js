@@ -64,7 +64,7 @@ describe('model: mapreduce:', function() {
     const num = 10;
     const docs = [];
     for (let i = 0; i < num; ++i) {
-      docs.push({author: authors[i % authors.length], owners: [id], published: true});
+      docs.push({ author: authors[i % authors.length], owners: [id], published: true });
     }
 
     MR.create(docs, function(err, insertedDocs) {
@@ -107,7 +107,7 @@ describe('model: mapreduce:', function() {
           reduce: function(k, vals) {
             return vals.length;
           },
-          query: {author: 'aaron', published: 1, owners: id}
+          query: { author: 'aaron', published: 1, owners: id }
         };
 
         MR.mapReduce(o, function(err, res) {
@@ -128,13 +128,13 @@ describe('model: mapreduce:', function() {
       function modeling() {
         const o = {
           map: function() {
-            emit(this.author, {own: magicID});
+            emit(this.author, { own: magicID });
           },
-          scope: {magicID: magicID},
+          scope: { magicID: magicID },
           reduce: function(k, vals) {
-            return {own: vals[0].own, count: vals.length};
+            return { own: vals[0].own, count: vals.length };
           },
-          out: {replace: '_mapreduce_test_' + random()}
+          out: { replace: '_mapreduce_test_' + random() }
         };
 
         MR.mapReduce(o, function(err, res) {
@@ -146,7 +146,7 @@ describe('model: mapreduce:', function() {
           assert.equal(typeof model.mapReduce, 'function');
 
           // queries work
-          model.where('value.count').gt(1).sort({_id: 1}).exec(function(err, docs) {
+          model.where('value.count').gt(1).sort({ _id: 1 }).exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs[0]._id, 'aaron');
             assert.equal(docs[1]._id, 'brian');
@@ -154,7 +154,7 @@ describe('model: mapreduce:', function() {
             assert.equal(docs[3]._id, 'nathan');
 
             // update casting works
-            model.findOneAndUpdate({_id: 'aaron'}, {published: true}, {new: true}, function(err, doc) {
+            model.findOneAndUpdate({ _id: 'aaron' }, { published: true }, { new: true }, function(err, doc) {
               assert.ifError(err);
               assert.ok(doc);
               assert.equal(doc._id, 'aaron');
@@ -162,8 +162,8 @@ describe('model: mapreduce:', function() {
 
               // ad-hoc population works
               model
-                .findOne({_id: 'aaron'})
-                .populate({path: 'value.own', model: 'MapReduce'})
+                .findOne({ _id: 'aaron' })
+                .populate({ path: 'value.own', model: 'MapReduce' })
                 .exec(function(err, doc) {
                   assert.ifError(err);
                   assert.equal(doc.value.own.author, 'guillermo');
@@ -228,7 +228,7 @@ describe('model: mapreduce:', function() {
       const authors = 'aaron guillermo brian nathan'.split(' ');
       const num = 10;
       for (let i = 0; i < num; ++i) {
-        docs.push({author: authors[i % authors.length], owners: [id], published: true});
+        docs.push({ author: authors[i % authors.length], owners: [id], published: true });
       }
 
       MR.create(docs, function(err, insertedDocs) {
@@ -277,13 +277,13 @@ describe('model: mapreduce:', function() {
     it('works with model', function() {
       const o = {
         map: function() {
-          emit(this.author, {own: magicID});
+          emit(this.author, { own: magicID });
         },
-        scope: {magicID: magicID},
+        scope: { magicID: magicID },
         reduce: function(k, vals) {
-          return {own: vals[0].own, count: vals.length};
+          return { own: vals[0].own, count: vals.length };
         },
-        out: {replace: '_mapreduce_test_' + random()}
+        out: { replace: '_mapreduce_test_' + random() }
       };
 
       return MR.mapReduce(o).
@@ -295,7 +295,7 @@ describe('model: mapreduce:', function() {
           assert.equal(typeof ret.mapReduce, 'function');
 
           // queries work
-          return ret.where('value.count').gt(1).sort({_id: 1});
+          return ret.where('value.count').gt(1).sort({ _id: 1 });
         }).
         then(function(docs) {
           assert.equal(docs[0]._id, 'aaron');

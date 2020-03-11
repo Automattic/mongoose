@@ -495,8 +495,8 @@ describe('aggregate: ', function() {
         assert.equal(aggregate.addFields({ a: 1, b: 1, c: 0 }), aggregate);
         assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }]);
 
-        aggregate.addFields({ d: {$add: ['$a', '$b']} });
-        assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }, { $addFields: { d: {$add: ['$a', '$b']} } }]);
+        aggregate.addFields({ d: { $add: ['$a', '$b'] } });
+        assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }, { $addFields: { d: { $add: ['$a', '$b'] } } }]);
         done();
       });
     });
@@ -555,7 +555,7 @@ describe('aggregate: ', function() {
         aggregate.replaceRoot('myNewRoot');
 
         assert.deepEqual(aggregate._pipeline,
-          [{ $replaceRoot: { newRoot: '$myNewRoot' }}]);
+          [{ $replaceRoot: { newRoot: '$myNewRoot' } }]);
         done();
       });
       it('works with an object (gh-6474)', function(done) {
@@ -596,7 +596,7 @@ describe('aggregate: ', function() {
         aggregate.sortByCount({ lname: '$employee.last' });
 
         assert.deepEqual(aggregate._pipeline,
-          [{ $sortByCount: { lname: '$employee.last' }}]);
+          [{ $sortByCount: { lname: '$employee.last' } }]);
         done();
       });
 
@@ -778,7 +778,7 @@ describe('aggregate: ', function() {
             connectToField: 'name',
             as: 'employeeHierarchy'
           }).
-          sort({name: 1}).
+          sort({ name: 1 }).
           exec(function(err, docs) {
             if (err) {
               return done(err);
@@ -969,7 +969,7 @@ describe('aggregate: ', function() {
         assert.equal(aggregate.options.readPreference.mode, pref);
         if (mongo26_or_greater) {
           aggregate.allowDiskUse(true);
-          aggregate.option({maxTimeMS: 1000});
+          aggregate.option({ maxTimeMS: 1000 });
           assert.equal(aggregate.options.allowDiskUse, true);
           assert.equal(aggregate.options.maxTimeMS, 1000);
         }

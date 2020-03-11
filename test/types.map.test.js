@@ -655,7 +655,7 @@ describe('Map', function() {
     return co(function*() {
       const first = yield Parent.create({
         children: {
-          one: {name: 'foo'}
+          one: { name: 'foo' }
         }
       });
 

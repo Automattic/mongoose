@@ -20,7 +20,7 @@ describe('SingleNestedPath', function() {
 
         const subEventSchema = new Schema({
           sub_events: [singleEventSchema]
-        }, {_id: false});
+        }, { _id: false });
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
 
@@ -40,7 +40,7 @@ describe('SingleNestedPath', function() {
 
         const subEventSchema = new Schema({
           sub_events: [singleEventSchema]
-        }, {_id: false});
+        }, { _id: false });
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
 

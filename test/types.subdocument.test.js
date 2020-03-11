@@ -90,7 +90,7 @@ describe('types.subdocument', function() {
         };
         return Thing.updateOne({
           _id: id
-        }, {$set: thingy2});
+        }, { $set: thingy2 });
       });
   });
 

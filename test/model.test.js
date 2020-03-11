@@ -3589,12 +3589,12 @@ describe('Model', function() {
           b.save(function() {
             b.elements.push({el: 'd'});
             b.test = 'a';
-            b.save(function(error,res) {
+            b.save(function(error, res) {
               assert.ok(error);
-              assert.strictEqual(res,undefined);
-              b.save(function(error,res) {
+              assert.strictEqual(res, undefined);
+              b.save(function(error, res) {
                 assert.ok(error);
-                assert.strictEqual(res,undefined);
+                assert.strictEqual(res, undefined);
                 M.collection.drop(done);
               });
             });

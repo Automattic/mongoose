@@ -1876,7 +1876,7 @@ describe('Query', function() {
           $geoWithin: {
             $geometry: {
               type: 'Polygon',
-              coordinates: [[[-1,0],[-1,3],[4,3],[4,0],[-1,0]]]
+              coordinates: [[[-1, 0], [-1, 3], [4, 3], [4, 0], [-1, 0]]]
             }
           }
         }

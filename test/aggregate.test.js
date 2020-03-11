@@ -495,8 +495,8 @@ describe('aggregate: ', function() {
         assert.equal(aggregate.addFields({ a: 1, b: 1, c: 0 }), aggregate);
         assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }]);
 
-        aggregate.addFields({ d: {$add: ['$a','$b']} });
-        assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }, { $addFields: { d: {$add: ['$a','$b']} } }]);
+        aggregate.addFields({ d: {$add: ['$a', '$b']} });
+        assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }, { $addFields: { d: {$add: ['$a', '$b']} } }]);
         done();
       });
     });

@@ -134,6 +134,11 @@
         "beforeColon": false,
         "afterColon": true
       }],
+      "comma-spacing": [2, {
+        "before": false,
+        "after": true
+      }],
+      "no-unreachable": 2,
       "quotes": [
         "error",
         "single"

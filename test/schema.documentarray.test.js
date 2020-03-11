@@ -94,7 +94,7 @@ describe('schema.documentarray', function() {
     assert.equal(doc.nested[0].length, 1);
     assert.equal(doc.nested[0][0].title, 'new');
 
-    doc.nested = [[{ title: 'first' }, { title: 'second' },{ title: 'third' }]];
+    doc.nested = [[{ title: 'first' }, { title: 'second' }, { title: 'third' }]];
     assert.equal(doc.nested[0].length, 3);
     assert.equal(doc.nested[0][1].title, 'second');
   });

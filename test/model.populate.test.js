@@ -6954,7 +6954,7 @@ describe('model: populate:', function() {
         const clickedSchema = new Schema({
           element: { type: String },
           users: [Number]
-        },{
+        }, {
           toJSON: { virtuals: true },
           toObject: { virtuals: true }
         });
@@ -7305,7 +7305,7 @@ describe('model: populate:', function() {
 
     const eventSchema = new Schema({
       message: String
-    },{ discriminatorKey: 'kind' });
+    }, { discriminatorKey: 'kind' });
 
     const batchSchema = new Schema({
       events: [eventSchema]
@@ -7608,7 +7608,7 @@ describe('model: populate:', function() {
       return new Author({ name: `author${n}`});
     });
 
-    const comments = 'abc'.split('').map((l,i) => {
+    const comments = 'abc'.split('').map((l, i) => {
       const id = authors[i]._id;
       return new Comment({ text: `comment_${l}`, author: id });
     });

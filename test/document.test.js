@@ -2030,7 +2030,7 @@ describe('document', function() {
           assert.equal(err.code, 11000);
         }
 
-        assert.equal(threw,true);
+        assert.equal(threw, true);
       });
     });
 
@@ -2049,11 +2049,11 @@ describe('document', function() {
         }
         catch (err) {
           assert.equal(err instanceof DocumentNotFoundError, true);
-          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "Person"`);
+          assert.equal(err.message, `No document found for query "{ _id: ${person._id} }" on model "Person"`);
           threw = true;
         }
 
-        assert.equal(threw,true);
+        assert.equal(threw, true);
       });
     });
 
@@ -2073,12 +2073,12 @@ describe('document', function() {
           yield person.save();
         }
         catch (err) {
-          assert.equal(err instanceof DocumentNotFoundError,true);
-          assert.equal(err.message,`No document found for query "{ _id: ${person._id} }" on model "Person"`);
+          assert.equal(err instanceof DocumentNotFoundError, true);
+          assert.equal(err.message, `No document found for query "{ _id: ${person._id} }" on model "Person"`);
           threw = true;
         }
 
-        assert.equal(threw,true);
+        assert.equal(threw, true);
       });
     });
   });

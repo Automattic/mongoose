@@ -1655,7 +1655,7 @@ describe('model: findOneAndUpdate:', function() {
         ]
       };
       const opts = {
-        'new': true,
+        new: true,
         upsert: false,
         passRawResult: false,
         overwrite: false,
@@ -2338,7 +2338,7 @@ describe('model: findOneAndUpdate:', function() {
     return co(function*() {
       let doc = yield Model.create({ name: 'test', __v: 10 });
       yield Model.findByIdAndUpdate(doc._id, {
-        '$unset': { name: '' },
+        $unset: { name: '' },
         __v: 0
       }, { upsert: true });
 

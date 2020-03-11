@@ -564,7 +564,7 @@ describe('model: querying:', function() {
           assert.ifError(err);
           found.id;
           assert.equal(found._id.toString(), created._id);
-          const query = {sigs: {'$in': [Buffer.from([3, 3, 3]), Buffer.from([4, 5, 6])]}};
+          const query = {sigs: {$in: [Buffer.from([3, 3, 3]), Buffer.from([4, 5, 6])]}};
           BlogPostB.findOne(query, function(err) {
             assert.ifError(err);
             done();
@@ -611,7 +611,7 @@ describe('model: querying:', function() {
 
       BlogPostB.create({owners: [id1, id2]}, function(err, created) {
         assert.ifError(err);
-        BlogPostB.findOne({owners: {'$elemMatch': {$in: [id2.toString()]}}}, function(err, found) {
+        BlogPostB.findOne({owners: {$elemMatch: {$in: [id2.toString()]}}}, function(err, found) {
           assert.ifError(err);
           assert.ok(found);
           assert.equal(created.id, found.id);
@@ -866,7 +866,7 @@ describe('model: querying:', function() {
         NE.create({ids: [id2, id4], b: id3}, function(err) {
           assert.ifError(err);
 
-          const query = NE.find({'b': id3.toString(), 'ids': {$ne: id1}});
+          const query = NE.find({b: id3.toString(), ids: {$ne: id1}});
           query.exec(function(err, nes1) {
             assert.ifError(err);
             assert.equal(nes1.length, 1);
@@ -983,7 +983,7 @@ describe('model: querying:', function() {
 
       BlogPostB.create({owners: [id1, id2]}, function(err) {
         assert.ifError(err);
-        BlogPostB.find({owners: {'$elemMatch': {$in: [id2.toString()]}}}, function(err, found) {
+        BlogPostB.find({owners: {$elemMatch: {$in: [id2.toString()]}}}, function(err, found) {
           assert.ifError(err);
           assert.equal(found.length, 1);
           done();
@@ -1221,23 +1221,23 @@ describe('model: querying:', function() {
         BlogPostB.findById(post._id, function(err, post) {
           assert.ifError(err);
 
-          BlogPostB.find({title: {'$all': ['Aristocats']}}, function(err, docs) {
+          BlogPostB.find({title: {$all: ['Aristocats']}}, function(err, docs) {
             assert.ifError(err);
             assert.equal(docs.length, 1);
 
-            BlogPostB.find({title: {'$all': [/^Aristocats/]}}, function(err, docs) {
+            BlogPostB.find({title: {$all: [/^Aristocats/]}}, function(err, docs) {
               assert.ifError(err);
               assert.equal(docs.length, 1);
 
-              BlogPostB.find({tags: {'$all': ['onex', 'twox', 'threex']}}, function(err, docs) {
+              BlogPostB.find({tags: {$all: ['onex', 'twox', 'threex']}}, function(err, docs) {
                 assert.ifError(err);
                 assert.equal(docs.length, 1);
 
-                BlogPostB.find({tags: {'$all': [/^onex/i]}}, function(err, docs) {
+                BlogPostB.find({tags: {$all: [/^onex/i]}}, function(err, docs) {
                   assert.ifError(err);
                   assert.equal(docs.length, 1);
 
-                  BlogPostB.findOne({tags: {'$all': /^two/}}, function(err, doc) {
+                  BlogPostB.findOne({tags: {$all: /^two/}}, function(err, doc) {
                     assert.ifError(err);
                     assert.equal(post.id, doc.id);
                     done();
@@ -1373,7 +1373,7 @@ describe('model: querying:', function() {
 
         pending = 2;
 
-        D.find({'dt': {$gte: '2011-03-30', $lte: '2011-04-01'}}).sort('dt').exec(function(err, docs) {
+        D.find({dt: {$gte: '2011-03-30', $lte: '2011-04-01'}}).sort('dt').exec(function(err, docs) {
           if (!--pending) {
             done();
           }
@@ -1387,7 +1387,7 @@ describe('model: querying:', function() {
           }));
         });
 
-        D.find({'dt': {$gt: '2011-03-30', $lt: '2011-04-02'}}).sort('dt').exec(function(err, docs) {
+        D.find({dt: {$gt: '2011-03-30', $lt: '2011-04-02'}}).sort('dt').exec(function(err, docs) {
           if (!--pending) {
             done();
           }
@@ -2008,7 +2008,7 @@ describe('model: querying:', function() {
       Test.create({loc: [35, 50]}, {loc: [-40, -90]}, complete);
 
       function test() {
-        Test.find({loc: {'$within': {'$box': [[30, 40], [40, 60]]}}}, function(err, docs) {
+        Test.find({loc: {$within: {$box: [[30, 40], [40, 60]]}}}, function(err, docs) {
           assert.ifError(err);
           assert.equal(docs.length, 1);
           done();

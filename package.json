@@ -124,6 +124,7 @@
         }
       ],
       "keyword-spacing": "error",
+      "no-whitespace-before-property": "error",
       "no-buffer-constructor": "warn",
       "no-console": "off",
       "no-multi-spaces": "error",
@@ -145,6 +146,7 @@
         "error",
         "single"
       ],
+      "quote-props": ["error", "as-needed"],
       "semi": "error",
       "space-before-blocks": "error",
       "space-before-function-paren": [

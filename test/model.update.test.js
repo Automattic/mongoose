@@ -241,8 +241,8 @@ describe('model: update:', function() {
   });
 
   it('makes copy of conditions and update options', function(done) {
-    const conditions = {'_id': post._id.toString()};
-    const update = {'$set': {'some_attrib': post._id.toString()}};
+    const conditions = {_id: post._id.toString()};
+    const update = {$set: {some_attrib: post._id.toString()}};
     BlogPost.update(conditions, update, function(err) {
       assert.ifError(err);
       assert.equal(typeof conditions._id, 'string');
@@ -1636,7 +1636,7 @@ describe('model: update:', function() {
 
       Collection.create({}, function(error, doc) {
         assert.ifError(error);
-        const update = { 'field2': { name: 'test' } };
+        const update = { field2: { name: 'test' } };
         Collection.update({ _id: doc._id }, update, function(err) {
           assert.ifError(err);
           Collection.collection.findOne({ _id: doc._id }, function(err, doc) {
@@ -1691,7 +1691,7 @@ describe('model: update:', function() {
         assert.ifError(error);
         const query = { 'regions.r': 'test' };
         const update = { $set: { 'regions.$.action': { order: 'move' } } };
-        const opts = { 'new': true };
+        const opts = { new: true };
         Season.findOneAndUpdate(query, update, opts, function(error, doc) {
           assert.ifError(error);
           assert.equal(doc.toObject().regions[0].action.order, 'move');
@@ -1950,7 +1950,7 @@ describe('model: update:', function() {
       b2.save(function(err, doc) {
         const query = { _id: doc._id };
         const update = { $push: { children: { senderId: '234' } } };
-        const opts = { 'new': true };
+        const opts = { new: true };
         Parent.findOneAndUpdate(query, update, opts).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.children.length, 1);
@@ -1993,7 +1993,7 @@ describe('model: update:', function() {
             child: { senderId: '567' }
           }
         };
-        const opts = { 'new': true };
+        const opts = { new: true };
         Parent.findOneAndUpdate(query, update, opts).exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.children.length, 1);
@@ -3072,7 +3072,7 @@ describe('model: update:', function() {
 
       const cond = { name: 'Xyz' };
       const obj1 = { x: 'Y' };
-      const set = { $set: { 'arr': obj1 } };
+      const set = { $set: { arr: obj1 } };
 
       Test.create(test).
         then(function() {

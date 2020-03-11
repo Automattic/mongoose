@@ -3090,7 +3090,7 @@ describe('document', function() {
       const Model = db.model('Test1', ModelSchema);
 
       const nestedModel = new NestedModel({
-        'field': 'nestedModel'
+        field: 'nestedModel'
       });
 
       nestedModel.save(function(error, nestedModel) {
@@ -3301,14 +3301,14 @@ describe('document', function() {
       const ChildSchema = new Schema({
         name: {
           type: String,
-          'default': 'child'
+          default: 'child'
         }
       });
 
       const ParentSchema = new Schema({
         child: {
           type: ChildSchema,
-          'default': {}
+          default: {}
         }
       });
 
@@ -7737,11 +7737,11 @@ describe('document', function() {
   });
 
   it('does not crash with array property named "undefined" (gh-7756)', function() {
-    const schema = new Schema({ 'undefined': [String] });
+    const schema = new Schema({ undefined: [String] });
     const Model = db.model('Test', schema);
 
     return co(function*() {
-      const doc = yield Model.create({ 'undefined': ['foo'] });
+      const doc = yield Model.create({ undefined: ['foo'] });
 
       doc['undefined'].push('bar');
       yield doc.save();
@@ -8691,7 +8691,7 @@ describe('document', function() {
 
     const subdocumentSchema = Schema({
       placedItems: {
-        '1': placedItemSchema,
+        1: placedItemSchema,
         first: placedItemSchema
       }
     });
@@ -8699,7 +8699,7 @@ describe('document', function() {
 
     return co(function*() {
       const doc = yield Model.create({
-        placedItems: { '1': { image: 'original' }, first: { image: 'original' } }
+        placedItems: { 1: { image: 'original' }, first: { image: 'original' } }
       });
 
       doc.set({

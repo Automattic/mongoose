@@ -250,7 +250,7 @@ describe('model', function() {
       assert.deepEqual(ContainerSchema.indexes().map(function(v) { return v[0]; }), [
         { 'sub.subSub.nested2': 1 },
         { 'sub.nested1': 1 },
-        { 'nested0': 1 }
+        { nested0: 1 }
       ]);
 
       done();

@@ -127,7 +127,7 @@ describe('ValidationError', function() {
     it('with correct error message (gh-4207)', function(done) {
       const old = mongoose.Error.messages;
       mongoose.Error.messages = {
-        'String': {
+        String: {
           minlength: 'woops!'
         }
       };

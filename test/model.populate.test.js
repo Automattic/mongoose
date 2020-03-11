@@ -642,7 +642,7 @@ describe('model: populate:', function() {
 
         BlogPost
           .findById(post._id)
-          .populate('_creator', {'name': 1})
+          .populate('_creator', {name: 1})
           .exec(function(err, post) {
             assert.ifError(err);
 
@@ -1339,7 +1339,7 @@ describe('model: populate:', function() {
 
           BlogPost
             .findById(post._id)
-            .populate('comments._creator', {'email': 1}, {name: /User/})
+            .populate('comments._creator', {email: 1}, {name: /User/})
             .exec(function(err, post) {
               assert.ifError(err);
 
@@ -1786,7 +1786,7 @@ describe('model: populate:', function() {
               assert.equal(post.fans[3].name, 'aaron');
 
               P.findById(post)
-                .populate('fans', 'name', null, {sort: {'name': -1}})
+                .populate('fans', 'name', null, {sort: {name: -1}})
                 .exec(function(err, post) {
                   assert.ifError(err);
 
@@ -1801,7 +1801,7 @@ describe('model: populate:', function() {
                   assert.strictEqual(undefined, post.fans[0].age);
 
                   P.findById(post)
-                    .populate('fans', 'age', {age: {$gt: 3}}, {sort: {'name': 'desc'}})
+                    .populate('fans', 'age', {age: {$gt: 3}}, {sort: {name: 'desc'}})
                     .exec(function(err, post) {
                       assert.ifError(err);
 
@@ -7012,7 +7012,7 @@ describe('model: populate:', function() {
         flexibleItemSchema.add({ outer: outerSchema });
         outerSchema.add({ inner: innerSchema });
         innerSchema.add({
-          flexible: [new Schema({ 'kind': String }, { discriminatorKey: 'kind' })]
+          flexible: [new Schema({ kind: String }, { discriminatorKey: 'kind' })]
         });
 
         const docArray = innerSchema.path('flexible');

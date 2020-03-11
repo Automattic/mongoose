@@ -131,7 +131,7 @@ describe('Map', function() {
 
       person.fact.delete('killer');
 
-      assert.deepStrictEqual(person.$__delta()[1], { '$unset': { 'fact.killer': 1 } });
+      assert.deepStrictEqual(person.$__delta()[1], { $unset: { 'fact.killer': 1 } });
       assert.deepStrictEqual(Array.from(person.fact.keys()).sort(), ['cool', 'girl']);
       assert.strictEqual(person.fact.get('killer'), undefined);
 
@@ -655,7 +655,7 @@ describe('Map', function() {
     return co(function*() {
       const first = yield Parent.create({
         children: {
-          'one': {name: 'foo'}
+          one: {name: 'foo'}
         }
       });
 

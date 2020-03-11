@@ -4071,7 +4071,7 @@ describe('Model', function() {
         }
       }, { autoIndex: false });
 
-      LocationSchema.index({ 'location': '2dsphere' });
+      LocationSchema.index({ location: '2dsphere' });
 
       const Location = db.model('Test', LocationSchema);
 

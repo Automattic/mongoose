@@ -2303,7 +2303,7 @@ describe('model: update:', function() {
     it('findOneAndUpdate with nested arrays (gh-5032)', function(done) {
       const schema = Schema({
         name: String,
-        inputs: [ [ String ] ] // Array of Arrays of Strings
+        inputs: [[String]] // Array of Arrays of Strings
       });
 
       const Activity = db.model('Test', schema);

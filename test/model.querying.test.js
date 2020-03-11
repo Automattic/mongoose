@@ -1853,7 +1853,7 @@ describe('model: querying:', function() {
     const docA = {name: 'A', block: new MongooseBuffer([195, 188, 98, 101, 114])}; // über
     const docB = {name: 'B', block: new MongooseBuffer('buffer shtuffs are neat')};
     const docC = {name: 'C', block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64')};
-    const docD = {name: 'D', block: new MongooseBuffer({ type: 'Buffer', data: [ 103, 104, 45, 54, 56, 54, 51 ] })};
+    const docD = {name: 'D', block: new MongooseBuffer({ type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] })};
 
     Test.create(docA, docB, docC, docD, function(err, a, b, c, d) {
       if (err) return done(err);

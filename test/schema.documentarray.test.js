@@ -81,7 +81,7 @@ describe('schema.documentarray', function() {
     });
 
     const nestedSchema = new Schema({
-      nested: [[ subSchema ]]
+      nested: [[subSchema]]
     });
 
     const Nested = mongoose.model('gh7799', nestedSchema);

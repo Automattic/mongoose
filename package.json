@@ -138,6 +138,7 @@
         "before": false,
         "after": true
       }],
+      "array-bracket-spacing": 1,
       "no-unreachable": 2,
       "quotes": [
         "error",

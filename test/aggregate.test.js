@@ -421,7 +421,7 @@ describe('aggregate: ', function() {
       const aggregate = new Aggregate();
       aggregate.redact({
         $cond: {
-          if: { $eq: [ '$level', 5 ] },
+          if: { $eq: ['$level', 5] },
           then: '$$PRUNE',
           else: '$$DESCEND'
         }
@@ -564,7 +564,7 @@ describe('aggregate: ', function() {
         aggregate.replaceRoot({ x: { $concat: ['$this', '$that'] } });
 
         assert.deepEqual(aggregate._pipeline,
-          [{ $replaceRoot: { newRoot: { x: { $concat: ['$this', '$that'] } } } } ]);
+          [{ $replaceRoot: { newRoot: { x: { $concat: ['$this', '$that'] } } } }]);
         done();
       });
     });

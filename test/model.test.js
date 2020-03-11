@@ -4872,7 +4872,7 @@ describe('Model', function() {
           ]);
 
           yield MyModel.updateMany({}, { $set: { 'grades.$[element]': 100 } }, {
-            arrayFilters: [ { element: { $gte: 100 } } ]
+            arrayFilters: [{ element: { $gte: 100 } }]
           });
 
           const docs = yield MyModel.find().sort({ _id: 1 });

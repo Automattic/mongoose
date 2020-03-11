@@ -23,7 +23,7 @@ describe('getVirtual', function() {
     // First embedded discriminator has a virtual
     const clickedSchema = new Schema({
       element: { type: String },
-      users: [ Number ]
+      users: [Number]
     });
 
     clickedSchema.virtual('users_$', {
@@ -55,7 +55,7 @@ describe('getVirtual', function() {
     const docArray = batchSchema.path('nested.events');
 
     // *** Adding Nested Layer and adding virtual to schema of nestedLayer
-    const nestedLayerSchema = new Schema({ users: [ Number ] }, {
+    const nestedLayerSchema = new Schema({ users: [Number] }, {
       toJSON: { virtuals: true},
       toObject: { virtuals: true }
     });

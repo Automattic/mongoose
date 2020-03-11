@@ -2033,13 +2033,13 @@ describe('Query', function() {
       const ls = {
         name: 'test',
         geo: {
-          coordinates: [ [14.59, 24.847], [28.477, 15.961] ]
+          coordinates: [[14.59, 24.847], [28.477, 15.961]]
         }
       };
       const ls2 = {
         name: 'test2',
         geo: {
-          coordinates: [ [27.528, 25.006], [14.063, 15.591] ]
+          coordinates: [[27.528, 25.006], [14.063, 15.591]]
         }
       };
       LineString.create(ls, ls2, function(error, ls1) {

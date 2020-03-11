@@ -6581,7 +6581,7 @@ describe('model: populate:', function() {
         const clickedSchema = new Schema(
           {
             element: { type: String },
-            users: [ Number ]
+            users: [Number]
           },
           {
             toJSON: { virtuals: true},
@@ -7894,7 +7894,7 @@ describe('model: populate:', function() {
 
     const t = new Trick({ description: 'roll over'});
     const d = new Dog({ name: 'Fido', trick: t._id });
-    const o = new Owner({ name: 'Bill', age: 10, dogs: [ d._id ] });
+    const o = new Owner({ name: 'Bill', age: 10, dogs: [d._id] });
 
     return co(function*() {
       yield [t.save(), d.save(), o.save()];
@@ -8579,7 +8579,7 @@ describe('model: populate:', function() {
       const eventSchema = Schema({ message: String }, { discriminatorKey: 'kind' });
       const batchSchema = Schema({ nested: { events: [eventSchema] } });
 
-      const nestedLayerSchema = Schema({ users: [ Number ] });
+      const nestedLayerSchema = Schema({ users: [Number] });
       nestedLayerSchema.virtual('users_$', {
         ref: 'User',
         localField: 'users',

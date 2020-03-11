@@ -4197,11 +4197,11 @@ describe('document', function() {
       });
       const RootSchema = new mongoose.Schema({
         rootName: String,
-        nested: { type: [ NestedSchema ] }
+        nested: { type: [NestedSchema] }
       });
 
       const Root = db.model('Test', RootSchema);
-      const root = new Root({ rootName: 'root', nested: [ { } ] });
+      const root = new Root({ rootName: 'root', nested: [{ }] });
       root.save(function(error) {
         assert.ok(error);
         assert.deepEqual(Object.keys(error.errors).sort(),

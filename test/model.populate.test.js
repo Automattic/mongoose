@@ -9201,9 +9201,8 @@ describe('model: populate:', function() {
     });
   });
 
-  it.only('throws an error when using limit with perDocumentLimit', function() {
+  it('throws an error when using limit with perDocumentLimit', function() {
     return co(function *() {
-
       const User = db.model('User',userSchema);
       const BlogPost = db.model('BlogPost',blogPostSchema);
 

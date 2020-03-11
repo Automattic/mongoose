@@ -2618,7 +2618,7 @@ describe('Query', function() {
 
         const OrderSchema = new Schema({
           lines: [new Schema({
-            amount: Number,
+            amount: Number
           }, { discriminatorKey: 'kind' })]
         });
 

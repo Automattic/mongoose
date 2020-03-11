@@ -139,6 +139,7 @@
         "after": true
       }],
       "array-bracket-spacing": 1,
+      "comma-dangle": [2, "never"],
       "no-unreachable": 2,
       "quotes": [
         "error",

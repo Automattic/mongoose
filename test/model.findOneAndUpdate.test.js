@@ -1240,7 +1240,7 @@ describe('model: findOneAndUpdate:', function() {
         username: String,
         socialMediaHandles: {
           type: Map,
-          of: socialMediaHandleSchema,
+          of: socialMediaHandleSchema
         }
       });
 

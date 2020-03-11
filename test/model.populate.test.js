@@ -3191,7 +3191,7 @@ describe('model: populate:', function() {
 
       const user = {
         _id: mongoose.Types.ObjectId(),
-        name: 'Arnold',
+        name: 'Arnold'
       };
 
       const post = {
@@ -6094,7 +6094,7 @@ describe('model: populate:', function() {
           let Company = db.model('gh6245', CompanySchema);
           const company = new Company({
             name: 'Uber',
-            departments: [{name: 'Security'}, {name: 'Engineering'}],
+            departments: [{name: 'Security'}, {name: 'Engineering'}]
           });
 
           yield company.save();
@@ -6838,7 +6838,7 @@ describe('model: populate:', function() {
             },
             populate: {
               path: 'user',
-              select: 'name -_id',
+              select: 'name -_id'
             }
           };
           return Post.find(cond, null, opts).populate(pop).exec();
@@ -6863,7 +6863,7 @@ describe('model: populate:', function() {
 
       it('honors top-level match with subPopulation (gh-6451)', function() {
         const anotherSchema = new Schema({
-          name: String,
+          name: String
         });
 
         const Another = db.model('Test2', anotherSchema);
@@ -6923,7 +6923,7 @@ describe('model: populate:', function() {
             match: { online: true },
             populate: {
               path: 'a',
-              select: '-_id name',
+              select: '-_id name'
             }
           };
           const doc = yield Test.findOne({ visible: true }).populate(popObj);
@@ -7074,7 +7074,7 @@ describe('model: populate:', function() {
         metadata: {
           type: Schema.Types.ObjectId,
           ref: 'Test'
-        },
+        }
       });
 
       const postSchema = new Schema({
@@ -7727,7 +7727,7 @@ describe('model: populate:', function() {
 
     const commentSchema = new Schema({
       postId: { type: Schema.Types.ObjectId },
-      text: String,
+      text: String
     });
 
     const Post = db.model('Post', postSchema);
@@ -8618,7 +8618,7 @@ describe('model: populate:', function() {
       name: String,
       children: [{
         barId: { type: Schema.Types.ObjectId, ref: 'Test' },
-        quantity: Number,
+        quantity: Number
       }]
     });
     FooSchema.virtual('children.bar', {
@@ -8757,7 +8757,7 @@ describe('model: populate:', function() {
       mainSchema.virtual('virtualField', {
         ref: 'Test1',
         localField: '_id',
-        foreignField: 'main',
+        foreignField: 'main'
       });
 
       const discriminatedSchema = new Schema({ description: String });
@@ -8918,11 +8918,11 @@ describe('model: populate:', function() {
         type: ObjectId,
         refPath: 'list.objectType'
       },
-      objectType: String,
+      objectType: String
     }, opts);
     const ItemSchemaB = Schema({
       data: { sourceId: Number },
-      objectType: String,
+      objectType: String
     }, opts);
 
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
@@ -9136,13 +9136,13 @@ describe('model: populate:', function() {
     const noId = { _id: false };
 
     const NestedDataSchema = Schema({
-      data: Schema({ title: String, description: String }, noId),
+      data: Schema({ title: String, description: String }, noId)
     }, noId);
 
     const InternalItemSchemaGen = () => Schema({
       data: {
         type: ObjectId,
-        refPath: 'list.objectType',
+        refPath: 'list.objectType'
       }
     }, noId);
 

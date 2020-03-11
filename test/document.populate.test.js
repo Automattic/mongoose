@@ -774,7 +774,7 @@ describe('document.populate', function() {
         'gh_7740_2',
         new mongoose.Schema({
           name: String,
-          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh_7740_1' }], default: [] },
+          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh_7740_1' }], default: [] }
         })
       );
 
@@ -907,7 +907,7 @@ describe('document.populate', function() {
 
     before(function() {
       const playerSchema = mongoose.Schema({
-        _id: String,
+        _id: String
       });
 
       const teamSchema = mongoose.Schema({
@@ -934,7 +934,7 @@ describe('document.populate', function() {
               return v.split(' ')[0];
             }
           }
-        })],
+        })]
       });
 
       Player = db.model('gh7521_Player', playerSchema);

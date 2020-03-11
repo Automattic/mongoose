@@ -37,7 +37,7 @@ describe('types.embeddeddocumentdeclarative', function() {
           name: 'Swamp Guide',
           child: {
             name: 'Tingle',
-            mixedUp: 'very',
+            mixedUp: 'very'
           }
         });
         const tingle = swampGuide.toObject().child;
@@ -60,7 +60,7 @@ describe('types.embeddeddocumentdeclarative', function() {
           name: 'King Daphnes Nohansen Hyrule',
           child: {
             name: 'Princess Zelda',
-            mixedUp: 'not',
+            mixedUp: 'not'
           }
         });
         const princessZelda = kingDaphnes.child.toObject();
@@ -107,8 +107,8 @@ describe('types.embeddeddocumentdeclarative', function() {
       child: {
         name: String,
         type: {
-          type: String,
-        },
+          type: String
+        }
       }
     };
     const ParentSchemaNotMixed = new Schema(ParentSchemaDef);
@@ -132,7 +132,7 @@ describe('types.embeddeddocumentdeclarative', function() {
         child: {
           name: 'Rito Chieftan',
           type: 'Mother',
-          confidence: 10,
+          confidence: 10
         }
       });
       const ritoChieftan = new ParentModelNotSubdoc({
@@ -140,7 +140,7 @@ describe('types.embeddeddocumentdeclarative', function() {
         child: {
           name: 'Prince Komali',
           type: 'Medli',
-          confidence: 1,
+          confidence: 1
         }
       });
 

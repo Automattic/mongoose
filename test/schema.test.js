@@ -888,7 +888,7 @@ describe('schema', function() {
         }, { discriminatorKey: 'kind', _id: false });
 
         const batchSchema = new Schema({
-          events: [eventSchema],
+          events: [eventSchema]
         });
 
         const docArray = batchSchema.path('events');
@@ -898,7 +898,7 @@ describe('schema', function() {
         }, { _id: false }));
 
         docArray.discriminator('gh6485_Purchased', Schema({
-          product: { type: String, index: true },
+          product: { type: String, index: true }
         }, { _id: false }));
 
         assert.deepEqual(batchSchema.indexes().map(v => v[0]), [

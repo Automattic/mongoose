@@ -5447,7 +5447,7 @@ describe('Model', function() {
             {
               updateOne: {
                 filter: {},
-                update: { $set: { 'children.$[].name': 'bar' } },
+                update: { $set: { 'children.$[].name': 'bar' } }
               }
             }
           ]);
@@ -6274,7 +6274,7 @@ describe('Model', function() {
       yield SampleModel.bulkWrite([{
         insertOne: {
           doc: { name: 'Samwell Tarly' }
-        },
+        }
       }, {
         replaceOne: {
           filter: { name: 'bar' },

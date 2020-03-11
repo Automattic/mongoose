@@ -56,7 +56,7 @@ describe('model translate aliases', function() {
         ['name', 'Stark'],
         ['_id', '1'],
         ['bio.age', 30],
-        ['d.s', 'DotSyntax'],
+        ['d.s', 'DotSyntax']
       ])
     );
   });

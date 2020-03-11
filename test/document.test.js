@@ -563,14 +563,14 @@ describe('document', function() {
     const clipSchema = Schema({
       height: Number,
       rows: Number,
-      width: Number,
+      width: Number
     }, {_id: false, id: false});
     const questionSchema = Schema({
       type: String,
       age: Number,
       clip: {
-        type: clipSchema,
-      },
+        type: clipSchema
+      }
     }, {_id: false, id: false});
     const keySchema = Schema({ql: [questionSchema]}, {_id: false, id: false});
     const Model = db.model('gh8468-2', Schema({
@@ -584,9 +584,9 @@ describe('document', function() {
           { type: 'mc', clip: {width: 1} },
           { type: 'mc', clip: {height: 1, rows: 1} },
           { type: 'mc', clip: {height: 2, rows: 1} },
-          { type: 'mc', clip: {height: 3, rows: 1} },
-        ]},
-      ],
+          { type: 'mc', clip: {height: 3, rows: 1} }
+        ]}
+      ]
     });
     return doc.save().then(() => {
       // The following was failing before fixing gh-8531 because
@@ -3642,7 +3642,7 @@ describe('document', function() {
             }
           },
           members: [{
-            name: String,
+            name: String
           }]
         });
 
@@ -3673,16 +3673,16 @@ describe('document', function() {
         const testSchema = new Schema({
           name: {
             first: String,
-            last: String,
+            last: String
           },
           relatives: {
             aunt: {
-              name: String,
+              name: String
             },
             uncle: {
-              name: String,
-            },
-          },
+              name: String
+            }
+          }
         });
         const M = db.model('Test', testSchema);
 
@@ -6992,9 +6992,9 @@ describe('document', function() {
       roles: {
         type: [{
           otherProperties: {
-            example: Boolean,
+            example: Boolean
           },
-          name: String,
+          name: String
         }],
         default: function() {
           return [
@@ -7102,7 +7102,7 @@ describe('document', function() {
     const ActivityBareSchema = new Schema({
       _id: {
         type: Schema.Types.ObjectId,
-        ref: 'Activity',
+        ref: 'Activity'
       },
       name: String
     });
@@ -7117,7 +7117,7 @@ describe('document', function() {
       activity: {
         _id: '5bf606f6471b6056b3f2bfc9',
         name: 'Activity name'
-      },
+      }
     };
 
     const Event = db.model('Test', EventSchema);
@@ -7616,20 +7616,20 @@ describe('document', function() {
       minimize: false, // So empty objects are returned
       strict: true,
       typeKey: '$type', // So that we can use fields named `type`
-      discriminatorKey: 'type',
+      discriminatorKey: 'type'
     };
 
     const IssueSchema = new mongoose.Schema({
       _id: String,
       text: String,
-      type: String,
+      type: String
     }, opts);
 
     const IssueModel = db.model('Test', IssueSchema);
 
     const SubIssueSchema = new mongoose.Schema({
       checklist: [{
-        completed: {$type: Boolean, default: false},
+        completed: {$type: Boolean, default: false}
       }]
     }, opts);
     IssueModel.discriminator('gh7704_sub', SubIssueSchema);
@@ -8535,7 +8535,7 @@ describe('document', function() {
       startDate: {
         type: Date,
         required: true,
-        min: [new Date('2020-01-01'), () => 'test'],
+        min: [new Date('2020-01-01'), () => 'test']
       }
     });
 

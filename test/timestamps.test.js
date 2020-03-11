@@ -187,12 +187,12 @@ describe('timestamps', function() {
     const modelSchema = new Schema({
       createdAt: {
         type: Date,
-        get: (date) => date && date.valueOf() / 1000,
+        get: (date) => date && date.valueOf() / 1000
       },
       updatedAt: {
         type: Date,
-        get: (date) => date && date.valueOf() / 1000,
-      },
+        get: (date) => date && date.valueOf() / 1000
+      }
     }, { timestamps: true });
 
     const Model = db.model('gh7496', modelSchema);

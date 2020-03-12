@@ -39,3 +39,31 @@ Using the `upsert` option, you can use `findOneAndUpdate()` as a find-and-[upser
 ```javascript
 [require:Tutorial.*findOneAndUpdate.*upsert]
 ```
+
+<h2 id="raw-result">The `rawResult` Option</h2>
+
+Mongoose transforms the result of `findOneAndUpdate()` by default: it
+returns the updated document. That makes it difficult to check whether
+a document was upserted or not. In order to get the updated document
+and check whether MongoDB upserted a new document in the same operation,
+you can set the `rawResult` flag to make Mongoose return the raw result
+from MongoDB.
+
+```javascript
+[require:Tutorial.*findOneAndUpdate.*rawResult$]
+```
+
+Here's what the `res` object from the above example looks like:
+
+```
+{ lastErrorObject:
+   { n: 1,
+     updatedExisting: false,
+     upserted: 5e6a9e5ec6e44398ae2ac16a },
+  value:
+   { _id: 5e6a9e5ec6e44398ae2ac16a,
+     name: 'Will Riker',
+     __v: 0,
+     age: 29 },
+  ok: 1 }
+```

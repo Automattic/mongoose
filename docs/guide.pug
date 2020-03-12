@@ -34,6 +34,7 @@ block content
       <li><a href="#virtuals">Virtuals</a></li>
       <li><a href="#aliases">Aliases</a></li>
       <li><a href="#options">Options</a></li>
+      <li><a href="#es6-classes">With ES6 Classes</a></li>
       <li><a href="#plugins">Pluggable</a></li>
       <li><a href="#further-reading">Further Reading</a></li>
     </ul>
@@ -1140,6 +1141,32 @@ block content
 
     // Will only contain an error for 'child.name'
     new Parent({ child: {} }).validateSync().errors;
+    ```
+
+    <h3 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h3>
+
+    Schemas have a [`loadClass()` method](/docs/api/schema.html#schema_Schema-loadClass)
+    that you can use to create a Mongoose schema from an [ES6 class](https://thecodebarbarian.com/an-overview-of-es6-classes):
+
+    * [ES6 class methods](https://masteringjs.io/tutorials/fundamentals/class#methods) become [Mongoose methods](/docs/guide.html#methods)
+    * [ES6 class statics](https://masteringjs.io/tutorials/fundamentals/class#statics) become [Mongoose statics](/docs/guide.html#statics)
+    * [ES6 getters and setters](https://masteringjs.io/tutorials/fundamentals/class#getterssetters) become [Mongoose virtuals](/docs/tutorials/virtuals.html)
+
+    Here's an example of using `loadClass()` to create a schema from an ES6 class:
+
+    ```javascript
+    class MyClass {
+      myMethod() { return 42; }
+      static myStatic() { return 42; }
+      get myVirtual() { return 42; }
+    }
+
+    const schema = new mongoose.Schema();
+    schema.loadClass(MyClass);
+
+    console.log(schema.methods); // { myMethod: [Function: myMethod] }
+    console.log(schema.statics); // { myStatic: [Function: myStatic] }
+    console.log(schema.virtuals); // { myVirtual: VirtualType { ... } }
     ```
 
     <h3 id="plugins"><a href="#plugins">Pluggable</a></h3>

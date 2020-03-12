@@ -21,6 +21,7 @@ If you are migrating from 4.x to 5.x please take a moment to read the <a href="/
   <li><a href="#virtuals">Virtuals</a></li>
   <li><a href="#aliases">Aliases</a></li>
   <li><a href="#options">Options</a></li>
+  <li><a href="#es6-classes">With ES6 Classes</a></li>
   <li><a href="#plugins">Pluggable</a></li>
   <li><a href="#further-reading">Further Reading</a></li>
 </ul>
@@ -877,6 +878,28 @@ Mongoose only report the parent error.</p>
 
 <span class="hljs-comment">// Will only contain an error for 'child.name'</span>
 <span class="hljs-keyword">new</span> Parent({ child: {} }).validateSync().errors;</code></pre>
+<h3 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h3>
+
+<p>Schemas have a <a href="/docs/api/schema.html#schema_Schema-loadClass"><code>loadClass()</code> method</a>
+that you can use to create a Mongoose schema from an <a href="https://thecodebarbarian.com/an-overview-of-es6-classes">ES6 class</a>:</p>
+<ul>
+<li><a href="https://masteringjs.io/tutorials/fundamentals/class#methods">ES6 class methods</a> become <a href="/docs/guide.html#methods">Mongoose methods</a></li>
+<li><a href="https://masteringjs.io/tutorials/fundamentals/class#statics">ES6 class statics</a> become <a href="/docs/guide.html#statics">Mongoose statics</a></li>
+<li><a href="https://masteringjs.io/tutorials/fundamentals/class#getterssetters">ES6 getters and setters</a> become <a href="/docs/tutorials/virtuals.html">Mongoose virtuals</a></li>
+</ul>
+<p>Here&#39;s an example of using <code>loadClass()</code> to create a schema from an ES6 class:</p>
+<pre><code class="language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> </span>{
+  myMethod() { <span class="hljs-keyword">return</span> <span class="hljs-number">42</span>; }
+  static myStatic() { <span class="hljs-keyword">return</span> <span class="hljs-number">42</span>; }
+  get myVirtual() { <span class="hljs-keyword">return</span> <span class="hljs-number">42</span>; }
+}
+
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema();
+schema.loadClass(MyClass);
+
+<span class="hljs-built_in">console</span>.log(schema.methods); <span class="hljs-comment">// { myMethod: [Function: myMethod] }</span>
+<span class="hljs-built_in">console</span>.log(schema.statics); <span class="hljs-comment">// { myStatic: [Function: myStatic] }</span>
+<span class="hljs-built_in">console</span>.log(schema.virtuals); <span class="hljs-comment">// { myVirtual: VirtualType { ... } }</span></code></pre>
 <h3 id="plugins"><a href="#plugins">Pluggable</a></h3>
 
 <p>Schemas are also <a href="./plugins.html">pluggable</a> which allows us to package up reusable features into

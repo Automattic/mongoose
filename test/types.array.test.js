@@ -1679,7 +1679,7 @@ describe('types array', function() {
 
       const slicedNames = user.names.slice(1, 2);
       slicedNames.push('test4');
-      assert.ok(slicedNames.includes('test2') && slicedNames.includes('test4'));
+      assert.ok(slicedNames.indexOf('test2') !== -1 && slicedNames.indexOf('test4') !== -1);
     });
   });
 

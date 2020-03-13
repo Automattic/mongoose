@@ -1670,6 +1670,17 @@ describe('types array', function() {
 
       assert.deepEqual(arr, [10, 3]);
     });
+
+    it('with push (gh-8655)', function() {
+      const userSchema = new Schema({ names: [String] });
+      const User = mongoose.model('User', userSchema);
+
+      const user = new User({ names: ['test1', 'test2', 'test3'] });
+
+      const evens = user.names.slice(1, 2);
+      evens.push('test4');
+      assert.ok(evens.includes('test2') && evens.includes('test4'));
+    });
   });
 
   describe('setting a doc array', function() {

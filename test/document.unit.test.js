@@ -15,7 +15,7 @@ describe('sharding', function() {
   it('should handle shard keys properly (gh-2127)', function(done) {
     const mockSchema = {
       options: {
-        shardKey: {date: 1}
+        shardKey: { date: 1 }
       }
     };
     const Stub = function() {
@@ -25,7 +25,7 @@ describe('sharding', function() {
     Stub.prototype.__proto__ = mongoose.Document.prototype;
     const d = new Stub();
     const currentTime = new Date();
-    d._doc = {date: currentTime};
+    d._doc = { date: currentTime };
 
     storeShard.call(d);
     assert.equal(d.$__.shardval.date, currentTime);
@@ -39,10 +39,10 @@ describe('toObject()', function() {
   beforeEach(function() {
     Stub = function() {
       const schema = this.schema = {
-        options: {toObject: {minimize: false, virtuals: true}},
-        virtuals: {virtual: 'test'}
+        options: { toObject: { minimize: false, virtuals: true } },
+        virtuals: { virtual: 'test' }
       };
-      this._doc = {empty: {}};
+      this._doc = { empty: {} };
       this.get = function(path) { return schema.virtuals[path]; };
       this.$__ = {};
     };
@@ -51,13 +51,13 @@ describe('toObject()', function() {
 
   it('should inherit options from schema', function(done) {
     const d = new Stub();
-    assert.deepEqual(d.toObject(), {empty: {}, virtual: 'test'});
+    assert.deepEqual(d.toObject(), { empty: {}, virtual: 'test' });
     done();
   });
 
   it('can overwrite schema-set default options', function(done) {
     const d = new Stub();
-    assert.deepEqual(d.toObject({minimize: true, virtuals: false}), {});
+    assert.deepEqual(d.toObject({ minimize: true, virtuals: false }), {});
     done();
   });
 

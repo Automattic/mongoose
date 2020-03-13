@@ -69,7 +69,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     }
 
     // let's find the closest person to bob
-    Person.find({name: 'bob'}, function(err, res) {
+    Person.find({ name: 'bob' }, function(err, res) {
       if (err) {
         throw err;
       }
@@ -86,7 +86,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
         // information about geospatial queries and indexes, see
         // http://docs.mongodb.org/manual/applications/geospatial-indexes/
         const coords = [7, 7];
-        Person.find({loc: {$nearSphere: coords}}).limit(1).exec(function(err, res) {
+        Person.find({ loc: { $nearSphere: coords } }).limit(1).exec(function(err, res) {
           console.log('Closest to %s is %s', coords, res);
           cleanup();
         });

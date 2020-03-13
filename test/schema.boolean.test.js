@@ -24,11 +24,11 @@ describe('schematype', function() {
 
   describe('boolean', function() {
     it('null default is permitted (gh-523)', function(done) {
-      const s1 = new Schema({b: {type: Boolean, default: null}});
+      const s1 = new Schema({ b: { type: Boolean, default: null } });
       const M1 = db.model('NullDateDefaultIsAllowed1', s1);
-      const s2 = new Schema({b: {type: Boolean, default: false}});
+      const s2 = new Schema({ b: { type: Boolean, default: false } });
       const M2 = db.model('NullDateDefaultIsAllowed2', s2);
-      const s3 = new Schema({b: {type: Boolean, default: true}});
+      const s3 = new Schema({ b: { type: Boolean, default: true } });
       const M3 = db.model('NullDateDefaultIsAllowed3', s3);
 
       const m1 = new M1;
@@ -41,7 +41,7 @@ describe('schematype', function() {
     });
 
     it('strictBool option (gh-5211)', function(done) {
-      const s1 = new Schema({b: {type: Boolean}});
+      const s1 = new Schema({ b: { type: Boolean } });
       const M1 = db.model('StrictBoolOption', s1);
 
       const strictValues = [true, false, 'true', 'false', 0, 1, '0', '1', 'no', 'yes'];
@@ -63,7 +63,7 @@ describe('schematype', function() {
     });
 
     it('strictBool schema option', function(done) {
-      const s1 = new Schema({b: {type: Boolean}}, {strictBool: true});
+      const s1 = new Schema({ b: { type: Boolean } }, { strictBool: true });
       const M1 = db.model('StrictBoolTrue', s1);
 
       const strictValues = [true, false, 'true', 'false', 0, 1, '0', '1'];

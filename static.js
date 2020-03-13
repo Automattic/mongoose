@@ -1,7 +1,7 @@
 'use strict';
 
 const nodeStatic = require('node-static');
-const server = new nodeStatic.Server('.', {cache: 0});
+const server = new nodeStatic.Server('.', { cache: 0 });
 
 require('http').createServer(function(req, res) {
   if (req.url === '/favicon.ico') {

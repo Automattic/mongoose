@@ -20,14 +20,14 @@ describe('model', function() {
     schemaB = new Schema({
       title: String,
       type: String
-    }, {discriminatorKey: 'type'});
+    }, { discriminatorKey: 'type' });
 
     schemaC = new Schema({
       test: {
         type: String,
         default: 'test'
       }
-    }, {discriminatorKey: 'type'});
+    }, { discriminatorKey: 'type' });
   });
 
   describe('hydrate()', function() {
@@ -39,7 +39,7 @@ describe('model', function() {
 
     before(function() {
       breakfastSchema = new Schema({
-        food: {type: String, enum: ['bacon', 'eggs']}
+        food: { type: String, enum: ['bacon', 'eggs'] }
       });
 
       db = start();
@@ -55,7 +55,7 @@ describe('model', function() {
     });
 
     it('hydrates documents with no modified paths', function(done) {
-      const hydrated = B.hydrate({_id: '541085faedb2f28965d0e8e7', title: 'chair'});
+      const hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e7', title: 'chair' });
 
       assert.ok(hydrated.get('_id') instanceof DocumentObjectId);
       assert.equal(hydrated.title, 'chair');
@@ -82,7 +82,7 @@ describe('model', function() {
     });
 
     it('works correctly with model discriminators', function(done) {
-      const hydrated = B.hydrate({_id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C'});
+      const hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C' });
 
       assert.equal(hydrated.test, 'test');
       assert.deepEqual(hydrated.schema.tree, schemaC.tree);

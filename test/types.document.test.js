@@ -52,13 +52,13 @@ describe('types.document', function() {
     }
 
     Subdocument.prototype.$__setSchema(new Schema({
-      test: {type: String, required: true},
-      work: {type: String, validate: /^good/}
+      test: { type: String, required: true },
+      work: { type: String, validate: /^good/ }
     }));
 
     RatingSchema = new Schema({
       stars: Number,
-      description: {source: {url: String, time: Date}}
+      description: { source: { url: String, time: Date } }
     });
 
     MovieSchema = new Schema({
@@ -89,7 +89,7 @@ describe('types.document', function() {
 
   it('objects can be passed to #set', function(done) {
     const a = new Subdocument();
-    a.set({test: 'paradiddle', work: 'good flam'});
+    a.set({ test: 'paradiddle', work: 'good flam' });
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
     done();
@@ -97,7 +97,7 @@ describe('types.document', function() {
 
   it('Subdocuments can be passed to #set', function(done) {
     const a = new Subdocument();
-    a.set({test: 'paradiddle', work: 'good flam'});
+    a.set({ test: 'paradiddle', work: 'good flam' });
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
     const b = new Subdocument();
@@ -119,7 +119,7 @@ describe('types.document', function() {
 
     const m2 = new Movie;
     delete m2._doc._id;
-    m2.init({_id: new mongoose.Types.ObjectId});
+    m2.init({ _id: new mongoose.Types.ObjectId });
     assert.equal(m2.id, m2.$__._id);
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
@@ -130,17 +130,17 @@ describe('types.document', function() {
   it('Subdocument#remove (gh-531)', function(done) {
     const Movie = db.model('Movie');
 
-    const super8 = new Movie({title: 'Super 8'});
+    const super8 = new Movie({ title: 'Super 8' });
 
     const id1 = '4e3d5fc7da5d7eb635063c96';
     const id2 = '4e3d5fc7da5d7eb635063c97';
     const id3 = '4e3d5fc7da5d7eb635063c98';
     const id4 = '4e3d5fc7da5d7eb635063c99';
 
-    super8.ratings.push({stars: 9, _id: id1});
-    super8.ratings.push({stars: 8, _id: id2});
-    super8.ratings.push({stars: 7, _id: id3});
-    super8.ratings.push({stars: 6, _id: id4});
+    super8.ratings.push({ stars: 9, _id: id1 });
+    super8.ratings.push({ stars: 8, _id: id2 });
+    super8.ratings.push({ stars: 7, _id: id3 });
+    super8.ratings.push({ stars: 6, _id: id4 });
 
     super8.save(function(err) {
       assert.ifError(err);
@@ -219,7 +219,7 @@ describe('types.document', function() {
           assert.ifError(err);
 
           assert.ok(movie.ratings[0].description.source.time instanceof Date);
-          movie.ratings[0].description.source = {url: 'http://www.lifeofpimovie.com/'};
+          movie.ratings[0].description.source = { url: 'http://www.lifeofpimovie.com/' };
 
           movie.save(function(err) {
             assert.ifError(err);
@@ -233,7 +233,7 @@ describe('types.document', function() {
               assert.equal(undefined, movie.ratings[0].description.source.time);
 
               const newDate = new Date;
-              movie.ratings[0].set('description.source.time', newDate, {merge: true});
+              movie.ratings[0].set('description.source.time', newDate, { merge: true });
               movie.save(function(err) {
                 assert.ifError(err);
 

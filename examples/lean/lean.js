@@ -68,7 +68,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // when using .lean() the default is true, but you can explicitly set the
     // value by passing in a boolean value. IE. .lean(false)
-    const q = Person.find({age: {$lt: 1000}}).sort('age').limit(2).lean();
+    const q = Person.find({ age: { $lt: 1000 } }).sort('age').limit(2).lean();
     q.exec(function(err, results) {
       if (err) throw err;
       console.log('Are the results MongooseDocuments?: %s', results[0] instanceof mongoose.Document);

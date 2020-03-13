@@ -36,7 +36,7 @@ describe('id virtual getter', function() {
   });
 
   it('should be turned off when `id` option is set to false', function(done) {
-    const schema = new Schema({}, {id: false});
+    const schema = new Schema({}, { id: false });
 
     const S = db.model('NoIdGetter', schema);
     S.create({}, function(err, s) {
@@ -55,7 +55,7 @@ describe('id virtual getter', function() {
     });
 
     const S = db.model('SchemaHasId', schema);
-    S.create({ id: 'test'}, function(err, s) {
+    S.create({ id: 'test' }, function(err, s) {
       assert.ifError(err);
 
       // Comparing with expected value

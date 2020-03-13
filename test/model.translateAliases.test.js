@@ -27,19 +27,19 @@ describe('model translate aliases', function() {
     assert.deepEqual(
       // Translate aliases
       Character.translateAliases({
-        '_id': '1',
-        '名': 'Stark',
-        '年齢': 30,
+        _id: '1',
+        名: 'Stark',
+        年齢: 30,
         'dot.syntax': 'DotSyntax',
-        '$and': [{'$or': [{'名': 'Stark'}, {'年齢': 30}]}, {'dot.syntax': 'DotSyntax'}]
+        $and: [{ $or: [{ 名: 'Stark' }, { 年齢: 30 }] }, { 'dot.syntax': 'DotSyntax' }]
       }),
       // How translated aliases suppose to look like
       {
         name: 'Stark',
-        '_id': '1',
+        _id: '1',
         'bio.age': 30,
         'd.s': 'DotSyntax',
-        '$and': [{'$or': [{name: 'Stark'}, {'bio.age': 30}]}, {'d.s': 'DotSyntax'}]
+        $and: [{ $or: [{ name: 'Stark' }, { 'bio.age': 30 }] }, { 'd.s': 'DotSyntax' }]
       }
     );
 
@@ -56,7 +56,7 @@ describe('model translate aliases', function() {
         ['name', 'Stark'],
         ['_id', '1'],
         ['bio.age', 30],
-        ['d.s', 'DotSyntax'],
+        ['d.s', 'DotSyntax']
       ])
     );
   });

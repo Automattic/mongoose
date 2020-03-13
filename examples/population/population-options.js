@@ -105,9 +105,9 @@ function example() {
     .find({})
     .populate({
       path: 'consoles',
-      match: {manufacturer: 'Nintendo'},
+      match: { manufacturer: 'Nintendo' },
       select: 'name',
-      options: {comment: 'population'}
+      options: { comment: 'population' }
     })
     .exec(function(err, games) {
       if (err) return done(err);

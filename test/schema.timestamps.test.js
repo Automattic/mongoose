@@ -175,13 +175,13 @@ describe('schema options.timestamps', function() {
       CatSchema = new Schema({
         name: String,
         hobby: String
-      }, {timestamps: true});
+      }, { timestamps: true });
       Cat = conn.model('Cat', CatSchema);
-      return Cat.deleteMany({}).then(() => Cat.create({name: 'newcat'}));
+      return Cat.deleteMany({}).then(() => Cat.create({ name: 'newcat' }));
     });
 
     it('should have fields when create', function(done) {
-      const cat = new Cat({name: 'newcat'});
+      const cat = new Cat({ name: 'newcat' });
       cat.save(function(err, doc) {
         assert.ok(doc.createdAt);
         assert.ok(doc.updatedAt);
@@ -191,7 +191,7 @@ describe('schema options.timestamps', function() {
     });
 
     it('should have fields when create with findOneAndUpdate', function(done) {
-      Cat.findOneAndUpdate({name: 'notexistname'}, {$set: {}}, {upsert: true, new: true}, function(err, doc) {
+      Cat.findOneAndUpdate({ name: 'notexistname' }, { $set: {} }, { upsert: true, new: true }, function(err, doc) {
         assert.ok(doc.createdAt);
         assert.ok(doc.updatedAt);
         assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
@@ -200,7 +200,7 @@ describe('schema options.timestamps', function() {
     });
 
     it('should change updatedAt when save', function(done) {
-      Cat.findOne({name: 'newcat'}, function(err, doc) {
+      Cat.findOne({ name: 'newcat' }, function(err, doc) {
         const old = doc.updatedAt;
 
         doc.hobby = 'coding';
@@ -213,7 +213,7 @@ describe('schema options.timestamps', function() {
     });
 
     it('should not change updatedAt when save with no modifications', function(done) {
-      Cat.findOne({name: 'newcat'}, function(err, doc) {
+      Cat.findOne({ name: 'newcat' }, function(err, doc) {
         const old = doc.updatedAt;
 
         doc.save(function(err, doc) {
@@ -240,11 +240,11 @@ describe('schema options.timestamps', function() {
     });
 
     it('should change updatedAt when findOneAndUpdate', function(done) {
-      Cat.create({name: 'test123'}, function(err) {
+      Cat.create({ name: 'test123' }, function(err) {
         assert.ifError(err);
-        Cat.findOne({name: 'test123'}, function(err, doc) {
+        Cat.findOne({ name: 'test123' }, function(err, doc) {
           const old = doc.updatedAt;
-          Cat.findOneAndUpdate({name: 'test123'}, {$set: {hobby: 'fish'}}, {new: true}, function(err, doc) {
+          Cat.findOneAndUpdate({ name: 'test123' }, { $set: { hobby: 'fish' } }, { new: true }, function(err, doc) {
             assert.ok(doc.updatedAt.getTime() > old.getTime());
             done();
           });
@@ -284,10 +284,10 @@ describe('schema options.timestamps', function() {
     });
 
     it('should have fields when update', function(done) {
-      Cat.findOne({name: 'newcat'}, function(err, doc) {
+      Cat.findOne({ name: 'newcat' }, function(err, doc) {
         const old = doc.updatedAt;
-        Cat.update({name: 'newcat'}, {$set: {hobby: 'fish'}}, function() {
-          Cat.findOne({name: 'newcat'}, function(err, doc) {
+        Cat.update({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
+          Cat.findOne({ name: 'newcat' }, function(err, doc) {
             assert.ok(doc.updatedAt.getTime() > old.getTime());
             done();
           });
@@ -296,10 +296,10 @@ describe('schema options.timestamps', function() {
     });
 
     it('should change updatedAt when updateOne', function(done) {
-      Cat.findOne({name: 'newcat'}, function(err, doc) {
+      Cat.findOne({ name: 'newcat' }, function(err, doc) {
         const old = doc.updatedAt;
-        Cat.updateOne({name: 'newcat'}, {$set: {hobby: 'fish'}}, function() {
-          Cat.findOne({name: 'newcat'}, function(err, doc) {
+        Cat.updateOne({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
+          Cat.findOne({ name: 'newcat' }, function(err, doc) {
             assert.ok(doc.updatedAt.getTime() > old.getTime());
             done();
           });
@@ -308,10 +308,10 @@ describe('schema options.timestamps', function() {
     });
 
     it('should change updatedAt when updateMany', function(done) {
-      Cat.findOne({name: 'newcat'}, function(err, doc) {
+      Cat.findOne({ name: 'newcat' }, function(err, doc) {
         const old = doc.updatedAt;
-        Cat.updateMany({name: 'newcat'}, {$set: {hobby: 'fish'}}, function() {
-          Cat.findOne({name: 'newcat'}, function(err, doc) {
+        Cat.updateMany({ name: 'newcat' }, { $set: { hobby: 'fish' } }, function() {
+          Cat.findOne({ name: 'newcat' }, function(err, doc) {
             assert.ok(doc.updatedAt.getTime() > old.getTime());
             done();
           });

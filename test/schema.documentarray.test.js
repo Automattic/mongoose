@@ -17,14 +17,14 @@ const Schema = mongoose.Schema;
 
 describe('schema.documentarray', function() {
   it('defaults should be preserved', function(done) {
-    const child = new Schema({title: String});
+    const child = new Schema({ title: String });
 
-    const schema1 = new Schema({x: {type: [child], default: [{title: 'Prometheus'}]}});
-    const schema2 = new Schema({x: {type: [child], default: {title: 'Prometheus'}}});
+    const schema1 = new Schema({ x: { type: [child], default: [{ title: 'Prometheus' }] } });
+    const schema2 = new Schema({ x: { type: [child], default: { title: 'Prometheus' } } });
     const schema3 = new Schema({
       x: {
         type: [child], default: function() {
-          return [{title: 'Prometheus'}];
+          return [{ title: 'Prometheus' }];
         }
       }
     });
@@ -44,19 +44,19 @@ describe('schema.documentarray', function() {
 
   it('only sets if document has same schema (gh-3701)', function(done) {
     const schema1 = new Schema({
-      arr: [new Schema({a: Number, b: Number}, {_id: false})]
+      arr: [new Schema({ a: Number, b: Number }, { _id: false })]
     });
     const schema2 = new Schema({
-      arr: [new Schema({a: Number}, {_id: false})]
+      arr: [new Schema({ a: Number }, { _id: false })]
     });
 
     const Model1 = mongoose.model('gh3701_0', schema1);
     const Model2 = mongoose.model('gh3701_1', schema2);
 
-    const source = new Model1({arr: [{a: 1, b: 1}, {a: 2, b: 2}]});
-    const dest = new Model2({arr: source.arr});
+    const source = new Model1({ arr: [{ a: 1, b: 1 }, { a: 2, b: 2 }] });
+    const dest = new Model2({ arr: source.arr });
 
-    assert.deepEqual(dest.toObject().arr, [{a: 1}, {a: 2}]);
+    assert.deepEqual(dest.toObject().arr, [{ a: 1 }, { a: 2 }]);
     done();
   });
 
@@ -81,20 +81,20 @@ describe('schema.documentarray', function() {
     });
 
     const nestedSchema = new Schema({
-      nested: [[ subSchema ]]
+      nested: [[subSchema]]
     });
 
     const Nested = mongoose.model('gh7799', nestedSchema);
 
-    const doc = new Nested({nested: [[{ title: 'cool' }, { title: 'not cool' }]]});
+    const doc = new Nested({ nested: [[{ title: 'cool' }, { title: 'not cool' }]] });
     assert.equal(doc.nested[0].length, 2);
     assert.equal(doc.nested[0][0].title, 'cool');
 
-    doc.set({nested: [[{ title: 'new' }]]});
+    doc.set({ nested: [[{ title: 'new' }]] });
     assert.equal(doc.nested[0].length, 1);
     assert.equal(doc.nested[0][0].title, 'new');
 
-    doc.nested = [[{ title: 'first' }, { title: 'second' },{ title: 'third' }]];
+    doc.nested = [[{ title: 'first' }, { title: 'second' }, { title: 'third' }]];
     assert.equal(doc.nested[0].length, 3);
     assert.equal(doc.nested[0][1].title, 'second');
   });

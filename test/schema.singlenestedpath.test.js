@@ -15,12 +15,12 @@ describe('SingleNestedPath', function() {
     describe('recursive nested discriminators', function() {
       it('allow multiple levels of data in the schema', function() {
         const singleEventSchema = new Schema({
-          message: String,
+          message: String
         }, { _id: false, discriminatorKey: 'kind' });
 
         const subEventSchema = new Schema({
           sub_events: [singleEventSchema]
-        }, {_id: false});
+        }, { _id: false });
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
 
@@ -35,12 +35,12 @@ describe('SingleNestedPath', function() {
 
       it('allow multiple levels of data in a document', function() {
         const singleEventSchema = new Schema({
-          message: String,
+          message: String
         }, { _id: false, discriminatorKey: 'kind' });
 
         const subEventSchema = new Schema({
           sub_events: [singleEventSchema]
-        }, {_id: false});
+        }, { _id: false });
 
         subEventSchema.path('sub_events').discriminator('SubEvent', subEventSchema);
 
@@ -61,10 +61,10 @@ describe('SingleNestedPath', function() {
                 sub_events: [{
                   kind: 'SubEvent',
                   message: 'level 5',
-                  sub_events: [],
-                }],
-              }],
-            }],
+                  sub_events: []
+                }]
+              }]
+            }]
           }]
         };
         const subEvent = SubEvent(multiLevel);
@@ -75,7 +75,7 @@ describe('SingleNestedPath', function() {
       it('allow multiple levels of data in the schema when the base schema has _id without auto', function() {
         const singleEventSchema = new Schema({
           _id: { type: Number, required: true },
-          message: String,
+          message: String
         }, { discriminatorKey: 'kind' });
 
         const subEventSchema = new Schema({
@@ -100,7 +100,7 @@ describe('SingleNestedPath', function() {
       it('allow multiple levels of data in a document when the base schema has _id without auto', function() {
         const singleEventSchema = new Schema({
           _id: { type: Number, required: true },
-          message: String,
+          message: String
         }, { discriminatorKey: 'kind' });
 
         const subEventSchema = new Schema({
@@ -131,10 +131,10 @@ describe('SingleNestedPath', function() {
                   _id: 1,
                   kind: 'SubEvent',
                   message: 'level 5',
-                  sub_events: [],
-                }],
-              }],
-            }],
+                  sub_events: []
+                }]
+              }]
+            }]
           }]
         };
         const subEvent = SubEvent(multiLevel);

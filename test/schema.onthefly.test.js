@@ -17,7 +17,7 @@ describe('schema.onthefly', function() {
   before(function() {
     DecoratedSchema = new Schema({
       title: String
-    }, {strict: false});
+    }, { strict: false });
 
     mongoose.model('Decorated', DecoratedSchema);
     db = start();
@@ -54,7 +54,7 @@ describe('schema.onthefly', function() {
   it('querying a document that had an on the fly schema should work', function(done) {
     const Decorated = db.model('Decorated', collection);
 
-    const post = new Decorated({title: 'AD HOC'});
+    const post = new Decorated({ title: 'AD HOC' });
     // Interpret adhoc as a Number
     post.set('adhoc', '9', Number);
     assert.equal(post.get('adhoc').valueOf(), 9);
@@ -92,7 +92,7 @@ describe('schema.onthefly', function() {
     const Decorated = db.model('Decorated', collection);
 
     const post = new Decorated();
-    post.set('moderators', [{name: 'alex trebek'}], [new Schema({name: String})]);
+    post.set('moderators', [{ name: 'alex trebek' }], [new Schema({ name: String })]);
     assert.equal(post.get('moderators')[0].name, 'alex trebek');
     done();
   });
@@ -101,9 +101,9 @@ describe('schema.onthefly', function() {
     const Decorated = db.model('Decorated', collection);
 
     const post = new Decorated();
-    const ModeratorSchema = new Schema({name: String, ranking: Number});
+    const ModeratorSchema = new Schema({ name: String, ranking: Number });
 
-    post.set('moderators', [{name: 'alex trebek', ranking: '1'}], [ModeratorSchema]);
+    post.set('moderators', [{ name: 'alex trebek', ranking: '1' }], [ModeratorSchema]);
     assert.equal(post.get('moderators')[0].name, 'alex trebek');
     post.save(function(err) {
       assert.ifError(err);
@@ -115,7 +115,7 @@ describe('schema.onthefly', function() {
         let rankingPostCast = found.get('moderators', [ModeratorSchema])[0].ranking;
         assert.equal(rankingPostCast, 1);
 
-        const NewModeratorSchema = new Schema({name: String, ranking: String});
+        const NewModeratorSchema = new Schema({ name: String, ranking: String });
         rankingPostCast = found.get('moderators', [NewModeratorSchema])[0].ranking;
         assert.equal(rankingPostCast, 1);
         done();
@@ -126,7 +126,7 @@ describe('schema.onthefly', function() {
   it('casts on get() (gh-2360)', function(done) {
     const Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
 
-    const d = new Decorated({title: '1'});
+    const d = new Decorated({ title: '1' });
     assert.equal(typeof d.get('title', Number), 'number');
 
     d.title = '000000000000000000000001';

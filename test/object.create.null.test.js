@@ -22,9 +22,9 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
       a: String,
       b: {
         c: Number,
-        d: [{e: String}]
+        d: [{ e: String }]
       },
-      f: {g: Date},
+      f: { g: Date },
       h: {}
     });
   });
@@ -134,7 +134,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
       let o = Object.create(null);
       o = {};
       o.name = String;
-      const x = {type: [o]};
+      const x = { type: [o] };
       s.path('works', x);
     });
 

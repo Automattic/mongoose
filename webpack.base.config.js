@@ -7,7 +7,7 @@ module.exports = {
         test: /\.js$/,
         include: [
           /\/mongoose\//i,
-          /\/kareem\//i,
+          /\/kareem\//i
         ],
         loader: 'babel-loader',
         options: {
@@ -24,10 +24,10 @@ module.exports = {
     fs: 'empty',
     module: 'empty',
     net: 'empty',
-    tls: 'empty',
+    tls: 'empty'
   },
   target: 'web',
-  mode: 'production',
+  mode: 'production'
 };
 
 

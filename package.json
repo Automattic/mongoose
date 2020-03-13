@@ -124,16 +124,31 @@
         }
       ],
       "keyword-spacing": "error",
+      "no-whitespace-before-property": "error",
       "no-buffer-constructor": "warn",
       "no-console": "off",
       "no-multi-spaces": "error",
       "no-constant-condition": "off",
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
+      "no-undef": "error",
+      "key-spacing": [2, {
+        "beforeColon": false,
+        "afterColon": true
+      }],
+      "comma-spacing": [2, {
+        "before": false,
+        "after": true
+      }],
+      "array-bracket-spacing": 1,
+      "object-curly-spacing": [2, "always"],
+      "comma-dangle": [2, "never"],
+      "no-unreachable": 2,
       "quotes": [
         "error",
         "single"
       ],
+      "quote-props": ["error", "as-needed"],
       "semi": "error",
       "space-before-blocks": "error",
       "space-before-function-paren": [

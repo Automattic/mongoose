@@ -25,14 +25,14 @@ describe('schema alias option', function() {
 
   it('works with all basic schema types', function(done) {
     const schema = new Schema({
-      string:   { type: String, alias: 'StringAlias' },
-      number:   { type: Number, alias: 'NumberAlias' },
-      date:     { type: Date, alias: 'DateAlias' },
-      buffer:   { type: Buffer, alias: 'BufferAlias' },
-      boolean:  { type: Boolean, alias: 'BooleanAlias' },
-      mixed:    { type: Schema.Types.Mixed, alias: 'MixedAlias' },
-      objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
-      array:    { type: [], alias: 'ArrayAlias' }
+      string: { type: String, alias: 'StringAlias' },
+      number: { type: Number, alias: 'NumberAlias' },
+      date: { type: Date, alias: 'DateAlias' },
+      buffer: { type: Buffer, alias: 'BufferAlias' },
+      boolean: { type: Boolean, alias: 'BooleanAlias' },
+      mixed: { type: Schema.Types.Mixed, alias: 'MixedAlias' },
+      objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias' },
+      array: { type: [], alias: 'ArrayAlias' }
     });
 
     const S = db.model('AliasSchemaType', schema);
@@ -64,14 +64,14 @@ describe('schema alias option', function() {
   it('works with nested schema types', function(done) {
     const schema = new Schema({
       nested: {
-        string:   { type: String, alias: 'StringAlias' },
-        number:   { type: Number, alias: 'NumberAlias' },
-        date:     { type: Date, alias: 'DateAlias' },
-        buffer:   { type: Buffer, alias: 'BufferAlias' },
-        boolean:  { type: Boolean, alias: 'BooleanAlias' },
-        mixed:    { type: Schema.Types.Mixed, alias: 'MixedAlias' },
-        objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias'},
-        array:    { type: [], alias: 'ArrayAlias' }
+        string: { type: String, alias: 'StringAlias' },
+        number: { type: Number, alias: 'NumberAlias' },
+        date: { type: Date, alias: 'DateAlias' },
+        buffer: { type: Buffer, alias: 'BufferAlias' },
+        boolean: { type: Boolean, alias: 'BooleanAlias' },
+        mixed: { type: Schema.Types.Mixed, alias: 'MixedAlias' },
+        objectId: { type: Schema.Types.ObjectId, alias: 'ObjectIdAlias' },
+        array: { type: [], alias: 'ArrayAlias' }
       }
     });
 

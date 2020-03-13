@@ -88,7 +88,7 @@ BlogPost.methods.findCreator = function(callback) {
 };
 
 BlogPost.statics.findByTitle = function(title, callback) {
-  return this.find({title: title}, callback);
+  return this.find({ title: title }, callback);
 };
 
 BlogPost.methods.expressiveQuery = function(creator, date, callback) {

@@ -52,7 +52,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // when querying data, instead of providing a callback, you can instead
     // leave that off and get a query object returned
-    const query = Person.find({age: {$lt: 1000}});
+    const query = Person.find({ age: { $lt: 1000 } });
 
     // this allows you to continue applying modifiers to it
     query.sort('birthday');

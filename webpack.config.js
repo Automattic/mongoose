@@ -13,11 +13,11 @@ const webpackConfig = Object.assign({}, base, {
     libraryTarget: 'umd',
     // override default 'window' globalObject so browser build will work in SSR environments
     // may become unnecessary in webpack 5
-    globalObject: 'typeof self !== \'undefined\' ? self : this',
+    globalObject: 'typeof self !== \'undefined\' ? self : this'
   },
   externals: [
     /^node_modules\/.+$/
-  ],
+  ]
 });
 
 module.exports = webpackConfig;

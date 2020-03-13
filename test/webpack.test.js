@@ -40,7 +40,7 @@ describe('webpack', function() {
         // acquit:ignore:start
         output: {
           path: `${__dirname}/files`
-        },
+        }
         // acquit:ignore:end
       });
       // acquit:ignore:start

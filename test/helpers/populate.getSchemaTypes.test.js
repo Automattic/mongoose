@@ -12,7 +12,7 @@ describe('getSchemaTypes', function() {
         type: String,
         required: true
       }
-    }, {discriminatorKey: 'type'});
+    }, { discriminatorKey: 'type' });
 
     const ItemBookSchema = new Schema({
       author: {
@@ -67,7 +67,7 @@ describe('getSchemaTypes', function() {
         type: String,
         required: true
       }
-    }, {discriminatorKey: 'type'});
+    }, { discriminatorKey: 'type' });
 
     const ItemBookSchema = new Schema({
       author: {
@@ -148,7 +148,7 @@ describe('getSchemaTypes', function() {
     });
 
     const ProducerSchema = new mongoose.Schema({
-      name: 'String',
+      name: 'String'
     });
 
     const Driver = mongoose.model('gh6798_Driver', DriverSchema);

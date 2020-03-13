@@ -28,20 +28,20 @@ describe('model', function() {
   describe('indexes', function() {
     it('are created when model is compiled', function(done) {
       const Indexed = new Schema({
-        name: {type: String, index: true},
+        name: { type: String, index: true },
         last: String,
         email: String,
         date: Date
       });
 
-      Indexed.index({last: 1, email: 1}, {unique: true});
-      Indexed.index({date: 1}, {expires: 10});
+      Indexed.index({ last: 1, email: 1 }, { unique: true });
+      Indexed.index({ date: 1 }, { expires: 10 });
 
       const IndexedModel = db.model('IndexedModel1', Indexed, 'indexedmodel' + random());
       let assertions = 0;
 
       IndexedModel.on('index', function() {
-        IndexedModel.collection.getIndexes({full: true}, function(err, indexes) {
+        IndexedModel.collection.getIndexes({ full: true }, function(err, indexes) {
           assert.ifError(err);
 
           indexes.forEach(function(index) {
@@ -66,13 +66,13 @@ describe('model', function() {
 
     it('of embedded documents', function(done) {
       const BlogPosts = new Schema({
-        _id: {type: ObjectId, index: true},
-        title: {type: String, index: true},
+        _id: { type: ObjectId, index: true },
+        title: { type: String, index: true },
         desc: String
       });
 
       const User = new Schema({
-        name: {type: String, index: true},
+        name: { type: String, index: true },
         blogposts: [BlogPosts]
       });
 
@@ -116,7 +116,7 @@ describe('model', function() {
       }, { excludeIndexes: true });
 
       const User = new Schema({
-        name: {type: String, index: true},
+        name: { type: String, index: true },
         blogposts: {
           type: [BlogPost],
           excludeIndexes: true
@@ -145,13 +145,13 @@ describe('model', function() {
 
     it('of multiple embedded documents with same schema', function(done) {
       const BlogPosts = new Schema({
-        _id: {type: ObjectId, unique: true},
-        title: {type: String, index: true},
+        _id: { type: ObjectId, unique: true },
+        title: { type: String, index: true },
         desc: String
       });
 
       const User = new Schema({
-        name: {type: String, index: true},
+        name: { type: String, index: true },
         blogposts: [BlogPosts],
         featured: [BlogPosts]
       });
@@ -197,10 +197,10 @@ describe('model', function() {
         desc: String
       });
 
-      BlogPosts.index({title: 1, desc: 1});
+      BlogPosts.index({ title: 1, desc: 1 });
 
       const User = new Schema({
-        name: {type: String, index: true},
+        name: { type: String, index: true },
         blogposts: [BlogPosts]
       });
 
@@ -250,7 +250,7 @@ describe('model', function() {
       assert.deepEqual(ContainerSchema.indexes().map(function(v) { return v[0]; }), [
         { 'sub.subSub.nested2': 1 },
         { 'sub.nested1': 1 },
-        { 'nested0': 1 }
+        { nested0: 1 }
       ]);
 
       done();
@@ -270,13 +270,13 @@ describe('model', function() {
     });
 
     it('error should emit on the model', function(done) {
-      const schema = new Schema({name: {type: String}});
+      const schema = new Schema({ name: { type: String } });
       const Test = db.model('IndexError5', schema, 'x' + random());
 
-      Test.create({name: 'hi'}, {name: 'hi'}, function(err) {
+      Test.create({ name: 'hi' }, { name: 'hi' }, function(err) {
         assert.strictEqual(err, null);
-        Test.schema.index({name: 1}, {unique: true});
-        Test.schema.index({other: 1});
+        Test.schema.index({ name: 1 }, { unique: true });
+        Test.schema.index({ other: 1 });
 
         Test.on('index', function(err) {
           assert.ok(/E11000 duplicate key error/.test(err.message), err);
@@ -290,8 +290,8 @@ describe('model', function() {
 
     it('when one index creation errors', function(done) {
       const userSchema = {
-        name: {type: String},
-        secondValue: {type: Boolean}
+        name: { type: String },
+        secondValue: { type: Boolean }
       };
 
       const User = new Schema(userSchema);
@@ -334,7 +334,7 @@ describe('model', function() {
 
     describe('auto creation', function() {
       it('can be disabled', function(done) {
-        const schema = new Schema({name: {type: String, index: true}});
+        const schema = new Schema({ name: { type: String, index: true } });
         schema.set('autoIndex', false);
 
         const Test = db.model('AutoIndexing6', schema, 'autoindexing-disable');
@@ -344,7 +344,7 @@ describe('model', function() {
 
         // Create a doc because mongodb 3.0 getIndexes errors if db doesn't
         // exist
-        Test.create({name: 'Bacon'}, function(err) {
+        Test.create({ name: 'Bacon' }, function(err) {
           assert.ifError(err);
           setTimeout(function() {
             Test.collection.getIndexes(function(err, indexes) {
@@ -359,7 +359,7 @@ describe('model', function() {
 
       describe('global autoIndexes (gh-1875)', function() {
         it('will create indexes as a default', function(done) {
-          const schema = new Schema({name: {type: String, index: true}});
+          const schema = new Schema({ name: { type: String, index: true } });
           const Test = db.model('GlobalAutoIndex7', schema, 'gh-1875-1');
           Test.on('index', function(error) {
             assert.ifError(error);
@@ -373,14 +373,14 @@ describe('model', function() {
         });
 
         it('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done) {
-          const db = start({config: {autoIndex: false}});
-          const schema = new Schema({name: {type: String, index: true}});
+          const db = start({ config: { autoIndex: false } });
+          const schema = new Schema({ name: { type: String, index: true } });
           const Test = db.model('GlobalAutoIndex8', schema, 'x' + random());
           Test.on('index', function() {
             assert.ok(false, 'Model.ensureIndexes() was called');
           });
 
-          Test.create({name: 'Bacon'}, function(err) {
+          Test.create({ name: 'Bacon' }, function(err) {
             assert.ifError(err);
             setTimeout(function() {
               Test.collection.getIndexes(function(err, indexes) {
@@ -396,14 +396,14 @@ describe('model', function() {
 
     describe.skip('model.ensureIndexes()', function() {
       it('is a function', function(done) {
-        const schema = mongoose.Schema({x: 'string'});
+        const schema = mongoose.Schema({ x: 'string' });
         const Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);
         assert.equal(typeof Test.ensureIndexes, 'function');
         done();
       });
 
       it('returns a Promise', function(done) {
-        const schema = mongoose.Schema({x: 'string'});
+        const schema = mongoose.Schema({ x: 'string' });
         const Test = mongoose.createConnection().model('ensureIndexes-' + random, schema);
         const p = Test.ensureIndexes();
         assert.ok(p instanceof mongoose.Promise);
@@ -411,10 +411,10 @@ describe('model', function() {
       });
 
       it('creates indexes', function(done) {
-        const schema = new Schema({name: {type: String}});
+        const schema = new Schema({ name: { type: String } });
         const Test = db.model('ManualIndexing' + random(), schema, 'x' + random());
 
-        Test.schema.index({name: 1}, {sparse: true});
+        Test.schema.index({ name: 1 }, { sparse: true });
 
         let called = false;
         Test.on('index', function() {

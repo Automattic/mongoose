@@ -417,7 +417,7 @@ describe('QueryCursor', function() {
 
   it('addCursorFlag (gh-4814)', function(done) {
     const userSchema = new mongoose.Schema({
-      name:  String
+      name: String
     });
 
     const User = db.model('gh4814', userSchema);
@@ -432,7 +432,7 @@ describe('QueryCursor', function() {
 
   it('data before close (gh-4998)', function(done) {
     const userSchema = new mongoose.Schema({
-      name:  String
+      name: String
     });
 
     const User = db.model('gh4998', userSchema);

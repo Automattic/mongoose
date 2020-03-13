@@ -1677,9 +1677,9 @@ describe('types array', function() {
 
       const user = new User({ names: ['test1', 'test2', 'test3'] });
 
-      const evens = user.names.slice(1, 2);
-      evens.push('test4');
-      assert.ok(evens.includes('test2') && evens.includes('test4'));
+      const slicedNames = user.names.slice(1, 2);
+      slicedNames.push('test4');
+      assert.ok(slicedNames.includes('test2') && slicedNames.includes('test4'));
     });
   });
 

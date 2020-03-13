@@ -5,6 +5,7 @@ The [`findOneAndUpdate()` function in Mongoose](/docs/api.html#query_Query-findO
 * [Getting Started](#getting-started)
 * [Atomic Updates](#atomic-updates)
 * [Upsert](#upsert)
+* [The `rawResult` Option](#raw-result)
 
 <h2 id="getting-started">Getting Started</h2>
 

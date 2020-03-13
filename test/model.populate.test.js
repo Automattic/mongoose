@@ -9203,22 +9203,22 @@ describe('model: populate:', function() {
 
   it('throws an error when using limit with perDocumentLimit', function() {
     return co(function *() {
-      const User = db.model('User',userSchema);
-      const BlogPost = db.model('BlogPost',blogPostSchema);
+      const User = db.model('User', userSchema);
+      const BlogPost = db.model('BlogPost', blogPostSchema);
 
-      const blogPosts = yield BlogPost.create([{title:'JS 101'},{title:'Mocha 101'}]);
-      const user = yield User.create({blogposts: blogPosts});
+      const blogPosts = yield BlogPost.create([{ title: 'JS 101' }, { title: 'Mocha 101' }]);
+      const user = yield User.create({ blogposts: blogPosts });
 
 
       let err;
       try {
-        yield User.find({_id:user._id}).populate({ path: 'blogposts', perDocumentLimit: 2,limit:1 });
+        yield User.find({ _id: user._id }).populate({ path: 'blogposts', perDocumentLimit: 2, limit: 1 });
       } catch (error) {
         err = error;
       }
 
       assert(err);
-      assert.equal(err.message,'Can not use `limit` and `perDocumentLimit` at the same time. Path: `blogposts`.');
+      assert.equal(err.message, 'Can not use `limit` and `perDocumentLimit` at the same time. Path: `blogposts`.');
     });
   });
 });

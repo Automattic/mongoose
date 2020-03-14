@@ -9078,6 +9078,28 @@ describe('model: populate:', function() {
     });
   });
 
+  it('top-level limit properly applies limit per document (gh-8657)', function() {
+    const Article = db.model('Article', mongoose.Schema({
+      authors: [{ type: Number, ref: 'User' }]
+    }));
+    const User = db.model('User', mongoose.Schema({ _id: Number }));
+
+    return co(function*() {
+      yield Article.create([
+        { authors: [1, 2] },
+        { authors: [3, 4] }
+      ]);
+      yield User.create({ _id: 1 }, { _id: 2 }, { _id: 3 }, { _id: 4 });
+
+      const res = yield Article.find().
+        sort({ _id: 1 }).
+        populate({ path: 'authors', limit: 1, sort: { _id: 1 } });
+      assert.equal(res.length, 2);
+      assert.deepEqual(res[0].authors.map(a => a._id), [1]);
+      assert.deepEqual(res[1].toObject().authors, []);
+    });
+  });
+
   it('correct limit with populate (gh-7318)', function() {
     const childSchema = Schema({ _id: Number, parentId: 'ObjectId' });
 

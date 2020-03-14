@@ -9073,7 +9073,7 @@ describe('model: populate:', function() {
         populate({ path: 'children', skip: 0, limit: 2 });
       assert.equal(docs[0]._id.toString(), p._id.toString());
       assert.equal(docs[1]._id.toString(), p2._id.toString());
-      assert.deepEqual(docs[0].children.map(c => c._id), [1, 2, 3]);
+      assert.deepEqual(docs[0].children.map(c => c._id), [1, 2]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
     });
   });

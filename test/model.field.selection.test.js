@@ -59,7 +59,7 @@ describe('model field selection', function() {
       def: { type: String, default: 'kandinsky' }
     });
 
-    
+
     BlogPostB = db.model('BlogPost', BlogPostSchema);
   });
 

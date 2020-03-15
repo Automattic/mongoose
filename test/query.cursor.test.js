@@ -176,7 +176,7 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('with pre-find hooks (gh-5096)', function(done) {
+    it('with pre-find hooks (gh-5096)', function() {
       const schema = new Schema({ name: String });
       let called = 0;
       schema.pre('find', function(next) {
@@ -186,14 +186,14 @@ describe('QueryCursor', function() {
 
       db.deleteModel(/Test/);
       const Model = db.model('Test', schema);
-      Model.create({ name: 'Test' }, function(error) {
-        assert.ifError(error);
-        Model.find().cursor().next(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(called, 1);
-          assert.equal(doc.name, 'Test');
-          done();
-        });
+
+      return co(function*() {
+        yield Model.deleteMany({});
+        yield Model.create({ name: 'Test' });
+
+        const doc = yield Model.find().cursor().next();
+        assert.equal(called, 1);
+        assert.equal(doc.name, 'Test');
       });
     });
   });
@@ -404,6 +404,7 @@ describe('QueryCursor', function() {
 
   it('handles non-boolean lean option (gh-7137)', function() {
     const schema = new Schema({ name: String });
+    db.deleteModel(/Test/);
     const Model = db.model('Test', schema);
 
     return co(function*() {

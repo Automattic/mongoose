@@ -6094,8 +6094,8 @@ describe('Model', function() {
         yield Model.createCollection();
 
         // If the collection is not created, the following will throw
-        // MongoError: Collection [mongoose_test.create_xxx_users] not found.
-        yield db.collection('users').stats();
+        // MongoError: Collection [mongoose_test.User] not found.
+        yield db.collection('User').stats();
 
         yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 

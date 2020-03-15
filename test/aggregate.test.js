@@ -18,17 +18,15 @@ const Schema = mongoose.Schema;
  * Test data
  */
 
-const EmployeeSchema = new Schema({
-  name: String,
-  sal: Number,
-  dept: String,
-  customers: [String],
-  reportsTo: String
-});
-
-mongoose.model('Employee', EmployeeSchema);
-
 function setupData(db, callback) {
+  const EmployeeSchema = new Schema({
+    name: String,
+    sal: Number,
+    dept: String,
+    customers: [String],
+    reportsTo: String
+  });
+
   let saved = 0;
   const emps = [
     { name: 'Alice', sal: 18000, dept: 'sales', customers: ['Eve', 'Fred'] },
@@ -36,7 +34,7 @@ function setupData(db, callback) {
     { name: 'Carol', sal: 14000, dept: 'r&d', reportsTo: 'Bob' },
     { name: 'Dave', sal: 14500, dept: 'r&d', reportsTo: 'Carol' }
   ];
-  const Employee = db.model('Employee');
+  const Employee = db.model('Employee', EmployeeSchema);
 
   Employee.deleteMany({}, function() {
     emps.forEach(function(data) {
@@ -93,6 +91,10 @@ describe('aggregate: ', function() {
   after(function(done) {
     db.close(done);
   });
+
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => require('./util').clearTestData(db));
 
   describe('append', function() {
     it('(pipeline)', function(done) {
@@ -616,7 +618,7 @@ describe('aggregate: ', function() {
   });
 
   describe('exec', function() {
-    before(function(done) {
+    beforeEach(function(done) {
       setupData(db, done);
     });
 
@@ -774,7 +776,7 @@ describe('aggregate: ', function() {
         aggregate.
           model(db.model('Employee')).
           graphLookup({
-            from: 'employees',
+            from: 'Employee',
             startWith: '$reportsTo',
             connectFromField: 'reportsTo',
             connectToField: 'name',
@@ -1001,7 +1003,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh5251', s);
+        const M = db.model('Test', s);
 
         M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
           assert.ifError(error);
@@ -1019,7 +1021,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh7606', s);
+        const M = db.model('Test', s);
 
         return co(function*() {
           yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
@@ -1039,7 +1041,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh8017', s);
+        const M = db.model('Test', s);
 
         return co(function*() {
           yield M.create([{ name: 'alpha' }, { name: 'Zeta' }]);
@@ -1060,7 +1062,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh5251_post', s);
+        const M = db.model('Test', s);
 
         M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
           assert.ifError(error);
@@ -1080,7 +1082,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh5251_error_agg', s);
+        const M = db.model('Test', s);
 
         M.aggregate([{ $fakeStage: { name: 'test' } }], function(error, res) {
           assert.ok(error);
@@ -1105,7 +1107,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh5251_error', s);
+        const M = db.model('Test', s);
 
         M.aggregate([{ $match: { name: 'test' } }], function(error, res) {
           assert.ok(error);
@@ -1131,7 +1133,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh5251_cursor', s);
+        const M = db.model('Test', s);
 
         let numDocs = 0;
         M.
@@ -1163,7 +1165,7 @@ describe('aggregate: ', function() {
           next();
         });
 
-        const M = db.model('gh5887_cursor', s);
+        const M = db.model('Test', s);
 
         return M.aggregate([{ $match: { name: 'test' } }]).explain().
           then(() => {
@@ -1176,7 +1178,7 @@ describe('aggregate: ', function() {
 
     it('readPref from schema (gh-5522)', function(done) {
       const schema = new Schema({ name: String }, { read: 'secondary' });
-      const M = db.model('gh5522', schema);
+      const M = db.model('Test', schema);
       const a = M.aggregate();
       assert.equal(a.options.readPreference.mode, 'secondary');
 
@@ -1189,7 +1191,7 @@ describe('aggregate: ', function() {
   });
 
   it('cursor (gh-3160)', function() {
-    const MyModel = db.model('gh3160', { name: String });
+    const MyModel = db.model('Test', { name: String });
 
     return co(function * () {
       yield MyModel.create({ name: 'test' });
@@ -1205,7 +1207,7 @@ describe('aggregate: ', function() {
   });
 
   it('catch() (gh-7267)', function() {
-    const MyModel = db.model('gh7267', {});
+    const MyModel = db.model('Test', {});
 
     return co(function * () {
       const err = yield MyModel.aggregate([{ $group: { foo: 'bar' } }]).
@@ -1218,7 +1220,7 @@ describe('aggregate: ', function() {
   it('cursor() without options (gh-3855)', function(done) {
     const db = start();
 
-    const MyModel = db.model('gh3855', { name: String });
+    const MyModel = db.model('Test', { name: String });
 
     db.on('open', function() {
       const cursor = MyModel.
@@ -1231,7 +1233,7 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() with useMongooseAggCursor (gh-5145)', function(done) {
-    const MyModel = db.model('gh5145', { name: String });
+    const MyModel = db.model('Test', { name: String });
 
     const cursor = MyModel.
       aggregate([{ $match: { name: 'test' } }]).
@@ -1243,7 +1245,7 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() with useMongooseAggCursor works (gh-5145) (gh-5394)', function(done) {
-    const MyModel = db.model('gh5394', { name: String });
+    const MyModel = db.model('Test', { name: String });
 
     MyModel.create({ name: 'test' }, function(error) {
       assert.ifError(error);
@@ -1265,7 +1267,7 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() eachAsync (gh-4300)', function(done) {
-    const MyModel = db.model('gh4300', { name: String });
+    const MyModel = db.model('Test', { name: String });
 
     let cur = 0;
     const expectedNames = ['Axl', 'Slash'];
@@ -1294,7 +1296,7 @@ describe('aggregate: ', function() {
   });
 
   it('cursor() eachAsync with options (parallel)', function(done) {
-    const MyModel = db.model('gh-6168', { name: String });
+    const MyModel = db.model('Test', { name: String });
 
     const names = [];
     const startedAt = [];
@@ -1327,7 +1329,7 @@ describe('aggregate: ', function() {
   });
 
   it('ability to add noCursorTimeout option (gh-4241)', function(done) {
-    const MyModel = db.model('gh4241', {
+    const MyModel = db.model('Test', {
       name: String
     });
 
@@ -1344,7 +1346,7 @@ describe('aggregate: ', function() {
   });
 
   it('query by document (gh-4866)', function(done) {
-    const MyModel = db.model('gh4866', {
+    const MyModel = db.model('Test', {
       name: String
     });
 
@@ -1359,7 +1361,7 @@ describe('aggregate: ', function() {
   it('sort by text score (gh-5258)', function(done) {
     const mySchema = new Schema({ test: String });
     mySchema.index({ test: 'text' });
-    const M = db.model('gh5258', mySchema);
+    const M = db.model('Test', mySchema);
 
     M.on('index', function(error) {
       assert.ifError(error);
@@ -1388,7 +1390,7 @@ describe('aggregate: ', function() {
     it('adds hint option', function(done) {
       const mySchema = new Schema({ name: String, qty: Number });
       mySchema.index({ qty: -1, name: -1 });
-      const M = db.model('gh6251', mySchema);
+      const M = db.model('Test', mySchema);
       M.on('index', function(error) {
         assert.ifError(error);
         const docs = [

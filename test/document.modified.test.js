@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -83,7 +82,7 @@ describe('document modified', function() {
       return this;
     });
 
-    BlogPost = db.model('BlogPost', BlogPostSchema); 
+    BlogPost = db.model('BlogPost', BlogPostSchema);
   });
 
   describe('modified states', function() {

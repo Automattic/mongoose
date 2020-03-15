@@ -808,12 +808,12 @@ describe('Map', function() {
         }
       });
       const doc = yield Model.findOne();
-  
+
       doc.numMap.set('answer', 42);
       doc.numMap.set('powerLevel', 9001);
       doc.docMap.set('captain', { name: 'Jean-Luc Picard' });
       doc.docMap.set('firstOfficer', { name: 'Will Riker' });
-  
+
       assert.deepEqual(doc.modifiedPaths(), []);
     });
   });

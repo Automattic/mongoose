@@ -1409,6 +1409,21 @@ describe('model: findOneAndUpdate:', function() {
         });
     });
 
+    it('validators ignore paths underneath mixed (gh-8659)', function() {
+      let called = 0;
+      const s = new Schema({
+        n: {
+          type: 'Mixed',
+          validate: () => { ++called; return false; }
+        }
+      });
+      const Test = db.model('Test', s);
+
+      const updateOptions = { runValidators: true, upsert: true, new: true };
+      return Test.findOneAndUpdate({}, { 'n.test': 'foo' }, updateOptions).
+        then(() => assert.equal(called, 0));
+    });
+
     it('should work with arrays (gh-3035)', function(done) {
       const testSchema = new mongoose.Schema({
         id: String,

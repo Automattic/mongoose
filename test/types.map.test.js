@@ -781,4 +781,40 @@ describe('Map', function() {
     assert.equal(doc.myMap.get('foo').name, 'bar');
     assert.ok(!doc.myMap.get('foo')._id);
   });
+
+  it('avoids marking path as modified if setting to same value (gh-8652)', function() {
+    const childSchema = mongoose.Schema({ name: String }, { _id: false });
+    const schema = mongoose.Schema({
+      numMap: {
+        type: Map,
+        of: Number
+      },
+      docMap: {
+        type: Map,
+        of: childSchema
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.create({
+        numMap: {
+          answer: 42,
+          powerLevel: 9001
+        },
+        docMap: {
+          captain: { name: 'Jean-Luc Picard' },
+          firstOfficer: { name: 'Will Riker' }
+        }
+      });
+      const doc = yield Model.findOne();
+  
+      doc.numMap.set('answer', 42);
+      doc.numMap.set('powerLevel', 9001);
+      doc.docMap.set('captain', { name: 'Jean-Luc Picard' });
+      doc.docMap.set('firstOfficer', { name: 'Will Riker' });
+  
+      assert.deepEqual(doc.modifiedPaths(), []);
+    });
+  });
 });

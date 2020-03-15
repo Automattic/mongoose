@@ -3,17 +3,13 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('model', function() {
   let db, schema;
-
-  function getModel(db) {
-    return db.model('GeoSearch', schema, 'geosearch-' + random());
-  }
+  let Geo;
 
   before(function() {
     schema = new Schema({
@@ -23,22 +19,23 @@ describe('model', function() {
     });
     schema.index({ pos: 'geoHaystack', type: 1 }, { bucketSize: 1 });
     db = start();
+
+    Geo = db.model('Test', schema);
   });
 
   after(function(done) {
     db.close(done);
   });
 
+  afterEach(() => Geo.deleteMany({}));
+
   describe('geoSearch', function() {
     this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
     it('works', function(done) {
-      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
-        assert.ifError(err);
-
+      Geo.init(function() {
         const geos = [];
         geos[0] = new Geo({ pos: [10, 10], type: 'place' });
         geos[1] = new Geo({ pos: [15, 5], type: 'place' });
@@ -75,10 +72,9 @@ describe('model', function() {
       });
     });
     it('works with lean', function(done) {
-      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.init(function(err) {
         assert.ifError(err);
 
         const geos = [];
@@ -113,10 +109,9 @@ describe('model', function() {
       });
     });
     it('throws the correct error messages', function(done) {
-      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.init(function(err) {
         assert.ifError(err);
 
         const g = new Geo({ pos: [10, 10], type: 'place' });
@@ -146,9 +141,7 @@ describe('model', function() {
     });
 
     it('returns a promise (gh-1614)', function(done) {
-      const Geo = getModel(db);
-
-      Geo.on('index', function() {
+      Geo.init(function() {
         const prom = Geo.geoSearch({ type: 'place' }, { near: [9, 9], maxDistance: 5 });
         assert.ok(prom instanceof mongoose.Promise);
 
@@ -157,8 +150,7 @@ describe('model', function() {
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {
-      const Geo = getModel(db);
-      Geo.on('index', function(err) {
+      Geo.init(function(err) {
         assert.ifError(err);
         const g = new Geo({ pos: [10, 10], type: 'place' });
         g.save(function(err) {

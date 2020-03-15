@@ -8,7 +8,6 @@ const start = require('./common');
 
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -18,11 +17,20 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 describe('model field selection', function() {
   let Comments;
   let BlogPostB;
-  let modelName;
-  let collection;
   let db;
 
   before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
+  beforeEach(function() {
     Comments = new Schema;
 
     Comments.add({
@@ -32,7 +40,7 @@ describe('model field selection', function() {
       comments: [Comments]
     });
 
-    BlogPostB = new Schema({
+    const BlogPostSchema = new Schema({
       title: String,
       author: String,
       slug: String,
@@ -51,18 +59,11 @@ describe('model field selection', function() {
       def: { type: String, default: 'kandinsky' }
     });
 
-    modelName = 'model.select.blogpost';
-    mongoose.model(modelName, BlogPostB);
-    collection = 'blogposts_' + random();
-    db = start();
-  });
-
-  after(function(done) {
-    db.close(done);
+    
+    BlogPostB = db.model('BlogPost', BlogPostSchema);
   });
 
   it('excluded fields should be undefined', function(done) {
-    const BlogPostB = db.model(modelName, collection);
     const date = new Date;
 
     const doc = {
@@ -97,7 +98,6 @@ describe('model field selection', function() {
   });
 
   it('excluded fields should be undefined and defaults applied to other fields', function(done) {
-    const BlogPostB = db.model(modelName, collection);
     const id = new DocumentObjectId;
     const date = new Date;
 
@@ -119,7 +119,6 @@ describe('model field selection', function() {
   });
 
   it('where subset of fields excludes _id', function(done) {
-    const BlogPostB = db.model(modelName, collection);
     BlogPostB.create({ title: 'subset 1' }, function(err) {
       assert.ifError(err);
       BlogPostB.findOne({ title: 'subset 1' }, { title: 1, _id: 0 }, function(err, found) {
@@ -132,7 +131,6 @@ describe('model field selection', function() {
   });
 
   it('works with subset of fields, excluding _id', function(done) {
-    const BlogPostB = db.model(modelName, collection);
     BlogPostB.create({ title: 'subset 1', author: 'me' }, function(err) {
       assert.ifError(err);
       BlogPostB.find({ title: 'subset 1' }, { title: 1, _id: 0 }, function(err, found) {
@@ -148,7 +146,7 @@ describe('model field selection', function() {
   });
 
   it('works with just _id and findOneAndUpdate (gh-3407)', function(done) {
-    const MyModel = db.model('gh3407', { test: { type: Number, default: 1 } });
+    const MyModel = db.model('Test', { test: { type: Number, default: 1 } });
 
     MyModel.collection.insertOne({}, function(error) {
       assert.ifError(error);
@@ -161,8 +159,6 @@ describe('model field selection', function() {
   });
 
   it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done) {
-    const BlogPostB = db.model(modelName, collection);
-
     BlogPostB.create({ title: 'LOTR', comments: [{ title: ':)' }] }, function(err, created) {
       assert.ifError(err);
       BlogPostB.find({ _id: created }, { _id: 0, 'comments._id': 0 }, function(err, found) {
@@ -183,7 +179,6 @@ describe('model field selection', function() {
   });
 
   it('included fields should have defaults applied when no value exists in db (gh-870)', function(done) {
-    const BlogPostB = db.model(modelName, collection);
     const id = new DocumentObjectId;
 
     BlogPostB.collection.insertOne(
@@ -205,8 +200,6 @@ describe('model field selection', function() {
   });
 
   it('including subdoc field excludes other subdoc fields (gh-1027)', function(done) {
-    const BlogPostB = db.model(modelName, collection);
-
     BlogPostB.create({ comments: [{ title: 'a' }, { title: 'b' }] }, function(err, doc) {
       assert.ifError(err);
 
@@ -228,8 +221,6 @@ describe('model field selection', function() {
   });
 
   it('excluding nested subdoc fields (gh-1027)', function(done) {
-    const BlogPostB = db.model(modelName, collection);
-
     BlogPostB.create({ title: 'top', comments: [{ title: 'a', body: 'body' }, { title: 'b', body: 'body', comments: [{ title: 'c' }] }] }, function(err, doc) {
       assert.ifError(err);
 
@@ -265,7 +256,7 @@ describe('model field selection', function() {
         ids: [{ type: Schema.ObjectId }]
       });
 
-      const B = db.model('gh-1091', postSchema);
+      const B = db.model('Test', postSchema);
       const _id1 = new mongoose.Types.ObjectId;
       const _id2 = new mongoose.Types.ObjectId;
 
@@ -304,7 +295,7 @@ describe('model field selection', function() {
         ids2: [{ type: Schema.ObjectId }]
       });
 
-      const B = db.model('gh-1334', postSchema);
+      const B = db.model('Test', postSchema);
       const _id1 = new mongoose.Types.ObjectId;
       const _id2 = new mongoose.Types.ObjectId;
 
@@ -349,7 +340,7 @@ describe('model field selection', function() {
         tags: [{ tag: String, count: 0 }]
       });
 
-      const Post = db.model('gh-2031', postSchema, 'gh-2031');
+      const Post = db.model('Test', postSchema);
       Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function(error) {
         assert.ifError(error);
         Post.findOne({ 'tags.tag': 'eggs' }, { 'tags.$': 1 }, function(error, post) {
@@ -365,7 +356,7 @@ describe('model field selection', function() {
   });
 
   it('selecting an array of docs applies defaults properly (gh-1108)', function(done) {
-    const M = db.model(modelName, collection);
+    const M = BlogPostB;
 
     const m = new M({ title: '1108', comments: [{ body: 'yay' }] });
     m.comments[0].comments = undefined;
@@ -387,7 +378,7 @@ describe('model field selection', function() {
       name: String
     });
 
-    const MyModel = db.model('gh3903', schema);
+    const MyModel = db.model('Test', schema);
 
     MyModel.create({ name: 'val', length: 3 }, function(error) {
       assert.ifError(error);
@@ -419,7 +410,7 @@ describe('model field selection', function() {
       }
     });
 
-    const Route = db.model('Route' + random(), RouteSchema);
+    const Route = db.model('Test', RouteSchema);
 
     const item = {
       stations: {
@@ -480,7 +471,8 @@ describe('model field selection', function() {
       }
     });
 
-    const BlogPost = db.model('gh7159', BlogPostSchema);
+    db.deleteModel(/BlogPost/);
+    const BlogPost = db.model('BlogPost', BlogPostSchema);
 
     return co(function*() {
       yield BlogPost.create({

@@ -134,7 +134,6 @@ describe('document', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
 
   describe('constructor', function() {

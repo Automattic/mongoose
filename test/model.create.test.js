@@ -28,7 +28,7 @@ describe('model', function() {
 
     before(function() {
       db = start();
-      B = db.model('model-create', schema, 'model-create-' + random());
+      B = db.model('Test', schema);
     });
 
     after(function(done) {
@@ -105,7 +105,9 @@ describe('model', function() {
       SchemaWithPreSaveHook.post('save', function() {
         countPost++;
       });
-      const MWPSH = db.model('mwpsh', SchemaWithPreSaveHook);
+
+      db.deleteModel(/Test/);
+      const MWPSH = db.model('Test', SchemaWithPreSaveHook);
       MWPSH.create([
         { preference: 'xx' },
         { preference: 'yy' },

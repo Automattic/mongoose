@@ -22,7 +22,6 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 describe('model: querying:', function() {
   let Comments;
   let BlogPostB;
-  let collection;
   let ModSchema;
   let geoSchema;
   let db;
@@ -87,11 +86,6 @@ describe('model: querying:', function() {
 
   after(function(done) {
     db.close(done);
-  });
-
-  beforeEach(function() {
-    // use different collection name in every test to avoid conflict (gh-6816)
-    collection = 'blogposts_' + random();
   });
 
   it('find returns a Query', function(done) {
@@ -854,7 +848,7 @@ describe('model: querying:', function() {
         b: Schema.ObjectId
       });
 
-      const NE = db.model('NE_Test', schema, 'nes__' + random());
+      const NE = db.model('Test', schema);
 
       const id1 = new DocumentObjectId;
       const id2 = new DocumentObjectId;
@@ -872,10 +866,10 @@ describe('model: querying:', function() {
             assert.equal(nes1.length, 1);
 
             NE.find({ b: { $ne: [1] } }, function(err) {
-              assert.equal(err.message, 'Cast to ObjectId failed for value "[ 1 ]" at path "b" for model "NE_Test"');
+              assert.equal(err.message, 'Cast to ObjectId failed for value "[ 1 ]" at path "b" for model "Test"');
 
               NE.find({ b: { $ne: 4 } }, function(err) {
-                assert.equal(err.message, 'Cast to ObjectId failed for value "4" at path "b" for model "NE_Test"');
+                assert.equal(err.message, 'Cast to ObjectId failed for value "4" at path "b" for model "Test"');
 
                 NE.find({ b: id3, ids: { $ne: id4 } }, function(err, nes4) {
                   assert.ifError(err);
@@ -1588,8 +1582,7 @@ describe('model: querying:', function() {
   });
 
   it('by Date (gh-336)', function(done) {
-    // GH-336
-    const Test = db.model('TestDateQuery', new Schema({ date: Date }), 'datetest_' + random());
+    const Test = db.model('Test', new Schema({ date: Date }));
     const now = new Date;
 
     Test.create({ date: now }, { date: new Date(now - 10000) }, function(err) {
@@ -1604,7 +1597,7 @@ describe('model: querying:', function() {
 
   it('mixed types with $elemMatch (gh-591)', function(done) {
     const S = new Schema({ a: [{}], b: Number });
-    const M = db.model('QueryingMixedArrays', S, random());
+    const M = db.model('Test', S);
 
     const m = new M;
     m.a = [1, 2, { name: 'Frodo' }, 'IDK', { name: 100 }];
@@ -1638,7 +1631,7 @@ describe('model: querying:', function() {
       const SSchema = new Schema({ name: String });
       const PSchema = new Schema({ sub: [SSchema] });
 
-      const P = db.model('usingAllWithObjectIds', PSchema);
+      const P = db.model('Test', PSchema);
       const sub = [{ name: 'one' }, { name: 'two' }, { name: 'three' }];
 
       P.create({ sub: sub }, function(err, p) {
@@ -1671,7 +1664,7 @@ describe('model: querying:', function() {
       const SSchema = new Schema({ d: Date });
       const PSchema = new Schema({ sub: [SSchema] });
 
-      const P = db.model('usingAllWithDates', PSchema);
+      const P = db.model('Test', PSchema);
       const sub = [
         { d: new Date },
         { d: new Date(Date.now() - 10000) },
@@ -1718,7 +1711,7 @@ describe('model: querying:', function() {
 
       const next = function() {
         const schema = new Schema({ test: [String] });
-        const MyModel = db.model('gh3163', schema);
+        const MyModel = db.model('Test', schema);
 
         MyModel.create({ test: ['log1', 'log2'] }, function(error) {
           assert.ifError(error);
@@ -1778,7 +1771,7 @@ describe('model: querying:', function() {
     });
 
     it('works with nested query selectors gh-1884', function(done) {
-      const B = db.model('gh1884', { a: String, b: String }, 'gh1884');
+      const B = db.model('Test', { a: String, b: String });
 
       B.deleteOne({ $and: [{ a: 'coffee' }, { b: { $in: ['bacon', 'eggs'] } }] }, function(error) {
         assert.ifError(error);
@@ -1789,7 +1782,7 @@ describe('model: querying:', function() {
 
   it('works with different methods and query types', function(done) {
     const BufSchema = new Schema({ name: String, block: Buffer });
-    const Test = db.model('BufferTest', BufSchema, 'buffers');
+    const Test = db.model('Test', BufSchema);
 
     const docA = { name: 'A', block: Buffer.from('über') };
     const docB = { name: 'B', block: Buffer.from('buffer shtuffs are neat') };
@@ -1814,7 +1807,7 @@ describe('model: querying:', function() {
 
           Test.findOne({ block: /buffer/i }, function(err) {
             assert.equal(err.message, 'Cast to buffer failed for value ' +
-              '"/buffer/i" at path "block" for model "BufferTest"');
+              '"/buffer/i" at path "block" for model "Test"');
             Test.findOne({ block: [195, 188, 98, 101, 114] }, function(err, rb) {
               assert.ifError(err);
               assert.equal(rb.block.toString('utf8'), 'über');
@@ -1848,7 +1841,7 @@ describe('model: querying:', function() {
   it('with conditionals', function(done) {
     // $in $nin etc
     const BufSchema = new Schema({ name: String, block: Buffer });
-    const Test = db.model('Buffer2', BufSchema, 'buffer_' + random());
+    const Test = db.model('Test', BufSchema);
 
     const docA = { name: 'A', block: new MongooseBuffer([195, 188, 98, 101, 114]) }; // über
     const docB = { name: 'B', block: new MongooseBuffer('buffer shtuffs are neat') };
@@ -1963,7 +1956,7 @@ describe('model: querying:', function() {
 
   describe('2d', function() {
     it('$near (gh-309)', function(done) {
-      const Test = db.model('Geo1', geoSchema, 'geospatial' + random());
+      const Test = db.model('Test', geoSchema);
 
       let pending = 2;
 
@@ -1990,7 +1983,7 @@ describe('model: querying:', function() {
     });
 
     it('$within arrays (gh-586)', function(done) {
-      const Test = db.model('Geo2', geoSchema, collection + 'geospatial');
+      const Test = db.model('Test', geoSchema);
 
       let pending = 2;
 
@@ -2017,7 +2010,7 @@ describe('model: querying:', function() {
     });
 
     it('$nearSphere with arrays (gh-610)', function(done) {
-      const Test = db.model('Geo3', geoSchema, 'y' + random());
+      const Test = db.model('Test', geoSchema);
 
       let pending = 2;
 
@@ -2050,7 +2043,7 @@ describe('model: querying:', function() {
           coordinates: { type: [Number], index: '2dsphere' }
         }
       });
-      const Test = db.model('gh1874', geoSchema, 'gh1874');
+      const Test = db.model('Test', geoSchema);
 
       let pending = 2;
       const complete = function(err) {
@@ -2090,7 +2083,7 @@ describe('model: querying:', function() {
     });
 
     it('$maxDistance with arrays', function(done) {
-      const Test = db.model('Geo4', geoSchema, 'geo4');
+      const Test = db.model('Test', geoSchema);
 
       let pending = 2;
 
@@ -2172,7 +2165,7 @@ describe('model: querying:', function() {
           return done();
         }
 
-        const Test = db.model('2dsphere-polygon', schema2dsphere, 'geospatial' + random());
+        const Test = db.model('Test', schema2dsphere);
 
         Test.on('index', function(err) {
           assert.ifError(err);
@@ -2205,7 +2198,7 @@ describe('model: querying:', function() {
           return done();
         }
 
-        const Test = db.model('2dsphere-geo', geoSchema, 'geospatial' + random());
+        const Test = db.model('Test', geoSchema);
 
         Test.on('index', function(err) {
           assert.ifError(err);
@@ -2235,7 +2228,7 @@ describe('model: querying:', function() {
           return done();
         }
 
-        const Test = db.model('2dsphere-geo-multi1', geoMultiSchema, 'geospatial' + random());
+        const Test = db.model('Test', geoMultiSchema);
 
         Test.create({
           geom: [{ type: 'LineString', coordinates: [[-178.0, 10.0], [178.0, 10.0]] },
@@ -2264,7 +2257,7 @@ describe('model: querying:', function() {
           return done();
         }
 
-        const Test = db.model('2dsphere-geo-multi2', geoMultiSchema, 'geospatial' + random());
+        const Test = db.model('Test', geoMultiSchema);
 
         Test.create({
           geom: [{ type: 'Polygon', coordinates: [[[28.7, 41], [29.2, 40.9], [29.1, 41.3], [28.7, 41]]] },
@@ -2295,7 +2288,7 @@ describe('model: querying:', function() {
           return done();
         }
 
-        const Test = db.model('2dsphere-geo', geoSchema, 'geospatial' + random());
+        const Test = db.model('Test', geoSchema);
 
         Test.on('index', function(err) {
           assert.ifError(err);
@@ -2328,8 +2321,7 @@ describe('model: querying:', function() {
 
         const geoJSONSchema = new Schema({ loc: { type: { type: String }, coordinates: [Number] } });
         geoJSONSchema.index({ loc: '2dsphere' });
-        const name = 'geospatial' + random();
-        const Test = db.model('Geo1', geoJSONSchema, name);
+        const Test = db.model('Test', geoJSONSchema);
 
         let pending = 2;
 
@@ -2370,7 +2362,7 @@ describe('model: querying:', function() {
         }
 
         return co(function*() {
-          const Model = db.model('2dsphere-geo', schema2dsphere, 'geospatial' + random());
+          const Model = db.model('Test', schema2dsphere);
           yield Model.init();
           const model = new Model();
           model.loc = [1, 2];
@@ -2402,40 +2394,28 @@ describe('model: querying:', function() {
       if (!mongo24_or_greater) {
         return done();
       }
-      const schemas = [];
-      schemas[0] = new Schema({ t: { type: String, index: 'hashed' } });
-      schemas[1] = new Schema({ t: { type: String, index: 'hashed', sparse: true } });
-      schemas[2] = new Schema({ t: { type: String, index: { type: 'hashed', sparse: true } } });
 
-      let pending = schemas.length;
+      const schema = new Schema({ t: { type: String, index: 'hashed' } });
 
-      schemas.forEach(function(schema, i) {
-        const H = db.model('Hashed' + i, schema);
-        H.on('index', function(err) {
+      const H = db.model('Test', schema);
+      H.on('index', function(err) {
+        assert.ifError(err);
+        H.collection.getIndexes({ full: true }, function(err, indexes) {
           assert.ifError(err);
-          H.collection.getIndexes({ full: true }, function(err, indexes) {
+
+          const found = indexes.some(function(index) {
+            return index.key.t === 'hashed';
+          });
+          assert.ok(found);
+
+          H.create({ t: 'hashing' }, {}, function(err, doc1, doc2) {
             assert.ifError(err);
-
-            const found = indexes.some(function(index) {
-              return index.key.t === 'hashed';
-            });
-            assert.ok(found);
-
-            H.create({ t: 'hashing' }, {}, function(err, doc1, doc2) {
-              assert.ifError(err);
-              assert.ok(doc1);
-              assert.ok(doc2);
-              complete();
-            });
+            assert.ok(doc1);
+            assert.ok(doc2);
+            done();
           });
         });
       });
-
-      function complete() {
-        if (--pending === 0) {
-          done();
-        }
-      }
     });
   });
 
@@ -2484,7 +2464,7 @@ describe('model: querying:', function() {
         subdoc: { title: String, num: Number }
       });
 
-      const M = mongoose.model('andor' + random(), sch);
+      const M = db.model('Test', sch);
 
       const cond = {
         $and: [
@@ -2506,7 +2486,7 @@ describe('model: querying:', function() {
         subdoc: { title: String, num: Number }
       });
 
-      const M = mongoose.model('andor' + random(), sch);
+      const M = db.model('Test', sch);
 
       const cond = {
         $and: [{ $or: [{ $and: [{ $or: [{ num: '12345' }, { 'subdoc.num': '56789' }] }] }] }]
@@ -2518,30 +2498,9 @@ describe('model: querying:', function() {
       done();
     });
 
-    it('test mongodb crash with invalid objectid string (gh-407)', function(done) {
-      const IndexedGuy = new mongoose.Schema({
-        name: { type: String }
-      });
-
-      const Guy = db.model('Guy', IndexedGuy);
-      Guy.find({
-        _id: {
-          $in: [
-            '4e0de2a6ee47bff98000e145',
-            '4e137bd81a6a8e00000007ac',
-            '',
-            '4e0e2ca0795666368603d974']
-        }
-      }, function(err) {
-        assert.equal(err.message,
-          'Cast to ObjectId failed for value "" at path "_id" for model "Guy"');
-        done();
-      });
-    });
-
     it('casts $elemMatch (gh-2199)', function(done) {
       const schema = new Schema({ dates: [Date] });
-      const Dates = db.model('Date', schema, 'dates');
+      const Dates = db.model('Test', schema);
 
       const array = ['2014-07-01T02:00:00.000Z', '2014-07-01T04:00:00.000Z'];
       Dates.create({ dates: array }, function(err) {

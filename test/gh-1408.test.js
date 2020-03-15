@@ -30,7 +30,7 @@ describe('documents should not be converted to _id (gh-1408)', function() {
       }
     });
 
-    const A = db.model('gh-1408', BrandSchema);
+    const A = db.model('Test', BrandSchema);
 
     const a = new A({
       settings: {

@@ -35,6 +35,9 @@ describe('geojson', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
   it('driver query', function() {
     const City = db.model('City', new Schema({
       name: String,
@@ -66,7 +69,7 @@ describe('geojson', function() {
   it('within helper', function() {
     const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
     // acquit:ignore:start
-    const City = db.model('City2', new Schema({
+    const City = db.model('City', new Schema({
       name: String,
       location: pointSchema
     }));

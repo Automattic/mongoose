@@ -193,7 +193,7 @@ describe('model', function() {
     it('throws error when discriminator has mapped discriminator key in schema with discriminatorKey option set', function(done) {
       assert.throws(
           function() {
-            var Foo = db.model('Test1', new Schema({}, {discriminatorKey: '_type'}), 'model-discriminator-' + random());
+            var Foo = db.model('Test1', new Schema({}, {discriminatorKey: '_type'}));
             Foo.discriminator('Bar', new Schema({_type: String}));
           },
           /Discriminator "Bar" cannot have field with name "_type"/
@@ -202,7 +202,7 @@ describe('model', function() {
     });
 
     it('throws error when discriminator with taken name is added', function(done) {
-      var Foo = db.model('Test1', new Schema({}), 'model-discriminator-' + random());
+      var Foo = db.model('Test1', new Schema({}));
       Foo.discriminator('Token', new Schema());
       assert.throws(
           function() {

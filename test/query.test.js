@@ -1812,7 +1812,7 @@ describe('Query', function() {
     });
 
     it.skip('allows sort with count (gh-3914)', function(done) {
-      const Post = db.model('Post', {
+      const Post = db.model('BlogPost', {
         title: String
       });
 
@@ -1824,7 +1824,7 @@ describe('Query', function() {
     });
 
     it.skip('allows sort with select (gh-3914)', function(done) {
-      const Post = db.model('Post', {
+      const Post = db.model('BlogPost', {
         title: String
       });
 
@@ -1836,7 +1836,7 @@ describe('Query', function() {
     });
 
     it('handles nested $ (gh-3265)', function(done) {
-      const Post = db.model('Post', {
+      const Post = db.model('BlogPost', {
         title: String,
         answers: [{
           details: String,
@@ -3090,14 +3090,14 @@ describe('Query', function() {
       const schema = new Schema({
         other: {
           type: Schema.Types.ObjectId,
-          ref: 'Other'
+          ref: 'Test1'
         }
       });
       schema.pre('findOne', function() {
         assert.deepStrictEqual(this.getPopulatedPaths(), ['other']);
       });
 
-      const Other = db.model('Other', otherSchema);
+      const Other = db.model('Test1', otherSchema);
       const Test = db.model('Test', schema);
 
       const other = new Other({ name: 'one' });

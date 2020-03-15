@@ -764,7 +764,7 @@ describe('document', function() {
 
       postSchema.set('toObject', { virtuals: true });
       const User = db.model('User', userSchema);
-      const Post = db.model('Post', postSchema);
+      const Post = db.model('BlogPost', postSchema);
 
       const user = new User({ firstName: 'Joe', lastName: 'Smith', password: 'password' });
 
@@ -1016,7 +1016,7 @@ describe('document', function() {
       });
 
       const User = db.model('User', UserSchema);
-      const Post = db.model('Post', PostSchema);
+      const Post = db.model('BlogPost', PostSchema);
 
       const val = new User({ name: 'Val' });
       const post = new Post({ title: 'Test', postedBy: val._id });
@@ -1039,17 +1039,17 @@ describe('document', function() {
 
     it('populate on nested path (gh-5703)', function() {
       const toySchema = new mongoose.Schema({ color: String });
-      const Toy = db.model('Toy', toySchema);
+      const Toy = db.model('Cat', toySchema);
 
       const childSchema = new mongoose.Schema({
         name: String,
         values: {
-          toy: { type: mongoose.Schema.Types.ObjectId, ref: 'Toy' }
+          toy: { type: mongoose.Schema.Types.ObjectId, ref: 'Cat' }
         }
       });
       const Child = db.model('Child', childSchema);
 
-      return Toy.create({ color: 'blue' }).
+      return Toy.create({ color: 'brown' }).
         then(function(toy) {
           return Child.create({ values: { toy: toy._id } });
         }).
@@ -1062,7 +1062,7 @@ describe('document', function() {
           });
         }).
         then(function(child) {
-          assert.equal(child.values.toy.color, 'blue');
+          assert.equal(child.values.toy.color, 'brown');
         });
     });
   });
@@ -1464,7 +1464,7 @@ describe('document', function() {
         controls: [Control]
       });
 
-      const Post = db.model('Post', PostSchema);
+      const Post = db.model('BlogPost', PostSchema);
 
       const post = new Post({
         controls: [{
@@ -1497,7 +1497,7 @@ describe('document', function() {
         controls: [Control]
       });
 
-      const Post = db.model('Post', PostSchema);
+      const Post = db.model('BlogPost', PostSchema);
 
       const post = new Post({
         controls: [{

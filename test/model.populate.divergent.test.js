@@ -8,11 +8,9 @@
 const start = require('./common');
 
 const assert = require('assert');
-const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
 const DivergentArrayError = mongoose.Error.DivergentArrayError;
-const random = utils.random;
 
 /**
  * Tests.
@@ -32,8 +30,8 @@ describe('model: populate: divergent arrays', function() {
 
   before(function(done) {
     db = start();
-    C = db.model('Child', { _id: Number, name: String }, 'child-' + random());
-    M = db.model('Parent', { array: { type: [{ type: Number, ref: 'Child' }] } }, 'parent-' + random());
+    C = db.model('Child', { _id: Number, name: String });
+    M = db.model('Parent', { array: { type: [{ type: Number, ref: 'Child' }] } });
 
     C.create(
       { _id: 0, name: 'zero' }

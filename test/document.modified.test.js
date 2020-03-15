@@ -356,8 +356,8 @@ describe('document modified', function() {
         child: { type: Schema.Types.ObjectId, ref: 'Child' }
       });
 
-      const Parent = db.model('Parent', parentSchema, 'parents');
-      const Child = db.model('Child', parentSchema, 'children');
+      const Parent = db.model('Parent', parentSchema);
+      const Child = db.model('Child', parentSchema);
 
       const child = new Child({ name: 'Mary' });
       const p = new Parent({ name: 'Alex', child: child });

@@ -15,9 +15,17 @@ describe('query middleware', function() {
   let Author;
   let Publisher;
 
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   const initializeData = function(done) {
-    Author = db.model('gh-2138', schema, 'gh-2138');
-    Publisher = db.model('gh-2138-1', publisherSchema, 'gh-2138-1');
+    Author = db.model('Person', schema);
+    Publisher = db.model('Publisher', publisherSchema, 'Publisher');
 
     Author.deleteMany({}, function(error) {
       if (error) {
@@ -52,7 +60,7 @@ describe('query middleware', function() {
     schema = new Schema({
       title: String,
       author: String,
-      publisher: { type: Schema.ObjectId, ref: 'gh-2138-1' },
+      publisher: { type: Schema.ObjectId, ref: 'Publisher' },
       options: String
     });
 
@@ -60,14 +68,11 @@ describe('query middleware', function() {
       name: String
     });
 
-    db = start();
-
     done();
   });
 
-  afterEach(function(done) {
-    db.close(done);
-  });
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
 
   it('has a pre find hook', function(done) {
     let count = 0;
@@ -388,7 +393,7 @@ describe('query middleware', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7195_deleteOne', schema);
+      const Model = db.model('Test', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
       const res = yield Model.deleteOne();
@@ -415,7 +420,7 @@ describe('query middleware', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7195_deleteMany', schema);
+      const Model = db.model('Test', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
       yield Model.deleteMany();
@@ -442,7 +447,7 @@ describe('query middleware', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7195_distinct', schema);
+      const Model = db.model('Test', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }, { title: 'bar' }]);
 
       const res = yield Model.distinct('title');
@@ -462,7 +467,7 @@ describe('query middleware', function() {
       next(new Error('woops'));
     });
 
-    const Book = db.model('gh2284', testSchema);
+    const Book = db.model('Test', testSchema);
 
     Book.on('index', function(error) {
       assert.ifError(error);
@@ -491,7 +496,7 @@ describe('query middleware', function() {
       next(error);
     });
 
-    const Test = db.model('gh4885', testSchema);
+    const Test = db.model('Test', testSchema);
 
     Test.create({}, function(error) {
       assert.ok(error);
@@ -562,7 +567,7 @@ describe('query middleware', function() {
       next(new Error('test2'));
     });
 
-    const Test = db.model('gh4927', schema);
+    const Test = db.model('Test', schema);
 
     Test.find().exec(function(error) {
       assert.equal(error.message, 'test2');
@@ -586,7 +591,7 @@ describe('query middleware', function() {
       next();
     });
 
-    const Test = db.model('gh5153', schema.clone());
+    const Test = db.model('Test', schema.clone());
 
     Test.find().exec(function(error) {
       assert.ifError(error);
@@ -605,7 +610,7 @@ describe('query middleware', function() {
       next();
     });
 
-    const Test = db.model('gh7418', schema);
+    const Test = db.model('Test', schema);
 
     return Test.updateOne({}, { name: 'bar' }).
       then(() => assert.equal(calledPost, 1));

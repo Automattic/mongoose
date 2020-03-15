@@ -222,7 +222,7 @@ describe('model: populate:', function() {
         }
       });
 
-      const messageSchema = new Schema({
+      const commentSchema = new Schema({
         message: String,
         author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         target: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -230,12 +230,12 @@ describe('model: populate:', function() {
 
       const Company = db.model('Company', companySchema);
       const User = db.model('User', userSchema);
-      const Message = db.model('Message', messageSchema);
+      const Comment = db.model('Comment', commentSchema);
 
       const company = new Company({ name: 'IniTech' });
       const user1 = new User({ name: 'Bill', company: company._id });
       const user2 = new User({ name: 'Peter', company: company._id });
-      const message = new Message({
+      const message = new Comment({
         message: 'Problems with TPS Report',
         author: user1._id,
         target: user2._id
@@ -253,7 +253,7 @@ describe('model: populate:', function() {
       });
 
       function next() {
-        Message.findOne({ _id: message._id }, function(error, message) {
+        Comment.findOne({ _id: message._id }, function(error, message) {
           assert.ifError(error);
           const options = {
             path: 'author target',
@@ -3077,11 +3077,11 @@ describe('model: populate:', function() {
         _id: Number,
         exercises: [String]
       });
-      const LessonSchema = new mongoose.Schema({
+      const VideoSchema = new mongoose.Schema({
         _id: String,
         url: String
       });
-      const StudyPlanSchema = new mongoose.Schema({
+      const ListSchema = new mongoose.Schema({
         parts: [
           {
             title: String,
@@ -3098,13 +3098,13 @@ describe('model: populate:', function() {
         ]
       });
 
-      const StudyPlan = db.model('StudyPlan', StudyPlanSchema);
+      const List = db.model('List', ListSchema);
       const Test = db.model('Test', TestSchema);
-      const Lesson = db.model('Lesson', LessonSchema);
+      const Video = db.model('Video', VideoSchema);
 
       const test = new Test({ _id: 123, exercises: ['t1', 't2'] });
-      const lesson = new Lesson({ _id: 'lesson', url: 'https://youtube.com' });
-      const studyPlan = new StudyPlan({
+      const lesson = new Video({ _id: 'lesson', url: 'https://youtube.com' });
+      const list = new List({
         parts: [
           {
             title: 'Study Plan 01',
@@ -3115,11 +3115,11 @@ describe('model: populate:', function() {
               },
               {
                 item: lesson._id,
-                kind: 'Lesson'
+                kind: 'Video'
               },
               {
                 item: lesson._id,
-                kind: 'Lesson'
+                kind: 'Video'
               }
             ]
           }
@@ -3127,8 +3127,8 @@ describe('model: populate:', function() {
       });
 
       return co(function*() {
-        yield [test.save(), lesson.save(), studyPlan.save()];
-        const doc = yield StudyPlan.findOne({}).populate('parts.contents.item');
+        yield [test.save(), lesson.save(), list.save()];
+        const doc = yield List.findOne({}).populate('parts.contents.item');
 
         assert.strictEqual(doc.parts[0].contents[0].item.exercises[0], 't1');
         assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
@@ -3186,7 +3186,7 @@ describe('model: populate:', function() {
         }]
       });
 
-      const Post = db.model('Post', PostSchema);
+      const Post = db.model('BlogPost', PostSchema);
       const User = db.model('User', UserSchema);
 
       const user = {
@@ -4565,7 +4565,7 @@ describe('model: populate:', function() {
           });
 
           ReportItemSchema.virtual('itemDetail', {
-            ref: 'Item',
+            ref: 'Child',
             localField: 'idItem',
             foreignField: '_id',
             justOne: true // here is the problem
@@ -4575,8 +4575,8 @@ describe('model: populate:', function() {
             _id: String
           });
 
-          const ReportModel = db.model('Test', ReportSchema);
-          const ItemModel = db.model('Item', ItemSchema);
+          const ReportModel = db.model('Parent', ReportSchema);
+          const ItemModel = db.model('Child', ItemSchema);
 
           yield ItemModel.create({ _id: 'foo' });
 
@@ -4641,11 +4641,11 @@ describe('model: populate:', function() {
         const UserSchema = new Schema({
           openId: String
         });
-        const TaskSchema = new Schema({
+        const CommentSchema = new Schema({
           openId: String
         });
 
-        TaskSchema.virtual('user', {
+        CommentSchema.virtual('user', {
           ref: 'User',
           localField: 'openId',
           foreignField: 'openId',
@@ -4653,13 +4653,13 @@ describe('model: populate:', function() {
         });
 
         const User = db.model('User', UserSchema);
-        const Task = db.model('Task', TaskSchema);
+        const Comment = db.model('Comment', CommentSchema);
 
         User.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
           assert.ifError(error);
-          Task.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
+          Comment.create({ openId: 'user1' }, { openId: 'user2' }, function(error) {
             assert.ifError(error);
-            Task.
+            Comment.
               find().
               sort({ openId: 1 }).
               populate('user').
@@ -5539,7 +5539,7 @@ describe('model: populate:', function() {
             required: true
           }
         });
-        const Field = db.model('Test', fieldSchema, 'fields');
+        const Field = db.model('Test', fieldSchema);
 
         const imageFieldSchema = new mongoose.Schema({
           value: {
@@ -5850,15 +5850,15 @@ describe('model: populate:', function() {
           parentId: mongoose.Schema.Types.ObjectId
         });
         childSchema.virtual('parent', {
-          ref: 'gh5240',
+          ref: 'Parent',
           localField: 'parentId',
           foreignField: '_id',
           justOne: true
         });
         const teamSchema = new Schema({ people: [childSchema] });
 
-        const Parent = db.model('gh5240', parentSchema);
-        const Team = db.model('gh5240_0', teamSchema);
+        const Parent = db.model('Parent', parentSchema);
+        const Team = db.model('Team', teamSchema);
 
         Parent.create({ name: 'Darth Vader' }).
           then(function(doc) {
@@ -5887,14 +5887,14 @@ describe('model: populate:', function() {
           name: String
         });
 
-        const Parent = db.model('gh5334_0', parentSchema);
-        const Child = db.model('gh5334', childSchema);
+        const Parent = db.model('Parent', parentSchema);
+        const Child = db.model('Child', childSchema);
 
         Child.create({ name: 'Luke' }, function(error, child) {
           assert.ifError(error);
           Parent.create({ name: 'Vader', child: child._id }, function(error) {
             assert.ifError(error);
-            Parent.find().populate({ path: 'child', model: 'gh5334' }).cursor().next(function(error, doc) {
+            Parent.find().populate({ path: 'child', model: 'Child' }).cursor().next(function(error, doc) {
               assert.ifError(error);
               assert.equal(doc.child.name, 'Luke');
               done();
@@ -5908,13 +5908,13 @@ describe('model: populate:', function() {
           _id: Number,
           name: String
         }, { versionKey: null });
-        const Ref = db.model('gh5468', refSchema);
+        const Ref = db.model('Test', refSchema);
 
         const testSchema = new mongoose.Schema({
           _id: Number,
-          prevnxt: [{ type: Number, ref: 'gh5468' }]
+          prevnxt: [{ type: Number, ref: 'Test' }]
         });
-        const Test = db.model('gh5468_0', testSchema);
+        const Test = db.model('Test1', testSchema);
 
         const docs = [1, 2, 3, 4, 5, 6].map(function(i) {
           return { _id: i };
@@ -5950,14 +5950,14 @@ describe('model: populate:', function() {
           parentId: mongoose.Schema.Types.ObjectId
         });
         childSchema.virtual('parent', {
-          ref: 'gh5311',
+          ref: 'Parent',
           localField: 'parentId',
           foreignField: '_id',
           justOne: true
         });
 
-        const Parent = db.model('gh5311', parentSchema);
-        const Child = db.model('gh5311_0', childSchema);
+        const Parent = db.model('Parent', parentSchema);
+        const Child = db.model('Child', childSchema);
 
         Parent.create({ name: 'Darth Vader' }).
           then(function(doc) {
@@ -5980,11 +5980,11 @@ describe('model: populate:', function() {
 
       it('empty virtual with Model.populate (gh-5331)', function(done) {
         const myModelSchema = new Schema({
-          virtualRefKey: { type: String, ref: 'gh5331' }
+          virtualRefKey: { type: String, ref: 'Test' }
         });
         myModelSchema.set('toJSON', { virtuals: true });
         myModelSchema.virtual('populatedVirtualRef', {
-          ref: 'gh5331',
+          ref: 'Test',
           localField: 'virtualRefKey',
           foreignField: 'handle'
         });
@@ -5993,8 +5993,8 @@ describe('model: populate:', function() {
           handle: String
         });
 
-        const MyModel = db.model('gh5331_0', myModelSchema);
-        db.model('gh5331', otherModelSchema);
+        const MyModel = db.model('Test', myModelSchema);
+        db.model('Test1', otherModelSchema);
 
         MyModel.create({ virtualRefKey: 'test' }, function(error, doc) {
           assert.ifError(error);
@@ -6012,14 +6012,14 @@ describe('model: populate:', function() {
           name: String
         });
 
-        const SomeModel = db.model('gh4715', someModelSchema);
+        const SomeModel = db.model('Test', someModelSchema);
 
         const schema0 = new mongoose.Schema({
           name1: String
         });
 
         schema0.virtual('detail', {
-          ref: 'gh4715',
+          ref: 'Test',
           localField: '_id',
           foreignField: '_id',
           justOne: true
@@ -6030,7 +6030,7 @@ describe('model: populate:', function() {
           obj: schema0
         });
 
-        const ModelMain = db.model('gh4715_0', schemaMain);
+        const ModelMain = db.model('Test1', schemaMain);
 
         ModelMain.create({ name: 'Test', obj: {} }).
           then(function(m) {
@@ -6047,7 +6047,7 @@ describe('model: populate:', function() {
       });
 
       it('populate with missing schema (gh-5364)', function(done) {
-        const Foo = db.model('gh5364', new mongoose.Schema({
+        const Foo = db.model('Test', new mongoose.Schema({
           bar: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Bar'
@@ -6069,13 +6069,13 @@ describe('model: populate:', function() {
           name: String
         });
 
-        db.model('gh5460', refSchema);
+        db.model('Test', refSchema);
 
         const schema = new mongoose.Schema({
-          ref: { type: mongoose.Schema.Types.ObjectId, ref: 'gh5460' }
+          ref: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' }
         });
 
-        const Model = db.model('gh5460_0', schema);
+        const Model = db.model('Test1', schema);
 
         const q = Model.find().read('secondaryPreferred').populate('ref');
         assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
@@ -6091,7 +6091,7 @@ describe('model: populate:', function() {
             departments: [DepartmentSchema]
           });
 
-          let Company = db.model('gh6245', CompanySchema);
+          let Company = db.model('Company', CompanySchema);
           const company = new Company({
             name: 'Uber',
             departments: [{ name: 'Security' }, { name: 'Engineering' }]
@@ -6102,16 +6102,16 @@ describe('model: populate:', function() {
           const EmployeeSchema = new Schema({ name: String });
           DepartmentSchema = new Schema({
             name: String,
-            employees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh6245' }]
+            employees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Company' }]
           });
           CompanySchema = new Schema({
             name: String,
             departments: [DepartmentSchema]
           });
 
-          delete db.models['gh6245'];
-          const Employee = db.model('gh6245_0', EmployeeSchema);
-          Company = db.model('gh6245', CompanySchema);
+          delete db.models['Company'];
+          const Employee = db.model('Person', EmployeeSchema);
+          Company = db.model('Company', CompanySchema);
 
           let uber = yield Company.findOne({ name: 'Uber' });
           const kurt = yield Employee.create({ name: 'Kurt' });
@@ -6136,7 +6136,7 @@ describe('model: populate:', function() {
           active: Boolean
         });
 
-        const Band = db.model('gh5336', BandSchema);
+        const Band = db.model('Band', BandSchema);
 
         const PersonSchema = new mongoose.Schema({
           name: String,
@@ -6144,12 +6144,12 @@ describe('model: populate:', function() {
         });
 
         PersonSchema.virtual('bandDetails', {
-          ref: 'gh5336',
+          ref: 'Band',
           localField: 'bands',
           foreignField: 'name',
           justOne: false
         });
-        const Person = db.model('gh5336_0', PersonSchema);
+        const Person = db.model('Person', PersonSchema);
 
         const band = new Band({ name: 'The Beatles', active: false });
         const person = new Person({
@@ -6182,7 +6182,7 @@ describe('model: populate:', function() {
           active: Boolean
         });
 
-        const Band = db.model('gh5336_10', BandSchema);
+        const Band = db.model('Band', BandSchema);
 
         const PersonSchema = new mongoose.Schema({
           name: String,
@@ -6190,12 +6190,12 @@ describe('model: populate:', function() {
         });
 
         PersonSchema.virtual('bandDetails', {
-          ref: 'gh5336_10',
+          ref: 'Band',
           localField: 'bands',
           foreignField: 'name',
           justOne: true
         });
-        const Person = db.model('gh5336_11', PersonSchema);
+        const Person = db.model('Person', PersonSchema);
 
         const band = new Band({ name: 'The Beatles', active: false });
         const person = new Person({
@@ -6228,20 +6228,20 @@ describe('model: populate:', function() {
           parentId: mongoose.Schema.Types.ObjectId
         });
 
-        const Child = db.model('gh4959', childSchema);
+        const Child = db.model('Child', childSchema);
 
         const parentSchema = new mongoose.Schema({
           name: String
         });
 
         parentSchema.virtual('detail', {
-          ref: 'gh4959',
+          ref: 'Child',
           localField: '_id',
           foreignField: 'parentId',
           justOne: true
         });
 
-        const Parent = db.model('gh4959_0', parentSchema);
+        const Parent = db.model('Parent', parentSchema);
 
         Parent.create({ name: 'Test' }).
           then(function(m) {
@@ -6261,15 +6261,15 @@ describe('model: populate:', function() {
 
       it('does not set `populated()` until populate is done (gh-5564)', function() {
         const userSchema = new mongoose.Schema({});
-        const User = db.model('gh5564', userSchema);
+        const User = db.model('User', userSchema);
 
         const testSchema = new mongoose.Schema({
           users: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'gh5564'
+            ref: 'User'
           }]
         });
-        const Test = db.model('gh5564_0', testSchema);
+        const Test = db.model('Test', testSchema);
 
         return User.create({}).
           then(function(user) {
@@ -6662,7 +6662,7 @@ describe('model: populate:', function() {
           const User = db.model('Test1', userSchema);
           const City = db.model('Test2', citySchema);
           const District = db.model('Test3', districtSchema);
-          const Post = db.model('Post', postSchema);
+          const Post = db.model('BlogPost', postSchema);
 
           const house = new House({ location: '123 abc st.' });
           const city = new City({ name: 'Some City' });
@@ -6790,7 +6790,7 @@ describe('model: populate:', function() {
         db.deleteModel(/.*/);
         const User = db.model('User', userSchema);
         const Teacher = db.model('Test', teachSchema);
-        const Post = db.model('Post', postSchema);
+        const Post = db.model('BlogPost', postSchema);
         const Comment = db.model('Comment', commentSchema);
 
         const users = [];
@@ -7301,7 +7301,7 @@ describe('model: populate:', function() {
       name: String
     });
 
-    const UserModel = db.model('User', userSchema, 'users');
+    const UserModel = db.model('User', userSchema);
 
     const eventSchema = new Schema({
       message: String
@@ -7498,18 +7498,18 @@ describe('model: populate:', function() {
 
   it('passes scope as Model instance (gh-6726)', function() {
     const otherSchema = new Schema({ name: String });
-    const Other = db.model('gh6726_Other', otherSchema);
+    const Other = db.model('Test1', otherSchema);
     const schema = new Schema({
       x: {
         type: Schema.Types.ObjectId,
-        ref: 'gh6726_Other',
+        ref: 'Test1',
         get: function(v) {
           assert.strictEqual(this.constructor.name, 'model');
           return v;
         }
       }
     });
-    const Test = db.model('gh6726_Test', schema);
+    const Test = db.model('Test', schema);
     const other = new Other({ name: 'Max' });
     const test = new Test({ x: other._id });
     return co(function*() {
@@ -7522,12 +7522,12 @@ describe('model: populate:', function() {
 
   it('respects schema array even if underlying doc doesnt use array (gh-6908)', function() {
     const jobSchema = new Schema({
-      company: [{ type: Schema.Types.ObjectId, ref: 'gh6908_Company' }]
+      company: [{ type: Schema.Types.ObjectId, ref: 'Company' }]
     });
-    const Job = db.model('gh6908_Job', jobSchema);
+    const Job = db.model('Test', jobSchema);
 
     const companySchema = new Schema({ name: String });
-    const Company = db.model('gh6908_Company', companySchema);
+    const Company = db.model('Company', companySchema);
 
     return co(function*() {
       const mdb = yield Company.create({ name: 'MongoDB' });
@@ -7602,7 +7602,7 @@ describe('model: populate:', function() {
 
     const Author = db.model('Author', authorSchema);
     const Comment = db.model('Comment', commentSchema);
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
 
     const authors = '123'.split('').map(n => {
       return new Author({ name: `author${n}` });
@@ -7699,7 +7699,7 @@ describe('model: populate:', function() {
       postId: { type: Schema.Types.ObjectId }
     });
 
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
     const Comment = db.model('Comment', commentSchema);
 
     return co(function*() {
@@ -7730,7 +7730,7 @@ describe('model: populate:', function() {
       text: String
     });
 
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
     const Comment = db.model('Comment', commentSchema);
 
     return co(function*() {
@@ -7830,47 +7830,47 @@ describe('model: populate:', function() {
   });
 
   it('multiple localFields and foreignFields (gh-5704)', function() {
-    const OrderSchema = new Schema({
+    const childSchema = new Schema({
       _id: Number,
       sourceId: Number
     });
-    const RefundSchema = new Schema({
+    const parentSchema = new Schema({
       _id: Number,
-      internalOrderId: Number,
-      sourceOrderId: Number
+      internalChildId: Number,
+      sourceChildId: Number
     });
-    RefundSchema.virtual('orders', {
-      ref: 'Order',
+    parentSchema.virtual('children', {
+      ref: 'Child',
       localField: function() {
-        return this.internalOrderId ? 'internalOrderId' : 'sourceOrderId';
+        return this.internalChildId ? 'internalChildId' : 'sourceChildId';
       },
       foreignField: function() {
-        return this.internalOrderId ? '_id' : 'sourceId';
+        return this.internalChildId ? '_id' : 'sourceId';
       }
     });
 
-    const Order = db.model('Order', OrderSchema);
-    const Refund = db.model('Test', RefundSchema);
+    const Child = db.model('Child', childSchema);
+    const Parent = db.model('Parent', parentSchema);
 
     return co(function*() {
-      yield Order.create([
+      yield Child.create([
         { _id: 1 },
         { _id: 99, sourceId: 2 }
       ]);
 
-      yield Refund.create([
-        { _id: 10, internalOrderId: 1 },
-        { _id: 11, sourceOrderId: 2 }
+      yield Parent.create([
+        { _id: 10, internalChildId: 1 },
+        { _id: 11, sourceChildId: 2 }
       ]);
 
-      let res = yield Refund.find().sort({ _id: 1 }).populate('orders');
+      let res = yield Parent.find().sort({ _id: 1 }).populate('children');
 
       res = res.map(doc => doc.toObject({ virtuals: true }));
-      assert.equal(res[0].orders.length, 1);
-      assert.strictEqual(res[0].orders[0]._id, 1);
+      assert.equal(res[0].children.length, 1);
+      assert.strictEqual(res[0].children[0]._id, 1);
 
-      assert.equal(res[1].orders.length, 1);
-      assert.strictEqual(res[1].orders[0]._id, 99);
+      assert.equal(res[1].children.length, 1);
+      assert.strictEqual(res[1].children[0]._id, 99);
     });
   });
 
@@ -7958,7 +7958,7 @@ describe('model: populate:', function() {
       user2: mongoose.ObjectId
     });
     postSchema.path('user2').ref(User);
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
 
     return co(function*() {
       const user = yield User.create({ name: 'val' });
@@ -8097,7 +8097,7 @@ describe('model: populate:', function() {
       },
       m: String
     });
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
 
     return co(function*() {
       const user = yield User1.create({ name: 'val' });
@@ -8124,7 +8124,7 @@ describe('model: populate:', function() {
       title: String
     });
 
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
 
     return co(function*() {
       const user = yield User.create({ name: 'val' });
@@ -8465,7 +8465,7 @@ describe('model: populate:', function() {
 
   it('handles refPath on discriminator when populating top-level model (gh-5109)', function() {
     const options = { discriminatorKey: 'kind' };
-    const Post = db.model('Post', new Schema({ time: Date, text: String }, options));
+    const Post = db.model('BlogPost', new Schema({ time: Date, text: String }, options));
 
     const MediaPost = Post.discriminator('Test', new Schema({
       media: { type: Schema.Types.ObjectId, refPath: 'mediaType' },
@@ -8506,7 +8506,7 @@ describe('model: populate:', function() {
 
     postSchema.virtual('mediaType').get(function() { return this._mediaType; });
 
-    const Post = db.model('Post', postSchema);
+    const Post = db.model('BlogPost', postSchema);
     const Image = db.model('Image', new Schema({ url: String }));
     const Video = db.model('Video', new Schema({ url: String, duration: Number }));
 
@@ -9149,7 +9149,7 @@ describe('model: populate:', function() {
 
   it('works when embedded discriminator array has populated path but not refPath (gh-8527)', function() {
     const Image = db.model('Image', Schema({ imageName: String }));
-    const Text = db.model('Text', Schema({ textName: String }));
+    const Video = db.model('Video', Schema({ videoName: String }));
     const ItemSchema = Schema({ objectType: String }, {
       discriminatorKey: 'objectType',
       _id: false
@@ -9172,20 +9172,20 @@ describe('model: populate:', function() {
 
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
     ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
-    ExampleSchema.path('list').discriminator('Text', InternalItemSchemaGen());
+    ExampleSchema.path('list').discriminator('Video', InternalItemSchemaGen());
     ExampleSchema.path('list').discriminator('ExternalSource', externalSchema);
     ExampleSchema.path('list').discriminator('NestedData', NestedDataSchema);
     const Example = db.model('Test', ExampleSchema);
 
     return co(function*() {
       const image1 = yield Image.create({ imageName: '01image' });
-      const text1 = yield Text.create({ textName: '01text' });
+      const video1 = yield Video.create({ videoName: '01video' });
 
       const example = yield Example.create({
         test: 'example',
         list: [
           { data: image1._id, objectType: 'Image' },
-          { data: text1._id, objectType: 'Text' },
+          { data: video1._id, objectType: 'Video' },
           { data: { sourceId: 123 }, objectType: 'ExternalSource' },
           { data: { title: 'test' }, objectType: 'NestedData' }
         ]

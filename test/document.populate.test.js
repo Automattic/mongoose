@@ -13,7 +13,6 @@ const co = require('co');
 const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
-const random = utils.random;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
@@ -71,21 +70,21 @@ TestDocument.prototype.$__setSchema(schema);
  * User schema.
  */
 
-const User = new Schema({
+const UserSchema = new Schema({
   name: String,
   email: String,
   gender: { type: String, enum: ['male', 'female'], default: 'male' },
   age: { type: Number, default: 21 },
-  blogposts: [{ type: ObjectId, ref: 'doc.populate.b' }]
-}, { collection: 'doc.populate.us' });
+  blogposts: [{ type: ObjectId, ref: 'BlogPost' }]
+});
 
 /**
  * Comment subdocument schema.
  */
 
-const Comment = new Schema({
-  asers: [{ type: ObjectId, ref: 'doc.populate.u' }],
-  _creator: { type: ObjectId, ref: 'doc.populate.u' },
+const CommentSchema = new Schema({
+  asers: [{ type: ObjectId, ref: 'User' }],
+  _creator: { type: ObjectId, ref: 'User' },
   content: String
 });
 
@@ -93,25 +92,28 @@ const Comment = new Schema({
  * Blog post schema.
  */
 
-const BlogPost = new Schema({
-  _creator: { type: ObjectId, ref: 'doc.populate.u' },
+const BlogPostSchema = new Schema({
+  _creator: { type: ObjectId, ref: 'User' },
   title: String,
-  comments: [Comment],
-  fans: [{ type: ObjectId, ref: 'doc.populate.u' }]
+  comments: [CommentSchema],
+  fans: [{ type: ObjectId, ref: 'User' }]
 });
-
-mongoose.model('doc.populate.b', BlogPost);
-mongoose.model('doc.populate.u', User);
-mongoose.model('doc.populate.u2', User);
 
 describe('document.populate', function() {
   let db, B, User;
   let user1, user2, post, _id;
 
-  before(function(done) {
+  before(function() {
     db = start();
-    B = db.model('doc.populate.b');
-    User = db.model('doc.populate.u');
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => require('./util').clearTestData(db));
+
+  beforeEach(function(done) {
+    B = db.model('BlogPost', BlogPostSchema);
+    User = db.model('User', UserSchema);
 
     _id = new mongoose.Types.ObjectId;
 
@@ -294,7 +296,7 @@ describe('document.populate', function() {
       param.select = '-email';
       param.options = { sort: 'name' };
       param.path = '_creator fans';
-      param.model = 'doc.populate.u2';
+      param.model = 'User';
 
       const creator_id = post._creator;
       const alt_id = post.fans[1];
@@ -323,7 +325,7 @@ describe('document.populate', function() {
         post.$__setValue('idontexist', user1._id);
 
         // populate the non-schema value by passing an explicit model
-        post.populate({ path: 'idontexist', model: 'doc.populate.u' }, function(err, post) {
+        post.populate({ path: 'idontexist', model: 'User' }, function(err, post) {
           assert.ifError(err);
           assert.ok(post);
           assert.equal(user1._id.toString(), post.get('idontexist')._id);
@@ -371,12 +373,13 @@ describe('document.populate', function() {
     });
 
     const NoteSchema = new Schema({
-      author: { type: String, ref: 'UserWithStringId' },
+      author: { type: String, ref: 'User' },
       body: String
     });
 
-    const User = db.model('UserWithStringId', UserSchema, random());
-    const Note = db.model('NoteWithStringId', NoteSchema, random());
+    db.deleteModel(/User/);
+    const User = db.model('User', UserSchema);
+    const Note = db.model('Test', NoteSchema);
 
     const alice = new User({ _id: 'alice', name: 'Alice In Wonderland' });
 
@@ -401,12 +404,13 @@ describe('document.populate', function() {
     });
 
     const NoteSchema = new Schema({
-      author: { type: Buffer, ref: 'UserWithBufferId' },
+      author: { type: Buffer, ref: 'User' },
       body: String
     });
 
-    const User = db.model('UserWithBufferId', UserSchema, random());
-    const Note = db.model('NoteWithBufferId', NoteSchema, random());
+    db.deleteModel(/User/);
+    const User = db.model('User', UserSchema);
+    const Note = db.model('Test', NoteSchema);
 
     const alice = new User({ _id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: 'Alice' });
 
@@ -439,12 +443,13 @@ describe('document.populate', function() {
     });
 
     const NoteSchema = new Schema({
-      author: { type: Number, ref: 'UserWithNumberId' },
+      author: { type: Number, ref: 'User' },
       body: String
     });
 
-    const User = db.model('UserWithNumberId', UserSchema, random());
-    const Note = db.model('NoteWithNumberId', NoteSchema, random());
+    db.deleteModel(/User/);
+    const User = db.model('User', UserSchema);
+    const Note = db.model('Test', NoteSchema);
 
     const alice = new User({ _id: 2359, name: 'Alice' });
 
@@ -493,13 +498,13 @@ describe('document.populate', function() {
     });
   });
 
-  it('gh-3308', function(done) {
-    const Person = db.model('gh3308', {
+  it('depopulates when setting `_id` (gh-3308)', function(done) {
+    const Person = db.model('Person', {
       name: String
     });
 
-    const Band = db.model('gh3308_0', {
-      guitarist: { type: Schema.Types.ObjectId, ref: 'gh3308' }
+    const Band = db.model('Band', {
+      guitarist: { type: Schema.Types.ObjectId, ref: 'Person' }
     });
 
     const slash = new Person({ name: 'Slash' });
@@ -518,17 +523,17 @@ describe('document.populate', function() {
 
   describe('gh-2214', function() {
     it('should return a real document array when populating', function(done) {
-      const Car = db.model('gh-2214-1', {
+      const Car = db.model('Car', {
         color: String,
         model: String
       });
 
-      const Person = db.model('gh-2214-2', {
+      const Person = db.model('Person', {
         name: String,
         cars: [
           {
             type: Schema.Types.ObjectId,
-            ref: 'gh-2214-1'
+            ref: 'Car'
           }
         ]
       });
@@ -566,37 +571,37 @@ describe('document.populate', function() {
 
   describe('gh-7889', function() {
     it('should save item added to array after populating the array', function(done) {
-      const Car = db.model('gh-7889-1', {
+      const Car = db.model('Car', {
         model: Number
       });
 
-      const Player = db.model('gh-7889-2', {
-        cars: [{ type: Schema.Types.ObjectId, ref: 'gh-7889-1' }]
+      const Person = db.model('Person', {
+        cars: [{ type: Schema.Types.ObjectId, ref: 'Car' }]
       });
 
-      let player;
+      let person;
 
       Car.create({ model: 0 }).then(car => {
-        return Player.create({ cars: [car._id] });
+        return Person.create({ cars: [car._id] });
       }).then(() => {
-        return Player.findOne({});
+        return Person.findOne({});
       }).then(p => {
-        player = p;
-        return player.populate('cars').execPopulate();
+        person = p;
+        return person.populate('cars').execPopulate();
       }).then(() => {
         return Car.create({ model: 1 });
       }).then(car => {
-        player.cars.push(car);
-        return player.populate('cars').execPopulate();
+        person.cars.push(car);
+        return person.populate('cars').execPopulate();
       }).then(() => {
         return Car.create({ model: 2 });
       }).then(car => {
-        player.cars.push(car);
-        return player.save();
+        person.cars.push(car);
+        return person.save();
       }).then(() => {
-        return Player.findOne({});
-      }).then(player => {
-        assert.equal(player.cars.length, 3);
+        return Person.findOne({});
+      }).then(person => {
+        assert.equal(person.cars.length, 3);
         done();
       });
     });
@@ -604,14 +609,14 @@ describe('document.populate', function() {
 
   describe('depopulate', function() {
     it('can depopulate specific path (gh-2509)', function(done) {
-      const Person = db.model('gh2509_1', {
+      const Person = db.model('Person', {
         name: String
       });
 
-      const Band = db.model('gh2509_2', {
+      const Band = db.model('Band', {
         name: String,
-        members: [{ type: Schema.Types.ObjectId, ref: 'gh2509_1' }],
-        lead: { type: Schema.Types.ObjectId, ref: 'gh2509_1' }
+        members: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
+        lead: { type: Schema.Types.ObjectId, ref: 'Person' }
       });
 
       const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
@@ -644,14 +649,14 @@ describe('document.populate', function() {
     });
 
     it('depopulates all (gh-6073)', function(done) {
-      const Person = db.model('gh6073_1', {
+      const Person = db.model('Person', {
         name: String
       });
 
-      const Band = db.model('gh6073_2', {
+      const Band = db.model('Band', {
         name: String,
-        members: [{ type: Schema.Types.ObjectId, ref: 'gh6073_1' }],
-        lead: { type: Schema.Types.ObjectId, ref: 'gh6073_1' }
+        members: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
+        lead: { type: Schema.Types.ObjectId, ref: 'Person' }
       });
 
       const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
@@ -677,7 +682,7 @@ describe('document.populate', function() {
     });
 
     it('doesn\'t throw when called on a doc that is not populated (gh-6075)', function(done) {
-      const Person = db.model('gh6075', {
+      const Person = db.model('Person', {
         name: String
       });
 
@@ -705,27 +710,27 @@ describe('document.populate', function() {
       }, { toJSON: { virtuals: true } });
 
       schema.virtual('$others', {
-        ref: 'gh6075_other',
+        ref: 'Test',
         localField: 'others',
         foreignField: 'val'
       });
 
       schema.virtual('$single', {
-        ref: 'gh6075_other',
+        ref: 'Test',
         localField: 'single',
         foreignField: 'val',
         justOne: true
       });
 
       schema.virtual('$last', {
-        ref: 'gh6075_other',
+        ref: 'Test',
         localField: 'single',
         foreignField: 'val',
         justOne: true
       });
 
-      const Other = db.model('gh6075_other', otherSchema);
-      const Test = db.model('gh6075_test', schema);
+      const Other = db.model('Test', otherSchema);
+      const Test = db.model('Test1', schema);
 
       const others = 'abc'.split('').map(c => {
         return new Other({
@@ -764,17 +769,17 @@ describe('document.populate', function() {
 
     it('depopulates field with empty array (gh-7740)', function() {
       db.model(
-        'gh_7740_1',
+        'Book',
         new mongoose.Schema({
           name: String,
           chapters: Number
         })
       );
       const Author = db.model(
-        'gh_7740_2',
+        'Person',
         new mongoose.Schema({
           name: String,
-          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gh_7740_1' }], default: [] }
+          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }], default: [] }
         })
       );
 
@@ -806,7 +811,7 @@ describe('document.populate', function() {
       embedded: EmbeddedSchema
     });
 
-    const Model = db.model('gh4552', ModelSchema);
+    const Model = db.model('Test', ModelSchema);
 
     const m = new Model({});
     m.embedded = {};
@@ -819,16 +824,16 @@ describe('document.populate', function() {
   it('handles pulling from populated array (gh-3579)', function(done) {
     const barSchema = new Schema({ name: String });
 
-    const Bar = db.model('gh3579', barSchema);
+    const Bar = db.model('Test', barSchema);
 
     const fooSchema = new Schema({
       bars: [{
         type: Schema.Types.ObjectId,
-        ref: 'gh3579'
+        ref: 'Test'
       }]
     });
 
-    const Foo = db.model('gh3579_0', fooSchema);
+    const Foo = db.model('Test1', fooSchema);
 
     Bar.create([{ name: 'bar1' }, { name: 'bar2' }], function(error, docs) {
       assert.ifError(error);
@@ -849,12 +854,12 @@ describe('document.populate', function() {
   describe('#populated() with virtuals (gh-7440)', function() {
     let Team;
 
-    before(function() {
+    beforeEach(function() {
       const teamSchema = mongoose.Schema({
         name: String,
         captain: String
       });
-      Team = db.model('gh7440_Team', teamSchema);
+      Team = db.model('Test', teamSchema);
     });
 
     it('works with justOne: false', function() {
@@ -863,11 +868,11 @@ describe('document.populate', function() {
         name: String
       });
       playerSchema.virtual('teams', {
-        ref: 'gh7440_Team',
+        ref: 'Test',
         localField: '_id',
         foreignField: 'captain'
       });
-      const Player = db.model('gh7440_Player_0', playerSchema);
+      const Player = db.model('Person', playerSchema);
 
       return co(function*() {
         const player = yield Player.create({ name: 'Derek Jeter', _id: 'test1' });
@@ -884,12 +889,12 @@ describe('document.populate', function() {
         name: String
       });
       playerSchema.virtual('team', {
-        ref: 'gh7440_Team',
+        ref: 'Test',
         localField: '_id',
         foreignField: 'captain',
         justOne: true
       });
-      const Player = db.model('gh7440_Player_1', playerSchema);
+      const Player = db.model('Person', playerSchema);
 
       return co(function*() {
         const player = yield Player.create({ name: 'Derek Jeter', _id: 'test1' });
@@ -905,7 +910,7 @@ describe('document.populate', function() {
     let Team;
     let Player;
 
-    before(function() {
+    beforeEach(function() {
       const playerSchema = mongoose.Schema({
         _id: String
       });
@@ -913,7 +918,7 @@ describe('document.populate', function() {
       const teamSchema = mongoose.Schema({
         captain: {
           type: String,
-          ref: 'gh7521_Player',
+          ref: 'Person',
           get: (v) => {
             if (!v || typeof v !== 'string') {
               return v;
@@ -925,7 +930,7 @@ describe('document.populate', function() {
         players: [new mongoose.Schema({
           player: {
             type: String,
-            ref: 'gh7521_Player',
+            ref: 'Person',
             get: (v) => {
               if (!v || typeof v !== 'string') {
                 return v;
@@ -937,8 +942,8 @@ describe('document.populate', function() {
         })]
       });
 
-      Player = db.model('gh7521_Player', playerSchema);
-      Team = db.model('gh7521_Team', teamSchema);
+      Player = db.model('Person', playerSchema);
+      Team = db.model('Test', teamSchema);
     });
 
     it('works with populate', function() {
@@ -968,19 +973,19 @@ describe('document.populate', function() {
     const schema2 = mongoose.Schema({
       g: {
         type: mongoose.ObjectId,
-        ref: 'gh7685_1'
+        ref: 'Test1'
       }
     });
     const schema3 = mongoose.Schema({
       i: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'gh7685_2'
+        ref: 'Test2'
       }
     });
 
-    const M = db.model('gh7685_1', schema);
-    const N = db.model('gh7685_2', schema2);
-    const O = db.model('gh7685_3', schema3);
+    const M = db.model('Test1', schema);
+    const N = db.model('Test2', schema2);
+    const O = db.model('Test3', schema3);
 
     return co(function*() {
       const m = yield M.create({ a: 'TEST' });

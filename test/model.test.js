@@ -5806,7 +5806,7 @@ describe('Model', function() {
       });
 
       const M1 = db.model('Test', s1);
-      const M2 = db.model('Test1', s2, 'tests');
+      const M2 = db.model('Test1', s2, M1.collection.name);
 
       M1.create({ array: {} }, function(err, doc) {
         assert.ifError(err);

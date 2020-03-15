@@ -38,13 +38,15 @@ function setupData(db, callback) {
   ];
   const Employee = db.model('Employee');
 
-  emps.forEach(function(data) {
-    const emp = new Employee(data);
+  Employee.deleteMany({}, function() {
+    emps.forEach(function(data) {
+      const emp = new Employee(data);
 
-    emp.save(function() {
-      if (++saved === emps.length) {
-        callback();
-      }
+      emp.save(function() {
+        if (++saved === emps.length) {
+          callback();
+        }
+      });
     });
   });
 }

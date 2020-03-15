@@ -408,6 +408,7 @@ describe('QueryCursor', function() {
     const Model = db.model('Test', schema);
 
     return co(function*() {
+      yield Model.deleteMany({});
       yield Model.create({ name: 'test' });
 
       let doc;

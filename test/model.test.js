@@ -6092,16 +6092,17 @@ describe('Model', function() {
       return co(function*() {
         yield Model.collection.drop().catch(() => {});
         yield Model.createCollection();
+        const collectionName = Model.collection.name;
 
         // If the collection is not created, the following will throw
         // MongoError: Collection [mongoose_test.User] not found.
-        yield db.collection('User').stats();
+        yield db.collection(collectionName).stats();
 
         yield Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
         // Ensure that the default collation is set. Mongoose will set the
         // collation on the query itself (see gh-4839).
-        const res = yield db.collection('users').
+        const res = yield db.collection(collectionName).
           find({}).sort({ name: 1 }).toArray();
         assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
       });

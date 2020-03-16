@@ -1,3 +1,16 @@
+5.9.5 / 2020-03-16
+==================
+ * fix: upgrade mongodb driver -> 3.5.5 #8667 #8664 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): emit "disconnected" after losing connectivity to every member of a replica set with `useUnifiedTopology: true` #8643
+ * fix(array): allow calling `slice()` after `push()` #8668 #8655 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(map): avoid marking map as modified if setting `key` to the same value #8652
+ * fix(updateValidators): don't run `Mixed` update validator on dotted path underneath mixed type #8659
+ * fix(populate): ensure top-level `limit` applies if one document being populated has more than `limit` results #8657
+ * fix(populate): throw error if both `limit` and `perDocumentLimit` are set #8661 #8658 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(findOneAndUpdate): add a section about the `rawResult` option #8662
+ * docs(guide): add section about `loadClass()` #8623
+ * docs(query): improve `Query#populate()` example to clarify that `sort` doesn't affect the original result's order #8647
+
 5.9.4 / 2020-03-09
 ==================
  * fix(document): allow `new Model(doc)` to set immutable properties when doc is a mongoose document #8642

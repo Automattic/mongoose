@@ -144,7 +144,7 @@ files.forEach(function(file) {
   pugify(filename, filemap[file]);
 
   if (process.argv[2] === '--watch') {
-    fs.watchFile(filename, {interval: 1000}, function(cur, prev) {
+    fs.watchFile(filename, { interval: 1000 }, function(cur, prev) {
       if (cur.mtime > prev.mtime) {
         pugify(filename, filemap[file]);
       }

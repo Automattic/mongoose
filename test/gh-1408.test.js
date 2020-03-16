@@ -19,10 +19,10 @@ describe('documents should not be converted to _id (gh-1408)', function() {
     const db = start();
 
     const PreferenceSchema = new Schema({
-      _id: {type: Schema.ObjectId, auto: true},
-      preference: {type: String, required: true},
-      value: {type: Schema.Types.Mixed}
-    }, {versionKey: false});
+      _id: { type: Schema.ObjectId, auto: true },
+      preference: { type: String, required: true },
+      value: { type: Schema.Types.Mixed }
+    }, { versionKey: false });
 
     const BrandSchema = new Schema({
       settings: {
@@ -30,15 +30,15 @@ describe('documents should not be converted to _id (gh-1408)', function() {
       }
     });
 
-    const A = db.model('gh-1408', BrandSchema);
+    const A = db.model('Test', BrandSchema);
 
     const a = new A({
       settings: {
         preferences:
-         [{preference: 'group_colors', value: false},
-           {preference: 'can_force_orders', value: true},
-           {preference: 'hide_from_buyers', value: true},
-           {preference: 'no_orders', value: ''}
+         [{ preference: 'group_colors', value: false },
+           { preference: 'can_force_orders', value: true },
+           { preference: 'hide_from_buyers', value: true },
+           { preference: 'no_orders', value: '' }
          ]
       }
     });
@@ -52,17 +52,17 @@ describe('documents should not be converted to _id (gh-1408)', function() {
         const newData = {
           settings: {
             preferences:
-             [{preference: 'group_colors', value: true},
-               {preference: 'can_force_orders', value: true},
-               {preference: 'custom_csv', value: ''},
-               {preference: 'hide_from_buyers', value: false},
-               {preference: 'nozoom', value: false},
-               {preference: 'no_orders', value: false}
+             [{ preference: 'group_colors', value: true },
+               { preference: 'can_force_orders', value: true },
+               { preference: 'custom_csv', value: '' },
+               { preference: 'hide_from_buyers', value: false },
+               { preference: 'nozoom', value: false },
+               { preference: 'no_orders', value: false }
              ]
           }
         };
 
-        doc.set('settings', newData.settings, {merge: true});
+        doc.set('settings', newData.settings, { merge: true });
         doc.markModified('settings'); // <== this caused the bug
         doc.save(function(err) {
           if (err) return done(err);

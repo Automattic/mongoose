@@ -10,9 +10,15 @@ const Collection = mongoose.Collection;
 const assert = require('assert');
 
 let server;
+const collectionNames = new Map();
 
 if (process.env.D === '1') {
   mongoose.set('debug', true);
+}
+if (process.env.PRINT_COLLECTIONS) {
+  after(function() {
+    console.log('Colls', Array.from(collectionNames.entries()).sort((a, b) => a[1] - b[1]));
+  });
 }
 
 // For 3.1.3 deprecations
@@ -90,6 +96,21 @@ module.exports = function(options) {
   delete options.noErrorListener;
 
   const conn = mongoose.createConnection(uri, options);
+
+  const model = conn.model;
+  conn.model = function(name, schema, collection) {
+    if (schema == null || schema._baseSchema != null) {
+      // 2 cases: if calling `db.model(name)` to retrieve a model,
+      // or if declaring a discriminator, skip adding the model name.
+      return model.apply(this, arguments);
+    }
+
+    const collName = collection == null ? mongoose.pluralize(name) : collection;
+
+    let count = collectionNames.get(collName) || 0;
+    collectionNames.set(collName, ++count);
+    return model.apply(this, arguments);
+  };
 
   if (noErrorListener) {
     return conn;

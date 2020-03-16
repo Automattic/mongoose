@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -28,7 +27,7 @@ describe('model', function() {
 
     before(function() {
       db = start();
-      B = db.model('model-create', schema, 'model-create-' + random());
+      B = db.model('Test', schema);
     });
 
     after(function(done) {
@@ -36,7 +35,7 @@ describe('model', function() {
     });
 
     it('accepts an array and returns an array', function(done) {
-      B.create([{title: 'hi'}, {title: 'bye'}], function(err, posts) {
+      B.create([{ title: 'hi' }, { title: 'bye' }], function(err, posts) {
         assert.ifError(err);
 
         assert.ok(posts instanceof Array);
@@ -79,7 +78,7 @@ describe('model', function() {
     });
 
     it('returns a promise', function(done) {
-      const p = B.create({title: 'returns promise'});
+      const p = B.create({ title: 'returns promise' });
       assert.ok(p instanceof mongoose.Promise);
       done();
     });
@@ -105,12 +104,14 @@ describe('model', function() {
       SchemaWithPreSaveHook.post('save', function() {
         countPost++;
       });
-      const MWPSH = db.model('mwpsh', SchemaWithPreSaveHook);
+
+      db.deleteModel(/Test/);
+      const MWPSH = db.model('Test', SchemaWithPreSaveHook);
       MWPSH.create([
-        {preference: 'xx'},
-        {preference: 'yy'},
-        {preference: '1'},
-        {preference: '2'}
+        { preference: 'xx' },
+        { preference: 'yy' },
+        { preference: '1' },
+        { preference: '2' }
       ], function(err, docs) {
         assert.ifError(err);
 
@@ -133,7 +134,7 @@ describe('model', function() {
 
     describe('callback is optional', function() {
       it('with one doc', function(done) {
-        const p = B.create({title: 'optional callback'});
+        const p = B.create({ title: 'optional callback' });
         p.then(function(doc) {
           assert.equal(doc.title, 'optional callback');
           done();
@@ -141,7 +142,7 @@ describe('model', function() {
       });
 
       it('with more than one doc', function(done) {
-        const p = B.create({title: 'optional callback 2'}, {title: 'orient expressions'});
+        const p = B.create({ title: 'optional callback 2' }, { title: 'orient expressions' });
         p.then(function(docs) {
           assert.equal(docs.length, 2);
           const doc1 = docs[0];
@@ -153,7 +154,7 @@ describe('model', function() {
       });
 
       it('with array of docs', function(done) {
-        const p = B.create([{title: 'optional callback3'}, {title: '3'}]);
+        const p = B.create([{ title: 'optional callback3' }, { title: '3' }]);
         p.then(function(docs) {
           assert.ok(docs instanceof Array);
           assert.equal(docs.length, 2);
@@ -166,9 +167,9 @@ describe('model', function() {
       });
 
       it('and should reject promise on error', function(done) {
-        const p = B.create({title: 'optional callback 4'});
+        const p = B.create({ title: 'optional callback 4' });
         p.then(function(doc) {
-          const p2 = B.create({_id: doc._id});
+          const p2 = B.create({ _id: doc._id });
           p2.then(function() {
             assert(false);
           }, function(err) {

@@ -133,8 +133,8 @@ describe('utils', function() {
   });
 
   it('utils.options', function(done) {
-    const o = {a: 1, b: 2, c: 3, 0: 'zero1'};
-    const defaults = {b: 10, d: 20, 0: 'zero2'};
+    const o = { a: 1, b: 2, c: 3, 0: 'zero1' };
+    const defaults = { b: 10, d: 20, 0: 'zero2' };
     const result = utils.options(defaults, o);
     assert.equal(result.a, 1);
     assert.equal(result.b, 2);
@@ -170,7 +170,7 @@ describe('utils', function() {
 
   it('deepEquals on MongooseDocumentArray works', function(done) {
     const db = start();
-    const A = new Schema({a: String});
+    const A = new Schema({ a: String });
     const M = db.model('deepEqualsOnMongooseDocArray', new Schema({
       a1: [A],
       a2: [A]
@@ -179,7 +179,7 @@ describe('utils', function() {
     db.close();
 
     const m1 = new M({
-      a1: [{a: 'Hi'}, {a: 'Bye'}]
+      a1: [{ a: 'Hi' }, { a: 'Bye' }]
     });
 
     m1.a2 = m1.a1;

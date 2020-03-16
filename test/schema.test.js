@@ -888,7 +888,7 @@ describe('schema', function() {
         }, { discriminatorKey: 'kind', _id: false });
 
         const batchSchema = new Schema({
-          events: [eventSchema],
+          events: [eventSchema]
         });
 
         const docArray = batchSchema.path('events');
@@ -898,7 +898,7 @@ describe('schema', function() {
         }, { _id: false }));
 
         docArray.discriminator('gh6485_Purchased', Schema({
-          product: { type: String, index: true },
+          product: { type: String, index: true }
         }, { _id: false }));
 
         assert.deepEqual(batchSchema.indexes().map(v => v[0]), [
@@ -2133,14 +2133,14 @@ describe('schema', function() {
 
   it('getters/setters with clone() (gh-8124)', function() {
     const schema = new mongoose.Schema({
-      field: {type: String, required: true}
+      field: { type: String, required: true }
     });
 
     schema.path('field').set(value => value ? value.toUpperCase() : value);
 
     const TestKo = db.model('Test', schema.clone());
 
-    const testKo = new TestKo({field: 'upper'});
+    const testKo = new TestKo({ field: 'upper' });
     assert.equal(testKo.field, 'UPPER');
   });
 

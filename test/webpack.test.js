@@ -1,8 +1,6 @@
 'use strict';
 
-const acorn = require('acorn');
 const assert = require('assert');
-const fs = require('fs');
 const utils = require('../lib/utils');
 const semver = require('semver');
 
@@ -30,17 +28,13 @@ describe('webpack', function() {
       assert.ok(!bundleBuildStats.compilation.warnings.
         find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
 
-      const bundleContent = fs.readFileSync(`${__dirname}/files/dist/browser.umd.js`, 'utf8');
-
-      acorn.parse(bundleContent, { ecmaVersion: 5 });
-
       const baseConfig = require('../webpack.base.config.js');
       const config = Object.assign({}, baseConfig, {
         entry: ['./test/files/sample.js'],
         // acquit:ignore:start
         output: {
           path: `${__dirname}/files`
-        },
+        }
         // acquit:ignore:end
       });
       // acquit:ignore:start
@@ -51,10 +45,6 @@ describe('webpack', function() {
         // Avoid expressions in `require()` because that scares webpack (gh-6705)
         assert.ok(!stats.compilation.warnings.
           find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
-
-        const content = fs.readFileSync(`${__dirname}/files/main.js`, 'utf8');
-
-        acorn.parse(content, { ecmaVersion: 5 });
 
         done();
       }));

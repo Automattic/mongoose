@@ -3,17 +3,13 @@
 const start = require('./common');
 
 const assert = require('assert');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('model', function() {
   let db, schema;
-
-  function getModel(db) {
-    return db.model('GeoSearch', schema, 'geosearch-' + random());
-  }
+  let Geo;
 
   before(function() {
     schema = new Schema({
@@ -21,29 +17,30 @@ describe('model', function() {
       complex: {},
       type: String
     });
-    schema.index({pos: 'geoHaystack', type: 1}, {bucketSize: 1});
+    schema.index({ pos: 'geoHaystack', type: 1 }, { bucketSize: 1 });
     db = start();
+
+    Geo = db.model('Test', schema);
   });
 
   after(function(done) {
     db.close(done);
   });
 
+  afterEach(() => Geo.deleteMany({}));
+
   describe('geoSearch', function() {
     this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
     it('works', function(done) {
-      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
-        assert.ifError(err);
-
+      Geo.init(function() {
         const geos = [];
-        geos[0] = new Geo({pos: [10, 10], type: 'place'});
-        geos[1] = new Geo({pos: [15, 5], type: 'place'});
-        geos[2] = new Geo({pos: [20, 15], type: 'house'});
-        geos[3] = new Geo({pos: [1, -1], type: 'house'});
+        geos[0] = new Geo({ pos: [10, 10], type: 'place' });
+        geos[1] = new Geo({ pos: [15, 5], type: 'place' });
+        geos[2] = new Geo({ pos: [20, 15], type: 'house' });
+        geos[3] = new Geo({ pos: [1, -1], type: 'house' });
         let count = geos.length;
 
         for (let i = 0; i < geos.length; i++) {
@@ -54,7 +51,7 @@ describe('model', function() {
         }
 
         function next() {
-          Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5}, function(err, results) {
+          Geo.geoSearch({ type: 'place' }, { near: [9, 9], maxDistance: 5 }, function(err, results) {
             assert.ifError(err);
             assert.equal(results.length, 1);
 
@@ -65,7 +62,7 @@ describe('model', function() {
             assert.equal(results[0].id, geos[0].id);
             assert.ok(results[0] instanceof Geo);
 
-            Geo.geoSearch({type: 'place'}, {near: [40, 40], maxDistance: 5}, function(err, results) {
+            Geo.geoSearch({ type: 'place' }, { near: [40, 40], maxDistance: 5 }, function(err, results) {
               assert.ifError(err);
               assert.equal(results.length, 0);
               done();
@@ -75,17 +72,16 @@ describe('model', function() {
       });
     });
     it('works with lean', function(done) {
-      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.init(function(err) {
         assert.ifError(err);
 
         const geos = [];
-        geos[0] = new Geo({pos: [10, 10], type: 'place'});
-        geos[1] = new Geo({pos: [15, 5], type: 'place'});
-        geos[2] = new Geo({pos: [20, 15], type: 'house'});
-        geos[3] = new Geo({pos: [1, -1], type: 'house'});
+        geos[0] = new Geo({ pos: [10, 10], type: 'place' });
+        geos[1] = new Geo({ pos: [15, 5], type: 'place' });
+        geos[2] = new Geo({ pos: [20, 15], type: 'house' });
+        geos[3] = new Geo({ pos: [1, -1], type: 'house' });
         let count = geos.length;
 
         for (let i = 0; i < geos.length; i++) {
@@ -96,7 +92,7 @@ describe('model', function() {
         }
 
         function next() {
-          Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5, lean: true}, function(err, results) {
+          Geo.geoSearch({ type: 'place' }, { near: [9, 9], maxDistance: 5, lean: true }, function(err, results) {
             assert.ifError(err);
             assert.equal(results.length, 1);
 
@@ -113,27 +109,26 @@ describe('model', function() {
       });
     });
     it('throws the correct error messages', function(done) {
-      const Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err) {
+      Geo.init(function(err) {
         assert.ifError(err);
 
-        const g = new Geo({pos: [10, 10], type: 'place'});
+        const g = new Geo({ pos: [10, 10], type: 'place' });
         g.save(function() {
           Geo.geoSearch([], {}, function(e) {
             assert.ok(e);
             assert.equal(e.message, 'Must pass conditions to geoSearch');
 
-            Geo.geoSearch({type: 'test'}, {}, function(e) {
+            Geo.geoSearch({ type: 'test' }, {}, function(e) {
               assert.ok(e);
               assert.equal(e.message, 'Must specify the near option in geoSearch');
 
-              Geo.geoSearch({type: 'test'}, {near: 'hello'}, function(e) {
+              Geo.geoSearch({ type: 'test' }, { near: 'hello' }, function(e) {
                 assert.ok(e);
                 assert.equal(e.message, 'near option must be an array [x, y]');
 
-                Geo.geoSearch({type: 'test'}, {near: [1, 2]}, function(err) {
+                Geo.geoSearch({ type: 'test' }, { near: [1, 2] }, function(err) {
                   assert.ok(err);
                   assert.ok(/maxDistance needs a number/.test(err));
                   done();
@@ -146,10 +141,8 @@ describe('model', function() {
     });
 
     it('returns a promise (gh-1614)', function(done) {
-      const Geo = getModel(db);
-
-      Geo.on('index', function() {
-        const prom = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
+      Geo.init(function() {
+        const prom = Geo.geoSearch({ type: 'place' }, { near: [9, 9], maxDistance: 5 });
         assert.ok(prom instanceof mongoose.Promise);
 
         prom.then(() => done(), err => done(err));
@@ -157,16 +150,15 @@ describe('model', function() {
     });
 
     it('allows not passing a callback (gh-1614)', function(done) {
-      const Geo = getModel(db);
-      Geo.on('index', function(err) {
+      Geo.init(function(err) {
         assert.ifError(err);
-        const g = new Geo({pos: [10, 10], type: 'place'});
+        const g = new Geo({ pos: [10, 10], type: 'place' });
         g.save(function(err) {
           assert.ifError(err);
 
           let promise;
           assert.doesNotThrow(function() {
-            promise = Geo.geoSearch({type: 'place'}, {near: [9, 9], maxDistance: 5});
+            promise = Geo.geoSearch({ type: 'place' }, { near: [9, 9], maxDistance: 5 });
           });
           function validate(ret) {
             assert.equal(ret.length, 1);

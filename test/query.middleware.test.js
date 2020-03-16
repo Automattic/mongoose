@@ -15,9 +15,17 @@ describe('query middleware', function() {
   let Author;
   let Publisher;
 
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   const initializeData = function(done) {
-    Author = db.model('gh-2138', schema, 'gh-2138');
-    Publisher = db.model('gh-2138-1', publisherSchema, 'gh-2138-1');
+    Author = db.model('Person', schema);
+    Publisher = db.model('Publisher', publisherSchema, 'Publisher');
 
     Author.deleteMany({}, function(error) {
       if (error) {
@@ -28,7 +36,7 @@ describe('query middleware', function() {
         if (error) {
           return done(error);
         }
-        Publisher.create({name: 'Wiley'}, function(error, publisher) {
+        Publisher.create({ name: 'Wiley' }, function(error, publisher) {
           if (error) {
             return done(error);
           }
@@ -52,7 +60,7 @@ describe('query middleware', function() {
     schema = new Schema({
       title: String,
       author: String,
-      publisher: {type: Schema.ObjectId, ref: 'gh-2138-1'},
+      publisher: { type: Schema.ObjectId, ref: 'Publisher' },
       options: String
     });
 
@@ -60,14 +68,11 @@ describe('query middleware', function() {
       name: String
     });
 
-    db = start();
-
     done();
   });
 
-  afterEach(function(done) {
-    db.close(done);
-  });
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
 
   it('has a pre find hook', function(done) {
     let count = 0;
@@ -80,7 +85,7 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({x: 1}, function(error) {
+      Author.find({ x: 1 }, function(error) {
         assert.ifError(error);
         assert.equal(count, 1);
         done();
@@ -100,7 +105,7 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({title: 'Professional AngularJS'}, function(error, docs) {
+      Author.find({ title: 'Professional AngularJS' }, function(error, docs) {
         assert.ifError(error);
         assert.equal(postCount, 1);
         assert.equal(docs.length, 1);
@@ -125,7 +130,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.find({title: 'Professional AngularJS'}).exec(function(error, docs) {
+      Author.find({ title: 'Professional AngularJS' }).exec(function(error, docs) {
         assert.ifError(error);
         assert.equal(count, 1);
         assert.equal(postCount, 1);
@@ -150,7 +155,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(count, 1);
         assert.equal(postCount, 1);
@@ -174,7 +179,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(count, 1);
         assert.equal(postCount, 1);
@@ -182,7 +187,7 @@ describe('query middleware', function() {
 
         count = 0;
         postCount = 0;
-        Author.find({title: 'Professional AngularJS'}, function(error, docs) {
+        Author.find({ title: 'Professional AngularJS' }, function(error, docs) {
           assert.ifError(error);
           assert.equal(count, 1);
           assert.equal(postCount, 1);
@@ -206,7 +211,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(doc.author, 'Val');
         assert.equal(doc.publisher.name, 'Wiley');
@@ -223,7 +228,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(doc.author, 'Val');
         assert.equal(doc.publisher.name, 'Wiley');
@@ -388,7 +393,7 @@ describe('query middleware', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7195_deleteOne', schema);
+      const Model = db.model('Test', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
       const res = yield Model.deleteOne();
@@ -415,7 +420,7 @@ describe('query middleware', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7195_deleteMany', schema);
+      const Model = db.model('Test', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }]);
 
       yield Model.deleteMany();
@@ -442,7 +447,7 @@ describe('query middleware', function() {
     });
 
     return co(function*() {
-      const Model = db.model('gh7195_distinct', schema);
+      const Model = db.model('Test', schema);
       yield Model.create([{ title: 'foo' }, { title: 'bar' }, { title: 'bar' }]);
 
       const res = yield Model.distinct('title');
@@ -462,7 +467,7 @@ describe('query middleware', function() {
       next(new Error('woops'));
     });
 
-    const Book = db.model('gh2284', testSchema);
+    const Book = db.model('Test', testSchema);
 
     Book.on('index', function(error) {
       assert.ifError(error);
@@ -491,7 +496,7 @@ describe('query middleware', function() {
       next(error);
     });
 
-    const Test = db.model('gh4885', testSchema);
+    const Test = db.model('Test', testSchema);
 
     Test.create({}, function(error) {
       assert.ok(error);
@@ -501,7 +506,7 @@ describe('query middleware', function() {
   });
 
   it('error handlers with findOneAndUpdate and passRawResult (gh-4836)', function(done) {
-    const schema = new Schema({name: {type: String}});
+    const schema = new Schema({ name: { type: String } });
 
     let called = false;
     const errorHandler = function(err, res, next) {
@@ -514,7 +519,7 @@ describe('query middleware', function() {
     const Person = db.model('Person', schema);
 
     Person.
-      findOneAndUpdate({name: 'name'}, {}, {upsert: true, passRawResult: true}).
+      findOneAndUpdate({ name: 'name' }, {}, { upsert: true, passRawResult: true }).
       exec(function(error) {
         assert.ifError(error);
         assert.ok(!called);
@@ -523,7 +528,7 @@ describe('query middleware', function() {
   });
 
   it('error handlers with findOneAndUpdate error and passRawResult (gh-4836)', function(done) {
-    const schema = new Schema({name: {type: String}});
+    const schema = new Schema({ name: { type: String } });
 
     let called = false;
     const errorHandler = function(err, res, next) {
@@ -536,7 +541,7 @@ describe('query middleware', function() {
     const Person = db.model('Person', schema);
 
     Person.
-      findOneAndUpdate({}, {_id: 'test'}, {upsert: true, passRawResult: true}).
+      findOneAndUpdate({}, { _id: 'test' }, { upsert: true, passRawResult: true }).
       exec(function(error) {
         assert.ok(error);
         assert.ok(called);
@@ -562,7 +567,7 @@ describe('query middleware', function() {
       next(new Error('test2'));
     });
 
-    const Test = db.model('gh4927', schema);
+    const Test = db.model('Test', schema);
 
     Test.find().exec(function(error) {
       assert.equal(error.message, 'test2');
@@ -586,7 +591,7 @@ describe('query middleware', function() {
       next();
     });
 
-    const Test = db.model('gh5153', schema.clone());
+    const Test = db.model('Test', schema.clone());
 
     Test.find().exec(function(error) {
       assert.ifError(error);
@@ -605,7 +610,7 @@ describe('query middleware', function() {
       next();
     });
 
-    const Test = db.model('gh7418', schema);
+    const Test = db.model('Test', schema);
 
     return Test.updateOne({}, { name: 'bar' }).
       then(() => assert.equal(calledPost, 1));

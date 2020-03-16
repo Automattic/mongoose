@@ -69,7 +69,7 @@ describe('castArrayFilters', function() {
         allUsers: { all: Number },
         individual: [{
           userId: String,
-          all: Number,
+          all: Number
         }]
       }
     });

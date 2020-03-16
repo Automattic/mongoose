@@ -121,4 +121,29 @@ describe('Tutorial: findOneAndUpdate()', function() {
     assert.equal(doc.age, 29);
     // acquit:ignore:end
   });
+
+  it('rawResult', async function() {
+    const filter = { name: 'Will Riker' };
+    const update = { age: 29 };
+
+    await Character.countDocuments(filter); // 0
+    // acquit:ignore:start
+    assert.equal(await Character.countDocuments(filter), 0);
+    // acquit:ignore:end
+
+    let res = await Character.findOneAndUpdate(filter, update, {
+      new: true,
+      upsert: true,
+      rawResult: true // Return the raw result from the MongoDB driver
+    });
+
+    res.value instanceof Character; // true
+    // The below property will be `false` if MongoDB upserted a new
+    // document, and `true` if MongoDB updated an existing object.
+    res.lastErrorObject.updatedExisting; // false
+    // acquit:ignore:start
+    assert.ok(res.value instanceof Character);
+    assert.ok(!res.lastErrorObject.updatedExisting);
+    // acquit:ignore:end
+  });
 });

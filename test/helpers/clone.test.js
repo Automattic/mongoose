@@ -170,7 +170,7 @@ describe('clone', () => {
         [symbols.schemaTypeSymbol]: 'MyType',
         clone() {
           return {
-            myAttr: this.myAttr,
+            myAttr: this.myAttr
           };
         }
       };

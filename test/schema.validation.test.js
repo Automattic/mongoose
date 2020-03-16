@@ -23,25 +23,25 @@ describe('schema', function() {
     it('invalid arguments are rejected (1044)', function(done) {
       assert.throws(function() {
         new Schema({
-          simple: {type: String, validate: 'nope'}
+          simple: { type: String, validate: 'nope' }
         });
       }, /Invalid validator/);
 
       assert.throws(function() {
         new Schema({
-          simple: {type: String, validate: ['nope']}
+          simple: { type: String, validate: ['nope'] }
         });
       }, /Invalid validator/);
 
       assert.throws(function() {
         new Schema({
-          simple: {type: String, validate: {nope: 1, msg: 'nope'}}
+          simple: { type: String, validate: { nope: 1, msg: 'nope' } }
         });
       }, /Invalid validator/);
 
       assert.throws(function() {
         new Schema({
-          simple: {type: String, validate: [{nope: 1, msg: 'nope'}, 'nope']}
+          simple: { type: String, validate: [{ nope: 1, msg: 'nope' }, 'nope'] }
         });
       }, /Invalid validator/);
 
@@ -50,8 +50,8 @@ describe('schema', function() {
 
     it('string enum', function(done) {
       const Test = new Schema({
-        complex: {type: String, enum: ['a', 'b', undefined, 'c', null]},
-        state: {type: String}
+        complex: { type: String, enum: ['a', 'b', undefined, 'c', null] },
+        state: { type: String }
       });
 
       assert.ok(Test.path('complex') instanceof SchemaTypes.String);
@@ -107,7 +107,7 @@ describe('schema', function() {
 
     it('string regexp', function(done) {
       const Test = new Schema({
-        simple: {type: String, match: /[a-z]/}
+        simple: { type: String, match: /[a-z]/ }
       });
 
       assert.equal(Test.path('simple').validators.length, 1);
@@ -158,8 +158,8 @@ describe('schema', function() {
         before(function() {
           db = start();
           const PersonSchema = new Schema({
-            name: {type: String},
-            num_cars: {type: Number, min: 20}
+            name: { type: String },
+            num_cars: { type: Number, min: 20 }
           });
           Person = db.model('person-schema-validation-test', PersonSchema);
         });
@@ -169,7 +169,7 @@ describe('schema', function() {
         });
 
         it('and can be set to "undefined" (gh-1594)', function(done) {
-          const p = new Person({name: 'Daniel'});
+          const p = new Person({ name: 'Daniel' });
           p.num_cars = 25;
 
           p.save(function(err) {
@@ -194,7 +194,7 @@ describe('schema', function() {
 
       it('number min and max', function(done) {
         const Tobi = new Schema({
-          friends: {type: Number, max: 15, min: 5}
+          friends: { type: Number, max: 15, min: 5 }
         });
 
         assert.equal(Tobi.path('friends').validators.length, 2);
@@ -309,7 +309,7 @@ describe('schema', function() {
 
       it('number required', function(done) {
         const Edwald = new Schema({
-          friends: {type: Number, required: true}
+          friends: { type: Number, required: true }
         });
 
         Edwald.path('friends').doValidate(null, function(err) {
@@ -329,7 +329,7 @@ describe('schema', function() {
 
       it('date required', function(done) {
         const Loki = new Schema({
-          birth_date: {type: Date, required: true}
+          birth_date: { type: Date, required: true }
         });
 
         Loki.path('birth_date').doValidate(null, function(err) {
@@ -349,7 +349,7 @@ describe('schema', function() {
 
       it('date not empty string (gh-3132)', function(done) {
         const HappyBirthday = new Schema({
-          date: {type: Date, required: true}
+          date: { type: Date, required: true }
         });
 
         HappyBirthday.path('date').doValidate('', function(err) {
@@ -360,7 +360,7 @@ describe('schema', function() {
 
       it('objectid required', function(done) {
         const Loki = new Schema({
-          owner: {type: ObjectId, required: true}
+          owner: { type: ObjectId, required: true }
         });
 
         Loki.path('owner').doValidate(new DocumentObjectId(), function(err) {
@@ -379,7 +379,7 @@ describe('schema', function() {
 
       it('array required', function(done) {
         const Loki = new Schema({
-          likes: {type: Array, required: true}
+          likes: { type: Array, required: true }
         });
 
         let remaining = 2;
@@ -404,7 +404,7 @@ describe('schema', function() {
         };
 
         const Loki = new Schema({
-          likes: {type: Array, required: true}
+          likes: { type: Array, required: true }
         });
 
         let remaining = 2;
@@ -422,7 +422,7 @@ describe('schema', function() {
 
       it('boolean required', function(done) {
         const Animal = new Schema({
-          isFerret: {type: Boolean, required: true}
+          isFerret: { type: Boolean, required: true }
         });
 
         let remaining = 4;
@@ -450,7 +450,7 @@ describe('schema', function() {
 
       it('mixed required', function(done) {
         const Animal = new Schema({
-          characteristics: {type: Mixed, required: true}
+          characteristics: { type: Mixed, required: true }
         });
 
         let remaining = 4;
@@ -496,7 +496,7 @@ describe('schema', function() {
         }
 
         const Animal = new Schema({
-          ferret: {type: Boolean, validate: validator}
+          ferret: { type: Boolean, validate: validator }
         });
 
         Animal.path('ferret').doValidate(true, function(err) {
@@ -568,7 +568,7 @@ describe('schema', function() {
           assert.ifError(err);
           assert.equal(called, true);
           done();
-        }, {a: 'b'});
+        }, { a: 'b' });
       });
     });
 
@@ -576,16 +576,16 @@ describe('schema', function() {
       describe('are customizable', function() {
         it('within schema definitions', function(done) {
           const schema = new Schema({
-            name: {type: String, enum: ['one', 'two']},
-            myenum: {type: String, enum: {values: ['x'], message: 'enum validator failed for path: {PATH} with {VALUE}'}},
-            requiredString1: {type: String, required: true},
-            requiredString2: {type: String, required: 'oops, {PATH} is missing. {TYPE}'},
-            matchString0: {type: String, match: /bryancranston/},
-            matchString1: {type: String, match: [/bryancranston/, 'invalid string for {PATH} with value: {VALUE}']},
-            numMin0: {type: Number, min: 10},
-            numMin1: {type: Number, min: [10, 'hey, {PATH} is too small']},
-            numMax0: {type: Number, max: 20},
-            numMax1: {type: Number, max: [20, 'hey, {PATH} ({VALUE}) is greater than {MAX}']}
+            name: { type: String, enum: ['one', 'two'] },
+            myenum: { type: String, enum: { values: ['x'], message: 'enum validator failed for path: {PATH} with {VALUE}' } },
+            requiredString1: { type: String, required: true },
+            requiredString2: { type: String, required: 'oops, {PATH} is missing. {TYPE}' },
+            matchString0: { type: String, match: /bryancranston/ },
+            matchString1: { type: String, match: [/bryancranston/, 'invalid string for {PATH} with value: {VALUE}'] },
+            numMin0: { type: Number, min: 10 },
+            numMin1: { type: Number, min: [10, 'hey, {PATH} is too small'] },
+            numMax0: { type: Number, max: 20 },
+            numMax1: { type: Number, max: [20, 'hey, {PATH} ({VALUE}) is greater than {MAX}'] }
           });
 
           const A = mongoose.model('schema-validation-messages-' + random(), schema);
@@ -628,10 +628,10 @@ describe('schema', function() {
           };
           const validator = [validate, '{PATH} failed validation ({VALUE})'];
 
-          const schema = new Schema({x: {type: [], validate: validator}});
+          const schema = new Schema({ x: { type: [], validate: validator } });
           const M = mongoose.model('custom-validator-' + random(), schema);
 
-          const m = new M({x: [3, 4, 5, 6]});
+          const m = new M({ x: [3, 4, 5, 6] });
 
           m.validate(function(err) {
             assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
@@ -657,7 +657,7 @@ describe('schema', function() {
           });
           const M = mongoose.model('custom-validator-async-' + random(), schema);
 
-          const m = new M({x: 'test'});
+          const m = new M({ x: 'test' });
 
           m.validate(function(err) {
             assert.ok(err.errors['x']);
@@ -684,7 +684,7 @@ describe('schema', function() {
           });
           const M = mongoose.model('gh5125', schema);
 
-          const m = new M({x: 'test'});
+          const m = new M({ x: 'test' });
 
           m.validate(function(err) {
             assert.ok(err.errors['x']);
@@ -710,7 +710,7 @@ describe('schema', function() {
           });
           const M = mongoose.model('gh5171', schema);
 
-          const m = new M({x: 'not test'});
+          const m = new M({ x: 'not test' });
 
           m.validate(function(err) {
             assert.ok(err.errors['x']);
@@ -733,7 +733,7 @@ describe('schema', function() {
           });
           const M = mongoose.model('gh-2132', schema, 'gh-2132');
 
-          const m = new M({x: 'a'});
+          const m = new M({ x: 'a' });
           m.validate(function(err) {
             assert.equal(err.errors.x.toString(), 'Error code 25');
             assert.equal(err.errors.x.properties.message, 'Error code 25');
@@ -756,7 +756,7 @@ describe('schema', function() {
           });
           const M = mongoose.model('gh-1936', schema, 'gh-1936');
 
-          const m = new M({x: 'whatever'});
+          const m = new M({ x: 'whatever' });
           m.validate(function(err) {
             assert.equal(err.errors.x.toString(), 'Custom message');
             done();
@@ -774,10 +774,10 @@ describe('schema', function() {
 
           const validator = [validate, '{PATH} failed validation ({VALUE})', 'customType'];
 
-          const schema = new Schema({x: {type: [], validate: validator}});
+          const schema = new Schema({ x: { type: [], validate: validator } });
           const M = mongoose.model('custom-validator-' + random(), schema);
 
-          const m = new M({x: [3, 4, 5, 6]});
+          const m = new M({ x: [3, 4, 5, 6] });
 
           m.validate(function(err) {
             assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
@@ -793,12 +793,12 @@ describe('schema', function() {
           }
 
           const validator = [
-            {validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
+            { validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType' }
           ];
-          const schema = new Schema({x: {type: [], validate: validator}});
+          const schema = new Schema({ x: { type: [], validate: validator } });
           const M = mongoose.model('custom-validator-' + random(), schema);
 
-          const m = new M({x: [3, 4, 5, 6]});
+          const m = new M({ x: [3, 4, 5, 6] });
 
           m.validate(function(err) {
             assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
@@ -810,7 +810,7 @@ describe('schema', function() {
     });
 
     it('should clear validator errors (gh-2302)', function(done) {
-      const userSchema = new Schema({name: {type: String, required: true}});
+      const userSchema = new Schema({ name: { type: String, required: true } });
       const User = mongoose.model('gh-2302', userSchema, 'gh-2302');
 
       const user = new User();
@@ -830,15 +830,15 @@ describe('schema', function() {
     it('should allow an array of enums (gh-661)', function(done) {
       const validBreakfastFoods = ['bacon', 'eggs', 'steak', 'coffee', 'butter'];
       const breakfastSchema = new Schema({
-        foods: [{type: String, enum: validBreakfastFoods}]
+        foods: [{ type: String, enum: validBreakfastFoods }]
       });
       const Breakfast = mongoose.model('gh-661', breakfastSchema, 'gh-661');
 
-      const goodBreakfast = new Breakfast({foods: ['eggs', 'bacon']});
+      const goodBreakfast = new Breakfast({ foods: ['eggs', 'bacon'] });
       goodBreakfast.validate(function(error) {
         assert.ifError(error);
 
-        const badBreakfast = new Breakfast({foods: ['tofu', 'waffles', 'coffee']});
+        const badBreakfast = new Breakfast({ foods: ['tofu', 'waffles', 'coffee'] });
         badBreakfast.validate(function(error) {
           assert.ok(error);
           assert.ok(error.errors['foods.0']);
@@ -857,7 +857,7 @@ describe('schema', function() {
     it('should allow an array of subdocuments with enums (gh-3521)', function(done) {
       const coolSchema = new Schema({
         votes: [{
-          vote: {type: String, enum: ['cool', 'not-cool']}
+          vote: { type: String, enum: ['cool', 'not-cool'] }
         }]
       });
       const Cool = mongoose.model('gh-3521', coolSchema, 'gh-3521');
@@ -924,8 +924,8 @@ describe('schema', function() {
     });
 
     it('doesnt do double validation on document arrays (gh-2618)', function(done) {
-      const A = new Schema({str: String});
-      let B = new Schema({a: [A]});
+      const A = new Schema({ str: String });
+      let B = new Schema({ a: [A] });
       let validateCalls = 0;
       B.path('a').validate(function() {
         ++validateCalls;
@@ -935,7 +935,7 @@ describe('schema', function() {
       B = mongoose.model('b', B);
 
       const p = new B();
-      p.a.push({str: 'asdf'});
+      p.a.push({ str: 'asdf' });
       p.validate(function(err) {
         assert.ifError(err);
         assert.equal(validateCalls, 1);
@@ -957,7 +957,7 @@ describe('schema', function() {
               value: {
                 type: Boolean,
                 required: false,
-                validate: {validator: myValidator}
+                validate: { validator: myValidator }
               }
             })]
           }
@@ -1040,7 +1040,7 @@ describe('schema', function() {
       });
       const Breakfast = mongoose.model('gh-2611', breakfastSchema, 'gh-2611');
 
-      const bad = new Breakfast({eggs: 'none'});
+      const bad = new Breakfast({ eggs: 'none' });
       bad.validate(function(error) {
         assert.ok(error);
         done();
@@ -1048,11 +1048,11 @@ describe('schema', function() {
     });
 
     it('handles multiple subdocument errors (gh-2589)', function(done) {
-      const foodSchema = new Schema({name: {type: String, required: true, enum: ['bacon', 'eggs']}});
-      const breakfast = new Schema({foods: [foodSchema], id: Number});
+      const foodSchema = new Schema({ name: { type: String, required: true, enum: ['bacon', 'eggs'] } });
+      const breakfast = new Schema({ foods: [foodSchema], id: Number });
 
       const Breakfast = mongoose.model('gh-2589', breakfast, 'gh-2589');
-      const bad = new Breakfast({foods: [{name: 'tofu'}, {name: 'waffles'}], id: 'Not a number'});
+      const bad = new Breakfast({ foods: [{ name: 'tofu' }, { name: 'waffles' }], id: 'Not a number' });
       bad.validate(function(error) {
         assert.ok(error);
         assert.deepEqual(['id', 'foods.0.name', 'foods.1.name'], Object.keys(error.errors));
@@ -1061,26 +1061,26 @@ describe('schema', function() {
     });
 
     it('handles subdocument cast errors (gh-2819)', function(done) {
-      const foodSchema = new Schema({eggs: {type: Number, required: true}});
-      const breakfast = new Schema({foods: [foodSchema], id: Number});
+      const foodSchema = new Schema({ eggs: { type: Number, required: true } });
+      const breakfast = new Schema({ foods: [foodSchema], id: Number });
 
       const Breakfast = mongoose.model('gh-2819', breakfast, 'gh-2819');
 
       // Initially creating subdocs with cast errors
-      const bad = new Breakfast({foods: [{eggs: 'Not a number'}], id: 'Not a number'});
+      const bad = new Breakfast({ foods: [{ eggs: 'Not a number' }], id: 'Not a number' });
       bad.validate(function(error) {
         assert.ok(error);
         assert.deepEqual(['foods.0.eggs', 'id'], Object.keys(error.errors).sort());
         assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
 
         // Pushing docs with cast errors
-        bad.foods.push({eggs: 'Also not a number'});
+        bad.foods.push({ eggs: 'Also not a number' });
         bad.validate(function(error) {
           assert.deepEqual(['foods.0.eggs', 'foods.1.eggs', 'id'], Object.keys(error.errors).sort());
           assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
 
           // Splicing docs with cast errors
-          bad.foods.splice(1, 1, {eggs: 'fail1'}, {eggs: 'fail2'});
+          bad.foods.splice(1, 1, { eggs: 'fail1' }, { eggs: 'fail2' });
           bad.validate(function(error) {
             assert.deepEqual(['foods.0.eggs', 'foods.1.eggs', 'foods.2.eggs', 'id'], Object.keys(error.errors).sort());
             assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
@@ -1095,7 +1095,7 @@ describe('schema', function() {
               assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
 
               // Remove the cast error using array.set()
-              bad.foods.set(1, {eggs: 1});
+              bad.foods.set(1, { eggs: 1 });
               bad.validate(function(error) {
                 assert.deepEqual(['foods.0.eggs', 'id'], Object.keys(error.errors).sort());
                 assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
@@ -1109,7 +1109,7 @@ describe('schema', function() {
     });
 
     it('fails when you try to set a nested path to a primitive (gh-2592)', function(done) {
-      const breakfast = new Schema({foods: {bacon: Number, eggs: Number}});
+      const breakfast = new Schema({ foods: { bacon: Number, eggs: Number } });
 
       const Breakfast = mongoose.model('gh-2592', breakfast, 'gh-2592');
 
@@ -1125,7 +1125,7 @@ describe('schema', function() {
     });
 
     it('doesnt execute other validators if required fails (gh-2725)', function(done) {
-      const breakfast = new Schema({description: {type: String, required: true, maxlength: 50}});
+      const breakfast = new Schema({ description: { type: String, required: true, maxlength: 50 } });
 
       const Breakfast = mongoose.model('gh2725', breakfast, 'gh2725');
       const bad = new Breakfast({});
@@ -1138,7 +1138,7 @@ describe('schema', function() {
     });
 
     it('doesnt execute other validators if required fails (gh-3025)', function(done) {
-      const breakfast = new Schema({description: {type: String, required: true, maxlength: 50}});
+      const breakfast = new Schema({ description: { type: String, required: true, maxlength: 50 } });
 
       const Breakfast = mongoose.model('gh3025', breakfast, 'gh3025');
       const bad = new Breakfast({});
@@ -1152,8 +1152,8 @@ describe('schema', function() {
 
     it('validateSync allows you to filter paths (gh-3153)', function(done) {
       const breakfast = new Schema({
-        description: {type: String, required: true, maxlength: 50},
-        other: {type: String, required: true}
+        description: { type: String, required: true, maxlength: 50 },
+        other: { type: String, required: true }
       });
 
       const Breakfast = mongoose.model('gh3153', breakfast, 'gh3153');
@@ -1168,7 +1168,7 @@ describe('schema', function() {
     });
 
     it('adds required validators to the front of the list (gh-2843)', function(done) {
-      const breakfast = new Schema({description: {type: String, maxlength: 50, required: true}});
+      const breakfast = new Schema({ description: { type: String, maxlength: 50, required: true } });
 
       const Breakfast = mongoose.model('gh2843', breakfast, 'gh2843');
       const bad = new Breakfast({});
@@ -1190,7 +1190,7 @@ describe('schema', function() {
       });
 
       const Breakfast = mongoose.model('gh2832', breakfast, 'gh2832');
-      Breakfast.create({description: undefined}, function(error) {
+      Breakfast.create({ description: undefined }, function(error) {
         assert.ok(error);
         const errorMessage = 'ValidationError: description: Cast to String failed for value "undefined" at path "description"';
         assert.equal(errorMessage, error.toString());
@@ -1202,13 +1202,13 @@ describe('schema', function() {
 
     it('allows you to validate embedded doc that was .create()-ed (gh-2902) (gh-2929)', function(done) {
       const parentSchema = mongoose.Schema({
-        children: [{name: {type: String, required: true}}]
+        children: [{ name: { type: String, required: true } }]
       });
 
       const Parent = mongoose.model('gh2902', parentSchema);
 
       const p = new Parent();
-      const n = p.children.create({name: '2'});
+      const n = p.children.create({ name: '2' });
       n.validate(function(error) {
         assert.ifError(error);
         const bad = p.children.create({});
@@ -1233,7 +1233,7 @@ describe('schema', function() {
       });
       const M = mongoose.model('gh2885', s);
 
-      const m = new M({n: 'test'});
+      const m = new M({ n: 'test' });
       m.validate(function(error) {
         assert.ok(error);
         assert.equal(error.errors.n.kind, 'user defined');
@@ -1242,10 +1242,10 @@ describe('schema', function() {
     });
 
     it('enums report kind (gh-3009)', function(done) {
-      const s = mongoose.Schema({n: {type: String, enum: ['a', 'b']}});
+      const s = mongoose.Schema({ n: { type: String, enum: ['a', 'b'] } });
       const M = mongoose.model('gh3009', s);
 
-      const m = new M({n: 'test'});
+      const m = new M({ n: 'test' });
       m.validate(function(error) {
         assert.ok(error);
         assert.equal(error.errors.n.kind, 'enum');

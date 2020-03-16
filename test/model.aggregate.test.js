@@ -23,21 +23,18 @@ const userSchema = new Schema({
   age: Number
 });
 
-const collection = 'aggregate_' + random();
-mongoose.model('Aggregate', userSchema);
-
 describe('model aggregate', function() {
   this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
-  const group = {$group: {_id: null, maxAge: {$max: '$age'}}};
-  const project = {$project: {maxAge: 1, _id: 0}};
+  const group = { $group: { _id: null, maxAge: { $max: '$age' } } };
+  const project = { $project: { maxAge: 1, _id: 0 } };
   let db, A, maxAge;
 
   let mongo26_or_greater = false;
 
   before(function(done) {
     db = start();
-    A = db.model('Aggregate', collection);
+    A = db.model('Test', userSchema);
 
     const authors = 'guillermo nathan tj damian marco'.split(' ');
     const num = 10;
@@ -47,7 +44,7 @@ describe('model aggregate', function() {
     for (let i = 0; i < num; ++i) {
       const age = Math.random() * 100 | 0;
       maxAge = Math.max(maxAge, age);
-      docs.push({author: authors[i % authors.length], age: age});
+      docs.push({ author: authors[i % authors.length], age: age });
     }
 
     A.create(docs, function(err) {

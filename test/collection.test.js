@@ -21,14 +21,14 @@ describe('collections:', function() {
       }
       assert.ok(connected);
       assert.ok(insertedId !== undefined);
-      collection.findOne({_id: insertedId}).then(doc => {
+      collection.findOne({ _id: insertedId }).then(doc => {
         assert.strictEqual(doc.foo, 'bar');
         db.close();
         done();
       });
     }
 
-    collection.insertOne({foo:'bar'}, {}, function(err, result) {
+    collection.insertOne({ foo: 'bar' }, {}, function(err, result) {
       assert.ok(connected);
       insertedId = result.insertedId;
       finish();
@@ -45,9 +45,9 @@ describe('collections:', function() {
     const db = mongoose.createConnection();
     const collection = db.collection('gh7676');
 
-    const promise = collection.insertOne({foo:'bar'}, {})
+    const promise = collection.insertOne({ foo: 'bar' }, {})
       .then(result =>
-        collection.findOne({_id: result.insertedId})
+        collection.findOne({ _id: result.insertedId })
       ).then(doc => {
         assert.strictEqual(doc.foo, 'bar');
       });

@@ -16,22 +16,25 @@ describe('QueryCursor', function() {
   let db;
   let Model;
 
-  before(function(done) {
+  before(function() {
     db = start();
-
-    const schema = new Schema({ name: String });
-    schema.virtual('test').get(function() { return 'test'; });
-
-    Model = db.model('gh1907_0', schema);
-
-    Model.create({ name: 'Axl' }, { name: 'Slash' }, function(error) {
-      assert.ifError(error);
-      done();
-    });
   });
 
   after(function(done) {
     db.close(done);
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+
+  afterEach(() => require('./util').clearTestData(db));
+
+  beforeEach(function() {
+    const schema = new Schema({ name: String });
+    schema.virtual('test').get(function() { return 'test'; });
+
+    Model = db.model('Test', schema);
+
+    return Model.create({ name: 'Axl' }, { name: 'Slash' });
   });
 
   describe('#next()', function() {
@@ -81,7 +84,7 @@ describe('QueryCursor', function() {
         name: String,
         born: String
       });
-      const Person = db.model('Person4342', personSchema);
+      const Person = db.model('Person', personSchema);
       const people = [
         { name: 'Axl Rose', born: 'William Bruce Rose' },
         { name: 'Slash', born: 'Saul Hudson' }
@@ -108,14 +111,14 @@ describe('QueryCursor', function() {
     it('with populate', function(done) {
       const bandSchema = new Schema({
         name: String,
-        members: [{ type: mongoose.Schema.ObjectId, ref: 'Person1907' }]
+        members: [{ type: mongoose.Schema.ObjectId, ref: 'Person' }]
       });
       const personSchema = new Schema({
         name: String
       });
 
-      const Person = db.model('Person1907', personSchema);
-      const Band = db.model('Band1907', bandSchema);
+      const Person = db.model('Person', personSchema);
+      const Band = db.model('Band', bandSchema);
 
       const people = [
         { name: 'Axl Rose' },
@@ -173,7 +176,7 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('with pre-find hooks (gh-5096)', function(done) {
+    it('with pre-find hooks (gh-5096)', function() {
       const schema = new Schema({ name: String });
       let called = 0;
       schema.pre('find', function(next) {
@@ -181,15 +184,16 @@ describe('QueryCursor', function() {
         next();
       });
 
-      const Model = db.model('gh5096', schema);
-      Model.create({ name: 'Test' }, function(error) {
-        assert.ifError(error);
-        Model.find().cursor().next(function(error, doc) {
-          assert.ifError(error);
-          assert.equal(called, 1);
-          assert.equal(doc.name, 'Test');
-          done();
-        });
+      db.deleteModel(/Test/);
+      const Model = db.model('Test', schema);
+
+      return co(function*() {
+        yield Model.deleteMany({});
+        yield Model.create({ name: 'Test' });
+
+        const doc = yield Model.find().cursor().next();
+        assert.equal(called, 1);
+        assert.equal(doc.name, 'Test');
       });
     });
   });
@@ -400,9 +404,11 @@ describe('QueryCursor', function() {
 
   it('handles non-boolean lean option (gh-7137)', function() {
     const schema = new Schema({ name: String });
-    const Model = db.model('gh7137', schema);
+    db.deleteModel(/Test/);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
+      yield Model.deleteMany({});
       yield Model.create({ name: 'test' });
 
       let doc;
@@ -417,10 +423,10 @@ describe('QueryCursor', function() {
 
   it('addCursorFlag (gh-4814)', function(done) {
     const userSchema = new mongoose.Schema({
-      name:  String
+      name: String
     });
 
-    const User = db.model('gh4814', userSchema);
+    const User = db.model('User', userSchema);
 
     const cursor = User.find().cursor().addCursorFlag('noCursorTimeout', true);
 
@@ -432,10 +438,10 @@ describe('QueryCursor', function() {
 
   it('data before close (gh-4998)', function(done) {
     const userSchema = new mongoose.Schema({
-      name:  String
+      name: String
     });
 
-    const User = db.model('gh4998', userSchema);
+    const User = db.model('User', userSchema);
     const users = [];
     for (let i = 0; i < 100; i++) {
       users.push({
@@ -478,7 +484,7 @@ describe('QueryCursor', function() {
 
   it('pulls schema-level readPreference (gh-8421)', function() {
     const read = 'secondaryPreferred';
-    const User = db.model('gh8421', Schema({ name: String }, { read }));
+    const User = db.model('User', Schema({ name: String }, { read }));
     const cursor = User.find().cursor();
 
     assert.equal(cursor.options.readPreference.mode, read);
@@ -486,7 +492,7 @@ describe('QueryCursor', function() {
 
   it('eachAsync() with parallel > numDocs (gh-8422)', function() {
     const schema = new mongoose.Schema({ name: String });
-    const Movie = db.model('gh8422', schema);
+    const Movie = db.model('Movie', schema);
 
     return co(function*() {
       yield Movie.create([

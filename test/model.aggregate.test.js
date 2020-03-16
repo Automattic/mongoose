@@ -23,9 +23,6 @@ const userSchema = new Schema({
   age: Number
 });
 
-const collection = 'aggregate_' + random();
-mongoose.model('Aggregate', userSchema);
-
 describe('model aggregate', function() {
   this.timeout(process.env.TRAVIS ? 8000 : 4500);
 
@@ -37,7 +34,7 @@ describe('model aggregate', function() {
 
   before(function(done) {
     db = start();
-    A = db.model('Aggregate', collection);
+    A = db.model('Test', userSchema);
 
     const authors = 'guillermo nathan tj damian marco'.split(' ');
     const num = 10;

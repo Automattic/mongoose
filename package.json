@@ -32,7 +32,6 @@
     "sift": "7.0.1"
   },
   "devDependencies": {
-    "acorn": "5.7.3",
     "acquit": "1.x",
     "acquit-ignore": "0.1.x",
     "acquit-require": "0.1.x",

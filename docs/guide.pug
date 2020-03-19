@@ -74,7 +74,7 @@ block content
     Notice above that if a property only requires a type, it can be specified using
     a shorthand notation (contrast the `title` property above with the `date`
     property).
-    
+
     Keys may also be assigned nested objects containing further key/type definitions
     like the `meta` property above.  This will happen whenever a key's value is a POJO
     that lacks a bona-fide `type` property.  In these cases, only the leaves in a tree
@@ -148,7 +148,7 @@ block content
 
     const doc = new Model();
     await doc.save(); // Throws "document must have an _id before saving"
-    
+
     doc._id = 1;
     await doc.save(); // works
     ```
@@ -239,6 +239,8 @@ block content
     Defining indexes at the schema level is necessary when creating
     [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
+    Please note that the field names within the [index](./api/schema.html#schema_Schema-index) method, should be wrapped within single quotes.
+
     ```javascript
       var animalSchema = new Schema({
         name: String,
@@ -246,7 +248,7 @@ block content
         tags: { type: [String], index: true } // field level
       });
 
-      animalSchema.index({ name: 1, type: -1 }); // schema level
+      animalSchema.index({ 'name': 1, 'type': -1 }); // schema level
     ```
 
     When your application starts up, Mongoose automatically calls [`createIndex`](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) for each defined index in your schema.
@@ -463,7 +465,7 @@ block content
     a capped collection if you set the [`capped` schema option](#capped). Like
     `autoIndex`, setting `autoCreate` to true is helpful for development and
     test environments.
-    
+
     Unfortunately, `createCollection()` cannot change an existing collection.
     For example, if you add `capped: 1024` to your schema and the existing
     collection is not capped, `createCollection()` will throw an error.

@@ -5540,7 +5540,9 @@ describe('Model', function() {
 
         return co(function*() {
           const createdUser = yield User.create({ name: 'Hafez' });
-          let threw = false;
+
+          let err;
+
           try {
             yield User.bulkWrite([{
               updateOne: {
@@ -5548,17 +5550,16 @@ describe('Model', function() {
               }
             }]);
           }
-          catch (err) {
-            threw = true;
-            assert.equal(err.message, 'Must provide an update object.');
+          catch (_err) {
+            err = _err;
           }
-          finally {
-            assert.equal(threw, true);
 
-            const userAfterUpdate = yield User.findOne({ _id: createdUser._id });
+          assert.ok(err);
+          assert.equal(err.message, 'Must provide an update object.');
 
-            assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
-          }
+          const userAfterUpdate = yield User.findOne({ _id: createdUser._id });
+
+          assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
         });
       });
     });

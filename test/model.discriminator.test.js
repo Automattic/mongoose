@@ -1345,6 +1345,7 @@ describe('model', function() {
         }
       }
 
+      mongoose.deleteModel(/Test/);
       const UserModel = mongoose.model(Test, new mongoose.Schema({}));
 
       const u = new UserModel({});

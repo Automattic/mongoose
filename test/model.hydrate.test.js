@@ -43,9 +43,9 @@ describe('model', function() {
       });
 
       db = start();
-      B = db.model('model-create', schemaB, 'gh-2637-1');
+      B = db.model('Test', schemaB);
       B.discriminator('C', schemaC);
-      Breakfast = db.model('gh-2637-2', breakfastSchema, 'gh-2637-2');
+      Breakfast = db.model('Test1', breakfastSchema);
 
       return db;
     });

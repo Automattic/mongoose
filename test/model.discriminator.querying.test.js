@@ -818,13 +818,13 @@ describe('model', function() {
           pin: { type: String, required: true, index: { unique: true } },
           totalAttendees: { type: Number },
           speakers: [{ type: Schema.Types.ObjectId, ref: 'Speaker' }],
-          surveys: [{ type: Schema.Types.ObjectId, ref: 'Survey' }],
+          surveys: [{ type: Schema.Types.ObjectId, ref: 'Test' }],
           questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }]
         });
 
         const Talk = Event.discriminator('Talk', TalkSchema);
 
-        const Survey = db.model('Survey', Schema({
+        const Survey = db.model('Test', Schema({
           name: String,
           date: Date
         }));

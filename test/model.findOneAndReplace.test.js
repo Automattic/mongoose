@@ -8,7 +8,6 @@ const start = require('./common');
 
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -18,12 +17,20 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 describe('model: findOneAndReplace:', function() {
   let Comments;
   let BlogPost;
-  let modelname;
-  let collection;
-  let strictSchema;
   let db;
 
   before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
+  beforeEach(function() {
     Comments = new Schema;
 
     Comments.add({
@@ -67,23 +74,11 @@ describe('model: findOneAndReplace:', function() {
       return this;
     });
 
-    modelname = 'ReplaceOneBlogPost';
-    mongoose.model(modelname, BlogPost);
-
-    collection = 'replaceoneblogposts';
-
-    strictSchema = new Schema({ name: String }, { strict: true });
-    mongoose.model('ReplaceOneStrictSchema', strictSchema);
-
-    db = start();
-  });
-
-  after(function(done) {
-    db.close(done);
+    BlogPost = db.model('BlogPost', BlogPost);
   });
 
   it('returns the original document', function() {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
     const title = 'remove muah';
 
     const post = new M({ title: title });
@@ -98,7 +93,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
 
     const now = new Date;
     let query;
@@ -134,7 +129,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    const M = db.model(modelname, collection + random());
+    const M = BlogPost;
     let pending = 5;
 
     M.findOneAndReplace({ name: 'aaron1' }, { select: 'name' }, cb);
@@ -152,7 +147,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
     let err;
 
     try {
@@ -166,7 +161,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
     let err;
 
     try {
@@ -180,7 +175,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    const M = db.model(modelname, collection + random());
+    const M = BlogPost;
     const _id = new DocumentObjectId;
     let pending = 2;
 
@@ -196,7 +191,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('returns the original document', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
     const title = 'remove muah pleez';
 
     const post = new M({ title: title });
@@ -215,7 +210,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
     const _id = new DocumentObjectId();
 
     let query;
@@ -237,7 +232,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
@@ -246,7 +241,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { select: { author: 1, title: 0 } });
     assert.strictEqual(1, query._fields.author);
@@ -255,7 +250,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('supports v3 sort string syntax', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { sort: 'author -title' });
     assert.equal(Object.keys(query.options.sort).length, 2);
@@ -265,7 +260,7 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    const M = db.model(modelname, collection);
+    const M = BlogPost;
 
     const query = M.findOneAndReplace({}, {}, { sort: { author: 1, title: -1 } });
     assert.equal(Object.keys(query.options.sort).length, 2);
@@ -275,8 +270,8 @@ describe('model: findOneAndReplace:', function() {
   });
 
   it('supports population (gh-1395)', function(done) {
-    const M = db.model('A', { name: String });
-    const N = db.model('B', { a: { type: Schema.ObjectId, ref: 'A' }, i: Number });
+    const M = db.model('Test1', { name: String });
+    const N = db.model('Test2', { a: { type: Schema.ObjectId, ref: 'Test1' }, i: Number });
 
     M.create({ name: 'i am an A' }, function(err, a) {
       if (err) return done(err);
@@ -309,7 +304,7 @@ describe('model: findOneAndReplace:', function() {
           }
         }
       });
-      const Model = db.model('gh6203', userSchema);
+      const Model = db.model('Test', userSchema);
 
       yield Model.findOneAndReplace({ foo: '123' }, { name: 'bar' });
 
@@ -334,7 +329,7 @@ describe('model: findOneAndReplace:', function() {
         ++postCount;
       });
 
-      const Breakfast = db.model('gh-439', s);
+      const Breakfast = db.model('Test', s);
       const breakfast = new Breakfast({
         base: 'eggs'
       });
@@ -371,7 +366,7 @@ describe('model: findOneAndReplace:', function() {
         ++postCount;
       });
 
-      const Breakfast = db.model('Breakfast', s);
+      const Breakfast = db.model('Test', s);
       const breakfast = new Breakfast({
         base: 'eggs'
       });
@@ -394,7 +389,7 @@ describe('model: findOneAndReplace:', function() {
 
   it('works (gh-7654)', function() {
     const schema = new Schema({ name: String, age: Number });
-    const Model = db.model('gh7654', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, { upsert: true });
@@ -412,7 +407,7 @@ describe('model: findOneAndReplace:', function() {
 
   it('schema-level projection (gh-7654)', function() {
     const schema = new Schema({ name: String, age: { type: Number, select: false } });
-    const Model = db.model('gh7654_0', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       const doc = yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
@@ -426,7 +421,7 @@ describe('model: findOneAndReplace:', function() {
 
   it('supports `new` in addition to `returnOriginal` (gh-7846)', function() {
     const schema = new Schema({ name: String, age: Number });
-    const Model = db.model('gh7846', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       const doc = yield Model.findOneAndReplace({}, { name: 'Jean-Luc Picard', age: 59 }, {
@@ -440,7 +435,7 @@ describe('model: findOneAndReplace:', function() {
 
   it('orFail() (gh-8030)', function() {
     const schema = Schema({ name: String, age: Number });
-    const Model = db.model('gh8030', schema);
+    const Model = db.model('Test', schema);
 
     return co(function*() {
       let err = yield Model.findOneAndReplace({}, { name: 'test' }).orFail().

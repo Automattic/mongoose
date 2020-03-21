@@ -2937,7 +2937,7 @@ describe('model: populate:', function() {
           }).save();
         }).
         then(function(basket) {
-          return basket.populate('balls.ball').execPopulate();
+          return basket.populate('balls.ball');
         }).
         then(function(basket) {
           assert.equal(basket.balls[0].ball.seam, 'yarn');
@@ -3007,7 +3007,7 @@ describe('model: populate:', function() {
       function test(id) {
         Parent.findById(id, function(error, doc) {
           assert.ifError(error);
-          doc.populate('children.toy.value').execPopulate().then(function(doc) {
+          doc.populate('children.toy.value').then(function(doc) {
             assert.equal(doc.children[0].toy.value.name, 'model-A');
             assert.equal(doc.children[1].toy.value, null);
             assert.equal(doc.children[2].toy.value.name, 'model-B');
@@ -3291,7 +3291,7 @@ describe('model: populate:', function() {
       ]);
 
       let agent = yield Agent.findOne({});
-      yield agent.populate('coopBrands.products').execPopulate();
+      yield agent.populate('coopBrands.products');
       agent = agent.toObject({ virtuals: true });
       assert.equal(agent.coopBrands[0].products.length, 2);
       assert.deepEqual(agent.coopBrands[1].products, []);
@@ -4089,7 +4089,7 @@ describe('model: populate:', function() {
       Demo.create({ name: 'test' }).
         then(function(demo) { return DemoWrapper.create({ demo: [demo._id] }); }).
         then(function(wrapper) { return DemoWrapper.findById(wrapper._id); }).
-        then(function(doc) { return doc.populate('demo').execPopulate(); }).
+        then(function(doc) { return doc.populate('demo'); }).
         then(function(res) {
           assert.equal(res.demo.toObject()[0].name, 'test');
           done();
@@ -5868,7 +5868,7 @@ describe('model: populate:', function() {
             return Team.findById(team._id);
           }).
           then(function(team) {
-            return team.populate('people.parent').execPopulate();
+            return team.populate('people.parent');
           }).
           then(function(team) {
             team = team.toObject({ virtuals: true });
@@ -5967,7 +5967,7 @@ describe('model: populate:', function() {
             return Child.findById(c._id);
           }).
           then(function(c) {
-            return c.populate('parent').execPopulate();
+            return c.populate('parent');
           }).
           then(function(c) {
             c = c.toObject({ virtuals: true });
@@ -6166,7 +6166,7 @@ describe('model: populate:', function() {
             return person.populate({
               path: 'bandDetails',
               match: { active: { $eq: true } }
-            }).execPopulate();
+            });
           }).
           then(function(person) {
             person = person.toObject({ virtuals: true });
@@ -6212,7 +6212,7 @@ describe('model: populate:', function() {
             return person.populate({
               path: 'bandDetails',
               match: { active: { $eq: true } }
-            }).execPopulate();
+            });
           }).
           then(function(person) {
             person = person.toObject({ virtuals: true });
@@ -6276,7 +6276,7 @@ describe('model: populate:', function() {
             return Test.create({ users: [user._id] });
           }).
           then(function(test) {
-            const promise = test.populate('users').execPopulate();
+            const promise = test.populate('users');
             assert.ok(!test.populated('users'));
             return promise;
           }).
@@ -7490,7 +7490,7 @@ describe('model: populate:', function() {
       p.children.push({ child: child });
       yield p.save();
 
-      p = yield p.populate(parentFieldsToPopulate).execPopulate();
+      p = yield p.populate(parentFieldsToPopulate);
       assert.ok(p.children[0].child);
       assert.equal(p.children[0].child.name, 'test');
     });
@@ -8010,7 +8010,7 @@ describe('model: populate:', function() {
       assert.equal(doc.children, null);
 
       doc = yield Parent.findOne();
-      yield doc.populate('childCount').execPopulate();
+      yield doc.populate('childCount');
       assert.equal(doc.childCount, 2);
       assert.equal(doc.children, null);
     });
@@ -8224,15 +8224,13 @@ describe('model: populate:', function() {
       assert.ok(!doc.arr1[0].arr2[1].item.name);
 
       doc = yield Model.findOne();
-      doc.populate('arr1.0.arr2.1.item');
-      yield doc.execPopulate();
+      yield doc.populate('arr1.0.arr2.1.item');
       assert.ok(!doc.arr1[0].arr2[0].item.name);
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
 
       doc = yield Model.findOne();
-      doc.populate('arr1.0.arr2.0.item');
-      doc.populate('arr1.0.arr2.1.item');
-      yield doc.execPopulate();
+      yield doc.populate('arr1.0.arr2.0.item');
+      yield doc.populate('arr1.0.arr2.1.item');
       assert.equal(doc.arr1[0].arr2[0].item.name, 'item1');
       assert.equal(doc.arr1[0].arr2[1].item.name, 'item2');
     });

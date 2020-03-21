@@ -267,26 +267,25 @@ describe('transactions', function() {
         then(article => assert.equal(article.author.name, 'Val'));
     });
 
-    it('`execPopulate()` uses the documents `$session()` by default', function() {
+    it('`Document#populate()` uses the documents `$session()` by default', function() {
       return Author.create([{ name: 'Val' }], { session: session }).
         then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
         // By default, the populate query should use the associated `$session()`
         then(articles => Article.findById(articles[0]._id).session(session)).
         then(article => {
           assert.ok(article.$session());
-          return article.populate('author').execPopulate();
+          return article.populate('author');
         }).
         then(article => assert.equal(article.author.name, 'Val'));
     });
 
-    it('`execPopulate()` supports overwriting the session', function() {
+    it('`Document#populate()` supports overwriting the session', function() {
       return Author.create([{ name: 'Val' }], { session: session }).
         then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
         then(() => Article.findOne().session(session)).
         then(article => {
           return article.
-            populate({ path: 'author', options: { session: null } }).
-            execPopulate();
+            populate({ path: 'author', options: { session: null } });
         }).
         then(article => assert.ok(!article.author));
     });

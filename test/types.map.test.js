@@ -371,7 +371,7 @@ describe('Map', function() {
         const doc = yield User.create({ apiKeys: { github: key._id, twitter: key2._id } });
 
         const _doc = yield User.findById(doc);
-        yield _doc.populate('apiKeys').execPopulate();
+        yield _doc.populate('apiKeys');
 
         assert.equal(_doc.apiKeys.get('github').key, 'abc123');
         assert.equal(_doc.apiKeys.get('twitter').key, 'key');

@@ -10,7 +10,6 @@ const start = require('./common');
 const Document = require('../lib/document');
 const assert = require('assert');
 const co = require('co');
-const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

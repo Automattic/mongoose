@@ -1056,7 +1056,7 @@ describe('document', function() {
           return Child.findById(child._id);
         }).
         then(function(child) {
-          return child.values.populate('toy').execPopulate().then(function() {
+          return child.values.populate('toy').then(function() {
             return child;
           });
         }).
@@ -2892,7 +2892,7 @@ describe('document', function() {
           Parent.findOne({ _id: doc._id }, function(error, doc) {
             assert.ifError(error);
             assert.ok(doc);
-            doc.populate('children').execPopulate().then(function(doc) {
+            doc.populate('children').then(function(doc) {
               assert.equal(doc.children.length, 1);
               assert.equal(doc.children[0].name, 'Luke Skywalker');
               done();
@@ -5986,7 +5986,7 @@ describe('document', function() {
       return Author.create({ name: 'Victor Hugo' }).
         then(function(author) { return Book.create({ author: author._id }); }).
         then(function() { return Book.findOne(); }).
-        then(function(doc) { return doc.populate('author').execPopulate(); }).
+        then(function(doc) { return doc.populate('author'); }).
         then(function(doc) {
           doc.author = {};
           assert.ok(!doc.author.name);

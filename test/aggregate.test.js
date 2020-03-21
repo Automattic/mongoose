@@ -1319,7 +1319,7 @@ describe('aggregate: ', function() {
 
     const cursor = MyModel.
       aggregate([{ $match: { name: 'test' } }]).
-      addCursorFlag('noCursorTimeout', true).
+      option({ noCursorTimeout: true }).
       cursor().
       exec();
 

@@ -411,7 +411,7 @@ describe('aggregate: ', function() {
       assert.equal(aggregate._model, null);
       assert.equal(aggregate.model(), null);
 
-      assert.equal(aggregate.model(model), aggregate);
+      assert.equal(aggregate.model(model), model);
       assert.equal(aggregate._model, model);
       assert.equal(aggregate.model(), model);
 
@@ -623,10 +623,9 @@ describe('aggregate: ', function() {
     });
 
     it('project', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         project({ sal: 1, sal_k: { $divide: ['$sal', 1000] } }).
         exec(function(err, docs) {
           assert.ifError(err);
@@ -639,10 +638,9 @@ describe('aggregate: ', function() {
     });
 
     it('group', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         group({ _id: '$dept' }).
         exec(function(err, docs) {
           assert.ifError(err);
@@ -658,10 +656,9 @@ describe('aggregate: ', function() {
     });
 
     it('skip', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         skip(1).
         exec(function(err, docs) {
           assert.ifError(err);
@@ -672,10 +669,9 @@ describe('aggregate: ', function() {
     });
 
     it('limit', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         limit(3).
         exec(function(err, docs) {
           assert.ifError(err);
@@ -686,10 +682,9 @@ describe('aggregate: ', function() {
     });
 
     it('unwind', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         unwind('customers').
         exec(function(err, docs) {
           assert.ifError(err);
@@ -700,10 +695,9 @@ describe('aggregate: ', function() {
     });
 
     it('unwind with obj', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       const agg = aggregate.
-        model(db.model('Employee')).
         unwind({ path: '$customers', preserveNullAndEmptyArrays: true });
 
       assert.equal(agg._pipeline.length, 1);
@@ -713,12 +707,11 @@ describe('aggregate: ', function() {
     });
 
     it('unwind throws with bad arg', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       let threw = false;
       try {
         aggregate.
-          model(db.model('Employee')).
           unwind(36);
       } catch (err) {
         assert.ok(err.message.indexOf('to unwind()') !== -1);
@@ -729,10 +722,9 @@ describe('aggregate: ', function() {
     });
 
     it('match', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         match({ sal: { $gt: 15000 } }).
         exec(function(err, docs) {
           assert.ifError(err);
@@ -743,10 +735,9 @@ describe('aggregate: ', function() {
     });
 
     it('sort', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         sort('sal').
         exec(function(err, docs) {
           assert.ifError(err);
@@ -771,10 +762,9 @@ describe('aggregate: ', function() {
       });
 
       function test() {
-        const aggregate = new Aggregate();
+        const aggregate = new Aggregate([], db.model('Employee'));
 
         aggregate.
-          model(db.model('Employee')).
           graphLookup({
             from: 'Employee',
             startWith: '$reportsTo',
@@ -818,10 +808,9 @@ describe('aggregate: ', function() {
       });
 
       function test() {
-        const aggregate = new Aggregate();
+        const aggregate = new Aggregate([], db.model('Employee'));
 
         aggregate.
-          model(db.model('Employee')).
           facet({
             departments: [
               {
@@ -853,10 +842,9 @@ describe('aggregate: ', function() {
     });
 
     it('complex pipeline', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       aggregate.
-        model(db.model('Employee')).
         match({ sal: { $lt: 16000 } }).
         unwind('customers').
         project({ emp: '$name', cust: '$customers' }).
@@ -873,10 +861,9 @@ describe('aggregate: ', function() {
     });
 
     it('pipeline() (gh-5825)', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
 
       const pipeline = aggregate.
-        model(db.model('Employee')).
         match({ sal: { $lt: 16000 } }).
         pipeline();
 
@@ -885,7 +872,7 @@ describe('aggregate: ', function() {
     });
 
     it('explain()', function(done) {
-      const aggregate = new Aggregate();
+      const aggregate = new Aggregate([], db.model('Employee'));
       start.mongodVersion(function(err, version) {
         if (err) {
           done(err);
@@ -898,7 +885,6 @@ describe('aggregate: ', function() {
         }
 
         aggregate.
-          model(db.model('Employee')).
           match({ sal: { $lt: 16000 } }).
           explain(function(err1, output) {
             assert.ifError(err1);
@@ -913,9 +899,8 @@ describe('aggregate: ', function() {
 
     describe('error when empty pipeline', function() {
       it('without a callback', function() {
-        const agg = new Aggregate;
+        const agg = new Aggregate([], db.model('Employee'));
 
-        agg.model(db.model('Employee'));
         const promise = agg.exec();
         assert.ok(promise instanceof mongoose.Promise);
 
@@ -926,9 +911,8 @@ describe('aggregate: ', function() {
       });
 
       it('with a callback', function(done) {
-        const aggregate = new Aggregate();
+        const aggregate = new Aggregate([], db.model('Employee'));
 
-        aggregate.model(db.model('Employee'));
         const callback = function(err) {
           assert.ok(err);
           assert.equal(err.message, 'Aggregate has empty pipeline');
@@ -1412,7 +1396,5 @@ describe('aggregate: ', function() {
         });
       });
     });
-
-
   });
 });

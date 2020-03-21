@@ -980,27 +980,6 @@ describe('model: update:', function() {
       });
     });
 
-    it('with omitUndefined (gh-6034)', function(done) {
-      const schema = new Schema({
-        boolField: {
-          type: Boolean,
-          default: false
-        }
-      });
-
-      const M = db.model('Test', schema);
-
-      const opts = { upsert: true, setDefaultsOnInsert: true, omitUndefined: true };
-      M.update({}, {}, opts, function(error) {
-        assert.ifError(error);
-        M.findOne({}, function(error, doc) {
-          assert.ifError(error);
-          assert.strictEqual(doc.boolField, false);
-          done();
-        });
-      });
-    });
-
     it('runs validators if theyre set', function(done) {
       const s = new Schema({
         topping: {

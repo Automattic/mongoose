@@ -55,15 +55,16 @@ describe('promises docs', function () {
    * a fully-fledged promise, use the `.exec()` function.
    */
   it('Queries are not promises', function (done) {
-    var query = Band.findOne({name: "Guns N' Roses"});
+    const filter = { name: "Guns N' Roses" };
+    const query = Band.findOne(filter);
     assert.ok(!(query instanceof Promise));
 
     // acquit:ignore:start
-    var outstanding = 2;
+    let outstanding = 2;
     // acquit:ignore:end
 
     // A query is not a fully-fledged promise, but it does have a `.then()`.
-    query.then(function (doc) {
+    Band.findOne(filter).then(function (doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -72,10 +73,10 @@ describe('promises docs', function () {
     });
 
     // `.exec()` gives you a fully-fledged promise
-    var promise = query.exec();
+    const promise = Band.findOne(filter).exec();
     assert.ok(promise instanceof Promise);
 
-    promise.then(function (doc) {
+    promise.then(function(doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -111,15 +112,16 @@ describe('promises docs', function () {
       return done();
     }
     // acquit:ignore:end
-    var query = Band.findOne({name: "Guns N' Roses"});
 
     // Use bluebird
     mongoose.Promise = require('bluebird');
-    assert.equal(query.exec().constructor, require('bluebird'));
+    let promise = Band.findOne({ name: "Guns N' Roses" }).exec();
+    assert.equal(promise.constructor, require('bluebird'));
 
     // Use q. Note that you **must** use `require('q').Promise`.
     mongoose.Promise = require('q').Promise;
-    assert.ok(query.exec() instanceof require('q').makePromise);
+    promise = Band.findOne({ name: "Guns N' Roses" }).exec();
+    assert.ok(promise instanceof require('q').makePromise);
 
     // acquit:ignore:start
     done();

@@ -48,7 +48,6 @@ describe('Query', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
 
   describe('constructor', function() {
@@ -3606,4 +3605,26 @@ describe('Query', function() {
       assert.ok(res);
     });
   });
+
+  it('throws an error if executed multiple times (gh-7398)', function() {
+    const Test = db.model('Test', Schema({ name: String }));
+
+    return co(function*() {
+      const q = Test.findOne();
+
+      yield q;
+
+      let err = yield q.then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'MongooseError');
+      assert.equal(err.message, 'Query was already executed: Test.findOne({})');
+      assert.ok(err.originalStack);
+
+      err = yield Test.find(() => {}).then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'MongooseError');
+      assert.equal(err.message, 'Query was already executed: Test.find({})');
+      assert.ok(err.originalStack);
+    });
+  })
 });

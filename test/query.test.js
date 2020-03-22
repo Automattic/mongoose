@@ -3626,5 +3626,5 @@ describe('Query', function() {
       assert.equal(err.message, 'Query was already executed: Test.find({})');
       assert.ok(err.originalStack);
     });
-  })
+  });
 });

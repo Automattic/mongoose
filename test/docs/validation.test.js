@@ -483,8 +483,7 @@ describe('validation docs', function() {
     });
     // acquit:ignore:end
     toySchema.path('color').validate(function(value) {
-      // When running update validators with the `context` option set to
-      // 'query', `this` refers to the query object.
+      // When running update validators, `this` refers to the query object.
       if (this.getUpdate().$set.name.toLowerCase().indexOf('red') !== -1) {
         return value === 'red';
       }
@@ -495,7 +494,7 @@ describe('validation docs', function() {
 
     var update = { color: 'blue', name: 'Red Power Ranger' };
     // Note the context option
-    var opts = { runValidators: true, context: 'query' };
+    var opts = { runValidators: true };
 
     Toy.updateOne({}, update, opts, function(error) {
       assert.ok(error.errors['color']);

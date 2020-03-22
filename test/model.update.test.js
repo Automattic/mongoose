@@ -1025,7 +1025,7 @@ describe('model: update:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { runValidators: true, context: 'query' };
+      const updateOptions = { runValidators: true };
       Breakfast.update({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 2);
@@ -2678,10 +2678,7 @@ describe('model: update:', function() {
 
       const Item = db.model('Test', ItemSchema);
 
-      const opts = {
-        runValidators: true,
-        context: 'query'
-      };
+      const opts = { runValidators: true };
       const update = {
         $pull: {
           recordings: {

@@ -96,11 +96,11 @@ describe('types.buffer', function() {
 
           t.sub.push({ name: 'Friday Friday' });
           t.save(function(err) {
-            assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
+            assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
             assert.equal(err.errors['sub.0.buf'].kind, 'required');
             t.sub[0].buf = Buffer.from('well well');
             t.save(function(err) {
-              assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
+              assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
               assert.equal(err.errors['sub.0.buf'].kind, 'user defined');
               assert.equal(err.errors['sub.0.buf'].message, 'valid failed');
 

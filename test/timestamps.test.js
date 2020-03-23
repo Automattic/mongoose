@@ -37,9 +37,9 @@ describe('timestamps', function() {
     }, { timestamps: true });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error) {
+    M.create({ name: 'Test' }, function(error, doc) {
       assert.ifError(error);
-      M.findOne({}, function(error, doc) {
+      M.findOne({ _id: doc._id }, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.createdAt);
         assert.ok(doc.updatedAt);
@@ -56,9 +56,9 @@ describe('timestamps', function() {
     }, { timestamps: { createdAt: null, updatedAt: true } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error) {
+    M.create({ name: 'Test' }, function(error, doc) {
       assert.ifError(error);
-      M.findOne({}, function(error, doc) {
+      M.findOne({ _id: doc._id }, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.createdAt);
         assert.ok(doc.updatedAt);
@@ -78,9 +78,9 @@ describe('timestamps', function() {
     });
     const M = db.model('Test', parentSchema);
 
-    M.create({ child: { name: 'test' } }, function(error) {
+    M.create({ child: { name: 'test' } }, function(error, doc) {
       assert.ifError(error);
-      M.findOne({}, function(error, doc) {
+      M.findOne({ _id: doc._id }, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.child.createdAt);
         assert.ok(doc.child.updatedAt);
@@ -97,9 +97,9 @@ describe('timestamps', function() {
     }, { timestamps: { createdAt: 'ts.c', updatedAt: 'ts.a' } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error) {
+    M.create({ name: 'Test' }, function(error, doc) {
       assert.ifError(error);
-      M.findOne({}, function(error, doc) {
+      M.findOne({ _id: doc._id }, function(error, doc) {
         assert.ifError(error);
         assert.ok(doc.ts.c);
         assert.ok(doc.ts.c.valueOf() >= startTime);
@@ -157,9 +157,9 @@ describe('timestamps', function() {
     }, { timestamps: { createdAt: 'ts.createdAt', updatedAt: 'ts.updatedAt' } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error) {
+    M.create({ name: 'Test' }, function(error, doc) {
       assert.ifError(error);
-      M.findOne({}, function(error, doc) {
+      M.findOne({ _id: doc._id }, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.ts.createdAt);
         assert.ok(doc.ts.updatedAt);
@@ -218,7 +218,8 @@ describe('timestamps', function() {
     const M = db.model('Test', schema);
 
     const startTime = Date.now();
-    return M.updateOne({}, { name: 'foo' }, { upsert: true }).
+    return M.deleteMany({}).
+      then(() => M.updateOne({}, { name: 'foo' }, { upsert: true })).
       then(() => assert.equal(called, 1)).
       then(() => M.findOne()).
       then(doc => assert.ok(doc.createdAt.valueOf() >= startTime));

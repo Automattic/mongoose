@@ -386,11 +386,14 @@ block content
     <h3 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h3>
 
     So far we've seen how to connect to MongoDB using Mongoose's default
-    connection. At times we may need multiple connections open to Mongo, each
-    with different read/write settings, or maybe just to different databases for
-    example. In these cases we can utilize `mongoose.createConnection()` which
-    accepts all the arguments already discussed and returns a fresh connection
-    for you.
+    connection. Mongoose creates a _default connection_ when you call `mongoose.connect()`.
+    You can access the default connection using `mongoose.connection`.
+    
+    You may need multiple connections to MongoDB for several reasons.
+    One reason is if you have multiple databases or multiple MongoDB clusters.
+    Another reason is to work around [slow trains](https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
+    The `mongoose.createConnection()` function takes the same arguments as
+    `mongoose.connect()` and returns a new connection.
 
     ```javascript
     const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
@@ -405,12 +408,13 @@ block content
     ```
 
     If you use multiple connections, you should make sure you export schemas,
-    **not** models.
+    **not** models. Exporting a model from a file is called the _export model pattern_.
+    The export model pattern is limited because you can only use one connection.
 
     ```javascript
     const userSchema = new Schema({ name: String, email: String });
 
-    // The correct pattern is to export a schema
+    // The alternative to the export model pattern is the export schema pattern.
     module.exports = userSchema;
 
     // Because if you export a model as shown below, the model will be scoped
@@ -418,19 +422,44 @@ block content
     // module.exports = mongoose.model('User', userSchema);
     ```
 
-    In addition, you should define a factory function that registers models on a
-    connection to make it easy to register all your models on a given connection.
+    If you use the export schema pattern, you still need to create models
+    somewhere. There are two common patterns. First is to export a connection
+    and register the models on the connection in the file:
 
     ```javascript
-    const userSchema = require('./userSchema');
+    // connections/fast.js
+    const mongoose = require('mongoose');
 
-    module.exports = conn => {
-      conn.model('User', userSchema);
-    };
+    const conn = mongoose.createConnection(process.env.MONGODB_URI);
+    conn.model('User', require('../schemas/user'));
+
+    module.exports = conn;
+
+    // connections/slow.js
+    const mongoose = require('mongoose');
+
+    const conn = mongoose.createConnection(process.env.MONGODB_URI);
+    conn.model('User', require('../schemas/user'));
+    conn.model('PageView', require('../schemas/pageView'));
+
+    module.exports = conn;
     ```
 
-    Mongoose creates a _default connection_ when you call `mongoose.connect()`.
-    You can access the default connection using `mongoose.connection`.
+    Another alternative is to register connections with a dependency injector
+    or another [inversion of control (IOC) pattern](https://thecodebarbarian.com/using-ramda-as-a-dependency-injector).
+
+    ```javascript
+    const mongoose = require('mongoose');
+
+    module.exports = function connectionFactory() {
+      const conn = mongoose.createConnection(process.env.MONGODB_URI);
+
+      conn.model('User', require('../schemas/user'));
+      conn.model('PageView', require('../schemas/pageView'));
+
+      return conn; 
+    };
+    ```
 
     <h3 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h3>
 

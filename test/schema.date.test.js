@@ -12,7 +12,8 @@ describe('SchemaDate', function() {
 
   before(function() {
     const schema = new Schema({ x: Date });
-    M = mongoose.model('Model', schema);
+    mongoose.deleteModel(/Test/);
+    M = mongoose.model('Test', schema);
   });
 
   it('accepts a Date', function() {

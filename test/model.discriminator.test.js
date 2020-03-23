@@ -215,12 +215,12 @@ describe('model', function() {
 
     it('throws error if model name is taken (gh-4148)', function(done) {
       var Foo = db.model('Test1', new Schema({}));
-      db.model('Bar', new Schema({}));
+      db.model('Test', new Schema({}));
       assert.throws(
         function() {
-          Foo.discriminator('Bar', new Schema());
+          Foo.discriminator('Test', new Schema());
         },
-        /Cannot overwrite `Bar`/);
+        /Cannot overwrite `Test`/);
       done();
     });
 
@@ -1310,7 +1310,8 @@ describe('model', function() {
         autoCreate: false
       });
       schema.plugin(plugin);
-      const model = mongoose.model('Model', schema);
+      mongoose.deleteModel(/Test/);
+      const model = mongoose.model('Test', schema);
 
       const discriminator = model.discriminator('Desc', new Schema({ anotherValue: String }));
 

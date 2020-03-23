@@ -21,7 +21,16 @@ describe('versioning', function() {
 
   before(function() {
     db = start();
+  });
 
+  after(function(done) {
+    db.close(done);
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
+  beforeEach(function() {
     Comments = new Schema();
 
     Comments.add({
@@ -55,22 +64,18 @@ describe('versioning', function() {
         }
       });
 
-    BlogPost = mongoose.model('Versioning', BlogPost).schema;
-  });
-
-  after(function(done) {
-    db.close(done);
+    BlogPost = db.model('BlogPost', BlogPost);
   });
 
   it('is only added to parent schema (gh-1265)', function(done) {
-    assert.ok(BlogPost.path('__v'));
-    assert.ok(!BlogPost.path('comments').__v);
-    assert.ok(!BlogPost.path('meta.nested').__v);
+    assert.ok(BlogPost.schema.path('__v'));
+    assert.ok(!BlogPost.schema.path('comments').__v);
+    assert.ok(!BlogPost.schema.path('meta.nested').__v);
     done();
   });
 
   it('works', function(done) {
-    const V = db.model('Versioning');
+    const V = BlogPost;
 
     const doc = new V;
     doc.title = 'testing versioning';
@@ -331,7 +336,7 @@ describe('versioning', function() {
   });
 
   it('versioning without version key', function(done) {
-    const V = db.model('Versioning');
+    const V = BlogPost;
 
     const doc = new V;
     doc.numbers = [3, 4, 5, 6, 7];
@@ -359,7 +364,8 @@ describe('versioning', function() {
 
   it('version works with strict docs', function(done) {
     const schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_' + random() });
-    const M = db.model('VersionStrict', schema);
+    db.deleteModel(/BlogPost/);
+    const M = db.model('BlogPost', schema);
     const m = new M({ str: ['death', 'to', 'smootchy'] });
     m.save(function(err) {
       assert.ifError(err);
@@ -384,7 +390,7 @@ describe('versioning', function() {
   });
 
   it('version works with existing unversioned docs', function(done) {
-    const V = db.model('Versioning');
+    const V = BlogPost;
 
     V.collection.insertOne({ title: 'unversioned', numbers: [1, 2, 3] }, { safe: true }, function(err) {
       assert.ifError(err);
@@ -413,7 +419,7 @@ describe('versioning', function() {
     const schema = new Schema(
       { configured: 'bool' },
       { versionKey: 'lolwat', collection: 'configuredversion' + random() });
-    const V = db.model('ConfiguredVersionKey', schema);
+    const V = db.model('Test', schema);
     const v = new V({ configured: true });
     v.save(function(err) {
       assert.ifError(err);
@@ -427,7 +433,7 @@ describe('versioning', function() {
 
   it('can be disabled', function(done) {
     const schema = new Schema({ x: ['string'] }, { versionKey: false });
-    const M = db.model('disabledVersioning', schema, 's' + random());
+    const M = db.model('Test', schema);
     M.create({ x: ['hi'] }, function(err, doc) {
       assert.ifError(err);
       assert.equal('__v' in doc._doc, false);
@@ -449,7 +455,7 @@ describe('versioning', function() {
   });
 
   it('works with numbericAlpha paths', function(done) {
-    const M = db.model('Versioning');
+    const M = BlogPost;
     const m = new M({ mixed: {} });
     const path = 'mixed.4a';
     m.set(path, 2);
@@ -461,7 +467,7 @@ describe('versioning', function() {
 
   describe('doc.increment()', function() {
     it('works without any other changes (gh-1475)', function(done) {
-      const V = db.model('Versioning');
+      const V = BlogPost;
 
       const doc = new V;
       doc.save(function(err) {
@@ -501,7 +507,7 @@ describe('versioning', function() {
   it('gh-1898', function(done) {
     const schema = new Schema({ tags: [String], name: String });
 
-    const M = db.model('gh-1898', schema, 'gh-1898');
+    const M = db.model('Test', schema);
 
     const m = new M({ tags: ['eggs'] });
 
@@ -521,7 +527,7 @@ describe('versioning', function() {
 
   it('can remove version key from toObject() (gh-2675)', function(done) {
     const schema = new Schema({ name: String });
-    const M = db.model('gh2675', schema, 'gh2675');
+    const M = db.model('Test', schema);
 
     const m = new M();
     m.save(function(err, m) {
@@ -535,7 +541,7 @@ describe('versioning', function() {
   });
 
   it('pull doesnt add version where clause (gh-6190)', function() {
-    const User = db.model('gh6190_User', new mongoose.Schema({
+    const User = db.model('User', new mongoose.Schema({
       unreadPosts: [{ type: mongoose.Schema.Types.ObjectId }]
     }));
 
@@ -562,7 +568,7 @@ describe('versioning', function() {
 
   it('copying doc works (gh-5779)', function(done) {
     const schema = new Schema({ subdocs: [{ a: Number }] });
-    const M = db.model('gh5779', schema, 'gh5779');
+    const M = db.model('Test', schema);
     const m = new M({ subdocs: [] });
     let m2;
 

@@ -64,7 +64,7 @@ describe('types.subdocument', function() {
   });
 
   it('not setting timestamps in subdocuments', function() {
-    const Thing = db.model('Thing', new Schema({
+    const Thing = db.model('Test', new Schema({
       subArray: [{
         testString: String
       }]
@@ -98,7 +98,7 @@ describe('types.subdocument', function() {
     it('defers to parent isModified (gh-8223)', function() {
       const childSchema = Schema({ id: Number, text: String });
       const parentSchema = Schema({ child: childSchema });
-      const Model = db.model('gh8223', parentSchema);
+      const Model = db.model('Test1', parentSchema);
 
       const doc = new Model({ child: { text: 'foo' } });
       assert.ok(doc.isModified('child.id'));

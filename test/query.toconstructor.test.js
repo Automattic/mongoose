@@ -5,7 +5,6 @@ const start = require('./common');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -13,28 +12,6 @@ const Schema = mongoose.Schema;
 describe('Query:', function() {
   let Comment;
   let Product;
-  let prodName;
-  let cName;
-
-  before(function() {
-    Comment = new Schema({
-      text: String
-    });
-
-    Product = new Schema({
-      tags: {}, // mixed
-      array: Array,
-      ids: [Schema.ObjectId],
-      strings: [String],
-      numbers: [Number],
-      comments: [Comment],
-      title: String
-    });
-    prodName = 'Product' + random();
-    mongoose.model(prodName, Product);
-    cName = 'Comment' + random();
-    mongoose.model(cName, Comment);
-  });
 
   describe('toConstructor', function() {
     let db;
@@ -47,8 +24,24 @@ describe('Query:', function() {
       db.close(done);
     });
 
+    before(function() {
+      Comment = new Schema({
+        text: String
+      });
+
+      Product = new Schema({
+        tags: {}, // mixed
+        array: Array,
+        ids: [Schema.ObjectId],
+        strings: [String],
+        numbers: [Number],
+        comments: [Comment],
+        title: String
+      });
+      Product = db.model('Product', Product);
+    });
+
     it('creates a query', function(done) {
-      const Product = db.model(prodName);
       const prodQ = Product.find({ title: /test/ }).toConstructor();
 
       assert.ok(prodQ() instanceof Query);
@@ -56,8 +49,6 @@ describe('Query:', function() {
     });
 
     it('copies all the right values', function(done) {
-      const Product = db.model(prodName);
-
       const prodQ = Product.update({ title: /test/ }, { title: 'blah' });
 
       const prodC = prodQ.toConstructor();
@@ -75,7 +66,6 @@ describe('Query:', function() {
     });
 
     it('gets expected results', function(done) {
-      const Product = db.model(prodName);
       Product.create({ title: 'this is a test' }, function(err, p) {
         assert.ifError(err);
         const prodC = Product.find({ title: /test/ }).toConstructor();
@@ -90,8 +80,6 @@ describe('Query:', function() {
     });
 
     it('can be re-used multiple times', function(done) {
-      const Product = db.model(prodName);
-
       Product.create([{ title: 'moar thing' }, { title: 'second thing' }], function(err, prods) {
         assert.ifError(err);
         assert.equal(prods.length, 2);
@@ -117,8 +105,6 @@ describe('Query:', function() {
     });
 
     it('options get merged properly', function(done) {
-      const Product = db.model(prodName);
-
       let prodC = Product.find({ title: /blah/ }).setOptions({ sort: 'title', lean: true });
       prodC = prodC.toConstructor();
 
@@ -132,8 +118,6 @@ describe('Query:', function() {
     });
 
     it('options get cloned (gh-3176)', function(done) {
-      const Product = db.model(prodName);
-
       let prodC = Product.find({ title: /blah/ }).setOptions({ sort: 'title', lean: true });
       prodC = prodC.toConstructor();
 
@@ -151,8 +135,6 @@ describe('Query:', function() {
     });
 
     it('creates subclasses of mquery', function(done) {
-      const Product = db.model(prodName);
-
       const opts = { safe: { w: 'majority' }, readPreference: 'p' };
       const match = { title: 'test', count: { $gt: 101 } };
       const select = { name: 1, count: 0 };
@@ -179,8 +161,6 @@ describe('Query:', function() {
     });
 
     it('with findOneAndUpdate (gh-4318)', function(done) {
-      const Product = db.model(prodName);
-
       const Q = Product.where({ title: 'test' }).toConstructor();
 
       const query = { 'tags.test': 1 };
@@ -204,7 +184,7 @@ describe('Query:', function() {
         called++;
       });
 
-      const Test = db.model('gh6455', schema);
+      const Test = db.model('Test', schema);
       const test = new Test({ name: 'Romero' });
       const Q = Test.findOne({}).toConstructor();
 
@@ -217,7 +197,8 @@ describe('Query:', function() {
     });
 
     it('works with entries-style sort() syntax (gh-8159)', function() {
-      const Model = mongoose.model('gh8159', Schema({ name: String }));
+      mongoose.deleteModel(/Test/);
+      const Model = mongoose.model('Test', Schema({ name: String }));
 
       const query = Model.find().sort([['name', 1]]);
       const Query = query.toConstructor();

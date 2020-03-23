@@ -661,7 +661,7 @@ describe('mongoose module:', function() {
         it('returns a new uncached model', function(done) {
           const m = new Mongoose;
           const s1 = new Schema({ a: [] });
-          const name = 'non-cached-collection-name';
+          const name = 'Test';
           const A = m.model(name, s1);
           const B = m.model(name);
           const C = m.model(name, 'alternate');

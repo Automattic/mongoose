@@ -16,7 +16,6 @@ const setValue = require('../lib/utils').setValue;
 const mongoose = require('./common').mongoose;
 const Schema = mongoose.Schema;
 const MongooseDocumentArray = mongoose.Types.DocumentArray;
-const collection = 'types.documentarray_' + random();
 
 /**
  * Setup.
@@ -60,6 +59,9 @@ describe('types.documentarray', function() {
   after(function(done) {
     db.close(done);
   });
+
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
 
   it('behaves and quacks like an array', function(done) {
     const a = new MongooseDocumentArray();
@@ -245,18 +247,10 @@ describe('types.documentarray', function() {
       });
 
       const db = mongoose.createConnection();
-      let M = db.model('gh-1415', { docs: [subSchema] });
-      let m = new M;
+      const M = db.model('Test', { docs: [subSchema] });
+      const m = new M;
       m.docs.push({ docs: [{ title: 'hello' }] });
-      let delta = m.$__delta()[1];
-      assert.equal(delta.$push.docs.$each[0].changed, undefined);
-
-      M = db.model('gh-1415-1', new Schema({ docs: [subSchema] }, {
-        usePushEach: true
-      }));
-      m = new M;
-      m.docs.push({ docs: [{ title: 'hello' }] });
-      delta = m.$__delta()[1];
+      const delta = m.$__delta()[1];
       assert.equal(delta.$push.docs.$each[0].changed, undefined);
 
       done();
@@ -282,8 +276,8 @@ describe('types.documentarray', function() {
         }
       });
 
-      const First = db.model('first', FirstSchema);
-      const Second = db.model('second', SecondSchema);
+      const First = db.model('Test', FirstSchema);
+      const Second = db.model('Test1', SecondSchema);
 
       const first = new First({});
 
@@ -306,7 +300,8 @@ describe('types.documentarray', function() {
       assert.equal(typeof a.create, 'function');
 
       const schema = new Schema({ docs: [new Schema({ name: 'string' })] });
-      const T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa' + random());
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
       const t = new T;
       assert.equal(typeof t.docs.create, 'function');
       const subdoc = t.docs.create({ name: 100 });
@@ -325,7 +320,7 @@ describe('types.documentarray', function() {
         next();
       });
       const schema = new Schema({ children: [child] });
-      const M = db.model('embeddedDocArray-push-re-cast', schema, 'edarecast-' + random());
+      const M = db.model('Test', schema, 'edarecast-' + random());
       const m = new M;
       m.save(function(err) {
         assert.ifError(err);
@@ -361,7 +356,7 @@ describe('types.documentarray', function() {
 
     it('corrects #ownerDocument() and index if value was created with array.create() (gh-1385)', function(done) {
       const mg = new mongoose.Mongoose;
-      const M = mg.model('1385', { docs: [{ name: String }] });
+      const M = mg.model('Test', { docs: [{ name: String }] });
       const m = new M;
       const doc = m.docs.create({ name: 'test 1385' });
       assert.equal(String(doc.ownerDocument()._id), String(m._id));
@@ -372,7 +367,7 @@ describe('types.documentarray', function() {
     });
 
     it('corrects #ownerDocument() if value was created with array.create() and set() (gh-7504)', function(done) {
-      const M = db.model('gh7504', {
+      const M = db.model('Test', {
         docs: [{ name: { type: String, validate: () => false } }]
       });
       const m = new M({});
@@ -394,7 +389,8 @@ describe('types.documentarray', function() {
         }]
       });
 
-      const Parent = mongoose.model('gh7724', parentSchema);
+      mongoose.deleteModel(/Test/);
+      const Parent = mongoose.model('Test', parentSchema);
 
       const p = new Parent({
         name: 'Eddard Stark',
@@ -425,7 +421,7 @@ describe('types.documentarray', function() {
       comments: [Comments]
     });
 
-    const Post = db.model('docarray-BlogPost', BlogPost, collection);
+    const Post = db.model('BlogPost', BlogPost);
 
     const p = new Post({ title: 'comment nesting' });
     const c1 = p.comments.create({ title: 'c1' });
@@ -469,7 +465,8 @@ describe('types.documentarray', function() {
         }
       });
 
-      const T = mongoose.model('TopLevelRequired', schema);
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
       const t = new T({});
       t.docs.push({ name: 'test1' });
       t.docs.push({ name: 'test2' });
@@ -491,7 +488,8 @@ describe('types.documentarray', function() {
         }]
       });
 
-      const T = mongoose.model('DocArrayNestedRequired', schema);
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
       const t = new T({});
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
@@ -512,7 +510,8 @@ describe('types.documentarray', function() {
         subdoc.invalidate('name', 'boo boo', '%');
         next();
       });
-      const T = mongoose.model('embeddedDocument#invalidate_test', schema, 'asdfasdfa' + random());
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
       const t = new T;
       t.docs.push({ name: 100 });
 
@@ -536,8 +535,8 @@ describe('types.documentarray', function() {
       const nested = new Schema({ v: { type: Number, max: 30 } });
       const schema = new Schema({
         docs: [nested]
-      }, { collection: 'embedded-invalidate-' + random() });
-      const M = db.model('embedded-invalidate', schema);
+      });
+      const M = db.model('Test', schema);
       const m = new M({ docs: [{ v: 900 }] });
       m.save(function(err) {
         assert.equal(err.errors['docs.0.v'].value, 900);
@@ -550,7 +549,7 @@ describe('types.documentarray', function() {
       const schema = new Schema({
         docs: [nested]
       });
-      const M = db.model('gh6723', schema);
+      const M = db.model('Test', schema);
 
       const m = new M({});
       m.docs = [50];
@@ -565,7 +564,7 @@ describe('types.documentarray', function() {
       const schema = new Schema({
         docs: [nested]
       });
-      const M = db.model('gh8317', schema);
+      const M = db.model('Test', schema);
 
       const doc = M.hydrate({ docs: [{ v: 1 }, { v: 2 }] });
       let arr = doc.docs;
@@ -578,7 +577,8 @@ describe('types.documentarray', function() {
 
     it('map() works', function() {
       const personSchema = new Schema({ friends: [{ name: { type: String } }] });
-      const Person = mongoose.model('gh8317-map', personSchema);
+      mongoose.deleteModel(/Test/);
+      const Person = mongoose.model('Test', personSchema);
 
       const person = new Person({ friends: [{ name: 'Hafez' }] });
 
@@ -590,7 +590,7 @@ describe('types.documentarray', function() {
     });
 
     it('slice() after map() works (gh-8399)', function() {
-      const MyModel = db.model('gh8399', Schema({
+      const MyModel = db.model('Test', Schema({
         myArray: [{ name: String }]
       }));
 
@@ -621,7 +621,7 @@ describe('types.documentarray', function() {
       children: [childSchema]
     });
 
-    const Parent = db.model('gh7249', parentSchema);
+    const Parent = db.model('Test', parentSchema);
 
     return co(function*() {
       let parent = yield Parent.create({

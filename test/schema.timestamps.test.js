@@ -127,6 +127,7 @@ describe('schema options.timestamps', function() {
         timestamps: true
       });
 
+      conn.deleteModel(/Test/);
       const Test = conn.model('Test', TestSchema);
 
       Test.create({
@@ -269,11 +270,13 @@ describe('schema options.timestamps', function() {
         }
       });
 
-      const Cat = conn.model('gh6381', CatSchema);
+      conn.deleteModel(/Test/);
+      const Cat = conn.model('Test', CatSchema);
 
       const d = new Date('2011-06-01');
 
       return co(function*() {
+        yield Cat.deleteMany({});
         yield Cat.insertMany([{ name: 'a' }, { name: 'b', createdAt: d }]);
 
         const cats = yield Cat.find().sort('name');
@@ -324,7 +327,8 @@ describe('schema options.timestamps', function() {
         cats: [CatSchema]
       });
 
-      const Group = conn.model('gh4049', GroupSchema);
+      conn.deleteModel(/Test/);
+      const Group = conn.model('Test', GroupSchema);
       const now = Date.now();
       Group.create({ cats: [{ name: 'Garfield' }] }, function(error, group) {
         assert.ifError(error);
@@ -339,7 +343,8 @@ describe('schema options.timestamps', function() {
         cats: [CatSchema]
       });
 
-      const Group = conn.model('gh4049_0', GroupSchema);
+      conn.deleteModel(/Test/);
+      const Group = conn.model('Test', GroupSchema);
       const now = Date.now();
       Group.create({ cats: [{ name: 'Garfield' }] }, function(error, group) {
         assert.ifError(error);
@@ -367,7 +372,8 @@ describe('schema options.timestamps', function() {
       updatedAt: Number,
       name: String
     }, { timestamps: true });
-    const Model = conn.model('gh3957', schema);
+    conn.deleteModel(/Test/);
+    const Model = conn.model('Test', schema);
     const start = Date.now();
 
     return co(function*() {
@@ -388,7 +394,8 @@ describe('schema options.timestamps', function() {
     }, {
       timestamps: { currentTime: () => 42 }
     });
-    const Model = conn.model('gh3957_0', schema);
+    conn.deleteModel(/Test/);
+    const Model = conn.model('Test', schema);
 
     return co(function*() {
       const doc = yield Model.create({ name: 'test' });

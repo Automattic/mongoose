@@ -33,7 +33,8 @@ describe('types.decimal128', function() {
       value: Schema.Types.Decimal128
     });
 
-    const BigNum = mongoose.model('gh6418', dec128);
+    mongoose.deleteModel(/Test/);
+    const BigNum = mongoose.model('Test', dec128);
 
     const obj = {
       str: '10.123',

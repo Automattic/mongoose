@@ -5541,18 +5541,14 @@ describe('Model', function() {
         return co(function*() {
           const createdUser = yield User.create({ name: 'Hafez' });
 
-          let err;
+          const err = yield User.bulkWrite([{
+            updateOne: {
+              filter: { _id: createdUser._id }
+            }
+          }])
+            .then(()=>null)
+            .catch(err=>err);
 
-          try {
-            yield User.bulkWrite([{
-              updateOne: {
-                filter: { _id: createdUser._id }
-              }
-            }]);
-          }
-          catch (_err) {
-            err = _err;
-          }
 
           assert.ok(err);
           assert.equal(err.message, 'Must provide an update object.');

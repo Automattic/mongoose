@@ -57,7 +57,7 @@ describe('debug: colors', function() {
 
   before(function() {
     db = start();
-    Test = db.model('Test', test, 'TEST');
+    Test = db.model('Test', test, 'Test');
   });
 
   after(function(done) {

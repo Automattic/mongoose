@@ -12,7 +12,6 @@ const EmbeddedDocument = require('../lib/types/embedded');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
 const util = require('./util');
 const utils = require('../lib/utils');
 const validator = require('validator');
@@ -572,7 +571,7 @@ describe('document', function() {
       }
     }, { _id: false, id: false });
     const keySchema = Schema({ ql: [questionSchema] }, { _id: false, id: false });
-    const Model = db.model('gh8468-2', Schema({
+    const Model = db.model('Test', Schema({
       name: String,
       keys: [keySchema]
     }));
@@ -1239,8 +1238,6 @@ describe('document', function() {
   });
 
   describe('#validate', function() {
-    const collection = 'validateschema_' + random();
-
     it('works (gh-891)', function(done) {
       let schema = null;
       let called = false;
@@ -1255,7 +1252,7 @@ describe('document', function() {
         nick: { type: String, required: true }
       });
 
-      const M = db.model('Test', schema, collection);
+      const M = db.model('Test', schema);
       const m = new M({ prop: 'gh891', nick: 'validation test' });
       m.save(function(err) {
         assert.ifError(err);
@@ -1430,7 +1427,7 @@ describe('document', function() {
           arr: { type: [], required: true, validate: validate }
         });
 
-        const M = db.model('Test', schema, collection);
+        const M = db.model('Test', schema);
         const m = new M({ name: 'gh1109-3', arr: null });
         m.save(function(err) {
           assert.equal(err.errors.arr.message, 'Path `arr` is required.');
@@ -4368,7 +4365,7 @@ describe('document', function() {
       };
 
       const schemaWithTimestamps = new Schema(schemaDefinition, { timestamps: { createdAt: 'misc.createdAt' } });
-      const PersonWithTimestamps = db.model('Person_timestamps', schemaWithTimestamps);
+      const PersonWithTimestamps = db.model('Person', schemaWithTimestamps);
       const dude = new PersonWithTimestamps({ name: 'Keanu', misc: { hometown: 'Beirut' } });
       assert.equal(dude.misc.isAlive, true);
 
@@ -4801,7 +4798,7 @@ describe('document', function() {
         hook: { type: String }
       });
 
-      const Model = db.model('Model', schema);
+      const Model = db.model('Test', schema);
 
       Model.create({ hook: 'test ' }, function(error) {
         assert.ifError(error);
@@ -5062,8 +5059,7 @@ describe('document', function() {
         contact: ContactSchema
       });
 
-      const EmergencyContact =
-        db.model('EmergencyContact', EmergencyContactSchema);
+      const EmergencyContact = db.model('Test', EmergencyContactSchema);
 
       const contact = new EmergencyContact({
         contactName: 'Electrical Service',
@@ -5926,7 +5922,7 @@ describe('document', function() {
         name: String
       }, { strict: false });
 
-      const Model = db.model('prototest', schema);
+      const Model = db.model('Test', schema);
       const doc = new Model({ '__proto__.x': 'foo' });
 
       assert.strictEqual(Model.x, void 0);
@@ -6349,7 +6345,7 @@ describe('document', function() {
           }
         }, { strict: false })
       });
-      const NestedModel = db.model('Nested', NestedSchema);
+      const NestedModel = db.model('Test', NestedSchema);
       const n = new NestedModel({
         parent: {
           name: 'foo',
@@ -8820,6 +8816,8 @@ describe('document', function() {
       age: { type: Number, validate: v => v < 200 }
     });
     const schema = Schema({ nested: nestedSchema });
+
+    mongoose.deleteModel(/Test/);
     const Model = mongoose.model('Test', schema);
 
     const doc = new Model({ nested: { name: 'a', age: 9001 } });

@@ -8,8 +8,6 @@ const start = require('./common');
 
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
-
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
@@ -24,6 +22,9 @@ describe('schema select option', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
   it('excluding paths through schematype', function(done) {
     const schema = new Schema({
       thin: Boolean,
@@ -31,7 +32,7 @@ describe('schema select option', function() {
       docs: [new Schema({ bool: Boolean, name: { type: String, select: false } })]
     });
 
-    const S = db.model('ExcludingBySchemaType', schema);
+    const S = db.model('Test', schema);
     S.create({ thin: true, name: 'the excluded', docs: [{ bool: true, name: 'test' }] }, function(err, s) {
       assert.ifError(err);
       assert.equal(s.name, 'the excluded');
@@ -73,7 +74,7 @@ describe('schema select option', function() {
       docs: [new Schema({ bool: Boolean, name: { type: String, select: true } })]
     });
 
-    const S = db.model('IncludingBySchemaType', schema);
+    const S = db.model('Test', schema);
     S.create({ thin: true, name: 'the included', docs: [{ bool: true, name: 'test' }] }, function(err, s) {
       assert.ifError(err);
       assert.equal(s.name, 'the included');
@@ -125,8 +126,8 @@ describe('schema select option', function() {
         docs: [new Schema({ name: { type: String, select: false }, bool: Boolean })]
       });
 
-      S = db.model('OverriddingSelectedBySchemaType', selected);
-      E = db.model('OverriddingExcludedBySchemaType', excluded);
+      S = db.model('Test1', selected);
+      E = db.model('Test2', excluded);
     });
 
     describe('works', function() {
@@ -284,7 +285,7 @@ describe('schema select option', function() {
       const selected = new Schema({
         docs: { type: [child], select: false }
       });
-      const M = m.model('gh-1333-deselect', selected);
+      const M = m.model('Test', selected);
 
       const query = M.findOne();
       query._applyPaths();
@@ -305,7 +306,7 @@ describe('schema select option', function() {
           docs: { type: [child], select: false }
         }
       });
-      const M = db.model('gh7945', selected);
+      const M = db.model('Test', selected);
 
       const query = M.findOne();
       query._applyPaths();
@@ -330,7 +331,7 @@ describe('schema select option', function() {
         docs: [new Schema({ name: { type: String, select: false }, bool: Boolean })]
       });
 
-      const M = db.model('ForcedInclusionOfPath', excluded);
+      const M = db.model('Test', excluded);
       M.create({ thin: false, name: '1 meter', docs: [{ name: 'test', bool: false }] }, function(err, d) {
         assert.ifError(err);
 
@@ -382,7 +383,7 @@ describe('schema select option', function() {
     });
 
     it('works with query.slice (gh-1370)', function(done) {
-      const M = db.model('1370', new Schema({ many: { type: [String], select: false } }));
+      const M = db.model('Test', new Schema({ many: { type: [String], select: false } }));
 
       M.create({ many: ['1', '2', '3', '4', '5'] }, function(err) {
         if (err) {
@@ -402,7 +403,7 @@ describe('schema select option', function() {
     });
 
     it('ignores if path does not have select in schema (gh-6785)', function() {
-      const M = db.model('gh6785', new Schema({
+      const M = db.model('Test', new Schema({
         a: String,
         b: String
       }));
@@ -417,14 +418,14 @@ describe('schema select option', function() {
     });
 
     it('omits if not in schema (gh-7017)', function() {
-      const M = db.model('gh7017', new Schema({
+      const M = db.model('Test', new Schema({
         a: { type: String, select: false },
         b: { type: String, select: false }
-      }), 'gh7017');
+      }), 'Test');
 
       return co(function*() {
         yield db.$initialConnection;
-        yield db.collection('gh7017').insertOne({
+        yield db.collection('Test').insertOne({
           a: 'foo',
           b: 'bar',
           c: 'baz'
@@ -448,7 +449,7 @@ describe('schema select option', function() {
       conflict: { type: String, select: false }
     });
 
-    const S = db.model('ConflictingBySchemaType', schema);
+    const S = db.model('Test', schema);
     S.create({ thin: true, name: 'bing', conflict: 'crosby' }, function(err, s) {
       assert.strictEqual(null, err);
       assert.equal(s.name, 'bing');
@@ -478,7 +479,7 @@ describe('schema select option', function() {
       name: { type: String, select: false }
     });
 
-    const M = db.model('SelectingOnly_idWithExcludedSchemaType', schema);
+    const M = db.model('Test', schema);
     M.find().select('_id -name').exec(function(err) {
       assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
 
@@ -494,7 +495,7 @@ describe('schema select option', function() {
       docs: [new Schema({ name: { type: String, select: false } })]
     });
 
-    const M = db.model('SelectingOnly_idWithExcludedSchemaTypeSubDoc', schema);
+    const M = db.model('Test', schema);
     M.find().select('_id -docs.name').exec(function(err) {
       assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
 
@@ -506,25 +507,25 @@ describe('schema select option', function() {
   });
 
   it('all inclusive/exclusive combos work', function(done) {
-    const coll = 'inclusiveexclusivecomboswork_' + random();
+    const coll = 'Test';
 
     const schema = new Schema({
       name: { type: String },
       age: Number
     }, { collection: coll });
-    const M = db.model('InclusiveExclusiveCombosWork', schema);
+    const M = db.model('Test1', schema);
 
     const schema1 = new Schema({
       name: { type: String, select: false },
       age: Number
     }, { collection: coll });
-    const S = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionFalse', schema1);
+    const S = db.model('Test2', schema1);
 
     const schema2 = new Schema({
       name: { type: String, select: true },
       age: Number
     }, { collection: coll });
-    const T = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionTrue', schema2);
+    const T = db.model('Test3', schema2);
 
     function useId(M, id, cb) {
       M.findOne().select('_id -name').exec(function(err, d) {
@@ -606,7 +607,7 @@ describe('schema select option', function() {
       }
     });
 
-    const User = db.model('gh4707', userSchema);
+    const User = db.model('Test', userSchema);
 
     const obj = {
       name: 'Val',
@@ -665,7 +666,7 @@ describe('schema select option', function() {
       }
     });
 
-    const Model = db.model('nested', NestedSchema);
+    const Model = db.model('Test', NestedSchema);
 
     const doc = new Model();
     doc.nested.name = undefined;

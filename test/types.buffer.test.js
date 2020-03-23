@@ -52,6 +52,9 @@ describe('types.buffer', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
   it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
     let a = new MongooseBuffer;
 
@@ -72,7 +75,7 @@ describe('types.buffer', function() {
   });
 
   it('buffer validation', function(done) {
-    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('Test', UserBuffer);
 
     User.on('index', function() {
       const t = new User({
@@ -115,7 +118,7 @@ describe('types.buffer', function() {
   });
 
   it('buffer storage', function(done) {
-    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('Test', UserBuffer);
 
     User.on('index', function() {
       const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
@@ -144,7 +147,7 @@ describe('types.buffer', function() {
   });
 
   it('test write markModified', function(done) {
-    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('Test', UserBuffer);
 
     User.on('index', function() {
       const sampleBuffer = Buffer.from([123, 223, 23, 42, 11]);
@@ -373,7 +376,7 @@ describe('types.buffer', function() {
   });
 
   it('can be set to null', function(done) {
-    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('Test', UserBuffer);
     const user = new User({ array: [null], required: Buffer.alloc(1) });
     user.save(function(err, doc) {
       assert.ifError(err);
@@ -387,7 +390,7 @@ describe('types.buffer', function() {
   });
 
   it('can be updated to null', function(done) {
-    const User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    const User = db.model('Test', UserBuffer);
     const user = new User({ array: [null], required: Buffer.alloc(1), serial: Buffer.alloc(1) });
     user.save(function(err, doc) {
       assert.ifError(err);
@@ -412,9 +415,9 @@ describe('types.buffer', function() {
   describe('subtype', function() {
     let bufferSchema, B;
 
-    before(function(done) {
+    beforeEach(function(done) {
       bufferSchema = new Schema({ buf: Buffer });
-      B = db.model('1571', bufferSchema);
+      B = db.model('Test', bufferSchema);
       done();
     });
 
@@ -485,7 +488,8 @@ describe('types.buffer', function() {
 
     it('cast from number (gh-3764)', function(done) {
       const schema = new Schema({ buf: Buffer });
-      const MyModel = mongoose.model('gh3764', schema);
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
 
       const doc = new MyModel({ buf: 9001 });
       assert.equal(doc.buf.length, 1);
@@ -494,7 +498,8 @@ describe('types.buffer', function() {
 
     it('cast from string', function(done) {
       const schema = new Schema({ buf: Buffer });
-      const MyModel = mongoose.model('bufferFromString', schema);
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
 
       const doc = new MyModel({ buf: 'hi' });
       assert.ok(doc.buf instanceof Buffer);
@@ -504,7 +509,8 @@ describe('types.buffer', function() {
 
     it('cast from array', function(done) {
       const schema = new Schema({ buf: Buffer });
-      const MyModel = mongoose.model('bufferFromArray', schema);
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
 
       const doc = new MyModel({ buf: [195, 188, 98, 101, 114] });
       assert.ok(doc.buf instanceof Buffer);
@@ -514,7 +520,8 @@ describe('types.buffer', function() {
 
     it('cast from Binary', function(done) {
       const schema = new Schema({ buf: Buffer });
-      const MyModel = mongoose.model('bufferFromBinary', schema);
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
 
       const doc = new MyModel({ buf: new MongooseBuffer.Binary([228, 189, 160, 229, 165, 189], 0) });
       assert.ok(doc.buf instanceof Buffer);
@@ -524,7 +531,8 @@ describe('types.buffer', function() {
 
     it('cast from json (gh-6863)', function(done) {
       const schema = new Schema({ buf: Buffer });
-      const MyModel = mongoose.model('gh6863', schema);
+      mongoose.deleteModel(/Test/);
+      const MyModel = mongoose.model('Test', schema);
 
       const doc = new MyModel({ buf: { type: 'Buffer', data: [103, 104, 45, 54, 56, 54, 51] } });
       assert.ok(doc.buf instanceof Buffer);

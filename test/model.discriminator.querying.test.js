@@ -341,8 +341,8 @@ describe('model', function() {
           }
         });
 
-        const Foo = db.model('Foo', schema);
-        const Bar = Foo.discriminator('Bar', new mongoose.Schema({
+        const Foo = db.model('Test', schema);
+        const Bar = Foo.discriminator('TestDiscriminator', new mongoose.Schema({
           bar: String
         }));
 

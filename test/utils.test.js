@@ -169,14 +169,12 @@ describe('utils', function() {
   });
 
   it('deepEquals on MongooseDocumentArray works', function(done) {
-    const db = start();
     const A = new Schema({ a: String });
-    const M = db.model('deepEqualsOnMongooseDocArray', new Schema({
+    mongoose.deleteModel(/Test/);
+    const M = mongoose.model('Test', new Schema({
       a1: [A],
       a2: [A]
     }));
-
-    db.close();
 
     const m1 = new M({
       a1: [{ a: 'Hi' }, { a: 'Bye' }]

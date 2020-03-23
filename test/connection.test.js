@@ -553,8 +553,12 @@ describe('connections:', function() {
       db.close(done);
     });
 
+    beforeEach(function() {
+      db.deleteModel(/.*/);
+    });
+
     it('allows passing a schema', function(done) {
-      const MyModel = db.model('MyModelasdf', new Schema({
+      const MyModel = mongoose.model('Test', new Schema({
         name: String
       }));
 
@@ -575,20 +579,21 @@ describe('connections:', function() {
     });
 
     it('prevents overwriting pre-existing models', function(done) {
-      const name = 'gh-1209-a';
-      db.model(name, new Schema);
+      db.deleteModel(/Test/);
+      db.model('Test', new Schema);
 
       assert.throws(function() {
-        db.model(name, new Schema);
-      }, /Cannot overwrite `gh-1209-a` model/);
+        db.model('Test', new Schema);
+      }, /Cannot overwrite `Test` model/);
 
       done();
     });
 
     it('allows passing identical name + schema args', function(done) {
-      const name = 'gh-1209-b';
+      const name = 'Test';
       const schema = new Schema;
 
+      db.deleteModel(/Test/);
       const model = db.model(name, schema);
       db.model(name, model.schema);
 
@@ -609,8 +614,9 @@ describe('connections:', function() {
 
       const db = start();
 
-      const A = mongoose.model('gh-1209-a', s1);
-      const B = db.model('gh-1209-a', s2);
+      mongoose.deleteModel(/Test/);
+      const A = mongoose.model('Test', s1);
+      const B = db.model('Test', s2);
 
       assert.ok(A.schema !== B.schema);
       assert.ok(A.schema.paths.one);
@@ -619,8 +625,8 @@ describe('connections:', function() {
       assert.ok(!A.schema.paths.two);
 
       // reset
-      delete db.models['gh-1209-a'];
-      const C = db.model('gh-1209-a');
+      delete db.models['Test'];
+      const C = db.model('Test');
       assert.ok(C.schema === A.schema);
 
       db.close();
@@ -641,7 +647,7 @@ describe('connections:', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {
           const s1 = new Schema({ a: [] });
-          const name = 'non-cached-collection-name';
+          const name = 'Test';
           const A = db.model(name, s1);
           const B = db.model(name);
           const C = db.model(name, 'alternate');
@@ -830,8 +836,8 @@ describe('connections:', function() {
         thing: Number
       });
 
-      const m1 = db.model('testMod', schema);
-      const m2 = db2.model('testMod', schema);
+      const m1 = db.model('Test', schema);
+      const m2 = db2.model('Test', schema);
 
       m1.create({ body: 'this is some text', thing: 1 }, function(err, i1) {
         assert.ifError(err);

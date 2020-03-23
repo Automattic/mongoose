@@ -215,12 +215,12 @@ describe('model', function() {
 
     it('throws error if model name is taken (gh-4148)', function(done) {
       var Foo = db.model('Test1', new Schema({}));
-      db.model('Bar', new Schema({}));
+      db.model('Test', new Schema({}));
       assert.throws(
         function() {
-          Foo.discriminator('Bar', new Schema());
+          Foo.discriminator('Test', new Schema());
         },
-        /Cannot overwrite `Bar`/);
+        /Cannot overwrite `Test`/);
       done();
     });
 
@@ -1310,7 +1310,8 @@ describe('model', function() {
         autoCreate: false
       });
       schema.plugin(plugin);
-      const model = mongoose.model('Model', schema);
+      mongoose.deleteModel(/Test/);
+      const model = mongoose.model('Test', schema);
 
       const discriminator = model.discriminator('Desc', new Schema({ anotherValue: String }));
 
@@ -1318,29 +1319,6 @@ describe('model', function() {
       assert.ok(!!copiedPlugin);
 
       mongoose.deleteModel(/Model/);
-    });
-
-    describe('does not have unintended side effects', function() {
-      // Delete every model
-      afterEach(function() { mongoose.deleteModel(/.+/); });
-
-      it('does not modify _id path of the passed in schema the _id is not auto generated (gh-8543)', function() {
-        const model = db.model('Model', new mongoose.Schema({ _id: Number }));
-        const passedInSchema = new mongoose.Schema({});
-        model.discriminator('Discrimintaor', passedInSchema);
-        assert.equal(passedInSchema.path('_id').instance, 'Number');
-      });
-
-      function throwErrorOnClone() { throw new Error('clone() was called on the unrelated schema'); };
-
-      it('when the base schema has an _id that is not auto generated (gh-8543) (gh-8546)', function() {
-        const unrelatedSchema = new mongoose.Schema({});
-        unrelatedSchema.clone = throwErrorOnClone;
-        db.model('UnrelatedModel', unrelatedSchema);
-
-        const model = db.model('Model', new mongoose.Schema({ _id: mongoose.Types.ObjectId }, { _id: false }));
-        model.discriminator('Discrimintaor', new mongoose.Schema({}).clone());
-      });
     });
   });
 
@@ -1368,6 +1346,7 @@ describe('model', function() {
         }
       }
 
+      mongoose.deleteModel(/Test/);
       const UserModel = mongoose.model(Test, new mongoose.Schema({}));
 
       const u = new UserModel({});

@@ -17,7 +17,9 @@ describe('asyncIterator', function() {
     db = await start();
 
     const schema = new mongoose.Schema({ name: String });
-    Movie = db.model('gh6737_Movie', schema);
+    await db.dropCollection('Movie').catch(() => {});
+    db.deleteModel(/Movie/);
+    Movie = db.model('Movie', schema);
 
     await Movie.create([
       { name: 'Kickboxer' },

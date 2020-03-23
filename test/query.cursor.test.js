@@ -25,7 +25,6 @@ describe('QueryCursor', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => require('./util').clearTestData(db));
 
   beforeEach(function() {

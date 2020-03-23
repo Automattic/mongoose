@@ -357,17 +357,40 @@ block content
 
     <h3 id="populate_an_existing_mongoose_document"><a href="#populate_an_existing_mongoose_document">Populating an existing document</a></h3>
 
-    If we have an existing mongoose document and want to populate some of its
-    paths, **mongoose >= 3.6** supports the
-    [document#populate()](./api.html#document_Document-populate) method.
+    If you have an existing mongoose document and want to populate some of its
+    paths, you can use the
+    [Document#populate()](./api.html#document_Document-populate) method.
+    Just make sure you call [`Document#execPopulate()`](/docs/api/document.html#document_Document-execPopulate)
+    to execute the `populate()`.
+
+    ```javascript
+    const person = await Person.findOne({ name: 'Ian Fleming' });
+    
+    person.populated('stories'); // null
+
+    // Call the `populate()` method on a document to populate a path.
+    // Need to call `execPopulate()` to actually execute the `populate()`.
+    await person.populate('stories').execPopulate();
+
+    person.populated('stories'); // Array of ObjectIds
+    person.stories[0].name; // 'Casino Royale'
+    ```
+
+    The `Document#populate()` method supports chaining, so you can chain
+    multiple `populate()` calls together.
+
+    ```javascript
+    await person.populate('stories').populate('fans').execPopulate();
+    person.populated('fans'); // Array of ObjectIds
+    ```
 
     <h3 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h3>
 
     If we have one or many mongoose documents or even plain objects
     (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may
     populate them using the [Model.populate()](./api.html#model_Model.populate)
-    method available in **mongoose >= 3.6**. This is what `document#populate()`
-    and `query#populate()` use to populate documents.
+    method. This is what `Document#populate()`
+    and `Query#populate()` use to populate documents.
 
     <h3 id="deep-populate"><a href="#deep-populate">Populating across multiple levels</a></h3>
 

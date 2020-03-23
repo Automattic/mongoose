@@ -127,7 +127,7 @@ block content
     ```
 
     When you create a new document with the automatically added
-    `_id` property, Mongoose createsa a new [`_id` of type ObjectId](https://masteringjs.io/tutorials/mongoose/objectid)
+    `_id` property, Mongoose creates a new [`_id` of type ObjectId](https://masteringjs.io/tutorials/mongoose/objectid)
     to your document.
 
     ```javascript
@@ -157,7 +157,7 @@ block content
 
     Instances of `Models` are [documents](./documents.html). Documents have
     many of their own [built-in instance methods](./api.html#document-js).
-    We may also define our own custom document instance methods too.
+    We may also define our own custom document instance methods.
 
     ```javascript
       // define a schema
@@ -205,7 +205,7 @@ block content
 
       const Animal = mongoose.model('Animal', animalSchema);
       let animals = await Animal.findByName('fido');
-      animls = animals.concat(await Animal.findByBreed('Poodle'));
+      animals = animals.concat(await Animal.findByBreed('Poodle'));
     ```
 
     Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.
@@ -1129,7 +1129,7 @@ block content
     ```
 
     Set the `storeSubdocValidationError` to `false` on the child schema to make
-    Mongoose only report the parent error.
+    Mongoose only reports the parent error.
 
     ```javascript
     const childSchema = new Schema({
@@ -1189,7 +1189,7 @@ block content
     [_The Little MongoDB Schema Design Book_](http://bit.ly/mongodb-schema-design)
     by Christian Kvalheim, the original author of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb).
     This book shows you how to implement performant schemas for a laundry list
-    of use cases, including ecommerce, wikis, and appointment bookings.
+    of use cases, including e-commerce, wikis, and appointment bookings.
 
     <h3 id="next">Next Up</h3>
 

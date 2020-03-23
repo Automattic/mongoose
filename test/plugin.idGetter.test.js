@@ -22,10 +22,13 @@ describe('id virtual getter', function() {
     db.close(done);
   });
 
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+
   it('should work as expected with an ObjectId', function(done) {
     const schema = new Schema({});
 
-    const S = db.model('Basic', schema);
+    const S = db.model('Test', schema);
     S.create({}, function(err, s) {
       assert.ifError(err);
 
@@ -38,7 +41,7 @@ describe('id virtual getter', function() {
   it('should be turned off when `id` option is set to false', function(done) {
     const schema = new Schema({}, { id: false });
 
-    const S = db.model('NoIdGetter', schema);
+    const S = db.model('Test', schema);
     S.create({}, function(err, s) {
       assert.ifError(err);
 
@@ -54,7 +57,7 @@ describe('id virtual getter', function() {
       id: String
     });
 
-    const S = db.model('SchemaHasId', schema);
+    const S = db.model('Test', schema);
     S.create({ id: 'test' }, function(err, s) {
       assert.ifError(err);
 

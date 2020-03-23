@@ -31,7 +31,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
 
   before(function() {
     db = start();
-    M = db.model('1484', schema);
+    M = db.model('Test', schema);
   });
 
   after(function(done) {

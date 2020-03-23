@@ -247,10 +247,10 @@ describe('types.documentarray', function() {
       });
 
       const db = mongoose.createConnection();
-      let M = db.model('Test', { docs: [subSchema] });
-      let m = new M;
+      const M = db.model('Test', { docs: [subSchema] });
+      const m = new M;
       m.docs.push({ docs: [{ title: 'hello' }] });
-      let delta = m.$__delta()[1];
+      const delta = m.$__delta()[1];
       assert.equal(delta.$push.docs.$each[0].changed, undefined);
 
       done();

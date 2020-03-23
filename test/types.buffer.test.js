@@ -9,7 +9,6 @@ const start = require('./common');
 const Buffer = require('safe-buffer').Buffer;
 const assert = require('assert');
 const mongoose = require('./common').mongoose;
-const random = require('../lib/utils').random;
 
 const MongooseBuffer = mongoose.Types.Buffer;
 const Schema = mongoose.Schema;
@@ -83,7 +82,7 @@ describe('types.buffer', function() {
       });
 
       t.validate(function(err) {
-        assert.ok(err.message.indexOf('UserBuffer validation failed') === 0, err.message);
+        assert.ok(err.message.indexOf('Test validation failed') === 0, err.message);
         assert.equal(err.errors.required.kind, 'required');
         t.required = { x: [20] };
         t.save(function(err) {

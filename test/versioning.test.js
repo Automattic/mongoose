@@ -364,7 +364,7 @@ describe('versioning', function() {
 
   it('version works with strict docs', function(done) {
     const schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_' + random() });
-    db.deleteModel(/BlogPost/)
+    db.deleteModel(/BlogPost/);
     const M = db.model('BlogPost', schema);
     const m = new M({ str: ['death', 'to', 'smootchy'] });
     m.save(function(err) {

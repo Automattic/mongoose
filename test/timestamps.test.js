@@ -127,9 +127,9 @@ describe('timestamps', function() {
     }, { timestamps: { createdAt: 'ts.createdAt', updatedAt: 'ts.updatedAt' } });
     const M = db.model('Test', schema);
 
-    M.create({ name: 'Test' }, function(error) {
+    M.create({ name: 'Test' }, function(error, doc) {
       assert.ifError(error);
-      M.findOne({}, function(error, doc) {
+      M.findOne({ _id: doc._id }, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.ts.createdAt);
         assert.ok(doc.ts.updatedAt);

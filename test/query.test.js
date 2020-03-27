@@ -1645,14 +1645,6 @@ describe('Query', function() {
     assert.strictEqual(opts.maxTimeMS, 1000);
   });
 
-  describe('update', function() {
-    it('when empty, nothing is run', function(done) {
-      const q = new Query;
-      assert.equal(false, !!q._castUpdate({}));
-      done();
-    });
-  });
-
   describe('bug fixes', function() {
     describe('collations', function() {
       before(function(done) {

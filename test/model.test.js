@@ -6474,4 +6474,26 @@ describe('Model', function() {
       assert.strictEqual(res.breed, 'Chorkie');
     });
   });
+
+  it('bulkWrite upsert works when update casts to empty (gh-8698)', function() {
+    const userSchema = new Schema({
+      name: String
+    });
+    const User = db.model('User', userSchema);
+    mongoose.set('debug', true)
+
+    return co(function*() {
+      yield User.bulkWrite([{
+        updateOne: {
+          filter: { name: 'test' },
+          update: { notInSchema: true },
+          upsert: true
+        }
+      }]);
+
+      const doc = yield User.findOne();
+      assert.ok(doc);
+      assert.strictEqual(doc.notInSchema, null);
+    });
+  });
 });

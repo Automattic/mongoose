@@ -6480,7 +6480,6 @@ describe('Model', function() {
       name: String
     });
     const User = db.model('User', userSchema);
-    mongoose.set('debug', true)
 
     return co(function*() {
       yield User.bulkWrite([{
@@ -6493,7 +6492,50 @@ describe('Model', function() {
 
       const doc = yield User.findOne();
       assert.ok(doc);
-      assert.strictEqual(doc.notInSchema, null);
+      assert.strictEqual(doc.notInSchema, undefined);
+    });
+  });
+
+  it('bulkWrite upsert with non-schema path in filter (gh-8698)', function() {
+    const userSchema = new Schema({
+      name: String
+    });
+    const User = db.model('User', userSchema);
+    mongoose.set('debug', true)
+
+    return co(function*() {
+      let err = yield User.bulkWrite([{
+        updateOne: {
+          filter: { notInSchema: 'foo' },
+          update: { name: 'test' },
+          upsert: true
+        }
+      }]).then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'StrictModeError');
+      assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
+
+      err = yield User.bulkWrite([{
+        updateMany: {
+          filter: { notInSchema: 'foo' },
+          update: { name: 'test' },
+          upsert: true
+        }
+      }]).then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'StrictModeError');
+      assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
+
+      err = yield User.bulkWrite([{
+        replaceOne: {
+          filter: { notInSchema: 'foo' },
+          update: { name: 'test' },
+          upsert: true
+        }
+      }]).then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'StrictModeError');
+      assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
     });
   });
 });

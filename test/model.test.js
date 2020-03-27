@@ -6501,7 +6501,6 @@ describe('Model', function() {
       name: String
     });
     const User = db.model('User', userSchema);
-    mongoose.set('debug', true);
 
     return co(function*() {
       let err = yield User.bulkWrite([{

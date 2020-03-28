@@ -1769,7 +1769,7 @@ describe('types array', function() {
 
   describe('of number', function() {
     it('allows nulls', function(done) {
-      const schema = new Schema({ x: [Number] }, { collection: 'nullsareallowed' + random() });
+      const schema = new Schema({ x: [Number] });
       const M = db.model('Test', schema);
       let m;
 

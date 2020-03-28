@@ -494,6 +494,7 @@ describe('QueryCursor', function() {
     const Movie = db.model('Movie', schema);
 
     return co(function*() {
+      yield Movie.deleteMany({});
       yield Movie.create([
         { name: 'Kickboxer' },
         { name: 'Ip Man' },

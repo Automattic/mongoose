@@ -8837,4 +8837,31 @@ describe('document', function() {
     const newDoc = new Model(doc);
     assert.equal(newDoc.name, 'test');
   });
+
+  it('can save nested array after setting (gh-8689)', function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      array: [[{
+        label: String,
+        value: String
+      }]]
+    });
+    const MyModel = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield MyModel.create({ name: 'foo' });
+
+      doc.set({
+        'array.0': [{
+          label: 'hello',
+          value: 'world'
+        }]
+      });
+      yield doc.save();
+
+      const updatedDoc = yield MyModel.findOne({ _id: doc._id });
+      assert.equal(updatedDoc.array[0][0].label, 'hello');
+      assert.equal(updatedDoc.array[0][0].value, 'world');
+    });
+  });
 });

@@ -1644,14 +1644,6 @@ describe('Query', function() {
     assert.strictEqual(opts.maxTimeMS, 1000);
   });
 
-  describe('update', function() {
-    it('when empty, nothing is run', function(done) {
-      const q = new Query;
-      assert.equal(false, !!q._castUpdate({}));
-      done();
-    });
-  });
-
   describe('bug fixes', function() {
     describe('collations', function() {
       before(function(done) {
@@ -3625,6 +3617,21 @@ describe('Query', function() {
       assert.equal(err.name, 'MongooseError');
       assert.equal(err.message, 'Query was already executed: Test.find({})');
       assert.ok(err.originalStack);
+    });
+  });
+
+  describe('stack traces', function() {
+    it('includes calling file for filter cast errors (gh-8691)', function() {
+      const toCheck = ['find', 'findOne', 'deleteOne'];
+      const Model = db.model('Test', Schema({}));
+
+      return co(function*() {
+        for (const fn of toCheck) {
+          const err = yield Model[fn]({ _id: 'fail' }).then(() => null, err => err);
+          assert.ok(err);
+          assert.ok(err.stack.includes(__filename), err.stack);
+        }
+      });
     });
   });
 });

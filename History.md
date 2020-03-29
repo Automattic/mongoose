@@ -1,3 +1,12 @@
+5.9.6 / 2020-03-23
+==================
+ * fix(document): allow saving document with nested document array after setting `nestedArr.0` #8689
+ * docs(connections): expand section about multiple connections to describe patterns for exporting schemas #8679
+ * docs(populate): add note about `execPopulate()` to "populate an existing document" section #8671 #8275
+ * docs: fix broken links #8690 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(guide): fix typos #8704 [MateRyze](https://github.com/MateRyze)
+ * docs(guide): fix minor typo #8683 [pkellz](https://github.com/pkellz)
+
 5.9.5 / 2020-03-16
 ==================
  * fix: upgrade mongodb driver -> 3.5.5 #8667 #8664 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

@@ -3598,4 +3598,19 @@ describe('Query', function() {
       assert.ok(res);
     });
   });
+
+  describe('stack traces', function() {
+    it('includes calling file for filter cast errors (gh-8691)', function() {
+      const toCheck = ['find', 'findOne', 'deleteOne'];
+      const Model = db.model('Test', Schema({}));
+
+      return co(function*() {
+        for (const fn of toCheck) {
+          const err = yield Model[fn]({ _id: 'fail' }).then(() => null, err => err);
+          assert.ok(err);
+          assert.ok(err.stack.includes(__filename), err.stack);
+        }
+      });
+    });
+  });
 });

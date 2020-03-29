@@ -3612,11 +3612,15 @@ describe('Query', function() {
       assert.equal(err.message, 'Query was already executed: Test.findOne({})');
       assert.ok(err.originalStack);
 
-      err = yield Test.find(() => {}).then(() => null, err => err);
+      const cb = () => {};
+      err = yield Test.find(cb).then(() => null, err => err);
       assert.ok(err);
       assert.equal(err.name, 'MongooseError');
       assert.equal(err.message, 'Query was already executed: Test.find({})');
       assert.ok(err.originalStack);
+
+      err = yield q.clone().then(() => null, err => err);
+      assert.ifError(err);
     });
   });
 
@@ -3631,6 +3635,83 @@ describe('Query', function() {
           assert.ok(err);
           assert.ok(err.stack.includes(__filename), err.stack);
         }
+      });
+    });
+  });
+
+  describe('clone', function() {
+    let Model;
+
+    beforeEach(function() {
+      Model = db.model('Test', Schema({ name: String, age: Number }));
+
+      return Model.create([
+        { name: 'Jean-Luc Picard', age: 59 },
+        { name: 'Will Riker', age: 29 }
+      ]);
+    });
+
+    it('with findOne', function() {
+      return co(function*() {
+        const q = Model.findOne({ age: 29 });
+        const q2 = q.clone();
+
+        let doc = yield q;
+        assert.equal(doc.name, 'Will Riker');
+
+        assert.deepEqual(q2._conditions, { age: 29 });
+        doc = yield q2;
+        assert.equal(doc.name, 'Will Riker');
+
+        const q3 = q.clone();
+        assert.deepEqual(q3._conditions, { age: 29 });
+        doc = yield q3;
+        assert.equal(doc.name, 'Will Riker');
+      });
+    });
+
+    it('with deleteOne', function() {
+      return co(function*() {
+        const q = Model.deleteOne({ age: 29 });
+
+        yield q;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+        yield Model.create({ name: 'Will Riker', age: 29 });
+
+        const q2 = q.clone();
+        assert.deepEqual(q2._conditions, { age: 29 });
+        yield q2;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+      });
+    });
+
+    it('with updateOne', function() {
+      return co(function*() {
+        const q = Model.updateOne({ name: 'Will Riker' }, { name: 'Thomas Riker' });
+
+        yield q;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+        yield Model.updateOne({ name: 'Thomas Riker' }, { name: 'Will Riker' });
+
+        const q2 = q.clone();
+        assert.deepEqual(q2._conditions, { name: 'Will Riker' });
+        assert.deepEqual(q2._update, { $set: { name: 'Thomas Riker' } });
+        yield q2;
+        assert.equal(yield Model.findOne({ name: 'Will Riker' }), null);
+      });
+    });
+
+    it('with distinct', function() {
+      return co(function*() {
+        const q = Model.distinct('name');
+
+        const res = yield q;
+        assert.deepEqual(res.sort(), ['Jean-Luc Picard', 'Will Riker']);
+
+        const q2 = q.clone();
+        assert.deepEqual(q2._distinct, 'name');
+        yield q2;
+        assert.deepEqual(res.sort(), ['Jean-Luc Picard', 'Will Riker']);
       });
     });
   });

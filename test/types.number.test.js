@@ -27,18 +27,6 @@ describe('types.number', function() {
     done();
   });
 
-  it('undefined throws number cast error', function(done) {
-    const n = new SchemaNumber();
-    let err;
-    try {
-      n.cast(undefined);
-    } catch (e) {
-      err = e;
-    }
-    assert.strictEqual(true, !!err);
-    done();
-  });
-
   it('array throws cast number error', function(done) {
     const n = new SchemaNumber();
     let err;

@@ -817,4 +817,31 @@ describe('Map', function() {
       assert.deepEqual(doc.modifiedPaths(), []);
     });
   });
+
+  it('handles setting map value to spread document (gh-8652)', function() {
+    const childSchema = mongoose.Schema({ name: String }, { _id: false });
+    const schema = mongoose.Schema({
+      docMap: {
+        type: Map,
+        of: childSchema
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.create({
+        docMap: {
+          captain: { name: 'Jean-Luc Picard' },
+          firstOfficer: { name: 'Will Riker' }
+        }
+      });
+      const doc = yield Model.findOne();
+
+      doc.docMap.set('captain', Object.assign({}, doc.docMap.get('firstOfficer')));
+      yield doc.save();
+
+      const fromDb = yield Model.findOne();
+      assert.equal(fromDb.docMap.get('firstOfficer').name, 'Will Riker');
+    });
+  });
 });

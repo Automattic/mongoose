@@ -11,7 +11,6 @@ const assert = require('assert');
 const co = require('co');
 const mongodb = require('mongodb');
 const mongoose = require('./common').mongoose;
-const random = require('../lib/utils').random;
 
 const MongooseArray = mongoose.Types.Array;
 const Schema = mongoose.Schema;
@@ -1769,7 +1768,7 @@ describe('types array', function() {
 
   describe('of number', function() {
     it('allows nulls', function(done) {
-      const schema = new Schema({ x: [Number] }, { collection: 'nullsareallowed' + random() });
+      const schema = new Schema({ x: [Number] });
       const M = db.model('Test', schema);
       let m;
 

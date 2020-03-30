@@ -1,3 +1,10 @@
+5.9.7 / 2020-03-30
+==================
+ * fix(map): avoid infinite loop when setting a map of documents to a document copied using spread operator #8722
+ * fix(query): clean stack trace for filter cast errors so they include the calling file #8691
+ * fix(model): make bulkWrite updates error if `strict` and `upsert` are set and `filter` contains a non-schema path #8698
+ * fix(cast): make internal `castToNumber()` allow undefined #8725 [p3x-robot](https://github.com/p3x-robot)
+
 5.9.6 / 2020-03-23
 ==================
  * fix(document): allow saving document with nested document array after setting `nestedArr.0` #8689

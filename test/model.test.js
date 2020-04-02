@@ -6546,20 +6546,20 @@ describe('Model', function() {
     const User = db.model('User', userSchema);
 
     return co(function*() {
-      const [user1, user2] = yield User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
+      const users = yield User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
 
       yield User.bulkWrite([
-        { updateOne: { filter: { _id: user1._id }, update: { name: 'John1' }, timestamps: false } },
-        { updateMany: { filter: { _id: user2._id }, update: { name: 'John2' }, timestamps: false } }
+        { updateOne: { filter: { _id: users[0]._id }, update: { name: 'John1' }, timestamps: false } },
+        { updateMany: { filter: { _id: users[1]._id }, update: { name: 'John2' }, timestamps: false } }
       ]);
 
-      const [updatedUser1, updatedUser2] = yield Promise.all([
-        User.findOne({ _id: user1._id }),
-        User.findOne({ _id: user2._id })
+      const usersAfterUpdate = yield Promise.all([
+        User.findOne({ _id: users[0]._id }),
+        User.findOne({ _id: users[1]._id })
       ]);
 
-      assert.deepEqual(user1.updatedAt, updatedUser1.updatedAt);
-      assert.deepEqual(user2.updatedAt, updatedUser2.updatedAt);
+      assert.deepEqual(users[0].updatedAt, usersAfterUpdate[0].updatedAt);
+      assert.deepEqual(users[1].updatedAt, usersAfterUpdate[1].updatedAt);
     });
   });
 });

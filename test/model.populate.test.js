@@ -8143,6 +8143,33 @@ describe('model: populate:', function() {
     });
   });
 
+  it('can use clone with lean (gh-8760)', function() {
+    const blogPostSchema = new Schema({
+      commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+    });
+
+    const commentSchema = new Schema({ content: String });
+
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+    const Comment = db.model('Comment', commentSchema);
+
+    const comment = new Comment({ content: 'Cool post.' });
+    const blogPost = new BlogPost({ commentsIds: [comment._id] });
+
+    return co(function*() {
+      yield Promise.all([
+        blogPost.save(),
+        comment.save()
+      ]);
+
+      const foundBlogPost = yield BlogPost.findOne({ _id: blogPost._id })
+        .populate({ path: 'commentsIds', options: { clone: true } })
+        .lean();
+
+      assert.equal(foundBlogPost.commentsIds[0].content, 'Cool post.');
+    });
+  });
+
   it('handles double nested array `foreignField` (gh-7374)', function() {
     const songSchema = Schema({
       title: { type: String },

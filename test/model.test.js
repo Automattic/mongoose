@@ -6537,4 +6537,29 @@ describe('Model', function() {
       assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
     });
   });
+
+  it('bulkWrite can disable timestamps with updateOne, and updateMany', function() {
+    const userSchema = new Schema({
+      name: String
+    }, { timestamps: true });
+
+    const User = db.model('User', userSchema);
+
+    return co(function*() {
+      const [user1, user2] = yield User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
+
+      yield User.bulkWrite([
+        { updateOne: { filter: { _id: user1._id }, update: { name: 'John1' }, timestamps: false } },
+        { updateMany: { filter: { _id: user2._id }, update: { name: 'John2' }, timestamps: false } }
+      ]);
+
+      const [updatedUser1, updatedUser2] = yield Promise.all([
+        User.findOne({ _id: user1._id }),
+        User.findOne({ _id: user2._id })
+      ]);
+
+      assert.deepEqual(user1.updatedAt, updatedUser1.updatedAt);
+      assert.deepEqual(user2.updatedAt, updatedUser2.updatedAt);
+    });
+  });
 });

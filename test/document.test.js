@@ -2078,7 +2078,7 @@ describe('document', function() {
       });
     });
 
-    it('passes save custom options to Model.exists(...) when no changes are present', function() {
+    it('passes save custom options to Model.exists(...) when no changes are present (gh-8739)', function() {
       const personSchema = new Schema({ name: String });
 
       let optionInMiddleware;

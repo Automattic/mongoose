@@ -230,11 +230,6 @@ beforeEach(function() {
   }
 });
 
-if (process.env.D === '1') {
-  global.Promise = require('promise-debug');
-  mongoose.Promise = require('promise-debug');
-}
-
 process.on('unhandledRejection', function(error, promise) {
   if (error.$expected) {
     return;

@@ -844,4 +844,28 @@ describe('Map', function() {
       assert.equal(fromDb.docMap.get('firstOfficer').name, 'Will Riker');
     });
   });
+
+  it('runs getters on map values (gh-8730)', function() {
+    const schema = mongoose.Schema({
+      name: String,
+      books: {
+        type: Map,
+        of: {
+          type: String,
+          get: function(v) { return `${v}, by ${this.name}`; }
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({
+      name: 'Ian Fleming',
+      books: {
+        'casino-royale': 'Casino Royale'
+      }
+    });
+
+    assert.equal(doc.books.get('casino-royale'), 'Casino Royale, by Ian Fleming');
+    assert.equal(doc.get('books.casino-royale'), 'Casino Royale, by Ian Fleming');
+  });
 });

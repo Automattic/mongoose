@@ -2077,6 +2077,26 @@ describe('document', function() {
         assert.equal(threw, true);
       });
     });
+
+    it('passes save custom options to Model.exists(...) when no changes are present', function() {
+      const personSchema = new Schema({ name: String });
+
+      let optionInMiddleware;
+
+      personSchema.pre('findOne', function(next) {
+        optionInMiddleware = this.getOptions().customOption;
+
+        return next();
+      });
+
+      const Person = db.model('Person', personSchema);
+      return co(function*() {
+        const person = yield Person.create({ name: 'Hafez' });
+        yield person.save({ customOption: 'test' });
+
+        assert.equal(optionInMiddleware, 'test');
+      });
+    });
   });
 
   it('properly calls queue functions (gh-2856)', function(done) {

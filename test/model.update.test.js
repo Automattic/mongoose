@@ -3339,6 +3339,25 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('respects useNestedStrict: false when updating a single nested path (gh-8735)', function() {
+    const emptySchema = Schema({}, {
+      strict : false,
+      _id : false,
+      versionKey : false
+    });
+
+    const testSchema = Schema({
+      test: String,
+      nested: emptySchema
+    }, { strict: true, versionKey: false, useNestedStrict: false });
+    const Test = db.model('Test', testSchema);
+
+    const update = { nested: { notInSchema: 'bar' } };
+    return Test.updateOne({ test: 'foo' }, update, { upsert: true }).
+      then(() => Test.collection.findOne()).
+      then(doc => assert.strictEqual(doc.nested.notInSchema, void 0));
+  });
+
   describe('mongodb 42 features', function() {
     before(function(done) {
       start.mongodVersion((err, version) => {

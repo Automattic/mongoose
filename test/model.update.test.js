@@ -3343,7 +3343,7 @@ describe('model: updateOne: ', function() {
     const emptySchema = Schema({}, {
       strict: false,
       _id: false,
-      versionKey : false
+      versionKey: false
     });
 
     const testSchema = Schema({

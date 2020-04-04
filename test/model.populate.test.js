@@ -8144,61 +8144,54 @@ describe('model: populate:', function() {
   });
 
   describe('gh-8760', function() {
-    it('can use clone with lean', function() {
-      const blogPostSchema = new Schema({
-        commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+    it('clone with lean creates identical copies from the same document', function() {
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
+
+      const postSchema = new Schema({
+        user: { type: mongoose.ObjectId, ref: 'User' },
+        title: String
       });
 
-      const commentSchema = new Schema({ content: String });
-
-      const BlogPost = db.model('BlogPost', blogPostSchema);
-      const Comment = db.model('Comment', commentSchema);
-
-      const comment = new Comment({ content: 'Cool post.' });
-      const blogPost = new BlogPost({ commentsIds: [comment._id] });
+      const Post = db.model('BlogPost', postSchema);
 
       return co(function*() {
-        yield Promise.all([
-          blogPost.save(),
-          comment.save()
+        const user = yield User.create({ name: 'val' });
+        yield Post.create([
+          { title: 'test1', user: user },
+          { title: 'test2', user: user }
         ]);
 
-        const foundBlogPost = yield BlogPost.findOne({ _id: blogPost._id })
-          .populate({ path: 'commentsIds', options: { clone: true } })
-          .lean();
+        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
 
-        assert.equal(foundBlogPost.commentsIds[0].content, 'Cool post.');
+        posts[0].user.name = 'val2';
+        assert.equal(posts[1].user.name, 'val');
       });
     });
 
-    it('clone with populate and lean correctly makes child lean', function() {
+    it('clone with populate and lean makes child lean', function() { {
       const isLean = v => v != null && !(v instanceof mongoose.Document);
 
-      const blogPostSchema = new Schema({
-        commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
+
+      const postSchema = new Schema({
+        user: { type: mongoose.ObjectId, ref: 'User' },
+        title: String
       });
 
-      const commentSchema = new Schema({ content: String });
-
-      const BlogPost = db.model('BlogPost', blogPostSchema);
-      const Comment = db.model('Comment', commentSchema);
-
-      const comment = new Comment({ content: 'Cool post.' });
-      const blogPost = new BlogPost({ commentsIds: [comment._id] });
+      const Post = db.model('BlogPost', postSchema);
 
       return co(function*() {
-        yield Promise.all([
-          blogPost.save(),
-          comment.save()
-        ]);
+        const user = yield User.create({ name: 'val' });
 
-        const foundBlogPost = yield BlogPost.findOne({ _id: blogPost._id })
-          .populate({ path: 'commentsIds', options: { clone: true } })
-          .lean();
+        yield Post.create({ title: 'test1', user: user });
 
-        assert.ok(isLean(foundBlogPost.commentsIds[0]));
+        const post = yield Post.findOne().populate({ path: 'user', options: { clone: true } }).lean();
+
+        assert.ok(isLean(post.user));
       });
-    });
+    }});
   });
 
   it('handles double nested array `foreignField` (gh-7374)', function() {

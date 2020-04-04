@@ -3341,8 +3341,8 @@ describe('model: updateOne: ', function() {
 
   it('respects useNestedStrict: false when updating a single nested path (gh-8735)', function() {
     const emptySchema = Schema({}, {
-      strict : false,
-      _id : false,
+      strict: false,
+      _id: false,
       versionKey : false
     });
 

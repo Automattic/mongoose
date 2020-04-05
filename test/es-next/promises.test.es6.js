@@ -110,8 +110,46 @@ describe('promises docs', function () {
    * However, we recommend using `.exec()` because that gives you
    * better stack traces.
    */
-  it('Should You Use `exec()` With `await`?', function() {
-    
+  it('Should You Use `exec()` With `await`?', async function() {
+    const doc = await Band.findOne({ name: "Guns N' Roses" }); // works
+    // acquit:ignore:start
+    assert.ok(!doc);
+    // acquit:ignore:end
+
+    const badId = 'this is not a valid id';
+    try {
+      await Band.findOne({ _id: badId });
+    } catch (err) {
+      // Without `exec()`, the stack trace does **not** include the
+      // calling code. Below is the stack trace:
+      //
+      // CastError: Cast to ObjectId failed for value "this is not a valid id" at path "_id" for model "band-promises"
+      //   at new CastError (/app/node_modules/mongoose/lib/error/cast.js:29:11)
+      //   at model.Query.exec (/app/node_modules/mongoose/lib/query.js:4331:21)
+      //   at model.Query.Query.then (/app/node_modules/mongoose/lib/query.js:4423:15)
+      //   at process._tickCallback (internal/process/next_tick.js:68:7)
+      err.stack;
+      // acquit:ignore:start
+      assert.ok(!err.stack.includes('promises.test.es6.js'));
+      // acquit:ignore:end
+    }
+
+    try {
+      await Band.findOne({ _id: badId }).exec();
+    } catch (err) {
+      // With `exec()`, the stack trace includes where in your code you
+      // called `exec()`. Below is the stack trace:
+      //
+      // CastError: Cast to ObjectId failed for value "this is not a valid id" at path "_id" for model "band-promises"
+      //   at new CastError (/app/node_modules/mongoose/lib/error/cast.js:29:11)
+      //   at model.Query.exec (/app/node_modules/mongoose/lib/query.js:4331:21)
+      //   at Context.<anonymous> (/app/test/index.test.js:138:42)
+      //   at process._tickCallback (internal/process/next_tick.js:68:7)
+      err.stack;
+      // acquit:ignore:start
+      assert.ok(err.stack.includes('promises.test.es6.js'));
+      // acquit:ignore:end
+    }
   });
   
   /**

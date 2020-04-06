@@ -167,7 +167,6 @@ block content
     * `useUnifiedTopology`- False by default. Set to `true` to opt in to using [the MongoDB driver's new connection management engine](/docs/deprecations.html#useunifiedtopology). You should set this option to `true`, except for the unlikely case that it prevents you from maintaining a stable connection.
     * `promiseLibrary`    - Sets the [underlying driver's promise library](http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html).
     * `poolSize`          - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `poolSize` is 5. Keep in mind that, as of MongoDB 3.4, MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
-    * `connectTimeoutMS`  - How long the MongoDB driver will wait before killing a socket due to inactivity _during initial connection_. Defaults to 30000. This option is passed transparently to [Node.js' `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback).
     * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. This is set to `30000` by default, you should set this to 2-3x your longest running operation if you expect some of your database operations to run longer than 20 seconds. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
     * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
     * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
@@ -179,11 +178,19 @@ block content
     * `reconnectTries`    - If you're connected to a single server or mongos proxy (as opposed to a replica set), the MongoDB driver will try to reconnect every `reconnectInterval` milliseconds for `reconnectTries` times, and give up afterward. When the driver gives up, the mongoose connection emits a `reconnectFailed` event. This option does nothing for replica set connections.
     * `reconnectInterval` - See `reconnectTries`
     * `bufferMaxEntries`  - The MongoDB driver also has its own buffering mechanism that kicks in when the driver is disconnected. Set this option to 0 and set `bufferCommands` to `false` on your schemas if you want your database operations to fail immediately when the driver is not connected, as opposed to waiting for reconnection.
+    * `connectTimeoutMS`  - How long the MongoDB driver will wait before killing a socket due to inactivity _during initial connection_. Defaults to 30000. This option is passed transparently to [Node.js' `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback).
 
     The following options are important for tuning Mongoose only if you are
     running **with** [the `useUnifiedTopology` option](/docs/deprecations.html#useunifiedtopology):
 
     * `serverSelectionTimeoutMS` - With `useUnifiedTopology`, the MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
+    * `heartbeatFrequencyMS` - With `useUnifiedTopology`, the MongoDB driver sends a heartbeat every `heartbeatFrequencyMS` to check on the status of the connection. A heartbeat is subject to `serverSelectionTimeoutMS`, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a `'disconnected'` event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits `'disconnected'`. We recommend you do **not** set this setting below 1000, too many heartbeats can lead to performance degradation.
+
+    The `serverSelectionTimeoutMS` option also handles how long `mongoose.connect()` will
+    retry initial connection before erroring out. With `useUnifiedTopology`, `mongoose.connect()`
+    will retry for 30 seconds by default (default `serverSelectionTimeoutMS`) before
+    erroring out. To get faster feedback on failed operations, you can reduce `serverSelectionTimeoutMS`
+    to 5000 as shown below.
 
     Example:
 

@@ -1442,12 +1442,6 @@ describe('schema', function() {
 
       assert.throws(function() {
         new Schema({
-          modelName: String
-        });
-      }, /`modelName` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
           isNew: String
         });
       }, /`isNew` may not be used as a schema pathname/);

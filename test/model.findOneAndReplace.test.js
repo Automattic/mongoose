@@ -29,6 +29,7 @@ describe('model: findOneAndReplace:', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
     Comments = new Schema;

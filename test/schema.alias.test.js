@@ -25,6 +25,7 @@ describe('schema alias option', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('works with all basic schema types', function(done) {
     const schema = new Schema({

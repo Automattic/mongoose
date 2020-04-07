@@ -62,6 +62,7 @@ describe('types.documentarray', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('behaves and quacks like an array', function(done) {
     const a = new MongooseDocumentArray();

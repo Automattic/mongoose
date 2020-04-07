@@ -68,8 +68,8 @@ describe('model: populate:', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('populating array of object', function(done) {
     const BlogPost = db.model('BlogPost', blogPostSchema);

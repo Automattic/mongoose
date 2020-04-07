@@ -29,8 +29,8 @@ describe('model: querying:', function() {
   before(() => { db = start(); });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
     Comments = new Schema;

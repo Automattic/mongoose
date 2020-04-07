@@ -53,6 +53,7 @@ describe('types.buffer', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
     let a = new MongooseBuffer;

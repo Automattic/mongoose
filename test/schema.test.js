@@ -56,6 +56,7 @@ describe('schema', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('nested fields with same name', function() {
     let NestedModel;

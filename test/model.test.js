@@ -86,6 +86,7 @@ describe('Model', function() {
   });
 
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('can be created using _id as embedded document', function(done) {
     const Test = db.model('Test', Schema({

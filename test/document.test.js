@@ -134,6 +134,7 @@ describe('document', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => util.clearTestData(db));
+  afterEach(() => util.stopRemainingOps(db));
 
   describe('constructor', function() {
     it('supports passing in schema directly (gh-8237)', function() {

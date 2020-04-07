@@ -52,6 +52,7 @@ describe('model', function() {
     });
 
     afterEach(() => require('./util').clearTestData(db));
+    afterEach(() => require('./util').stopRemainingOps(db));
 
     after(function(done) {
       db.close(done);

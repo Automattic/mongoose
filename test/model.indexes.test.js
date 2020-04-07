@@ -29,6 +29,7 @@ describe('model', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('indexes', function() {
     this.timeout(5000);

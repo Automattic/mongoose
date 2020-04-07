@@ -14,3 +14,12 @@ exports.clearTestData = function clearTestData(db) {
 
   return Promise.all(arr);
 };
+
+exports.stopRemainingOps = function stopRemainingOps(db) {
+  // Make all future operations on currently defined models hang
+  // forever. Since the collection gets deleted, should get
+  // garbage collected.
+  for (const model of Object.values(db.models)) {
+    model.collection.buffer = true;
+  }
+};

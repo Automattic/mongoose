@@ -79,6 +79,23 @@ describe('Tutorial: findOneAndUpdate()', function() {
     // acquit:ignore:end
   });
 
+  it('returnOriginal option', async function() {
+    const filter = { name: 'Jean-Luc Picard' };
+    const update = { age: 59 };
+
+    // `doc` is the document _after_ `update` was applied because of
+    // `returnOriginal: false`
+    let doc = await Character.findOneAndUpdate(filter, update, {
+      returnOriginal: false
+    });
+    doc.name; // 'Jean-Luc Picard'
+    doc.age; // 59
+    // acquit:ignore:start
+    assert.equal(doc.name, 'Jean-Luc Picard');
+    assert.equal(doc.age, 59);
+    // acquit:ignore:end
+  });
+
   it('save race condition', async function() {
     const filter = { name: 'Jean-Luc Picard' };
     const update = { age: 59 };

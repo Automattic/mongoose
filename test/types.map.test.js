@@ -869,4 +869,33 @@ describe('Map', function() {
     assert.equal(doc.books.get('casino-royale'), 'Casino Royale, by Ian Fleming');
     assert.equal(doc.get('books.casino-royale'), 'Casino Royale, by Ian Fleming');
   });
+
+  it('handles validation of document array with maps and nested paths (gh-8767)', function() {
+    const subSchema = Schema({
+      _id: Number,
+      level2: {
+        type : Map,
+        of: Schema({
+          _id: Number,
+          level3: { 
+            type: Map,
+            of: Number,
+            required: true
+          }
+        })
+      },
+      otherProps: { test: Number }
+    });
+    const mainSchema = Schema({ _id: Number, level1: [subSchema] });
+    const Test = db.model('Test', mainSchema);
+
+    const doc = new Test({
+      _id: 1,
+      level1: [
+        { _id: 10, level2: { answer: { _id: 101, level3: { value: 42 } } } },
+        { _id: 20, level2: { powerLevel: { _id: 201, level3: { value: 9001 } } } }
+      ]
+    });
+    return doc.validate();
+  });
 });

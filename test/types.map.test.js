@@ -874,10 +874,10 @@ describe('Map', function() {
     const subSchema = Schema({
       _id: Number,
       level2: {
-        type : Map,
+        type: Map,
         of: Schema({
           _id: Number,
-          level3: { 
+          level3: {
             type: Map,
             of: Number,
             required: true

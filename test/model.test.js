@@ -6563,4 +6563,30 @@ describe('Model', function() {
       assert.deepEqual(users[1].updatedAt, usersAfterUpdate[1].updatedAt);
     });
   });
+
+  it('bulkWrite can overwrite schema `strict` option (gh-8778)', function() {
+    const userSchema = new Schema({
+      name: String
+    }, { strict: true });
+
+    const User = db.model('User', userSchema);
+
+    return co(function*() {
+      const users = yield User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
+
+      yield User.bulkWrite([
+        { updateOne: { filter: { _id: users[0]._id }, update: { notInSchema: 1 } } },
+        { updateMany: { filter: { _id: users[1]._id }, update: { notInSchema: 2 } } }
+      ],
+      { strict: false });
+
+      const usersAfterUpdate = yield Promise.all([
+        User.collection.findOne({ _id: users[0]._id }),
+        User.collection.findOne({ _id: users[1]._id })
+      ]);
+
+      assert.equal(usersAfterUpdate[0].notInSchema, 1);
+      assert.equal(usersAfterUpdate[1].notInSchema, 2);
+    });
+  });
 });

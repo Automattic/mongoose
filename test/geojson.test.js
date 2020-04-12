@@ -37,6 +37,7 @@ describe('geojson', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('driver query', function() {
     const City = db.model('City', new Schema({

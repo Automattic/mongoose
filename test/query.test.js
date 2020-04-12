@@ -49,6 +49,7 @@ describe('Query', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('constructor', function() {
     it('should not corrupt options', function(done) {

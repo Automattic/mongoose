@@ -1,3 +1,22 @@
+5.9.8 / 2020-04-06
+==================
+ * fix(map): run getters when calling `Map#get()` #8730
+ * fix(populate): handle `refPath` function in embedded discriminator #8731
+ * fix(model): allow setting timestamps to false for bulkWrite #8758 #8745 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): pass custom options to `exists()` when no changes to save #8764 #8739 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(update): respect `useNestedStrict: false` when updating a single nested path #8735
+ * fix(schema): allow `modelName` as a schema path, since `modelName` is a static property on models #7967
+ * docs(promises): add section about using `exec()` with queries and `await` #8747
+ * docs(connections): clarify that `connectTimeoutMS` doesn't do anything with `useUnifiedTopology`, should use `serverSelectionTimeoutMS` #8721
+ * chore: upgrade mpath -> 0.7.0 #8762 [roja548](https://github.com/roja548)
+
+5.9.7 / 2020-03-30
+==================
+ * fix(map): avoid infinite loop when setting a map of documents to a document copied using spread operator #8722
+ * fix(query): clean stack trace for filter cast errors so they include the calling file #8691
+ * fix(model): make bulkWrite updates error if `strict` and `upsert` are set and `filter` contains a non-schema path #8698
+ * fix(cast): make internal `castToNumber()` allow undefined #8725 [p3x-robot](https://github.com/p3x-robot)
+
 5.9.6 / 2020-03-23
 ==================
  * fix(document): allow saving document with nested document array after setting `nestedArr.0` #8689

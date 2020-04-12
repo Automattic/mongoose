@@ -68,8 +68,8 @@ describe('model: populate:', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('populating array of object', function(done) {
     const BlogPost = db.model('BlogPost', blogPostSchema);
@@ -9240,5 +9240,86 @@ describe('model: populate:', function() {
       assert(err);
       assert.equal(err.message, 'Can not use `limit` and `perDocumentLimit` at the same time. Path: `blogposts`.');
     });
+  });
+
+  it('handles function refPath with discriminators (gh-8731)', function() {
+    return co(function *() {
+      const nested = Schema({}, { discriminatorKey: 'type' });
+      const mainSchema = Schema({ items: [nested] });
+
+      mainSchema.path('items').discriminator('TestDiscriminator', Schema({
+        childModel: { type: String },
+        child: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: (doc, path) => path.replace('.child', '.childModel')
+        }
+      }));
+      const Parent = db.model('Parent', mainSchema);
+      const Child = db.model('Child', Schema({ name: String }));
+
+      const child = yield Child.create({ name: 'test' });
+      yield Parent.create({
+        items: [{
+          type: 'TestDiscriminator',
+          childModel: 'Child',
+          child: child._id
+        }]
+      });
+
+      const doc = yield Parent.findOne().populate('items.child').exec();
+      assert.equal(doc.items[0].child.name, 'test');
+      assert.ok(doc.items[0].populated('child'));
+    });
+  });
+
+  describe('gh-8760', function() {
+    it('clone with lean creates identical copies from the same document', function() {
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
+
+      const postSchema = new Schema({
+        user: { type: mongoose.ObjectId, ref: 'User' },
+        title: String
+      });
+
+      const Post = db.model('BlogPost', postSchema);
+
+      return co(function*() {
+        const user = yield User.create({ name: 'val' });
+        yield Post.create([
+          { title: 'test1', user: user },
+          { title: 'test2', user: user }
+        ]);
+
+        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
+
+        posts[0].user.name = 'val2';
+        assert.equal(posts[1].user.name, 'val');
+      });
+    });
+
+    it('clone with populate and lean makes child lean', function() { {
+      const isLean = v => v != null && !(v instanceof mongoose.Document);
+
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
+
+      const postSchema = new Schema({
+        user: { type: mongoose.ObjectId, ref: 'User' },
+        title: String
+      });
+
+      const Post = db.model('BlogPost', postSchema);
+
+      return co(function*() {
+        const user = yield User.create({ name: 'val' });
+
+        yield Post.create({ title: 'test1', user: user });
+
+        const post = yield Post.findOne().populate({ path: 'user', options: { clone: true } }).lean();
+
+        assert.ok(isLean(post.user));
+      });
+    }});
   });
 });

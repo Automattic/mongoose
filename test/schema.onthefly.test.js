@@ -26,6 +26,7 @@ describe('schema.onthefly', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('setting should cache the schema type and cast values appropriately', function(done) {
     const Decorated = db.model('Test', DecoratedSchema);

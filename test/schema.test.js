@@ -56,6 +56,7 @@ describe('schema', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('nested fields with same name', function() {
     let NestedModel;
@@ -1439,12 +1440,6 @@ describe('schema', function() {
           db: String
         });
       }, /`db` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          modelName: String
-        });
-      }, /`modelName` may not be used as a schema pathname/);
 
       assert.throws(function() {
         new Schema({

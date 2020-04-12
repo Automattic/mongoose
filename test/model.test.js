@@ -86,6 +86,7 @@ describe('Model', function() {
   });
 
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('can be created using _id as embedded document', function(done) {
     const Test = db.model('Test', Schema({
@@ -6535,6 +6536,31 @@ describe('Model', function() {
       assert.ok(err);
       assert.equal(err.name, 'StrictModeError');
       assert.ok(err.message.indexOf('notInSchema') !== -1, err.message);
+    });
+  });
+
+  it('bulkWrite can disable timestamps with updateOne, and updateMany', function() {
+    const userSchema = new Schema({
+      name: String
+    }, { timestamps: true });
+
+    const User = db.model('User', userSchema);
+
+    return co(function*() {
+      const users = yield User.create([{ name: 'Hafez1' }, { name: 'Hafez2' }]);
+
+      yield User.bulkWrite([
+        { updateOne: { filter: { _id: users[0]._id }, update: { name: 'John1' }, timestamps: false } },
+        { updateMany: { filter: { _id: users[1]._id }, update: { name: 'John2' }, timestamps: false } }
+      ]);
+
+      const usersAfterUpdate = yield Promise.all([
+        User.findOne({ _id: users[0]._id }),
+        User.findOne({ _id: users[1]._id })
+      ]);
+
+      assert.deepEqual(users[0].updatedAt, usersAfterUpdate[0].updatedAt);
+      assert.deepEqual(users[1].updatedAt, usersAfterUpdate[1].updatedAt);
     });
   });
 });

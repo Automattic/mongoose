@@ -26,6 +26,7 @@ describe('QueryCursor', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
     const schema = new Schema({ name: String });

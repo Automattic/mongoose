@@ -30,6 +30,7 @@ describe('Map', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('validation', function() {
     const nestedValidateCalls = [];
@@ -843,5 +844,58 @@ describe('Map', function() {
       const fromDb = yield Model.findOne();
       assert.equal(fromDb.docMap.get('firstOfficer').name, 'Will Riker');
     });
+  });
+
+  it('runs getters on map values (gh-8730)', function() {
+    const schema = mongoose.Schema({
+      name: String,
+      books: {
+        type: Map,
+        of: {
+          type: String,
+          get: function(v) { return `${v}, by ${this.name}`; }
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({
+      name: 'Ian Fleming',
+      books: {
+        'casino-royale': 'Casino Royale'
+      }
+    });
+
+    assert.equal(doc.books.get('casino-royale'), 'Casino Royale, by Ian Fleming');
+    assert.equal(doc.get('books.casino-royale'), 'Casino Royale, by Ian Fleming');
+  });
+
+  it('handles validation of document array with maps and nested paths (gh-8767)', function() {
+    const subSchema = Schema({
+      _id: Number,
+      level2: {
+        type: Map,
+        of: Schema({
+          _id: Number,
+          level3: {
+            type: Map,
+            of: Number,
+            required: true
+          }
+        })
+      },
+      otherProps: { test: Number }
+    });
+    const mainSchema = Schema({ _id: Number, level1: [subSchema] });
+    const Test = db.model('Test', mainSchema);
+
+    const doc = new Test({
+      _id: 1,
+      level1: [
+        { _id: 10, level2: { answer: { _id: 101, level3: { value: 42 } } } },
+        { _id: 20, level2: { powerLevel: { _id: 201, level3: { value: 9001 } } } }
+      ]
+    });
+    return doc.validate();
   });
 });

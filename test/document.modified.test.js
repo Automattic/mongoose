@@ -26,6 +26,7 @@ describe('document modified', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function() {
     const Comments = new Schema;

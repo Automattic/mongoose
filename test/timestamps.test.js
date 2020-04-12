@@ -21,6 +21,7 @@ describe('timestamps', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('does not override timestamp params defined in schema (gh-4868)', function(done) {
     const startTime = Date.now();

@@ -93,8 +93,8 @@ describe('aggregate: ', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('append', function() {
     it('(pipeline)', function(done) {

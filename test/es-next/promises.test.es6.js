@@ -20,6 +20,8 @@ describe('promises docs', function () {
   });
 
   after(function (done) {
+    mongoose.Promise = global.Promise;
+
     db.close(done);
   });
 
@@ -56,16 +58,15 @@ describe('promises docs', function () {
    * a fully-fledged promise, use the `.exec()` function.
    */
   it('Queries are not promises', function (done) {
-    const filter = { name: "Guns N' Roses" };
-    const query = Band.findOne(filter);
+    var query = Band.findOne({name: "Guns N' Roses"});
     assert.ok(!(query instanceof Promise));
 
     // acquit:ignore:start
-    let outstanding = 2;
+    var outstanding = 2;
     // acquit:ignore:end
 
     // A query is not a fully-fledged promise, but it does have a `.then()`.
-    Band.findOne(filter).then(function (doc) {
+    query.then(function (doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -74,10 +75,10 @@ describe('promises docs', function () {
     });
 
     // `.exec()` gives you a fully-fledged promise
-    const promise = Band.findOne(filter).exec();
+    var promise = query.exec();
     assert.ok(promise instanceof Promise);
 
-    promise.then(function(doc) {
+    promise.then(function (doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -111,8 +112,46 @@ describe('promises docs', function () {
    * However, we recommend using `.exec()` because that gives you
    * better stack traces.
    */
-  it('Should You Use `exec()` With `await`?', function() {
-    
+  it('Should You Use `exec()` With `await`?', async function() {
+    const doc = await Band.findOne({ name: "Guns N' Roses" }); // works
+    // acquit:ignore:start
+    assert.ok(!doc);
+    // acquit:ignore:end
+
+    const badId = 'this is not a valid id';
+    try {
+      await Band.findOne({ _id: badId });
+    } catch (err) {
+      // Without `exec()`, the stack trace does **not** include the
+      // calling code. Below is the stack trace:
+      //
+      // CastError: Cast to ObjectId failed for value "this is not a valid id" at path "_id" for model "band-promises"
+      //   at new CastError (/app/node_modules/mongoose/lib/error/cast.js:29:11)
+      //   at model.Query.exec (/app/node_modules/mongoose/lib/query.js:4331:21)
+      //   at model.Query.Query.then (/app/node_modules/mongoose/lib/query.js:4423:15)
+      //   at process._tickCallback (internal/process/next_tick.js:68:7)
+      err.stack;
+      // acquit:ignore:start
+      assert.ok(!err.stack.includes('promises.test.es6.js'));
+      // acquit:ignore:end
+    }
+
+    try {
+      await Band.findOne({ _id: badId }).exec();
+    } catch (err) {
+      // With `exec()`, the stack trace includes where in your code you
+      // called `exec()`. Below is the stack trace:
+      //
+      // CastError: Cast to ObjectId failed for value "this is not a valid id" at path "_id" for model "band-promises"
+      //   at new CastError (/app/node_modules/mongoose/lib/error/cast.js:29:11)
+      //   at model.Query.exec (/app/node_modules/mongoose/lib/query.js:4331:21)
+      //   at Context.<anonymous> (/app/test/index.test.js:138:42)
+      //   at process._tickCallback (internal/process/next_tick.js:68:7)
+      err.stack;
+      // acquit:ignore:start
+      assert.ok(err.stack.includes('promises.test.es6.js'));
+      // acquit:ignore:end
+    }
   });
   
   /**
@@ -127,16 +166,15 @@ describe('promises docs', function () {
       return done();
     }
     // acquit:ignore:end
+    var query = Band.findOne({name: "Guns N' Roses"});
 
     // Use bluebird
     mongoose.Promise = require('bluebird');
-    let promise = Band.findOne({ name: "Guns N' Roses" }).exec();
-    assert.equal(promise.constructor, require('bluebird'));
+    assert.equal(query.exec().constructor, require('bluebird'));
 
     // Use q. Note that you **must** use `require('q').Promise`.
     mongoose.Promise = require('q').Promise;
-    promise = Band.findOne({ name: "Guns N' Roses" }).exec();
-    assert.ok(promise instanceof require('q').makePromise);
+    assert.ok(query.exec() instanceof require('q').makePromise);
 
     // acquit:ignore:start
     done();

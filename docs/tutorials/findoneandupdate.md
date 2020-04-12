@@ -23,6 +23,15 @@ You should set the `new` option to `true` to return the document **after** `upda
 
 Mongoose's `findOneAndUpdate()` is slightly different from [the MongoDB Node.js driver's `findOneAndUpdate()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOneAndUpdate) because it returns the document itself, not a [result object](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~findAndModifyWriteOpResult).
 
+As an alternative to the `new` option, you can also use the `returnOriginal` option.
+`returnOriginal: false` is equivalent to `new: true`. The `returnOriginal` option
+exists for consistency with the [the MongoDB Node.js driver's `findOneAndUpdate()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOneAndUpdate),
+which has the same option.
+
+```javascript
+[require:Tutorial.*findOneAndUpdate.*returnOriginal option]
+```
+
 <h2 id="atomic-updates">Atomic Updates</h2>
 
 With the exception of an [unindexed upsert](https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/#upsert-and-unique-index), [`findOneAndUpdate()` is atomic](https://docs.mongodb.com/manual/core/write-operations-atomicity/#atomicity). That means you can assume the document doesn't change between when MongoDB finds the document and when it updates the document, _unless_ you're doing an [upsert](#upsert).

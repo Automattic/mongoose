@@ -167,14 +167,35 @@ block content
     [QueryCursor](./api.html#query_Query-cursor).
 
     ```javascript
-    var cursor = Person.find({ occupation: /host/ }).cursor();
-    cursor.on('data', function(doc) {
-      // Called once for every document
-    });
-    cursor.on('close', function() {
-      // Called when done
-    });
+    const cursor = Person.find({ occupation: /host/ }).cursor();
+
+    for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
+      console.log(doc); // Prints documents one at a time
+    }
     ```
+
+    Iterating through a Mongoose query using [async iterators](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js.html)
+    also creates a cursor.
+
+    ```javascript
+    for await (const doc of Person.find()) {
+      console.log(doc); // Prints documents one at a time
+    }
+    ```
+
+    Cursors are subject to [cursor timeouts](https://stackoverflow.com/questions/21853178/when-a-mongodb-cursor-will-expire).
+    By default, MongoDB will close your cursor after 10 minutes and subsequent
+    `next()` calls will result in a `MongoError: cursor id 123 not found` error.
+    To override this, set the `noCursorTimeout` option on your cursor.
+
+    ```javascript
+    // MongoDB won't automatically close this cursor after 10 minutes.
+    const cursor = Person.find().cursor().addCursorFlag('noCursorTimeout', true);
+    ```
+
+    However, cursors can still time out because of [session idle timeouts](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
+    So even a cursor with `noCursorTimeout` set will still time out after 30 minutes
+    of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 
     <h3 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h3>
 

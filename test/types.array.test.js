@@ -42,6 +42,7 @@ describe('types array', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('behaves and quacks like an Array', function(done) {
     const a = new MongooseArray;

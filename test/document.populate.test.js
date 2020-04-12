@@ -107,8 +107,8 @@ describe('document.populate', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   beforeEach(function(done) {
     B = db.model('BlogPost', BlogPostSchema);

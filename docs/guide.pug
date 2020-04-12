@@ -187,7 +187,7 @@ block content
 
     <h3 id="statics"><a href="#statics">Statics</a></h3>
 
-    You can also add static functions to your model. There are 2 equivalent
+    You can also add static functions to your model. There are two equivalent
     ways to add a static:
 
     - Add a function property to `schema.statics`
@@ -396,7 +396,7 @@ block content
     <h3 id="options"><a href="#options">Options</a></h3>
 
     Schemas have a few configurable options which can be passed to the
-    constructor or `set` directly:
+    constructor or to the `set` method:
 
     ```javascript
     new Schema({..}, options);
@@ -530,9 +530,9 @@ block content
     <h3 id="id"><a href="#id">option: id</a></h3>
 
     Mongoose assigns each of your schemas an `id` virtual getter by default
-    which returns the documents `_id` field cast to a string, or in the case of
+    which returns the document's `_id` field cast to a string, or in the case of
     ObjectIds, its hexString. If you don't want an `id` getter added to your
-    schema, you may disable it passing this option at schema construction time.
+    schema, you may disable it by passing this option at schema construction time.
 
     ```javascript
     // default behavior
@@ -728,7 +728,8 @@ block content
     The `strict` option may also be set to `"throw"` which will cause errors
     to be produced instead of dropping the bad data.
 
-    _NOTE: Any key/val set on the instance that does not exist in your schema is always ignored, regardless of schema option._
+    _NOTE: Any key/val set on the instance that does not exist in your schema
+    is always ignored, regardless of schema option._
 
     ```javascript
     var thingSchema = new Schema({..})
@@ -776,7 +777,7 @@ block content
     <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
     Exactly the same as the [toObject](#toObject) option but only applies when
-    the documents `toJSON` method is called.
+    the document's `toJSON` method is called.
 
     ```javascript
     var schema = new Schema({ name: String });
@@ -797,10 +798,10 @@ block content
     <h3 id="toObject"><a href="#toObject">option: toObject</a></h3>
 
     Documents have a [toObject](/docs/api.html#document_Document-toObject) method
-    which converts the mongoose document into a plain javascript object. This
+    which converts the mongoose document into a plain JavaScript object. This
     method accepts a few options. Instead of applying these options on a
-    per-document basis we may declare the options here and have it applied to
-    all of this schemas documents by default.
+    per-document basis, we may declare the options at the schema level and have
+    them applied to all of the schema's documents by default.
 
     To have all virtuals show up in your `console.log` output, set the
     `toObject` option to `{ getters: true }`:
@@ -976,11 +977,11 @@ block content
 
     <h3 id="timestamps"><a href="#timestamps">option: timestamps</a></h3>
 
-    If set `timestamps`, mongoose assigns `createdAt` and `updatedAt` fields to
-    your schema, the type assigned is [Date](./api.html#schema-date-js).
+    The `timestamps` option tells mongoose to assign `createdAt` and `updatedAt` fields
+    to your schema. The type assigned is [Date](./api.html#schema-date-js).
 
-    By default, the name of two fields are `createdAt` and `updatedAt`, customize
-    the field name by setting `timestamps.createdAt` and `timestamps.updatedAt`.
+    By default, the names of the fields are `createdAt` and `updatedAt`. Customize
+    the field names by setting `timestamps.createdAt` and `timestamps.updatedAt`.
 
     ```javascript
     const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
@@ -1016,8 +1017,8 @@ block content
     ]);
     ```
 
-    By default, Mongoose uses the current time `new Date()` to get
-    the current time. But if you want to overwrite the function
+    By default, Mongoose uses `new Date()` to get the current time.
+    If you want to overwrite the function
     Mongoose uses to get the current time, you can set the
     `timestamps.currentTime` option. Mongoose will call the
     `timestamps.currentTime` function whenever it needs to get

@@ -102,8 +102,8 @@ describe('model: update:', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('works', function(done) {
     BlogPost.findById(post._id, function(err, cf) {
@@ -3080,6 +3080,7 @@ describe('model: updateOne: ', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('updating a map (gh-7111)', function() {
     const accountSchema = new Schema({ balance: Number });
@@ -3313,6 +3314,25 @@ describe('model: updateOne: ', function() {
       assert.ok(doc.data);
       assert.equal(doc.data.toString('utf8'), 'test');
     });
+  });
+
+  it('respects useNestedStrict: false when updating a single nested path (gh-8735)', function() {
+    const emptySchema = Schema({}, {
+      strict: false,
+      _id: false,
+      versionKey: false
+    });
+
+    const testSchema = Schema({
+      test: String,
+      nested: emptySchema
+    }, { strict: true, versionKey: false, useNestedStrict: false });
+    const Test = db.model('Test', testSchema);
+
+    const update = { nested: { notInSchema: 'bar' } };
+    return Test.updateOne({ test: 'foo' }, update, { upsert: true }).
+      then(() => Test.collection.findOne()).
+      then(doc => assert.strictEqual(doc.nested.notInSchema, void 0));
   });
 
   describe('mongodb 42 features', function() {

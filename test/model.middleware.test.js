@@ -25,6 +25,7 @@ describe('model middleware', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('post save', function(done) {
     const schema = new Schema({

@@ -134,6 +134,7 @@ describe('document', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => util.clearTestData(db));
+  afterEach(() => util.stopRemainingOps(db));
 
   describe('constructor', function() {
     it('supports passing in schema directly (gh-8237)', function() {
@@ -2075,6 +2076,26 @@ describe('document', function() {
         }
 
         assert.equal(threw, true);
+      });
+    });
+
+    it('passes save custom options to Model.exists(...) when no changes are present (gh-8739)', function() {
+      const personSchema = new Schema({ name: String });
+
+      let optionInMiddleware;
+
+      personSchema.pre('findOne', function(next) {
+        optionInMiddleware = this.getOptions().customOption;
+
+        return next();
+      });
+
+      const Person = db.model('Person', personSchema);
+      return co(function*() {
+        const person = yield Person.create({ name: 'Hafez' });
+        yield person.save({ customOption: 'test' });
+
+        assert.equal(optionInMiddleware, 'test');
       });
     });
   });
@@ -7863,6 +7884,32 @@ describe('document', function() {
           name: 'test2',
           immutable: 'bar'
         });
+      });
+    });
+
+    it('skips discriminator key', function() {
+      return co(function*() {
+        const D = Model.discriminator('D', Schema({ other: String }));
+        yield Model.collection.insertOne({
+          _id: 2,
+          __v: 5,
+          __t: 'D',
+          name: 'test',
+          nested: { prop: 'foo' },
+          immutable: 'bar',
+          other: 'baz'
+        });
+        const doc = yield D.findOne({ _id: 2 });
+        doc.overwrite({ _id: 2, name: 'test2' });
+
+        assert.deepEqual(doc.toObject(), {
+          _id: 2,
+          __v: 5,
+          __t: 'D',
+          name: 'test2',
+          immutable: 'bar'
+        });
+        return doc.validate();
       });
     });
   });

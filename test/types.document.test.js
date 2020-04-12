@@ -66,12 +66,15 @@ describe('types.document', function() {
       ratings: [RatingSchema]
     });
 
-    mongoose.model('Movie', MovieSchema);
     db = start();
   });
 
   after(function(done) {
     db.close(done);
+  });
+
+  beforeEach(function() {
+    db.deleteModel(/.*/);
   });
 
   it('test that validate sets errors', function(done) {
@@ -108,7 +111,7 @@ describe('types.document', function() {
   });
 
   it('cached _ids', function(done) {
-    const Movie = db.model('Movie');
+    const Movie = db.model('Movie', MovieSchema);
     const m = new Movie;
 
     assert.equal(m.id, m.$__._id);
@@ -128,7 +131,7 @@ describe('types.document', function() {
   });
 
   it('Subdocument#remove (gh-531)', function(done) {
-    const Movie = db.model('Movie');
+    const Movie = db.model('Movie', MovieSchema);
 
     const super8 = new Movie({ title: 'Super 8' });
 
@@ -200,7 +203,7 @@ describe('types.document', function() {
 
   describe('setting nested objects', function() {
     it('works (gh-1394)', function(done) {
-      const Movie = db.model('Movie');
+      const Movie = db.model('Movie', MovieSchema);
 
       Movie.create({
         title: 'Life of Pi',

@@ -1,3 +1,16 @@
+5.9.9 / 2020-04-13
+==================
+ * fix(model): make Model.bulkWrite accept `strict` option #8782 #8788 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(virtual): make populated virtual getter return value when it is passed in #8775 #8774 [makinde](https://github.com/makinde)
+ * fix(document): handle validating document array whose docs contain maps and nested paths #8767
+ * fix(document): skip discriminator key when overwriting a document #8765
+ * fix(populate): support `clone` option with `lean` #8761 #8760
+ * docs(transactions): use `endSession()` in all transactions examples #8741
+ * docs(queries): expand streaming section to include async iterators, cursor timeouts, and sesssion idle timeouts #8720
+ * docs(model+query+findoneandupdate): add docs for `returnOriginal` option #8766
+ * docs(model): fix punctuation #8788 [dandv](https://github.com/dandv)
+ * docs: fix typos #8780 #8799 [dandv](https://github.com/dandv)
+
 5.9.8 / 2020-04-06
 ==================
  * fix(map): run getters when calling `Map#get()` #8730

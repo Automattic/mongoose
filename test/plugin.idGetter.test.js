@@ -24,6 +24,7 @@ describe('id virtual getter', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('should work as expected with an ObjectId', function(done) {
     const schema = new Schema({});

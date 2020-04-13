@@ -204,7 +204,7 @@ block content
 
   h3#options Options
   :markdown
-    `Schema`s have a few configurable options which can be passed to the constructor or `set` directly:
+    `Schema`s have a few configurable options which can be passed to the constructor or the `set` method:
   :js
     new Schema({..}, options);
 
@@ -255,7 +255,7 @@ block content
 
   h4#id option: id
   :markdown
-    Mongoose assigns each of your schemas an `id` virtual getter by default which returns the documents `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
+    Mongoose assigns each of your schemas an `id` virtual getter by default which returns the document's `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
   :js
     // default behavior
     var schema = new Schema({ name: String });
@@ -394,7 +394,7 @@ block content
 
   h4#toJSON option: toJSON
   :markdown
-    Exactly the same as the [toObject](#toObject) option but only applies when the documents `toJSON` method is called.
+    Exactly the same as the [toObject](#toObject) option but only applies when the document's `toJSON` method is called.
   :js
     var schema = new Schema({ name: String });
     schema.path('name').get(function (v) {
@@ -410,7 +410,7 @@ block content
 
   h4#toObject option: toObject
   :markdown
-    Documents have a [toObject](/docs/api.html#document_Document-toObject) method which converts the mongoose document into a plain javascript object. This method accepts a few options. Instead of applying these options on a per-document basis we may declare the options here and have it applied to all of this schemas documents by default.
+    Documents have a [toObject](/docs/api.html#document_Document-toObject) method which converts the mongoose document into a plain JavaScript object. This method accepts a few options. Instead of applying these options on a per-document basis, we may declare the options at the schena level, and have them applied to all of the schema's documents by default.
 
     To have all virtuals show up in your `console.log` output, set the `toObject` option to `{ getters: true }`:
 
@@ -426,7 +426,7 @@ block content
 
   h4#versionKey option: versionKey
   :markdown
-    The `versionKey` is a property set on each document when first created by Mongoose. This keys value contains the internal [revision](http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning) of the document. The name of this document property is configurable. The default is `__v`. If this conflicts with your application you can configure as such:
+    The `versionKey` is a property set on each document when first created by Mongoose. This key's value contains the internal [revision](http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning) of the document. The name of this document property is configurable. The default is `__v`. If this conflicts with your application you can configure as such:
   :js
     var schema = new Schema({ name: 'string' });
     var Thing = db.model('Thing', schema);

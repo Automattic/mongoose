@@ -102,8 +102,8 @@ describe('model: update:', function() {
   });
 
   beforeEach(() => db.deleteModel(/.*/));
-
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('works', function(done) {
     BlogPost.findById(post._id, function(err, cf) {
@@ -3104,6 +3104,7 @@ describe('model: updateOne: ', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => util.clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('updating a map (gh-7111)', function() {
     const accountSchema = new Schema({ balance: Number });

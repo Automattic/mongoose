@@ -76,6 +76,7 @@ describe('model', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('discriminator()', function() {
     var Person, Employee;

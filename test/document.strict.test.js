@@ -25,6 +25,7 @@ describe('document: strict mode:', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('should work', function() {
     let Lax, Strict;

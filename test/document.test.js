@@ -134,6 +134,7 @@ describe('document', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => util.clearTestData(db));
+  afterEach(() => util.stopRemainingOps(db));
 
   describe('constructor', function() {
     it('supports passing in schema directly (gh-8237)', function() {
@@ -7883,6 +7884,32 @@ describe('document', function() {
           name: 'test2',
           immutable: 'bar'
         });
+      });
+    });
+
+    it('skips discriminator key', function() {
+      return co(function*() {
+        const D = Model.discriminator('D', Schema({ other: String }));
+        yield Model.collection.insertOne({
+          _id: 2,
+          __v: 5,
+          __t: 'D',
+          name: 'test',
+          nested: { prop: 'foo' },
+          immutable: 'bar',
+          other: 'baz'
+        });
+        const doc = yield D.findOne({ _id: 2 });
+        doc.overwrite({ _id: 2, name: 'test2' });
+
+        assert.deepEqual(doc.toObject(), {
+          _id: 2,
+          __v: 5,
+          __t: 'D',
+          name: 'test2',
+          immutable: 'bar'
+        });
+        return doc.validate();
       });
     });
   });

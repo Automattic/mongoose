@@ -76,22 +76,29 @@ describe('transactions', function() {
       // visible outside of the transaction.
       then(() => session.commitTransaction()).
       then(() => Customer.findOne({ name: 'Test' })).
-      then(doc => assert.ok(doc));
+      then(doc => assert.ok(doc)).
+      then(() => session.endSession());
   });
 
   it('withTransaction', function() {
     // acquit:ignore:start
     const Customer = db.model('Customer_withTrans', new Schema({ name: String }));
     // acquit:ignore:end
+
+    let session = null;
     return Customer.createCollection().
       then(() => Customer.startSession()).
       // The `withTransaction()` function's first parameter is a function
       // that returns a promise.
-      then(session => session.withTransaction(() => {
-        return Customer.create([{ name: 'Test' }], { session: session });
-      })).
+      then(_session => {
+        session = _session;
+        return session.withTransaction(() => {
+          return Customer.create([{ name: 'Test' }], { session: session });
+        });
+      }).
       then(() => Customer.countDocuments()).
-      then(count => assert.strictEqual(count, 1));
+      then(count => assert.strictEqual(count, 1)).
+      then(() => session.endSession());
   });
 
   it('abort', function() {
@@ -109,7 +116,8 @@ describe('transactions', function() {
       then(() => Customer.create([{ name: 'Test2' }], { session: session })).
       then(() => session.abortTransaction()).
       then(() => Customer.countDocuments()).
-      then(count => assert.strictEqual(count, 0));
+      then(count => assert.strictEqual(count, 0)).
+      then(() => session.endSession());
   });
 
   it('save', function() {
@@ -136,10 +144,9 @@ describe('transactions', function() {
       then(() => User.findOne({ name: 'bar' })).
       // Won't find the doc because `save()` is part of an uncommitted transaction
       then(doc => assert.ok(!doc)).
-      then(() => {
-        session.commitTransaction();
-        return User.findOne({ name: 'bar' });
-      }).
+      then(() => session.commitTransaction()).
+      then(() => session.endSession()).
+      then(() => User.findOne({ name: 'bar' })).
       then(doc => assert.ok(doc));
   });
 
@@ -195,14 +202,13 @@ describe('transactions', function() {
         },
         { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
       ]).session(session)).
-      then(res => {
-        assert.deepEqual(res, [
-          { _id: { month: 6, year: 2018 }, count: 2 },
-          { _id: { month: 6, year: 2017 }, count: 1 },
-          { _id: { month: 5, year: 2017 }, count: 1 }
-        ]);
-        session.commitTransaction();
-      });
+      then(res => assert.deepEqual(res, [
+        { _id: { month: 6, year: 2018 }, count: 2 },
+        { _id: { month: 6, year: 2017 }, count: 1 },
+        { _id: { month: 5, year: 2017 }, count: 1 }
+      ])).
+      then(() => session.commitTransaction()).
+      then(() => session.endSession());
   });
 
   describe('populate (gh-6754)', function() {
@@ -238,9 +244,9 @@ describe('transactions', function() {
         });
     });
 
-    afterEach(function(done) {
+    afterEach(function() {
       session.commitTransaction();
-      done();
+      return session.endSession();
     });
 
     it('`populate()` uses the querys session', function() {
@@ -311,10 +317,9 @@ describe('transactions', function() {
       then(() => Character.deleteMany({ name: /Lannister/ }, { session: session })).
       then(() => Character.deleteOne({ name: 'Jon Snow' }, { session: session })).
       then(() => Character.find({}).session(session)).
-      then(res => {
-        assert.equal(res.length, 1);
-        session.commitTransaction();
-      });
+      then(res => assert.equal(res.length, 1)).
+      then(() => session.commitTransaction()).
+      then(() => session.endSession());
   });
 
   it('remove, update, updateOne (gh-7455)', function() {
@@ -337,6 +342,7 @@ describe('transactions', function() {
 
       // Undo both update and delete since doc should pull from `$session()`
       yield session.abortTransaction();
+      session.endSession();
 
       const fromDb = yield Character.findOne().then(doc => doc.toObject());
       delete fromDb._id;
@@ -354,6 +360,7 @@ describe('transactions', function() {
         const test = yield Test.create([{}], { session }).then(res => res[0]);
         yield test.save(); // throws DocumentNotFoundError
       }));
+      yield session.endSession();
     });
   });
 });

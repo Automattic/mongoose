@@ -73,6 +73,7 @@ describe('query middleware', function() {
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
 
   it('has a pre find hook', function(done) {
     let count = 0;

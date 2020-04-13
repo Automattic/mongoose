@@ -171,6 +171,7 @@ describe('model field selection', function() {
         assert.strictEqual(true, Array.isArray(found[0].comments));
         assert.equal(found[0].comments.length, 1);
         assert.equal(found[0].comments[0].title, ':)');
+
         assert.strictEqual(undefined, found[0].comments[0]._id);
         // gh-590
         assert.ok(!found[0].comments[0].id);

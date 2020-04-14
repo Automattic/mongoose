@@ -2,7 +2,7 @@
 
 require('./common');
 
-const ObjectId = require('bson').ObjectId;
+const ObjectId = require('../lib/driver').get().ObjectId;
 const Schema = require('../lib/schema');
 const assert = require('assert');
 

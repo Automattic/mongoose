@@ -298,4 +298,43 @@ describe('timestamps', function() {
       assert.ok(doc.updatedAt > start, `${doc.updatedAt} >= ${start}`);
     });
   });
+
+  it('updates updatedAt when calling update on subchild', function() {
+    const subchildschema = new mongoose.Schema({
+      name: String
+    }, { timestamps: true });
+    const schema = new mongoose.Schema({
+      name: String,
+      subchild: subchildschema
+    }, { timestamps: true });
+    const parentSchema = new mongoose.Schema({
+      child: schema
+    }, { timestamps: true });
+
+    const Model = db.model('Test', parentSchema);
+
+    return co(function*() {
+      let doc = yield Model.create({ name: 'test', child: {
+        name: 'child',
+        subchild: {
+          name: 'subchild'
+        }
+      } });
+      assert.ok(doc.child.updatedAt);
+      const startTime = doc.createdAt;
+      yield new Promise(resolve => setTimeout(resolve), 25);
+
+      doc = yield Model.findOneAndUpdate({}, { $set: {
+        'child.subchild.name': 'subChildUpdated'
+      } }, { new: true });
+
+      assert.ok(doc.updatedAt.valueOf() > startTime,
+        `Parent Timestamp not updated: ${doc.updatedAt}`);
+      assert.ok(doc.child.updatedAt.valueOf() > startTime,
+        `Child Timestamp not updated: ${doc.updatedAt}`);
+      assert.ok(doc.child.subchild.updatedAt.valueOf() > startTime,
+        `SubChild Timestamp not updated: ${doc.updatedAt}`);
+    });
+  });
+
 });

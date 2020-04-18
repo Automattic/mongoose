@@ -527,14 +527,14 @@ describe('model field selection', function() {
 
   it('selection specified in query overwrites option in schema', function() {
     return co(function*() {
-      const productSchema = new Schema({ name: { type: String, select: true } });
+      const productSchema = new Schema({ name: { type: String, select: false } });
 
       const Product = db.model('Product', productSchema);
 
 
       yield Product.create({ name: 'Computer' });
 
-      const product = yield Product.findOne().select('-name');
+      const product = yield Product.findOne().select('name');
 
       assert.equal(product.name, 'Computer');
     });

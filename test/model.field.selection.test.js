@@ -496,4 +496,32 @@ describe('model field selection', function() {
       assert.strictEqual(doc.settings.calendar.dateFormat, '1234');
     });
   });
+
+  it('when `select: true` in schema, works with $elemMatch in projection', function() {
+    return co(function*() {
+
+      const productSchema = new Schema({
+        attributes: {
+          select: true,
+          type: [{ name: String, group: String }]
+        }
+      });
+
+      const Product = db.model('Product', productSchema);
+
+      const attributes = [
+        { name: 'a', group: 'alpha' },
+        { name: 'b', group: 'beta' }
+      ];
+
+      yield Product.create({ name: 'test', attributes });
+
+      const product = yield Product.findOne()
+        .select({ attributes: { $elemMatch: { group: 'beta' } } });
+
+      assert.equal(product.attributes[0].name, 'b');
+      assert.equal(product.attributes[0].group, 'beta');
+      assert.equal(product.attributes.length, 1);
+    });
+  });
 });

@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const co = require('co');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -63,7 +64,7 @@ describe('model', function() {
     it('fires callback when empty array passed', function(done) {
       B.create([], function(err, a) {
         assert.ifError(err);
-        assert.ok(!a);
+        assert.deepEqual(a, []);
         done();
       });
     });
@@ -187,6 +188,17 @@ describe('model', function() {
           }).
           catch(done);
       });
+
+      it('when passed an empty array, returns an empty array', function() {
+        return co(function*() {
+          const userSchema = new Schema({ name: String });
+          const User = db.model('User', userSchema);
+
+          const users = yield User.create([]);
+          assert.deepEqual(users, []);
+        });
+      });
+
     });
   });
 });

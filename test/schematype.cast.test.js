@@ -85,7 +85,7 @@ describe('SchemaType.cast() (gh-7045)', function() {
     }
     assert.ok(threw);
 
-    objectid.cast(new ObjectId()); // Should not throw
+    objectid.cast(new ObjectId());
   });
 
   it('handles boolean', function() {

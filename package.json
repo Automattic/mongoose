@@ -135,6 +135,12 @@
       "no-useless-rename": "error",
       "no-dupe-keys": "error",
       "space-in-parens": ["error", "never"],
+      "spaced-comment": [2, "always", {
+        "block": {
+          "markers": ["!"],
+          "balanced": true
+        }
+      }],
       "key-spacing": [
         2,
         {

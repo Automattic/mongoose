@@ -135,21 +135,21 @@
       "no-useless-rename": "error",
       "no-dupe-keys": "error",
       "space-in-parens": ["error", "never"],
-      "spaced-comment": [2, "always", {
+      "spaced-comment": ["error", "always", {
         "block": {
           "markers": ["!"],
           "balanced": true
         }
       }],
       "key-spacing": [
-        2,
+        "error",
         {
           "beforeColon": false,
           "afterColon": true
         }
       ],
       "comma-spacing": [
-        2,
+        "error",
         {
           "before": false,
           "after": true
@@ -157,14 +157,14 @@
       ],
       "array-bracket-spacing": 1,
       "object-curly-spacing": [
-        2,
+        "error",
         "always"
       ],
       "comma-dangle": [
-        2,
+        "error",
         "never"
       ],
-      "no-unreachable": 2,
+      "no-unreachable": "error",
       "quotes": [
         "error",
         "single"

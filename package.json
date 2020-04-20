@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.9.9",
+  "version": "5.9.10",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -19,9 +19,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "bson": "~1.1.1",
+    "bson": "^1.1.4",
     "kareem": "2.3.1",
-    "mongodb": "3.5.5",
+    "mongodb": "3.5.6",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.7.0",
     "mquery": "3.2.2",
@@ -131,15 +131,26 @@
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
       "no-undef": "error",
+      "no-unneeded-ternary": "error",
+      "no-const-assign": "error",
+      "no-useless-rename": "error",
+      "no-dupe-keys": "error",
+      "space-in-parens": ["error", "never"],
+      "spaced-comment": ["error", "always", {
+        "block": {
+          "markers": ["!"],
+          "balanced": true
+        }
+      }],
       "key-spacing": [
-        2,
+        "error",
         {
           "beforeColon": false,
           "afterColon": true
         }
       ],
       "comma-spacing": [
-        2,
+        "error",
         {
           "before": false,
           "after": true
@@ -147,14 +158,14 @@
       ],
       "array-bracket-spacing": 1,
       "object-curly-spacing": [
-        2,
+        "error",
         "always"
       ],
       "comma-dangle": [
-        2,
+        "error",
         "never"
       ],
-      "no-unreachable": 2,
+      "no-unreachable": "error",
       "quotes": [
         "error",
         "single"
@@ -164,6 +175,10 @@
         "as-needed"
       ],
       "semi": "error",
+      "no-extra-semi": "error",
+      "semi-spacing": "error",
+      "no-spaced-func": "error",
+      "no-throw-literal": "error",
       "space-before-blocks": "error",
       "space-before-function-paren": [
         "error",

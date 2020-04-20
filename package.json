@@ -130,6 +130,11 @@
       "func-call-spacing": "error",
       "no-trailing-spaces": "error",
       "no-undef": "error",
+      "no-unneeded-ternary": "error",
+      "no-const-assign": "error",
+      "no-useless-rename": "error",
+      "no-dupe-keys": "error",
+      "space-in-parens": ["error", "never"],
       "key-spacing": [
         2,
         {

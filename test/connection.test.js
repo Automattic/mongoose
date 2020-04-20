@@ -700,12 +700,12 @@ describe('connections:', function() {
     db.then(function() {
       setTimeout(function() {
         // TODO: enforce error.message, right now get a confusing error
-        /*db.collection('Test').insertOne({x:1}, function(error) {
+        /* db.collection('Test').insertOne({x:1}, function(error) {
           assert.ok(error);
 
           //assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
           done();
-        });*/
+        }); */
 
         let threw = false;
         try {

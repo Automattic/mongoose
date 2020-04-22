@@ -536,7 +536,7 @@ describe('QueryCursor', function() {
     const User = db.model('User', new Schema({ name: String }));
 
     const cursor = User.find().cursor();
-    cursor.on('data', (_)=>{});
+    cursor.on('data', ()=>{});
 
     let closeEventTriggeredCount = 0;
     cursor.on('close', () => closeEventTriggeredCount++);
@@ -551,7 +551,7 @@ describe('QueryCursor', function() {
     const User = db.model('User', new Schema({ name: String }));
 
     const cursor = User.aggregate([{ $match: {} }]).cursor().exec();
-    cursor.on('data', (_)=>{});
+    cursor.on('data', ()=>{});
 
     let closeEventTriggeredCount = 0;
     cursor.on('close', () => closeEventTriggeredCount++);

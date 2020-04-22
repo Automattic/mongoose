@@ -531,4 +531,36 @@ describe('QueryCursor', function() {
       assert.deepEqual(docs.map(d => d.order), [1, 2, 3]);
     });
   });
+
+  it('closing query cursor emits `close` event only once (gh-8835)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    const cursor = User.find().cursor();
+    cursor.on('data', (_)=>{});
+
+    let closeEventTriggeredCount = 0;
+    cursor.on('close', () => closeEventTriggeredCount++);
+
+    setTimeout(() => {
+      assert.equal(closeEventTriggeredCount, 1);
+      done();
+    }, 20);
+  });
+
+  it('closing aggregation cursor emits `close` event only once (gh-8835)', function(done) {
+    const User = db.model('User', new Schema({ name: String }));
+
+    const cursor = User.aggregate([{ $match: {} }]).cursor().exec();
+    cursor.on('data', (_)=>{});
+
+    let closeEventTriggeredCount = 0;
+    cursor.on('close', () => closeEventTriggeredCount++);
+
+
+    setTimeout(() => {
+      assert.equal(closeEventTriggeredCount, 1);
+      done();
+    }, 20);
+
+  });
 });

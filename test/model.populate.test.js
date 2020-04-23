@@ -6438,9 +6438,9 @@ describe('model: populate:', function() {
           }).
           then(function(results) {
             assert.equal(results.length, 2);
-            assert.equal(results[0].activity.kind, 'gh5858_1' );
+            assert.equal(results[0].activity.kind, 'gh5858_1');
             assert.equal(results[0].activity.postedBy.name, 'val');
-            assert.equal(results[1].activity.kind, 'gh5858_2' );
+            assert.equal(results[1].activity.kind, 'gh5858_2');
             assert.equal(results[1].activity.postedBy, null);
           });
       });

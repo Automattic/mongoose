@@ -1,3 +1,16 @@
+5.9.10 / 2020-04-20
+===================
+ * fix: upgrade mongodb -> 3.5.6, bson -> 1.1.4 #8719
+ * fix(document): avoid calling `$set()` on object keys if object path isn't in schema #8751
+ * fix(timestamps): handle timestamps on doubly nested subdocuments #8799
+ * fix(schematype): throw error if default is set to a schema instance #8751
+ * fix: handle $elemMatch projection with `select: false` in schema #8818 #8806 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: make FAQ questions more linkable #8825 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(validation): use `init()` as opposed to `once('index')` in `unique` example #8816
+ * docs: clarify `insertMany()` return value #8820 [dandv](https://github.com/dandv)
+ * docs(populate+query): fix typos #8793 #8794 [dandv](https://github.com/dandv)
+ * docs(model): document skipId parameter #8791 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.9.9 / 2020-04-13
 ==================
  * fix(model): make Model.bulkWrite accept `strict` option #8782 #8788 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

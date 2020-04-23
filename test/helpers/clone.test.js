@@ -204,7 +204,7 @@ describe('clone', () => {
     it('does nothing', () => {
       class BeeSon {
         constructor() { this.myAttr = 'myAttrVal'; }
-        toBSON( ) {}
+        toBSON() {}
       }
       const base = new BeeSon();
       const cloned = clone(base, { bson: true });

@@ -11,16 +11,15 @@ const assert = require('assert');
 const Schema = mongoose.Schema;
 
 describe('schematype', function() {
-  it('honors the selected option', function(done) {
+  it('honors the selected option', function() {
     const s = new Schema({ thought: { type: String, select: false } });
     assert.ok(!s.path('thought').selected);
 
     const a = new Schema({ thought: { type: String, select: true } });
     assert.ok(a.path('thought').selected);
-    done();
   });
 
-  it('properly handles specifying index in combination with unique or sparse', function(done) {
+  it('properly handles specifying index in combination with unique or sparse', function() {
     let s = new Schema({ name: { type: String, index: true, unique: true } });
     assert.deepEqual(s.path('name')._index, { unique: true });
     s = new Schema({ name: { type: String, unique: true, index: true } });
@@ -29,10 +28,9 @@ describe('schematype', function() {
     assert.deepEqual(s.path('name')._index, { sparse: true });
     s = new Schema({ name: { type: String, sparse: true, index: true } });
     assert.deepEqual(s.path('name')._index, { sparse: true });
-    done();
   });
 
-  it('handles index: false with unique, sparse, text set to false (gh-7620)', function(done) {
+  it('handles index: false with unique, sparse, text set to false (gh-7620)', function() {
     let s = new Schema({ name: { type: String, index: false, unique: false } });
     assert.equal(s.path('name')._index, false);
     s = new Schema({ name: { type: String, unique: false, index: false } });
@@ -47,8 +45,6 @@ describe('schematype', function() {
     assert.equal(s.path('name')._index, false);
     s = new Schema({ name: { type: String, text: false, index: false } });
     assert.equal(s.path('name')._index, false);
-
-    done();
   });
 
   describe('checkRequired()', function() {

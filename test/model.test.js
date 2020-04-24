@@ -6441,9 +6441,10 @@ describe('Model', function() {
 
     const User = db.model('User', userSchema);
     return co(function*() {
-      const err = yield User.validate({ friends: [null] }).catch(err => err);
+      const err = yield User.validate({ friends: [null, ''] }).catch(err => err);
 
-      assert.ok(err.message.indexOf('`friends.0` is required') !== -1);
+      assert.ok(err.errors['friends.0']);
+      assert.ok(err.errors['friends.1']);
     });
   });
 

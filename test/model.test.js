@@ -6434,6 +6434,19 @@ describe('Model', function() {
     });
   });
 
+  it('Model.validate(...) validates paths in arrays (gh-8821)', function() {
+    const userSchema = new Schema({
+      friends: [{ type: String, required: true }]
+    });
+
+    const User = db.model('User', userSchema);
+    return co(function*() {
+      const err = yield new User({ friends: [null] }).validate().catch(err => err);
+
+      assert.ok(err.message.indexOf('`friends.0` is required') !== -1);
+    });
+  });
+
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
     const schema = Schema({ name: String });
     const ops = [];

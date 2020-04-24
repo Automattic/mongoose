@@ -42,8 +42,9 @@ function getVersion() {
 
 function getLatestLegacyVersion(startsWith) {
   const hist = fs.readFileSync('./History.md', 'utf8').replace(/\r/g, '\n').split('\n');
-  for (let i = 0; i < hist.length; ++i) {
-    const line = (hist[i] || '').trim();
+
+  for (const rawLine of hist) {
+    const line = (rawLine || '').trim();
     if (!line) {
       continue;
     }
@@ -52,6 +53,7 @@ function getLatestLegacyVersion(startsWith) {
       return match[1];
     }
   }
+
   throw new Error('no match found');
 }
 

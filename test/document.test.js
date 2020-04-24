@@ -6339,9 +6339,9 @@ describe('document', function() {
         name: {
           type: String,
           set: function(v) {
-            const sp = v.split(' ');
-            for (let i = 0; i < sp.length; ++i) {
-              this.keywords.push(sp[i]);
+            const splitStrings = v.split(' ');
+            for (const keyword of splitStrings) {
+              this.keywords.push(keyword);
             }
             return v;
           }

@@ -865,10 +865,10 @@ describe('model: findOneAndUpdate:', function() {
 
     Thing.findOneAndUpdate({ _id: key }, { $set: { flag: false } }, { upsert: true, new: false, rawResult: true }).exec(function(err, rawResult) {
       assert.ifError(err);
-      assert.equal(rawResult.lastErrorObject.updatedExisting, false );
+      assert.equal(rawResult.lastErrorObject.updatedExisting, false);
       Thing.findOneAndUpdate({ _id: key }, { $set: { flag: true } }, { upsert: true, new: false, rawResult: true }).exec(function(err, rawResult2) {
         assert.ifError(err);
-        assert.equal(rawResult2.lastErrorObject.updatedExisting, true );
+        assert.equal(rawResult2.lastErrorObject.updatedExisting, true);
         assert.equal(rawResult2.value._id, key);
         assert.equal(rawResult2.value.flag, false);
         done();

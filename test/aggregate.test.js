@@ -97,7 +97,7 @@ describe('aggregate: ', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('append', function() {
-    it('(pipeline)', function(done) {
+    it('(pipeline)', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.append({ $a: 1 }, { $b: 2 }, { $c: 3 }), aggregate);
@@ -105,11 +105,9 @@ describe('aggregate: ', function() {
 
       aggregate.append({ $d: 4 }, { $c: 5 });
       assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }, { $d: 4 }, { $c: 5 }]);
-
-      done();
     });
 
-    it('supports array as single argument', function(done) {
+    it('supports array as single argument', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.append([{ $a: 1 }, { $b: 2 }, { $c: 3 }]), aggregate);
@@ -117,11 +115,9 @@ describe('aggregate: ', function() {
 
       aggregate.append([{ $d: 4 }, { $c: 5 }]);
       assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }, { $d: 4 }, { $c: 5 }]);
-
-      done();
     });
 
-    it('throws if non-operator parameter is passed', function(done) {
+    it('throws if non-operator parameter is passed', function() {
       const aggregate = new Aggregate();
       const regexp = /Arguments must be aggregate pipeline operators/;
 
@@ -140,33 +136,27 @@ describe('aggregate: ', function() {
       assert.throws(function() {
         aggregate.append([{ $a: 1 }, { a: 1 }]);
       }, regexp);
-
-      done();
     });
 
-    it('does not throw when 0 args passed', function(done) {
+    it('does not throw when 0 args passed', function() {
       const aggregate = new Aggregate();
 
       assert.doesNotThrow(function() {
         aggregate.append();
       });
-
-      done();
     });
 
-    it('does not throw when empty array is passed as single argument', function(done) {
+    it('does not throw when empty array is passed as single argument', function() {
       const aggregate = new Aggregate();
 
       assert.doesNotThrow(function() {
         aggregate.append([]);
       });
-
-      done();
     });
   });
 
   describe('project', function() {
-    it('(object)', function(done) {
+    it('(object)', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.project({ a: 1, b: 1, c: 0 }), aggregate);
@@ -174,11 +164,9 @@ describe('aggregate: ', function() {
 
       aggregate.project({ b: 1 });
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
-
-      done();
     });
 
-    it('(string)', function(done) {
+    it('(string)', function() {
       const aggregate = new Aggregate();
 
       aggregate.project(' a b   -c  ');
@@ -186,31 +174,25 @@ describe('aggregate: ', function() {
 
       aggregate.project('b');
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
-
-      done();
     });
 
-    it('("a","b","c")', function(done) {
+    it('("a","b","c")', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();
         aggregate.project('a', 'b', 'c');
       }, /Invalid project/);
-
-      done();
     });
 
-    it('["a","b","c"]', function(done) {
+    it('["a","b","c"]', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();
         aggregate.project(['a', 'b', 'c']);
       }, /Invalid project/);
-
-      done();
     });
   });
 
   describe('group', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.group({ a: 1, b: 2 }), aggregate);
@@ -218,13 +200,11 @@ describe('aggregate: ', function() {
 
       aggregate.group({ c: 3 });
       assert.deepEqual(aggregate._pipeline, [{ $group: { a: 1, b: 2 } }, { $group: { c: 3 } }]);
-
-      done();
     });
   });
 
   describe('skip', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.skip(42), aggregate);
@@ -232,13 +212,11 @@ describe('aggregate: ', function() {
 
       aggregate.skip(42);
       assert.deepEqual(aggregate._pipeline, [{ $skip: 42 }, { $skip: 42 }]);
-
-      done();
     });
   });
 
   describe('limit', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.limit(42), aggregate);
@@ -246,13 +224,11 @@ describe('aggregate: ', function() {
 
       aggregate.limit(42);
       assert.deepEqual(aggregate._pipeline, [{ $limit: 42 }, { $limit: 42 }]);
-
-      done();
     });
   });
 
   describe('unwind', function() {
-    it('("field")', function(done) {
+    it('("field")', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.unwind('field'), aggregate);
@@ -265,13 +241,11 @@ describe('aggregate: ', function() {
         { $unwind: '$b' },
         { $unwind: '$c' }
       ]);
-
-      done();
     });
   });
 
   describe('match', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.match({ a: 1 }), aggregate);
@@ -279,13 +253,11 @@ describe('aggregate: ', function() {
 
       aggregate.match({ b: 2 });
       assert.deepEqual(aggregate._pipeline, [{ $match: { a: 1 } }, { $match: { b: 2 } }]);
-
-      done();
     });
   });
 
   describe('sort', function() {
-    it('(object)', function(done) {
+    it('(object)', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.sort({ a: 1, b: 'asc', c: 'descending' }), aggregate);
@@ -293,11 +265,9 @@ describe('aggregate: ', function() {
 
       aggregate.sort({ b: 'desc' });
       assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: -1 } }]);
-
-      done();
     });
 
-    it('(string)', function(done) {
+    it('(string)', function() {
       const aggregate = new Aggregate();
 
       aggregate.sort(' a b   -c  ');
@@ -305,31 +275,25 @@ describe('aggregate: ', function() {
 
       aggregate.sort('b');
       assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: 1 } }]);
-
-      done();
     });
 
-    it('("a","b","c")', function(done) {
+    it('("a","b","c")', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();
         aggregate.sort('a', 'b', 'c');
       }, /Invalid sort/);
-
-      done();
     });
 
-    it('["a","b","c"]', function(done) {
+    it('["a","b","c"]', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();
         aggregate.sort(['a', 'b', 'c']);
       }, /Invalid sort/);
-
-      done();
     });
   });
 
   describe('near', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
 
       assert.equal(aggregate.near({ a: 1 }), aggregate);
@@ -337,11 +301,9 @@ describe('aggregate: ', function() {
 
       aggregate.near({ b: 2 });
       assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }, { $geoNear: { b: 2 } }]);
-
-      done();
     });
 
-    it('works with discriminators (gh-3304)', function(done) {
+    it('works with discriminators (gh-3304)', function() {
       let aggregate = new Aggregate();
       const stub = {
         schema: {
@@ -368,13 +330,11 @@ describe('aggregate: ', function() {
       Aggregate._prepareDiscriminatorPipeline(aggregate);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
-
-      done();
     });
   });
 
   describe('lookup', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
       const obj = {
         from: 'users',
@@ -387,24 +347,22 @@ describe('aggregate: ', function() {
 
       assert.equal(aggregate._pipeline.length, 1);
       assert.deepEqual(aggregate._pipeline[0].$lookup, obj);
-      done();
     });
   });
 
   describe('sample', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
 
       aggregate.sample(3);
 
       assert.equal(aggregate._pipeline.length, 1);
       assert.deepEqual(aggregate._pipeline[0].$sample, { size: 3 });
-      done();
     });
   });
 
   describe('model()', function() {
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
       const model = { foo: 42 };
 
@@ -414,14 +372,12 @@ describe('aggregate: ', function() {
       assert.equal(aggregate.model(model), model);
       assert.equal(aggregate._model, model);
       assert.equal(aggregate.model(), model);
-
-      done();
     });
   });
 
   describe('redact', function() {
     const pipelineResult = [{ $redact: { $cond: { if: { $eq: ['$level', 5] }, then: '$$PRUNE', else: '$$DESCEND' } } }];
-    it('works', function(done) {
+    it('works', function() {
       const aggregate = new Aggregate();
       aggregate.redact({
         $cond: {
@@ -431,15 +387,11 @@ describe('aggregate: ', function() {
         }
       });
       assert.deepEqual(aggregate._pipeline, pipelineResult);
-
-      done();
     });
-    it('works with (condition, string, string)', function(done) {
+    it('works with (condition, string, string)', function() {
       const aggregate = new Aggregate();
       aggregate.redact({ $eq: ['$level', 5] }, '$$PRUNE', '$$DESCEND');
       assert.deepEqual(aggregate._pipeline, pipelineResult);
-
-      done();
     });
   });
 
@@ -449,7 +401,7 @@ describe('aggregate: ', function() {
     });
 
     describe('graphLookup', function() {
-      it('works', function(done) {
+      it('works', function() {
         const aggregate = new Aggregate();
         aggregate.graphLookup({
           startWith: '$test',
@@ -465,10 +417,9 @@ describe('aggregate: ', function() {
           connectFromField: 'testFromField',
           connectToField: '_id'
         });
-        done();
       });
 
-      it('automatically prepends $ to the startWith field', function(done) {
+      it('automatically prepends $ to the startWith field', function() {
         const aggregate = new Aggregate();
         aggregate.graphLookup({
           startWith: 'test'
@@ -477,7 +428,6 @@ describe('aggregate: ', function() {
         assert.deepEqual(aggregate._pipeline[0].$graphLookup, {
           startWith: '$test'
         });
-        done();
       });
 
       it('Throws if no options are passed to graphLookup', function(done) {
@@ -493,7 +443,7 @@ describe('aggregate: ', function() {
     });
 
     describe('addFields', function() {
-      it('(object)', function(done) {
+      it('(object)', function() {
         const aggregate = new Aggregate();
 
         assert.equal(aggregate.addFields({ a: 1, b: 1, c: 0 }), aggregate);
@@ -501,12 +451,11 @@ describe('aggregate: ', function() {
 
         aggregate.addFields({ d: { $add: ['$a', '$b'] } });
         assert.deepEqual(aggregate._pipeline, [{ $addFields: { a: 1, b: 1, c: 0 } }, { $addFields: { d: { $add: ['$a', '$b'] } } }]);
-        done();
       });
     });
 
     describe('facet', function() {
-      it('works', function(done) {
+      it('works', function() {
         const aggregate = new Aggregate();
 
         aggregate.facet({
@@ -548,60 +497,54 @@ describe('aggregate: ', function() {
             }
           ]
         });
-        done();
       });
     });
 
     describe('replaceRoot', function() {
-      it('works with a string', function(done) {
+      it('works with a string', function() {
         const aggregate = new Aggregate();
 
         aggregate.replaceRoot('myNewRoot');
 
         assert.deepEqual(aggregate._pipeline,
           [{ $replaceRoot: { newRoot: '$myNewRoot' } }]);
-        done();
       });
-      it('works with an object (gh-6474)', function(done) {
+      it('works with an object (gh-6474)', function() {
         const aggregate = new Aggregate();
 
         aggregate.replaceRoot({ x: { $concat: ['$this', '$that'] } });
 
         assert.deepEqual(aggregate._pipeline,
           [{ $replaceRoot: { newRoot: { x: { $concat: ['$this', '$that'] } } } }]);
-        done();
       });
     });
 
     describe('count', function() {
-      it('works', function(done) {
+      it('works', function() {
         const aggregate = new Aggregate();
 
         aggregate.count('countResult');
 
         assert.deepEqual(aggregate._pipeline, [{ $count: 'countResult' }]);
-        done();
       });
     });
 
     describe('sortByCount', function() {
-      it('works with a string argument', function(done) {
+      it('works with a string argument', function() {
         const aggregate = new Aggregate();
 
         aggregate.sortByCount('countedField');
 
         assert.deepEqual(aggregate._pipeline, [{ $sortByCount: '$countedField' }]);
-        done();
       });
 
-      it('works with an object argument', function(done) {
+      it('works with an object argument', function() {
         const aggregate = new Aggregate();
 
         aggregate.sortByCount({ lname: '$employee.last' });
 
         assert.deepEqual(aggregate._pipeline,
           [{ $sortByCount: { lname: '$employee.last' } }]);
-        done();
       });
 
       it('throws if the argument is neither a string or object', function(done) {

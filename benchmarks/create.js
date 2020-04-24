@@ -22,11 +22,11 @@ let Board = new Schema({
   checklists: {type: [Checklist]}
 });
 
-// var start1 = new Date();
+// const start1 = new Date();
 Board = mongoose.model('Board', Board);
-// var Cl = mongoose.model('Checklist', Checklist);
+// const Cl = mongoose.model('Checklist', Checklist);
 const doc = JSON.parse(fs.readFileSync(__dirname + '/bigboard.json'));
-// var time1 = (new Date - start1);
+// const time1 = (new Date - start1);
 // console.error('reading from disk and parsing JSON took %d ms', time1);
 
 const start2 = new Date();

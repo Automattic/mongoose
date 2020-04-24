@@ -17,6 +17,7 @@ const Mixed = SchemaTypes.Mixed;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
+const co = require('co');
 const Buffer = require('safe-buffer').Buffer;
 
 /**
@@ -2383,4 +2384,31 @@ describe('schema', function() {
     assert.equal(TurboManSchema.path('price').instance, 'Number');
     assert.equal(TurboManSchema.path('year').instance, 'Number');
   });
+
+  describe('gh-8849', function() {
+    it('treats `select: undefined` as not specifying `select` option', function() {
+      const userSchema = new Schema({ name: { type: String, select: undefined } });
+      const User = db.model('User', userSchema);
+
+      return co(function*() {
+        yield User.create({ name: 'Hafez' });
+        const user = yield User.findOne();
+
+        assert.equal(user.name, 'Hafez');
+      });
+    });
+
+    it('treats `select: null` as not specifying `select` option', function() {
+      const userSchema = new Schema({ name: { type: String, select: null } });
+      const User = db.model('User', userSchema);
+
+      return co(function*() {
+        yield User.create({ name: 'Hafez' });
+        const user = yield User.findOne();
+
+        assert.equal(user.name, 'Hafez');
+      });
+    });
+  });
+
 });

@@ -43,8 +43,8 @@ describe('model', function() {
         geos[3] = new Geo({ pos: [1, -1], type: 'house' });
         let count = geos.length;
 
-        for (let i = 0; i < geos.length; i++) {
-          geos[i].save(function(err) {
+        for (const geo of geos) {
+          geo.save(function(err) {
             assert.ifError(err);
             --count || next();
           });
@@ -84,8 +84,8 @@ describe('model', function() {
         geos[3] = new Geo({ pos: [1, -1], type: 'house' });
         let count = geos.length;
 
-        for (let i = 0; i < geos.length; i++) {
-          geos[i].save(function(err) {
+        for (const geo of geos) {
+          geo.save(function(err) {
             assert.ifError(err);
             --count || next();
           });

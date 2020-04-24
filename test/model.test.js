@@ -4651,6 +4651,83 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() validation error with ordered true when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ok(error);
+        assert.equal(res, undefined);
+        assert.equal(error.name, 'ValidationError');
+        done();
+      });
+    });
+
+    it('insertMany() validation error with ordered false when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: false };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ifError(error);
+        assert.equal(res.length, 0);
+        assert.equal(error, null);
+        done();
+      });
+    });
+
+    it('insertMany() validation error with ordered true and rawResult true when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: true, rawResult: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ok(error);
+        assert.equal(res, undefined);
+        assert.equal(error.name, 'ValidationError');
+        done();
+      });
+    });
+
+    it('insertMany() validation error with ordered false and rawResult true when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: false, rawResult: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ifError(error);
+        assert.equal(res.mongoose.validationErrors.length, 2);
+        assert.equal(res.mongoose.validationErrors[0].name, 'ValidationError');
+        assert.equal(res.mongoose.validationErrors[1].name, 'ValidationError');
+        done();
+      });
+    });
+
     it('insertMany() depopulate (gh-4590)', function(done) {
       const personSchema = new Schema({
         name: String

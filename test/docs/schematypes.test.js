@@ -28,26 +28,27 @@ describe('schemaTypes', function () {
    * method you need to implement is the `cast()` method.
    */
   it('Creating a Basic Custom Schema Type', function() {
-    function Int8(key, options) {
-      mongoose.SchemaType.call(this, key, options, 'Int8');
-    }
-    Int8.prototype = Object.create(mongoose.SchemaType.prototype);
+    class Int8 extends mongoose.SchemaType {
+      constructor(key, options) {
+        super(key, options, 'Int8');
+      }
 
-    // `cast()` takes a parameter that can be anything. You need to
-    // validate the provided `val` and throw a `CastError` if you
-    // can't convert it.
-    Int8.prototype.cast = function(val) {
-      var _val = Number(val);
-      if (isNaN(_val)) {
-        throw new Error('Int8: ' + val + ' is not a number');
+      // `cast()` takes a parameter that can be anything. You need to
+      // validate the provided `val` and throw a `CastError` if you
+      // can't convert it.
+      cast(val) {
+        var _val = Number(val);
+        if (isNaN(_val)) {
+          throw new Error('Int8: ' + val + ' is not a number');
+        }
+        _val = Math.round(_val);
+        if (_val < -0x80 || _val > 0x7F) {
+          throw new Error('Int8: ' + val +
+            ' is outside of the range of valid 8-bit ints');
+        }
+        return _val;
       }
-      _val = Math.round(_val);
-      if (_val < -0x80 || _val > 0x7F) {
-        throw new Error('Int8: ' + val +
-          ' is outside of the range of valid 8-bit ints');
-      }
-      return _val;
-    };
+    }
 
     // Don't forget to add `Int8` to the type registry
     mongoose.Schema.Types.Int8 = Int8;

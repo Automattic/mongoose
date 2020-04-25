@@ -957,28 +957,4 @@ describe('document.populate', function() {
       assert.ok(finalDoc.i.populated('g'));
     });
   });
-
-  it('doc.execPopulate(options) is a shorthand for doc.populate(options).execPopulate(...) (gh-8839)', function() {
-    const userSchema = new Schema({ name: String });
-    const User = db.model('Test1', userSchema);
-
-    const postSchema = new Schema({
-      user: { type: mongoose.ObjectId, ref: 'Test1' },
-      title: String
-    });
-
-    const Post = db.model('Test2', postSchema);
-
-    return co(function*() {
-      const user = yield User.create({ name: 'val' });
-
-      yield Post.create({ title: 'test1', user: user });
-
-      const post = yield Post.findOne();
-
-      yield post.execPopulate({ path: 'user' });
-
-      assert.equal(post.user.name, 'val');
-    });
-  });
 });

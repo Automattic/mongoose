@@ -7,7 +7,7 @@
 const start = require('./common');
 
 const DocumentArray = require('../lib/types/documentarray');
-const EmbeddedDocument = require('../lib/types/embedded');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
 const co = require('co');
 const random = require('../lib/utils').random;
@@ -23,14 +23,14 @@ const MongooseDocumentArray = mongoose.Types.DocumentArray;
 
 function TestDoc(schema) {
   const Subdocument = function() {
-    EmbeddedDocument.call(this, {}, new DocumentArray);
+    ArraySubdocument.call(this, {}, new DocumentArray);
   };
 
   /**
-   * Inherits from EmbeddedDocument.
+   * Inherits from ArraySubdocument.
    */
 
-  Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+  Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
   /**
    * Set schema.
@@ -308,7 +308,7 @@ describe('types.documentarray', function() {
       const subdoc = t.docs.create({ name: 100 });
       assert.ok(subdoc._id);
       assert.equal(subdoc.name, '100');
-      assert.ok(subdoc instanceof EmbeddedDocument);
+      assert.ok(subdoc instanceof ArraySubdocument);
       done();
     });
   });
@@ -411,7 +411,7 @@ describe('types.documentarray', function() {
     });
   });
 
-  it('#push should work on EmbeddedDocuments more than 2 levels deep', function(done) {
+  it('#push should work on ArraySubdocument more than 2 levels deep', function(done) {
     const Comments = new Schema;
     Comments.add({
       title: String,

@@ -401,7 +401,7 @@ describe('document modified', function() {
           ]
         });
 
-        assert.ok(account.roles[0].users[0].isModified);
+        assert.ok(account.roles[0].isModified('users'));
         return Promise.all([User.init(), Account.init()]);
       });
 

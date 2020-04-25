@@ -7,7 +7,7 @@
 const start = require('./common');
 
 const DocumentArray = require('../lib/types/documentarray');
-const EmbeddedDocument = require('../lib/types/embedded');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
 
 const mongoose = start.mongoose;
@@ -29,14 +29,14 @@ const test = new Schema({
 
 function TestDoc(schema) {
   const Subdocument = function() {
-    EmbeddedDocument.call(this, {}, new DocumentArray);
+    ArraySubdocument.call(this, {}, new DocumentArray);
   };
 
   /**
-   * Inherits from EmbeddedDocument.
+   * Inherits from ArraySubdocument.
    */
 
-  Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+  Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
   /**
    * Set schema.

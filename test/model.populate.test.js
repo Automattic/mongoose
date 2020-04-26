@@ -9290,17 +9290,19 @@ describe('model: populate:', function() {
         const user = yield User.create({ name: 'val' });
         yield Post.create([
           { title: 'test1', user: user },
-          { title: 'test2', user: user }
+          { title: 'test2', user: user },
+          { title: 'test3', user: new mongoose.Types.ObjectId() }
         ]);
 
         const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
 
         posts[0].user.name = 'val2';
         assert.equal(posts[1].user.name, 'val');
+        assert.equal(posts[2].user, null);
       });
     });
 
-    it('clone with populate and lean makes child lean', function() { {
+    it('clone with populate and lean makes child lean', function() {
       const isLean = v => v != null && !(v instanceof mongoose.Document);
 
       const userSchema = new Schema({ name: String });
@@ -9322,6 +9324,6 @@ describe('model: populate:', function() {
 
         assert.ok(isLean(post.user));
       });
-    }});
+    });
   });
 });

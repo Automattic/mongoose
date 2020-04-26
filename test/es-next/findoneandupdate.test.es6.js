@@ -9,8 +9,6 @@ describe('Tutorial: findOneAndUpdate()', function() {
   const mongoose = new start.mongoose.Mongoose();
   let Character;
 
-  mongoose.set('useFindAndModify', false);
-
   before(async function() {
     await mongoose.connect('mongodb://localhost:27017/mongoose', {
       useNewUrlParser: true

@@ -8874,4 +8874,26 @@ describe('document', function() {
       assert.equal(updatedDoc.array[0][0].value, 'world');
     });
   });
+
+  it('handles validator errors on subdoc paths (gh-5226)', function() {
+    const schema = Schema({
+      child: {
+        type: Schema({ name: String }),
+        validate: () => false
+      },
+      children: {
+        type: [{ name: String }],
+        validate: () => false
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ child: {}, children: [] });
+    return doc.validate().then(() => assert.ok(false), err => {
+      assert.ok(err);
+      assert.ok(err.errors);
+      assert.ok(err.errors.child);
+      assert.ok(err.errors.children);
+    });
+  });
 });

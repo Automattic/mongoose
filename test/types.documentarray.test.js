@@ -321,7 +321,7 @@ describe('types.documentarray', function() {
         next();
       });
       const schema = new Schema({ children: [child] });
-      const M = db.model('Test', schema, 'edarecast-' + random());
+      const M = db.model('Test', schema);
       const m = new M;
       m.save(function(err) {
         assert.ifError(err);

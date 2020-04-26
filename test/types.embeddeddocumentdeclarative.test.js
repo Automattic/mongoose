@@ -25,30 +25,8 @@ describe('types.embeddeddocumentdeclarative', function() {
       }
     };
 
-    describe('with the default legacy behavior (typePojoToMixed=true)', function() {
+    describe('creates subdocument schema if `type` is an object with keys', function() {
       const ParentSchema = new mongoose.Schema(ParentSchemaDef);
-      it('interprets the POJO as Mixed (gh-7494)', function(done) {
-        assert.equal(ParentSchema.paths.child.instance, 'Mixed');
-        done();
-      });
-      it('does not enforce provided schema on the child path (gh-7494)', function(done) {
-        const ParentModel = mongoose.model('ParentModel-7494-EmbeddedDeclarativeMixed', ParentSchema);
-        const swampGuide = new ParentModel({
-          name: 'Swamp Guide',
-          child: {
-            name: 'Tingle',
-            mixedUp: 'very'
-          }
-        });
-        const tingle = swampGuide.toObject().child;
-
-        assert.equal(tingle.name, 'Tingle');
-        assert.equal(tingle.mixedUp, 'very');
-        done();
-      });
-    });
-    describe('with the optional subschema behavior (typePojoToMixed=false)', function() {
-      const ParentSchema = new mongoose.Schema(ParentSchemaDef, { typePojoToMixed: false });
       it('interprets the POJO as a subschema (gh-7494)', function(done) {
         assert.equal(ParentSchema.paths.child.instance, 'Embedded');
         assert.strictEqual(ParentSchema.paths.child['$isSingleNested'], true);
@@ -77,7 +55,7 @@ describe('types.embeddeddocumentdeclarative', function() {
               type: { test: String }
             }
           }]
-        }, { typePojoToMixed: false });
+        });
 
         assert.ok(schema.path('arr').schema.path('nested').instance !== 'Mixed');
         assert.ok(schema.path('arr').schema.path('nested.test') instanceof mongoose.Schema.Types.String);
@@ -94,7 +72,7 @@ describe('types.embeddeddocumentdeclarative', function() {
               }
             }
           }
-        }, { typePojoToMixed: false });
+        });
 
         assert.ok(schema.path('l1').instance !== 'Mixed');
         assert.ok(schema.path('l1.l2').instance !== 'Mixed');
@@ -112,7 +90,7 @@ describe('types.embeddeddocumentdeclarative', function() {
       }
     };
     const ParentSchemaNotMixed = new Schema(ParentSchemaDef);
-    const ParentSchemaNotSubdoc = new Schema(ParentSchemaDef, { typePojoToMixed: false });
+    const ParentSchemaNotSubdoc = new Schema(ParentSchemaDef);
     it('does not create a path for child in either option', function(done) {
       assert.equal(ParentSchemaNotMixed.paths['child.name'].instance, 'String');
       assert.equal(ParentSchemaNotSubdoc.paths['child.name'].instance, 'String');

@@ -238,13 +238,9 @@ block content
     on the parent schema instantiation or on the mongoose instance).
     ```javascript
     var parentSchema = new Schema({
-      child: { type: { name: 'string' } }
-    }, { typePojoToMixed: false });
-    // Equivalent
-    var parentSchema = new Schema({
       child: new Schema({ name: 'string' })
     });
-    // Not equivalent!  Careful - a Mixed path is created instead!
+    // Equivalent
     var parentSchema = new Schema({
       child: { type: { name: 'string' } }
     });

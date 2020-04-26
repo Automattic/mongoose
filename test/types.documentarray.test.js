@@ -10,7 +10,6 @@ const DocumentArray = require('../lib/types/documentarray');
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
 const co = require('co');
-const random = require('../lib/utils').random;
 const setValue = require('../lib/utils').setValue;
 
 const mongoose = require('./common').mongoose;

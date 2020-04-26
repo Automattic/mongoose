@@ -9,7 +9,7 @@ const start = require('./common');
 
 const assert = require('assert');
 const mongoose = start.mongoose;
-const EmbeddedDocument = require('../lib/types/embedded');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const EventEmitter = require('events').EventEmitter;
 const DocumentArray = require('../lib/types/documentarray');
 const Schema = mongoose.Schema;
@@ -41,11 +41,11 @@ describe('types.document', function() {
       arr.$path = () => 'jsconf.ar';
       arr.$parent = () => new Dummy;
       arr[0] = this;
-      EmbeddedDocument.call(this, {}, arr);
+      ArraySubdocument.call(this, {}, arr);
     }
     Subdocument = _Subdocument;
 
-    Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
+    Subdocument.prototype.__proto__ = ArraySubdocument.prototype;
 
     for (const i in EventEmitter.prototype) {
       Subdocument[i] = EventEmitter.prototype[i];

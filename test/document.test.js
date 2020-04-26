@@ -8,7 +8,7 @@ const start = require('./common');
 
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
-const EmbeddedDocument = require('../lib/types/embedded');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
@@ -1786,11 +1786,11 @@ describe('document', function() {
             }]
           });
 
-          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
+          assert.ok(doc.schedule[0] instanceof ArraySubdocument);
           doc.set('schedule.0.open', 1100);
           assert.ok(doc.schedule);
           assert.ok(doc.schedule.isMongooseDocumentArray);
-          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
+          assert.ok(doc.schedule[0] instanceof ArraySubdocument);
           assert.equal(doc.schedule[0].open, 1100);
           assert.equal(doc.schedule[0].close, 1900);
 

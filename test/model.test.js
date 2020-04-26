@@ -6577,7 +6577,7 @@ describe('Model', function() {
         { notInSchema: 1 },
         { notInSchema: 2 },
         { notInSchema: 3 }
-      ], { strict: false }).then(res=>res.ops);
+      ]).then(res=>res.ops);
 
       // Act
       yield User.bulkWrite([

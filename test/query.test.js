@@ -3640,6 +3640,23 @@ describe('Query', function() {
     });
   });
 
+  it('setter priorVal (gh-8629)', function() {
+    const priorVals = [];
+    const schema = Schema({
+      name: {
+        type: String,
+        set: (v, priorVal) => {
+          priorVals.push(priorVal);
+          return v;
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    return Model.updateOne({}, { name: 'bar' }).exec().
+      then(() => assert.deepEqual(priorVals, [null]));
+  });
+
   describe('clone', function() {
     let Model;
 

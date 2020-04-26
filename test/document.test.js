@@ -1671,6 +1671,35 @@ describe('document', function() {
       });
     });
 
+    it('passes priorVal (gh-8629)', function() {
+      const names = [];
+      const profiles = [];
+      const Model = db.model('Test', Schema({
+        name: {
+          type: String,
+          set: (v, priorVal) => {
+            names.push(priorVal);
+            return v;
+          }
+        },
+        profile: {
+          type: Schema({ age: Number }, { _id: false }),
+          set: (v, priorVal) => {
+            profiles.push(priorVal == null ? priorVal : priorVal.toObject());
+            return v;
+          }
+        }
+      }));
+      const doc = new Model({ name: 'test', profile: { age: 29 } });
+      assert.deepEqual(names, [null]);
+      assert.deepEqual(profiles, [null]);
+
+      doc.name = 'test2';
+      doc.profile = { age: 30 };
+      assert.deepEqual(names, [null, 'test']);
+      assert.deepEqual(profiles, [null, { age: 29 }]);
+    });
+
     describe('on nested paths', function() {
       describe('using set(path, object)', function() {
         it('overwrites the entire object', function(done) {
@@ -5452,17 +5481,18 @@ describe('document', function() {
     it('consistent setter context for single nested (gh-5363)', function(done) {
       const contentSchema = new Schema({
         blocks: [{ type: String }],
-        summary: { type: String }
+        previous: [{ type: String }]
       });
 
       // Subdocument setter
-      const contexts = [];
-      contentSchema.path('blocks').set(function(srcBlocks) {
-        if (!this.ownerDocument().isNew) {
-          contexts.push(this.toObject());
+      const oldVals = [];
+      contentSchema.path('blocks').set(function(newVal, oldVal) {
+        if (!this.ownerDocument().isNew && oldVal != null) {
+          oldVals.push(oldVal.toObject());
+          this.set('previous', [].concat(oldVal.toObject()));
         }
 
-        return srcBlocks;
+        return newVal;
       });
 
       const noteSchema = new Schema({
@@ -5482,16 +5512,16 @@ describe('document', function() {
 
       note.save().
         then(function(note) {
-          assert.equal(contexts.length, 0);
+          assert.equal(oldVals.length, 0);
           note.set('body', {
-            summary: 'New Summary',
             blocks: ['gallery', 'html']
           });
           return note.save();
         }).
         then(function() {
-          assert.equal(contexts.length, 1);
-          assert.deepEqual(contexts[0].blocks, ['html']);
+          assert.equal(oldVals.length, 1);
+          assert.deepEqual(oldVals[0], ['html']);
+          assert.deepEqual(note.body.previous, ['html']);
           done();
         }).
         catch(done);

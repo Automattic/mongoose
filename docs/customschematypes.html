@@ -9,26 +9,27 @@ To create a new schema type, you need to inherit from <code>mongoose.SchemaType<
 and add the corresponding property to <code>mongoose.Schema.Types</code>. The one
 method you need to implement is the <code>cast()</code> method.</p>
 
-<pre><code class="language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Int8</span>(<span class="hljs-params">key, options</span>) </span>{
-  mongoose.SchemaType.call(<span class="hljs-keyword">this</span>, key, options, <span class="hljs-string">'Int8'</span>);
-}
-Int8.prototype = <span class="hljs-built_in">Object</span>.create(mongoose.SchemaType.prototype);
+<pre><code class="language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Int8</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">mongoose</span>.<span class="hljs-title">SchemaType</span> </span>{
+  <span class="hljs-keyword">constructor</span>(key, options) {
+    <span class="hljs-keyword">super</span>(key, options, <span class="hljs-string">'Int8'</span>);
+  }
 
-<span class="hljs-comment">// `cast()` takes a parameter that can be anything. You need to</span>
-<span class="hljs-comment">// validate the provided `val` and throw a `CastError` if you</span>
-<span class="hljs-comment">// can't convert it.</span>
-Int8.prototype.cast = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">val</span>) </span>{
-  <span class="hljs-keyword">var</span> _val = <span class="hljs-built_in">Number</span>(val);
-  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(_val)) {
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Int8: '</span> + val + <span class="hljs-string">' is not a number'</span>);
+  <span class="hljs-comment">// `cast()` takes a parameter that can be anything. You need to</span>
+  <span class="hljs-comment">// validate the provided `val` and throw a `CastError` if you</span>
+  <span class="hljs-comment">// can't convert it.</span>
+  cast(val) {
+    <span class="hljs-keyword">var</span> _val = <span class="hljs-built_in">Number</span>(val);
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(_val)) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Int8: '</span> + val + <span class="hljs-string">' is not a number'</span>);
+    }
+    _val = <span class="hljs-built_in">Math</span>.round(_val);
+    <span class="hljs-keyword">if</span> (_val &lt; <span class="hljs-number">-0x80</span> || _val &gt; <span class="hljs-number">0x7F</span>) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Int8: '</span> + val +
+        <span class="hljs-string">' is outside of the range of valid 8-bit ints'</span>);
+    }
+    <span class="hljs-keyword">return</span> _val;
   }
-  _val = <span class="hljs-built_in">Math</span>.round(_val);
-  <span class="hljs-keyword">if</span> (_val &lt; <span class="hljs-number">-0x80</span> || _val &gt; <span class="hljs-number">0x7F</span>) {
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Int8: '</span> + val +
-      <span class="hljs-string">' is outside of the range of valid 8-bit ints'</span>);
-  }
-  <span class="hljs-keyword">return</span> _val;
-};
+}
 
 <span class="hljs-comment">// Don't forget to add `Int8` to the type registry</span>
 mongoose.Schema.Types.Int8 = Int8;

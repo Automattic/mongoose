@@ -22,7 +22,7 @@ doc.save(); <span class="hljs-comment">// changes to foo will not be persisted a
 <h4>Example</h4>
 
 <pre><code>MyModel = mongoose.model(<span class="hljs-string">'test'</span>, { name: { type: <span class="hljs-built_in">String</span>, <span class="hljs-keyword">default</span>: <span class="hljs-string">'Val '</span>} });
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> MyModel();
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> MyModel();
 m.$isDefault(<span class="hljs-string">'name'</span>); <span class="hljs-comment">// true</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="document_Document-$isDeleted"><a href="#document_Document-$isDeleted">Document.prototype.$isDeleted()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[val]
 <span class="method-type">&laquo;Boolean&raquo;</span> optional, overrides whether mongoose thinks the doc is deleted</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Boolean&raquo;</span> whether mongoose thinks this doc is deleted.</p>
@@ -130,7 +130,7 @@ doc.modifiedPaths(); <span class="hljs-comment">// ['nested', 'nested.bar']</spa
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> promise = doc.
+<pre><code><span class="hljs-keyword">const</span> promise = doc.
   populate(<span class="hljs-string">'company'</span>).
   populate({
     path: <span class="hljs-string">'notes'</span>,
@@ -142,7 +142,15 @@ doc.modifiedPaths(); <span class="hljs-comment">// ['nested', 'nested.bar']</spa
   execPopulate();
 
 <span class="hljs-comment">// summary</span>
-doc.execPopulate().then(resolve, reject);</code></pre>  </div><hr class="separate-api-elements"><h3 id="document_Document-get"><a href="#document_Document-get">Document.prototype.get()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
+doc.execPopulate().then(resolve, reject);</code></pre>
+
+<p>// you can also use doc.execPopulate(options) as a shorthand for   // doc.populate(options).execPopulate()</p>
+
+<h4>Example:</h4>
+
+<p>const promise = doc.execPopulate({ path: 'company', select: 'employees' });</p>
+
+<p>// summary   promise.then(resolve,reject);</p>  </div><hr class="separate-api-elements"><h3 id="document_Document-get"><a href="#document_Document-get">Document.prototype.get()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">[type]
 <span class="method-type">&laquo;Schema|String|Number|Buffer|*&raquo;</span> optionally specify a type for on-the-fly attributes</p>
 </li><li class="param">[options]
@@ -489,7 +497,7 @@ schema.options.toObject.transform = <span class="hljs-function"><span class="hlj
   <span class="hljs-keyword">return</span> ret;
 }
 
-<span class="hljs-keyword">var</span> doc = <span class="hljs-keyword">new</span> Doc({ _id: <span class="hljs-string">'anId'</span>, secret: <span class="hljs-number">47</span>, name: <span class="hljs-string">'Wreck-it Ralph'</span> });
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Doc({ _id: <span class="hljs-string">'anId'</span>, secret: <span class="hljs-number">47</span>, name: <span class="hljs-string">'Wreck-it Ralph'</span> });
 doc.toObject();                                        <span class="hljs-comment">// { secret: 47, name: 'Wreck-it Ralph' }</span>
 doc.toObject({ hide: <span class="hljs-string">'secret _id'</span>, transform: <span class="hljs-literal">false</span> });<span class="hljs-comment">// { _id: 'anId', secret: 47, name: 'Wreck-it Ralph' }</span>
 doc.toObject({ hide: <span class="hljs-string">'secret _id'</span>, transform: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// { name: 'Wreck-it Ralph' }</span></code></pre>
@@ -591,7 +599,7 @@ doc.save(); <span class="hljs-comment">// changes to foo will not be persisted</
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> err = doc.validateSync();
+<pre><code><span class="hljs-keyword">const</span> err = doc.validateSync();
 <span class="hljs-keyword">if</span> (err) {
   handleError(err);
 } <span class="hljs-keyword">else</span> {

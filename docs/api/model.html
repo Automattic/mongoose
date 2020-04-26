@@ -1022,11 +1022,13 @@ promise.then(<span class="hljs-function"><span class="hljs-keyword">function</sp
 }).then(<span class="hljs-literal">null</span>, handleError).end()</code></pre>  </div><hr class="separate-api-elements"><h3 id="model_Model.populate"><a href="#model_Model.populate">Model.populate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">docs
 <span class="method-type">&laquo;Document|Array&raquo;</span> Either a single document or array of documents to populate.</p>
 </li><li class="param">options
-<span class="method-type">&laquo;Object&raquo;</span> A hash of key/val (path, options) used for population.</p>
-</li><ul style="margin-top: 0.5em"><li>[options.retainNullValues=false]
-<span class="method-type">&laquo;boolean&raquo;</span> by default, Mongoose removes null and undefined values from populated arrays. Use this option to make <code>populate()</code> retain <code>null</code> and <code>undefined</code> array entries.</p>
+<span class="method-type">&laquo;Object|String&raquo;</span> Either the paths to populate or an object specifying all parameters</p>
+</li><ul style="margin-top: 0.5em"><li>[options.path=null]
+<span class="method-type">&laquo;string&raquo;</span> The path to populate.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.retainNullValues=false]
+<span class="method-type">&laquo;boolean&raquo;</span> By default, Mongoose removes null and undefined values from populated arrays. Use this option to make <code>populate()</code> retain <code>null</code> and <code>undefined</code> array entries.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.getters=false]
-<span class="method-type">&laquo;boolean&raquo;</span> if true, Mongoose will call any getters defined on the <code>localField</code>. By default, Mongoose gets the raw value of <code>localField</code>. For example, you would need to set this option to <code>true</code> if you wanted to <a href="/docs/schematypes.html#schematype-options">add a <code>lowercase</code> getter to your <code>localField</code></a>.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, Mongoose will call any getters defined on the <code>localField</code>. By default, Mongoose gets the raw value of <code>localField</code>. For example, you would need to set this option to <code>true</code> if you wanted to <a href="/docs/schematypes.html#schematype-options">add a <code>lowercase</code> getter to your <code>localField</code></a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.clone=false]
 <span class="method-type">&laquo;boolean&raquo;</span> When you do <code>BlogPost.find().populate(&#39;author&#39;)</code>, blog posts with the same author will share 1 copy of an <code>author</code> doc. Enable this option to make Mongoose clone populated docs before assigning them.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.match=null]

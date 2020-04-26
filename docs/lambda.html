@@ -28,13 +28,17 @@ exports.handler = <span class="hljs-keyword">async</span> <span class="hljs-func
   <span class="hljs-comment">// This means your Lambda function doesn't have to go through the</span>
   <span class="hljs-comment">// potentially expensive process of connecting to MongoDB every time.</span>
   <span class="hljs-keyword">if</span> (conn == <span class="hljs-literal">null</span>) {
-    conn = <span class="hljs-keyword">await</span> mongoose.createConnection(uri, {
+    conn = mongoose.createConnection(uri, {
       <span class="hljs-comment">// Buffering means mongoose will queue up operations if it gets</span>
       <span class="hljs-comment">// disconnected from MongoDB and send them when it reconnects.</span>
       <span class="hljs-comment">// With serverless, better to fail fast if not connected.</span>
       bufferCommands: <span class="hljs-literal">false</span>, <span class="hljs-comment">// Disable mongoose buffering</span>
       bufferMaxEntries: <span class="hljs-number">0</span> <span class="hljs-comment">// and MongoDB driver buffering</span>
     });
+
+    <span class="hljs-comment">// `await`ing connection after assigning to the `conn` variable</span>
+    <span class="hljs-comment">// to avoid multiple function calls creating new connections</span>
+    <span class="hljs-keyword">await</span> conn;
     conn.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> mongoose.Schema({ name: <span class="hljs-built_in">String</span> }));
   }
 

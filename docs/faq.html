@@ -26,16 +26,27 @@ directly?</p>
 doc.save();</code></pre>
 <p><strong>A</strong>. Mongoose doesn&#39;t create getters/setters for array indexes; without
 them mongoose never gets notified of the change and so doesn&#39;t know to
-persist the new value. The work-around is to use
-<a href="./api.html#types_array_MongooseArray.set">MongooseArray#set</a> available
-in <strong>Mongoose &gt;= 3.2.0</strong>.</p>
-<pre><code class="language-javascript"><span class="hljs-comment">// 3.2.0</span>
+persist the new value. There are two workarounds:
+<a href="./api.html#types_array_MongooseArray.set"><code>MongooseArray#set</code></a> or
+<a href="/docs/api/document.html#document_Document-markModified"><code>Document#markModified()</code></a>.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Saves changes successfully</span>
 doc.array.set(<span class="hljs-number">3</span>, <span class="hljs-string">'changed'</span>);
 doc.save();
 
-<span class="hljs-comment">// if running a version less than 3.2.0, you must mark the array modified before saving.</span>
+<span class="hljs-comment">// Also saves changes successfully</span>
 doc.array[<span class="hljs-number">3</span>] = <span class="hljs-string">'changed'</span>;
 doc.markModified(<span class="hljs-string">'array'</span>);
+doc.save();</code></pre>
+<p>This <strong>only</strong> affects when you set an array index directly. If you set
+a path on a document array element, you do not need to use <code>markModified()</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Saves changes successfully without `markModified()`, because this</span>
+<span class="hljs-comment">// code doesn't set an array index, it sets a path underneath an array index.</span>
+doc.docArray[<span class="hljs-number">3</span>].name = <span class="hljs-string">'changed'</span>;
+doc.save();
+
+<span class="hljs-comment">// Does **not** save changes successfully. You need to use `markModified()`</span>
+<span class="hljs-comment">// or `set()` because this sets an array index.</span>
+doc.docArray[<span class="hljs-number">3</span>] = { name: <span class="hljs-string">'changed'</span> };
 doc.save();</code></pre>
 <hr id="unique-doesnt-work" />
 

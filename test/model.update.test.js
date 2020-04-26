@@ -3025,7 +3025,7 @@ describe('model: update:', function() {
 
       Group.update({}, update, opts, function(error) {
         assert.ok(error);
-        assert.ok(error.errors['users.0.permission'], Object.keys(error.errors));
+        assert.ok(error.errors['users.0.permission.read'], Object.keys(error.errors));
         done();
       });
     });

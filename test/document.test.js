@@ -5097,7 +5097,6 @@ describe('document', function() {
       });
       contact.validate(function(error) {
         assert.ok(error);
-        assert.ok(error.errors['contact']);
         assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
 
         // This `JSON.stringify()` should not throw
@@ -6809,42 +6808,6 @@ describe('document', function() {
 
       const fromDb = yield Model.findOne();
       assert.ok(fromDb.error.errors.name);
-    });
-  });
-
-  it('storeSubdocValidationError (gh-6802)', function() {
-    return co(function*() {
-      const GrandchildSchema = new Schema({
-        name: {
-          type: String,
-          required: true
-        }
-      }, { storeSubdocValidationError: false });
-
-      const ChildSchema = new Schema({
-        name: String,
-        child: GrandchildSchema
-      }, { storeSubdocValidationError: false });
-
-      const ParentSchema = new Schema({
-        name: String,
-        child: ChildSchema
-      });
-      const Parent = db.model('Parent', ParentSchema);
-
-      const parent = new Parent({ child: { child: {} } });
-
-      let err = yield parent.validate().then(() => null, err => err);
-      assert.ok(err);
-      assert.ok(err.errors['child.child.name']);
-      assert.ok(!err.errors['child']);
-      assert.ok(!err.errors['child.child']);
-
-      err = parent.validateSync();
-      assert.ok(err);
-      assert.ok(err.errors['child.child.name']);
-      assert.ok(!err.errors['child']);
-      assert.ok(!err.errors['child.child']);
     });
   });
 

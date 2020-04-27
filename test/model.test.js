@@ -5624,8 +5624,8 @@ describe('Model', function() {
               filter: { _id: createdUser._id }
             }
           }])
-            .then(()=>null)
-            .catch(err=>err);
+            .then(() => null)
+            .catch(err => err);
 
 
           assert.ok(err);
@@ -6668,7 +6668,7 @@ describe('Model', function() {
         { notInSchema: 1 },
         { notInSchema: 2 },
         { notInSchema: 3 }
-      ]).then(res=>res.ops);
+      ]).then(res => res.ops);
 
       // Act
       yield User.bulkWrite([

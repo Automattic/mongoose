@@ -156,6 +156,10 @@
         }
       ],
       "array-bracket-spacing": 1,
+      "arrow-spacing": ["error", {
+        "before": true,
+        "after": true
+      }],
       "object-curly-spacing": [
         "error",
         "always"

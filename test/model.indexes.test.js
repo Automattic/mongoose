@@ -336,6 +336,22 @@ describe('model', function() {
       });
     });
 
+    it('creates descending indexes from schema definition(gh-8895)', function() {
+      return co(function*() {
+        const userSchema = new Schema({
+          name: { type: String, index: -1 }
+        });
+
+        const User = db.model('User', userSchema);
+
+        yield User.init();
+
+        const indexes = yield User.collection.getIndexes();
+
+        assert.ok(indexes['name_-1']);
+      });
+    });
+
     describe('auto creation', function() {
       it('can be disabled', function(done) {
         const schema = new Schema({ name: { type: String, index: true } });

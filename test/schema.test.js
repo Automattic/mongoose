@@ -2415,19 +2415,19 @@ describe('schema', function() {
     it('throws errors on compiling schema with reserved key as a flat type', function() {
       const buildInvalidSchema = () => new Schema({ db: String });
 
-      assert.throws(buildInvalidSchema, { message: /`db` may not be used as a schema pathname/ });
+      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
     });
 
     it('throws errors on compiling schema with reserved key as a nested object', function() {
       const buildInvalidSchema = () => new Schema({ db: { nested: String } });
 
-      assert.throws(buildInvalidSchema, { message: /`db` may not be used as a schema pathname/ });
+      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
     });
 
     it('throws errors on compiling schema with reserved key as a nested array', function() {
       const buildInvalidSchema = () => new Schema({ db: [{ nested: String }] });
 
-      assert.throws(buildInvalidSchema, { message: /`db` may not be used as a schema pathname/ });
+      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
     });
   });
 });

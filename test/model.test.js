@@ -4651,6 +4651,83 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() validation error with ordered true when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ok(error);
+        assert.equal(res, undefined);
+        assert.equal(error.name, 'ValidationError');
+        done();
+      });
+    });
+
+    it('insertMany() validation error with ordered false when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: false };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ifError(error);
+        assert.equal(res.length, 0);
+        assert.equal(error, null);
+        done();
+      });
+    });
+
+    it('insertMany() validation error with ordered true and rawResult true when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: true, rawResult: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ok(error);
+        assert.equal(res, undefined);
+        assert.equal(error.name, 'ValidationError');
+        done();
+      });
+    });
+
+    it('insertMany() validation error with ordered false and rawResult true when all documents are invalid', function(done) {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { foo: 'The Phantom Menace' },
+        { foobar: 'The Force Awakens' }
+      ];
+      const opts = { ordered: false, rawResult: true };
+      Movie.insertMany(arr, opts, function(error, res) {
+        assert.ifError(error);
+        assert.equal(res.mongoose.validationErrors.length, 2);
+        assert.equal(res.mongoose.validationErrors[0].name, 'ValidationError');
+        assert.equal(res.mongoose.validationErrors[1].name, 'ValidationError');
+        done();
+      });
+    });
+
     it('insertMany() depopulate (gh-4590)', function(done) {
       const personSchema = new Schema({
         name: String
@@ -5547,8 +5624,8 @@ describe('Model', function() {
               filter: { _id: createdUser._id }
             }
           }])
-            .then(()=>null)
-            .catch(err=>err);
+            .then(() => null)
+            .catch(err => err);
 
 
           assert.ok(err);
@@ -6434,6 +6511,20 @@ describe('Model', function() {
     });
   });
 
+  it('Model.validate(...) validates paths in arrays (gh-8821)', function() {
+    const userSchema = new Schema({
+      friends: [{ type: String, required: true, minlength: 3 }]
+    });
+
+    const User = db.model('User', userSchema);
+    return co(function*() {
+      const err = yield User.validate({ friends: [null, 'A'] }).catch(err => err);
+
+      assert.ok(err.errors['friends.0']);
+      assert.ok(err.errors['friends.1']);
+    });
+  });
+
   it('sets correct `Document#op` with `save()` (gh-8439)', function() {
     const schema = Schema({ name: String });
     const ops = [];
@@ -6577,7 +6668,7 @@ describe('Model', function() {
         { notInSchema: 1 },
         { notInSchema: 2 },
         { notInSchema: 3 }
-      ], { strict: false }).then(res=>res.ops);
+      ]).then(res => res.ops);
 
       // Act
       yield User.bulkWrite([

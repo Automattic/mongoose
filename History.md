@@ -1,3 +1,17 @@
+5.9.11 / 2020-04-30
+===================
+ * fix: upgrade mongodb driver -> 3.5.7 #8842 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: validate nested paths on Model.validate(...) #8848 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): make doc.execPopulate(options) a shorthand for doc.populate(options) #8840 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): return validation errors when all docs are invalid & rawResult set #8853 [tusharf5](https://github.com/tusharf5)
+ * fix(schemaType): treat select: null or select: undefined as not specified #8850 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: fix stream close event listener being called multiple times in Node 14 #8835 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): handle `clone` with `lean` when setting a path to `null` #8807
+ * docs(faq): clarify setting paths under document arrays with `markModified()` #8854
+ * docs: fix race condition in creating connection for lambda #8845 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: add options.path for Model.populate(...) #8833 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: use ES6 classes for custom schema type example #8802
+
 5.9.10 / 2020-04-20
 ===================
  * fix: upgrade mongodb -> 3.5.6, bson -> 1.1.4 #8719

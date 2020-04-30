@@ -2,7 +2,7 @@
 ===================
  * fix: upgrade mongodb driver -> 3.5.7 #8842 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix: validate nested paths on Model.validate(...) #8848 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
- * fix(populate): make doc.execPopulate(options) a shorthand for doc.populate(options) #8840 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): make doc.execPopulate(options) a shorthand for doc.populate(options).execPopulate() #8840 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix(model): return validation errors when all docs are invalid & rawResult set #8853 [tusharf5](https://github.com/tusharf5)
  * fix(schemaType): treat select: null or select: undefined as not specified #8850 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix: fix stream close event listener being called multiple times in Node 14 #8835 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

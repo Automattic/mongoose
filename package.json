@@ -198,6 +198,7 @@
           "message": "Don't use Mocha's global context"
         }
       ],
+      "no-prototype-builtins": "off",
       "mocha-no-only/mocha-no-only": [
         "error"
       ]

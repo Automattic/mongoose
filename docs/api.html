@@ -2170,6 +2170,8 @@ A.findByIdAndRemove()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.returnOriginal=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
+<span class="method-type">&laquo;Boolean&raquo;</span> By default, if you don&#39;t include any <a href="https://docs.mongodb.com/manual/reference/operator/update/">update operators</a> in <code>update</code>, Mongoose will wrap <code>update</code> in <code>$set</code> for you. This prevents you from accidentally overwriting the document. This option tells Mongoose to skip adding <code>$set</code>. An alternative to this would be using <a href="https://mongoosejs.com/docs/api/model.html#model_Model.findOneAndReplace">Model.findOneAndReplace({ _id: id }, update, options, callback)</a>.</p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issues a mongodb findAndModify update command by a document's _id field. <code>findByIdAndUpdate(id, ...)</code> is equivalent to <code>findOneAndUpdate({ _id: id }, ...)</code>.</p>
 
@@ -2446,6 +2448,8 @@ A.findOneAndReplace()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.returnOriginal=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
+<span class="method-type">&laquo;Boolean&raquo;</span> By default, if you don&#39;t include any <a href="https://docs.mongodb.com/manual/reference/operator/update/">update operators</a> in <code>update</code>, Mongoose will wrap <code>update</code> in <code>$set</code> for you. This prevents you from accidentally overwriting the document. This option tells Mongoose to skip adding <code>$set</code>. An alternative to this would be using <a href="https://mongoosejs.com/docs/api/model.html#model_Model.findOneAndReplace">Model.findOneAndReplace(conditions, update, options, callback)</a>.</p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issues a mongodb findAndModify update command.</p>
 
@@ -2561,6 +2565,8 @@ Event.init().then(<span class="hljs-function"><span class="hljs-keyword">functio
 <span class="method-type">&laquo;Boolean&raquo;</span> = false] if false, the returned promise resolves to the documents that passed mongoose document validation. If <code>true</code>, will return the <a href="http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#~insertWriteOpCallback">raw result from the MongoDB driver</a> with a <code>mongoose</code> property that contains <code>validationErrors</code> if this is an unordered <code>insertMany</code>.</p>
 </li><li class="param">[options.lean
 <span class="method-type">&laquo;Boolean&raquo;</span> = false] if <code>true</code>, skips hydrating and validating the documents. This option is useful if you need the extra performance, but Mongoose won&#39;t validate the documents before inserting.</p>
+</li><li class="param">[options.limit
+<span class="method-type">&laquo;Number&raquo;</span> = null] this limits the number of documents being processed (validation/casting) by mongoose in parallel, this does <strong>NOT</strong> send the documents in batches to MongoDB. Use this option if you&#39;re processing a large number of documents and your app is running out of memory.</p>
 </li><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> callback</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolving to the raw result from the MongoDB driver if <code>options.rawResult</code> was <code>true</code>, or the documents that passed validation, otherwise</p>

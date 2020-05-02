@@ -30,7 +30,7 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">const</span> vehicleSchema = <span class="hljs-keyword">new</span> Schema({ fuelLevel: mongoose.Decimal128 });</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Document"><a href="#mongoose_Mongoose-Document">Mongoose.prototype.Document()</a></h3><div><p>The Mongoose <a href="#document-js">Document</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-DocumentProvider"><a href="#mongoose_Mongoose-DocumentProvider">Mongoose.prototype.DocumentProvider()</a></h3><div><p>The Mongoose DocumentProvider constructor. Mongoose users should not have to use this directly</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Error"><a href="#mongoose_Mongoose-Error">Mongoose.prototype.Error()</a></h3><div><p>The <a href="#error_MongooseError">MongooseError</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Mixed"><a href="#mongoose_Mongoose-Mixed">Mongoose.prototype.Mixed</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Mixed <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that Mongoose's change tracking, casting, and validation should ignore.</p>
+<pre><code><span class="hljs-keyword">const</span> vehicleSchema = <span class="hljs-keyword">new</span> Schema({ fuelLevel: mongoose.Decimal128 });</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Document"><a href="#mongoose_Mongoose-Document">Mongoose.prototype.Document()</a></h3><div><p>The Mongoose <a href="/api/document.html">Document</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-DocumentProvider"><a href="#mongoose_Mongoose-DocumentProvider">Mongoose.prototype.DocumentProvider()</a></h3><div><p>The Mongoose DocumentProvider constructor. Mongoose users should not have to use this directly</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Error"><a href="#mongoose_Mongoose-Error">Mongoose.prototype.Error()</a></h3><div><p>The <a href="#error_MongooseError">MongooseError</a> constructor.</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Mixed"><a href="#mongoose_Mongoose-Mixed">Mongoose.prototype.Mixed</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Mixed <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that Mongoose's change tracking, casting, and validation should ignore.</p>
 
 <h4>Example:</h4>
 
@@ -1454,11 +1454,13 @@ doc.set(path, value, { strict: <span class="hljs-literal">false</span> });</code
 
 <ul>
 <li><code>getters</code> apply all getters (path and virtual getters), defaults to false</li>
+<li><code>aliases</code> apply all aliases if <code>virtuals=true</code>, defaults to true</li>
 <li><code>virtuals</code> apply virtual getters (can override <code>getters</code> option), defaults to false</li>
-<li><code>minimize</code> remove empty objects (defaults to true)</li>
+<li><code>minimize</code> remove empty objects, defaults to true</li>
 <li><code>transform</code> a transform function to apply to the resulting document before returning</li>
-<li><code>depopulate</code> depopulate any populated paths, replacing them with their original refs (defaults to false)</li>
-<li><code>versionKey</code> whether to include the version key (defaults to true)</li>
+<li><code>depopulate</code> depopulate any populated paths, replacing them with their original refs, defaults to false</li>
+<li><code>versionKey</code> whether to include the version key, defaults to true</li>
+<li><code>flattenMaps</code> convert Maps to POJOs. Useful if you want to JSON.stringify() the result of toObject(), defaults to false</li>
 </ul>
 
 <h4>Getters/Virtuals</h4>
@@ -3995,7 +3997,7 @@ query.where(<span class="hljs-string">'path'</span>).intersects({
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
 </li></ul><div><p>Sets the lean option.</p>
 
-<p>Documents returned from queries with the <code>lean</code> option enabled are plain javascript objects, not <a href="#document-js">Mongoose Documents</a>. They have no <code>save</code> method, getters/setters, virtuals, or other Mongoose features.</p>
+<p>Documents returned from queries with the <code>lean</code> option enabled are plain javascript objects, not <a href="/api/document.html">Mongoose Documents</a>. They have no <code>save</code> method, getters/setters, virtuals, or other Mongoose features.</p>
 
 <h4>Example:</h4>
 

@@ -117,14 +117,14 @@ doc._id = <span class="hljs-number">1</span>;
 <h3 id="methods"><a href="#methods">Instance methods</a></h3>
 
 <p>Instances of <code>Models</code> are <a href="./documents.html">documents</a>. Documents have
-many of their own <a href="./api.html#document-js">built-in instance methods</a>.
+many of their own <a href="./api/document.html">built-in instance methods</a>.
 We may also define our own custom document instance methods.</p>
 <pre><code class="language-javascript">  <span class="hljs-comment">// define a schema</span>
   <span class="hljs-keyword">var</span> animalSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, type: <span class="hljs-built_in">String</span> });
 
   <span class="hljs-comment">// assign a function to the "methods" object of our animalSchema</span>
   animalSchema.methods.findSimilarTypes = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cb</span>) </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.model(<span class="hljs-string">'Animal'</span>).find({ type: <span class="hljs-keyword">this</span>.type }, cb);
+    <span class="hljs-keyword">return</span> mongoose.model(<span class="hljs-string">'Animal'</span>).find({ type: <span class="hljs-keyword">this</span>.type }, cb);
   };</code></pre>
 <p>Now all of our <code>animal</code> instances have a <code>findSimilarTypes</code> method available
 to them.</p>

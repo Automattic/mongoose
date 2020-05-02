@@ -1198,4 +1198,13 @@ describe('connections:', function() {
       assert.equal(changes[0].operationType, 'insert');
     });
   });
+
+  it('useDB inherits config from default conneciton (gh-8267)', function() {
+    return co(function*() {
+      yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { useCreateIndex: true });
+
+      const db2 = mongoose.connection.useDb('gh8267-1');
+      assert.equal(db2.config.useCreateIndex, true);
+    });
+  });
 });

@@ -8911,4 +8911,34 @@ describe('document', function() {
       assert.equal(updatedDoc.array[0][0].value, 'world');
     });
   });
+
+  it('reports array cast error with index (gh-8888)', function() {
+    const schema = Schema({ test: [Number] },
+      { autoIndex: false, autoCreate: false });
+    const Test = db.model('test', schema);
+
+    const t = new Test({ test: [1, 'world'] });
+    const err = t.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors);
+    assert.ok(err.errors['test']);
+    assert.ok(err.errors['test.1']);
+  });
+
+  it('sets defaults if setting nested path to empty object with minimize false (gh-8829)', function() {
+    const cartSchema = Schema({
+      _id: 'String',
+      item: {
+        name: { type: 'String', default: 'Default Name' }
+      }
+    },
+    { minimize: false });
+    const Test = db.model('Test', cartSchema);
+
+    const doc = new Test({ _id: 'foobar', item: {} });
+
+    return doc.save().
+      then(() => Test.collection.findOne()).
+      then(doc => assert.equal(doc.item.name, 'Default Name'));
+  });
 });

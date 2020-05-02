@@ -9323,5 +9323,35 @@ describe('model: populate:', function() {
         assert.ok(isLean(post.user));
       });
     });
+
+    it('can populate subdocs where one is discriminator and the other is not (gh-8837)', function() {
+      return co(function*() {
+        const eventSchema = new Schema({ }, { discriminatorKey: 'type' });
+        const eventsListSchema = new Schema({ events: [eventSchema] });
+
+        const clickEventSchema = new Schema({
+          modelName: { type: String, required: true },
+          productId: { type: Schema.ObjectId, refPath: 'events.modelName' }
+        });
+
+        const eventsSchemaType = eventsListSchema.path('events');
+        eventsSchemaType.discriminator('ClickEvent', clickEventSchema);
+
+        const EventsList = db.model('EventsList', eventsListSchema);
+        const Product = db.model('Product', new Schema({ name: String }));
+
+        const product = yield Product.create({ name: 'GTX 1050 Ti' });
+
+        yield EventsList.create({
+          events: [
+            { },
+            { type: 'ClickEvent', modelName: 'Product', productId: product._id }
+          ]
+        });
+
+        const result = yield EventsList.findOne().populate('events.productId');
+        assert.equal(result.events[1].productId.name, 'GTX 1050 Ti');
+      });
+    });
   });
 });

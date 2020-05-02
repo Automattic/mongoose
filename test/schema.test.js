@@ -543,7 +543,7 @@ describe('schema', function() {
     });
 
     it('scope', function(done) {
-      function lowercase(v, self) {
+      function lowercase(v, cur, self) {
         assert.equal(this.a, 'b');
         assert.equal(self.path, 'name');
         return v.toLowerCase();

@@ -8913,7 +8913,7 @@ describe('document', function() {
   });
 
   it('reports array cast error with index (gh-8888)', function() {
-    const schema = Schema({ test: [ Number ] },
+    const schema = Schema({ test: [Number] },
       { autoIndex: false, autoCreate: false });
     const Test = db.model('test', schema);
 
@@ -8921,6 +8921,7 @@ describe('document', function() {
     const err = t.validateSync();
     assert.ok(err);
     assert.ok(err.errors);
+    assert.ok(err.errors['test']);
     assert.ok(err.errors['test.1']);
   });
 });

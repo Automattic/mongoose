@@ -8924,4 +8924,21 @@ describe('document', function() {
     assert.ok(err.errors['test']);
     assert.ok(err.errors['test.1']);
   });
+
+  it('sets defaults if setting nested path to empty object with minimize false (gh-8829)', function() {
+    const cartSchema = Schema({
+      _id: 'String',
+      item: {
+        name: { type: 'String', default: 'Default Name' },
+      }
+    },
+    { minimize: false });
+    const Test = db.model('Test', cartSchema);
+  
+    const doc = new Test({ _id: 'foobar', item: {} });
+
+    return doc.save().
+      then(() => Test.collection.findOne()).
+      then(doc => assert.equal(doc.item.name, 'Default Name'));  
+  });
 });

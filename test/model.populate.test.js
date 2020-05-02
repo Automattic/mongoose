@@ -9288,17 +9288,19 @@ describe('model: populate:', function() {
         const user = yield User.create({ name: 'val' });
         yield Post.create([
           { title: 'test1', user: user },
-          { title: 'test2', user: user }
+          { title: 'test2', user: user },
+          { title: 'test3', user: new mongoose.Types.ObjectId() }
         ]);
 
         const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
 
         posts[0].user.name = 'val2';
         assert.equal(posts[1].user.name, 'val');
+        assert.equal(posts[2].user, null);
       });
     });
 
-    it('clone with populate and lean makes child lean', function() { {
+    it('clone with populate and lean makes child lean', function() {
       const isLean = v => v != null && !(v instanceof mongoose.Document);
 
       const userSchema = new Schema({ name: String });
@@ -9320,6 +9322,36 @@ describe('model: populate:', function() {
 
         assert.ok(isLean(post.user));
       });
-    }});
+    });
+
+    it('can populate subdocs where one is discriminator and the other is not (gh-8837)', function() {
+      return co(function*() {
+        const eventSchema = new Schema({ }, { discriminatorKey: 'type' });
+        const eventsListSchema = new Schema({ events: [eventSchema] });
+
+        const clickEventSchema = new Schema({
+          modelName: { type: String, required: true },
+          productId: { type: Schema.ObjectId, refPath: 'events.modelName' }
+        });
+
+        const eventsSchemaType = eventsListSchema.path('events');
+        eventsSchemaType.discriminator('ClickEvent', clickEventSchema);
+
+        const EventsList = db.model('EventsList', eventsListSchema);
+        const Product = db.model('Product', new Schema({ name: String }));
+
+        const product = yield Product.create({ name: 'GTX 1050 Ti' });
+
+        yield EventsList.create({
+          events: [
+            { },
+            { type: 'ClickEvent', modelName: 'Product', productId: product._id }
+          ]
+        });
+
+        const result = yield EventsList.findOne().populate('events.productId');
+        assert.equal(result.events[1].productId.name, 'GTX 1050 Ti');
+      });
+    });
   });
 });

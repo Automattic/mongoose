@@ -432,7 +432,6 @@ block content
     - [selectPopulatedPaths](#selectPopulatedPaths)
     - [skipVersioning](#skipVersioning)
     - [timestamps](#timestamps)
-    - [storeSubdocValidationError](#storeSubdocValidationError)
 
     <h3 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h3>
 
@@ -1107,41 +1106,6 @@ block content
     // Because `selectPopulatedPaths` is false, the below doc will **not**
     // contain an `author` property.
     const doc = await Book.findOne().select('title').populate('author');
-    ```
-
-    <h3 id="storeSubdocValidationError">
-      <a href="#storeSubdocValidationError">
-        option: storeSubdocValidationError
-      </a>
-    </h3>
-
-    For legacy reasons, when there is a validation error in subpath of a
-    single nested schema, Mongoose will record that there was a validation error
-    in the single nested schema path as well. For example:
-
-    ```javascript
-    const childSchema = new Schema({ name: { type: String, required: true } });
-    const parentSchema = new Schema({ child: childSchema });
-
-    const Parent = mongoose.model('Parent', parentSchema);
-
-    // Will contain an error for both 'child.name' _and_ 'child'
-    new Parent({ child: {} }).validateSync().errors;
-    ```
-
-    Set the `storeSubdocValidationError` to `false` on the child schema to make
-    Mongoose only reports the parent error.
-
-    ```javascript
-    const childSchema = new Schema({
-      name: { type: String, required: true }
-    }, { storeSubdocValidationError: false }); // <-- set on the child schema
-    const parentSchema = new Schema({ child: childSchema });
-
-    const Parent = mongoose.model('Parent', parentSchema);
-
-    // Will only contain an error for 'child.name'
-    new Parent({ child: {} }).validateSync().errors;
     ```
 
     <h3 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h3>

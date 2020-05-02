@@ -6433,11 +6433,11 @@ describe('Model', function() {
 
       return Model.create({ name: 'foo' }).
         then(() => Model.exists({ name: 'foo' })).
-        then(res => assert.strictEqual(res, true)).
+        then(res => assert.ok(res)).
         then(() => Model.exists({})).
-        then(res => assert.strictEqual(res, true)).
+        then(res => assert.ok(res)).
         then(() => Model.exists()).
-        then(res => assert.strictEqual(res, true));
+        then(res => assert.ok(res));
     });
 
     it('returns false if no doc exists', function() {
@@ -6445,9 +6445,9 @@ describe('Model', function() {
 
       return Model.create({ name: 'foo' }).
         then(() => Model.exists({ name: 'bar' })).
-        then(res => assert.strictEqual(res, false)).
+        then(res => assert.ok(!res)).
         then(() => Model.exists({ otherProp: 'foo' })).
-        then(res => assert.strictEqual(res, false));
+        then(res => assert.ok(!res));
     });
 
     it('options (gh-8075)', function() {

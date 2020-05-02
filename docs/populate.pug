@@ -360,8 +360,6 @@ block content
     If you have an existing mongoose document and want to populate some of its
     paths, you can use the
     [Document#populate()](./api.html#document_Document-populate) method.
-    Just make sure you call [`Document#execPopulate()`](/docs/api/document.html#document_Document-execPopulate)
-    to execute the `populate()`.
 
     ```javascript
     const person = await Person.findOne({ name: 'Ian Fleming' });
@@ -369,19 +367,21 @@ block content
     person.populated('stories'); // null
 
     // Call the `populate()` method on a document to populate a path.
-    // Need to call `execPopulate()` to actually execute the `populate()`.
-    await person.populate('stories').execPopulate();
+    await person.populate('stories');
 
     person.populated('stories'); // Array of ObjectIds
     person.stories[0].name; // 'Casino Royale'
     ```
 
-    The `Document#populate()` method supports chaining, so you can chain
-    multiple `populate()` calls together.
+    To `populate()` multiple paths, you can either pass a single
+    string of space-delimited paths, an array of paths, or an
+    array of populate options.
 
     ```javascript
-    await person.populate('stories').populate('fans').execPopulate();
-    person.populated('fans'); // Array of ObjectIds
+    // All 3 are equivalent
+    await person.populate('stories fans');
+    await person.populate(['stories', 'fans']);
+    await person.populate([{ path: 'stories' }, { path: 'fans' }]);
     ```
 
     <h3 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h3>

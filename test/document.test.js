@@ -8,7 +8,7 @@ const start = require('./common');
 
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
-const EmbeddedDocument = require('../lib/types/embedded');
+const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
@@ -1056,7 +1056,7 @@ describe('document', function() {
           return Child.findById(child._id);
         }).
         then(function(child) {
-          return child.values.populate('toy').execPopulate().then(function() {
+          return child.values.populate('toy').then(function() {
             return child;
           });
         }).
@@ -1786,11 +1786,11 @@ describe('document', function() {
             }]
           });
 
-          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
+          assert.ok(doc.schedule[0] instanceof ArraySubdocument);
           doc.set('schedule.0.open', 1100);
           assert.ok(doc.schedule);
           assert.ok(doc.schedule.isMongooseDocumentArray);
-          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
+          assert.ok(doc.schedule[0] instanceof ArraySubdocument);
           assert.equal(doc.schedule[0].open, 1100);
           assert.equal(doc.schedule[0].close, 1900);
 
@@ -2910,7 +2910,7 @@ describe('document', function() {
           Parent.findOne({ _id: doc._id }, function(error, doc) {
             assert.ifError(error);
             assert.ok(doc);
-            doc.populate('children').execPopulate().then(function(doc) {
+            doc.populate('children').then(function(doc) {
               assert.equal(doc.children.length, 1);
               assert.equal(doc.children[0].name, 'Luke Skywalker');
               done();
@@ -5097,7 +5097,6 @@ describe('document', function() {
       });
       contact.validate(function(error) {
         assert.ok(error);
-        assert.ok(error.errors['contact']);
         assert.ok(error.errors['contact.additionalContacts.0.contactValue']);
 
         // This `JSON.stringify()` should not throw
@@ -6003,7 +6002,7 @@ describe('document', function() {
       return Author.create({ name: 'Victor Hugo' }).
         then(function(author) { return Book.create({ author: author._id }); }).
         then(function() { return Book.findOne(); }).
-        then(function(doc) { return doc.populate('author').execPopulate(); }).
+        then(function(doc) { return doc.populate('author'); }).
         then(function(doc) {
           doc.author = {};
           assert.ok(!doc.author.name);
@@ -6809,42 +6808,6 @@ describe('document', function() {
 
       const fromDb = yield Model.findOne();
       assert.ok(fromDb.error.errors.name);
-    });
-  });
-
-  it('storeSubdocValidationError (gh-6802)', function() {
-    return co(function*() {
-      const GrandchildSchema = new Schema({
-        name: {
-          type: String,
-          required: true
-        }
-      }, { storeSubdocValidationError: false });
-
-      const ChildSchema = new Schema({
-        name: String,
-        child: GrandchildSchema
-      }, { storeSubdocValidationError: false });
-
-      const ParentSchema = new Schema({
-        name: String,
-        child: ChildSchema
-      });
-      const Parent = db.model('Parent', ParentSchema);
-
-      const parent = new Parent({ child: { child: {} } });
-
-      let err = yield parent.validate().then(() => null, err => err);
-      assert.ok(err);
-      assert.ok(err.errors['child.child.name']);
-      assert.ok(!err.errors['child']);
-      assert.ok(!err.errors['child.child']);
-
-      err = parent.validateSync();
-      assert.ok(err);
-      assert.ok(err.errors['child.child.name']);
-      assert.ok(!err.errors['child']);
-      assert.ok(!err.errors['child.child']);
     });
   });
 
@@ -8909,6 +8872,28 @@ describe('document', function() {
       const updatedDoc = yield MyModel.findOne({ _id: doc._id });
       assert.equal(updatedDoc.array[0][0].label, 'hello');
       assert.equal(updatedDoc.array[0][0].value, 'world');
+    });
+  });
+
+  it('handles validator errors on subdoc paths (gh-5226)', function() {
+    const schema = Schema({
+      child: {
+        type: Schema({ name: String }),
+        validate: () => false
+      },
+      children: {
+        type: [{ name: String }],
+        validate: () => false
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ child: {}, children: [] });
+    return doc.validate().then(() => assert.ok(false), err => {
+      assert.ok(err);
+      assert.ok(err.errors);
+      assert.ok(err.errors.child);
+      assert.ok(err.errors.children);
     });
   });
 });

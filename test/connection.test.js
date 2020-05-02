@@ -608,41 +608,6 @@ describe('connections:', function() {
       done();
     });
 
-    it('uses the passed schema when global model exists with same name (gh-1209)', function(done) {
-      const s1 = new Schema({ one: String });
-      const s2 = new Schema({ two: Number });
-
-      const db = start();
-
-      mongoose.deleteModel(/Test/);
-      const A = mongoose.model('Test', s1);
-      const B = db.model('Test', s2);
-
-      assert.ok(A.schema !== B.schema);
-      assert.ok(A.schema.paths.one);
-      assert.ok(B.schema.paths.two);
-      assert.ok(!B.schema.paths.one);
-      assert.ok(!A.schema.paths.two);
-
-      // reset
-      delete db.models['Test'];
-      const C = db.model('Test');
-      assert.ok(C.schema === A.schema);
-
-      db.close();
-      done();
-    });
-
-    describe('get existing model with not existing collection in db', function() {
-      it('must return exiting collection with all collection options', function(done) {
-        mongoose.model('some-th-1458', new Schema({ test: String }, { capped: { size: 1000, max: 10 } }));
-        const m = db.model('some-th-1458');
-        assert.equal(1000, m.collection.opts.capped.size);
-        assert.equal(10, m.collection.opts.capped.max);
-        done();
-      });
-    });
-
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {

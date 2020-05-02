@@ -843,11 +843,11 @@ describe('model: findOneAndUpdate:', function() {
       let fruit = yield Fruit.create({ name: 'Apple' });
 
       fruit = yield Fruit.findOneAndUpdate({}, { $set: { name: 'Banana' } },
-        { new: true, useFindAndModify: false });
+        { new: true });
       assert.ok(fruit instanceof mongoose.Document);
 
       fruit = yield Fruit.findOneAndUpdate({}, { $set: { name: 'Cherry' } },
-        { new: true, useFindAndModify: true });
+        { new: true });
       assert.ok(fruit instanceof mongoose.Document);
     });
   });
@@ -1915,7 +1915,7 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
 
-    it('only calls setters once with useFindAndModify (gh-6203)', function() {
+    it('only calls setters once (gh-6203)', function() {
       return co(function*() {
         const calls = [];
         const userSchema = new mongoose.Schema({
@@ -1930,129 +1930,9 @@ describe('model: findOneAndUpdate:', function() {
         });
         const Model = db.model('User', userSchema);
 
-        yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' }, {
-          useFindAndModify: false
-        });
+        yield Model.findOneAndUpdate({ foo: '123' }, { name: 'bar' });
 
         assert.deepEqual(calls, ['123']);
-      });
-    });
-
-    it('useFindAndModify in opts (gh-5616)', function(done) {
-      const m = new mongoose.constructor();
-
-      m.connect(start.uri, { useNewUrlParser: true });
-
-      const calls = [];
-      m.set('debug', function(collection, fnName) {
-        calls.push({ collection: collection, fnName: fnName });
-      });
-
-      const schema = new m.Schema({
-        arr: [String]
-      });
-
-      const Model = m.model('Test', schema);
-
-      const update = { $push: { arr: 'test' } };
-      const options = { useFindAndModify: false };
-      Model.findOneAndUpdate({}, update, options, function() {
-        assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'tests');
-        assert.equal(calls[0].fnName, 'findOneAndUpdate');
-        m.disconnect();
-        done();
-      });
-    });
-
-    it('useFindAndModify in set (gh-5616)', function(done) {
-      const m = new mongoose.constructor();
-
-      m.connect(start.uri, { useNewUrlParser: true });
-
-      const calls = [];
-      m.set('debug', function(collection, fnName) {
-        calls.push({ collection: collection, fnName: fnName });
-      });
-
-      m.set('useFindAndModify', false);
-      const schema = new m.Schema({
-        arr: [String]
-      });
-
-      const Model = m.model('Test', schema);
-
-      const update = { $push: { arr: 'test' } };
-      const options = {};
-      Model.findOneAndUpdate({}, update, options, function() {
-        assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'tests');
-        assert.equal(calls[0].fnName, 'findOneAndUpdate');
-        m.disconnect();
-        done();
-      });
-    });
-
-    it('useFindAndModify in connection options (gh-7108)', function(done) {
-      const m = new mongoose.constructor();
-      m.connect(start.uri, { useNewUrlParser: true, useFindAndModify: false });
-
-      const calls = [];
-      m.set('debug', function(collection, fnName) {
-        calls.push({ collection: collection, fnName: fnName });
-      });
-
-      const Model = m.model('Test', { name: String });
-      const update = { name: 'test' };
-      Model.findOneAndUpdate({}, update, {}, function() {
-        assert.equal(calls.length, 1);
-        assert.equal(calls[0].collection, 'tests');
-        assert.equal(calls[0].fnName, 'findOneAndUpdate');
-        m.disconnect();
-        done();
-      });
-    });
-
-    it('useFindAndModify with overwrite (gh-6887)', function() {
-      return co(function*() {
-        const m = new mongoose.constructor();
-        yield m.connect(start.uri, { useNewUrlParser: true });
-
-        const calls = [];
-        m.set('debug', function(collection, fnName) {
-          calls.push({ collection: collection, fnName: fnName });
-        });
-
-        m.set('useFindAndModify', false);
-
-        const schema = new m.Schema({
-          name: String,
-          age: Number,
-          location: String
-        });
-
-        const Model = m.model('Test', schema);
-
-        const options = { overwrite: true, new: true };
-        const doc = yield Model.create({ name: 'Jennifer', location: 'Taipei' });
-        const newDoc1 = yield Model.findOneAndUpdate({ name: 'Jennifer' }, { age: 24 }, options);
-        const newDoc2 = yield Model.findByIdAndUpdate(doc._id, { name: 'Fonger', location: 'Hsinchu' }, options);
-
-        assert.strictEqual(newDoc1.name, undefined);
-        assert.strictEqual(newDoc1.age, 24);
-        assert.strictEqual(newDoc1.location, undefined);
-
-        assert.strictEqual(newDoc2.name, 'Fonger');
-        assert.strictEqual(newDoc2.age, undefined);
-        assert.strictEqual(newDoc2.location, 'Hsinchu');
-
-        assert.equal(calls.length, 3);
-        assert.equal(calls[1].collection, 'tests');
-        assert.equal(calls[1].collection, 'tests');
-        assert.equal(calls[2].fnName, 'findOneAndReplace');
-        assert.equal(calls[2].fnName, 'findOneAndReplace');
-
-        m.disconnect();
       });
     });
 
@@ -2408,7 +2288,7 @@ describe('model: findOneAndUpdate:', function() {
       yield Cat.create({ name: 'test' });
       const res = yield Cat.findOneAndUpdate({}, {
         name: 'test2'
-      }, { returnOriginal: false, useFindAndModify: false });
+      }, { returnOriginal: false });
       assert.equal(res.name, 'test2');
     });
   });

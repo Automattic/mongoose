@@ -980,27 +980,6 @@ describe('model: update:', function() {
       });
     });
 
-    it('with omitUndefined (gh-6034)', function(done) {
-      const schema = new Schema({
-        boolField: {
-          type: Boolean,
-          default: false
-        }
-      });
-
-      const M = db.model('Test', schema);
-
-      const opts = { upsert: true, setDefaultsOnInsert: true, omitUndefined: true };
-      M.update({}, {}, opts, function(error) {
-        assert.ifError(error);
-        M.findOne({}, function(error, doc) {
-          assert.ifError(error);
-          assert.strictEqual(doc.boolField, false);
-          done();
-        });
-      });
-    });
-
     it('runs validators if theyre set', function(done) {
       const s = new Schema({
         topping: {
@@ -1046,7 +1025,7 @@ describe('model: update:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { runValidators: true, context: 'query' };
+      const updateOptions = { runValidators: true };
       Breakfast.update({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 2);
@@ -2699,10 +2678,7 @@ describe('model: update:', function() {
 
       const Item = db.model('Test', ItemSchema);
 
-      const opts = {
-        runValidators: true,
-        context: 'query'
-      };
+      const opts = { runValidators: true };
       const update = {
         $pull: {
           recordings: {
@@ -3049,7 +3025,7 @@ describe('model: update:', function() {
 
       Group.update({}, update, opts, function(error) {
         assert.ok(error);
-        assert.ok(error.errors['users.0.permission'], Object.keys(error.errors));
+        assert.ok(error.errors['users.0.permission.read'], Object.keys(error.errors));
         done();
       });
     });

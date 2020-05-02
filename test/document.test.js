@@ -8929,16 +8929,16 @@ describe('document', function() {
     const cartSchema = Schema({
       _id: 'String',
       item: {
-        name: { type: 'String', default: 'Default Name' },
+        name: { type: 'String', default: 'Default Name' }
       }
     },
     { minimize: false });
     const Test = db.model('Test', cartSchema);
-  
+
     const doc = new Test({ _id: 'foobar', item: {} });
 
     return doc.save().
       then(() => Test.collection.findOne()).
-      then(doc => assert.equal(doc.item.name, 'Default Name'));  
+      then(doc => assert.equal(doc.item.name, 'Default Name'));
   });
 });

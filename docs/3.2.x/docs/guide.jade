@@ -90,7 +90,7 @@ block content
     var animalSchema = new Schema({ name: String, type: String });
 
     animalSchema.methods.findSimilarTypes = function (cb) {
-      return this.model('Animal').find({ type: this.type }, cb);
+      return mongoose.model('Animal').find({ type: this.type }, cb);
     }
   p
     | Now all of our 

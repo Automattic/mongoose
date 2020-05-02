@@ -165,7 +165,7 @@ block content
 
       // assign a function to the "methods" object of our animalSchema
       animalSchema.methods.findSimilarTypes = function(cb) {
-        return this.model('Animal').find({ type: this.type }, cb);
+        return mongoose.model('Animal').find({ type: this.type }, cb);
       };
     ```
 

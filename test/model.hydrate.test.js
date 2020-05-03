@@ -33,6 +33,7 @@ describe('model', function() {
   describe('hydrate()', function() {
     let db;
     let B;
+    let C;
     let Breakfast;
 
     let breakfastSchema;
@@ -44,7 +45,7 @@ describe('model', function() {
 
       db = start();
       B = db.model('Test', schemaB);
-      B.discriminator('C', schemaC);
+      C = B.discriminator('C', schemaC);
       Breakfast = db.model('Test1', breakfastSchema);
 
       return db;
@@ -85,7 +86,7 @@ describe('model', function() {
       const hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C' });
 
       assert.equal(hydrated.test, 'test');
-      assert.deepEqual(hydrated.schema.tree, schemaC.tree);
+      assert.deepEqual(hydrated.schema.tree, C.schema.tree);
       done();
     });
   });

@@ -291,7 +291,8 @@ describe('model', function() {
 
       it('inherits validators', function(done) {
         assert.strictEqual(Employee.schema.path('gender').validators, PersonSchema.path('gender').validators);
-        assert.strictEqual(Employee.schema.path('department').validators, EmployeeSchema.path('department').validators);
+        assert.deepEqual(Employee.schema.path('department').validators,
+          EmployeeSchema.path('department').validators);
         done();
       });
 

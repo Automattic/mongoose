@@ -125,12 +125,12 @@ describe('model', function() {
                 assert.equal(docs[0].name, 'Base event');
 
                 assert.ok(docs[1] instanceof ConversionEvent);
-                assert.deepEqual(docs[1].schema.tree, ConversionEventSchema.tree);
+                assert.equal(docs[1].schema.$originalSchemaId, ConversionEventSchema.$id);
                 assert.equal(docs[1].name, 'Conversion event');
                 assert.equal(docs[1].revenue, 1.337);
 
                 assert.ok(docs[2] instanceof ImpressionEvent);
-                assert.deepEqual(docs[2].schema.tree, ImpressionEventSchema.tree);
+                assert.equal(docs[2].schema.$originalSchemaId, ImpressionEventSchema.$id);
                 assert.equal(docs[2].name, 'Impression event');
                 done();
               });
@@ -156,12 +156,14 @@ describe('model', function() {
                 assert.equal(docs[0].name, 'Base event');
 
                 assert.ok(docs[1] instanceof ConversionEvent);
-                assert.deepEqual(docs[1].schema.tree, ConversionEventSchema.tree);
+                assert.equal(docs[1].schema.$originalSchemaId,
+                  ConversionEventSchema.$id);
                 assert.equal(docs[1].name, 'Conversion event');
                 assert.equal(docs[1].revenue, undefined);
 
                 assert.ok(docs[2] instanceof ImpressionEvent);
-                assert.deepEqual(docs[2].schema.tree, ImpressionEventSchema.tree);
+                assert.equal(docs[2].schema.$originalSchemaId,
+                  ImpressionEventSchema.$id);
                 assert.equal(docs[2].name, 'Impression event');
                 done();
               });
@@ -385,14 +387,14 @@ describe('model', function() {
                 BaseEvent.findOne({ _id: impressionEvent._id }, function(err, event) {
                   assert.ifError(err);
                   assert.ok(event instanceof ImpressionEvent);
-                  assert.deepEqual(event.schema.tree, ImpressionEventSchema.tree);
+                  assert.equal(event.schema.$originalSchemaId, ImpressionEventSchema.$id);
                   assert.equal(event.name, 'Impression event');
 
                   // finds & hydrates ConversionEvent
                   BaseEvent.findOne({ _id: conversionEvent._id }, function(err, event) {
                     assert.ifError(err);
                     assert.ok(event instanceof ConversionEvent);
-                    assert.deepEqual(event.schema.tree, ConversionEventSchema.tree);
+                    assert.deepEqual(event.schema.$originalSchemaId, ConversionEventSchema.$id);
                     assert.equal(event.name, 'Conversion event');
                     done();
                   });
@@ -424,14 +426,16 @@ describe('model', function() {
                 BaseEvent.findOne({ _id: impressionEvent._id }, fields, function(err, event) {
                   assert.ifError(err);
                   assert.ok(event instanceof ImpressionEvent);
-                  assert.deepEqual(event.schema.tree, ImpressionEventSchema.tree);
+                  assert.equal(event.schema.$originalSchemaId,
+                    ImpressionEventSchema.$id);
                   assert.equal(event.name, 'Impression event');
 
                   // finds & hydrates ConversionEvent
                   BaseEvent.findOne({ _id: conversionEvent._id }, fields, function(err, event) {
                     assert.ifError(err);
                     assert.ok(event instanceof ConversionEvent);
-                    assert.deepEqual(event.schema.tree, ConversionEventSchema.tree);
+                    assert.deepEqual(event.schema.$originalSchemaId,
+                      ConversionEventSchema.$id);
                     assert.equal(event.name, 'Conversion event');
                     if (checkUndefinedRevenue === true) {
                       assert.equal(event.revenue, undefined);

@@ -2492,10 +2492,10 @@ describe('Query', function() {
         yield Model.create({ n: 42 });
 
         let res = yield Model.find().explain('queryPlanner');
-        assert.ok(res[0].queryPlanner);
+        assert.ok(res.queryPlanner);
 
         res = yield Model.find().explain();
-        assert.ok(res[0].queryPlanner);
+        assert.ok(res.queryPlanner);
 
         res = yield Model.find().explain().explain(false);
         assert.equal(res[0].n, 42);

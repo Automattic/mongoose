@@ -136,6 +136,10 @@ describe('aggregate: ', function() {
       assert.throws(function() {
         aggregate.append([{ $a: 1 }, { a: 1 }]);
       }, regexp);
+
+      assert.throws(function() {
+        aggregate.append([{ $a: 1, $b: 1 }]);
+      }, regexp);
     });
 
     it('does not throw when 0 args passed', function() {
@@ -143,6 +147,14 @@ describe('aggregate: ', function() {
 
       assert.doesNotThrow(function() {
         aggregate.append();
+      });
+    });
+
+    it('does not throw when $comment is passed along with $match', function() {
+      const aggregate = new Aggregate();
+
+      assert.doesNotThrow(function() {
+        aggregate.append([{ $match: { a: 5 }, $comment: 'match comment' }]);
       });
     });
 

@@ -539,4 +539,21 @@ describe('model field selection', function() {
       assert.equal(product.name, 'Computer');
     });
   });
+
+  it('selecting with `false` instead of `0` doesn\'t overwrite schema `select: false` (gh-8923)', function() {
+    return co(function*() {
+      const userSchema = new Schema({
+        name: { type: String, select: false },
+        age: { type: Number }
+      });
+
+      const User = db.model('User', userSchema);
+
+      yield User.create({ name: 'Hafez', age: 25 });
+
+      const user = yield User.findOne().select({ age: false });
+
+      assert.ok(!user.name);
+    });
+  });
 });

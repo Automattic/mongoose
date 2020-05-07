@@ -332,7 +332,10 @@ mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</spa
 <hr id="limit-vs-perDocumentLimit" />
 
 <p><a href="#limit-vs-perDocumentLimit"><strong>Q</strong></a>. I am using <code>Model.find(...).populate(...)</code> with the <code>limit</code> option, but getting fewer results than the limit. What gives?</p>
-<p><strong>A</strong>. In order to avoid executing a separate query for each document returned from the <code>find</code> query, Mongoose instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the <a href="/api/populate.html##limit-vs-perDocumentLimit">perDocumentLimit</a> option (new in Mongoose 5.9.0). Just keep in mind that populate() will execute a separate query for each document.</p>
+<p><strong>A</strong>. In order to avoid executing a separate query for each document returned from the <code>find</code> query, Mongoose
+instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
+<a href="/docs/populate.html#limit-vs-perDocumentLimit">perDocumentLimit</a> option (new in Mongoose 5.9.0). Just keep in
+mind that populate() will execute a separate query for each document.</p>
 <hr id="add_something" />
 
 <p><strong>Something to add?</strong></p>

@@ -45,7 +45,10 @@ describe('schema options.useMongoTimestamp', function() {
         Object.assign(doc, params);
         return doc.save()
           .then(() => {
-            return model.findOne({ _id })
+            // Note that when useMongoTimestamp option is used, the in
+            // memory document won't have the generated updatedAt
+            // value. It must be fetched from database.
+            return model.findOne({ _id }, 'updatedAt')
               .then((doc) => {
                 console.log(`${new Date().toISOString()}: saved document with id: ${doc._id} updatedAt value: ${doc.updatedAt.toISOString()}`);
                 return doc;

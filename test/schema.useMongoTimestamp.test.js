@@ -22,12 +22,6 @@ describe('schema options.useMongoTimestamp', function() {
     conn.close(done);
   });
 
-  let maxUpdatedAtGenerated;
-
-  beforeEach(function() {
-    maxUpdatedAtGenerated = new Date(0);
-  });
-
   function setPreValidateHook(schema) {
     schema.pre('validate', function(next) {
       setTimeout(function() {
@@ -51,12 +45,10 @@ describe('schema options.useMongoTimestamp', function() {
         Object.assign(doc, params);
         return doc.save()
           .then(() => {
-            model.findOne({ _id })
+            return model.findOne({ _id })
               .then((doc) => {
-                if (doc.updatedAt.getTime() > maxUpdatedAtGenerated.getTime()) {
-                  maxUpdatedAtGenerated = doc.updatedAt;
-                }
                 console.log(`${new Date().toISOString()}: saved document with id: ${doc._id} updatedAt value: ${doc.updatedAt.toISOString()}`);
+                return doc;
               });
           });
       });
@@ -77,15 +69,16 @@ describe('schema options.useMongoTimestamp', function() {
     const doc = new Model();
     doc.name = 'test';
     return doc.save().then(() => {
-      const update1 = findAndSaveWithParam(doc._id, Model, { preValidateTimeout: 100 });
-      const update2 = findAndSaveWithParam(doc._id, Model, { preSaveTimeout: 150 });
+      const update1 = findAndSaveWithParam(doc._id, Model, { preValidateTimeout: 1000 });
+      const update2 = findAndSaveWithParam(doc._id, Model, { preSaveTimeout: 1500 });
 
       return Promise.all([update1, update2])
-        .then(() => {
+        .then(([doc1, doc2]) => {
+          const maxUpdatedAtGenerated = Math.max(doc1.updatedAt, doc2.updatedAt);
           return Model
             .findOne({ _id: doc._id })
             .then(doc => {
-              assert.ok(maxUpdatedAtGenerated.getTime() > doc.updatedAt.getTime(), true);
+              assert.ok(maxUpdatedAtGenerated > doc.updatedAt.getTime(), true);
             });
         });
     });
@@ -107,15 +100,16 @@ describe('schema options.useMongoTimestamp', function() {
     const doc = new Model();
     doc.name = 'test';
     return doc.save().then(() => {
-      const update1 = findAndSaveWithParam(doc._id, Model, { preValidateTimeout: 100 });
-      const update2 = findAndSaveWithParam(doc._id, Model, { preSaveTimeout: 150 });
+      const update1 = findAndSaveWithParam(doc._id, Model, { preValidateTimeout: 1000 });
+      const update2 = findAndSaveWithParam(doc._id, Model, { preSaveTimeout: 1500 });
 
       return Promise.all([update1, update2])
-        .then(() => {
+        .then(([doc1, doc2]) => {
+          const maxUpdatedAtGenerated = Math.max(doc1.updatedAt, doc2.updatedAt);
           return Model
             .findOne({ _id: doc._id })
             .then(doc => {
-              assert.ok(maxUpdatedAtGenerated.getTime() === doc.updatedAt.getTime(), true);
+              assert.ok(maxUpdatedAtGenerated === doc.updatedAt.getTime(), true);
             });
         });
     });

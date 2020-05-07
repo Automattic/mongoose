@@ -453,7 +453,10 @@ block content
 
     <a href="#limit-vs-perDocumentLimit">**Q**</a>. I am using `Model.find(...).populate(...)` with the `limit` option, but getting fewer results than the limit. What gives?
 
-    **A**. In order to avoid executing a separate query for each document returned from the `find` query, Mongoose instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the [perDocumentLimit](/api/populate.html##limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in mind that populate() will execute a separate query for each document.
+    **A**. In order to avoid executing a separate query for each document returned from the `find` query, Mongoose
+    instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
+    [perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
+    mind that populate() will execute a separate query for each document.
 
     <hr id="add_something" />
 

@@ -3325,6 +3325,29 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('moves $set of immutable properties to $setOnInsert (gh-8951)', function() {
+    const Model = db.model('Test', Schema({
+      name: String,
+      age: { type: Number, default: 25, immutable: true }
+    }));
+
+    return co(function*() {
+      yield Model.bulkWrite([
+        {
+          updateOne: {
+            filter: { name: 'John' },
+            update: { name: 'John', age: 20 },
+            upsert: true,
+            setDefaultsOnInsert: true
+          }
+        }
+      ]);
+
+      const doc = yield Model.findOne().lean();
+      assert.equal(doc.age, 20);
+    });
+  });
+
   it('updates buffers with `runValidators` successfully (gh-8580)', function() {
     const Test = db.model('Test', Schema({
       data: { type: Buffer, required: true }

@@ -8941,4 +8941,27 @@ describe('document', function() {
       then(() => Test.collection.findOne()).
       then(doc => assert.equal(doc.item.name, 'Default Name'));
   });
+
+  it('handles modifying a subpath of a nested array of documents (gh-8926)', function() {
+    const bookSchema = new Schema({ title: String });
+    const aisleSchema = new Schema({
+      shelves: [[bookSchema]]
+    });
+    const librarySchema = new Schema({ aisles: [aisleSchema] });
+
+    const Library = db.model('Test', librarySchema);
+
+    return co(function*() {
+      yield Library.create({
+        aisles: [{ shelves: [[{ title: 'Clean Code' }]] }]
+      });
+
+      const library = yield Library.findOne();
+      library.aisles[0].shelves[0][0].title = 'Refactoring';
+      yield library.save();
+
+      const foundLibrary = yield Library.findOne().lean();
+      assert.equal(foundLibrary.aisles[0].shelves[0][0].title, 'Refactoring');
+    });
+  });
 });

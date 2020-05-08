@@ -1,3 +1,11 @@
+5.9.13 / 2020-05-08
+===================
+ * fix(schema): mark correct path as modified when setting a path underneath a nested array of documents #8926
+ * fix(query): Query#select({ field: false }) should not overwrite schema selection options #8929 #8923
+ * fix(update): handle immutable properties are ignored in bulk upserts #8952 [philippejer](https://github.com/philippejer)
+ * docs(browser): add back sample webpack config #8890
+ * docs(faq): fix broken reference in limit vs perDocumentLimit #8937
+
 5.9.12 / 2020-05-04
 ===================
  * fix(document): report cast error on array elements with array index instead of just being a cast error for the whole array #8888

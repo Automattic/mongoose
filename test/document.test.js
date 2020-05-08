@@ -8941,4 +8941,40 @@ describe('document', function() {
       then(() => Test.collection.findOne()).
       then(doc => assert.equal(doc.item.name, 'Default Name'));
   });
+
+  it('Document#save accepts `timestamps` option (gh-8947) for update', function() {
+    return co(function*() {
+      // Arrange
+      const userSchema = new Schema({ name: String }, { timestamps: true });
+      const User = db.model('User', userSchema);
+
+      const createdUser = yield User.create({ name: 'Hafez' });
+
+      const user = yield User.findOne({ _id: createdUser._id });
+
+      // Act
+      user.name = 'John';
+      yield user.save({ timestamps: false });
+
+      // Assert
+      assert.deepEqual(createdUser.updatedAt, user.updatedAt);
+    });
+  });
+
+  it('Document#save accepts `timestamps` option (gh-8947) on inserting a new document', function() {
+    return co(function*() {
+      // Arrange
+      const userSchema = new Schema({ name: String }, { timestamps: true });
+      const User = db.model('User', userSchema);
+
+      const user = new User({ name: 'Hafez' });
+
+      // Act
+      yield user.save({ timestamps: false });
+
+      // Assert
+      assert.ok(!user.createdAt);
+      assert.ok(!user.updatedAt);
+    });
+  });
 });

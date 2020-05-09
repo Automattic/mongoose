@@ -1557,4 +1557,25 @@ describe('model', function() {
       done();
     });
   });
+
+  it('attempting to populate on base model a virtual path defined on discriminator does not throw an error (gh-8924)', function () {
+    return co(function* () {
+      const User = db.model('User', {});
+      const Post = db.model('Post', {});
+      
+      const userWithPostSchema = new Schema({ postId: Schema.ObjectId });
+      
+      userWithPostSchema.virtual('post', { ref: 'Post', localField: 'postId', foreignField: '_id' });
+      
+      const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
+      
+      const post = yield Post.create({});
+      
+      yield UserWithPost.create({ postId: post._id });
+      
+      const user = yield User.findOne().populate({ path: 'post' });
+      
+      assert.ok(user.postId);
+    })
+  });
 });

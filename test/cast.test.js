@@ -88,7 +88,7 @@ describe('cast: ', function() {
       const numbers = [123, 456, 'asfds'];
       assert.throws(function() {
         cast(schema, { x: numbers });
-      }, /Cast to number failed for value "asfds"/);
+      }, /Cast to Number failed for value "asfds"/);
       done();
     });
   });

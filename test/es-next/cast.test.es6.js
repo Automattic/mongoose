@@ -87,7 +87,7 @@ describe('Cast Tutorial', function() {
     err.message;
     // acquit:ignore:start
     assert.ok(err instanceof mongoose.CastError);
-    assert.equal(err.message, 'Cast to number failed for value "not a ' +
+    assert.equal(err.message, 'Cast to Number failed for value "not a ' +
       'number" at path "age" for model "Character"');
     // acquit:ignore:end
   });

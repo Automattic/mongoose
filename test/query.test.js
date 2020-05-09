@@ -3733,4 +3733,20 @@ describe('Query', function() {
       });
     });
   });
+
+  it('casts filter according to discriminator schema if in filter (gh-8881)', function() {
+    const userSchema = new Schema({ name: String }, { discriminatorKey: 'kind' });
+    const User = db.model('User', userSchema);
+
+    return co(function*() {
+      const UserWithAge = User.discriminator('UserWithAge', new Schema({ age: Number }));
+      yield UserWithAge.create({ name: 'Hafez', age: 25 });
+
+      // should cast `age` to number
+      const user = yield User.findOne({ kind: 'UserWithAge', age: '25' });
+
+      assert.equal(user.name, 'Hafez');
+      assert.equal(user.age, 25);
+    });
+  });
 });

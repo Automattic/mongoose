@@ -16,7 +16,39 @@ describe('webpack', function() {
     const webpack = require('webpack');
     this.timeout(90000);
     // acquit:ignore:end
+    const webpackConfig = {
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            include: [
+              /\/mongoose\//i,
+              /\/kareem\//i
+            ],
+            loader: 'babel-loader',
+            options: {
+              presets: ['es2015']
+            }
+          }
+        ]
+      },
+      node: {
+        // Replace these Node.js native modules with empty objects, Mongoose's
+        // browser library does not use them.
+        // See https://webpack.js.org/configuration/node/
+        dns: 'empty',
+        fs: 'empty',
+        module: 'empty',
+        net: 'empty',
+        tls: 'empty'
+      },
+      target: 'web',
+      mode: 'production'
+    };
+    // acquit:ignore:start
     const webpackBundle = require('../webpack.config.js');
+    const baseConfig = require('../webpack.base.config.js');
+    assert.deepEqual(webpackConfig, baseConfig);
     const webpackBundleForTest = Object.assign({}, webpackBundle, {
       output: Object.assign({}, webpackBundle.output, { path: `${__dirname}/files` })
     });
@@ -28,16 +60,12 @@ describe('webpack', function() {
       assert.ok(!bundleBuildStats.compilation.warnings.
         find(msg => msg.toString().startsWith('ModuleDependencyWarning:')));
 
-      const baseConfig = require('../webpack.base.config.js');
       const config = Object.assign({}, baseConfig, {
         entry: ['./test/files/sample.js'],
-        // acquit:ignore:start
         output: {
           path: `${__dirname}/files`
         }
-        // acquit:ignore:end
       });
-      // acquit:ignore:start
       webpack(config, utils.tick(function(error, stats) {
         assert.ifError(error);
         assert.deepEqual(stats.compilation.errors, []);
@@ -48,7 +76,7 @@ describe('webpack', function() {
 
         done();
       }));
-      // acquit:ignore:end
     }));
+    // acquit:ignore:end
   });
 });

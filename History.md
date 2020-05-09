@@ -1,3 +1,27 @@
+5.9.13 / 2020-05-08
+===================
+ * fix(schema): mark correct path as modified when setting a path underneath a nested array of documents #8926
+ * fix(query): Query#select({ field: false }) should not overwrite schema selection options #8929 #8923
+ * fix(update): handle immutable properties are ignored in bulk upserts #8952 [philippejer](https://github.com/philippejer)
+ * docs(browser): add back sample webpack config #8890
+ * docs(faq): fix broken reference in limit vs perDocumentLimit #8937
+
+5.9.12 / 2020-05-04
+===================
+ * fix(document): report cast error on array elements with array index instead of just being a cast error for the whole array #8888
+ * fix(connection): throw more helpful error in case of IP whitelisting issue with Atlas #8846
+ * fix(schema): throw error on schema with reserved key with type of object #8869 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(connection): inherit config for useDB from default connection #8267 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query): set mongodb options for `distinct()` #8906 [clhuang](https://github.com/clhuang)
+ * fix(schema): allow adding descending indexes on schema #8895 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): set defaults if setting nested path to empty object with `minimize: false` #8829
+ * fix(populate): check discriminator existence before accessing schema in getModelsMapForPopulate #8837 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix broken references to Mongoose#Document API, and prefer mongoose.model(...) over Document#model(...) #8914 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(model): adds options.limit to Model.insertMany(...) #8864 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: add flattenMaps and aliases to Document#toObject() #8901 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(model): add options.overwrite to findOneAndUpdate #8865 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(populate+faq): separate limit-vs-perDocumentLimit into its own section, add FAQ for populate and limit #8917 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.9.11 / 2020-04-30
 ===================
  * fix: upgrade mongodb driver -> 3.5.7 #8842 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

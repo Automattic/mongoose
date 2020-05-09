@@ -1806,7 +1806,7 @@ describe('model: querying:', function() {
           assert.equal(rb.block.toString('utf8'), 'buffer shtuffs are neat');
 
           Test.findOne({ block: /buffer/i }, function(err) {
-            assert.equal(err.message, 'Cast to buffer failed for value ' +
+            assert.equal(err.message, 'Cast to Buffer failed for value ' +
               '"/buffer/i" at path "block" for model "Test"');
             Test.findOne({ block: [195, 188, 98, 101, 114] }, function(err, rb) {
               assert.ifError(err);

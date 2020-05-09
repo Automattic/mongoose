@@ -3437,7 +3437,7 @@ describe('model: updateOne: ', function() {
         _id: false,
         strict: false
       });
-    
+
       const StoreSchema = Schema({ contact: ContactSchema });
       const Store = db.model('Test', StoreSchema);
 

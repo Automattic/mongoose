@@ -8366,7 +8366,7 @@ describe('model: populate:', function() {
 
   it('supports cross-db populate with refPath (gh-6520)', function() {
     return co(function*() {
-      const db2 = yield mongoose.createConnection(start.uri2);
+      const db2 = yield mongoose.createConnection(start.uri2).asPromise();
 
       const bookSchema = new Schema({ title: String });
       const movieSchema = new Schema({ title: String });

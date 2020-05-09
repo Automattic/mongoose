@@ -100,7 +100,7 @@ describe('Date Tutorial', function() {
             max: '1994-05-23'
           }
         });
-        db = yield start();
+        db = yield start().asPromise();
         Episode = db.model('Episode', episodeSchema);
 
         yield Episode.create([

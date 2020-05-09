@@ -2430,4 +2430,10 @@ describe('schema', function() {
       assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
     });
   });
+
+  it('disables `id` virtual if no `_id` path (gh-3936)', function() {
+    const schema = Schema({ name: String }, { _id: false });
+    assert.ok(!schema.paths._id);
+    assert.ok(!schema.virtuals.id);
+  });
 });

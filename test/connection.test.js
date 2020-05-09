@@ -34,9 +34,7 @@ describe('connections:', function() {
 
       const findPromise = Test.findOne();
 
-      assert.equal(typeof conn.catch, 'function');
-
-      return conn.
+      return conn.asPromise().
         then(function(conn) {
           assert.equal(conn.constructor.name, 'NativeConnection');
           assert.equal(conn.host, 'localhost');
@@ -54,7 +52,7 @@ describe('connections:', function() {
       const promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
         autoIndex: false,
         useNewUrlParser: true
-      });
+      }).asPromise();
 
       promise.then(function(conn) {
         assert.strictEqual(conn.config.autoIndex, false);
@@ -66,7 +64,7 @@ describe('connections:', function() {
       return co(function*() {
         const conn = yield mongoose.createConnection(uri, {
           autoCreate: true
-        });
+        }).asPromise();
 
         const Model = conn.model('gh6489_Conn', new Schema({ name: String }, {
           collation: { locale: 'en_US', strength: 1 },
@@ -89,7 +87,7 @@ describe('connections:', function() {
 
     it('autoCreate when collection already exists does not fail (gh-7122)', function() {
       return co(function*() {
-        const conn = yield mongoose.createConnection(uri);
+        const conn = yield mongoose.createConnection(uri).asPromise();
 
         const schema = new mongoose.Schema({
           name: {
@@ -116,7 +114,7 @@ describe('connections:', function() {
         throw new Error('Fail');
       };
 
-      conn.then(() => done(), err => done(err));
+      conn.asPromise().then(() => done(), err => done(err));
     });
 
     it('throws helpful error with legacy syntax (gh-6756)', function(done) {
@@ -216,7 +214,7 @@ describe('connections:', function() {
           ++numClose;
         });
 
-        conn.
+        conn.asPromise().
           then(function() {
             assert.equal(conn.readyState, conn.states.connected);
             assert.equal(numConnected, 1);
@@ -283,7 +281,7 @@ describe('connections:', function() {
           ++numReconnectFailed;
         });
 
-        conn.
+        conn.asPromise().
           then(function() {
             assert.equal(numConnected, 1);
             return server.stop();
@@ -349,7 +347,7 @@ describe('connections:', function() {
         const Model = conn.model('gh4513', new Schema());
 
         return co(function*() {
-          yield conn;
+          yield conn.asPromise();
 
           assert.equal(conn.readyState, conn.states.connected);
 
@@ -452,7 +450,7 @@ describe('connections:', function() {
   it('should accept unix domain sockets', function(done) {
     const host = encodeURIComponent('/tmp/mongodb-27017.sock');
     const db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`, { useNewUrlParser: true });
-    db.catch(() => {});
+    db.asPromise().catch(() => {});
     assert.equal(db.name, 'fake');
     assert.equal(db.host, '/tmp/mongodb-27017.sock');
     assert.equal(db.pass, 'psw');
@@ -522,7 +520,7 @@ describe('connections:', function() {
         useNewUrlParser: true,
         useUnifiedTopology: false // Workaround re: NODE-2250
       });
-      db.catch(() => {});
+      db.asPromise().catch(() => {});
       db.on('error', function() {
         // this callback has no params which triggered the bug #759
         db.close();
@@ -646,7 +644,7 @@ describe('connections:', function() {
     const opts = {};
     const db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     const coll = db.collection('Test');
-    db.then(function() {
+    db.asPromise().then(function() {
       setTimeout(function() {
         coll.insertOne({ x: 1 }, function(error) {
           assert.ok(error);
@@ -662,16 +660,8 @@ describe('connections:', function() {
   it('force close with connection created after close (gh-5664)', function(done) {
     const opts = {};
     const db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
-    db.then(function() {
+    db.asPromise().then(function() {
       setTimeout(function() {
-        // TODO: enforce error.message, right now get a confusing error
-        /* db.collection('Test').insertOne({x:1}, function(error) {
-          assert.ok(error);
-
-          //assert.ok(error.message.indexOf('pool was destroyed') !== -1, error.message);
-          done();
-        }); */
-
         let threw = false;
         try {
           db.collection('Test').insertOne({ x: 1 });
@@ -712,17 +702,22 @@ describe('connections:', function() {
 
   it('dbName option (gh-6106)', function() {
     const opts = { dbName: 'bacon' };
-    return mongoose.createConnection('mongodb://localhost:27017/test', opts).then(db => {
-      assert.equal(db.name, 'bacon');
-      db.close();
-    });
+    return mongoose.
+      createConnection('mongodb://localhost:27017/test', opts).
+      asPromise().
+      then(db => {
+        assert.equal(db.name, 'bacon');
+        db.close();
+      });
   });
 
   it('uses default database in uri if options.dbName is not provided', function() {
-    return mongoose.createConnection('mongodb://localhost:27017/default-db-name').then(db => {
-      assert.equal(db.name, 'default-db-name');
-      db.close();
-    });
+    return mongoose.createConnection('mongodb://localhost:27017/default-db-name').
+      asPromise().
+      then(db => {
+        assert.equal(db.name, 'default-db-name');
+        db.close();
+      });
   });
 
   it('startSession() (gh-6653)', function() {
@@ -1035,7 +1030,7 @@ describe('connections:', function() {
             user: 'user',
             pass: 'pass'
           });
-          db.catch(() => {});
+          db.asPromise().catch(() => {});
 
           assert.equal(db.shouldAuthenticate(), true);
 
@@ -1063,7 +1058,7 @@ describe('connections:', function() {
             user: 'user',
             auth: { authMechanism: 'MONGODB-X509' }
           });
-          db.catch(() => {});
+          db.asPromise().catch(() => {});
           assert.equal(db.shouldAuthenticate(), true);
 
           db.close();
@@ -1077,7 +1072,7 @@ describe('connections:', function() {
             pass: 'pass',
             auth: { authMechanism: 'MONGODB-X509' }
           });
-          db.catch(() => {});
+          db.asPromise().catch(() => {});
 
           assert.equal(db.shouldAuthenticate(), true);
 
@@ -1124,7 +1119,7 @@ describe('connections:', function() {
     };
     const uri = 'mongodb://baddomain:27017/test';
 
-    return mongoose.createConnection(uri, opts).then(() => assert.ok(false), err => {
+    return mongoose.createConnection(uri, opts).asPromise().then(() => assert.ok(false), err => {
       assert.equal(err.name, 'MongooseServerSelectionError');
     });
   });
@@ -1164,7 +1159,7 @@ describe('connections:', function() {
     });
   });
 
-  it('useDB inherits config from default conneciton (gh-8267)', function() {
+  it('useDB inherits config from default connection (gh-8267)', function() {
     return co(function*() {
       yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { useCreateIndex: true });
 

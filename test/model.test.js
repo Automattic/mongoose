@@ -5119,7 +5119,7 @@ describe('Model', function() {
             // Don't wait for promise
             const sessionPromise = MyModel.startSession({ causalConsistency: true });
 
-            yield db;
+            yield db.asPromise();
 
             const session = yield sessionPromise;
 

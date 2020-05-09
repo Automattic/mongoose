@@ -3431,5 +3431,26 @@ describe('model: updateOne: ', function() {
         assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
       });
     });
+
+    it('use child schema strict on single nested updates if useNestedStrict not set (gh-8922)', function() {
+      const ContactSchema = Schema({ email: String }, {
+        _id: false,
+        strict: false
+      });
+    
+      const StoreSchema = Schema({ contact: ContactSchema });
+      const Store = db.model('Test', StoreSchema);
+
+      return co(function*() {
+        yield Store.updateOne({}, {
+          contact: {
+            email: '234@example.com', notInSchema: '234'
+          }
+        }, { upsert: true });
+        const updatedStore = yield Store.collection.findOne();
+        assert.strictEqual(updatedStore.contact.email, '234@example.com');
+        assert.strictEqual(updatedStore.contact.notInSchema, '234');
+      });
+    });
   });
 });

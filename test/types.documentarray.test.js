@@ -10,6 +10,7 @@ const DocumentArray = require('../lib/types/documentarray');
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
 const co = require('co');
+const idGetter = require('../lib/plugins/idGetter');
 const setValue = require('../lib/utils').setValue;
 
 const mongoose = require('./common').mongoose;
@@ -39,7 +40,7 @@ function TestDoc(schema) {
     title: { type: String }
   });
 
-  Subdocument.prototype.$__setSchema(schema || SubSchema);
+  Subdocument.prototype.$__setSchema(idGetter(schema || SubSchema));
 
   return Subdocument;
 }
@@ -575,7 +576,7 @@ describe('types.documentarray', function() {
       assert.equal(doc.docs.length, 2);
     });
 
-    it('map() works', function() {
+    it('map() works (gh-8317)', function() {
       const personSchema = new Schema({ friends: [{ name: { type: String } }] });
       mongoose.deleteModel(/Test/);
       const Person = mongoose.model('Test', personSchema);

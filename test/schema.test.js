@@ -19,6 +19,7 @@ const ReadPref = mongoose.mongo.ReadPreference;
 const vm = require('vm');
 const co = require('co');
 const Buffer = require('safe-buffer').Buffer;
+const applyPlugins = require('../lib/helpers/schema/applyPlugins');
 
 /**
  * Test Document constructor.
@@ -2432,7 +2433,10 @@ describe('schema', function() {
   });
 
   it('disables `id` virtual if no `_id` path (gh-3936)', function() {
+    const idGetter = require('../lib/plugins/idGetter');
+
     const schema = Schema({ name: String }, { _id: false });
+    applyPlugins(schema, [[idGetter]]);
     assert.ok(!schema.paths._id);
     assert.ok(!schema.virtuals.id);
   });

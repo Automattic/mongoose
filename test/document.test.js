@@ -12,6 +12,7 @@ const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const co = require('co');
+const idGetter = require('../lib/plugins/idGetter');
 const util = require('./util');
 const utils = require('../lib/utils');
 const validator = require('validator');
@@ -76,7 +77,7 @@ const schema = new Schema({
   date: Date
 });
 
-TestDocument.prototype.$__setSchema(schema);
+TestDocument.prototype.$__setSchema(idGetter(schema));
 
 schema.virtual('nested.agePlus2').get(function() {
   return this.nested.age + 2;

@@ -1362,10 +1362,22 @@ doc.populate(options).execPopulate() <span class="hljs-comment">// executed, ret
 <li>same as in <a href="#model_Model.replaceOne">Model.replaceOne</a></li>
 </ul></div><hr class="separate-api-elements"><h3 id="document_Document-save"><a href="#document_Document-save">Document.prototype.save()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> options optional options</p>
-</li><ul style="margin-top: 0.5em"><li>[options.safe]
-<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="http://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a></p>
+</li><ul style="margin-top: 0.5em"><li>[options.session=null]
+<span class="method-type">&laquo;Session&raquo;</span> the <a href="https://docs.mongodb.com/manual/reference/server-sessions/">session</a> associated with this save operation. If not specified, defaults to the <a href="api.html#document_Document-$session">document&#39;s associated session</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.safe]
+<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="http://mongoosejs.com//docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.validateBeforeSave]
 <span class="method-type">&laquo;Boolean&raquo;</span> set to false to save without validating.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.w]
+<span class="method-type">&laquo;Number|String&raquo;</span> set the <a href="https://docs.mongodb.com/manual/reference/write-concern/#w-option">write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.j]
+<span class="method-type">&laquo;Boolean&raquo;</span> set to true for MongoDB to wait until this <code>save()</code> has been <a href="https://docs.mongodb.com/manual/reference/write-concern/#j-option">journaled before resolving the returned promise</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.wtimeout]
+<span class="method-type">&laquo;Number&raquo;</span> sets a <a href="https://docs.mongodb.com/manual/reference/write-concern/#wtimeout">timeout for the write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.checkKeys=true]
+<span class="method-type">&laquo;Boolean&raquo;</span> the MongoDB driver prevents you from saving keys that start with &#39;$&#39; or contain &#39;.&#39; by default. Set this option to <code>false</code> to skip that check. See <a href="https://docs.mongodb.com/manual/reference/limits/#Restrictions-on-Field-Names">restrictions on field names</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.timestamps=true]
+<span class="method-type">&laquo;Boolean&raquo;</span> if <code>false</code> and <a href="./guide.html#timestamps">timestamps</a> are enabled, skip timestamps for this <code>save()</code>.</p>
 </li></ul><li class="param">[fn]
 <span class="method-type">&laquo;Function&raquo;</span> optional callback</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,undefined&raquo;</span> Returns undefined if used with callback or a Promise otherwise.</p>
@@ -1374,24 +1386,14 @@ doc.populate(options).execPopulate() <span class="hljs-comment">// executed, ret
 <h4>Example:</h4>
 
 <pre><code>product.sold = <span class="hljs-built_in">Date</span>.now();
-product.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, product</span>) </span>{
-  <span class="hljs-keyword">if</span> (err) ..
-})</code></pre>
+product = <span class="hljs-keyword">await</span> product.save();</code></pre>
 
-<p>The callback will receive two parameters</p>
-
-<ol>
-<li><code>err</code> if an error occurred</li>
-<li><code>product</code> which is the saved <code>product</code></li>
-</ol>
-
-<p>As an extra measure of flow control, save will return a Promise.</p>
+<p>If save is successful, the returned promise will fulfill with the document saved.</p>
 
 <h4>Example:</h4>
 
-<pre><code>product.save().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">product</span>) </span>{
-   ...
-});</code></pre></div><hr class="separate-api-elements"><h3 id="document_Document-schema"><a href="#document_Document-schema">Document.prototype.schema</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The documents schema.</p></div><hr class="separate-api-elements"><h3 id="document_Document-set"><a href="#document_Document-set">Document.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
+<pre><code><span class="hljs-keyword">const</span> newProduct = <span class="hljs-keyword">await</span> product.save();
+newProduct === product; <span class="hljs-comment">// true</span></code></pre></div><hr class="separate-api-elements"><h3 id="document_Document-schema"><a href="#document_Document-schema">Document.prototype.schema</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The documents schema.</p></div><hr class="separate-api-elements"><h3 id="document_Document-set"><a href="#document_Document-set">Document.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;String|Object&raquo;</span> path or object of key/vals to set</p>
 </li><li class="param">val
 <span class="method-type">&laquo;Any&raquo;</span> the value to set</p>

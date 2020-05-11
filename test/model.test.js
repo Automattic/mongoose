@@ -6691,4 +6691,13 @@ describe('Model', function() {
     });
   });
 
+  it('cast errors have `kind` field (gh-8953)', function() {
+    return co(function*() {
+      const User = db.model('User', {});
+      const err = yield User.findOne({ _id: 'invalid' }).then(() => null, err => err);
+
+      assert.deepEqual(err.kind, 'ObjectId');
+    });
+  });
+
 });

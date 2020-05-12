@@ -668,4 +668,21 @@ describe('types.documentarray', function() {
     assert.equal(doc2.subDocArray[0].ownerDocument().name, 'doc2');
     assert.equal(doc1.subDocArray[0].ownerDocument().name, 'doc1');
   });
+
+  it('modifying subdoc path after `slice()` (gh-8356)', function() {
+    mongoose.deleteModel(/Test/);
+    const nestedArraySchema = Schema({
+      name: String,
+      subDocArray: [{ name: String }]
+    });
+
+    const Model = db.model('Test', nestedArraySchema);
+    const doc = new Model().init({
+      name: 'test',
+      subDocArray: [{ name: 'foo' }, { name: 'bar' }]
+    });
+
+    doc.subDocArray.slice(1, 2)[0].name = 'baz';
+    assert.ok(doc.isModified('subDocArray.1.name'));
+  });
 });

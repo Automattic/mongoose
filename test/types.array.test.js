@@ -2058,4 +2058,63 @@ describe('types array', function() {
       });
     });
   });
+
+  describe('built-in array methods that modify element structure return vanilla arrays (gh-8356)', function() {
+    beforeEach(function() {
+      mongoose.deleteModel(/Test/);
+    });
+
+    it('filter', function() {
+      const Model = mongoose.model('Test', Schema({ arr: [String] }));
+      const doc = new Model({ arr: ['foo', 'bar', 'baz'] });
+
+      const arr = doc.arr.filter(str => str.startsWith('b'));
+      assert.deepEqual(arr, ['bar', 'baz']);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('flat', function() {
+      if (Array.prototype.flat == null) {
+        return this.skip();
+      }
+
+      const Model = mongoose.model('Test', Schema({ arr: [[String]] }));
+      const doc = new Model({ arr: [['foo']] });
+
+      const arr = doc.arr.flat();
+      assert.deepEqual(arr, ['foo']);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('flatMap', function() {
+      if (Array.prototype.flatMap == null) {
+        return this.skip();
+      }
+
+      const Model = mongoose.model('Test', Schema({ arr: [Number] }));
+      const doc = new Model({ arr: [1, 3, 5, 7] });
+
+      const arr = doc.arr.flatMap(v => [v, v + 1]);
+      assert.deepEqual(arr, [1, 2, 3, 4, 5, 6, 7, 8]);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('map', function() {
+      const Model = mongoose.model('Test', Schema({ arr: [Number] }));
+      const doc = new Model({ arr: [2, 4, 6, 8] });
+
+      const arr = doc.arr.map(v => v / 2);
+      assert.deepEqual(arr, [1, 2, 3, 4]);
+      assert.ok(!arr.isMongooseArray);
+    });
+
+    it('slice', function() {
+      const Model = mongoose.model('Test', Schema({ arr: [Number] }));
+      const doc = new Model({ arr: [2, 4, 6, 8] });
+
+      const arr = doc.arr.slice(1, 3);
+      assert.deepEqual(arr, [4, 6]);
+      assert.ok(!arr.isMongooseArray);
+    });
+  });
 });

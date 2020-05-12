@@ -9294,7 +9294,7 @@ describe('model: populate:', function() {
           { title: 'test3', user: new mongoose.Types.ObjectId() }
         ]);
 
-        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
+        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).sort('title').lean();
 
         posts[0].user.name = 'val2';
         assert.equal(posts[1].user.name, 'val');

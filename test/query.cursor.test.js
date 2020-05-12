@@ -561,6 +561,51 @@ describe('QueryCursor', function() {
       assert.equal(closeEventTriggeredCount, 1);
       done();
     }, 20);
+  });
 
+  it('passes document index as the second argument for query cursor (gh-8972)', function() {
+    return co(function *() {
+      const User = db.model('User', Schema({ order: Number }));
+
+      yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
+
+
+      const docsWithIndexes = [];
+
+      yield User.find().sort('order').cursor().eachAsync((doc, i) => {
+        docsWithIndexes.push({ order: doc.order, i: i });
+      });
+
+      const expected = [
+        { order: 1, i: 0 },
+        { order: 2, i: 1 },
+        { order: 3, i: 2 }
+      ];
+
+      assert.deepEqual(docsWithIndexes, expected);
+    });
+  });
+
+  it('passes document index as the second argument for aggregation cursor (gh-8972)', function() {
+    return co(function *() {
+      const User = db.model('User', Schema({ order: Number }));
+
+      yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
+
+
+      const docsWithIndexes = [];
+
+      yield User.aggregate([{ $sort: { order: 1 } }]).cursor().exec().eachAsync((doc, i) => {
+        docsWithIndexes.push({ order: doc.order, i: i });
+      });
+
+      const expected = [
+        { order: 1, i: 0 },
+        { order: 2, i: 1 },
+        { order: 3, i: 2 }
+      ];
+
+      assert.deepEqual(docsWithIndexes, expected);
+    });
   });
 });

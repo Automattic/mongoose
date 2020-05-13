@@ -1577,4 +1577,11 @@ describe('model', function() {
       assert.ok(user.postId);
     })
   });
+
+  it('accepts a POJO as a schema for discriminators (gh-8984)', function () {
+    const User = db.model('User',{});
+    const SuperUser = User.discriminator('SuperUser',{})
+
+    assert.ok(SuperUser.schema)
+  })
 });

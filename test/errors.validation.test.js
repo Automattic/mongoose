@@ -232,4 +232,19 @@ describe('ValidationError', function() {
 
     assert.equal(err.message, 'Validation failed');
   });
+
+  describe('when user code defines a r/o Error#toJSON', function() {
+    it('shoud not fail', function() {
+      const err = [];
+      const child = require('child_process')
+        .fork('./test/isolated/project-has-error.toJSON.js', { silent: true });
+
+      child.stderr.on('data', function(buf) { err.push(buf); });
+      child.on('exit', function(code) {
+        const stderr = err.join('');
+        assert.equal(stderr, '');
+        assert.equal(code, 0);
+      });
+    });
+  });
 });

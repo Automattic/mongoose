@@ -9294,7 +9294,7 @@ describe('model: populate:', function() {
           { title: 'test3', user: new mongoose.Types.ObjectId() }
         ]);
 
-        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
+        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).sort('title').lean();
 
         posts[0].user.name = 'val2';
         assert.equal(posts[1].user.name, 'val');
@@ -9353,6 +9353,28 @@ describe('model: populate:', function() {
 
         const result = yield EventsList.findOne().populate('events.productId');
         assert.equal(result.events[1].productId.name, 'GTX 1050 Ti');
+      });
+    });
+
+    it('can populate virtuals defined on child discriminators (gh-8924)', function() {
+      return co(function*() {
+        const User = db.model('User', {});
+        const Post = db.model('Post', { name: String });
+
+        const userWithPostSchema = new Schema({ postId: Schema.ObjectId });
+
+        userWithPostSchema.virtual('post', { ref: 'Post', localField: 'postId', foreignField: '_id', justOne: true });
+
+        const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
+
+        const post = yield Post.create({ name: 'Clean Code' });
+
+        yield UserWithPost.create({ postId: post._id });
+
+        const user = yield User.findOne().populate({ path: 'post' });
+
+
+        assert.equal(user.post.name, 'Clean Code');
       });
     });
   });

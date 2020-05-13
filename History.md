@@ -1,3 +1,15 @@
+5.9.14 / 2020-05-13
+===================
+ * fix(cursor): add index as second parameter to eachAsync callback #8972 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query): cast filter according to discriminator schema if discriminator key in filter #8881
+ * fix(model): fix throwing error when populating virtual path defined on child discriminator #8924 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(errors): handle case when user has make `Error.prototype.toJSON` read only #8986 [osher](https://github.com/osher)
+ * fix(model): add `kind` to cast errors thrown by query execution #8953 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(update): use child schema strict on single nested updates if useNestedStrict not set #8922
+ * docs(model): improve `save()` docs #8956 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: add immutable type to Schema Types #8987 [Andrew5569](https://github.com/Andrew5569)
+ * docs: sort schema reserved keys in documentation #8966 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.9.13 / 2020-05-08
 ===================
  * fix(schema): mark correct path as modified when setting a path underneath a nested array of documents #8926

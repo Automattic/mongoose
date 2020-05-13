@@ -5643,7 +5643,7 @@ describe('Model', function() {
           Person.discriminator('Worker', new Schema({ age: Number }));
 
 
-          const [person1, person2, person3, person4, person5] = yield Person.create([
+          yield Person.create([
             { __t: 'Worker', name: 'Hafez1', age: '5' },
             { __t: 'Worker', name: 'Hafez2', age: '10' },
             { __t: 'Worker', name: 'Hafez3', age: '15' },
@@ -5652,11 +5652,11 @@ describe('Model', function() {
           ]);
 
           yield Person.bulkWrite([
-            { updateOne: { filter: { __t: 'Worker', _id: person1._id, age: '5' }, update: { age: '6' } } },
-            { updateMany: { filter: { __t: 'Worker', _id: person2._id, age: '10' }, update: { age: '11' } } },
-            { replaceOne: { filter: { __t: 'Worker', _id: person3._id, age: '15' }, replacement: { name: 'Hafez3', age: '16' } } },
-            { deleteOne: { filter: { __t: 'Worker', _id: person4._id, age: '20' } } },
-            { deleteMany: { filter: { __t: 'Worker', _id: person5._id, age: '25' } } },
+            { updateOne: { filter: { __t: 'Worker', age: '5' }, update: { age: '6' } } },
+            { updateMany: { filter: { __t: 'Worker', age: '10' }, update: { age: '11' } } },
+            { replaceOne: { filter: { __t: 'Worker', age: '15' }, replacement: { name: 'Hafez3', age: '16' } } },
+            { deleteOne: { filter: { __t: 'Worker', age: '20' } } },
+            { deleteMany: { filter: { __t: 'Worker', age: '25' } } },
             { insertOne: { document: { __t: 'Worker', name: 'Hafez6', age: '30' } } }
           ]);
 

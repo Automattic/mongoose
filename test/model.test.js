@@ -5636,6 +5636,39 @@ describe('Model', function() {
           assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
         });
       });
+
+      it('casts according to child discriminator if `discriminatorKey` is present (gh-8982)', function() {
+        return co(function*() {
+          const Person = db.model('Person', { name: String });
+          Person.discriminator('Worker', new Schema({ age: Number }));
+
+
+          const [person1, person2, person3, person4, person5] = yield Person.create([
+            { __t: 'Worker', name: 'Hafez1', age: '5' },
+            { __t: 'Worker', name: 'Hafez2', age: '10' },
+            { __t: 'Worker', name: 'Hafez3', age: '15' },
+            { __t: 'Worker', name: 'Hafez4', age: '20' },
+            { __t: 'Worker', name: 'Hafez5', age: '25' }
+          ]);
+
+          yield Person.bulkWrite([
+            { updateOne: { filter: { __t: 'Worker', _id: person1._id, age: '5' }, update: { age: '6' } } },
+            { updateMany: { filter: { __t: 'Worker', _id: person2._id, age: '10' }, update: { age: '11' } } },
+            { replaceOne: { filter: { __t: 'Worker', _id: person3._id, age: '15' }, replacement: { name: 'Hafez3', age: '16' } } },
+            { deleteOne: { filter: { __t: 'Worker', _id: person4._id, age: '20' } } },
+            { deleteMany: { filter: { __t: 'Worker', _id: person5._id, age: '25' } } },
+            { insertOne: { document: { __t: 'Worker', name: 'Hafez6', age: '30' } } }
+          ]);
+
+          const people = yield Person.find().sort('name');
+
+          assert.equal(people.length, 4);
+          assert.equal(people[0].age, 6);
+          assert.equal(people[1].age, 11);
+          assert.equal(people[2].age, 16);
+          assert.equal(people[3].age, 30);
+        });
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {

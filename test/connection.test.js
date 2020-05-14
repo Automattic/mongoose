@@ -119,18 +119,16 @@ describe('connections:', function() {
       conn.then(() => done(), err => done(err));
     });
 
-    it('throws helpful error with legacy syntax (gh-6756)', function(done) {
+    it('throws helpful error with legacy syntax (gh-6756)', function() {
       assert.throws(function() {
         mongoose.createConnection('localhost', 'dbname', 27017);
       }, /mongoosejs\.com.*connections\.html/);
-      done();
     });
 
-    it('throws helpful error with undefined uri (gh-6763)', function(done) {
+    it('throws helpful error with undefined uri (gh-6763)', function() {
       assert.throws(function() {
         mongoose.createConnection(void 0, { useNewUrlParser: true });
       }, /string.*createConnection/);
-      done();
     });
 
     it('resolving with q (gh-5714)', function(done) {

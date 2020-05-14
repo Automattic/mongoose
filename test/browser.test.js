@@ -22,16 +22,16 @@ describe('browser', function() {
     exec('node --eval "const mongoose = require(\'./lib/browser\'); new mongoose.Schema();"', done);
   });
 
-  it('document works (gh-4987)', function(done) {
+  it('document works (gh-4987)', function() {
     const schema = new Schema({
       name: { type: String, required: true },
       quest: { type: String, match: /Holy Grail/i, required: true },
       favoriteColor: { type: String, enum: ['Red', 'Blue'], required: true }
     });
 
-    new Document({}, schema);
-
-    done();
+    assert.doesNotThrow(function() {
+      new Document({}, schema);
+    });
   });
 
   it('document validation with arrays (gh-6175)', function() {

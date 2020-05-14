@@ -1803,20 +1803,17 @@ describe('document', function() {
         new M({ thang: {} });
         assert.deepEqual({}, val);
       });
-      it('works with arrays', function(done) {
+      it('works with arrays', function() {
         new M({ thang: [] });
         assert.deepEqual([], val);
-        done();
       });
-      it('works with numbers', function(done) {
+      it('works with numbers', function() {
         new M({ thang: 4 });
         assert.deepEqual(4, val);
-        done();
       });
-      it('works with strings', function(done) {
+      it('works with strings', function() {
         new M({ thang: '3' });
         assert.deepEqual('3', val);
-        done();
       });
     });
 
@@ -2071,7 +2068,7 @@ describe('document', function() {
     });
   });
 
-  it('properly calls queue functions (gh-2856)', function(done) {
+  it('properly calls queue functions (gh-2856)', function() {
     const personSchema = new mongoose.Schema({
       name: String
     });
@@ -2085,7 +2082,6 @@ describe('document', function() {
     const Person = db.model('Person', personSchema);
     new Person({ name: 'Val' });
     assert.equal(calledName, 'Val');
-    done();
   });
 
   describe('bug fixes', function() {
@@ -2177,7 +2173,7 @@ describe('document', function() {
         });
     });
 
-    it('setters firing with objects on real paths (gh-2943)', function(done) {
+    it('setters firing with objects on real paths (gh-2943)', function() {
       const M = db.model('Test', {
         myStr: {
           type: String, set: function(v) {
@@ -2192,12 +2188,10 @@ describe('document', function() {
 
       new M({ otherStr: { value: 'test' } });
       assert.ok(!t.otherStr);
-
-      done();
     });
 
     describe('gh-2782', function() {
-      it('should set data from a sub doc', function(done) {
+      it('should set data from a sub doc', function() {
         const schema1 = new mongoose.Schema({
           data: {
             email: String
@@ -2214,11 +2208,10 @@ describe('document', function() {
         const doc2 = new Model2();
         doc2.set(doc1.data);
         assert.equal(doc2.email, 'some@example.com');
-        done();
       });
     });
 
-    it('set data from subdoc keys (gh-3346)', function(done) {
+    it('set data from subdoc keys (gh-3346)', function() {
       const schema1 = new mongoose.Schema({
         data: {
           email: String
@@ -2230,7 +2223,6 @@ describe('document', function() {
       assert.equal(doc1.data.email, 'some@example.com');
       const doc2 = new Model1({ data: doc1.data });
       assert.equal(doc2.data.email, 'some@example.com');
-      done();
     });
 
     it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
@@ -2293,7 +2285,7 @@ describe('document', function() {
       });
     });
 
-    it('single embedded schemas with validation (gh-2689)', function(done) {
+    it('single embedded schemas with validation (gh-2689)', function() {
       const userSchema = new mongoose.Schema({
         name: String,
         email: { type: String, required: true, match: /.+@.+/ }
@@ -2318,11 +2310,9 @@ describe('document', function() {
       assert.ok(error);
       assert.ok(error.errors['user.email']);
       assert.equal(error.errors['user.email'].kind, 'regexp');
-
-      done();
     });
 
-    it('single embedded parent() (gh-5134)', function(done) {
+    it('single embedded parent() (gh-5134)', function() {
       const userSchema = new mongoose.Schema({
         name: String,
         email: { type: String, required: true, match: /.+@.+/ }
@@ -2337,8 +2327,6 @@ describe('document', function() {
 
       const e = new Event({ name: 'test', user: {} });
       assert.strictEqual(e.user.parent(), e.user.ownerDocument());
-
-      done();
     });
 
     it('single embedded schemas with markmodified (gh-2689)', function(done) {
@@ -2615,7 +2603,7 @@ describe('document', function() {
       });
     });
 
-    it('single embedded schemas with methods (gh-3534)', function(done) {
+    it('single embedded schemas with methods (gh-3534)', function() {
       const personSchema = new Schema({ name: String });
       personSchema.methods.firstName = function() {
         return this.name.substr(0, this.name.indexOf(' '));
@@ -2626,7 +2614,6 @@ describe('document', function() {
 
       const gnr = new Band({ leadSinger: { name: 'Axl Rose' } });
       assert.equal(gnr.leadSinger.firstName(), 'Axl');
-      done();
     });
 
     it('single embedded schemas with models (gh-3535)', function(done) {
@@ -2646,7 +2633,7 @@ describe('document', function() {
       });
     });
 
-    it('single embedded schemas with indexes (gh-3594)', function(done) {
+    it('single embedded schemas with indexes (gh-3594)', function() {
       const personSchema = new Schema({ name: { type: String, unique: true } });
 
       const bandSchema = new Schema({ leadSinger: personSchema });
@@ -2655,7 +2642,6 @@ describe('document', function() {
       const index = bandSchema.indexes()[0];
       assert.deepEqual(index[0], { 'leadSinger.name': 1 });
       assert.ok(index[1].unique);
-      done();
     });
 
     it('removing single embedded docs (gh-3596)', function(done) {
@@ -2807,7 +2793,7 @@ describe('document', function() {
       });
     });
 
-    it('handles virtuals with dots correctly (gh-3618)', function(done) {
+    it('handles virtuals with dots correctly (gh-3618)', function() {
       const testSchema = new Schema({ nested: { type: Object, default: {} } });
       testSchema.virtual('nested.test').get(function() {
         return true;
@@ -2826,7 +2812,6 @@ describe('document', function() {
       delete doc._id;
       delete doc.id;
       assert.deepEqual(doc, { nested: { test: true } });
-      done();
     });
 
     it('handles pushing with numeric keys (gh-3623)', function(done) {
@@ -2917,7 +2902,7 @@ describe('document', function() {
       });
     });
 
-    it('handles conflicting names (gh-3867)', function(done) {
+    it('handles conflicting names (gh-3867)', function() {
       const testSchema = new Schema({
         name: {
           type: String,
@@ -2939,7 +2924,6 @@ describe('document', function() {
 
       const fields = Object.keys(doc.validateSync().errors).sort();
       assert.deepEqual(fields, ['name', 'things.0.name']);
-      done();
     });
 
     it('populate with lean (gh-3873)', function(done) {
@@ -3186,7 +3170,7 @@ describe('document', function() {
       });
     });
 
-    it('skip validation if required returns false (gh-4094)', function(done) {
+    it('skip validation if required returns false (gh-4094)', function() {
       const schema = new Schema({
         div: {
           type: Number,
@@ -3197,7 +3181,6 @@ describe('document', function() {
       const Model = db.model('Test', schema);
       const m = new Model();
       assert.ifError(m.validateSync());
-      done();
     });
 
     it('ability to overwrite array default (gh-4109)', function(done) {
@@ -3285,7 +3268,7 @@ describe('document', function() {
         catch(done);
     });
 
-    it('single embedded with defaults have $parent (gh-4115)', function(done) {
+    it('single embedded with defaults have $parent (gh-4115)', function() {
       const ChildSchema = new Schema({
         name: {
           type: String,
@@ -3304,7 +3287,6 @@ describe('document', function() {
 
       const p = new Parent();
       assert.equal(p.child.$parent, p);
-      done();
     });
 
     it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', function(done) {
@@ -3537,19 +3519,16 @@ describe('document', function() {
       });
     });
 
-    it('minimize + empty object (gh-4337)', function(done) {
+    it('minimize + empty object (gh-4337)', function() {
       const SomeModelSchema = new mongoose.Schema({}, {
         minimize: false
       });
 
       const SomeModel = db.model('Test', SomeModelSchema);
 
-      try {
+      assert.doesNotThrow(function() {
         new SomeModel({});
-      } catch (error) {
-        assert.ifError(error);
-      }
-      done();
+      });
     });
 
     it('directModifiedPaths() (gh-7373)', function() {
@@ -3587,7 +3566,7 @@ describe('document', function() {
         });
       });
 
-      it('includeChildren option (gh-6134)', function(done) {
+      it('includeChildren option (gh-6134)', function() {
         const personSchema = new mongoose.Schema({
           name: { type: String },
           colors: {
@@ -3616,11 +3595,9 @@ describe('document', function() {
         const anakin = new Person({ name: 'Anakin' });
         anakin.colors = { primary: 'blue' };
         assert.deepEqual(anakin.modifiedPaths({ includeChildren: true }), ['name', 'colors', 'colors.primary']);
-
-        done();
       });
 
-      it('includeChildren option with arrays (gh-5904)', function(done) {
+      it('includeChildren option with arrays (gh-5904)', function() {
         const teamSchema = new mongoose.Schema({
           name: String,
           colors: {
@@ -3653,8 +3630,6 @@ describe('document', function() {
           'members.0',
           'members.0.name'
         ]);
-
-        done();
       });
 
       it('1 level down nested paths get marked modified on initial set (gh-7313) (gh-6944)', function() {
@@ -3716,7 +3691,7 @@ describe('document', function() {
       });
     });
 
-    it('deep default array values (gh-4540)', function(done) {
+    it('deep default array values (gh-4540)', function() {
       const schema = new Schema({
         arr: [{
           test: {
@@ -3728,7 +3703,6 @@ describe('document', function() {
       assert.doesNotThrow(function() {
         db.model('Test', schema);
       });
-      done();
     });
 
     it('default values with subdoc array (gh-4390)', function(done) {
@@ -3769,7 +3743,7 @@ describe('document', function() {
       });
     });
 
-    it('setting array subpath (gh-4472)', function(done) {
+    it('setting array subpath (gh-4472)', function() {
       const ChildSchema = new mongoose.Schema({
         name: String,
         age: Number
@@ -3790,7 +3764,6 @@ describe('document', function() {
       });
 
       assert.deepEqual(p.toObject().data.children, [{ name: 'Bob', age: 900 }]);
-      done();
     });
 
     it('ignore paths (gh-4480)', function() {
@@ -3882,7 +3855,7 @@ describe('document', function() {
         catch(done);
     });
 
-    it('validateSync with undefined and conditional required (gh-4607)', function(done) {
+    it('validateSync with undefined and conditional required (gh-4607)', function() {
       const schema = new mongoose.Schema({
         type: mongoose.SchemaTypes.Number,
         conditional: {
@@ -3902,11 +3875,9 @@ describe('document', function() {
           conditional: void 0
         }).validateSync();
       });
-
-      done();
     });
 
-    it('conditional required on single nested (gh-4663)', function(done) {
+    it('conditional required on single nested (gh-4663)', function() {
       const childSchema = new Schema({
         name: String
       });
@@ -3921,8 +3892,8 @@ describe('document', function() {
 
       const M = db.model('Test', schema);
 
-      new M({ child: { name: 'test' } }).validateSync();
-      done();
+      const err = new M({ child: { name: 'test' } }).validateSync();
+      assert.ifError(err);
     });
 
     it('setting full path under single nested schema works (gh-4578) (gh-4528)', function(done) {
@@ -3981,7 +3952,7 @@ describe('document', function() {
       });
     });
 
-    it('toObject() does not depopulate top level (gh-3057)', function(done) {
+    it('toObject() does not depopulate top level (gh-3057)', function() {
       const Cat = db.model('Cat', { name: String });
       const Human = db.model('Person', {
         name: String,
@@ -3993,7 +3964,6 @@ describe('document', function() {
 
       assert.equal(kitty.toObject({ depopulate: true }).name, 'Zildjian');
       assert.ok(!person.toObject({ depopulate: true }).petCat.name);
-      done();
     });
 
     it('toObject() respects schema-level depopulate (gh-6313)', function(done) {

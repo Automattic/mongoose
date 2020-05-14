@@ -219,14 +219,13 @@ describe('document', function() {
   });
 
   describe('shortcut getters', function() {
-    it('return undefined for properties with a null/undefined parent object (gh-1326)', function(done) {
+    it('return undefined for properties with a null/undefined parent object (gh-1326)', function() {
       const doc = new TestDocument;
       doc.init({ nested: null });
       assert.strictEqual(undefined, doc.nested.age);
-      done();
     });
 
-    it('work', function(done) {
+    it('work', function() {
       const doc = new TestDocument();
       doc.init({
         test: 'test',
@@ -299,11 +298,10 @@ describe('document', function() {
       assert.equal(String(doc2.nested.cool), '4cf70857337498f95900001c');
 
       assert.ok(doc.oids !== doc2.oids);
-      done();
     });
   });
 
-  it('test shortcut setters', function(done) {
+  it('test shortcut setters', function() {
     const doc = new TestDocument();
 
     doc.init({
@@ -328,22 +326,19 @@ describe('document', function() {
     assert.equal(Object.keys(doc._doc.nested).length, 1);
     assert.equal(doc.nested.path, 'overwrite the entire nested object');
     assert.ok(doc.isModified('nested'));
-    done();
   });
 
-  it('test accessor of id', function(done) {
+  it('test accessor of id', function() {
     const doc = new TestDocument();
     assert.ok(doc._id instanceof DocumentObjectId);
-    done();
   });
 
-  it('test shortcut of id hexString', function(done) {
+  it('test shortcut of id hexString', function() {
     const doc = new TestDocument();
     assert.equal(typeof doc.id, 'string');
-    done();
   });
 
-  it('toObject options', function(done) {
+  it('toObject options', function() {
     const doc = new TestDocument();
 
     doc.init({
@@ -498,7 +493,6 @@ describe('document', function() {
 
     // all done
     delete doc.schema.options.toObject;
-    done();
   });
 
   it('toObject transform', function(done) {
@@ -700,7 +694,7 @@ describe('document', function() {
       });
     });
 
-    it('handles child schema transforms', function(done) {
+    it('handles child schema transforms', function() {
       const userSchema = new Schema({
         name: String,
         email: String
@@ -736,7 +730,6 @@ describe('document', function() {
       assert.equal(output.email, 'a@b.co');
       assert.equal(output.followers[0].name, 'Val');
       assert.equal(output.followers[0].email, undefined);
-      done();
     });
 
     it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
@@ -784,7 +777,7 @@ describe('document', function() {
   });
 
   describe('toJSON', function() {
-    it('toJSON options', function(done) {
+    it('toJSON options', function() {
       const doc = new TestDocument();
 
       doc.init({
@@ -910,10 +903,9 @@ describe('document', function() {
 
       // all done
       delete doc.schema.options.toJSON;
-      done();
     });
 
-    it('jsonifying an object', function(done) {
+    it('jsonifying an object', function() {
       const doc = new TestDocument({ test: 'woot' });
       const oidString = doc._id.toString();
       // convert to json string
@@ -923,7 +915,6 @@ describe('document', function() {
 
       assert.equal(obj.test, 'woot');
       assert.equal(obj._id, oidString);
-      done();
     });
 
     it('jsonifying an object\'s populated items works (gh-1376)', function(done) {
@@ -1067,12 +1058,11 @@ describe('document', function() {
   });
 
   describe.skip('#update', function() {
-    it('returns a Query', function(done) {
+    it('returns a Query', function() {
       const mg = new mongoose.Mongoose;
       const M = mg.model('Test', { s: String });
       const doc = new M;
       assert.ok(doc.update() instanceof Query);
-      done();
     });
     it('calling update on document should relay to its model (gh-794)', function(done) {
       const Docs = new Schema({ text: String });
@@ -1100,31 +1090,28 @@ describe('document', function() {
     });
   });
 
-  it('toObject should not set undefined values to null', function(done) {
+  it('toObject should not set undefined values to null', function() {
     const doc = new TestDocument();
     const obj = doc.toObject();
 
     delete obj._id;
     assert.deepEqual(obj, { numbers: [], oids: [], em: [] });
-    done();
   });
 
   describe('Errors', function() {
-    it('MongooseErrors should be instances of Error (gh-209)', function(done) {
+    it('MongooseErrors should be instances of Error (gh-209)', function() {
       const MongooseError = require('../lib/error');
       const err = new MongooseError('Some message');
       assert.ok(err instanceof Error);
-      done();
     });
-    it('ValidationErrors should be instances of Error', function(done) {
+    it('ValidationErrors should be instances of Error', function() {
       const ValidationError = Document.ValidationError;
       const err = new ValidationError(new TestDocument);
       assert.ok(err instanceof Error);
-      done();
     });
   });
 
-  it('methods on embedded docs should work', function(done) {
+  it('methods on embedded docs should work', function() {
     const ESchema = new Schema({ name: String });
 
     ESchema.methods.test = function() {
@@ -1150,10 +1137,9 @@ describe('document', function() {
     assert.equal(typeof p.embed[0].test, 'function');
     assert.equal(typeof E.ten, 'function');
     assert.equal(p.embed[0].test(), 'apple butter');
-    done();
   });
 
-  it('setting a positional path does not cast value to array', function(done) {
+  it('setting a positional path does not cast value to array', function() {
     const doc = new TestDocument;
     doc.init({ numbers: [1, 3] });
     assert.equal(doc.numbers[0], 1);
@@ -1161,10 +1147,9 @@ describe('document', function() {
     doc.set('numbers.1', 2);
     assert.equal(doc.numbers[0], 1);
     assert.equal(doc.numbers[1], 2);
-    done();
   });
 
-  it('no maxListeners warning should occur', function(done) {
+  it('no maxListeners warning should occur', function() {
     let traced = false;
     const trace = console.trace;
 
@@ -1192,7 +1177,6 @@ describe('document', function() {
 
     new S({ title: 'test' });
     assert.equal(traced, false);
-    done();
   });
 
   it('unselected required fields should pass validation', function(done) {
@@ -1601,19 +1585,17 @@ describe('document', function() {
         M = db.model('Test5', new Schema({ name: String }, { _id: false }));
       });
 
-      it('with string _ids', function(done) {
+      it('with string _ids', function() {
         const s1 = new S({ _id: 'one' });
         const s2 = new S({ _id: 'one' });
         assert.ok(s1.equals(s2));
-        done();
       });
-      it('with number _ids', function(done) {
+      it('with number _ids', function() {
         const n1 = new N({ _id: 0 });
         const n2 = new N({ _id: 0 });
         assert.ok(n1.equals(n2));
-        done();
       });
-      it('with ObjectId _ids', function(done) {
+      it('with ObjectId _ids', function() {
         let id = new mongoose.Types.ObjectId;
         let o1 = new O({ _id: id });
         let o2 = new O({ _id: id });
@@ -1623,28 +1605,25 @@ describe('document', function() {
         o1 = new O({ _id: id });
         o2 = new O({ _id: id });
         assert.ok(o1.equals(o2));
-        done();
       });
-      it('with Buffer _ids', function(done) {
+      it('with Buffer _ids', function() {
         const n1 = new B({ _id: 0 });
         const n2 = new B({ _id: 0 });
         assert.ok(n1.equals(n2));
-        done();
       });
-      it('with _id disabled (gh-1687)', function(done) {
+      it('with _id disabled (gh-1687)', function() {
         const m1 = new M;
         const m2 = new M;
         assert.doesNotThrow(function() {
           m1.equals(m2);
         });
-        done();
       });
     });
   });
 
   describe('setter', function() {
     describe('order', function() {
-      it('is applied correctly', function(done) {
+      it('is applied correctly', function() {
         const date = 'Thu Aug 16 2012 09:45:59 GMT-0700';
         const d = new TestDocument();
         dateSetterCalled = false;
@@ -1654,7 +1633,6 @@ describe('document', function() {
         assert.ok(d._doc.date instanceof Date);
         assert.ok(d.date instanceof Date);
         assert.equal(+d.date, +new Date(date));
-        done();
       });
     });
 
@@ -1673,7 +1651,7 @@ describe('document', function() {
 
     describe('on nested paths', function() {
       describe('using set(path, object)', function() {
-        it('overwrites the entire object', function(done) {
+        it('overwrites the entire object', function() {
           let doc = new TestDocument();
 
           doc.init({
@@ -1755,8 +1733,6 @@ describe('document', function() {
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
           assert.equal(doc.nested.deep.x, 'Hank and Marie');
-
-          done();
         });
 
         it('allows positional syntax on mixed nested paths (gh-6738)', function() {
@@ -1772,7 +1748,7 @@ describe('document', function() {
           assert.strictEqual(doc.nested.a.b.c.d.e.f, 'g');
         });
 
-        it('gh-1954', function(done) {
+        it('gh-1954', function() {
           const schema = new Schema({
             schedule: [new Schema({ open: Number, close: Number })]
           });
@@ -1793,19 +1769,16 @@ describe('document', function() {
           assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           assert.equal(doc.schedule[0].open, 1100);
           assert.equal(doc.schedule[0].close, 1900);
-
-          done();
         });
       });
 
       describe('when overwriting with a document instance', function() {
-        it('does not cause StackOverflows (gh-1234)', function(done) {
+        it('does not cause StackOverflows (gh-1234)', function() {
           const doc = new TestDocument({ nested: { age: 35 } });
           doc.nested = doc.nested;
           assert.doesNotThrow(function() {
             doc.nested.age;
           });
-          done();
         });
       });
     });
@@ -1816,7 +1789,7 @@ describe('document', function() {
       let val;
       let M;
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         const schema = new mongoose.Schema({ v: Number });
         schema.virtual('thang').set(function(v) {
           val = v;
@@ -1824,13 +1797,11 @@ describe('document', function() {
 
         db.deleteModel(/Test/);
         M = db.model('Test', schema);
-        done();
       });
 
-      it('works with objects', function(done) {
+      it('works with objects', function() {
         new M({ thang: {} });
         assert.deepEqual({}, val);
-        done();
       });
       it('works with arrays', function(done) {
         new M({ thang: [] });

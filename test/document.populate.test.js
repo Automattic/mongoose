@@ -200,11 +200,10 @@ describe('document.populate', function() {
       });
     });
 
-    it('are not modified when no arguments are passed', function(done) {
+    it('are not modified when no arguments are passed', function() {
       const d = new TestDocument();
       const o = utils.clone(d.options);
       assert.deepEqual(o, d.populate().options);
-      done();
     });
   });
 
@@ -498,7 +497,7 @@ describe('document.populate', function() {
     });
   });
 
-  it('depopulates when setting `_id` (gh-3308)', function(done) {
+  it('depopulates when setting `_id` (gh-3308)', function() {
     const Person = db.model('Person', {
       name: String
     });
@@ -517,8 +516,6 @@ describe('document.populate', function() {
     const buckethead = new Person({ name: 'Buckethead' });
     gnr.guitarist = buckethead._id;
     assert.ok(!gnr.populated('guitarist'));
-
-    done();
   });
 
   describe('gh-2214', function() {
@@ -799,7 +796,7 @@ describe('document.populate', function() {
     });
   });
 
-  it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
+  it('does not allow you to call populate() on nested docs (gh-4552)', function() {
     const EmbeddedSchema = new Schema({
       reference: {
         type: mongoose.Schema.ObjectId,
@@ -818,7 +815,6 @@ describe('document.populate', function() {
     assert.throws(function() {
       m.embedded.populate('reference');
     }, /on nested docs/);
-    done();
   });
 
   it('handles pulling from populated array (gh-3579)', function(done) {

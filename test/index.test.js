@@ -44,26 +44,24 @@ describe('mongoose module:', function() {
     });
   });
 
-  it('legacy pluralize by default (gh-5958)', function(done) {
+  it('legacy pluralize by default (gh-5958)', function() {
     const mongoose = new Mongoose();
 
     mongoose.model('User', new Schema({}));
 
     assert.equal(mongoose.model('User').collection.name, 'users');
-    done();
   });
 
-  it('returns legacy pluralize function by default', function(done) {
+  it('returns legacy pluralize function by default', function() {
     const legacyPluralize = require('mongoose-legacy-pluralize');
     const mongoose = new Mongoose();
 
     const pluralize = mongoose.pluralize();
 
     assert.equal(pluralize, legacyPluralize);
-    done();
   });
 
-  it('sets custom pluralize function (gh-5877)', function(done) {
+  it('sets custom pluralize function (gh-5877)', function() {
     const mongoose = new Mongoose();
 
     // some custom function of type (str: string) => string
@@ -75,7 +73,6 @@ describe('mongoose module:', function() {
 
     mongoose.model('User', new Schema({}));
     assert.equal(mongoose.model('User').collection.name, 'User');
-    done();
   });
 
   it('debug to stream (gh-7018)', function() {
@@ -100,7 +97,7 @@ describe('mongoose module:', function() {
     });
   });
 
-  it('{g,s}etting options', function(done) {
+  it('{g,s}etting options', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('runValidators', 'b');
@@ -109,17 +106,14 @@ describe('mongoose module:', function() {
     assert.equal(mongoose.get('runValidators'), 'b');
     assert.equal(mongoose.set('runValidators'), 'b');
     assert.equal(mongoose.get('useNewUrlParser'), 'c');
-    done();
   });
 
-  it('allows `const { model } = mongoose` (gh-3768)', function(done) {
+  it('allows `const { model } = mongoose` (gh-3768)', function() {
     const model = mongoose.model;
 
     model('gh3768', new Schema({ name: String }));
 
     assert.ok(mongoose.models['gh3768']);
-
-    done();
   });
 
   it('options object (gh-8144)', function() {
@@ -128,7 +122,7 @@ describe('mongoose module:', function() {
     assert.strictEqual(mongoose.options.bufferCommands, false);
   });
 
-  it('bufferCommands option (gh-5879)', function(done) {
+  it('bufferCommands option (gh-5879)', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('bufferCommands', false);
@@ -136,11 +130,9 @@ describe('mongoose module:', function() {
     const M = mongoose.model('Test', new Schema({}));
 
     assert.ok(!M.collection.buffer);
-
-    done();
   });
 
-  it('cloneSchemas option (gh-6274)', function(done) {
+  it('cloneSchemas option (gh-6274)', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('cloneSchemas', true);
@@ -156,11 +148,9 @@ describe('mongoose module:', function() {
 
     const M2 = mongoose.model('Test2', s);
     assert.ok(M2.schema === s);
-
-    done();
   });
 
-  it('objectIdGetter option (gh-6588)', function(done) {
+  it('objectIdGetter option (gh-6588)', function() {
     const mongoose = new Mongoose();
 
     let o = new mongoose.Types.ObjectId();
@@ -175,8 +165,6 @@ describe('mongoose module:', function() {
 
     o = new mongoose.Types.ObjectId();
     assert.strictEqual(o._id, o);
-
-    done();
   });
 
   it('runValidators option (gh-6865) (gh-6578)', function() {
@@ -221,7 +209,7 @@ describe('mongoose module:', function() {
       });
   });
 
-  it('toJSON options (gh-6815)', function(done) {
+  it('toJSON options (gh-6815)', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('toJSON', { virtuals: true });
@@ -243,11 +231,9 @@ describe('mongoose module:', function() {
     doc = new M2();
     assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
     assert.equal(doc.toJSON().foo, 'bar');
-
-    done();
   });
 
-  it('toObject options (gh-6815)', function(done) {
+  it('toObject options (gh-6815)', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('toObject', { virtuals: true });
@@ -259,10 +245,9 @@ describe('mongoose module:', function() {
     const doc = new M();
     assert.equal(doc.toObject().foo, 42);
     assert.strictEqual(doc.toJSON().foo, void 0);
-    done();
   });
 
-  it('strict option (gh-6858)', function(done) {
+  it('strict option (gh-6858)', function() {
     const mongoose = new Mongoose();
 
     // With strict: throw, no schema-level override
@@ -301,8 +286,6 @@ describe('mongoose module:', function() {
     assert.strictEqual(doc.$__.strictMode, false);
 
     assert.equal(doc.toObject().bar, 'baz');
-
-    done();
   });
 
   it('declaring global plugins (gh-5690)', function(done) {
@@ -437,7 +420,7 @@ describe('mongoose module:', function() {
     return Promise.resolve();
   });
 
-  it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function(done) {
+  it('top-level ObjectId, Decimal128, Mixed (gh-6760)', function() {
     const mongoose = new Mongoose();
 
     const schema = new Schema({
@@ -452,8 +435,6 @@ describe('mongoose module:', function() {
 
     assert.ok(doc.testId instanceof mongoose.Types.ObjectId);
     assert.ok(doc.testNum instanceof mongoose.Types.Decimal128);
-
-    done();
   });
 
   it('stubbing now() for timestamps (gh-6728)', function() {
@@ -582,7 +563,7 @@ describe('mongoose module:', function() {
   });
 
   describe('model()', function() {
-    it('accessing a model that hasn\'t been defined', function(done) {
+    it('accessing a model that hasn\'t been defined', function() {
       const mong = new Mongoose();
       let thrown = false;
 
@@ -594,7 +575,6 @@ describe('mongoose module:', function() {
       }
 
       assert.equal(thrown, true);
-      done();
     });
 
     it('returns the model at creation', function(done) {

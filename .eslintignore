@@ -1,7 +1,6 @@
 docs/
 bin/
 test/triage/
-test/model.discriminator.test.js
 tools/
 test/es-next/
 test/files/

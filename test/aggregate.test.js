@@ -435,7 +435,7 @@ describe('aggregate: ', function() {
         assert.throws(function() {
           aggregate.graphLookup('invalid options');
         },
-        { name: 'TypeError' });
+        TypeError);
       });
     });
 
@@ -548,7 +548,7 @@ describe('aggregate: ', function() {
         const aggregate = new Aggregate();
         assert.throws(function() {
           aggregate.sortByCount(1);
-        }, { name: 'TypeError' });
+        }, TypeError);
       });
     });
   });

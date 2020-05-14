@@ -1741,14 +1741,13 @@ describe('schema', function() {
       done();
     });
 
-    it('methods named toString (gh-4551)', function(done) {
+    it('methods named toString (gh-4551)', function() {
       this.schema.methods.toString = function() {
         return 'test';
       };
-      assert.doesNotThrow(function() {
+      assert.doesNotThrow(() => {
         mongoose.model('gh4551', this.schema);
       });
-      done();
     });
 
     it('handles default value = 0 (gh-4620)', function(done) {

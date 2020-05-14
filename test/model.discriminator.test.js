@@ -251,9 +251,10 @@ describe('model', function() {
         department: String
       }, { id: false });
 
-      // Should not throw
-      var Person = db.model('Test1', PersonSchema);
-      Person.discriminator('Boss', BossSchema);
+      assert.doesNotThrow(function () {
+        var Person = db.model('Test1', PersonSchema);
+        Person.discriminator('Boss', BossSchema);
+      });
       done();
     });
 
@@ -442,10 +443,9 @@ describe('model', function() {
             somethingElse: {type: String}
           });
 
-          // Should not throw
-          const SubModel = Model.discriminator('TestSub', subSchema);
-
-          return Promise.resolve();
+          assert.doesNotThrow(function(){
+            Model.discriminator('TestSub', subSchema);
+          })
         });
       });
 
@@ -614,8 +614,10 @@ describe('model', function() {
 
         var Person = db.model('Person', personSchema);
         var Parent = Person.discriminator('Parent', parentSchema.clone());
-        // Should not throw
-        var Parent2 = Person.discriminator('Parent2', parentSchema.clone());
+        
+        assert.doesNotThrow(function () {
+         Person.discriminator('Parent2', parentSchema.clone());
+        });
         done();
       });
 
@@ -756,7 +758,6 @@ describe('model', function() {
           info: 'AAAAAAAAAAAAAAAAAAAAAAAA',
         });
 
-        // Should not throw
         assert.ifError(d1.validateSync());
 
         done();

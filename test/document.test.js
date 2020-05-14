@@ -4457,8 +4457,9 @@ describe('document', function() {
           return Test.findById(doc._id);
         }).
         then(function(doc) {
-          // Should not throw
-          require('util').inspect(doc);
+          assert.doesNotThrow(function() {
+            require('util').inspect(doc);
+          });
           done();
         }).
         catch(done);
@@ -4988,8 +4989,9 @@ describe('document', function() {
 
       assert.deepEqual(doc.toObject({ virtuals: true }).tests, ['a', 'b']);
 
-      // Should not throw
-      require('util').inspect(doc);
+      assert.doesNotThrow(function() {
+        require('util').inspect(doc);
+      });
       JSON.stringify(doc);
 
       done();
@@ -7389,7 +7391,9 @@ describe('document', function() {
 
     assert.equal(cu.profile.name, 'foo');
     assert.equal(cu.profile.email, 'bar');
-    cu.toObject(); // shouldn't throw
+    assert.doesNotThrow(function() {
+      cu.toObject();
+    });
   });
 
   it('setting single nested subdoc with custom date types and getters/setters (gh-7601)', function() {

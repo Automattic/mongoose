@@ -148,7 +148,9 @@ describe('mongoose module:', function() {
     const s = new Schema({});
     const M = mongoose.model('Test', s);
     assert.ok(M.schema !== s);
-    mongoose.model('Test', M.schema); // Shouldn't throw
+    assert.doesNotThrow(function() {
+      mongoose.model('Test', M.schema);
+    });
 
     mongoose.set('cloneSchemas', false);
 

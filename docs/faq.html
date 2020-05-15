@@ -18,6 +18,7 @@
   <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
 </div>
 
+
 <hr id="array-changes-not-saved" />
 
 <p><a href="#array-changes-not-saved"><strong>Q</strong></a>. Why don&#39;t my changes to arrays get saved when I update an element
@@ -316,15 +317,6 @@ validating, and then subsequently invalidating the same path.</p>
 <p><a href="#objectid-validation"><strong>Q</strong></a>. Why is <strong>any</strong> 12 character string successfully cast to an ObjectId?</p>
 <p><strong>A</strong>. Technically, any 12 character string is a valid <a href="https://docs.mongodb.com/manual/reference/bson-types/#objectid">ObjectId</a>.
 Consider using a regex like <code>/^[a-f0-9]{24}$/</code> to test whether a string is exactly 24 hex characters.</p>
-<hr id="slow-localhost" />
-
-<p><a href="#slow-localhost"><strong>Q</strong></a>. I&#39;m connecting to <code>localhost</code> and it takes me nearly 1 second to connect. How do I fix this?</p>
-<p><strong>A</strong>. The underlying MongoDB driver defaults to looking for IPv6 addresses, so the most likely cause is that your <code>localhost</code> DNS mapping isn&#39;t configured to handle IPv6. Use <code>127.0.0.1</code> instead of <code>localhost</code> or use the <code>family</code> option as shown in the <a href="https://mongoosejs.com/docs/connections.html#options">connection docs</a>.</p>
-<pre><code class="language-javascript"><span class="hljs-comment">// One alternative is to bypass 'localhost'</span>
-mongoose.connect(<span class="hljs-string">'mongodb://127.0.0.1:27017/test'</span>);
-<span class="hljs-comment">// Another option is to specify the `family` option, which tells the</span>
-<span class="hljs-comment">// MongoDB driver to only look for IPv4 addresses rather than IPv6 first.</span>
-mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/test'</span>, { family: <span class="hljs-number">4</span> });</code></pre>
 <hr id="map-keys-strings" />
 
 <p><a href="#map-keys-strings"><strong>Q</strong></a>. Why do keys in Mongoose Maps have to be strings?</p>

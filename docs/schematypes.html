@@ -290,7 +290,7 @@ constructor or the string <code>&#39;Number&#39;</code>.</p>
 call it and assign the returned value to the path.</p>
 <p>The values <code>null</code> and <code>undefined</code> are not cast.</p>
 <p>NaN, strings that cast to NaN, arrays, and objects that don&#39;t have a <code>valueOf()</code> function
-will all result in a <a href="/docs/api.html#mongooseerror_MongooseError.CastError">CastError</a>.</p>
+will all result in a <a href="/docs/validation.html#cast-errors">CastError</a> once validated, meaning that it will not throw on initialization, only when validated.</p>
 <h4 id="dates">Dates</h4>
 
 <p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Built-in <code>Date</code> methods</a> are <a href="https://github.com/Automattic/mongoose/issues/1598"><strong>not</strong> hooked into</a> the mongoose change tracking logic which in English means that if you use a <code>Date</code> in your document and modify it with a method like <code>setMonth()</code>, mongoose will be unaware of this change and <code>doc.save()</code> will not persist this modification. If you must modify <code>Date</code> types using built-in methods, tell mongoose about the change with <code>doc.markModified(&#39;pathToYourDate&#39;)</code> before saving.</p>
@@ -383,7 +383,7 @@ By default, Mongoose casts the below values to <code>true</code>:</p>
 <li><code>&#39;0&#39;</code></li>
 <li><code>&#39;no&#39;</code></li>
 </ul>
-<p>Any other value causes a <a href="/docs/api.html#mongooseerror_MongooseError.CastError">CastError</a>.
+<p>Any other value causes a <a href="/docs/validation.html#cast-errors">CastError</a>.
 You can modify what values Mongoose converts to true or false using the
 <code>convertToTrue</code> and <code>convertToFalse</code> properties, which are <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">JavaScript sets</a>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ b: <span class="hljs-built_in">Boolean</span> }));

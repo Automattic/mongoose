@@ -47,7 +47,7 @@ doc <span class="hljs-keyword">instanceof</span> mongoose.Document; <span class=
 JavaScript assignments and Mongoose will convert it into <a href="https://docs.mongodb.com/manual/reference/operator/update/">MongoDB update operators</a>.</p>
 <pre><code class="language-javascript">doc.name = <span class="hljs-string">'foo'</span>;
 
-<span class="hljs-comment">// Mongoose sends a `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`</span>
+<span class="hljs-comment">// Mongoose sends an `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`</span>
 <span class="hljs-comment">// to MongoDB.</span>
 <span class="hljs-keyword">await</span> doc.save();</code></pre>
 <p>If the document with the corresponding <code>_id</code> is not found, Mongoose will
@@ -71,7 +71,7 @@ with casting, <a href="middleware.html#notes">middleware</a>, and <a href="valid
 execute <code>save()</code> middleware. If you need save middleware and full validation,
 first query for the document and then <code>save()</code> it.</em></p>
 <h3 id="validating">Validating</h3>
-<p>Documents are casted validated before they are saved. Mongoose first casts
+<p>Documents are casted and validated before they are saved. Mongoose first casts
 values to the specified type and then validates them. Internally, Mongoose
 calls the document&#39;s <a href="api.html#document_Document-validate"><code>validate()</code> method</a>
 before saving.</p>

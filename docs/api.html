@@ -775,7 +775,6 @@ schema.static(<span class="hljs-string">'findByName'</span>, <span class="hljs-f
 <li>_posts</li>
 <li>_pres</li>
 <li>collection</li>
-<li>db</li>
 <li>emit</li>
 <li>errors</li>
 <li>get</li>
@@ -1381,7 +1380,7 @@ doc.populate(options).execPopulate() <span class="hljs-comment">// executed, ret
 </li></ul><li class="param">[fn]
 <span class="method-type">&laquo;Function&raquo;</span> optional callback</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,undefined&raquo;</span> Returns undefined if used with callback or a Promise otherwise.</p>
-</li></ul><div><p>Saves this document.</p>
+</li></ul><div><p>Saves this document by inserting a new document into the database if <a href="/docs/api.html#document_Document-isNew">document.isNew</a> is <code>true</code>, or sends an <a href="/docs/api.html#document_Document-updateOne">updateOne</a> operation <strong>only</strong> with the modifications to the database, it does not replace the whole document in the latter case.</p>
 
 <h4>Example:</h4>
 
@@ -2831,7 +2830,7 @@ doc.model(<span class="hljs-string">'User'</span>).findById(id, callback);</code
 </li></ul><li class="param">[fn]
 <span class="method-type">&laquo;Function&raquo;</span> optional callback</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,undefined&raquo;</span> Returns undefined if used with callback or a Promise otherwise.</p>
-</li></ul><div><p>Saves this document.</p>
+</li></ul><div><p>Saves this document by inserting a new document into the database if <a href="/docs/api.html#document_Document-isNew">document.isNew</a> is <code>true</code>, or sends an <a href="/docs/api.html#document_Document-updateOne">updateOne</a> operation <strong>only</strong> with the modifications to the database, it does not replace the whole document in the latter case.</p>
 
 <h4>Example:</h4>
 

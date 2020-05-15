@@ -577,7 +577,7 @@ describe('mongoose module:', function() {
       assert.equal(thrown, true);
     });
 
-    it('returns the model at creation', function(done) {
+    it('returns the model at creation', function() {
       const Named = mongoose.model('Named', new Schema({ name: String }));
       const n1 = new Named();
       assert.equal(n1.name, null);
@@ -588,7 +588,6 @@ describe('mongoose module:', function() {
       const Numbered = mongoose.model('Numbered', schema, collection);
       const n3 = new Numbered({ number: 1234 });
       assert.equal(n3.number.valueOf(), 1234);
-      done();
     });
 
     it('prevents overwriting pre-existing models', function(done) {
@@ -616,7 +615,7 @@ describe('mongoose module:', function() {
       done();
     });
 
-    it('allows passing identical name+schema+collection args (gh-5767)', function(done) {
+    it('allows passing identical name+schema+collection args (gh-5767)', function() {
       const m = new Mongoose;
       const schema = new Schema;
       const model = m.model('A', schema, 'AA');
@@ -626,16 +625,12 @@ describe('mongoose module:', function() {
       });
 
       assert.equal(model, m.model('A', model.schema, 'AA'));
-
-      done();
     });
 
-    it('throws on unknown model name', function(done) {
+    it('throws on unknown model name', function() {
       assert.throws(function() {
         mongoose.model('iDoNotExist!');
       }, /Schema hasn't been registered/);
-
-      done();
     });
 
     describe('passing collection name', function() {
@@ -734,14 +729,12 @@ describe('mongoose module:', function() {
       assert.equal(typeof mongoose.Error.VersionError, 'function');
     }
 
-    it('of module', function(done) {
+    it('of module', function() {
       test(mongoose);
-      done();
     });
 
-    it('of new Mongoose instances', function(done) {
+    it('of new Mongoose instances', function() {
       test(new mongoose.Mongoose);
-      done();
     });
 
     it('of result from .connect() (gh-3940)', function(done) {

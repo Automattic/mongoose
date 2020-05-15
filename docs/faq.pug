@@ -429,19 +429,6 @@ block content
     **A**. Technically, any 12 character string is a valid [ObjectId](https://docs.mongodb.com/manual/reference/bson-types/#objectid).
     Consider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exactly 24 hex characters.
 
-    <hr id="slow-localhost" />
-
-    <a href="#slow-localhost">**Q**</a>. I'm connecting to `localhost` and it takes me nearly 1 second to connect. How do I fix this?
-
-    **A**. The underlying MongoDB driver defaults to looking for IPv6 addresses, so the most likely cause is that your `localhost` DNS mapping isn't configured to handle IPv6. Use `127.0.0.1` instead of `localhost` or use the `family` option as shown in the [connection docs](https://mongoosejs.com/docs/connections.html#options).
-
-    ```javascript
-    // One alternative is to bypass 'localhost'
-    mongoose.connect('mongodb://127.0.0.1:27017/test');
-    // Another option is to specify the `family` option, which tells the
-    // MongoDB driver to only look for IPv4 addresses rather than IPv6 first.
-    mongoose.connect('mongodb://localhost:27017/test', { family: 4 });
-    ```
 
     <hr id="map-keys-strings" />
 

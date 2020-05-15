@@ -348,7 +348,7 @@ block content
     The values `null` and `undefined` are not cast.
 
     NaN, strings that cast to NaN, arrays, and objects that don't have a `valueOf()` function
-    will all result in a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError) once validated, meaning that it will not throw on initialization, only when validated.
+    will all result in a [CastError](/docs/validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated.
 
     <h4 id="dates">Dates</h4>
 
@@ -472,7 +472,7 @@ block content
     * `'0'`
     * `'no'`
 
-    Any other value causes a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError).
+    Any other value causes a [CastError](/docs/validation.html#cast-errors).
     You can modify what values Mongoose converts to true or false using the
     `convertToTrue` and `convertToFalse` properties, which are [JavaScript sets](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set).
 

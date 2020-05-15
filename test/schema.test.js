@@ -1438,12 +1438,6 @@ describe('schema', function() {
 
       assert.throws(function() {
         new Schema({
-          db: String
-        });
-      }, /`db` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
           isNew: String
         });
       }, /`isNew` may not be used as a schema pathname/);
@@ -2413,21 +2407,21 @@ describe('schema', function() {
 
   describe('Schema.reserved (gh-8869)', function() {
     it('throws errors on compiling schema with reserved key as a flat type', function() {
-      const buildInvalidSchema = () => new Schema({ db: String });
+      const buildInvalidSchema = () => new Schema({ save: String });
 
-      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
+      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
 
     it('throws errors on compiling schema with reserved key as a nested object', function() {
-      const buildInvalidSchema = () => new Schema({ db: { nested: String } });
+      const buildInvalidSchema = () => new Schema({ save: { nested: String } });
 
-      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
+      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
 
     it('throws errors on compiling schema with reserved key as a nested array', function() {
-      const buildInvalidSchema = () => new Schema({ db: [{ nested: String }] });
+      const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
 
-      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
+      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
   });
 });

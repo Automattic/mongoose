@@ -1196,7 +1196,7 @@ describe('schema', function() {
   });
 
   describe('#add()', function() {
-    it('does not polute existing paths', function(done) {
+    it('does not pollute existing paths', function(done) {
       let o = { name: String };
       let s = new Schema(o);
 
@@ -2423,5 +2423,14 @@ describe('schema', function() {
 
       assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
+  });
+
+  it('treats dotted paths with no parent as a nested path (gh-9020)', function() {
+    const customerSchema = new Schema({
+      'card.brand': String,
+      'card.last4': String
+    });
+
+    assert.ok(customerSchema.nested['card']);
   });
 });

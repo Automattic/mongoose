@@ -346,7 +346,7 @@ describe('timestamps', function() {
     }, { timestamps: true });
     const schema = Schema({ products: [ProductSchema] }, { timestamps: true });
     const Order = db.model('Order', schema);
-  
+
     const update = {
       products: [{
         name: 'ASUS Vivobook Pro',

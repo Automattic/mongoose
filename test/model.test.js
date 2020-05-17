@@ -4528,6 +4528,42 @@ describe('Model', function() {
       }
     });
 
+    it('insertMany() `writeErrors` if only one error (gh-8938)', function() {
+      const QuestionType = new mongoose.Schema({
+        code: { type: String, required: true, unique: true },
+        text: String
+      });
+      const Question = db.model('Test', QuestionType);
+
+      return co(function*() {
+        yield Question.init();
+
+        yield Question.create({ code: 'MEDIUM', text: '123' });
+        const data = [
+          { code: 'MEDIUM', text: '1111' },
+          { code: 'test', text: '222' },
+          { code: 'HARD', text: '2222' }
+        ];
+        const opts = { ordered: false, rawResult: true };
+        let err = yield Question.insertMany(data, opts).catch(err => err);
+        assert.ok(Array.isArray(err.writeErrors));
+        assert.equal(err.writeErrors.length, 1);
+        assert.equal(err.insertedDocs.length, 2);
+        assert.equal(err.insertedDocs[0].code, 'test');
+        assert.equal(err.insertedDocs[1].code, 'HARD');
+
+        yield Question.deleteMany({});
+        yield Question.create({ code: 'MEDIUM', text: '123' });
+        yield Question.create({ code: 'HARD', text: '123' });
+
+        err = yield Question.insertMany(data, opts).catch(err => err);
+        assert.ok(Array.isArray(err.writeErrors));
+        assert.equal(err.writeErrors.length, 2);
+        assert.equal(err.insertedDocs.length, 1);
+        assert.equal(err.insertedDocs[0].code, 'test');
+      });
+    });
+
     it('insertMany() ordered option for single validation error', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {
@@ -5636,6 +5672,39 @@ describe('Model', function() {
           assert.equal(userAfterUpdate.name, 'Hafez', 'Document data is not wiped if no update object is provided.');
         });
       });
+
+      it('casts according to child discriminator if `discriminatorKey` is present (gh-8982)', function() {
+        return co(function*() {
+          const Person = db.model('Person', { name: String });
+          Person.discriminator('Worker', new Schema({ age: Number }));
+
+
+          yield Person.create([
+            { __t: 'Worker', name: 'Hafez1', age: '5' },
+            { __t: 'Worker', name: 'Hafez2', age: '10' },
+            { __t: 'Worker', name: 'Hafez3', age: '15' },
+            { __t: 'Worker', name: 'Hafez4', age: '20' },
+            { __t: 'Worker', name: 'Hafez5', age: '25' }
+          ]);
+
+          yield Person.bulkWrite([
+            { updateOne: { filter: { __t: 'Worker', age: '5' }, update: { age: '6' } } },
+            { updateMany: { filter: { __t: 'Worker', age: '10' }, update: { age: '11' } } },
+            { replaceOne: { filter: { __t: 'Worker', age: '15' }, replacement: { name: 'Hafez3', age: '16' } } },
+            { deleteOne: { filter: { __t: 'Worker', age: '20' } } },
+            { deleteMany: { filter: { __t: 'Worker', age: '25' } } },
+            { insertOne: { document: { __t: 'Worker', name: 'Hafez6', age: '30' } } }
+          ]);
+
+          const people = yield Person.find().sort('name');
+
+          assert.equal(people.length, 4);
+          assert.equal(people[0].age, 6);
+          assert.equal(people[1].age, 11);
+          assert.equal(people[2].age, 16);
+          assert.equal(people[3].age, 30);
+        });
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {
@@ -6688,6 +6757,15 @@ describe('Model', function() {
       assert.equal(usersAfterUpdate[0].notInSchema, 'first');
       assert.equal(usersAfterUpdate[1].notInSchema, 'second');
       assert.equal(usersAfterUpdate[2].notInSchema, 'third');
+    });
+  });
+
+  it('cast errors have `kind` field (gh-8953)', function() {
+    return co(function*() {
+      const User = db.model('User', {});
+      const err = yield User.findOne({ _id: 'invalid' }).then(() => null, err => err);
+
+      assert.deepEqual(err.kind, 'ObjectId');
     });
   });
 

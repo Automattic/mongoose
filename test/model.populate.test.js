@@ -9292,7 +9292,7 @@ describe('model: populate:', function() {
           { title: 'test3', user: new mongoose.Types.ObjectId() }
         ]);
 
-        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).lean();
+        const posts = yield Post.find().populate({ path: 'user', options: { clone: true } }).sort('title').lean();
 
         posts[0].user.name = 'val2';
         assert.equal(posts[1].user.name, 'val');
@@ -9352,6 +9352,58 @@ describe('model: populate:', function() {
         const result = yield EventsList.findOne().populate('events.productId');
         assert.equal(result.events[1].productId.name, 'GTX 1050 Ti');
       });
+    });
+
+    it('can populate virtuals defined on child discriminators (gh-8924)', function() {
+      return co(function*() {
+        const User = db.model('User', {});
+        const Post = db.model('Post', { name: String });
+
+        const userWithPostSchema = new Schema({ postId: Schema.ObjectId });
+
+        userWithPostSchema.virtual('post', { ref: 'Post', localField: 'postId', foreignField: '_id', justOne: true });
+
+        const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
+
+        const post = yield Post.create({ name: 'Clean Code' });
+
+        yield UserWithPost.create({ postId: post._id });
+
+        const user = yield User.findOne().populate({ path: 'post' });
+
+
+        assert.equal(user.post.name, 'Clean Code');
+      });
+    });
+  });
+
+  it('no-op if populating on a document array with no ref (gh-8946)', function() {
+    const teamSchema = Schema({
+      members: [{ user: { type: ObjectId, ref: 'User' } }]
+    });
+    const userSchema = Schema({ name: { type: String } });
+    userSchema.virtual('teams', {
+      ref: 'Team',
+      localField: '_id',
+      foreignField: 'members.user',
+      justOne: false
+    });
+    const User = db.model('User', userSchema);
+    const Team = db.model('Team', teamSchema);
+
+    return co(function*() {
+      const user = yield User.create({ name: 'User' });
+      yield Team.create({ members: [{ user: user._id }] });
+
+      const res = yield User.findOne().populate({
+        path: 'teams',
+        populate: {
+          path: 'members', // No ref
+          populate: { path: 'user' }
+        }
+      });
+
+      assert.equal(res.teams[0].members[0].user.name, 'User');
     });
   });
 });

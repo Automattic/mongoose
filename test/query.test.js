@@ -3749,4 +3749,21 @@ describe('Query', function() {
       assert.equal(user.age, 25);
     });
   });
+
+  it('casts update object according to child discriminator schema when `discriminatorKey` is present (gh-8982)', function() {
+    const userSchema = new Schema({ }, { discriminatorKey: 'kind' });
+    const Person = db.model('Person', userSchema);
+
+    return co(function*() {
+      const Worker = Person.discriminator('Worker', new Schema({ locations: [String] }));
+      const worker = yield Worker.create({ locations: ['US'] });
+
+      // should cast `update` according to `Worker` schema
+      yield Person.updateOne({ _id: worker._id, kind: 'Worker' }, { $push: { locations: 'UK' } });
+
+      const person = yield Person.findOne({ _id: worker._id });
+
+      assert.deepEqual(person.locations, ['US', 'UK']);
+    });
+  });
 });

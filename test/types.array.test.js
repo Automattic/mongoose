@@ -1780,8 +1780,19 @@ describe('types array', function() {
         // undefined is not allowed
         m = new M({ x: [1, undefined, 3] });
         m.save(function(err) {
-          assert.ok(err);
-          done();
+          assert.ifError(err);
+
+          m.x = [1,, 3];
+          m.save(function(err) {
+            assert.ifError(err);
+            assert.strictEqual(m.x[1], void 0);
+            m.x.set(1, 2);
+            m.save(function(err) {
+              assert.ifError(err);
+              assert.deepEqual(m.toObject().x, [1, 2, 3]);
+              done();
+            });
+          });
         });
       });
     });

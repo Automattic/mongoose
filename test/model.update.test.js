@@ -296,7 +296,7 @@ describe('model: update:', function() {
         $set: { date: (new Date).getTime() } // check for single val casting
       };
 
-      BlogPost.update({ _id: post._id, 'comments.body': 'been there' }, update, function(err) {
+      BlogPost.update({ _id: post._id, 'comments.body': 'been there' }, update, { strict: false }, function(err) {
         assert.ifError(err);
         BlogPost.findById(post, function(err, ret) {
           assert.ifError(err);
@@ -1654,29 +1654,6 @@ describe('model: update:', function() {
         then(doc => {
           assert.equal(doc.name, 'Val');
         });
-    });
-
-    it('nested schemas with strict false (gh-3883)', function(done) {
-      const OrderSchema = new mongoose.Schema({
-      }, { strict: false, _id: false });
-
-      const SeasonSchema = new mongoose.Schema({
-        regions: [OrderSchema]
-      }, { useNestedStrict: true });
-
-      const Season = db.model('Test', SeasonSchema);
-      const obj = { regions: [{ r: 'test', action: { order: 'hold' } }] };
-      Season.create(obj, function(error) {
-        assert.ifError(error);
-        const query = { 'regions.r': 'test' };
-        const update = { $set: { 'regions.$.action': { order: 'move' } } };
-        const opts = { new: true };
-        Season.findOneAndUpdate(query, update, opts, function(error, doc) {
-          assert.ifError(error);
-          assert.equal(doc.toObject().regions[0].action.order, 'move');
-          done();
-        });
-      });
     });
 
     it('middleware update with exec (gh-3549)', function(done) {
@@ -3339,7 +3316,7 @@ describe('model: updateOne: ', function() {
     });
   });
 
-  it('respects useNestedStrict: false when updating a single nested path (gh-8735)', function() {
+  it('allows overriding child strict mode with top-level strict (gh-8961)', function() {
     const emptySchema = Schema({}, {
       strict: false,
       _id: false,
@@ -3349,13 +3326,38 @@ describe('model: updateOne: ', function() {
     const testSchema = Schema({
       test: String,
       nested: emptySchema
-    }, { strict: true, versionKey: false, useNestedStrict: false });
+    }, { strict: true, versionKey: false });
     const Test = db.model('Test', testSchema);
 
+    return co(function*() {
+      const filter = { test: 'foo' };
+      let update = { nested: { notInSchema: 'bar' } };
+
+      yield Test.deleteMany({});
+      yield Test.updateOne(filter, update, { upsert: true });
+      let doc = yield Test.findOne({ test: 'foo' });
+      assert.equal(doc.get('nested.notInSchema'), 'bar');
+
+      yield Test.deleteMany({});
+      yield Test.updateOne(filter, update, { upsert: true, strict: true });
+      doc = yield Test.findOne({ test: 'foo' });
+      assert.equal(doc.get('nested.notInSchema'), void 0);
+
+      update = { 'nested.notInSchema': 'baz' };
+      yield Test.updateOne(filter, update, { upsert: true });
+      doc = yield Test.findOne({ test: 'foo' });
+      assert.equal(doc.get('nested.notInSchema'), 'baz');
+
+      update = { 'nested.notInSchema': 'foo' };
+      yield Test.updateOne(filter, update, { upsert: true, strict: true });
+      doc = yield Test.findOne({ test: 'foo' });
+      assert.equal(doc.get('nested.notInSchema'), 'baz');
+    });
+
     const update = { nested: { notInSchema: 'bar' } };
-    return Test.updateOne({ test: 'foo' }, update, { upsert: true }).
+    return Test.updateOne({ test: 'foo' }, update, { upsert: true, strict: true }).
       then(() => Test.collection.findOne()).
-      then(doc => assert.strictEqual(doc.nested.notInSchema, void 0));
+      then(doc => assert.strictEqual(doc.nested.notInSchema, 'bar'));
   });
 
   describe('mongodb 42 features', function() {

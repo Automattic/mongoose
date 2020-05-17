@@ -569,7 +569,6 @@ describe('QueryCursor', function() {
 
       yield User.create([{ order: 1 }, { order: 2 }, { order: 3 }]);
 
-
       const docsWithIndexes = [];
 
       yield User.find().sort('order').cursor().eachAsync((doc, i) => {

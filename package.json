@@ -1,13 +1,19 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "3.9.7",
+  "version": "3.9.8",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
   "license": "MIT",
   "dependencies": {
     "hooks": "0.3.2",
-    "mongodb": "1.4.12",
+    "bson": "git+ssh://git@github.com/aemonge/js-bson.git#0.2.23",
+    "mongodb": {
+      "version": "1.4.12",
+      "dependencies": {
+        "bson": "git+ssh://git@github.com/aemonge/js-bson.git#0.2.23"
+      }
+    },
     "ms": "0.1.0",
     "sliced": "0.0.5",
     "muri": "0.3.1",

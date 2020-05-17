@@ -4528,6 +4528,37 @@ describe('Model', function() {
       }
     });
 
+    it('insertMany() `writeErrors` if only one error (gh-8938)', function() {
+      const QuestionType = new mongoose.Schema({
+        code: { type: String, required: true, unique: true },
+        text: String
+      });
+      const Question = db.model('Test', QuestionType);
+
+      return co(function*() {
+        yield Question.init();
+
+        yield Question.create({ code: 'MEDIUM', text: '123' });
+        const data = [
+          { code: 'MEDIUM', text: '1111' },
+          { code: 'test', text: '222' },
+          { code: 'HARD', text: '2222' }
+        ];
+        const opts = { ordered: false, rawResult: true };
+        let err = yield Question.insertMany(data, opts).catch(err => err);
+        assert.ok(Array.isArray(err.writeErrors));
+        assert.equal(err.writeErrors.length, 1);
+
+        yield Question.deleteMany({});
+        yield Question.create({ code: 'MEDIUM', text: '123' });
+        yield Question.create({ code: 'HARD', text: '123' });
+
+        err = yield Question.insertMany(data, opts).catch(err => err);
+        assert.ok(Array.isArray(err.writeErrors));
+        assert.equal(err.writeErrors.length, 2);
+      });
+    });
+
     it('insertMany() ordered option for single validation error', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {

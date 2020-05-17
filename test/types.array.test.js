@@ -1782,7 +1782,7 @@ describe('types array', function() {
         m.save(function(err) {
           assert.ifError(err);
 
-          m.x = [1,, 3];
+          m.x = [1,, 3]; // eslint-disable-line no-sparse-arrays
           m.save(function(err) {
             assert.ifError(err);
             assert.strictEqual(m.x[1], void 0);

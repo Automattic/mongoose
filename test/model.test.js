@@ -4548,6 +4548,9 @@ describe('Model', function() {
         let err = yield Question.insertMany(data, opts).catch(err => err);
         assert.ok(Array.isArray(err.writeErrors));
         assert.equal(err.writeErrors.length, 1);
+        assert.equal(err.insertedDocs.length, 2);
+        assert.equal(err.insertedDocs[0].code, 'test');
+        assert.equal(err.insertedDocs[1].code, 'HARD');
 
         yield Question.deleteMany({});
         yield Question.create({ code: 'MEDIUM', text: '123' });
@@ -4556,6 +4559,8 @@ describe('Model', function() {
         err = yield Question.insertMany(data, opts).catch(err => err);
         assert.ok(Array.isArray(err.writeErrors));
         assert.equal(err.writeErrors.length, 2);
+        assert.equal(err.insertedDocs.length, 1);
+        assert.equal(err.insertedDocs[0].code, 'test');
       });
     });
 

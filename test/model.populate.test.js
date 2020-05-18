@@ -9378,4 +9378,34 @@ describe('model: populate:', function() {
       });
     });
   });
+
+  it('no-op if populating on a document array with no ref (gh-8946)', function() {
+    const teamSchema = Schema({
+      members: [{ user: { type: ObjectId, ref: 'User' } }]
+    });
+    const userSchema = Schema({ name: { type: String } });
+    userSchema.virtual('teams', {
+      ref: 'Team',
+      localField: '_id',
+      foreignField: 'members.user',
+      justOne: false
+    });
+    const User = db.model('User', userSchema);
+    const Team = db.model('Team', teamSchema);
+
+    return co(function*() {
+      const user = yield User.create({ name: 'User' });
+      yield Team.create({ members: [{ user: user._id }] });
+
+      const res = yield User.findOne().populate({
+        path: 'teams',
+        populate: {
+          path: 'members', // No ref
+          populate: { path: 'user' }
+        }
+      });
+
+      assert.equal(res.teams[0].members[0].user.name, 'User');
+    });
+  });
 });

@@ -337,4 +337,31 @@ describe('timestamps', function() {
     });
   });
 
+  it('sets timestamps on deeply nested docs on upsert (gh-8894)', function() {
+    const JournalSchema = Schema({ message: String }, { timestamps: true });
+    const ProductSchema = Schema({
+      name: String,
+      journal: [JournalSchema],
+      lastJournal: JournalSchema
+    }, { timestamps: true });
+    const schema = Schema({ products: [ProductSchema] }, { timestamps: true });
+    const Order = db.model('Order', schema);
+
+    const update = {
+      products: [{
+        name: 'ASUS Vivobook Pro',
+        journal: [{ message: 'out of stock' }],
+        lastJournal: { message: 'out of stock' }
+      }]
+    };
+
+    return Order.findOneAndUpdate({}, update, { upsert: true, new: true }).
+      then(doc => {
+        assert.ok(doc.products[0].journal[0].createdAt);
+        assert.ok(doc.products[0].journal[0].updatedAt);
+
+        assert.ok(doc.products[0].lastJournal.createdAt);
+        assert.ok(doc.products[0].lastJournal.updatedAt);
+      });
+  });
 });

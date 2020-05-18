@@ -1,3 +1,19 @@
+5.9.15 / 2020-05-18
+===================
+ * fix(schema): treat creating dotted path with no parent as creating a nested path #9020
+ * fix(documentarray): make sure you can call `unshift()` after `map()` #9012 [philippejer](https://github.com/philippejer)
+ * fix(model): cast bulkwrite according to discriminator schema if discriminator key is present #8982 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): remove `db` from reserved keywords #8940
+ * fix(populate): treat populating a doc array that doesn't have a `ref` as a no-op #8946
+ * fix(timestamps): set createdAt and updatedAt on doubly nested subdocs when upserting #8894
+ * fix(model): allow POJOs as schemas for model.discriminator(...) #8991 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): report `insertedDocs` on `insertMany()` errors #8938
+ * fix(model): ensure consistent `writeErrors` property on insertMany error with `ordered: false`, even if only one op failed #8938
+ * docs: add anchor tag to strictQuery and strict #9014 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(faq): remove faq ipv6 #9004
+ * docs: add note about throwing error only after validation and fix broken reference to api/CastError #8993 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix typos in documents.pug #9005 [dandv](https://github.com/dandv)
+
 5.9.14 / 2020-05-13
 ===================
  * fix(cursor): add index as second parameter to eachAsync callback #8972 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

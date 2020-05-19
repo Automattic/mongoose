@@ -475,8 +475,9 @@ describe('schema options.timestamps', function() {
         preValidateTimeout: Number,
         preSaveTimeout: Number
       }, {
-        timestamps: true,
-        useMongoTimestamp: true
+        timestamps: {
+          useMongoTimestamp: true
+        }
       });
       setPreValidateHook(schema);
       setPreSaveHook(schema);
@@ -504,8 +505,11 @@ describe('schema options.timestamps', function() {
       const schema = Schema({
         name: String
       }, {
-        timestamps: { updatedAt: 'lastModified', createdAt: 'createdAt' },
-        useMongoTimestamp: true
+        timestamps: {
+          updatedAt: 'lastModified',
+          createdAt: 'createdAt',
+          useMongoTimestamp: true
+        }
       });
       const Model = conn.model('Test3', schema);
 

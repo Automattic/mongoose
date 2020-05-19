@@ -6760,8 +6760,8 @@ describe('Model', function() {
       ]);
 
       const users = yield User.find().lean();
-      assert(typeof users[0].updatedAt === 'number');
-      assert(typeof users[1].updatedAt === 'number');
+      assert.equal(typeof users[0].updatedAt, 'number');
+      assert.equal(typeof users[1].updatedAt, 'number');
 
       // not-lean queries casts to number even if stored on DB as a date
       assert.equal(users[0] instanceof User, false);

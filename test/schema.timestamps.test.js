@@ -527,5 +527,35 @@ describe('schema options.timestamps', function() {
           });
       });
     });
+
+    it('works with updateOne (via applyTimestamptsToUpdate and all other ops that use it)', function() {
+      const schema = Schema({
+        name: String
+      }, {
+        timestamps: {
+          updatedAt: 'lastModified',
+          createdAt: 'createdAt',
+          useMongoTimestamp: true
+        }
+      });
+      const Model = conn.model('Test4', schema);
+
+      const doc = new Model();
+      doc.name = 'test';
+      return doc.save().then(doc => {
+        return Model
+          .findOne({ _id: doc._id })
+          .then(doc => {
+            const prevLastModified = doc.lastModified;
+            return Model.updateOne({ _id: doc._id }, { name: 'some change' })
+              .then(() => {
+                return Model.findOne({ _id: doc._id }, 'lastModified')
+                  .then(doc => {
+                    assert.ok(doc.lastModified.getTime() > prevLastModified.getTime());
+                  });
+              });
+          });
+      });
+    });
   });
 });

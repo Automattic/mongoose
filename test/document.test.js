@@ -9001,7 +9001,7 @@ describe('document', function() {
     });
   });
 
-  it('Sets default when passing undefined as value for a key in a nested subdoc (gh-????)', function() {
+  it('Sets default when passing undefined as value for a key in a nested subdoc (gh-9039)', function() {
     const Test = db.model('Test', {
       nested: {
         prop: {

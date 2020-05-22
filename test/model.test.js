@@ -6769,4 +6769,40 @@ describe('Model', function() {
     });
   });
 
+  it('casts bulkwrite timestamps to `Number` when specified (gh-9030)', function() {
+    return co(function* () {
+      const userSchema = new Schema({
+        name: String,
+        updatedAt: Number
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      yield User.create([{ name: 'user1' }, { name: 'user2' }]);
+
+      yield User.bulkWrite([
+        {
+          updateOne: {
+            filter: { name: 'user1' },
+            update: { name: 'new name' }
+          }
+        },
+        {
+          updateMany: {
+            filter: { name: 'user2' },
+            update: { name: 'new name' }
+          }
+        }
+      ]);
+
+      const users = yield User.find().lean();
+      assert.equal(typeof users[0].updatedAt, 'number');
+      assert.equal(typeof users[1].updatedAt, 'number');
+
+      // not-lean queries casts to number even if stored on DB as a date
+      assert.equal(users[0] instanceof User, false);
+      assert.equal(users[1] instanceof User, false);
+    });
+  });
+
 });

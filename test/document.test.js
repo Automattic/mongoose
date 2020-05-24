@@ -9012,4 +9012,20 @@ describe('document', function() {
       assert.ok(!user.updatedAt);
     });
   });
+
+  it('Sets default when passing undefined as value for a key in a nested subdoc (gh-9039)', function() {
+    const Test = db.model('Test', {
+      nested: {
+        prop: {
+          type: String,
+          default: 'some default value'
+        }
+      }
+    });
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { prop: undefined } });
+      assert.equal(doc.nested.prop, 'some default value');
+    });
+  });
 });

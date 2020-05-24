@@ -1585,4 +1585,20 @@ describe('model', function() {
 
     assert.ok(SuperUser.schema.path('ability'));
   });
+
+  it('removes paths underneath mixed type if discriminator schema sets path to mixed (gh-9042)', function() {
+    const TestSchema = Schema({ name: String });
+    const MainSchema = Schema({ run: { tab: TestSchema } }, {
+      discriminatorKey: 'type'
+    });
+    const Main = db.model('Test', MainSchema);
+
+    const DiscriminatorSchema = Schema({ run: {} });
+
+    const D = Main.discriminator('copy', DiscriminatorSchema);
+    assert.ok(!D.schema.paths['run.tab']);
+
+    const doc = new D({ run: { tab: { id: 42 } } });
+    assert.ifError(doc.validateSync());
+  });
 });

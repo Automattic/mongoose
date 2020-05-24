@@ -3729,13 +3729,13 @@ describe('Query', function() {
   it('allows disabling `setDefaultsOnInsert` (gh-8410)', function() {
     const schema = new Schema({
       title: String,
-      genre: {type: String, default: 'Action'}
+      genre: { type: String, default: 'Action' }
     });
 
     const Movie = db.model('Movie', schema);
 
     const query = {};
-    const update = {title: 'The Terminator'};
+    const update = { title: 'The Terminator' };
     const options = {
       new: true,
       upsert: true,

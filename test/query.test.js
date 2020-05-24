@@ -3749,7 +3749,7 @@ describe('Query', function() {
         assert.strictEqual(doc.genre, void 0);
       });
   });
-  
+
   it('throws readable error if `$and` and `$or` contain non-objects (gh-8948)', function() {
     const userSchema = new Schema({ name: String });
     const Person = db.model('Person', userSchema);

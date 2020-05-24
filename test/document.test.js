@@ -2461,7 +2461,7 @@ describe('document', function() {
         assert.equal(error.errors['user.email'].kind, 'regexp');
 
         const nestedUpdate = { name: 'test' };
-        const options = { upsert: true, setDefaultsOnInsert: true };
+        const options = { upsert: true };
         Event.updateOne({}, nestedUpdate, options, function(error) {
           assert.ifError(error);
           Event.findOne({ name: 'test' }, function(error, ev) {
@@ -2487,13 +2487,9 @@ describe('document', function() {
         const fakeDoc = new Model({});
         yield Model.create({});
 
-        // toggle to false to see correct behavior
-        // where subdoc is not created
-        const setDefaultsFlag = true;
-
         const res = yield Model.findOneAndUpdate({ _id: fakeDoc._id }, {
           test: 'test'
-        }, { setDefaultsOnInsert: setDefaultsFlag, upsert: true, new: true });
+        }, { upsert: true, new: true });
 
         assert.equal(res.test, 'test');
         assert.ok(!res.subDoc);

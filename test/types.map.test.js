@@ -203,7 +203,7 @@ describe('Map', function() {
       assert.ok(doc.m instanceof Map);
       assert.deepEqual(Array.from(doc.toObject().m.keys()), ['bacon', 'eggs']);
 
-      yield Test.updateOne({}, { n: 1 }, { upsert: true, setDefaultsOnInsert: true });
+      yield Test.updateOne({}, { n: 1 }, { upsert: true });
 
       const saved = yield Test.findOne({ n: 1 });
       assert.ok(saved);

@@ -1159,7 +1159,7 @@ describe('model: findOneAndUpdate:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, new: true };
+      const updateOptions = { upsert: true, new: true };
       Breakfast.findOneAndUpdate(
         {},
         { base: 'eggs' },
@@ -1184,7 +1184,7 @@ describe('model: findOneAndUpdate:', function() {
       }, { versionKey: null });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, new: true };
+      const updateOptions = { upsert: true, new: true };
       Breakfast.findOneAndUpdate(
         { topping: 'sausage', numEggs: 4 },
         { base: 'eggs' },
@@ -1205,7 +1205,7 @@ describe('model: findOneAndUpdate:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, new: true };
+      const updateOptions = { upsert: true, new: true };
       Breakfast.findOneAndUpdate(
         { topping: { $ne: 'sausage' } },
         { base: 'eggs' },
@@ -1236,7 +1236,7 @@ describe('model: findOneAndUpdate:', function() {
 
       return co(function*() {
         const update = { $setOnInsert: { username: 'test' } };
-        const opts = { upsert: true, setDefaultsOnInsert: true, new: true };
+        const opts = { upsert: true, new: true };
         const doc = yield Profile.findOneAndUpdate({}, update, opts);
         assert.equal(doc.socialMediaHandles, undefined);
       });
@@ -1261,7 +1261,6 @@ describe('model: findOneAndUpdate:', function() {
 
       const updateOptions = {
         upsert: true,
-        setDefaultsOnInsert: true,
         runValidators: true,
         new: true
       };
@@ -1426,7 +1425,7 @@ describe('model: findOneAndUpdate:', function() {
       const TestModel = db.model('Test', testSchema);
       TestModel.create({ id: '1' }, function(error) {
         assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true, setDefaultsOnInsert: true },
+        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true },
           function(error) {
             assert.ifError(error);
             done();
@@ -1444,7 +1443,7 @@ describe('model: findOneAndUpdate:', function() {
       const TestModel = db.model('Test', testSchema);
       TestModel.create({ blob: null, status: 'active' }, function(error) {
         assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1', blob: null }, { $set: { status: 'inactive' } }, { upsert: true, setDefaultsOnInsert: true },
+        TestModel.findOneAndUpdate({ id: '1', blob: null }, { $set: { status: 'inactive' } }, { upsert: true },
           function(error) {
             assert.ifError(error);
             done();
@@ -1468,7 +1467,7 @@ describe('model: findOneAndUpdate:', function() {
       const TestModel = db.model('Test', testSchema);
       TestModel.create({ id: '1' }, function(error) {
         assert.ifError(error);
-        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true, setDefaultsOnInsert: true },
+        TestModel.findOneAndUpdate({ id: '1' }, { $set: { name: 'Joe' } }, { upsert: true },
           function(error) {
             assert.ifError(error);
             done();
@@ -1487,7 +1486,7 @@ describe('model: findOneAndUpdate:', function() {
 
       const TestModel = db.model('Test', testSchema);
       const update = { $setOnInsert: { a: [{ foo: 'bar' }], b: [2] } };
-      const opts = { upsert: true, new: true, setDefaultsOnInsert: true };
+      const opts = { upsert: true, new: true };
       TestModel
         .findOneAndUpdate({ name: 'abc' }, update, opts,
           function(error, doc) {
@@ -1662,8 +1661,7 @@ describe('model: findOneAndUpdate:', function() {
         upsert: false,
         passRawResult: false,
         overwrite: false,
-        runValidators: true,
-        setDefaultsOnInsert: true
+        runValidators: true
       };
       Board.
         findOneAndUpdate({}, update, opts).
@@ -1718,7 +1716,6 @@ describe('model: findOneAndUpdate:', function() {
       const Model = db.model('Test', modelSchema);
       Model.findOneAndUpdate({ nonexistingField: 1 }, { field: 2 }, {
         upsert: true,
-        setDefaultsOnInsert: true,
         new: true
       }).exec(function(error) {
         assert.ok(error);
@@ -2083,7 +2080,6 @@ describe('model: findOneAndUpdate:', function() {
       const user = { name: 'upsert', foo: uuid.v4() };
       const opts = {
         upsert: true,
-        setDefaultsOnInsert: true,
         new: true
       };
       User.findOneAndUpdate({}, user, opts).exec(function(error, doc) {
@@ -2337,7 +2333,7 @@ describe('model: findOneAndUpdate:', function() {
       prop: String
     }));
 
-    const opts = { upsert: true, setDefaultsOnInsert: true, new: true };
+    const opts = { upsert: true, new: true };
     return Model.findOneAndUpdate({}, { prop: 'foo', L1: {} }, opts).lean().
       then(doc => assert.equal(doc.L1.L2.name, 'foo'));
   });

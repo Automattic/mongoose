@@ -1846,7 +1846,7 @@ describe('Query', function() {
 
       const MyModel = db.model('Test', schema);
 
-      const opts = { setDefaultsOnInsert: true, upsert: true };
+      const opts = { upsert: true };
       MyModel.updateOne({}, {}, opts, function(error) {
         assert.ifError(error);
         MyModel.findOne({}, function(error, doc) {
@@ -3724,5 +3724,29 @@ describe('Query', function() {
 
       assert.deepEqual(person.locations, ['US', 'UK']);
     });
+  });
+
+  it('allows disabling `setDefaultsOnInsert` (gh-8410)', function() {
+    const schema = new Schema({
+      title: String,
+      genre: {type: String, default: 'Action'}
+    });
+
+    const Movie = db.model('Movie', schema);
+
+    const query = {};
+    const update = {title: 'The Terminator'};
+    const options = {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: false,
+      lean: true
+    };
+
+    return Movie.deleteMany({}).
+      then(() => Movie.findOneAndUpdate(query, update, options)).
+      then(doc => {
+        assert.strictEqual(doc.genre, void 0);
+      });
   });
 });

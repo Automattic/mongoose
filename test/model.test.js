@@ -5480,8 +5480,7 @@ describe('Model', function() {
               update: {
                 $inc: { num: 1 }
               },
-              upsert: true,
-              setDefaultsOnInsert: true
+              upsert: true
             }
           }
         ];

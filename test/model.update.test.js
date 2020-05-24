@@ -891,7 +891,7 @@ describe('model: update:', function() {
     it('applies defaults on upsert', function(done) {
       const s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
       const Breakfast = db.model('Test', s);
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true };
+      const updateOptions = { upsert: true };
       Breakfast.update({}, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
         Breakfast.findOne({}).lean().exec(function(error, breakfast) {
@@ -919,7 +919,7 @@ describe('model: update:', function() {
         embedded: null
       };
 
-      const opts = { upsert: true, setDefaultsOnInsert: true };
+      const opts = { upsert: true };
 
       Parent.
         findOneAndUpdate({ _id: newDoc._id }, newDoc, opts).
@@ -931,7 +931,7 @@ describe('model: update:', function() {
       const s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true };
+      const updateOptions = { upsert: true };
       Breakfast.update({ topping: 'sausage' }, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
         Breakfast.findOne({}, function(error, breakfast) {
@@ -947,7 +947,7 @@ describe('model: update:', function() {
       const s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true };
+      const updateOptions = { upsert: true };
       Breakfast.update({ topping: { $ne: 'sausage' } }, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
         Breakfast.findOne({}, function(error, breakfast) {
@@ -969,7 +969,7 @@ describe('model: update:', function() {
 
       const M = db.model('Test', schema);
 
-      const opts = { upsert: true, setDefaultsOnInsert: true };
+      const opts = { upsert: true };
       M.update({}, {}, opts, function(error) {
         assert.ifError(error);
         M.findOne({}, function(error, doc) {
@@ -997,7 +997,7 @@ describe('model: update:', function() {
       });
       const Breakfast = db.model('Test', s);
 
-      const updateOptions = { upsert: true, setDefaultsOnInsert: true, runValidators: true };
+      const updateOptions = { upsert: true, runValidators: true };
       Breakfast.update({}, { topping: 'bacon', base: 'eggs' }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(Object.keys(error.errors).length, 1);
@@ -1768,7 +1768,6 @@ describe('model: update:', function() {
       const update = { $inc: { num: 1 }, $push: { arr: { num: 5 } } };
       const options = {
         upsert: true,
-        setDefaultsOnInsert: true,
         new: true,
         runValidators: true
       };
@@ -2283,7 +2282,7 @@ describe('model: update:', function() {
       User.findOneAndUpdate(
         { username: 'test', isDeleted: false },
         { createdAt: '2017-03-06T14:08:59+00:00' },
-        { new: true, setDefaultsOnInsert: true, upsert: true },
+        { new: true, upsert: true },
         function(error) {
           assert.ifError(error);
           User.update({ username: 'test' }, { createdAt: new Date() }).
@@ -2486,8 +2485,7 @@ describe('model: update:', function() {
       const TestModel = db.model('Test', testSchema);
       const options = {
         overwrite: true,
-        upsert: true,
-        setDefaultsOnInsert: true
+        upsert: true
       };
 
       const update = { name: 'test' };
@@ -3268,7 +3266,7 @@ describe('model: updateOne: ', function() {
       age: { type: Number, default: 25, immutable: true }
     }));
 
-    const _opts = { upsert: true, setDefaultsOnInsert: true };
+    const _opts = { upsert: true };
 
     return co(function*() {
       yield Model.updateOne({ name: 'John' }, { name: 'John', age: 20 }, _opts);
@@ -3290,8 +3288,7 @@ describe('model: updateOne: ', function() {
           updateOne: {
             filter: { name: 'John' },
             update: { name: 'John', age: 20 },
-            upsert: true,
-            setDefaultsOnInsert: true
+            upsert: true
           }
         }
       ]);

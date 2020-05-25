@@ -1,3 +1,14 @@
+5.9.16 / 2020-05-25
+===================
+ * perf(error): convert errors to classes extending Error for lower CPU overhead #9021 [zbjornson](https://github.com/zbjornson)
+ * fix(query): throw CastError if filter `$and`, `$or`, `$nor` contain non-object values #8948
+ * fix(bulkwrite): cast filter & update to schema after applying timestamps #9030 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): don't overwrite defaults with undefined keys in nested documents #9039 [vitorhnn](https://github.com/vitorhnn)
+ * fix(discriminator): remove discriminator schema nested paths pulled from base schema underneath a mixed path in discriminator schema #9042
+ * fix(model): make syncIndexes() not drop index if all user-specified collation options are the same #8994
+ * fix(document): make internal `$__.scope` property a symbol instead to work around a bug with fast-safe-stringify #8955
+ * docs: model.findByIdAndUpdate() 'new' param fix #9026 [dandv](https://github.com/dandv)
+
 5.9.15 / 2020-05-18
 ===================
  * fix(schema): treat creating dotted path with no parent as creating a nested path #9020

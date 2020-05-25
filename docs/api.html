@@ -1713,6 +1713,14 @@ Users.aggregate().
 <ul>
 <li>Mongoose does <strong>not</strong> cast aggregation pipelines to the model's schema because <code>$project</code> and <code>$group</code> operators allow redefining the "shape" of the documents at any stage of the pipeline, which may leave documents in an incompatible format. You can use the <a href="https://github.com/AbdelrahmanHafez/mongoose-cast-aggregation">mongoose-cast-aggregation plugin</a> to enable minimal casting for aggregation pipelines.</li>
 <li>The documents returned are plain javascript objects, not mongoose documents (since any shape of document can be returned).</li>
+</ul>
+
+<h4>More About Aggregations:</h4>
+
+<ul>
+<li><a href="/docs/api/aggregate.html">Mongoose <code>Aggregate</code></a></li>
+<li><a href="https://masteringjs.io/tutorials/mongoose/aggregate">An Introduction to Mongoose Aggregate</a></li>
+<li><a href="http://docs.mongodb.org/manual/applications/aggregation/">MongoDB Aggregation docs</a></li>
 </ul></div><hr class="separate-api-elements"><h3 id="model_Model.bulkWrite"><a href="#model_Model.bulkWrite">Model.bulkWrite()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">ops
 <span class="method-type">&laquo;Array&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[ops.insertOne.document]
 <span class="method-type">&laquo;Object&raquo;</span> The document to insert</p>

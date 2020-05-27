@@ -853,7 +853,7 @@ block content
     var schema = new Schema({ name: String });
     schema.set('validateBeforeSave', false);
     schema.path('name').validate(function (value) {
-        return v != null;
+        return value != null;
     });
     var M = mongoose.model('Person', schema);
     var m = new M({ name: null });

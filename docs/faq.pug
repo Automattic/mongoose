@@ -112,8 +112,7 @@ block content
     // Promise based alternative. `init()` returns a promise that resolves
     // when the indexes have finished building successfully. The `init()`
     // function is idempotent, so don't worry about triggering an index rebuild.
-    Model.init().then(function(err) {
-      assert.ifError(err);
+    Model.init().then(function() {
       Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
         console.log(err);
       });

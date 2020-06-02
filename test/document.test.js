@@ -8942,6 +8942,17 @@ describe('document', function() {
       then(doc => assert.equal(doc.item.name, 'Default Name'));
   });
 
+  it('clears cast errors when setting an array subpath (gh-9080)', function() {
+    const userSchema = new Schema({ tags: [Schema.ObjectId] });
+    const User = db.model('User', userSchema);
+
+    const user = new User({ tags: ['hey'] });
+    user.tags = [];
+
+    const err = user.validateSync();
+    assert.ifError(err);
+  });
+
   it('handles modifying a subpath of a nested array of documents (gh-8926)', function() {
     const bookSchema = new Schema({ title: String });
     const aisleSchema = new Schema({

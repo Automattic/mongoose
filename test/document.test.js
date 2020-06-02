@@ -8953,6 +8953,30 @@ describe('document', function() {
     assert.ifError(err);
   });
 
+  it('saves successfully if you splice() a sliced array (gh-9011)', function() {
+    const childSchema = Schema({ values: [Number] });
+    const parentSchema = Schema({ children: [childSchema] });
+
+    const Parent = db.model('Parent', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({
+        children: [
+          { values: [1, 2, 3] },
+          { values: [4, 5, 6] }
+        ]
+      });
+
+      const parent = yield Parent.findOne();
+      const copy = parent.children[0].values.slice();
+      copy.splice(1);
+
+      yield parent.save();
+      const _parent = yield Parent.findOne();
+      assert.deepEqual(_parent.toObject().children[0].values, [1, 2, 3]);
+    });
+  });
+
   it('handles modifying a subpath of a nested array of documents (gh-8926)', function() {
     const bookSchema = new Schema({ title: String });
     const aisleSchema = new Schema({

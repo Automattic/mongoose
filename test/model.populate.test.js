@@ -9409,10 +9409,10 @@ describe('model: populate:', function() {
     });
   });
 
-  it('no-op if populating a nested path (gh-9073)', function() {  
+  it('no-op if populating a nested path (gh-9073)', function() {
     const buildingSchema = Schema({ owner: String });
     const Building = db.model('Building', buildingSchema);
-  
+
     const officeSchema = new Schema({
       title: String,
       place: { building: { type: Schema.ObjectId, ref: 'Building' } }

@@ -618,7 +618,7 @@ block content
 
     const doc = new User({ name: 'Val', picture: '/123.png' });
     doc.picture; // 'https://s3.amazonaws.com/mybucket/123.png'
-    doc.toObject({ getters: false }).picture; // '123.png'
+    doc.toObject({ getters: false }).picture; // '/123.png'
     ```
 
     Generally, you only use getters on primitive paths as opposed to arrays

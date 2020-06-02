@@ -1,3 +1,14 @@
+5.9.17 / 2020-06-02
+===================
+ * fix(document): avoid tracking changes like `splice()` on slice()-ed arrays #9011
+ * fix(populate): make populating a nested path a no-op #9073
+ * fix(document): clear nested cast errors when overwriting an array path #9080
+ * fix: upgrade mongodb to v3.5.8 #9069 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(document): add validateModifiedOnly to Document#save(), Document#validateSync() and Document#validate() #9078 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(faq): fix typo #9075 [tigransimonyan](https://github.com/tigransimonyan)
+ * docs: document all parameters to .debug #9029 [dandv](https://github.com/dandv)
+ * docs: fix property value in Getters example #9061 [ismet](https://github.com/ismet)
+
 5.9.16 / 2020-05-25
 ===================
  * perf(error): convert errors to classes extending Error for lower CPU overhead #9021 [zbjornson](https://github.com/zbjornson)

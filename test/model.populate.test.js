@@ -9408,4 +9408,25 @@ describe('model: populate:', function() {
       assert.equal(res.teams[0].members[0].user.name, 'User');
     });
   });
+
+  it('no-op if populating a nested path (gh-9073)', function() {  
+    const buildingSchema = Schema({ owner: String });
+    const Building = db.model('Building', buildingSchema);
+  
+    const officeSchema = new Schema({
+      title: String,
+      place: { building: { type: Schema.ObjectId, ref: 'Building' } }
+    });
+    const Office = db.model('Office', officeSchema);
+
+    return co(function*() {
+      const building = new Building({ owner: 'test' });
+      yield building.save();
+      yield Office.create({ place: { building: building._id } });
+
+      const foundOffice = yield Office.findOne({}).
+        populate({ path: 'place', populate: 'building' });
+      assert.equal(foundOffice.place.building.owner, 'test');
+    });
+  });
 });

@@ -101,8 +101,10 @@ function pugify(filename, options, newfile) {
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;
-  options.editLink = 'https://github.com/Automattic/mongoose/blob/master' +
+
+  const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(process.cwd(), '');
+  options.editLink = options.editLink || _editLink;
 
   let contents = fs.readFileSync(filename).toString();
 
@@ -163,5 +165,7 @@ const _acquit = require('./docs/source/acquit');
 const acquitFiles = Object.keys(_acquit);
 acquitFiles.forEach(function(file) {
   const filename = __dirname + '/docs/acquit.pug';
+  _acquit[file].editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
+    _acquit[file].input.replace(process.cwd(), '');
   pugify(filename, _acquit[file], __dirname + '/docs/' + file);
 });

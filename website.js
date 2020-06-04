@@ -130,13 +130,14 @@ function pugify(filename, options, newfile) {
     }
   };
 
+  newfile = newfile || filename.replace('.pug', '.html');
+  options.outputUrl = newfile.replace(process.cwd(), '');
+
   pug.render(contents, options, function(err, str) {
     if (err) {
       console.error(err.stack);
       return;
     }
-
-    newfile = newfile || filename.replace('.pug', '.html');
 
     fs.writeFile(newfile, str, function(err) {
       if (err) {

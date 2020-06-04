@@ -98,6 +98,8 @@ function pugify(filename, options, newfile) {
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;
+  options.editLink = 'https://github.com/Automattic/mongoose/blob/master' +
+    filename.replace(process.cwd(), '');
 
   let contents = fs.readFileSync(filename).toString();
 

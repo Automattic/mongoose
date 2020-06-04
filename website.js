@@ -76,6 +76,9 @@ append style
     p { line-height: 1.5em }
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
   :markdown
 ${md.split('\n').map(line => '    ' + line).join('\n')}
 `;

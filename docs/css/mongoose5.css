@@ -181,7 +181,8 @@ pre {
   position: absolute;
   top: 0.125em;
   right: 0px;
-  background-color: #dfdfdf;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
   padding: 5px;
   padding-bottom: 0px;
   border-radius: 3px;

@@ -9051,4 +9051,29 @@ describe('document', function() {
       assert.equal(doc.nested.prop, 'some default value');
     });
   });
+
+  describe('Document#getChanges(...) (gh-9096)', function() {
+    it('returns an empty object when there are no changes', function() {
+      return co(function*() {
+        const User = db.model('User', { name: String, age: Number, country: String });
+        const user = yield User.create({ name: 'Hafez', age: 25, country: 'Egypt' });
+
+        const changes = user.getChanges();
+        assert.deepEqual(changes, {});
+      });
+    });
+
+    it('returns only the changed paths', function() {
+      return co(function*() {
+        const User = db.model('User', { name: String, age: Number, country: String });
+        const user = yield User.create({ name: 'Hafez', age: 25, country: 'Egypt' });
+
+        user.country = undefined;
+        user.age = 26;
+
+        const changes = user.getChanges();
+        assert.deepEqual(changes, { $set: { age: 26 }, $unset: { country: 1 } });
+      });
+    });
+  });
 });

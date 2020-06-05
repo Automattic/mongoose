@@ -186,7 +186,7 @@ afterEach(<span class="hljs-function"><span class="hljs-keyword">function</span>
 <pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
 
 <span class="hljs-comment">// define an Actor model with this mongoose instance</span>
-<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> Schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
 mongoose.model(<span class="hljs-string">'Actor'</span>, schema);
 
 <span class="hljs-comment">// create a new connection</span>

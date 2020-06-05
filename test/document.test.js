@@ -9051,4 +9051,21 @@ describe('document', function() {
       assert.equal(doc.nested.prop, 'some default value');
     });
   });
+
+  it('can use $locals for virtual setters (gh-9098)', function() {
+    const personSchema = new Schema();
+
+    personSchema.virtual('fullName')
+      .get(function() {
+        return this.$locals.fullName;
+      })
+      .set(function(fullName) {
+        this.$locals.fullName = fullName;
+      });
+
+    const Person = mongoose.model('Person', personSchema);
+
+    const aunt = new Person({ fullName: 'Aunt Rose' });
+    assert.equal(aunt.fullName, 'Aunt Rose');
+  });
 });

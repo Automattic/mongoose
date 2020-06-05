@@ -9052,6 +9052,24 @@ describe('document', function() {
     });
   });
 
+  it('allows accessing $locals when initializing (gh-9098)', function() {
+    const personSchema = new mongoose.Schema({
+      name: {
+        first: String,
+        last: String
+      }
+    });
+
+    personSchema.virtual('fullName').
+      get(function() { return this.$locals.fullName; }).
+      set(function(newFullName) { this.$locals.fullName = newFullName; });
+
+    const Person = db.model('Person', personSchema);
+
+    const axl = new Person({ fullName: 'Axl Rose' });
+    assert.equal(axl.fullName, 'Axl Rose');
+  });
+
   describe('Document#getChanges(...) (gh-9096)', function() {
     it('returns an empty object when there are no changes', function() {
       return co(function*() {

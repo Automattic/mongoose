@@ -1,3 +1,36 @@
+5.9.18 / 2020-06-05
+===================
+ * fix: improve atlas error in the event of incorrect password #9095
+ * docs: add edit link for all docs pages #9058
+ * fix(document): allow accessing `$locals` when initializing document #9099 #9098 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query): make `setDefaultsOnInsert` a mongoose option so it doesn't end up in debug output #9086
+ * docs(connection+index): add serverSelectionTimeoutMS and heartbeatFrequencyMS to `connect()` and `openUri()` options #9071
+ * docs(geojson): add notes about geojson 2dsphere indexes #9044
+ * docs: make active page bold in navbar #9062
+ * docs: correct a typo in a code snippet #9089 [Elvis-Sarfo](https://github.com/Elvis-Sarfo)
+
+5.9.17 / 2020-06-02
+===================
+ * fix(document): avoid tracking changes like `splice()` on slice()-ed arrays #9011
+ * fix(populate): make populating a nested path a no-op #9073
+ * fix(document): clear nested cast errors when overwriting an array path #9080
+ * fix: upgrade mongodb to v3.5.8 #9069 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(document): add validateModifiedOnly to Document#save(), Document#validateSync() and Document#validate() #9078 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(faq): fix typo #9075 [tigransimonyan](https://github.com/tigransimonyan)
+ * docs: document all parameters to .debug #9029 [dandv](https://github.com/dandv)
+ * docs: fix property value in Getters example #9061 [ismet](https://github.com/ismet)
+
+5.9.16 / 2020-05-25
+===================
+ * perf(error): convert errors to classes extending Error for lower CPU overhead #9021 [zbjornson](https://github.com/zbjornson)
+ * fix(query): throw CastError if filter `$and`, `$or`, `$nor` contain non-object values #8948
+ * fix(bulkwrite): cast filter & update to schema after applying timestamps #9030 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): don't overwrite defaults with undefined keys in nested documents #9039 [vitorhnn](https://github.com/vitorhnn)
+ * fix(discriminator): remove discriminator schema nested paths pulled from base schema underneath a mixed path in discriminator schema #9042
+ * fix(model): make syncIndexes() not drop index if all user-specified collation options are the same #8994
+ * fix(document): make internal `$__.scope` property a symbol instead to work around a bug with fast-safe-stringify #8955
+ * docs: model.findByIdAndUpdate() 'new' param fix #9026 [dandv](https://github.com/dandv)
+
 5.9.15 / 2020-05-18
 ===================
  * fix(schema): treat creating dotted path with no parent as creating a nested path #9020

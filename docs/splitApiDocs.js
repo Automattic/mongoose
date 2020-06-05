@@ -12,7 +12,8 @@ api.docs.forEach(file => {
 
   const options = Object.assign({}, file, {
     package: pkg,
-    docs: api.docs
+    docs: api.docs,
+    outputUrl: `/docs/api/${file.name.toLowerCase()}.html`
   });
 
   const html = jade.renderFile('./docs/api_split.pug', options);

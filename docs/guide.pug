@@ -5,6 +5,10 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## Schemas
 
@@ -851,7 +855,7 @@ block content
     var schema = new Schema({ name: String });
     schema.set('validateBeforeSave', false);
     schema.path('name').validate(function (value) {
-        return v != null;
+        return value != null;
     });
     var M = mongoose.model('Person', schema);
     var m = new M({ name: null });

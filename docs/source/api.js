@@ -183,6 +183,10 @@ function parse() {
       data.hideFromNav = true;
     }
 
+    data.file = props.file;
+    data.editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
+      props.file;
+
     out.push(data);
   }
 }

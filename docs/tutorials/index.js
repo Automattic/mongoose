@@ -3,7 +3,7 @@
 const fs = require('fs');
 
 const tutorials = fs.readdirSync(__dirname).filter(file => file.endsWith('.md'));
-console.log(tutorials)
+
 module.exports = tutorials.reduce((map, filename) => {
   const content = fs.readFileSync(`${__dirname}/${filename}`, 'utf8');
   map[`docs/tutorials/${filename}`] = {

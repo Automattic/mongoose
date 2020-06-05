@@ -1,6 +1,10 @@
 extends layout
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   ul.toc
     each block in acquitBlocks[0].blocks
       li

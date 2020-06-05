@@ -1,3 +1,14 @@
+5.9.18 / 2020-06-05
+===================
+ * fix: improve atlas error in the event of incorrect password #9095
+ * docs: add edit link for all docs pages #9058
+ * fix(document): allow accessing `$locals` when initializing document #9099 #9098 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query): make `setDefaultsOnInsert` a mongoose option so it doesn't end up in debug output #9086
+ * docs(connection+index): add serverSelectionTimeoutMS and heartbeatFrequencyMS to `connect()` and `openUri()` options #9071
+ * docs(geojson): add notes about geojson 2dsphere indexes #9044
+ * docs: make active page bold in navbar #9062
+ * docs: correct a typo in a code snippet #9089 [Elvis-Sarfo](https://github.com/Elvis-Sarfo)
+
 5.9.17 / 2020-06-02
 ===================
  * fix(document): avoid tracking changes like `splice()` on slice()-ed arrays #9011

@@ -177,6 +177,25 @@ pre {
   margin-top: 5px;
 }
 
+.edit-docs-link {
+  position: absolute;
+  top: 0.125em;
+  right: 0px;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  padding: 5px;
+  padding-bottom: 0px;
+  border-radius: 3px;
+}
+
+.edit-docs-link img {
+  width: 1.25em;
+}
+
+.pure-menu-link.selected {
+  font-weight: bold;
+}
+
 /* Mobile */
 
 #mobile-menu {
@@ -279,6 +298,10 @@ pre {
 
   .active {
     display: block !important;
+  }
+
+  .edit-docs-link {
+    display: none;
   }
 }
 

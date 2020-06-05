@@ -8942,6 +8942,41 @@ describe('document', function() {
       then(doc => assert.equal(doc.item.name, 'Default Name'));
   });
 
+  it('clears cast errors when setting an array subpath (gh-9080)', function() {
+    const userSchema = new Schema({ tags: [Schema.ObjectId] });
+    const User = db.model('User', userSchema);
+
+    const user = new User({ tags: ['hey'] });
+    user.tags = [];
+
+    const err = user.validateSync();
+    assert.ifError(err);
+  });
+
+  it('saves successfully if you splice() a sliced array (gh-9011)', function() {
+    const childSchema = Schema({ values: [Number] });
+    const parentSchema = Schema({ children: [childSchema] });
+
+    const Parent = db.model('Parent', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({
+        children: [
+          { values: [1, 2, 3] },
+          { values: [4, 5, 6] }
+        ]
+      });
+
+      const parent = yield Parent.findOne();
+      const copy = parent.children[0].values.slice();
+      copy.splice(1);
+
+      yield parent.save();
+      const _parent = yield Parent.findOne();
+      assert.deepEqual(_parent.toObject().children[0].values, [1, 2, 3]);
+    });
+  });
+
   it('handles modifying a subpath of a nested array of documents (gh-8926)', function() {
     const bookSchema = new Schema({ title: String });
     const aisleSchema = new Schema({
@@ -8999,5 +9034,39 @@ describe('document', function() {
       assert.ok(!user.createdAt);
       assert.ok(!user.updatedAt);
     });
+  });
+
+  it('Sets default when passing undefined as value for a key in a nested subdoc (gh-9039)', function() {
+    const Test = db.model('Test', {
+      nested: {
+        prop: {
+          type: String,
+          default: 'some default value'
+        }
+      }
+    });
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { prop: undefined } });
+      assert.equal(doc.nested.prop, 'some default value');
+    });
+  });
+
+  it('allows accessing $locals when initializing (gh-9098)', function() {
+    const personSchema = new mongoose.Schema({
+      name: {
+        first: String,
+        last: String
+      }
+    });
+
+    personSchema.virtual('fullName').
+      get(function() { return this.$locals.fullName; }).
+      set(function(newFullName) { this.$locals.fullName = newFullName; });
+
+    const Person = db.model('Person', personSchema);
+
+    const axl = new Person({ fullName: 'Axl Rose' });
+    assert.equal(axl.fullName, 'Axl Rose');
   });
 });

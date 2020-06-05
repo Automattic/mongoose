@@ -611,6 +611,27 @@ describe('types.documentarray', function() {
         'd'
       ]);
     });
+
+    it('unshift() after map() works (gh-9012)', function() {
+      const MyModel = db.model('Test', Schema({
+        myArray: [{ name: String }]
+      }));
+
+      const doc = new MyModel({
+        myArray: [{ name: 'b' }, { name: 'c' }]
+      });
+      let myArray = doc.myArray;
+
+      myArray = myArray.map(val => ({ name: `${val.name} mapped` }));
+
+      myArray.unshift({ name: 'a inserted' });
+
+      assert.deepEqual(myArray.map(v => v.name), [
+        'a inserted',
+        'b mapped',
+        'c mapped'
+      ]);
+    });
   });
 
   it('cleans modified subpaths on splice() (gh-7249)', function() {

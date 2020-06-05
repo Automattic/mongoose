@@ -29,9 +29,13 @@ block content
 
   each item in docs
     hr.separate-api
-    h2(id=item.name, class="item-header")
-      a(href='#' + item.name)
-        | #{item.name}
+    div.item-header-wrap
+      <a class="edit-docs-link" href="#{item.editLink}">
+        <img src="/docs/images/pencil.svg" />
+      </a>
+      h2(id=item.name, class="item-header")
+        a(href='#' + item.name)
+          | #{item.name}
     ul
       each prop in item.props
         li

@@ -4528,6 +4528,42 @@ describe('Model', function() {
       }
     });
 
+    it('insertMany() `writeErrors` if only one error (gh-8938)', function() {
+      const QuestionType = new mongoose.Schema({
+        code: { type: String, required: true, unique: true },
+        text: String
+      });
+      const Question = db.model('Test', QuestionType);
+
+      return co(function*() {
+        yield Question.init();
+
+        yield Question.create({ code: 'MEDIUM', text: '123' });
+        const data = [
+          { code: 'MEDIUM', text: '1111' },
+          { code: 'test', text: '222' },
+          { code: 'HARD', text: '2222' }
+        ];
+        const opts = { ordered: false, rawResult: true };
+        let err = yield Question.insertMany(data, opts).catch(err => err);
+        assert.ok(Array.isArray(err.writeErrors));
+        assert.equal(err.writeErrors.length, 1);
+        assert.equal(err.insertedDocs.length, 2);
+        assert.equal(err.insertedDocs[0].code, 'test');
+        assert.equal(err.insertedDocs[1].code, 'HARD');
+
+        yield Question.deleteMany({});
+        yield Question.create({ code: 'MEDIUM', text: '123' });
+        yield Question.create({ code: 'HARD', text: '123' });
+
+        err = yield Question.insertMany(data, opts).catch(err => err);
+        assert.ok(Array.isArray(err.writeErrors));
+        assert.equal(err.writeErrors.length, 2);
+        assert.equal(err.insertedDocs.length, 1);
+        assert.equal(err.insertedDocs[0].code, 'test');
+      });
+    });
+
     it('insertMany() ordered option for single validation error', function(done) {
       start.mongodVersion(function(err, version) {
         if (err) {
@@ -6730,6 +6766,42 @@ describe('Model', function() {
       const err = yield User.findOne({ _id: 'invalid' }).then(() => null, err => err);
 
       assert.deepEqual(err.kind, 'ObjectId');
+    });
+  });
+
+  it('casts bulkwrite timestamps to `Number` when specified (gh-9030)', function() {
+    return co(function* () {
+      const userSchema = new Schema({
+        name: String,
+        updatedAt: Number
+      }, { timestamps: true });
+
+      const User = db.model('User', userSchema);
+
+      yield User.create([{ name: 'user1' }, { name: 'user2' }]);
+
+      yield User.bulkWrite([
+        {
+          updateOne: {
+            filter: { name: 'user1' },
+            update: { name: 'new name' }
+          }
+        },
+        {
+          updateMany: {
+            filter: { name: 'user2' },
+            update: { name: 'new name' }
+          }
+        }
+      ]);
+
+      const users = yield User.find().lean();
+      assert.equal(typeof users[0].updatedAt, 'number');
+      assert.equal(typeof users[1].updatedAt, 'number');
+
+      // not-lean queries casts to number even if stored on DB as a date
+      assert.equal(users[0] instanceof User, false);
+      assert.equal(users[1] instanceof User, false);
     });
   });
 

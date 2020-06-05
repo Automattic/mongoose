@@ -17,6 +17,10 @@ block append style
     }
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## FAQ
 
@@ -113,7 +117,6 @@ block content
     // when the indexes have finished building successfully. The `init()`
     // function is idempotent, so don't worry about triggering an index rebuild.
     Model.init().then(function() {
-      assert.ifError(err);
       Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
         console.log(err);
       });

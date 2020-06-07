@@ -5590,7 +5590,7 @@ describe('model: populate:', function() {
               populate: {
                 path: 'value'
               }
-            });
+            }).exec();
           }).
           then(function(obj) {
             assert.equal(obj.fields.length, 2);

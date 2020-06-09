@@ -12,11 +12,11 @@
 </div>
 
 <p>Jest is a client-side JavaScript testing library developed by Facebook.
-It was one of the libraries affected by <a href="https://www.theregister.co.uk/2017/09/22/facebook_will_free_react_other_code_from_unloved_license/">Facebook&#39;s licensing scandal in 2017</a>.
 Because Jest is designed primarily for testing React applications, using
 it to test Node.js server-side applications comes with a lot of caveats.
-We strongly recommend using <a href="http://npmjs.com/package/mocha">Mocha</a> instead.
-If you choose to delve into dangerous waters and test Mongoose apps with
+We strongly advise against using Jest for testing any Node.js apps unless
+you are an expert developer with an intimate knowledge of Jest.</p>
+<p>If you choose to delve into dangerous waters and test Mongoose apps with
 Jest, here&#39;s what you need to know:</p>
 <h2 id="recommended-testenvironment">Recommended <code>testEnvironment</code></h2>
 <p>Do <strong>not</strong> use Jest&#39;s default <a href="https://jestjs.io/docs/en/configuration.html#testenvironment-string"><code>jsdom</code> test environment</a>
@@ -60,6 +60,12 @@ exports.setTimeout = <span class="hljs-function"><span class="hljs-keyword">func
 <span class="hljs-keyword">const</span> time = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../util/time'</span>);
 <span class="hljs-keyword">const</span> sinon = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sinon'</span>);
 sinon.stub(time, <span class="hljs-string">'setTimeout'</span>);</code></pre>
+<h2 id="globalsetup-and-globalteardown"><code>globalSetup</code> and <code>globalTeardown</code></h2>
+<p>Do <strong>not</strong> use <code>globalSetup</code> to call <code>mongoose.connect()</code> or
+<code>mongoose.createConnection()</code>. Jest runs <code>globalSetup</code> in
+a <a href="https://github.com/facebook/jest/issues/7184">separate environment</a>,
+so you cannot use any connections you create in <code>globalSetup</code>
+in your tests.</p>
 <h2 id="further-reading">Further Reading</h2>
 <p>Want to learn more about testing Mongoose apps? The
 <a href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fnode-js-express-rest-web-services%2Ftable-of-contents">RESTful Web Services with Node.js and Express</a>

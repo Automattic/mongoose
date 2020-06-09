@@ -936,7 +936,22 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 Product.find().mod(<span class="hljs-string">'inventory'</span>, [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 Product.find().where(<span class="hljs-string">'inventory'</span>).mod([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 <span class="hljs-comment">// This syntax is a little strange, but supported.</span>
-Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">
+Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</p>
+</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
+
+<ul>
+<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
+<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api.html#model_Model.hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
+<li><code>strict</code>: controls how Mongoose handles keys that aren't in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
+<li><code>strictQuery</code>: controls how Mongoose handles keys that aren't in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: 'bar' })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
+<li><code>useFindAndModify</code>: used to work around the <a href="/docs/deprecations.html#findandmodify"><code>findAndModify()</code> deprecation warning</a></li>
+<li><code>omitUndefined</code>: delete any properties whose value is <code>undefined</code> when casting an update. In other words, if this is set, Mongoose will delete <code>baz</code> from the update in <code>Model.updateOne({}, { foo: 'bar', baz: undefined })</code> before sending the update to the server.</li>
+<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
+</ul>
+
+<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">
 <span class="method-type">&laquo;public&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> Mongoose-specific options</p>
 </li></ul><div><p>Returns an object containing the Mongoose-specific options for this query, including <code>lean</code> and <code>populate</code>.</p>
 
@@ -961,22 +976,7 @@ q.mongooseOptions().lean; <span class="hljs-comment">// true</span></code></pre>
 <li><code>strict</code></li>
 <li><code>nearSphere</code></li>
 <li><code>useFindAndModify</code></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
-<span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</p>
-</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
-
-<ul>
-<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
-<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api.html#model_Model.hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
-<li><code>strict</code>: controls how Mongoose handles keys that aren't in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
-<li><code>strictQuery</code>: controls how Mongoose handles keys that aren't in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: 'bar' })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
-<li><code>useFindAndModify</code>: used to work around the <a href="/docs/deprecations.html#findandmodify"><code>findAndModify()</code> deprecation warning</a></li>
-<li><code>omitUndefined</code>: delete any properties whose value is <code>undefined</code> when casting an update. In other words, if this is set, Mongoose will delete <code>baz</code> from the update in <code>Model.updateOne({}, { foo: 'bar', baz: undefined })</code> before sending the update to the server.</li>
-<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
-</ul>
-
-<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
 

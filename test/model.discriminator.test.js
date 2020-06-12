@@ -87,12 +87,12 @@ describe('model', function() {
       Employee = Person.discriminator('Employee', EmployeeSchema);
     });
 
-    it('model defaults without discriminator', function(done) {
+    it('model defaults without discriminator', function() {
       const Model = db.model('Test1', new Schema());
       assert.equal(Model.discriminators, undefined);
     });
 
-    it('is instance of root', function(done) {
+    it('is instance of root', function() {
       assert.equal(Employee.baseModelName, 'Test');
       const employee = new Employee();
       assert.ok(employee instanceof Person);
@@ -101,7 +101,7 @@ describe('model', function() {
       assert.strictEqual(employee.__proto__.__proto__.constructor, Person);
     });
 
-    it('can define static and instance methods', function(done) {
+    it('can define static and instance methods', function() {
       function BossBaseSchema() {
         Schema.apply(this, arguments);
 
@@ -141,13 +141,13 @@ describe('model', function() {
       done();
     });
 
-    it('adds discriminatorKey to schema with default as name', function(done) {
+    it('adds discriminatorKey to schema with default as name', function() {
       const type = Employee.schema.paths.__t;
       assert.equal(type.options.type, String);
       assert.equal(type.options.default, 'Employee');
     });
 
-    it('adds discriminator to Model.discriminators object', function(done) {
+    it('adds discriminator to Model.discriminators object', function() {
       assert.equal(Object.keys(Person.discriminators).length, 1);
       assert.equal(Person.discriminators['Employee'], Employee);
       const newName = 'model-discriminator-' + random();
@@ -156,7 +156,7 @@ describe('model', function() {
       assert.equal(Person.discriminators[newName], NewDiscriminatorType);
     });
 
-    it('throws error on invalid schema', function(done) {
+    it('throws error on invalid schema', function() {
       assert.throws(
         function() {
           Person.discriminator('Foo');
@@ -165,7 +165,7 @@ describe('model', function() {
       );
     });
 
-    it('throws error when attempting to nest discriminators', function(done) {
+    it('throws error when attempting to nest discriminators', function() {
       assert.throws(
         function() {
           Employee.discriminator('model-discriminator-foo', new Schema());
@@ -174,7 +174,7 @@ describe('model', function() {
       );
     });
 
-    it('throws error when discriminator has mapped discriminator key in schema', function(done) {
+    it('throws error when discriminator has mapped discriminator key in schema', function() {
       assert.throws(
         function() {
           Person.discriminator('model-discriminator-foo', new Schema({ __t: String }));
@@ -193,7 +193,7 @@ describe('model', function() {
       );
     });
 
-    it('throws error when discriminator with taken name is added', function(done) {
+    it('throws error when discriminator with taken name is added', function() {
       const Foo = db.model('Test1', new Schema({}));
       Foo.discriminator('Token', new Schema());
       assert.throws(
@@ -204,7 +204,7 @@ describe('model', function() {
       );
     });
 
-    it('throws error if model name is taken (gh-4148)', function(done) {
+    it('throws error if model name is taken (gh-4148)', function() {
       const Foo = db.model('Test1', new Schema({}));
       db.model('Test', new Schema({}));
       assert.throws(
@@ -259,7 +259,7 @@ describe('model', function() {
         done();
       });
 
-      it('is not customizable', function(done) {
+      it('is not customizable', function() {
         const CustomizedSchema = new Schema({}, { capped: true });
 
         assert.throws(function() {
@@ -269,18 +269,18 @@ describe('model', function() {
     });
 
     describe('root schema inheritance', function() {
-      it('inherits field mappings', function(done) {
+      it('inherits field mappings', function() {
         assert.strictEqual(Employee.schema.path('name'), Person.schema.path('name'));
         assert.strictEqual(Employee.schema.path('gender'), Person.schema.path('gender'));
         assert.equal(Person.schema.paths.department, undefined);
       });
 
-      it('inherits validators', function(done) {
+      it('inherits validators', function() {
         assert.strictEqual(Employee.schema.path('gender').validators, PersonSchema.path('gender').validators);
         assert.strictEqual(Employee.schema.path('department').validators, EmployeeSchema.path('department').validators);
       });
 
-      it('does not inherit and override fields that exist', function(done) {
+      it('does not inherit and override fields that exist', function() {
         const FemaleSchema = new Schema({ gender: { type: String, default: 'F' } }),
             Female = Person.discriminator('model-discriminator-female', FemaleSchema);
 
@@ -291,20 +291,20 @@ describe('model', function() {
         assert.equal(gender.options.default, 'F');
       });
 
-      it('inherits methods', function(done) {
+      it('inherits methods', function() {
         const employee = new Employee();
         assert.strictEqual(employee.getFullName, PersonSchema.methods.getFullName);
         assert.strictEqual(employee.getDepartment, EmployeeSchema.methods.getDepartment);
         assert.equal((new Person).getDepartment, undefined);
       });
 
-      it('inherits statics', function(done) {
+      it('inherits statics', function() {
         assert.strictEqual(Employee.findByGender, PersonSchema.statics.findByGender);
         assert.strictEqual(Employee.findByDepartment, EmployeeSchema.statics.findByDepartment);
         assert.equal(Person.findByDepartment, undefined);
       });
 
-      it('inherits virtual (g.s)etters', function(done) {
+      it('inherits virtual (g.s)etters', function() {
         const employee = new Employee();
         employee.name.full = 'John Doe';
         assert.equal(employee.name.full, 'John Doe');
@@ -315,7 +315,7 @@ describe('model', function() {
         assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true }]]);
       });
 
-      it('gets options overridden by root options except toJSON and toObject', function(done) {
+      it('gets options overridden by root options except toJSON and toObject', function() {
         const personOptions = clone(Person.schema.options),
             employeeOptions = clone(Employee.schema.options);
 
@@ -369,7 +369,7 @@ describe('model', function() {
           });
       });
 
-      it('with typeKey (gh-4339)', function(done) {
+      it('with typeKey (gh-4339)', function() {
         const options = { typeKey: '$type', discriminatorKey: '_t' };
         const schema = new Schema({ test: { $type: String } }, options);
         const Model = db.model('Test', schema);
@@ -671,7 +671,7 @@ describe('model', function() {
           });
       });
 
-      it('reusing schema for discriminators (gh-5684)', function(done) {
+      it('reusing schema for discriminators (gh-5684)', function() {
         const ParentSchema = new Schema({});
         const ChildSchema = new Schema({ name: String });
 
@@ -699,7 +699,7 @@ describe('model', function() {
         assert.equal(doc2.things[0].name, 'test');
       });
 
-      it('overwrites nested paths in parent schema (gh-6076)', function(done) {
+      it('overwrites nested paths in parent schema (gh-6076)', function() {
         const schema = mongoose.Schema({
           account: {
             type: Object

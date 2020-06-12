@@ -42,12 +42,12 @@ describe('castArrayFilters', function() {
     done();
   });
 
-  it('casts on multiple fields', function (done) {
+  it('casts on multiple fields', function(done) {
     const schema = new Schema({
       comments: [{
         text: String,
-        replies: [{ 
-          beginAt: Date, 
+        replies: [{
+          beginAt: Date,
           endAt: Date
         }]
       }]

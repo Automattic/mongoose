@@ -183,7 +183,7 @@ describe('model', function() {
       );
     });
 
-    it('throws error when discriminator has mapped discriminator key in schema with discriminatorKey option set', function(done) {
+    it('throws error when discriminator has mapped discriminator key in schema with discriminatorKey option set', function() {
       assert.throws(
         function() {
           const Foo = db.model('Test1', new Schema({}, { discriminatorKey: '_type' }));

@@ -1074,7 +1074,7 @@ describe('model', function() {
         catch(done);
     });
 
-    it('embedded with single nested subdocs and tied value (gh-8164)', function() {
+    it('embedded with single nested subdocs and tied value (gh-8164) (gh-9108)', function() {
       const eventSchema = new Schema({ message: String },
         { discriminatorKey: 'kind', _id: false });
 
@@ -1087,13 +1087,13 @@ describe('model', function() {
       }, { _id: false }), 'purchase');
 
       const MyModel = db.model('Test1', trackSchema);
-      const doc1 = {
+      let doc1 = {
         event: {
           kind: 'click',
           element: 'Amazon Link'
         }
       };
-      const doc2 = {
+      let doc2 = {
         event: {
           kind: 'purchase',
           product: 'Professional AngularJS'
@@ -1101,8 +1101,8 @@ describe('model', function() {
       };
       return MyModel.create([doc1, doc2]).
         then(function(docs) {
-          const doc1 = docs[0];
-          const doc2 = docs[1];
+          doc1 = docs[0];
+          doc2 = docs[1];
 
           assert.equal(doc1.event.kind, 'click');
           assert.equal(doc1.event.element, 'Amazon Link');
@@ -1111,6 +1111,14 @@ describe('model', function() {
           assert.equal(doc2.event.kind, 'purchase');
           assert.equal(doc2.event.product, 'Professional AngularJS');
           assert.ok(!doc2.event.element);
+
+          return MyModel.updateOne({ 'event.kind': 'click' }, {
+            'event.element': 'Pluralsight Link'
+          });
+        }).
+        then(() => MyModel.findById(doc1._id)).
+        then(doc => {
+          assert.equal(doc.event.element, 'Pluralsight Link');
         });
     });
 

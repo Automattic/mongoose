@@ -5,6 +5,10 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## Subdocuments
 
@@ -20,7 +24,7 @@ block content
 
     Subdocuments are documents embedded in other documents. In Mongoose, this
     means you can nest schemas in other schemas. Mongoose has two
-    distinct notions of subdocuments: arrays of subdocuments and single nested
+    distinct notions of subdocuments: [arrays of subdocuments](https://masteringjs.io/tutorials/mongoose/array#document-arrays) and single nested
     subdocuments.
     ```javascript
     var childSchema = new Schema({ name: 'string' });
@@ -40,6 +44,7 @@ block content
   :markdown
     <ul class="toc">
       <li><a href="#what-is-a-subdocument-">What is a Subdocument?</a></li>
+      <li><a href="#subdocuments-versus-nested-paths">Subdocuments versus Nested Paths</a></li>
       <li><a href="#finding-a-subdocument">Finding a Subdocument</a></li>
       <li><a href="#adding-subdocs-to-arrays">Adding Subdocs to Arrays</a></li>
       <li><a href="#removing-subdocs">Removing Subdocs</a></li>
@@ -106,8 +111,8 @@ block content
     });
 
     var parentSchema = new mongoose.Schema({
-      child: childSchema,
-        });
+      child: childSchema
+    });
 
     parentSchema.pre('validate', function(next) {
       console.log('1');
@@ -118,6 +123,59 @@ block content
       console.log('4');
       next();
     });
+    ```
+
+    ### Subdocuments versus Nested Paths
+
+    In Mongoose, nested paths are subtly different from subdocuments.
+    For example, below are two schemas: one with `child` as a subdocument,
+    and one with `child` as a nested path.
+
+    ```javascript
+    // Subdocument
+    const subdocumentSchema = new mongoose.Schema({
+      child: new mongoose.Schema({ name: String, age: Number })
+    });
+    const Subdoc = mongoose.model('Subdoc', subdocumentSchema);
+
+    // Nested path
+    const nestedSchema = new mongoose.Schema({
+      child: { name: String, age: Number }
+    });
+    const Nested = mongoose.model('Nested', nestedSchema);
+    ```
+
+    These two schemas look similar, and the documents in MongoDB will
+    have the same structure with both schemas. But there are a few
+    Mongoose-specific differences:
+
+    First, instances of `Nested` never have `child === undefined`.
+    You can always set subproperties of `child`, even if you don't set
+    the `child` property. But instances of `Subdoc` can have `child === undefined`.
+
+    ```javascript
+    const doc1 = new Subdoc({});
+    doc1.child === undefined; // true
+    doc1.child.name = 'test'; // Throws TypeError: cannot read property...
+
+    const doc2 = new Nested({});
+    doc2.child === undefined; // false
+    console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
+    doc2.child.name = 'test'; // Works
+    ```
+
+    Secondly, in Mongoose 5, [`Document#set()`](/docs/api/document.html#document_Document-set)
+    merges when you call it on a nested path, but overwrites when you call
+    it on a subdocument.
+
+    ```javascript
+    const doc1 = new Subdoc({ child: { name: 'Luke', age: 19 } });
+    doc1.set({ child: { age: 21 } });
+    doc1.child; // { age: 21 }
+
+    const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
+    doc2.set({ child: { age: 21 } });
+    doc2.child; // { name: Luke, age: 21 }
     ```
 
   h3#finding-a-subdocument Finding a Subdocument

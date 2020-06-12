@@ -1196,7 +1196,7 @@ describe('schema', function() {
   });
 
   describe('#add()', function() {
-    it('does not polute existing paths', function(done) {
+    it('does not pollute existing paths', function(done) {
       let o = { name: String };
       let s = new Schema(o);
 
@@ -1435,12 +1435,6 @@ describe('schema', function() {
           schema: String
         });
       }, /`schema` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
-          db: String
-        });
-      }, /`db` may not be used as a schema pathname/);
 
       assert.throws(function() {
         new Schema({
@@ -2414,21 +2408,30 @@ describe('schema', function() {
 
   describe('Schema.reserved (gh-8869)', function() {
     it('throws errors on compiling schema with reserved key as a flat type', function() {
-      const buildInvalidSchema = () => new Schema({ db: String });
+      const buildInvalidSchema = () => new Schema({ save: String });
 
-      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
+      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
 
     it('throws errors on compiling schema with reserved key as a nested object', function() {
-      const buildInvalidSchema = () => new Schema({ db: { nested: String } });
+      const buildInvalidSchema = () => new Schema({ save: { nested: String } });
 
-      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
+      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
 
     it('throws errors on compiling schema with reserved key as a nested array', function() {
-      const buildInvalidSchema = () => new Schema({ db: [{ nested: String }] });
+      const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
 
-      assert.throws(buildInvalidSchema, /`db` may not be used as a schema pathname/);
+      assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
     });
+  });
+
+  it('treats dotted paths with no parent as a nested path (gh-9020)', function() {
+    const customerSchema = new Schema({
+      'card.brand': String,
+      'card.last4': String
+    });
+
+    assert.ok(customerSchema.nested['card']);
   });
 });

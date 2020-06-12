@@ -5,6 +5,10 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## Documents
 
@@ -71,7 +75,7 @@ block content
     ```javascript
     doc.name = 'foo';
 
-    // Mongoose sends a `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`
+    // Mongoose sends an `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`
     // to MongoDB.
     await doc.save();
     ```
@@ -108,7 +112,7 @@ block content
 
     ### Validating
 
-    Documents are casted validated before they are saved. Mongoose first casts
+    Documents are casted and validated before they are saved. Mongoose first casts
     values to the specified type and then validates them. Internally, Mongoose
     calls the document's [`validate()` method](api.html#document_Document-validate)
     before saving.

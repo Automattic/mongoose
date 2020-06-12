@@ -9378,4 +9378,55 @@ describe('model: populate:', function() {
       });
     });
   });
+
+  it('no-op if populating on a document array with no ref (gh-8946)', function() {
+    const teamSchema = Schema({
+      members: [{ user: { type: ObjectId, ref: 'User' } }]
+    });
+    const userSchema = Schema({ name: { type: String } });
+    userSchema.virtual('teams', {
+      ref: 'Team',
+      localField: '_id',
+      foreignField: 'members.user',
+      justOne: false
+    });
+    const User = db.model('User', userSchema);
+    const Team = db.model('Team', teamSchema);
+
+    return co(function*() {
+      const user = yield User.create({ name: 'User' });
+      yield Team.create({ members: [{ user: user._id }] });
+
+      const res = yield User.findOne().populate({
+        path: 'teams',
+        populate: {
+          path: 'members', // No ref
+          populate: { path: 'user' }
+        }
+      });
+
+      assert.equal(res.teams[0].members[0].user.name, 'User');
+    });
+  });
+
+  it('no-op if populating a nested path (gh-9073)', function() {
+    const buildingSchema = Schema({ owner: String });
+    const Building = db.model('Building', buildingSchema);
+
+    const officeSchema = new Schema({
+      title: String,
+      place: { building: { type: Schema.ObjectId, ref: 'Building' } }
+    });
+    const Office = db.model('Office', officeSchema);
+
+    return co(function*() {
+      const building = new Building({ owner: 'test' });
+      yield building.save();
+      yield Office.create({ place: { building: building._id } });
+
+      const foundOffice = yield Office.findOne({}).
+        populate({ path: 'place', populate: 'building' });
+      assert.equal(foundOffice.place.building.owner, 'test');
+    });
+  });
 });

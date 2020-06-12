@@ -5,6 +5,10 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## Schemas
 
@@ -77,8 +81,10 @@ block content
     
     Keys may also be assigned nested objects containing further key/type definitions
     like the `meta` property above.  This will happen whenever a key's value is a POJO
-    that lacks a bona-fide `type` property.  In these cases, only the leaves in a tree
-    are given actual paths in the schema (like `meta.votes` and `meta.favs` above),
+    that doesn't have a `type` property.
+    
+    In these cases, Mongoose only creates actual schema paths for leaves
+    in the tree. (like `meta.votes` and `meta.favs` above),
     and the branches do not have actual paths.  A side-effect of this is that `meta`
     above cannot have its own validation.  If validation is needed up the tree, a path
     needs to be created up the tree - see the [Subdocuments](./subdocs.html) section
@@ -688,7 +694,7 @@ block content
     _Note that Mongoose does not send the `shardcollection` command for you. You
     must configure your shards yourself._
 
-    <h3 id="strict">option: strict</h3>
+    <h3 id="strict"><a href="#strict">option: strict</a></h3>
 
     The strict option, (enabled by default), ensures that values passed to our
     model constructor that were not specified in our schema do not get saved to
@@ -739,7 +745,7 @@ block content
     thing.save(); // iAmNotInTheSchema is never saved to the db
     ```
 
-    <h3 id="strictQuery">option: strictQuery</h3>
+    <h3 id="strictQuery"><a href="#strictQuery">option: strictQuery</a></h3>
 
     For backwards compatibility, the `strict` option does **not** apply to
     the `filter` parameter for queries.
@@ -853,7 +859,7 @@ block content
     var schema = new Schema({ name: String });
     schema.set('validateBeforeSave', false);
     schema.path('name').validate(function (value) {
-        return v != null;
+        return value != null;
     });
     var M = mongoose.model('Person', schema);
     var m = new M({ name: null });

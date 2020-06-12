@@ -42,6 +42,10 @@
   list-style-type: none;
 }
 
+.item-header-wrap {
+  position: relative;
+}
+
 @media (max-width: 1785px) {
   .api-nav {
     display: none;

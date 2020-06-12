@@ -19,10 +19,10 @@ const Schema = mongoose.Schema;
  * Setup
  */
 const PersonSchema = new Schema({
-  name: {first: String, last: String},
+  name: { first: String, last: String },
   gender: String
-}, {collection: 'model-discriminator-' + random()});
-PersonSchema.index({name: 1});
+}, { collection: 'model-discriminator-' + random() });
+PersonSchema.index({ name: 1 });
 PersonSchema.methods.getFullName = function() {
   return this.name.first + ' ' + this.name.last;
 };
@@ -36,18 +36,18 @@ PersonSchema.virtual('name.full').get(function() {
   return this.name.first + ' ' + this.name.last;
 });
 PersonSchema.virtual('name.full').set(function(name) {
-  var split = name.split(' ');
+  const split = name.split(' ');
   this.name.first = split[0];
   this.name.last = split[1];
 });
 PersonSchema.path('gender').validate(function(value) {
   return /[A-Z]/.test(value);
 }, 'Invalid name');
-PersonSchema.set('toObject', {getters: true, virtuals: true});
-PersonSchema.set('toJSON', {getters: true, virtuals: true});
+PersonSchema.set('toObject', { getters: true, virtuals: true });
+PersonSchema.set('toJSON', { getters: true, virtuals: true });
 
-var EmployeeSchema = new Schema({department: String});
-EmployeeSchema.index({department: 1});
+const EmployeeSchema = new Schema({ department: String });
+EmployeeSchema.index({ department: 1 });
 EmployeeSchema.methods.getDepartment = function() {
   return this.department;
 };
@@ -56,12 +56,12 @@ EmployeeSchema.statics.findByDepartment = function() {
 EmployeeSchema.path('department').validate(function(value) {
   return /[a-zA-Z]/.test(value);
 }, 'Invalid name');
-var employeeSchemaPreSaveFn = function(next) {
+const employeeSchemaPreSaveFn = function(next) {
   next();
 };
 EmployeeSchema.pre('save', employeeSchemaPreSaveFn);
-EmployeeSchema.set('toObject', {getters: true, virtuals: false});
-EmployeeSchema.set('toJSON', {getters: false, virtuals: true});
+EmployeeSchema.set('toObject', { getters: true, virtuals: false });
+EmployeeSchema.set('toJSON', { getters: false, virtuals: true });
 
 describe('model', function() {
   let db;
@@ -79,7 +79,7 @@ describe('model', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   describe('discriminator()', function() {
-    var Person, Employee;
+    let Person, Employee;
 
     before(function() {
       db = start();
@@ -88,13 +88,13 @@ describe('model', function() {
     });
 
     it('model defaults without discriminator', function(done) {
-      var Model = db.model('Test1', new Schema());
+      const Model = db.model('Test1', new Schema());
       assert.equal(Model.discriminators, undefined);
     });
 
     it('is instance of root', function(done) {
       assert.equal(Employee.baseModelName, 'Test');
-      var employee = new Employee();
+      const employee = new Employee();
       assert.ok(employee instanceof Person);
       assert.ok(employee instanceof Employee);
       assert.strictEqual(employee.__proto__.constructor, Employee);
@@ -113,18 +113,18 @@ describe('model', function() {
 
       util.inherits(BossBaseSchema, Schema);
 
-      var PersonSchema = new BossBaseSchema();
-      var BossSchema = new BossBaseSchema({department: String});
+      const PersonSchema = new BossBaseSchema();
+      const BossSchema = new BossBaseSchema({ department: String });
       BossSchema.methods.myName = function() {
         return this.name;
       };
       BossSchema.statics.currentPresident = function() {
         return 'obama';
       };
-      var Person = db.model('Person', PersonSchema);
-      var Boss = Person.discriminator('Boss', BossSchema);
+      const Person = db.model('Person', PersonSchema);
+      const Boss = Person.discriminator('Boss', BossSchema);
 
-      var boss = new Boss({name: 'Bernenke'});
+      const boss = new Boss({ name: 'Bernenke' });
       assert.equal(boss.myName(), 'Bernenke');
       assert.equal(boss.notInstanceMethod, undefined);
       assert.equal(Boss.currentPresident(), 'obama');
@@ -132,15 +132,17 @@ describe('model', function() {
     });
 
     it('sets schema root discriminator mapping', function(done) {
-      assert.deepEqual(Person.schema.discriminatorMapping, {key: '__t', value: null, isRoot: true});
+      assert.deepEqual(Person.schema.discriminatorMapping, { key: '__t', value: null, isRoot: true });
+      done();
     });
 
     it('sets schema discriminator type mapping', function(done) {
-      assert.deepEqual(Employee.schema.discriminatorMapping, {key: '__t', value: 'Employee', isRoot: false});
+      assert.deepEqual(Employee.schema.discriminatorMapping, { key: '__t', value: 'Employee', isRoot: false });
+      done();
     });
 
     it('adds discriminatorKey to schema with default as name', function(done) {
-      var type = Employee.schema.paths.__t;
+      const type = Employee.schema.paths.__t;
       assert.equal(type.options.type, String);
       assert.equal(type.options.default, 'Employee');
     });
@@ -148,62 +150,62 @@ describe('model', function() {
     it('adds discriminator to Model.discriminators object', function(done) {
       assert.equal(Object.keys(Person.discriminators).length, 1);
       assert.equal(Person.discriminators['Employee'], Employee);
-      var newName = 'model-discriminator-' + random();
-      var NewDiscriminatorType = Person.discriminator(newName, new Schema());
+      const newName = 'model-discriminator-' + random();
+      const NewDiscriminatorType = Person.discriminator(newName, new Schema());
       assert.equal(Object.keys(Person.discriminators).length, 2);
       assert.equal(Person.discriminators[newName], NewDiscriminatorType);
     });
 
     it('throws error on invalid schema', function(done) {
       assert.throws(
-          function() {
-            Person.discriminator('Foo');
-          },
-          /You must pass a valid discriminator Schema/
+        function() {
+          Person.discriminator('Foo');
+        },
+        /You must pass a valid discriminator Schema/
       );
     });
 
     it('throws error when attempting to nest discriminators', function(done) {
       assert.throws(
-          function() {
-            Employee.discriminator('model-discriminator-foo', new Schema());
-          },
-          /Discriminator "model-discriminator-foo" can only be a discriminator of the root model/
+        function() {
+          Employee.discriminator('model-discriminator-foo', new Schema());
+        },
+        /Discriminator "model-discriminator-foo" can only be a discriminator of the root model/
       );
     });
 
     it('throws error when discriminator has mapped discriminator key in schema', function(done) {
       assert.throws(
-          function() {
-            Person.discriminator('model-discriminator-foo', new Schema({__t: String}));
-          },
-          /Discriminator "model-discriminator-foo" cannot have field with name "__t"/
+        function() {
+          Person.discriminator('model-discriminator-foo', new Schema({ __t: String }));
+        },
+        /Discriminator "model-discriminator-foo" cannot have field with name "__t"/
       );
     });
 
     it('throws error when discriminator has mapped discriminator key in schema with discriminatorKey option set', function(done) {
       assert.throws(
-          function() {
-            var Foo = db.model('Test1', new Schema({}, {discriminatorKey: '_type'}));
-            Foo.discriminator('Bar', new Schema({_type: String}));
-          },
-          /Discriminator "Bar" cannot have field with name "_type"/
+        function() {
+          const Foo = db.model('Test1', new Schema({}, { discriminatorKey: '_type' }));
+          Foo.discriminator('Bar', new Schema({ _type: String }));
+        },
+        /Discriminator "Bar" cannot have field with name "_type"/
       );
     });
 
     it('throws error when discriminator with taken name is added', function(done) {
-      var Foo = db.model('Test1', new Schema({}));
+      const Foo = db.model('Test1', new Schema({}));
       Foo.discriminator('Token', new Schema());
       assert.throws(
-          function() {
-            Foo.discriminator('Token', new Schema());
-          },
-          /Discriminator with name "Token" already exists/
+        function() {
+          Foo.discriminator('Token', new Schema());
+        },
+        /Discriminator with name "Token" already exists/
       );
     });
 
     it('throws error if model name is taken (gh-4148)', function(done) {
-      var Foo = db.model('Test1', new Schema({}));
+      const Foo = db.model('Test1', new Schema({}));
       db.model('Test', new Schema({}));
       assert.throws(
         function() {
@@ -213,7 +215,7 @@ describe('model', function() {
     });
 
     it('works with nested schemas (gh-2821)', function(done) {
-      var MinionSchema = function() {
+      const MinionSchema = function() {
         mongoose.Schema.apply(this, arguments);
 
         this.add({
@@ -222,7 +224,7 @@ describe('model', function() {
       };
       util.inherits(MinionSchema, mongoose.Schema);
 
-      var BaseSchema = function() {
+      const BaseSchema = function() {
         mongoose.Schema.apply(this, arguments);
 
         this.add({
@@ -233,30 +235,32 @@ describe('model', function() {
       };
       util.inherits(BaseSchema, mongoose.Schema);
 
-      var PersonSchema = new BaseSchema();
-      var BossSchema = new BaseSchema({
+      const PersonSchema = new BaseSchema();
+      const BossSchema = new BaseSchema({
         department: String
       }, { id: false });
 
-      assert.doesNotThrow(function () {
-        var Person = db.model('Test1', PersonSchema);
-        Person.discriminator('Boss', BossSchema);
-      });
+      // Should not throw
+      const Person = db.model('Test1', PersonSchema);
+      Person.discriminator('Boss', BossSchema);
+      done();
     });
 
     describe('options', function() {
       it('allows toObject to be overridden', function(done) {
         assert.notDeepEqual(Employee.schema.get('toObject'), Person.schema.get('toObject'));
-        assert.deepEqual(Employee.schema.get('toObject'), {getters: true, virtuals: false});
+        assert.deepEqual(Employee.schema.get('toObject'), { getters: true, virtuals: false });
+        done();
       });
 
       it('allows toJSON to be overridden', function(done) {
         assert.notDeepEqual(Employee.schema.get('toJSON'), Person.schema.get('toJSON'));
-        assert.deepEqual(Employee.schema.get('toJSON'), {getters: false, virtuals: true});
+        assert.deepEqual(Employee.schema.get('toJSON'), { getters: false, virtuals: true });
+        done();
       });
 
       it('is not customizable', function(done) {
-        var CustomizedSchema = new Schema({}, {capped: true});
+        const CustomizedSchema = new Schema({}, { capped: true });
 
         assert.throws(function() {
           Person.discriminator('model-discriminator-custom', CustomizedSchema);
@@ -277,10 +281,10 @@ describe('model', function() {
       });
 
       it('does not inherit and override fields that exist', function(done) {
-        var FemaleSchema = new Schema({gender: {type: String, default: 'F'}}),
+        const FemaleSchema = new Schema({ gender: { type: String, default: 'F' } }),
             Female = Person.discriminator('model-discriminator-female', FemaleSchema);
 
-        var gender = Female.schema.paths.gender;
+        const gender = Female.schema.paths.gender;
 
         assert.notStrictEqual(gender, Person.schema.paths.gender);
         assert.equal(gender.instance, 'String');
@@ -288,7 +292,7 @@ describe('model', function() {
       });
 
       it('inherits methods', function(done) {
-        var employee = new Employee();
+        const employee = new Employee();
         assert.strictEqual(employee.getFullName, PersonSchema.methods.getFullName);
         assert.strictEqual(employee.getDepartment, EmployeeSchema.methods.getDepartment);
         assert.equal((new Person).getDepartment, undefined);
@@ -301,18 +305,18 @@ describe('model', function() {
       });
 
       it('inherits virtual (g.s)etters', function(done) {
-        var employee = new Employee();
+        const employee = new Employee();
         employee.name.full = 'John Doe';
         assert.equal(employee.name.full, 'John Doe');
       });
 
-      it('does not inherit indexes', function(done) {
-        assert.deepEqual(Person.schema.indexes(), [[{name: 1}, {background: true}]]);
-        assert.deepEqual(Employee.schema.indexes(), [[{department: 1}, {background: true}]]);
+      it('does not inherit indexes', function() {
+        assert.deepEqual(Person.schema.indexes(), [[{ name: 1 }, { background: true }]]);
+        assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true }]]);
       });
 
       it('gets options overridden by root options except toJSON and toObject', function(done) {
-        var personOptions = clone(Person.schema.options),
+        const personOptions = clone(Person.schema.options),
             employeeOptions = clone(Employee.schema.options);
 
         delete personOptions.toJSON;
@@ -324,7 +328,7 @@ describe('model', function() {
       });
 
       it('does not allow setting discriminator key (gh-2041)', function(done) {
-        var doc = new Employee({ __t: 'fake' });
+        const doc = new Employee({ __t: 'fake' });
         assert.equal(doc.__t, 'Employee');
         doc.save(function(error) {
           assert.ok(error);
@@ -362,13 +366,13 @@ describe('model', function() {
         return new D({ text: 'test' }).validate().
           then(() => {
             assert.equal(called, 1);
-          })
+          });
       });
 
       it('with typeKey (gh-4339)', function(done) {
-        var options = { typeKey: '$type', discriminatorKey: '_t' };
-        var schema = new Schema({ test: { $type: String } }, options);
-        var Model = db.model('Test', schema);
+        const options = { typeKey: '$type', discriminatorKey: '_t' };
+        const schema = new Schema({ test: { $type: String } }, options);
+        const Model = db.model('Test', schema);
         Model.discriminator('D', new Schema({
           test2: String
         }, { typeKey: '$type' }));
@@ -382,14 +386,14 @@ describe('model', function() {
           m.set('applyPluginsToDiscriminators', true);
         });
 
-        it('works (gh-4965)', function(done) {
-          var schema = new m.Schema({ test: String });
-          var called = 0;
+        it('works (gh-4965)', function() {
+          const schema = new m.Schema({ test: String });
+          let called = 0;
           m.plugin(function() {
             ++called;
           });
-          var Model = m.model('Test', schema);
-          var childSchema = new m.Schema({
+          const Model = m.model('Test', schema);
+          const childSchema = new m.Schema({
             test2: String
           });
           Model.discriminator('D', childSchema);
@@ -401,22 +405,21 @@ describe('model', function() {
             schema.options.versionKey = false;
             schema.options.minimize = false;
           });
-          
+
           const schema = new m.Schema({
-            type: {type: String},
-            something: {type: String}
+            type: { type: String },
+            something: { type: String }
           }, {
             discriminatorKey: 'type'
           });
           const Model = m.model('Test', schema);
-          
+
           const subSchema = new m.Schema({
-            somethingElse: {type: String}
+            somethingElse: { type: String }
           });
 
-          assert.doesNotThrow(function(){
-            Model.discriminator('TestSub', subSchema);
-          })
+          // Should not throw
+          Model.discriminator('TestSub', subSchema);
         });
       });
 
@@ -432,7 +435,7 @@ describe('model', function() {
           items: {
             type: [abstractSchema],
             default: defaultValue
-          },
+          }
         });
 
         schema.path('items').discriminator('concrete', concreteSchema);
@@ -452,7 +455,7 @@ describe('model', function() {
         const batchSchema = new Schema({ events: [eventSchema] });
         const docArray = batchSchema.path('events');
 
-        const Clicked = docArray.discriminator('Clicked', new Schema({
+        docArray.discriminator('Clicked', new Schema({
           element: {
             type: String,
             required: true
@@ -497,10 +500,10 @@ describe('model', function() {
       it('embedded discriminator with numeric type (gh-7808)', function() {
         const typesSchema = Schema({
           type: { type: Number }
-        }, { discriminatorKey:'type',_id:false });
+        }, { discriminatorKey: 'type', _id: false });
 
         const mainSchema = Schema({
-          types:[typesSchema]
+          types: [typesSchema]
         });
 
         mainSchema.path('types').discriminator(1,
@@ -522,12 +525,12 @@ describe('model', function() {
       });
 
       it('supports clone() (gh-4983)', function(done) {
-        var childSchema = new Schema({
+        const childSchema = new Schema({
           name: String
         });
-        var childCalls = 0;
-        var childValidateCalls = 0;
-        var preValidate = function preValidate(next) {
+        let childCalls = 0;
+        let childValidateCalls = 0;
+        const preValidate = function preValidate(next) {
           ++childValidateCalls;
           next();
         };
@@ -537,29 +540,29 @@ describe('model', function() {
           next();
         });
 
-        var personSchema = new Schema({
+        const personSchema = new Schema({
           name: String
         }, { discriminatorKey: 'kind' });
 
-        var parentSchema = new Schema({
+        const parentSchema = new Schema({
           children: [childSchema],
           heir: childSchema
         });
-        var parentCalls = 0;
+        let parentCalls = 0;
         parentSchema.pre('save', function(next) {
           ++parentCalls;
           next();
         });
 
-        var Person = db.model('Person', personSchema);
-        var Parent = Person.discriminator('Parent', parentSchema.clone());
+        const Person = db.model('Person', personSchema);
+        const Parent = Person.discriminator('Parent', parentSchema.clone());
 
-        var obj = {
+        const obj = {
           name: 'Ned Stark',
           heir: { name: 'Robb Stark' },
           children: [{ name: 'Jon Snow' }]
         };
-        var doc = new Parent(obj);
+        const doc = new Parent(obj);
 
         doc.save(function(error, doc) {
           assert.ifError(error);
@@ -574,39 +577,37 @@ describe('model', function() {
         });
       });
 
-      it('clone() allows reusing schemas (gh-5098)', function(done) {
-        var personSchema = new Schema({
+      it('clone() allows reusing schemas (gh-5098)', function() {
+        const personSchema = new Schema({
           name: String
         }, { discriminatorKey: 'kind' });
 
-        var parentSchema = new Schema({
+        const parentSchema = new Schema({
           child: String
         });
 
-        var Person = db.model('Person', personSchema);
-        var Parent = Person.discriminator('Parent', parentSchema.clone());
-        
-        assert.doesNotThrow(function () {
-         Person.discriminator('Parent2', parentSchema.clone());
-        });
+        const Person = db.model('Person', personSchema);
+        Person.discriminator('Parent', parentSchema.clone());
+        // Should not throw
+        Person.discriminator('Parent2', parentSchema.clone());
       });
 
       it('clone() allows reusing with different models (gh-5721)', function(done) {
-        var schema = new mongoose.Schema({
+        const schema = new mongoose.Schema({
           name: String
         });
 
-        var schemaExt = new mongoose.Schema({
+        const schemaExt = new mongoose.Schema({
           nameExt: String
         });
 
-        var ModelA = db.model('Test1', schema);
+        const ModelA = db.model('Test1', schema);
         ModelA.discriminator('D1', schemaExt);
 
         ModelA.findOneAndUpdate({}, { $set: { name: 'test' } }, function(error) {
           assert.ifError(error);
 
-          var ModelB = db.model('Test2', schema.clone());
+          const ModelB = db.model('Test2', schema.clone());
           ModelB.discriminator('D2', schemaExt.clone());
 
           done();
@@ -624,7 +625,7 @@ describe('model', function() {
           });
 
           const Setting = db.model('Test', settingSchema);
-          const DefaultAdvisor = Setting.discriminator('DefaultAdvisor',
+          Setting.discriminator('DefaultAdvisor',
             defaultAdvisorSchema);
 
           let threw = false;
@@ -644,22 +645,22 @@ describe('model', function() {
       });
 
       it('copies query hooks (gh-5147)', function(done) {
-        var options = { discriminatorKey: 'kind' };
+        const options = { discriminatorKey: 'kind' };
 
-        var eventSchema = new mongoose.Schema({ time: Date }, options);
-        var eventSchemaCalls = 0;
+        const eventSchema = new mongoose.Schema({ time: Date }, options);
+        let eventSchemaCalls = 0;
         eventSchema.pre('findOneAndUpdate', function() {
           ++eventSchemaCalls;
         });
 
-        var Event = db.model('Test', eventSchema);
+        const Event = db.model('Test', eventSchema);
 
-        var clickedEventSchema = new mongoose.Schema({ url: String }, options);
-        var clickedEventSchemaCalls = 0;
+        const clickedEventSchema = new mongoose.Schema({ url: String }, options);
+        let clickedEventSchemaCalls = 0;
         clickedEventSchema.pre('findOneAndUpdate', function() {
           ++clickedEventSchemaCalls;
         });
-        var ClickedLinkEvent = Event.discriminator('ClickedLink', clickedEventSchema);
+        const ClickedLinkEvent = Event.discriminator('ClickedLink', clickedEventSchema);
 
         ClickedLinkEvent.findOneAndUpdate({}, { time: new Date() }, {}).
           exec(function(error) {
@@ -671,26 +672,26 @@ describe('model', function() {
       });
 
       it('reusing schema for discriminators (gh-5684)', function(done) {
-        var ParentSchema = new Schema({});
-        var ChildSchema = new Schema({ name: String });
+        const ParentSchema = new Schema({});
+        const ChildSchema = new Schema({ name: String });
 
-        var FirstContainerSchema = new Schema({
+        const FirstContainerSchema = new Schema({
           stuff: [ParentSchema]
         });
 
         FirstContainerSchema.path('stuff').discriminator('Child', ChildSchema);
 
-        var SecondContainerSchema = new Schema({
+        const SecondContainerSchema = new Schema({
           things: [ParentSchema]
         });
 
         SecondContainerSchema.path('things').discriminator('Child', ChildSchema);
 
-        var M1 = db.model('Test1', FirstContainerSchema);
-        var M2 = db.model('Test2', SecondContainerSchema);
+        const M1 = db.model('Test1', FirstContainerSchema);
+        const M2 = db.model('Test2', SecondContainerSchema);
 
-        var doc1 = new M1({ stuff: [{ __t: 'Child', name: 'test' }] });
-        var doc2 = new M2({ things: [{ __t: 'Child', name: 'test' }] });
+        const doc1 = new M1({ stuff: [{ __t: 'Child', name: 'test' }] });
+        const doc2 = new M2({ things: [{ __t: 'Child', name: 'test' }] });
 
         assert.equal(doc1.stuff.length, 1);
         assert.equal(doc1.stuff[0].name, 'test');
@@ -701,7 +702,7 @@ describe('model', function() {
       it('overwrites nested paths in parent schema (gh-6076)', function(done) {
         const schema = mongoose.Schema({
           account: {
-            type: Object,
+            type: Object
           }
         });
 
@@ -721,29 +722,29 @@ describe('model', function() {
 
         const d1 = new Disc({
           account: {
-            user: 'AAAAAAAAAAAAAAAAAAAAAAAA',
+            user: 'AAAAAAAAAAAAAAAAAAAAAAAA'
           },
-          info: 'AAAAAAAAAAAAAAAAAAAAAAAA',
+          info: 'AAAAAAAAAAAAAAAAAAAAAAAA'
         });
 
         assert.ifError(d1.validateSync());
       });
 
       it('nested discriminator key with projecting in parent (gh-5775)', function(done) {
-        var itemSchema = new Schema({
+        const itemSchema = new Schema({
           type: { type: String },
           active: { type: Boolean, default: true }
         }, { discriminatorKey: 'type' });
 
-        var collectionSchema = new Schema({
+        const collectionSchema = new Schema({
           items: [itemSchema]
         });
 
-        var s = new Schema({ count: Number });
+        const s = new Schema({ count: Number });
         collectionSchema.path('items').discriminator('type1', s);
 
-        var MyModel = db.model('Test', collectionSchema);
-        var doc = {
+        const MyModel = db.model('Test', collectionSchema);
+        const doc = {
           items: [{ type: 'type1', active: false, count: 3 }]
         };
         MyModel.create(doc, function(error) {
@@ -760,15 +761,15 @@ describe('model', function() {
       });
 
       it('with $meta projection (gh-5859)', function() {
-        var eventSchema = new Schema({ eventField: String }, { id: false });
-        var Event = db.model('Test', eventSchema);
+        const eventSchema = new Schema({ eventField: String }, { id: false });
+        const Event = db.model('Test', eventSchema);
 
-        var trackSchema = new Schema({ trackField: String });
-        var Track = Event.discriminator('Track', trackSchema);
+        const trackSchema = new Schema({ trackField: String });
+        const Track = Event.discriminator('Track', trackSchema);
 
-        var trackedItem = new Track({
+        const trackedItem = new Track({
           trackField: 'trackField',
-          eventField: 'eventField',
+          eventField: 'eventField'
         });
 
         return trackedItem.save().
@@ -790,28 +791,28 @@ describe('model', function() {
       });
 
       it('embedded discriminators with $push (gh-5009)', function(done) {
-        var eventSchema = new Schema({ message: String },
+        const eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });
-        var batchSchema = new Schema({ events: [eventSchema] });
-        var docArray = batchSchema.path('events');
+        const batchSchema = new Schema({ events: [eventSchema] });
+        const docArray = batchSchema.path('events');
 
-        var Clicked = docArray.discriminator('Clicked', new Schema({
+        docArray.discriminator('Clicked', new Schema({
           element: {
             type: String,
             required: true
           }
         }, { _id: false }));
 
-        var Purchased = docArray.discriminator('Purchased', new Schema({
+        docArray.discriminator('Purchased', new Schema({
           product: {
             type: String,
             required: true
           }
         }, { _id: false }));
 
-        var Batch = db.model('Test', batchSchema);
+        const Batch = db.model('Test', batchSchema);
 
-        var batch = {
+        const batch = {
           events: [
             { kind: 'Clicked', element: '#hero' }
           ]
@@ -841,28 +842,28 @@ describe('model', function() {
       });
 
       it('embedded discriminators with $push + $each (gh-5070)', function(done) {
-        var eventSchema = new Schema({ message: String },
+        const eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });
-        var batchSchema = new Schema({ events: [eventSchema] });
-        var docArray = batchSchema.path('events');
+        const batchSchema = new Schema({ events: [eventSchema] });
+        const docArray = batchSchema.path('events');
 
-        var Clicked = docArray.discriminator('Clicked', new Schema({
+        docArray.discriminator('Clicked', new Schema({
           element: {
             type: String,
             required: true
           }
         }, { _id: false }));
 
-        var Purchased = docArray.discriminator('Purchased', new Schema({
+        docArray.discriminator('Purchased', new Schema({
           product: {
             type: String,
             required: true
           }
         }, { _id: false }));
 
-        var Batch = db.model('Test1', batchSchema);
+        const Batch = db.model('Test1', batchSchema);
 
-        var batch = {
+        const batch = {
           events: [
             { kind: 'Clicked', element: '#hero' }
           ]
@@ -892,28 +893,28 @@ describe('model', function() {
       });
 
       it('embedded discriminators with $set (gh-5130)', function(done) {
-        var eventSchema = new Schema({ message: String },
+        const eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind' });
-        var batchSchema = new Schema({ events: [eventSchema] });
-        var docArray = batchSchema.path('events');
+        const batchSchema = new Schema({ events: [eventSchema] });
+        const docArray = batchSchema.path('events');
 
-        var Clicked = docArray.discriminator('Clicked', new Schema({
+        docArray.discriminator('Clicked', new Schema({
           element: {
             type: String,
             required: true
           }
         }));
 
-        var Purchased = docArray.discriminator('Purchased', new Schema({
+        docArray.discriminator('Purchased', new Schema({
           product: {
             type: String,
             required: true
           }
         }));
 
-        var Batch = db.model('Test1', batchSchema);
+        const Batch = db.model('Test1', batchSchema);
 
-        var batch = {
+        const batch = {
           events: [
             { kind: 'Clicked', element: '#hero' }
           ]
@@ -924,7 +925,7 @@ describe('model', function() {
             assert.equal(doc.events.length, 1);
             return Batch.updateOne({ _id: doc._id, 'events._id': doc.events[0]._id }, {
               $set: {
-                'events.$':  {
+                'events.$': {
                   message: 'updated',
                   kind: 'Clicked',
                   element: '#hero2'
@@ -938,18 +939,18 @@ describe('model', function() {
           then(function(doc) {
             assert.equal(doc.events.length, 1);
             assert.equal(doc.events[0].message, 'updated');
-            assert.equal(doc.events[0].element, '#hero2');    // <-- test failed
-            assert.equal(doc.events[0].kind, 'Clicked');      // <-- test failed
+            assert.equal(doc.events[0].element, '#hero2'); // <-- test failed
+            assert.equal(doc.events[0].kind, 'Clicked'); // <-- test failed
             done();
           }).
           catch(done);
       });
 
       it('embedded in document arrays (gh-2723)', function(done) {
-        var eventSchema = new Schema({ message: String },
+        const eventSchema = new Schema({ message: String },
           { discriminatorKey: 'kind', _id: false });
 
-        var batchSchema = new Schema({ events: [eventSchema] });
+        const batchSchema = new Schema({ events: [eventSchema] });
         batchSchema.path('events').discriminator('Clicked', new Schema({
           element: String
         }, { _id: false }));
@@ -957,8 +958,8 @@ describe('model', function() {
           product: String
         }, { _id: false }));
 
-        var MyModel = db.model('Test1', batchSchema);
-        var doc = {
+        const MyModel = db.model('Test1', batchSchema);
+        const doc = {
           events: [
             { kind: 'Clicked', element: 'Test' },
             { kind: 'Purchased', product: 'Test2' }
@@ -969,7 +970,7 @@ describe('model', function() {
             assert.equal(doc.events.length, 2);
             assert.equal(doc.events[0].element, 'Test');
             assert.equal(doc.events[1].product, 'Test2');
-            var obj = doc.toObject({ virtuals: false });
+            const obj = doc.toObject({ virtuals: false });
             delete obj._id;
             assert.deepEqual(obj, {
               __v: 0,
@@ -1000,10 +1001,10 @@ describe('model', function() {
     });
 
     it('embedded with single nested subdocs (gh-5244)', function(done) {
-      var eventSchema = new Schema({ message: String },
+      const eventSchema = new Schema({ message: String },
         { discriminatorKey: 'kind', _id: false });
 
-      var trackSchema = new Schema({ event: eventSchema });
+      const trackSchema = new Schema({ event: eventSchema });
       trackSchema.path('event').discriminator('Clicked', new Schema({
         element: String
       }, { _id: false }));
@@ -1011,14 +1012,14 @@ describe('model', function() {
         product: String
       }, { _id: false }));
 
-      var MyModel = db.model('Test1', trackSchema);
-      var doc1 = {
+      const MyModel = db.model('Test1', trackSchema);
+      const doc1 = {
         event: {
           kind: 'Clicked',
           element: 'Amazon Link'
         }
       };
-      var doc2 = {
+      const doc2 = {
         event: {
           kind: 'Purchased',
           product: 'Professional AngularJS'
@@ -1026,8 +1027,8 @@ describe('model', function() {
       };
       MyModel.create([doc1, doc2]).
         then(function(docs) {
-          var doc1 = docs[0];
-          var doc2 = docs[1];
+          const doc1 = docs[0];
+          const doc2 = docs[1];
 
           assert.equal(doc1.event.kind, 'Clicked');
           assert.equal(doc1.event.element, 'Amazon Link');
@@ -1041,11 +1042,11 @@ describe('model', function() {
         catch(done);
     });
 
-    it('embedded with single nested subdocs and tied value (gh-8164)', function() {
+    it('embedded with single nested subdocs and tied value (gh-8164) (gh-9108)', function() {
       const eventSchema = new Schema({ message: String },
         { discriminatorKey: 'kind', _id: false });
 
-        const trackSchema = new Schema({ event: eventSchema });
+      const trackSchema = new Schema({ event: eventSchema });
       trackSchema.path('event').discriminator('Clicked', new Schema({
         element: String
       }, { _id: false }), 'click');
@@ -1054,13 +1055,13 @@ describe('model', function() {
       }, { _id: false }), 'purchase');
 
       const MyModel = db.model('Test1', trackSchema);
-      const doc1 = {
+      let doc1 = {
         event: {
           kind: 'click',
           element: 'Amazon Link'
         }
       };
-      const doc2 = {
+      let doc2 = {
         event: {
           kind: 'purchase',
           product: 'Professional AngularJS'
@@ -1068,8 +1069,8 @@ describe('model', function() {
       };
       return MyModel.create([doc1, doc2]).
         then(function(docs) {
-          const doc1 = docs[0];
-          const doc2 = docs[1];
+          doc1 = docs[0];
+          doc2 = docs[1];
 
           assert.equal(doc1.event.kind, 'click');
           assert.equal(doc1.event.element, 'Amazon Link');
@@ -1078,6 +1079,14 @@ describe('model', function() {
           assert.equal(doc2.event.kind, 'purchase');
           assert.equal(doc2.event.product, 'Professional AngularJS');
           assert.ok(!doc2.event.element);
+
+          return MyModel.updateOne({ 'event.kind': 'click' }, {
+            'event.element': 'Pluralsight Link'
+          });
+        }).
+        then(() => MyModel.findById(doc1._id)).
+        then(doc => {
+          assert.equal(doc.event.element, 'Pluralsight Link');
         });
     });
 
@@ -1091,9 +1100,9 @@ describe('model', function() {
       const docArray = batchSchema.path('events');
 
       const clickedSchema = new Schema({
-        element: {type: String, required: true}
+        element: { type: String, required: true }
       }, { _id: false });
-      const Clicked = docArray.discriminator('Clicked', clickedSchema);
+      docArray.discriminator('Clicked', clickedSchema);
 
       const M = db.model('Test1', batchSchema);
 
@@ -1112,7 +1121,7 @@ describe('model', function() {
       const arr = batchSchema.path('events');
 
       const clickedSchema = new Schema({
-        element: {type: String, required: true}
+        element: { type: String, required: true }
       }, { _id: false });
 
       let threw = false;
@@ -1137,19 +1146,19 @@ describe('model', function() {
       const conA = mongoose.createConnection(start.uri);
 
       const schemaExt = new Schema({ nameExt: String });
-      
+
       const modelA = conA.model('Test', schema);
       modelA.discriminator('AExt', schemaExt);
-      
+
       const conB = mongoose.createConnection(start.uri);
-      
+
       const modelB = conB.model('Test1', schema);
       modelB.discriminator('AExt', schemaExt);
-      
+
     });
 
-    describe('embedded discriminators + hooks (gh-5706)', function(){
-      var counters = {
+    describe('embedded discriminators + hooks (gh-5706)', function() {
+      const counters = {
         eventPreSave: 0,
         eventPostSave: 0,
         purchasePreSave: 0,
@@ -1157,9 +1166,9 @@ describe('model', function() {
         eventPreValidate: 0,
         eventPostValidate: 0,
         purchasePreValidate: 0,
-        purchasePostValidate: 0,
+        purchasePostValidate: 0
       };
-      var eventSchema = new Schema(
+      const eventSchema = new Schema(
         { message: String },
         { discriminatorKey: 'kind', _id: false }
       );
@@ -1168,7 +1177,7 @@ describe('model', function() {
         next();
       });
 
-      eventSchema.post('validate', function(doc) {
+      eventSchema.post('validate', function() {
         counters.eventPostValidate++;
       });
 
@@ -1177,12 +1186,12 @@ describe('model', function() {
         next();
       });
 
-      eventSchema.post('save', function(doc) {
+      eventSchema.post('save', function() {
         counters.eventPostSave++;
       });
 
-      var purchasedSchema = new Schema({
-        product: String,
+      const purchasedSchema = new Schema({
+        product: String
       }, { _id: false });
 
       purchasedSchema.pre('validate', function(next) {
@@ -1190,7 +1199,7 @@ describe('model', function() {
         next();
       });
 
-      purchasedSchema.post('validate', function(doc) {
+      purchasedSchema.post('validate', function() {
         counters.purchasePostValidate++;
       });
 
@@ -1199,7 +1208,7 @@ describe('model', function() {
         next();
       });
 
-      purchasedSchema.post('save', function(doc) {
+      purchasedSchema.post('save', function() {
         counters.purchasePostSave++;
       });
 
@@ -1209,25 +1218,25 @@ describe('model', function() {
         });
       });
 
-      it('should call the hooks on the embedded document defined by both the parent and discriminated schemas', function(done){
-        var trackSchema = new Schema({
-          event: eventSchema,
+      it('should call the hooks on the embedded document defined by both the parent and discriminated schemas', function(done) {
+        const trackSchema = new Schema({
+          event: eventSchema
         });
 
-        var embeddedEventSchema = trackSchema.path('event');
+        const embeddedEventSchema = trackSchema.path('event');
         embeddedEventSchema.discriminator('Purchased', purchasedSchema.clone());
 
-        var TrackModel = db.model('Track', trackSchema);
-        var doc = new TrackModel({
+        const TrackModel = db.model('Track', trackSchema);
+        const doc = new TrackModel({
           event: {
             message: 'Test',
             kind: 'Purchased'
           }
         });
-        doc.save(function(err){
+        doc.save(function(err) {
           assert.ok(!err);
-          assert.equal(doc.event.message, 'Test')
-          assert.equal(doc.event.kind, 'Purchased')
+          assert.equal(doc.event.message, 'Test');
+          assert.equal(doc.event.kind, 'Purchased');
           Object.keys(counters).forEach(function(i) {
             assert.equal(counters[i], 1, 'Counter ' + i + ' incorrect');
           });
@@ -1235,16 +1244,16 @@ describe('model', function() {
         });
       });
 
-      it('should call the hooks on the embedded document in an embedded array defined by both the parent and discriminated schemas', function(done){
-        var trackSchema = new Schema({
-          events: [eventSchema],
+      it('should call the hooks on the embedded document in an embedded array defined by both the parent and discriminated schemas', function(done) {
+        const trackSchema = new Schema({
+          events: [eventSchema]
         });
 
-        var embeddedEventSchema = trackSchema.path('events');
+        const embeddedEventSchema = trackSchema.path('events');
         embeddedEventSchema.discriminator('Purchased', purchasedSchema.clone());
 
-        var TrackModel = db.model('Track', trackSchema);
-        var doc = new TrackModel({
+        const TrackModel = db.model('Track', trackSchema);
+        const doc = new TrackModel({
           events: [
             {
               message: 'Test',
@@ -1256,7 +1265,7 @@ describe('model', function() {
             }
           ]
         });
-        doc.save(function(err){
+        doc.save(function(err) {
           assert.ok(!err);
           assert.equal(doc.events[0].kind, 'Purchased');
           assert.equal(doc.events[0].message, 'Test');
@@ -1270,8 +1279,8 @@ describe('model', function() {
       });
     });
 
-    it('should copy plugins', function () {
-      const plugin = (schema) => { };
+    it('should copy plugins', function() {
+      const plugin = () => { };
 
       const schema = new Schema({ value: String }, {
         autoIndex: false,
@@ -1293,10 +1302,10 @@ describe('model', function() {
   describe('bug fixes', function() {
     it('discriminators with classes modifies class in place (gh-5175)', function(done) {
       class Vehicle extends mongoose.Model { }
-      var V = mongoose.model(Vehicle, new mongoose.Schema());
+      const V = mongoose.model(Vehicle, new mongoose.Schema());
       assert.ok(V === Vehicle);
       class Car extends Vehicle { }
-      var C = Vehicle.discriminator(Car, new mongoose.Schema());
+      const C = Vehicle.discriminator(Car, new mongoose.Schema());
       assert.ok(C === Car);
       done();
     });
@@ -1325,14 +1334,14 @@ describe('model', function() {
     });
 
     it('supports adding properties (gh-5104) (gh-5635)', function(done) {
-      class Shape extends mongoose.Model { };
-      class Circle extends Shape { };
+      class Shape extends mongoose.Model { }
+      class Circle extends Shape { }
 
       const ShapeModel = mongoose.model(Shape, new mongoose.Schema({
         color: String
       }));
 
-      const CircleModel = ShapeModel.discriminator(Circle, new mongoose.Schema({
+      ShapeModel.discriminator(Circle, new mongoose.Schema({
         radius: Number
       }));
 
@@ -1394,9 +1403,9 @@ describe('model', function() {
         title: String,
         kind: { type: String, required: true }
       }, { discriminatorKey: 'kind' });
-      
+
       const Event = db.model('Test', eventSchema);
-      const Clicked = Event.discriminator('Clicked',
+      Event.discriminator('Clicked',
         Schema({ url: String }));
 
       const doc = new Event({ title: 'foo' });
@@ -1416,7 +1425,7 @@ describe('model', function() {
 
       const documentSchema = Schema({
         title: String,
-        sections: [ sectionSchema ]
+        sections: [sectionSchema]
       });
 
       const sectionsType = documentSchema.path('sections');
@@ -1458,7 +1467,7 @@ describe('model', function() {
       const e = new ClickedLinkEvent({
         lookups: [{
           hi: 'address1',
-          name: 'address2',
+          name: 'address2'
         }],
         url: 'google.com'
       });
@@ -1500,16 +1509,16 @@ describe('model', function() {
         product: { type: Schema.Types.ObjectId, ref: 'Product' }
       });
 
-      const OrderItemSchema = new Schema({}, {discriminatorKey: '__t'});
+      const OrderItemSchema = new Schema({}, { discriminatorKey: '__t' });
 
       const OrderSchema = new Schema({
-        items: [OrderItemSchema],
+        items: [OrderItemSchema]
       });
 
       OrderSchema.path('items').discriminator('ProductItem', ProductItemSchema);
       const Order = db.model('Order', OrderSchema);
 
-      const product = new Product({title: 'Product title'});
+      const product = new Product({ title: 'Product title' });
 
       const order = new Order({
         items: [{
@@ -1524,24 +1533,47 @@ describe('model', function() {
     });
   });
 
-  it('attempting to populate on base model a virtual path defined on discriminator does not throw an error (gh-8924)', function () {
+  it('attempting to populate on base model a virtual path defined on discriminator does not throw an error (gh-8924)', function() {
     return co(function* () {
       const User = db.model('User', {});
       const Post = db.model('Post', {});
-      
+
       const userWithPostSchema = new Schema({ postId: Schema.ObjectId });
-      
+
       userWithPostSchema.virtual('post', { ref: 'Post', localField: 'postId', foreignField: '_id' });
-      
+
       const UserWithPost = User.discriminator('UserWithPost', userWithPostSchema);
-      
+
       const post = yield Post.create({});
-      
+
       yield UserWithPost.create({ postId: post._id });
-      
+
       const user = yield User.findOne().populate({ path: 'post' });
-      
+
       assert.ok(user.postId);
-    })
+    });
+  });
+
+  it('accepts a POJO as a schema for discriminators (gh-8984)', function() {
+    const User = db.model('User', {});
+    const SuperUser = User.discriminator('SuperUser', { ability: String });
+
+    assert.ok(SuperUser.schema.path('ability'));
+  });
+
+  it('removes paths underneath mixed type if discriminator schema sets path to mixed (gh-9042)', function() {
+    const TestSchema = Schema({ name: String });
+    const MainSchema = Schema({ run: { tab: TestSchema } }, {
+      discriminatorKey: 'type'
+    });
+    const Main = db.model('Test', MainSchema);
+
+    const DiscriminatorSchema = Schema({ run: {} });
+
+    const D = Main.discriminator('copy', DiscriminatorSchema);
+    assert.ok(!D.schema.paths['run.tab']);
+
+    const doc = new D({ run: { tab: { id: 42 } } });
+    assert.ifError(doc.validateSync());
   });
 });

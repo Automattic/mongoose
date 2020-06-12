@@ -5,6 +5,10 @@ block append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     <h2 id="schematypes"><a href="#schematypes">SchemaTypes</a></h2>
 
@@ -32,6 +36,7 @@ block content
       <li><a href="#schematype-options">SchemaType Options</a></li>
       <li><a href="#customtypes">Creating Custom Types</a></li>
       <li><a href="#path">The `schema.path()` Function</a></li>
+      <li><a href="#further-reading">Further Reading</a></li>
     </ul>
 
     * [What is a SchemaType?](#what-is-a-schematype)
@@ -76,6 +81,7 @@ block content
     - [Array](#arrays)
     - [Decimal128](./api.html#mongoose_Mongoose-Decimal128)
     - [Map](#maps)
+    - [Schema](#schemas)
 
     <h4>Example</h4>
 
@@ -348,7 +354,7 @@ block content
     The values `null` and `undefined` are not cast.
 
     NaN, strings that cast to NaN, arrays, and objects that don't have a `valueOf()` function
-    will all result in a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError).
+    will all result in a [CastError](/docs/validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated.
 
     <h4 id="dates">Dates</h4>
 
@@ -472,7 +478,7 @@ block content
     * `'0'`
     * `'no'`
 
-    Any other value causes a [CastError](/docs/api.html#mongooseerror_MongooseError.CastError).
+    Any other value causes a [CastError](/docs/validation.html#cast-errors).
     You can modify what values Mongoose converts to true or false using the
     `convertToTrue` and `convertToFalse` properties, which are [JavaScript sets](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set).
 
@@ -617,7 +623,7 @@ block content
 
     const doc = new User({ name: 'Val', picture: '/123.png' });
     doc.picture; // 'https://s3.amazonaws.com/mybucket/123.png'
-    doc.toObject({ getters: false }).picture; // '123.png'
+    doc.toObject({ getters: false }).picture; // '/123.png'
     ```
 
     Generally, you only use getters on primitive paths as opposed to arrays
@@ -657,6 +663,28 @@ block content
     schema.path('arr.0.url').get(v => `${root}${v}`);
     ```
 
+    <h3 id="schemas"><a href="#schemas">Schemas</a></h3>
+
+    To declare a path as another [schema](./guide.html#definition),
+    set `type` to the sub-schema's instance.
+
+    To set a default value based on the sub-schema's shape, simply set a default value,
+    and the value will be cast based on the sub-schema's definition before being set
+    during document creation.
+
+    ```javascript
+    const subSchema = new mongoose.Schema({
+      // some schema definition here
+    });
+
+    const schema = new mongoose.Schema({
+      data: {
+        type: subSchema
+        default: {}
+      }
+    });
+    ```
+
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
 
     Mongoose can also be extended with [custom SchemaTypes](customschematypes.html). Search the
@@ -692,6 +720,9 @@ block content
     You can use this function to inspect the schema type for a given path,
     including what validators it has and what the type is.
 
-    <h3 id="next"><a href="#next">Next Up</a></h3>
+    <h3 id="further-reading"><a href="#further-reading">Further Reading</a></h3>
 
-    Now that we've covered `SchemaTypes`, let's take a look at [Connections](/docs/connections.html).
+    <ul>
+      <li><a href="https://masteringjs.io/tutorials/mongoose/schematype">An Introduction to Mongoose SchemaTypes</a></li>
+      <li><a href="https://kb.objectrocket.com/mongo-db/mongoose-schema-types-1418">Mongoose Schema Types</a></li>
+    </ul>

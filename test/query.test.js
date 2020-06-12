@@ -3631,7 +3631,7 @@ describe('Query', function() {
   });
 
   it('casts update object according to child discriminator schema when `discriminatorKey` is present (gh-8982)', function() {
-    const userSchema = new Schema({ }, { discriminatorKey: 'kind' });
+    const userSchema = new Schema({}, { discriminatorKey: 'kind' });
     const Person = db.model('Person', userSchema);
 
     return co(function*() {
@@ -3644,6 +3644,25 @@ describe('Query', function() {
       const person = yield Person.findOne({ _id: worker._id });
 
       assert.deepEqual(person.locations, ['US', 'UK']);
+    });
+  });
+
+  it('throws readable error if `$and` and `$or` contain non-objects (gh-8948)', function() {
+    const userSchema = new Schema({ name: String });
+    const Person = db.model('Person', userSchema);
+
+    return co(function*() {
+      let err = yield Person.find({ $and: [null] }).catch(err => err);
+      assert.equal(err.name, 'CastError');
+      assert.equal(err.path, '$and.0');
+
+      err = yield Person.find({ $or: [false] }).catch(err => err);
+      assert.equal(err.name, 'CastError');
+      assert.equal(err.path, '$or.0');
+
+      err = yield Person.find({ $nor: ['not an object'] }).catch(err => err);
+      assert.equal(err.name, 'CastError');
+      assert.equal(err.path, '$nor.0');
     });
   });
 });

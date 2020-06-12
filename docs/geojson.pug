@@ -5,6 +5,10 @@ block append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     # Using GeoJSON
 
@@ -145,3 +149,24 @@ block content
     ```javascript
     [require:geojson.*within helper]
     ```
+
+    <h2 id="geospatial-indexes">Geospatial Indexes</h2>
+
+    MongoDB supports [2dsphere indexes](https://docs.mongodb.com/manual/core/2dsphere/)
+    for speeding up geospatial queries. Here's how you can define
+    a 2dsphere index on a GeoJSON point:
+
+    ```javascript
+    [require:geojson.*index$]
+    ```
+
+    You can also define a geospatial index using the [`Schema#index()` function](/docs/api/schema.html#schema_Schema-index)
+    as shown below.
+
+    ```javascript
+    citySchema.index({ location: '2dsphere' });
+    ```
+
+    MongoDB's [`$near` query operator](https://docs.mongodb.com/v4.0/reference/operator/query/near/#op._S_near)
+    and [`$geoNear` aggregation stage](https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/#pipe._S_geoNear)
+    _require_ a 2dsphere index. 

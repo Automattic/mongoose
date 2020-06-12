@@ -5,6 +5,10 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## Models
 
@@ -48,7 +52,7 @@ block content
     ```
   :markdown
     The first argument is the _singular_ name of the collection your model is
-    for. ** Mongoose automatically looks for the plural, lowercased version of your model name. **
+    for. **Mongoose automatically looks for the plural, lowercased version of your model name.**
     Thus, for the example above, the model Tank is for the **tanks** collection
     in the database.
 

@@ -84,6 +84,7 @@ files.forEach(function(file) {
   }
 
   exports[file.output] = {
+    input: file.input,
     title: file.title,
     acquitBlocks: blocks,
     suffix: file.suffix,

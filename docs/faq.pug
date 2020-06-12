@@ -17,6 +17,10 @@ block append style
     }
 
 block content
+  <a class="edit-docs-link" href="#{editLink}">
+    <img src="/docs/images/pencil.svg" />
+  </a>
+
   :markdown
     ## FAQ
 
@@ -29,6 +33,7 @@ block content
     <div class="native-inline">
       <a href="#native_link#"><span class="sponsor">Sponsor</span> #native_company# — #native_desc#</a>
     </div>
+
 
     <hr id="array-changes-not-saved" />
 
@@ -72,6 +77,7 @@ block content
     doc.save();
     ```
 
+
     <hr id="unique-doesnt-work" />
 
     <a href="#unique-doesnt-work">**Q**</a>. I declared a schema property as `unique` but I can still save
@@ -111,7 +117,6 @@ block content
     // when the indexes have finished building successfully. The `init()`
     // function is idempotent, so don't worry about triggering an index rebuild.
     Model.init().then(function() {
-      assert.ifError(err);
       Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
         console.log(err);
       });
@@ -123,6 +128,7 @@ block content
     you should [create your indexes using the MongoDB shell](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/)
     rather than relying on mongoose to do it for you. The `unique` option for schemas is
     convenient for development and documentation, but mongoose is *not* an index management solution.
+
 
     <hr id="nested-properties" />
 
@@ -154,6 +160,7 @@ block content
     must always be defined as an object on a mongoose document, even if `nested`
     is undefined on the underlying [POJO](./guide.html#minimize).
 
+
     <hr id="destructured-imports" />
 
     <a href="#destructured-imports">**Q**</a>. When I use named imports like `import { set } from 'mongoose'`, I
@@ -178,6 +185,7 @@ block content
     const { foo } = require('./file1');
     foo(); // "undefined"
     ```
+
 
     <hr id="arrow-functions" />
 
@@ -208,6 +216,7 @@ block content
       console.log(this);
     });
     ```
+
 
     <hr id="type-key">
 
@@ -253,6 +262,7 @@ block content
     });
     ```
 
+
     <hr id="populate_sort_order" />
 
     <a href="#populate_sort_order">**Q**</a>. I'm populating a nested property under an array like the below code:
@@ -278,6 +288,7 @@ block content
     connect to MongoDB. Read the [buffering section of the connection docs](./connections.html#buffering)
     for more information.
 
+
     <hr id="enable_debugging" />
 
     <a href="#enable_debugging">**Q**</a>. How can I enable debugging?
@@ -293,6 +304,7 @@ block content
 
     All executed collection methods will log output of their arguments to your
     console.
+
 
     <hr id="callback_never_executes" />
 
@@ -319,12 +331,14 @@ block content
     mongoose.set('bufferCommands', false);
     ```
 
+
     <hr id="creating_connections" />
 
     <a href="#creating_connections">**Q**</a>. Should I create/destroy a new connection for each database operation?
 
     **A**. No. Open your connection when your application starts up and leave
     it open until the application shuts down.
+
 
     <hr id="overwrite-model-error" />
 
@@ -351,6 +365,7 @@ block content
     var Kitten = connection.model('Kitten', kittySchema);
     ```
 
+
     <hr id="array-defaults" />
 
     <a href="#array-defaults">**Q**</a>. How can I change mongoose's default behavior of initializing an array
@@ -365,6 +380,8 @@ block content
       }
     });
     ```
+
+
     <hr id="initialize-array-path-null" />
     
     <a href="#initialize-array-path-null">**Q**</a>. How can I initialize an array path to `null`?
@@ -388,6 +405,7 @@ block content
     $group, etc. the type of a property may change during the aggregation. If you want
     to query by date using the aggregation framework, you're responsible for ensuring
     that you're passing in a valid date.
+
 
     <hr id="date_changes" />
 
@@ -429,19 +447,6 @@ block content
     **A**. Technically, any 12 character string is a valid [ObjectId](https://docs.mongodb.com/manual/reference/bson-types/#objectid).
     Consider using a regex like `/^[a-f0-9]{24}$/` to test whether a string is exactly 24 hex characters.
 
-    <hr id="slow-localhost" />
-
-    <a href="#slow-localhost">**Q**</a>. I'm connecting to `localhost` and it takes me nearly 1 second to connect. How do I fix this?
-
-    **A**. The underlying MongoDB driver defaults to looking for IPv6 addresses, so the most likely cause is that your `localhost` DNS mapping isn't configured to handle IPv6. Use `127.0.0.1` instead of `localhost` or use the `family` option as shown in the [connection docs](https://mongoosejs.com/docs/connections.html#options).
-
-    ```javascript
-    // One alternative is to bypass 'localhost'
-    mongoose.connect('mongodb://127.0.0.1:27017/test');
-    // Another option is to specify the `family` option, which tells the
-    // MongoDB driver to only look for IPv4 addresses rather than IPv6 first.
-    mongoose.connect('mongodb://localhost:27017/test', { family: 4 });
-    ```
 
     <hr id="map-keys-strings" />
 
@@ -457,6 +462,7 @@ block content
     instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
     [perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
     mind that populate() will execute a separate query for each document.
+
 
     <hr id="add_something" />
 

@@ -112,6 +112,6 @@ describe('schema.documentarray', function() {
     assert.equal(doc.arr.length, 1);
     assert.ok(!doc.arr[0]._id);
 
-    mongoose.Schema.Types.DocumentArray.set('_id', true);
+    mongoose.Schema.Types.DocumentArray.defaultOptions = {};
   });
 });

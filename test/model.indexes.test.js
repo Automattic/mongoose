@@ -459,6 +459,7 @@ describe('model', function() {
     const Model = db.model('Test', schema);
 
     return Model.init().
+      then(() => Model.syncIndexes()).
       then(() => Model.listIndexes()).
       then(indexes => {
         assert.equal(indexes.length, 2);

@@ -2002,13 +2002,13 @@ describe('schema', function() {
       });
 
       assert.equal(schema.childSchemas.length, 2);
-      assert.equal(schema.childSchemas[0].schema, schema1);
-      assert.equal(schema.childSchemas[1].schema, schema2);
+      assert.strictEqual(schema.childSchemas[0].schema, schema1);
+      assert.strictEqual(schema.childSchemas[1].schema, schema2);
 
       schema = schema.clone();
       assert.equal(schema.childSchemas.length, 2);
-      assert.equal(schema.childSchemas[0].schema, schema1);
-      assert.equal(schema.childSchemas[1].schema, schema2);
+      assert.strictEqual(schema.childSchemas[0].schema, schema1);
+      assert.strictEqual(schema.childSchemas[1].schema, schema2);
 
       done();
     });

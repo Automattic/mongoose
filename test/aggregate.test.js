@@ -430,15 +430,12 @@ describe('aggregate: ', function() {
         });
       });
 
-      it('Throws if no options are passed to graphLookup', function(done) {
+      it('Throws if no options are passed to graphLookup', function() {
         const aggregate = new Aggregate();
-        try {
+        assert.throws(function() {
           aggregate.graphLookup('invalid options');
-          done(new Error('Should have errored'));
-        } catch (error) {
-          assert.ok(error instanceof TypeError);
-          done();
-        }
+        },
+        TypeError);
       });
     });
 
@@ -547,15 +544,11 @@ describe('aggregate: ', function() {
           [{ $sortByCount: { lname: '$employee.last' } }]);
       });
 
-      it('throws if the argument is neither a string or object', function(done) {
+      it('throws if the argument is neither a string or object', function() {
         const aggregate = new Aggregate();
-        try {
+        assert.throws(function() {
           aggregate.sortByCount(1);
-          done(new Error('Should have errored'));
-        } catch (error) {
-          assert.ok(error instanceof TypeError);
-          done();
-        }
+        }, TypeError);
       });
     });
   });
@@ -642,7 +635,7 @@ describe('aggregate: ', function() {
         });
     });
 
-    it('unwind with obj', function(done) {
+    it('unwind with obj', function() {
       const aggregate = new Aggregate();
 
       const agg = aggregate.
@@ -652,10 +645,9 @@ describe('aggregate: ', function() {
       assert.equal(agg._pipeline.length, 1);
       assert.strictEqual(agg._pipeline[0].$unwind.preserveNullAndEmptyArrays,
         true);
-      done();
     });
 
-    it('unwind throws with bad arg', function(done) {
+    it('unwind throws with bad arg', function() {
       const aggregate = new Aggregate();
 
       let threw = false;
@@ -668,7 +660,6 @@ describe('aggregate: ', function() {
         threw = true;
       }
       assert.ok(threw);
-      done();
     });
 
     it('match', function(done) {
@@ -815,7 +806,7 @@ describe('aggregate: ', function() {
         });
     });
 
-    it('pipeline() (gh-5825)', function(done) {
+    it('pipeline() (gh-5825)', function() {
       const aggregate = new Aggregate();
 
       const pipeline = aggregate.
@@ -824,7 +815,6 @@ describe('aggregate: ', function() {
         pipeline();
 
       assert.deepEqual(pipeline, [{ $match: { sal: { $lt: 16000 } } }]);
-      done();
     });
 
     it('explain()', function(done) {
@@ -883,7 +873,7 @@ describe('aggregate: ', function() {
     });
 
     describe('error when not bound to a model', function() {
-      it('with callback', function(done) {
+      it('with callback', function() {
         const aggregate = new Aggregate();
 
         aggregate.skip(0);
@@ -895,8 +885,6 @@ describe('aggregate: ', function() {
           assert.equal(error.message, 'Aggregate not bound to any Model');
         }
         assert.ok(threw);
-
-        done();
       });
     });
 
@@ -1119,7 +1107,7 @@ describe('aggregate: ', function() {
       });
     });
 
-    it('readPref from schema (gh-5522)', function(done) {
+    it('readPref from schema (gh-5522)', function() {
       const schema = new Schema({ name: String }, { read: 'secondary' });
       const M = db.model('Test', schema);
       const a = M.aggregate();
@@ -1128,8 +1116,6 @@ describe('aggregate: ', function() {
       a.read('secondaryPreferred');
 
       assert.equal(a.options.readPreference.mode, 'secondaryPreferred');
-
-      done();
     });
   });
 
@@ -1175,7 +1161,7 @@ describe('aggregate: ', function() {
     });
   });
 
-  it('cursor() with useMongooseAggCursor (gh-5145)', function(done) {
+  it('cursor() with useMongooseAggCursor (gh-5145)', function() {
     const MyModel = db.model('Test', { name: String });
 
     const cursor = MyModel.
@@ -1183,8 +1169,6 @@ describe('aggregate: ', function() {
       cursor({ useMongooseAggCursor: true }).
       exec();
     assert.ok(cursor instanceof require('stream').Readable);
-
-    done();
   });
 
   it('cursor() with useMongooseAggCursor works (gh-5145) (gh-5394)', function(done) {

@@ -452,6 +452,24 @@ describe('model', function() {
     });
   });
 
+  it('sets correct partialFilterExpression for document array (gh-9091)', function() {
+    const childSchema = new Schema({ name: String });
+    childSchema.index({ name: 1 }, { partialFilterExpression: { name: { $exists: true } } });
+    const schema = new Schema({ arr: [childSchema] });
+    const Model = db.model('Test', schema);
+
+    return Model.init().
+      then(() => Model.syncIndexes()).
+      then(() => Model.listIndexes()).
+      then(indexes => {
+        assert.equal(indexes.length, 2);
+        assert.ok(indexes[1].partialFilterExpression);
+        assert.deepEqual(indexes[1].partialFilterExpression, {
+          'arr.name': { $exists: true }
+        });
+      });
+  });
+
   describe('discriminators with unique', function() {
     this.timeout(5000);
 

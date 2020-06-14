@@ -73,7 +73,7 @@ describe('document: strict mode:', function() {
       });
     });
 
-    it('when creating models with strict schemas', function(done) {
+    it('when creating models with strict schemas', function() {
       const s = new Strict({ content: 'sample', rouge: 'data' });
       assert.equal(s.$__.strictMode, true);
 
@@ -86,10 +86,9 @@ describe('document: strict mode:', function() {
       assert.ok(!('rouge' in so));
       assert.ok(!s.rouge);
       assert.ok(!so.rouge);
-      done();
     });
 
-    it('when overriding strictness', function(done) {
+    it('when overriding strictness', function() {
       // instance override
       let instance = new Lax({ content: 'sample', rouge: 'data' }, true);
       assert.ok(instance.$__.strictMode);
@@ -114,7 +113,6 @@ describe('document: strict mode:', function() {
       assert.equal(s3.content, 'sample');
       assert.ok(!('rouge' in s3));
       assert.ok(!s3.rouge);
-      done();
     });
 
     it('when using Model#create', function(done) {
@@ -128,7 +126,7 @@ describe('document: strict mode:', function() {
     });
   });
 
-  it('nested doc', function(done) {
+  it('nested doc', function() {
     const lax = new Schema({
       name: { last: String }
     }, { strict: false });
@@ -161,7 +159,6 @@ describe('document: strict mode:', function() {
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
-    done();
   });
 
   it('sub doc', function(done) {
@@ -210,7 +207,7 @@ describe('document: strict mode:', function() {
     });
   });
 
-  it('virtuals', function(done) {
+  it('virtuals', function() {
     let getCount = 0,
         setCount = 0;
 
@@ -248,8 +245,6 @@ describe('document: strict mode:', function() {
     assert.equal('string', typeof temp);
     assert.equal(getCount, 1);
     assert.equal(setCount, 2);
-
-    done();
   });
 
   it('can be overridden during set()', function(done) {
@@ -355,7 +350,7 @@ describe('document: strict mode:', function() {
   });
 
   describe('"throws" mode', function() {
-    it('throws on set() of unknown property', function(done) {
+    it('throws on set() of unknown property', function() {
       const schema = new Schema({ n: String, docs: [{ x: [{ y: String }] }] });
       schema.set('strict', 'throw');
       const M = db.model('Test', schema);
@@ -398,11 +393,9 @@ describe('document: strict mode:', function() {
       assert.throws(function() {
         m.set('docs.0.x.4.y.z', 3);
       }, badField);
-
-      done();
     });
 
-    it('fails with extra fields', function(done) {
+    it('fails with extra fields', function() {
       // Simple schema with throws option
       const FooSchema = new mongoose.Schema({
         name: { type: String }
@@ -419,11 +412,9 @@ describe('document: strict mode:', function() {
         // The extra baz field should throw
         new Foo({ name: 'bar', baz: 'bam' });
       }, /Field `baz` is not in schema/);
-
-      done();
     });
 
-    it('doesnt throw with refs (gh-2665)', function(done) {
+    it('doesnt throw with refs (gh-2665)', function() {
       // Simple schema with throws option
       const FooSchema = new mongoose.Schema({
         name: { type: mongoose.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
@@ -436,11 +427,9 @@ describe('document: strict mode:', function() {
       assert.doesNotThrow(function() {
         new Foo({ name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
       });
-
-      done();
     });
 
-    it('set nested to num throws ObjectExpectedError (gh-3735)', function(done) {
+    it('set nested to num throws ObjectExpectedError (gh-3735)', function() {
       const schema = new Schema({
         resolved: {
           by: { type: String }
@@ -452,7 +441,6 @@ describe('document: strict mode:', function() {
       assert.throws(function() {
         new Test({ resolved: 123 });
       }, /ObjectExpectedError/);
-      done();
     });
   });
 

@@ -149,7 +149,7 @@ describe('SingleNestedPath', function() {
       name: String,
       pseudonym: String
     });
-  
+
     const bookSchema = new mongoose.Schema({
       author: {
         type: authorSchema,

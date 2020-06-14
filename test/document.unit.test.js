@@ -12,7 +12,7 @@ const storeShard = require('../lib/plugins/sharding').storeShard;
 const mongoose = start.mongoose;
 
 describe('sharding', function() {
-  it('should handle shard keys properly (gh-2127)', function(done) {
+  it('should handle shard keys properly (gh-2127)', function() {
     const mockSchema = {
       options: {
         shardKey: { date: 1 }
@@ -29,7 +29,6 @@ describe('sharding', function() {
 
     storeShard.call(d);
     assert.equal(d.$__.shardval.date, currentTime);
-    done();
   });
 });
 
@@ -49,24 +48,21 @@ describe('toObject()', function() {
     Stub.prototype = Object.create(mongoose.Document.prototype);
   });
 
-  it('should inherit options from schema', function(done) {
+  it('should inherit options from schema', function() {
     const d = new Stub();
     assert.deepEqual(d.toObject(), { empty: {}, virtual: 'test' });
-    done();
   });
 
-  it('can overwrite schema-set default options', function(done) {
+  it('can overwrite schema-set default options', function() {
     const d = new Stub();
     assert.deepEqual(d.toObject({ minimize: true, virtuals: false }), {});
-    done();
   });
 
-  it('doesnt crash with empty object (gh-3130)', function(done) {
+  it('doesnt crash with empty object (gh-3130)', function() {
     const d = new Stub();
     d._doc = undefined;
     assert.doesNotThrow(function() {
       d.toObject();
     });
-    done();
   });
 });

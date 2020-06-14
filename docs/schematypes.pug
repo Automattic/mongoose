@@ -81,6 +81,7 @@ block content
     - [Array](#arrays)
     - [Decimal128](./api.html#mongoose_Mongoose-Decimal128)
     - [Map](#maps)
+    - [Schema](#schemas)
 
     <h4>Example</h4>
 
@@ -660,6 +661,28 @@ block content
 
     // Good, do this instead of declaring a getter on `arr`
     schema.path('arr.0.url').get(v => `${root}${v}`);
+    ```
+
+    <h3 id="schemas"><a href="#schemas">Schemas</a></h3>
+
+    To declare a path as another [schema](./guide.html#definition),
+    set `type` to the sub-schema's instance.
+
+    To set a default value based on the sub-schema's shape, simply set a default value,
+    and the value will be cast based on the sub-schema's definition before being set
+    during document creation.
+
+    ```javascript
+    const subSchema = new mongoose.Schema({
+      // some schema definition here
+    });
+
+    const schema = new mongoose.Schema({
+      data: {
+        type: subSchema
+        default: {}
+      }
+    });
     ```
 
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>

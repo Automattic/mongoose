@@ -114,14 +114,12 @@ describe('model aggregate', function() {
       });
     });
 
-    it('when returning Aggregate', function(done) {
+    it('when returning Aggregate', function() {
       assert(A.aggregate([project]) instanceof Aggregate);
-      done();
     });
 
-    it('throws when passing object (gh-6732)', function(done) {
+    it('throws when passing object (gh-6732)', function() {
       assert.throws(() => A.aggregate({}), /disallows passing a spread/);
-      done();
     });
 
     it('can use helper for $out', function(done) {

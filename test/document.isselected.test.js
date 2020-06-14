@@ -97,7 +97,7 @@ TestDocument.prototype.hooksTest = function(fn) {
  * Test.
  */
 describe('document', function() {
-  it('isSelected()', function(done) {
+  it('isSelected()', function() {
     let doc = new TestDocument();
 
     doc.init({
@@ -332,11 +332,9 @@ describe('document', function() {
     assert.ok(!doc.isSelected('nested'));
     assert.ok(!doc.isSelected('nested.age'));
     assert.ok(!doc.isSelected('numbers'));
-
-    done();
   });
 
-  it('isDirectSelected (gh-5063)', function(done) {
+  it('isDirectSelected (gh-5063)', function() {
     const selection = {
       test: 1,
       numbers: 1,
@@ -357,7 +355,5 @@ describe('document', function() {
     assert.ok(doc.isDirectSelected('nested.deep'));
     assert.ok(!doc.isDirectSelected('nested.cool'));
     assert.ok(!doc.isDirectSelected('nested'));
-
-    done();
   });
 });

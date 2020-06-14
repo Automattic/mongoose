@@ -42,6 +42,31 @@ describe('castArrayFilters', function() {
     done();
   });
 
+  it('casts on multiple fields', function(done) {
+    const schema = new Schema({
+      comments: [{
+        text: String,
+        replies: [{
+          beginAt: Date,
+          endAt: Date
+        }]
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'comments.$[x].replies.$[y].endAt': '2019-01-01' } }, {
+      arrayFilters: [{ 'x.text': 123 }, { 'y.beginAt': { $gte: '2018-01-01' }, 'y.endAt': { $lt: '2020-01-01' } }]
+    });
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0]['x.text'], '123');
+    assert.ok(q.options.arrayFilters[1]['y.beginAt'].$gte instanceof Date);
+    assert.ok(q.options.arrayFilters[1]['y.endAt'].$lt instanceof Date);
+
+    done();
+  });
+
   it('sane error on same filter twice', function(done) {
     const schema = new Schema({
       comments: [{

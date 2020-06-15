@@ -59,7 +59,7 @@ describe('collections:', function() {
     });
   });
 
-  it('methods should that throw (unimplemented)', function(done) {
+  it('methods should that throw (unimplemented)', function() {
     const collection = new Collection('test', mongoose.connection);
     let thrown = false;
 
@@ -142,6 +142,5 @@ describe('collections:', function() {
 
     assert.ok(thrown);
     thrown = false;
-    done();
   });
 });

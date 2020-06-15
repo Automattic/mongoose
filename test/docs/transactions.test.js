@@ -360,7 +360,26 @@ describe('transactions', function() {
         const test = yield Test.create([{}], { session }).then(res => res[0]);
         yield test.save(); // throws DocumentNotFoundError
       }));
-      yield session.endSession();
+      session.endSession();
+    });
+  });
+
+  it('correct `isNew` after abort (gh-8852)', function() {
+    return co(function*() {
+      const schema = Schema({ name: String });
+
+      const Test = db.model('gh8852', schema);
+
+      yield Test.createCollection();
+      const doc = new Test({ name: 'foo' });
+      yield db.
+        transaction(session => co(function*() {
+          yield doc.save({ session });
+          assert.ok(!doc.isNew);
+          throw new Error('Oops');
+        })).
+        catch(err => assert.equal(err.message, 'Oops'));
+      assert.ok(doc.isNew);
     });
   });
 });

@@ -143,4 +143,42 @@ describe('SingleNestedPath', function() {
       });
     });
   });
+
+  it('copies over `requiredValidator` (gh-8819)', function() {
+    const authorSchema = new mongoose.Schema({
+      name: String,
+      pseudonym: String
+    });
+
+    const bookSchema = new mongoose.Schema({
+      author: {
+        type: authorSchema,
+        required: true
+      }
+    });
+
+    const clone = bookSchema.clone();
+    assert.ok(clone.path('author').requiredValidator);
+    assert.strictEqual(clone.path('author').requiredValidator,
+      clone.path('author').validators[0].validator);
+  });
+
+  it('supports `set()` (gh-8883)', function() {
+    mongoose.deleteModel(/Test/);
+    mongoose.Schema.Types.Embedded.set('required', true);
+
+    const Model = mongoose.model('Test', mongoose.Schema({
+      nested: mongoose.Schema({
+        test: String
+      })
+    }));
+
+    const doc = new Model({});
+
+    const err = doc.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['nested']);
+
+    mongoose.Schema.Types.Embedded.set('required', false);
+  });
 });

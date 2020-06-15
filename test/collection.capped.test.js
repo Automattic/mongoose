@@ -28,14 +28,14 @@ describe('collections: capped:', function() {
     db.close(done);
   });
 
-  it('schemas should have option size', function(done) {
+  it('schemas should have option size', function() {
     const capped = new Schema({ key: String });
     capped.set('capped', { size: 1000 });
 
     assert.ok(capped.options.capped);
     assert.equal(capped.options.capped.size, 1000);
-    done();
   });
+
   it('creation', function() {
     this.timeout(30000);
 

@@ -1,3 +1,19 @@
+5.9.19 / 2020-06-15
+===================
+ * fix: upgrade mongodb driver -> 3.5.9 #9124 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: copy `required` validator on single nested subdoc correctly when calling `Schema#clone()` #8819
+ * fix(discriminator): handle `tiedValue` when casting update on nested paths #9108
+ * fix(model): allow empty arrays for bulkWrite #9132 #9131 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): correctly set partialFilterExpression for nested schema indexes #9091
+ * fix(castArrayFilters): handle casting on all fields of array filter #9122 [lafeuil](https://github.com/lafeuil)
+ * fix(update): handle nested path createdAt when overwriting parent path #9105
+ * docs(subdocs): add some notes on the difference between single nested subdocs and nested paths #9085
+ * docs(subdocs): improve docs on `typePojoToMixed` #9085
+ * docs: add note about connections in `globalSetup` with Jest #9063
+ * docs: add schema and how to set default sub-schema to schematype options #9111 [dfle](https://github.com/dfle)
+ * docs(index): use `const` instead of `var` in examples #9125 [dmcgrouther](https://github.com/dmcgrouther)
+ * docs: corrected markdown typo #9117
+
 5.9.18 / 2020-06-05
 ===================
  * fix: improve atlas error in the event of incorrect password #9095

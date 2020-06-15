@@ -6799,10 +6799,44 @@ describe('Model', function() {
       assert.equal(typeof users[0].updatedAt, 'number');
       assert.equal(typeof users[1].updatedAt, 'number');
 
-      // not-lean queries casts to number even if stored on DB as a date
+      // not-lean queries cast to number even if stored on DB as a date
       assert.equal(users[0] instanceof User, false);
       assert.equal(users[1] instanceof User, false);
     });
   });
 
+  it('Model#bulkWrite(...) does not throw an error when provided an empty array (gh-9131)', function() {
+    return co(function*() {
+      const userSchema = new Schema();
+      const User = db.model('User', userSchema);
+
+      const res = yield User.bulkWrite([]);
+
+      assert.deepEqual(
+        res,
+        {
+          result: {
+            ok: 1,
+            writeErrors: [],
+            writeConcernErrors: [],
+            insertedIds: [],
+            nInserted: 0,
+            nUpserted: 0,
+            nMatched: 0,
+            nModified: 0,
+            nRemoved: 0,
+            upserted: []
+          },
+          insertedCount: 0,
+          matchedCount: 0,
+          modifiedCount: 0,
+          deletedCount: 0,
+          upsertedCount: 0,
+          upsertedIds: {},
+          insertedIds: {},
+          n: 0
+        }
+      );
+    });
+  });
 });

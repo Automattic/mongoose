@@ -10,6 +10,7 @@ const Schema = mongoose.Schema;
 describe('transactions', function() {
   let db;
   let _skipped = false;
+  this.timeout(10000);
 
   before(function() {
     if (!process.env.REPLICA_SET) {
@@ -380,6 +381,27 @@ describe('transactions', function() {
         })).
         catch(err => assert.equal(err.message, 'Oops'));
       assert.ok(doc.isNew);
+    });
+  });
+
+  it('can save document after aborted transaction (gh-8380)', function() {
+    return co(function*() {
+      const schema = Schema({ name: String, arr: [String] });
+
+      const Test = db.model('gh8380', schema);
+
+      yield Test.createCollection();
+      yield Test.create({ name: 'foo', arr: ['bar'] });
+      const doc = yield Test.findOne();
+      yield db.
+        transaction(session => co(function*() {
+          doc.arr.pop();
+          yield doc.save({ session });
+          throw new Error('Oops');
+        })).
+        catch(err => assert.equal(err.message, 'Oops'));
+      doc.set('arr.0', 'qux');
+      yield doc.save();
     });
   });
 });

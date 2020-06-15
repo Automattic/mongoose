@@ -766,7 +766,7 @@ describe('mongoose module:', function() {
         }, { collection: 'movies_1' });
 
         const Movie = db.model('Movie', schema);
-
+        yield Movie.deleteMany({});
 
         yield Movie.updateOne(
           {},

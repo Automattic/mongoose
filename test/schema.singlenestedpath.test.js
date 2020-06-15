@@ -143,4 +143,23 @@ describe('SingleNestedPath', function() {
       });
     });
   });
+
+  it('copies over `requiredValidator` (gh-8819)', function() {
+    const authorSchema = new mongoose.Schema({
+      name: String,
+      pseudonym: String
+    });
+
+    const bookSchema = new mongoose.Schema({
+      author: {
+        type: authorSchema,
+        required: true
+      }
+    });
+
+    const clone = bookSchema.clone();
+    assert.ok(clone.path('author').requiredValidator);
+    assert.strictEqual(clone.path('author').requiredValidator,
+      clone.path('author').validators[0].validator);
+  });
 });

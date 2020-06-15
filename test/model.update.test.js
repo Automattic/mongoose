@@ -3382,6 +3382,31 @@ describe('model: updateOne: ', function() {
       then(doc => assert.strictEqual(doc.nested.notInSchema, void 0));
   });
 
+  it('handles timestamp properties in nested paths when overwriting parent path (gh-9105)', function() {
+    const SampleSchema = Schema({ nested: { test: String } }, {
+      timestamps: {
+        createdAt: 'nested.createdAt',
+        updatedAt: 'nested.updatedAt'
+      }
+    });
+    const Test = db.model('Test', SampleSchema);
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { test: 'foo' } });
+      assert.ok(doc.nested.updatedAt);
+      assert.ok(doc.nested.createdAt);
+
+      yield cb => setTimeout(cb, 10);
+      yield Test.updateOne({ _id: doc._id }, { nested: { test: 'bar' } });
+
+      const fromDb = yield Test.findOne({ _id: doc._id });
+      assert.ok(fromDb.nested.updatedAt);
+      assert.ok(fromDb.nested.updatedAt > doc.nested.updatedAt);
+      assert.ok(fromDb.nested.createdAt);
+      assert.ok(fromDb.nested.createdAt > doc.nested.createdAt);
+    });
+  });
+
   describe('mongodb 42 features', function() {
     before(function(done) {
       start.mongodVersion((err, version) => {

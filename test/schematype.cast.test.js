@@ -44,11 +44,11 @@ describe('SchemaType.cast() (gh-7045)', function() {
       assert.equal(error.name, 'CastError');
     }
 
-    objectid.cast('000000000000000000000000'); // Should not throw
-
-    // Base objectid shouldn't throw
-    baseObjectId.cast('12charstring');
-    baseObjectId.cast('000000000000000000000000');
+    assert.doesNotThrow(function() {
+      objectid.cast('000000000000000000000000');
+      baseObjectId.cast('12charstring');
+      baseObjectId.cast('000000000000000000000000');
+    });
 
     assert.ok(threw);
   });
@@ -119,8 +119,9 @@ describe('SchemaType.cast() (gh-7045)', function() {
       assert.equal(error.name, 'CastError');
     }
     assert.ok(threw);
-
-    b.cast(true); // Should not throw
+    assert.doesNotThrow(function() {
+      b.cast(true);
+    });
   });
 
   describe('string', function() {
@@ -131,7 +132,9 @@ describe('SchemaType.cast() (gh-7045)', function() {
       });
 
       const s = new Schema.Types.String();
-      s.cast('short'); // Should not throw
+      assert.doesNotThrow(function() {
+        s.cast('short');
+      });
 
       assert.throws(() => s.cast('wayyyy too long'), /CastError/);
     });
@@ -140,7 +143,10 @@ describe('SchemaType.cast() (gh-7045)', function() {
       Schema.Types.String.cast(false);
 
       const s = new Schema.Types.String();
-      s.cast('short'); // Should not throw
+
+      assert.doesNotThrow(function() {
+        s.cast('short');
+      });
 
       assert.throws(() => s.cast(123), /CastError/);
     });
@@ -154,8 +160,10 @@ describe('SchemaType.cast() (gh-7045)', function() {
       });
 
       const d = new Schema.Types.Date();
-      d.cast('2018-06-01'); // Should not throw
-      d.cast(new Date()); // Should not throw
+      assert.doesNotThrow(function() {
+        d.cast('2018-06-01');
+        d.cast(new Date());
+      });
 
       assert.throws(() => d.cast(''), /CastError/);
     });
@@ -164,7 +172,9 @@ describe('SchemaType.cast() (gh-7045)', function() {
       Schema.Types.Date.cast(false);
 
       const d = new Schema.Types.Date();
-      d.cast(new Date()); // Should not throw
+      assert.doesNotThrow(function() {
+        d.cast(new Date());
+      });
 
       assert.throws(() => d.cast('2018-06-01'), /CastError/);
     });
@@ -178,7 +188,9 @@ describe('SchemaType.cast() (gh-7045)', function() {
       });
 
       const d = new Schema.Types.Decimal128();
-      d.cast('1000'); // Should not throw
+      assert.doesNotThrow(function() {
+        d.cast('1000');
+      });
 
       assert.throws(() => d.cast(1000), /CastError/);
     });
@@ -190,7 +202,9 @@ describe('SchemaType.cast() (gh-7045)', function() {
       assert.throws(() => d.cast('1000'), /CastError/);
       assert.throws(() => d.cast(1000), /CastError/);
 
-      d.cast(original.decimal128('1000')); // Should not throw
+      assert.doesNotThrow(function() {
+        d.cast(original.decimal128('1000'));
+      });
     });
   });
 });

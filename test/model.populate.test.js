@@ -560,8 +560,12 @@ describe('model: populate:', function() {
     function next(_id) {
       Sample.findOne({ _id }, function(error, sample) {
         assert.ifError(error);
-        const opts = { path: 'items.company', options: { lean: true } };
-        Company.populate(sample, opts, function(error) {
+        const opts = {
+          path: 'items.company',
+          options: { lean: true },
+          model: Company
+        };
+        Sample.populate(sample, opts, function(error) {
           assert.ifError(error);
           assert.strictEqual(sample.items[1].company, void 0);
           done();
@@ -1383,7 +1387,11 @@ describe('model: populate:', function() {
           // non-existant subprop
           BlogPost
             .findById(post._id)
-            .populate('comments._idontexist', 'email')
+            .populate({
+              path: 'comments._idontexist',
+              select: 'email',
+              strictPopulate: false
+            })
             .exec(function(err) {
               assert.ifError(err);
 
@@ -1397,7 +1405,12 @@ describe('model: populate:', function() {
                   // helpful when populating mapReduce results too.
                   BlogPost
                     .findById(post._id)
-                    .populate('comments._idontexist', 'email', 'User')
+                    .populate({
+                      path: 'comments._idontexist',
+                      select: 'email',
+                      model: 'User',
+                      strictPopulate: false
+                    })
                     .exec(function(err, post) {
                       assert.ifError(err);
                       assert.ok(post);

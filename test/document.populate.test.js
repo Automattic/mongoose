@@ -277,13 +277,13 @@ describe('document.populate', function() {
     B.findById(post, function(err, post) {
       assert.ifError(err);
       post.populate('idontexist', function(err) {
-        assert.ifError(err);
+        assert.ok(err);
 
         // stuff an ad-hoc value in
         post.$__setValue('idontexist', user1._id);
 
         // populate the non-schema value by passing an explicit model
-        post.populate({ path: 'idontexist', model: 'User' }, function(err, post) {
+        post.populate({ path: 'idontexist', model: 'User', strictPopulate: false }, function(err, post) {
           assert.ifError(err);
           assert.ok(post);
           assert.equal(user1._id.toString(), post.get('idontexist')._id);

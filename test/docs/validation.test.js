@@ -495,7 +495,7 @@ describe('validation docs', function() {
   });
 
   /**
-   * The other key difference that update validators only run on the paths
+   * The other key difference is that update validators only run on the paths
    * specified in the update. For instance, in the below example, because
    * 'name' is not specified in the update operation, update validation will
    * succeed.

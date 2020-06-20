@@ -9429,4 +9429,52 @@ describe('model: populate:', function() {
       assert.equal(foundOffice.place.building.owner, 'test');
     });
   });
+
+  it('handles populating primitive array under document array with discriminator (gh-9148)', function() {
+    const ContentSchema = new Schema({ name: String });
+    const Content = db.model('Test1', ContentSchema);
+
+    const DataSchema = new Schema({ alias: String }, {
+      discriminatorKey: 'type',
+      _id: false
+    });
+    const ContentRelationSchema = new Schema({
+      content: [{ type: Schema.Types.ObjectId, ref: 'Test1' }]
+    }, { _id: false });
+    const PageSchema = new Schema({
+      name: String,
+      data: [DataSchema]
+    });
+
+    PageSchema.path('data').discriminator('content', ContentRelationSchema);
+    const Page = db.model('Test', PageSchema);
+
+    return co(function*() {
+      const content = yield Promise.all([
+        Content.create({ name: 'A' }),
+        Content.create({ name: 'B' }),
+      ]);
+
+      const doc = yield Page.create({
+        name: 'Index',
+        data: [{
+          alias: 'my_content',
+          type: 'content',
+          content: [content[0]._id, content[1]._id]
+        }]
+      });
+
+      const page = yield Page.findById(doc._id).populate({
+        path: 'data.content',
+        select: { name: 1, _id: 0 }
+      });
+      assert.ok(Array.isArray(page.data[0].content));
+      console.log('Foo', page.data)
+      assert.deepEqual(page.toObject().data, [{
+        alias: 'my_content',
+        type: 'content',
+        content: [{ name: 'A' }, { name: 'B' }]
+      }]);
+    });
+  });
 });

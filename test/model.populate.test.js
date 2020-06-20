@@ -9452,7 +9452,7 @@ describe('model: populate:', function() {
     return co(function*() {
       const content = yield Promise.all([
         Content.create({ name: 'A' }),
-        Content.create({ name: 'B' }),
+        Content.create({ name: 'B' })
       ]);
 
       const doc = yield Page.create({
@@ -9469,7 +9469,6 @@ describe('model: populate:', function() {
         select: { name: 1, _id: 0 }
       });
       assert.ok(Array.isArray(page.data[0].content));
-      console.log('Foo', page.data)
       assert.deepEqual(page.toObject().data, [{
         alias: 'my_content',
         type: 'content',

@@ -470,6 +470,28 @@ describe('model', function() {
       });
   });
 
+  it('skips automatic indexing on childSchema if autoIndex: false (gh-9150)', function() {
+    const nestedSchema = mongoose.Schema({
+      name: { type: String, index: true }
+    }, { autoIndex: false });
+    const schema = mongoose.Schema({
+      nested: nestedSchema,
+      top: { type: String, index: true }
+    });
+    let Model;
+
+    return Promise.resolve().
+      then(() => {
+        Model = db.model('Model', schema);
+        return Model.init();
+      }).
+      then(() => Model.listIndexes()).
+      then(indexes => {
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[1].key, { top: 1 });
+      });
+  });
+
   describe('discriminators with unique', function() {
     this.timeout(5000);
 

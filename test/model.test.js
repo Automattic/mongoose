@@ -6805,7 +6805,7 @@ describe('Model', function() {
     });
   });
 
-  it('Model#bulkWrite(...) does not throw an error when provided an empty array (gh-9131)', function() {
+  it('Model.bulkWrite(...) does not throw an error when provided an empty array (gh-9131)', function() {
     return co(function*() {
       const userSchema = new Schema();
       const User = db.model('User', userSchema);
@@ -6837,6 +6837,35 @@ describe('Model', function() {
           n: 0
         }
       );
+    });
+  });
+
+  it('Model.bulkWrite(...) does not throw an error with upsert:true, setDefaultsOnInsert: true (gh-9157)', function() {
+    return co(function*() {
+      const userSchema = new Schema(
+        {
+          friends: [String],
+          age: { type: Number, default: 25 }
+        },
+        { timestamps: true }
+      );
+      const User = db.model('User', userSchema);
+
+      yield User.bulkWrite([
+        {
+          updateOne: {
+            filter: { },
+            update: { friends: ['Sam'] },
+            upsert: true,
+            setDefaultsOnInsert: true
+          }
+        }
+      ]);
+
+      const user = yield User.findOne().sort({ _id: -1 });
+
+      assert.equal(user.age, 25);
+      assert.deepEqual(user.friends, ['Sam']);
     });
   });
 });

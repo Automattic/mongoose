@@ -8986,7 +8986,7 @@ describe('document', function() {
       }
     });
 
-    const User = mongoose.model('User', userSchema);
+    const User = db.model('User', userSchema);
 
     const user = new User({ name: 'Hafez' });
     assert.throws(function() {

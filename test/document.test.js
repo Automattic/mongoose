@@ -8975,4 +8975,26 @@ describe('document', function() {
     const axl = new Person({ fullName: 'Axl Rose' });
     assert.equal(axl.fullName, 'Axl Rose');
   });
+
+  it('throws an error when `transform` returns a promise (gh-9163)', function() {
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        transform: function() {
+          return new Promise(() => {});
+        }
+      }
+    });
+
+    const User = mongoose.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+    assert.throws(function() {
+      user.toJSON();
+    }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
+
+    assert.throws(function() {
+      user.toObject();
+    }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
+  });
 });

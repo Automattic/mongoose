@@ -9533,7 +9533,7 @@ describe('model: populate:', function() {
 
     return co(function*() {
       const doc1 = yield Model.create({ title: 'doc1' });
-      const doc2 = yield Model.create({
+      yield Model.create({
         title: 'doc2',
         items: [{
           type: 'link',

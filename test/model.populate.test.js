@@ -9483,7 +9483,7 @@ describe('model: populate:', function() {
       commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
     });
     const Post = db.model('Post', postSchema);
-  
+
     const commentSchema = new Schema({ content: String });
     const Comment = db.model('Comment', commentSchema);
 
@@ -9509,7 +9509,7 @@ describe('model: populate:', function() {
       yield post2.save();
 
       const posts = yield Post.find().populate({ path: 'commentsIds', select: 'content -_id', perDocumentLimit: 2 });
-  
+
       assert.equal(posts[0].commentsIds.length, 2);
       assert.equal(posts[1].commentsIds.length, 2);
     });

@@ -1,3 +1,13 @@
+5.9.20 / 2020-06-22
+===================
+ * fix(populate): handle populating primitive array under document array discriminator #9148
+ * fix(connection): make sure to close previous connection when calling `openUri()` on an already open connection #9107
+ * fix(model): fix conflicting $setOnInsert default values with `update` values in bulkWrite #9160 #9157 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(validation): add note about validateBeforeSave and invalidate #9144 [dandv](https://github.com/dandv)
+ * docs: specify the array field syntax for invalidate #9137 [dandv](https://github.com/dandv)
+ * docs: fix several typos and broken references #9024 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix minor typo #9143 [dandv](https://github.com/dandv)
+
 5.9.19 / 2020-06-15
 ===================
  * fix: upgrade mongodb driver -> 3.5.9 #9124 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

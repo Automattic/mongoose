@@ -9429,4 +9429,121 @@ describe('model: populate:', function() {
       assert.equal(foundOffice.place.building.owner, 'test');
     });
   });
+
+  it('handles populating primitive array under document array with discriminator (gh-9148)', function() {
+    const ContentSchema = new Schema({ name: String });
+    const Content = db.model('Test1', ContentSchema);
+
+    const DataSchema = new Schema({ alias: String }, {
+      discriminatorKey: 'type',
+      _id: false
+    });
+    const ContentRelationSchema = new Schema({
+      content: [{ type: Schema.Types.ObjectId, ref: 'Test1' }]
+    }, { _id: false });
+    const PageSchema = new Schema({
+      name: String,
+      data: [DataSchema]
+    });
+
+    PageSchema.path('data').discriminator('content', ContentRelationSchema);
+    const Page = db.model('Test', PageSchema);
+
+    return co(function*() {
+      const content = yield Promise.all([
+        Content.create({ name: 'A' }),
+        Content.create({ name: 'B' })
+      ]);
+
+      const doc = yield Page.create({
+        name: 'Index',
+        data: [{
+          alias: 'my_content',
+          type: 'content',
+          content: [content[0]._id, content[1]._id]
+        }]
+      });
+
+      const page = yield Page.findById(doc._id).populate({
+        path: 'data.content',
+        select: { name: 1, _id: 0 }
+      });
+      assert.ok(Array.isArray(page.data[0].content));
+      assert.deepEqual(page.toObject().data, [{
+        alias: 'my_content',
+        type: 'content',
+        content: [{ name: 'A' }, { name: 'B' }]
+      }]);
+    });
+  });
+
+  it('handles deselecting _id with `perDocumentLimit` (gh-8460) (gh-9175)', function() {
+    const postSchema = new Schema({
+      title: String,
+      commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+    });
+    const Post = db.model('Post', postSchema);
+
+    const commentSchema = new Schema({ content: String });
+    const Comment = db.model('Comment', commentSchema);
+
+    return co(function*() {
+      const post1 = new Post({ title: 'I have 3 comments' });
+      let comments = yield Comment.create([
+        { content: 'Cool first post' },
+        { content: 'Very cool first post' },
+        { content: 'Super cool first post' }
+      ]);
+
+      post1.commentsIds = comments;
+      yield post1.save();
+
+      const post2 = new Post({ title: 'I have 4 comments' });
+      comments = yield Comment.create([
+        { content: 'Cool second post' },
+        { content: 'Very cool second post' },
+        { content: 'Super cool second post' },
+        { content: 'Absolutely cool second post' }
+      ]);
+      post2.commentsIds = comments;
+      yield post2.save();
+
+      const posts = yield Post.find().populate({ path: 'commentsIds', select: 'content -_id', perDocumentLimit: 2 });
+
+      assert.equal(posts[0].commentsIds.length, 2);
+      assert.equal(posts[1].commentsIds.length, 2);
+    });
+  });
+
+  it('handles embedded discriminator `refPath` with multiple documents (gh-8731) (gh-9153)', function() {
+    const nested = Schema({}, { discriminatorKey: 'type' });
+    const mySchema = Schema({ title: { type: String }, items: [nested] });
+
+    const itemType = mySchema.path('items');
+
+    itemType.discriminator('link', Schema({
+      fooType: { type: String },
+      foo: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'items.fooType'
+      }
+    }));
+
+    const Model = db.model('Test', mySchema);
+
+    return co(function*() {
+      const doc1 = yield Model.create({ title: 'doc1' });
+      yield Model.create({
+        title: 'doc2',
+        items: [{
+          type: 'link',
+          fooType: 'Test',
+          foo: doc1._id
+        }]
+      });
+
+      const docs = yield Model.find({ }).sort({ title: 1 }).populate('items.foo').exec();
+      assert.equal(docs[1].items[0].foo.title, 'doc1');
+    });
+  });
 });

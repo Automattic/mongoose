@@ -9514,4 +9514,36 @@ describe('model: populate:', function() {
       assert.equal(posts[1].commentsIds.length, 2);
     });
   });
+
+  it('handles embedded discriminator `refPath` with multiple documents (gh-8731) (gh-9153)', function() {
+    const nested = Schema({}, { discriminatorKey: 'type' });
+    const mySchema = Schema({ title: { type: String }, items: [nested] });
+
+    const itemType = mySchema.path('items');
+
+    itemType.discriminator('link', Schema({
+      fooType: { type: String },
+      foo: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'items.fooType'
+      }
+    }));
+
+    const Model = db.model('Test', mySchema);
+
+    return co(function*() {
+      const doc1 = yield Model.create({ title: 'doc1' });
+      const doc2 = yield Model.create({
+        title: 'doc2',
+        items: [{
+          type: 'link',
+          fooType: 'Test',
+          foo: doc1._id
+        }]
+      });
+
+      const docs = yield Model.find({ }).sort({ title: 1 }).populate('items.foo').exec();
+      assert.equal(docs[1].items[0].foo.title, 'doc1');
+    });
+  });
 });

@@ -8976,6 +8976,28 @@ describe('document', function() {
     assert.equal(axl.fullName, 'Axl Rose');
   });
 
+  it('throws an error when `transform` returns a promise (gh-9163)', function() {
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        transform: function() {
+          return new Promise(() => {});
+        }
+      }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+    assert.throws(function() {
+      user.toJSON();
+    }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
+
+    assert.throws(function() {
+      user.toObject();
+    }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
+  });
+    
   it('uses strict equality when checking mixed paths for modifications (gh-9165)', function() {
     const schema = Schema({ obj: {} });
     const Model = db.model('gh9165', schema);

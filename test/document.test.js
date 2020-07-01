@@ -8997,4 +8997,18 @@ describe('document', function() {
       user.toObject();
     }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
   });
+    
+  it('uses strict equality when checking mixed paths for modifications (gh-9165)', function() {
+    const schema = Schema({ obj: {} });
+    const Model = db.model('gh9165', schema);
+
+    return Model.create({ obj: { key: '2' } }).
+      then(doc => {
+        doc.obj = { key: 2 };
+        assert.ok(doc.modifiedPaths().indexOf('obj') !== -1);
+        return doc.save();
+      }).
+      then(doc => Model.findById(doc)).
+      then(doc => assert.strictEqual(doc.obj.key, 2));
+  });
 });

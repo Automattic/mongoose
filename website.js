@@ -76,7 +76,7 @@ append style
     p { line-height: 1.5em }
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
   :markdown

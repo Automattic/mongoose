@@ -10,6 +10,7 @@ const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
 const co = require('co');
+const mongodb = require('mongodb');
 const server = require('./common').server;
 
 const mongoose = start.mongoose;
@@ -1183,6 +1184,22 @@ describe('connections:', function() {
 
       const db2 = mongoose.connection.useDb('gh8267-1');
       assert.equal(db2.config.useCreateIndex, true);
+    });
+  });
+
+  it('allows setting client on a disconnected connection (gh-9164)', function() {
+    return co(function*() {
+      const client = yield mongodb.MongoClient.connect('mongodb://localhost:27017/mongoose_test', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      const conn = mongoose.createConnection().setClient(client);
+
+      assert.equal(conn.readyState, 1);
+
+      yield conn.createCollection('test');
+      const res = yield conn.dropCollection('test');
+      assert.ok(res);
     });
   });
 });

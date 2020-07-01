@@ -8991,13 +8991,13 @@ describe('document', function() {
     const user = new User({ name: 'Hafez' });
     assert.throws(function() {
       user.toJSON();
-    }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
+    }, /must be synchronous/);
 
     assert.throws(function() {
       user.toObject();
-    }, /`transform` option has to be synchronous, but is returning a promise on path `name`./);
+    }, /must be synchronous/);
   });
-    
+
   it('uses strict equality when checking mixed paths for modifications (gh-9165)', function() {
     const schema = Schema({ obj: {} });
     const Model = db.model('gh9165', schema);

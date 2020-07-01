@@ -9022,6 +9022,28 @@ describe('document', function() {
     assert.ok(!doc.testSingleNested.prop);
   });
 
+  it('throws an error when `transform` returns a promise (gh-9163)', function() {
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        transform: function() {
+          return new Promise(() => {});
+        }
+      }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+    assert.throws(function() {
+      user.toJSON();
+    }, /must be synchronous/);
+
+    assert.throws(function() {
+      user.toObject();
+    }, /must be synchronous/);
+  });
+
   it('uses strict equality when checking mixed paths for modifications (gh-9165)', function() {
     const schema = Schema({ obj: {} });
     const Model = db.model('gh9165', schema);

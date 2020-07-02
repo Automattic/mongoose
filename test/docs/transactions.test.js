@@ -386,22 +386,39 @@ describe('transactions', function() {
 
   it('can save document after aborted transaction (gh-8380)', function() {
     return co(function*() {
-      const schema = Schema({ name: String, arr: [String] });
+      const schema = Schema({ name: String, arr: [String], arr2: [String] });
 
       const Test = db.model('gh8380', schema);
 
       yield Test.createCollection();
-      yield Test.create({ name: 'foo', arr: ['bar'] });
+      yield Test.create({ name: 'foo', arr: ['bar'], arr2: ['foo'] });
       const doc = yield Test.findOne();
       yield db.
         transaction(session => co(function*() {
-          doc.arr.pop();
+          doc.arr.pull('bar');
+          doc.arr2.push('bar');
+
           yield doc.save({ session });
+
+          doc.name = 'baz';
           throw new Error('Oops');
         })).
-        catch(err => assert.equal(err.message, 'Oops'));
-      doc.set('arr.0', 'qux');
-      yield doc.save();
+        catch(err => {
+          assert.equal(err.message, 'Oops');
+        });
+
+      const changes = doc.$__delta()[1];
+      assert.equal(changes.$set.name, 'baz');
+      assert.deepEqual(changes.$pullAll.arr, ['bar']);
+      assert.deepEqual(changes.$push.arr2, { $each: ['bar'] });
+      assert.ok(!changes.$set.arr2);
+
+      yield doc.save({ session: null });
+
+      const newDoc = yield Test.collection.findOne();
+      assert.equal(newDoc.name, 'baz');
+      assert.deepEqual(newDoc.arr, []);
+      assert.deepEqual(newDoc.arr2, ['foo', 'bar']);
     });
   });
 });

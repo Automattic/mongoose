@@ -6869,7 +6869,7 @@ describe('Model', function() {
     });
   });
 
-  describe('defaultNewOnFindAndUpdateOrReplace', function() {
+  describe('defaultNewOnFindAndUpdateOrReplace (gh-9183)', function() {
     const originalValue = mongoose.get('defaultNewOnFindAndUpdateOrReplace');
     beforeEach(() => {
       mongoose.set('defaultNewOnFindAndUpdateOrReplace', true);
@@ -6879,7 +6879,7 @@ describe('Model', function() {
       mongoose.set('defaultNewOnFindAndUpdateOrReplace', originalValue);
     });
 
-    it('Setting `defaultNewOnFindAndUpdateOrReplace` works (gh-9183)', function() {
+    it('Setting `defaultNewOnFindAndUpdateOrReplace` works', function() {
       return co(function*() {
         const userSchema = new Schema({
           name: { type: String }
@@ -6897,6 +6897,27 @@ describe('Model', function() {
 
         const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' });
         assert.equal(user3.name, 'Hafez3');
+      });
+    });
+
+    it('`defaultNewOnFindAndUpdateOrReplace` can be overwritten', function() {
+      return co(function*() {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+        const createdUser = yield User.create({ name: 'Hafez' });
+
+        const user1 = yield User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' }, { new: false });
+        assert.equal(user1.name, 'Hafez');
+
+        const user2 = yield User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' }, { new: false });
+        assert.equal(user2.name, 'Hafez1');
+
+        const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' }, { new: false });
+        assert.equal(user3.name, 'Hafez2');
       });
     });
   });

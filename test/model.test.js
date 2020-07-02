@@ -6869,17 +6869,17 @@ describe('Model', function() {
     });
   });
 
-  describe('defaultNewOnFindAndUpdate', function() {
-    const originalValue = mongoose.get('defaultNewOnFindAndUpdate');
+  describe('defaultNewOnFindAndUpdateOrReplace', function() {
+    const originalValue = mongoose.get('defaultNewOnFindAndUpdateOrReplace');
     beforeEach(() => {
-      mongoose.set('defaultNewOnFindAndUpdate', true);
+      mongoose.set('defaultNewOnFindAndUpdateOrReplace', true);
     });
 
     afterEach(() => {
-      mongoose.set('defaultNewOnFindAndUpdate', originalValue);
+      mongoose.set('defaultNewOnFindAndUpdateOrReplace', originalValue);
     });
 
-    it('Setting `defaultNewOnFindAndUpdate` works (gh-9183)', function() {
+    it('Setting `defaultNewOnFindAndUpdateOrReplace` works (gh-9183)', function() {
       return co(function*() {
         const userSchema = new Schema({
           name: { type: String }

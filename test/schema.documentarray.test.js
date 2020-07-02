@@ -98,4 +98,20 @@ describe('schema.documentarray', function() {
     assert.equal(doc.nested[0].length, 3);
     assert.equal(doc.nested[0][1].title, 'second');
   });
+
+  it('supports `set()` (gh-8883)', function() {
+    mongoose.deleteModel(/Test/);
+    mongoose.Schema.Types.DocumentArray.set('_id', false);
+
+    const Model = mongoose.model('Test', mongoose.Schema({
+      arr: { type: [{ name: String }] }
+    }));
+
+    const doc = new Model({ arr: [{ name: 'test' }] });
+
+    assert.equal(doc.arr.length, 1);
+    assert.ok(!doc.arr[0]._id);
+
+    mongoose.Schema.Types.DocumentArray.defaultOptions = {};
+  });
 });

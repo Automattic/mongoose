@@ -8975,4 +8975,86 @@ describe('document', function() {
     const axl = new Person({ fullName: 'Axl Rose' });
     assert.equal(axl.fullName, 'Axl Rose');
   });
+
+  describe('Document#getChanges(...) (gh-9096)', function() {
+    it('returns an empty object when there are no changes', function() {
+      return co(function*() {
+        const User = db.model('User', { name: String, age: Number, country: String });
+        const user = yield User.create({ name: 'Hafez', age: 25, country: 'Egypt' });
+
+        const changes = user.getChanges();
+        assert.deepEqual(changes, {});
+      });
+    });
+
+    it('returns only the changed paths', function() {
+      return co(function*() {
+        const User = db.model('User', { name: String, age: Number, country: String });
+        const user = yield User.create({ name: 'Hafez', age: 25, country: 'Egypt' });
+
+        user.country = undefined;
+        user.age = 26;
+
+        const changes = user.getChanges();
+        assert.deepEqual(changes, { $set: { age: 26 }, $unset: { country: 1 } });
+      });
+    });
+  });
+
+  it('supports skipping defaults on a document (gh-8271)', function() {
+    const testSchema = new mongoose.Schema({
+      testTopLevel: { type: String, default: 'foo' },
+      testNested: {
+        prop: { type: String, default: 'bar' }
+      },
+      testArray: [{ prop: { type: String, defualt: 'baz' } }],
+      testSingleNested: new Schema({
+        prop: { type: String, default: 'qux' }
+      })
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test({ testArray: [{}], testSingleNested: {} }, null,
+      { defaults: false });
+    assert.ok(!doc.testTopLevel);
+    assert.ok(!doc.testNested.prop);
+    assert.ok(!doc.testArray[0].prop);
+    assert.ok(!doc.testSingleNested.prop);
+  });
+
+  it('throws an error when `transform` returns a promise (gh-9163)', function() {
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        transform: function() {
+          return new Promise(() => {});
+        }
+      }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+    assert.throws(function() {
+      user.toJSON();
+    }, /must be synchronous/);
+
+    assert.throws(function() {
+      user.toObject();
+    }, /must be synchronous/);
+  });
+
+  it('uses strict equality when checking mixed paths for modifications (gh-9165)', function() {
+    const schema = Schema({ obj: {} });
+    const Model = db.model('gh9165', schema);
+
+    return Model.create({ obj: { key: '2' } }).
+      then(doc => {
+        doc.obj = { key: 2 };
+        assert.ok(doc.modifiedPaths().indexOf('obj') !== -1);
+        return doc.save();
+      }).
+      then(doc => Model.findById(doc)).
+      then(doc => assert.strictEqual(doc.obj.key, 2));
+  });
 });

@@ -753,5 +753,57 @@ describe('mongoose module:', function() {
         done();
       });
     });
+
+    it('can set `setDefaultsOnInsert` as a global option (gh-9032)', function() {
+      return co(function* () {
+        const m = new mongoose.Mongoose();
+        m.set('setDefaultsOnInsert', true);
+        const db = yield m.connect('mongodb://localhost:27017/mongoose_test_9032');
+
+        const schema = new m.Schema({
+          title: String,
+          genre: { type: String, default: 'Action' }
+        }, { collection: 'movies_1' });
+
+        const Movie = db.model('Movie', schema);
+        yield Movie.deleteMany({});
+
+        yield Movie.updateOne(
+          {},
+          { title: 'Cloud Atlas' },
+          { upsert: true }
+        );
+
+        // lean is necessary to avoid defaults by casting
+        const movie = yield Movie.findOne({ title: 'Cloud Atlas' }).lean();
+        assert.equal(movie.genre, 'Action');
+      });
+    });
+
+    it('setting `setDefaultOnInsert` on operation has priority over base option (gh-9032)', function() {
+      return co(function* () {
+        const m = new mongoose.Mongoose();
+        m.set('setDefaultsOnInsert', true);
+        const db = yield m.connect('mongodb://localhost:27017/mongoose_test_9032');
+
+        const schema = new m.Schema({
+          title: String,
+          genre: { type: String, default: 'Action' }
+        }, { collection: 'movies_2' });
+
+        const Movie = db.model('Movie', schema);
+
+
+        yield Movie.updateOne(
+          {},
+          { title: 'The Man From Earth' },
+          { upsert: true, setDefaultsOnInsert: false }
+        );
+
+        // lean is necessary to avoid defaults by casting
+        const movie = yield Movie.findOne({ title: 'The Man From Earth' }).lean();
+        assert.ok(!movie.genre);
+      });
+    });
   });
 });

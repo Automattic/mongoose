@@ -1,3 +1,22 @@
+5.9.21 / 2020-07-01
+===================
+ * fix: propagate `typeKey` option to implicitly created schemas from `typePojoToMixed` #9185 [joaoritter](https://github.com/joaoritter)
+ * fix(populate): handle embedded discriminator `refPath` with multiple documents #9153
+ * fix(populate): handle deselected foreign field with `perDocumentLimit` and multiple documents #9175
+ * fix(document): disallow `transform` functions that return promises #9176 #9163 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): use strict equality when checking mixed paths for modifications #9165
+ * docs: add target="_blank" to all edit links #9058
+
+5.9.20 / 2020-06-22
+===================
+ * fix(populate): handle populating primitive array under document array discriminator #9148
+ * fix(connection): make sure to close previous connection when calling `openUri()` on an already open connection #9107
+ * fix(model): fix conflicting $setOnInsert default values with `update` values in bulkWrite #9160 #9157 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(validation): add note about validateBeforeSave and invalidate #9144 [dandv](https://github.com/dandv)
+ * docs: specify the array field syntax for invalidate #9137 [dandv](https://github.com/dandv)
+ * docs: fix several typos and broken references #9024 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix minor typo #9143 [dandv](https://github.com/dandv)
+
 5.9.19 / 2020-06-15
 ===================
  * fix: upgrade mongodb driver -> 3.5.9 #9124 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

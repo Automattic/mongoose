@@ -6839,4 +6839,36 @@ describe('Model', function() {
       );
     });
   });
+
+  describe('defaultNewOnFindAndUpdate', function() {
+    const originalValue = mongoose.get('defaultNewOnFindAndUpdate');
+    beforeEach(() => {
+      mongoose.set('defaultNewOnFindAndUpdate', true);
+    });
+
+    afterEach(() => {
+      mongoose.set('defaultNewOnFindAndUpdate', originalValue);
+    });
+
+    it('Setting `defaultNewOnFindAndUpdate` works (gh-9183)', function() {
+      return co(function*() {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+        const createdUser = yield User.create({ name: 'Hafez' });
+
+        const user1 = yield User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' });
+        assert.equal(user1.name, 'Hafez1');
+
+        const user2 = yield User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' });
+        assert.equal(user2.name, 'Hafez2');
+
+        const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' });
+        assert.equal(user3.name, 'Hafez3');
+      });
+    });
+  });
 });

@@ -21,7 +21,7 @@
   "dependencies": {
     "bson": "^1.1.4",
     "kareem": "2.3.1",
-    "mongodb": "3.5.9",
+    "mongodb": "git@github.com:mongodb/node-mongodb-native.git#3.6",
     "mongoose-legacy-pluralize": "1.0.2",
     "mpath": "0.7.0",
     "mquery": "3.2.2",
@@ -134,13 +134,22 @@
       "no-const-assign": "error",
       "no-useless-rename": "error",
       "no-dupe-keys": "error",
-      "space-in-parens": ["error", "never"],
-      "spaced-comment": ["error", "always", {
-        "block": {
-          "markers": ["!"],
-          "balanced": true
+      "space-in-parens": [
+        "error",
+        "never"
+      ],
+      "spaced-comment": [
+        "error",
+        "always",
+        {
+          "block": {
+            "markers": [
+              "!"
+            ],
+            "balanced": true
+          }
         }
-      }],
+      ],
       "key-spacing": [
         "error",
         {
@@ -156,10 +165,13 @@
         }
       ],
       "array-bracket-spacing": 1,
-      "arrow-spacing": ["error", {
-        "before": true,
-        "after": true
-      }],
+      "arrow-spacing": [
+        "error",
+        {
+          "before": true,
+          "after": true
+        }
+      ],
       "object-curly-spacing": [
         "error",
         "always"

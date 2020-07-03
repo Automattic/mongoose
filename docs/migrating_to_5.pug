@@ -60,6 +60,7 @@ block content
     * [debug output defaults to stdout instead of stderr](#debug-output)
     * [Overwriting filter properties](#overwrite-filter)
     * [`bulkWrite()` results](#bulkwrite-results)
+    * [Strict SSL validation](#strict-ssl-validation)
 
     <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
 
@@ -555,4 +556,17 @@ block content
       upsertedIds: {},
       insertedIds: { '0': 5be9a1c87decfc6443dd9f18 },
       n: 1 }
+    ```
+
+    <h3 id="strict-ssl-validation"><a href="#strict-ssl-validation">
+      Strict SSL Validation
+    </a></h3>
+
+    The most recent versions of the [MongoDB Node.js driver use strict SSL validation by default](http://mongodb.github.io/node-mongodb-native/3.5/tutorials/connect/tls/),
+    which may lead to errors if you're using [self-signed certificates](https://github.com/Automattic/mongoose/issues/9147).
+
+    If this is blocking you from upgrading, you can set the `tlsInsecure` option to `true`.
+
+    ```javascript
+    mongoose.connect(uri, { tlsInsecure: false }); // Opt out of additional SSL validation
     ```

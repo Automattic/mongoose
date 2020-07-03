@@ -6869,17 +6869,17 @@ describe('Model', function() {
     });
   });
 
-  describe('defaultNewOnFindAndUpdateOrReplace (gh-9183)', function() {
-    const originalValue = mongoose.get('defaultNewOnFindAndUpdateOrReplace');
+  describe('returnOriginal (gh-9183)', function() {
+    const originalValue = mongoose.get('returnOriginal');
     beforeEach(() => {
-      mongoose.set('defaultNewOnFindAndUpdateOrReplace', true);
+      mongoose.set('returnOriginal', false);
     });
 
     afterEach(() => {
-      mongoose.set('defaultNewOnFindAndUpdateOrReplace', originalValue);
+      mongoose.set('returnOriginal', originalValue);
     });
 
-    it('Setting `defaultNewOnFindAndUpdateOrReplace` works', function() {
+    it('Setting `returnOriginal` works', function() {
       return co(function*() {
         const userSchema = new Schema({
           name: { type: String }
@@ -6900,7 +6900,7 @@ describe('Model', function() {
       });
     });
 
-    it('`defaultNewOnFindAndUpdateOrReplace` can be overwritten', function() {
+    it('`returnOriginal` can be overwritten', function() {
       return co(function*() {
         const userSchema = new Schema({
           name: { type: String }

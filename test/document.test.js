@@ -9057,4 +9057,16 @@ describe('document', function() {
       then(doc => Model.findById(doc)).
       then(doc => assert.strictEqual(doc.obj.key, 2));
   });
+
+  it('supports `useProjection` option for `toObject()` (gh-9118)', function() {
+    const authorSchema = new mongoose.Schema({
+      name: String,
+      hiddenField: { type: String, select: false }
+    });
+
+    const Author = db.model('Author', authorSchema);
+
+    const example = new Author({ name: 'John', hiddenField: 'A secret' });
+    assert.strictEqual(example.toJSON({ useProjection: true }).hiddenField, void 0);
+  });
 });

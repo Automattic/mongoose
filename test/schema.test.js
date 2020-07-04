@@ -2434,4 +2434,12 @@ describe('schema', function() {
 
     assert.ok(customerSchema.nested['card']);
   });
+
+  it('allows using `mongoose.Schema.Types.Array` as type (gh-9194)', function() {
+    const schema = new Schema({
+      arr: mongoose.Schema.Types.Array
+    });
+
+    assert.equal(schema.path('arr').caster.instance, 'Mixed');
+  });
 });

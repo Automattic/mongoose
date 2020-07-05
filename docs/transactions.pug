@@ -5,7 +5,7 @@ block append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -46,7 +46,36 @@ block content
     operation in a transaction, you need to pass the `session` as an option.
 
     ```javascript
-    [require:transactions.*basic example]
+    const Customer = mongoose.model('Customer', new Schema({ name: String }));
+
+    await Customer.createCollection();
+    const session = await mongoose.startSession();
+
+    // Start a transaction
+    session.startTransaction();
+
+    // This `create()` is part of the transaction because of the `session`
+    // option.
+    await Customer.create([{ name: 'Test' }], { session: session });
+
+    // Transactions execute in isolation, so unless you pass a `session`
+    // to `findOne()` you won't see the document until the transaction
+    // is committed.
+    const customerWithoutSession = await Customer.findOne({ name: 'Test' });
+    assert.ok(!customerWithoutSession);
+
+    // This `findOne()` will return the doc, because passing the `session`
+    // means this `findOne()` will run as part of the transaction.
+    const customerFromSession = await Customer.findOne({ name: 'Test' }).session(session);
+    assert.ok(customerFromSession);
+
+    // Once the transaction is committed, the write operation becomes
+    // visible outside of the transaction.
+    await session.commitTransaction();
+    const customerAfterCommittingSession = await Customer.findOne({ name: 'Test' });
+    assert.ok(customerAfterCommittingSession);
+
+    await session.endSession();
     ```
 
     In the above example, `session` is an instance of the
@@ -66,7 +95,22 @@ block content
     incrementing `B`'s balance.
 
     ```javascript
-    [require:transactions.*abort]
+    const Customer = mongoose.model('Customer', new Schema({ name: String }));
+
+    await Customer.createCollection();
+    const session = await Customer.startSession();
+    session.startTransaction();
+
+
+    await Customer.create([{ name: 'Test' }], { session: session });
+    await Customer.create([{ name: 'Test2' }], { session: session });
+
+    await session.abortTransaction();
+    const count = await Customer.countDocuments();
+
+    assert.strictEqual(count, 0);
+
+    await session.endSession();
     ```
 
     ## The `withTransaction()` Helper
@@ -81,7 +125,18 @@ block content
     - Retrying in the event of a [transient transaction error](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
 
     ```javascript
-    [require:transactions.*withTransaction]
+    await Customer.createCollection();
+    const session = await Customer.startSession();
+
+    // The `withTransaction()` function's first parameter is a function
+    // that returns a promise.
+    await session.withTransaction(() => {
+      return Customer.create([{ name: 'Test' }], { session: session });
+    });
+
+    const count = await Customer.countDocuments();
+    assert.strictEqual(count, 1);
+    await session.endSession();
     ```
 
     For more information on the `ClientSession#withTransaction()` function, please see
@@ -96,7 +151,31 @@ block content
     To get/set the session associated with a given document, use [`doc.$session()`](/docs/api.html#document_Document-$session).
 
     ```javascript
-    [require:transactions.*save]
+    const User = mongoose.model('User', new Schema({ name: String }));
+
+    await User.createCollection();
+    const session = await mongoose.startSession();
+
+    await User.create({ name: 'foo' });
+
+    session.startTransaction();
+    const user = await User.findOne({ name: 'foo' }).session(session);
+    // Getter/setter for the session associated with this document.
+    assert.ok(user.$session());
+    user.name = 'bar';
+    // By default, `save()` uses the associated session
+    await user.save();
+
+
+    // Won't find the doc because `save()` is part of an uncommitted transaction
+    const userAfterSave = await User.findOne({ name: 'bar' });
+    assert.ok(!userAfterSave);
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    const userAfterCommittingTransaction = await User.findOne({ name: 'bar' });
+    assert.ok(userAfterCommittingTransaction);
     ```
 
     ## With the Aggregation Framework
@@ -107,5 +186,38 @@ block content
     Below is an example of executing an aggregation within a transaction.
 
     ```javascript
-    [require:transactions.*aggregate]
+    const Event = mongoose.model('Event', new Schema({ createdAt: Date }), 'Event');
+    await Event.createCollection();
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    await Event.insertMany([
+      { createdAt: new Date('2018-06-01') },
+      { createdAt: new Date('2018-06-02') },
+      { createdAt: new Date('2017-06-01') },
+      { createdAt: new Date('2017-05-31') }
+    ], { session });
+
+    const res = await Event.aggregate([
+      {
+        $group: {
+          _id: {
+            month: { $month: '$createdAt' },
+            year: { $year: '$createdAt' }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
+    ]).session(session);
+
+    assert.deepEqual(res, [
+      { _id: { month: 6, year: 2018 }, count: 2 },
+      { _id: { month: 6, year: 2017 }, count: 1 },
+      { _id: { month: 5, year: 2017 }, count: 1 }
+    ]);
+
+    await session.commitTransaction();
+    await session.endSession();    
     ```

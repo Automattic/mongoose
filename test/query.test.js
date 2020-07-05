@@ -832,7 +832,8 @@ describe('Query', function() {
         select: undefined,
         model: undefined,
         options: undefined,
-        _docs: {}
+        _docs: {},
+        _childDocs: []
       };
       q.populate(o);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
@@ -844,7 +845,8 @@ describe('Query', function() {
       let o = {
         path: 'yellow.brick',
         match: { bricks: { $lt: 1000 } },
-        _docs: {}
+        _docs: {},
+        _childDocs: []
       };
       q.populate(Object.assign({}, o));
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
@@ -853,7 +855,8 @@ describe('Query', function() {
       q.populate('yellow.brick');
       o = {
         path: 'yellow.brick',
-        _docs: {}
+        _docs: {},
+        _childDocs: []
       };
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 1);
       assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], o);
@@ -866,11 +869,13 @@ describe('Query', function() {
       assert.equal(Object.keys(q._mongooseOptions.populate).length, 2);
       assert.deepEqual(q._mongooseOptions.populate['yellow.brick'], {
         path: 'yellow.brick',
-        _docs: {}
+        _docs: {},
+        _childDocs: []
       });
       assert.deepEqual(q._mongooseOptions.populate['dirt'], {
         path: 'dirt',
-        _docs: {}
+        _docs: {},
+        _childDocs: []
       });
       done();
     });

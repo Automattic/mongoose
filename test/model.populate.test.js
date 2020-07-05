@@ -9546,4 +9546,44 @@ describe('model: populate:', function() {
       assert.equal(docs[1].items[0].foo.title, 'doc1');
     });
   });
+
+  it('Sets the populated document\'s parent() (gh-8092)', function() {
+    const schema = new Schema({
+      single: { type: Number, ref: 'Child' },
+      arr: [{ type: Number, ref: 'Child' }],
+      docArr: [{ ref: { type: Number, ref: 'Child' } }]
+    });
+
+    schema.virtual('myVirtual', {
+      ref: 'Child',
+      localField: 'single',
+      foreignField: '_id',
+      justOne: true
+    });
+
+    const Parent = db.model('Parent', schema);
+    const Child = db.model('Child', Schema({ _id: Number, name: String }));
+
+    return co(function*() {
+      yield Child.create({ _id: 1, name: 'test' });
+
+      yield Parent.create({ single: 1, arr: [1], docArr: [{ ref: 1 }] });
+
+      let doc = yield Parent.findOne().populate('single');
+      assert.ok(doc.single.parent() === doc);
+
+      doc = yield Parent.findOne().populate('arr');
+      assert.ok(doc.arr[0].parent() === doc);
+
+      doc = yield Parent.findOne().populate('docArr.ref');
+      assert.ok(doc.docArr[0].ref.parent() === doc);
+
+      doc = yield Parent.findOne().populate('myVirtual');
+      assert.ok(doc.myVirtual.parent() === doc);
+
+      doc = yield Parent.findOne();
+      yield doc.populate('single').execPopulate();
+      assert.ok(doc.single.parent() === doc);
+    });
+  });
 });

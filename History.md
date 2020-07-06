@@ -1,3 +1,21 @@
+5.9.22 / 2020-07-06
+===================
+ * fix(schema): treat `{ type: mongoose.Schema.Types.Array }` as equivalent to `{ type: Array }` #9194
+ * fix: revert fix for #9107 to avoid issues when calling `connect()` multiple times #9167
+ * fix(update): respect storeSubdocValidationError option with update validators #9172
+ * fix: upgrade to safe-buffer 5.2 #9198
+ * docs: add a note about SSL validation to migration guide #9147
+ * docs(schemas): fix inconsistent header #9196 [samtsai15](https://github.com/samtsai15)
+
+5.9.21 / 2020-07-01
+===================
+ * fix: propagate `typeKey` option to implicitly created schemas from `typePojoToMixed` #9185 [joaoritter](https://github.com/joaoritter)
+ * fix(populate): handle embedded discriminator `refPath` with multiple documents #9153
+ * fix(populate): handle deselected foreign field with `perDocumentLimit` and multiple documents #9175
+ * fix(document): disallow `transform` functions that return promises #9176 #9163 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): use strict equality when checking mixed paths for modifications #9165
+ * docs: add target="_blank" to all edit links #9058
+
 5.9.20 / 2020-06-22
 ===================
  * fix(populate): handle populating primitive array under document array discriminator #9148

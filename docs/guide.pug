@@ -5,7 +5,7 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -364,7 +364,7 @@ block content
     Only non-virtual properties work as part of queries and for field selection.
     Since virtuals are not stored in MongoDB, you can't query with them.
 
-    <h5 id="aliases"><a href="#aliases">Aliases</a></h5>
+    <h3 id="aliases"><a href="#aliases">Aliases</a></h3>
 
     Aliases are a particular type of virtual where the getter and setter
     seamlessly get and set another property. This is handy for saving network

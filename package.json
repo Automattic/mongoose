@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.9.20",
+  "version": "5.9.22",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -27,7 +27,7 @@
     "mquery": "3.2.2",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
-    "safe-buffer": "5.1.2",
+    "safe-buffer": "5.2.1",
     "sliced": "1.0.1",
     "sift": "7.0.1"
   },
@@ -135,13 +135,22 @@
       "no-const-assign": "error",
       "no-useless-rename": "error",
       "no-dupe-keys": "error",
-      "space-in-parens": ["error", "never"],
-      "spaced-comment": ["error", "always", {
-        "block": {
-          "markers": ["!"],
-          "balanced": true
+      "space-in-parens": [
+        "error",
+        "never"
+      ],
+      "spaced-comment": [
+        "error",
+        "always",
+        {
+          "block": {
+            "markers": [
+              "!"
+            ],
+            "balanced": true
+          }
         }
-      }],
+      ],
       "key-spacing": [
         "error",
         {
@@ -157,10 +166,13 @@
         }
       ],
       "array-bracket-spacing": 1,
-      "arrow-spacing": ["error", {
-        "before": true,
-        "after": true
-      }],
+      "arrow-spacing": [
+        "error",
+        {
+          "before": true,
+          "after": true
+        }
+      ],
       "object-curly-spacing": [
         "error",
         "always"

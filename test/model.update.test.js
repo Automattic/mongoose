@@ -3478,4 +3478,22 @@ describe('model: updateOne: ', function() {
       });
     });
   });
+
+  it('update validators respect storeSubdocValidationError (gh-9172)', function() {
+    const opts = { storeSubdocValidationError: false };
+    const Model = db.model('Test', Schema({
+      nested: Schema({
+        arr: [{ name: { type: String, required: true } }]
+      }, opts)
+    }));
+
+    return co(function*() {
+      const opts = { runValidators: true };
+      const err = yield Model.updateOne({}, { nested: { arr: [{}] } }, opts).catch(err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors['nested.arr.0.name']);
+      assert.ok(!err.errors['nested']);
+    });
+  });
 });

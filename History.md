@@ -1,3 +1,10 @@
+5.9.23 / 2020-07-10
+===================
+ * fix(model): fix `syncIndexes()` error when db index has a collation but Mongoose index does not #9224 [clhuang](https://github.com/clhuang)
+ * fix(array): only cast array to proper depth if it contains an non-array value #9217 #9215 [cyrilgandon](https://github.com/cyrilgandon)
+ * docs(schematype): document the `transform` option #9211
+ * docs(mongoose): fix typo #9212 [JNa0](https://github.com/JNa0)
+
 5.9.22 / 2020-07-06
 ===================
  * fix(schema): treat `{ type: mongoose.Schema.Types.Array }` as equivalent to `{ type: Array }` #9194

@@ -8687,6 +8687,22 @@ describe('document', function() {
     assert.deepEqual(obj.lines, [[[3, 4]]]);
   });
 
+  it('doesnt wrap empty nested array with insufficient depth', function() {
+    const weekSchema = mongoose.Schema({
+      days: {
+        type: [[[Number]]],
+        required: true
+      }
+    });
+
+    const Week = db.model('Test', weekSchema);
+    const emptyWeek = new Week();
+
+    emptyWeek.days = [[], [], [], [], [], [], []];
+    const obj = emptyWeek.toObject();
+    assert.deepEqual(obj.days, [[], [], [], [], [], [], []]);
+  });
+
   it('doesnt wipe out nested keys when setting nested key to empty object with minimize (gh-8565)', function() {
     const opts = { autoIndex: false, autoCreate: false };
     const schema1 = Schema({ plaid: { nestedKey: String } }, opts);

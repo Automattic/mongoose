@@ -9027,4 +9027,29 @@ describe('document', function() {
       then(doc => Model.findById(doc)).
       then(doc => assert.strictEqual(doc.obj.key, 2));
   });
+
+  it('clears out priorDoc after overwriting single nested subdoc (gh-9208)', function() {
+    const TestModel = db.model('Test', Schema({
+      nested: Schema({
+        myBool: Boolean,
+        myString: String
+      })
+    }));
+
+    return co(function*() {
+      const test = new TestModel();
+
+      test.nested = { myBool: true };
+      yield test.save();
+
+      test.nested = { myString: 'asdf' };
+      yield test.save();
+
+      test.nested.myBool = true;
+      yield test.save();
+
+      const doc = yield TestModel.findById(test);
+      assert.strictEqual(doc.nested.myBool, true);
+    });
+  });
 });

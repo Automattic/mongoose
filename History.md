@@ -1,3 +1,7 @@
+4.13.21 / 2020-07-12
+====================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+
 4.13.20 / 2020-01-07
 ====================
  * fix(schema): make aliases handle mongoose-lean-virtuals #6069

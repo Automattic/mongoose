@@ -1,3 +1,7 @@
+4.13.21 / 2020-07-12
+====================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+
 5.9.23 / 2020-07-10
 ===================
  * fix(model): fix `syncIndexes()` error when db index has a collation but Mongoose index does not #9224 [clhuang](https://github.com/clhuang)

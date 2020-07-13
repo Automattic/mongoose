@@ -1,3 +1,12 @@
+5.9.24 / 2020-07-13
+===================
+ * fix(connection): respect connection-level `bufferCommands` option if `mongoose.connect()` is called after `mongoose.model()` #9179
+ * fix(document): clear out `priorDoc` after overwriting single nested subdoc so changes after overwrite get persisted correctly #9208
+ * fix(connection): dont overwrite user-specified `bufferMaxEntries` when setting `bufferCommands` #9218
+ * fix(model): allow passing projection to `Model.hydrate()` #9209
+ * fix(schema+document): support adding `null` to schema boolean's `convertToFalse` set #9223
+ * docs(model): make `find` and `findOne()` examples use async/await and clarify `find({})` is find all #9210
+
 4.13.21 / 2020-07-12
 ====================
  * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222

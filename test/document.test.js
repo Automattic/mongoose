@@ -6309,26 +6309,55 @@ describe('document', function() {
       });
     });
 
-    it('convertToFalse and convertToTrue (gh-6758)', function() {
-      const TestSchema = new Schema({ b: Boolean });
-      const Test = db.model('Test', TestSchema);
+    describe('convertToFalse and convertToTrue (gh-6758)', function() {
+      let convertToFalse = null;
+      let convertToTrue = null;
 
-      mongoose.Schema.Types.Boolean.convertToTrue.add('aye');
-      mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
+      beforeEach(function() {
+        convertToFalse = new Set(mongoose.Schema.Types.Boolean.convertToFalse);
+        convertToTrue = new Set(mongoose.Schema.Types.Boolean.convertToTrue);
+      });
 
-      const doc1 = new Test({ b: 'aye' });
-      const doc2 = new Test({ b: 'nay' });
+      afterEach(function() {
+        mongoose.Schema.Types.Boolean.convertToFalse = convertToFalse;
+        mongoose.Schema.Types.Boolean.convertToTrue = convertToTrue;
+      });
 
-      assert.strictEqual(doc1.b, true);
-      assert.strictEqual(doc2.b, false);
+      it('lets you add custom strings that get converted to true/false', function() {
+        const TestSchema = new Schema({ b: Boolean });
+        const Test = db.model('Test', TestSchema);
 
-      return doc1.save().
-        then(() => Test.findOne({ b: { $exists: 'aye' } })).
-        then(doc => assert.ok(doc)).
-        then(() => {
-          mongoose.Schema.Types.Boolean.convertToTrue.delete('aye');
-          mongoose.Schema.Types.Boolean.convertToFalse.delete('nay');
-        });
+        mongoose.Schema.Types.Boolean.convertToTrue.add('aye');
+        mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
+
+        const doc1 = new Test({ b: 'aye' });
+        const doc2 = new Test({ b: 'nay' });
+
+        assert.strictEqual(doc1.b, true);
+        assert.strictEqual(doc2.b, false);
+
+        return doc1.save().
+          then(() => Test.findOne({ b: { $exists: 'aye' } })).
+          then(doc => assert.ok(doc)).
+          then(() => {
+            mongoose.Schema.Types.Boolean.convertToTrue.delete('aye');
+            mongoose.Schema.Types.Boolean.convertToFalse.delete('nay');
+          });
+      });
+
+      it('allows adding `null` to list of values that convert to false (gh-9223)', function() {
+        const TestSchema = new Schema({ b: Boolean });
+        const Test = db.model('Test', TestSchema);
+
+        mongoose.Schema.Types.Boolean.convertToFalse.add(null);
+
+        const doc1 = new Test({ b: null });
+        const doc2 = new Test();
+        doc2.init({ b: null });
+
+        assert.strictEqual(doc1.b, false);
+        assert.strictEqual(doc2.b, false);
+      });
     });
 
     it('doesnt double-call getters when using get() (gh-6779)', function() {

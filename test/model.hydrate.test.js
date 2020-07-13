@@ -81,6 +81,22 @@ describe('model', function() {
       });
     });
 
+    it('supports projection (gh-9209)', function(done) {
+      const schema = new Schema({
+        prop: String,
+        arr: [String]
+      });
+      const Model = db.model('Test2', schema);
+
+      const doc = Model.hydrate({ prop: 'test' }, { arr: 0 });
+
+      assert.equal(doc.isNew, false);
+      assert.equal(doc.isModified(), false);
+      assert.ok(!doc.$__delta());
+
+      done();
+    });
+
     it('works correctly with model discriminators', function(done) {
       const hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C' });
 

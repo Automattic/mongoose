@@ -715,19 +715,26 @@ describe('connections:', function() {
     let db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
 
     let M = db.model('gh5720', new Schema({}));
-    assert.ok(!M.collection.buffer);
+    assert.ok(!M.collection._shouldBufferCommands());
     db.close();
 
     opts = { bufferCommands: true };
     db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     M = db.model('gh5720', new Schema({}, { bufferCommands: false }));
-    assert.ok(!M.collection.buffer);
+    assert.ok(!M.collection._shouldBufferCommands());
     db.close();
 
     opts = { bufferCommands: true };
     db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     M = db.model('gh5720', new Schema({}));
-    assert.ok(M.collection.buffer);
+    assert.ok(M.collection._shouldBufferCommands());
+
+    db = mongoose.createConnection();
+    M = db.model('gh5720', new Schema({}));
+    opts = { bufferCommands: false };
+    db.openUri('mongodb://localhost:27017/test', opts);
+    assert.ok(!M.collection._shouldBufferCommands());
+
     db.close(done);
   });
 

@@ -796,7 +796,7 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719-2)', function(done) {
+      it('reference in child schemas (gh-2719-2)', function() {
         function BaseSchema() {
           Schema.apply(this, arguments);
 
@@ -830,29 +830,23 @@ describe('model', function() {
           date: Date
         }));
 
-        Survey.create({
-          name: 'That you see?',
-          date: Date.now()
-        }, function(err, survey) {
-          assert.ifError(err);
+        return co(function*() {
+          const survey = yield Survey.create({
+            name: 'That you see?',
+            date: Date.now()
+          });
 
-          Talk.create({
+          yield Talk.create({
             name: 'Meetup rails',
             date: new Date('2015-04-01T00:00:00Z'),
             pin: '0004',
             period: { start: '11:00', end: '12:00' },
             surveys: [survey]
-          }, function(err) {
-            assert.ifError(err);
-
-            Event.find({}).populate('surveys').exec(function(err, events) {
-              assert.ifError(err);
-
-              assert.ok(events[0].surveys[0] instanceof Survey);
-
-              done();
-            });
           });
+
+          const events = yield Event.find({}).populate('surveys').exec();
+
+          assert.ok(events[0].surveys[0] instanceof Survey);
         });
       });
     });

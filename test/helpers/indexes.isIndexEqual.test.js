@@ -54,4 +54,32 @@ describe('isIndexEqual', function() {
 
     assert.ok(!isIndexEqual(key, options, dbIndex));
   });
+
+  it('handles text indexes (gh-9225)', function() {
+    const key = { name: 'text' };
+    const options = {};
+    const dbIndex = {
+      v: 2,
+      key: { _fts: 'text', _ftsx: 1 },
+      name: 'name_text',
+      ns: 'test.tests',
+      background: true,
+      weights: { name: 1 },
+      default_language: 'english',
+      language_override: 'language',
+      textIndexVersion: 3
+    };
+
+    assert.ok(isIndexEqual(key, options, dbIndex));
+
+    key.otherProp = 'text';
+    assert.ok(!isIndexEqual(key, options, dbIndex));
+
+    delete key.otherProp;
+    options.weights = { name: 2 };
+    assert.ok(!isIndexEqual(key, options, dbIndex));
+
+    options.weights.name = 1;
+    assert.ok(isIndexEqual(key, options, dbIndex));
+  });
 });

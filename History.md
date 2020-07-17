@@ -1,3 +1,12 @@
+5.9.25 / 2020-07-17
+===================
+ * fix(discriminator): allow passing a compiled model's schema as a parameter to `discriminator()` #9238
+ * fix(connection): throw more readable error when querying db before initial connection when `bufferCommands = false` #9239
+ * fix(indexes): don't unnecessarily drop text indexes when running `syncIndexes()` #9225
+ * fix: make Boolean _castNullish respect omitUndefined #9242 [ehpc](https://github.com/ehpc)
+ * fix(populate): populate single nested discriminator underneath doc array when populated docs have different model but same id #9244
+ * docs(mongoose): correct formatting typo #9247 [JNa0](https://github.com/JNa0)
+
 5.9.24 / 2020-07-13
 ===================
  * fix(connection): respect connection-level `bufferCommands` option if `mongoose.connect()` is called after `mongoose.model()` #9179

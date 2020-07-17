@@ -710,7 +710,7 @@ describe('connections:', function() {
     });
   });
 
-  it('bufferCommands (gh-5720)', function(done) {
+  it('bufferCommands (gh-5720)', function() {
     let opts = { bufferCommands: false };
     let db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
 
@@ -735,7 +735,8 @@ describe('connections:', function() {
     db.openUri('mongodb://localhost:27017/test', opts);
     assert.ok(!M.collection._shouldBufferCommands());
 
-    db.close(done);
+    return M.findOne().then(() => assert.ok(false), err => assert.ok(err.message.includes('initial connection'))).
+      then(() => db.close());
   });
 
   it('dbName option (gh-6106)', function() {

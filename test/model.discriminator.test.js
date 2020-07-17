@@ -1576,4 +1576,20 @@ describe('model', function() {
     const doc = new D({ run: { tab: { id: 42 } } });
     assert.ifError(doc.validateSync());
   });
+
+  it('can use compiled model schema as a discriminator (gh-9238)', function() {
+    const SmsSchema = new mongoose.Schema({ senderNumber: String });
+    const EmailSchema = new mongoose.Schema({ fromEmailAddress: String });
+    const messageSchema = new mongoose.Schema({ method: String }, { discriminatorKey: 'method' });
+
+    const Message = db.model('Test', messageSchema);
+    Message.discriminator('email', EmailSchema);
+    Message.discriminator('sms', SmsSchema);
+
+    const schema = new mongoose.Schema({ actions: [{ name: String }] });
+    const actions = schema.path('actions');
+
+    actions.discriminator('message', Message.schema);
+    assert.ok(actions.schema.discriminators['message']);
+  });
 });

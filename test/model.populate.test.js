@@ -9546,4 +9546,40 @@ describe('model: populate:', function() {
       assert.equal(docs[1].items[0].foo.title, 'doc1');
     });
   });
+
+  it('populates single nested discriminator underneath doc array when populated docs have different model but same id (gh-9244)', function() {
+    const catSchema = Schema({ _id: Number, name: String });
+    const dogSchema = Schema({ _id: Number, name: String });
+
+    const notificationSchema = Schema({ title: String }, { discriminatorKey: 'type' });
+    const notificationTypeASchema = Schema({
+      subject: {
+        type: Number,
+        ref: 'Cat'
+      }
+    }, { discriminatorKey: 'type' });
+    const notificationTypeBSchema = Schema({
+      subject: {
+        type: Number,
+        ref: 'Dog'
+      }
+    }, { discriminatorKey: 'type' });
+
+    const CatModel = db.model('Cat', catSchema);
+    const DogModel = db.model('Dog', dogSchema);
+    const NotificationModel = db.model('Notification', notificationSchema);
+    const NotificationTypeAModel = NotificationModel.discriminator('NotificationTypeA', notificationTypeASchema);
+    const NotificationTypeBModel = NotificationModel.discriminator('NotificationTypeB', notificationTypeBSchema);
+
+    return co(function*() {
+      const cat = yield CatModel.create({ _id: 1, name: 'Keanu' });
+      const dog = yield DogModel.create({ _id: 1, name: 'Bud' });
+
+      yield NotificationTypeAModel.create({ subject: cat._id, title: 'new cat' });
+      yield NotificationTypeBModel.create({ subject: dog._id, title: 'new dog' });
+
+      const notifications = yield NotificationModel.find({}).populate('subject');
+      assert.deepEqual(notifications.map(el => el.subject.name), ['Keanu', 'Bud']);
+    });
+  });
 });

@@ -273,7 +273,7 @@ block content
     connection may emit.
 
     * `connecting`: Emitted when Mongoose starts making its initial connection to the MongoDB server
-    * `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server
+    * `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity.
     * `open`: Equivalent to `connected`
     * `disconnecting`: Your app called [`Connection#close()`](api.html#connection_Connection-close) to disconnect from MongoDB
     * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
@@ -283,6 +283,11 @@ block content
     * `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
     * `all`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.
     * `reconnectFailed`: Emitted when you're connected to a standalone server and Mongoose has run out of [`reconnectTries`](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html#handling-single-server-outages). The [MongoDB driver](http://npmjs.com/package/mongodb) will no longer attempt to reconnect after this event is emitted. This event will never be emitted if you're connected to a replica set.
+
+    When you're connecting to a single MongoDB server (a "standalone"), Mongoose will emit 'disconnected' if it gets
+    disconnected from the standalone server, and 'connected' if it successfully connects to the standalone. In a
+    replica set with `useUnifiedTopology = true`, Mongoose will emit 'disconnected' if it loses connectivity to
+    _every_ server in the replica set, and 'connected' if it manages to reconnect to at least one server in the replica set.
 
     <h3 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h3>
 

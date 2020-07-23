@@ -210,7 +210,7 @@ connectivity to the MongoDB server. Below is a list of events that a
 connection may emit.</p>
 <ul>
 <li><code>connecting</code>: Emitted when Mongoose starts making its initial connection to the MongoDB server</li>
-<li><code>connected</code>: Emitted when Mongoose successfully makes its initial connection to the MongoDB server</li>
+<li><code>connected</code>: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity.</li>
 <li><code>open</code>: Equivalent to <code>connected</code></li>
 <li><code>disconnecting</code>: Your app called <a href="api.html#connection_Connection-close"><code>Connection#close()</code></a> to disconnect from MongoDB</li>
 <li><code>disconnected</code>: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.</li>
@@ -221,6 +221,10 @@ connection may emit.</p>
 <li><code>all</code>: Emitted when you&#39;re connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.</li>
 <li><code>reconnectFailed</code>: Emitted when you&#39;re connected to a standalone server and Mongoose has run out of <a href="https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html#handling-single-server-outages"><code>reconnectTries</code></a>. The <a href="http://npmjs.com/package/mongodb">MongoDB driver</a> will no longer attempt to reconnect after this event is emitted. This event will never be emitted if you&#39;re connected to a replica set.</li>
 </ul>
+<p>When you&#39;re connecting to a single MongoDB server (a &quot;standalone&quot;), Mongoose will emit &#39;disconnected&#39; if it gets
+disconnected from the standalone server, and &#39;connected&#39; if it successfully connects to the standalone. In a
+replica set with <code>useUnifiedTopology = true</code>, Mongoose will emit &#39;disconnected&#39; if it loses connectivity to
+<em>every</em> server in the replica set, and &#39;connected&#39; if it manages to reconnect to at least one server in the replica set.</p>
 <h3 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h3>
 
 <p>For long running applications, it is often prudent to enable <code>keepAlive</code>

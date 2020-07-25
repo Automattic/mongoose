@@ -122,14 +122,21 @@ describe('mongoose module:', function() {
     assert.strictEqual(mongoose.options.bufferCommands, false);
   });
 
-  it('bufferCommands option (gh-5879)', function() {
+  it('bufferCommands option (gh-5879) (gh-9179)', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('bufferCommands', false);
 
     const M = mongoose.model('Test', new Schema({}));
 
-    assert.ok(!M.collection.buffer);
+    assert.ok(!M.collection._shouldBufferCommands());
+
+    // Allow changing bufferCommands after defining model (gh-9179)
+    mongoose.set('bufferCommands', true);
+    assert.ok(M.collection._shouldBufferCommands());
+
+    mongoose.set('bufferCommands', false);
+    assert.ok(!M.collection._shouldBufferCommands());
   });
 
   it('cloneSchemas option (gh-6274)', function() {

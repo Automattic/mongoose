@@ -593,4 +593,26 @@ describe('versioning', function() {
       }).
       catch(done);
   });
+
+  it('optimistic concurrency (gh-9001) (gh-5424)', function() {
+    const schema = new Schema({ name: String }, { optimisticConcurrency: true });
+    const M = db.model('Test', schema);
+
+    const doc = new M({ name: 'foo' });
+
+    return co(function*() {
+      yield doc.save();
+
+      const d1 = yield M.findOne();
+      const d2 = yield M.findOne();
+
+      d1.name = 'bar';
+      yield d1.save();
+
+      d2.name = 'qux';
+      const err = yield d2.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'VersionError');
+    });
+  });
 });

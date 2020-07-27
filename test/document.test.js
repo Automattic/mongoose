@@ -9108,4 +9108,17 @@ describe('document', function() {
       yield doc.save();
     });
   });
+
+  it('allows removing boolean key by setting it to `undefined` (gh-9275)', function() {
+    const Test = db.model('Test', Schema({ a: Boolean }));
+
+    return co(function*() {
+      const doc = yield Test.create({ a: true });
+      doc.a = undefined;
+      yield doc.save();
+
+      const fromDb = yield Test.findOne().lean();
+      assert.ok(!('a' in fromDb));
+    });
+  });
 });

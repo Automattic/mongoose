@@ -1,3 +1,17 @@
+5.9.26 / 2020-07-27
+===================
+ * fix(document): allow unsetting boolean field by setting the field to `undefined` #9275
+ * fix(document): throw error when overwriting a single nested subdoc changes an immutable path within the subdoc #9281
+ * fix(timestamps): apply timestamps to `bulkWrite()` updates when not using `$set` #9268
+ * fix(browser): upgrade babel to v7 to work around an issue with `extends Error` #9273
+ * fix: make subdocument's `invalidate()` methods have the same return value as top-level document #9271
+ * docs(model): make `create()` docs use async/await, and add another warning about how `create()` with options requires array syntax #9280
+ * docs(connections): clarify that Mongoose can emit 'connected' when reconnecting after losing connectivity #9240
+ * docs(populate): clarify that you can't filter based on foreign document properties when populating #9279
+ * docs(document+model): clarify how `validateModifiedOnly` option works #9263
+ * docs: remove extra poolSize option in comment #9270 [shahvicky](https://github.com/shahvicky)
+ * docs: point bulkWrite() link to mongoose docs instead of localhost #9284
+
 5.9.25 / 2020-07-17
 ===================
  * fix(discriminator): allow passing a compiled model's schema as a parameter to `discriminator()` #9238

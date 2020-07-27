@@ -9081,4 +9081,44 @@ describe('document', function() {
       assert.strictEqual(doc.nested.myBool, true);
     });
   });
+
+  it('handles immutable properties underneath single nested subdocs when overwriting (gh-9281)', function() {
+    const SubSchema = Schema({
+      nestedProp: {
+        type: String,
+        immutable: true
+      }
+    }, { strict: 'throw' });
+
+    const TestSchema = Schema({ object: SubSchema }, { strict: 'throw' });
+    const Test = db.model('Test', TestSchema);
+
+    return co(function*() {
+      yield Test.create({ object: { nestedProp: 'A' } });
+      const doc = yield Test.findOne();
+
+      doc.object = {};
+      const err = yield doc.save().then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors['object']);
+      assert.ok(err.message.includes('Path `nestedProp` is immutable'), err.message);
+
+      doc.object = { nestedProp: 'A' };
+      yield doc.save();
+    });
+  });
+
+  it('allows removing boolean key by setting it to `undefined` (gh-9275)', function() {
+    const Test = db.model('Test', Schema({ a: Boolean }));
+
+    return co(function*() {
+      const doc = yield Test.create({ a: true });
+      doc.a = undefined;
+      yield doc.save();
+
+      const fromDb = yield Test.findOne().lean();
+      assert.ok(!('a' in fromDb));
+    });
+  });
 });

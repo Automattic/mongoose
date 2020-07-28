@@ -123,31 +123,24 @@ describe('document modified', function() {
   });
 
   describe('isDefault', function() {
-    it('works', function(done) {
+    it('works', function() {
       const MyModel = db.model('Test',
         { name: { type: String, default: 'Val ' } });
       const m = new MyModel();
       assert.ok(m.$isDefault('name'));
-      done();
     });
   });
 
   describe('isModified', function() {
-    it('should not throw with no argument', function(done) {
+    it('should not throw with no argument', function() {
       const post = new BlogPost;
 
-      let threw = false;
-      try {
+      assert.doesNotThrow(function() {
         post.isModified();
-      } catch (err) {
-        threw = true;
-      }
-
-      assert.equal(threw, false);
-      done();
+      });
     });
 
-    it('when modifying keys', function(done) {
+    it('when modifying keys', function() {
       const post = new BlogPost;
       post.init({
         title: 'Test',
@@ -164,10 +157,9 @@ describe('document modified', function() {
       assert.equal(post.isModified('date'), true);
 
       assert.equal(post.isModified('meta.date'), false);
-      done();
     });
 
-    it('setting a key identically to its current value should not dirty the key', function(done) {
+    it('setting a key identically to its current value should not dirty the key', function() {
       const post = new BlogPost;
       post.init({
         title: 'Test',
@@ -178,11 +170,10 @@ describe('document modified', function() {
       assert.equal(post.isModified('title'), false);
       post.set('title', 'Test');
       assert.equal(post.isModified('title'), false);
-      done();
     });
 
     describe('on DocumentArray', function() {
-      it('work', function(done) {
+      it('work', function() {
         const post = new BlogPost();
         post.init({
           title: 'Test',
@@ -196,10 +187,8 @@ describe('document modified', function() {
         assert.equal(post.isDirectModified('comments'), false);
         assert.equal(post.isModified('comments.0.title'), true);
         assert.equal(post.isDirectModified('comments.0.title'), true);
-
-        done();
       });
-      it('with accessors', function(done) {
+      it('with accessors', function() {
         const post = new BlogPost();
         post.init({
           title: 'Test',
@@ -213,23 +202,19 @@ describe('document modified', function() {
         assert.equal(post.isDirectModified('comments'), false);
         assert.equal(post.isModified('comments.0.body'), true);
         assert.equal(post.isDirectModified('comments.0.body'), true);
-
-        done();
       });
     });
 
     describe('on MongooseArray', function() {
-      it('atomic methods', function(done) {
+      it('atomic methods', function() {
         const post = new BlogPost();
         assert.equal(post.isModified('owners'), false);
         post.get('owners').push(new DocumentObjectId);
         assert.equal(post.isModified('owners'), true);
-        done();
       });
-      it('native methods', function(done) {
+      it('native methods', function() {
         const post = new BlogPost;
         assert.equal(post.isModified('owners'), false);
-        done();
       });
     });
 
@@ -335,7 +320,7 @@ describe('document modified', function() {
       });
     });
 
-    it('properly sets populated for gh-1530 (gh-2678)', function(done) {
+    it('properly sets populated for gh-1530 (gh-2678)', function() {
       const parentSchema = new Schema({
         name: String,
         child: { type: Schema.Types.ObjectId, ref: 'Child' }
@@ -348,7 +333,6 @@ describe('document modified', function() {
       const p = new Parent({ name: 'Alex', child: child });
 
       assert.equal(child._id.toString(), p.populated('child').toString());
-      done();
     });
 
     describe('manually populating arrays', function() {
@@ -362,7 +346,7 @@ describe('document modified', function() {
         db.close(done);
       });
 
-      it('gh-1530 for arrays (gh-3575)', function(done) {
+      it('gh-1530 for arrays (gh-3575)', function() {
         const parentSchema = new Schema({
           name: String,
           children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
@@ -376,7 +360,6 @@ describe('document modified', function() {
 
         assert.equal('Luke', p.children[0].name);
         assert.ok(p.populated('children'));
-        done();
       });
 
       it('setting nested arrays (gh-3721)', function() {
@@ -405,7 +388,7 @@ describe('document modified', function() {
         return Promise.all([User.init(), Account.init()]);
       });
 
-      it('with discriminators (gh-3575)', function(done) {
+      it('with discriminators (gh-3575)', function() {
         const shapeSchema = new mongoose.Schema({}, { discriminatorKey: 'kind' });
 
         db.deleteModel(/Test/);
@@ -430,8 +413,6 @@ describe('document modified', function() {
         assert.ok(test.populated('bars'));
         assert.ok(test.bars[0]._id);
         assert.ok(test.bars[1]._id);
-
-        done();
       });
 
       it('updates embedded doc parents upon direct assignment (gh-5189)', function(done) {

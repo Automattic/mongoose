@@ -5,7 +5,7 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -44,6 +44,7 @@ block content
   :markdown
     <ul class="toc">
       <li><a href="#what-is-a-subdocument-">What is a Subdocument?</a></li>
+      <li><a href="#subdocuments-versus-nested-paths">Subdocuments versus Nested Paths</a></li>
       <li><a href="#finding-a-subdocument">Finding a Subdocument</a></li>
       <li><a href="#adding-subdocs-to-arrays">Adding Subdocs to Arrays</a></li>
       <li><a href="#removing-subdocs">Removing Subdocs</a></li>
@@ -110,8 +111,8 @@ block content
     });
 
     var parentSchema = new mongoose.Schema({
-      child: childSchema,
-        });
+      child: childSchema
+    });
 
     parentSchema.pre('validate', function(next) {
       console.log('1');
@@ -122,6 +123,59 @@ block content
       console.log('4');
       next();
     });
+    ```
+
+    ### Subdocuments versus Nested Paths
+
+    In Mongoose, nested paths are subtly different from subdocuments.
+    For example, below are two schemas: one with `child` as a subdocument,
+    and one with `child` as a nested path.
+
+    ```javascript
+    // Subdocument
+    const subdocumentSchema = new mongoose.Schema({
+      child: new mongoose.Schema({ name: String, age: Number })
+    });
+    const Subdoc = mongoose.model('Subdoc', subdocumentSchema);
+
+    // Nested path
+    const nestedSchema = new mongoose.Schema({
+      child: { name: String, age: Number }
+    });
+    const Nested = mongoose.model('Nested', nestedSchema);
+    ```
+
+    These two schemas look similar, and the documents in MongoDB will
+    have the same structure with both schemas. But there are a few
+    Mongoose-specific differences:
+
+    First, instances of `Nested` never have `child === undefined`.
+    You can always set subproperties of `child`, even if you don't set
+    the `child` property. But instances of `Subdoc` can have `child === undefined`.
+
+    ```javascript
+    const doc1 = new Subdoc({});
+    doc1.child === undefined; // true
+    doc1.child.name = 'test'; // Throws TypeError: cannot read property...
+
+    const doc2 = new Nested({});
+    doc2.child === undefined; // false
+    console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
+    doc2.child.name = 'test'; // Works
+    ```
+
+    Secondly, in Mongoose 5, [`Document#set()`](/docs/api/document.html#document_Document-set)
+    merges when you call it on a nested path, but overwrites when you call
+    it on a subdocument.
+
+    ```javascript
+    const doc1 = new Subdoc({ child: { name: 'Luke', age: 19 } });
+    doc1.set({ child: { age: 21 } });
+    doc1.child; // { age: 21 }
+
+    const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
+    doc2.set({ child: { age: 21 } });
+    doc2.child; // { name: Luke, age: 21 }
     ```
 
   h3#finding-a-subdocument Finding a Subdocument
@@ -222,8 +276,9 @@ block content
 
   h4#altsyntaxarrays Alternate declaration syntax for arrays
   :markdown
-    If you create a schema with an array of objects, mongoose will automatically
+    If you create a schema with an array of objects, Mongoose will automatically
     convert the object to a schema for you:
+
     ```javascript
     var parentSchema = new Schema({
       children: [{ name: 'string' }]
@@ -234,21 +289,6 @@ block content
     });
     ```
 
-  h4#altsyntaxsingle Alternate declaration syntax for single subdocuments
-  :markdown
-    Similarly, single subdocuments also have a shorthand whereby you can omit
-    wrapping the schema with an instance of Schema.  However, for historical
-    reasons, this alternate declaration must be enabled via an option (either
-    on the parent schema instantiation or on the mongoose instance).
-    ```javascript
-    var parentSchema = new Schema({
-      child: new Schema({ name: 'string' })
-    });
-    // Equivalent
-    var parentSchema = new Schema({
-      child: { type: { name: 'string' } }
-    });
-    ```
   h3#next Next Up
   :markdown
     Now that we've covered Subdocuments, let's take a look at

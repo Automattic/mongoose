@@ -364,4 +364,35 @@ describe('timestamps', function() {
         assert.ok(doc.products[0].lastJournal.updatedAt);
       });
   });
+
+  it('sets timestamps on bulk write without `$set` (gh-9268)', function() {
+    const NestedSchema = new Schema({ name: String }, {
+      timestamps: true,
+      _id: false
+    });
+    const TestSchema = new Schema({
+      nestedDoc: NestedSchema
+    });
+    const Test = db.model('Test', TestSchema);
+
+    return co(function*() {
+      yield Test.create({ nestedDoc: { name: 'test' } });
+      const doc = yield Test.findOne().lean();
+
+      yield cb => setTimeout(cb, 10);
+      yield Test.bulkWrite([
+        {
+          updateOne: {
+            filter: {},
+            update: {
+              'nestedDoc.name': 'test2'
+            }
+          }
+        }
+      ]);
+
+      const newDoc = yield Test.findById(doc).lean();
+      assert.ok(newDoc.nestedDoc.updatedAt > doc.nestedDoc.updatedAt);
+    });
+  });
 });

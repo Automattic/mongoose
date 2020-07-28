@@ -5,7 +5,7 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -81,8 +81,10 @@ block content
     
     Keys may also be assigned nested objects containing further key/type definitions
     like the `meta` property above.  This will happen whenever a key's value is a POJO
-    that lacks a bona-fide `type` property.  In these cases, only the leaves in a tree
-    are given actual paths in the schema (like `meta.votes` and `meta.favs` above),
+    that doesn't have a `type` property.
+    
+    In these cases, Mongoose only creates actual schema paths for leaves
+    in the tree. (like `meta.votes` and `meta.favs` above),
     and the branches do not have actual paths.  A side-effect of this is that `meta`
     above cannot have its own validation.  If validation is needed up the tree, a path
     needs to be created up the tree - see the [Subdocuments](./subdocs.html) section
@@ -362,7 +364,7 @@ block content
     Only non-virtual properties work as part of queries and for field selection.
     Since virtuals are not stored in MongoDB, you can't query with them.
 
-    <h5 id="aliases"><a href="#aliases">Aliases</a></h5>
+    <h3 id="aliases"><a href="#aliases">Aliases</a></h3>
 
     Aliases are a particular type of virtual where the getter and setter
     seamlessly get and set another property. This is handy for saving network

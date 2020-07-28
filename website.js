@@ -22,7 +22,6 @@ markdown.setOptions({
 });
 
 const tests = [
-  ...acquit.parse(fs.readFileSync('./test/webpack.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/docs/transactions.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),
@@ -76,7 +75,7 @@ append style
     p { line-height: 1.5em }
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
   :markdown

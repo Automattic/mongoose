@@ -1,3 +1,90 @@
+5.9.26 / 2020-07-27
+===================
+ * fix(document): allow unsetting boolean field by setting the field to `undefined` #9275
+ * fix(document): throw error when overwriting a single nested subdoc changes an immutable path within the subdoc #9281
+ * fix(timestamps): apply timestamps to `bulkWrite()` updates when not using `$set` #9268
+ * fix(browser): upgrade babel to v7 to work around an issue with `extends Error` #9273
+ * fix: make subdocument's `invalidate()` methods have the same return value as top-level document #9271
+ * docs(model): make `create()` docs use async/await, and add another warning about how `create()` with options requires array syntax #9280
+ * docs(connections): clarify that Mongoose can emit 'connected' when reconnecting after losing connectivity #9240
+ * docs(populate): clarify that you can't filter based on foreign document properties when populating #9279
+ * docs(document+model): clarify how `validateModifiedOnly` option works #9263
+ * docs: remove extra poolSize option in comment #9270 [shahvicky](https://github.com/shahvicky)
+ * docs: point bulkWrite() link to mongoose docs instead of localhost #9284
+
+5.9.25 / 2020-07-17
+===================
+ * fix(discriminator): allow passing a compiled model's schema as a parameter to `discriminator()` #9238
+ * fix(connection): throw more readable error when querying db before initial connection when `bufferCommands = false` #9239
+ * fix(indexes): don't unnecessarily drop text indexes when running `syncIndexes()` #9225
+ * fix: make Boolean _castNullish respect omitUndefined #9242 [ehpc](https://github.com/ehpc)
+ * fix(populate): populate single nested discriminator underneath doc array when populated docs have different model but same id #9244
+ * docs(mongoose): correct formatting typo #9247 [JNa0](https://github.com/JNa0)
+
+5.9.24 / 2020-07-13
+===================
+ * fix(connection): respect connection-level `bufferCommands` option if `mongoose.connect()` is called after `mongoose.model()` #9179
+ * fix(document): clear out `priorDoc` after overwriting single nested subdoc so changes after overwrite get persisted correctly #9208
+ * fix(connection): dont overwrite user-specified `bufferMaxEntries` when setting `bufferCommands` #9218
+ * fix(model): allow passing projection to `Model.hydrate()` #9209
+ * fix(schema+document): support adding `null` to schema boolean's `convertToFalse` set #9223
+ * docs(model): make `find` and `findOne()` examples use async/await and clarify `find({})` is find all #9210
+
+4.13.21 / 2020-07-12
+====================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+
+5.9.23 / 2020-07-10
+===================
+ * fix(model): fix `syncIndexes()` error when db index has a collation but Mongoose index does not #9224 [clhuang](https://github.com/clhuang)
+ * fix(array): only cast array to proper depth if it contains an non-array value #9217 #9215 [cyrilgandon](https://github.com/cyrilgandon)
+ * docs(schematype): document the `transform` option #9211
+ * docs(mongoose): fix typo #9212 [JNa0](https://github.com/JNa0)
+
+5.9.22 / 2020-07-06
+===================
+ * fix(schema): treat `{ type: mongoose.Schema.Types.Array }` as equivalent to `{ type: Array }` #9194
+ * fix: revert fix for #9107 to avoid issues when calling `connect()` multiple times #9167
+ * fix(update): respect storeSubdocValidationError option with update validators #9172
+ * fix: upgrade to safe-buffer 5.2 #9198
+ * docs: add a note about SSL validation to migration guide #9147
+ * docs(schemas): fix inconsistent header #9196 [samtsai15](https://github.com/samtsai15)
+
+5.9.21 / 2020-07-01
+===================
+ * fix: propagate `typeKey` option to implicitly created schemas from `typePojoToMixed` #9185 [joaoritter](https://github.com/joaoritter)
+ * fix(populate): handle embedded discriminator `refPath` with multiple documents #9153
+ * fix(populate): handle deselected foreign field with `perDocumentLimit` and multiple documents #9175
+ * fix(document): disallow `transform` functions that return promises #9176 #9163 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): use strict equality when checking mixed paths for modifications #9165
+ * docs: add target="_blank" to all edit links #9058
+
+5.9.20 / 2020-06-22
+===================
+ * fix(populate): handle populating primitive array under document array discriminator #9148
+ * fix(connection): make sure to close previous connection when calling `openUri()` on an already open connection #9107
+ * fix(model): fix conflicting $setOnInsert default values with `update` values in bulkWrite #9160 #9157 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(validation): add note about validateBeforeSave and invalidate #9144 [dandv](https://github.com/dandv)
+ * docs: specify the array field syntax for invalidate #9137 [dandv](https://github.com/dandv)
+ * docs: fix several typos and broken references #9024 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix minor typo #9143 [dandv](https://github.com/dandv)
+
+5.9.19 / 2020-06-15
+===================
+ * fix: upgrade mongodb driver -> 3.5.9 #9124 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: copy `required` validator on single nested subdoc correctly when calling `Schema#clone()` #8819
+ * fix(discriminator): handle `tiedValue` when casting update on nested paths #9108
+ * fix(model): allow empty arrays for bulkWrite #9132 #9131 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): correctly set partialFilterExpression for nested schema indexes #9091
+ * fix(castArrayFilters): handle casting on all fields of array filter #9122 [lafeuil](https://github.com/lafeuil)
+ * fix(update): handle nested path createdAt when overwriting parent path #9105
+ * docs(subdocs): add some notes on the difference between single nested subdocs and nested paths #9085
+ * docs(subdocs): improve docs on `typePojoToMixed` #9085
+ * docs: add note about connections in `globalSetup` with Jest #9063
+ * docs: add schema and how to set default sub-schema to schematype options #9111 [dfle](https://github.com/dfle)
+ * docs(index): use `const` instead of `var` in examples #9125 [dmcgrouther](https://github.com/dmcgrouther)
+ * docs: corrected markdown typo #9117
+
 5.9.18 / 2020-06-05
 ===================
  * fix: improve atlas error in the event of incorrect password #9095

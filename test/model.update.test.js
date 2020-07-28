@@ -3352,6 +3352,31 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('handles timestamp properties in nested paths when overwriting parent path (gh-9105)', function() {
+    const SampleSchema = Schema({ nested: { test: String } }, {
+      timestamps: {
+        createdAt: 'nested.createdAt',
+        updatedAt: 'nested.updatedAt'
+      }
+    });
+    const Test = db.model('Test', SampleSchema);
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { test: 'foo' } });
+      assert.ok(doc.nested.updatedAt);
+      assert.ok(doc.nested.createdAt);
+
+      yield cb => setTimeout(cb, 10);
+      yield Test.updateOne({ _id: doc._id }, { nested: { test: 'bar' } });
+
+      const fromDb = yield Test.findOne({ _id: doc._id });
+      assert.ok(fromDb.nested.updatedAt);
+      assert.ok(fromDb.nested.updatedAt > doc.nested.updatedAt);
+      assert.ok(fromDb.nested.createdAt);
+      assert.ok(fromDb.nested.createdAt > doc.nested.createdAt);
+    });
+  });
+
   describe('mongodb 42 features', function() {
     before(function(done) {
       start.mongodVersion((err, version) => {
@@ -3400,6 +3425,24 @@ describe('model: updateOne: ', function() {
           [{ $set: { name: 'Raikou' } }], { new: true });
         assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
       });
+    });
+  });
+
+  it('update validators respect storeSubdocValidationError (gh-9172)', function() {
+    const opts = { storeSubdocValidationError: false };
+    const Model = db.model('Test', Schema({
+      nested: Schema({
+        arr: [{ name: { type: String, required: true } }]
+      }, opts)
+    }));
+
+    return co(function*() {
+      const opts = { runValidators: true };
+      const err = yield Model.updateOne({}, { nested: { arr: [{}] } }, opts).catch(err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors['nested.arr.0.name']);
+      assert.ok(!err.errors['nested']);
     });
   });
 });

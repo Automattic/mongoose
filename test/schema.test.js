@@ -1736,13 +1736,13 @@ describe('schema', function() {
       done();
     });
 
-    it('methods named toString (gh-4551)', function(done) {
+    it('methods named toString (gh-4551)', function() {
       this.schema.methods.toString = function() {
         return 'test';
       };
-      // should not throw
-      mongoose.model('gh4551', this.schema);
-      done();
+      assert.doesNotThrow(() => {
+        mongoose.model('gh4551', this.schema);
+      });
     });
 
     it('handles default value = 0 (gh-4620)', function(done) {
@@ -1892,8 +1892,9 @@ describe('schema', function() {
         const schema = new db.Schema({ name: MyType });
         const otherSchema = schema.clone();
 
-        // Should not throw
-        otherSchema.add({ name2: MyType });
+        assert.doesNotThrow(function() {
+          otherSchema.add({ name2: MyType });
+        });
       });
 
       it('clones schema types (gh-7537)', function() {
@@ -2442,5 +2443,13 @@ describe('schema', function() {
     });
 
     assert.ok(customerSchema.nested['card']);
+  });
+
+  it('allows using `mongoose.Schema.Types.Array` as type (gh-9194)', function() {
+    const schema = new Schema({
+      arr: mongoose.Schema.Types.Array
+    });
+
+    assert.equal(schema.path('arr').caster.instance, 'Mixed');
   });
 });

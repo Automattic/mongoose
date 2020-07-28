@@ -5,7 +5,7 @@ block append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -81,6 +81,7 @@ block content
     - [Array](#arrays)
     - [Decimal128](./api.html#mongoose_Mongoose-Decimal128)
     - [Map](#maps)
+    - [Schema](#schemas)
 
     <h4>Example</h4>
 
@@ -237,9 +238,10 @@ block content
     * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
     * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](./guide.html#virtuals) with the given name that gets/sets this path.
     * `immutable`: boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has `isNew: true`.
+    * `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](/docs/api/document.html#document_Document-toJSON) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
 
     ```javascript
-    var numberSchema = new Schema({
+    const numberSchema = new Schema({
       integerOnly: {
         type: Number,
         get: v => Math.round(v),
@@ -248,9 +250,9 @@ block content
       }
     });
 
-    var Number = mongoose.model('Number', numberSchema);
+    const Number = mongoose.model('Number', numberSchema);
 
-    var doc = new Number();
+    const doc = new Number();
     doc.integerOnly = 2.001;
     doc.integerOnly; // 2
     doc.i; // 2
@@ -646,6 +648,28 @@ block content
 
     // Good, do this instead of declaring a getter on `arr`
     schema.path('arr.0.url').get(v => `${root}${v}`);
+    ```
+
+    <h3 id="schemas"><a href="#schemas">Schemas</a></h3>
+
+    To declare a path as another [schema](./guide.html#definition),
+    set `type` to the sub-schema's instance.
+
+    To set a default value based on the sub-schema's shape, simply set a default value,
+    and the value will be cast based on the sub-schema's definition before being set
+    during document creation.
+
+    ```javascript
+    const subSchema = new mongoose.Schema({
+      // some schema definition here
+    });
+
+    const schema = new mongoose.Schema({
+      data: {
+        type: subSchema
+        default: {}
+      }
+    });
     ```
 
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>

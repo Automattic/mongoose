@@ -60,6 +60,7 @@ block content
     * [debug output defaults to stdout instead of stderr](#debug-output)
     * [Overwriting filter properties](#overwrite-filter)
     * [`bulkWrite()` results](#bulkwrite-results)
+    * [Strict SSL validation](#strict-ssl-validation)
 
     <h3 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h3>
 
@@ -104,7 +105,7 @@ block content
       Connection Logic and `useMongoClient`
     </a></h3>
 
-    The [`useMongoClient` option](http://mongoosejs.com/docs/4.x/docs/connections.html#use-mongo-client) was
+    The [`useMongoClient` option](/docs/4.x/docs/connections.html#use-mongo-client) was
     removed in Mongoose 5, it is now always `true`. As a consequence, Mongoose 5
     no longer supports several function signatures for `mongoose.connect()` that
     worked in Mongoose 4.x if the `useMongoClient` option was off. Below are some
@@ -488,7 +489,7 @@ block content
     </a></h3>
 
     Mongoose 5.x uses version 3.x of the [MongoDB Node.js driver](http://npmjs.com/package/mongodb). MongoDB driver 3.x changed the format of
-    the result of [`bulkWrite()` calls](http://localhost:8088/docs/api.html#model_Model.bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
+    the result of [`bulkWrite()` calls](/docs/api.html#model_Model.bulkWrite) so there is no longer a top-level `nInserted`, `nModified`, etc. property. The new result object structure is [described here](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~BulkWriteOpResult).
 
     ```javascript
     const Model = mongoose.model('Test', new Schema({ name: String }));
@@ -555,4 +556,17 @@ block content
       upsertedIds: {},
       insertedIds: { '0': 5be9a1c87decfc6443dd9f18 },
       n: 1 }
+    ```
+
+    <h3 id="strict-ssl-validation"><a href="#strict-ssl-validation">
+      Strict SSL Validation
+    </a></h3>
+
+    The most recent versions of the [MongoDB Node.js driver use strict SSL validation by default](http://mongodb.github.io/node-mongodb-native/3.5/tutorials/connect/tls/),
+    which may lead to errors if you're using [self-signed certificates](https://github.com/Automattic/mongoose/issues/9147).
+
+    If this is blocking you from upgrading, you can set the `tlsInsecure` option to `true`.
+
+    ```javascript
+    mongoose.connect(uri, { tlsInsecure: false }); // Opt out of additional SSL validation
     ```

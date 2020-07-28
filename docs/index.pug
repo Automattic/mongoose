@@ -31,7 +31,7 @@ block content
 
     ```javascript
     // getting-started.js
-    var mongoose = require('mongoose');
+    const mongoose = require('mongoose');
     mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true});
     ```
 
@@ -40,7 +40,7 @@ block content
     error occurs:
 
     ```javascript
-    var db = mongoose.connection;
+    const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {
       // we're connected!
@@ -54,7 +54,7 @@ block content
     Let's get a reference to it and define our kittens.
 
     ```javascript
-    var kittySchema = new mongoose.Schema({
+    const kittySchema = new mongoose.Schema({
       name: String
     });
     ```
@@ -62,7 +62,7 @@ block content
     So far so good. We've got a schema with one property, `name`, which will be a  `String`. The next step is compiling our schema into a [Model](/docs/models.html).
 
     ```javascript
-    var Kitten = mongoose.model('Kitten', kittySchema);
+    const Kitten = mongoose.model('Kitten', kittySchema);
     ```
 
     A model is a class with which we construct documents.
@@ -70,7 +70,7 @@ block content
     Let's create a kitten document representing the little guy we just met on the sidewalk outside:
 
     ```javascript
-    var silence = new Kitten({ name: 'Silence' });
+    const silence = new Kitten({ name: 'Silence' });
     console.log(silence.name); // 'Silence'
     ```
 
@@ -80,20 +80,20 @@ block content
     ```javascript
     // NOTE: methods must be added to the schema before compiling it with mongoose.model()
     kittySchema.methods.speak = function () {
-      var greeting = this.name
+      const greeting = this.name
         ? "Meow name is " + this.name
         : "I don't have a name";
       console.log(greeting);
     }
 
-    var Kitten = mongoose.model('Kitten', kittySchema);
+    const Kitten = mongoose.model('Kitten', kittySchema);
     ```
 
     Functions added to the `methods` property of a schema get compiled into
     the `Model` prototype and exposed on each document instance:
 
     ```javascript
-    var fluffy = new Kitten({ name: 'fluffy' });
+    const fluffy = new Kitten({ name: 'fluffy' });
     fluffy.speak(); // "Meow name is fluffy"
     ```
 
@@ -125,7 +125,7 @@ block content
     ```
 
     This performs a search for all documents with a name property that begins
-    with "Fluff" and returns the result as an array of kittens to the callback.
+    with "fluff" and returns the result as an array of kittens to the callback.
 
     ### Congratulations
 

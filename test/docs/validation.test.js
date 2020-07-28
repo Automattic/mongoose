@@ -23,7 +23,9 @@ describe('validation docs', function() {
    *
    * - Validation is defined in the [SchemaType](./schematypes.html)
    * - Validation is [middleware](./middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
+   * - You can disable automatic validation before save by setting the [validateBeforeSave](./guide.html#validateBeforeSave) option
    * - You can manually run validation using `doc.validate(callback)` or `doc.validateSync()`
+   * - You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](./api.html#document_Document-invalidate)
    * - Validators are not run on undefined values. The only exception is the [`required` validator](./api.html#schematype_SchemaType-required).
    * - Validation is asynchronously recursive; when you call [Model#save](./api.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](./api.html#model_Model-save) callback receives it
    * - Validation is customizable
@@ -492,7 +494,7 @@ describe('validation docs', function() {
   });
 
   /**
-   * The other key difference that update validators only run on the paths
+   * The other key difference is that update validators only run on the paths
    * specified in the update. For instance, in the below example, because
    * 'name' is not specified in the update operation, update validation will
    * succeed.

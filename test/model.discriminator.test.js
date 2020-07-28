@@ -277,7 +277,8 @@ describe('model', function() {
 
       it('inherits validators', function() {
         assert.strictEqual(Employee.schema.path('gender').validators, PersonSchema.path('gender').validators);
-        assert.strictEqual(Employee.schema.path('department').validators, EmployeeSchema.path('department').validators);
+        assert.deepEqual(Employee.schema.path('department').validators,
+          EmployeeSchema.path('department').validators);
       });
 
       it('does not inherit and override fields that exist', function() {

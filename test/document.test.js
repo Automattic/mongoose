@@ -9116,6 +9116,7 @@ describe('document', function() {
       assert.ok(err.errors['object']);
       assert.ok(err.message.includes('Path `nestedProp` is immutable'), err.message);
 
+      // Setting to the same value as the previous doc is ok.
       doc.object = { nestedProp: 'A' };
       yield doc.save();
     });

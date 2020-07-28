@@ -22,7 +22,6 @@ markdown.setOptions({
 });
 
 const tests = [
-  ...acquit.parse(fs.readFileSync('./test/webpack.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/geojson.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/docs/transactions.test.js').toString()),
   ...acquit.parse(fs.readFileSync('./test/schema.alias.test.js').toString()),

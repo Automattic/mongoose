@@ -60,6 +60,7 @@ describe('types array', function() {
     const doc = new Test({ arr: ['test'] });
 
     assert.deepEqual(doc.arr, new MongooseArray(['test']));
+    assert.deepEqual(doc.arr, ['test']);
 
     done();
   });

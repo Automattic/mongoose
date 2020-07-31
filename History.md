@@ -1,3 +1,8 @@
+5.9.27 / 2020-07-31
+===================
+ * fix: upgrade mongodb driver -> 3.5.10 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(transactions): make transactions docs use async/await for readability #9204
+
 5.9.26 / 2020-07-27
 ===================
  * fix(document): allow unsetting boolean field by setting the field to `undefined` #9275

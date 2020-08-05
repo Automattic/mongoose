@@ -9163,4 +9163,20 @@ describe('document', function() {
       assert.equal(ride.steps.vehicle[0].status, 2);
     });
   });
+
+  it('allows saving after setting document array to itself (gh-9266)', function() {
+    const Model = db.model('Test', Schema({ keys: [{ _id: false, name: String }] }));
+
+    return co(function*() {
+      const document = new Model({});
+
+      document.keys[0] = { name: 'test' };
+      document.keys = document.keys;
+
+      yield document.save();
+
+      const fromDb = yield Model.findOne();
+      assert.deepEqual(fromDb.toObject().keys, [{ name: 'test' }]);
+    });
+  });
 });

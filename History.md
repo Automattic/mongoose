@@ -1,3 +1,12 @@
+5.9.28 / 2020-08-07
+===================
+ * fix(connection): consistently stop buffering when "reconnected" is emitted #9295
+ * fix(error): ensure `name` and `message` show up on individual ValidatorErrors when calling JSON.stringify() on a ValidationError #9296
+ * fix(document): keeps manually populated paths when setting a nested path to itself #9293
+ * fix(document): allow saving after setting document array to itself #9266
+ * fix(schema): handle `match` schema validator with `/g` flag #9287
+ * docs(guide): refactor transactions examples to async/await #9204
+
 5.9.27 / 2020-07-31
 ===================
  * fix: upgrade mongodb driver -> 3.5.10 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

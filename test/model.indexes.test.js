@@ -558,7 +558,7 @@ describe('model', function() {
         assert.deepEqual(indexes[1].key, { username: 1 });
         assert.ok(!indexes[1].collation);
 
-        userSchema = new mongoose.Schema({ username: String });
+        userSchema = new mongoose.Schema({ username: String }, { autoIndex: false });
         userSchema.index({ username: 1 }, {
           unique: true,
           collation: {
@@ -569,7 +569,6 @@ describe('model', function() {
         db.deleteModel('User');
         User = db.model('User', userSchema, 'User');
 
-        yield User.init();
         yield User.syncIndexes();
 
         indexes = yield User.listIndexes();

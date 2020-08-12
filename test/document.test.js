@@ -6309,26 +6309,55 @@ describe('document', function() {
       });
     });
 
-    it('convertToFalse and convertToTrue (gh-6758)', function() {
-      const TestSchema = new Schema({ b: Boolean });
-      const Test = db.model('Test', TestSchema);
+    describe('convertToFalse and convertToTrue (gh-6758)', function() {
+      let convertToFalse = null;
+      let convertToTrue = null;
 
-      mongoose.Schema.Types.Boolean.convertToTrue.add('aye');
-      mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
+      beforeEach(function() {
+        convertToFalse = new Set(mongoose.Schema.Types.Boolean.convertToFalse);
+        convertToTrue = new Set(mongoose.Schema.Types.Boolean.convertToTrue);
+      });
 
-      const doc1 = new Test({ b: 'aye' });
-      const doc2 = new Test({ b: 'nay' });
+      afterEach(function() {
+        mongoose.Schema.Types.Boolean.convertToFalse = convertToFalse;
+        mongoose.Schema.Types.Boolean.convertToTrue = convertToTrue;
+      });
 
-      assert.strictEqual(doc1.b, true);
-      assert.strictEqual(doc2.b, false);
+      it('lets you add custom strings that get converted to true/false', function() {
+        const TestSchema = new Schema({ b: Boolean });
+        const Test = db.model('Test', TestSchema);
 
-      return doc1.save().
-        then(() => Test.findOne({ b: { $exists: 'aye' } })).
-        then(doc => assert.ok(doc)).
-        then(() => {
-          mongoose.Schema.Types.Boolean.convertToTrue.delete('aye');
-          mongoose.Schema.Types.Boolean.convertToFalse.delete('nay');
-        });
+        mongoose.Schema.Types.Boolean.convertToTrue.add('aye');
+        mongoose.Schema.Types.Boolean.convertToFalse.add('nay');
+
+        const doc1 = new Test({ b: 'aye' });
+        const doc2 = new Test({ b: 'nay' });
+
+        assert.strictEqual(doc1.b, true);
+        assert.strictEqual(doc2.b, false);
+
+        return doc1.save().
+          then(() => Test.findOne({ b: { $exists: 'aye' } })).
+          then(doc => assert.ok(doc)).
+          then(() => {
+            mongoose.Schema.Types.Boolean.convertToTrue.delete('aye');
+            mongoose.Schema.Types.Boolean.convertToFalse.delete('nay');
+          });
+      });
+
+      it('allows adding `null` to list of values that convert to false (gh-9223)', function() {
+        const TestSchema = new Schema({ b: Boolean });
+        const Test = db.model('Test', TestSchema);
+
+        mongoose.Schema.Types.Boolean.convertToFalse.add(null);
+
+        const doc1 = new Test({ b: null });
+        const doc2 = new Test();
+        doc2.init({ b: null });
+
+        assert.strictEqual(doc1.b, false);
+        assert.strictEqual(doc2.b, false);
+      });
     });
 
     it('doesnt double-call getters when using get() (gh-6779)', function() {
@@ -8687,6 +8716,22 @@ describe('document', function() {
     assert.deepEqual(obj.lines, [[[3, 4]]]);
   });
 
+  it('doesnt wrap empty nested array with insufficient depth', function() {
+    const weekSchema = mongoose.Schema({
+      days: {
+        type: [[[Number]]],
+        required: true
+      }
+    });
+
+    const Week = db.model('Test', weekSchema);
+    const emptyWeek = new Week();
+
+    emptyWeek.days = [[], [], [], [], [], [], []];
+    const obj = emptyWeek.toObject();
+    assert.deepEqual(obj.days, [[], [], [], [], [], [], []]);
+  });
+
   it('doesnt wipe out nested keys when setting nested key to empty object with minimize (gh-8565)', function() {
     const opts = { autoIndex: false, autoCreate: false };
     const schema1 = Schema({ plaid: { nestedKey: String } }, opts);
@@ -9056,5 +9101,140 @@ describe('document', function() {
       }).
       then(doc => Model.findById(doc)).
       then(doc => assert.strictEqual(doc.obj.key, 2));
+  });
+
+  it('supports `useProjection` option for `toObject()` (gh-9118)', function() {
+    const authorSchema = new mongoose.Schema({
+      name: String,
+      hiddenField: { type: String, select: false }
+    });
+
+    const Author = db.model('Author', authorSchema);
+
+    const example = new Author({ name: 'John', hiddenField: 'A secret' });
+    assert.strictEqual(example.toJSON({ useProjection: true }).hiddenField, void 0);
+  });
+
+  it('clears out priorDoc after overwriting single nested subdoc (gh-9208)', function() {
+    const TestModel = db.model('Test', Schema({
+      nested: Schema({
+        myBool: Boolean,
+        myString: String
+      })
+    }));
+
+    return co(function*() {
+      const test = new TestModel();
+
+      test.nested = { myBool: true };
+      yield test.save();
+
+      test.nested = { myString: 'asdf' };
+      yield test.save();
+
+      test.nested.myBool = true;
+      yield test.save();
+
+      const doc = yield TestModel.findById(test);
+      assert.strictEqual(doc.nested.myBool, true);
+    });
+  });
+
+  it('handles immutable properties underneath single nested subdocs when overwriting (gh-9281)', function() {
+    const SubSchema = Schema({
+      nestedProp: {
+        type: String,
+        immutable: true
+      }
+    }, { strict: 'throw' });
+
+    const TestSchema = Schema({ object: SubSchema }, { strict: 'throw' });
+    const Test = db.model('Test', TestSchema);
+
+    return co(function*() {
+      yield Test.create({ object: { nestedProp: 'A' } });
+      const doc = yield Test.findOne();
+
+      doc.object = {};
+      const err = yield doc.save().then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors['object']);
+      assert.ok(err.message.includes('Path `nestedProp` is immutable'), err.message);
+
+      doc.object = { nestedProp: 'A' };
+      yield doc.save();
+    });
+  });
+
+  it('allows removing boolean key by setting it to `undefined` (gh-9275)', function() {
+    const Test = db.model('Test', Schema({ a: Boolean }));
+
+    return co(function*() {
+      const doc = yield Test.create({ a: true });
+      doc.a = undefined;
+      yield doc.save();
+
+      const fromDb = yield Test.findOne().lean();
+      assert.ok(!('a' in fromDb));
+    });
+  });
+
+  it('keeps manually populated paths when setting a nested path to itself (gh-9293)', function() {
+    const StepSchema = Schema({
+      ride: { type: ObjectId, ref: 'Ride' },
+      status: Number
+    });
+
+    const RideSchema = Schema({
+      status: Number,
+      steps: {
+        taxi: [{ type: ObjectId, ref: 'Step' }],
+        rent: [{ type: ObjectId, ref: 'Step' }],
+        vehicle: [{ type: ObjectId, ref: 'Step' }]
+      }
+    });
+
+    const Step = db.model('Step', StepSchema);
+    const Ride = db.model('Ride', RideSchema);
+
+    return co(function*() {
+      let ride = yield Ride.create({ status: 0 });
+      const steps = yield Step.create([
+        { ride: ride, status: 0 },
+        { ride: ride, status: 1 },
+        { ride: ride, status: 2 }
+      ]);
+
+      ride.steps = { taxi: [steps[0]], rent: [steps[1]], vehicle: [steps[2]] };
+      yield ride.save();
+
+      ride = yield Ride.findOne({}).populate('steps.taxi steps.vehicle steps.rent');
+
+      assert.equal(ride.steps.taxi[0].status, 0);
+      assert.equal(ride.steps.rent[0].status, 1);
+      assert.equal(ride.steps.vehicle[0].status, 2);
+
+      ride.steps = ride.steps;
+      assert.equal(ride.steps.taxi[0].status, 0);
+      assert.equal(ride.steps.rent[0].status, 1);
+      assert.equal(ride.steps.vehicle[0].status, 2);
+    });
+  });
+
+  it('allows saving after setting document array to itself (gh-9266)', function() {
+    const Model = db.model('Test', Schema({ keys: [{ _id: false, name: String }] }));
+
+    return co(function*() {
+      const document = new Model({});
+
+      document.keys[0] = { name: 'test' };
+      document.keys = document.keys;
+
+      yield document.save();
+
+      const fromDb = yield Model.findOne();
+      assert.deepEqual(fromDb.toObject().keys, [{ name: 'test' }]);
+    });
   });
 });

@@ -9546,4 +9546,80 @@ describe('model: populate:', function() {
       assert.equal(docs[1].items[0].foo.title, 'doc1');
     });
   });
+
+  it('Sets the populated document\'s parent() (gh-8092)', function() {
+    const schema = new Schema({
+      single: { type: Number, ref: 'Child' },
+      arr: [{ type: Number, ref: 'Child' }],
+      docArr: [{ ref: { type: Number, ref: 'Child' } }]
+    });
+
+    schema.virtual('myVirtual', {
+      ref: 'Child',
+      localField: 'single',
+      foreignField: '_id',
+      justOne: true
+    });
+
+    const Parent = db.model('Parent', schema);
+    const Child = db.model('Child', Schema({ _id: Number, name: String }));
+
+    return co(function*() {
+      yield Child.create({ _id: 1, name: 'test' });
+
+      yield Parent.create({ single: 1, arr: [1], docArr: [{ ref: 1 }] });
+
+      let doc = yield Parent.findOne().populate('single');
+      assert.ok(doc.single.parent() === doc);
+
+      doc = yield Parent.findOne().populate('arr');
+      assert.ok(doc.arr[0].parent() === doc);
+
+      doc = yield Parent.findOne().populate('docArr.ref');
+      assert.ok(doc.docArr[0].ref.parent() === doc);
+
+      doc = yield Parent.findOne().populate('myVirtual');
+      assert.ok(doc.myVirtual.parent() === doc);
+
+      doc = yield Parent.findOne();
+      yield doc.populate('single').execPopulate();
+      assert.ok(doc.single.parent() === doc);
+    });
+  });
+
+  it('populates single nested discriminator underneath doc array when populated docs have different model but same id (gh-9244)', function() {
+    const catSchema = Schema({ _id: Number, name: String });
+    const dogSchema = Schema({ _id: Number, name: String });
+
+    const notificationSchema = Schema({ title: String }, { discriminatorKey: 'type' });
+    const notificationTypeASchema = Schema({
+      subject: {
+        type: Number,
+        ref: 'Cat'
+      }
+    }, { discriminatorKey: 'type' });
+    const notificationTypeBSchema = Schema({
+      subject: {
+        type: Number,
+        ref: 'Dog'
+      }
+    }, { discriminatorKey: 'type' });
+
+    const CatModel = db.model('Cat', catSchema);
+    const DogModel = db.model('Dog', dogSchema);
+    const NotificationModel = db.model('Notification', notificationSchema);
+    const NotificationTypeAModel = NotificationModel.discriminator('NotificationTypeA', notificationTypeASchema);
+    const NotificationTypeBModel = NotificationModel.discriminator('NotificationTypeB', notificationTypeBSchema);
+
+    return co(function*() {
+      const cat = yield CatModel.create({ _id: 1, name: 'Keanu' });
+      const dog = yield DogModel.create({ _id: 1, name: 'Bud' });
+
+      yield NotificationTypeAModel.create({ subject: cat._id, title: 'new cat' });
+      yield NotificationTypeBModel.create({ subject: dog._id, title: 'new dog' });
+
+      const notifications = yield NotificationModel.find({}).populate('subject');
+      assert.deepEqual(notifications.map(el => el.subject.name), ['Keanu', 'Bud']);
+    });
+  });
 });

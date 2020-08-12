@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.9.21",
+  "version": "5.9.28",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -27,17 +27,18 @@
     "mquery": "3.2.2",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
-    "safe-buffer": "5.1.2",
+    "safe-buffer": "5.2.1",
     "sliced": "1.0.1",
     "sift": "7.0.1"
   },
   "devDependencies": {
+    "@babel/core": "7.10.5",
+    "@babel/preset-env": "7.10.4",
     "acquit": "1.x",
     "acquit-ignore": "0.1.x",
     "acquit-require": "0.1.x",
     "async": "2.6.2",
-    "babel-loader": "7.1.4",
-    "babel-preset-es2015": "6.24.1",
+    "babel-loader": "8.1.0",
     "benchmark": "2.1.4",
     "bluebird": "3.5.5",
     "chalk": "2.4.2",
@@ -62,7 +63,7 @@
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",
-    "webpack": "4.16.4"
+    "webpack": "4.44.0"
   },
   "directories": {
     "lib": "./lib/mongoose"

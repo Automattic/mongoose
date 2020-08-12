@@ -711,25 +711,33 @@ describe('connections:', function() {
     });
   });
 
-  it('bufferCommands (gh-5720)', function(done) {
+  it('bufferCommands (gh-5720)', function() {
     let opts = { bufferCommands: false };
     let db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
 
     let M = db.model('gh5720', new Schema({}));
-    assert.ok(!M.collection.buffer);
+    assert.ok(!M.collection._shouldBufferCommands());
     db.close();
 
     opts = { bufferCommands: true };
     db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     M = db.model('gh5720', new Schema({}, { bufferCommands: false }));
-    assert.ok(!M.collection.buffer);
+    assert.ok(!M.collection._shouldBufferCommands());
     db.close();
 
     opts = { bufferCommands: true };
     db = mongoose.createConnection('mongodb://localhost:27017/test', opts);
     M = db.model('gh5720', new Schema({}));
-    assert.ok(M.collection.buffer);
-    db.close(done);
+    assert.ok(M.collection._shouldBufferCommands());
+
+    db = mongoose.createConnection();
+    M = db.model('gh5720', new Schema({}));
+    opts = { bufferCommands: false };
+    db.openUri('mongodb://localhost:27017/test', opts);
+    assert.ok(!M.collection._shouldBufferCommands());
+
+    return M.findOne().then(() => assert.ok(false), err => assert.ok(err.message.includes('initial connection'))).
+      then(() => db.close());
   });
 
   it('dbName option (gh-6106)', function() {

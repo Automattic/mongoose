@@ -27,7 +27,7 @@ function BaseSchema() {
 util.inherits(BaseSchema, Schema);
 
 const EventSchema = new BaseSchema();
-const ImpressionEventSchema = new BaseSchema();
+const ImpressionEventSchema = new BaseSchema({ element: String });
 const ConversionEventSchema = new BaseSchema({ revenue: Number });
 const SecretEventSchema = new BaseSchema({ secret: { type: String, select: false } });
 
@@ -176,6 +176,28 @@ describe('model', function() {
 
       it('hydrates correct models when fields selection set as object', function(done) {
         checkHydratesCorrectModels({ name: 1 }, done);
+      });
+
+      it('casts underneath $or if discriminator key in filter (gh-9018)', function() {
+        return co(function*() {
+          yield ImpressionEvent.create({ name: 'Impression event', element: '42' });
+          yield ConversionEvent.create({ name: 'Conversion event', revenue: 1.337 });
+
+          let docs = yield BaseEvent.find({ __t: 'Impression', element: 42 });
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].name, 'Impression event');
+
+          docs = yield BaseEvent.find({ $or: [{ __t: 'Impression', element: 42 }] });
+          assert.equal(docs.length, 1);
+          assert.equal(docs[0].name, 'Impression event');
+
+          docs = yield BaseEvent.find({
+            $or: [{ __t: 'Impression', element: 42 }, { __t: 'Conversion', revenue: '1.337' }]
+          }).sort({ __t: 1 });
+          assert.equal(docs.length, 2);
+          assert.equal(docs[0].name, 'Conversion event');
+          assert.equal(docs[1].name, 'Impression event');
+        });
       });
 
       describe('discriminator model only finds documents of its type', function() {
@@ -796,7 +818,7 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719-2)', function(done) {
+      it('reference in child schemas (gh-2719-2)', function() {
         function BaseSchema() {
           Schema.apply(this, arguments);
 
@@ -830,29 +852,23 @@ describe('model', function() {
           date: Date
         }));
 
-        Survey.create({
-          name: 'That you see?',
-          date: Date.now()
-        }, function(err, survey) {
-          assert.ifError(err);
+        return co(function*() {
+          const survey = yield Survey.create({
+            name: 'That you see?',
+            date: Date.now()
+          });
 
-          Talk.create({
+          yield Talk.create({
             name: 'Meetup rails',
             date: new Date('2015-04-01T00:00:00Z'),
             pin: '0004',
             period: { start: '11:00', end: '12:00' },
             surveys: [survey]
-          }, function(err) {
-            assert.ifError(err);
-
-            Event.find({}).populate('surveys').exec(function(err, events) {
-              assert.ifError(err);
-
-              assert.ok(events[0].surveys[0] instanceof Survey);
-
-              done();
-            });
           });
+
+          const events = yield Event.find({}).populate('surveys').exec();
+
+          assert.ok(events[0].surveys[0] instanceof Survey);
         });
       });
     });

@@ -434,6 +434,7 @@ block content
     - [useNestedStrict](#useNestedStrict)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
+    - [optimisticConcurrency](#optimisticConcurrency)
     - [collation](#collation)
     - [selectPopulatedPaths](#selectPopulatedPaths)
     - [skipVersioning](#skipVersioning)
@@ -891,9 +892,8 @@ block content
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
     ```
 
-    Note that Mongoose versioning is **not** a full [optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control)
-    solution. Use [mongoose-update-if-current](https://github.com/eoin-obrien/mongoose-update-if-current)
-    for OCC support. Mongoose versioning only operates on arrays:
+    Note that Mongoose's default versioning is **not** a full [optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control)
+    solution. Mongoose's default versioning only operates on arrays as shown below.
 
     ```javascript
     // 2 copies of the same document
@@ -910,6 +910,8 @@ block content
     doc2.set('comments.1.body', 'new comment');
     await doc2.save();
     ```
+
+    If you need optimistic concurrency support for `save()`, you can set the [`optimisticConcurrency` option](#optimisticConcurrency)
 
     Document versioning can also be disabled by setting the `versionKey` to
     `false`.
@@ -944,6 +946,70 @@ block content
       update.$inc = update.$inc || {};
       update.$inc.__v = 1;
     });
+    ```
+
+    <h3 id="optimisticConcurrency"><a href="#optimisticConcurrency">option: optimisticConcurrency</a></h3>
+
+    [Optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control) is a strategy to ensure
+    the document you're updating didn't change between when you loaded it using `find()` or `findOne()`, and when
+    you update it using `save()`.
+
+    For example, suppose you have a `House` model that contains a list of `photos`, and a `status` that represents
+    whether this house shows up in searches. Suppose that a house that has status `'APPROVED'` must have at least
+    two `photos`. You might implement the logic of approving a house document as shown below:
+
+    ```javascript
+    async function markApproved(id) {
+      const house = await House.findOne({ _id });
+      if (house.photos.length < 2) {
+        throw new Error('House must have at least two photos!');
+      }
+      
+      house.status = 'APPROVED';
+      await house.save();
+    }
+    ```
+
+    The `markApproved()` function looks right in isolation, but there might be a potential issue: what if another
+    function removes the house's photos between the `findOne()` call and the `save()` call? For example, the below
+    code will succeed:
+
+    ```javascript
+    const house = await House.findOne({ _id });
+    if (house.photos.length < 2) {
+      throw new Error('House must have at least two photos!');
+    }
+
+    const house2 = await House.findOne({ _id });
+    house2.photos = [];
+    await house2.save();
+
+    // Marks the house as 'APPROVED' even though it has 0 photos!
+    house.status = 'APPROVED';
+    await house.save();
+    ```
+
+    If you set the `optimisticConcurrency` option on the `House` model's schema, the above script will throw an
+    error.
+
+    ```javascript
+    const House = mongoose.model('House', Schema({
+      status: String,
+      photos: [String]
+    }, { optimisticConcurrency: true }));
+
+    const house = await House.findOne({ _id });
+    if (house.photos.length < 2) {
+      throw new Error('House must have at least two photos!');
+    }
+
+    const house2 = await House.findOne({ _id });
+    house2.photos = [];
+    await house2.save();
+
+    // Throws 'VersionError: No matching document found for id "..." version 0'
+    house.status = 'APPROVED';
+    await house.save();
     ```
 
     <h3 id="collation"><a href="#collation">option: collation</a></h3>

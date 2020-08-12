@@ -1,3 +1,69 @@
+5.9.28 / 2020-08-07
+===================
+ * fix(connection): consistently stop buffering when "reconnected" is emitted #9295
+ * fix(error): ensure `name` and `message` show up on individual ValidatorErrors when calling JSON.stringify() on a ValidationError #9296
+ * fix(document): keeps manually populated paths when setting a nested path to itself #9293
+ * fix(document): allow saving after setting document array to itself #9266
+ * fix(schema): handle `match` schema validator with `/g` flag #9287
+ * docs(guide): refactor transactions examples to async/await #9204
+
+5.9.27 / 2020-07-31
+===================
+ * fix: upgrade mongodb driver -> 3.5.10 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(transactions): make transactions docs use async/await for readability #9204
+
+5.9.26 / 2020-07-27
+===================
+ * fix(document): allow unsetting boolean field by setting the field to `undefined` #9275
+ * fix(document): throw error when overwriting a single nested subdoc changes an immutable path within the subdoc #9281
+ * fix(timestamps): apply timestamps to `bulkWrite()` updates when not using `$set` #9268
+ * fix(browser): upgrade babel to v7 to work around an issue with `extends Error` #9273
+ * fix: make subdocument's `invalidate()` methods have the same return value as top-level document #9271
+ * docs(model): make `create()` docs use async/await, and add another warning about how `create()` with options requires array syntax #9280
+ * docs(connections): clarify that Mongoose can emit 'connected' when reconnecting after losing connectivity #9240
+ * docs(populate): clarify that you can't filter based on foreign document properties when populating #9279
+ * docs(document+model): clarify how `validateModifiedOnly` option works #9263
+ * docs: remove extra poolSize option in comment #9270 [shahvicky](https://github.com/shahvicky)
+ * docs: point bulkWrite() link to mongoose docs instead of localhost #9284
+
+5.9.25 / 2020-07-17
+===================
+ * fix(discriminator): allow passing a compiled model's schema as a parameter to `discriminator()` #9238
+ * fix(connection): throw more readable error when querying db before initial connection when `bufferCommands = false` #9239
+ * fix(indexes): don't unnecessarily drop text indexes when running `syncIndexes()` #9225
+ * fix: make Boolean _castNullish respect omitUndefined #9242 [ehpc](https://github.com/ehpc)
+ * fix(populate): populate single nested discriminator underneath doc array when populated docs have different model but same id #9244
+ * docs(mongoose): correct formatting typo #9247 [JNa0](https://github.com/JNa0)
+
+5.9.24 / 2020-07-13
+===================
+ * fix(connection): respect connection-level `bufferCommands` option if `mongoose.connect()` is called after `mongoose.model()` #9179
+ * fix(document): clear out `priorDoc` after overwriting single nested subdoc so changes after overwrite get persisted correctly #9208
+ * fix(connection): dont overwrite user-specified `bufferMaxEntries` when setting `bufferCommands` #9218
+ * fix(model): allow passing projection to `Model.hydrate()` #9209
+ * fix(schema+document): support adding `null` to schema boolean's `convertToFalse` set #9223
+ * docs(model): make `find` and `findOne()` examples use async/await and clarify `find({})` is find all #9210
+
+4.13.21 / 2020-07-12
+====================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+
+5.9.23 / 2020-07-10
+===================
+ * fix(model): fix `syncIndexes()` error when db index has a collation but Mongoose index does not #9224 [clhuang](https://github.com/clhuang)
+ * fix(array): only cast array to proper depth if it contains an non-array value #9217 #9215 [cyrilgandon](https://github.com/cyrilgandon)
+ * docs(schematype): document the `transform` option #9211
+ * docs(mongoose): fix typo #9212 [JNa0](https://github.com/JNa0)
+
+5.9.22 / 2020-07-06
+===================
+ * fix(schema): treat `{ type: mongoose.Schema.Types.Array }` as equivalent to `{ type: Array }` #9194
+ * fix: revert fix for #9107 to avoid issues when calling `connect()` multiple times #9167
+ * fix(update): respect storeSubdocValidationError option with update validators #9172
+ * fix: upgrade to safe-buffer 5.2 #9198
+ * docs: add a note about SSL validation to migration guide #9147
+ * docs(schemas): fix inconsistent header #9196 [samtsai15](https://github.com/samtsai15)
+
 5.9.21 / 2020-07-01
 ===================
  * fix: propagate `typeKey` option to implicitly created schemas from `typePojoToMixed` #9185 [joaoritter](https://github.com/joaoritter)

@@ -560,7 +560,7 @@ describe('model', function() {
         assert.deepEqual(indexes[1].key, { username: 1 });
         assert.ok(!indexes[1].collation);
 
-        userSchema = new mongoose.Schema({ username: String });
+        userSchema = new mongoose.Schema({ username: String }, { autoIndex: false });
         userSchema.index({ username: 1 }, {
           unique: true,
           collation: {
@@ -571,13 +571,41 @@ describe('model', function() {
         db.deleteModel('User');
         User = db.model('User', userSchema, 'User');
 
-        yield User.init();
         yield User.syncIndexes();
 
         indexes = yield User.listIndexes();
         assert.equal(indexes.length, 2);
         assert.deepEqual(indexes[1].key, { username: 1 });
         assert.ok(!!indexes[1].collation);
+
+        yield User.collection.drop();
+      });
+    });
+
+    it('reports syncIndexes() error (gh-9303)', function() {
+      return co(function*() {
+        let userSchema = new mongoose.Schema({ username: String, email: String });
+        let User = db.model('User', userSchema);
+
+        yield User.createCollection().catch(() => {});
+        let indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 1);
+
+        yield User.create([{ username: 'test', email: 'foo@bar' }, { username: 'test', email: 'foo@bar' }]);
+
+        userSchema = new mongoose.Schema({ username: String, email: String }, { autoIndex: false });
+        userSchema.index({ username: 1 }, { unique: true });
+        userSchema.index({ email: 1 });
+        db.deleteModel('User');
+        User = db.model('User', userSchema, 'User');
+
+        const err = yield User.syncIndexes().then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.code, 11000);
+
+        indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[1].key, { email: 1 });
 
         yield User.collection.drop();
       });

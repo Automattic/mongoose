@@ -20,7 +20,7 @@ describe('model', function() {
   before(function() {
     db = start();
 
-    return db.createCollection('Test');
+    return db.createCollection('Test').catch(() => {});
   });
 
   after(function(done) {
@@ -458,16 +458,18 @@ describe('model', function() {
     const schema = new Schema({ arr: [childSchema] });
     const Model = db.model('Test', schema);
 
-    return Model.init().
-      then(() => Model.syncIndexes()).
-      then(() => Model.listIndexes()).
-      then(indexes => {
-        assert.equal(indexes.length, 2);
-        assert.ok(indexes[1].partialFilterExpression);
-        assert.deepEqual(indexes[1].partialFilterExpression, {
-          'arr.name': { $exists: true }
-        });
+    return co(function*() {
+      yield Model.init();
+
+      yield Model.syncIndexes();
+      const indexes = yield Model.listIndexes();
+
+      assert.equal(indexes.length, 2);
+      assert.ok(indexes[1].partialFilterExpression);
+      assert.deepEqual(indexes[1].partialFilterExpression, {
+        'arr.name': { $exists: true }
       });
+    });
   });
 
   it('skips automatic indexing on childSchema if autoIndex: false (gh-9150)', function() {

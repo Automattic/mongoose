@@ -212,17 +212,18 @@ describe('ValidationError', function() {
     });
   });
 
-  it('JSON.stringify() with message (gh-5309)', function() {
+  it('JSON.stringify() with message (gh-5309) (gh-9296)', function() {
     model.modelName = 'TestClass';
     const err = new ValidationError(new model());
 
-    err.addError('test', { message: 'Fail' });
+    err.addError('test', new ValidatorError({ message: 'Fail' }));
 
     const obj = JSON.parse(JSON.stringify(err));
     assert.ok(obj.message.indexOf('TestClass validation failed') !== -1,
       obj.message);
     assert.ok(obj.message.indexOf('test: Fail') !== -1,
       obj.message);
+    assert.ok(obj.errors['test'].message);
 
     function model() {}
   });

@@ -9179,4 +9179,62 @@ describe('document', function() {
       assert.ok(!('a' in fromDb));
     });
   });
+
+  it('keeps manually populated paths when setting a nested path to itself (gh-9293)', function() {
+    const StepSchema = Schema({
+      ride: { type: ObjectId, ref: 'Ride' },
+      status: Number
+    });
+
+    const RideSchema = Schema({
+      status: Number,
+      steps: {
+        taxi: [{ type: ObjectId, ref: 'Step' }],
+        rent: [{ type: ObjectId, ref: 'Step' }],
+        vehicle: [{ type: ObjectId, ref: 'Step' }]
+      }
+    });
+
+    const Step = db.model('Step', StepSchema);
+    const Ride = db.model('Ride', RideSchema);
+
+    return co(function*() {
+      let ride = yield Ride.create({ status: 0 });
+      const steps = yield Step.create([
+        { ride: ride, status: 0 },
+        { ride: ride, status: 1 },
+        { ride: ride, status: 2 }
+      ]);
+
+      ride.steps = { taxi: [steps[0]], rent: [steps[1]], vehicle: [steps[2]] };
+      yield ride.save();
+
+      ride = yield Ride.findOne({}).populate('steps.taxi steps.vehicle steps.rent');
+
+      assert.equal(ride.steps.taxi[0].status, 0);
+      assert.equal(ride.steps.rent[0].status, 1);
+      assert.equal(ride.steps.vehicle[0].status, 2);
+
+      ride.steps = ride.steps;
+      assert.equal(ride.steps.taxi[0].status, 0);
+      assert.equal(ride.steps.rent[0].status, 1);
+      assert.equal(ride.steps.vehicle[0].status, 2);
+    });
+  });
+
+  it('allows saving after setting document array to itself (gh-9266)', function() {
+    const Model = db.model('Test', Schema({ keys: [{ _id: false, name: String }] }));
+
+    return co(function*() {
+      const document = new Model({});
+
+      document.keys[0] = { name: 'test' };
+      document.keys = document.keys;
+
+      yield document.save();
+
+      const fromDb = yield Model.findOne();
+      assert.deepEqual(fromDb.toObject().keys, [{ name: 'test' }]);
+    });
+  });
 });

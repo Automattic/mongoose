@@ -1,3 +1,23 @@
+5.10.0 / 2020-08-14
+===================
+ * feat: upgrade to MongoDB driver 3.6 for full MongoDB 4.4 support
+ * feat(connection): add `Connection#transaction()` helper that handles resetting Mongoose document state if the transaction fails #8380
+ * feat(connection): make transaction() helper reset array atomics after failed transaction
+ * feat(schema+model): add `optimisticConcurrency` option to use OCC for `save()` #9001 #5424
+ * feat(aggregate): add `Aggregate#search()` for Atlas Text Search #9115
+ * feat(mongoose): add support for setting `setDefaultsOnInsert` as a global option #9036 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(mongoose): add support for setting `returnOriginal` as a global option #9189 #9183 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(mongoose): allow global option mongoose.set('strictQuery', true) #9016 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): add Document#getChanges #9097 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): support `defaults` option to disable adding defaults to a single document #8271
+ * feat(SingleNestedPath+DocumentArray): add static `set()` function for global options, support setting `_id` globally #8883
+ * feat(query): handle casting `$or` when each clause contains a different discriminator key #9018
+ * feat(query): add overwriteDiscriminatorKey option that allows changing the discriminator key in `findOneAndUpdate()`, `updateOne()`, etc. #6087
+ * fix(connection): make calling `mongoose.connect()` while already connected a no-op #9203
+ * feat(connection): add `getClient()` and `setClient()` function for interacting with a connection's underlying MongoClient instance #9164
+ * feat(document+populate): add `parent()` function that allows you to get the parent document for populated docs #8092
+ * feat(document): add `useProjection` option to `toObject()` and `toJSON()` for hiding deselected fields on newly created documents #9118
+
 5.9.29 / 2020-08-13
 ===================
  * fix(document): support setting nested path to itself when it has nested subpaths #9313

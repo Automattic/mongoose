@@ -2002,13 +2002,13 @@ describe('schema', function() {
       });
 
       assert.equal(schema.childSchemas.length, 2);
-      assert.equal(schema.childSchemas[0].schema, schema1);
-      assert.equal(schema.childSchemas[1].schema, schema2);
+      assert.strictEqual(schema.childSchemas[0].schema, schema1);
+      assert.strictEqual(schema.childSchemas[1].schema, schema2);
 
       schema = schema.clone();
       assert.equal(schema.childSchemas.length, 2);
-      assert.equal(schema.childSchemas[0].schema, schema1);
-      assert.equal(schema.childSchemas[1].schema, schema2);
+      assert.strictEqual(schema.childSchemas[0].schema, schema1);
+      assert.strictEqual(schema.childSchemas[1].schema, schema2);
 
       done();
     });
@@ -2423,6 +2423,35 @@ describe('schema', function() {
       const buildInvalidSchema = () => new Schema({ save: [{ nested: String }] });
 
       assert.throws(buildInvalidSchema, /`save` may not be used as a schema pathname/);
+    });
+  });
+
+  describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
+    let strictQueryOriginalValue;
+
+    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
+    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
+
+    it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
+      // Arrange
+      mongoose.set('strictQuery', 'some value');
+
+      // Act
+      const schema = new Schema();
+
+      // Assert
+      assert.equal(schema.get('strictQuery'), 'some value');
+    });
+
+    it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
+      // Arrange
+      mongoose.set('strictQuery', 'base option');
+
+      // Act
+      const schema = new Schema({}, { strictQuery: 'schema option' });
+
+      // Assert
+      assert.equal(schema.get('strictQuery'), 'schema option');
     });
   });
 

@@ -9222,6 +9222,39 @@ describe('document', function() {
     });
   });
 
+  it('doesnt wipe out nested paths when setting a nested path to itself (gh-9313)', function() {
+    const schema = new Schema({
+      nested: {
+        prop1: { type: Number, default: 50 },
+        prop2: {
+          type: String,
+          enum: ['val1', 'val2'],
+          default: 'val1',
+          required: true
+        },
+        prop3: {
+          prop4: { type: Number, default: 0 }
+        }
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      let doc = yield Model.create({});
+
+      doc = yield Model.findById(doc);
+
+      doc.nested = doc.nested;
+
+      assert.equal(doc.nested.prop2, 'val1');
+      yield doc.save();
+
+      const fromDb = yield Model.collection.findOne({ _id: doc._id });
+      assert.equal(fromDb.nested.prop2, 'val1');
+    });
+  });
+
   it('allows saving after setting document array to itself (gh-9266)', function() {
     const Model = db.model('Test', Schema({ keys: [{ _id: false, name: String }] }));
 

@@ -1,3 +1,9 @@
+5.9.29 / 2020-08-13
+===================
+ * fix(document): support setting nested path to itself when it has nested subpaths #9313
+ * fix(model): make `syncIndexes()` report error if it can't create an index #9303
+ * fix: handle auth error when Atlas username is incorrect #9300
+
 5.9.28 / 2020-08-07
 ===================
  * fix(connection): consistently stop buffering when "reconnected" is emitted #9295

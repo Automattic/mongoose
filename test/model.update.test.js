@@ -3479,6 +3479,35 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  describe('overwriteDiscriminatorKey', function() {
+    it('allows changing discriminator key in update (gh-6087)', function() {
+      const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+      const baseModel = db.model('Test', baseSchema);
+
+      const aSchema = Schema({ aThing: Number }, { _id: false, id: false });
+      const aModel = baseModel.discriminator('A', aSchema);
+
+      const bSchema = new Schema({ bThing: String }, { _id: false, id: false });
+      const bModel = baseModel.discriminator('B', bSchema);
+
+      return co(function*() {
+        // Model is created as a type A
+        let doc = yield baseModel.create({ type: 'A', aThing: 1 });
+
+        yield aModel.updateOne(
+          { _id: doc._id },
+          { type: 'B', bThing: 'two' },
+          { runValidators: true, overwriteDiscriminatorKey: true }
+        );
+
+        doc = yield baseModel.findById(doc);
+        assert.equal(doc.type, 'B');
+        assert.ok(doc instanceof bModel);
+        assert.equal(doc.bThing, 'two');
+      });
+    });
+  });
+
   it('update validators respect storeSubdocValidationError (gh-9172)', function() {
     const opts = { storeSubdocValidationError: false };
     const Model = db.model('Test', Schema({

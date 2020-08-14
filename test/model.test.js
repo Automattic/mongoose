@@ -6868,4 +6868,57 @@ describe('Model', function() {
       assert.deepEqual(user.friends, ['Sam']);
     });
   });
+
+  describe('returnOriginal (gh-9183)', function() {
+    const originalValue = mongoose.get('returnOriginal');
+    beforeEach(() => {
+      mongoose.set('returnOriginal', false);
+    });
+
+    afterEach(() => {
+      mongoose.set('returnOriginal', originalValue);
+    });
+
+    it('Setting `returnOriginal` works', function() {
+      return co(function*() {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+        const createdUser = yield User.create({ name: 'Hafez' });
+
+        const user1 = yield User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' });
+        assert.equal(user1.name, 'Hafez1');
+
+        const user2 = yield User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' });
+        assert.equal(user2.name, 'Hafez2');
+
+        const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' });
+        assert.equal(user3.name, 'Hafez3');
+      });
+    });
+
+    it('`returnOriginal` can be overwritten', function() {
+      return co(function*() {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+        const createdUser = yield User.create({ name: 'Hafez' });
+
+        const user1 = yield User.findOneAndUpdate({ _id: createdUser._id }, { name: 'Hafez1' }, { new: false });
+        assert.equal(user1.name, 'Hafez');
+
+        const user2 = yield User.findByIdAndUpdate(createdUser._id, { name: 'Hafez2' }, { new: false });
+        assert.equal(user2.name, 'Hafez1');
+
+        const user3 = yield User.findOneAndReplace({ _id: createdUser._id }, { name: 'Hafez3' }, { new: false });
+        assert.equal(user3.name, 'Hafez2');
+      });
+    });
+  });
 });

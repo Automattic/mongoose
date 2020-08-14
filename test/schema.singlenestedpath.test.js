@@ -162,4 +162,23 @@ describe('SingleNestedPath', function() {
     assert.strictEqual(clone.path('author').requiredValidator,
       clone.path('author').validators[0].validator);
   });
+
+  it('supports `set()` (gh-8883)', function() {
+    mongoose.deleteModel(/Test/);
+    mongoose.Schema.Types.Embedded.set('required', true);
+
+    const Model = mongoose.model('Test', mongoose.Schema({
+      nested: mongoose.Schema({
+        test: String
+      })
+    }));
+
+    const doc = new Model({});
+
+    const err = doc.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['nested']);
+
+    mongoose.Schema.Types.Embedded.set('required', false);
+  });
 });

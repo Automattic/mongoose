@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const co = require('co');
 const start = require('../common');
 
 const mongoose = start.mongoose;
@@ -352,5 +351,57 @@ describe('transactions', function() {
       await test.save(); // throws DocumentNotFoundError
     });
     session.endSession();
+  });
+
+  it('correct `isNew` after abort (gh-8852)', async function() {
+    const schema = Schema({ name: String });
+
+    const Test = db.model('gh8852', schema);
+
+    await Test.createCollection();
+    const doc = new Test({ name: 'foo' });
+    await db.
+      transaction(async (session) =>  {
+        await doc.save({ session });
+        assert.ok(!doc.isNew);
+        throw new Error('Oops');
+      }).
+      catch(err => assert.equal(err.message, 'Oops'));
+    assert.ok(doc.isNew);
+  });
+
+  it('can save document after aborted transaction (gh-8380)', async function() {
+    const schema = Schema({ name: String, arr: [String], arr2: [String] });
+
+    const Test = db.model('gh8380', schema);
+
+    await Test.createCollection();
+    await Test.create({ name: 'foo', arr: ['bar'], arr2: ['foo'] });
+    const doc = await Test.findOne();
+    await db.
+      transaction(async (session) => {
+        doc.arr.pull('bar');
+        doc.arr2.push('bar');
+
+        await doc.save({ session });
+        doc.name = 'baz';
+        throw new Error('Oops');
+      }).
+      catch(err => {
+        assert.equal(err.message, 'Oops');
+      });
+
+    const changes = doc.$__delta()[1];
+    assert.equal(changes.$set.name, 'baz');
+    assert.deepEqual(changes.$pullAll.arr, ['bar']);
+    assert.deepEqual(changes.$push.arr2, { $each: ['bar'] });
+    assert.ok(!changes.$set.arr2);
+
+    await doc.save({ session: null });
+
+    const newDoc = await Test.collection.findOne();
+    assert.equal(newDoc.name, 'baz');
+    assert.deepEqual(newDoc.arr, []);
+    assert.deepEqual(newDoc.arr2, ['foo', 'bar']);
   });
 });

@@ -1637,12 +1637,12 @@ describe('model: populate:', function() {
         title: 'Notre-Dame de Paris',
         fans: []
       });
-      
+
       yield BlogPost.collection.updateOne({ _id: post._id }, {
         $set: { fans: [user.id] }
       });
 
-      yield user.delete()
+      yield user.delete();
 
       const returned = yield BlogPost.
         findById(post._id).

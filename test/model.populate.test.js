@@ -1626,6 +1626,33 @@ describe('model: populate:', function() {
     });
   });
 
+  it('supports `retainNullValues` while supressing _id of subdocument', function() {
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+    const User = db.model('User', userSchema);
+
+    return co(function*() {
+      const user = new User({ name: 'Victor Hugo' });
+      yield user.save();
+      const post = yield BlogPost.create({
+        title: 'Notre-Dame de Paris',
+        fans: []
+      });
+      
+      yield BlogPost.collection.updateOne({ _id: post._id }, {
+        $set: { fans: [user.id] }
+      });
+
+      yield user.delete()
+
+      const returned = yield BlogPost.
+        findById(post._id).
+        populate({ path: 'fans', select: 'name -_id', options: { retainNullValues: true } });
+
+      assert.equal(returned.fans.length, 1);
+      assert.strictEqual(returned.fans[0], null);
+    });
+  });
+
   it('populating more than one array at a time', function(done) {
     const User = db.model('User', userSchema);
     const M = db.model('Test', new Schema({

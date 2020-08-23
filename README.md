@@ -72,7 +72,9 @@ Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 ```js
 await mongoose.connect('mongodb://localhost/my_database', {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true
 });
 ```
 

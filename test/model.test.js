@@ -6869,6 +6869,23 @@ describe('Model', function() {
     });
   });
 
+  it('allows calling `create()` after `bulkWrite()` (gh-9350)', function() {
+    const schema = Schema({ foo: Boolean });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.bulkWrite([
+        { insertOne: { document: { foo: undefined } } },
+        { updateOne: { filter: {}, update: { $set: { foo: true } } } }
+      ]);
+
+      yield Model.create({ foo: undefined });
+
+      const docs = yield Model.find();
+      assert.equal(docs.length, 2);
+    });
+  });
+
   describe('returnOriginal (gh-9183)', function() {
     const originalValue = mongoose.get('returnOriginal');
     beforeEach(() => {

@@ -6886,6 +6886,20 @@ describe('Model', function() {
     });
   });
 
+  it('skips applying init hooks if `document` option set to `false` (gh-9316)', function() {
+    const schema = new Schema({ name: String });
+    let called = 0;
+    schema.post(/.*/, { query: true, document: false }, function test() {
+      ++called;
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({ name: 'test' });
+    assert.equal(called, 0);
+  });
+
   describe('returnOriginal (gh-9183)', function() {
     const originalValue = mongoose.get('returnOriginal');
     beforeEach(() => {

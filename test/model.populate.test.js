@@ -9649,4 +9649,32 @@ describe('model: populate:', function() {
       assert.deepEqual(notifications.map(el => el.subject.name), ['Keanu', 'Bud']);
     });
   });
+
+  it('skips checking `refPath` if the path to populate is undefined (gh-9340)', function() {
+    const firstSchema = Schema({
+      ref: String,
+      linkedId: {
+        type: Schema.ObjectId,
+        refPath: 'ref'
+      }
+    });
+    const Parent = db.model('Parent', firstSchema);
+
+    const secondSchema = new Schema({ name: String });
+    const Child = db.model('Child', secondSchema);
+
+    return co(function*() {
+      const child = yield Child.create({ name: 'child' });
+      yield Parent.create({ ref: 'Child', linkedId: child._id });
+      yield Parent.create({ ref: 'does not exist' });
+
+      const res = yield Parent.find().populate('linkedId').sort({ ref: 1 }).exec();
+      assert.equal(res.length, 2);
+
+      assert.equal(res[0].ref, 'Child');
+      assert.equal(res[0].linkedId.name, 'child');
+      assert.equal(res[1].ref, 'does not exist');
+      assert.strictEqual(res[1].linkedId, undefined);
+    });
+  });
 });

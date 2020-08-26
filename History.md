@@ -1,3 +1,14 @@
+5.10.1 / 2020-08-26
+===================
+ * fix(mongoose): fix `.then()` is not a function error when calling `mongoose.connect()` multiple times #9358 #9335 #9331
+ * fix: allow calling `create()` after `bulkWrite()` by clearing internal casting context #9350
+ * fix(model): dont wipe out changes made while `save()` is in-flight #9327
+ * fix(populate): skip checking `refPath` if the path to populate is undefined #9340
+ * fix(document): allow accessing document values from function `default` on array #9351
+ * fix(model): skip applying init hook if called with `schema.pre(..., { document: false })` #9316
+ * fix(populate): support `retainNullValues` when setting `_id` to `false` for subdocument #9337 #9336 [FelixRe0](https://github.com/FelixRe0)
+ * docs: update connect example to avoid deprecation warnings #9332 [moander](https://github.com/moander)
+
 5.10.0 / 2020-08-14
 ===================
  * feat: upgrade to MongoDB driver 3.6 for full MongoDB 4.4 support

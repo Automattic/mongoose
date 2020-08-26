@@ -6869,6 +6869,81 @@ describe('Model', function() {
     });
   });
 
+  it('allows calling `create()` after `bulkWrite()` (gh-9350)', function() {
+    const schema = Schema({ foo: Boolean });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.bulkWrite([
+        { insertOne: { document: { foo: undefined } } },
+        { updateOne: { filter: {}, update: { $set: { foo: true } } } }
+      ]);
+
+      yield Model.create({ foo: undefined });
+
+      const docs = yield Model.find();
+      assert.equal(docs.length, 2);
+    });
+  });
+
+  it('skips applying init hooks if `document` option set to `false` (gh-9316)', function() {
+    const schema = new Schema({ name: String });
+    let called = 0;
+    schema.post(/.*/, { query: true, document: false }, function test() {
+      ++called;
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({ name: 'test' });
+    assert.equal(called, 0);
+  });
+
+  it('retains atomics after failed `save()` (gh-9327)', function() {
+    const schema = new Schema({ arr: [String] });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ arr: [] });
+
+      yield Test.deleteMany({});
+
+      doc.arr.push('test');
+      const err = yield doc.save().then(() => null, err => err);
+      assert.ok(err);
+
+      const delta = doc.getChanges();
+      assert.ok(delta.$push);
+      assert.ok(delta.$push.arr);
+    });
+  });
+
+  it('doesnt wipe out changes made while `save()` is in flight (gh-9327)', function() {
+    const schema = new Schema({ num1: Number, num2: Number });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({});
+
+      doc.num1 = 1;
+      doc.num2 = 1;
+      const p = doc.save();
+
+      yield cb => setTimeout(cb, 0);
+
+      doc.num1 = 2;
+      doc.num2 = 2;
+      yield p;
+
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc._id);
+      assert.equal(fromDb.num1, 2);
+      assert.equal(fromDb.num2, 2);
+    });
+  });
+
   describe('returnOriginal (gh-9183)', function() {
     const originalValue = mongoose.get('returnOriginal');
     beforeEach(() => {

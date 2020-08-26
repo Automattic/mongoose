@@ -9270,4 +9270,20 @@ describe('document', function() {
       assert.deepEqual(fromDb.toObject().keys, [{ name: 'test' }]);
     });
   });
+
+  it('allows accessing document values from function default on array (gh-9351) (gh-6155)', function() {
+    const schema = Schema({
+      publisher: String,
+      authors: {
+        type: [String],
+        default: function() {
+          return [this.publisher];
+        }
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({ publisher: 'Mastering JS' });
+    assert.deepEqual(doc.toObject().authors, ['Mastering JS']);
+  });
 });

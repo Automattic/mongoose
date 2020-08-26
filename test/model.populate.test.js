@@ -1626,6 +1626,33 @@ describe('model: populate:', function() {
     });
   });
 
+  it('supports `retainNullValues` while supressing _id of subdocument', function() {
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+    const User = db.model('User', userSchema);
+
+    return co(function*() {
+      const user = new User({ name: 'Victor Hugo' });
+      yield user.save();
+      const post = yield BlogPost.create({
+        title: 'Notre-Dame de Paris',
+        fans: []
+      });
+
+      yield BlogPost.collection.updateOne({ _id: post._id }, {
+        $set: { fans: [user.id] }
+      });
+
+      yield user.delete();
+
+      const returned = yield BlogPost.
+        findById(post._id).
+        populate({ path: 'fans', select: 'name -_id', options: { retainNullValues: true } });
+
+      assert.equal(returned.fans.length, 1);
+      assert.strictEqual(returned.fans[0], null);
+    });
+  });
+
   it('populating more than one array at a time', function(done) {
     const User = db.model('User', userSchema);
     const M = db.model('Test', new Schema({
@@ -9620,6 +9647,34 @@ describe('model: populate:', function() {
 
       const notifications = yield NotificationModel.find({}).populate('subject');
       assert.deepEqual(notifications.map(el => el.subject.name), ['Keanu', 'Bud']);
+    });
+  });
+
+  it('skips checking `refPath` if the path to populate is undefined (gh-9340)', function() {
+    const firstSchema = Schema({
+      ref: String,
+      linkedId: {
+        type: Schema.ObjectId,
+        refPath: 'ref'
+      }
+    });
+    const Parent = db.model('Parent', firstSchema);
+
+    const secondSchema = new Schema({ name: String });
+    const Child = db.model('Child', secondSchema);
+
+    return co(function*() {
+      const child = yield Child.create({ name: 'child' });
+      yield Parent.create({ ref: 'Child', linkedId: child._id });
+      yield Parent.create({ ref: 'does not exist' });
+
+      const res = yield Parent.find().populate('linkedId').sort({ ref: 1 }).exec();
+      assert.equal(res.length, 2);
+
+      assert.equal(res[0].ref, 'Child');
+      assert.equal(res[0].linkedId.name, 'child');
+      assert.equal(res[1].ref, 'does not exist');
+      assert.strictEqual(res[1].linkedId, undefined);
     });
   });
 });

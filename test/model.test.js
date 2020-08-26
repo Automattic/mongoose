@@ -6900,6 +6900,50 @@ describe('Model', function() {
     assert.equal(called, 0);
   });
 
+  it('retains atomics after failed `save()` (gh-9327)', function() {
+    const schema = new Schema({ arr: [String] });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ arr: [] });
+
+      yield Test.deleteMany({});
+
+      doc.arr.push('test');
+      const err = yield doc.save().then(() => null, err => err);
+      assert.ok(err);
+
+      const delta = doc.getChanges();
+      assert.ok(delta.$push);
+      assert.ok(delta.$push.arr);
+    });
+  });
+
+  it('doesnt wipe out changes made while `save()` is in flight (gh-9327)', function() {
+    const schema = new Schema({ num1: Number, num2: Number });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({});
+
+      doc.num1 = 1;
+      doc.num2 = 1;
+      const p = doc.save();
+
+      yield cb => setTimeout(cb, 0);
+
+      doc.num1 = 2;
+      doc.num2 = 2;
+      yield p;
+
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc._id);
+      assert.equal(fromDb.num1, 2);
+      assert.equal(fromDb.num2, 2);
+    });
+  });
+
   describe('returnOriginal (gh-9183)', function() {
     const originalValue = mongoose.get('returnOriginal');
     beforeEach(() => {

@@ -9286,4 +9286,29 @@ describe('document', function() {
     const doc = new Test({ publisher: 'Mastering JS' });
     assert.deepEqual(doc.toObject().authors, ['Mastering JS']);
   });
+
+  it('handles pulling array subdocs when _id is an alias (gh-9319)', function() {
+    const childSchema = Schema({
+      field: {
+        type: String,
+        alias: '_id'
+      }
+    }, { _id: false });
+
+    const parentSchema = Schema({ children: [childSchema] });
+    const Parent = db.model('Parent', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({ children: [{ field: '1' }] });
+      const p = yield Parent.findOne();
+
+      p.children.pull('1');
+      yield p.save();
+
+      assert.equal(p.children.length, 0);
+
+      const fromDb = yield Parent.findOne();
+      assert.equal(fromDb.children.length, 0);
+    });
+  });
 });

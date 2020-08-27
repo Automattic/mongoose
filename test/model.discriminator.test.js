@@ -762,31 +762,35 @@ describe('model', function() {
 
       it('with $meta projection (gh-5859)', function() {
         const eventSchema = new Schema({ eventField: String }, { id: false });
+        eventSchema.index({ eventField: 'text' });
         const Event = db.model('Test', eventSchema);
 
         const trackSchema = new Schema({ trackField: String });
         const Track = Event.discriminator('Track', trackSchema);
 
         const trackedItem = new Track({
-          trackField: 'trackField',
-          eventField: 'eventField'
+          trackField: 'track',
+          eventField: 'event'
         });
 
         return trackedItem.save().
+          then(() => Event.init()).
           then(function() {
-            return Event.find({}).select({ score: { $meta: 'textScore' } });
+            return Event.find({ $text: { $search: 'event' } }).
+              select({ score: { $meta: 'textScore' } });
           }).
           then(function(docs) {
             assert.equal(docs.length, 1);
-            assert.equal(docs[0].trackField, 'trackField');
+            assert.equal(docs[0].trackField, 'track');
           }).
           then(function() {
-            return Track.find({}).select({ score: { $meta: 'textScore' } });
+            return Track.find({ $text: { $search: 'event' } }).
+              select({ score: { $meta: 'textScore' } });
           }).
           then(function(docs) {
             assert.equal(docs.length, 1);
-            assert.equal(docs[0].trackField, 'trackField');
-            assert.equal(docs[0].eventField, 'eventField');
+            assert.equal(docs[0].trackField, 'track');
+            assert.equal(docs[0].eventField, 'event');
           });
       });
 

@@ -324,6 +324,27 @@ describe('schema select option', function() {
     });
   });
 
+  it('should not project in discriminator key if projected in implicitly with .$ (gh-9361)', function() {
+    const eventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+
+    const batchSchema = new Schema({ events: [eventSchema] });
+    batchSchema.path('events').discriminator('Clicked', new Schema({
+      element: String
+    }, { _id: false }));
+    batchSchema.path('events').discriminator('Purchased', new Schema({
+      product: String
+    }, { _id: false }));
+
+    const MyModel = db.model('Test', batchSchema);
+
+    const query = MyModel.find({ 'events.message': 'foo' }).select({ 'events.$': 1 });
+    query._applyPaths();
+
+    assert.equal(Object.keys(query._fields).length, 1);
+    assert.ok(query._fields['events.$']);
+  });
+
   describe('forcing inclusion of a deselected schema path', function() {
     it('works', function(done) {
       const excluded = new Schema({

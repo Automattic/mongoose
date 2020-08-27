@@ -15,6 +15,7 @@
 <ul class="toc">
   <li><a href="#example">Example</a></li>
   <li><a href="#global">Global Plugins</a></li>
+  <li><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></li>
   <li><a href="#official">Officially Supported Plugins</a></li>
 </ul>
 
@@ -62,6 +63,35 @@ mongoose.plugin(<span class="hljs-built_in">require</span>(<span class="hljs-str
 <span class="hljs-comment">// `loadedAtPlugin` gets attached to both schemas</span>
 <span class="hljs-keyword">const</span> Game = mongoose.model(<span class="hljs-string">'Game'</span>, gameSchema);
 <span class="hljs-keyword">const</span> Player = mongoose.model(<span class="hljs-string">'Player'</span>, playerSchema);</code></pre>
+<h3 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h3>
+
+<p>Because many plugins rely on <a href="/docs/middleware.html">middleware</a>, you should make sure to apply plugins <strong>before</strong>
+you call <code>mongoose.model()</code> or <code>conn.model()</code>. Otherwise, <a href="/docs/middleware.html#defining">any middleware the plugin registers won&#39;t get applied</a>.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// loadedAt.js</span>
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadedAtPlugin</span>(<span class="hljs-params">schema, options</span>) </span>{
+  schema.virtual(<span class="hljs-string">'loadedAt'</span>).
+    get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._loadedAt; }).
+    set(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) </span>{ <span class="hljs-keyword">this</span>._loadedAt = v; });
+
+  schema.post([<span class="hljs-string">'find'</span>, <span class="hljs-string">'findOne'</span>], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">docs</span>) </span>{
+    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">Array</span>.isArray(docs)) {
+      docs = [docs];
+    }
+    <span class="hljs-keyword">const</span> now = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> docs) {
+      doc.loadedAt = now;
+    }
+  });
+};
+
+<span class="hljs-comment">// game-schema.js</span>
+<span class="hljs-keyword">const</span> loadedAtPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./loadedAt'</span>);
+<span class="hljs-keyword">const</span> gameSchema = <span class="hljs-keyword">new</span> Schema({ ... });
+<span class="hljs-keyword">const</span> Game = mongoose.model(<span class="hljs-string">'Game'</span>, gameSchema);
+
+<span class="hljs-comment">// `find()` and `findOne()` hooks from `loadedAtPlugin()` won't get applied</span>
+<span class="hljs-comment">// because `mongoose.model()` was already called!</span>
+gameSchema.plugin(loadedAtPlugin);</code></pre>
 <h3 id="official"><a href="#official">Officially Supported Plugins</a></h3>
 
 <p>The Mongoose team maintains several plugins that add cool new features to

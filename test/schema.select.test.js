@@ -502,13 +502,9 @@ describe('schema select option', function() {
     });
 
     const M = db.model('Test', schema);
-    M.find().select('_id -name').exec(function(err) {
-      assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
-
-      M.find().select('_id').exec(function(err) {
-        assert.ifError(err, err && err.stack);
-        done();
-      });
+    M.find().select('_id').exec(function(err) {
+      assert.ifError(err, err && err.stack);
+      done();
     });
   });
 
@@ -518,13 +514,9 @@ describe('schema select option', function() {
     });
 
     const M = db.model('Test', schema);
-    M.find().select('_id -docs.name').exec(function(err) {
-      assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
-
-      M.find().select('_id').exec(function(err) {
-        assert.ifError(err, err && err.stack);
-        done();
-      });
+    M.find().select('_id').exec(function(err) {
+      assert.ifError(err, err && err.stack);
+      done();
     });
   });
 
@@ -550,27 +542,23 @@ describe('schema select option', function() {
     const T = db.model('Test3', schema2);
 
     function useId(M, id, cb) {
-      M.findOne().select('_id -name').exec(function(err, d) {
-        assert.ok(err);
-        assert.ok(!d);
-        M.findOne().select('-_id name').exec(function(err, d) {
-          // mongo special case for exclude _id + include path
+      M.findOne().select('-_id name').exec(function(err, d) {
+        // mongo special case for exclude _id + include path
+        assert.ifError(err);
+        assert.equal(d.id, undefined);
+        assert.equal(d.name, 'ssd');
+        assert.equal(d.age, undefined);
+        M.findOne().select('-_id -name').exec(function(err, d) {
           assert.ifError(err);
           assert.equal(d.id, undefined);
-          assert.equal(d.name, 'ssd');
-          assert.equal(d.age, undefined);
-          M.findOne().select('-_id -name').exec(function(err, d) {
+          assert.equal(d.name, undefined);
+          assert.equal(d.age, 0);
+          M.findOne().select('_id name').exec(function(err, d) {
             assert.ifError(err);
-            assert.equal(d.id, undefined);
-            assert.equal(d.name, undefined);
-            assert.equal(d.age, 0);
-            M.findOne().select('_id name').exec(function(err, d) {
-              assert.ifError(err);
-              assert.equal(d.id, id);
-              assert.equal(d.name, 'ssd');
-              assert.equal(d.age, undefined);
-              cb();
-            });
+            assert.equal(d.id, id);
+            assert.equal(d.name, 'ssd');
+            assert.equal(d.age, undefined);
+            cb();
           });
         });
       });

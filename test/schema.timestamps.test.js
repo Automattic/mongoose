@@ -406,4 +406,40 @@ describe('schema options.timestamps', function() {
       assert.equal(doc.updatedAt, 42);
     });
   });
+
+  it('shouldnt bump updatedAt in single nested subdocs that are not modified (gh-9357)', function() {
+    const nestedSchema = Schema({
+      nestedA: { type: String },
+      nestedB: { type: String }
+    }, { timestamps: true });
+    const parentSchema = Schema({
+      content: {
+        a: nestedSchema,
+        b: nestedSchema,
+        c: String
+      }
+    });
+  
+    conn.deleteModel(/Test/);
+    const Parent = conn.model('Test', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({
+        content: {
+          a: { nestedA: 'a' },
+          b: { nestedB: 'b' }
+        }
+      });
+    
+      const doc = yield Parent.findOne();
+
+      const ts = doc.content.b.updatedAt;
+      doc.content.a.nestedA = 'b';
+      yield cb => setTimeout(cb, 10);
+      yield doc.save();
+
+      const fromDb = yield Parent.findById(doc);
+      assert.strictEqual(fromDb.content.b.updatedAt.valueOf(), ts.valueOf());
+    });
+  });
 });

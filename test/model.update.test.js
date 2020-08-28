@@ -3128,6 +3128,25 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('updating a map path underneath a single nested subdoc (gh-9298)', function() {
+    const schema = Schema({
+      cities: {
+        type: Map,
+        of: Schema({ population: Number })
+      }
+    });
+    const Test = db.model('Test', Schema({ country: schema }));
+
+    return co(function*() {
+      yield Test.create({});
+
+      yield Test.updateOne({}, { 'country.cities.newyork.population': '10000' });
+
+      const updated = yield Test.findOne({}).lean();
+      assert.strictEqual(updated.country.cities.newyork.population, 10000);
+    });
+  });
+
   it('overwrite an array with empty (gh-7135)', function() {
     const ElementSchema = Schema({
       a: { type: String, required: true }

@@ -424,6 +424,8 @@ describe('schema options.timestamps', function() {
     const Parent = conn.model('Test', parentSchema);
 
     return co(function*() {
+      yield Parent.deleteMany({});
+
       yield Parent.create({
         content: {
           a: { nestedA: 'a' },

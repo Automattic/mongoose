@@ -419,7 +419,7 @@ describe('schema options.timestamps', function() {
         c: String
       }
     });
-  
+
     conn.deleteModel(/Test/);
     const Parent = conn.model('Test', parentSchema);
 
@@ -430,7 +430,7 @@ describe('schema options.timestamps', function() {
           b: { nestedB: 'b' }
         }
       });
-    
+
       const doc = yield Parent.findOne();
 
       const ts = doc.content.b.updatedAt;

@@ -1,3 +1,12 @@
+5.10.2 / 2020-08-28
+===================
+ * fix(model): avoid uncaught error if `insertMany()` fails due to server selection error #9355
+ * fix(aggregate): automatically convert accumulator function options to strings #9364
+ * fix(document): handle `pull()` on a document array when `_id` is an alias #9319
+ * fix(queryhelpers): avoid path collision error when projecting in discriminator key with `.$` #9361
+ * fix: fix typo in error message thrown by unimplemented createIndex #9367 [timhaley94](https://github.com/timhaley94)
+ * docs(plugins): note that plugins should be applied before you call `mongoose.model()` #7723
+
 5.10.1 / 2020-08-26
 ===================
  * fix(mongoose): fix `.then()` is not a function error when calling `mongoose.connect()` multiple times #9358 #9335 #9331

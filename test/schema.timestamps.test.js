@@ -444,4 +444,43 @@ describe('schema options.timestamps', function() {
       assert.strictEqual(fromDb.content.b.updatedAt.valueOf(), ts.valueOf());
     });
   });
+
+  it('bumps updatedAt with mixed $set (gh-9357)', function() {
+    const nestedSchema = Schema({
+      nestedA: { type: String },
+      nestedB: { type: String }
+    }, { timestamps: true });
+    const parentSchema = Schema({
+      content: {
+        a: nestedSchema,
+        b: nestedSchema,
+        c: String
+      }
+    });
+
+    conn.deleteModel(/Test/);
+    const Parent = conn.model('Test', parentSchema);
+
+    return co(function*() {
+      yield Parent.deleteMany({});
+
+      const doc = yield Parent.create({
+        content: {
+          a: { nestedA: 'a' },
+          b: { nestedB: 'b' }
+        }
+      });
+      const ts = doc.content.b.updatedAt;
+
+      yield cb => setTimeout(cb, 10);
+      const fromDb = yield Parent.findOneAndUpdate({}, {
+        'content.c': 'value',
+        $set: {
+          'content.a.nestedA': 'value'
+        }
+      }, { new: true });
+
+      assert.ok(fromDb.content.a.updatedAt.valueOf() > ts.valueOf());
+    });
+  });
 });

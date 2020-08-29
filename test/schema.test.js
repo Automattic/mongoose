@@ -2471,4 +2471,28 @@ describe('schema', function() {
 
     assert.equal(schema.path('arr').caster.instance, 'Mixed');
   });
+
+  it('handles using a schematype when defining a path (gh-9370)', function() {
+    const schema1 = Schema({
+      foo: {
+        type: Number,
+        min: 4,
+        get: get
+      }
+    });
+
+    function get(v) {
+      return Math.floor(v);
+    }
+
+    const schema2 = Schema({
+      bar: schema1.path('foo')
+    });
+
+    const schematype = schema2.path('bar');
+    assert.equal(schematype.path, 'bar');
+    assert.equal(schematype.options.type, Number);
+    assert.equal(schematype.options.min, 4);
+    assert.equal(schematype.options.get, get);
+  });
 });

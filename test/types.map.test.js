@@ -434,6 +434,42 @@ describe('Map', function() {
         assert.equal(event.scenes.get('bar').name, 'bar');
       });
     });
+
+    it('handles populating path of subdoc (gh-9359)', function() {
+      const bookSchema = Schema({
+        author: {
+          type: 'ObjectId',
+          ref: 'Person'
+        },
+        title: String
+      }, { _id: false });
+
+      const schema = Schema({
+        books: {
+          type: Map,
+          of: bookSchema
+        }
+      });
+
+      const Person = db.model('Person', Schema({ name: String }));
+      const Test = db.model('Test', schema);
+
+      return co(function*() {
+        const person = yield Person.create({ name: 'Ian Fleming' });
+        yield Test.create({
+          books: {
+            key1: {
+              title: 'Casino Royale',
+              author: person._id
+            }
+          }
+        });
+
+        const doc = yield Test.findOne().populate('books.$*.author');
+
+        assert.equal(doc.books.get('key1').author.name, 'Ian Fleming');
+      });
+    });
   });
 
   it('discriminators', function() {

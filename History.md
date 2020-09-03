@@ -1,3 +1,12 @@
+5.10.3 / 2020-09-03
+===================
+ * fix: upgrade mongodb -> 3.6.1 #9380 [lamhieu-vk](https://github.com/lamhieu-vk)
+ * fix(populate): allow populating paths underneath subdocument maps #9359
+ * fix(update): handle casting map paths when map is underneath a single nested subdoc #9298
+ * fix(discriminator): avoid removing nested path if both base and discriminator schema have the same nested path #9362
+ * fix(schema): support `Schema#add()` with schematype instances with different paths #9370
+ * docs(api): fix typo in `Query#get()` example #9372 [elainewlin](https://github.com/elainewlin)
+
 5.10.2 / 2020-08-28
 ===================
  * fix(model): avoid uncaught error if `insertMany()` fails due to server selection error #9355

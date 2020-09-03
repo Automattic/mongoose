@@ -1581,6 +1581,40 @@ describe('model', function() {
     assert.ifError(doc.validateSync());
   });
 
+  it('doesnt remove paths at the same level (gh-9362)', function() {
+    const StepSchema = new Schema({
+      view: {
+        url: {
+          type: String,
+          trim: true
+        }
+      }
+    }, { discriminatorKey: 'type' });
+
+    const ClickSchema = new Schema([
+      StepSchema,
+      {
+        view: {
+          clickCount: {
+            type: Number,
+            default: 1,
+            min: 1
+          }
+        }
+      }
+    ], { discriminatorKey: 'type' });
+
+    const Test = db.model('Test', StepSchema);
+    const D = Test.discriminator('Test1', ClickSchema);
+    assert.ok(D.schema.paths['view.url']);
+
+    const doc = new D({ view: { url: 'google.com' } });
+    assert.ifError(doc.validateSync());
+
+    assert.equal(doc.view.url, 'google.com');
+    assert.equal(doc.view.clickCount, 1);
+  });
+
   it('can use compiled model schema as a discriminator (gh-9238)', function() {
     const SmsSchema = new mongoose.Schema({ senderNumber: String });
     const EmailSchema = new mongoose.Schema({ fromEmailAddress: String });

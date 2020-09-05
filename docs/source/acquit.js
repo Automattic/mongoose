@@ -75,7 +75,7 @@ files.forEach(function(file) {
     for (var j = 0; j < block.blocks.length; ++j) {
       var b = block.blocks[j];
       b.identifier = toHtmlIdentifier(acquit.trimEachLine(b.contents));
-      b.contents = marked.inlineLexer(acquit.trimEachLine(b.contents), []);
+      b.contents = marked(acquit.trimEachLine(b.contents), []);
       if (b.comments && b.comments.length) {
         var last = b.comments.length - 1;
         b.comments[last] = marked(acquit.trimEachLine(b.comments[last]));

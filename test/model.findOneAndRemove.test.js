@@ -347,6 +347,17 @@ describe('model: findOneAndRemove:', function() {
     });
   });
 
+  it('with orFail() (gh-9381)', function() {
+    const User = db.model('User', Schema({ name: String }));
+
+    return User.findOneAndRemove({ name: 'not found' }).orFail().
+      then(() => null, err => err).
+      then(err => {
+        assert.ok(err);
+        assert.equal(err.name, 'DocumentNotFoundError');
+      });
+  });
+
   describe('middleware', function() {
     it('works', function(done) {
       const s = new Schema({

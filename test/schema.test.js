@@ -739,10 +739,16 @@ describe('schema', function() {
       }, { _id: true });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
+      schema.set('_id', false);
+      assert.ok(schema.path('_id') == null);
+
       schema = new Schema({
         name: String
       }, { _id: false });
       assert.equal(schema.path('_id'), undefined);
+
+      schema.set('_id', true);
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
       // old options
       schema = new Schema({

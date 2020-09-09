@@ -34,3 +34,6 @@ website.js
 
 migrating_to_5.md
 renovate.json
+.travis.yml
+webpack.config.js
+webpack.base.config.js

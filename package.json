@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.10.3",
+  "version": "5.10.4",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -50,7 +50,7 @@
     "highlight.js": "9.1.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "marked": "0.6.2",
+    "marked": "1.1.1",
     "mocha": "5.x",
     "moment": "2.x",
     "mongodb-topology-manager": "1.0.11",

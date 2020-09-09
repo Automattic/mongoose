@@ -9311,4 +9311,18 @@ describe('document', function() {
       assert.equal(fromDb.children.length, 0);
     });
   });
+
+  it('allows setting nested path to instance of model (gh-9392)', function() {
+    const def = { test: String };
+    const Child = db.model('Child', def);
+
+    const Parent = db.model('Parent', { nested: def });
+
+    const c = new Child({ test: 'new' });
+
+    const p = new Parent({ nested: { test: 'old' } });
+    p.nested = c;
+
+    assert.equal(p.nested.test, 'new');
+  });
 });

@@ -1,3 +1,10 @@
+5.10.4 / 2020-09-09
+===================
+ * fix(document): allow setting nested path to instance of model #9392
+ * fix: handle `findOneAndRemove()` with `orFail()` #9381
+ * fix(schema): support setting `_id` option to `false` after instantiating schema #9390
+ * docs(document): fix formatting on `getChanges()` #9376
+
 5.10.3 / 2020-09-03
 ===================
  * fix: upgrade mongodb -> 3.6.1 #9380 [lamhieu-vk](https://github.com/lamhieu-vk)

@@ -9325,4 +9325,62 @@ describe('document', function() {
 
     assert.equal(p.nested.test, 'new');
   });
+
+  it('unmarks modified if setting a value to the same value as it was previously (gh-9396)', function() {
+    const schema = new Schema({
+      bar: String
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const foo = new Test({ bar: 'bar' });
+      yield foo.save();
+      assert.ok(!foo.isModified('bar'));
+
+      foo.bar = 'baz';
+      assert.ok(foo.isModified('bar'));
+
+      foo.bar = 'bar';
+      assert.ok(!foo.isModified('bar'));
+    });
+  });
+
+  it('unmarks modified if setting a value to the same subdoc as it was previously (gh-9396)', function() {
+    const schema = new Schema({
+      nested: { bar: String },
+      subdoc: new Schema({ bar: String }, { _id: false })
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const foo = new Test({ nested: { bar: 'bar' }, subdoc: { bar: 'bar' } });
+      yield foo.save();
+      assert.ok(!foo.isModified('nested'));
+      assert.ok(!foo.isModified('subdoc'));
+
+      foo.nested = { bar: 'baz' };
+      foo.subdoc = { bar: 'baz' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+
+      foo.nested = { bar: 'bar' };
+      foo.subdoc = { bar: 'bar' };
+      assert.ok(!foo.isModified('nested'));
+      assert.ok(!foo.isModified('subdoc'));
+      assert.ok(!foo.isModified('subdoc.bar'));
+
+      foo.nested = { bar: 'baz' };
+      foo.subdoc = { bar: 'baz' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+      yield foo.save();
+
+      foo.nested = { bar: 'bar' };
+      foo.subdoc = { bar: 'bar' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+      assert.ok(foo.isModified('subdoc.bar'));
+    });
+  });
 });

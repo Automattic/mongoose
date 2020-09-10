@@ -170,9 +170,9 @@ block content
       const animalSchema = new Schema({ name: String, type: String });
 
       // assign a function to the "methods" object of our animalSchema
-      animalSchema.methods.findSimilarTypes = cb => (
-        mongoose.model('Animal').find({ type: this.type }, cb)
-      )
+      animalSchema.methods.findSimilarTypes = function(cb) {
+        return mongoose.model('Animal').find({ type: this.type }, cb);
+      };
     ```
 
     Now all of our `animal` instances have a `findSimilarTypes` method available
@@ -201,11 +201,11 @@ block content
 
     ```javascript
       // Assign a function to the "statics" object of our animalSchema
-      animalSchema.statics.findByName = name => (
-        this.find({ name: new RegExp(name, 'i') });
-       )
+      animalSchema.statics.findByName = function(name) {
+        return this.find({ name: new RegExp(name, 'i') });
+      };
       // Or, equivalently, you can call `animalSchema.static()`.
-      animalSchema.static('findByBreed', breed => this.find({ breed }) )
+      animalSchema.static('findByBreed', function(breed) { return this.find({ breed }); });
 
       const Animal = mongoose.model('Animal', animalSchema);
       let animals = await Animal.findByName('fido');
@@ -221,9 +221,9 @@ block content
     [chainable query builder API](./queries.html).
 
     ```javascript
-      animalSchema.query.byName = name => (
-        this.where({ name: new RegExp(name, 'i') })
-      )
+      animalSchema.query.byName = function(name) {
+        return this.where({ name: new RegExp(name, 'i') })
+      };
 
       const Animal = mongoose.model('Animal', animalSchema);
 
@@ -323,7 +323,7 @@ block content
     define a `fullName` property that won't get persisted to MongoDB.
 
     ```javascript
-    personSchema.virtual('fullName').get(() => {
+    personSchema.virtual('fullName').get(function() {
       return this.name.first + ' ' + this.name.last;
     });
     ```
@@ -346,8 +346,10 @@ block content
 
     ```javascript
     personSchema.virtual('fullName').
-      get(() => this.name.first + ' ' + this.name.last).
-      set(v => {
+      get(function() {
+        return this.name.first + ' ' + this.name.last;
+       }).
+      set(function(v) {
         this.name.first = v.substr(0, v.indexOf(' '));
         this.name.last = v.substr(v.indexOf(' ') + 1);
       });
@@ -813,7 +815,7 @@ block content
 
     ```javascript
     const schema = new Schema({ name: String });
-    schema.path('name').get(v => {
+    schema.path('name').get(function(v) {
       return v + ' is my name';
     });
     schema.set('toObject', { getters: true });

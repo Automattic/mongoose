@@ -49,10 +49,10 @@ block content
     collection and defines the shape of the documents within that collection.
 
     ```javascript
-      var mongoose = require('mongoose');
-      var Schema = mongoose.Schema;
+      import mongoose from 'mongoose';
+      const { Schema } = mongoose;
 
-      var blogSchema = new Schema({
+      const blogSchema = new Schema({
         title:  String, // String is shorthand for {type: String}
         author: String,
         body:   String,
@@ -118,7 +118,7 @@ block content
     To do so, we pass it into `mongoose.model(modelName, schema)`:
 
     ```javascript
-      var Blog = mongoose.model('Blog', blogSchema);
+      const Blog = mongoose.model('Blog', blogSchema);
       // ready to go!
     ```
 
@@ -167,7 +167,7 @@ block content
 
     ```javascript
       // define a schema
-      var animalSchema = new Schema({ name: String, type: String });
+      const animalSchema = new Schema({ name: String, type: String });
 
       // assign a function to the "methods" object of our animalSchema
       animalSchema.methods.findSimilarTypes = function(cb) {
@@ -180,9 +180,9 @@ block content
 
     ```javascript
       var Animal = mongoose.model('Animal', animalSchema);
-      var dog = new Animal({ type: 'dog' });
+      const dog = new Animal({ type: 'dog' });
 
-      dog.findSimilarTypes(function(err, dogs) {
+      dog.findSimilarTypes((err, dogs) => {
         console.log(dogs); // woof
       });
     ```
@@ -205,9 +205,7 @@ block content
         return this.find({ name: new RegExp(name, 'i') });
       };
       // Or, equivalently, you can call `animalSchema.static()`.
-      animalSchema.static('findByBreed', function(breed) {
-        return this.find({ breed });
-      });
+      animalSchema.static('findByBreed', function(breed) { return this.find({ breed }); });
 
       const Animal = mongoose.model('Animal', animalSchema);
       let animals = await Animal.findByName('fido');
@@ -224,16 +222,16 @@ block content
 
     ```javascript
       animalSchema.query.byName = function(name) {
-        return this.where({ name: new RegExp(name, 'i') });
+        return this.where({ name: new RegExp(name, 'i') })
       };
 
-      var Animal = mongoose.model('Animal', animalSchema);
+      const Animal = mongoose.model('Animal', animalSchema);
 
-      Animal.find().byName('fido').exec(function(err, animals) {
+      Animal.find().byName('fido').exec((err, animals) => {
         console.log(animals);
       });
 
-      Animal.findOne().byName('fido').exec(function(err, animal) {
+      Animal.findOne().byName('fido').exec((err, animal) => {
         console.log(animal);
       });
     ```
@@ -246,7 +244,7 @@ block content
     [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
     ```javascript
-      var animalSchema = new Schema({
+      const animalSchema = new Schema({
         name: String,
         type: String,
         tags: { type: [String], index: true } // field level
@@ -277,9 +275,9 @@ block content
       // Will cause an error because mongodb has an _id index by default that
       // is not sparse
       animalSchema.index({ _id: 1 }, { sparse: true });
-      var Animal = mongoose.model('Animal', animalSchema);
+      const Animal = mongoose.model('Animal', animalSchema);
 
-      Animal.on('index', function(error) {
+      Animal.on('index', error => {
         // "_id index cannot be sparse"
         console.log(error.message);
       });
@@ -296,7 +294,7 @@ block content
 
     ```javascript
       // define a schema
-      var personSchema = new Schema({
+      const personSchema = new Schema({
         name: {
           first: String,
           last: String
@@ -304,10 +302,10 @@ block content
       });
 
       // compile our model
-      var Person = mongoose.model('Person', personSchema);
+      const Person = mongoose.model('Person', personSchema);
 
       // create a document
-      var axl = new Person({
+      const axl = new Person({
         name: { first: 'Axl', last: 'Rose' }
       });
     ```
@@ -325,7 +323,7 @@ block content
     define a `fullName` property that won't get persisted to MongoDB.
 
     ```javascript
-    personSchema.virtual('fullName').get(function () {
+    personSchema.virtual('fullName').get(function() {
       return this.name.first + ' ' + this.name.last;
     });
     ```
@@ -348,7 +346,9 @@ block content
 
     ```javascript
     personSchema.virtual('fullName').
-      get(function() { return this.name.first + ' ' + this.name.last; }).
+      get(function() {
+        return this.name.first + ' ' + this.name.last;
+       }).
       set(function(v) {
         this.name.first = v.substr(0, v.indexOf(' '));
         this.name.last = v.substr(v.indexOf(' ') + 1);
@@ -372,7 +372,7 @@ block content
     into a longer name for code readability.
 
     ```javascript
-    var personSchema = new Schema({
+    const personSchema = new Schema({
       n: {
         type: String,
         // Now accessing `name` will get you the value of `n`, and setting `n` will set the value of `name`
@@ -381,7 +381,7 @@ block content
     });
 
     // Setting `name` will propagate to `n`
-    var person = new Person({ name: 'Val' });
+    const person = new Person({ name: 'Val' });
     console.log(person); // { n: 'Val' }
     console.log(person.toObject({ virtuals: true })); // { n: 'Val', name: 'Val' }
     console.log(person.name); // "Val"
@@ -409,7 +409,7 @@ block content
 
     // or
 
-    var schema = new Schema({..});
+    const schema = new Schema({..});
     schema.set(option, value);
     ```
 
@@ -500,7 +500,7 @@ block content
     ```javascript
     mongoose.set('bufferCommands', true);
     // Schema option below overrides the above, if the schema option is set.
-    var schema = new Schema({..}, { bufferCommands: false });
+    const schema = new Schema({..}, { bufferCommands: false });
     ```
 
     <h3 id="capped"><a href="#capped">option: capped</a></h3>
@@ -531,7 +531,7 @@ block content
     for your collection.
 
     ```javascript
-    var dataSchema = new Schema({..}, { collection: 'data' });
+    const dataSchema = new Schema({..}, { collection: 'data' });
     ```
 
     <h3 id="id"><a href="#id">option: id</a></h3>
@@ -543,15 +543,15 @@ block content
 
     ```javascript
     // default behavior
-    var schema = new Schema({ name: String });
-    var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
+    const schema = new Schema({ name: String });
+    const Page = mongoose.model('Page', schema);
+    const p = new Page({ name: 'mongodb.org' });
     console.log(p.id); // '50341373e894ad16347efe01'
 
     // disabled id
-    var schema = new Schema({ name: String }, { id: false });
+    const schema = new Schema({ name: String }, { id: false });
     var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
+    const p = new Page({ name: 'mongodb.org' });
     console.log(p.id); // undefined
     ```
 
@@ -569,18 +569,18 @@ block content
 
     ```javascript
     // default behavior
-    var schema = new Schema({ name: String });
-    var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
+    const schema = new Schema({ name: String });
+    const Page = mongoose.model('Page', schema);
+    const p = new Page({ name: 'mongodb.org' });
     console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
 
     // disabled _id
-    var childSchema = new Schema({ name: String }, { _id: false });
-    var parentSchema = new Schema({ children: [childSchema] });
+    const childSchema = new Schema({ name: String }, { _id: false });
+    const parentSchema = new Schema({ children: [childSchema] });
 
-    var Model = mongoose.model('Model', parentSchema);
+    const Model = mongoose.model('Model', parentSchema);
 
-    Model.create({ children: [{ name: 'Luke' }] }, function(error, doc) {
+    Model.create({ children: [{ name: 'Luke' }] }, (error, doc) => {
       // doc.children[0]._id will be undefined
     });
     ```
@@ -638,11 +638,11 @@ block content
     to all queries derived from a model.
 
     ```javascript
-    var schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
-    var schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
-    var schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
-    var schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
-    var schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
+    const schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
+    const schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
+    const schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
+    const schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
+    const schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
     ```
 
     The alias of each pref is also permitted so instead of having to type out
@@ -659,10 +659,10 @@ block content
 
     ```javascript
     // pings the replset members periodically to track network latency
-    var options = { replset: { strategy: 'ping' }};
+    const options = { replset: { strategy: 'ping' }};
     mongoose.connect(uri, options);
 
-    var schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
+    const schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
     mongoose.model('JellyBean', schema);
     ```
 
@@ -702,23 +702,23 @@ block content
     the db.
 
     ```javascript
-    var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', thingSchema);
-    var thing = new Thing({ iAmNotInTheSchema: true });
+    const thingSchema = new Schema({..})
+    const Thing = mongoose.model('Thing', thingSchema);
+    const thing = new Thing({ iAmNotInTheSchema: true });
     thing.save(); // iAmNotInTheSchema is not saved to the db
 
     // set to false..
-    var thingSchema = new Schema({..}, { strict: false });
-    var thing = new Thing({ iAmNotInTheSchema: true });
+    const thingSchema = new Schema({..}, { strict: false });
+    const thing = new Thing({ iAmNotInTheSchema: true });
     thing.save(); // iAmNotInTheSchema is now saved to the db!!
     ```
 
     This also affects the use of `doc.set()` to set a property value.
 
     ```javascript
-    var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', thingSchema);
-    var thing = new Thing;
+    const thingSchema = new Schema({..})
+    const Thing = mongoose.model('Thing', thingSchema);
+    const thing = new Thing;
     thing.set('iAmNotInTheSchema', true);
     thing.save(); // iAmNotInTheSchema is not saved to the db
     ```
@@ -727,9 +727,9 @@ block content
     boolean argument:
 
     ```javascript
-    var Thing = mongoose.model('Thing');
-    var thing = new Thing(doc, true);  // enables strict mode
-    var thing = new Thing(doc, false); // disables strict mode
+    const Thing = mongoose.model('Thing');
+    const thing = new Thing(doc, true);  // enables strict mode
+    const thing = new Thing(doc, false); // disables strict mode
     ```
 
     The `strict` option may also be set to `"throw"` which will cause errors
@@ -739,9 +739,9 @@ block content
     is always ignored, regardless of schema option._
 
     ```javascript
-    var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', thingSchema);
-    var thing = new Thing;
+    const thingSchema = new Schema({..})
+    const Thing = mongoose.model('Thing', thingSchema);
+    const thing = new Thing;
     thing.iAmNotInTheSchema = true;
     thing.save(); // iAmNotInTheSchema is never saved to the db
     ```
@@ -787,13 +787,13 @@ block content
     the document's `toJSON` method is called.
 
     ```javascript
-    var schema = new Schema({ name: String });
+    const schema = new Schema({ name: String });
     schema.path('name').get(function (v) {
       return v + ' is my name';
     });
     schema.set('toJSON', { getters: true, virtuals: false });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: 'Max Headroom' });
+    const M = mongoose.model('Person', schema);
+    const m = new M({ name: 'Max Headroom' });
     console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }
     console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
     // since we know toJSON is called whenever a js object is stringified:
@@ -814,13 +814,13 @@ block content
     `toObject` option to `{ getters: true }`:
 
     ```javascript
-    var schema = new Schema({ name: String });
-    schema.path('name').get(function (v) {
+    const schema = new Schema({ name: String });
+    schema.path('name').get(function(v) {
       return v + ' is my name';
     });
     schema.set('toObject', { getters: true });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: 'Max Headroom' });
+    const M = mongoose.model('Person', schema);
+    const m = new M({ name: 'Max Headroom' });
     console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
     ```
 
@@ -833,7 +833,7 @@ block content
 
     ```javascript
     // Mongoose interprets this as 'loc is a String'
-    var schema = new Schema({ loc: { type: String, coordinates: [Number] } });
+    const schema = new Schema({ loc: { type: String, coordinates: [Number] } });
     ```
 
     However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
@@ -841,7 +841,7 @@ block content
     uses to find type declarations, set the 'typeKey' schema option.
 
     ```javascript
-    var schema = new Schema({
+    const schema = new Schema({
       // Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'
       loc: { type: String, coordinates: [Number] },
       // Mongoose interprets this as 'name is a String'
@@ -857,13 +857,13 @@ block content
     validation, you can set `validateBeforeSave` to false.
 
     ```javascript
-    var schema = new Schema({ name: String });
+    const schema = new Schema({ name: String });
     schema.set('validateBeforeSave', false);
     schema.path('name').validate(function (value) {
         return value != null;
     });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: null });
+    const M = mongoose.model('Person', schema);
+    const m = new M({ name: null });
     m.validate(function(err) {
         console.log(err); // Will tell you that null is not allowed.
     });
@@ -1018,17 +1018,17 @@ block content
     for every query and aggregation. [Here's a beginner-friendly overview of collations](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations).
 
     ```javascript
-    var schema = new Schema({
+    const schema = new Schema({
       name: String
     }, { collation: { locale: 'en_US', strength: 1 } });
 
-    var MyModel = db.model('MyModel', schema);
+    const MyModel = db.model('MyModel', schema);
 
     MyModel.create([{ name: 'val' }, { name: 'Val' }]).
-      then(function() {
+      then(() => {
         return MyModel.find({ name: 'val' });
       }).
-      then(function(docs) {
+      then((docs) => {
         // `docs` will contain both docs, because `strength: 1` means
         // MongoDB will ignore case when matching.
       });
@@ -1114,31 +1114,31 @@ block content
     schema's strict mode setting.
 
     ```javascript
-    var childSchema = new Schema({}, { strict: false });
-    var parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
-    var Parent = mongoose.model('Parent', parentSchema);
-    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+    const childSchema = new Schema({}, { strict: false });
+    const parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
+    const Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, (error) => {
       // Error because parentSchema has `strict: throw`, even though
       // `childSchema` has `strict: false`
     });
 
-    var update = { 'child.name': 'Luke Skywalker' };
-    var opts = { strict: false };
+    const update = { 'child.name': 'Luke Skywalker' };
+    const opts = { strict: false };
     Parent.update({}, update, opts, function(error) {
       // This works because passing `strict: false` to `update()` overwrites
       // the parent schema.
     });
     ```
 
-    If you set `useNestedStrict` to true, mongoose will use the child schema's
+    If you set `useNconstestedStrict` to true, mongoose will use the child schema's
     `strict` option for casting updates.
 
     ```javascript
-    var childSchema = new Schema({}, { strict: false });
+    const childSchema = new Schema({}, { strict: false });
     var parentSchema = new Schema({ child: childSchema },
       { strict: 'throw', useNestedStrict: true });
-    var Parent = mongoose.model('Parent', parentSchema);
-    Parent.update({}, { 'child.name': 'Luke Skywalker' }, function(error) {
+    const Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, error => {
       // Works!
     });
     ```

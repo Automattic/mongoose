@@ -89,7 +89,13 @@ pre code {
 li.sub-item {
   height: 23px;
   font-size: 11pt;
-  margin-left: 20px;
+  margin-left: 15px;
+}
+
+li.tertiary-item {
+  height: 23px;
+  font-size: 11pt;
+  margin-left: 30px;
 }
 
 li.version {

@@ -77,6 +77,13 @@ html(lang='en')
                 a.pure-menu-link(href="/docs/subdocs.html", class=outputUrl === '/docs/subdocs.html' ? 'selected' : '') Subdocuments
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/queries.html", class=outputUrl === '/docs/queries.html' ? 'selected' : '') Queries
+              - if (['/docs/queries', '/docs/tutorials/findoneandupdate', '/docs/tutorials/lean', '/docs/tutorials/query_casting'].some(path => outputUrl.startsWith(path)))
+                li.pure-menu-item.tertiary-item
+                  a.pure-menu-link(href="/docs/tutorials/query_casting.html", class=outputUrl === '/docs/tutorials/query_casting.html' ? 'selected' : '') Query Casting
+                li.pure-menu-item.tertiary-item
+                  a.pure-menu-link(href="/docs/tutorials/findoneandupdate.html", class=outputUrl === '/docs/tutorials/findoneandupdate.html' ? 'selected' : '') findOneAndUpdate
+                li.pure-menu-item.tertiary-item
+                  a.pure-menu-link(href="/docs/tutorials/lean.html", class=outputUrl === '/docs/tutorials/lean.html' ? 'selected' : '') The Lean Option
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/validation.html", class=outputUrl === '/docs/validation.html' ? 'selected' : '') Validation
               li.pure-menu-item.sub-item

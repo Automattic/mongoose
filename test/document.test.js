@@ -774,6 +774,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('respects child schemas minimize (gh-9405)', function() {
+      const postSchema = new Schema({
+        owner: { type: Schema.Types.ObjectId, ref: 'User' },
+        props: { type: Object, default: {} }
+      });
+      const userSchema = new Schema({
+        firstName: String,
+        props: { type: Object, default: {} }
+      }, { minimize: false });
+
+      const User = db.model('User', userSchema);
+      const Post = db.model('BlogPost', postSchema);
+
+      const user = new User({ firstName: 'test' });
+      const post = new Post({ owner: user });
+
+      let obj = post.toObject();
+      assert.strictEqual(obj.props, void 0);
+      assert.deepEqual(obj.owner.props, {});
+
+      obj = post.toObject({ minimize: false });
+      assert.deepEqual(obj.props, {});
+      assert.deepEqual(obj.owner.props, {});
+
+      obj = post.toObject({ minimize: true });
+      assert.strictEqual(obj.props, void 0);
+      assert.strictEqual(obj.owner.props, void 0);
+    });
   });
 
   describe('toJSON', function() {

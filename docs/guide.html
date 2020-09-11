@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.10.4: Schemas</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.10.4</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/guide.pug" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.10.5: Schemas</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.10.5</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/guide.pug" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="schemas">Schemas</h2>
 <script>
@@ -32,10 +32,10 @@ If you are migrating from 4.x to 5.x please take a moment to read the <a href="/
 
 <p>Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB
 collection and defines the shape of the documents within that collection.</p>
-<pre><code class="language-javascript">  <span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-  <span class="hljs-keyword">var</span> Schema = mongoose.Schema;
+<pre><code class="language-javascript">  <span class="hljs-keyword">import</span> mongoose <span class="hljs-keyword">from</span> <span class="hljs-string">'mongoose'</span>;
+  <span class="hljs-keyword">const</span> { Schema } = mongoose;
 
-  <span class="hljs-keyword">var</span> blogSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-keyword">const</span> blogSchema = <span class="hljs-keyword">new</span> Schema({
     title:  <span class="hljs-built_in">String</span>, <span class="hljs-comment">// String is shorthand for {type: String}</span>
     author: <span class="hljs-built_in">String</span>,
     body:   <span class="hljs-built_in">String</span>,
@@ -90,7 +90,7 @@ and document lifecycle hooks called <a href="./middleware.html">middleware</a>.<
 <p>To use our schema definition, we need to convert our <code>blogSchema</code> into a
 <a href="./models.html">Model</a> we can work with.
 To do so, we pass it into <code>mongoose.model(modelName, schema)</code>:</p>
-<pre><code class="language-javascript">  <span class="hljs-keyword">var</span> Blog = mongoose.model(<span class="hljs-string">'Blog'</span>, blogSchema);
+<pre><code class="language-javascript">  <span class="hljs-keyword">const</span> Blog = mongoose.model(<span class="hljs-string">'Blog'</span>, blogSchema);
   <span class="hljs-comment">// ready to go!</span></code></pre>
 <h3 id="_id"><a href="#_id">Ids</a></h3>
 
@@ -123,7 +123,7 @@ doc._id = <span class="hljs-number">1</span>;
 many of their own <a href="./api/document.html">built-in instance methods</a>.
 We may also define our own custom document instance methods.</p>
 <pre><code class="language-javascript">  <span class="hljs-comment">// define a schema</span>
-  <span class="hljs-keyword">var</span> animalSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, type: <span class="hljs-built_in">String</span> });
+  <span class="hljs-keyword">const</span> animalSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, type: <span class="hljs-built_in">String</span> });
 
   <span class="hljs-comment">// assign a function to the "methods" object of our animalSchema</span>
   animalSchema.methods.findSimilarTypes = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">cb</span>) </span>{
@@ -132,9 +132,9 @@ We may also define our own custom document instance methods.</p>
 <p>Now all of our <code>animal</code> instances have a <code>findSimilarTypes</code> method available
 to them.</p>
 <pre><code class="language-javascript">  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
-  <span class="hljs-keyword">var</span> dog = <span class="hljs-keyword">new</span> Animal({ type: <span class="hljs-string">'dog'</span> });
+  <span class="hljs-keyword">const</span> dog = <span class="hljs-keyword">new</span> Animal({ type: <span class="hljs-string">'dog'</span> });
 
-  dog.findSimilarTypes(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, dogs</span>) </span>{
+  dog.findSimilarTypes((err, dogs) =&gt; {
     <span class="hljs-built_in">console</span>.log(dogs); <span class="hljs-comment">// woof</span>
   });</code></pre>
 <ul>
@@ -155,9 +155,7 @@ ways to add a static:</p>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.find({ name: <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(name, <span class="hljs-string">'i'</span>) });
   };
   <span class="hljs-comment">// Or, equivalently, you can call `animalSchema.static()`.</span>
-  animalSchema.static(<span class="hljs-string">'findByBreed'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">breed</span>) </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.find({ breed });
-  });
+  animalSchema.static(<span class="hljs-string">'findByBreed'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">breed</span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.find({ breed }); });
 
   <span class="hljs-keyword">const</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
   <span class="hljs-keyword">let</span> animals = <span class="hljs-keyword">await</span> Animal.findByName(<span class="hljs-string">'fido'</span>);
@@ -169,16 +167,16 @@ ways to add a static:</p>
 but for mongoose queries. Query helper methods let you extend mongoose&#39;s
 <a href="./queries.html">chainable query builder API</a>.</p>
 <pre><code class="language-javascript">  animalSchema.query.byName = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name</span>) </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.where({ name: <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(name, <span class="hljs-string">'i'</span>) });
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.where({ name: <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(name, <span class="hljs-string">'i'</span>) })
   };
 
-  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
+  <span class="hljs-keyword">const</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
 
-  Animal.find().byName(<span class="hljs-string">'fido'</span>).exec(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, animals</span>) </span>{
+  Animal.find().byName(<span class="hljs-string">'fido'</span>).exec((err, animals) =&gt; {
     <span class="hljs-built_in">console</span>.log(animals);
   });
 
-  Animal.findOne().byName(<span class="hljs-string">'fido'</span>).exec(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, animal</span>) </span>{
+  Animal.findOne().byName(<span class="hljs-string">'fido'</span>).exec((err, animal) =&gt; {
     <span class="hljs-built_in">console</span>.log(animal);
   });</code></pre>
 <h3 id="indexes"><a href="#indexes">Indexes</a></h3>
@@ -187,7 +185,7 @@ but for mongoose queries. Query helper methods let you extend mongoose&#39;s
 With mongoose, we define these indexes within our <code>Schema</code> <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schema_date_SchemaDate-expires">level</a> or the <code>schema</code> level.
 Defining indexes at the schema level is necessary when creating
 <a href="https://docs.mongodb.com/manual/core/index-compound/">compound indexes</a>.</p>
-<pre><code class="language-javascript">  <span class="hljs-keyword">var</span> animalSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript">  <span class="hljs-keyword">const</span> animalSchema = <span class="hljs-keyword">new</span> Schema({
     name: <span class="hljs-built_in">String</span>,
     type: <span class="hljs-built_in">String</span>,
     tags: { type: [<span class="hljs-built_in">String</span>], index: <span class="hljs-literal">true</span> } <span class="hljs-comment">// field level</span>
@@ -210,9 +208,9 @@ building or an error occurred.</p>
 <pre><code class="language-javascript">  <span class="hljs-comment">// Will cause an error because mongodb has an _id index by default that</span>
   <span class="hljs-comment">// is not sparse</span>
   animalSchema.index({ _id: <span class="hljs-number">1</span> }, { sparse: <span class="hljs-literal">true</span> });
-  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
+  <span class="hljs-keyword">const</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
 
-  Animal.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+  Animal.on(<span class="hljs-string">'index'</span>, error =&gt; {
     <span class="hljs-comment">// "_id index cannot be sparse"</span>
     <span class="hljs-built_in">console</span>.log(error.message);
   });</code></pre>
@@ -224,7 +222,7 @@ you can get and set but that do not get persisted to MongoDB. The getters
 are useful for formatting or combining fields, while setters are useful for
 de-composing a single value into multiple values for storage.</p>
 <pre><code class="language-javascript">  <span class="hljs-comment">// define a schema</span>
-  <span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({
+  <span class="hljs-keyword">const</span> personSchema = <span class="hljs-keyword">new</span> Schema({
     name: {
       first: <span class="hljs-built_in">String</span>,
       last: <span class="hljs-built_in">String</span>
@@ -232,10 +230,10 @@ de-composing a single value into multiple values for storage.</p>
   });
 
   <span class="hljs-comment">// compile our model</span>
-  <span class="hljs-keyword">var</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, personSchema);
+  <span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, personSchema);
 
   <span class="hljs-comment">// create a document</span>
-  <span class="hljs-keyword">var</span> axl = <span class="hljs-keyword">new</span> Person({
+  <span class="hljs-keyword">const</span> axl = <span class="hljs-keyword">new</span> Person({
     name: { first: <span class="hljs-string">'Axl'</span>, last: <span class="hljs-string">'Rose'</span> }
   });</code></pre>
 <p>Suppose you want to print out the person&#39;s full name. You could do it yourself:</p>
@@ -245,7 +243,7 @@ And what if you want to do some extra processing on the name, like
 <a href="https://www.npmjs.com/package/diacritics">removing diacritics</a>? A
 <a href="./api.html#virtualtype_VirtualType-get">virtual property getter</a> lets you
 define a <code>fullName</code> property that won&#39;t get persisted to MongoDB.</p>
-<pre><code class="language-javascript">personSchema.virtual(<span class="hljs-string">'fullName'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+<pre><code class="language-javascript">personSchema.virtual(<span class="hljs-string">'fullName'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last;
 });</code></pre>
 <p>Now, mongoose will call your getter function every time you access the
@@ -259,7 +257,9 @@ Pass <code>{ virtuals: true }</code> to either
 <p>You can also add a custom setter to your virtual that will let you set both
 first name and last name via the <code>fullName</code> virtual.</p>
 <pre><code class="language-javascript">personSchema.virtual(<span class="hljs-string">'fullName'</span>).
-  get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last; }).
+  get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last;
+   }).
   set(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) </span>{
     <span class="hljs-keyword">this</span>.name.first = v.substr(<span class="hljs-number">0</span>, v.indexOf(<span class="hljs-string">' '</span>));
     <span class="hljs-keyword">this</span>.name.last = v.substr(v.indexOf(<span class="hljs-string">' '</span>) + <span class="hljs-number">1</span>);
@@ -277,7 +277,7 @@ Since virtuals are not stored in MongoDB, you can&#39;t query with them.</p>
 seamlessly get and set another property. This is handy for saving network
 bandwidth, so you can convert a short property name stored in the database
 into a longer name for code readability.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> personSchema = <span class="hljs-keyword">new</span> Schema({
   n: {
     type: <span class="hljs-built_in">String</span>,
     <span class="hljs-comment">// Now accessing `name` will get you the value of `n`, and setting `n` will set the value of `name`</span>
@@ -286,7 +286,7 @@ into a longer name for code readability.</p>
 });
 
 <span class="hljs-comment">// Setting `name` will propagate to `n`</span>
-<span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Val'</span> });
+<span class="hljs-keyword">const</span> person = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Val'</span> });
 <span class="hljs-built_in">console</span>.log(person); <span class="hljs-comment">// { n: 'Val' }</span>
 <span class="hljs-built_in">console</span>.log(person.toObject({ virtuals: <span class="hljs-literal">true</span> })); <span class="hljs-comment">// { n: 'Val', name: 'Val' }</span>
 <span class="hljs-built_in">console</span>.log(person.name); <span class="hljs-comment">// "Val"</span>
@@ -323,7 +323,7 @@ constructor or to the <code>set</code> method:</p>
 
 <span class="hljs-comment">// or</span>
 
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..});
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..});
 schema.set(option, value);</code></pre>
 <p>Valid options:</p>
 <ul>
@@ -395,7 +395,7 @@ to false.</p>
 <p>The schema <code>bufferCommands</code> option overrides the global <code>bufferCommands</code> option.</p>
 <pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">true</span>);
 <span class="hljs-comment">// Schema option below overrides the above, if the schema option is set.</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });</code></pre>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });</code></pre>
 <h3 id="capped"><a href="#capped">option: capped</a></h3>
 
 <p>Mongoose supports MongoDBs <a href="http://www.mongodb.org/display/DOCS/Capped+Collections">capped</a>
@@ -414,7 +414,7 @@ In this case you must explicitly pass the <code>size</code> option, which is req
 the <a href="./api.html#utils_exports.toCollectionName">utils.toCollectionName</a> method.
 This method pluralizes the name. Set this option if you need a different name
 for your collection.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> dataSchema = <span class="hljs-keyword">new</span> Schema({..}, { collection: <span class="hljs-string">'data'</span> });</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> dataSchema = <span class="hljs-keyword">new</span> Schema({..}, { collection: <span class="hljs-string">'data'</span> });</code></pre>
 <h3 id="id"><a href="#id">option: id</a></h3>
 
 <p>Mongoose assigns each of your schemas an <code>id</code> virtual getter by default
@@ -422,15 +422,15 @@ which returns the document&#39;s <code>_id</code> field cast to a string, or in 
 ObjectIds, its hexString. If you don&#39;t want an <code>id</code> getter added to your
 schema, you may disable it by passing this option at schema construction time.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// default behavior</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
-<span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
-<span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
+<span class="hljs-keyword">const</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
 <span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// '50341373e894ad16347efe01'</span>
 
 <span class="hljs-comment">// disabled id</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { id: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { id: <span class="hljs-literal">false</span> });
 <span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
-<span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
+<span class="hljs-keyword">const</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
 <span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// undefined</span></code></pre>
 <h3 id="_id"><a href="#_id">option: _id</a></h3>
 
@@ -443,18 +443,18 @@ added to your schema at all, you may disable it using this option.</p>
 save a document without knowing its id, so you will get an error if
 you try to save a document without an <code>_id</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// default behavior</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
-<span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
-<span class="hljs-keyword">var</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
+<span class="hljs-keyword">const</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
 <span class="hljs-built_in">console</span>.log(p); <span class="hljs-comment">// { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }</span>
 
 <span class="hljs-comment">// disabled _id</span>
-<span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { _id: <span class="hljs-literal">false</span> });
-<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ children: [childSchema] });
+<span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { _id: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ children: [childSchema] });
 
-<span class="hljs-keyword">var</span> Model = mongoose.model(<span class="hljs-string">'Model'</span>, parentSchema);
+<span class="hljs-keyword">const</span> Model = mongoose.model(<span class="hljs-string">'Model'</span>, parentSchema);
 
-Model.create({ children: [{ name: <span class="hljs-string">'Luke'</span> }] }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) </span>{
+Model.create({ children: [{ name: <span class="hljs-string">'Luke'</span> }] }, (error, doc) =&gt; {
   <span class="hljs-comment">// doc.children[0]._id will be undefined</span>
 });</code></pre>
 <h3 id="minimize"><a href="#minimize">option: minimize</a></h3>
@@ -496,11 +496,11 @@ sam.$isEmpty(<span class="hljs-string">'inventory'</span>); <span class="hljs-co
 schema level, providing us a way to apply default
 <a href="http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference">ReadPreferences</a>
 to all queries derived from a model.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'primary'</span> });            <span class="hljs-comment">// also aliased as 'p'</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'primaryPreferred'</span> });   <span class="hljs-comment">// aliased as 'pp'</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'secondary'</span> });          <span class="hljs-comment">// aliased as 's'</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'secondaryPreferred'</span> }); <span class="hljs-comment">// aliased as 'sp'</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'nearest'</span> });            <span class="hljs-comment">// aliased as 'n'</span></code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'primary'</span> });            <span class="hljs-comment">// also aliased as 'p'</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'primaryPreferred'</span> });   <span class="hljs-comment">// aliased as 'pp'</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'secondary'</span> });          <span class="hljs-comment">// aliased as 's'</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'secondaryPreferred'</span> }); <span class="hljs-comment">// aliased as 'sp'</span>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: <span class="hljs-string">'nearest'</span> });            <span class="hljs-comment">// aliased as 'n'</span></code></pre>
 <p>The alias of each pref is also permitted so instead of having to type out
 &#39;secondaryPreferred&#39; and getting the spelling wrong, we can simply pass &#39;sp&#39;.</p>
 <p>The read option also allows us to specify <em>tag sets</em>. These tell the
@@ -511,10 +511,10 @@ of the replica-set it should attempt to read. Read more about tag sets
 <p><em>NOTE: you may also specify the driver read pref <a href="http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy">strategy</a>
 option when connecting:</em></p>
 <pre><code class="language-javascript"><span class="hljs-comment">// pings the replset members periodically to track network latency</span>
-<span class="hljs-keyword">var</span> options = { replset: { strategy: <span class="hljs-string">'ping'</span> }};
+<span class="hljs-keyword">const</span> options = { replset: { strategy: <span class="hljs-string">'ping'</span> }};
 mongoose.connect(uri, options);
 
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: [<span class="hljs-string">'nearest'</span>, { disk: <span class="hljs-string">'ssd'</span> }] });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { read: [<span class="hljs-string">'nearest'</span>, { disk: <span class="hljs-string">'ssd'</span> }] });
 mongoose.model(<span class="hljs-string">'JellyBean'</span>, schema);</code></pre>
 <h3 id="writeConcern"><a href="#writeConcern">option: writeConcern</a></h3>
 
@@ -541,33 +541,33 @@ must configure your shards yourself.</em></p>
 <p>The strict option, (enabled by default), ensures that values passed to our
 model constructor that were not specified in our schema do not get saved to
 the db.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
-<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
-<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ iAmNotInTheSchema: <span class="hljs-literal">true</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
+<span class="hljs-keyword">const</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> Thing({ iAmNotInTheSchema: <span class="hljs-literal">true</span> });
 thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is not saved to the db</span>
 
 <span class="hljs-comment">// set to false..</span>
-<span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..}, { strict: <span class="hljs-literal">false</span> });
-<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing({ iAmNotInTheSchema: <span class="hljs-literal">true</span> });
+<span class="hljs-keyword">const</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..}, { strict: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> Thing({ iAmNotInTheSchema: <span class="hljs-literal">true</span> });
 thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is now saved to the db!!</span></code></pre>
 <p>This also affects the use of <code>doc.set()</code> to set a property value.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
-<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
-<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing;
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
+<span class="hljs-keyword">const</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> Thing;
 thing.set(<span class="hljs-string">'iAmNotInTheSchema'</span>, <span class="hljs-literal">true</span>);
 thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is not saved to the db</span></code></pre>
 <p>This value can be overridden at the model instance level by passing a second
 boolean argument:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>);
-<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing(doc, <span class="hljs-literal">true</span>);  <span class="hljs-comment">// enables strict mode</span>
-<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing(doc, <span class="hljs-literal">false</span>); <span class="hljs-comment">// disables strict mode</span></code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>);
+<span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> Thing(doc, <span class="hljs-literal">true</span>);  <span class="hljs-comment">// enables strict mode</span>
+<span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> Thing(doc, <span class="hljs-literal">false</span>); <span class="hljs-comment">// disables strict mode</span></code></pre>
 <p>The <code>strict</code> option may also be set to <code>&quot;throw&quot;</code> which will cause errors
 to be produced instead of dropping the bad data.</p>
 <p><em>NOTE: Any key/val set on the instance that does not exist in your schema
 is always ignored, regardless of schema option.</em></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
-<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
-<span class="hljs-keyword">var</span> thing = <span class="hljs-keyword">new</span> Thing;
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> thingSchema = <span class="hljs-keyword">new</span> Schema({..})
+<span class="hljs-keyword">const</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, thingSchema);
+<span class="hljs-keyword">const</span> thing = <span class="hljs-keyword">new</span> Thing;
 thing.iAmNotInTheSchema = <span class="hljs-literal">true</span>;
 thing.save(); <span class="hljs-comment">// iAmNotInTheSchema is never saved to the db</span></code></pre>
 <h3 id="strictQuery"><a href="#strictQuery">option: strictQuery</a></h3>
@@ -597,13 +597,13 @@ MyModel.find({ notInSchema: <span class="hljs-number">1</span> });</code></pre>
 
 <p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when
 the document&#39;s <code>toJSON</code> method is called.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
 schema.path(<span class="hljs-string">'name'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">v</span>) </span>{
   <span class="hljs-keyword">return</span> v + <span class="hljs-string">' is my name'</span>;
 });
 schema.set(<span class="hljs-string">'toJSON'</span>, { getters: <span class="hljs-literal">true</span>, virtuals: <span class="hljs-literal">false</span> });
-<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-string">'Max Headroom'</span> });
+<span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-string">'Max Headroom'</span> });
 <span class="hljs-built_in">console</span>.log(m.toObject()); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }</span>
 <span class="hljs-built_in">console</span>.log(m.toJSON()); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
 <span class="hljs-comment">// since we know toJSON is called whenever a js object is stringified:</span>
@@ -618,13 +618,13 @@ per-document basis, we may declare the options at the schema level and have
 them applied to all of the schema&#39;s documents by default.</p>
 <p>To have all virtuals show up in your <code>console.log</code> output, set the
 <code>toObject</code> option to <code>{ getters: true }</code>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
-schema.path(<span class="hljs-string">'name'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">v</span>) </span>{
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+schema.path(<span class="hljs-string">'name'</span>).get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>) </span>{
   <span class="hljs-keyword">return</span> v + <span class="hljs-string">' is my name'</span>;
 });
 schema.set(<span class="hljs-string">'toObject'</span>, { getters: <span class="hljs-literal">true</span> });
-<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-string">'Max Headroom'</span> });
+<span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-string">'Max Headroom'</span> });
 <span class="hljs-built_in">console</span>.log(m); <span class="hljs-comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span></code></pre>
 <p>To see all available <code>toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p>
 <h3 id="typeKey"><a href="#typeKey">option: typeKey</a></h3>
@@ -632,11 +632,11 @@ schema.set(<span class="hljs-string">'toObject'</span>, { getters: <span class="
 <p>By default, if you have an object with key &#39;type&#39; in your schema, mongoose
 will interpret it as a type declaration.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Mongoose interprets this as 'loc is a String'</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ loc: { type: <span class="hljs-built_in">String</span>, coordinates: [<span class="hljs-built_in">Number</span>] } });</code></pre>
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ loc: { type: <span class="hljs-built_in">String</span>, coordinates: [<span class="hljs-built_in">Number</span>] } });</code></pre>
 <p>However, for applications like <a href="http://docs.mongodb.org/manual/reference/geojson/">geoJSON</a>,
 the &#39;type&#39; property is important. If you want to control which key mongoose
 uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-comment">// Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'</span>
   loc: { type: <span class="hljs-built_in">String</span>, coordinates: [<span class="hljs-built_in">Number</span>] },
   <span class="hljs-comment">// Mongoose interprets this as 'name is a String'</span>
@@ -648,13 +648,13 @@ uses to find type declarations, set the &#39;typeKey&#39; schema option.</p>
 the database. This is to prevent saving an invalid document. If you want to
 handle validation manually, and be able to save objects which don&#39;t pass
 validation, you can set <code>validateBeforeSave</code> to false.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
 schema.set(<span class="hljs-string">'validateBeforeSave'</span>, <span class="hljs-literal">false</span>);
 schema.path(<span class="hljs-string">'name'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
     <span class="hljs-keyword">return</span> value != <span class="hljs-literal">null</span>;
 });
-<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-literal">null</span> });
+<span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M({ name: <span class="hljs-literal">null</span> });
 m.validate(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
     <span class="hljs-built_in">console</span>.log(err); <span class="hljs-comment">// Will tell you that null is not allowed.</span>
 });
@@ -775,17 +775,17 @@ house.status = <span class="hljs-string">'APPROVED'</span>;
 
 <p>Sets a default <a href="https://docs.mongodb.com/manual/reference/collation/">collation</a>
 for every query and aggregation. <a href="http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">Here&#39;s a beginner-friendly overview of collations</a>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   name: <span class="hljs-built_in">String</span>
 }, { collation: { locale: <span class="hljs-string">'en_US'</span>, strength: <span class="hljs-number">1</span> } });
 
-<span class="hljs-keyword">var</span> MyModel = db.model(<span class="hljs-string">'MyModel'</span>, schema);
+<span class="hljs-keyword">const</span> MyModel = db.model(<span class="hljs-string">'MyModel'</span>, schema);
 
 MyModel.create([{ name: <span class="hljs-string">'val'</span> }, { name: <span class="hljs-string">'Val'</span> }]).
-  then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  then(() =&gt; {
     <span class="hljs-keyword">return</span> MyModel.find({ name: <span class="hljs-string">'val'</span> });
   }).
-  then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">docs</span>) </span>{
+  then((docs) =&gt; {
     <span class="hljs-comment">// `docs` will contain both docs, because `strength: 1` means</span>
     <span class="hljs-comment">// MongoDB will ignore case when matching.</span>
   });</code></pre>
@@ -854,27 +854,27 @@ the current time.</p>
 <p>Write operations like <code>update()</code>, <code>updateOne()</code>, <code>updateMany()</code>,
 and <code>findOneAndUpdate()</code> only check the top-level
 schema&#39;s strict mode setting.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
-<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema }, { strict: <span class="hljs-string">'throw'</span> });
-<span class="hljs-keyword">var</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
-Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
+<span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema }, { strict: <span class="hljs-string">'throw'</span> });
+<span class="hljs-keyword">const</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
+Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, (error) =&gt; {
   <span class="hljs-comment">// Error because parentSchema has `strict: throw`, even though</span>
   <span class="hljs-comment">// `childSchema` has `strict: false`</span>
 });
 
-<span class="hljs-keyword">var</span> update = { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> };
-<span class="hljs-keyword">var</span> opts = { strict: <span class="hljs-literal">false</span> };
+<span class="hljs-keyword">const</span> update = { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> };
+<span class="hljs-keyword">const</span> opts = { strict: <span class="hljs-literal">false</span> };
 Parent.update({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// This works because passing `strict: false` to `update()` overwrites</span>
   <span class="hljs-comment">// the parent schema.</span>
 });</code></pre>
-<p>If you set <code>useNestedStrict</code> to true, mongoose will use the child schema&#39;s
+<p>If you set <code>useNconstestedStrict</code> to true, mongoose will use the child schema&#39;s
 <code>strict</code> option for casting updates.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
 <span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema },
   { strict: <span class="hljs-string">'throw'</span>, useNestedStrict: <span class="hljs-literal">true</span> });
-<span class="hljs-keyword">var</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
-Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+<span class="hljs-keyword">const</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
+Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, error =&gt; {
   <span class="hljs-comment">// Works!</span>
 });</code></pre>
 <h3 id="selectPopulatedPaths">

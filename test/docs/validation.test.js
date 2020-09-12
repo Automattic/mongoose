@@ -1,12 +1,12 @@
 'use strict';
-var assert = require('assert');
-var mongoose = require('../../');
+const assert = require('assert');
+const mongoose = require('../../');
 
-var Promise = global.Promise || require('bluebird');
+const Promise = global.Promise || require('bluebird');
 
 describe('validation docs', function() {
-  var db;
-  var Schema = mongoose.Schema;
+  let db;
+  let Schema = mongoose.Schema;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
@@ -32,16 +32,16 @@ describe('validation docs', function() {
    */
 
   it('Validation', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       name: {
         type: String,
         required: true
       }
     });
-    var Cat = db.model('Cat', schema);
+    const Cat = db.model('Cat', schema);
 
     // This cat has no name :(
-    var cat = new Cat();
+    const cat = new Cat();
     cat.save(function(error) {
       assert.equal(error.errors['name'].message,
         'Path `name` is required.');
@@ -66,7 +66,7 @@ describe('validation docs', function() {
    */
 
   it('Built-in Validators', function(done) {
-    var breakfastSchema = new Schema({
+    const breakfastSchema = new Schema({
       eggs: {
         type: Number,
         min: [6, 'Too few eggs'],
@@ -84,14 +84,14 @@ describe('validation docs', function() {
         }
       }
     });
-    var Breakfast = db.model('Breakfast', breakfastSchema);
+    const Breakfast = db.model('Breakfast', breakfastSchema);
 
-    var badBreakfast = new Breakfast({
+    const badBreakfast = new Breakfast({
       eggs: 2,
       bacon: 0,
       drink: 'Milk'
     });
-    var error = badBreakfast.validateSync();
+    let error = badBreakfast.validateSync();
     assert.equal(error.errors['eggs'].message,
       'Too few eggs');
     assert.ok(!error.errors['bacon']);
@@ -171,7 +171,7 @@ describe('validation docs', function() {
    * [`SchemaType#validate()` API docs](./api.html#schematype_SchemaType-validate).
    */
   it('Custom Validators', function(done) {
-    var userSchema = new Schema({
+    const userSchema = new Schema({
       phone: {
         type: String,
         validate: {
@@ -184,9 +184,9 @@ describe('validation docs', function() {
       }
     });
 
-    var User = db.model('user', userSchema);
-    var user = new User();
-    var error;
+    const User = db.model('user', userSchema);
+    const user = new User();
+    let error;
 
     user.phone = '555.0123';
     error = user.validateSync();
@@ -259,12 +259,12 @@ describe('validation docs', function() {
    */
 
   it('Validation Errors', function(done) {
-    var toySchema = new Schema({
+    const toySchema = new Schema({
       color: String,
       name: String
     });
 
-    var validator = function(value) {
+    const validator = function(value) {
       return /red|white|gold/i.test(value);
     };
     toySchema.path('color').validate(validator,
@@ -276,9 +276,9 @@ describe('validation docs', function() {
       return true;
     }, 'Name `{VALUE}` is not valid');
 
-    var Toy = db.model('Toy', toySchema);
+    const Toy = db.model('Toy', toySchema);
 
-    var toy = new Toy({ color: 'Green', name: 'Power Ranger' });
+    const toy = new Toy({ color: 'Green', name: 'Power Ranger' });
 
     toy.save(function (err) {
       // `err` is a ValidationError object
@@ -342,7 +342,7 @@ describe('validation docs', function() {
    */
 
   it('Required Validators On Nested Objects', function(done) {
-    var personSchema = new Schema({
+    let personSchema = new Schema({
       name: {
         first: String,
         last: String
@@ -355,7 +355,7 @@ describe('validation docs', function() {
     }, /Cannot.*'required'/);
 
     // To make a nested object required, use a single nested schema
-    var nameSchema = new Schema({
+    const nameSchema = new Schema({
       first: String,
       last: String
     });
@@ -367,10 +367,10 @@ describe('validation docs', function() {
       }
     });
 
-    var Person = db.model('Person', personSchema);
+    const Person = db.model('Person', personSchema);
 
-    var person = new Person();
-    var error = person.validateSync();
+    const person = new Person();
+    const error = person.validateSync();
     assert.ok(error.errors['name']);
     // acquit:ignore:start
     done();
@@ -392,18 +392,18 @@ describe('validation docs', function() {
    * caveats.
    */
   it('Update Validators', function(done) {
-    var toySchema = new Schema({
+    const toySchema = new Schema({
       color: String,
       name: String
     });
 
-    var Toy = db.model('Toys', toySchema);
+    const Toy = db.model('Toys', toySchema);
 
     Toy.schema.path('color').validate(function (value) {
       return /red|green|blue/i.test(value);
     }, 'Invalid color');
 
-    var opts = { runValidators: true };
+    const opts = { runValidators: true };
     Toy.updateOne({}, { color: 'not a color' }, opts, function (err) {
       assert.equal(err.errors.color.message,
         'Invalid color');
@@ -423,7 +423,7 @@ describe('validation docs', function() {
    */
 
   it('Update Validators and `this`', function(done) {
-    var toySchema = new Schema({
+    const toySchema = new Schema({
       color: String,
       name: String
     });
@@ -438,14 +438,14 @@ describe('validation docs', function() {
       return true;
     });
 
-    var Toy = db.model('ActionFigure', toySchema);
+    const Toy = db.model('ActionFigure', toySchema);
 
-    var toy = new Toy({ color: 'red', name: 'Red Power Ranger' });
-    var error = toy.validateSync();
+    const toy = new Toy({ color: 'red', name: 'Red Power Ranger' });
+    const error = toy.validateSync();
     assert.ok(error.errors['color']);
 
-    var update = { color: 'red', name: 'Red Power Ranger' };
-    var opts = { runValidators: true };
+    const update = { color: 'red', name: 'Red Power Ranger' };
+    const opts = { runValidators: true };
 
     Toy.updateOne({}, update, opts, function(error) {
       // The update validator throws an error:
@@ -466,7 +466,7 @@ describe('validation docs', function() {
 
   it('The `context` option', function(done) {
     // acquit:ignore:start
-    var toySchema = new Schema({
+    const toySchema = new Schema({
       color: String,
       name: String
     });
@@ -480,11 +480,11 @@ describe('validation docs', function() {
       return true;
     });
 
-    var Toy = db.model('Figure', toySchema);
+    const Toy = db.model('Figure', toySchema);
 
-    var update = { color: 'blue', name: 'Red Power Ranger' };
+    const update = { color: 'blue', name: 'Red Power Ranger' };
     // Note the context option
-    var opts = { runValidators: true, context: 'query' };
+    const opts = { runValidators: true, context: 'query' };
 
     Toy.updateOne({}, update, opts, function(error) {
       assert.ok(error.errors['color']);
@@ -506,17 +506,17 @@ describe('validation docs', function() {
 
   it('Update Validators Only Run On Updated Paths', function(done) {
     // acquit:ignore:start
-    var outstanding = 2;
+    let outstanding = 2;
     // acquit:ignore:end
-    var kittenSchema = new Schema({
+    const kittenSchema = new Schema({
       name: { type: String, required: true },
       age: Number
     });
 
-    var Kitten = db.model('Kitten', kittenSchema);
+    const Kitten = db.model('Kitten', kittenSchema);
 
-    var update = { color: 'blue' };
-    var opts = { runValidators: true };
+    const update = { color: 'blue' };
+    const opts = { runValidators: true };
     Kitten.updateOne({}, update, opts, function(err) {
       // Operation succeeds despite the fact that 'name' is not specified
       // acquit:ignore:start
@@ -524,7 +524,7 @@ describe('validation docs', function() {
       // acquit:ignore:end
     });
 
-    var unset = { $unset: { name: 1 } };
+    const unset = { $unset: { name: 1 } };
     Kitten.updateOne({}, unset, opts, function(err) {
       // Operation fails because 'name' is required
       assert.ok(err);
@@ -555,7 +555,7 @@ describe('validation docs', function() {
    */
 
   it('Update Validators Only Run For Some Operations', function(done) {
-    var testSchema = new Schema({
+    const testSchema = new Schema({
       number: { type: Number, max: 0 },
       arr: [{ message: { type: String, maxlength: 10 } }]
     });
@@ -566,10 +566,10 @@ describe('validation docs', function() {
       return v.length < 2;
     });
 
-    var Test = db.model('Test', testSchema);
+    const Test = db.model('Test', testSchema);
 
-    var update = { $inc: { number: 1 } };
-    var opts = { runValidators: true };
+    let update = { $inc: { number: 1 } };
+    const opts = { runValidators: true };
     Test.updateOne({}, update, opts, function(error) {
       // There will never be a validation error here
       update = { $push: [{ message: 'hello' }, { message: 'world' }] };
@@ -589,22 +589,22 @@ describe('validation docs', function() {
    */
 
   it('On $push and $addToSet', function(done) {
-    var testSchema = new Schema({
+    const testSchema = new Schema({
       numbers: [{ type: Number, max: 0 }],
       docs: [{
         name: { type: String, required: true }
       }]
     });
 
-    var Test = db.model('TestPush', testSchema);
+    const Test = db.model('TestPush', testSchema);
 
-    var update = {
+    const update = {
       $push: {
         numbers: 1,
         docs: { name: null }
       }
     };
-    var opts = { runValidators: true };
+    const opts = { runValidators: true };
     Test.updateOne({}, update, opts, function(error) {
       assert.ok(error.errors['numbers']);
       assert.ok(error.errors['docs']);

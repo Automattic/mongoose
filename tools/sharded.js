@@ -3,10 +3,10 @@
 const co = require('co');
 
 co(function*() {
-  var Sharded = require('mongodb-topology-manager').Sharded;
+  const Sharded = require('mongodb-topology-manager').Sharded;
 
   // Create new instance
-  var topology = new Sharded({
+  const topology = new Sharded({
     mongod: 'mongod',
     mongos: 'mongos'
   });

@@ -430,7 +430,7 @@ block content
     Say you have a user schema which keeps track of the user's friends.
 
     ```javascript
-    var userSchema = new Schema({
+    const userSchema = new Schema({
       name: String,
       friends: [{ type: ObjectId, ref: 'User' }]
     });

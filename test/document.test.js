@@ -9354,4 +9354,45 @@ describe('document', function() {
 
     assert.equal(p.nested.test, 'new');
   });
+
+  it('marks path as errored if default function throws (gh-9408)', function() {
+    const jobSchema = new Schema({
+      deliveryAt: Date,
+      subJob: [{
+        deliveryAt: Date,
+        shippingAt: {
+          type: Date,
+          default: () => { throw new Error('Oops!'); }
+        },
+        prop: { type: String, default: 'default' }
+      }]
+    });
+
+    const Job = db.model('Test', jobSchema);
+
+    const doc = new Job({ subJob: [{ deliveryAt: new Date() }] });
+    assert.equal(doc.subJob[0].prop, 'default');
+  });
+
+  it('passes subdoc with initial values set to default function when init-ing (gh-9408)', function() {
+    const jobSchema = new Schema({
+      deliveryAt: Date,
+      subJob: [{
+        deliveryAt: Date,
+        shippingAt: {
+          type: Date,
+          default: function() {
+            return this.deliveryAt;
+          }
+        }
+      }]
+    });
+
+    const Job = db.model('Test', jobSchema);
+
+    const date = new Date();
+    const doc = new Job({ subJob: [{ deliveryAt: date }] });
+
+    assert.equal(doc.subJob[0].shippingAt.valueOf(), date.valueOf());
+  });
 });

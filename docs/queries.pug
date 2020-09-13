@@ -62,7 +62,7 @@ block content
     When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
 
     ```javascript
-    var Person = mongoose.model('Person', yourSchema);
+    const Person = mongoose.model('Person', yourSchema);
 
     // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
     Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
@@ -83,7 +83,7 @@ block content
 
     ```javascript
     // find each person with a last name matching 'Ghost'
-    var query = Person.findOne({ 'name.last': 'Ghost' });
+    const query = Person.findOne({ 'name.last': 'Ghost' });
 
     // selecting the `name` and `occupation` fields
     query.select('name occupation');

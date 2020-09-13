@@ -27,24 +27,24 @@ describe('defaults docs', function () {
    * strictly `undefined`.
    */
   it('Declaring defaults in your schema', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       name: String,
       role: { type: String, default: 'guitarist' }
     });
 
-    var Person = db.model('Person', schema);
+    const Person = db.model('Person', schema);
 
-    var axl = new Person({ name: 'Axl Rose', role: 'singer' });
+    const axl = new Person({ name: 'Axl Rose', role: 'singer' });
     assert.equal(axl.role, 'singer');
 
-    var slash = new Person({ name: 'Slash' });
+    const slash = new Person({ name: 'Slash' });
     assert.equal(slash.role, 'guitarist');
 
-    var izzy = new Person({ name: 'Izzy', role: undefined });
+    const izzy = new Person({ name: 'Izzy', role: undefined });
     assert.equal(izzy.role, 'guitarist');
 
     // Defaults do **not** run on `null`, `''`, or value other than `undefined`.
-    var foo = new Person({ name: 'Bar', role: null });
+    const foo = new Person({ name: 'Bar', role: null });
     assert.strictEqual(foo.role, null);
 
     Person.create(axl, slash, function(error) {
@@ -65,7 +65,7 @@ describe('defaults docs', function () {
    * execute that function and use the return value as the default.
    */
   it('Default functions', function() {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String,
       date: {
         type: Date,
@@ -74,9 +74,9 @@ describe('defaults docs', function () {
       }
     });
 
-    var BlogPost = db.model('BlogPost', schema);
+    const BlogPost = db.model('BlogPost', schema);
 
-    var post = new BlogPost({title: '5 Best Arnold Schwarzenegger Movies'});
+    const post = new BlogPost({title: '5 Best Arnold Schwarzenegger Movies'});
 
     // The post has a default Date set to now
     assert.ok(post.date.getTime() >= Date.now() - 1000);
@@ -97,16 +97,16 @@ describe('defaults docs', function () {
    * using MongoDB server < 2.4.0, do **not** use `setDefaultsOnInsert`.
    */
   it('The `setDefaultsOnInsert` option', function(done) {
-    var schema = new Schema({
+    const schema = new Schema({
       title: String,
       genre: {type: String, default: 'Action'}
     });
 
-    var Movie = db.model('Movie', schema);
+    const Movie = db.model('Movie', schema);
 
-    var query = {};
-    var update = {title: 'The Terminator'};
-    var options = {
+    const query = {};
+    const update = {title: 'The Terminator'};
+    const options = {
       // Return the document after updates are applied
       new: true,
       // Create a document if one isn't found. Required

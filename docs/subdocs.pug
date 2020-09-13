@@ -27,9 +27,9 @@ block content
     distinct notions of subdocuments: [arrays of subdocuments](https://masteringjs.io/tutorials/mongoose/array#document-arrays) and single nested
     subdocuments.
     ```javascript
-    var childSchema = new Schema({ name: 'string' });
+    const childSchema = new Schema({ name: 'string' });
 
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       // Array of subdocuments
       children: [childSchema],
       // Single nested subdocuments. Caveat: single nested subdocs only work
@@ -62,8 +62,8 @@ block content
     not saved individually, they are saved whenever their top-level parent
     document is saved.
     ```javascript
-    var Parent = mongoose.model('Parent', parentSchema);
-    var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+    const Parent = mongoose.model('Parent', parentSchema);
+    const parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
     parent.children[0].name = 'Matthew';
 
     // `parent.children[0].save()` is a no-op, it triggers middleware but
@@ -85,7 +85,7 @@ block content
       next();
     });
 
-    var parent = new Parent({ children: [{ name: 'invalid' }] });
+    const parent = new Parent({ children: [{ name: 'invalid' }] });
     parent.save(function (err) {
       console.log(err.message) // #sadpanda
     });
@@ -98,7 +98,7 @@ block content
 
     ```javascript
     // Below code will print out 1-4 in order
-    var childSchema = new mongoose.Schema({ name: 'string' });
+    const childSchema = new mongoose.Schema({ name: 'string' });
 
     childSchema.pre('validate', function(next) {
       console.log('2');
@@ -110,7 +110,7 @@ block content
       next();
     });
 
-    var parentSchema = new mongoose.Schema({
+    const parentSchema = new mongoose.Schema({
       child: childSchema
     });
 
@@ -184,7 +184,7 @@ block content
     special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
     for searching a document array to find a document with a given `_id`.
     ```javascript
-    var doc = parent.children.id(_id);
+    const doc = parent.children.id(_id);
     ```
   h3#adding-subdocs-to-arrays Adding Subdocs to Arrays
   :markdown
@@ -194,12 +194,12 @@ block content
     [addToSet](./api.html#mongoosearray_MongooseArray-addToSet),
     and others cast arguments to their proper types transparently:
     ```javascript
-    var Parent = mongoose.model('Parent');
-    var parent = new Parent;
+    const Parent = mongoose.model('Parent');
+    const parent = new Parent;
 
     // create a comment
     parent.children.push({ name: 'Liesl' });
-    var subdoc = parent.children[0];
+    const subdoc = parent.children[0];
     console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
     subdoc.isNew; // true
 
@@ -213,7 +213,7 @@ block content
     [create](./api.html#types_documentarray_MongooseDocumentArray.create)
     method of MongooseArrays.
     ```javascript
-    var newdoc = parent.children.create({ name: 'Aaron' });
+    const newdoc = parent.children.create({ name: 'Aaron' });
     ```
   h3#removing-subdocs Removing Subdocs
   :markdown
@@ -280,11 +280,11 @@ block content
     convert the object to a schema for you:
 
     ```javascript
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       children: [{ name: 'string' }]
     });
     // Equivalent
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       children: [new Schema({ name: 'string' })]
     });
     ```

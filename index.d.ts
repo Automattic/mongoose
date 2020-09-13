@@ -29,8 +29,41 @@ declare module "mongoose" {
 
   class Document {}
 
-  class Model<T> extends Document {
-    constructor(obj?: any);
+  export var Model: Model<any>;
+  interface Model<T extends Document> {
+    new(doc?: any): T;
+
+    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
+    save(options?: SaveOptions): Promise<this>;
+    save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
+    save(fn?: (err: Error | null, doc: this) => void): void;
+
+    /** Base Mongoose instance the model uses. */
+    base: typeof mongoose;
+
+    /**
+     * If this is a discriminator model, `baseModelName` is the name of
+     * the base model.
+     */
+    baseModelName: string | undefined;
+
+    /** Registered discriminators for this model. */
+    discriminators: { [name: string]: Model<any> } | undefined;
+
+    /** Translate any aliases fields/conditions so the final query or document object is pure */
+    translateAliases(raw: any): any;
+
+    remove(filter?: any, callback?: (err: Error | null) => void): Query<T>;
+  }
+
+  interface SaveOptions {
+    checkKeys?: boolean;
+    validateBeforeSave?: boolean;
+    validateModifiedOnly?: boolean;
+    timestamps?: boolean;
+    j?: boolean;
+    w?: number | string;
+    wtimeout?: number;
   }
 
   class Schema {
@@ -46,5 +79,9 @@ declare module "mongoose" {
 
   interface SchemaTypeOptions<T> {
     type?: T;
+  }
+
+  interface Query<T extends Document> {
+    exec(callback?: (err: Error | null, res: T) => void): Promise<T>;
   }
 }

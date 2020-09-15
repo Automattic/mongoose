@@ -463,6 +463,31 @@ block content
     [perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
     mind that populate() will execute a separate query for each document.
 
+    <hr id="duplicate-query" />
+
+    <a href="#duplicate-query">**Q**</a>. My query/update seems to execute twice. Why is this happening?
+
+    **A**. The most common cause of duplicate queries is **mixing callbacks and promises with queries**.
+    That's because passing a callback to a query function, like `find()` or `updateOne()`,
+    immediately executes the query, and calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then)
+    executes the query again.
+
+    Mixing promises and callbacks can lead to duplicate entries in arrays.
+    For example, the below code inserts 2 entries into the `tags` array, **not* just 1.
+
+    ```javascript
+    const BlogPost = mongoose.model('BlogPost', new Schema({
+      title: String,
+      tags: [String]
+    }));
+
+    // Because there's both `await` **and** a callback, this `updateOne()` executes twice
+    // and thus pushes the same string into `tags` twice.
+    const update = { $push: { tags: ['javascript'] } };
+    await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, res) => {
+      console.log(res);
+    });
+    ```
 
     <hr id="add_something" />
 

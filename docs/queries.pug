@@ -154,7 +154,26 @@ block content
     ```
 
     Don't mix using callbacks and promises with queries, or you may end up
-    with duplicate operations.
+    with duplicate operations. That's because passing a callback to a query function
+    immediately executes the query, and calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then)
+    executes the query again.
+
+    Mixing promises and callbacks can lead to duplicate entries in arrays.
+    For example, the below code inserts 2 entries into the `tags` array, **not* just 1.
+
+    ```javascript
+    const BlogPost = mongoose.model('BlogPost', new Schema({
+      title: String,
+      tags: [String]
+    }));
+
+    // Because there's both `await` **and** a callback, this `updateOne()` executes twice
+    // and thus pushes the same string into `tags` twice.
+    const update = { $push: { tags: ['javascript'] } };
+    await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, res) => {
+      console.log(res);
+    });
+    ```
 
     <h3 id="refs"><a href="#refs">References to other documents</a></h3>
 

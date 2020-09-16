@@ -47,8 +47,8 @@ block content
     for you.
 
     ```javascript
-    var schema = new mongoose.Schema({ name: 'string', size: 'string' });
-    var Tank = mongoose.model('Tank', schema);
+    const schema = new mongoose.Schema({ name: 'string', size: 'string' });
+    const Tank = mongoose.model('Tank', schema);
     ```
   :markdown
     The first argument is the _singular_ name of the collection your model is
@@ -66,9 +66,9 @@ block content
     them and saving to the database is easy.
 
     ```javascript
-    var Tank = mongoose.model('Tank', yourSchema);
+    const Tank = mongoose.model('Tank', yourSchema);
 
-    var small = new Tank({ size: 'small' });
+    const small = new Tank({ size: 'small' });
     small.save(function (err) {
       if (err) return handleError(err);
       // saved!
@@ -97,8 +97,8 @@ block content
     If you create a custom connection, use that connection's `model()` function
     instead.
     ```javascript
-    var connection = mongoose.createConnection('mongodb://localhost:27017/test');
-    var Tank = connection.model('Tank', yourSchema);
+    const connection = mongoose.createConnection('mongodb://localhost:27017/test');
+    const Tank = connection.model('Tank', yourSchema);
     ```
   h3(id="querying") Querying
   :markdown

@@ -1,11 +1,11 @@
 'use strict';
-var PromiseProvider = require('../../lib/promise_provider');
-var assert = require('assert');
-var mongoose = require('../../');
+const PromiseProvider = require('../../lib/promise_provider');
+const assert = require('assert');
+const mongoose = require('../../');
 
 describe('promises docs', function () {
-  var Band;
-  var db;
+  let Band;
+  let db;
 
   before(function (done) {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
@@ -35,12 +35,12 @@ describe('promises docs', function () {
    * You can also read more about [promises in Mongoose](https://masteringjs.io/tutorials/mongoose/promise).
    */
   it('Built-in Promises', function (done) {
-    var gnr = new Band({
+    const gnr = new Band({
       name: "Guns N' Roses",
       members: ['Axl', 'Slash']
     });
 
-    var promise = gnr.save();
+    const promise = gnr.save();
     assert.ok(promise instanceof Promise);
 
     promise.then(function (doc) {
@@ -58,11 +58,11 @@ describe('promises docs', function () {
    * a fully-fledged promise, use the `.exec()` function.
    */
   it('Queries are not promises', function (done) {
-    var query = Band.findOne({name: "Guns N' Roses"});
+    const query = Band.findOne({name: "Guns N' Roses"});
     assert.ok(!(query instanceof Promise));
 
     // acquit:ignore:start
-    var outstanding = 2;
+    let outstanding = 2;
     // acquit:ignore:end
 
     // A query is not a fully-fledged promise, but it does have a `.then()`.
@@ -75,7 +75,7 @@ describe('promises docs', function () {
     });
 
     // `.exec()` gives you a fully-fledged promise
-    var promise = query.exec();
+    const promise = query.exec();
     assert.ok(promise instanceof Promise);
 
     promise.then(function (doc) {
@@ -166,7 +166,7 @@ describe('promises docs', function () {
       return done();
     }
     // acquit:ignore:end
-    var query = Band.findOne({name: "Guns N' Roses"});
+    const query = Band.findOne({name: "Guns N' Roses"});
 
     // Use bluebird
     mongoose.Promise = require('bluebird');

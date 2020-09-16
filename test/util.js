@@ -8,6 +8,11 @@ exports.clearTestData = function clearTestData(db) {
   const arr = [];
 
   for (const model of Object.keys(db.models)) {
+    const Model = db.models[model];
+    if (Model.baseModelName != null) {
+      // Skip discriminators
+      continue;
+    }
     arr.push(db.models[model].deleteMany({}));
     arr.push(db.models[model].collection.dropIndexes().catch(() => {}));
   }

@@ -179,7 +179,7 @@ block content
     to them.
 
     ```javascript
-      var Animal = mongoose.model('Animal', animalSchema);
+      const Animal = mongoose.model('Animal', animalSchema);
       const dog = new Animal({ type: 'dog' });
 
       dog.findSimilarTypes((err, dogs) => {
@@ -492,7 +492,7 @@ block content
     to false.
 
     ```javascript
-    var schema = new Schema({..}, { bufferCommands: false });
+    const schema = new Schema({..}, { bufferCommands: false });
     ```
 
     The schema `bufferCommands` option overrides the global `bufferCommands` option.
@@ -550,7 +550,7 @@ block content
 
     // disabled id
     const schema = new Schema({ name: String }, { id: false });
-    var Page = mongoose.model('Page', schema);
+    const Page = mongoose.model('Page', schema);
     const p = new Page({ name: 'mongodb.org' });
     console.log(p.id); // undefined
     ```
@@ -1135,7 +1135,7 @@ block content
 
     ```javascript
     const childSchema = new Schema({}, { strict: false });
-    var parentSchema = new Schema({ child: childSchema },
+    const parentSchema = new Schema({ child: childSchema },
       { strict: 'throw', useNestedStrict: true });
     const Parent = mongoose.model('Parent', parentSchema);
     Parent.update({}, { 'child.name': 'Luke Skywalker' }, error => {

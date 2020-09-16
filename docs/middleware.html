@@ -86,7 +86,7 @@ This means that both <code>doc.updateOne()</code> and <code>Model.updateOne()</c
 
 <p>Pre middleware functions are executed one after another, when each
 middleware calls <code>next</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema(..);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema(..);
 schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
   <span class="hljs-comment">// do stuff</span>
   next();
@@ -106,7 +106,7 @@ schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-keyword">a
 <p>If you use <code>next()</code>, the <code>next()</code> call does <strong>not</strong> stop the rest of the code in your middleware function from executing. Use
 <a href="https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm">the early <code>return</code> pattern</a>
 to prevent the rest of your middleware function from running when you call <code>next()</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema(..);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema(..);
 schema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
   <span class="hljs-keyword">if</span> (foo()) {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'calling next!'</span>);
@@ -339,7 +339,7 @@ errors and making error messages more readable.</p>
 <p>Error handling middleware is defined as middleware that takes one extra
 parameter: the &#39;error&#39; that occurred as the first parameter to the function.
 Error handling middleware can then transform the error however you want.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   name: {
     type: <span class="hljs-built_in">String</span>,
     <span class="hljs-comment">// Will trigger a MongoError with code 11000 when</span>
@@ -375,7 +375,7 @@ schema.post(<span class="hljs-string">'update'</span>, <span class="hljs-functio
   }
 });
 
-<span class="hljs-keyword">var</span> people = [{ name: <span class="hljs-string">'Axl Rose'</span> }, { name: <span class="hljs-string">'Slash'</span> }];
+<span class="hljs-keyword">const</span> people = [{ name: <span class="hljs-string">'Axl Rose'</span> }, { name: <span class="hljs-string">'Slash'</span> }];
 Person.create(people, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   Person.update({ name: <span class="hljs-string">'Slash'</span> }, { $set: { name: <span class="hljs-string">'Axl Rose'</span> } }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
     <span class="hljs-comment">// `error.message` will be "There was a duplicate key error"</span>

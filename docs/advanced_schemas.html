@@ -37,7 +37,7 @@ to virtuals.</p>
 }
 
 schema.loadClass(PersonClass);
-<span class="hljs-keyword">var</span> Person = db.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">const</span> Person = db.model(<span class="hljs-string">'Person'</span>, schema);
 
 Person.create({ firstName: <span class="hljs-string">'Jon'</span>, lastName: <span class="hljs-string">'Snow'</span> }).
   then(doc =&gt; {

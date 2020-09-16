@@ -42,8 +42,8 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> mongoose2 = <span class="hljs-keyword">new</span> mongoose.Mongoose();</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Number"><a href="#mongoose_Mongoose-Number">Mongoose.prototype.Number</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Number <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that Mongoose should cast to numbers.</p>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> mongoose2 = <span class="hljs-keyword">new</span> mongoose.Mongoose();</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Number"><a href="#mongoose_Mongoose-Number">Mongoose.prototype.Number</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Number <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that Mongoose should cast to numbers.</p>
 
 <h4>Example:</h4>
 
@@ -57,9 +57,9 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> Schema = mongoose.Schema;
-<span class="hljs-keyword">var</span> CatSchema = <span class="hljs-keyword">new</span> Schema(..);</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaType"><a href="#mongoose_Mongoose-SchemaType">Mongoose.prototype.SchemaType()</a></h3><div><p>The Mongoose <a href="#schematype_SchemaType">SchemaType</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypeOptions"><a href="#mongoose_Mongoose-SchemaTypeOptions">Mongoose.prototype.SchemaTypeOptions()</a></h3><div><p>The constructor used for schematype options</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypes"><a href="#mongoose_Mongoose-SchemaTypes">Mongoose.prototype.SchemaTypes</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The various Mongoose SchemaTypes.</p>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> Schema = mongoose.Schema;
+<span class="hljs-keyword">const</span> CatSchema = <span class="hljs-keyword">new</span> Schema(..);</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaType"><a href="#mongoose_Mongoose-SchemaType">Mongoose.prototype.SchemaType()</a></h3><div><p>The Mongoose <a href="#schematype_SchemaType">SchemaType</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypeOptions"><a href="#mongoose_Mongoose-SchemaTypeOptions">Mongoose.prototype.SchemaTypeOptions()</a></h3><div><p>The constructor used for schematype options</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypes"><a href="#mongoose_Mongoose-SchemaTypes">Mongoose.prototype.SchemaTypes</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The various Mongoose SchemaTypes.</p>
 
 <h4>Note:</h4>
 
@@ -67,8 +67,8 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> array = mongoose.Types.Array;</code></pre>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> array = mongoose.Types.Array;</code></pre>
 
 <h4>Types:</h4>
 
@@ -82,8 +82,8 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <p>Using this exposed access to the <code>ObjectId</code> type, we can construct ids on demand.</p>
 
-<pre><code><span class="hljs-keyword">var</span> ObjectId = mongoose.Types.ObjectId;
-<span class="hljs-keyword">var</span> id1 = <span class="hljs-keyword">new</span> ObjectId;</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-VirtualType"><a href="#mongoose_Mongoose-VirtualType">Mongoose.prototype.VirtualType()</a></h3><div><p>The Mongoose <a href="#virtualtype_VirtualType">VirtualType</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connect"><a href="#mongoose_Mongoose-connect">Mongoose.prototype.connect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">uri(s)
+<pre><code><span class="hljs-keyword">const</span> ObjectId = mongoose.Types.ObjectId;
+<span class="hljs-keyword">const</span> id1 = <span class="hljs-keyword">new</span> ObjectId;</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-VirtualType"><a href="#mongoose_Mongoose-VirtualType">Mongoose.prototype.VirtualType()</a></h3><div><p>The Mongoose <a href="#virtualtype_VirtualType">VirtualType</a> constructor</p></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connect"><a href="#mongoose_Mongoose-connect">Mongoose.prototype.connect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">uri(s)
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> passed down to the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html">MongoDB driver&#39;s <code>connect()</code> function</a>, except for 4 mongoose-specific options explained below.</p>
 </li><ul style="margin-top: 0.5em"><li>[options.bufferCommands=true]
@@ -133,21 +133,21 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 <pre><code>mongoose.connect(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>);
 
 <span class="hljs-comment">// replica sets</span>
-<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/mydatabase'</span>;
+<span class="hljs-keyword">const</span> uri = <span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/mydatabase'</span>;
 mongoose.connect(uri);
 
 <span class="hljs-comment">// with options</span>
 mongoose.connect(uri, options);
 
 <span class="hljs-comment">// optional callback that gets fired when initial connection completed</span>
-<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://nonexistent.domain:27000'</span>;
+<span class="hljs-keyword">const</span> uri = <span class="hljs-string">'mongodb://nonexistent.domain:27000'</span>;
 mongoose.connect(uri, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// if error is truthy, the initial connection failed.</span>
 })</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connection"><a href="#mongoose_Mongoose-connection">Mongoose.prototype.connection</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span></li></ul><div><p>The Mongoose module's default connection. Equivalent to <code>mongoose.connections[0]</code>, see <a href="#mongoose_Mongoose-connections"><code>connections</code></a>.</p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
 mongoose.connect(...);
 mongoose.connection.on(<span class="hljs-string">'error'</span>, cb);</code></pre>
 
@@ -213,18 +213,18 @@ mongoose.connections.length; <span class="hljs-comment">// 2</span></code></pre>
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>);
 
 <span class="hljs-comment">// and options</span>
-<span class="hljs-keyword">var</span> opts = { db: { native_parser: <span class="hljs-literal">true</span> }}
+<span class="hljs-keyword">const</span> opts = { db: { native_parser: <span class="hljs-literal">true</span> }}
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>, opts);
 
 <span class="hljs-comment">// replica sets</span>
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/database'</span>);
 
 <span class="hljs-comment">// and options</span>
-<span class="hljs-keyword">var</span> opts = { replset: { strategy: <span class="hljs-string">'ping'</span>, rs_name: <span class="hljs-string">'testSet'</span> }}
+<span class="hljs-keyword">const</span> opts = { replset: { strategy: <span class="hljs-string">'ping'</span>, rs_name: <span class="hljs-string">'testSet'</span> }}
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/database'</span>, opts);
 
 <span class="hljs-comment">// and options</span>
-<span class="hljs-keyword">var</span> opts = { server: { auto_reconnect: <span class="hljs-literal">false</span> }, user: <span class="hljs-string">'username'</span>, pass: <span class="hljs-string">'mypassword'</span> }
+<span class="hljs-keyword">const</span> opts = { server: { auto_reconnect: <span class="hljs-literal">false</span> }, user: <span class="hljs-string">'username'</span>, pass: <span class="hljs-string">'mypassword'</span> }
 db = mongoose.createConnection(<span class="hljs-string">'localhost'</span>, <span class="hljs-string">'database'</span>, port, opts)
 
 <span class="hljs-comment">// initialize now, connect later</span>
@@ -277,17 +277,17 @@ mongoose.isValidObjectId(<span class="hljs-number">6</span>); <span class="hljs-
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
 
 <span class="hljs-comment">// define an Actor model with this mongoose instance</span>
 <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
 mongoose.model(<span class="hljs-string">'Actor'</span>, schema);
 
 <span class="hljs-comment">// create a new connection</span>
-<span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+<span class="hljs-keyword">const</span> conn = mongoose.createConnection(..);
 
 <span class="hljs-comment">// create Actor model</span>
-<span class="hljs-keyword">var</span> Actor = conn.model(<span class="hljs-string">'Actor'</span>, schema);
+<span class="hljs-keyword">const</span> Actor = conn.model(<span class="hljs-string">'Actor'</span>, schema);
 conn.model(<span class="hljs-string">'Actor'</span>) === Actor; <span class="hljs-comment">// true</span>
 conn.model(<span class="hljs-string">'Actor'</span>, schema) === Actor; <span class="hljs-comment">// true, same schema</span>
 conn.model(<span class="hljs-string">'Actor'</span>, schema, <span class="hljs-string">'actors'</span>) === Actor; <span class="hljs-comment">// true, same schema and collection name</span>
@@ -299,7 +299,7 @@ conn.model(<span class="hljs-string">'Actor'</span>, <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
 
 <span class="hljs-comment">// or</span>
 
@@ -307,8 +307,8 @@ schema.set(<span class="hljs-string">'collection'</span>, <span class="hljs-stri
 
 <span class="hljs-comment">// or</span>
 
-<span class="hljs-keyword">var</span> collectionName = <span class="hljs-string">'actor'</span>
-<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-modelNames"><a href="#mongoose_Mongoose-modelNames">Mongoose.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this instance of Mongoose.</p>
+<span class="hljs-keyword">const</span> collectionName = <span class="hljs-string">'actor'</span>
+<span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre></div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-modelNames"><a href="#mongoose_Mongoose-modelNames">Mongoose.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this instance of Mongoose.</p>
 
 <h4>Note:</h4>
 
@@ -378,9 +378,9 @@ mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-functio
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> child = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, age: <span class="hljs-built_in">Number</span>, children: [child] });
-<span class="hljs-keyword">var</span> Tree = mongoose.model(<span class="hljs-string">'Tree'</span>, schema);
+<pre><code><span class="hljs-keyword">const</span> child = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, age: <span class="hljs-built_in">Number</span>, children: [child] });
+<span class="hljs-keyword">const</span> Tree = mongoose.model(<span class="hljs-string">'Tree'</span>, schema);
 
 <span class="hljs-comment">// setting schema options</span>
 <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { _id: <span class="hljs-literal">false</span>, autoIndex: <span class="hljs-literal">false</span> })</code></pre>
@@ -427,8 +427,8 @@ mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-functio
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;</code></pre>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> ObjectId = mongoose.Schema.Types.ObjectId;</code></pre>
 
 <h4>Types:</h4>
 
@@ -445,7 +445,7 @@ mongoose.set(<span class="hljs-string">'debug'</span>, <span class="hljs-functio
 
 <p>Using this exposed access to the <code>Mixed</code> SchemaType, we can use them in our schema.</p>
 
-<pre><code><span class="hljs-keyword">var</span> Mixed = mongoose.Schema.Types.Mixed;
+<pre><code><span class="hljs-keyword">const</span> Mixed = mongoose.Schema.Types.Mixed;
 <span class="hljs-keyword">new</span> mongoose.Schema({ _user: Mixed })</code></pre></div><hr class="separate-api-elements"><h3 id="schema_Schema-indexTypes"><a href="#schema_Schema-indexTypes">Schema.indexTypes</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The allowed index types</p></div><hr class="separate-api-elements"><h3 id="schema_Schema-add"><a href="#schema_Schema-add">Schema.prototype.add()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
 <span class="method-type">&laquo;Object|Schema&raquo;</span> plain object with paths to add, or another schema</p>
 </li><li class="param">[prefix]
@@ -553,15 +553,15 @@ userSchema.loadClass(UserClass);
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = kittySchema = <span class="hljs-keyword">new</span> Schema(..);
+<pre><code><span class="hljs-keyword">const</span> schema = kittySchema = <span class="hljs-keyword">new</span> Schema(..);
 
 schema.method(<span class="hljs-string">'meow'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'meeeeeoooooooooooow'</span>);
 })
 
-<span class="hljs-keyword">var</span> Kitty = mongoose.model(<span class="hljs-string">'Kitty'</span>, schema);
+<span class="hljs-keyword">const</span> Kitty = mongoose.model(<span class="hljs-string">'Kitty'</span>, schema);
 
-<span class="hljs-keyword">var</span> fizz = <span class="hljs-keyword">new</span> Kitty;
+<span class="hljs-keyword">const</span> fizz = <span class="hljs-keyword">new</span> Kitty;
 fizz.meow(); <span class="hljs-comment">// meeeeeooooooooooooow</span></code></pre>
 
 <p>If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as methods.</p>
@@ -579,7 +579,7 @@ fizz.scratch();</code></pre>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ a: <span class="hljs-built_in">String</span> }).add({ b: <span class="hljs-built_in">String</span> });
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ a: <span class="hljs-built_in">String</span> }).add({ b: <span class="hljs-built_in">String</span> });
 schema.obj; <span class="hljs-comment">// { a: String }</span></code></pre></div><hr class="separate-api-elements"><h3 id="schema_Schema-path"><a href="#schema_Schema-path">Schema.prototype.path()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">constructor
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Gets/sets schema paths.</p>
@@ -645,7 +645,7 @@ mongoose.model(<span class="hljs-string">'Test'</span>, s); <span class="hljs-co
 <span class="method-type">&laquo;Function&raquo;</span> callback</p>
 </li></ul><div><p>Defines a post hook for the document</p>
 
-<pre><code>var schema = new Schema(..);
+<pre><code>const schema = new Schema(..);
 schema.post('save', function (doc) {
   console.log('this fired after a document was saved');
 });
@@ -658,9 +658,9 @@ schema.post(/Many$/, function(res) {
   console.log('this fired after you ran `updateMany()` or `deleteMany()`);
 });
 
-var Model = mongoose.model('Model', schema);
+const Model = mongoose.model('Model', schema);
 
-var m = new Model(..);
+const m = new Model(..);
 m.save(function(err) {
   console.log('this fires after the `post` hook');
 });
@@ -679,7 +679,7 @@ m.find(function(err, docs) {
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, created: <span class="hljs-built_in">Date</span> });
+<pre><code><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, created: <span class="hljs-built_in">Date</span> });
 
 toySchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
   <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.created) <span class="hljs-keyword">this</span>.created = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>;
@@ -807,7 +807,7 @@ schema.static(<span class="hljs-string">'findByName'</span>, <span class="hljs-f
 
 <p><em>NOTE:</em> Use of these terms as method names is permitted, but play at your own risk, as they may be existing mongoose document methods you are stomping on.</p>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema(..);
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema(..);
  schema.methods.init = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{} <span class="hljs-comment">// potentially breaking</span></code></pre></div><hr class="separate-api"><div class="item-header-wrap"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/connection.js" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 class="item-header" id="Connection"><a href="#Connection">Connection</a></h2></div><ul><li><a href="#connection_Connection">Connection()</a></li><li><a href="#connection_Connection-close">Connection.prototype.close()</a></li><li><a href="#connection_Connection-collection">Connection.prototype.collection()</a></li><li><a href="#connection_Connection-collections">Connection.prototype.collections</a></li><li><a href="#connection_Connection-config">Connection.prototype.config</a></li><li><a href="#connection_Connection-createCollection">Connection.prototype.createCollection()</a></li><li><a href="#connection_Connection-db">Connection.prototype.db</a></li><li><a href="#connection_Connection-deleteModel">Connection.prototype.deleteModel()</a></li><li><a href="#connection_Connection-dropCollection">Connection.prototype.dropCollection()</a></li><li><a href="#connection_Connection-dropDatabase">Connection.prototype.dropDatabase()</a></li><li><a href="#connection_Connection-get">Connection.prototype.get()</a></li><li><a href="#connection_Connection-getClient">Connection.prototype.getClient()</a></li><li><a href="#connection_Connection-host">Connection.prototype.host</a></li><li><a href="#connection_Connection-id">Connection.prototype.id</a></li><li><a href="#connection_Connection-model">Connection.prototype.model()</a></li><li><a href="#connection_Connection-modelNames">Connection.prototype.modelNames()</a></li><li><a href="#connection_Connection-models">Connection.prototype.models</a></li><li><a href="#connection_Connection-name">Connection.prototype.name</a></li><li><a href="#connection_Connection-openUri">Connection.prototype.openUri()</a></li><li><a href="#connection_Connection-pass">Connection.prototype.pass</a></li><li><a href="#connection_Connection-plugin">Connection.prototype.plugin()</a></li><li><a href="#connection_Connection-plugins">Connection.prototype.plugins</a></li><li><a href="#connection_Connection-port">Connection.prototype.port</a></li><li><a href="#connection_Connection-readyState">Connection.prototype.readyState</a></li><li><a href="#connection_Connection-set">Connection.prototype.set()</a></li><li><a href="#connection_Connection-setClient">Connection.prototype.setClient()</a></li><li><a href="#connection_Connection-startSession">Connection.prototype.startSession()</a></li><li><a href="#connection_Connection-transaction">Connection.prototype.transaction()</a></li><li><a href="#connection_Connection-useDb">Connection.prototype.useDb()</a></li><li><a href="#connection_Connection-user">Connection.prototype.user</a></li><li><a href="#connection_Connection-watch">Connection.prototype.watch()</a></li></ul><hr class="separate-api-elements"><h3 id="connection_Connection"><a href="#connection_Connection">Connection()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">base
@@ -890,17 +890,17 @@ conn.id; <span class="hljs-comment">// 1</span></code></pre></div><hr class="sep
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> The compiled model</p>
 </li></ul><div><p>Defines or retrieves a model.</p>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> db = mongoose.createConnection(..);
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> db = mongoose.createConnection(..);
 db.model(<span class="hljs-string">'Venue'</span>, <span class="hljs-keyword">new</span> Schema(..));
-<span class="hljs-keyword">var</span> Ticket = db.model(<span class="hljs-string">'Ticket'</span>, <span class="hljs-keyword">new</span> Schema(..));
-<span class="hljs-keyword">var</span> Venue = db.model(<span class="hljs-string">'Venue'</span>);</code></pre>
+<span class="hljs-keyword">const</span> Ticket = db.model(<span class="hljs-string">'Ticket'</span>, <span class="hljs-keyword">new</span> Schema(..));
+<span class="hljs-keyword">const</span> Venue = db.model(<span class="hljs-string">'Venue'</span>);</code></pre>
 
 <p><em>When no <code>collection</code> argument is passed, Mongoose produces a collection name by passing the model <code>name</code> to the <a href="#utils_exports.toCollectionName">utils.toCollectionName</a> method. This method pluralizes the name. If you don't like this behavior, either pass a collection name or set your schemas collection name option.</em></p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
 
 <span class="hljs-comment">// or</span>
 
@@ -908,8 +908,8 @@ schema.set(<span class="hljs-string">'collection'</span>, <span class="hljs-stri
 
 <span class="hljs-comment">// or</span>
 
-<span class="hljs-keyword">var</span> collectionName = <span class="hljs-string">'actor'</span>
-<span class="hljs-keyword">var</span> M = conn.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre></div><hr class="separate-api-elements"><h3 id="connection_Connection-modelNames"><a href="#connection_Connection-modelNames">Connection.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this connection.</p></div><hr class="separate-api-elements"><h3 id="connection_Connection-models"><a href="#connection_Connection-models">Connection.prototype.models</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a> containing a map from model names to models. Contains all models that have been added to this connection using <a href="/docs/api/connection.html#connection_Connection-model"><code>Connection#model()</code></a>.</p>
+<span class="hljs-keyword">const</span> collectionName = <span class="hljs-string">'actor'</span>
+<span class="hljs-keyword">const</span> M = conn.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre></div><hr class="separate-api-elements"><h3 id="connection_Connection-modelNames"><a href="#connection_Connection-modelNames">Connection.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this connection.</p></div><hr class="separate-api-elements"><h3 id="connection_Connection-models"><a href="#connection_Connection-models">Connection.prototype.models</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a> containing a map from model names to models. Contains all models that have been added to this connection using <a href="/docs/api/connection.html#connection_Connection-model"><code>Connection#model()</code></a>.</p>
 
 <h4>Example</h4>
 
@@ -1991,8 +1991,8 @@ Users.aggregate().
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> userSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
-<span class="hljs-keyword">var</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
+<pre><code><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
+<span class="hljs-keyword">const</span> User = mongoose.model(<span class="hljs-string">'User'</span>, userSchema);
 
 User.createCollection().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">collection</span>) </span>{
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Collection is created!'</span>);
@@ -2045,15 +2045,15 @@ User.createCollection().then(<span class="hljs-function"><span class="hljs-keywo
 }
 util.inherits(BaseSchema, Schema);
 
-<span class="hljs-keyword">var</span> PersonSchema = <span class="hljs-keyword">new</span> BaseSchema();
-<span class="hljs-keyword">var</span> BossSchema = <span class="hljs-keyword">new</span> BaseSchema({ department: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> PersonSchema = <span class="hljs-keyword">new</span> BaseSchema();
+<span class="hljs-keyword">const</span> BossSchema = <span class="hljs-keyword">new</span> BaseSchema({ department: <span class="hljs-built_in">String</span> });
 
-<span class="hljs-keyword">var</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, PersonSchema);
-<span class="hljs-keyword">var</span> Boss = Person.discriminator(<span class="hljs-string">'Boss'</span>, BossSchema);
+<span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, PersonSchema);
+<span class="hljs-keyword">const</span> Boss = Person.discriminator(<span class="hljs-string">'Boss'</span>, BossSchema);
 <span class="hljs-keyword">new</span> Boss().__t; <span class="hljs-comment">// "Boss". `__t` is the default `discriminatorKey`</span>
 
-<span class="hljs-keyword">var</span> employeeSchema = <span class="hljs-keyword">new</span> Schema({ boss: ObjectId });
-<span class="hljs-keyword">var</span> Employee = Person.discriminator(<span class="hljs-string">'Employee'</span>, employeeSchema, <span class="hljs-string">'staff'</span>);
+<span class="hljs-keyword">const</span> employeeSchema = <span class="hljs-keyword">new</span> Schema({ boss: ObjectId });
+<span class="hljs-keyword">const</span> Employee = Person.discriminator(<span class="hljs-string">'Employee'</span>, employeeSchema, <span class="hljs-string">'staff'</span>);
 <span class="hljs-keyword">new</span> Employee().__t; <span class="hljs-comment">// "staff" because of 3rd argument above</span></code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.distinct"><a href="#model_Model.distinct">Model.distinct()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">field
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">[conditions]
 <span class="method-type">&laquo;Object&raquo;</span> optional</p>
@@ -2071,7 +2071,7 @@ util.inherits(BaseSchema, Schema);
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'unique urls with more than 100 clicks'</span>, result);
 })
 
-<span class="hljs-keyword">var</span> query = Link.distinct(<span class="hljs-string">'url'</span>);
+<span class="hljs-keyword">const</span> query = Link.distinct(<span class="hljs-string">'url'</span>);
 query.exec(callback);</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.ensureIndexes"><a href="#model_Model.ensureIndexes">Model.ensureIndexes()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> internal options</p>
 </li><li class="param">[cb]
@@ -2088,8 +2088,8 @@ query.exec(callback);</code></pre></div><hr class="separate-api-elements"><h3 id
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> eventSchema = <span class="hljs-keyword">new</span> Schema({ thing: { type: <span class="hljs-string">'string'</span>, unique: <span class="hljs-literal">true</span> }})
-<span class="hljs-keyword">var</span> Event = mongoose.model(<span class="hljs-string">'Event'</span>, eventSchema);
+<pre><code><span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> Schema({ thing: { type: <span class="hljs-string">'string'</span>, unique: <span class="hljs-literal">true</span> }})
+<span class="hljs-keyword">const</span> Event = mongoose.model(<span class="hljs-string">'Event'</span>, eventSchema);
 
 Event.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
   <span class="hljs-keyword">if</span> (err) <span class="hljs-built_in">console</span>.error(err); <span class="hljs-comment">// error occurred during index creation</span>
@@ -2129,7 +2129,7 @@ Event.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><
 <li><code>findOne()</code></li>
 </ul></div><hr class="separate-api-elements"><h3 id="model_Model.find"><a href="#model_Model.find">Model.find()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">filter
 <span class="method-type">&laquo;Object|ObjectId&raquo;</span> </li><li class="param">[projection]
-<span class="method-type">&laquo;Object|String&raquo;</span> optional fields to return, see <a href="http://mongoosejs.com/docs/api.html#query_Query-select"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="http://mongoosejs.com/docs/api.html#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
@@ -2155,7 +2155,7 @@ MyModel.find({ name: <span class="hljs-string">'john'</span>, age: { $gte: <span
 <span class="hljs-keyword">await</span> MyModel.find({ name: <span class="hljs-regexp">/john/i</span> }, <span class="hljs-literal">null</span>, { skip: <span class="hljs-number">10</span> }).exec();</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.findById"><a href="#model_Model.findById">Model.findById()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">id
 <span class="method-type">&laquo;Any&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param">[projection]
-<span class="method-type">&laquo;Object|String&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
@@ -2201,6 +2201,8 @@ Adventure.findById(id, <span class="hljs-function"><span class="hljs-keyword">fu
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issue a mongodb findAndModify remove command by a document's _id field. <code>findByIdAndRemove(id, ...)</code> is equivalent to <code>findOneAndRemove({ _id: id }, ...)</code>.</p>
 
@@ -2313,7 +2315,7 @@ Model.findByIdAndUpdate(id, { $set: { name: <span class="hljs-string">'jason bou
   doc.save(callback);
 });</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.findOne"><a href="#model_Model.findOne">Model.findOne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[conditions]
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[projection]
-<span class="method-type">&laquo;Object|String&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><li class="param">[callback]
@@ -2337,6 +2339,8 @@ Adventure.findOne({ country: <span class="hljs-string">'Croatia'</span> }, <span
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="http://mongoosejs.com/docs/api.html#query_Query-setOptions"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li>[options.strict]
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><li class="param">[callback]
@@ -2359,8 +2363,8 @@ Adventure.findOne({ country: <span class="hljs-string">'Croatia'</span> }, <span
 <ul>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 <li><code>maxTimeMS</code>: puts a time limit on the query - requires mongodb >= 2.6.0</li>
-<li><code>select</code>: sets the document fields to return</li>
-<li><code>projection</code>: like select, it determines which fields to return, ex. <code>{ projection: { _id: 0 } }</code></li>
+<li><code>select</code>: sets the document fields to return, ex. <code>{ projection: { _id: 0 } }</code></li>
+<li><code>projection</code>: equivalent to <code>select</code></li>
 <li><code>rawResult</code>: if true, returns the <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#findAndModify">raw result from the MongoDB driver</a></li>
 <li><code>strict</code>: overwrites the schema's <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a> for this update</li>
 </ul>
@@ -2394,6 +2398,8 @@ A.findOneAndDelete()           <span class="hljs-comment">// returns Query</span
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.strict]
 <span class="method-type">&laquo;Boolean|String&raquo;</span> overwrites the schema&#39;s <a href="http://mongoosejs.com/docs/guide.html#strict">strict mode option</a></p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issue a mongodb findAndModify remove command.</p>
 
@@ -2460,6 +2466,8 @@ A.findOneAndRemove()           <span class="hljs-comment">// returns Query</span
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.returnOriginal=null]
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issue a MongoDB <code>findOneAndReplace()</code> command.</p>
 
@@ -2516,6 +2524,8 @@ A.findOneAndReplace()           <span class="hljs-comment">// returns Query</spa
 <span class="method-type">&laquo;Boolean&raquo;</span> An alias for the <code>new</code> option. <code>returnOriginal: false</code> is equivalent to <code>new: true</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li>[options.overwrite=false]
 <span class="method-type">&laquo;Boolean&raquo;</span> By default, if you don&#39;t include any <a href="https://docs.mongodb.com/manual/reference/operator/update/">update operators</a> in <code>update</code>, Mongoose will wrap <code>update</code> in <code>$set</code> for you. This prevents you from accidentally overwriting the document. This option tells Mongoose to skip adding <code>$set</code>. An alternative to this would be using <a href="https://mongoosejs.com/docs/api/model.html#model_Model.findOneAndReplace">Model.findOneAndReplace(conditions, update, options, callback)</a>.</p>
+</li></ul><ul style="margin-top: 0.5em"><li>[options.projection=null]
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional fields to return, see <a href="#query_Query-select"><code>Query.prototype.select()</code></a></p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issues a mongodb findAndModify update command.</p>
 
@@ -2549,7 +2559,7 @@ A.findOneAndUpdate()                             <span class="hljs-comment">// r
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = { name: <span class="hljs-string">'borne'</span> };
+<pre><code><span class="hljs-keyword">const</span> query = { name: <span class="hljs-string">'borne'</span> };
 Model.findOneAndUpdate(query, { name: <span class="hljs-string">'jason bourne'</span> }, options, callback)
 
 <span class="hljs-comment">// is sent as</span>
@@ -2587,7 +2597,7 @@ Model.findOneAndUpdate(query, { $set: { name: <span class="hljs-string">'jason b
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> options = { near: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], maxDistance: <span class="hljs-number">5</span> };
+<pre><code><span class="hljs-keyword">const</span> options = { near: [<span class="hljs-number">10</span>, <span class="hljs-number">10</span>], maxDistance: <span class="hljs-number">5</span> };
 Locations.geoSearch({ type : <span class="hljs-string">"house"</span> }, options, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, res</span>) </span>{
   <span class="hljs-built_in">console</span>.log(res);
 });</code></pre>
@@ -2601,24 +2611,24 @@ Locations.geoSearch({ type : <span class="hljs-string">"house"</span> }, options
 <li><code>lean</code> {Object|Boolean} return the raw object instead of the Mongoose Model</li>
 </ul></div><hr class="separate-api-elements"><h3 id="model_Model.hydrate"><a href="#model_Model.hydrate">Model.hydrate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param">[projection]
-<span class="method-type">&laquo;Object|String&raquo;</span> optional projection containing which fields should be selected for this document</p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> optional projection containing which fields should be selected for this document</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> document instance</p>
 </li></ul><div><p>Shortcut for creating a new Document from existing raw data, pre-saved in the DB. The document returned has no paths marked as modified initially.</p>
 
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-comment">// hydrate previous data into a Mongoose document</span>
-<span class="hljs-keyword">var</span> mongooseCandy = Candy.hydrate({ _id: <span class="hljs-string">'54108337212ffb6d459f854c'</span>, type: <span class="hljs-string">'jelly bean'</span> });</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.init"><a href="#model_Model.init">Model.init()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback]
+<span class="hljs-keyword">const</span> mongooseCandy = Candy.hydrate({ _id: <span class="hljs-string">'54108337212ffb6d459f854c'</span>, type: <span class="hljs-string">'jelly bean'</span> });</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.init"><a href="#model_Model.init">Model.init()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><div><p>This function is responsible for building <a href="https://docs.mongodb.com/manual/indexes/">indexes</a>, unless <a href="http://mongoosejs.com/docs/guide.html#autoIndex"><code>autoIndex</code></a> is turned off.</p>
 
 <p>Mongoose calls this function automatically when a model is created using <a href="/docs/api.html#mongoose_Mongoose-model"><code>mongoose.model()</code></a> or <a href="/docs/api.html#connection_Connection-model"><code>connection.model()</code></a>, so you don't need to call it. This function is also idempotent, so you may call it to get back a promise that will resolve when your indexes are finished building as an alternative to <a href="/docs/guide.html#indexes"><code>MyModel.on('index')</code></a></p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> eventSchema = <span class="hljs-keyword">new</span> Schema({ thing: { type: <span class="hljs-string">'string'</span>, unique: <span class="hljs-literal">true</span> }})
+<pre><code><span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> Schema({ thing: { type: <span class="hljs-string">'string'</span>, unique: <span class="hljs-literal">true</span> }})
 <span class="hljs-comment">// This calls `Event.init()` implicitly, so you don't need to call</span>
 <span class="hljs-comment">// `Event.init()` on your own.</span>
-<span class="hljs-keyword">var</span> Event = mongoose.model(<span class="hljs-string">'Event'</span>, eventSchema);
+<span class="hljs-keyword">const</span> Event = mongoose.model(<span class="hljs-string">'Event'</span>, eventSchema);
 
 Event.init().then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">Event</span>) </span>{
   <span class="hljs-comment">// You can also use `Event.on('index')` if you prefer event emitters</span>
@@ -2652,7 +2662,7 @@ Event.init().then(<span class="hljs-function"><span class="hljs-keyword">functio
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> arr = [{ name: <span class="hljs-string">'Star Wars'</span> }, { name: <span class="hljs-string">'The Empire Strikes Back'</span> }];
+<pre><code><span class="hljs-keyword">const</span> arr = [{ name: <span class="hljs-string">'Star Wars'</span> }, { name: <span class="hljs-string">'The Empire Strikes Back'</span> }];
 Movies.insertMany(arr, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, docs</span>) </span>{});</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model.inspect"><a href="#model_Model.inspect">Model.inspect()</a></h3><div><p>Helper for console.log. Given a model named 'MyModel', returns the string <code>'Model { MyModel }'</code>.</p>
 
 <h4>Example:</h4>
@@ -2674,7 +2684,7 @@ MyModel.inspect(); <span class="hljs-comment">// 'Model { Test }'</span>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> o = {};
+<pre><code><span class="hljs-keyword">const</span> o = {};
 <span class="hljs-comment">// `map()` and `reduce()` are run on the MongoDB server, not Node.js,</span>
 <span class="hljs-comment">// these functions are converted to strings</span>
 o.map = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{ emit(<span class="hljs-keyword">this</span>.name, <span class="hljs-number">1</span>) };
@@ -2711,7 +2721,7 @@ User.mapReduce(o, <span class="hljs-function"><span class="hljs-keyword">functio
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> o = {};
+<pre><code><span class="hljs-keyword">const</span> o = {};
 <span class="hljs-comment">// You can also define `map()` and `reduce()` as strings if your</span>
 <span class="hljs-comment">// linter complains about `emit()` not being defined</span>
 o.map = <span class="hljs-string">'function () { emit(this.name, 1) }'</span>;
@@ -2729,10 +2739,10 @@ User.mapReduce(o, <span class="hljs-function"><span class="hljs-keyword">functio
 <span class="hljs-comment">// `mapReduce()` returns a promise. However, ES6 promises can only</span>
 <span class="hljs-comment">// resolve to exactly one value,</span>
 o.resolveToObject = <span class="hljs-literal">true</span>;
-<span class="hljs-keyword">var</span> promise = User.mapReduce(o);
+<span class="hljs-keyword">const</span> promise = User.mapReduce(o);
 promise.then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{
-  <span class="hljs-keyword">var</span> model = res.model;
-  <span class="hljs-keyword">var</span> stats = res.stats;
+  <span class="hljs-keyword">const</span> model = res.model;
+  <span class="hljs-keyword">const</span> stats = res.stats;
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'map reduce took %d ms'</span>, stats.processtime)
   <span class="hljs-keyword">return</span> model.find().where(<span class="hljs-string">'value'</span>).gt(<span class="hljs-number">10</span>).exec();
 }).then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">docs</span>) </span>{
@@ -2776,7 +2786,7 @@ promise.then(<span class="hljs-function"><span class="hljs-keyword">function</sp
 
 <pre><code><span class="hljs-comment">// populates a single object</span>
 User.findById(id, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, user</span>) </span>{
-  <span class="hljs-keyword">var</span> opts = [
+  <span class="hljs-keyword">const</span> opts = [
     { path: <span class="hljs-string">'company'</span>, match: { x: <span class="hljs-number">1</span> }, select: <span class="hljs-string">'name'</span> },
     { path: <span class="hljs-string">'notes'</span>, options: { limit: <span class="hljs-number">10</span> }, model: <span class="hljs-string">'override'</span> }
   ];
@@ -2788,9 +2798,9 @@ User.findById(id, <span class="hljs-function"><span class="hljs-keyword">functio
 
 <span class="hljs-comment">// populates an array of objects</span>
 User.find(match, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, users</span>) </span>{
-  <span class="hljs-keyword">var</span> opts = [{ path: <span class="hljs-string">'company'</span>, match: { x: <span class="hljs-number">1</span> }, select: <span class="hljs-string">'name'</span> }];
+  <span class="hljs-keyword">const</span> opts = [{ path: <span class="hljs-string">'company'</span>, match: { x: <span class="hljs-number">1</span> }, select: <span class="hljs-string">'name'</span> }];
 
-  <span class="hljs-keyword">var</span> promise = User.populate(users, opts);
+  <span class="hljs-keyword">const</span> promise = User.populate(users, opts);
   promise.then(<span class="hljs-built_in">console</span>.log).end();
 })
 
@@ -2803,13 +2813,13 @@ User.find(match, <span class="hljs-function"><span class="hljs-keyword">function
 <span class="hljs-comment">//   weapon: { type: ObjectId, ref: 'Weapon' }</span>
 <span class="hljs-comment">// });</span>
 
-<span class="hljs-keyword">var</span> user = { name: <span class="hljs-string">'Indiana Jones'</span>, weapon: <span class="hljs-number">389</span> };
+<span class="hljs-keyword">const</span> user = { name: <span class="hljs-string">'Indiana Jones'</span>, weapon: <span class="hljs-number">389</span> };
 Weapon.populate(user, { path: <span class="hljs-string">'weapon'</span>, model: <span class="hljs-string">'Weapon'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, user</span>) </span>{
   <span class="hljs-built_in">console</span>.log(user.weapon.name); <span class="hljs-comment">// whip</span>
 })
 
 <span class="hljs-comment">// populate many plain objects</span>
-<span class="hljs-keyword">var</span> users = [{ name: <span class="hljs-string">'Indiana Jones'</span>, weapon: <span class="hljs-number">389</span> }]
+<span class="hljs-keyword">const</span> users = [{ name: <span class="hljs-string">'Indiana Jones'</span>, weapon: <span class="hljs-number">389</span> }]
 users.push({ name: <span class="hljs-string">'Batman'</span>, weapon: <span class="hljs-number">8921</span> })
 Weapon.populate(users, { path: <span class="hljs-string">'weapon'</span> }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, users</span>) </span>{
   users.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">user</span>) </span>{
@@ -2848,7 +2858,7 @@ Weapon.populate(users, { path: <span class="hljs-string">'weapon'</span> }, <spa
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> doc = <span class="hljs-keyword">new</span> Tank;
+<pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Tank;
 doc.model(<span class="hljs-string">'User'</span>).findById(id, callback);</code></pre></div><hr class="separate-api-elements"><h3 id="model_Model-modelName"><a href="#model_Model-modelName">Model.prototype.modelName</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The name of the model</p></div><hr class="separate-api-elements"><h3 id="model_Model-remove"><a href="#model_Model-remove">Model.prototype.remove()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.session=null]
 <span class="method-type">&laquo;Session&raquo;</span> the <a href="https://docs.mongodb.com/manual/reference/server-sessions/">session</a> associated with this operation. If not specified, defaults to the <a href="api.html#document_Document-$session">document&#39;s associated session</a>.</p>
@@ -3076,7 +3086,7 @@ res.nModified;</code></pre>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = { name: <span class="hljs-string">'borne'</span> };
+<pre><code><span class="hljs-keyword">const</span> query = { name: <span class="hljs-string">'borne'</span> };
 Model.update(query, { name: <span class="hljs-string">'jason bourne'</span> }, options, callback);
 
 <span class="hljs-comment">// is sent as</span>
@@ -3310,8 +3320,8 @@ MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-s
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> lowerLeft = [<span class="hljs-number">40.73083</span>, <span class="hljs-number">-73.99756</span>]
-<span class="hljs-keyword">var</span> upperRight= [<span class="hljs-number">40.741404</span>,  <span class="hljs-number">-73.988135</span>]
+<pre><code><span class="hljs-keyword">const</span> lowerLeft = [<span class="hljs-number">40.73083</span>, <span class="hljs-number">-73.99756</span>]
+<span class="hljs-keyword">const</span> upperRight= [<span class="hljs-number">40.741404</span>,  <span class="hljs-number">-73.988135</span>]
 
 query.where(<span class="hljs-string">'loc'</span>).within().box(lowerLeft, upperRight)
 query.box({ ll : lowerLeft, ur : upperRight })</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-cast"><a href="#query_Query-cast">Query.prototype.cast()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[model]
@@ -3333,7 +3343,7 @@ query.box({ ll : lowerLeft, ur : upperRight })</code></pre></div><hr class="sepa
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span> };
+<pre><code><span class="hljs-keyword">const</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span> };
 query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-circle"><a href="#query_Query-circle">Query.prototype.circle()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">area
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
@@ -3341,13 +3351,13 @@ query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span> }
+<pre><code><span class="hljs-keyword">const</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span> }
 query.where(<span class="hljs-string">'loc'</span>).within().circle(area)
 <span class="hljs-comment">// alternatively</span>
 query.circle(<span class="hljs-string">'loc'</span>, area);
 
 <span class="hljs-comment">// spherical calculations</span>
-<span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span>, spherical: <span class="hljs-literal">true</span> }
+<span class="hljs-keyword">const</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span>, spherical: <span class="hljs-literal">true</span> }
 query.where(<span class="hljs-string">'loc'</span>).within().circle(area)
 <span class="hljs-comment">// alternatively</span>
 query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-collation"><a href="#query_Query-collation">Query.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
@@ -3380,7 +3390,7 @@ query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre></div><h
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> countQuery = model.where({ <span class="hljs-string">'color'</span>: <span class="hljs-string">'black'</span> }).count();
+<pre><code><span class="hljs-keyword">const</span> countQuery = model.where({ <span class="hljs-string">'color'</span>: <span class="hljs-string">'black'</span> }).count();
 
 query.count({ color: <span class="hljs-string">'black'</span> }).count(callback)
 
@@ -3441,7 +3451,7 @@ Thing.
 
 <span class="hljs-comment">// Or you can use `.next()` to manually get the next doc in the stream.</span>
 <span class="hljs-comment">// `.next()` returns a promise, so you can use promises or callbacks.</span>
-<span class="hljs-keyword">var</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).cursor();
+<span class="hljs-keyword">const</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).cursor();
 cursor.next(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) </span>{
   <span class="hljs-built_in">console</span>.log(doc);
 });
@@ -3583,8 +3593,8 @@ Schema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> TestSchema = <span class="hljs-keyword">new</span> Schema({ num: <span class="hljs-built_in">Number</span> });
-<span class="hljs-keyword">var</span> TestModel = db.model(<span class="hljs-string">'Test'</span>, TestSchema);
+<pre><code><span class="hljs-keyword">const</span> TestSchema = <span class="hljs-keyword">new</span> Schema({ num: <span class="hljs-built_in">Number</span> });
+<span class="hljs-keyword">const</span> TestModel = db.model(<span class="hljs-string">'Test'</span>, TestSchema);
 TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'woops'</span>)).exec(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// `error` will be a cast error because `num` failed to cast</span>
 });</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-estimatedDocumentCount"><a href="#query_Query-estimatedDocumentCount">Query.prototype.estimatedDocumentCount()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
@@ -3611,8 +3621,8 @@ TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<
 
 <h4>Examples:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> promise = query.exec();
-<span class="hljs-keyword">var</span> promise = query.exec(<span class="hljs-string">'update'</span>);
+<pre><code><span class="hljs-keyword">const</span> promise = query.exec();
+<span class="hljs-keyword">const</span> promise = query.exec(<span class="hljs-string">'update'</span>);
 
 query.exec(callback);
 query.exec(<span class="hljs-string">'find'</span>, callback);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-exists"><a href="#query_Query-exists">Query.prototype.exists()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
@@ -3682,7 +3692,7 @@ instead.</li>
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query  = Kitten.where({ color: <span class="hljs-string">'white'</span> });
+<pre><code><span class="hljs-keyword">const</span> query  = Kitten.where({ color: <span class="hljs-string">'white'</span> });
 query.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, kitten</span>) </span>{
   <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
   <span class="hljs-keyword">if</span> (kitten) {
@@ -3909,15 +3919,15 @@ query.findOneAndUpdate()                             <span class="hljs-comment">
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> polyA = [[[ <span class="hljs-number">10</span>, <span class="hljs-number">20</span> ], [ <span class="hljs-number">10</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">20</span> ]]]
+<pre><code><span class="hljs-keyword">const</span> polyA = [[[ <span class="hljs-number">10</span>, <span class="hljs-number">20</span> ], [ <span class="hljs-number">10</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">20</span> ]]]
 query.where(<span class="hljs-string">'loc'</span>).within().geometry({ type: <span class="hljs-string">'Polygon'</span>, coordinates: polyA })
 
 <span class="hljs-comment">// or</span>
-<span class="hljs-keyword">var</span> polyB = [[ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ], [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span> ]]
+<span class="hljs-keyword">const</span> polyB = [[ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ], [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span> ]]
 query.where(<span class="hljs-string">'loc'</span>).within().geometry({ type: <span class="hljs-string">'LineString'</span>, coordinates: polyB })
 
 <span class="hljs-comment">// or</span>
-<span class="hljs-keyword">var</span> polyC = [ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ]
+<span class="hljs-keyword">const</span> polyC = [ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ]
 query.where(<span class="hljs-string">'loc'</span>).within().geometry({ type: <span class="hljs-string">'Point'</span>, coordinates: polyC })
 
 <span class="hljs-comment">// or</span>
@@ -3949,7 +3959,7 @@ query.getFilter(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span><
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.limit(<span class="hljs-number">10</span>);
 query.setOptions({ maxTimeMS: <span class="hljs-number">1000</span> })
 query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-getPopulatedPaths"><a href="#query_Query-getPopulatedPaths">Query.prototype.getPopulatedPaths()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> an array of strings representing populated paths</p>
@@ -3977,14 +3987,14 @@ query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> }).where(<span class="hljs-string">'b'</span>).gt(<span class="hljs-number">2</span>);
 query.getQuery(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-getUpdate"><a href="#query_Query-getUpdate">Query.prototype.getUpdate()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current update operations</p>
 </li></ul><div><p>Returns the current update operations as a JSON object.</p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-gt"><a href="#query_Query-gt">Query.prototype.gt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
@@ -4157,22 +4167,7 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 Product.find().mod(<span class="hljs-string">'inventory'</span>, [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 Product.find().where(<span class="hljs-string">'inventory'</span>).mod([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 <span class="hljs-comment">// This syntax is a little strange, but supported.</span>
-Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
-<span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</p>
-</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
-
-<ul>
-<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
-<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api.html#model_Model.hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
-<li><code>strict</code>: controls how Mongoose handles keys that aren't in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
-<li><code>strictQuery</code>: controls how Mongoose handles keys that aren't in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: 'bar' })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
-<li><code>useFindAndModify</code>: used to work around the <a href="/docs/deprecations.html#findandmodify"><code>findAndModify()</code> deprecation warning</a></li>
-<li><code>omitUndefined</code>: delete any properties whose value is <code>undefined</code> when casting an update. In other words, if this is set, Mongoose will delete <code>baz</code> from the update in <code>Model.updateOne({}, { foo: 'bar', baz: undefined })</code> before sending the update to the server.</li>
-<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
-</ul>
-
-<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p></div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">
+Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">
 <span class="method-type">&laquo;public&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> Mongoose-specific options</p>
 </li></ul><div><p>Returns an object containing the Mongoose-specific options for this query, including <code>lean</code> and <code>populate</code>.</p>
 
@@ -4197,7 +4192,22 @@ q.mongooseOptions().lean; <span class="hljs-comment">// true</span></code></pre>
 <li><code>strict</code></li>
 <li><code>nearSphere</code></li>
 <li><code>useFindAndModify</code></li>
-</ul></div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+</ul></div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</p>
+</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
+
+<ul>
+<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
+<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api.html#model_Model.hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
+<li><code>strict</code>: controls how Mongoose handles keys that aren't in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
+<li><code>strictQuery</code>: controls how Mongoose handles keys that aren't in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: 'bar' })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
+<li><code>useFindAndModify</code>: used to work around the <a href="/docs/deprecations.html#findandmodify"><code>findAndModify()</code> deprecation warning</a></li>
+<li><code>omitUndefined</code>: delete any properties whose value is <code>undefined</code> when casting an update. In other words, if this is set, Mongoose will delete <code>baz</code> from the update in <code>Model.updateOne({}, { foo: 'bar', baz: undefined })</code> before sending the update to the server.</li>
+<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
+</ul>
+
+<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p></div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
 
@@ -4493,7 +4503,7 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 <ul>
 <li><code>replaceOne()</code></li>
 </ul></div><hr class="separate-api-elements"><h3 id="query_Query-select"><a href="#query_Query-select">Query.prototype.select()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
-<span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
 </li></ul><div><p>Specifies which document fields to include or exclude (also known as the query "projection")</p>
 
 <p>When using string syntax, prefixing a path with <code>-</code> will flag that path as excluded. When a path does not have the <code>-</code> prefix, it is included. Lastly, if a path is prefixed with <code>+</code>, it forces inclusion of the path, which is useful for paths excluded at the <a href="/docs/api.html#schematype_SchemaType-select">schema level</a>.</p>
@@ -4504,6 +4514,9 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 
 <pre><code><span class="hljs-comment">// include a and b, exclude other fields</span>
 query.select(<span class="hljs-string">'a b'</span>);
+<span class="hljs-comment">// Equivalent syntaxes:</span>
+query.select([<span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>]);
+query.select({ a: <span class="hljs-number">1</span>, b: <span class="hljs-number">1</span> });
 
 <span class="hljs-comment">// exclude c and d, include other fields</span>
 query.select(<span class="hljs-string">'-c -d'</span>);
@@ -4614,7 +4627,7 @@ query.selectedInclusively() <span class="hljs-comment">// true</span></code></pr
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> })
 query.setQuery({ a: <span class="hljs-number">2</span> });
 query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-setUpdate"><a href="#query_Query-setUpdate">Query.prototype.setUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">new
@@ -4623,7 +4636,7 @@ query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre></di
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.setUpdate({ $set: { b: <span class="hljs-number">6</span> } });
 query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code></pre></div><hr class="separate-api-elements"><h3 id="query_Query-size"><a href="#query_Query-size">Query.prototype.size()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
@@ -4728,10 +4741,10 @@ query.tailable(<span class="hljs-literal">false</span>)</code></pre>
 <pre><code><span class="hljs-comment">// Create a query for adventure movies and read from the primary</span>
 <span class="hljs-comment">// node in the replica-set unless it is down, in which case we'll</span>
 <span class="hljs-comment">// read from a secondary node.</span>
-<span class="hljs-keyword">var</span> query = Movie.find({ tags: <span class="hljs-string">'adventure'</span> }).read(<span class="hljs-string">'primaryPreferred'</span>);
+<span class="hljs-keyword">const</span> query = Movie.find({ tags: <span class="hljs-string">'adventure'</span> }).read(<span class="hljs-string">'primaryPreferred'</span>);
 
 <span class="hljs-comment">// create a custom Query constructor based off these settings</span>
-<span class="hljs-keyword">var</span> Adventure = query.toConstructor();
+<span class="hljs-keyword">const</span> Adventure = query.toConstructor();
 
 <span class="hljs-comment">// Adventure is now a subclass of mongoose.Query and works the same way but with the</span>
 <span class="hljs-comment">// default query parameters and options set.</span>
@@ -4811,7 +4824,7 @@ Model.where({ _id: id }).update({ $set: { title: <span class="hljs-string">'word
 
 <p>The operation is only executed when a callback is passed. To force execution without a callback, we must first call update() and then execute it by using the <code>exec()</code> method.</p>
 
-<pre><code>var q = Model.where({ _id: id });
+<pre><code>const q = Model.where({ _id: id });
 q.update({ $set: { name: 'bob' }}).update(); // not executed
 
 q.update({ $set: { name: 'bob' }}).exec(); // executed
@@ -4821,11 +4834,11 @@ q.update({ $set: { name: 'bob' }}).exec(); // executed
 q.update({ name: 'bob' }).exec();
 
 // overwriting with empty docs
-var q = Model.where({ _id: id }).setOptions({ overwrite: true })
+const q = Model.where({ _id: id }).setOptions({ overwrite: true })
 q.update({ }, callback); // executes
 
 // multi update with overwrite to empty doc
-var q = Model.where({ _id: id });
+const q = Model.where({ _id: id });
 q.setOptions({ multi: true, overwrite: true })
 q.update({ });
 q.update(callback); // executed
@@ -5093,7 +5106,7 @@ Thing.
   on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{ <span class="hljs-built_in">console</span>.log(doc.foo); });
 
 <span class="hljs-comment">// Or map documents returned by `.next()`</span>
-<span class="hljs-keyword">var</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).
+<span class="hljs-keyword">const</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).
   cursor().
   map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
     doc.foo = <span class="hljs-string">"bar"</span>;
@@ -5179,7 +5192,7 @@ aggregate.addFields({ salary_k: { $divide: [ <span class="hljs-string">"$salary"
 <pre><code>aggregate.append({ $project: { field: <span class="hljs-number">1</span> }}, { $limit: <span class="hljs-number">2</span> });
 
 <span class="hljs-comment">// or pass an array</span>
-<span class="hljs-keyword">var</span> pipeline = [{ $match: { daw: <span class="hljs-string">'Logic Audio X'</span> }} ];
+<span class="hljs-keyword">const</span> pipeline = [{ $match: { daw: <span class="hljs-string">'Logic Audio X'</span> }} ];
 aggregate.append(pipeline);</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-catch"><a href="#aggregate_Aggregate-catch">Aggregate.prototype.catch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[reject]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error. Like <a href="#query_Query-then"><code>.then()</code></a>, but only takes a rejection handler.</p></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-collation"><a href="#aggregate_Aggregate-collation">Aggregate.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">collation
 <span class="method-type">&laquo;Object&raquo;</span> options</p>
@@ -5204,7 +5217,7 @@ aggregate.append(pipeline);</code></pre></div><hr class="separate-api-elements">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> cursor = Model.aggregate(..).cursor({ batchSize: <span class="hljs-number">1000</span> }).exec();
+<pre><code><span class="hljs-keyword">const</span> cursor = Model.aggregate(..).cursor({ batchSize: <span class="hljs-number">1000</span> }).exec();
 cursor.eachAsync(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc, i</span>) </span>{
   <span class="hljs-comment">// use doc</span>
 });</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-exec"><a href="#aggregate_Aggregate-exec">Aggregate.prototype.exec()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback]
@@ -5215,7 +5228,7 @@ cursor.eachAsync(<span class="hljs-function"><span class="hljs-keyword">function
 <pre><code>aggregate.exec(callback);
 
 <span class="hljs-comment">// Because a promise is returned, the `callback` is optional.</span>
-<span class="hljs-keyword">var</span> promise = aggregate.exec();
+<span class="hljs-keyword">const</span> promise = aggregate.exec();
 promise.then(..);</code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-explain"><a href="#aggregate_Aggregate-explain">Aggregate.prototype.explain()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">callback
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Execute the aggregation with explain</p>
 
@@ -5318,7 +5331,7 @@ aggregate.model() === SomeOtherModel; <span class="hljs-comment">// true</span><
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> agg = Model.aggregate(..).option({ allowDiskUse: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// Set the `allowDiskUse` option</span>
+<pre><code><span class="hljs-keyword">const</span> agg = Model.aggregate(..).option({ allowDiskUse: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// Set the `allowDiskUse` option</span>
 agg.options; <span class="hljs-comment">// `{ allowDiskUse: true }`</span></code></pre></div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-options"><a href="#aggregate_Aggregate-options">Aggregate.prototype.options</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Contains options passed down to the <a href="https://docs.mongodb.com/manual/reference/command/aggregate/">aggregate command</a>.</p>
 
 <h2>Supported options are</h2>
@@ -5545,7 +5558,7 @@ Thing.
   on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{ <span class="hljs-built_in">console</span>.log(doc.foo); });
 
 <span class="hljs-comment">// Or map documents returned by `.next()`</span>
-<span class="hljs-keyword">var</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).
+<span class="hljs-keyword">const</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).
   cursor().
   map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
     doc.foo = <span class="hljs-string">"bar"</span>;
@@ -5594,9 +5607,9 @@ mongoose.Number.get(<span class="hljs-function"><span class="hljs-keyword">funct
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ n: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">10</span> })
-<span class="hljs-keyword">var</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M;
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ n: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">10</span> })
+<span class="hljs-keyword">const</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M;
 <span class="hljs-built_in">console</span>.log(m.n) <span class="hljs-comment">// 10</span></code></pre>
 
 <p>Defaults can be either <code>functions</code> which return the value to use as the default or the literal value itself. Either way, the value will be cast based on its schema type before being set during document creation.</p>
@@ -5604,13 +5617,13 @@ mongoose.Number.get(<span class="hljs-function"><span class="hljs-keyword">funct
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-comment">// values are cast:</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ aNumber: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">4.815162342</span> }})
-<span class="hljs-keyword">var</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M;
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ aNumber: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">4.815162342</span> }})
+<span class="hljs-keyword">const</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M;
 <span class="hljs-built_in">console</span>.log(m.aNumber) <span class="hljs-comment">// 4.815162342</span>
 
 <span class="hljs-comment">// default unique objects for Mixed types:</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
 schema.path(<span class="hljs-string">'mixed'</span>).default(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
   <span class="hljs-keyword">return</span> {};
 });
@@ -5618,13 +5631,13 @@ schema.path(<span class="hljs-string">'mixed'</span>).default(<span class="hljs-
 <span class="hljs-comment">// if we don't use a function to return object literals for Mixed defaults,</span>
 <span class="hljs-comment">// each document will receive a reference to the same object literal creating</span>
 <span class="hljs-comment">// a "shared" object instance:</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
 schema.path(<span class="hljs-string">'mixed'</span>).default({});
-<span class="hljs-keyword">var</span> M = db.model(<span class="hljs-string">'M'</span>, schema);
-<span class="hljs-keyword">var</span> m1 = <span class="hljs-keyword">new</span> M;
+<span class="hljs-keyword">const</span> M = db.model(<span class="hljs-string">'M'</span>, schema);
+<span class="hljs-keyword">const</span> m1 = <span class="hljs-keyword">new</span> M;
 m1.mixed.added = <span class="hljs-number">1</span>;
 <span class="hljs-built_in">console</span>.log(m1.mixed); <span class="hljs-comment">// { added: 1 }</span>
-<span class="hljs-keyword">var</span> m2 = <span class="hljs-keyword">new</span> M;
+<span class="hljs-keyword">const</span> m2 = <span class="hljs-keyword">new</span> M;
 <span class="hljs-built_in">console</span>.log(m2.mixed); <span class="hljs-comment">// { added: 1 }</span></code></pre></div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-get"><a href="#schematype_SchemaType-get">SchemaType.prototype.get()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</p>
 </li></ul><div><p>Adds a getter to this schematype.</p>
@@ -5637,10 +5650,10 @@ m1.mixed.added = <span class="hljs-number">1</span>;
 }
 
 <span class="hljs-comment">// defining within the schema</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, get: dob })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, get: dob })
 
 <span class="hljs-comment">// or by retreiving its SchemaType</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: <span class="hljs-built_in">Date</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: <span class="hljs-built_in">Date</span> })
 s.path(<span class="hljs-string">'born'</span>).get(dob)</code></pre>
 
 <p>Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.</p>
@@ -5651,11 +5664,11 @@ s.path(<span class="hljs-string">'born'</span>).get(dob)</code></pre>
   <span class="hljs-keyword">return</span> <span class="hljs-string">'****-****-****-'</span> + cc.slice(cc.length<span class="hljs-number">-4</span>, cc.length);
 }
 
-<span class="hljs-keyword">var</span> AccountSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> AccountSchema = <span class="hljs-keyword">new</span> Schema({
   creditCardNumber: { type: <span class="hljs-built_in">String</span>, get: obfuscate }
 });
 
-<span class="hljs-keyword">var</span> Account = db.model(<span class="hljs-string">'Account'</span>, AccountSchema);
+<span class="hljs-keyword">const</span> Account = db.model(<span class="hljs-string">'Account'</span>, AccountSchema);
 
 Account.findById(id, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, found</span>) </span>{
   <span class="hljs-built_in">console</span>.log(found.creditCardNumber); <span class="hljs-comment">// '****-****-****-1234'</span>
@@ -5671,12 +5684,12 @@ Account.findById(id, <span class="hljs-function"><span class="hljs-keyword">func
   }
 }
 
-<span class="hljs-keyword">var</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
   name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span>, get: inspector },
   taxonomy: { type: <span class="hljs-built_in">String</span>, get: inspector }
 })
 
-<span class="hljs-keyword">var</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
+<span class="hljs-keyword">const</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
 
 Virus.findById(id, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, virus</span>) </span>{
   <span class="hljs-built_in">console</span>.log(virus.name);     <span class="hljs-comment">// name is required</span>
@@ -5721,11 +5734,11 @@ Model.updateOne({}, { name: <span class="hljs-string">'test2'</span> }, { strict
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, index: <span class="hljs-literal">true</span> })
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'hashed'</span> })
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'2d'</span>, sparse: <span class="hljs-literal">true</span> })
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: { type: <span class="hljs-string">'2dsphere'</span>, sparse: <span class="hljs-literal">true</span> }})
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ date: { type: <span class="hljs-built_in">Date</span>, index: { unique: <span class="hljs-literal">true</span>, expires: <span class="hljs-string">'1d'</span> }})
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, index: <span class="hljs-literal">true</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'hashed'</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'2d'</span>, sparse: <span class="hljs-literal">true</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: { type: <span class="hljs-string">'2dsphere'</span>, sparse: <span class="hljs-literal">true</span> }})
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ date: { type: <span class="hljs-built_in">Date</span>, index: { unique: <span class="hljs-literal">true</span>, expires: <span class="hljs-string">'1d'</span> }})
 s.path(<span class="hljs-string">'my.path'</span>).index(<span class="hljs-literal">true</span>);
 s.path(<span class="hljs-string">'my.date'</span>).index({ expires: <span class="hljs-number">60</span> });
 s.path(<span class="hljs-string">'my.path'</span>).index({ unique: <span class="hljs-literal">true</span>, sparse: <span class="hljs-literal">true</span> });</code></pre>
@@ -5764,15 +5777,15 @@ postSchema.path(<span class="hljs-string">'user'</span>).ref(() =&amp;gt; User);
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-literal">true</span> })
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-literal">true</span> })
 
 <span class="hljs-comment">// or with custom error message</span>
 
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-string">'{PATH} is required!'</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-string">'{PATH} is required!'</span> })
 
 <span class="hljs-comment">// or with a function</span>
 
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({
   userId: ObjectId,
   username: {
     type: <span class="hljs-built_in">String</span>,
@@ -5781,7 +5794,7 @@ postSchema.path(<span class="hljs-string">'user'</span>).ref(() =&amp;gt; User);
 })
 
 <span class="hljs-comment">// or with a function and a custom message</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({
   userId: ObjectId,
   username: {
     type: <span class="hljs-built_in">String</span>,
@@ -5801,7 +5814,7 @@ s.path(<span class="hljs-string">'name'</span>).required(<span class="hljs-liter
 s.path(<span class="hljs-string">'name'</span>).required(<span class="hljs-literal">true</span>, <span class="hljs-string">'grrr :( '</span>);
 
 <span class="hljs-comment">// or make a path conditionally required based on a function</span>
-<span class="hljs-keyword">var</span> isOver18 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.age &gt;= <span class="hljs-number">18</span>; };
+<span class="hljs-keyword">const</span> isOver18 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.age &gt;= <span class="hljs-number">18</span>; };
 s.path(<span class="hljs-string">'voterRegistrationId'</span>).required(isOver18);</code></pre>
 
 <p>The required validator uses the SchemaType's <code>checkRequired</code> function to determine whether a given value satisfies the required validator. By default, a value satisfies the required validator if <code>val != null</code> (that is, if the value is not null nor undefined). However, most built-in mongoose schema types override the default <code>checkRequired</code> function:</p></div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-select"><a href="#schematype_SchemaType-select">SchemaType.prototype.select()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
@@ -5827,10 +5840,10 @@ T.find().select(<span class="hljs-string">'-x'</span>).exec(callback);</code></p
 }
 
 <span class="hljs-comment">// defining within the schema</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, set: capitalize }});
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, set: capitalize }});
 
 <span class="hljs-comment">// or with the SchemaType</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
 s.path(<span class="hljs-string">'name'</span>).set(capitalize);</code></pre>
 
 <p>Setters allow you to transform the data before it gets to the raw mongodb document or query.</p>
@@ -5843,17 +5856,17 @@ s.path(<span class="hljs-string">'name'</span>).set(capitalize);</code></pre>
   return v.toLowerCase();
 }
 
-var UserSchema = new Schema({
+const UserSchema = new Schema({
   email: { type: String, set: toLower }
 });
 
-var User = db.model('User', UserSchema);
+const User = db.model('User', UserSchema);
 
-var user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'});
+const user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'});
 console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
 
 // or
-var user = new User();
+const user = new User();
 user.email = '<a href='mailto:Avenue@Q.com'>Avenue@Q.com</a>';
 console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
 User.updateOne({ _id: _id }, { $set: { email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>' } }); // update to '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
@@ -5875,13 +5888,13 @@ User.updateOne({ _id: _id }, { $set: { email: '<a href='mailto:AVENUE@Q.COM'>AVE
   }
 }
 
-<span class="hljs-keyword">var</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
   name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span>, set: inspector },
   taxonomy: { type: <span class="hljs-built_in">String</span>, set: inspector }
 })
 
-<span class="hljs-keyword">var</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
-<span class="hljs-keyword">var</span> v = <span class="hljs-keyword">new</span> Virus({ name: <span class="hljs-string">'Parvoviridae'</span>, taxonomy: <span class="hljs-string">'Parvovirinae'</span> });
+<span class="hljs-keyword">const</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
+<span class="hljs-keyword">const</span> v = <span class="hljs-keyword">new</span> Virus({ name: <span class="hljs-string">'Parvoviridae'</span>, taxonomy: <span class="hljs-string">'Parvovirinae'</span> });
 
 <span class="hljs-built_in">console</span>.log(v.name);     <span class="hljs-comment">// name is required</span>
 <span class="hljs-built_in">console</span>.log(v.taxonomy); <span class="hljs-comment">// Parvovirinae</span></code></pre>
@@ -5904,14 +5917,14 @@ nameSchema.path('name').set(function(v) {
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, sparse: <span class="hljs-literal">true</span> } });
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, sparse: <span class="hljs-literal">true</span> } });
 s.path(<span class="hljs-string">'name'</span>).index({ sparse: <span class="hljs-literal">true</span> });</code></pre></div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-text"><a href="#schematype_SchemaType-text">SchemaType.prototype.text()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">bool
 <span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</p>
 </li></ul><div><p>Declares a full text index.</p>
 
 <h3>Example:</h3>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({name : {type: <span class="hljs-built_in">String</span>, text : <span class="hljs-literal">true</span> })
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({name : {type: <span class="hljs-built_in">String</span>, text : <span class="hljs-literal">true</span> })
  s.path(<span class="hljs-string">'name'</span>).index({text : <span class="hljs-literal">true</span>});</code></pre></div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-transform"><a href="#schematype_SchemaType-transform">SchemaType.prototype.transform()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</p>
 </li></ul><div><p>Defines a custom function for transforming this path when converting a document to JSON.</p>
@@ -5937,7 +5950,7 @@ doc.toJSON().date; <span class="hljs-comment">// 2016 as a number</span>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }});
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }});
 s.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hljs-literal">true</span> });</code></pre>
 
 <p><em>NOTE: violating the constraint returns an <code>E11000</code> error from MongoDB when saving, not a Mongoose validation error.</em></p></div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-validate"><a href="#schematype_SchemaType-validate">SchemaType.prototype.validate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
@@ -5969,12 +5982,12 @@ s.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hlj
 
 <span class="hljs-comment">// with a custom error message</span>
 
-<span class="hljs-keyword">var</span> custom = [validator, <span class="hljs-string">'Uh oh, {PATH} does not equal "something".'</span>]
+<span class="hljs-keyword">const</span> custom = [validator, <span class="hljs-string">'Uh oh, {PATH} does not equal "something".'</span>]
 <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, validate: custom }});
 
 <span class="hljs-comment">// adding many validators at a time</span>
 
-<span class="hljs-keyword">var</span> many = [
+<span class="hljs-keyword">const</span> many = [
     { validator: validator, msg: <span class="hljs-string">'uh oh'</span> }
   , { validator: anotherValidator, msg: <span class="hljs-string">'failed'</span> }
 ]
@@ -5982,7 +5995,7 @@ s.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hlj
 
 <span class="hljs-comment">// or utilizing SchemaType methods directly:</span>
 
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });
 schema.path(<span class="hljs-string">'name'</span>).validate(validator, <span class="hljs-string">'validation of `{PATH}` failed with value `{VALUE}`'</span>);</code></pre>
 
 <h4>Error message templates:</h4>
@@ -6025,11 +6038,11 @@ schema.path(<span class="hljs-string">'name'</span>).validate(validator, <span c
 
 <p>If validation fails during <code>pre('save')</code> and no callback was passed to receive the error, an <code>error</code> event will be emitted on your Models associated db <a href="#connection_Connection">connection</a>, passing the validation error object along.</p>
 
-<pre><code><span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+<pre><code><span class="hljs-keyword">const</span> conn = mongoose.createConnection(..);
 conn.on(<span class="hljs-string">'error'</span>, handleError);
 
-<span class="hljs-keyword">var</span> Product = conn.model(<span class="hljs-string">'Product'</span>, yourSchema);
-<span class="hljs-keyword">var</span> dvd = <span class="hljs-keyword">new</span> Product(..);
+<span class="hljs-keyword">const</span> Product = conn.model(<span class="hljs-string">'Product'</span>, yourSchema);
+<span class="hljs-keyword">const</span> dvd = <span class="hljs-keyword">new</span> Product(..);
 dvd.save(); <span class="hljs-comment">// emits error on the `conn` above</span></code></pre>
 
 <p>If you want to handle these errors at the Model level, add an <code>error</code> listener to your Model as shown below.</p>
@@ -6098,7 +6111,7 @@ fullname <span class="hljs-keyword">instanceof</span> mongoose.VirtualType <span
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> virtual = schema.virtual(<span class="hljs-string">'fullname'</span>);
+<pre><code><span class="hljs-keyword">const</span> virtual = schema.virtual(<span class="hljs-string">'fullname'</span>);
 virtual.get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, virtual, doc</span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last;
 });</code></pre></div><hr class="separate-api-elements"><h3 id="virtualtype_VirtualType-set"><a href="#virtualtype_VirtualType-set">VirtualType.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">VirtualType,
@@ -6118,7 +6131,7 @@ virtual.get(<span class="hljs-function"><span class="hljs-keyword">function</spa
 
 <pre><code><span class="hljs-keyword">const</span> virtual = schema.virtual(<span class="hljs-string">'fullname'</span>);
 virtual.set(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, virtual, doc</span>) </span>{
-  <span class="hljs-keyword">var</span> parts = value.split(<span class="hljs-string">' '</span>);
+  <span class="hljs-keyword">const</span> parts = value.split(<span class="hljs-string">' '</span>);
   <span class="hljs-keyword">this</span>.name.first = parts[<span class="hljs-number">0</span>];
   <span class="hljs-keyword">this</span>.name.last = parts[<span class="hljs-number">1</span>];
 });
@@ -6194,7 +6207,7 @@ err.errors[<span class="hljs-string">'name'</span>].value; <span class="hljs-com
 
 <pre><code>doc.array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];
 
- <span class="hljs-keyword">var</span> popped = doc.array.$pop();
+ <span class="hljs-keyword">const</span> popped = doc.array.$pop();
  <span class="hljs-built_in">console</span>.log(popped); <span class="hljs-comment">// 3</span>
  <span class="hljs-built_in">console</span>.log(doc.array); <span class="hljs-comment">// [1,2]</span>
 
@@ -6217,7 +6230,7 @@ err.errors[<span class="hljs-string">'name'</span>].value; <span class="hljs-com
 
 <pre><code>doc.array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];
 
- <span class="hljs-keyword">var</span> shifted = doc.array.$shift();
+ <span class="hljs-keyword">const</span> shifted = doc.array.$shift();
  <span class="hljs-built_in">console</span>.log(shifted); <span class="hljs-comment">// 1</span>
  <span class="hljs-built_in">console</span>.log(doc.array); <span class="hljs-comment">// [2,3]</span>
 
@@ -6239,7 +6252,7 @@ err.errors[<span class="hljs-string">'name'</span>].value; <span class="hljs-com
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [2,3,4]</span>
-<span class="hljs-keyword">var</span> added = doc.array.addToSet(<span class="hljs-number">4</span>,<span class="hljs-number">5</span>);
+<span class="hljs-keyword">const</span> added = doc.array.addToSet(<span class="hljs-number">4</span>,<span class="hljs-number">5</span>);
 <span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [2,3,4,5]</span>
 <span class="hljs-built_in">console</span>.log(added)     <span class="hljs-comment">// [5]</span></code></pre></div><hr class="separate-api-elements"><h3 id="mongoosearray_MongooseArray-includes"><a href="#mongoosearray_MongooseArray-includes">MongooseArray.prototype.includes()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
 <span class="method-type">&laquo;Object&raquo;</span> the item to check</p>
@@ -6298,9 +6311,9 @@ doc.nums; <span class="hljs-comment">// [1, 2, 3, 4, 5]</span></code></pre></div
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-comment">// given documents based on the following</span>
-<span class="hljs-keyword">var</span> Doc = mongoose.model(<span class="hljs-string">'Doc'</span>, <span class="hljs-keyword">new</span> Schema({ array: [<span class="hljs-built_in">Number</span>] }));
+<span class="hljs-keyword">const</span> Doc = mongoose.model(<span class="hljs-string">'Doc'</span>, <span class="hljs-keyword">new</span> Schema({ array: [<span class="hljs-built_in">Number</span>] }));
 
-<span class="hljs-keyword">var</span> doc = <span class="hljs-keyword">new</span> Doc({ array: [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>] })
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Doc({ array: [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>] })
 
 <span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [2,3,4]</span>
 
@@ -6316,7 +6329,7 @@ doc.save() <span class="hljs-comment">// change is not saved</span></code></pre>
 <h4>Example:</h4>
 
 <pre><code>doc.array = [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];
-<span class="hljs-keyword">var</span> res = doc.array.shift();
+<span class="hljs-keyword">const</span> res = doc.array.shift();
 <span class="hljs-built_in">console</span>.log(res) <span class="hljs-comment">// 2</span>
 <span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [3]</span></code></pre>
 

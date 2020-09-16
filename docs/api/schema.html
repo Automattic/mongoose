@@ -17,9 +17,9 @@
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> child = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, age: <span class="hljs-built_in">Number</span>, children: [child] });
-<span class="hljs-keyword">var</span> Tree = mongoose.model(<span class="hljs-string">'Tree'</span>, schema);
+<pre><code><span class="hljs-keyword">const</span> child = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, age: <span class="hljs-built_in">Number</span>, children: [child] });
+<span class="hljs-keyword">const</span> Tree = mongoose.model(<span class="hljs-string">'Tree'</span>, schema);
 
 <span class="hljs-comment">// setting schema options</span>
 <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { _id: <span class="hljs-literal">false</span>, autoIndex: <span class="hljs-literal">false</span> })</code></pre>
@@ -66,8 +66,8 @@
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;</code></pre>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> ObjectId = mongoose.Schema.Types.ObjectId;</code></pre>
 
 <h4>Types:</h4>
 
@@ -84,7 +84,7 @@
 
 <p>Using this exposed access to the <code>Mixed</code> SchemaType, we can use them in our schema.</p>
 
-<pre><code><span class="hljs-keyword">var</span> Mixed = mongoose.Schema.Types.Mixed;
+<pre><code><span class="hljs-keyword">const</span> Mixed = mongoose.Schema.Types.Mixed;
 <span class="hljs-keyword">new</span> mongoose.Schema({ _user: Mixed })</code></pre>  </div><hr class="separate-api-elements"><h3 id="schema_Schema-indexTypes"><a href="#schema_Schema-indexTypes">Schema.indexTypes</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The allowed index types</p>  </div><hr class="separate-api-elements"><h3 id="schema_Schema-add"><a href="#schema_Schema-add">Schema.prototype.add()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
 <span class="method-type">&laquo;Object|Schema&raquo;</span> plain object with paths to add, or another schema</p>
 </li><li class="param">[prefix]
@@ -192,15 +192,15 @@ userSchema.loadClass(UserClass);
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = kittySchema = <span class="hljs-keyword">new</span> Schema(..);
+<pre><code><span class="hljs-keyword">const</span> schema = kittySchema = <span class="hljs-keyword">new</span> Schema(..);
 
 schema.method(<span class="hljs-string">'meow'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'meeeeeoooooooooooow'</span>);
 })
 
-<span class="hljs-keyword">var</span> Kitty = mongoose.model(<span class="hljs-string">'Kitty'</span>, schema);
+<span class="hljs-keyword">const</span> Kitty = mongoose.model(<span class="hljs-string">'Kitty'</span>, schema);
 
-<span class="hljs-keyword">var</span> fizz = <span class="hljs-keyword">new</span> Kitty;
+<span class="hljs-keyword">const</span> fizz = <span class="hljs-keyword">new</span> Kitty;
 fizz.meow(); <span class="hljs-comment">// meeeeeooooooooooooow</span></code></pre>
 
 <p>If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as methods.</p>
@@ -218,7 +218,7 @@ fizz.scratch();</code></pre>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ a: <span class="hljs-built_in">String</span> }).add({ b: <span class="hljs-built_in">String</span> });
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ a: <span class="hljs-built_in">String</span> }).add({ b: <span class="hljs-built_in">String</span> });
 schema.obj; <span class="hljs-comment">// { a: String }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="schema_Schema-path"><a href="#schema_Schema-path">Schema.prototype.path()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">path
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">constructor
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><div><p>Gets/sets schema paths.</p>
@@ -284,7 +284,7 @@ mongoose.model(<span class="hljs-string">'Test'</span>, s); <span class="hljs-co
 <span class="method-type">&laquo;Function&raquo;</span> callback</p>
 </li></ul><div><p>Defines a post hook for the document</p>
 
-<pre><code>var schema = new Schema(..);
+<pre><code>const schema = new Schema(..);
 schema.post('save', function (doc) {
   console.log('this fired after a document was saved');
 });
@@ -297,9 +297,9 @@ schema.post(/Many$/, function(res) {
   console.log('this fired after you ran `updateMany()` or `deleteMany()`);
 });
 
-var Model = mongoose.model('Model', schema);
+const Model = mongoose.model('Model', schema);
 
-var m = new Model(..);
+const m = new Model(..);
 m.save(function(err) {
   console.log('this fires after the `post` hook');
 });
@@ -318,7 +318,7 @@ m.find(function(err, docs) {
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, created: <span class="hljs-built_in">Date</span> });
+<pre><code><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span>, created: <span class="hljs-built_in">Date</span> });
 
 toySchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
   <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.created) <span class="hljs-keyword">this</span>.created = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>;
@@ -446,7 +446,7 @@ schema.static(<span class="hljs-string">'findByName'</span>, <span class="hljs-f
 
 <p><em>NOTE:</em> Use of these terms as method names is permitted, but play at your own risk, as they may be existing mongoose document methods you are stomping on.</p>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema(..);
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema(..);
  schema.methods.init = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{} <span class="hljs-comment">// potentially breaking</span></code></pre>  </div></div><script>_native.init("CK7DT53U",{
   targetClass: 'native-inline'
 });</script></div></div><script type="text/javascript">var xhr = new XMLHttpRequest();

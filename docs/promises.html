@@ -13,12 +13,12 @@ This means that you can do things like <code>MyModel.findOne({}).then()</code> a
 <p>You can find the return type of specific operations <a href="https://mongoosejs.com/docs/api.html">in the api docs</a>
 You can also read more about <a href="https://masteringjs.io/tutorials/mongoose/promise">promises in Mongoose</a>.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> gnr = <span class="hljs-keyword">new</span> Band({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> gnr = <span class="hljs-keyword">new</span> Band({
   name: <span class="hljs-string">"Guns N' Roses"</span>,
   members: [<span class="hljs-string">'Axl'</span>, <span class="hljs-string">'Slash'</span>]
 });
 
-<span class="hljs-keyword">var</span> promise = gnr.save();
+<span class="hljs-keyword">const</span> promise = gnr.save();
 assert.ok(promise <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Promise</span>);
 
 promise.then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
@@ -30,7 +30,7 @@ function for <a href="https://www.npmjs.com/package/co">co</a> and async/await a
 a convenience. If you need
 a fully-fledged promise, use the <code>.exec()</code> function.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> query = Band.findOne({name: <span class="hljs-string">"Guns N' Roses"</span>});
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> query = Band.findOne({name: <span class="hljs-string">"Guns N' Roses"</span>});
 assert.ok(!(query <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Promise</span>));
 
 <span class="hljs-comment">// A query is not a fully-fledged promise, but it does have a `.then()`.</span>
@@ -39,7 +39,7 @@ query.then(<span class="hljs-function"><span class="hljs-keyword">function</span
 });
 
 <span class="hljs-comment">// `.exec()` gives you a fully-fledged promise</span>
-<span class="hljs-keyword">var</span> promise = query.exec();
+<span class="hljs-keyword">const</span> promise = query.exec();
 assert.ok(promise <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Promise</span>);
 
 promise.then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc</span>) </span>{
@@ -99,7 +99,7 @@ library like <a href="https://www.npmjs.com/package/bluebird">bluebird</a>. Just
 <code>mongoose.Promise</code> to your favorite
 ES6-style promise constructor and mongoose will use it.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> query = Band.findOne({name: <span class="hljs-string">"Guns N' Roses"</span>});
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> query = Band.findOne({name: <span class="hljs-string">"Guns N' Roses"</span>});
 
 <span class="hljs-comment">// Use bluebird</span>
 mongoose.Promise = <span class="hljs-built_in">require</span>(<span class="hljs-string">'bluebird'</span>);

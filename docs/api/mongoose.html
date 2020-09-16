@@ -49,8 +49,8 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> mongoose2 = <span class="hljs-keyword">new</span> mongoose.Mongoose();</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Number"><a href="#mongoose_Mongoose-Number">Mongoose.prototype.Number</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Number <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that Mongoose should cast to numbers.</p>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> mongoose2 = <span class="hljs-keyword">new</span> mongoose.Mongoose();</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-Number"><a href="#mongoose_Mongoose-Number">Mongoose.prototype.Number</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The Mongoose Number <a href="/docs/schematypes.html">SchemaType</a>. Used for declaring paths in your schema that Mongoose should cast to numbers.</p>
 
 <h4>Example:</h4>
 
@@ -64,9 +64,9 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> Schema = mongoose.Schema;
-<span class="hljs-keyword">var</span> CatSchema = <span class="hljs-keyword">new</span> Schema(..);</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaType"><a href="#mongoose_Mongoose-SchemaType">Mongoose.prototype.SchemaType()</a></h3><div><p>The Mongoose <a href="#schematype_SchemaType">SchemaType</a> constructor</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypeOptions"><a href="#mongoose_Mongoose-SchemaTypeOptions">Mongoose.prototype.SchemaTypeOptions()</a></h3><div><p>The constructor used for schematype options</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypes"><a href="#mongoose_Mongoose-SchemaTypes">Mongoose.prototype.SchemaTypes</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The various Mongoose SchemaTypes.</p>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> Schema = mongoose.Schema;
+<span class="hljs-keyword">const</span> CatSchema = <span class="hljs-keyword">new</span> Schema(..);</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaType"><a href="#mongoose_Mongoose-SchemaType">Mongoose.prototype.SchemaType()</a></h3><div><p>The Mongoose <a href="#schematype_SchemaType">SchemaType</a> constructor</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypeOptions"><a href="#mongoose_Mongoose-SchemaTypeOptions">Mongoose.prototype.SchemaTypeOptions()</a></h3><div><p>The constructor used for schematype options</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-SchemaTypes"><a href="#mongoose_Mongoose-SchemaTypes">Mongoose.prototype.SchemaTypes</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The various Mongoose SchemaTypes.</p>
 
 <h4>Note:</h4>
 
@@ -74,8 +74,8 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> array = mongoose.Types.Array;</code></pre>
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> array = mongoose.Types.Array;</code></pre>
 
 <h4>Types:</h4>
 
@@ -89,8 +89,8 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 
 <p>Using this exposed access to the <code>ObjectId</code> type, we can construct ids on demand.</p>
 
-<pre><code><span class="hljs-keyword">var</span> ObjectId = mongoose.Types.ObjectId;
-<span class="hljs-keyword">var</span> id1 = <span class="hljs-keyword">new</span> ObjectId;</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-VirtualType"><a href="#mongoose_Mongoose-VirtualType">Mongoose.prototype.VirtualType()</a></h3><div><p>The Mongoose <a href="#virtualtype_VirtualType">VirtualType</a> constructor</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connect"><a href="#mongoose_Mongoose-connect">Mongoose.prototype.connect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">uri(s)
+<pre><code><span class="hljs-keyword">const</span> ObjectId = mongoose.Types.ObjectId;
+<span class="hljs-keyword">const</span> id1 = <span class="hljs-keyword">new</span> ObjectId;</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-VirtualType"><a href="#mongoose_Mongoose-VirtualType">Mongoose.prototype.VirtualType()</a></h3><div><p>The Mongoose <a href="#virtualtype_VirtualType">VirtualType</a> constructor</p>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connect"><a href="#mongoose_Mongoose-connect">Mongoose.prototype.connect()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">uri(s)
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> passed down to the <a href="http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html">MongoDB driver&#39;s <code>connect()</code> function</a>, except for 4 mongoose-specific options explained below.</p>
 </li><ul style="margin-top: 0.5em"><li>[options.bufferCommands=true]
@@ -140,21 +140,21 @@ schema.path(<span class="hljs-string">'test'</span>) <span class="hljs-keyword">
 <pre><code>mongoose.connect(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>);
 
 <span class="hljs-comment">// replica sets</span>
-<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/mydatabase'</span>;
+<span class="hljs-keyword">const</span> uri = <span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/mydatabase'</span>;
 mongoose.connect(uri);
 
 <span class="hljs-comment">// with options</span>
 mongoose.connect(uri, options);
 
 <span class="hljs-comment">// optional callback that gets fired when initial connection completed</span>
-<span class="hljs-keyword">var</span> uri = <span class="hljs-string">'mongodb://nonexistent.domain:27000'</span>;
+<span class="hljs-keyword">const</span> uri = <span class="hljs-string">'mongodb://nonexistent.domain:27000'</span>;
 mongoose.connect(uri, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// if error is truthy, the initial connection failed.</span>
 })</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-connection"><a href="#mongoose_Mongoose-connection">Mongoose.prototype.connection</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;Connection&raquo;</span></li></ul><div><p>The Mongoose module's default connection. Equivalent to <code>mongoose.connections[0]</code>, see <a href="#mongoose_Mongoose-connections"><code>connections</code></a>.</p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
 mongoose.connect(...);
 mongoose.connection.on(<span class="hljs-string">'error'</span>, cb);</code></pre>
 
@@ -220,18 +220,18 @@ mongoose.connections.length; <span class="hljs-comment">// 2</span></code></pre>
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>);
 
 <span class="hljs-comment">// and options</span>
-<span class="hljs-keyword">var</span> opts = { db: { native_parser: <span class="hljs-literal">true</span> }}
+<span class="hljs-keyword">const</span> opts = { db: { native_parser: <span class="hljs-literal">true</span> }}
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port/database'</span>, opts);
 
 <span class="hljs-comment">// replica sets</span>
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/database'</span>);
 
 <span class="hljs-comment">// and options</span>
-<span class="hljs-keyword">var</span> opts = { replset: { strategy: <span class="hljs-string">'ping'</span>, rs_name: <span class="hljs-string">'testSet'</span> }}
+<span class="hljs-keyword">const</span> opts = { replset: { strategy: <span class="hljs-string">'ping'</span>, rs_name: <span class="hljs-string">'testSet'</span> }}
 db = mongoose.createConnection(<span class="hljs-string">'mongodb://user:pass@localhost:port,anotherhost:port,yetanother:port/database'</span>, opts);
 
 <span class="hljs-comment">// and options</span>
-<span class="hljs-keyword">var</span> opts = { server: { auto_reconnect: <span class="hljs-literal">false</span> }, user: <span class="hljs-string">'username'</span>, pass: <span class="hljs-string">'mypassword'</span> }
+<span class="hljs-keyword">const</span> opts = { server: { auto_reconnect: <span class="hljs-literal">false</span> }, user: <span class="hljs-string">'username'</span>, pass: <span class="hljs-string">'mypassword'</span> }
 db = mongoose.createConnection(<span class="hljs-string">'localhost'</span>, <span class="hljs-string">'database'</span>, port, opts)
 
 <span class="hljs-comment">// initialize now, connect later</span>
@@ -284,17 +284,17 @@ mongoose.isValidObjectId(<span class="hljs-number">6</span>); <span class="hljs-
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
 
 <span class="hljs-comment">// define an Actor model with this mongoose instance</span>
 <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
 mongoose.model(<span class="hljs-string">'Actor'</span>, schema);
 
 <span class="hljs-comment">// create a new connection</span>
-<span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+<span class="hljs-keyword">const</span> conn = mongoose.createConnection(..);
 
 <span class="hljs-comment">// create Actor model</span>
-<span class="hljs-keyword">var</span> Actor = conn.model(<span class="hljs-string">'Actor'</span>, schema);
+<span class="hljs-keyword">const</span> Actor = conn.model(<span class="hljs-string">'Actor'</span>, schema);
 conn.model(<span class="hljs-string">'Actor'</span>) === Actor; <span class="hljs-comment">// true</span>
 conn.model(<span class="hljs-string">'Actor'</span>, schema) === Actor; <span class="hljs-comment">// true, same schema</span>
 conn.model(<span class="hljs-string">'Actor'</span>, schema, <span class="hljs-string">'actors'</span>) === Actor; <span class="hljs-comment">// true, same schema and collection name</span>
@@ -306,7 +306,7 @@ conn.model(<span class="hljs-string">'Actor'</span>, <span class="hljs-keyword">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
 
 <span class="hljs-comment">// or</span>
 
@@ -314,8 +314,8 @@ schema.set(<span class="hljs-string">'collection'</span>, <span class="hljs-stri
 
 <span class="hljs-comment">// or</span>
 
-<span class="hljs-keyword">var</span> collectionName = <span class="hljs-string">'actor'</span>
-<span class="hljs-keyword">var</span> M = mongoose.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-modelNames"><a href="#mongoose_Mongoose-modelNames">Mongoose.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this instance of Mongoose.</p>
+<span class="hljs-keyword">const</span> collectionName = <span class="hljs-string">'actor'</span>
+<span class="hljs-keyword">const</span> M = mongoose.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoose_Mongoose-modelNames"><a href="#mongoose_Mongoose-modelNames">Mongoose.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this instance of Mongoose.</p>
 
 <h4>Note:</h4>
 

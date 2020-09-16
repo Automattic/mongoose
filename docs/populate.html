@@ -319,7 +319,7 @@ and <code>Query#populate()</code> use to populate documents.</p>
 <h3 id="deep-populate"><a href="#deep-populate">Populating across multiple levels</a></h3>
 
 <p>Say you have a user schema which keeps track of the user&#39;s friends.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> userSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
   name: <span class="hljs-built_in">String</span>,
   friends: [{ type: ObjectId, ref: <span class="hljs-string">'User'</span> }]
 });</code></pre>

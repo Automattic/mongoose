@@ -27,16 +27,16 @@
 <li>Validation is customizable</li>
 </ul>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   name: {
     type: <span class="hljs-built_in">String</span>,
     required: <span class="hljs-literal">true</span>
   }
 });
-<span class="hljs-keyword">var</span> Cat = db.model(<span class="hljs-string">'Cat'</span>, schema);
+<span class="hljs-keyword">const</span> Cat = db.model(<span class="hljs-string">'Cat'</span>, schema);
 
 <span class="hljs-comment">// This cat has no name :(</span>
-<span class="hljs-keyword">var</span> cat = <span class="hljs-keyword">new</span> Cat();
+<span class="hljs-keyword">const</span> cat = <span class="hljs-keyword">new</span> Cat();
 cat.save(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   assert.equal(error.errors[<span class="hljs-string">'name'</span>].message,
     <span class="hljs-string">'Path `name` is required.'</span>);
@@ -54,7 +54,7 @@ cat.save(<span class="hljs-function"><span class="hljs-keyword">function</span>(
 </ul>
 <p>Each of the validator links above provide more information about how to enable them and customize their error messages.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> breakfastSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> breakfastSchema = <span class="hljs-keyword">new</span> Schema({
   eggs: {
     type: <span class="hljs-built_in">Number</span>,
     min: [<span class="hljs-number">6</span>, <span class="hljs-string">'Too few eggs'</span>],
@@ -72,14 +72,14 @@ cat.save(<span class="hljs-function"><span class="hljs-keyword">function</span>(
     }
   }
 });
-<span class="hljs-keyword">var</span> Breakfast = db.model(<span class="hljs-string">'Breakfast'</span>, breakfastSchema);
+<span class="hljs-keyword">const</span> Breakfast = db.model(<span class="hljs-string">'Breakfast'</span>, breakfastSchema);
 
-<span class="hljs-keyword">var</span> badBreakfast = <span class="hljs-keyword">new</span> Breakfast({
+<span class="hljs-keyword">const</span> badBreakfast = <span class="hljs-keyword">new</span> Breakfast({
   eggs: <span class="hljs-number">2</span>,
   bacon: <span class="hljs-number">0</span>,
   drink: <span class="hljs-string">'Milk'</span>
 });
-<span class="hljs-keyword">var</span> error = badBreakfast.validateSync();
+<span class="hljs-keyword">let</span> error = badBreakfast.validateSync();
 assert.equal(error.errors[<span class="hljs-string">'eggs'</span>].message,
   <span class="hljs-string">'Too few eggs'</span>);
 assert.ok(!error.errors[<span class="hljs-string">'bacon'</span>]);
@@ -137,7 +137,7 @@ to suit your needs.</p>
 You can find detailed instructions on how to do this in the
 <a href="./api.html#schematype_SchemaType-validate"><code>SchemaType#validate()</code> API docs</a>.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> userSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> Schema({
   phone: {
     type: <span class="hljs-built_in">String</span>,
     validate: {
@@ -150,9 +150,9 @@ You can find detailed instructions on how to do this in the
   }
 });
 
-<span class="hljs-keyword">var</span> User = db.model(<span class="hljs-string">'user'</span>, userSchema);
-<span class="hljs-keyword">var</span> user = <span class="hljs-keyword">new</span> User();
-<span class="hljs-keyword">var</span> error;
+<span class="hljs-keyword">const</span> User = db.model(<span class="hljs-string">'user'</span>, userSchema);
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> User();
+<span class="hljs-keyword">let</span> error;
 
 user.phone = <span class="hljs-string">'555.0123'</span>;
 error = user.validateSync();
@@ -212,12 +212,12 @@ A ValidatorError also may have a <code>reason</code> property. If an error was
 thrown in the validator, this property will contain the error that was
 thrown.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> Schema({
   color: <span class="hljs-built_in">String</span>,
   name: <span class="hljs-built_in">String</span>
 });
 
-<span class="hljs-keyword">var</span> validator = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
+<span class="hljs-keyword">const</span> validator = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-regexp">/red|white|gold/i</span>.test(value);
 };
 toySchema.path(<span class="hljs-string">'color'</span>).validate(validator,
@@ -229,9 +229,9 @@ toySchema.path(<span class="hljs-string">'name'</span>).validate(<span class="hl
   <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 }, <span class="hljs-string">'Name `{VALUE}` is not valid'</span>);
 
-<span class="hljs-keyword">var</span> Toy = db.model(<span class="hljs-string">'Toy'</span>, toySchema);
+<span class="hljs-keyword">const</span> Toy = db.model(<span class="hljs-string">'Toy'</span>, toySchema);
 
-<span class="hljs-keyword">var</span> toy = <span class="hljs-keyword">new</span> Toy({ color: <span class="hljs-string">'Green'</span>, name: <span class="hljs-string">'Power Ranger'</span> });
+<span class="hljs-keyword">const</span> toy = <span class="hljs-keyword">new</span> Toy({ color: <span class="hljs-string">'Green'</span>, name: <span class="hljs-string">'Power Ranger'</span> });
 
 toy.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
   <span class="hljs-comment">// `err` is a ValidationError object</span>
@@ -278,7 +278,7 @@ err.errors[<span class="hljs-string">'numWheels'</span>].message;</code></pre>
 </a></h2><p>Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> personSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> personSchema = <span class="hljs-keyword">new</span> Schema({
   name: {
     first: <span class="hljs-built_in">String</span>,
     last: <span class="hljs-built_in">String</span>
@@ -291,7 +291,7 @@ assert.throws(<span class="hljs-function"><span class="hljs-keyword">function</s
 }, <span class="hljs-regexp">/Cannot.*'required'/</span>);
 
 <span class="hljs-comment">// To make a nested object required, use a single nested schema</span>
-<span class="hljs-keyword">var</span> nameSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> nameSchema = <span class="hljs-keyword">new</span> Schema({
   first: <span class="hljs-built_in">String</span>,
   last: <span class="hljs-built_in">String</span>
 });
@@ -303,10 +303,10 @@ personSchema = <span class="hljs-keyword">new</span> Schema({
   }
 });
 
-<span class="hljs-keyword">var</span> Person = db.model(<span class="hljs-string">'Person'</span>, personSchema);
+<span class="hljs-keyword">const</span> Person = db.model(<span class="hljs-string">'Person'</span>, personSchema);
 
-<span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> Person();
-<span class="hljs-keyword">var</span> error = person.validateSync();
+<span class="hljs-keyword">const</span> person = <span class="hljs-keyword">new</span> Person();
+<span class="hljs-keyword">const</span> error = person.validateSync();
 assert.ok(error.errors[<span class="hljs-string">'name'</span>]);</code></pre>
 <h2 id="update-validators"><a href="#update-validators"><p>Update Validators</p>
 </a></h2><p>In the above examples, you learned about document validation. Mongoose also
@@ -321,18 +321,18 @@ the <code>runValidators</code> option.</p>
 Be careful: update validators are off by default because they have several
 caveats.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> Schema({
   color: <span class="hljs-built_in">String</span>,
   name: <span class="hljs-built_in">String</span>
 });
 
-<span class="hljs-keyword">var</span> Toy = db.model(<span class="hljs-string">'Toys'</span>, toySchema);
+<span class="hljs-keyword">const</span> Toy = db.model(<span class="hljs-string">'Toys'</span>, toySchema);
 
 Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-regexp">/red|green|blue/i</span>.test(value);
 }, <span class="hljs-string">'Invalid color'</span>);
 
-<span class="hljs-keyword">var</span> opts = { runValidators: <span class="hljs-literal">true</span> };
+<span class="hljs-keyword">const</span> opts = { runValidators: <span class="hljs-literal">true</span> };
 Toy.updateOne({}, { color: <span class="hljs-string">'not a color'</span> }, opts, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
   assert.equal(err.errors.color.message,
     <span class="hljs-string">'Invalid color'</span>);
@@ -345,7 +345,7 @@ However, when running update validators, the document being updated
 may not be in the server&#39;s memory, so by default the value of <code>this</code> is
 not defined.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> toySchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> toySchema = <span class="hljs-keyword">new</span> Schema({
   color: <span class="hljs-built_in">String</span>,
   name: <span class="hljs-built_in">String</span>
 });
@@ -360,14 +360,14 @@ toySchema.path(<span class="hljs-string">'color'</span>).validate(<span class="h
   <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 });
 
-<span class="hljs-keyword">var</span> Toy = db.model(<span class="hljs-string">'ActionFigure'</span>, toySchema);
+<span class="hljs-keyword">const</span> Toy = db.model(<span class="hljs-string">'ActionFigure'</span>, toySchema);
 
-<span class="hljs-keyword">var</span> toy = <span class="hljs-keyword">new</span> Toy({ color: <span class="hljs-string">'red'</span>, name: <span class="hljs-string">'Red Power Ranger'</span> });
-<span class="hljs-keyword">var</span> error = toy.validateSync();
+<span class="hljs-keyword">const</span> toy = <span class="hljs-keyword">new</span> Toy({ color: <span class="hljs-string">'red'</span>, name: <span class="hljs-string">'Red Power Ranger'</span> });
+<span class="hljs-keyword">const</span> error = toy.validateSync();
 assert.ok(error.errors[<span class="hljs-string">'color'</span>]);
 
-<span class="hljs-keyword">var</span> update = { color: <span class="hljs-string">'red'</span>, name: <span class="hljs-string">'Red Power Ranger'</span> };
-<span class="hljs-keyword">var</span> opts = { runValidators: <span class="hljs-literal">true</span> };
+<span class="hljs-keyword">const</span> update = { color: <span class="hljs-string">'red'</span>, name: <span class="hljs-string">'Red Power Ranger'</span> };
+<span class="hljs-keyword">const</span> opts = { runValidators: <span class="hljs-literal">true</span> };
 
 Toy.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// The update validator throws an error:</span>
@@ -389,11 +389,11 @@ to the underlying query.</p>
   <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 });
 
-<span class="hljs-keyword">var</span> Toy = db.model(<span class="hljs-string">'Figure'</span>, toySchema);
+<span class="hljs-keyword">const</span> Toy = db.model(<span class="hljs-string">'Figure'</span>, toySchema);
 
-<span class="hljs-keyword">var</span> update = { color: <span class="hljs-string">'blue'</span>, name: <span class="hljs-string">'Red Power Ranger'</span> };
+<span class="hljs-keyword">const</span> update = { color: <span class="hljs-string">'blue'</span>, name: <span class="hljs-string">'Red Power Ranger'</span> };
 <span class="hljs-comment">// Note the context option</span>
-<span class="hljs-keyword">var</span> opts = { runValidators: <span class="hljs-literal">true</span>, context: <span class="hljs-string">'query'</span> };
+<span class="hljs-keyword">const</span> opts = { runValidators: <span class="hljs-literal">true</span>, context: <span class="hljs-string">'query'</span> };
 
 Toy.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   assert.ok(error.errors[<span class="hljs-string">'color'</span>]);
@@ -406,20 +406,20 @@ succeed.</p>
 <p>When using update validators, <code>required</code> validators <strong>only</strong> fail when
 you try to explicitly <code>$unset</code> the key.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> kittenSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> kittenSchema = <span class="hljs-keyword">new</span> Schema({
   name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> },
   age: <span class="hljs-built_in">Number</span>
 });
 
-<span class="hljs-keyword">var</span> Kitten = db.model(<span class="hljs-string">'Kitten'</span>, kittenSchema);
+<span class="hljs-keyword">const</span> Kitten = db.model(<span class="hljs-string">'Kitten'</span>, kittenSchema);
 
-<span class="hljs-keyword">var</span> update = { color: <span class="hljs-string">'blue'</span> };
-<span class="hljs-keyword">var</span> opts = { runValidators: <span class="hljs-literal">true</span> };
+<span class="hljs-keyword">const</span> update = { color: <span class="hljs-string">'blue'</span> };
+<span class="hljs-keyword">const</span> opts = { runValidators: <span class="hljs-literal">true</span> };
 Kitten.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
   <span class="hljs-comment">// Operation succeeds despite the fact that 'name' is not specified</span>
 });
 
-<span class="hljs-keyword">var</span> unset = { $unset: { name: <span class="hljs-number">1</span> } };
+<span class="hljs-keyword">const</span> unset = { $unset: { name: <span class="hljs-number">1</span> } };
 Kitten.updateOne({}, unset, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
   <span class="hljs-comment">// Operation fails because 'name' is required</span>
   assert.ok(err);
@@ -442,7 +442,7 @@ following update operators:</p>
 <strong>not</strong> run any validation on the array itself, only individual elements
 of the array.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> testSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> testSchema = <span class="hljs-keyword">new</span> Schema({
   number: { type: <span class="hljs-built_in">Number</span>, max: <span class="hljs-number">0</span> },
   arr: [{ message: { type: <span class="hljs-built_in">String</span>, maxlength: <span class="hljs-number">10</span> } }]
 });
@@ -453,10 +453,10 @@ testSchema.path(<span class="hljs-string">'arr'</span>).validate(<span class="hl
   <span class="hljs-keyword">return</span> v.length &lt; <span class="hljs-number">2</span>;
 });
 
-<span class="hljs-keyword">var</span> Test = db.model(<span class="hljs-string">'Test'</span>, testSchema);
+<span class="hljs-keyword">const</span> Test = db.model(<span class="hljs-string">'Test'</span>, testSchema);
 
-<span class="hljs-keyword">var</span> update = { $inc: { number: <span class="hljs-number">1</span> } };
-<span class="hljs-keyword">var</span> opts = { runValidators: <span class="hljs-literal">true</span> };
+<span class="hljs-keyword">let</span> update = { $inc: { number: <span class="hljs-number">1</span> } };
+<span class="hljs-keyword">const</span> opts = { runValidators: <span class="hljs-literal">true</span> };
 Test.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// There will never be a validation error here</span>
   update = { $push: [{ message: <span class="hljs-string">'hello'</span> }, { message: <span class="hljs-string">'world'</span> }] };
@@ -468,22 +468,22 @@ Test.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-k
 <h2 id="on-$push-and-$addtoset"><a href="#on-$push-and-$addtoset"><p>On $push and $addToSet</p>
 </a></h2><p>New in 4.8.0: update validators also run on <code>$push</code> and <code>$addToSet</code></p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> testSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> testSchema = <span class="hljs-keyword">new</span> Schema({
   numbers: [{ type: <span class="hljs-built_in">Number</span>, max: <span class="hljs-number">0</span> }],
   docs: [{
     name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> }
   }]
 });
 
-<span class="hljs-keyword">var</span> Test = db.model(<span class="hljs-string">'TestPush'</span>, testSchema);
+<span class="hljs-keyword">const</span> Test = db.model(<span class="hljs-string">'TestPush'</span>, testSchema);
 
-<span class="hljs-keyword">var</span> update = {
+<span class="hljs-keyword">const</span> update = {
   $push: {
     numbers: <span class="hljs-number">1</span>,
     docs: { name: <span class="hljs-literal">null</span> }
   }
 };
-<span class="hljs-keyword">var</span> opts = { runValidators: <span class="hljs-literal">true</span> };
+<span class="hljs-keyword">const</span> opts = { runValidators: <span class="hljs-literal">true</span> };
 Test.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   assert.ok(error.errors[<span class="hljs-string">'numbers'</span>]);
   assert.ok(error.errors[<span class="hljs-string">'docs'</span>]);

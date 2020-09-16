@@ -87,8 +87,8 @@ MyModel.find().all(<span class="hljs-string">'pets'</span>, [<span class="hljs-s
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> lowerLeft = [<span class="hljs-number">40.73083</span>, <span class="hljs-number">-73.99756</span>]
-<span class="hljs-keyword">var</span> upperRight= [<span class="hljs-number">40.741404</span>,  <span class="hljs-number">-73.988135</span>]
+<pre><code><span class="hljs-keyword">const</span> lowerLeft = [<span class="hljs-number">40.73083</span>, <span class="hljs-number">-73.99756</span>]
+<span class="hljs-keyword">const</span> upperRight= [<span class="hljs-number">40.741404</span>,  <span class="hljs-number">-73.988135</span>]
 
 query.where(<span class="hljs-string">'loc'</span>).within().box(lowerLeft, upperRight)
 query.box({ ll : lowerLeft, ur : upperRight })</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-cast"><a href="#query_Query-cast">Query.prototype.cast()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[model]
@@ -110,7 +110,7 @@ query.box({ ll : lowerLeft, ur : upperRight })</code></pre>  </div><hr class="se
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span> };
+<pre><code><span class="hljs-keyword">const</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span> };
 query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-circle"><a href="#query_Query-circle">Query.prototype.circle()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">area
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
@@ -118,13 +118,13 @@ query.where(<span class="hljs-string">'loc'</span>).within().centerSphere(area);
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span> }
+<pre><code><span class="hljs-keyword">const</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span> }
 query.where(<span class="hljs-string">'loc'</span>).within().circle(area)
 <span class="hljs-comment">// alternatively</span>
 query.circle(<span class="hljs-string">'loc'</span>, area);
 
 <span class="hljs-comment">// spherical calculations</span>
-<span class="hljs-keyword">var</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span>, spherical: <span class="hljs-literal">true</span> }
+<span class="hljs-keyword">const</span> area = { center: [<span class="hljs-number">50</span>, <span class="hljs-number">50</span>], radius: <span class="hljs-number">10</span>, unique: <span class="hljs-literal">true</span>, spherical: <span class="hljs-literal">true</span> }
 query.where(<span class="hljs-string">'loc'</span>).within().circle(area)
 <span class="hljs-comment">// alternatively</span>
 query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-collation"><a href="#query_Query-collation">Query.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">value
@@ -157,7 +157,7 @@ query.circle(<span class="hljs-string">'loc'</span>, area);</code></pre>  </div>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> countQuery = model.where({ <span class="hljs-string">'color'</span>: <span class="hljs-string">'black'</span> }).count();
+<pre><code><span class="hljs-keyword">const</span> countQuery = model.where({ <span class="hljs-string">'color'</span>: <span class="hljs-string">'black'</span> }).count();
 
 query.count({ color: <span class="hljs-string">'black'</span> }).count(callback)
 
@@ -218,7 +218,7 @@ Thing.
 
 <span class="hljs-comment">// Or you can use `.next()` to manually get the next doc in the stream.</span>
 <span class="hljs-comment">// `.next()` returns a promise, so you can use promises or callbacks.</span>
-<span class="hljs-keyword">var</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).cursor();
+<span class="hljs-keyword">const</span> cursor = Thing.find({ name: <span class="hljs-regexp">/^hello/</span> }).cursor();
 cursor.next(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) </span>{
   <span class="hljs-built_in">console</span>.log(doc);
 });
@@ -360,8 +360,8 @@ Schema.pre(<span class="hljs-string">'find'</span>, <span class="hljs-function">
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> TestSchema = <span class="hljs-keyword">new</span> Schema({ num: <span class="hljs-built_in">Number</span> });
-<span class="hljs-keyword">var</span> TestModel = db.model(<span class="hljs-string">'Test'</span>, TestSchema);
+<pre><code><span class="hljs-keyword">const</span> TestSchema = <span class="hljs-keyword">new</span> Schema({ num: <span class="hljs-built_in">Number</span> });
+<span class="hljs-keyword">const</span> TestModel = db.model(<span class="hljs-string">'Test'</span>, TestSchema);
 TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'woops'</span>)).exec(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
   <span class="hljs-comment">// `error` will be a cast error because `num` failed to cast</span>
 });</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-estimatedDocumentCount"><a href="#query_Query-estimatedDocumentCount">Query.prototype.estimatedDocumentCount()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[options]
@@ -388,8 +388,8 @@ TestModel.find({ num: <span class="hljs-string">'not a number'</span> }).error(<
 
 <h4>Examples:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> promise = query.exec();
-<span class="hljs-keyword">var</span> promise = query.exec(<span class="hljs-string">'update'</span>);
+<pre><code><span class="hljs-keyword">const</span> promise = query.exec();
+<span class="hljs-keyword">const</span> promise = query.exec(<span class="hljs-string">'update'</span>);
 
 query.exec(callback);
 query.exec(<span class="hljs-string">'find'</span>, callback);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-exists"><a href="#query_Query-exists">Query.prototype.exists()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
@@ -459,7 +459,7 @@ instead.</li>
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query  = Kitten.where({ color: <span class="hljs-string">'white'</span> });
+<pre><code><span class="hljs-keyword">const</span> query  = Kitten.where({ color: <span class="hljs-string">'white'</span> });
 query.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, kitten</span>) </span>{
   <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
   <span class="hljs-keyword">if</span> (kitten) {
@@ -686,15 +686,15 @@ query.findOneAndUpdate()                             <span class="hljs-comment">
 
 <h4>Example</h4>
 
-<pre><code><span class="hljs-keyword">var</span> polyA = [[[ <span class="hljs-number">10</span>, <span class="hljs-number">20</span> ], [ <span class="hljs-number">10</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">20</span> ]]]
+<pre><code><span class="hljs-keyword">const</span> polyA = [[[ <span class="hljs-number">10</span>, <span class="hljs-number">20</span> ], [ <span class="hljs-number">10</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">40</span> ], [ <span class="hljs-number">30</span>, <span class="hljs-number">20</span> ]]]
 query.where(<span class="hljs-string">'loc'</span>).within().geometry({ type: <span class="hljs-string">'Polygon'</span>, coordinates: polyA })
 
 <span class="hljs-comment">// or</span>
-<span class="hljs-keyword">var</span> polyB = [[ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ], [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span> ]]
+<span class="hljs-keyword">const</span> polyB = [[ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ], [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span> ]]
 query.where(<span class="hljs-string">'loc'</span>).within().geometry({ type: <span class="hljs-string">'LineString'</span>, coordinates: polyB })
 
 <span class="hljs-comment">// or</span>
-<span class="hljs-keyword">var</span> polyC = [ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ]
+<span class="hljs-keyword">const</span> polyC = [ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ]
 query.where(<span class="hljs-string">'loc'</span>).within().geometry({ type: <span class="hljs-string">'Point'</span>, coordinates: polyC })
 
 <span class="hljs-comment">// or</span>
@@ -726,7 +726,7 @@ query.getFilter(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span><
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.limit(<span class="hljs-number">10</span>);
 query.setOptions({ maxTimeMS: <span class="hljs-number">1000</span> })
 query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-getPopulatedPaths"><a href="#query_Query-getPopulatedPaths">Query.prototype.getPopulatedPaths()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> an array of strings representing populated paths</p>
@@ -754,14 +754,14 @@ query.getOptions(); <span class="hljs-comment">// { limit: 10, maxTimeMS: 1000 }
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> }).where(<span class="hljs-string">'b'</span>).gt(<span class="hljs-number">2</span>);
 query.getQuery(); <span class="hljs-comment">// { a: 1, b: { $gt: 2 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-getUpdate"><a href="#query_Query-getUpdate">Query.prototype.getUpdate()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> current update operations</p>
 </li></ul><div><p>Returns the current update operations as a JSON object.</p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.getUpdate(); <span class="hljs-comment">// { $set: { a: 5 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-gt"><a href="#query_Query-gt">Query.prototype.gt()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
@@ -934,22 +934,7 @@ docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</
 Product.find().mod(<span class="hljs-string">'inventory'</span>, [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 Product.find().where(<span class="hljs-string">'inventory'</span>).mod([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]);
 <span class="hljs-comment">// This syntax is a little strange, but supported.</span>
-Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
-<span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</p>
-</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
-
-<ul>
-<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
-<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api.html#model_Model.hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
-<li><code>strict</code>: controls how Mongoose handles keys that aren't in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
-<li><code>strictQuery</code>: controls how Mongoose handles keys that aren't in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: 'bar' })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
-<li><code>useFindAndModify</code>: used to work around the <a href="/docs/deprecations.html#findandmodify"><code>findAndModify()</code> deprecation warning</a></li>
-<li><code>omitUndefined</code>: delete any properties whose value is <code>undefined</code> when casting an update. In other words, if this is set, Mongoose will delete <code>baz</code> from the update in <code>Model.updateOne({}, { foo: 'bar', baz: undefined })</code> before sending the update to the server.</li>
-<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
-</ul>
-
-<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">
+Product.find().where(<span class="hljs-string">'inventory'</span>).mod(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">
 <span class="method-type">&laquo;public&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> Mongoose-specific options</p>
 </li></ul><div><p>Returns an object containing the Mongoose-specific options for this query, including <code>lean</code> and <code>populate</code>.</p>
 
@@ -974,7 +959,22 @@ q.mongooseOptions().lean; <span class="hljs-comment">// true</span></code></pre>
 <li><code>strict</code></li>
 <li><code>nearSphere</code></li>
 <li><code>useFindAndModify</code></li>
-</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
+</ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-mongooseOptions"><a href="#query_Query-mongooseOptions">Query.prototype.mongooseOptions()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">options
+<span class="method-type">&laquo;Object&raquo;</span> if specified, overwrites the current options</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the options</p>
+</li></ul><div><p>Getter/setter around the current mongoose-specific options for this query Below are the current Mongoose-specific options.</p>
+
+<ul>
+<li><code>populate</code>: an array representing what paths will be populated. Should have one entry for each call to <a href="/docs/api.html#query_Query-populate"><code>Query.prototype.populate()</code></a></li>
+<li><code>lean</code>: if truthy, Mongoose will not <a href="/docs/api.html#model_Model.hydrate">hydrate</a> any documents that are returned from this query. See <a href="/docs/api.html#query_Query-lean"><code>Query.prototype.lean()</code></a> for more information.</li>
+<li><code>strict</code>: controls how Mongoose handles keys that aren't in the schema for updates. This option is <code>true</code> by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the <a href="/docs/guide.html#strict"><code>strict</code> mode docs</a> for more information.</li>
+<li><code>strictQuery</code>: controls how Mongoose handles keys that aren't in the schema for the query <code>filter</code>. This option is <code>false</code> by default for backwards compatibility, which means Mongoose will allow <code>Model.find({ foo: 'bar' })</code> even if <code>foo</code> is not in the schema. See the <a href="/docs/guide.html#strictQuery"><code>strictQuery</code> docs</a> for more information.</li>
+<li><code>useFindAndModify</code>: used to work around the <a href="/docs/deprecations.html#findandmodify"><code>findAndModify()</code> deprecation warning</a></li>
+<li><code>omitUndefined</code>: delete any properties whose value is <code>undefined</code> when casting an update. In other words, if this is set, Mongoose will delete <code>baz</code> from the update in <code>Model.updateOne({}, { foo: 'bar', baz: undefined })</code> before sending the update to the server.</li>
+<li><code>nearSphere</code>: use <code>$nearSphere</code> instead of <code>near()</code>. See the <a href="/docs/api.html#query_Query-nearSphere"><code>Query.prototype.nearSphere()</code> docs</a></li>
+</ul>
+
+<p>Mongoose maintains a separate object for internal options because Mongoose sends <code>Query.prototype.options</code> to the MongoDB server, and the above options are not relevant for the MongoDB server.</p>  </div><hr class="separate-api-elements"><h3 id="query_Query-ne"><a href="#query_Query-ne">Query.prototype.ne()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param">val
 <span class="method-type">&laquo;Number&raquo;</span> </li></ul><div><p>Specifies a <code>$ne</code> query condition.</p>
 
@@ -1270,7 +1270,7 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 <ul>
 <li><code>replaceOne()</code></li>
 </ul>  </div><hr class="separate-api-elements"><h3 id="query_Query-select"><a href="#query_Query-select">Query.prototype.select()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">arg
-<span class="method-type">&laquo;Object|String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
+<span class="method-type">&laquo;Object|String|Array&lt;String&gt;&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</p>
 </li></ul><div><p>Specifies which document fields to include or exclude (also known as the query "projection")</p>
 
 <p>When using string syntax, prefixing a path with <code>-</code> will flag that path as excluded. When a path does not have the <code>-</code> prefix, it is included. Lastly, if a path is prefixed with <code>+</code>, it forces inclusion of the path, which is useful for paths excluded at the <a href="/docs/api.html#schematype_SchemaType-select">schema level</a>.</p>
@@ -1281,6 +1281,9 @@ res.nModified; <span class="hljs-comment">// Number of documents modified</span>
 
 <pre><code><span class="hljs-comment">// include a and b, exclude other fields</span>
 query.select(<span class="hljs-string">'a b'</span>);
+<span class="hljs-comment">// Equivalent syntaxes:</span>
+query.select([<span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>]);
+query.select({ a: <span class="hljs-number">1</span>, b: <span class="hljs-number">1</span> });
 
 <span class="hljs-comment">// exclude c and d, include other fields</span>
 query.select(<span class="hljs-string">'-c -d'</span>);
@@ -1391,7 +1394,7 @@ query.selectedInclusively() <span class="hljs-comment">// true</span></code></pr
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.find({ a: <span class="hljs-number">1</span> })
 query.setQuery({ a: <span class="hljs-number">2</span> });
 query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-setUpdate"><a href="#query_Query-setUpdate">Query.prototype.setUpdate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">new
@@ -1400,7 +1403,7 @@ query.getQuery(); <span class="hljs-comment">// { a: 2 }</span></code></pre>  </
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> query = <span class="hljs-keyword">new</span> Query();
+<pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-keyword">new</span> Query();
 query.update({}, { $set: { a: <span class="hljs-number">5</span> } });
 query.setUpdate({ $set: { b: <span class="hljs-number">6</span> } });
 query.getUpdate(); <span class="hljs-comment">// { $set: { b: 6 } }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="query_Query-size"><a href="#query_Query-size">Query.prototype.size()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[path]
@@ -1505,10 +1508,10 @@ query.tailable(<span class="hljs-literal">false</span>)</code></pre>
 <pre><code><span class="hljs-comment">// Create a query for adventure movies and read from the primary</span>
 <span class="hljs-comment">// node in the replica-set unless it is down, in which case we'll</span>
 <span class="hljs-comment">// read from a secondary node.</span>
-<span class="hljs-keyword">var</span> query = Movie.find({ tags: <span class="hljs-string">'adventure'</span> }).read(<span class="hljs-string">'primaryPreferred'</span>);
+<span class="hljs-keyword">const</span> query = Movie.find({ tags: <span class="hljs-string">'adventure'</span> }).read(<span class="hljs-string">'primaryPreferred'</span>);
 
 <span class="hljs-comment">// create a custom Query constructor based off these settings</span>
-<span class="hljs-keyword">var</span> Adventure = query.toConstructor();
+<span class="hljs-keyword">const</span> Adventure = query.toConstructor();
 
 <span class="hljs-comment">// Adventure is now a subclass of mongoose.Query and works the same way but with the</span>
 <span class="hljs-comment">// default query parameters and options set.</span>
@@ -1588,7 +1591,7 @@ Model.where({ _id: id }).update({ $set: { title: <span class="hljs-string">'word
 
 <p>The operation is only executed when a callback is passed. To force execution without a callback, we must first call update() and then execute it by using the <code>exec()</code> method.</p>
 
-<pre><code>var q = Model.where({ _id: id });
+<pre><code>const q = Model.where({ _id: id });
 q.update({ $set: { name: 'bob' }}).update(); // not executed
 
 q.update({ $set: { name: 'bob' }}).exec(); // executed
@@ -1598,11 +1601,11 @@ q.update({ $set: { name: 'bob' }}).exec(); // executed
 q.update({ name: 'bob' }).exec();
 
 // overwriting with empty docs
-var q = Model.where({ _id: id }).setOptions({ overwrite: true })
+const q = Model.where({ _id: id }).setOptions({ overwrite: true })
 q.update({ }, callback); // executes
 
 // multi update with overwrite to empty doc
-var q = Model.where({ _id: id });
+const q = Model.where({ _id: id });
 q.setOptions({ multi: true, overwrite: true })
 q.update({ });
 q.update(callback); // executed

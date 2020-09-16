@@ -22,7 +22,7 @@ method you need to implement is the <code>cast()</code> method.</p>
   <span class="hljs-comment">// validate the provided `val` and throw a `CastError` if you</span>
   <span class="hljs-comment">// can't convert it.</span>
   cast(val) {
-    <span class="hljs-keyword">var</span> _val = <span class="hljs-built_in">Number</span>(val);
+    <span class="hljs-keyword">let</span> _val = <span class="hljs-built_in">Number</span>(val);
     <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(_val)) {
       <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Int8: '</span> + val + <span class="hljs-string">' is not a number'</span>);
     }
@@ -38,10 +38,10 @@ method you need to implement is the <code>cast()</code> method.</p>
 <span class="hljs-comment">// Don't forget to add `Int8` to the type registry</span>
 mongoose.Schema.Types.Int8 = Int8;
 
-<span class="hljs-keyword">var</span> testSchema = <span class="hljs-keyword">new</span> Schema({ test: Int8 });
-<span class="hljs-keyword">var</span> Test = mongoose.model(<span class="hljs-string">'CustomTypeExample'</span>, testSchema);
+<span class="hljs-keyword">const</span> testSchema = <span class="hljs-keyword">new</span> Schema({ test: Int8 });
+<span class="hljs-keyword">const</span> Test = mongoose.model(<span class="hljs-string">'CustomTypeExample'</span>, testSchema);
 
-<span class="hljs-keyword">var</span> t = <span class="hljs-keyword">new</span> Test();
+<span class="hljs-keyword">const</span> t = <span class="hljs-keyword">new</span> Test();
 t.test = <span class="hljs-string">'abc'</span>;
 assert.ok(t.validateSync());
 assert.equal(t.validateSync().errors[<span class="hljs-string">'test'</span>].name, <span class="hljs-string">'CastError'</span>);

@@ -22,22 +22,22 @@ using the <code>model.discriminator()</code> function. This function takes
 key (defaults to the model name). It returns a model whose schema
 is the union of the base schema and the discriminator schema.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> options = {discriminatorKey: <span class="hljs-string">'kind'</span>};
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> options = {discriminatorKey: <span class="hljs-string">'kind'</span>};
 
-<span class="hljs-keyword">var</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.Schema({time: <span class="hljs-built_in">Date</span>}, options);
-<span class="hljs-keyword">var</span> Event = mongoose.model(<span class="hljs-string">'Event'</span>, eventSchema);
+<span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.Schema({time: <span class="hljs-built_in">Date</span>}, options);
+<span class="hljs-keyword">const</span> Event = mongoose.model(<span class="hljs-string">'Event'</span>, eventSchema);
 
 <span class="hljs-comment">// ClickedLinkEvent is a special type of Event that has</span>
 <span class="hljs-comment">// a URL.</span>
-<span class="hljs-keyword">var</span> ClickedLinkEvent = Event.discriminator(<span class="hljs-string">'ClickedLink'</span>,
+<span class="hljs-keyword">const</span> ClickedLinkEvent = Event.discriminator(<span class="hljs-string">'ClickedLink'</span>,
   <span class="hljs-keyword">new</span> mongoose.Schema({url: <span class="hljs-built_in">String</span>}, options));
 
 <span class="hljs-comment">// When you create a generic event, it can't have a URL field...</span>
-<span class="hljs-keyword">var</span> genericEvent = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
+<span class="hljs-keyword">const</span> genericEvent = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
 assert.ok(!genericEvent.url);
 
 <span class="hljs-comment">// But a ClickedLinkEvent can</span>
-<span class="hljs-keyword">var</span> clickedEvent =
+<span class="hljs-keyword">const</span> clickedEvent =
   <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
 assert.ok(clickedEvent.url);</code></pre>
 <h2 id="discriminators-save-to-the-event-models-collection"><a href="#discriminators-save-to-the-event-models-collection"><p>Discriminators save to the Event model&#39;s collection</p>
@@ -46,11 +46,11 @@ a new user registered. These <code>SignedUpEvent</code> instances will be
 stored in the same collection as generic events and <code>ClickedLinkEvent</code>
 instances.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> event1 = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now()});
-<span class="hljs-keyword">var</span> event2 = <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
-<span class="hljs-keyword">var</span> event3 = <span class="hljs-keyword">new</span> SignedUpEvent({time: <span class="hljs-built_in">Date</span>.now(), user: <span class="hljs-string">'testuser'</span>});
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> event1 = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now()});
+<span class="hljs-keyword">const</span> event2 = <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
+<span class="hljs-keyword">const</span> event3 = <span class="hljs-keyword">new</span> SignedUpEvent({time: <span class="hljs-built_in">Date</span>.now(), user: <span class="hljs-string">'testuser'</span>});
 
-<span class="hljs-keyword">var</span> save = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc, callback</span>) </span>{
+<span class="hljs-keyword">const</span> save = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">doc, callback</span>) </span>{
   doc.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, doc</span>) </span>{
     callback(error, doc);
   });
@@ -68,9 +68,9 @@ discriminator models is by the &#39;discriminator key&#39;, which is
 to your schemas that it uses to track which discriminator
 this document is an instance of.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> event1 = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now()});
-<span class="hljs-keyword">var</span> event2 = <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
-<span class="hljs-keyword">var</span> event3 = <span class="hljs-keyword">new</span> SignedUpEvent({time: <span class="hljs-built_in">Date</span>.now(), user: <span class="hljs-string">'testuser'</span>});
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> event1 = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now()});
+<span class="hljs-keyword">const</span> event2 = <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
+<span class="hljs-keyword">const</span> event3 = <span class="hljs-keyword">new</span> SignedUpEvent({time: <span class="hljs-built_in">Date</span>.now(), user: <span class="hljs-string">'testuser'</span>});
 
 assert.ok(!event1.__t);
 assert.equal(event2.__t, <span class="hljs-string">'ClickedLink'</span>);
@@ -80,9 +80,9 @@ assert.equal(event3.__t, <span class="hljs-string">'SignedUp'</span>);</code></p
 to queries. In other words, <code>find()</code>, <code>count()</code>, <code>aggregate()</code>, etc.
 are smart enough to account for discriminators.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> event1 = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now()});
-<span class="hljs-keyword">var</span> event2 = <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
-<span class="hljs-keyword">var</span> event3 = <span class="hljs-keyword">new</span> SignedUpEvent({time: <span class="hljs-built_in">Date</span>.now(), user: <span class="hljs-string">'testuser'</span>});
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> event1 = <span class="hljs-keyword">new</span> Event({time: <span class="hljs-built_in">Date</span>.now()});
+<span class="hljs-keyword">const</span> event2 = <span class="hljs-keyword">new</span> ClickedLinkEvent({time: <span class="hljs-built_in">Date</span>.now(), url: <span class="hljs-string">'google.com'</span>});
+<span class="hljs-keyword">const</span> event3 = <span class="hljs-keyword">new</span> SignedUpEvent({time: <span class="hljs-built_in">Date</span>.now(), user: <span class="hljs-string">'testuser'</span>});
 
 <span class="hljs-built_in">Promise</span>.all([event1.save(), event2.save(), event3.save()]).
   then(() =&gt; ClickedLinkEvent.find({})).
@@ -96,31 +96,31 @@ are smart enough to account for discriminators.</p>
 However, you can also attach middleware to the discriminator schema
 without affecting the base schema.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> options = {discriminatorKey: <span class="hljs-string">'kind'</span>};
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> options = {discriminatorKey: <span class="hljs-string">'kind'</span>};
 
-<span class="hljs-keyword">var</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.Schema({time: <span class="hljs-built_in">Date</span>}, options);
-<span class="hljs-keyword">var</span> eventSchemaCalls = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.Schema({time: <span class="hljs-built_in">Date</span>}, options);
+<span class="hljs-keyword">let</span> eventSchemaCalls = <span class="hljs-number">0</span>;
 eventSchema.pre(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
   ++eventSchemaCalls;
   next();
 });
-<span class="hljs-keyword">var</span> Event = mongoose.model(<span class="hljs-string">'GenericEvent'</span>, eventSchema);
+<span class="hljs-keyword">const</span> Event = mongoose.model(<span class="hljs-string">'GenericEvent'</span>, eventSchema);
 
-<span class="hljs-keyword">var</span> clickedLinkSchema = <span class="hljs-keyword">new</span> mongoose.Schema({url: <span class="hljs-built_in">String</span>}, options);
-<span class="hljs-keyword">var</span> clickedSchemaCalls = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">const</span> clickedLinkSchema = <span class="hljs-keyword">new</span> mongoose.Schema({url: <span class="hljs-built_in">String</span>}, options);
+<span class="hljs-keyword">let</span> clickedSchemaCalls = <span class="hljs-number">0</span>;
 clickedLinkSchema.pre(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
   ++clickedSchemaCalls;
   next();
 });
-<span class="hljs-keyword">var</span> ClickedLinkEvent = Event.discriminator(<span class="hljs-string">'ClickedLinkEvent'</span>,
+<span class="hljs-keyword">const</span> ClickedLinkEvent = Event.discriminator(<span class="hljs-string">'ClickedLinkEvent'</span>,
   clickedLinkSchema);
 
-<span class="hljs-keyword">var</span> event1 = <span class="hljs-keyword">new</span> ClickedLinkEvent();
+<span class="hljs-keyword">const</span> event1 = <span class="hljs-keyword">new</span> ClickedLinkEvent();
 event1.validate(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
   assert.equal(eventSchemaCalls, <span class="hljs-number">1</span>);
   assert.equal(clickedSchemaCalls, <span class="hljs-number">1</span>);
 
-  <span class="hljs-keyword">var</span> generic = <span class="hljs-keyword">new</span> Event();
+  <span class="hljs-keyword">const</span> generic = <span class="hljs-keyword">new</span> Event();
   generic.validate(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     assert.equal(eventSchemaCalls, <span class="hljs-number">2</span>);
     assert.equal(clickedSchemaCalls, <span class="hljs-number">1</span>);
@@ -133,14 +133,14 @@ take precedence. There is one exception: the <code>_id</code> field.
 If a custom _id field is set on the base schema, that will always
 override the discriminator&#39;s _id field, as shown below.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> options = {discriminatorKey: <span class="hljs-string">'kind'</span>};
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> options = {discriminatorKey: <span class="hljs-string">'kind'</span>};
 
 <span class="hljs-comment">// Base schema has a custom String `_id` and a Date `time`...</span>
-<span class="hljs-keyword">var</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.Schema({_id: <span class="hljs-built_in">String</span>, time: <span class="hljs-built_in">Date</span>},
+<span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> mongoose.Schema({_id: <span class="hljs-built_in">String</span>, time: <span class="hljs-built_in">Date</span>},
   options);
-<span class="hljs-keyword">var</span> Event = mongoose.model(<span class="hljs-string">'BaseEvent'</span>, eventSchema);
+<span class="hljs-keyword">const</span> Event = mongoose.model(<span class="hljs-string">'BaseEvent'</span>, eventSchema);
 
-<span class="hljs-keyword">var</span> clickedLinkSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+<span class="hljs-keyword">const</span> clickedLinkSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
   url: <span class="hljs-built_in">String</span>,
   time: <span class="hljs-built_in">String</span>
 }, options);
@@ -148,10 +148,10 @@ override the discriminator&#39;s _id field, as shown below.</p>
 <span class="hljs-comment">// implicitly added ObjectId `_id`.</span>
 assert.ok(clickedLinkSchema.path(<span class="hljs-string">'_id'</span>));
 assert.equal(clickedLinkSchema.path(<span class="hljs-string">'_id'</span>).instance, <span class="hljs-string">'ObjectID'</span>);
-<span class="hljs-keyword">var</span> ClickedLinkEvent = Event.discriminator(<span class="hljs-string">'ChildEventBad'</span>,
+<span class="hljs-keyword">const</span> ClickedLinkEvent = Event.discriminator(<span class="hljs-string">'ChildEventBad'</span>,
   clickedLinkSchema);
 
-<span class="hljs-keyword">var</span> event1 = <span class="hljs-keyword">new</span> ClickedLinkEvent({_id: <span class="hljs-string">'custom id'</span>, time: <span class="hljs-string">'4pm'</span>});
+<span class="hljs-keyword">const</span> event1 = <span class="hljs-keyword">new</span> ClickedLinkEvent({_id: <span class="hljs-string">'custom id'</span>, time: <span class="hljs-string">'4pm'</span>});
 <span class="hljs-comment">// clickedLinkSchema overwrites the `time` path, but **not**</span>
 <span class="hljs-comment">// the `_id` path.</span>
 assert.strictEqual(<span class="hljs-keyword">typeof</span> event1._id, <span class="hljs-string">'string'</span>);
@@ -160,19 +160,19 @@ assert.strictEqual(<span class="hljs-keyword">typeof</span> event1.time, <span c
 </a></h2><p>When you use <code>Model.create()</code>, mongoose will pull the correct type from
 the discriminator key for you.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> Schema = mongoose.Schema;
-<span class="hljs-keyword">var</span> shapeSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Schema = mongoose.Schema;
+<span class="hljs-keyword">const</span> shapeSchema = <span class="hljs-keyword">new</span> Schema({
   name: <span class="hljs-built_in">String</span>
 }, { discriminatorKey: <span class="hljs-string">'kind'</span> });
 
-<span class="hljs-keyword">var</span> Shape = db.model(<span class="hljs-string">'Shape'</span>, shapeSchema);
+<span class="hljs-keyword">const</span> Shape = db.model(<span class="hljs-string">'Shape'</span>, shapeSchema);
 
-<span class="hljs-keyword">var</span> Circle = Shape.discriminator(<span class="hljs-string">'Circle'</span>,
+<span class="hljs-keyword">const</span> Circle = Shape.discriminator(<span class="hljs-string">'Circle'</span>,
   <span class="hljs-keyword">new</span> Schema({ radius: <span class="hljs-built_in">Number</span> }));
-<span class="hljs-keyword">var</span> Square = Shape.discriminator(<span class="hljs-string">'Square'</span>,
+<span class="hljs-keyword">const</span> Square = Shape.discriminator(<span class="hljs-string">'Square'</span>,
   <span class="hljs-keyword">new</span> Schema({ side: <span class="hljs-built_in">Number</span> }));
 
-<span class="hljs-keyword">var</span> shapes = [
+<span class="hljs-keyword">const</span> shapes = [
   { name: <span class="hljs-string">'Test'</span> },
   { kind: <span class="hljs-string">'Circle'</span>, radius: <span class="hljs-number">5</span> },
   { kind: <span class="hljs-string">'Square'</span>, side: <span class="hljs-number">10</span> }
@@ -195,17 +195,17 @@ you store subdocuments matching different schemas in the same array.</p>
 schemas <strong>before</strong> you use them. You should <strong>not</strong> call <code>pre()</code> or
 <code>post()</code> after calling <code>discriminator()</code></p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> eventSchema = <span class="hljs-keyword">new</span> Schema({ message: <span class="hljs-built_in">String</span> },
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> Schema({ message: <span class="hljs-built_in">String</span> },
   { discriminatorKey: <span class="hljs-string">'kind'</span>, _id: <span class="hljs-literal">false</span> });
 
-<span class="hljs-keyword">var</span> batchSchema = <span class="hljs-keyword">new</span> Schema({ events: [eventSchema] });
+<span class="hljs-keyword">const</span> batchSchema = <span class="hljs-keyword">new</span> Schema({ events: [eventSchema] });
 
 <span class="hljs-comment">// `batchSchema.path('events')` gets the mongoose `DocumentArray`</span>
-<span class="hljs-keyword">var</span> docArray = batchSchema.path(<span class="hljs-string">'events'</span>);
+<span class="hljs-keyword">const</span> docArray = batchSchema.path(<span class="hljs-string">'events'</span>);
 
 <span class="hljs-comment">// The `events` array can contain 2 different types of events, a</span>
 <span class="hljs-comment">// 'clicked' event that requires an element id that was clicked...</span>
-<span class="hljs-keyword">var</span> clickedSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> clickedSchema = <span class="hljs-keyword">new</span> Schema({
   element: {
     type: <span class="hljs-built_in">String</span>,
     required: <span class="hljs-literal">true</span>
@@ -213,20 +213,20 @@ schemas <strong>before</strong> you use them. You should <strong>not</strong> ca
 }, { _id: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// Make sure to attach any hooks to `eventSchema` and `clickedSchema`</span>
 <span class="hljs-comment">// **before** calling `discriminator()`.</span>
-<span class="hljs-keyword">var</span> Clicked = docArray.discriminator(<span class="hljs-string">'Clicked'</span>, clickedSchema);
+<span class="hljs-keyword">const</span> Clicked = docArray.discriminator(<span class="hljs-string">'Clicked'</span>, clickedSchema);
 
 <span class="hljs-comment">// ... and a 'purchased' event that requires the product that was purchased.</span>
-<span class="hljs-keyword">var</span> Purchased = docArray.discriminator(<span class="hljs-string">'Purchased'</span>, <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> Purchased = docArray.discriminator(<span class="hljs-string">'Purchased'</span>, <span class="hljs-keyword">new</span> Schema({
   product: {
     type: <span class="hljs-built_in">String</span>,
     required: <span class="hljs-literal">true</span>
   }
 }, { _id: <span class="hljs-literal">false</span> }));
 
-<span class="hljs-keyword">var</span> Batch = db.model(<span class="hljs-string">'EventBatch'</span>, batchSchema);
+<span class="hljs-keyword">const</span> Batch = db.model(<span class="hljs-string">'EventBatch'</span>, batchSchema);
 
 <span class="hljs-comment">// Create a new batch of events with different kinds</span>
-<span class="hljs-keyword">var</span> batch = {
+<span class="hljs-keyword">const</span> batch = {
   events: [
     { kind: <span class="hljs-string">'Clicked'</span>, element: <span class="hljs-string">'#hero'</span>, message: <span class="hljs-string">'hello'</span> },
     { kind: <span class="hljs-string">'Purchased'</span>, product: <span class="hljs-string">'action-figure-1'</span>, message: <span class="hljs-string">'world'</span> }
@@ -263,23 +263,23 @@ In the below example, <code>sub_events</code> is an embedded discriminator, and
 for <code>sub_event</code> keys with value &#39;SubEvent&#39;, <code>sub_events.events</code> is an
 embedded discriminator.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> singleEventSchema = <span class="hljs-keyword">new</span> Schema({ message: <span class="hljs-built_in">String</span> },
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> singleEventSchema = <span class="hljs-keyword">new</span> Schema({ message: <span class="hljs-built_in">String</span> },
   { discriminatorKey: <span class="hljs-string">'kind'</span>, _id: <span class="hljs-literal">false</span> });
 
-<span class="hljs-keyword">var</span> eventListSchema = <span class="hljs-keyword">new</span> Schema({ events: [singleEventSchema] });
+<span class="hljs-keyword">const</span> eventListSchema = <span class="hljs-keyword">new</span> Schema({ events: [singleEventSchema] });
 
-<span class="hljs-keyword">var</span> subEventSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> subEventSchema = <span class="hljs-keyword">new</span> Schema({
    sub_events: [singleEventSchema]
 }, { _id: <span class="hljs-literal">false</span> });
 
-<span class="hljs-keyword">var</span> SubEvent = subEventSchema.path(<span class="hljs-string">'sub_events'</span>).
+<span class="hljs-keyword">const</span> SubEvent = subEventSchema.path(<span class="hljs-string">'sub_events'</span>).
   discriminator(<span class="hljs-string">'SubEvent'</span>, subEventSchema);
 eventListSchema.path(<span class="hljs-string">'events'</span>).discriminator(<span class="hljs-string">'SubEvent'</span>, subEventSchema);
 
-<span class="hljs-keyword">var</span> Eventlist = db.model(<span class="hljs-string">'EventList'</span>, eventListSchema);
+<span class="hljs-keyword">const</span> Eventlist = db.model(<span class="hljs-string">'EventList'</span>, eventListSchema);
 
 <span class="hljs-comment">// Create a new batch of events with different kinds</span>
-<span class="hljs-keyword">var</span> list = {
+<span class="hljs-keyword">const</span> list = {
   events: [
     { kind: <span class="hljs-string">'SubEvent'</span>, sub_events: [{kind:<span class="hljs-string">'SubEvent'</span>, sub_events:[], message:<span class="hljs-string">'test1'</span>}], message: <span class="hljs-string">'hello'</span> },
     { kind: <span class="hljs-string">'SubEvent'</span>, sub_events: [{kind:<span class="hljs-string">'SubEvent'</span>, sub_events:[{kind:<span class="hljs-string">'SubEvent'</span>, sub_events:[], message:<span class="hljs-string">'test3'</span>}], message:<span class="hljs-string">'test2'</span>}], message: <span class="hljs-string">'world'</span> }

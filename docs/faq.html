@@ -58,19 +58,19 @@ duplicates. What gives?</p>
 <p><strong>A</strong>. Mongoose doesn&#39;t handle <code>unique</code> on its own: <code>{ name: { type: String, unique: true } }</code>
 is just a shorthand for creating a <a href="https://docs.mongodb.com/manual/core/index-unique/">MongoDB unique index on <code>name</code></a>.
 For example, if MongoDB doesn&#39;t already have a unique index on <code>name</code>, the below code will not error despite the fact that <code>unique</code> is true.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }
 });
-<span class="hljs-keyword">var</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
+<span class="hljs-keyword">const</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
 
 Model.create([{ name: <span class="hljs-string">'Val'</span> }, { name: <span class="hljs-string">'Val'</span> }], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
   <span class="hljs-built_in">console</span>.log(err); <span class="hljs-comment">// No error, unless index was already built</span>
 });</code></pre>
 <p>However, if you wait for the index to build using the <code>Model.on(&#39;index&#39;)</code> event, attempts to save duplicates will correctly error.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }
 });
-<span class="hljs-keyword">var</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
+<span class="hljs-keyword">const</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
 
 Model.on(<span class="hljs-string">'index'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{ <span class="hljs-comment">// &lt;-- Wait for model's indexes to finish</span>
   assert.ifError(err);
@@ -95,12 +95,12 @@ convenient for development and documentation, but mongoose is <em>not</em> an in
 <hr id="nested-properties" />
 
 <p><a href="#nested-properties"><strong>Q</strong></a>. When I have a nested property in a schema, mongoose adds empty objects by default. Why?</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   nested: {
     prop: <span class="hljs-built_in">String</span>
   }
 });
-<span class="hljs-keyword">var</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
+<span class="hljs-keyword">const</span> Model = db.model(<span class="hljs-string">'Test'</span>, schema);
 
 <span class="hljs-comment">// The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns</span>
 <span class="hljs-comment">// `nested` to an empty object `{}` by default.</span>
@@ -144,7 +144,7 @@ Mongoose getters/setters depend on <code>this</code> to give you access to the d
 <pre><code class="language-javascript"><span class="hljs-comment">// Do **NOT** use arrow functions as shown below unless you're certain</span>
 <span class="hljs-comment">// that's what you want. If you're reading this FAQ, odds are you should</span>
 <span class="hljs-comment">// just be using a conventional function.</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({
   propWithGetter: {
     type: <span class="hljs-built_in">String</span>,
     get: v =&gt; {
@@ -231,7 +231,7 @@ mongoose.connect(..);
 mongoose.connection.on(<span class="hljs-string">'error'</span>, handleError);
 
 <span class="hljs-comment">// if connecting on a separate connection</span>
-<span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+<span class="hljs-keyword">const</span> conn = mongoose.createConnection(..);
 conn.on(<span class="hljs-string">'error'</span>, handleError);</code></pre>
 <p>If you want to opt out of mongoose&#39;s buffering mechanism across your entire
 application, set the global <code>bufferCommands</code> option to false:</p>
@@ -253,14 +253,14 @@ attempt to create a new model named &#39;ModelName&#39; before <strong>every</st
 and so you will get an error. Make sure you only create a new model with
 a given name <strong>once</strong>. If you need to create multiple models with the
 same name, create a new connection and bind the model to the connection.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> connection = mongoose.createConnection(..);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> connection = mongoose.createConnection(..);
 
 <span class="hljs-comment">// use mongoose.Schema</span>
-<span class="hljs-keyword">var</span> kittySchema = mongoose.Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> kittySchema = mongoose.Schema({ name: <span class="hljs-built_in">String</span> });
 
 <span class="hljs-comment">// use connection.model</span>
-<span class="hljs-keyword">var</span> Kitten = connection.model(<span class="hljs-string">'Kitten'</span>, kittySchema);</code></pre>
+<span class="hljs-keyword">const</span> Kitten = connection.model(<span class="hljs-string">'Kitten'</span>, kittySchema);</code></pre>
 <hr id="array-defaults" />
 
 <p><a href="#array-defaults"><strong>Q</strong></a>. How can I change mongoose&#39;s default behavior of initializing an array
@@ -329,6 +329,26 @@ Consider using a regex like <code>/^[a-f0-9]{24}$/</code> to test whether a stri
 instead queries using (numDocuments * limit) as the limit. If you need the correct limit, you should use the
 <a href="/docs/populate.html#limit-vs-perDocumentLimit">perDocumentLimit</a> option (new in Mongoose 5.9.0). Just keep in
 mind that populate() will execute a separate query for each document.</p>
+<hr id="duplicate-query" />
+
+<p><a href="#duplicate-query"><strong>Q</strong></a>. My query/update seems to execute twice. Why is this happening?</p>
+<p><strong>A</strong>. The most common cause of duplicate queries is <strong>mixing callbacks and promises with queries</strong>.
+That&#39;s because passing a callback to a query function, like <code>find()</code> or <code>updateOne()</code>,
+immediately executes the query, and calling <a href="https://masteringjs.io/tutorials/fundamentals/then"><code>then()</code></a>
+executes the query again.</p>
+<p>Mixing promises and callbacks can lead to duplicate entries in arrays.
+For example, the below code inserts 2 entries into the <code>tags</code> array, *<em>not</em> just 1.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, <span class="hljs-keyword">new</span> Schema({
+  title: <span class="hljs-built_in">String</span>,
+  tags: [<span class="hljs-built_in">String</span>]
+}));
+
+<span class="hljs-comment">// Because there's both `await` **and** a callback, this `updateOne()` executes twice</span>
+<span class="hljs-comment">// and thus pushes the same string into `tags` twice.</span>
+<span class="hljs-keyword">const</span> update = { $push: { tags: [<span class="hljs-string">'javascript'</span>] } };
+<span class="hljs-keyword">await</span> BlogPost.updateOne({ title: <span class="hljs-string">'Introduction to Promises'</span> }, update, (err, res) =&gt; {
+  <span class="hljs-built_in">console</span>.log(res);
+});</code></pre>
 <hr id="add_something" />
 
 <p><strong>Something to add?</strong></p>

@@ -62,7 +62,7 @@ fullname <span class="hljs-keyword">instanceof</span> mongoose.VirtualType <span
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> virtual = schema.virtual(<span class="hljs-string">'fullname'</span>);
+<pre><code><span class="hljs-keyword">const</span> virtual = schema.virtual(<span class="hljs-string">'fullname'</span>);
 virtual.get(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, virtual, doc</span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name.first + <span class="hljs-string">' '</span> + <span class="hljs-keyword">this</span>.name.last;
 });</code></pre>  </div><hr class="separate-api-elements"><h3 id="virtualtype_VirtualType-set"><a href="#virtualtype_VirtualType-set">VirtualType.prototype.set()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">VirtualType,
@@ -82,7 +82,7 @@ virtual.get(<span class="hljs-function"><span class="hljs-keyword">function</spa
 
 <pre><code><span class="hljs-keyword">const</span> virtual = schema.virtual(<span class="hljs-string">'fullname'</span>);
 virtual.set(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, virtual, doc</span>) </span>{
-  <span class="hljs-keyword">var</span> parts = value.split(<span class="hljs-string">' '</span>);
+  <span class="hljs-keyword">const</span> parts = value.split(<span class="hljs-string">' '</span>);
   <span class="hljs-keyword">this</span>.name.first = parts[<span class="hljs-number">0</span>];
   <span class="hljs-keyword">this</span>.name.last = parts[<span class="hljs-number">1</span>];
 });

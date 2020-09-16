@@ -48,9 +48,9 @@ mongoose.Number.get(<span class="hljs-function"><span class="hljs-keyword">funct
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ n: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">10</span> })
-<span class="hljs-keyword">var</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M;
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ n: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">10</span> })
+<span class="hljs-keyword">const</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M;
 <span class="hljs-built_in">console</span>.log(m.n) <span class="hljs-comment">// 10</span></code></pre>
 
 <p>Defaults can be either <code>functions</code> which return the value to use as the default or the literal value itself. Either way, the value will be cast based on its schema type before being set during document creation.</p>
@@ -58,13 +58,13 @@ mongoose.Number.get(<span class="hljs-function"><span class="hljs-keyword">funct
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-comment">// values are cast:</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ aNumber: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">4.815162342</span> }})
-<span class="hljs-keyword">var</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> M;
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ aNumber: { type: <span class="hljs-built_in">Number</span>, <span class="hljs-keyword">default</span>: <span class="hljs-number">4.815162342</span> }})
+<span class="hljs-keyword">const</span> M = db.model(<span class="hljs-string">'M'</span>, schema)
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> M;
 <span class="hljs-built_in">console</span>.log(m.aNumber) <span class="hljs-comment">// 4.815162342</span>
 
 <span class="hljs-comment">// default unique objects for Mixed types:</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
 schema.path(<span class="hljs-string">'mixed'</span>).default(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
   <span class="hljs-keyword">return</span> {};
 });
@@ -72,13 +72,13 @@ schema.path(<span class="hljs-string">'mixed'</span>).default(<span class="hljs-
 <span class="hljs-comment">// if we don't use a function to return object literals for Mixed defaults,</span>
 <span class="hljs-comment">// each document will receive a reference to the same object literal creating</span>
 <span class="hljs-comment">// a "shared" object instance:</span>
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
 schema.path(<span class="hljs-string">'mixed'</span>).default({});
-<span class="hljs-keyword">var</span> M = db.model(<span class="hljs-string">'M'</span>, schema);
-<span class="hljs-keyword">var</span> m1 = <span class="hljs-keyword">new</span> M;
+<span class="hljs-keyword">const</span> M = db.model(<span class="hljs-string">'M'</span>, schema);
+<span class="hljs-keyword">const</span> m1 = <span class="hljs-keyword">new</span> M;
 m1.mixed.added = <span class="hljs-number">1</span>;
 <span class="hljs-built_in">console</span>.log(m1.mixed); <span class="hljs-comment">// { added: 1 }</span>
-<span class="hljs-keyword">var</span> m2 = <span class="hljs-keyword">new</span> M;
+<span class="hljs-keyword">const</span> m2 = <span class="hljs-keyword">new</span> M;
 <span class="hljs-built_in">console</span>.log(m2.mixed); <span class="hljs-comment">// { added: 1 }</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-get"><a href="#schematype_SchemaType-get">SchemaType.prototype.get()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</p>
 </li></ul><div><p>Adds a getter to this schematype.</p>
@@ -91,10 +91,10 @@ m1.mixed.added = <span class="hljs-number">1</span>;
 }
 
 <span class="hljs-comment">// defining within the schema</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, get: dob })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, get: dob })
 
 <span class="hljs-comment">// or by retreiving its SchemaType</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: <span class="hljs-built_in">Date</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: <span class="hljs-built_in">Date</span> })
 s.path(<span class="hljs-string">'born'</span>).get(dob)</code></pre>
 
 <p>Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.</p>
@@ -105,11 +105,11 @@ s.path(<span class="hljs-string">'born'</span>).get(dob)</code></pre>
   <span class="hljs-keyword">return</span> <span class="hljs-string">'****-****-****-'</span> + cc.slice(cc.length<span class="hljs-number">-4</span>, cc.length);
 }
 
-<span class="hljs-keyword">var</span> AccountSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> AccountSchema = <span class="hljs-keyword">new</span> Schema({
   creditCardNumber: { type: <span class="hljs-built_in">String</span>, get: obfuscate }
 });
 
-<span class="hljs-keyword">var</span> Account = db.model(<span class="hljs-string">'Account'</span>, AccountSchema);
+<span class="hljs-keyword">const</span> Account = db.model(<span class="hljs-string">'Account'</span>, AccountSchema);
 
 Account.findById(id, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, found</span>) </span>{
   <span class="hljs-built_in">console</span>.log(found.creditCardNumber); <span class="hljs-comment">// '****-****-****-1234'</span>
@@ -125,12 +125,12 @@ Account.findById(id, <span class="hljs-function"><span class="hljs-keyword">func
   }
 }
 
-<span class="hljs-keyword">var</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
   name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span>, get: inspector },
   taxonomy: { type: <span class="hljs-built_in">String</span>, get: inspector }
 })
 
-<span class="hljs-keyword">var</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
+<span class="hljs-keyword">const</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
 
 Virus.findById(id, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, virus</span>) </span>{
   <span class="hljs-built_in">console</span>.log(virus.name);     <span class="hljs-comment">// name is required</span>
@@ -175,11 +175,11 @@ Model.updateOne({}, { name: <span class="hljs-string">'test2'</span> }, { strict
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, index: <span class="hljs-literal">true</span> })
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'hashed'</span> })
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'2d'</span>, sparse: <span class="hljs-literal">true</span> })
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: { type: <span class="hljs-string">'2dsphere'</span>, sparse: <span class="hljs-literal">true</span> }})
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ date: { type: <span class="hljs-built_in">Date</span>, index: { unique: <span class="hljs-literal">true</span>, expires: <span class="hljs-string">'1d'</span> }})
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, index: <span class="hljs-literal">true</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'hashed'</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: <span class="hljs-string">'2d'</span>, sparse: <span class="hljs-literal">true</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ loc: { type: [<span class="hljs-built_in">Number</span>], index: { type: <span class="hljs-string">'2dsphere'</span>, sparse: <span class="hljs-literal">true</span> }})
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ date: { type: <span class="hljs-built_in">Date</span>, index: { unique: <span class="hljs-literal">true</span>, expires: <span class="hljs-string">'1d'</span> }})
 s.path(<span class="hljs-string">'my.path'</span>).index(<span class="hljs-literal">true</span>);
 s.path(<span class="hljs-string">'my.date'</span>).index({ expires: <span class="hljs-number">60</span> });
 s.path(<span class="hljs-string">'my.path'</span>).index({ unique: <span class="hljs-literal">true</span>, sparse: <span class="hljs-literal">true</span> });</code></pre>
@@ -218,15 +218,15 @@ postSchema.path(<span class="hljs-string">'user'</span>).ref(() =&amp;gt; User);
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-literal">true</span> })
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-literal">true</span> })
 
 <span class="hljs-comment">// or with custom error message</span>
 
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-string">'{PATH} is required!'</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ born: { type: <span class="hljs-built_in">Date</span>, required: <span class="hljs-string">'{PATH} is required!'</span> })
 
 <span class="hljs-comment">// or with a function</span>
 
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({
   userId: ObjectId,
   username: {
     type: <span class="hljs-built_in">String</span>,
@@ -235,7 +235,7 @@ postSchema.path(<span class="hljs-string">'user'</span>).ref(() =&amp;gt; User);
 })
 
 <span class="hljs-comment">// or with a function and a custom message</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({
   userId: ObjectId,
   username: {
     type: <span class="hljs-built_in">String</span>,
@@ -255,7 +255,7 @@ s.path(<span class="hljs-string">'name'</span>).required(<span class="hljs-liter
 s.path(<span class="hljs-string">'name'</span>).required(<span class="hljs-literal">true</span>, <span class="hljs-string">'grrr :( '</span>);
 
 <span class="hljs-comment">// or make a path conditionally required based on a function</span>
-<span class="hljs-keyword">var</span> isOver18 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.age &gt;= <span class="hljs-number">18</span>; };
+<span class="hljs-keyword">const</span> isOver18 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.age &gt;= <span class="hljs-number">18</span>; };
 s.path(<span class="hljs-string">'voterRegistrationId'</span>).required(isOver18);</code></pre>
 
 <p>The required validator uses the SchemaType's <code>checkRequired</code> function to determine whether a given value satisfies the required validator. By default, a value satisfies the required validator if <code>val != null</code> (that is, if the value is not null nor undefined). However, most built-in mongoose schema types override the default <code>checkRequired</code> function:</p>  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-select"><a href="#schematype_SchemaType-select">SchemaType.prototype.select()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">val
@@ -281,10 +281,10 @@ T.find().select(<span class="hljs-string">'-x'</span>).exec(callback);</code></p
 }
 
 <span class="hljs-comment">// defining within the schema</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, set: capitalize }});
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, set: capitalize }});
 
 <span class="hljs-comment">// or with the SchemaType</span>
-<span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
+<span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
 s.path(<span class="hljs-string">'name'</span>).set(capitalize);</code></pre>
 
 <p>Setters allow you to transform the data before it gets to the raw mongodb document or query.</p>
@@ -297,17 +297,17 @@ s.path(<span class="hljs-string">'name'</span>).set(capitalize);</code></pre>
   return v.toLowerCase();
 }
 
-var UserSchema = new Schema({
+const UserSchema = new Schema({
   email: { type: String, set: toLower }
 });
 
-var User = db.model('User', UserSchema);
+const User = db.model('User', UserSchema);
 
-var user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'});
+const user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'});
 console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
 
 // or
-var user = new User();
+const user = new User();
 user.email = '<a href='mailto:Avenue@Q.com'>Avenue@Q.com</a>';
 console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
 User.updateOne({ _id: _id }, { $set: { email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>' } }); // update to '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
@@ -329,13 +329,13 @@ User.updateOne({ _id: _id }, { $set: { email: '<a href='mailto:AVENUE@Q.COM'>AVE
   }
 }
 
-<span class="hljs-keyword">var</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> VirusSchema = <span class="hljs-keyword">new</span> Schema({
   name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span>, set: inspector },
   taxonomy: { type: <span class="hljs-built_in">String</span>, set: inspector }
 })
 
-<span class="hljs-keyword">var</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
-<span class="hljs-keyword">var</span> v = <span class="hljs-keyword">new</span> Virus({ name: <span class="hljs-string">'Parvoviridae'</span>, taxonomy: <span class="hljs-string">'Parvovirinae'</span> });
+<span class="hljs-keyword">const</span> Virus = db.model(<span class="hljs-string">'Virus'</span>, VirusSchema);
+<span class="hljs-keyword">const</span> v = <span class="hljs-keyword">new</span> Virus({ name: <span class="hljs-string">'Parvoviridae'</span>, taxonomy: <span class="hljs-string">'Parvovirinae'</span> });
 
 <span class="hljs-built_in">console</span>.log(v.name);     <span class="hljs-comment">// name is required</span>
 <span class="hljs-built_in">console</span>.log(v.taxonomy); <span class="hljs-comment">// Parvovirinae</span></code></pre>
@@ -358,14 +358,14 @@ nameSchema.path('name').set(function(v) {
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, sparse: <span class="hljs-literal">true</span> } });
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, sparse: <span class="hljs-literal">true</span> } });
 s.path(<span class="hljs-string">'name'</span>).index({ sparse: <span class="hljs-literal">true</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-text"><a href="#schematype_SchemaType-text">SchemaType.prototype.text()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">bool
 <span class="method-type">&laquo;Boolean&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</p>
 </li></ul><div><p>Declares a full text index.</p>
 
 <h3>Example:</h3>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({name : {type: <span class="hljs-built_in">String</span>, text : <span class="hljs-literal">true</span> })
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({name : {type: <span class="hljs-built_in">String</span>, text : <span class="hljs-literal">true</span> })
  s.path(<span class="hljs-string">'name'</span>).index({text : <span class="hljs-literal">true</span>});</code></pre>  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-transform"><a href="#schematype_SchemaType-transform">SchemaType.prototype.transform()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</p>
 </li></ul><div><p>Defines a custom function for transforming this path when converting a document to JSON.</p>
@@ -391,7 +391,7 @@ doc.toJSON().date; <span class="hljs-comment">// 2016 as a number</span>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }});
+<pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, unique: <span class="hljs-literal">true</span> }});
 s.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hljs-literal">true</span> });</code></pre>
 
 <p><em>NOTE: violating the constraint returns an <code>E11000</code> error from MongoDB when saving, not a Mongoose validation error.</em></p>  </div><hr class="separate-api-elements"><h3 id="schematype_SchemaType-validate"><a href="#schematype_SchemaType-validate">SchemaType.prototype.validate()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
@@ -423,12 +423,12 @@ s.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hlj
 
 <span class="hljs-comment">// with a custom error message</span>
 
-<span class="hljs-keyword">var</span> custom = [validator, <span class="hljs-string">'Uh oh, {PATH} does not equal "something".'</span>]
+<span class="hljs-keyword">const</span> custom = [validator, <span class="hljs-string">'Uh oh, {PATH} does not equal "something".'</span>]
 <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, validate: custom }});
 
 <span class="hljs-comment">// adding many validators at a time</span>
 
-<span class="hljs-keyword">var</span> many = [
+<span class="hljs-keyword">const</span> many = [
     { validator: validator, msg: <span class="hljs-string">'uh oh'</span> }
   , { validator: anotherValidator, msg: <span class="hljs-string">'failed'</span> }
 ]
@@ -436,7 +436,7 @@ s.path(<span class="hljs-string">'name'</span>).index({ unique: <span class="hlj
 
 <span class="hljs-comment">// or utilizing SchemaType methods directly:</span>
 
-<span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });
 schema.path(<span class="hljs-string">'name'</span>).validate(validator, <span class="hljs-string">'validation of `{PATH}` failed with value `{VALUE}`'</span>);</code></pre>
 
 <h4>Error message templates:</h4>
@@ -479,11 +479,11 @@ schema.path(<span class="hljs-string">'name'</span>).validate(validator, <span c
 
 <p>If validation fails during <code>pre('save')</code> and no callback was passed to receive the error, an <code>error</code> event will be emitted on your Models associated db <a href="#connection_Connection">connection</a>, passing the validation error object along.</p>
 
-<pre><code><span class="hljs-keyword">var</span> conn = mongoose.createConnection(..);
+<pre><code><span class="hljs-keyword">const</span> conn = mongoose.createConnection(..);
 conn.on(<span class="hljs-string">'error'</span>, handleError);
 
-<span class="hljs-keyword">var</span> Product = conn.model(<span class="hljs-string">'Product'</span>, yourSchema);
-<span class="hljs-keyword">var</span> dvd = <span class="hljs-keyword">new</span> Product(..);
+<span class="hljs-keyword">const</span> Product = conn.model(<span class="hljs-string">'Product'</span>, yourSchema);
+<span class="hljs-keyword">const</span> dvd = <span class="hljs-keyword">new</span> Product(..);
 dvd.save(); <span class="hljs-comment">// emits error on the `conn` above</span></code></pre>
 
 <p>If you want to handle these errors at the Model level, add an <code>error</code> listener to your Model as shown below.</p>

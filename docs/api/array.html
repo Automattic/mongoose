@@ -18,7 +18,7 @@
 
 <pre><code>doc.array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];
 
- <span class="hljs-keyword">var</span> popped = doc.array.$pop();
+ <span class="hljs-keyword">const</span> popped = doc.array.$pop();
  <span class="hljs-built_in">console</span>.log(popped); <span class="hljs-comment">// 3</span>
  <span class="hljs-built_in">console</span>.log(doc.array); <span class="hljs-comment">// [1,2]</span>
 
@@ -41,7 +41,7 @@
 
 <pre><code>doc.array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];
 
- <span class="hljs-keyword">var</span> shifted = doc.array.$shift();
+ <span class="hljs-keyword">const</span> shifted = doc.array.$shift();
  <span class="hljs-built_in">console</span>.log(shifted); <span class="hljs-comment">// 1</span>
  <span class="hljs-built_in">console</span>.log(doc.array); <span class="hljs-comment">// [2,3]</span>
 
@@ -63,7 +63,7 @@
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [2,3,4]</span>
-<span class="hljs-keyword">var</span> added = doc.array.addToSet(<span class="hljs-number">4</span>,<span class="hljs-number">5</span>);
+<span class="hljs-keyword">const</span> added = doc.array.addToSet(<span class="hljs-number">4</span>,<span class="hljs-number">5</span>);
 <span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [2,3,4,5]</span>
 <span class="hljs-built_in">console</span>.log(added)     <span class="hljs-comment">// [5]</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="mongoosearray_MongooseArray-includes"><a href="#mongoosearray_MongooseArray-includes">MongooseArray.prototype.includes()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">obj
 <span class="method-type">&laquo;Object&raquo;</span> the item to check</p>
@@ -122,9 +122,9 @@ doc.nums; <span class="hljs-comment">// [1, 2, 3, 4, 5]</span></code></pre>  </d
 <h4>Example:</h4>
 
 <pre><code><span class="hljs-comment">// given documents based on the following</span>
-<span class="hljs-keyword">var</span> Doc = mongoose.model(<span class="hljs-string">'Doc'</span>, <span class="hljs-keyword">new</span> Schema({ array: [<span class="hljs-built_in">Number</span>] }));
+<span class="hljs-keyword">const</span> Doc = mongoose.model(<span class="hljs-string">'Doc'</span>, <span class="hljs-keyword">new</span> Schema({ array: [<span class="hljs-built_in">Number</span>] }));
 
-<span class="hljs-keyword">var</span> doc = <span class="hljs-keyword">new</span> Doc({ array: [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>] })
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Doc({ array: [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>] })
 
 <span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [2,3,4]</span>
 
@@ -140,7 +140,7 @@ doc.save() <span class="hljs-comment">// change is not saved</span></code></pre>
 <h4>Example:</h4>
 
 <pre><code>doc.array = [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];
-<span class="hljs-keyword">var</span> res = doc.array.shift();
+<span class="hljs-keyword">const</span> res = doc.array.shift();
 <span class="hljs-built_in">console</span>.log(res) <span class="hljs-comment">// 2</span>
 <span class="hljs-built_in">console</span>.log(doc.array) <span class="hljs-comment">// [3]</span></code></pre>
 

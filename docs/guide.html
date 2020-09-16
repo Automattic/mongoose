@@ -131,7 +131,7 @@ We may also define our own custom document instance methods.</p>
   };</code></pre>
 <p>Now all of our <code>animal</code> instances have a <code>findSimilarTypes</code> method available
 to them.</p>
-<pre><code class="language-javascript">  <span class="hljs-keyword">var</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
+<pre><code class="language-javascript">  <span class="hljs-keyword">const</span> Animal = mongoose.model(<span class="hljs-string">'Animal'</span>, animalSchema);
   <span class="hljs-keyword">const</span> dog = <span class="hljs-keyword">new</span> Animal({ type: <span class="hljs-string">'dog'</span> });
 
   dog.findSimilarTypes((err, dogs) =&gt; {
@@ -391,7 +391,7 @@ default by setting <a href="/docs/api/mongoose.html#mongoose_Mongoose-set"><code
 <p>By default, mongoose buffers commands when the connection goes down until
 the driver manages to reconnect. To disable buffering, set <code>bufferCommands</code>
 to false.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({..}, { bufferCommands: <span class="hljs-literal">false</span> });</code></pre>
 <p>The schema <code>bufferCommands</code> option overrides the global <code>bufferCommands</code> option.</p>
 <pre><code class="language-javascript">mongoose.set(<span class="hljs-string">'bufferCommands'</span>, <span class="hljs-literal">true</span>);
 <span class="hljs-comment">// Schema option below overrides the above, if the schema option is set.</span>
@@ -429,7 +429,7 @@ schema, you may disable it by passing this option at schema construction time.</
 
 <span class="hljs-comment">// disabled id</span>
 <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { id: <span class="hljs-literal">false</span> });
-<span class="hljs-keyword">var</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
+<span class="hljs-keyword">const</span> Page = mongoose.model(<span class="hljs-string">'Page'</span>, schema);
 <span class="hljs-keyword">const</span> p = <span class="hljs-keyword">new</span> Page({ name: <span class="hljs-string">'mongodb.org'</span> });
 <span class="hljs-built_in">console</span>.log(p.id); <span class="hljs-comment">// undefined</span></code></pre>
 <h3 id="_id"><a href="#_id">option: _id</a></h3>
@@ -871,7 +871,7 @@ Parent.update({}, update, opts, <span class="hljs-function"><span class="hljs-ke
 <p>If you set <code>useNconstestedStrict</code> to true, mongoose will use the child schema&#39;s
 <code>strict</code> option for casting updates.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({}, { strict: <span class="hljs-literal">false</span> });
-<span class="hljs-keyword">var</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema },
+<span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({ child: childSchema },
   { strict: <span class="hljs-string">'throw'</span>, useNestedStrict: <span class="hljs-literal">true</span> });
 <span class="hljs-keyword">const</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
 Parent.update({}, { <span class="hljs-string">'child.name'</span>: <span class="hljs-string">'Luke Skywalker'</span> }, error =&gt; {

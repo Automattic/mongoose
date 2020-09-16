@@ -10,24 +10,24 @@ a new document without that path set, the default will kick in.</p>
 <p>Note: Mongoose only applies a default if the value of the path is
 strictly <code>undefined</code>.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   name: <span class="hljs-built_in">String</span>,
   role: { type: <span class="hljs-built_in">String</span>, <span class="hljs-keyword">default</span>: <span class="hljs-string">'guitarist'</span> }
 });
 
-<span class="hljs-keyword">var</span> Person = db.model(<span class="hljs-string">'Person'</span>, schema);
+<span class="hljs-keyword">const</span> Person = db.model(<span class="hljs-string">'Person'</span>, schema);
 
-<span class="hljs-keyword">var</span> axl = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Axl Rose'</span>, role: <span class="hljs-string">'singer'</span> });
+<span class="hljs-keyword">const</span> axl = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Axl Rose'</span>, role: <span class="hljs-string">'singer'</span> });
 assert.equal(axl.role, <span class="hljs-string">'singer'</span>);
 
-<span class="hljs-keyword">var</span> slash = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Slash'</span> });
+<span class="hljs-keyword">const</span> slash = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Slash'</span> });
 assert.equal(slash.role, <span class="hljs-string">'guitarist'</span>);
 
-<span class="hljs-keyword">var</span> izzy = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Izzy'</span>, role: <span class="hljs-literal">undefined</span> });
+<span class="hljs-keyword">const</span> izzy = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Izzy'</span>, role: <span class="hljs-literal">undefined</span> });
 assert.equal(izzy.role, <span class="hljs-string">'guitarist'</span>);
 
 <span class="hljs-comment">// Defaults do **not** run on `null`, `''`, or value other than `undefined`.</span>
-<span class="hljs-keyword">var</span> foo = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Bar'</span>, role: <span class="hljs-literal">null</span> });
+<span class="hljs-keyword">const</span> foo = <span class="hljs-keyword">new</span> Person({ name: <span class="hljs-string">'Bar'</span>, role: <span class="hljs-literal">null</span> });
 assert.strictEqual(foo.role, <span class="hljs-literal">null</span>);
 
 Person.create(axl, slash, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
@@ -42,7 +42,7 @@ Person.create(axl, slash, <span class="hljs-function"><span class="hljs-keyword"
 </a></h2><p>You can also set the <code>default</code> schema option to a function. Mongoose will
 execute that function and use the return value as the default.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   title: <span class="hljs-built_in">String</span>,
   date: {
     type: <span class="hljs-built_in">Date</span>,
@@ -51,9 +51,9 @@ execute that function and use the return value as the default.</p>
   }
 });
 
-<span class="hljs-keyword">var</span> BlogPost = db.model(<span class="hljs-string">'BlogPost'</span>, schema);
+<span class="hljs-keyword">const</span> BlogPost = db.model(<span class="hljs-string">'BlogPost'</span>, schema);
 
-<span class="hljs-keyword">var</span> post = <span class="hljs-keyword">new</span> BlogPost({title: <span class="hljs-string">'5 Best Arnold Schwarzenegger Movies'</span>});
+<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">new</span> BlogPost({title: <span class="hljs-string">'5 Best Arnold Schwarzenegger Movies'</span>});
 
 <span class="hljs-comment">// The post has a default Date set to now</span>
 assert.ok(post.date.getTime() &gt;= <span class="hljs-built_in">Date</span>.now() - <span class="hljs-number">1000</span>);
@@ -69,16 +69,16 @@ behavior using the <code>setDefaultsOnInsert</code> option.</p>
 The <code>$setOnInsert</code> operator was introduced in MongoDB 2.4. If you&#39;re
 using MongoDB server &lt; 2.4.0, do <strong>not</strong> use <code>setDefaultsOnInsert</code>.</p>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   title: <span class="hljs-built_in">String</span>,
   genre: {type: <span class="hljs-built_in">String</span>, <span class="hljs-keyword">default</span>: <span class="hljs-string">'Action'</span>}
 });
 
-<span class="hljs-keyword">var</span> Movie = db.model(<span class="hljs-string">'Movie'</span>, schema);
+<span class="hljs-keyword">const</span> Movie = db.model(<span class="hljs-string">'Movie'</span>, schema);
 
-<span class="hljs-keyword">var</span> query = {};
-<span class="hljs-keyword">var</span> update = {title: <span class="hljs-string">'The Terminator'</span>};
-<span class="hljs-keyword">var</span> options = {
+<span class="hljs-keyword">const</span> query = {};
+<span class="hljs-keyword">const</span> update = {title: <span class="hljs-string">'The Terminator'</span>};
+<span class="hljs-keyword">const</span> options = {
   <span class="hljs-comment">// Return the document after updates are applied</span>
   <span class="hljs-keyword">new</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-comment">// Create a document if one isn't found. Required</span>

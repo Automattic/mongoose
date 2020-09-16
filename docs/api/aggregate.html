@@ -85,7 +85,7 @@ aggregate.addFields({ salary_k: { $divide: [ <span class="hljs-string">"$salary"
 <pre><code>aggregate.append({ $project: { field: <span class="hljs-number">1</span> }}, { $limit: <span class="hljs-number">2</span> });
 
 <span class="hljs-comment">// or pass an array</span>
-<span class="hljs-keyword">var</span> pipeline = [{ $match: { daw: <span class="hljs-string">'Logic Audio X'</span> }} ];
+<span class="hljs-keyword">const</span> pipeline = [{ $match: { daw: <span class="hljs-string">'Logic Audio X'</span> }} ];
 aggregate.append(pipeline);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-catch"><a href="#aggregate_Aggregate-catch">Aggregate.prototype.catch()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[reject]
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Executes the query returning a <code>Promise</code> which will be resolved with either the doc(s) or rejected with the error. Like <a href="#query_Query-then"><code>.then()</code></a>, but only takes a rejection handler.</p>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-collation"><a href="#aggregate_Aggregate-collation">Aggregate.prototype.collation()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">collation
 <span class="method-type">&laquo;Object&raquo;</span> options</p>
@@ -110,7 +110,7 @@ aggregate.append(pipeline);</code></pre>  </div><hr class="separate-api-elements
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> cursor = Model.aggregate(..).cursor({ batchSize: <span class="hljs-number">1000</span> }).exec();
+<pre><code><span class="hljs-keyword">const</span> cursor = Model.aggregate(..).cursor({ batchSize: <span class="hljs-number">1000</span> }).exec();
 cursor.eachAsync(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc, i</span>) </span>{
   <span class="hljs-comment">// use doc</span>
 });</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-exec"><a href="#aggregate_Aggregate-exec">Aggregate.prototype.exec()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">[callback]
@@ -121,7 +121,7 @@ cursor.eachAsync(<span class="hljs-function"><span class="hljs-keyword">function
 <pre><code>aggregate.exec(callback);
 
 <span class="hljs-comment">// Because a promise is returned, the `callback` is optional.</span>
-<span class="hljs-keyword">var</span> promise = aggregate.exec();
+<span class="hljs-keyword">const</span> promise = aggregate.exec();
 promise.then(..);</code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-explain"><a href="#aggregate_Aggregate-explain">Aggregate.prototype.explain()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">callback
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Execute the aggregation with explain</p>
 
@@ -224,7 +224,7 @@ aggregate.model() === SomeOtherModel; <span class="hljs-comment">// true</span><
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> agg = Model.aggregate(..).option({ allowDiskUse: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// Set the `allowDiskUse` option</span>
+<pre><code><span class="hljs-keyword">const</span> agg = Model.aggregate(..).option({ allowDiskUse: <span class="hljs-literal">true</span> }); <span class="hljs-comment">// Set the `allowDiskUse` option</span>
 agg.options; <span class="hljs-comment">// `{ allowDiskUse: true }`</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="aggregate_Aggregate-options"><a href="#aggregate_Aggregate-options">Aggregate.prototype.options</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Contains options passed down to the <a href="https://docs.mongodb.com/manual/reference/command/aggregate/">aggregate command</a>.</p>
 
 <h2>Supported options are</h2>

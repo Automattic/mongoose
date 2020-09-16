@@ -41,14 +41,14 @@ on the default port (27017). If connecting fails on your machine, try using
 <p>Mongoose lets you start using your models immediately, without waiting for
 mongoose to establish a connection to MongoDB.</p>
 <pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost:27017/myapp'</span>, {useNewUrlParser: <span class="hljs-literal">true</span>});
-<span class="hljs-keyword">var</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));
+<span class="hljs-keyword">const</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));
 <span class="hljs-comment">// Works</span>
 MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });</code></pre>
 <p>That&#39;s because mongoose buffers model function calls internally. This
 buffering is convenient, but also a common source of confusion. Mongoose
 will <em>not</em> throw any errors by default if you use a model without
 connecting.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> MyModel = mongoose.model(<span class="hljs-string">'Test'</span>, <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }));
 <span class="hljs-comment">// Will just hang until mongoose successfully connects</span>
 MyModel.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">/* ... */</span> });
 

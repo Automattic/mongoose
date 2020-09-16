@@ -46,7 +46,7 @@ and pass the results to the <code>callback</code>.</p>
 
 <h3 id="executing">Executing</h3>
 <p>When executing a query with a <code>callback</code> function, you specify your query as a JSON document. The JSON document&#39;s syntax is the same as the <a href="http://docs.mongodb.org/manual/tutorial/query-documents/">MongoDB shell</a>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, yourSchema);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Person = mongoose.model(<span class="hljs-string">'Person'</span>, yourSchema);
 
 <span class="hljs-comment">// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields</span>
 Person.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> }, <span class="hljs-string">'name occupation'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, person</span>) </span>{
@@ -61,7 +61,7 @@ will be null. If the query is successful, the <code>error</code> parameter will 
 <p>Anywhere a callback is passed to a query in Mongoose, the callback follows the pattern <code>callback(error, results)</code>. What <code>results</code> is depends on the operation: For <code>findOne()</code> it is a <a href="./api.html#model_Model.findOne">potentially-null single document</a>, <code>find()</code> a <a href="./api.html#model_Model.find">list of documents</a>, <code>count()</code> <a href="./api.html#model_Model.count">the number of documents</a>, <code>update()</code> the <a href="./api.html#model_Model.update">number of documents affected</a>, etc. The <a href="./api.html#model-js">API docs for Models</a> provide more detail on what is passed to the callbacks.</p>
 <p>Now let&#39;s look at what happens when no <code>callback</code> is passed:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// find each person with a last name matching 'Ghost'</span>
-<span class="hljs-keyword">var</span> query = Person.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> });
+<span class="hljs-keyword">const</span> query = Person.findOne({ <span class="hljs-string">'name.last'</span>: <span class="hljs-string">'Ghost'</span> });
 
 <span class="hljs-comment">// selecting the `name` and `occupation` fields</span>
 query.select(<span class="hljs-string">'name occupation'</span>);
@@ -120,7 +120,22 @@ because of the callback, and two because <code>.then()</code> is called twice.</
 q.then(() =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Update 2'</span>));
 q.then(() =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Update 3'</span>));</code></pre>
 <p>Don&#39;t mix using callbacks and promises with queries, or you may end up
-with duplicate operations.</p>
+with duplicate operations. That&#39;s because passing a callback to a query function
+immediately executes the query, and calling <a href="https://masteringjs.io/tutorials/fundamentals/then"><code>then()</code></a>
+executes the query again.</p>
+<p>Mixing promises and callbacks can lead to duplicate entries in arrays.
+For example, the below code inserts 2 entries into the <code>tags</code> array, *<em>not</em> just 1.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> BlogPost = mongoose.model(<span class="hljs-string">'BlogPost'</span>, <span class="hljs-keyword">new</span> Schema({
+  title: <span class="hljs-built_in">String</span>,
+  tags: [<span class="hljs-built_in">String</span>]
+}));
+
+<span class="hljs-comment">// Because there's both `await` **and** a callback, this `updateOne()` executes twice</span>
+<span class="hljs-comment">// and thus pushes the same string into `tags` twice.</span>
+<span class="hljs-keyword">const</span> update = { $push: { tags: [<span class="hljs-string">'javascript'</span>] } };
+<span class="hljs-keyword">await</span> BlogPost.updateOne({ title: <span class="hljs-string">'Introduction to Promises'</span> }, update, (err, res) =&gt; {
+  <span class="hljs-built_in">console</span>.log(res);
+});</code></pre>
 <h3 id="refs"><a href="#refs">References to other documents</a></h3>
 
 <p>There are no joins in MongoDB but sometimes we still want references to

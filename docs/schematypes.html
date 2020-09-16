@@ -70,7 +70,7 @@ Check out <a href="http://plugins.mongoosejs.io">Mongoose&#39;s plugins search</
 </ul>
 <h4>Example</h4>
 
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   name:    <span class="hljs-built_in">String</span>,
   binary:  Buffer,
   living:  <span class="hljs-built_in">Boolean</span>,
@@ -101,9 +101,9 @@ Check out <a href="http://plugins.mongoosejs.io">Mongoose&#39;s plugins search</
 
 <span class="hljs-comment">// example use</span>
 
-<span class="hljs-keyword">var</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, schema);
+<span class="hljs-keyword">const</span> Thing = mongoose.model(<span class="hljs-string">'Thing'</span>, schema);
 
-<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">new</span> Thing;
+<span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> Thing;
 m.name = <span class="hljs-string">'Statue of Liberty'</span>;
 m.age = <span class="hljs-number">125</span>;
 m.updated = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>;
@@ -164,17 +164,17 @@ below.</p>
 
 <p>You can declare a schema type using the type directly, or an object with
 a <code>type</code> property.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema1 = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema1 = <span class="hljs-keyword">new</span> Schema({
   test: <span class="hljs-built_in">String</span> <span class="hljs-comment">// `test` is a path of type String</span>
 });
 
-<span class="hljs-keyword">var</span> schema2 = <span class="hljs-keyword">new</span> Schema({
+<span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-comment">// The `test` object contains the "SchemaType options"</span>
   test: { type: <span class="hljs-built_in">String</span> } <span class="hljs-comment">// `test` is a path of type string</span>
 });</code></pre>
 <p>In addition to the type property, you can specify additional properties
 for a path. For example, if you want to lowercase a string before saving:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema2 = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
   test: {
     type: <span class="hljs-built_in">String</span>,
     lowercase: <span class="hljs-literal">true</span> <span class="hljs-comment">// Always convert `test` to lowercase</span>
@@ -228,7 +228,7 @@ using schema type options.</p>
 <li><code>unique</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-unique/">unique index</a> on this property.</li>
 <li><code>sparse</code>: boolean, whether to define a <a href="https://docs.mongodb.com/manual/core/index-sparse/">sparse index</a> on this property.</li>
 </ul>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema2 = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema2 = <span class="hljs-keyword">new</span> Schema({
   test: {
     type: <span class="hljs-built_in">String</span>,
     index: <span class="hljs-literal">true</span>,
@@ -299,7 +299,7 @@ will all result in a <a href="/docs/validation.html#cast-errors">CastError</a> o
 <h4 id="dates">Dates</h4>
 
 <p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Built-in <code>Date</code> methods</a> are <a href="https://github.com/Automattic/mongoose/issues/1598"><strong>not</strong> hooked into</a> the mongoose change tracking logic which in English means that if you use a <code>Date</code> in your document and modify it with a method like <code>setMonth()</code>, mongoose will be unaware of this change and <code>doc.save()</code> will not persist this modification. If you must modify <code>Date</code> types using built-in methods, tell mongoose about the change with <code>doc.markModified(&#39;pathToYourDate&#39;)</code> before saving.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> Assignment = mongoose.model(<span class="hljs-string">'Assignment'</span>, { dueDate: <span class="hljs-built_in">Date</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Assignment = mongoose.model(<span class="hljs-string">'Assignment'</span>, { dueDate: <span class="hljs-built_in">Date</span> });
 Assignment.findOne(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, doc</span>) </span>{
   doc.dueDate.setMonth(<span class="hljs-number">3</span>);
   doc.save(callback); <span class="hljs-comment">// THIS DOES NOT SAVE YOUR CHANGE</span>
@@ -406,8 +406,8 @@ mongoose.Schema.Types.Boolean.convertToFalse.add(<span class="hljs-string">'nay'
 and arrays of <a href="./subdocs.html">subdocuments</a>. Arrays of SchemaTypes are
 also called <em>primitive arrays</em>, and arrays of subdocuments are also called
 <em>document arrays</em>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> ToySchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
-<span class="hljs-keyword">var</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToySchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> });
+<span class="hljs-keyword">const</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
   toys: [ToySchema],
   buffers: [Buffer],
   strings: [<span class="hljs-built_in">String</span>],
@@ -415,10 +415,10 @@ also called <em>primitive arrays</em>, and arrays of subdocuments are also calle
   <span class="hljs-comment">// ... etc</span>
 });</code></pre>
 <p>Arrays are special because they implicitly have a default value of <code>[]</code> (empty array).</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> ToyBox = mongoose.model(<span class="hljs-string">'ToyBox'</span>, ToyBoxSchema);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToyBox = mongoose.model(<span class="hljs-string">'ToyBox'</span>, ToyBoxSchema);
 <span class="hljs-built_in">console</span>.log((<span class="hljs-keyword">new</span> ToyBox()).toys); <span class="hljs-comment">// []</span></code></pre>
 <p>To overwrite this default, you need to set the default value to <code>undefined</code></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ToyBoxSchema = <span class="hljs-keyword">new</span> Schema({
   toys: {
     type: [ToySchema],
     <span class="hljs-keyword">default</span>: <span class="hljs-literal">undefined</span>
@@ -426,10 +426,10 @@ also called <em>primitive arrays</em>, and arrays of subdocuments are also calle
 });</code></pre>
 <p>Note: specifying an empty array is equivalent to <code>Mixed</code>. The following all create arrays of
 <code>Mixed</code>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> Empty1 = <span class="hljs-keyword">new</span> Schema({ any: [] });
-<span class="hljs-keyword">var</span> Empty2 = <span class="hljs-keyword">new</span> Schema({ any: <span class="hljs-built_in">Array</span> });
-<span class="hljs-keyword">var</span> Empty3 = <span class="hljs-keyword">new</span> Schema({ any: [Schema.Types.Mixed] });
-<span class="hljs-keyword">var</span> Empty4 = <span class="hljs-keyword">new</span> Schema({ any: [{}] });</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Empty1 = <span class="hljs-keyword">new</span> Schema({ any: [] });
+<span class="hljs-keyword">const</span> Empty2 = <span class="hljs-keyword">new</span> Schema({ any: <span class="hljs-built_in">Array</span> });
+<span class="hljs-keyword">const</span> Empty3 = <span class="hljs-keyword">new</span> Schema({ any: [Schema.Types.Mixed] });
+<span class="hljs-keyword">const</span> Empty4 = <span class="hljs-keyword">new</span> Schema({ any: [{}] });</code></pre>
 <h4 id="maps">Maps</h4>
 
 <p><em>New in Mongoose 5.1.0</em></p>
@@ -563,7 +563,7 @@ and
 
 <p>The <code>schema.path()</code> function returns the instantiated schema type for a
 given path.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> sampleSchema = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> } });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> sampleSchema = <span class="hljs-keyword">new</span> Schema({ name: { type: <span class="hljs-built_in">String</span>, required: <span class="hljs-literal">true</span> } });
 <span class="hljs-built_in">console</span>.log(sampleSchema.path(<span class="hljs-string">'name'</span>));
 <span class="hljs-comment">// Output looks like:</span>
 <span class="hljs-comment">/**

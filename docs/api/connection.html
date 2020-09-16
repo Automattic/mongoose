@@ -90,17 +90,17 @@ conn.id; <span class="hljs-comment">// 1</span></code></pre>  </div><hr class="s
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> The compiled model</p>
 </li></ul><div><p>Defines or retrieves a model.</p>
 
-<pre><code><span class="hljs-keyword">var</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
-<span class="hljs-keyword">var</span> db = mongoose.createConnection(..);
+<pre><code><span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>);
+<span class="hljs-keyword">const</span> db = mongoose.createConnection(..);
 db.model(<span class="hljs-string">'Venue'</span>, <span class="hljs-keyword">new</span> Schema(..));
-<span class="hljs-keyword">var</span> Ticket = db.model(<span class="hljs-string">'Ticket'</span>, <span class="hljs-keyword">new</span> Schema(..));
-<span class="hljs-keyword">var</span> Venue = db.model(<span class="hljs-string">'Venue'</span>);</code></pre>
+<span class="hljs-keyword">const</span> Ticket = db.model(<span class="hljs-string">'Ticket'</span>, <span class="hljs-keyword">new</span> Schema(..));
+<span class="hljs-keyword">const</span> Venue = db.model(<span class="hljs-string">'Venue'</span>);</code></pre>
 
 <p><em>When no <code>collection</code> argument is passed, Mongoose produces a collection name by passing the model <code>name</code> to the <a href="#utils_exports.toCollectionName">utils.toCollectionName</a> method. This method pluralizes the name. If you don't like this behavior, either pass a collection name or set your schemas collection name option.</em></p>
 
 <h4>Example:</h4>
 
-<pre><code><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
+<pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> }, { collection: <span class="hljs-string">'actor'</span> });
 
 <span class="hljs-comment">// or</span>
 
@@ -108,8 +108,8 @@ schema.set(<span class="hljs-string">'collection'</span>, <span class="hljs-stri
 
 <span class="hljs-comment">// or</span>
 
-<span class="hljs-keyword">var</span> collectionName = <span class="hljs-string">'actor'</span>
-<span class="hljs-keyword">var</span> M = conn.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre>  </div><hr class="separate-api-elements"><h3 id="connection_Connection-modelNames"><a href="#connection_Connection-modelNames">Connection.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this connection.</p>  </div><hr class="separate-api-elements"><h3 id="connection_Connection-models"><a href="#connection_Connection-models">Connection.prototype.models</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a> containing a map from model names to models. Contains all models that have been added to this connection using <a href="/docs/api/connection.html#connection_Connection-model"><code>Connection#model()</code></a>.</p>
+<span class="hljs-keyword">const</span> collectionName = <span class="hljs-string">'actor'</span>
+<span class="hljs-keyword">const</span> M = conn.model(<span class="hljs-string">'Actor'</span>, schema, collectionName)</code></pre>  </div><hr class="separate-api-elements"><h3 id="connection_Connection-modelNames"><a href="#connection_Connection-modelNames">Connection.prototype.modelNames()</a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Array&raquo;</span> </li></ul><div><p>Returns an array of model names created on this connection.</p>  </div><hr class="separate-api-elements"><h3 id="connection_Connection-models"><a href="#connection_Connection-models">Connection.prototype.models</a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>A <a href="https://masteringjs.io/tutorials/fundamentals/pojo">POJO</a> containing a map from model names to models. Contains all models that have been added to this connection using <a href="/docs/api/connection.html#connection_Connection-model"><code>Connection#model()</code></a>.</p>
 
 <h4>Example</h4>
 

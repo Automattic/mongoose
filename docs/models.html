@@ -17,8 +17,8 @@
 reading documents from the underlying MongoDB database.</p>
 <ul><li><a href="#compiling">Compiling your first model</a></li><li><a href="#constructing-documents">Constructing Documents</a></li><li><a href="#querying">Querying</a></li><li><a href="#deleting">Deleting</a></li><li><a href="#updating">Updating</a></li><li><a href="#change-streams">Change Streams</a></li></ul><h3 id="compiling">Compiling your first model</h3><p>When you call <code>mongoose.model()</code> on a schema, Mongoose <em>compiles</em> a model
 for you.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({ name: <span class="hljs-string">'string'</span>, size: <span class="hljs-string">'string'</span> });
-<span class="hljs-keyword">var</span> Tank = mongoose.model(<span class="hljs-string">'Tank'</span>, schema);</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.Schema({ name: <span class="hljs-string">'string'</span>, size: <span class="hljs-string">'string'</span> });
+<span class="hljs-keyword">const</span> Tank = mongoose.model(<span class="hljs-string">'Tank'</span>, schema);</code></pre>
 <p>The first argument is the <em>singular</em> name of the collection your model is
 for. <strong>Mongoose automatically looks for the plural, lowercased version of your model name.</strong>
 Thus, for the example above, the model Tank is for the <strong>tanks</strong> collection
@@ -28,9 +28,9 @@ you&#39;ve added everything you want to <code>schema</code>, including hooks,
 before calling <code>.model()</code>!</p>
 <h3 id="constructing-documents">Constructing Documents</h3><p>An instance of a model is called a <a href="./documents.html">document</a>. Creating
 them and saving to the database is easy.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> Tank = mongoose.model(<span class="hljs-string">'Tank'</span>, yourSchema);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> Tank = mongoose.model(<span class="hljs-string">'Tank'</span>, yourSchema);
 
-<span class="hljs-keyword">var</span> small = <span class="hljs-keyword">new</span> Tank({ size: <span class="hljs-string">'small'</span> });
+<span class="hljs-keyword">const</span> small = <span class="hljs-keyword">new</span> Tank({ size: <span class="hljs-string">'small'</span> });
 small.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
   <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> handleError(err);
   <span class="hljs-comment">// saved!</span>
@@ -53,8 +53,8 @@ uses is open. Every model has an associated connection. When you use
 <pre><code class="language-javascript">mongoose.connect(<span class="hljs-string">'mongodb://localhost/gettingstarted'</span>, {useNewUrlParser: <span class="hljs-literal">true</span>});</code></pre>
 <p>If you create a custom connection, use that connection&#39;s <code>model()</code> function
 instead.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">var</span> connection = mongoose.createConnection(<span class="hljs-string">'mongodb://localhost:27017/test'</span>);
-<span class="hljs-keyword">var</span> Tank = connection.model(<span class="hljs-string">'Tank'</span>, yourSchema);</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> connection = mongoose.createConnection(<span class="hljs-string">'mongodb://localhost:27017/test'</span>);
+<span class="hljs-keyword">const</span> Tank = connection.model(<span class="hljs-string">'Tank'</span>, yourSchema);</code></pre>
 <h3 id="querying">Querying</h3><p>Finding documents is easy with Mongoose, which supports the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries">rich</a> query syntax of MongoDB. Documents can be retreived using each <code>models</code> <a href="./api.html#model_Model.find">find</a>, <a href="./api.html#model_Model.findById">findById</a>, <a href="./api.html#model_Model.findOne">findOne</a>, or <a href="./api.html#model_Model.where">where</a> static methods.</p>
 <pre><code class="language-javascript">Tank.find({ size: <span class="hljs-string">'small'</span> }).where(<span class="hljs-string">'createdDate'</span>).gt(oneYearAgo).exec(callback);</code></pre>
 <p>See the chapter on <a href="./queries.html">queries</a> for more details on how to use the <a href="./api.html#query-js">Query</a> api.</p>

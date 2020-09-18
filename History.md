@@ -1,3 +1,13 @@
+5.10.6 / 2020-09-18
+===================
+ * fix(populate): handle `options.perDocumentLimit` option same as `perDocumentLimit` when calling `populate()` #9418
+ * fix(document): invalidate path if default function throws an error #9408
+ * fix: ensure subdocument defaults run after initial values are set when initing #9408
+ * docs(faq+queries): add more detail about duplicate queries, including an faq entry #9386
+ * docs: replace var with let and const in docs and test files #9414 [jmadankumar](https://github.com/jmadankumar)
+ * docs(model+query): document using array of strings as projection #9413
+ * docs(middleware): add missing backtick #9425 [tphobe9312](https://github.com/tphobe9312)
+
 5.10.5 / 2020-09-11
 ===================
  * fix: bump mongodb -> 3.6.2 #9411 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

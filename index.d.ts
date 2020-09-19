@@ -2,6 +2,7 @@ declare module "mongoose" {
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
 
+  /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
   export function connect(uri: string, options: ConnectOptions, callback: (err: Error) => void): void;
   export function connect(uri: string, callback: (err: Error) => void): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
@@ -79,6 +80,91 @@ declare module "mongoose" {
 
   interface SchemaTypeOptions<T> {
     type?: T;
+
+    /** Defines a virtual with the given name that gets/sets this path. */
+    alias?: string;
+
+    /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
+    validate?: RegExp | [RegExp, string] | Function;
+
+    /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
+    cast?: string;
+
+    /**
+     * If true, attach a required validator to this path, which ensures this path
+     * path cannot be set to a nullish value. If a function, Mongoose calls the
+     * function and only checks for nullish values if the function returns a truthy value.
+     */
+    required?: boolean | (() => boolean);
+
+    /**
+     * The default value for this path. If a function, Mongoose executes the function
+     * and uses the return value as the default.
+     */
+    default?: T | ((this: any, doc: any) => T);
+
+    /**
+     * The model that `populate()` should use if populating this path.
+     */
+    ref?: string | Model<any> | ((this: any, doc: any) => string | Model<any>);
+
+    /**
+     * Whether to include or exclude this path by default when loading documents
+     * using `find()`, `findOne()`, etc.
+     */
+    select?: boolean | number;
+
+    /**
+     * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
+     * build an index on this path when the model is compiled.
+     */
+    index?: boolean | number | IndexOptions;
+
+    /**
+     * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose
+     * will build a unique index on this path when the
+     * model is compiled. [The `unique` option is **not** a validator](/docs/validation.html#the-unique-option-is-not-a-validator).
+     */
+    unique?: boolean | number;
+
+    /**
+     * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
+     * disallow changes to this path once the document is saved to the database for the first time. Read more
+     * about [immutability in Mongoose here](http://thecodebarbarian.com/whats-new-in-mongoose-5-6-immutable-properties.html).
+     */
+    immutable?: boolean | ((this: any, doc: any) => boolean);
+
+    /**
+     * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
+     * build a sparse index on this path.
+     */
+    sparse?: boolean | number;
+
+    /**
+     * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose
+     * will build a text index on this path.
+     */
+    text?: boolean | number | any;
+
+    /**
+     * Define a transform function for this individual schema type.
+     * Only called when calling `toJSON()` or `toObject()`.
+     */
+    transform?: (this: any, val: T) => any;
+
+    /** defines a custom getter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
+    get?: (value: T, schematype?: this) => any;
+
+    /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
+    set?: (value: T, schematype?: this) => any;
+  }
+
+  interface IndexOptions {
+    background?: boolean,
+    expires?: number | string
+    sparse?: boolean,
+    type?: string,
+    unique?: boolean
   }
 
   interface Query<T extends Document> {

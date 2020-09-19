@@ -19,6 +19,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@types/mongodb": "^3.5.27",
     "bson": "^1.1.4",
     "kareem": "2.3.1",
     "mongodb": "3.6.1",
@@ -28,8 +29,8 @@
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
     "safe-buffer": "5.2.1",
-    "sliced": "1.0.1",
-    "sift": "7.0.1"
+    "sift": "7.0.1",
+    "sliced": "1.0.1"
   },
   "devDependencies": {
     "@babel/core": "7.10.5",
@@ -60,6 +61,7 @@
     "pug": "2.0.3",
     "q": "1.5.1",
     "semver": "5.5.0",
+    "typescript": "4.x",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",

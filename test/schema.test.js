@@ -1981,6 +1981,18 @@ describe('schema', function() {
         assert.ok(clone.path('events').Constructor.discriminators['gh7954_Clicked']);
         assert.ok(clone.path('events').Constructor.discriminators['gh7954_Purchased']);
       });
+
+      it('uses Mongoose instance\'s Schema constructor (gh-9426)', function() {
+        const db = new mongoose.Mongoose();
+        db.Schema.prototype.localTest = function() {
+          return 42;
+        };
+        const test = new db.Schema({});
+        assert.equal(test.localTest(), 42);
+
+        const test2 = test.clone();
+        assert.equal(test2.localTest(), 42);
+      });
     });
 
     it('TTL index with timestamps (gh-5656)', function(done) {

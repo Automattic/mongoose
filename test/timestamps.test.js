@@ -395,4 +395,11 @@ describe('timestamps', function() {
       assert.ok(newDoc.nestedDoc.updatedAt > doc.nestedDoc.updatedAt);
     });
   });
+
+  it('works with property named "set" (gh-9428)', function() {
+    const schema = new Schema({ set: String }, { timestamps: true });
+    const Model = db.model('Test', schema);
+
+    return Model.create({ set: 'test' }).then(doc => assert.ok(doc.createdAt));
+  });
 });

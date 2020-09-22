@@ -157,6 +157,51 @@ declare module "mongoose" {
 
     /** defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty). */
     set?: (value: T, schematype?: this) => any;
+
+    /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
+    enum?: Array<string | number>
+
+    /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
+    subtype?: number
+
+    /** The minimum value allowed for this path. Only allowed for numbers and dates. */
+    min?: number | Date;
+
+    /** The maximum value allowed for this path. Only allowed for numbers and dates. */
+    max?: number | Date;
+
+    /** Defines a TTL index on this path. Only allowed for dates. */
+    expires?: Date;
+
+    /** If `true`, Mongoose will skip gathering indexes on subpaths. Only allowed for subdocuments and subdocument arrays. */
+    excludeIndexes?: boolean;
+
+    /** If set, overrides the child schema's `_id` option. Only allowed for subdocuments and subdocument arrays. */
+    _id?: boolean;
+
+    /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
+    of?: Function | SchemaTypeOptions<any>;
+
+    /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
+    auto?: boolean;
+
+    /** Attaches a validator that succeeds if the data string matches the given regular expression, and fails otherwise. */
+    match?: RegExp;
+
+    /** If truthy, Mongoose will add a custom setter that lowercases this string using JavaScript's built-in `String#toLowerCase()`. */
+    lowercase?: boolean;
+
+    /** If truthy, Mongoose will add a custom setter that removes leading and trailing whitespace using JavaScript's built-in `String#trim()`. */
+    trim?: boolean;
+
+    /** If truthy, Mongoose will add a custom setter that uppercases this string using JavaScript's built-in `String#toUpperCase()`. */
+    uppercase?: boolean;
+
+    /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
+    minlength?: number;
+
+    /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
+    maxlength?: number;
   }
 
   interface IndexOptions {

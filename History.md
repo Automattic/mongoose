@@ -1,3 +1,21 @@
+5.10.6 / 2020-09-18
+===================
+ * fix(populate): handle `options.perDocumentLimit` option same as `perDocumentLimit` when calling `populate()` #9418
+ * fix(document): invalidate path if default function throws an error #9408
+ * fix: ensure subdocument defaults run after initial values are set when initing #9408
+ * docs(faq+queries): add more detail about duplicate queries, including an faq entry #9386
+ * docs: replace var with let and const in docs and test files #9414 [jmadankumar](https://github.com/jmadankumar)
+ * docs(model+query): document using array of strings as projection #9413
+ * docs(middleware): add missing backtick #9425 [tphobe9312](https://github.com/tphobe9312)
+
+5.10.5 / 2020-09-11
+===================
+ * fix: bump mongodb -> 3.6.2 #9411 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query+aggregate+cursor): support async iteration over a cursor instance as opposed to a Query or Aggregate instance #9403
+ * fix(document): respect child schema `minimize` if `toObject()` is called without an explicit `minimize` #9405
+ * docs(guide): use const instead of var #9394 [nainardev](https://github.com/nainardev)
+ * docs(query): link to lean, findOneAndUpdate, query casting tutorials from query docs #9410
+
 5.10.4 / 2020-09-09
 ===================
  * fix(document): allow setting nested path to instance of model #9392

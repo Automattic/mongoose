@@ -6,7 +6,7 @@ const mongodb = require('mongodb');
 
 co(function*() {
   // Create new instance
-  var server = new Server('mongod', {
+  const server = new Server('mongod', {
     auth: null,
     dbpath: '/data/db/27017'
   });

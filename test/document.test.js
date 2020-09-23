@@ -9417,4 +9417,23 @@ describe('document', function() {
 
     assert.ok(docFromValidation === user);
   });
+
+  it('works with path named isSelected (gh-9438)', function() {
+    const categorySchema = new Schema({
+      name: String,
+      categoryUrl: { type: String, required: true }, // Makes test fail
+      isSelected: Boolean
+    });
+
+    const siteSchema = new Schema({ categoryUrls: [categorySchema] });
+
+    const Test = db.model('Test', siteSchema);
+    const test = new Test({
+      categoryUrls: [
+        { name: 'A', categoryUrl: 'B', isSelected: false, isModified: false }
+      ]
+    });
+    const err = test.validateSync();
+    assert.ifError(err);
+  });
 });

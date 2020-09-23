@@ -62,6 +62,12 @@ declare module "mongoose" {
     countDocuments(callback?: (err: any, count: number) => void): Query<number, T>;
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
+    /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
+    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, T>;
+
+    /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
+    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
+
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(callback?: (err: any, count: number) => void): Query<Array<T>, T>;
     find(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
@@ -266,6 +272,12 @@ declare module "mongoose" {
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(callback?: (err: any, count: number) => void): Query<number, DocType>;
     countDocuments(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
+
+    /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
+    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
+
+    /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
+    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, T>;    
   }
 
   export type FilterQuery<T> = {

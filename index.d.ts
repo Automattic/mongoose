@@ -72,10 +72,13 @@ declare module "mongoose" {
      * Create a new schema
      */
     constructor(definition?: SchemaDefinition);
+
+    /** Adds key path / schema type pairs to this schema. */
+    add(obj: SchemaDefinition | Schema, prefix?: string): this;
   }
 
   interface SchemaDefinition {
-    [path: string]: SchemaTypeOptions<any>
+    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Array<Schema> | Array<SchemaTypeOptions<any>>;
   }
 
   interface SchemaTypeOptions<T> {

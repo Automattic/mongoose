@@ -1995,22 +1995,6 @@ describe('schema', function() {
       });
     });
 
-    it('TTL index with timestamps (gh-5656)', function(done) {
-      const testSchema = new mongoose.Schema({
-        foo: String,
-        updatedAt: {
-          type: Date,
-          expires: '2h'
-        }
-      }, { timestamps: true });
-
-      const indexes = testSchema.indexes();
-      assert.deepEqual(indexes, [
-        [{ updatedAt: 1 }, { background: true, expireAfterSeconds: 7200 }]
-      ]);
-      done();
-    });
-
     it('childSchemas prop (gh-5695)', function(done) {
       const schema1 = new Schema({ name: String });
       const schema2 = new Schema({ test: String });

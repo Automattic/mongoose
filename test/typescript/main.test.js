@@ -30,13 +30,17 @@ describe('typescript syntax', function() {
 
   it('handles maps', function() {
     const errors = runTest('maps.ts');
-    console.log(errors);
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.messageText.includes('not assignable'), errors[0].messageText.messageText);
   });
 
   it('subdocuments', function() {
     const errors = runTest('subdocuments.ts');
+    assert.equal(errors.length, 0);
+  });
+
+  it('queries', function() {
+    const errors = runTest('queries.ts');
     assert.equal(errors.length, 0);
   });
 });

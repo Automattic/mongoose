@@ -54,7 +54,47 @@ declare module "mongoose" {
     /** Translate any aliases fields/conditions so the final query or document object is pure */
     translateAliases(raw: any): any;
 
-    remove(filter?: any, callback?: (err: Error | null) => void): Query<T>;
+    /** Creates a `count` query: counts the number of documents that match `filter`. */
+    count(callback?: (err: any, count: number) => void): Query<number, T>;
+    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
+
+    /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
+    countDocuments(callback?: (err: any, count: number) => void): Query<number, T>;
+    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
+
+    /** Creates a `find` query: gets a list of documents that match `filter`. */
+    find(callback?: (err: any, count: number) => void): Query<Array<T>, T>;
+    find(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
+    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
+
+    remove(filter?: any, callback?: (err: Error | null) => void): Query<any, T>;
+  }
+
+  interface QueryOptions {
+    tailable?: number;
+    sort?: any;
+    limit?: number;
+    skip?: number;
+    maxscan?: number;
+    batchSize?: number;
+    comment?: any;
+    snapshot?: any;
+    readPreference?: mongodb.ReadPreferenceMode;
+    hint?: any;
+    upsert?: boolean;
+    writeConcern?: any;
+    timestamps?: boolean;
+    omitUndefined?: boolean;
+    overwriteDiscriminatorKey?: boolean;
+    lean?: boolean | any;
+    populate?: string;
+    projection?: any;
+    maxTimeMS?: number;
+    useFindAndModify?: boolean;
+    rawResult?: boolean;
+    collation?: mongodb.CollationDocument;
+    session?: mongodb.ClientSession;
+    explain?: any;
   }
 
   interface SaveOptions {
@@ -215,7 +255,27 @@ declare module "mongoose" {
     unique?: boolean
   }
 
-  interface Query<T extends Document> {
-    exec(callback?: (err: Error | null, res: T) => void): Promise<T>;
+  interface Query<T, DocType extends Document> {
+    exec(): Promise<T>;
+    exec(callback?: (err: Error | null, res: T) => void): void;
+
+    /** Specifies this query as a `count` query. */
+    count(callback?: (err: any, count: number) => void): Query<number, DocType>;
+    count(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
+
+    /** Specifies this query as a `countDocuments` query. */
+    countDocuments(callback?: (err: any, count: number) => void): Query<number, DocType>;
+    countDocuments(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
   }
+
+  export type FilterQuery<T> = {
+    [P in keyof T]?: P extends '_id'
+      ? [Extract<T[P], mongodb.ObjectId>] extends [never]
+        ? mongodb.Condition<T[P]>
+        : mongodb.Condition<T[P] | string | { _id: mongodb.ObjectId }>
+      : [Extract<T[P], mongodb.ObjectId>] extends [never]
+      ? mongodb.Condition<T[P]>
+      : mongodb.Condition<T[P] | string>;
+  } &
+    mongodb.RootQuerySelector<T>;
 }

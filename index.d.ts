@@ -38,13 +38,6 @@ declare module "mongoose" {
   interface Model<T extends Document> {
     new(doc?: any): T;
 
-    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
-    save(options?: SaveOptions): Promise<this>;
-    save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
-    save(fn?: (err: Error | null, doc: this) => void): void;
-
-    $where(argument: string | Function): Query<Array<T>, T>;
-
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;
 
@@ -53,6 +46,47 @@ declare module "mongoose" {
      * the base model.
      */
     baseModelName: string | undefined;
+
+    /**
+     * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
+     * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
+     * command. This is faster than sending multiple independent operations (e.g.
+     * if you use `create()`) because with `bulkWrite()` there is only one round
+     * trip to MongoDB.
+     */
+    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
+    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
+
+    /** Creates a new document or documents */
+    create(doc: T | DocumentDefinition<T>): Promise<T>;
+    create(docs: Array<T | DocumentDefinition<T>>, options?: SaveOptions): Promise<Array<T>>;
+    create(...docs: Array<T | DocumentDefinition<T>>): Promise<T>;
+    create(doc: T | DocumentDefinition<T>, callback: (err: Error | null, doc: T) => void): void;
+    create(docs: Array<T | DocumentDefinition<T>>, callback: (err: Error | null, docs: Array<T>) => void): void;
+
+    /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
+    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T | InsertManyResult>;
+    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T> | InsertManyResult>;
+    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: Error | null, res: T | InsertManyResult) => void): void;
+    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: Error | null, res: Array<T> | InsertManyResult) => void): void;
+
+    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
+    save(options?: SaveOptions): Promise<this>;
+    save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
+    save(fn?: (err: Error | null, doc: this) => void): void;
+
+    /**
+     * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
+     * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
+     * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
+     **/
+    startSession(options?: mongodb.SessionOptions, cb?: (err: any, session: mongodb.ClientSession) => void): Promise<mongodb.ClientSession>;
+
+    /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
+    watch(pipeline?: Array<object>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
+
+    /** Adds a `$where` clause to this query */
+    $where(argument: string | Function): Query<Array<T>, T>;
 
     /** Registered discriminators for this model. */
     discriminators: { [name: string]: Model<any> } | undefined;
@@ -82,11 +116,17 @@ declare module "mongoose" {
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
+    /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
+    findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
+    /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
+    findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
@@ -135,6 +175,18 @@ declare module "mongoose" {
     j?: boolean;
     w?: number | string;
     wtimeout?: number;
+  }
+
+  interface InsertManyOptions {
+    limit?: number;
+    rawResult?: boolean;
+    ordered?: boolean;
+    lean?: boolean;
+    session?: mongodb.ClientSession;
+  }
+
+  interface InsertManyResult extends mongodb.InsertWriteOpResult<any> {
+    mongoose?: { validationErrors?: Array<Error> }
   }
 
   class Schema {
@@ -313,8 +365,11 @@ declare module "mongoose" {
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
+    /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
+    findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(conditions?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;

@@ -43,6 +43,12 @@ describe('typescript syntax', function() {
     const errors = runTest('queries.ts');
     assert.equal(errors.length, 0);
   });
+
+  it('create', function() {
+    const errors = runTest('create.ts');
+    assert.equal(errors.length, 1);
+    assert.ok(errors[0].messageText.messageText.includes('No overload matches'), errors[0].messageText.messageText);
+  });
 });
 
 function runTest(file) {

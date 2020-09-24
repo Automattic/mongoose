@@ -8384,9 +8384,9 @@ describe('model: populate:', function() {
 
     return co(function*() {
       const c = yield Child.create({ name: 'test' });
-      yield Parent.create({ list: [{ fill: { child: c._id } }] });
+      const p = yield Parent.create({ list: [{ fill: { child: c._id } }] });
 
-      const doc = yield Parent.findOne().populate('list.fill.child');
+      const doc = yield Parent.findById(p).populate('list.fill.child');
 
       assert.equal(doc.list.length, 1);
       assert.strictEqual(doc.list[0].fill.child.name, 'test');

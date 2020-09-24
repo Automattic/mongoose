@@ -2497,4 +2497,13 @@ describe('schema', function() {
     assert.equal(schematype.options.min, 4);
     assert.equal(schematype.options.get, get);
   });
+
+  it('applies correct schema to nested primitive arrays (gh-9429)', function() {
+    const schema = new Schema({
+      ids: [[{ type: 'ObjectId', required: true }]]
+    });
+
+    const casted = schema.path('ids').cast([[]]);
+    assert.equal(casted[0].$path(), 'ids.$');
+  });
 });

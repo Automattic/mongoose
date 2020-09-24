@@ -1,8 +1,9 @@
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Model, Types } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
 interface ITest extends Model<ITest> {
+  _id?: Types.ObjectId,
   name?: string;
 }
 
@@ -16,3 +17,7 @@ Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).
   then((res: Array<ITest>) => console.log(res[0].name));
 
 Test.distinct('name').exec().then((res: Array<any>) => console.log(res[0]));
+
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
+
+Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));

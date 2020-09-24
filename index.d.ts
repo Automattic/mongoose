@@ -28,6 +28,10 @@ declare module "mongoose" {
     autoCreate?: boolean;
   }
 
+  namespace Types {
+    class ObjectId extends mongodb.ObjectID {}
+  }
+
   class Document {}
 
   export var Model: Model<any>;
@@ -38,6 +42,8 @@ declare module "mongoose" {
     save(options?: SaveOptions): Promise<this>;
     save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
     save(fn?: (err: Error | null, doc: this) => void): void;
+
+    $where(argument: string | Function): Query<Array<T>, T>;
 
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;
@@ -73,7 +79,25 @@ declare module "mongoose" {
     find(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
     find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
 
+    /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
+    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
+    /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
+    /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
+    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
+    /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
+    /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
+    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
     remove(filter?: any, callback?: (err: Error | null) => void): Query<any, T>;
+
+    /** Creates a Query, applies the passed conditions, and returns the Query. */
+    where(path: string, val?: any): Query<Array<T>, T>;
   }
 
   interface QueryOptions {
@@ -261,9 +285,11 @@ declare module "mongoose" {
     unique?: boolean
   }
 
-  interface Query<T, DocType extends Document> {
-    exec(): Promise<T>;
-    exec(callback?: (err: Error | null, res: T) => void): void;
+  interface Query<ResultType, DocType extends Document> {
+    exec(): Promise<ResultType>;
+    exec(callback?: (err: Error | null, res: ResultType) => void): void;
+
+    $where(argument: string | Function): Query<Array<DocType>, DocType>;
 
     /** Specifies this query as a `count` query. */
     count(callback?: (err: any, count: number) => void): Query<number, DocType>;
@@ -274,10 +300,30 @@ declare module "mongoose" {
     countDocuments(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
+    distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<any>, DocType>;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, T>;    
+    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, DocType>;
+
+    /** Creates a `find` query: gets a list of documents that match `filter`. */
+    find(callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
+    find(filter: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
+    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
+
+    /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
+    findOneAndDelete(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+
+    /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
+    findOneAndUpdate(conditions?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+
+    /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
+    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+
+    /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+
+    /** Creates a Query, applies the passed conditions, and returns the Query. */
+    where(path: string, val?: any): Query<Array<DocType>, DocType>;
   }
 
   export type FilterQuery<T> = {
@@ -290,4 +336,8 @@ declare module "mongoose" {
       : mongodb.Condition<T[P] | string>;
   } &
     mongodb.RootQuerySelector<T>;
+  
+  export type UpdateQuery<T> = mongodb.UpdateQuery<T> & mongodb.MatchKeysAndValues<T>;
+
+  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Model<T>, '_id'>>
 }

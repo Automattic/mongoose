@@ -1,3 +1,11 @@
+5.10.7 / 2020-09-24
+===================
+ * fix(schema): set correct path and schema on nested primitive arrays #9429
+ * fix(document): pass document to required validator so `required` can use arrow functions #9435 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): handle required when schema has property named `isSelected` #9438
+ * fix(timestamps): allow using timestamps when schema has a property named 'set' #9428
+ * fix(schema): make `Schema#clone()` use parent Mongoose instance's Schema constructor #9426
+
 5.10.6 / 2020-09-18
 ===================
  * fix(populate): handle `options.perDocumentLimit` option same as `perDocumentLimit` when calling `populate()` #9418

@@ -9395,4 +9395,45 @@ describe('document', function() {
 
     assert.equal(doc.subJob[0].shippingAt.valueOf(), date.valueOf());
   });
+
+  it('passes document as an argument for `required` function in schema definition (gh-9433)', function() {
+    let docFromValidation;
+
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        required: (doc) => {
+          docFromValidation = doc;
+          return doc.age > 18;
+        }
+      },
+      age: Number
+    });
+
+    const User = db.model('User', userSchema);
+    const user = new User({ age: 26 });
+    const err = user.validateSync();
+    assert.ok(err);
+
+    assert.ok(docFromValidation === user);
+  });
+
+  it('works with path named isSelected (gh-9438)', function() {
+    const categorySchema = new Schema({
+      name: String,
+      categoryUrl: { type: String, required: true }, // Makes test fail
+      isSelected: Boolean
+    });
+
+    const siteSchema = new Schema({ categoryUrls: [categorySchema] });
+
+    const Test = db.model('Test', siteSchema);
+    const test = new Test({
+      categoryUrls: [
+        { name: 'A', categoryUrl: 'B', isSelected: false, isModified: false }
+      ]
+    });
+    const err = test.validateSync();
+    assert.ifError(err);
+  });
 });

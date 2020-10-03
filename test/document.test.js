@@ -9436,4 +9436,16 @@ describe('document', function() {
     const err = test.validateSync();
     assert.ifError(err);
   });
+
+  it('init tracks cast error reason (gh-9448)', function() {
+    const Test = db.model('Test', Schema({
+      num: Number
+    }));
+
+    const doc = new Test();
+    doc.init({ num: 'not a number' });
+
+    const err = doc.validateSync();
+    assert.ok(err.errors['num'].reason);
+  });
 });

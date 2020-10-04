@@ -49,6 +49,11 @@ describe('typescript syntax', function() {
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.messageText.includes('No overload matches'), errors[0].messageText.messageText);
   });
+
+  it('aggregate', function() {
+    const errors = runTest('aggregate.ts');
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

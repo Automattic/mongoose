@@ -38,6 +38,9 @@ declare module "mongoose" {
   interface Model<T extends Document> {
     new(doc?: any): T;
 
+    aggregate<R>(pipeline?: any[]): Aggregate<Array<R>>;
+    aggregate<R>(pipeline: any[], cb: Function): Promise<Array<R>>;
+
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;
 
@@ -64,6 +67,12 @@ declare module "mongoose" {
     create(doc: T | DocumentDefinition<T>, callback: (err: Error | null, doc: T) => void): void;
     create(docs: Array<T | DocumentDefinition<T>>, callback: (err: Error | null, docs: Array<T>) => void): void;
 
+    /**
+     * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
+     * The document returned has no paths marked as modified initially.
+     */
+    hydrate(obj: any): T;
+
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
     insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T | InsertManyResult>;
     insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T> | InsertManyResult>;
@@ -81,6 +90,10 @@ declare module "mongoose" {
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      **/
     startSession(options?: mongodb.SessionOptions, cb?: (err: any, session: mongodb.ClientSession) => void): Promise<mongodb.ClientSession>;
+
+    /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
+    validate(callback?: (err: any) => void): Promise<void>;
+    validate(optional: any, callback?: (err: any) => void): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
     watch(pipeline?: Array<object>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
@@ -134,7 +147,30 @@ declare module "mongoose" {
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
+    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: Error | null, res: Array<T>) => void): Query<Array<T>, T>;
+
+    /** Executes a mapReduce command. */
+    mapReduce<Key, Value>(
+      o: MapReduceOptions<T, Key, Value>,
+      callback?: (err: any, res: any) => void
+    ): Promise<any>;
+
     remove(filter?: any, callback?: (err: Error | null) => void): Query<any, T>;
+
+    /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
+    replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+
+    /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+
+    /** Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option. */
+    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+
+    /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
+    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+
+    /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
+    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where(path: string, val?: any): Query<Array<T>, T>;
@@ -165,6 +201,7 @@ declare module "mongoose" {
     collation?: mongodb.CollationDocument;
     session?: mongodb.ClientSession;
     explain?: any;
+    multi?: boolean;
   }
 
   interface SaveOptions {
@@ -187,6 +224,59 @@ declare module "mongoose" {
 
   interface InsertManyResult extends mongodb.InsertWriteOpResult<any> {
     mongoose?: { validationErrors?: Array<Error> }
+  }
+
+  interface MapReduceOptions<T, Key, Val> {
+    map: Function | string;
+    reduce: (key: Key, vals: T[]) => Val;
+    /** query filter object. */
+    query?: any;
+    /** sort input objects using this key */
+    sort?: any;
+    /** max number of documents */
+    limit?: number;
+    /** keep temporary data default: false */
+    keeptemp?: boolean;
+    /** finalize function */
+    finalize?: (key: Key, val: Val) => Val;
+    /** scope variables exposed to map/reduce/finalize during execution */
+    scope?: any;
+    /** it is possible to make the execution stay in JS. Provided in MongoDB > 2.0.X default: false */
+    jsMode?: boolean;
+    /** provide statistics on job execution time. default: false */
+    verbose?: boolean;
+    readPreference?: string;
+    /** sets the output target for the map reduce job. default: {inline: 1} */
+    out?: {
+      /** the results are returned in an array */
+      inline?: number;
+      /**
+       * {replace: 'collectionName'} add the results to collectionName: the
+       * results replace the collection
+       */
+      replace?: string;
+      /**
+       * {reduce: 'collectionName'} add the results to collectionName: if
+       * dups are detected, uses the reducer / finalize functions
+       */
+      reduce?: string;
+      /**
+       * {merge: 'collectionName'} add the results to collectionName: if
+       * dups exist the new docs overwrite the old
+       */
+      merge?: string;
+    };
+  }
+
+  interface GeoSearchOptions {
+    /** x,y point to search for */
+    near: number[];
+    /** the maximum distance from the point near that a result can be */
+    maxDistance: number;
+    /** The maximum number of results to return */
+    limit?: number;
+    /** return the raw object instead of the Mongoose Model */
+    lean?: boolean;
   }
 
   class Schema {
@@ -395,4 +485,89 @@ declare module "mongoose" {
   export type UpdateQuery<T> = mongodb.UpdateQuery<T> & mongodb.MatchKeysAndValues<T>;
 
   export type DocumentDefinition<T> = Omit<T, Exclude<keyof Model<T>, '_id'>>
+
+  class Aggregate<R> {
+    /**
+     * Sets an option on this aggregation. This function will be deprecated in a
+     * future release. */
+    addCursorFlag(flag: string, value: boolean): this;
+
+    /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
+    allowDiskUse(value: boolean): this;
+
+    /**
+     * Executes the query returning a `Promise` which will be
+     * resolved with either the doc(s) or rejected with the error.
+     * Like [`.then()`](#query_Query-then), but only takes a rejection handler.
+     */
+    catch: Promise<R>["catch"];
+
+    /** Adds a collation. */
+    collation(options: mongodb.CollationDocument): this;
+
+    /** Appends a new $count operator to this aggregate pipeline. */
+    count(countName: string): this;
+
+    /**
+     * Sets the cursor option option for the aggregation query (ignored for < 2.6.0).
+     */
+    cursor(options?: object): this;
+
+    /** Executes the aggregate pipeline on the currently bound Model. If cursor option is set, returns a cursor */
+    exec(callback?: (err: any, result: R) => void): Promise<R> | any;
+
+    /** Execute the aggregation with explain */
+    explain(callback?: (err: Error, result: any) => void): Promise<any>;
+
+    /** Combines multiple aggregation pipelines. */
+    facet(options: any): this;
+
+    /** Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection. */
+    graphLookup(options: any): this;
+
+    /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
+    hint(value: object | string): this;
+
+    /** Appends new custom $lookup operator to this aggregate pipeline. */
+    lookup(options: any): this;
+
+    /** Returns the current pipeline */
+    pipeline(): any[];
+
+    /** Sets the readPreference option for the aggregation query. */
+    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+
+    /** Sets the readConcern level for the aggregation query. */
+    readConcern(level: string): this;
+
+    /** Appends a new $redact operator to this aggregate pipeline. */
+    redact(expression: any, thenExpr: string | any, elseExpr: string | any): this;
+
+    /**
+     * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s
+     * `$search` stage.
+     */
+    search(options: any): this;
+
+    /** Lets you set arbitrary options, for middleware or plugins. */
+    option(value: object): this;
+
+    /** Appends new custom $sample operator to this aggregate pipeline. */
+    sample(size: number): this;
+
+    /** Sets the session for this aggregation. Useful for [transactions](/docs/transactions.html). */
+    session(session: mongodb.ClientSession | null): this;
+
+    /** Appends a new $sort operator to this aggregate pipeline. */
+    sort(arg: any): this;
+
+    /** Provides promise for aggregate. */
+    then: Promise<R>["then"];
+
+    /**
+     * Appends a new $sortByCount operator to this aggregate pipeline. Accepts either a string field name
+     * or a pipeline object.
+     */
+    sortByCount(arg: string | any): this;
+  }
 }

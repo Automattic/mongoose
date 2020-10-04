@@ -404,4 +404,19 @@ describe('transactions', function() {
     assert.deepEqual(newDoc.arr, []);
     assert.deepEqual(newDoc.arr2, ['foo', 'bar']);
   });
+
+  it('can save a new document with an array', async function () {
+    const schema = Schema({ arr: [String] });
+
+    const Test = db.model('new_doc_array', schema);
+
+    await Test.createCollection();
+    const doc = new Test({ arr: ['foo'] });
+    await db.transaction(async (session) => {
+      await doc.save({ session });
+    });
+
+    const createdDoc = await Test.collection.findOne();
+    assert.deepEqual(createdDoc.arr, ['foo']);
+  });
 });

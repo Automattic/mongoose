@@ -6251,6 +6251,18 @@ describe('Model', function() {
         assert.deepEqual(res.map(v => v.name), ['alpha', 'Zeta']);
       });
     });
+
+    it('createCollection() handles NamespaceExists errors (gh-9447)', function() {
+      const userSchema = new Schema({ name: String });
+      const Model = db.model('User', userSchema);
+
+      return co(function*() {
+        yield Model.collection.drop().catch(() => {});
+
+        yield Model.createCollection();
+        yield Model.createCollection();
+      });
+    });
   });
 
   it('dropDatabase() after init allows re-init (gh-6967)', function() {

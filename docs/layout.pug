@@ -69,6 +69,9 @@ html(lang='en')
                 a.pure-menu-link(href="/docs/schematypes.html", class=outputUrl === '/docs/schematypes.html' ? 'selected' : '') SchemaTypes
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/connections.html", class=outputUrl === '/docs/connections.html' ? 'selected' : '') Connections
+              - if (['/docs/connections', '/docs/tutorials/ssl'].some(path => outputUrl.startsWith(path)))
+                li.pure-menu-item.tertiary-item
+                  a.pure-menu-link(href="/docs/tutorials/ssl.html", class=outputUrl === '/docs/tutorials/ssl.html' ? 'selected' : '') SSL Connections
               li.pure-menu-item.sub-item
                 a.pure-menu-link(href="/docs/models.html", class=outputUrl === '/docs/models.html' ? 'selected' : '') Models
               li.pure-menu-item.sub-item

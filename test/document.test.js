@@ -9449,7 +9449,7 @@ describe('document', function() {
     assert.ok(err.errors['num'].reason);
   });
 
-  it('init tracks cast error reason (gh-9459)', function() {
+  it('correctly handles setting nested path underneath single nested subdocs (gh-9459)', function() {
     const preferencesSchema = mongoose.Schema({
       notifications: {
         email: Boolean,

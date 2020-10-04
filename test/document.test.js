@@ -9448,4 +9448,46 @@ describe('document', function() {
     const err = doc.validateSync();
     assert.ok(err.errors['num'].reason);
   });
+
+  it('init tracks cast error reason (gh-9459)', function() {
+    const preferencesSchema = mongoose.Schema({
+      notifications: {
+        email: Boolean,
+        push: Boolean
+      },
+      keepSession: Boolean
+    }, { _id: false });
+
+    const User = db.model('User', Schema({
+      email: String,
+      username: String,
+      preferences: preferencesSchema
+    }));
+
+    const userFixture = {
+      email: 'foo@bar.com',
+      username: 'foobars',
+      preferences: {
+        keepSession: true,
+        notifications: {
+          email: false,
+          push: false
+        }
+      }
+    };
+
+    let userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications': { email: true }
+    });
+    let testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true });
+
+    userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications.email': true
+    });
+    testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
+  });
 });

@@ -9436,4 +9436,58 @@ describe('document', function() {
     const err = test.validateSync();
     assert.ifError(err);
   });
+
+  it('init tracks cast error reason (gh-9448)', function() {
+    const Test = db.model('Test', Schema({
+      num: Number
+    }));
+
+    const doc = new Test();
+    doc.init({ num: 'not a number' });
+
+    const err = doc.validateSync();
+    assert.ok(err.errors['num'].reason);
+  });
+
+  it('correctly handles setting nested path underneath single nested subdocs (gh-9459)', function() {
+    const preferencesSchema = mongoose.Schema({
+      notifications: {
+        email: Boolean,
+        push: Boolean
+      },
+      keepSession: Boolean
+    }, { _id: false });
+
+    const User = db.model('User', Schema({
+      email: String,
+      username: String,
+      preferences: preferencesSchema
+    }));
+
+    const userFixture = {
+      email: 'foo@bar.com',
+      username: 'foobars',
+      preferences: {
+        keepSession: true,
+        notifications: {
+          email: false,
+          push: false
+        }
+      }
+    };
+
+    let userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications': { email: true }
+    });
+    let testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true });
+
+    userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications.email': true
+    });
+    testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
+  });
 });

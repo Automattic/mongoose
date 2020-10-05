@@ -27,7 +27,7 @@ By default, Mongoose does **not** cast filter properties that aren't in your sch
 [require:Cast Tutorial.*not in schema]
 ```
 
-You can configure this behavior using the [`strictQuery` option for schemas](https://mongoosejs.com/docs/guide.html#strictQuery). This option is analagous to the [`strict` option](https://mongoosejs.com/docs/guide.html#strict). Setting `strictQuery` to `true` removes non-schema properties from the filter:
+You can configure this behavior using the [`strictQuery` option for schemas](https://mongoosejs.com/docs/guide.html#strictQuery). This option is analogous to the [`strict` option](https://mongoosejs.com/docs/guide.html#strict). Setting `strictQuery` to `true` removes non-schema properties from the filter:
 
 ```javascript
 [require:Cast Tutorial.*strictQuery true]

@@ -365,6 +365,25 @@ declare module "mongoose" {
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition | Schema, prefix?: string): this;
+
+    /** Returns a copy of this schema */
+    clone(): Schema;
+
+    /** Iterates the schemas paths similar to Array#forEach. */
+    eachPath(fn: (path: string, type: SchemaType) => void): this;
+
+    /** Gets/sets schema paths. */
+    path(path: string): SchemaType;
+    path(path: string, constructor: any): this;
+
+    /** Returns the pathType of `path` for this schema. */
+    pathType(path: string): string;
+
+    /** Adds a method call to the queue. */
+    queue(name: string, args: any[]): this;
+
+    /** Returns an Array of path strings that are required by this schema. */
+    requiredPaths(invalidate?: boolean): string[];
   }
 
   interface SchemaDefinition {
@@ -647,5 +666,68 @@ declare module "mongoose" {
      * or a pipeline object.
      */
     sortByCount(arg: string | any): this;
+  }
+
+  class SchemaType {
+    /** SchemaType constructor */
+    constructor(path: string, options?: any, instance?: string);
+
+    /** Get/set the function used to cast arbitrary values to this type. */
+    static cast(caster?: Function | boolean): Function;
+
+    /** Sets a default option for this schema type. */
+    static set(option: string, value: any): void;
+
+    /** Attaches a getter for all instances of this schema type. */
+    static get(getter: (value: any) => any): void;
+
+    /** Sets a default value for this SchemaType. */
+    default(val: any): any;
+
+    /** Adds a getter to this schematype. */
+    get(fn: Function): this;
+
+    /**
+     * Defines this path as immutable. Mongoose prevents you from changing
+     * immutable paths unless the parent document has [`isNew: true`](/docs/api.html#document_Document-isNew).
+     */
+    immutable(bool: boolean): this;
+
+    /** Declares the index options for this schematype. */
+    index(options: any): this;
+
+    /**
+     * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
+     * looks at to determine the foreign collection it should query.
+     */
+    ref(ref: string | boolean | Model<any>): this;
+
+    /**
+     * Adds a required validator to this SchemaType. The validator gets added
+     * to the front of this SchemaType's validators array using unshift().
+     */
+    required(required: boolean, message?: string): this;
+
+    /** Sets default select() behavior for this path. */
+    select(val: boolean): this;
+
+    /** Adds a setter to this schematype. */
+    set(fn: Function): this;
+
+    /** Declares a sparse index. */
+    sparse(bool: boolean): this;
+
+    /** Declares a full text index. */
+    text(bool: boolean): this;
+
+    /** Defines a custom function for transforming this path when converting a document to JSON. */
+    transform(fn: (value: any) => any);
+
+    /** Declares an unique index. */
+    unique(bool: boolean): this;
+
+    /** Adds validator(s) for this document path. */
+    validate(obj: RegExp | Function | any, errorMsg?: string,
+      type?: string): this;
   }
 }

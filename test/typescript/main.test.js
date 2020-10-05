@@ -59,6 +59,11 @@ describe('typescript syntax', function() {
     const errors = runTest('discriminator.ts');
     assert.equal(errors.length, 0);
   });
+
+  it('multiple connections', function() {
+    const errors = runTest('connection.ts');
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

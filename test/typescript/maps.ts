@@ -1,4 +1,4 @@
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
 const schema: Schema = new Schema({
   map1: {
@@ -18,7 +18,7 @@ const schema: Schema = new Schema({
   }
 });
 
-interface ITest extends Model<ITest> {
+interface ITest extends Document {
   map1: Map<string, number>,
   map2: Map<string, string>,
   map3: Map<string, number>

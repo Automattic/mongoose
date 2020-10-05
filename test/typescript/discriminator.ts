@@ -1,8 +1,8 @@
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
-interface IBaseTest extends Model<IBaseTest> {
+interface IBaseTest extends Document {
   name?: string;
 }
 

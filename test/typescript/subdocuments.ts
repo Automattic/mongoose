@@ -1,4 +1,4 @@
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
 const childSchema: Schema = new Schema({ name: String });
 
@@ -15,7 +15,7 @@ const schema: Schema = new Schema({
   }],
 });
 
-interface ITest extends Model<ITest> {
+interface ITest extends Document {
   child1: { name: String },
   child2: { name: String }
 }

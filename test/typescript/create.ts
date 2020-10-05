@@ -1,8 +1,8 @@
-import { Schema, model, Model, Types } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
-interface ITest extends Model<ITest> {
+interface ITest extends Document {
   _id?: Types.ObjectId,
   name?: string;
 }

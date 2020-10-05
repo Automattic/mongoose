@@ -28,11 +28,55 @@ declare module "mongoose" {
     autoCreate?: boolean;
   }
 
+  class Connection {}
+
+  class Collection {}
+
   namespace Types {
     class ObjectId extends mongodb.ObjectID {}
   }
 
-  class Document {}
+  class Document {
+    constructor(doc?: any);
+
+    /** Additional properties to attach to the query when calling `save()` and `isNew` is false. */
+    $where: object;
+
+    /** If this is a discriminator model, `baseModelName` is the name of the base model. */
+    baseModelName?: string;
+
+    /** Collection the model uses. */
+    collection: Collection;
+
+    /** Connection the model uses. */
+    db: Connection;
+
+    /** Removes this document from the db. */
+    delete(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
+    delete(options?: QueryOptions): Query<any, this>;
+
+    /** Removes this document from the db. */
+    deleteOne(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
+    deleteOne(options?: QueryOptions): Query<any, this>;
+
+    /** Signal that we desire an increment of this documents version. */
+    increment(): this;
+
+    /** Returns another Model instance. */
+    model<T extends Model<any>>(name: string): T;
+
+    /** The name of the model */
+    modelName: string;
+
+    /** Removes this document from the db. */
+    remove(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
+    remove(options?: QueryOptions): Query<any, this>;
+
+    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
+    save(options?: SaveOptions): Promise<this>;
+    save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
+    save(fn?: (err: Error | null, doc: this) => void): void;
+  }
 
   export var Model: Model<any>;
   interface Model<T extends Document> extends NodeJS.EventEmitter {
@@ -71,6 +115,12 @@ declare module "mongoose" {
     createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: Error | null, collection: mongodb.Collection<T>) => void): void;
 
     /**
+     * Event emitter that reports any errors that occurred. Useful for global error
+     * handling.
+     */
+    events: NodeJS.EventEmitter;
+
+    /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
      */
@@ -103,11 +153,6 @@ declare module "mongoose" {
 
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
-
-    /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
-    save(options?: SaveOptions): Promise<this>;
-    save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
-    save(fn?: (err: Error | null, doc: this) => void): void;
 
     /**
      * Makes the indexes in MongoDB match the indexes defined in this model's
@@ -581,7 +626,7 @@ declare module "mongoose" {
   
   export type UpdateQuery<T> = mongodb.UpdateQuery<T> & mongodb.MatchKeysAndValues<T>;
 
-  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Model<T>, '_id'>>
+  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>
 
   class Aggregate<R> {
     /**

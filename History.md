@@ -1,3 +1,13 @@
+5.10.8 / 2020-10-05
+===================
+ * fix(schema): handle setting nested paths underneath single nested subdocs #9459
+ * fix(schema+index): allow calling `mongoose.model()` with schema from a different Mongoose module instance #9449
+ * fix(transaction): fix saving new documents w/ arrays in transactions #9457 [PenguinToast](https://github.com/PenguinToast)
+ * fix(document): track `reason` on cast errors that occur while init-ing a document #9448
+ * fix(model): make `createCollection()` not throw error when collection already exists to be consistent with v5.9 #9447
+ * docs(connections): add SSL connections docs #9443
+ * docs(query_casting): fix typo #9458 [craig-davis](https://github.com/craig-davis)
+
 5.10.7 / 2020-09-24
 ===================
  * fix(schema): set correct path and schema on nested primitive arrays #9429

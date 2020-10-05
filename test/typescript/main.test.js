@@ -54,6 +54,11 @@ describe('typescript syntax', function() {
     const errors = runTest('aggregate.ts');
     assert.equal(errors.length, 0);
   });
+
+  it('discriminators', function() {
+    const errors = runTest('discriminator.ts');
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

@@ -35,7 +35,7 @@ declare module "mongoose" {
   class Document {}
 
   export var Model: Model<any>;
-  interface Model<T extends Document> {
+  interface Model<T extends Document> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
     aggregate<R>(pipeline?: any[]): Aggregate<Array<R>>;
@@ -67,11 +67,24 @@ declare module "mongoose" {
     create(doc: T | DocumentDefinition<T>, callback: (err: Error | null, doc: T) => void): void;
     create(docs: Array<T | DocumentDefinition<T>>, callback: (err: Error | null, docs: Array<T>) => void): void;
 
+    createCollection(options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<T>>;
+    createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: Error | null, collection: mongodb.Collection<T>) => void): void;
+
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
      */
     hydrate(obj: any): T;
+
+    /**
+     * This function is responsible for building [indexes](https://docs.mongodb.com/manual/indexes/),
+     * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
+     * Mongoose calls this function automatically when a model is created using
+     * [`mongoose.model()`](/docs/api.html#mongoose_Mongoose-model) or
+     * [`connection.model()`](/docs/api.html#connection_Connection-model), so you
+     * don't need to call it.
+     */
+    init(callback?: (err: any) => void): Promise<T>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
     insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T | InsertManyResult>;
@@ -79,10 +92,31 @@ declare module "mongoose" {
     insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: Error | null, res: T | InsertManyResult) => void): void;
     insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: Error | null, res: Array<T> | InsertManyResult) => void): void;
 
+    /**
+     * Lists the indexes currently defined in MongoDB. This may or may not be
+     * the same as the indexes defined in your schema depending on whether you
+     * use the [`autoIndex` option](/docs/guide.html#autoIndex) and if you
+     * build indexes manually.
+     */
+    listIndexes(callback: (err: Error | null, res: Array<any>) => void): void;
+    listIndexes(): Promise<Array<any>>;
+
+    populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
+      callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
+
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
     save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
     save(fn?: (err: Error | null, doc: this) => void): void;
+
+    /**
+     * Makes the indexes in MongoDB match the indexes defined in this model's
+     * schema. This function will drop any indexes that are not defined in
+     * the model's schema except the `_id` index, and build any indexes that
+     * are in your schema but not in MongoDB.
+     */
+    syncIndexes(options?: object): Promise<Array<string>>;
+    syncIndexes(options: object | null, callback: (err: Error | null, dropped: Array<string>) => void): void;
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -115,8 +149,32 @@ declare module "mongoose" {
     countDocuments(callback?: (err: any, count: number) => void): Query<number, T>;
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
+    /**
+     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
+     * function.
+     */
+    createIndexes(options: any): Promise<void>;
+    createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+
+    /** Adds a discriminator type. */
+    discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
+
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
     estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, T>;
+
+    /**
+     * Sends `createIndex` commands to mongo for each index declared in the schema.
+     * The `createIndex` commands are sent in series.
+     */
+    ensureIndexes(options: any): Promise<void>;
+    ensureIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+
+    /**
+     * Returns true if at least one document exists in the database that matches
+     * the given `filter`, and false otherwise.
+     */
+    exists(filter: FilterQuery<T>): Promise<boolean>;
+    exists(filter: FilterQuery<T>, callback: (err: any, res: boolean) => void): void;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
@@ -277,6 +335,26 @@ declare module "mongoose" {
     limit?: number;
     /** return the raw object instead of the Mongoose Model */
     lean?: boolean;
+  }
+
+  interface PopulateOptions {
+    /** space delimited path(s) to populate */
+    path: string;
+    /** fields to select */
+    select?: any;
+    /** query conditions to match */
+    match?: any;
+    /** optional model to use for population */
+    model?: string | Model<any>;
+    /** optional query options like sort, limit, etc */
+    options?: any;
+    /** deep populate */
+    populate?: PopulateOptions | Array<PopulateOptions>;
+    /**
+     * If true Mongoose will always set `path` to an array, if false Mongoose will
+     * always set `path` to a document. Inferred from schema by default.
+     */
+    justOne?: boolean;
   }
 
   class Schema {

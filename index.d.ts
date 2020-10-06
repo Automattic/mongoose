@@ -191,6 +191,13 @@ declare module "mongoose" {
   class Document {
     constructor(doc?: any);
 
+    /**
+     * Empty object that you can use for storing properties on the document. This
+     * is handy for passing data to middleware without conflicting with Mongoose
+     * internals.
+     */
+    $locals: object;
+
     /** Additional properties to attach to the query when calling `save()` and `isNew` is false. */
     $where: object;
 
@@ -211,8 +218,17 @@ declare module "mongoose" {
     deleteOne(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
     deleteOne(options?: QueryOptions): Query<any, this>;
 
+    /** Hash containing current validation errors. */
+    errors?: ValidationError;
+
+    /** The string version of this documents _id. */
+    id: string;
+
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
+
+    /** Boolean flag specifying if the document is new. */
+    isNew: boolean;
 
     /** Returns another Model instance. */
     model<T extends Model<any>>(name: string): T;
@@ -228,6 +244,9 @@ declare module "mongoose" {
     save(options?: SaveOptions): Promise<this>;
     save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
     save(fn?: (err: Error | null, doc: this) => void): void;
+
+    /** The documents schema. */
+    schema: Schema;
   }
 
   export var Model: Model<any>;
@@ -926,5 +945,30 @@ declare module "mongoose" {
     /** Adds validator(s) for this document path. */
     validate(obj: RegExp | Function | any, errorMsg?: string,
       type?: string): this;
+  }
+
+  class ValidationError extends Error {
+    name: 'ValidationError';
+
+    errors: {[path: string]: ValidatorError | CastError};
+  }
+
+  class CastError extends Error {
+    name: 'CastError';
+    stringValue: string;
+    kind: string;
+    value: any;
+    path: string;
+    reason?: any;
+    model?: any;
+  }
+
+  class ValidatorError extends Error {
+    name: 'ValidatorError';
+    properties: {message: string, type?: string, path?: string, value?: any, reason?: any};
+    kind: string;
+    path: string;
+    value: any;
+    reason?: Error | null;
   }
 }

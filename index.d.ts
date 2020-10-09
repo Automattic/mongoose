@@ -207,12 +207,18 @@ declare module "mongoose" {
      */
     $isEmpty(path: string);
 
+    /** Checks if a path is invalid */
+    $isValid(path: string);
+
     /**
      * Empty object that you can use for storing properties on the document. This
      * is handy for passing data to middleware without conflicting with Mongoose
      * internals.
      */
     $locals: object;
+
+    /** Marks a path as valid, removing existing validation errors. */
+    $markValid(path: string);
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -252,6 +258,9 @@ declare module "mongoose" {
     deleteOne(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
     deleteOne(options?: QueryOptions): Query<any, this>;
 
+    /** Takes a populated field and returns it to its unpopulated state. */
+    depopulate(path: string): this;
+
     /**
      * Returns the list of paths that have been directly modified. A direct
      * modified path is a path that you explicitly set, whether via `doc.foo = 'bar'`,
@@ -259,11 +268,30 @@ declare module "mongoose" {
      */
     directModifiedPaths(): Array<string>;
 
+    /**
+     * Returns true if this document is equal to another document.
+     *
+     * Documents are considered equal when they have matching `_id`s, unless neither
+     * document has an `_id`, in which case this function falls back to using
+     * `deepEqual()`.
+     */
+    equals(doc: Document): boolean;
+
     /** Hash containing current validation errors. */
     errors?: ValidationError;
 
+    /** Explicitly executes population and returns a promise. Useful for promises integration. */
+    execPopulate(): Promise<this>;
+    execPopulate(callback: (err: Error | null, res: this) => void): void;
+
     /** Returns the value of a path. */
     get(path: string, type?: any, options?: any);
+
+    /**
+     * Returns the changes that happened to the document
+     * in the format that will be sent to MongoDB.
+     */
+    getChanges(): UpdateQuery<this>;
 
     /** The string version of this documents _id. */
     id: string;
@@ -277,6 +305,9 @@ declare module "mongoose" {
      * you do **not** need to call this function on your own.
      */
     init(obj: any, opts?: any, cb?: (err: Error | null, doc: this) => void): this;
+
+    /** Marks a path as invalid, causing validation to fail. */
+    invalidate(path: string, errorMsg: string | Error, value?: any, kind?: string): Error | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
     isDirectModified(path: string): boolean;
@@ -318,6 +349,20 @@ declare module "mongoose" {
      */
     overwrite(obj: DocumentDefinition<this>): this;
 
+    /** If this document is a subdocument or populated document, returns the document's parent. Returns `undefined` otherwise. */
+    parent(): Document | undefined;
+
+    /**
+     * Populates document references, executing the `callback` when complete.
+     * If you want to use promises instead, use this function with
+     * [`execPopulate()`](#document_Document-execPopulate).
+     */
+    populate(path: string, callback?: (err: Error | null, res: this) => void): this;
+    populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: Error | null, res: this) => void): this;
+
+    /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
+    populated(path: string): any;
+
     /** Removes this document from the db. */
     remove(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
     remove(options?: QueryOptions): Query<any, this>;
@@ -335,6 +380,12 @@ declare module "mongoose" {
     set(path: string, val: any, type: any, options?: any): this;
     set(value: any): this;
 
+    /** The return value of this method is used in calls to JSON.stringify(doc). */
+    toJSON(options?: ToObjectOptions): any;
+
+    /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
+    toObject(options?: ToObjectOptions): any;
+
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string);
 
@@ -343,6 +394,15 @@ declare module "mongoose" {
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
     updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: Error, res: any) => void): Query<any, this>;
+
+    /** Executes registered validation rules for this document. */
+    validate(pathsToValidate?: Array<string>, options?: any): Promise<void>;
+    validate(callback: (err: Error | null) => void): void;
+    validate(pathsToValidate: Array<string>, callback: (err: Error | null) => void): void;
+    validate(pathsToValidate: Array<string>, options: any, callback: (err: Error | null) => void): void;
+
+    /** Executes registered validation rules (skipping asynchronous validators) for this document. */
+    validateSync(pathsToValidate?: Array<string>, options?: any): Error | null;
 
     /** The documents schema. */
     schema: Schema;
@@ -670,6 +730,27 @@ declare module "mongoose" {
      * always set `path` to a document. Inferred from schema by default.
      */
     justOne?: boolean;
+  }
+
+  interface ToObjectOptions {
+    /** apply all getters (path and virtual getters) */
+    getters?: boolean;
+    /** apply virtual getters (can override getters option) */
+    virtuals?: boolean;
+    /** if `options.virtuals = true`, you can set `options.aliases = false` to skip applying aliases. This option is a no-op if `options.virtuals = false`. */
+    aliases?: boolean;
+    /** remove empty objects (defaults to true) */
+    minimize?: boolean;
+    /** if set, mongoose will call this function to allow you to transform the returned object */
+    transform?: (doc: any, ret: any, options: any) => any;
+    /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
+    depopulate?: boolean;
+    /** if false, exclude the version key (`__v` by default) from the output */
+    versionKey?: boolean;
+    /** if true, convert Maps to POJOs. Useful if you want to `JSON.stringify()` the result of `toObject()`. */
+    flattenMaps?: boolean;
+    /** If true, omits fields that are excluded in this document's projection. Unless you specified a projection, this will omit any field that has `select: false` in the schema. */
+    useProjection?: boolean;
   }
 
   class Schema {

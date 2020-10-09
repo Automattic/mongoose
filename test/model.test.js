@@ -5022,6 +5022,32 @@ describe('Model', function() {
         });
       });
 
+      it('avoids unused array filter error (gh-9468)', function() {
+        return co(function*() {
+          const MyModel = db.model('Test', new Schema({
+            _id: Number,
+            grades: [Number]
+          }));
+
+          yield MyModel.create([
+            { _id: 1, grades: [95, 92, 90] },
+            { _id: 2, grades: [98, 100, 102] },
+            { _id: 3, grades: [95, 110, 100] }
+          ]);
+
+          yield MyModel.updateMany({}, { $set: { 'grades.0': 100 } }, {
+            arrayFilters: [{
+              element: { $gte: 95 }
+            }]
+          });
+
+          const docs = yield MyModel.find().sort({ _id: 1 });
+          assert.deepEqual(docs[0].toObject().grades, [100, 92, 90]);
+          assert.deepEqual(docs[1].toObject().grades, [100, 100, 102]);
+          assert.deepEqual(docs[2].toObject().grades, [100, 110, 100]);
+        });
+      });
+
       describe('watch()', function() {
         before(function() {
           if (!process.env.REPLICA_SET) {

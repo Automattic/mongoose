@@ -1,3 +1,8 @@
+5.10.9 / 2020-10-09
+===================
+ * fix(update): strip out unused array filters to avoid "filter was not used in the update" error #9468
+ * fix(mongoose): allow setting `autoCreate` as a global option to be consistent with `autoIndex` #9466
+
 5.10.8 / 2020-10-05
 ===================
  * fix(schema): handle setting nested paths underneath single nested subdocs #9459

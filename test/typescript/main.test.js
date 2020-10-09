@@ -14,54 +14,84 @@ describe('typescript syntax', function() {
 
   it('create schema and model', function() {
     const errors = runTest('createBasicSchemaDefinition.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 
   it('connect syntax', function() {
     const errors = runTest('connectSyntax.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 
   it('reports error on invalid getter syntax', function() {
     const errors = runTest('schemaGettersSetters.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.messageText.includes('incorrect: number'), errors[0].messageText.messageText);
   });
 
   it('handles maps', function() {
     const errors = runTest('maps.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.messageText.includes('not assignable'), errors[0].messageText.messageText);
   });
 
   it('subdocuments', function() {
     const errors = runTest('subdocuments.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 
   it('queries', function() {
     const errors = runTest('queries.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 
   it('create', function() {
     const errors = runTest('create.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.messageText.includes('No overload matches'), errors[0].messageText.messageText);
   });
 
   it('aggregate', function() {
     const errors = runTest('aggregate.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 
   it('discriminators', function() {
     const errors = runTest('discriminator.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 
   it('multiple connections', function() {
     const errors = runTest('connection.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
     assert.equal(errors.length, 0);
   });
 });

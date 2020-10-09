@@ -191,12 +191,46 @@ declare module "mongoose" {
   class Document {
     constructor(doc?: any);
 
+    /** Don't run validation on this path or persist changes to this path. */
+    $ignore(path: string);
+
+    /** Checks if a path is set to its default. */
+    $isDefault(path: string);
+
+    /** Getter/setter, determines whether the document was removed or not. */
+    $isDeleted(val?: boolean);
+
+    /**
+     * Returns true if the given path is nullish or only contains empty objects.
+     * Useful for determining whether this subdoc will get stripped out by the
+     * [minimize option](/docs/guide.html#minimize).
+     */
+    $isEmpty(path: string);
+
     /**
      * Empty object that you can use for storing properties on the document. This
      * is handy for passing data to middleware without conflicting with Mongoose
      * internals.
      */
     $locals: object;
+
+    /**
+     * A string containing the current operation that Mongoose is executing
+     * on this document. May be `null`, `'save'`, `'validate'`, or `'remove'`.
+     */
+    $op: string | null;
+
+    /**
+     * Getter/setter around the session associated with this document. Used to
+     * automatically set `session` if you `save()` a doc that you got from a
+     * query with an associated session.
+     */
+    $session(session?: mongodb.ClientSession | null): mongodb.ClientSession;
+
+    /** Alias for `set()`, used internally to avoid conflicts */
+    $set(path: string, val: any, options?: any): this;
+    $set(path: string, val: any, type: any, options?: any): this;
+    $set(value: any): this;
 
     /** Additional properties to attach to the query when calling `save()` and `isNew` is false. */
     $where: object;
@@ -218,8 +252,18 @@ declare module "mongoose" {
     deleteOne(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
     deleteOne(options?: QueryOptions): Query<any, this>;
 
+    /**
+     * Returns the list of paths that have been directly modified. A direct
+     * modified path is a path that you explicitly set, whether via `doc.foo = 'bar'`,
+     * `Object.assign(doc, { foo: 'bar' })`, or `doc.set('foo', 'bar')`.
+     */
+    directModifiedPaths(): Array<string>;
+
     /** Hash containing current validation errors. */
     errors?: ValidationError;
+
+    /** Returns the value of a path. */
+    get(path: string, type?: any, options?: any);
 
     /** The string version of this documents _id. */
     id: string;
@@ -227,8 +271,39 @@ declare module "mongoose" {
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
 
+    /**
+     * Initializes the document without setters or marking anything modified.
+     * Called internally after a document is returned from mongodb. Normally,
+     * you do **not** need to call this function on your own.
+     */
+    init(obj: any, opts?: any, cb?: (err: Error | null, doc: this) => void): this;
+
+    /** Returns true if `path` was directly set and modified, else false. */
+    isDirectModified(path: string): boolean;
+
+    /** Checks if `path` was explicitly selected. If no projection, always returns true. */
+    isDirectSelected(path: string): boolean;
+
+    /** Checks if `path` is in the `init` state, that is, it was set by `Document#init()` and not modified since. */
+    isInit(path: string);
+
+    /**
+     * Returns true if any of the given paths is modified, else false. If no arguments, returns `true` if any path
+     * in this document is modified.
+     */
+    isModified(path?: string | Array<string>): boolean;
+
+    /** Checks if `path` was selected in the source query which initialized this document. */
+    isSelected(path: string): boolean;
+
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
+
+    /** Marks the path as having pending changes to write to the db. */
+    markModified(path: string, scope?: any);
+
+    /** Returns the list of paths that have been modified. */
+    modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
 
     /** Returns another Model instance. */
     model<T extends Model<any>>(name: string): T;
@@ -236,14 +311,38 @@ declare module "mongoose" {
     /** The name of the model */
     modelName: string;
 
+    /**
+     * Overwrite all values in this document with the values of `obj`, except
+     * for immutable properties. Behaves similarly to `set()`, except for it
+     * unsets all properties that aren't in `obj`.
+     */
+    overwrite(obj: DocumentDefinition<this>): this;
+
     /** Removes this document from the db. */
     remove(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
     remove(options?: QueryOptions): Query<any, this>;
+
+    /** Sends a replaceOne command with this document `_id` as the query selector. */
+    replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
     save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
     save(fn?: (err: Error | null, doc: this) => void): void;
+
+    /** Sets the value of a path, or many paths. */
+    set(path: string, val: any, options?: any): this;
+    set(path: string, val: any, type: any, options?: any): this;
+    set(value: any): this;
+
+    /** Clears the modified state on the specified path. */
+    unmarkModified(path: string);
+
+    /** Sends an update command with this document `_id` as the query selector. */
+    update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: Error, res: any) => void): Query<any, this>;
+
+    /** Sends an updateOne command with this document `_id` as the query selector. */
+    updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: Error, res: any) => void): Query<any, this>;
 
     /** The documents schema. */
     schema: Schema;

@@ -926,6 +926,19 @@ declare module "mongoose" {
 
     $where(argument: string | Function): Query<Array<DocType>, DocType>;
 
+    /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    all(val: Array<any>): this;
+    all(path: string, val: Array<any>): this;
+
+    /** Specifies arguments for an `$and` condition. */
+    and(array: Array<FilterQuery<DocType>>): this;
+
+    /** Specifies the batchSize option. */
+    batchSize(val: number): this;
+
+    /** Specifies the `comment` option. */
+    comment(val: string): this;
+
     /** Specifies this query as a `count` query. */
     count(callback?: (err: any, count: number) => void): Query<number, DocType>;
     count(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
@@ -937,8 +950,19 @@ declare module "mongoose" {
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<any>, DocType>;
 
+    /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    elemMatch(val: Function | any): this;
+    elemMatch(path: string, val: Function | any): this;
+
+    /** Specifies the complementary comparison value for paths specified with `where()` */
+    equals(val: any): this;
+
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
     estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, DocType>;
+
+    /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    exists(val: boolean): this;
+    exists(path: string, val: boolean): this;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
@@ -960,8 +984,83 @@ declare module "mongoose" {
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
-    /** Creates a Query, applies the passed conditions, and returns the Query. */
-    where(path: string, val?: any): Query<Array<DocType>, DocType>;
+    /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    gt(val: number): this;
+    gt(path: string, val: number): this;
+
+    /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    gte(val: number): this;
+    gte(path: string, val: number): this;
+
+    /** Sets query hints. */
+    hint(val: any): this;
+
+    /** Specifies an `$in` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    in(val: Array<any>): this;
+    in(path: string, val: Array<any>): this;
+
+    /** Specifies the maximum number of documents the query will return. */
+    limit(val: number): this;
+
+    /** Specifies a `$lt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    lt(val: number): this;
+    lt(path: string, val: number): this;
+
+    /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    lte(val: number): this;
+    lte(path: string, val: number): this;
+
+    /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    maxDistance(val: number): this;
+    maxDistance(path: string, val: number): this;
+
+    /** Specifies the maxScan option. */
+    maxScan(val: number): this;
+
+    /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
+    mod(val: Array<number>): this;
+    mod(path: string, val: Array<number>): this;
+
+    /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    ne(val: any): this;
+    ne(path: string, val: any);
+
+    /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    nin(val: Array<any>): this;
+    nin(path: string, val: Array<any>): this;
+
+    /** Specifies arguments for an `$nor` condition. */
+    nor(array: Array<FilterQuery<DocType>>): this;
+
+    /** Specifies arguments for an `$or` condition. */
+    or(array: Array<FilterQuery<DocType>>): this;
+
+    /** Specifies a `$regex` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    regex(val: string | RegExp): this;
+    regex(path: string, val: string | RegExp): this;
+
+    /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    size(val: number): this;
+    size(path: string, val: number): this;
+
+    /** Specifies the number of documents to skip. */
+    skip(val: number): this;
+
+    /** Specifies a `$slice` projection for an array. */
+    slice(val: number | Array<number>): this;
+    slice(path: string, val: number | Array<number>): this;
+
+    /** Specifies this query as a `snapshot` query. */
+    snapshot(val?: boolean): this;
+
+    /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
+    toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<ResultType, DocType>;
+
+    /** Specifies a path for use with chaining. */
+    where(path: string, val?: any): this;
+
+    /** Defines a `$within` or `$geoWithin` argument for geo-spatial queries. */
+    within(val?: any): this;
   }
 
   export type FilterQuery<T> = {

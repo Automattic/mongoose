@@ -911,7 +911,7 @@ describe('model query casting', function() {
         const _doc = yield Test.create({ arr: [{ x: 1 }, { y: 3 }, { x: 2 }] });
 
         const doc = yield Test.findOne({
-          arr: { $elemMatch: { $nor: [{ x: 1 }, { y: 3 }] }  }
+          arr: { $elemMatch: { $nor: [{ x: 1 }, { y: 3 }] } }
         });
 
         assert.equal(_doc._id.toString(), doc._id.toString());

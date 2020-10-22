@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const co = require('co');
 const random = require('../lib/utils').random;
 
 const mongoose = start.mongoose;
@@ -899,6 +900,22 @@ describe('model query casting', function() {
           done();
         });
       }
+    });
+
+    it('casts $nor within $elemMatch (gh-9479)', function() {
+      const Test = db.model('Test', Schema({
+        arr: [{ x: Number, y: Number }]
+      }));
+
+      return co(function*() {
+        const _doc = yield Test.create({ arr: [{ x: 1 }, { y: 3 }, { x: 2 }] });
+
+        const doc = yield Test.findOne({
+          arr: { $elemMatch: { $nor: [{ x: 1 }, { y: 3 }] }  }
+        });
+
+        assert.equal(_doc._id.toString(), doc._id.toString());
+      });
     });
   });
 

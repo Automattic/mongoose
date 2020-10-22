@@ -774,6 +774,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('respects child schemas minimize (gh-9405)', function() {
+      const postSchema = new Schema({
+        owner: { type: Schema.Types.ObjectId, ref: 'User' },
+        props: { type: Object, default: {} }
+      });
+      const userSchema = new Schema({
+        firstName: String,
+        props: { type: Object, default: {} }
+      }, { minimize: false });
+
+      const User = db.model('User', userSchema);
+      const Post = db.model('BlogPost', postSchema);
+
+      const user = new User({ firstName: 'test' });
+      const post = new Post({ owner: user });
+
+      let obj = post.toObject();
+      assert.strictEqual(obj.props, void 0);
+      assert.deepEqual(obj.owner.props, {});
+
+      obj = post.toObject({ minimize: false });
+      assert.deepEqual(obj.props, {});
+      assert.deepEqual(obj.owner.props, {});
+
+      obj = post.toObject({ minimize: true });
+      assert.strictEqual(obj.props, void 0);
+      assert.strictEqual(obj.owner.props, void 0);
+    });
   });
 
   describe('toJSON', function() {
@@ -9382,5 +9411,141 @@ describe('document', function() {
       assert.ok(foo.isModified('subdoc'));
       assert.ok(foo.isModified('subdoc.bar'));
     });
+  });
+
+  it('marks path as errored if default function throws (gh-9408)', function() {
+    const jobSchema = new Schema({
+      deliveryAt: Date,
+      subJob: [{
+        deliveryAt: Date,
+        shippingAt: {
+          type: Date,
+          default: () => { throw new Error('Oops!'); }
+        },
+        prop: { type: String, default: 'default' }
+      }]
+    });
+
+    const Job = db.model('Test', jobSchema);
+
+    const doc = new Job({ subJob: [{ deliveryAt: new Date() }] });
+    assert.equal(doc.subJob[0].prop, 'default');
+  });
+
+  it('passes subdoc with initial values set to default function when init-ing (gh-9408)', function() {
+    const jobSchema = new Schema({
+      deliveryAt: Date,
+      subJob: [{
+        deliveryAt: Date,
+        shippingAt: {
+          type: Date,
+          default: function() {
+            return this.deliveryAt;
+          }
+        }
+      }]
+    });
+
+    const Job = db.model('Test', jobSchema);
+
+    const date = new Date();
+    const doc = new Job({ subJob: [{ deliveryAt: date }] });
+
+    assert.equal(doc.subJob[0].shippingAt.valueOf(), date.valueOf());
+  });
+
+  it('passes document as an argument for `required` function in schema definition (gh-9433)', function() {
+    let docFromValidation;
+
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        required: (doc) => {
+          docFromValidation = doc;
+          return doc.age > 18;
+        }
+      },
+      age: Number
+    });
+
+    const User = db.model('User', userSchema);
+    const user = new User({ age: 26 });
+    const err = user.validateSync();
+    assert.ok(err);
+
+    assert.ok(docFromValidation === user);
+  });
+
+  it('works with path named isSelected (gh-9438)', function() {
+    const categorySchema = new Schema({
+      name: String,
+      categoryUrl: { type: String, required: true }, // Makes test fail
+      isSelected: Boolean
+    });
+
+    const siteSchema = new Schema({ categoryUrls: [categorySchema] });
+
+    const Test = db.model('Test', siteSchema);
+    const test = new Test({
+      categoryUrls: [
+        { name: 'A', categoryUrl: 'B', isSelected: false, isModified: false }
+      ]
+    });
+    const err = test.validateSync();
+    assert.ifError(err);
+  });
+
+  it('init tracks cast error reason (gh-9448)', function() {
+    const Test = db.model('Test', Schema({
+      num: Number
+    }));
+
+    const doc = new Test();
+    doc.init({ num: 'not a number' });
+
+    const err = doc.validateSync();
+    assert.ok(err.errors['num'].reason);
+  });
+
+  it('correctly handles setting nested path underneath single nested subdocs (gh-9459)', function() {
+    const preferencesSchema = mongoose.Schema({
+      notifications: {
+        email: Boolean,
+        push: Boolean
+      },
+      keepSession: Boolean
+    }, { _id: false });
+
+    const User = db.model('User', Schema({
+      email: String,
+      username: String,
+      preferences: preferencesSchema
+    }));
+
+    const userFixture = {
+      email: 'foo@bar.com',
+      username: 'foobars',
+      preferences: {
+        keepSession: true,
+        notifications: {
+          email: false,
+          push: false
+        }
+      }
+    };
+
+    let userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications': { email: true }
+    });
+    let testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true });
+
+    userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications.email': true
+    });
+    testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
   });
 });

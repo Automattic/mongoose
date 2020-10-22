@@ -1,3 +1,44 @@
+5.10.9 / 2020-10-09
+===================
+ * fix(update): strip out unused array filters to avoid "filter was not used in the update" error #9468
+ * fix(mongoose): allow setting `autoCreate` as a global option to be consistent with `autoIndex` #9466
+
+5.10.8 / 2020-10-05
+===================
+ * fix(schema): handle setting nested paths underneath single nested subdocs #9459
+ * fix(schema+index): allow calling `mongoose.model()` with schema from a different Mongoose module instance #9449
+ * fix(transaction): fix saving new documents w/ arrays in transactions #9457 [PenguinToast](https://github.com/PenguinToast)
+ * fix(document): track `reason` on cast errors that occur while init-ing a document #9448
+ * fix(model): make `createCollection()` not throw error when collection already exists to be consistent with v5.9 #9447
+ * docs(connections): add SSL connections docs #9443
+ * docs(query_casting): fix typo #9458 [craig-davis](https://github.com/craig-davis)
+
+5.10.7 / 2020-09-24
+===================
+ * fix(schema): set correct path and schema on nested primitive arrays #9429
+ * fix(document): pass document to required validator so `required` can use arrow functions #9435 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): handle required when schema has property named `isSelected` #9438
+ * fix(timestamps): allow using timestamps when schema has a property named 'set' #9428
+ * fix(schema): make `Schema#clone()` use parent Mongoose instance's Schema constructor #9426
+
+5.10.6 / 2020-09-18
+===================
+ * fix(populate): handle `options.perDocumentLimit` option same as `perDocumentLimit` when calling `populate()` #9418
+ * fix(document): invalidate path if default function throws an error #9408
+ * fix: ensure subdocument defaults run after initial values are set when initing #9408
+ * docs(faq+queries): add more detail about duplicate queries, including an faq entry #9386
+ * docs: replace var with let and const in docs and test files #9414 [jmadankumar](https://github.com/jmadankumar)
+ * docs(model+query): document using array of strings as projection #9413
+ * docs(middleware): add missing backtick #9425 [tphobe9312](https://github.com/tphobe9312)
+
+5.10.5 / 2020-09-11
+===================
+ * fix: bump mongodb -> 3.6.2 #9411 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query+aggregate+cursor): support async iteration over a cursor instance as opposed to a Query or Aggregate instance #9403
+ * fix(document): respect child schema `minimize` if `toObject()` is called without an explicit `minimize` #9405
+ * docs(guide): use const instead of var #9394 [nainardev](https://github.com/nainardev)
+ * docs(query): link to lean, findOneAndUpdate, query casting tutorials from query docs #9410
+
 5.10.4 / 2020-09-09
 ===================
  * fix(document): allow setting nested path to instance of model #9392

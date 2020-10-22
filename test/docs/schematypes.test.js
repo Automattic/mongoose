@@ -1,10 +1,10 @@
 'use strict';
-var assert = require('assert');
-var mongoose = require('../../');
+const assert = require('assert');
+const mongoose = require('../../');
 
 describe('schemaTypes', function () {
-  var db;
-  var Schema = mongoose.Schema;
+  let db;
+  let Schema = mongoose.Schema;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
@@ -37,7 +37,7 @@ describe('schemaTypes', function () {
       // validate the provided `val` and throw a `CastError` if you
       // can't convert it.
       cast(val) {
-        var _val = Number(val);
+        let _val = Number(val);
         if (isNaN(_val)) {
           throw new Error('Int8: ' + val + ' is not a number');
         }
@@ -53,10 +53,10 @@ describe('schemaTypes', function () {
     // Don't forget to add `Int8` to the type registry
     mongoose.Schema.Types.Int8 = Int8;
 
-    var testSchema = new Schema({ test: Int8 });
-    var Test = mongoose.model('CustomTypeExample', testSchema);
+    const testSchema = new Schema({ test: Int8 });
+    const Test = mongoose.model('CustomTypeExample', testSchema);
 
-    var t = new Test();
+    const t = new Test();
     t.test = 'abc';
     assert.ok(t.validateSync());
     assert.equal(t.validateSync().errors['test'].name, 'CastError');

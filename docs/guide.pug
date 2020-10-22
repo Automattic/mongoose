@@ -418,6 +418,7 @@ block content
     - [autoIndex](#autoIndex)
     - [autoCreate](#autoCreate)
     - [bufferCommands](#bufferCommands)
+    - [bufferTimeoutMS](#bufferTimeoutMS)
     - [capped](#capped)
     - [collection](#collection)
     - [id](#id)
@@ -501,6 +502,16 @@ block content
     mongoose.set('bufferCommands', true);
     // Schema option below overrides the above, if the schema option is set.
     const schema = new Schema({..}, { bufferCommands: false });
+    ```
+
+    <h3 id="bufferTimeoutMS"><a href="#bufferTimeoutMS">option: bufferTimeoutMS</a></h3>
+
+    If `bufferCommands` is on, this option sets the maximum amount of time Mongoose buffering will wait before
+    throwing an error. If not specified, Mongoose will use 10000 (10 seconds).
+
+    ```javascript
+    // If an operation is buffered for more than 1 second, throw an error.
+    const schema = new Schema({..}, { bufferTimeoutMS: 1000 });
     ```
 
     <h3 id="capped"><a href="#capped">option: capped</a></h3>

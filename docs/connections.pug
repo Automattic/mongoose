@@ -145,6 +145,10 @@ block content
     });
     ```
 
+    Note that the `error` event in the code above does not fire when mongoose loses 
+    connection after the initial connection was established. You can listen to the
+    `disconnected` event for that purpose.
+
     <h3 id="options"><a href="#options">Options</a></h3>
 
     The `connect` method also accepts an `options` object which will be passed

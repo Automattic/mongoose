@@ -118,25 +118,25 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     o.nested = Object.create(null);
     o.nested.n = Number;
 
-    assert.doesNotThrow(function() {
+    void function() {
       new Schema(o);
-    });
+    }();
 
-    assert.doesNotThrow(function() {
+    void function() {
       const s = new Schema;
       const o = Object.create(null);
       o.yay = Number;
       s.path('works', o);
-    });
+    }();
 
-    assert.doesNotThrow(function() {
+    void function() {
       const s = new Schema;
       let o = Object.create(null);
       o = {};
       o.name = String;
       const x = { type: [o] };
       s.path('works', x);
-    });
+    }();
 
     done();
   });

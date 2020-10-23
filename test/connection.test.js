@@ -1210,4 +1210,20 @@ describe('connections:', function() {
       assert.ok(res);
     });
   });
+
+  it('connection.then(...) resolves to a connection instance (gh-9496)', function() {
+    return co(function *() {
+      const m = new mongoose.Mongoose;
+
+      m.connect('mongodb://localhost:27017/test_gh9496', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      const conn = yield m.connection;
+
+      assert.ok(conn instanceof m.Connection);
+      assert.ok(conn);
+    });
+  });
+
 });

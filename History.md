@@ -1,3 +1,11 @@
+5.10.10 / 2020-10-23
+====================
+ * fix(schema): handle merging schemas from separate Mongoose module instances when schema has a virtual #9471
+ * fix(connection): make connection.then(...) resolve to a connection instance #9497 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(aggregate): when using $search with discriminators, add `$match` as the 2nd stage in pipeline rather than 1st #9487
+ * fix(query): cast $nor within $elemMatch #9479
+ * docs(connection): add note about 'error' event versus 'disconnected' event #9488 [tareqdayya](https://github.com/tareqdayya)
+
 5.10.9 / 2020-10-09
 ===================
  * fix(update): strip out unused array filters to avoid "filter was not used in the update" error #9468

@@ -9548,4 +9548,28 @@ describe('document', function() {
 
     assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
   });
+
+  it('avoids overwriting array subdocument when setting dotted path that is not selected (gh-9427)', function() {
+    const Test = db.model('Test', Schema({
+      arr: [{ _id: false, val: Number }],
+      name: String,
+      age: Number
+    }));
+
+    return co(function*() {
+      let doc = yield Test.create({
+        name: 'Test',
+        arr: [{ val: 1 }, { val: 2 }],
+        age: 30
+      });
+
+      doc = yield Test.findById(doc._id).select('name');
+      doc.set('arr.0.val', 2);
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc._id);
+      assert.deepEqual(fromDb.toObject().arr, [{ val: 2 }, { val: 2 }]);
+    });
+
+  });
 });

@@ -9355,6 +9355,64 @@ describe('document', function() {
     assert.equal(p.nested.test, 'new');
   });
 
+  it('unmarks modified if setting a value to the same value as it was previously (gh-9396)', function() {
+    const schema = new Schema({
+      bar: String
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const foo = new Test({ bar: 'bar' });
+      yield foo.save();
+      assert.ok(!foo.isModified('bar'));
+
+      foo.bar = 'baz';
+      assert.ok(foo.isModified('bar'));
+
+      foo.bar = 'bar';
+      assert.ok(!foo.isModified('bar'));
+    });
+  });
+
+  it('unmarks modified if setting a value to the same subdoc as it was previously (gh-9396)', function() {
+    const schema = new Schema({
+      nested: { bar: String },
+      subdoc: new Schema({ bar: String }, { _id: false })
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const foo = new Test({ nested: { bar: 'bar' }, subdoc: { bar: 'bar' } });
+      yield foo.save();
+      assert.ok(!foo.isModified('nested'));
+      assert.ok(!foo.isModified('subdoc'));
+
+      foo.nested = { bar: 'baz' };
+      foo.subdoc = { bar: 'baz' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+
+      foo.nested = { bar: 'bar' };
+      foo.subdoc = { bar: 'bar' };
+      assert.ok(!foo.isModified('nested'));
+      assert.ok(!foo.isModified('subdoc'));
+      assert.ok(!foo.isModified('subdoc.bar'));
+
+      foo.nested = { bar: 'baz' };
+      foo.subdoc = { bar: 'baz' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+      yield foo.save();
+
+      foo.nested = { bar: 'bar' };
+      foo.subdoc = { bar: 'bar' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+      assert.ok(foo.isModified('subdoc.bar'));
+    });
+  });
+
   it('marks path as errored if default function throws (gh-9408)', function() {
     const jobSchema = new Schema({
       deliveryAt: Date,
@@ -9489,5 +9547,29 @@ describe('document', function() {
     testUser = new User(userWithEmailNotifications);
 
     assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
+  });
+
+  it('avoids overwriting array subdocument when setting dotted path that is not selected (gh-9427)', function() {
+    const Test = db.model('Test', Schema({
+      arr: [{ _id: false, val: Number }],
+      name: String,
+      age: Number
+    }));
+
+    return co(function*() {
+      let doc = yield Test.create({
+        name: 'Test',
+        arr: [{ val: 1 }, { val: 2 }],
+        age: 30
+      });
+
+      doc = yield Test.findById(doc._id).select('name');
+      doc.set('arr.0.val', 2);
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc._id);
+      assert.deepEqual(fromDb.toObject().arr, [{ val: 2 }, { val: 2 }]);
+    });
+
   });
 });

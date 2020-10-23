@@ -51,6 +51,7 @@ To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick st
 
 If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
 
+* `npm install`
 * `make docclean`
 * `make gendocs`
 * `node static.js`

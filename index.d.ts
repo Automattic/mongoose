@@ -2,6 +2,7 @@ declare module "mongoose" {
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
+  import stream = require('stream');
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
   export function connect(uri: string, options: ConnectOptions, callback: (err: Error) => void): void;
@@ -635,7 +636,7 @@ declare module "mongoose" {
     session?: mongodb.ClientSession;
     explain?: any;
     multi?: boolean;
-    strict: boolean | string;
+    strict?: boolean | string;
   }
 
   interface SaveOptions {
@@ -937,6 +938,23 @@ declare module "mongoose" {
     /** Specifies the batchSize option. */
     batchSize(val: number): this;
 
+    /** Specifies a `$box` condition */
+    box(val: any): this;
+    box(lower: number[], upper: number[]): this;
+
+    cast(model: Model<any> | null, obj: any): UpdateQuery<DocType>;
+
+    /**
+     * Executes the query returning a `Promise` which will be
+     * resolved with either the doc(s) or rejected with the error.
+     * Like `.then()`, but only takes a rejection handler.
+     */
+    catch: Promise<ResultType>["catch"];
+
+    /** Specifies a `$center` or `$centerSphere` condition. */
+    circle(area: any): this;
+    circle(path: string, area: any): this;
+
     /** Adds a collation to this op (MongoDB 3.4 and up) */
     collation(value: mongodb.CollationDocument): this;
 
@@ -950,6 +968,12 @@ declare module "mongoose" {
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(callback?: (err: any, count: number) => void): Query<number, DocType>;
     countDocuments(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
+
+    /**
+     * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
+     * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
+     */
+    cursor(options?: any): QueryCursor<DocType>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like
@@ -984,6 +1008,9 @@ declare module "mongoose" {
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
     estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, DocType>;
+
+    /** Executes the query */
+    exec(callback?: (err: any, result: ResultType) => void): Promise<ResultType> | any;
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     exists(val: boolean): this;
@@ -1020,6 +1047,9 @@ declare module "mongoose" {
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
+    /** Specifies a `$geometry` condition */
+    geometry(object: { type: string, coordinates: any[] }): this;
+
     /**
      * For update operations, returns the value of a path in the update's `$set`.
      * Useful for writing getters/setters that can work with both update operations
@@ -1032,6 +1062,9 @@ declare module "mongoose" {
 
     /** Gets query options. */
     getOptions(): QueryOptions;
+
+    /** Gets a list of paths to be populated by this query */
+    getPopulatedPaths(): Array<string>;
 
     /** Returns the current query filter. Equivalent to `getFilter()`. */
     getQuery(): FilterQuery<DocType>;
@@ -1054,6 +1087,9 @@ declare module "mongoose" {
     in(val: Array<any>): this;
     in(path: string, val: Array<any>): this;
 
+    /** Declares an intersects query for `geometry()`. */
+    intersects(arg?: any): this;
+
     /** Requests acknowledgement that this operation has been persisted to MongoDB's on-disk journal. */
     j(val: boolean | null): this;
 
@@ -1070,6 +1106,12 @@ declare module "mongoose" {
     /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     lte(val: number): this;
     lte(path: string, val: number): this;
+
+    /**
+     * Runs a function `fn` and treats the return value of `fn` as the new value
+     * for the query to resolve to.
+     */
+    map<MappedType>(fn: (doc: DocType) => MappedType): Query<MappedType, DocType>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;
@@ -1102,6 +1144,10 @@ declare module "mongoose" {
     ne(val: any): this;
     ne(path: string, val: any);
 
+    /** Specifies a `$near` or `$nearSphere` condition */
+    near(val: any): this;
+    near(path: string, val: any): this;
+
     /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     nin(val: Array<any>): this;
     nin(path: string, val: Array<any>): this;
@@ -1111,6 +1157,21 @@ declare module "mongoose" {
 
     /** Specifies arguments for an `$or` condition. */
     or(array: Array<FilterQuery<DocType>>): this;
+
+    /**
+     * Make this query throw an error if no documents match the given `filter`.
+     * This is handy for integrating with async/await, because `orFail()` saves you
+     * an extra `if` statement to check if no document was found.
+     */
+    orFail(err?: Error | (() => Error)): this;
+
+    /** Specifies a `$polygon` condition */
+    polygon(...coordinatePairs: number[][]): this;
+    polygon(path: string, ...coordinatePairs: number[][]): this;
+
+    /** Specifies paths which should be populated with other documents. */
+    populate(path: string | any, select?: string | any, model?: string | Model<any>, match?: any): this;
+    populate(options: PopulateOptions | Array<PopulateOptions>): this;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: any | null): any;
@@ -1132,8 +1193,24 @@ declare module "mongoose" {
      */
     remove(filter?: FilterQuery<DocType>, callback?: (err: Error | null, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
 
+    /**
+     * Declare and/or execute this query as a replaceOne() operation. Same as
+     * `update()`, except MongoDB will replace the existing document and will
+     * not accept any [atomic](https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
+     */
+    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocumentDefinition<DocType>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, DocType>;
+
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select(arg: string | any): this;
+
+    /** Determines if field selection has been made. */
+    selected(): boolean;
+
+    /** Determines if exclusive field selection has been made. */
+    selectedExclusively(): boolean;
+
+    /** Determines if inclusive field selection has been made. */
+    selectedInclusively(): boolean;
 
     /**
      * Sets the [MongoDB session](https://docs.mongodb.com/manual/reference/server-sessions/)
@@ -1174,8 +1251,37 @@ declare module "mongoose" {
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
     sort(arg: string | any): this;
 
+    /** Sets the tailable option (for use with capped collections). */
+    tailable(bool?: boolean, opts?: {
+      numberOfRetries?: number;
+      tailableRetryInterval?: number;
+    }): this;
+
+    /**
+     * Executes the query returning a `Promise` which will be
+     * resolved with either the doc(s) or rejected with the error.
+     */
+    then: Promise<ResultType>["then"];
+
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
     toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<ResultType, DocType>;
+
+    /** Declare and/or execute this query as an update() operation. */
+    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+
+    /**
+     * Declare and/or execute this query as an updateMany() operation. Same as
+     * `update()`, except MongoDB will update _all_ documents that match
+     * `filter` (as opposed to just the first one) regardless of the value of
+     * the `multi` option.
+     */
+    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+
+    /**
+     * Declare and/or execute this query as an updateOne() operation. Same as
+     * `update()`, except it does not support the `multi` or `overwrite` options.
+     */
+    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
 
     /**
      * Sets the specified number of `mongod` servers, or tag set of `mongod` servers,
@@ -1211,6 +1317,44 @@ declare module "mongoose" {
   export type UpdateQuery<T> = mongodb.UpdateQuery<T> & mongodb.MatchKeysAndValues<T>;
 
   export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>
+
+  class QueryCursor<DocType extends Document> extends stream.Readable {
+    /**
+     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
+     * Useful for setting the `noCursorTimeout` and `tailable` flags.
+     */
+    addCursorFlag(flag: string, value: boolean);
+
+    /**
+     * Marks this cursor as closed. Will stop streaming and subsequent calls to
+     * `next()` will error.
+     */
+    close(): Promise<void>;
+    close(callback: (err: Error | null) => void): void;
+
+    /**
+     * Execute `fn` for every document in the cursor. If `fn` returns a promise,
+     * will wait for the promise to resolve before iterating on to the next one.
+     * Returns a promise that resolves when done.
+     */
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }, cb?: (err: Error | null) => void): void;
+
+    /**
+     * Registers a transform function which subsequently maps documents retrieved
+     * via the streams interface or `.next()`
+     */
+    map<ResultType extends Document>(fn: (res: DocType) => ResultType): QueryCursor<ResultType>;
+
+    /**
+     * Get the next document from this cursor. Will return `null` when there are
+     * no documents left.
+     */
+    next(): Promise<DocType>;
+    next(callback: (err: Error | null, doc: DocType | null) => void): void;
+
+    options: any;
+  }
 
   class Aggregate<R> {
     /**

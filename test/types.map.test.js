@@ -934,4 +934,26 @@ describe('Map', function() {
     });
     return doc.validate();
   });
+
+  it('persists `.clear()` (gh-9493)', function() {
+    const BoardSchema = new Schema({
+      _id: { type: String },
+      elements: { type: Map, default: new Map() }
+    });
+
+    const BoardModel = db.model('Test', BoardSchema);
+
+    return co(function*() {
+      let board = new BoardModel({ _id: 'test' });
+      board.elements.set('a', 1);
+      yield board.save();
+
+      board = yield BoardModel.findById('test').exec();
+      board.elements.clear();
+      yield board.save();
+
+      board = yield BoardModel.findById('test').exec();
+      assert.equal(board.elements.size, 0);
+    });
+  });
 });

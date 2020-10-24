@@ -4,17 +4,68 @@ declare module "mongoose" {
   import mongoose = require('mongoose');
   import stream = require('stream');
 
+  /** The various Mongoose SchemaTypes. */
+  export var SchemaTypes: typeof Schema.Types;
+
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
   export function connect(uri: string, options: ConnectOptions, callback: (err: CallbackError) => void): void;
   export function connect(uri: string, callback: (err: CallbackError) => void): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
+
+  /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
+  export var connection: Connection;
+
+  /** An array containing all connections associated with this Mongoose instance. */
+  export var connections: Connection[];
 
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Promise<Connection>;
   export function createConnection(): Connection;
   export function createConnection(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn: Connection) => void): void;
 
+  /**
+   * Removes the model named `name` from the default connection, if it exists.
+   * You can use this function to clean up any models you created in your tests to
+   * prevent OverwriteModelErrors.
+   */
+  export function deleteModel(name: string | RegExp): typeof mongoose;
+
+  export function disconnect(): Promise<void>;
+  export function disconnect(cb: (err: CallbackError) => void): void;
+
   export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
+
+  /** Returns an array of model names created on this instance of Mongoose. */
+  export function modelNames(): Array<string>;
+
+  /** The node-mongodb-native driver Mongoose uses. */
+  export var mongo: typeof mongodb;
+
+  /**
+   * Mongoose uses this function to get the current time when setting
+   * [timestamps](/docs/guide.html#timestamps). You may stub out this function
+   * using a tool like [Sinon](https://www.npmjs.com/package/sinon) for testing.
+   */
+  export function now(): Date;
+
+  /** Declares a global plugin executed on all Schemas. */
+  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any);
+
+  /** Getter/setter around function for pluralizing collection names. */
+  export function pluralize(fn?: (str: string) => string): (str: string) => string;
+
+  /**
+   * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
+   * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
+   * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
+   */
+  export function startSession(options?: mongodb.SessionOptions): Promise<mongodb.ClientSession>;
+  export function startSession(options: mongodb.SessionOptions, cb: (err: any, session: mongodb.ClientSession) => void): void;
+
+  /** The Mongoose version */
+  export var version: string;
+
+  export type CastError = Error.CastError;
 
   type Mongoose = typeof mongoose;
 
@@ -279,7 +330,7 @@ declare module "mongoose" {
     equals(doc: Document): boolean;
 
     /** Hash containing current validation errors. */
-    errors?: ValidationError;
+    errors?: Error.ValidationError;
 
     /** Explicitly executes population and returns a promise. Useful for promises integration. */
     execPopulate(): Promise<this>;
@@ -666,7 +717,7 @@ declare module "mongoose" {
   }
 
   interface InsertManyResult extends mongodb.InsertWriteOpResult<any> {
-    mongoose?: { validationErrors?: Array<Error> }
+    mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> }
   }
 
   interface MapReduceOptions<T, Key, Val> {
@@ -995,6 +1046,15 @@ declare module "mongoose" {
     get(fn: Function): this;
     /** Adds a custom setter to this virtual. */
     set(fn: Function): this;
+  }
+
+  namespace Schema {
+    namespace Types {
+      class Array extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+      }
+    }
   }
 
   interface Query<ResultType, DocType extends Document> {
@@ -1615,33 +1675,107 @@ declare module "mongoose" {
       type?: string): this;
   }
 
-  class ValidationError extends Error {
-    name: 'ValidationError';
-
-    errors: {[path: string]: ValidatorError | CastError};
-  }
-
-  class CastError extends Error {
-    name: 'CastError';
-    stringValue: string;
-    kind: string;
-    value: any;
-    path: string;
-    reason?: any;
-    model?: any;
-  }
-
-  class ValidatorError extends Error {
-    name: 'ValidatorError';
-    properties: {message: string, type?: string, path?: string, value?: any, reason?: any};
-    kind: string;
-    path: string;
-    value: any;
-    reason?: Error | null;
-  }
-
   class NativeError extends global.Error {}
   type CallbackError = NativeError | null;
 
-  class Error extends global.Error {}
+  class Error extends global.Error {
+    constructor(msg: string);
+
+    /** The type of error. "MongooseError" for generic errors. */
+    name: string;
+
+    static messages: any;
+
+    static Messages: any;
+  }
+
+  module Error {
+    export class CastError extends Error {
+      name: 'CastError';
+      stringValue: string;
+      kind: string;
+      value: any;
+      path: string;
+      reason?: NativeError | null;
+      model?: any;
+    }
+
+    export class DisconnectedError extends Error {
+      name: 'DisconnectedError';
+    }
+
+    export class DivergentArrayError extends Error {
+      name: 'DivergentArrayError';
+    }
+
+    export class MissingSchemaError extends Error {
+      name: 'MissingSchemaError';
+    }
+
+    export class DocumentNotFoundError extends Error {
+      name: 'DocumentNotFoundError';
+      result: any;
+      numAffected: number;
+      filter: any;
+      query: any;
+    }
+
+    export class ObjectExpectedError extends Error {
+      name: 'ObjectExpectedError';
+      path: string;
+    }
+
+    export class ObjectParameterError extends Error {
+      name: 'ObjectParameterError';
+    }
+
+    export class OverwriteModelError extends Error {
+      name: 'OverwriteModelError';
+    }
+
+    export class ParallelSaveError extends Error {
+      name: 'ParallelSaveError';
+    }
+
+    export class ParallelValidateError extends Error {
+      name: 'ParallelValidateError';
+    }
+
+    export class MongooseServerSelectionError extends Error {
+      name: 'MongooseServerSelectionError';
+    }
+
+    export class StrictModeError extends Error {
+      name: 'StrictModeError';
+      isImmutableError: boolean;
+      path: string;
+    }
+
+    export class ValidationError extends Error {
+      name: 'ValidationError';
+  
+      errors: {[path: string]: ValidatorError | CastError};
+    }
+  
+    export class ValidatorError extends Error {
+      name: 'ValidatorError';
+      properties: {
+        message: string,
+        type?: string,
+        path?: string,
+        value?: any,
+        reason?: any
+      };
+      kind: string;
+      path: string;
+      value: any;
+      reason?: Error | null;
+    }
+
+    export class VersionError extends Error {
+      name: 'VersionError';
+      version: number;
+      modifiedPaths: Array<string>;
+    }
+  }
 }

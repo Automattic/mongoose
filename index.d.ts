@@ -770,12 +770,40 @@ declare module "mongoose" {
     /** Iterates the schemas paths similar to Array#forEach. */
     eachPath(fn: (path: string, type: SchemaType) => void): this;
 
+    /** Defines an index (most likely compound) for this schema. */
+    index(fields: any, options?: any): this;
+
+    /**
+     * Returns a list of indexes that this schema declares, via `schema.index()`
+     * or by `index: true` in a path's options.
+     */
+    indexes(): Array<any>;
+
+    /** Gets a schema option. */
+    get(path: string): any;
+
+    /**
+     * Loads an ES6 class into a schema. Maps [setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) + [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get), [static methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static),
+     * and [instance methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Class_body_and_method_definitions)
+     * to schema [virtuals](http://mongoosejs.com/docs/guide.html#virtuals),
+     * [statics](http://mongoosejs.com/docs/guide.html#statics), and
+     * [methods](http://mongoosejs.com/docs/guide.html#methods).
+     */
+    loadClass(model: Function): this;
+
+    /** Adds an instance method to documents constructed from Models compiled from this schema. */
+    method(name: string, fn: Function, opts?: any): this;
+    method(methods: any): this;
+
     /** Gets/sets schema paths. */
     path(path: string): SchemaType;
     path(path: string, constructor: any): this;
 
     /** Returns the pathType of `path` for this schema. */
     pathType(path: string): string;
+
+    /** Registers a plugin for this schema. */
+    plugin(fn: (schema: Schema, opts?: any) => void, opts?: any);
 
     /** Defines a post hook for the model. */
     post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err: Error | null) => void) => void): this;
@@ -797,8 +825,23 @@ declare module "mongoose" {
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
 
+    /** Removes the given `path` (or [`paths`]). */
+    remove(paths: string | Array<string>): this;
+
     /** Returns an Array of path strings that are required by this schema. */
     requiredPaths(invalidate?: boolean): string[];
+
+    /** Sets a schema option. */
+    set(path: string, value: any, _tags?: any): this;
+
+    /** Adds static "class" methods to Models compiled from this schema. */
+    static(name: string, fn: Function): this;
+
+    /** Creates a virtual type with the given name. */
+    virtual(name: string, options?: any): VirtualType;
+
+    /** Returns the virtual type with the given `name`. */
+    virtualpath(name: string): VirtualType | null;
   }
 
   interface SchemaDefinition {
@@ -937,6 +980,13 @@ declare module "mongoose" {
     sparse?: boolean,
     type?: string,
     unique?: boolean
+  }
+
+  class VirtualType {
+    /** Adds a custom getter to this virtual. */
+    get(fn: Function): this;
+    /** Adds a custom setter to this virtual. */
+    set(fn: Function): this;
   }
 
   interface Query<ResultType, DocType extends Document> {

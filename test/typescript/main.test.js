@@ -109,14 +109,14 @@ describe('typescript syntax', function() {
       console.log(errors);
     }
     assert.equal(errors.length, 1);
-    assert.ok(errors[0].messageText.includes("Property 'notAFunction' does not exist"), errors[0].messageText);
+    assert.ok(errors[0].messageText.includes('Property \'notAFunction\' does not exist'), errors[0].messageText);
   });
 });
 
 function runTest(file) {
   const program = typescript.createProgram([`${__dirname}/${file}`], tsconfig);
 
-  let emitResult = program.emit();
+  const emitResult = program.emit();
 
   return typescript.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 }

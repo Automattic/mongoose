@@ -5,14 +5,14 @@ declare module "mongoose" {
   import stream = require('stream');
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
-  export function connect(uri: string, options: ConnectOptions, callback: (err: Error) => void): void;
-  export function connect(uri: string, callback: (err: Error) => void): void;
+  export function connect(uri: string, options: ConnectOptions, callback: (err: CallbackError) => void): void;
+  export function connect(uri: string, callback: (err: CallbackError) => void): void;
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Promise<Connection>;
   export function createConnection(): Connection;
-  export function createConnection(uri: string, options: ConnectOptions, callback: (err: Error | null, conn: Connection) => void): void;
+  export function createConnection(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn: Connection) => void): void;
 
   export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
 
@@ -37,8 +37,8 @@ declare module "mongoose" {
 
   class Connection extends events.EventEmitter {
     /** Closes the connection */
-    close(callback: (err: Error | null) => void): void;
-    close(force: boolean, callback: (err: Error | null) => void): void;
+    close(callback: (err: CallbackError) => void): void;
+    close(force: boolean, callback: (err: CallbackError) => void): void;
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
@@ -56,8 +56,8 @@ declare module "mongoose" {
      * and [views](https://docs.mongodb.com/manual/core/views/) from mongoose.
      */
     createCollection<T = any>(name: string, options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<T>>;
-    createCollection<T = any>(name: string, cb: (err: Error | null, collection: mongodb.Collection<T>) => void): void;
-    createCollection<T = any>(name: string, options: mongodb.CollectionCreateOptions, cb?: (err: Error | null, collection: mongodb.Collection) => void): Promise<mongodb.Collection<T>>;
+    createCollection<T = any>(name: string, cb: (err: CallbackError, collection: mongodb.Collection<T>) => void): void;
+    createCollection<T = any>(name: string, options: mongodb.CollectionCreateOptions, cb?: (err: CallbackError, collection: mongodb.Collection) => void): Promise<mongodb.Collection<T>>;
 
     /**
      * Removes the model named `name` from this connection, if it exists. You can
@@ -71,14 +71,14 @@ declare module "mongoose" {
      * all documents and indexes.
      */
     dropCollection(collection: string): Promise<void>;
-    dropCollection(collection: string, cb: (err: Error | null) => void): void;
+    dropCollection(collection: string, cb: (err: CallbackError) => void): void;
 
     /**
      * Helper for `dropDatabase()`. Deletes the given database, including all
      * collections, documents, and indexes.
      */
     dropDatabase(): Promise<void>;
-    dropDatabase(cb: (err: Error | null) => void): void;
+    dropDatabase(cb: (err: CallbackError) => void): void;
 
     /** Gets the value of the option `key`. Equivalent to `conn.options[key]` */
     get(key: string): any;
@@ -119,8 +119,8 @@ declare module "mongoose" {
 
     /** Opens the connection with a URI using `MongoClient.connect()`. */
     openUri(uri: string, options?: ConnectOptions): Promise<Connection>;
-    openUri(uri: string, callback: (err: Error | null, conn?: Connection) => void): Connection;
-    openUri(uri: string, options: ConnectOptions, callback: (err: Error | null, conn?: Connection) => void): Connection;
+    openUri(uri: string, callback: (err: CallbackError, conn?: Connection) => void): Connection;
+    openUri(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn?: Connection) => void): Connection;
 
     /** The password specified in the URI */
     pass: string;
@@ -252,11 +252,11 @@ declare module "mongoose" {
     db: Connection;
 
     /** Removes this document from the db. */
-    delete(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
+    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     delete(options?: QueryOptions): Query<any, this>;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
+    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     deleteOne(options?: QueryOptions): Query<any, this>;
 
     /** Takes a populated field and returns it to its unpopulated state. */
@@ -283,7 +283,7 @@ declare module "mongoose" {
 
     /** Explicitly executes population and returns a promise. Useful for promises integration. */
     execPopulate(): Promise<this>;
-    execPopulate(callback: (err: Error | null, res: this) => void): void;
+    execPopulate(callback: (err: CallbackError, res: this) => void): void;
 
     /** Returns the value of a path. */
     get(path: string, type?: any, options?: any);
@@ -305,10 +305,10 @@ declare module "mongoose" {
      * Called internally after a document is returned from mongodb. Normally,
      * you do **not** need to call this function on your own.
      */
-    init(obj: any, opts?: any, cb?: (err: Error | null, doc: this) => void): this;
+    init(obj: any, opts?: any, cb?: (err: CallbackError, doc: this) => void): this;
 
     /** Marks a path as invalid, causing validation to fail. */
-    invalidate(path: string, errorMsg: string | Error, value?: any, kind?: string): Error | null;
+    invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
     isDirectModified(path: string): boolean;
@@ -358,14 +358,14 @@ declare module "mongoose" {
      * If you want to use promises instead, use this function with
      * [`execPopulate()`](#document_Document-execPopulate).
      */
-    populate(path: string, callback?: (err: Error | null, res: this) => void): this;
-    populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: Error | null, res: this) => void): this;
+    populate(path: string, callback?: (err: CallbackError, res: this) => void): this;
+    populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: CallbackError, res: this) => void): this;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
 
     /** Removes this document from the db. */
-    remove(options?: QueryOptions, cb?: (err: Error | null, res: any) => void): void;
+    remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     remove(options?: QueryOptions): Query<any, this>;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
@@ -373,8 +373,8 @@ declare module "mongoose" {
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
-    save(options?: SaveOptions, fn?: (err: Error | null, doc: this) => void): void;
-    save(fn?: (err: Error | null, doc: this) => void): void;
+    save(options?: SaveOptions, fn?: (err: CallbackError, doc: this) => void): void;
+    save(fn?: (err: CallbackError, doc: this) => void): void;
 
     /** Sets the value of a path, or many paths. */
     set(path: string, val: any, options?: any): this;
@@ -391,19 +391,19 @@ declare module "mongoose" {
     unmarkModified(path: string);
 
     /** Sends an update command with this document `_id` as the query selector. */
-    update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: Error, res: any) => void): Query<any, this>;
+    update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
-    updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: Error, res: any) => void): Query<any, this>;
+    updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
     validate(pathsToValidate?: Array<string>, options?: any): Promise<void>;
-    validate(callback: (err: Error | null) => void): void;
-    validate(pathsToValidate: Array<string>, callback: (err: Error | null) => void): void;
-    validate(pathsToValidate: Array<string>, options: any, callback: (err: Error | null) => void): void;
+    validate(callback: (err: CallbackError) => void): void;
+    validate(pathsToValidate: Array<string>, callback: (err: CallbackError) => void): void;
+    validate(pathsToValidate: Array<string>, options: any, callback: (err: CallbackError) => void): void;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(pathsToValidate?: Array<string>, options?: any): Error | null;
+    validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
 
     /** The documents schema. */
     schema: Schema;
@@ -435,21 +435,51 @@ declare module "mongoose" {
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
 
+    /** Creates a `count` query: counts the number of documents that match `filter`. */
+    count(callback?: (err: any, count: number) => void): Query<number, T>;
+    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
+
+    /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
+    countDocuments(callback?: (err: any, count: number) => void): Query<number, T>;
+    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
+
     /** Creates a new document or documents */
     create(doc: T | DocumentDefinition<T>): Promise<T>;
     create(docs: Array<T | DocumentDefinition<T>>, options?: SaveOptions): Promise<Array<T>>;
     create(...docs: Array<T | DocumentDefinition<T>>): Promise<T>;
-    create(doc: T | DocumentDefinition<T>, callback: (err: Error | null, doc: T) => void): void;
-    create(docs: Array<T | DocumentDefinition<T>>, callback: (err: Error | null, docs: Array<T>) => void): void;
+    create(doc: T | DocumentDefinition<T>, callback: (err: CallbackError, doc: T) => void): void;
+    create(docs: Array<T | DocumentDefinition<T>>, callback: (err: CallbackError, docs: Array<T>) => void): void;
 
+    /**
+     * Create the collection for this model. By default, if no indexes are specified,
+     * mongoose will not create the collection for the model until any documents are
+     * created. Use this method to create the collection explicitly.
+     */
     createCollection(options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<T>>;
-    createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: Error | null, collection: mongodb.Collection<T>) => void): void;
+    createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: CallbackError, collection: mongodb.Collection<T>) => void): void;
+
+    /**
+     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
+     * function.
+     */
+    createIndexes(options: any): Promise<void>;
+    createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+
+    /**
+     * Sends `createIndex` commands to mongo for each index declared in the schema.
+     * The `createIndex` commands are sent in series.
+     */
+    ensureIndexes(options: any): Promise<void>;
+    ensureIndexes(options: any, callback?: (err: any) => void): Promise<void>;
 
     /**
      * Event emitter that reports any errors that occurred. Useful for global error
      * handling.
      */
     events: NodeJS.EventEmitter;
+
+    /** Finds one document. */
+    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
 
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
@@ -470,8 +500,8 @@ declare module "mongoose" {
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
     insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T | InsertManyResult>;
     insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T> | InsertManyResult>;
-    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: Error | null, res: T | InsertManyResult) => void): void;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: Error | null, res: Array<T> | InsertManyResult) => void): void;
+    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: CallbackError, res: T | InsertManyResult) => void): void;
+    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: CallbackError, res: Array<T> | InsertManyResult) => void): void;
 
     /**
      * Lists the indexes currently defined in MongoDB. This may or may not be
@@ -479,7 +509,7 @@ declare module "mongoose" {
      * use the [`autoIndex` option](/docs/guide.html#autoIndex) and if you
      * build indexes manually.
      */
-    listIndexes(callback: (err: Error | null, res: Array<any>) => void): void;
+    listIndexes(callback: (err: CallbackError, res: Array<any>) => void): void;
     listIndexes(): Promise<Array<any>>;
 
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
@@ -492,7 +522,7 @@ declare module "mongoose" {
      * are in your schema but not in MongoDB.
      */
     syncIndexes(options?: object): Promise<Array<string>>;
-    syncIndexes(options: object | null, callback: (err: Error | null, dropped: Array<string>) => void): void;
+    syncIndexes(options: object | null, callback: (err: CallbackError, dropped: Array<string>) => void): void;
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
@@ -517,33 +547,14 @@ declare module "mongoose" {
     /** Translate any aliases fields/conditions so the final query or document object is pure */
     translateAliases(raw: any): any;
 
-    /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(callback?: (err: any, count: number) => void): Query<number, T>;
-    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
-
-    /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
-    countDocuments(callback?: (err: any, count: number) => void): Query<number, T>;
-    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
-
-    /**
-     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
-     * function.
-     */
-    createIndexes(options: any): Promise<void>;
-    createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
-
     /** Adds a discriminator type. */
     discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
 
+    /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
+    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
+
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
     estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, T>;
-
-    /**
-     * Sends `createIndex` commands to mongo for each index declared in the schema.
-     * The `createIndex` commands are sent in series.
-     */
-    ensureIndexes(options: any): Promise<void>;
-    ensureIndexes(options: any, callback?: (err: any) => void): Promise<void>;
 
     /**
      * Returns true if at least one document exists in the database that matches
@@ -551,9 +562,6 @@ declare module "mongoose" {
      */
     exists(filter: FilterQuery<T>): Promise<boolean>;
     exists(filter: FilterQuery<T>, callback: (err: any, res: boolean) => void): void;
-
-    /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(callback?: (err: any, count: number) => void): Query<Array<T>, T>;
@@ -581,7 +589,7 @@ declare module "mongoose" {
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
-    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: Error | null, res: Array<T>) => void): Query<Array<T>, T>;
+    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): Query<Array<T>, T>;
 
     /** Executes a mapReduce command. */
     mapReduce<Key, Value>(
@@ -589,7 +597,7 @@ declare module "mongoose" {
       callback?: (err: any, res: any) => void
     ): Promise<any>;
 
-    remove(filter?: any, callback?: (err: Error | null) => void): Query<any, T>;
+    remove(filter?: any, callback?: (err: CallbackError) => void): Query<any, T>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
@@ -806,21 +814,21 @@ declare module "mongoose" {
     plugin(fn: (schema: Schema, opts?: any) => void, opts?: any);
 
     /** Defines a post hook for the model. */
-    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err: Error | null) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, res: any, next: (err: Error | null) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, res: Array<any>, next: (err: Error | null) => void) => void): this;
-    post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, res: any, next: (err: Error | null) => void) => void): this;
+    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
+    post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
 
-    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, err: Error, res: any, next: (err: Error | null) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, err: Error, res: any, next: (err: Error | null) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, err: Error, res: Array<any>, next: (err: Error | null) => void) => void): this;
-    post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, err: Error, res: any, next: (err: Error | null) => void) => void): this;
+    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
+    post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err: Error | null) => void) => void): this;
-    pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: Error | null) => void) => void): this;
-    pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: Error | null) => void) => void): this;
-    pre<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, next: (err: Error | null) => void) => void): this;
+    pre<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
@@ -991,7 +999,7 @@ declare module "mongoose" {
 
   interface Query<ResultType, DocType extends Document> {
     exec(): Promise<ResultType>;
-    exec(callback?: (err: Error | null, res: ResultType) => void): void;
+    exec(callback?: (err: CallbackError, res: ResultType) => void): void;
 
     $where(argument: string | Function): Query<Array<DocType>, DocType>;
 
@@ -1047,14 +1055,14 @@ declare module "mongoose" {
      * remove, except it deletes _every_ document that matches `filter` in the
      * collection, regardless of the value of `single`.
      */
-    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
      * remove, except it deletes at most one document regardless of the `single`
      * option.
      */
-    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<any>, DocType>;
@@ -1067,8 +1075,8 @@ declare module "mongoose" {
      * Gets/sets the error flag on this query. If this flag is not null or
      * undefined, the `exec()` promise will reject without executing.
      */
-    error(): Error | null;
-    error(val: Error | null): this;
+    error(): NativeError | null;
+    error(val: NativeError | null): this;
 
     /** Specifies the complementary comparison value for paths specified with `where()` */
     equals(val: any): this;
@@ -1094,10 +1102,10 @@ declare module "mongoose" {
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
     find(filter: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
-    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: Error | null, count: number) => void): Query<Array<DocType>, DocType>;
+    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<Array<DocType>, DocType>;
 
     /** Declares the query a findOne operation. When executed, the first found document is passed to the callback. */
-    findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: Error | null, count: number) => void): Query<DocType | null, DocType>;
+    findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
@@ -1230,7 +1238,7 @@ declare module "mongoose" {
      * This is handy for integrating with async/await, because `orFail()` saves you
      * an extra `if` statement to check if no document was found.
      */
-    orFail(err?: Error | (() => Error)): this;
+    orFail(err?: NativeError | (() => NativeError)): this;
 
     /** Specifies a `$polygon` condition */
     polygon(...coordinatePairs: number[][]): this;
@@ -1258,7 +1266,7 @@ declare module "mongoose" {
      * deprecated, you should use [`deleteOne()`](#query_Query-deleteOne)
      * or [`deleteMany()`](#query_Query-deleteMany) instead. 
      */
-    remove(filter?: FilterQuery<DocType>, callback?: (err: Error | null, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
+    remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
 
     /**
      * Declare and/or execute this query as a replaceOne() operation. Same as
@@ -1334,7 +1342,7 @@ declare module "mongoose" {
     toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<ResultType, DocType>;
 
     /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
@@ -1342,13 +1350,13 @@ declare module "mongoose" {
      * `filter` (as opposed to just the first one) regardless of the value of
      * the `multi` option.
      */
-    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
-    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: Error | null, res: any) => void): Query<any, DocType>;
+    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
 
     /**
      * Sets the specified number of `mongod` servers, or tag set of `mongod` servers,
@@ -1397,7 +1405,7 @@ declare module "mongoose" {
      * `next()` will error.
      */
     close(): Promise<void>;
-    close(callback: (err: Error | null) => void): void;
+    close(callback: (err: CallbackError) => void): void;
 
     /**
      * Execute `fn` for every document in the cursor. If `fn` returns a promise,
@@ -1405,7 +1413,7 @@ declare module "mongoose" {
      * Returns a promise that resolves when done.
      */
     eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }, cb?: (err: Error | null) => void): void;
+    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -1418,7 +1426,7 @@ declare module "mongoose" {
      * no documents left.
      */
     next(): Promise<DocType>;
-    next(callback: (err: Error | null, doc: DocType | null) => void): void;
+    next(callback: (err: CallbackError, doc: DocType | null) => void): void;
 
     options: any;
   }
@@ -1454,7 +1462,7 @@ declare module "mongoose" {
     exec(callback?: (err: any, result: R) => void): Promise<R> | any;
 
     /** Execute the aggregation with explain */
-    explain(callback?: (err: Error, result: any) => void): Promise<any>;
+    explain(callback?: (err: CallbackError, result: any) => void): Promise<any>;
 
     /** Combines multiple aggregation pipelines. */
     facet(options: any): this;
@@ -1506,6 +1514,42 @@ declare module "mongoose" {
      * or a pipeline object.
      */
     sortByCount(arg: string | any): this;
+  }
+
+  class AggregationCursor extends stream.Readable {
+    /**
+     * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
+     * Useful for setting the `noCursorTimeout` and `tailable` flags.
+     */
+    addCursorFlag(flag: string, value: boolean);
+
+    /**
+     * Marks this cursor as closed. Will stop streaming and subsequent calls to
+     * `next()` will error.
+     */
+    close(): Promise<void>;
+    close(callback: (err: CallbackError) => void): void;
+
+    /**
+     * Execute `fn` for every document in the cursor. If `fn` returns a promise,
+     * will wait for the promise to resolve before iterating on to the next one.
+     * Returns a promise that resolves when done.
+     */
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number }): Promise<void>;
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number }, cb?: (err: CallbackError) => void): void;
+
+    /**
+     * Registers a transform function which subsequently maps documents retrieved
+     * via the streams interface or `.next()`
+     */
+    map(fn: (res: any) => any): this;
+
+    /**
+     * Get the next document from this cursor. Will return `null` when there are
+     * no documents left.
+     */
+    next(): Promise<any>;
+    next(callback: (err: CallbackError, doc: any) => void): void;
   }
 
   class SchemaType {
@@ -1595,4 +1639,9 @@ declare module "mongoose" {
     value: any;
     reason?: Error | null;
   }
+
+  class NativeError extends global.Error {}
+  type CallbackError = NativeError | null;
+
+  class Error extends global.Error {}
 }

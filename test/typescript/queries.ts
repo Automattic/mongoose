@@ -16,6 +16,8 @@ Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => consol
 Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).exec().
   then((res: Array<ITest>) => console.log(res[0].name));
 
+Test.findOne().orFail(new Error('bar')).then((doc: ITest) => console.log('Found! ' + doc.name));
+
 Test.distinct('name').exec().then((res: Array<any>) => console.log(res[0]));
 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITest | null) => console.log(res));

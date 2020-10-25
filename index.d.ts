@@ -4,6 +4,43 @@ declare module "mongoose" {
   import mongoose = require('mongoose');
   import stream = require('stream');
 
+  /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
+  export type Date = Schema.Types.Date;
+
+  /**
+   * The Mongoose Decimal128 [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that should be
+   * [128-bit decimal floating points](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html).
+   * Do not use this to create a new Decimal128 instance, use `mongoose.Types.Decimal128`
+   * instead.
+   */
+  export type Decimal128 = Schema.Types.Decimal128;
+
+  /**
+   * The Mongoose Mixed [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that Mongoose's change tracking, casting,
+   * and validation should ignore.
+   */
+  export type Mixed = Schema.Types.Mixed;
+
+  /**
+   * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that Mongoose should cast to numbers.
+   */
+  export type Number = Schema.Types.Number;
+
+  /**
+   * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that should be
+   * [MongoDB ObjectIds](https://docs.mongodb.com/manual/reference/method/ObjectId/).
+   * Do not use this to create a new ObjectId instance, use `mongoose.Types.ObjectId`
+   * instead.
+   */
+  export type ObjectId = Schema.Types.ObjectId;
+
+  export var Promise: any;
+  export var PromiseProvider: any;
+
   /** The various Mongoose SchemaTypes. */
   export var SchemaTypes: typeof Schema.Types;
 
@@ -32,6 +69,12 @@ declare module "mongoose" {
 
   export function disconnect(): Promise<void>;
   export function disconnect(cb: (err: CallbackError) => void): void;
+
+  /**
+   * Returns true if Mongoose can cast the given value to an ObjectId, or
+   * false otherwise.
+   */
+  export function isValidObjectId(v: any): boolean;
 
   export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
 
@@ -235,10 +278,6 @@ declare module "mongoose" {
   }
 
   class Collection {}
-
-  namespace Types {
-    class ObjectId extends mongodb.ObjectID {}
-  }
 
   class Document {
     constructor(doc?: any);
@@ -1181,16 +1220,6 @@ declare module "mongoose" {
   }
 
   namespace Types {
-    class Subdocument extends Document {
-      $isSingleNested: true;
-
-      /** Returns the top level document of this sub-document. */
-      ownerDocument(): Document;
-
-      /** Returns this sub-documents parent document. */
-      parent(): Document;
-    }
-
     class Array<T> extends global.Array<T> {
       /** Pops the array atomically at most one time per document `save()`. */
       $pop(): T;
@@ -1234,6 +1263,48 @@ declare module "mongoose" {
 
       /** Converts this buffer to its Binary type representation. */
       toObject(subtype?: number): mongodb.Binary;
+    }
+
+    class Decimal128 extends mongodb.Decimal128 { }
+
+    class DocumentArray<T extends Document> extends Types.Array<T> {
+      isMongooseDocumentArray: true;
+
+      /** Creates a subdocument casted to this schema. */
+      create(obj: any): T;
+
+      /** Searches array items for the first document with a matching _id. */
+      id(id: any): T | null;
+    }
+
+    class EmbeddedDocument extends Document {
+      /** Returns the top level document of this sub-document. */
+      ownerDocument(): Document;
+
+      /** Returns this sub-documents parent document. */
+      parent(): Document;
+
+      /** Returns this sub-documents parent array. */
+      parentArray(): DocumentArray<Document>;
+    }
+
+    class Map<V> extends global.Map<string, V> {
+      /** Converts a Mongoose map into a vanilla JavaScript map. */
+      toObject(options: ToObjectOptions & { flattenMaps?: boolean }): any;
+    }
+
+    class ObjectId extends mongodb.ObjectID {
+      _id?: ObjectId;
+    }
+
+    class Subdocument extends Document {
+      $isSingleNested: true;
+
+      /** Returns the top level document of this sub-document. */
+      ownerDocument(): Document;
+
+      /** Returns this sub-documents parent document. */
+      parent(): Document;
     }
   }
 

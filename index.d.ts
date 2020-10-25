@@ -1053,7 +1053,187 @@ declare module "mongoose" {
       class Array extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
+
+        static options: { castNonArrays: boolean; };
+
+        discriminator(name: string, schema: Schema, tag?: string);
+
+        /**
+         * Adds an enum validator if this is an array of strings or numbers. Equivalent to
+         * `SchemaString.prototype.enum()` or `SchemaNumber.prototype.enum()`
+         */
+        enum(vals: string[] | number[]);
       }
+
+      class Boolean extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        /** Configure which values get casted to `true`. */
+        static convertToTrue: Set<any>;
+
+        /** Configure which values get casted to `false`. */
+        static convertToFalse: Set<any>;
+      }
+
+      class Buffer extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        /**
+         * Sets the default [subtype](https://studio3t.com/whats-new/best-practices-uuid-mongodb/)
+         * for this buffer. You can find a [list of allowed subtypes here](http://api.mongodb.com/python/current/api/bson/binary.html).
+         */
+        subtype(subtype: number): this;
+      }
+
+      class Date extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        /** Declares a TTL index (rounded to the nearest second) for _Date_ types only. */
+        expires(when: number | string): this;
+
+        /** Sets a maximum date validator. */
+        max(value: Date, message: string): this;
+
+        /** Sets a minimum date validator. */
+        min(value: Date, message: string): this;
+      }
+
+      class Decimal128 extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+      }
+
+      class DocumentArray extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        static options: { castNonArrays: boolean; };
+
+        discriminator(name: string, schema: Schema, tag?: string);
+      }
+
+      class Map extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+      }
+
+      class Mixed extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+      }
+
+      class Number extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        /** Sets a enum validator */
+        enum(vals: number[]);
+
+        /** Sets a maximum number validator. */
+        max(value: number, message: string): this;
+
+        /** Sets a minimum number validator. */
+        min(value: number, message: string): this;
+      }
+
+      class ObjectId extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        /** Adds an auto-generated ObjectId default if turnOn is true. */
+        auto(turnOn: boolean): this;
+      }
+
+      class Embedded extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+      }
+
+      class String extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: string;
+
+        /** Adds an enum validator */
+        enum(vals: string[] | any): this;
+
+        /** Adds a lowercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
+        lowercase(shouldApply?: boolean): this;
+
+        /** Sets a regexp validator. */
+        match(value: RegExp, message: string): this;
+
+        /** Sets a maximum length validator. */
+        maxlength(value: number, message: string): this;
+
+        /** Sets a minimum length validator. */
+        minlength(value: number, message: string): this;
+
+        /** Adds a trim [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
+        trim(shouldTrim?: boolean): this;
+
+        /** Adds an uppercase [setter](http://mongoosejs.com/docs/api.html#schematype_SchemaType-set). */
+        uppercase(shouldApply?: boolean): this;
+      }
+    }
+  }
+
+  namespace Types {
+    class Subdocument extends Document {
+      $isSingleNested: true;
+
+      /** Returns the top level document of this sub-document. */
+      ownerDocument(): Document;
+
+      /** Returns this sub-documents parent document. */
+      parent(): Document;
+    }
+
+    class Array<T> extends global.Array<T> {
+      /** Pops the array atomically at most one time per document `save()`. */
+      $pop(): T;
+
+      /** Atomically shifts the array at most one time per document `save()`. */
+      $shift(): T;
+
+      /** Adds values to the array if not already present. */
+      addToSet(...args: any[]): any[];
+
+      isMongooseArray: true;
+
+      /** Pushes items to the array non-atomically. */
+      nonAtomicPush(...args: any[]): number;
+
+      /**
+       * Pulls items from the array atomically. Equality is determined by casting
+       * the provided value to an embedded document and comparing using
+       * [the `Document.equals()` function.](./api.html#document_Document-equals)
+       */
+      pull(...args: any[]): this;
+
+      /**
+       * Alias of [pull](#mongoosearray_MongooseArray-pull)
+       */
+      remove(...args: any[]): this;
+
+      /** Sets the casted `val` at index `i` and marks the array modified. */
+      set(i: number, val: T): this;
+
+      /** Atomically shifts the array at most one time per document `save()`. */
+      shift(): T;
+
+      /** Returns a native js Array. */
+      toObject(options: ToObjectOptions): any;
+    }
+
+    class Buffer extends global.Buffer {
+      /** Sets the subtype option and marks the buffer modified. */
+      subtype(subtype: number | ToObjectOptions): void;
+
+      /** Converts this buffer to its Binary type representation. */
+      toObject(subtype?: number): mongodb.Binary;
     }
   }
 
@@ -1619,11 +1799,16 @@ declare module "mongoose" {
     /** Get/set the function used to cast arbitrary values to this type. */
     static cast(caster?: Function | boolean): Function;
 
+    static checkRequired(checkRequired: (v: any) => boolean);
+
     /** Sets a default option for this schema type. */
     static set(option: string, value: any): void;
 
     /** Attaches a getter for all instances of this schema type. */
     static get(getter: (value: any) => any): void;
+
+    /** Get/set the function used to cast arbitrary values to this type. */
+    cast(caster: (v: any) => any): (v: any) => any;
 
     /** Sets a default value for this SchemaType. */
     default(val: any): any;

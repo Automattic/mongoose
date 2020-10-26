@@ -1,3 +1,11 @@
+5.10.11 / 2020-10-26
+====================
+ * fix(connection): when calling `mongoose.connect()` multiple times in parallel, make 2nd call wait for connection before resolving #9476
+ * fix(map): make `save()` persist `Map#clear()` #9493
+ * fix(document): avoid overwriting array subdocument when setting dotted path that isn't selected #9427
+ * fix(connection): don't throw Atlas error if server discovery doesn't find any servers #9470
+ * docs: update options for Model.findOneAndUpdate #9499 [radamson](https://github.com/radamson)
+
 5.10.10 / 2020-10-23
 ====================
  * fix(schema): handle merging schemas from separate Mongoose module instances when schema has a virtual #9471

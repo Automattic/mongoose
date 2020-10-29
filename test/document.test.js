@@ -9548,7 +9548,7 @@ describe('document', function() {
         taxPercent: 10
       });
 
-      assert.ok(doc.modifiedPaths().includes('taxPercent'));
+      assert.ok(doc.modifiedPaths().indexOf('taxPercent') !== -1);
 
       yield doc.save();
 

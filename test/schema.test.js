@@ -2506,4 +2506,52 @@ describe('schema', function() {
     const casted = schema.path('ids').cast([[]]);
     assert.equal(casted[0].$path(), 'ids.$');
   });
+
+  describe('cast option (gh-8407)', function() {
+    it('disable casting using `false`', function() {
+      const schema = Schema({
+        myId: { type: 'ObjectId', cast: false },
+        myNum: { type: 'number', cast: false },
+        myDate: { type: Date, cast: false },
+        myBool: { type: Boolean, cast: false },
+        myStr: { type: String, cast: false }
+      });
+
+      assert.throws(() => schema.path('myId').cast('12charstring'), /Cast to ObjectId failed/);
+      assert.throws(() => schema.path('myNum').cast('foo'), /Cast to Number failed/);
+      assert.throws(() => schema.path('myDate').cast('2012'), /Cast to date failed/);
+      assert.throws(() => schema.path('myBool').cast('true'), /Cast to Boolean failed/);
+      assert.throws(() => schema.path('myStr').cast(55), /Cast to string failed/);
+
+      schema.path('myId').cast(new mongoose.Types.ObjectId());
+      schema.path('myNum').cast(42);
+      schema.path('myDate').cast(new Date());
+      schema.path('myBool').cast(false);
+      schema.path('myStr').cast('Hello, World');
+    });
+
+    it('custom casters', function() {
+      const schema = Schema({
+        myId: {
+          type: 'ObjectId',
+          cast: v => new mongoose.Types.ObjectId(v)
+        },
+        myNum: {
+          type: 'number',
+          cast: v => Math.ceil(v)
+        },
+        myDate: { type: Date, cast: v => new Date(v) },
+        myBool: { type: Boolean, cast: v => !!v },
+        myStr: { type: String, cast: v => '' + v }
+      });
+
+      assert.equal(schema.path('myId').cast('12charstring').toHexString(), '313263686172737472696e67');
+      assert.equal(schema.path('myNum').cast(3.14), 4);
+      assert.equal(schema.path('myDate').cast('2012-06-01').getFullYear(), 2012);
+      assert.equal(schema.path('myBool').cast('hello'), true);
+      assert.equal(schema.path('myStr').cast(42), '42');
+
+      assert.throws(() => schema.path('myId').cast('bad'), /Cast to ObjectId failed/);
+    });
+  });
 });

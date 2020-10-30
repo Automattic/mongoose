@@ -9570,6 +9570,48 @@ describe('document', function() {
       const fromDb = yield Test.findById(doc._id);
       assert.deepEqual(fromDb.toObject().arr, [{ val: 2 }, { val: 2 }]);
     });
+  });
 
+  it('ignore getters when diffing objects for change tracking (gh-9501)', function() {
+    const schema = new Schema({
+      title: {
+        type: String,
+        required: true
+      },
+      price: {
+        type: Number,
+        min: 0
+      },
+      taxPercent: {
+        type: Number,
+        required: function() {
+          return this.price != null;
+        },
+        min: 0,
+        max: 100,
+        get: value => value || 10
+      }
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({
+        title: 'original'
+      });
+
+      doc.set({
+        title: 'updated',
+        price: 10,
+        taxPercent: 10
+      });
+
+      assert.ok(doc.modifiedPaths().indexOf('taxPercent') !== -1);
+
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.taxPercent, 10);
+    });
   });
 });

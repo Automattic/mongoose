@@ -1226,4 +1226,17 @@ describe('connections:', function() {
     });
   });
 
+  it('connection.then(...) does not throw when passed undefined (gh-9505)', function() {
+    const m = new mongoose.Mongoose;
+
+    const db = m.createConnection('mongodb://localhost:27017/test_gh9505', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    assert.doesNotThrow(() => {
+      db.then(null);
+    });
+  });
+
 });

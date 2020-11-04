@@ -9,6 +9,9 @@ mongoose.connect('mongodb://localhost:27017/test', { ssl: true });
 mongoose.connect('mongodb://localhost:27017/test?ssl=true');
 ```
 
+The `ssl` option defaults to `false` for connection strings that start with `mongodb://`. However,
+the `ssl` option defaults to `true` for connection strings that start with `mongodb+srv://`. So if you are using an srv connection string to connect to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), SSL is enabled by default.
+
 If you try to connect to a MongoDB cluster that requires SSL without enabling the `ssl` option, `mongoose.connect()`
 will error out with the below error:
 

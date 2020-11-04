@@ -1,3 +1,12 @@
+5.10.12 / 2020-11-04
+====================
+ * fix(connection): catch and report sync errors in connection wrappers like `startSession()` #9515
+ * fix(document): ignore getters when diffing values for change tracking #9501
+ * fix(connection): avoid executing promise handler unless it's a function #9507 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(error): throw more helpful error when connecting to a non-SSL MongoDB server with SSL enabled #9511
+ * docs(model+query): clarify that `deleteOne` and `deleteMany` trigger middleware #9504
+ * docs(ssl): add note about `ssl` defaulting to `true` for srv connection strings #9511
+
 5.10.11 / 2020-10-26
 ====================
  * fix(connection): when calling `mongoose.connect()` multiple times in parallel, make 2nd call wait for connection before resolving #9476

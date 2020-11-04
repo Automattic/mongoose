@@ -9651,19 +9651,24 @@ describe('model: populate:', function() {
 
       let doc = yield Parent.findOne().populate('single');
       assert.ok(doc.single.parent() === doc);
+      assert.ok(doc.single.$parent() === doc);
 
       doc = yield Parent.findOne().populate('arr');
       assert.ok(doc.arr[0].parent() === doc);
+      assert.ok(doc.arr[0].$parent() === doc);
 
       doc = yield Parent.findOne().populate('docArr.ref');
       assert.ok(doc.docArr[0].ref.parent() === doc);
+      assert.ok(doc.docArr[0].ref.$parent() === doc);
 
       doc = yield Parent.findOne().populate('myVirtual');
       assert.ok(doc.myVirtual.parent() === doc);
+      assert.ok(doc.myVirtual.$parent() === doc);
 
       doc = yield Parent.findOne();
       yield doc.populate('single').execPopulate();
       assert.ok(doc.single.parent() === doc);
+      assert.ok(doc.single.$parent() === doc);
     });
   });
 

@@ -642,7 +642,7 @@ describe('query middleware', function() {
     const schema = Schema({ name: String });
 
     let called = 0;
-    schema.pre(/.*/, { query: true }, function() {
+    schema.pre(/.*/, { query: true, document: false }, function() {
       ++called;
     });
     const Model = db.model('Test', schema);

@@ -9614,4 +9614,37 @@ describe('document', function() {
       assert.equal(fromDb.taxPercent, 10);
     });
   });
+
+  it('allows defining middleware for all document hooks using regexp (gh-9190)', function() {
+    const schema = Schema({ name: String });
+
+    let called = 0;
+    schema.pre(/.*/, { document: true, query: false }, function() {
+      ++called;
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.find();
+      assert.equal(called, 0);
+
+      yield Model.findOne();
+      assert.equal(called, 0);
+
+      yield Model.countDocuments();
+      assert.equal(called, 0);
+
+      const docs = yield Model.create([{ name: 'test' }], { validateBeforeSave: false });
+      assert.equal(called, 1);
+
+      yield docs[0].validate();
+      assert.equal(called, 2);
+
+      yield docs[0].updateOne({ name: 'test2' });
+      assert.equal(called, 3);
+
+      yield Model.aggregate([{ $match: { name: 'test' } }]);
+      assert.equal(called, 3);
+    });
+  });
 });

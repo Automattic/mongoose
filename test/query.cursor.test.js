@@ -689,4 +689,26 @@ describe('QueryCursor', function() {
       assert.deepEqual(docsWithIndexes, expected);
     });
   });
+
+  it('post hooks (gh-9435)', function() {
+    const schema = new mongoose.Schema({ name: String });
+    schema.post('find', function(doc) {
+      doc.name = doc.name.toUpperCase();
+    });
+    const Movie = db.model('Movie', schema);
+
+    return co(function*() {
+      yield Movie.deleteMany({});
+      yield Movie.create([
+        { name: 'Kickboxer' },
+        { name: 'Ip Man' },
+        { name: 'Enter the Dragon' }
+      ]);
+
+      const arr = [];
+      yield Movie.find().sort({ name: -1 }).cursor().
+        eachAsync(doc => arr.push(doc.name));
+      assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
+    });
+  });
 });

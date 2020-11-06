@@ -363,5 +363,11 @@ describe('document', function() {
     assert.ok(doc.isDirectSelected('nested.deep'));
     assert.ok(!doc.isDirectSelected('nested.cool'));
     assert.ok(!doc.isDirectSelected('nested'));
+
+    assert.ok(doc.isDirectSelected('nested.deep nested'));
+    assert.ok(!doc.isDirectSelected('nested.cool nested'));
+
+    assert.ok(doc.isDirectSelected(['nested.deep', 'nested']));
+    assert.ok(!doc.isDirectSelected(['nested.cool', 'nested']));
   });
 });

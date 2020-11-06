@@ -4077,7 +4077,8 @@ describe('Model', function() {
       const Location = db.model('Test', LocationSchema);
 
       return co(function*() {
-        yield Location.collection.drop();
+        yield Location.collection.drop().catch(() => {});
+        yield Location.createCollection();
         yield Location.createIndexes();
 
         yield Location.create({

@@ -9614,4 +9614,46 @@ describe('document', function() {
       assert.equal(fromDb.taxPercent, 10);
     });
   });
+
+  it('correctly handles setting nested props to other nested props (gh-9519)', function() {
+    const schemaA = Schema({
+      propX: {
+        nested1: { prop: Number },
+        nested2: { prop: Number },
+        nested3: { prop: Number }
+      },
+      propY: {
+        nested1: { prop: Number },
+        nested2: { prop: Number },
+        nested3: { prop: Number }
+      }
+    });
+
+    const schemaB = Schema({ prop: { prop: Number } });
+
+    const ModelA = db.model('Test1', schemaA);
+    const ModelB = db.model('Test2', schemaB);
+
+    return co(function*() {
+      const saved = yield ModelA.create({
+        propX: {
+          nested1: { prop: 1 },
+          nested2: { prop: 1 },
+          nested3: { prop: 1 }
+        },
+        propY: {
+          nested1: { prop: 2 },
+          nested2: { prop: 2 },
+          nested3: { prop: 2 }
+        }
+      });
+
+      const objA = yield ModelA.findById(saved._id);
+      const objB = new ModelB();
+
+      objB.prop = objA.propX.nested1;
+
+      assert.strictEqual(objB.prop.prop, 1);
+    });
+  });
 });

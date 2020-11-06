@@ -200,8 +200,10 @@ describe('document modified', function() {
         post.get('comments')[0].body = 'Woot';
         assert.equal(post.isModified('comments'), true);
         assert.equal(post.isDirectModified('comments'), false);
+        assert.equal(post.isDirectModified(['comments']), false);
         assert.equal(post.isModified('comments.0.body'), true);
         assert.equal(post.isDirectModified('comments.0.body'), true);
+        assert.equal(post.isDirectModified(['comments.0.body', 'comments']), true);
       });
     });
 

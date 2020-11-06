@@ -9549,6 +9549,30 @@ describe('document', function() {
     assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
   });
 
+  it('$isValid() with space-delimited and array syntax (gh-9474)', function() {
+    const Test = db.model('Test', Schema({
+      name: String,
+      email: String,
+      age: Number,
+      answer: Number
+    }));
+
+    const doc = new Test({ name: 'test', email: 'test@gmail.com', age: 'bad', answer: 'bad' });
+
+    assert.ok(doc.$isValid('name'));
+    assert.ok(doc.$isValid('email'));
+    assert.ok(!doc.$isValid('age'));
+    assert.ok(!doc.$isValid('answer'));
+
+    assert.ok(doc.$isValid('name email'));
+    assert.ok(doc.$isValid('name age'));
+    assert.ok(!doc.$isValid('age answer'));
+
+    assert.ok(doc.$isValid(['name', 'email']));
+    assert.ok(doc.$isValid(['name', 'age']));
+    assert.ok(!doc.$isValid(['age', 'answer']));
+  });
+
   it('avoids overwriting array subdocument when setting dotted path that is not selected (gh-9427)', function() {
     const Test = db.model('Test', Schema({
       arr: [{ _id: false, val: Number }],

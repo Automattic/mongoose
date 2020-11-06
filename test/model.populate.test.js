@@ -1054,8 +1054,11 @@ describe('model: populate:', function() {
                   assert.equal(blogposts[0].fans[0].name, 'Fan 3');
                   assert.equal(blogposts[0].fans[0].email, 'fan3@learnboost.com');
                   assert.equal(blogposts[0].fans[0].isInit('email'), true);
+                  assert.equal(blogposts[0].fans[0].isInit(['email']), true);
                   assert.equal(blogposts[0].fans[0].isInit('gender'), false);
                   assert.equal(blogposts[0].fans[0].isInit('age'), false);
+                  assert.equal(blogposts[0].fans[0].isInit(['email', 'age']), true);
+                  assert.equal(blogposts[0].fans[0].isInit(['gender', 'age']), false);
 
                   assert.strictEqual(blogposts[1].fans.length, 1);
                   assert.equal(blogposts[1].fans[0].name, 'Fan 3');

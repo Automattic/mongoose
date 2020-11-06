@@ -1,3 +1,8 @@
+5.10.13 / 2020-11-06
+====================
+ * fix: upgrade mongodb driver -> 3.6.3 for Lambda cold start fixes #9521 #9179 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): correctly handle setting props to other nested props #9519
+
 5.10.12 / 2020-11-04
 ====================
  * fix(connection): catch and report sync errors in connection wrappers like `startSession()` #9515

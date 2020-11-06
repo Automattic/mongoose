@@ -3544,4 +3544,28 @@ describe('model: updateOne: ', function() {
       assert.ok(!err.errors['nested']);
     });
   });
+
+  it('handles spread docs (gh-9518)', function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      children: [{ name: String }]
+    });
+
+    const Person = db.model('Person', schema);
+
+    return co(function*() {
+      const doc = yield Person.create({
+        name: 'Anakin',
+        children: [{ name: 'Luke' }]
+      });
+
+      doc.children[0].name = 'Luke Skywalker';
+      const update = { 'children.0': Object.assign({}, doc.children[0]) };
+
+      yield Person.updateOne({ _id: doc._id }, update);
+
+      const fromDb = yield Person.findById(doc);
+      assert.equal(fromDb.children[0].name, 'Luke Skywalker');
+    });
+  });
 });

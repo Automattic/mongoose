@@ -4708,6 +4708,63 @@ describe('model: populate:', function() {
         });
       });
 
+      it('virtuals with getters (gh-9343)', function() {
+        const UserSchema = new Schema({
+          openId: String,
+          test: String
+        });
+        const CommentSchema = new Schema({
+          openId: String
+        });
+
+        CommentSchema.virtual('user', {
+          ref: 'User',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true
+        }).get(v => v.test);
+
+        const User = db.model('User', UserSchema);
+        const Comment = db.model('Comment', CommentSchema);
+
+        return co(function*() {
+          yield Comment.create({ openId: 'test' });
+          yield User.create({ openId: 'test', test: 'my string' });
+
+          const comment = yield Comment.findOne({ openId: 'test' }).populate('user');
+          assert.equal(comment.user, 'my string');
+        });
+      });
+
+      it('virtuals with `get` option (gh-9343)', function() {
+        const UserSchema = new Schema({
+          openId: String,
+          test: String
+        });
+        const CommentSchema = new Schema({
+          openId: String
+        });
+
+        CommentSchema.virtual('user', {
+          ref: 'User',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true,
+          get: v => v.test
+        });
+
+        const User = db.model('User', UserSchema);
+        const Comment = db.model('Comment', CommentSchema);
+
+        return co(function*() {
+          yield Comment.create({ openId: 'test' });
+          yield User.create({ openId: 'test', test: 'my string' });
+
+          const comment = yield Comment.findOne({ openId: 'test' }).populate('user');
+          assert.equal(comment.user, 'my string');
+        });
+      });
+
       it('hydrates properly (gh-4618)', function(done) {
         const ASchema = new Schema({
           name: { type: String }

@@ -98,23 +98,26 @@ describe('ValidationError', function() {
     });
   });
 
-  describe('#minlength', function() {
+  describe('#minLength', function() {
     it('causes a validation error', function(done) {
       const AddressSchema = new Schema({
-        postalCode: { type: String, minlength: 5 }
+        postalCode: { type: String, minlength: 5 },
+        zipCode: { type: String, minLength: 5 }
       });
 
       const Address = mongoose.model('MinLengthAddress', AddressSchema);
 
       const model = new Address({
-        postalCode: '9512'
+        postalCode: '9512',
+        zipCode: '9512'
       });
 
       // should fail validation
       model.validate(function(err) {
-        assert.notEqual(err, null, 'String minlegth validation failed.');
+        assert.notEqual(err, null, 'String minLength validation failed.');
         assert.ok(err.message.startsWith('MinLengthAddress validation failed'));
         model.postalCode = '95125';
+        model.zipCode = '95125';
 
         // should pass validation
         model.validate(function(err) {
@@ -133,13 +136,15 @@ describe('ValidationError', function() {
       };
 
       const AddressSchema = new Schema({
-        postalCode: { type: String, minlength: 5 }
+        postalCode: { type: String, minlength: 5 },
+        zipCode: { type: String, minLength: 5 }
       });
 
       const Address = mongoose.model('gh4207', AddressSchema);
 
       const model = new Address({
-        postalCode: '9512'
+        postalCode: '9512',
+        zipCode: '9512'
       });
 
       // should fail validation
@@ -152,23 +157,26 @@ describe('ValidationError', function() {
     });
   });
 
-  describe('#maxlength', function() {
+  describe('#maxLength', function() {
     it('causes a validation error', function(done) {
       const AddressSchema = new Schema({
-        postalCode: { type: String, maxlength: 10 }
+        postalCode: { type: String, maxlength: 10 },
+        zipCode: { type: String, maxLength: 10 }
       });
 
       const Address = mongoose.model('MaxLengthAddress', AddressSchema);
 
       const model = new Address({
-        postalCode: '95125012345'
+        postalCode: '95125012345',
+        zipCode: '95125012345'
       });
 
       // should fail validation
       model.validate(function(err) {
-        assert.notEqual(err, null, 'String maxlegth validation failed.');
+        assert.notEqual(err, null, 'String maxLength validation failed.');
         assert.ok(err.message.startsWith('MaxLengthAddress validation failed'));
         model.postalCode = '95125';
+        model.zipCode = '95125';
 
         // should pass validation
         model.validate(function(err) {

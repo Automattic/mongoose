@@ -339,7 +339,7 @@ block content
 
     // Only query middleware. This will get called when you do `Model.remove()`
     // but not `doc.remove()`.
-    schema.pre('remove', { query: true, document: flse }, function() {
+    schema.pre('remove', { query: true, document: false }, function() {
       console.log('Removing!');
     });
     ```

@@ -8864,7 +8864,7 @@ describe('model: populate:', function() {
       });
     });
 
-    it.skip('virtual populate with multiple `localField` and `foreignField` (gh-6608)', function() {
+    it('virtual populate with multiple `localField` and `foreignField` (gh-6608)', function() {
       const employeeSchema = Schema({
         locationId: String,
         departmentId: String,
@@ -8878,19 +8878,27 @@ describe('model: populate:', function() {
         justOne: true
       });
 
+      employeeSchema.virtual('departments', {
+        ref: 'Test',
+        localField: ['locationId', 'departmentId'],
+        foreignField: ['locationId', 'name'],
+        justOne: false
+      });
+
       const departmentSchema = Schema({
         locationId: String,
         name: String
       });
 
       return co(function*() {
+        db.deleteModel(/Test/);
         const Employee = db.model('Person', employeeSchema);
         const Department = db.model('Test', departmentSchema);
 
         yield Employee.create([
-          { locationId: 'Miami', department: 'Engineering', name: 'Valeri Karpov' },
-          { locationId: 'Miami', department: 'Accounting', name: 'Test 1' },
-          { locationId: 'New York', department: 'Engineering', name: 'Test 2' }
+          { locationId: 'Miami', departmentId: 'Engineering', name: 'Valeri Karpov' },
+          { locationId: 'Miami', departmentId: 'Accounting', name: 'Test 1' },
+          { locationId: 'New York', departmentId: 'Engineering', name: 'Test 2' }
         ]);
 
         const depts = yield Department.create([
@@ -8901,9 +8909,25 @@ describe('model: populate:', function() {
         const dept = depts[0];
 
         const doc = yield Employee.findOne({ name: 'Valeri Karpov' }).
-          populate('department');
+          populate('department departments');
         assert.equal(doc.department._id.toHexString(), dept._id.toHexString());
         assert.equal(doc.department.name, 'Engineering');
+
+        assert.equal(doc.departments.length, 1);
+        assert.equal(doc.departments[0]._id.toHexString(), dept._id.toHexString());
+        assert.equal(doc.departments[0].name, 'Engineering');
+
+        const docs = yield Employee.find().
+          sort({ name: 1 }).
+          populate('department');
+
+        assert.equal(docs.length, 3);
+        assert.equal(docs[0].department.name, 'Accounting');
+        assert.equal(docs[0].department.locationId, 'Miami');
+        assert.equal(docs[1].department.name, 'Engineering');
+        assert.equal(docs[1].department.locationId, 'New York');
+        assert.equal(docs[2].department.name, 'Engineering');
+        assert.equal(docs[2].department.locationId, 'Miami');
       });
     });
   });

@@ -1226,4 +1226,44 @@ describe('connections:', function() {
     });
   });
 
+  it('connection.then(...) does not throw when passed undefined (gh-9505)', function() {
+    const m = new mongoose.Mongoose;
+
+    const db = m.createConnection('mongodb://localhost:27017/test_gh9505', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    assert.doesNotThrow(() => {
+      db.then(null);
+    });
+  });
+
+  it('allows overwriting models (gh-9406)', function() {
+    const m = new mongoose.Mongoose();
+
+    const M1 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    const M2 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    const M3 = m.connection.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+
+    assert.ok(M1 !== M2);
+    assert.ok(M2 !== M3);
+
+    assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
+  });
+
+  it('allows setting `overwriteModels` globally (gh-9406)', function() {
+    const m = new mongoose.Mongoose();
+    m.set('overwriteModels', true);
+
+    const M1 = m.model('Test', Schema({ name: String }));
+    const M2 = m.model('Test', Schema({ name: String }));
+    const M3 = m.connection.model('Test', Schema({ name: String }));
+
+    assert.ok(M1 !== M2);
+    assert.ok(M2 !== M3);
+
+    m.set('overwriteModels', false);
+    assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
+  });
 });

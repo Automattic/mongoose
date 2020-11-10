@@ -329,17 +329,17 @@ block content
     You can pass options to [`Schema.pre()`](/docs/api.html#schema_Schema-pre)
     and [`Schema.post()`](/docs/api.html#schema_Schema-post) to switch whether
     Mongoose calls your `remove()` hook for [`Document.remove()`](/docs/api.html#model_Model-remove)
-    or [`Model.remove()`](/docs/api.html#model_Model.remove):
+    or [`Model.remove()`](/docs/api.html#model_Model.remove). Note here that you need to set both `document` and `query` properties in the passed object:
 
     ```javascript
     // Only document middleware
-    schema.pre('remove', { document: true }, function() {
+    schema.pre('remove', { document: true, query: false }, function() {
       console.log('Removing doc!');
     });
 
     // Only query middleware. This will get called when you do `Model.remove()`
     // but not `doc.remove()`.
-    schema.pre('remove', { query: true }, function() {
+    schema.pre('remove', { query: true, document: false }, function() {
       console.log('Removing!');
     });
     ```

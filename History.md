@@ -1,3 +1,25 @@
+5.10.13 / 2020-11-06
+====================
+ * fix: upgrade mongodb driver -> 3.6.3 for Lambda cold start fixes #9521 #9179 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): correctly handle setting props to other nested props #9519
+
+5.10.12 / 2020-11-04
+====================
+ * fix(connection): catch and report sync errors in connection wrappers like `startSession()` #9515
+ * fix(document): ignore getters when diffing values for change tracking #9501
+ * fix(connection): avoid executing promise handler unless it's a function #9507 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(error): throw more helpful error when connecting to a non-SSL MongoDB server with SSL enabled #9511
+ * docs(model+query): clarify that `deleteOne` and `deleteMany` trigger middleware #9504
+ * docs(ssl): add note about `ssl` defaulting to `true` for srv connection strings #9511
+
+5.10.11 / 2020-10-26
+====================
+ * fix(connection): when calling `mongoose.connect()` multiple times in parallel, make 2nd call wait for connection before resolving #9476
+ * fix(map): make `save()` persist `Map#clear()` #9493
+ * fix(document): avoid overwriting array subdocument when setting dotted path that isn't selected #9427
+ * fix(connection): don't throw Atlas error if server discovery doesn't find any servers #9470
+ * docs: update options for Model.findOneAndUpdate #9499 [radamson](https://github.com/radamson)
+
 5.10.10 / 2020-10-23
 ====================
  * fix(schema): handle merging schemas from separate Mongoose module instances when schema has a virtual #9471

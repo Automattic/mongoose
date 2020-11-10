@@ -637,4 +637,34 @@ describe('query middleware', function() {
       assert.equal(docs.length, 1);
     });
   });
+
+  it('allows registering middleware for all queries with regexp (gh-9190)', function() {
+    const schema = Schema({ name: String });
+
+    let called = 0;
+    schema.pre(/.*/, { query: true, document: false }, function() {
+      ++called;
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.find();
+      assert.equal(called, 1);
+
+      yield Model.findOne();
+      assert.equal(called, 2);
+
+      yield Model.countDocuments();
+      assert.equal(called, 3);
+
+      yield Model.create({ name: 'test' });
+      assert.equal(called, 3);
+
+      yield Model.insertMany([{ name: 'test' }]);
+      assert.equal(called, 3);
+
+      yield Model.aggregate([{ $match: { name: 'test' } }]);
+      assert.equal(called, 3);
+    });
+  });
 });

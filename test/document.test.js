@@ -3315,7 +3315,7 @@ describe('document', function() {
       const Parent = db.model('Parent', ParentSchema);
 
       const p = new Parent();
-      assert.equal(p.child.$parent, p);
+      assert.equal(p.child.$parent(), p);
     });
 
     it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', function(done) {
@@ -9549,6 +9549,30 @@ describe('document', function() {
     assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
   });
 
+  it('$isValid() with space-delimited and array syntax (gh-9474)', function() {
+    const Test = db.model('Test', Schema({
+      name: String,
+      email: String,
+      age: Number,
+      answer: Number
+    }));
+
+    const doc = new Test({ name: 'test', email: 'test@gmail.com', age: 'bad', answer: 'bad' });
+
+    assert.ok(doc.$isValid('name'));
+    assert.ok(doc.$isValid('email'));
+    assert.ok(!doc.$isValid('age'));
+    assert.ok(!doc.$isValid('answer'));
+
+    assert.ok(doc.$isValid('name email'));
+    assert.ok(doc.$isValid('name age'));
+    assert.ok(!doc.$isValid('age answer'));
+
+    assert.ok(doc.$isValid(['name', 'email']));
+    assert.ok(doc.$isValid(['name', 'age']));
+    assert.ok(!doc.$isValid(['age', 'answer']));
+  });
+
   it('avoids overwriting array subdocument when setting dotted path that is not selected (gh-9427)', function() {
     const Test = db.model('Test', Schema({
       arr: [{ _id: false, val: Number }],
@@ -9570,6 +9594,123 @@ describe('document', function() {
       const fromDb = yield Test.findById(doc._id);
       assert.deepEqual(fromDb.toObject().arr, [{ val: 2 }, { val: 2 }]);
     });
+  });
 
+  it('ignore getters when diffing objects for change tracking (gh-9501)', function() {
+    const schema = new Schema({
+      title: {
+        type: String,
+        required: true
+      },
+      price: {
+        type: Number,
+        min: 0
+      },
+      taxPercent: {
+        type: Number,
+        required: function() {
+          return this.price != null;
+        },
+        min: 0,
+        max: 100,
+        get: value => value || 10
+      }
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({
+        title: 'original'
+      });
+
+      doc.set({
+        title: 'updated',
+        price: 10,
+        taxPercent: 10
+      });
+
+      assert.ok(doc.modifiedPaths().indexOf('taxPercent') !== -1);
+
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.taxPercent, 10);
+    });
+  });
+
+  it('allows defining middleware for all document hooks using regexp (gh-9190)', function() {
+    const schema = Schema({ name: String });
+
+    let called = 0;
+    schema.pre(/.*/, { document: true, query: false }, function() {
+      ++called;
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.find();
+      assert.equal(called, 0);
+
+      yield Model.findOne();
+      assert.equal(called, 0);
+
+      yield Model.countDocuments();
+      assert.equal(called, 0);
+
+      const docs = yield Model.create([{ name: 'test' }], { validateBeforeSave: false });
+      assert.equal(called, 1);
+
+      yield docs[0].validate();
+      assert.equal(called, 2);
+
+      yield docs[0].updateOne({ name: 'test2' });
+      assert.equal(called, 3);
+
+      yield Model.aggregate([{ $match: { name: 'test' } }]);
+      assert.equal(called, 3);
+    });
+  });
+
+  it('correctly handles setting nested props to other nested props (gh-9519)', function() {
+    const schemaA = Schema({
+      propX: {
+        nested1: { prop: Number },
+        nested2: { prop: Number },
+        nested3: { prop: Number }
+      },
+      propY: {
+        nested1: { prop: Number },
+        nested2: { prop: Number },
+        nested3: { prop: Number }
+      }
+    });
+
+    const schemaB = Schema({ prop: { prop: Number } });
+
+    const ModelA = db.model('Test1', schemaA);
+    const ModelB = db.model('Test2', schemaB);
+
+    return co(function*() {
+      const saved = yield ModelA.create({
+        propX: {
+          nested1: { prop: 1 },
+          nested2: { prop: 1 },
+          nested3: { prop: 1 }
+        },
+        propY: {
+          nested1: { prop: 2 },
+          nested2: { prop: 2 },
+          nested3: { prop: 2 }
+        }
+      });
+
+      const objA = yield ModelA.findById(saved._id);
+      const objB = new ModelB();
+
+      objB.prop = objA.propX.nested1;
+
+      assert.strictEqual(objB.prop.prop, 1);
+    });
   });
 });

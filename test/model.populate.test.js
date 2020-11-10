@@ -1054,8 +1054,11 @@ describe('model: populate:', function() {
                   assert.equal(blogposts[0].fans[0].name, 'Fan 3');
                   assert.equal(blogposts[0].fans[0].email, 'fan3@learnboost.com');
                   assert.equal(blogposts[0].fans[0].isInit('email'), true);
+                  assert.equal(blogposts[0].fans[0].isInit(['email']), true);
                   assert.equal(blogposts[0].fans[0].isInit('gender'), false);
                   assert.equal(blogposts[0].fans[0].isInit('age'), false);
+                  assert.equal(blogposts[0].fans[0].isInit(['email', 'age']), true);
+                  assert.equal(blogposts[0].fans[0].isInit(['gender', 'age']), false);
 
                   assert.strictEqual(blogposts[1].fans.length, 1);
                   assert.equal(blogposts[1].fans[0].name, 'Fan 3');
@@ -4702,6 +4705,63 @@ describe('model: populate:', function() {
                 done();
               });
           });
+        });
+      });
+
+      it('virtuals with getters (gh-9343)', function() {
+        const UserSchema = new Schema({
+          openId: String,
+          test: String
+        });
+        const CommentSchema = new Schema({
+          openId: String
+        });
+
+        CommentSchema.virtual('user', {
+          ref: 'User',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true
+        }).get(v => v.test);
+
+        const User = db.model('User', UserSchema);
+        const Comment = db.model('Comment', CommentSchema);
+
+        return co(function*() {
+          yield Comment.create({ openId: 'test' });
+          yield User.create({ openId: 'test', test: 'my string' });
+
+          const comment = yield Comment.findOne({ openId: 'test' }).populate('user');
+          assert.equal(comment.user, 'my string');
+        });
+      });
+
+      it('virtuals with `get` option (gh-9343)', function() {
+        const UserSchema = new Schema({
+          openId: String,
+          test: String
+        });
+        const CommentSchema = new Schema({
+          openId: String
+        });
+
+        CommentSchema.virtual('user', {
+          ref: 'User',
+          localField: 'openId',
+          foreignField: 'openId',
+          justOne: true,
+          get: v => v.test
+        });
+
+        const User = db.model('User', UserSchema);
+        const Comment = db.model('Comment', CommentSchema);
+
+        return co(function*() {
+          yield Comment.create({ openId: 'test' });
+          yield User.create({ openId: 'test', test: 'my string' });
+
+          const comment = yield Comment.findOne({ openId: 'test' }).populate('user');
+          assert.equal(comment.user, 'my string');
         });
       });
 
@@ -8804,7 +8864,7 @@ describe('model: populate:', function() {
       });
     });
 
-    it.skip('virtual populate with multiple `localField` and `foreignField` (gh-6608)', function() {
+    it('virtual populate with multiple `localField` and `foreignField` (gh-6608)', function() {
       const employeeSchema = Schema({
         locationId: String,
         departmentId: String,
@@ -8818,19 +8878,27 @@ describe('model: populate:', function() {
         justOne: true
       });
 
+      employeeSchema.virtual('departments', {
+        ref: 'Test',
+        localField: ['locationId', 'departmentId'],
+        foreignField: ['locationId', 'name'],
+        justOne: false
+      });
+
       const departmentSchema = Schema({
         locationId: String,
         name: String
       });
 
       return co(function*() {
+        db.deleteModel(/Test/);
         const Employee = db.model('Person', employeeSchema);
         const Department = db.model('Test', departmentSchema);
 
         yield Employee.create([
-          { locationId: 'Miami', department: 'Engineering', name: 'Valeri Karpov' },
-          { locationId: 'Miami', department: 'Accounting', name: 'Test 1' },
-          { locationId: 'New York', department: 'Engineering', name: 'Test 2' }
+          { locationId: 'Miami', departmentId: 'Engineering', name: 'Valeri Karpov' },
+          { locationId: 'Miami', departmentId: 'Accounting', name: 'Test 1' },
+          { locationId: 'New York', departmentId: 'Engineering', name: 'Test 2' }
         ]);
 
         const depts = yield Department.create([
@@ -8841,9 +8909,25 @@ describe('model: populate:', function() {
         const dept = depts[0];
 
         const doc = yield Employee.findOne({ name: 'Valeri Karpov' }).
-          populate('department');
+          populate('department departments');
         assert.equal(doc.department._id.toHexString(), dept._id.toHexString());
         assert.equal(doc.department.name, 'Engineering');
+
+        assert.equal(doc.departments.length, 1);
+        assert.equal(doc.departments[0]._id.toHexString(), dept._id.toHexString());
+        assert.equal(doc.departments[0].name, 'Engineering');
+
+        const docs = yield Employee.find().
+          sort({ name: 1 }).
+          populate('department');
+
+        assert.equal(docs.length, 3);
+        assert.equal(docs[0].department.name, 'Accounting');
+        assert.equal(docs[0].department.locationId, 'Miami');
+        assert.equal(docs[1].department.name, 'Engineering');
+        assert.equal(docs[1].department.locationId, 'New York');
+        assert.equal(docs[2].department.name, 'Engineering');
+        assert.equal(docs[2].department.locationId, 'Miami');
       });
     });
   });
@@ -9651,19 +9735,24 @@ describe('model: populate:', function() {
 
       let doc = yield Parent.findOne().populate('single');
       assert.ok(doc.single.parent() === doc);
+      assert.ok(doc.single.$parent() === doc);
 
       doc = yield Parent.findOne().populate('arr');
       assert.ok(doc.arr[0].parent() === doc);
+      assert.ok(doc.arr[0].$parent() === doc);
 
       doc = yield Parent.findOne().populate('docArr.ref');
       assert.ok(doc.docArr[0].ref.parent() === doc);
+      assert.ok(doc.docArr[0].ref.$parent() === doc);
 
       doc = yield Parent.findOne().populate('myVirtual');
       assert.ok(doc.myVirtual.parent() === doc);
+      assert.ok(doc.myVirtual.$parent() === doc);
 
       doc = yield Parent.findOne();
       yield doc.populate('single').execPopulate();
       assert.ok(doc.single.parent() === doc);
+      assert.ok(doc.single.$parent() === doc);
     });
   });
 

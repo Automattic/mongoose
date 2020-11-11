@@ -111,6 +111,14 @@ describe('typescript syntax', function() {
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.includes('Property \'notAFunction\' does not exist'), errors[0].messageText);
   });
+
+  it('model inheritance', function() {
+    const errors = runTest('modelInheritance.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

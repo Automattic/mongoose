@@ -1615,6 +1615,21 @@ describe('model', function() {
     assert.equal(doc.view.clickCount, 1);
   });
 
+  it('overwrites if discriminator schema sets a path to single nested but base schema sets to doc array (gh-9354)', function() {
+    const A = db.model('Test', Schema({
+      prop: [{ reqProp: { type: String, required: true } }]
+    }));
+
+    const B = A.discriminator('Test2', Schema({
+      prop: Schema({ name: String })
+    }));
+
+    assert.ok(!B.schema.path('prop').schema.path('reqProp'));
+
+    const doc = new B({ prop: { name: 'test' } });
+    return doc.validate();
+  });
+
   it('can use compiled model schema as a discriminator (gh-9238)', function() {
     const SmsSchema = new mongoose.Schema({ senderNumber: String });
     const EmailSchema = new mongoose.Schema({ fromEmailAddress: String });

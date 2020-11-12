@@ -3328,19 +3328,29 @@ describe('model: updateOne: ', function() {
     });
   });
 
-  it('moves $set of immutable properties to $setOnInsert (gh-8467)', function() {
+  it('moves $set of immutable properties to $setOnInsert (gh-8467) (gh-9537)', function() {
+    const childSchema = Schema({ name: String });
     const Model = db.model('Test', Schema({
       name: String,
-      age: { type: Number, default: 25, immutable: true }
+      age: { type: Number, default: 25, immutable: true },
+      child: { type: childSchema, immutable: true }
     }));
 
     const _opts = { upsert: true, setDefaultsOnInsert: true };
 
     return co(function*() {
-      yield Model.updateOne({ name: 'John' }, { name: 'John', age: 20 }, _opts);
+      yield Model.deleteMany({});
+      yield Model.updateOne({}, { name: 'John', age: 20, child: { name: 'test' } }, _opts);
 
       const doc = yield Model.findOne().lean();
       assert.equal(doc.age, 20);
+      assert.equal(doc.name, 'John');
+      assert.equal(doc.child.name, 'test');
+
+      yield Model.updateOne({}, { name: 'new', age: 29, child: { name: 'new' } }, _opts);
+      assert.equal(doc.age, 20);
+      assert.equal(doc.name, 'John');
+      assert.equal(doc.child.name, 'test');
     });
   });
 

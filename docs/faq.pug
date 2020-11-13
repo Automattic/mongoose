@@ -300,6 +300,9 @@ block content
     
     // disable colors in debug mode
     mongoose.set('debug', { color: false })
+
+    // get mongodb-shell friendly output (ISODate)
+    mongoose.set('debug', { shell: true })
     ```
 
     All executed collection methods will log output of their arguments to your

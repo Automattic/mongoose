@@ -8705,7 +8705,7 @@ describe('document', function() {
 
     const doc = new Model({
       nested: {
-        date: new Date('2020-01-01')
+        date: new Date('2020-06-01')
       }
     });
     assert.equal(doc.toObject({ transform: true }).nested.date, '2020');

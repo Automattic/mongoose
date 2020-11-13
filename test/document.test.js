@@ -8692,6 +8692,25 @@ describe('document', function() {
     assert.equal(doc.toObject({ transform: true }).arr[0].myDate, '2017');
   });
 
+  it('transforms nested paths (gh-9543)', function() {
+    const schema = Schema({
+      nested: {
+        date: {
+          type: Date,
+          transform: v => v.getFullYear()
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({
+      nested: {
+        date: new Date('2020-01-01')
+      }
+    });
+    assert.equal(doc.toObject({ transform: true }).nested.date, '2020');
+  });
+
   it('handles setting numeric paths with single nested subdocs (gh-8583)', function() {
     const placedItemSchema = Schema({ image: String }, { _id: false });
 

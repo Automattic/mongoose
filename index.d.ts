@@ -472,10 +472,10 @@ declare module "mongoose" {
     set(value: any): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options?: ToObjectOptions): any;
+    toJSON(options?: ToObjectOptions): LeanDocument<this>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject(options?: ToObjectOptions): any;
+    toObject(options?: ToObjectOptions): LeanDocument<this>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string);
@@ -1480,7 +1480,7 @@ declare module "mongoose" {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean(val?: boolean | any): this;
+    lean(val?: boolean | any): Query<LeanDocument<DocType>, DocType>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
@@ -1702,7 +1702,9 @@ declare module "mongoose" {
   
   export type UpdateQuery<T> = mongodb.UpdateQuery<T> & mongodb.MatchKeysAndValues<T>;
 
-  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>
+  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>;
+
+  export type LeanDocument<T> = Omit<T, Exclude<keyof Document, '_id'>>;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
     /**

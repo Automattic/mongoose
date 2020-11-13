@@ -119,6 +119,16 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 0);
   });
+
+  it('lean documents', function() {
+    const errors = runTest('leanDocuments.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 2);
+    assert.ok(errors[0].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
+    assert.ok(errors[1].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
+  });
 });
 
 function runTest(file) {

@@ -1,3 +1,11 @@
+5.10.14 / 2020-11-12
+====================
+ * fix(update): handle casting immutable object properties with `$setOnInsert` #9537
+ * fix(discriminator): overwrite instead of merge if discriminator schema specifies a path is single nested but base schema has path as doc array #9534
+ * docs(middleware): clarify that you need to set both `document` and `query` on `remove` hooks to get just document middleware #9530 [mustafaKamal-fe](https://github.com/mustafaKamal-fe)
+ * docs(CONTRIBUTING): remove mmapv1 recommendation and clean up a few other details #9529
+ * refactor: remove duplicate function definition #9527 [ksullivan](https://github.com/ksullivan)
+
 5.10.13 / 2020-11-06
 ====================
  * fix: upgrade mongodb driver -> 3.6.3 for Lambda cold start fixes #9521 #9179 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

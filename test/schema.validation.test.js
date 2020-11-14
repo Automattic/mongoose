@@ -1369,5 +1369,23 @@ describe('schema', function() {
         done();
       });
     });
+    describe('`enum` accepts an object to support TypeScript enums (gh-9546) (gh-9535)', function() {
+      it('strings', function() {
+        const userSchema = new Schema({
+          name: {
+            type: String,
+            enum: {
+              hafez: 'Hafez',
+              nada: 'Nada'
+            }
+          }
+        });
+
+        const User = mongoose.model('User_gh9546_1', userSchema);
+        const user = new User({ name: 'Ameen' });
+        const err = user.validateSync();
+        assert.equal(err.message, 'User_gh9546_1 validation failed: name: `Ameen` is not a valid enum value for path `name`.');
+      });
+    });
   });
 });

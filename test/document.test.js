@@ -7876,6 +7876,28 @@ describe('document', function() {
         return doc.validate();
       });
     });
+
+    it('overwrites maps (gh-9549)', function() {
+      const schema = new Schema({
+        name: String,
+        myMap: { type: Map, of: String }
+      });
+      db.deleteModel(/Test/);
+      const Test = db.model('Test', schema);
+
+      let doc = new Test({ name: 'test', myMap: { a: 1, b: 2 } });
+
+      return co(function*() {
+        yield doc.save();
+
+        doc = yield Test.findById(doc);
+        doc.overwrite({ name: 'test2', myMap: { b: 2, c: 3 } });
+        yield doc.save();
+
+        doc = yield Test.findById(doc);
+        assert.deepEqual(Array.from(doc.toObject().myMap.values()), [2, 3]);
+      });
+    });
   });
 
   it('copies virtuals from array subdocs when casting array of docs with same schema (gh-7898)', function() {

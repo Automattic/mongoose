@@ -125,9 +125,10 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 2);
+    assert.equal(errors.length, 3);
     assert.ok(errors[0].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
     assert.ok(errors[1].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
+    assert.ok(errors[2].messageText.includes('Property \'testMethod\' does not exist'), errors[0].messageText);
   });
 });
 

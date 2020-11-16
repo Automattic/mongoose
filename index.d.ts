@@ -1704,7 +1704,10 @@ declare module "mongoose" {
 
   export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>;
 
-  export type LeanDocument<T> = Omit<T, Exclude<keyof Document, '_id'>>;
+  type FunctionPropertyNames<T> = { 
+    [K in keyof T]: T[K] extends Function ? K : never 
+  }[keyof T];
+  export type LeanDocument<T> = Omit<Omit<T, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
     /**

@@ -32,8 +32,8 @@ describe('debug: shell', function() {
   let testModel;
 
   let lastLog;
-  let originalConsole = console.info;
-  let originalDebugOption = mongoose.options.debug
+  const originalConsole = console.info;
+  const originalDebugOption = mongoose.options.debug;
 
   before(function(done) {
     db = start();
@@ -44,8 +44,8 @@ describe('debug: shell', function() {
       lastLog = arguments[0];
       if (originalDebugOption) {
         originalConsole.apply(console, arguments);
-      };
-    }
+      }
+    };
 
     done();
   });
@@ -53,20 +53,20 @@ describe('debug: shell', function() {
   after(function(done) {
     // revert monkey patch
     console.info = originalConsole;
-    mongoose.set('debug', originalDebugOption)
+    mongoose.set('debug', originalDebugOption);
     db.close(done);
   });
 
-  it('no-shell', async function() {
-    mongoose.set('debug', {shell: false});
-    await testModel.create({dob: new Date()});
-    assert.equal(true, lastLog.includes('new Date'));
+  it('no-shell', function() {
+    mongoose.set('debug', { shell: false });
+    return testModel.create({ dob: new Date() }).
+      then(() => assert.equal(true, lastLog.includes('new Date')));
   });
 
-  it('shell', async function() {
-    mongoose.set('debug', {shell: true});
-    await testModel.create({dob: new Date()});
-    assert.equal(true, lastLog.includes('ISODate'));
+  it('shell', function() {
+    mongoose.set('debug', { shell: true });
+    testModel.create({ dob: new Date() }).
+      then(() => assert.equal(true, lastLog.includes('ISODate')));
   });
 
 });

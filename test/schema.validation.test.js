@@ -1369,5 +1369,102 @@ describe('schema', function() {
         done();
       });
     });
+    describe('`enum` accepts an object to support TypeScript enums (gh-9546) (gh-9535)', function() {
+      it('strings', function() {
+        // Arrange
+        const userSchema = new Schema({
+          name: {
+            type: String,
+            enum: {
+              hafez: 'Hafez',
+              nada: 'Nada'
+            }
+          }
+        });
+
+        const User = mongoose.model('User_gh9546_1', userSchema);
+
+        // Act
+        const user = new User({ name: 'Ameen' });
+        const err = user.validateSync();
+
+        // Assert
+        assert.equal(err.message, 'User_gh9546_1 validation failed: name: `Ameen` is not a valid enum value for path `name`.');
+      });
+
+      it('numbers', function() {
+        // Arrange
+        const userSchema = new Schema({
+          status: {
+            type: Number,
+            enum: {
+              0: 0,
+              1: 1
+            }
+          }
+        });
+
+        const User = mongoose.model('User_gh9546_2', userSchema);
+
+        // Act
+        const user = new User({ status: 2 });
+        const err = user.validateSync();
+
+        // Assert
+        assert.equal(err.message, 'User_gh9546_2 validation failed: status: `2` is not a valid enum value for path `status`.');
+      });
+
+      it('arrays', function() {
+        // Arrange
+        const userSchema = new Schema({
+          favoriteNumbers: {
+            type: [Number],
+            enum: { 1: 1, 2: 2 }
+          }
+        });
+
+        const User = mongoose.model('User_gh9546_3', userSchema);
+
+        // Act
+        const user = new User({ favoriteNumbers: [1, 10, 2, 20] });
+        const err = user.validateSync();
+
+        // Assert
+        assert.equal(err.message, 'User_gh9546_3 validation failed: favoriteNumbers.1: `10` is not a valid enum value for path `favoriteNumbers.1`., favoriteNumbers.3: `20` is not a valid enum value for path `favoriteNumbers.3`.');
+      });
+
+      it('passes when using valid data', function() {
+        // Arrange
+        const userSchema = new Schema({
+          name: {
+            type: String,
+            enum: {
+              hafez: 'Hafez',
+              nada: 'Nada'
+            }
+          },
+          status: {
+            type: Number,
+            enum: {
+              0: 0,
+              1: 1
+            }
+          },
+          favoriteNumbers: {
+            type: [Number],
+            enum: { 1: 1, 2: 2 }
+          }
+        });
+
+        const User = mongoose.model('User_gh9546_4', userSchema);
+
+        // Act
+        const user = new User({ name: 'Hafez', status: 1, favoriteNumbers: [1, 2, 2, 2] });
+        const err = user.validateSync();
+
+        // Assert
+        assert.ifError(err);
+      });
+    });
   });
 });

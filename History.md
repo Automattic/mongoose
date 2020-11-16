@@ -1,3 +1,13 @@
+5.10.15 / 2020-11-16
+====================
+ * fix(array): make sure `Array#toObject()` returns a vanilla JavaScript array in Node.js 6+ #9540
+ * fix(connection): make `disconnect()` stop Mongoose if it is trying to reconnect #9531
+ * fix: ensure `Document#overwrite()` correctly overwrites maps #9549
+ * fix(document): make transform work with nested paths #9544 #9543 [jonathan-wilkinson](https://github.com/jonathan-wilkinson)
+ * fix(query): maxTimeMS in count, countDocuments, distinct #9552 [FlameFractal](https://github.com/FlameFractal)
+ * fix(schema): remove warning re: `increment` as a schema path name #9538
+ * fix(model): automatically set `partialFilterExpression` for indexes in discriminator schemas #9542
+
 5.10.14 / 2020-11-12
 ====================
  * fix(update): handle casting immutable object properties with `$setOnInsert` #9537

@@ -2149,7 +2149,7 @@ describe('schema', function() {
   it('SchemaStringOptions line up with schema/string (gh-8256)', function() {
     const SchemaStringOptions = require('../lib/options/SchemaStringOptions');
     const keys = Object.keys(SchemaStringOptions.prototype).
-      filter(key => key !== 'constructor');
+      filter(key => key !== 'constructor' && key !== 'populate');
     const functions = Object.keys(Schema.Types.String.prototype).
       filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired'].indexOf(key) === -1);
     assert.deepEqual(keys.sort(), functions.sort());

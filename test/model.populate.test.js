@@ -9819,4 +9819,27 @@ describe('model: populate:', function() {
       assert.strictEqual(res[1].linkedId, undefined);
     });
   });
+
+  it('supports default populate options (gh-6029)', function() {
+    const parentSchema = Schema({
+      child: {
+        type: 'ObjectId',
+        ref: 'Child',
+        populate: { select: 'name' }
+      }
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const childSchema = new Schema({ name: String, age: Number });
+    const Child = db.model('Child', childSchema);
+
+    return co(function*() {
+      const child = yield Child.create({ name: 'my name', age: 30 });
+      yield Parent.create({ child: child._id });
+
+      const res = yield Parent.findOne().populate('child');
+      assert.equal(res.child.name, 'my name');
+      assert.strictEqual(res.child.age, void 0);
+    });
+  });
 });

@@ -513,6 +513,7 @@ describe('model', function() {
       const deviceSchema = new Schema({
         _id: { type: Schema.ObjectId, auto: true },
         name: { type: String, unique: true }, // Should become a partial
+        other: { type: String, index: true }, // Should become a partial
         model: { type: String }
       });
 
@@ -525,7 +526,12 @@ describe('model', function() {
         Base.create({}),
         User.create({ emailId: 'val@karpov.io', firstName: 'Val' }),
         Device.create({ name: 'Samsung', model: 'Galaxy' })
-      ]);
+      ]).then(() => Base.listIndexes()).
+        then(indexes => indexes.find(i => i.key.other)).
+        then(index => {
+          assert.deepEqual(index.key, { other: 1 });
+          assert.deepEqual(index.partialFilterExpression, { kind: 'Device' });
+        });
     });
 
     it('decorated discriminator index with syncIndexes (gh-6347)', function() {

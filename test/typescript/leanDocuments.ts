@@ -22,6 +22,7 @@ void async function main() {
   const doc: ITest = await Test.findOne();
 
   doc.subdoc = new Subdoc({ name: 'test' });
+  doc.id = 'Hello';
 
   doc.testMethod();
 

@@ -1235,6 +1235,9 @@ declare module "mongoose" {
       /** Pushes items to the array non-atomically. */
       nonAtomicPush(...args: any[]): number;
 
+      /** Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking. */
+      push(...args: any[]): number;
+
       /**
        * Pulls items from the array atomically. Equality is determined by casting
        * the provided value to an embedded document and comparing using
@@ -1255,6 +1258,9 @@ declare module "mongoose" {
 
       /** Returns a native js Array. */
       toObject(options: ToObjectOptions): any;
+
+      /** Wraps [`Array#unshift`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/unshift) with proper change tracking. */
+      unshift(...args: any[]): number;
     }
 
     class Buffer extends global.Buffer {

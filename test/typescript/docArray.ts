@@ -21,6 +21,8 @@ void async function main() {
   const record: Subdoc = doc.tags.create({ name: 'test' });
   doc.tags.push(record);
 
+  doc.tags.push({ name: 'test' });
+
   await doc.save();
 
   const _doc: LeanDocument<ITest> = await Test.findOne().lean();

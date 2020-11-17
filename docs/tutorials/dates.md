@@ -70,7 +70,7 @@ new Date('2010'); // 2010-01-01T00:00:00.000Z
 Mongoose converts numeric strings that contain numbers outside the [range of representable dates in JavaScript](https://stackoverflow.com/questions/11526504/minimum-and-maximum-date) and converts them to numbers before passing them to the date constructor.
 
 ```javascript
-require: Date Tutorial.*Example 1.4.3]
+[require: Date Tutorial.*Example 1.4.3]
 ```
 
 ## Timezones

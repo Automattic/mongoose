@@ -5,6 +5,7 @@ const schema: Schema = new Schema({ name: { type: 'String' } });
 interface ITest extends Document {
   _id?: Types.ObjectId,
   name?: string;
+  mixed?: any;
   testMethod: () => number;
 }
 
@@ -24,6 +25,8 @@ void async function main() {
   await _doc.save();
 
   _doc.testMethod();
+  _doc.name = 'test';
+  _doc.mixed = 42;
 
   const hydrated = Test.hydrate(_doc);
   await hydrated.save();

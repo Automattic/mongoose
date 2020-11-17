@@ -92,7 +92,7 @@ declare module "mongoose" {
   export function now(): Date;
 
   /** Declares a global plugin executed on all Schemas. */
-  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any);
+  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): typeof mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
   export function pluralize(fn?: (str: string) => string): (str: string) => string;
@@ -226,7 +226,7 @@ declare module "mongoose" {
     port: number;
 
     /** Declares a plugin executed on all schemas you pass to `conn.model()` */
-    plugin(fn: (schema: Schema, opts?: any) => void, opts?: any);
+    plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Connection;
 
     /** The plugins that will be applied to all models created on this connection. */
     plugins: Array<any>;
@@ -265,7 +265,7 @@ declare module "mongoose" {
      * async function executes successfully and attempt to retry if
      * there was a retriable error.
      */
-    transaction(fn: (session: mongodb.ClientSession) => Promise<any>);
+    transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<any>;
 
     /** Switches to a different database using the same connection pool. */
     useDb(name: string, options?: { useCache?: boolean }): Connection;
@@ -283,23 +283,23 @@ declare module "mongoose" {
     constructor(doc?: any);
 
     /** Don't run validation on this path or persist changes to this path. */
-    $ignore(path: string);
+    $ignore(path: string): void;
 
     /** Checks if a path is set to its default. */
-    $isDefault(path: string);
+    $isDefault(path: string): boolean;
 
     /** Getter/setter, determines whether the document was removed or not. */
-    $isDeleted(val?: boolean);
+    $isDeleted(val?: boolean): boolean;
 
     /**
      * Returns true if the given path is nullish or only contains empty objects.
      * Useful for determining whether this subdoc will get stripped out by the
      * [minimize option](/docs/guide.html#minimize).
      */
-    $isEmpty(path: string);
+    $isEmpty(path: string): boolean;
 
     /** Checks if a path is invalid */
-    $isValid(path: string);
+    $isValid(path: string): boolean;
 
     /**
      * Empty object that you can use for storing properties on the document. This
@@ -309,7 +309,7 @@ declare module "mongoose" {
     $locals: object;
 
     /** Marks a path as valid, removing existing validation errors. */
-    $markValid(path: string);
+    $markValid(path: string): void;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -376,7 +376,7 @@ declare module "mongoose" {
     execPopulate(callback: (err: CallbackError, res: this) => void): void;
 
     /** Returns the value of a path. */
-    get(path: string, type?: any, options?: any);
+    get(path: string, type?: any, options?: any): any;
 
     /**
      * Returns the changes that happened to the document
@@ -407,7 +407,7 @@ declare module "mongoose" {
     isDirectSelected(path: string): boolean;
 
     /** Checks if `path` is in the `init` state, that is, it was set by `Document#init()` and not modified since. */
-    isInit(path: string);
+    isInit(path: string): boolean;
 
     /**
      * Returns true if any of the given paths is modified, else false. If no arguments, returns `true` if any path
@@ -422,7 +422,7 @@ declare module "mongoose" {
     isNew: boolean;
 
     /** Marks the path as having pending changes to write to the db. */
-    markModified(path: string, scope?: any);
+    markModified(path: string, scope?: any): void;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
@@ -478,7 +478,7 @@ declare module "mongoose" {
     toObject(options?: ToObjectOptions): LeanDocument<this>;
 
     /** Clears the modified state on the specified path. */
-    unmarkModified(path: string);
+    unmarkModified(path: string): void;
 
     /** Sends an update command with this document `_id` as the query selector. */
     update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
@@ -901,7 +901,7 @@ declare module "mongoose" {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin(fn: (schema: Schema, opts?: any) => void, opts?: any);
+    plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
     post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
@@ -1095,13 +1095,13 @@ declare module "mongoose" {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string);
+        discriminator(name: string, schema: Schema, tag?: string): any;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
          * `SchemaString.prototype.enum()` or `SchemaNumber.prototype.enum()`
          */
-        enum(vals: string[] | number[]);
+        enum(vals: string[] | number[]): this;
       }
 
       class Boolean extends SchemaType {
@@ -1151,7 +1151,7 @@ declare module "mongoose" {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string);
+        discriminator(name: string, schema: Schema, tag?: string): any;
       }
 
       class Map extends SchemaType {
@@ -1169,7 +1169,7 @@ declare module "mongoose" {
         static schemaName: string;
 
         /** Sets a enum validator */
-        enum(vals: number[]);
+        enum(vals: number[]): this;
 
         /** Sets a maximum number validator. */
         max(value: number, message: string): this;
@@ -1537,7 +1537,7 @@ declare module "mongoose" {
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne(val: any): this;
-    ne(path: string, val: any);
+    ne(path: string, val: any): this;
 
     /** Specifies a `$near` or `$nearSphere` condition */
     near(val: any): this;
@@ -1725,8 +1725,7 @@ declare module "mongoose" {
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
     T extends TreatAsPrimitives ? T : // primitives
-    [T] extends [Document] ? LeanDocument<T> :
-    T;
+    LeanDocument<T>; // Documents and everything else
 
   export type _LeanDocument<T> = {
     [K in keyof T]:
@@ -1743,7 +1742,7 @@ declare module "mongoose" {
      * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.
      */
-    addCursorFlag(flag: string, value: boolean);
+    addCursorFlag(flag: string, value: boolean): this;
 
     /**
      * Marks this cursor as closed. Will stop streaming and subsequent calls to
@@ -1866,7 +1865,7 @@ declare module "mongoose" {
      * Adds a [cursor flag](http://mongodb.github.io/node-mongodb-native/2.2/api/Cursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.
      */
-    addCursorFlag(flag: string, value: boolean);
+    addCursorFlag(flag: string, value: boolean): this;
 
     /**
      * Marks this cursor as closed. Will stop streaming and subsequent calls to
@@ -1904,7 +1903,7 @@ declare module "mongoose" {
     /** Get/set the function used to cast arbitrary values to this type. */
     static cast(caster?: Function | boolean): Function;
 
-    static checkRequired(checkRequired: (v: any) => boolean);
+    static checkRequired(checkRequired?: (v: any) => boolean): (v: any) => boolean;
 
     /** Sets a default option for this schema type. */
     static set(option: string, value: any): void;
@@ -1955,7 +1954,7 @@ declare module "mongoose" {
     text(bool: boolean): this;
 
     /** Defines a custom function for transforming this path when converting a document to JSON. */
-    transform(fn: (value: any) => any);
+    transform(fn: (value: any) => any): this;
 
     /** Declares an unique index. */
     unique(bool: boolean): this;

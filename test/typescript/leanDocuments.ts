@@ -3,7 +3,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
 class Subdoc extends Document {
-  name: string
+  name: string;
 }
 
 interface ITest extends Document {

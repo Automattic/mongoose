@@ -1268,6 +1268,9 @@ declare module "mongoose" {
     class Decimal128 extends mongodb.Decimal128 { }
 
     class DocumentArray<T extends Document> extends Types.Array<T> {
+      /** DocumentArray constructor */
+      constructor(values: any[]);
+
       isMongooseDocumentArray: true;
 
       /** Creates a subdocument casted to this schema. */

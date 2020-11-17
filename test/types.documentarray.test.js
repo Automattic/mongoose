@@ -689,4 +689,22 @@ describe('types.documentarray', function() {
     assert.equal(doc2.subDocArray[0].ownerDocument().name, 'doc2');
     assert.equal(doc1.subDocArray[0].ownerDocument().name, 'doc1');
   });
+
+  it('supports setting to newly constructed array with no path or parent (gh-8108)', function() {
+    const nestedArraySchema = Schema({
+      name: String,
+      subDocArray: [{ _id: false, name: String }]
+    });
+
+    const Model = db.model('Test', nestedArraySchema);
+
+    const doc = new Model({ name: 'doc1' });
+    doc.subDocArray = new DocumentArray([]);
+
+    doc.subDocArray.push({ name: 'foo' });
+
+    return doc.save().
+      then(() => Model.findById(doc)).
+      then(doc => assert.deepEqual(doc.toObject().subDocArray, [{ name: 'foo' }]));
+  });
 });

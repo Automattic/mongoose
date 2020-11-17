@@ -130,6 +130,14 @@ describe('typescript syntax', function() {
     assert.ok(errors[1].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
     assert.ok(errors[2].messageText.includes('Property \'testMethod\' does not exist'), errors[0].messageText);
   });
+
+  it('doc array', function() {
+    const errors = runTest('docArray.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

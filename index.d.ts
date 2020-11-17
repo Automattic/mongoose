@@ -1711,7 +1711,26 @@ declare module "mongoose" {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
     [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never) 
   }[keyof T];
-  export type LeanDocument<T> = Omit<Omit<T, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>;
+
+  type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
+  type TreatAsPrimitives = actualPrimitives |
+    Date | RegExp | Symbol | Error | BigInt | Types.ObjectId;
+
+  type LeanType<T> =
+    0 extends (1 & T) ? T : // any
+    T extends TreatAsPrimitives ? T : // primitives
+    [T] extends [Document] ? LeanDocument<T> :
+    T;
+
+  export type _LeanDocument<T> = {
+    [K in keyof T]:
+      0 extends (1 & T[K]) ? T[K] : // any
+      T[K] extends unknown[] ? LeanType<T[K][number]>[] : // Array
+      T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
+      T[K];
+  };
+
+  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
     /**

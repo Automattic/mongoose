@@ -2,10 +2,15 @@ import { Schema, model, Document, Types } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
+class Subdoc extends Document {
+  name: string
+}
+
 interface ITest extends Document {
   _id?: Types.ObjectId,
   name?: string;
   mixed?: any;
+  subdoc?: Subdoc;
   testMethod: () => number;
 }
 
@@ -16,6 +21,8 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc: ITest = await Test.findOne();
 
+  doc.subdoc = new Subdoc({ name: 'test' });
+
   doc.testMethod();
 
   const pojo = doc.toObject();
@@ -25,6 +32,7 @@ void async function main() {
   await _doc.save();
 
   _doc.testMethod();
+  _doc.subdoc.toObject();
   _doc.name = 'test';
   _doc.mixed = 42;
 

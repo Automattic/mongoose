@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document, Types, LeanDocument } from 'mongoose';
 
 const schema: Schema = new Schema({ tags: [new Schema({ name: String })] });
 
@@ -22,4 +22,8 @@ void async function main() {
   doc.tags.push(record);
 
   await doc.save();
+
+  const _doc: LeanDocument<ITest> = await Test.findOne().lean();
+  _doc.tags[0].name.substr(1);
+  _doc.tags.create({ name: 'fail' });
 }();

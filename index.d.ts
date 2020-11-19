@@ -1230,6 +1230,12 @@ declare module "mongoose" {
       /** Adds values to the array if not already present. */
       addToSet(...args: any[]): any[];
 
+      /** Return whether or not the `obj` is included in the array. */
+      includes(obj: any, fromIndex?: number): boolean;
+
+      /** Return the index of `obj` or `-1` if not found. */
+      indexOf(searchElement: any, fromIndex?: number): number;
+
       isMongooseArray: true;
 
       /** Pushes items to the array non-atomically. */
@@ -1255,6 +1261,12 @@ declare module "mongoose" {
 
       /** Atomically shifts the array at most one time per document `save()`. */
       shift(): T;
+
+      /** Returns a vanilla JavaScript array containing the elements between `start` and `end`. */
+      slice(start?: number, end?: number): T[];
+
+      /** Wraps [`Array#splice`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice) with proper change tracking and casting. */
+      splice(start: number, deleteCount?: number, ...args: any[]): T[];
 
       /** Returns a native js Array. */
       toObject(options: ToObjectOptions): any;

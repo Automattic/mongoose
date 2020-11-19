@@ -137,8 +137,17 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 1);
-    assert.ok(errors[0].messageText.includes('Property \'create\' does not exist'), errors[0].messageText);
+    assert.equal(errors.length, 2);
+    assert.ok(errors[0].messageText.includes('Property \'toObject\' does not exist'), errors[0].messageText);
+    assert.ok(errors[1].messageText.includes('Property \'create\' does not exist'), errors[1].messageText);
+  });
+
+  it('union document', function() {
+    const errors = runTest('unionDocument.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
   });
 });
 

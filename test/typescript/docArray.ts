@@ -22,8 +22,11 @@ void async function main() {
   doc.tags.push(record);
 
   doc.tags.push({ name: 'test' });
+  doc.tags.indexOf({ name: 'test' });
 
   await doc.save();
+
+  doc.tags.slice().toObject();
 
   const _doc: LeanDocument<ITest> = await Test.findOne().lean();
   _doc.tags[0].name.substr(1);

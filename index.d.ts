@@ -76,7 +76,9 @@ declare module "mongoose" {
    */
   export function isValidObjectId(v: any): boolean;
 
+  /** Defines a model or retrieves it. */
   export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T extends Document, U extends Model<T>>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): U;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
@@ -343,11 +345,11 @@ declare module "mongoose" {
 
     /** Removes this document from the db. */
     delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
-    delete(options?: QueryOptions): Query<any, this>;
+    delete(options?: QueryOptions): Query<this, any>;
 
     /** Removes this document from the db. */
     deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
-    deleteOne(options?: QueryOptions): Query<any, this>;
+    deleteOne(options?: QueryOptions): Query<this, any>;
 
     /** Takes a populated field and returns it to its unpopulated state. */
     depopulate(path: string): this;
@@ -456,10 +458,10 @@ declare module "mongoose" {
 
     /** Removes this document from the db. */
     remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
-    remove(options?: QueryOptions): Query<any, this>;
+    remove(options?: QueryOptions): Query<this, any>;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
-    replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, this>;
+    replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<this, any>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
@@ -481,10 +483,10 @@ declare module "mongoose" {
     unmarkModified(path: string): void;
 
     /** Sends an update command with this document `_id` as the query selector. */
-    update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
+    update(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<this, any>;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
-    updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, this>;
+    updateOne(update?: UpdateQuery<this>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<this, any>;
 
     /** Executes registered validation rules for this document. */
     validate(pathsToValidate?: Array<string>, options?: any): Promise<void>;
@@ -526,12 +528,12 @@ declare module "mongoose" {
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
 
     /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(callback?: (err: any, count: number) => void): Query<number, T>;
-    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
+    count(callback?: (err: any, count: number) => void): Query<T, number>;
+    count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<T, number>;
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
-    countDocuments(callback?: (err: any, count: number) => void): Query<number, T>;
-    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
+    countDocuments(callback?: (err: any, count: number) => void): Query<T, number>;
+    countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<T, number>;
 
     /** Creates a new document or documents */
     create(doc: T | DocumentDefinition<T>): Promise<T>;
@@ -569,7 +571,7 @@ declare module "mongoose" {
     events: NodeJS.EventEmitter;
 
     /** Finds one document. */
-    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
+    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T, T | null>;
 
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
@@ -629,7 +631,7 @@ declare module "mongoose" {
     watch(pipeline?: Array<object>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
 
     /** Adds a `$where` clause to this query */
-    $where(argument: string | Function): Query<Array<T>, T>;
+    $where(argument: string | Function): Query<T, Array<T>>;
 
     /** Registered discriminators for this model. */
     discriminators: { [name: string]: Model<any> } | undefined;
@@ -641,10 +643,10 @@ declare module "mongoose" {
     discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<any>, T>;
+    distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<T, Array<any>>;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, T>;
+    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<T, number>;
 
     /**
      * Returns true if at least one document exists in the database that matches
@@ -654,32 +656,32 @@ declare module "mongoose" {
     exists(filter: FilterQuery<T>, callback: (err: any, res: boolean) => void): void;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: (err: any, count: number) => void): Query<Array<T>, T>;
-    find(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
-    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
+    find(callback?: (err: any, count: number) => void): Query<T, Array<T>>;
+    find(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<T, Array<T>>;
+    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, count: number) => void): Query<T, Array<T>>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
-    findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
-    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
-    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): Query<Array<T>, T>;
+    geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): Query<T, Array<T>>;
 
     /** Executes a mapReduce command. */
     mapReduce<Key, Value>(
@@ -687,25 +689,25 @@ declare module "mongoose" {
       callback?: (err: any, res: any) => void
     ): Promise<any>;
 
-    remove(filter?: any, callback?: (err: CallbackError) => void): Query<any, T>;
+    remove(filter?: any, callback?: (err: CallbackError) => void): Query<T, any>;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
-    replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<T, any>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
+    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T, T | null>;
 
     /** Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option. */
-    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<T, any>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<T, any>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<T, any>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
-    where(path: string, val?: any): Query<Array<T>, T>;
+    where(path: string, val?: any): Query<T, Array<T>>;
   }
 
   interface QueryOptions {
@@ -893,6 +895,9 @@ declare module "mongoose" {
     method(name: string, fn: Function, opts?: any): this;
     method(methods: any): this;
 
+    /** Object containing currently defined methods */
+    methods: { [path: string]: Function };
+
     /** Gets/sets schema paths. */
     path(path: string): SchemaType;
     path(path: string, constructor: any): this;
@@ -934,6 +939,9 @@ declare module "mongoose" {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: Function): this;
+
+    /** Object containing currently defined statics */
+    statics: { [path: string]: Function };
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;
@@ -1329,11 +1337,11 @@ declare module "mongoose" {
     }
   }
 
-  interface Query<ResultType, DocType extends Document> {
+  interface Query<DocType extends Document, ResultType = DocType> {
     exec(): Promise<ResultType>;
     exec(callback?: (err: CallbackError, res: ResultType) => void): void;
 
-    $where(argument: string | Function): Query<Array<DocType>, DocType>;
+    $where(argument: string | Function): Query<DocType, Array<DocType>>;
 
     /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     all(val: Array<any>): this;
@@ -1369,12 +1377,12 @@ declare module "mongoose" {
     comment(val: string): this;
 
     /** Specifies this query as a `count` query. */
-    count(callback?: (err: any, count: number) => void): Query<number, DocType>;
-    count(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
+    count(callback?: (err: any, count: number) => void): Query<DocType, number>;
+    count(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<DocType, number>;
 
     /** Specifies this query as a `countDocuments` query. */
-    countDocuments(callback?: (err: any, count: number) => void): Query<number, DocType>;
-    countDocuments(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<number, DocType>;
+    countDocuments(callback?: (err: any, count: number) => void): Query<DocType, number>;
+    countDocuments(criteria: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<DocType, number>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
@@ -1387,17 +1395,17 @@ declare module "mongoose" {
      * remove, except it deletes _every_ document that matches `filter` in the
      * collection, regardless of the value of `single`.
      */
-    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
+    deleteMany(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): Query<DocType, any>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
      * remove, except it deletes at most one document regardless of the `single`
      * option.
      */
-    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
+    deleteOne(filter?: FilterQuery<DocType>, options?: QueryOptions, callback?: (err: CallbackError, res: any) => void): Query<DocType, any>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<any>, DocType>;
+    distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<DocType, Array<any>>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch(val: Function | any): this;
@@ -1414,7 +1422,7 @@ declare module "mongoose" {
     equals(val: any): this;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, DocType>;
+    estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<DocType, number>;
 
     /** Executes the query */
     exec(callback?: (err: any, result: ResultType) => void): Promise<ResultType> | any;
@@ -1432,27 +1440,27 @@ declare module "mongoose" {
     explain(verbose?: string): this;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
-    find(filter: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
-    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<Array<DocType>, DocType>;
+    find(callback?: (err: any, count: number) => void): Query<DocType, Array<DocType>>;
+    find(filter: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<DocType, Array<DocType>>;
+    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<DocType, Array<DocType>>;
 
     /** Declares the query a findOne operation. When executed, the first found document is passed to the callback. */
-    findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<DocType | null, DocType>;
+    findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<DocType, DocType | null>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
-    findOneAndDelete(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findOneAndDelete(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType, DocType | null>;
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType, DocType | null>;
     
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType, DocType | null>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType, DocType | null>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
+    findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType, DocType | null>;
 
     /** Specifies a `$geometry` condition */
     geometry(object: { type: string, coordinates: any[] }): this;
@@ -1501,7 +1509,7 @@ declare module "mongoose" {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean(val?: boolean | any): Query<LeanDocument<DocType>, DocType>;
+    lean(val?: boolean | any): Query<DocType, LeanDocument<DocType>>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
@@ -1518,7 +1526,7 @@ declare module "mongoose" {
      * Runs a function `fn` and treats the return value of `fn` as the new value
      * for the query to resolve to.
      */
-    map<MappedType>(fn: (doc: DocType) => MappedType): Query<MappedType, DocType>;
+    map<MappedType>(fn: (doc: DocType) => MappedType): Query<DocType, MappedType>;
 
     /** Specifies an `$maxDistance` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     maxDistance(val: number): this;
@@ -1598,14 +1606,14 @@ declare module "mongoose" {
      * deprecated, you should use [`deleteOne()`](#query_Query-deleteOne)
      * or [`deleteMany()`](#query_Query-deleteMany) instead. 
      */
-    remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
+    remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.WriteOpResult['result']) => void): Query<DocType, mongodb.WriteOpResult['result']>;
 
     /**
      * Declare and/or execute this query as a replaceOne() operation. Same as
      * `update()`, except MongoDB will replace the existing document and will
      * not accept any [atomic](https://docs.mongodb.com/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
      */
-    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocumentDefinition<DocType>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, DocType>;
+    replaceOne(filter?: FilterQuery<DocType>, replacement?: DocumentDefinition<DocType>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<DocType, any>;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select(arg: string | any): this;
@@ -1671,10 +1679,10 @@ declare module "mongoose" {
     then: Promise<ResultType>["then"];
 
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
-    toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<ResultType, DocType>;
+    toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<DocType, ResultType>;
 
     /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
+    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<DocType, any>;
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
@@ -1682,13 +1690,13 @@ declare module "mongoose" {
      * `filter` (as opposed to just the first one) regardless of the value of
      * the `multi` option.
      */
-    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
+    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<DocType, any>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
-    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
+    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<DocType, any>;
 
     /**
      * Sets the specified number of `mongod` servers, or tag set of `mongod` servers,

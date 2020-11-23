@@ -137,52 +137,6 @@ describe('versioning', function() {
       });
     }
 
-    function test13(err) {
-      assert.ifError(err);
-      done();
-    }
-
-    function test12(err, a, b) {
-      assert.ok(err instanceof VersionError);
-      assert.ok(err.stack.indexOf('versioning.test.js') !== -1);
-      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(a.comments.length, 5);
-
-      a.comments.addToSet({ title: 'aven' });
-      a.comments.addToSet({ title: 'avengers' });
-      let d = a.$__delta();
-
-      assert.equal(d[0].__v, undefined, 'version should not be included in where clause');
-      assert.ok(!d[1].$set);
-      assert.ok(d[1].$addToSet);
-      assert.ok(d[1].$addToSet.comments);
-
-      a.comments.$shift();
-      d = a.$__delta();
-      assert.equal(d[0].__v, 12, 'version should be included in where clause');
-      assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
-      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
-      assert.ok(!d[1].$addToSet);
-      save(a, b, test13);
-    }
-
-    function test11(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a._doc.__v, 11);
-      assert.equal(a.mixed.arr.length, 6);
-      assert.equal(a.mixed.arr[4].x, 1);
-      assert.equal(a.mixed.arr[5], 'woot');
-      assert.equal(a.mixed.arr[3][0], 10);
-
-      a.comments.addToSet({ title: 'monkey' });
-      b.markModified('comments');
-
-      const d = b.$__delta();
-      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
-
-      save(a, b, test12);
-    }
-
     function test10(err, a, b) {
       assert.ifError(err);
       assert.equal(b.meta.nested[2].title, 'two');
@@ -190,9 +144,8 @@ describe('versioning', function() {
       assert.equal(b.meta.nested[1].comments[0].title, 'sub one');
       assert.equal(a._doc.__v, 10);
       assert.equal(a.mixed.arr.length, 3);
-      a.mixed.arr.push([10], { x: 1 }, 'woot');
-      a.markModified('mixed.arr');
-      save(a, b, test11);
+
+      done();
     }
 
     function test9(err, a, b) {
@@ -474,6 +427,78 @@ describe('versioning', function() {
           });
         });
       });
+    });
+  });
+
+  it('increments version when modifying mixed array', function() {
+    return co(function*() {
+      const a = new BlogPost({ mixed: { arr: [] } });
+      yield a.save();
+
+      assert.equal(a._doc.__v, 0);
+
+      a.mixed.arr.push([10], { x: 1 }, 'test');
+      a.markModified('mixed.arr');
+
+      yield a.save();
+
+      assert.equal(a._doc.__v, 1);
+      assert.equal(a.mixed.arr.length, 3);
+      assert.equal(a.mixed.arr[1].x, 1);
+      assert.equal(a.mixed.arr[2], 'test');
+      assert.equal(a.mixed.arr[0][0], 10);
+    });
+  });
+
+  it('increments version when $set-ing an array', function() {
+    return co(function*() {
+      const a = new BlogPost({});
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.comments.addToSet({ title: 'monkey' });
+      b.markModified('comments');
+
+      const d = b.$__delta();
+      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
+
+      yield a.save();
+      const err = yield b.save().then(() => null, err => err);
+
+      assert.ok(err instanceof VersionError);
+      assert.ok(err.stack.indexOf('versioning.test.js') !== -1);
+      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
+      assert.equal(a.comments.length, 1);
+    });
+  });
+
+  it('increments version and converts to $set when mixing $shift and $addToSet', function() {
+    return co(function*() {
+      const a = new BlogPost({});
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.comments.addToSet({ title: 'aven' });
+      a.comments.addToSet({ title: 'avengers' });
+      let d = a.$__delta();
+
+      assert.equal(d[0].__v, undefined, 'version should not be included in where clause');
+      assert.ok(!d[1].$set);
+      assert.ok(d[1].$addToSet);
+      assert.ok(d[1].$addToSet.comments);
+
+      a.comments.$shift();
+      d = a.$__delta();
+      assert.equal(d[0].__v, 0, 'version should be included in where clause');
+      assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
+      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
+      assert.ok(!d[1].$addToSet);
+
+      yield [a.save(), b.save()];
     });
   });
 

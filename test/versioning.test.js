@@ -137,24 +137,9 @@ describe('versioning', function() {
       });
     }
 
-    function test15(err, a) {
-      assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned sub-document fields');
+    function test13(err) {
+      assert.ifError(err);
       done();
-    }
-
-    function test14(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
-      a.comments[0].dontVersionMeEither.push('value1');
-      b.comments[0].dontVersionMeEither.push('value2');
-      save(a, b, test15);
-    }
-
-    function test13(err, a, b) {
-      assert.ifError(err);
-      a.dontVersionMe.push('value1');
-      b.dontVersionMe.push('value2');
-      save(a, b, test14);
     }
 
     function test12(err, a, b) {
@@ -489,6 +474,38 @@ describe('versioning', function() {
           });
         });
       });
+    });
+  });
+
+  it('should not increment version for non-versioned fields', function() {
+    return co(function*() {
+      const a = new BlogPost({});
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.dontVersionMe.push('value1');
+      b.dontVersionMe.push('value2');
+      yield [a.save(), b.save()];
+
+      assert.equal(a._doc.__v, 0);
+    });
+  });
+
+  it('should not increment version for non-versioned sub-document fields', function() {
+    return co(function*() {
+      const a = new BlogPost({ comments: [{ title: 'test' }] });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.comments[0].dontVersionMeEither.push('value1');
+      b.comments[0].dontVersionMeEither.push('value2');
+      yield [a.save(), b.save()];
+
+      assert.equal(a._doc.__v, 0);
     });
   });
 

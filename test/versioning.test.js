@@ -413,7 +413,8 @@ describe('versioning', function() {
       a.meta.nested.push({ title: 'test1' });
       a.meta.nested.push({ title: 'test2' });
       b.meta.nested.push({ title: 'test3' });
-      yield [a.save(), b.save()];
+      yield a.save();
+      yield b.save();
 
       a = yield BlogPost.findById(a);
       assert.equal(a._doc.__v, 2);

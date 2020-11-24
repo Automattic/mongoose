@@ -137,41 +137,11 @@ describe('versioning', function() {
       });
     }
 
-    function test10(err, a, b) {
-      assert.ifError(err);
-      assert.equal(b.meta.nested[2].title, 'two');
-      assert.equal(b.meta.nested[0].title, 'zero');
-      assert.equal(b.meta.nested[1].comments[0].title, 'sub one');
-      assert.equal(a._doc.__v, 10);
-      assert.equal(a.mixed.arr.length, 3);
-
-      done();
-    }
-
-    function test9(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a.meta.nested.length, 6);
-      assert.equal(a._doc.__v, 10);
-      // nested subdoc property changes should not trigger version increments
-      a.meta.nested[2].title = 'two';
-      b.meta.nested[0].title = 'zero';
-      b.meta.nested[1].comments[0].title = 'sub one';
-      save(a, b, function(err, _a, _b) {
-        assert.ifError(err);
-        assert.equal(a._doc.__v, 10);
-        assert.equal(b._doc.__v, 10);
-        test10(null, _a, _b);
-      });
-    }
-
-    function test8(err, a, b) {
+    function test8(err, a) {
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.meta.nested.length, 3);
       assert.equal(a._doc.__v, 8);
-      a.meta.nested.push({ title: 'the' });
-      a.meta.nested.push({ title: 'killing' });
-      b.meta.nested.push({ title: 'biutiful' });
-      save(a, b, test9);
+      done();
     }
 
     function test7(err, a, b) {
@@ -427,6 +397,52 @@ describe('versioning', function() {
           });
         });
       });
+    });
+  });
+
+  it('increments version on push', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        meta: { nested: [] }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.nested.push({ title: 'test1' });
+      a.meta.nested.push({ title: 'test2' });
+      b.meta.nested.push({ title: 'test3' });
+      yield [a.save(), b.save()];
+
+      a = yield BlogPost.findById(a);
+      assert.equal(a._doc.__v, 2);
+      assert.deepEqual(a.meta.nested.map(v => v.title), ['test1', 'test2', 'test3']);
+    });
+  });
+
+  it('does not increment version when setting nested paths', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        meta: {
+          nested: [{ title: 'test1' }, { title: 'test2' }, { title: 'test3' }]
+        }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.nested[2].title = 'two';
+      b.meta.nested[0].title = 'zero';
+      b.meta.nested[1].title = 'sub one';
+
+      yield [a.save(), b.save()];
+      assert.equal(a._doc.__v, 0);
+
+      a = yield BlogPost.findById(a);
+      assert.equal(a.meta.nested[2].title, 'two');
+      assert.equal(a.meta.nested[0].title, 'zero');
     });
   });
 

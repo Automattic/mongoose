@@ -1,3 +1,10 @@
+5.10.16 / 2020-11-25
+====================
+ * fix(connection): copy config options from connection rather than base connection when calling `useDb()` #9569
+ * fix(schema): support `of` for array type definitions to be consistent with maps #9564
+ * docs(dates): fix broken example reference #9557 [kertof](https://github.com/kertof)
+ * docs(virtualtype): remove unintentional h2 tag re: tj/dox#60 #9568
+
 5.10.15 / 2020-11-16
 ====================
  * fix(array): make sure `Array#toObject()` returns a vanilla JavaScript array in Node.js 6+ #9540

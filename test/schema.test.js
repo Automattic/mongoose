@@ -2506,4 +2506,16 @@ describe('schema', function() {
     const casted = schema.path('ids').cast([[]]);
     assert.equal(casted[0].$path(), 'ids.$');
   });
+
+  it('supports `of` for array type definition (gh-9564)', function() {
+    const schema = new Schema({
+      nums: { type: Array, of: Number },
+      tags: { type: 'array', of: String },
+      subdocs: { type: Array, of: Schema({ name: String }) }
+    });
+
+    assert.equal(schema.path('nums').caster.instance, 'Number');
+    assert.equal(schema.path('tags').caster.instance, 'String');
+    assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
+  });
 });

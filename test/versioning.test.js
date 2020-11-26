@@ -137,48 +137,11 @@ describe('versioning', function() {
       });
     }
 
-    function test8(err, a) {
-      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(a.meta.nested.length, 3);
-      assert.equal(a._doc.__v, 8);
-      done();
-    }
-
-    function test7(err, a, b) {
-      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(a.arr.length, 2);
-      assert.equal(a.arr[0][0], 'updated');
-      assert.equal(a.arr[1], 'woot');
-      assert.equal(a._doc.__v, 7);
-      a.meta.nested.$pop();
-      b.meta.nested.$pop();
-      save(a, b, test8);
-    }
-
-    function test6(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a.arr.length, 2);
-      assert.equal(a.arr[0][0], 'updated');
-      assert.equal(a.arr[1], 'using set');
-      assert.equal(a._doc.__v, 6);
-      b.set('arr.0', 'not an array');
-      // should overwrite b's changes, last write wins
-      // force a $set
-      a.arr.pull('using set');
-      a.arr.push('woot', 'woot2');
-      a.arr.$pop();
-      save(a, b, test7);
-    }
-
-    function test5(err, a, b) {
+    function test5(err, a) {
       assert.ifError(err);
       assert.equal(a.arr[0][0], 'updated');
       assert.equal(a._doc.__v, 5);
-      a.set('arr.0', 'not an array');
-      // should overwrite a's changes, last write wins
-      b.arr.pull(10);
-      b.arr.addToSet('using set');
-      save(a, b, test6);
+      done();
     }
 
     function test4(err, a, b) {
@@ -397,6 +360,71 @@ describe('versioning', function() {
           });
         });
       });
+    });
+  });
+
+  it('allows pull/push after $set', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        arr: ['test1', 10]
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.set('arr.0', 'not an array');
+      // should overwrite a's changes, last write wins
+      b.arr.pull(10);
+      b.arr.addToSet('using set');
+
+      yield a.save();
+      yield b.save();
+
+      a = yield BlogPost.findById(a);
+      assert.deepEqual(a.toObject().arr, ['test1', 'using set']);
+    });
+  });
+
+  it('$set after pull/push throws', function() {
+    return co(function*() {
+      const a = new BlogPost({
+        arr: ['test1', 'using set']
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      b.set('arr.0', 'not an array');
+      // force a $set
+      a.arr.pull('using set');
+      a.arr.push('woot', 'woot2');
+      a.arr.$pop();
+
+      yield a.save();
+      const err = yield b.save().then(() => null, err => err);
+
+      assert.ok(/No matching document/.test(err.message), err.message);
+    });
+  });
+
+  it('doesnt persist conflicting changes', function() {
+    return co(function*() {
+      const a = new BlogPost({
+        meta: { nested: [{ title: 'test1' }, { title: 'test2' }] }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.nested.$pop();
+      b.meta.nested.$pop();
+      yield a.save();
+      const err = yield b.save().then(() => null, err => err);
+
+      assert.ok(/No matching document/.test(err.message), err.message);
     });
   });
 

@@ -75,175 +75,6 @@ describe('versioning', function() {
     done();
   });
 
-  it('works', function(done) {
-    const V = BlogPost;
-
-    const doc = new V;
-    doc.title = 'testing versioning';
-    doc.date = new Date;
-    doc.meta.date = new Date;
-    doc.meta.visitors = 34;
-    doc.meta.numbers = [12, 11, 10];
-    doc.meta.nested = [
-      { title: 'does it work?', date: new Date },
-      { title: '1', comments: [{ title: 'this is sub #1' }, { title: 'this is sub #2' }] },
-      { title: '2', comments: [{ title: 'this is sub #3' }, { title: 'this is sub #4' }] },
-      { title: 'hi', date: new Date }
-    ];
-    doc.mixed = { arr: [12, 11, 10] };
-    doc.numbers = [3, 4, 5, 6, 7];
-    doc.comments = [
-      { title: 'comments 0', date: new Date },
-      { title: 'comments 1', comments: [{ title: 'comments.1.comments.1' }, { title: 'comments.1.comments.2' }] },
-      { title: 'coments 2', comments: [{ title: 'comments.2.comments.1' }, { title: 'comments.2.comments.2' }] },
-      { title: 'comments 3', date: new Date }
-    ];
-    doc.arr = [['2d']];
-
-    function save(a, b, cb) {
-      let e;
-      function lookup() {
-        let a1, b1;
-        V.findById(a, function(err, a_) {
-          if (err && !e) {
-            e = err;
-          }
-          a1 = a_;
-          if (a1 && b1) {
-            cb(e, a1, b1);
-          }
-        });
-        V.findById(b, function(err, b_) {
-          if (err && !e) {
-            e = err;
-          }
-          b1 = b_;
-          if (a1 && b1) {
-            cb(e, a1, b1);
-          }
-        });
-      }
-      // make sure that a saves before b
-      a.save(function(err) {
-        if (err) {
-          e = err;
-        }
-        b.save(function(err) {
-          if (err) {
-            e = err;
-          }
-          lookup();
-        });
-      });
-    }
-
-    function test8(err, a) {
-      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(a.meta.nested.length, 3);
-      assert.equal(a._doc.__v, 8);
-      done();
-    }
-
-    function test7(err, a, b) {
-      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
-      assert.equal(a.arr.length, 2);
-      assert.equal(a.arr[0][0], 'updated');
-      assert.equal(a.arr[1], 'woot');
-      assert.equal(a._doc.__v, 7);
-      a.meta.nested.$pop();
-      b.meta.nested.$pop();
-      save(a, b, test8);
-    }
-
-    function test6(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a.arr.length, 2);
-      assert.equal(a.arr[0][0], 'updated');
-      assert.equal(a.arr[1], 'using set');
-      assert.equal(a._doc.__v, 6);
-      b.set('arr.0', 'not an array');
-      // should overwrite b's changes, last write wins
-      // force a $set
-      a.arr.pull('using set');
-      a.arr.push('woot', 'woot2');
-      a.arr.$pop();
-      save(a, b, test7);
-    }
-
-    function test5(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a.arr[0][0], 'updated');
-      assert.equal(a._doc.__v, 5);
-      a.set('arr.0', 'not an array');
-      // should overwrite a's changes, last write wins
-      b.arr.pull(10);
-      b.arr.addToSet('using set');
-      save(a, b, test6);
-    }
-
-    function test4(err, a, b) {
-      assert.ok(/No matching document/.test(err), err);
-      assert.equal(a._doc.__v, 5);
-      assert.equal(err.version, b._doc.__v - 1);
-      assert.deepEqual(err.modifiedPaths, ['numbers', 'numbers.2']);
-      a.set('arr.0.0', 'updated');
-      const d = a.$__delta();
-      assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');
-      assert.ok(!('$inc' in d[1]));
-      save(a, b, test5);
-    }
-
-    function test3(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a.meta.numbers.length, 5);
-      assert.equal(b.meta.numbers.length, 5);
-      assert.equal(-1, a.meta.numbers.indexOf(10));
-      assert.ok(~a.meta.numbers.indexOf(20));
-      assert.equal(a._doc.__v, 4);
-
-      a.numbers.pull(3, 20);
-
-      // should fail
-      b.set('numbers.2', 100);
-      save(a, b, test4);
-    }
-
-    function test2(err, a, b) {
-      assert.ifError(err);
-      assert.equal(a.meta.numbers.length, 5);
-      assert.equal(a._doc.__v, 2);
-      a.meta.numbers.pull(10);
-      b.meta.numbers.push(20);
-      save(a, b, test3);
-    }
-
-    function test1(a, b) {
-      a.meta.numbers.push(9);
-      b.meta.numbers.push(8);
-      save(a, b, test2);
-    }
-
-    doc.save(function(err) {
-      let a, b;
-      assert.ifError(err);
-      // test 2 concurrent ops
-      V.findById(doc, function(err, _a) {
-        assert.ifError(err);
-        a = _a;
-        if (a && b) {
-          test1(a, b);
-        }
-      });
-      V.findById(doc, function(err, _b) {
-        assert.ifError(err);
-        b = _b;
-        if (a && b) {
-          test1(a, b);
-        }
-      });
-    });
-  });
-
   it('versioning without version key', function(done) {
     const V = BlogPost;
 
@@ -397,6 +228,164 @@ describe('versioning', function() {
           });
         });
       });
+    });
+  });
+
+  it('allows concurrent push', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        meta: {
+          numbers: []
+        }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.numbers.push(2);
+      b.meta.numbers.push(4);
+
+      yield a.save();
+      yield b.save();
+
+      a = yield BlogPost.findById(a);
+      assert.deepEqual(a.toObject().meta.numbers, [2, 4]);
+      assert.equal(a._doc.__v, 2);
+    });
+  });
+
+  it('allows concurrent push and pull', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        meta: {
+          numbers: [2, 4, 6, 8]
+        }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.numbers.pull(2);
+      b.meta.numbers.push(10);
+
+      yield [a.save(), b.save()];
+
+      a = yield BlogPost.findById(a);
+      assert.deepEqual(a.toObject().meta.numbers, [4, 6, 8, 10]);
+      assert.equal(a._doc.__v, 2);
+    });
+  });
+
+  it('throws if you set a positional path after pulling', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        meta: {
+          numbers: [2, 4, 6, 8]
+        }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.numbers.pull(4, 6);
+      b.set('meta.numbers.2', 7);
+
+      yield a.save();
+      const err = yield b.save().then(() => null, err => err);
+
+      assert.ok(/No matching document/.test(err.message), err.message);
+      a = yield BlogPost.findById(a);
+      assert.equal(a._doc.__v, 1);
+    });
+  });
+
+  it('allows pull/push after $set', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        arr: ['test1', 10]
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.set('arr.0', 'not an array');
+      // should overwrite a's changes, last write wins
+      b.arr.pull(10);
+      b.arr.addToSet('using set');
+
+      yield a.save();
+      yield b.save();
+
+      a = yield BlogPost.findById(a);
+      assert.deepEqual(a.toObject().arr, ['test1', 'using set']);
+    });
+  });
+
+  it('should add version to where clause', function() {
+    return co(function*() {
+      let a = new BlogPost({
+        arr: [['before update']]
+      });
+      yield a.save();
+
+      assert.equal(a._doc.__v, 0);
+
+      a.set('arr.0.0', 'updated');
+      const d = a.$__delta();
+      assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause');
+      assert.ok(!('$inc' in d[1]));
+
+      yield a.save();
+
+      a = yield BlogPost.findById(a);
+      assert.equal(a.arr[0][0], 'updated');
+      assert.equal(a._doc.__v, 0);
+    });
+  });
+
+  it('$set after pull/push throws', function() {
+    return co(function*() {
+      const a = new BlogPost({
+        arr: ['test1', 'using set']
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      b.set('arr.0', 'not an array');
+      // force a $set
+      a.arr.pull('using set');
+      a.arr.push('woot', 'woot2');
+      a.arr.$pop();
+
+      yield a.save();
+      const err = yield b.save().then(() => null, err => err);
+
+      assert.ok(/No matching document/.test(err.message), err.message);
+    });
+  });
+
+  it('doesnt persist conflicting changes', function() {
+    return co(function*() {
+      const a = new BlogPost({
+        meta: { nested: [{ title: 'test1' }, { title: 'test2' }] }
+      });
+      yield a.save();
+      const b = yield BlogPost.findById(a);
+
+      assert.equal(a._doc.__v, 0);
+
+      a.meta.nested.$pop();
+      b.meta.nested.$pop();
+      yield a.save();
+      const err = yield b.save().then(() => null, err => err);
+
+      assert.ok(/No matching document/.test(err.message), err.message);
     });
   });
 

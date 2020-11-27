@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.10.16: SubDocuments</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.10.16</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/subdocs.pug" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v5.10.17: SubDocuments</title><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png"><link rel="manifest" href="images/favicon/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><span></span></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><div class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="#">Version 5.10.17</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/4.x">Version 4.13.21</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/3.8.x">Version 3.8.40</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api.html">API</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/built-with-mongoose.html" >Built with Mongoose</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/subdocs.pug" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h2 id="subdocuments">Subdocuments</h2>
 <script>
@@ -15,14 +15,14 @@
 means you can nest schemas in other schemas. Mongoose has two
 distinct notions of subdocuments: <a href="https://masteringjs.io/tutorials/mongoose/array#document-arrays">arrays of subdocuments</a> and single nested
 subdocuments.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-string">'string'</span> });
 
 <span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-comment">// Array of subdocuments</span>
-  children: [childSchema],
+  <span class="hljs-attr">children</span>: [childSchema],
   <span class="hljs-comment">// Single nested subdocuments. Caveat: single nested subdocs only work</span>
   <span class="hljs-comment">// in mongoose &gt;= 4.2.0</span>
-  child: childSchema
+  <span class="hljs-attr">child</span>: childSchema
 });</code></pre>
 <p>Aside from code reuse, one important reason to use subdocuments is to create
 a path where there would otherwise not be one to allow for validation over
@@ -46,7 +46,7 @@ difference is that subdocuments are
 not saved individually, they are saved whenever their top-level parent
 document is saved.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> Parent = mongoose.model(<span class="hljs-string">'Parent'</span>, parentSchema);
-<span class="hljs-keyword">const</span> parent = <span class="hljs-keyword">new</span> Parent({ children: [{ name: <span class="hljs-string">'Matt'</span> }, { name: <span class="hljs-string">'Sarah'</span> }] })
+<span class="hljs-keyword">const</span> parent = <span class="hljs-keyword">new</span> Parent({ <span class="hljs-attr">children</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">'Matt'</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">'Sarah'</span> }] })
 parent.children[<span class="hljs-number">0</span>].name = <span class="hljs-string">'Matthew'</span>;
 
 <span class="hljs-comment">// `parent.children[0].save()` is a no-op, it triggers middleware but</span>
@@ -64,7 +64,7 @@ middleware.</p>
   next();
 });
 
-<span class="hljs-keyword">const</span> parent = <span class="hljs-keyword">new</span> Parent({ children: [{ name: <span class="hljs-string">'invalid'</span> }] });
+<span class="hljs-keyword">const</span> parent = <span class="hljs-keyword">new</span> Parent({ <span class="hljs-attr">children</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">'invalid'</span> }] });
 parent.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
   <span class="hljs-built_in">console</span>.log(err.message) <span class="hljs-comment">// #sadpanda</span>
 });</code></pre>
@@ -73,7 +73,7 @@ parent.save(<span class="hljs-function"><span class="hljs-keyword">function</spa
 top-level document&#39;s <code>pre(&#39;validate&#39;)</code> middleware. This is because validating
 before <code>save()</code> is actually a piece of built-in middleware.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Below code will print out 1-4 in order</span>
-<span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> mongoose.Schema({ name: <span class="hljs-string">'string'</span> });
+<span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> mongoose.Schema({ <span class="hljs-attr">name</span>: <span class="hljs-string">'string'</span> });
 
 childSchema.pre(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'2'</span>);
@@ -86,7 +86,7 @@ childSchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-funct
 });
 
 <span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
-  child: childSchema
+  <span class="hljs-attr">child</span>: childSchema
 });
 
 parentSchema.pre(<span class="hljs-string">'validate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
@@ -104,13 +104,13 @@ For example, below are two schemas: one with <code>child</code> as a subdocument
 and one with <code>child</code> as a nested path.</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Subdocument</span>
 <span class="hljs-keyword">const</span> subdocumentSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
-  child: <span class="hljs-keyword">new</span> mongoose.Schema({ name: <span class="hljs-built_in">String</span>, age: <span class="hljs-built_in">Number</span> })
+  <span class="hljs-attr">child</span>: <span class="hljs-keyword">new</span> mongoose.Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-built_in">Number</span> })
 });
 <span class="hljs-keyword">const</span> Subdoc = mongoose.model(<span class="hljs-string">'Subdoc'</span>, subdocumentSchema);
 
 <span class="hljs-comment">// Nested path</span>
 <span class="hljs-keyword">const</span> nestedSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
-  child: { name: <span class="hljs-built_in">String</span>, age: <span class="hljs-built_in">Number</span> }
+  <span class="hljs-attr">child</span>: { <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-built_in">Number</span> }
 });
 <span class="hljs-keyword">const</span> Nested = mongoose.model(<span class="hljs-string">'Nested'</span>, nestedSchema);</code></pre>
 <p>These two schemas look similar, and the documents in MongoDB will
@@ -130,12 +130,12 @@ doc2.child.name = <span class="hljs-string">'test'</span>; <span class="hljs-com
 <p>Secondly, in Mongoose 5, <a href="/docs/api/document.html#document_Document-set"><code>Document#set()</code></a>
 merges when you call it on a nested path, but overwrites when you call
 it on a subdocument.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> doc1 = <span class="hljs-keyword">new</span> Subdoc({ child: { name: <span class="hljs-string">'Luke'</span>, age: <span class="hljs-number">19</span> } });
-doc1.set({ child: { age: <span class="hljs-number">21</span> } });
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> doc1 = <span class="hljs-keyword">new</span> Subdoc({ <span class="hljs-attr">child</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">'Luke'</span>, <span class="hljs-attr">age</span>: <span class="hljs-number">19</span> } });
+doc1.set({ <span class="hljs-attr">child</span>: { <span class="hljs-attr">age</span>: <span class="hljs-number">21</span> } });
 doc1.child; <span class="hljs-comment">// { age: 21 }</span>
 
-<span class="hljs-keyword">const</span> doc2 = <span class="hljs-keyword">new</span> Nested({ child: { name: <span class="hljs-string">'Luke'</span>, age: <span class="hljs-number">19</span> } });
-doc2.set({ child: { age: <span class="hljs-number">21</span> } });
+<span class="hljs-keyword">const</span> doc2 = <span class="hljs-keyword">new</span> Nested({ <span class="hljs-attr">child</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">'Luke'</span>, <span class="hljs-attr">age</span>: <span class="hljs-number">19</span> } });
+doc2.set({ <span class="hljs-attr">child</span>: { <span class="hljs-attr">age</span>: <span class="hljs-number">21</span> } });
 doc2.child; <span class="hljs-comment">// { name: Luke, age: 21 }</span></code></pre>
 <h3 id="finding-a-subdocument">Finding a Subdocument</h3><p>Each subdocument has an <code>_id</code> by default. Mongoose document arrays have a
 special <a href="./api.html#types_documentarray_MongooseDocumentArray-id">id</a> method
@@ -150,7 +150,7 @@ and others cast arguments to their proper types transparently:</p>
 <span class="hljs-keyword">const</span> parent = <span class="hljs-keyword">new</span> Parent;
 
 <span class="hljs-comment">// create a comment</span>
-parent.children.push({ name: <span class="hljs-string">'Liesl'</span> });
+parent.children.push({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Liesl'</span> });
 <span class="hljs-keyword">const</span> subdoc = parent.children[<span class="hljs-number">0</span>];
 <span class="hljs-built_in">console</span>.log(subdoc) <span class="hljs-comment">// { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }</span>
 subdoc.isNew; <span class="hljs-comment">// true</span>
@@ -162,7 +162,7 @@ parent.save(<span class="hljs-function"><span class="hljs-keyword">function</spa
 <p>Subdocs may also be created without adding them to the array by using the
 <a href="./api.html#types_documentarray_MongooseDocumentArray.create">create</a>
 method of MongooseArrays.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> newdoc = parent.children.create({ name: <span class="hljs-string">'Aaron'</span> });</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> newdoc = parent.children.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Aaron'</span> });</code></pre>
 <h3 id="removing-subdocs">Removing Subdocs</h3><p>Each subdocument has it&#39;s own
 <a href="./api.html#types_embedded_EmbeddedDocument-remove">remove</a> method. For
 an array subdocument, this is equivalent to calling <code>.pull()</code> on the
@@ -179,14 +179,14 @@ parent.save(<span class="hljs-function"><span class="hljs-keyword">function</spa
 <h3 id="subdoc-parents">Parents of Subdocs</h3><p>Sometimes, you need to get the parent of a subdoc. You can access the
 parent using the <code>parent()</code> function.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  docArr: [{ name: <span class="hljs-built_in">String</span> }],
-  singleNested: <span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-built_in">String</span> })
+  <span class="hljs-attr">docArr</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> }],
+  <span class="hljs-attr">singleNested</span>: <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-built_in">String</span> })
 });
 <span class="hljs-keyword">const</span> Model = mongoose.model(<span class="hljs-string">'Test'</span>, schema);
 
 <span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Model({
-  docArr: [{ name: <span class="hljs-string">'foo'</span> }],
-  singleNested: { name: <span class="hljs-string">'bar'</span> }
+  <span class="hljs-attr">docArr</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">'foo'</span> }],
+  <span class="hljs-attr">singleNested</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">'bar'</span> }
 });
 
 doc.singleNested.parent() === doc; <span class="hljs-comment">// true</span>
@@ -194,15 +194,15 @@ doc.docArr[<span class="hljs-number">0</span>].parent() === doc; <span class="hl
 <p>If you have a deeply nested subdoc, you can access the top-level document
 using the <code>ownerDocument()</code> function.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  level1: <span class="hljs-keyword">new</span> Schema({
-    level2: <span class="hljs-keyword">new</span> Schema({
-      test: <span class="hljs-built_in">String</span>
+  <span class="hljs-attr">level1</span>: <span class="hljs-keyword">new</span> Schema({
+    <span class="hljs-attr">level2</span>: <span class="hljs-keyword">new</span> Schema({
+      <span class="hljs-attr">test</span>: <span class="hljs-built_in">String</span>
     })
   })
 });
 <span class="hljs-keyword">const</span> Model = mongoose.model(<span class="hljs-string">'Test'</span>, schema);
 
-<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Model({ level1: { level2: <span class="hljs-string">'test'</span> } });
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> Model({ <span class="hljs-attr">level1</span>: { <span class="hljs-attr">level2</span>: <span class="hljs-string">'test'</span> } });
 
 doc.level1.level2.parent() === doc; <span class="hljs-comment">// false</span>
 doc.level1.level2.parent() === doc.level1; <span class="hljs-comment">// true</span>
@@ -210,35 +210,35 @@ doc.level1.level2.ownerDocument() === doc; <span class="hljs-comment">// true</s
 <h4 id="altsyntaxarrays">Alternate declaration syntax for arrays</h4><p>If you create a schema with an array of objects, Mongoose will automatically
 convert the object to a schema for you:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({
-  children: [{ name: <span class="hljs-string">'string'</span> }]
+  <span class="hljs-attr">children</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">'string'</span> }]
 });
 <span class="hljs-comment">// Equivalent</span>
 <span class="hljs-keyword">const</span> parentSchema = <span class="hljs-keyword">new</span> Schema({
-  children: [<span class="hljs-keyword">new</span> Schema({ name: <span class="hljs-string">'string'</span> })]
+  <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">name</span>: <span class="hljs-string">'string'</span> })]
 });</code></pre>
 <h4 id="altsyntaxsingle">Alternate declaration syntax for single nested subdocuments</h4><p>Unlike document arrays, Mongoose 5 does not convert an objects in schemas
 into nested schemas. In the below example, <code>nested</code> is a <em>nested path</em>
 rather than a subdocument.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  nested: {
-    prop: <span class="hljs-built_in">String</span>
+  <span class="hljs-attr">nested</span>: {
+    <span class="hljs-attr">prop</span>: <span class="hljs-built_in">String</span>
   }
 });</code></pre>
 <p>This leads to some surprising behavior when you attempt to define a
 nested path with validators or getters/setters.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  nested: {
+  <span class="hljs-attr">nested</span>: {
     <span class="hljs-comment">// Do not do this! This makes `nested` a mixed path in Mongoose 5</span>
-    type: { prop: <span class="hljs-built_in">String</span> },
-    required: <span class="hljs-literal">true</span>
+    <span class="hljs-attr">type</span>: { <span class="hljs-attr">prop</span>: <span class="hljs-built_in">String</span> },
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
   }
 });
 
 <span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  nested: {
+  <span class="hljs-attr">nested</span>: {
     <span class="hljs-comment">// This works correctly</span>
-    type: <span class="hljs-keyword">new</span> Schema({ prop: <span class="hljs-built_in">String</span> }),
-    required: <span class="hljs-literal">true</span>
+    <span class="hljs-attr">type</span>: <span class="hljs-keyword">new</span> Schema({ <span class="hljs-attr">prop</span>: <span class="hljs-built_in">String</span> }),
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
   }
 });</code></pre>
 <p>Surprisingly, declaring <code>nested</code> with an object <code>type</code> makes <code>nested</code>
@@ -247,13 +247,13 @@ make Mongoose automatically convert <code>type: { prop: String }</code> into
 <code>type: new Schema({ prop: String })</code>, set the <code>typePojoToMixed</code> option
 to <code>false</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
-  nested: {
+  <span class="hljs-attr">nested</span>: {
     <span class="hljs-comment">// Because of `typePojoToMixed`, Mongoose knows to</span>
     <span class="hljs-comment">// wrap `{ prop: String }` in a `new Schema()`.</span>
-    type: { prop: <span class="hljs-built_in">String</span> },
-    required: <span class="hljs-literal">true</span>
+    <span class="hljs-attr">type</span>: { <span class="hljs-attr">prop</span>: <span class="hljs-built_in">String</span> },
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
   }
-}, { typePojoToMixed: <span class="hljs-literal">false</span> });</code></pre>
+}, { <span class="hljs-attr">typePojoToMixed</span>: <span class="hljs-literal">false</span> });</code></pre>
 <h3 id="next">Next Up</h3><p>Now that we&#39;ve covered Subdocuments, let&#39;s take a look at
 <a href="./queries.html">querying</a>.</p>
 </div></div><script type="text/javascript">var xhr = new XMLHttpRequest();

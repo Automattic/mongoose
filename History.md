@@ -1,3 +1,7 @@
+5.10.17 / 2020-11-27
+====================
+ * fix(document): allow setting fields after an undefined field #9587 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.10.16 / 2020-11-25
 ====================
  * fix(connection): copy config options from connection rather than base connection when calling `useDb()` #9569

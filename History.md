@@ -1,3 +1,7 @@
+5.10.18 / 2020-11-29
+====================
+ * fix(connection): connect and disconnect can be used destructured #9598 #9597 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 5.10.17 / 2020-11-27
 ====================
  * fix(document): allow setting fields after an undefined field #9587 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

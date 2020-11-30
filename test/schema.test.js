@@ -2554,7 +2554,7 @@ describe('schema', function() {
       assert.throws(() => schema.path('myId').cast('bad'), /Cast to ObjectId failed/);
     });
   });
-  
+
   it('supports `of` for array type definition (gh-9564)', function() {
     const schema = new Schema({
       nums: { type: Array, of: Number },

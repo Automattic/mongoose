@@ -1246,6 +1246,8 @@ describe('connections:', function() {
       const connect = m.connect;
       const disconnect = m.disconnect;
 
+      yield disconnect();
+
       const errorOnConnect = yield connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
       assert.ifError(errorOnConnect);
 

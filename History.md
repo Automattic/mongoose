@@ -1,3 +1,9 @@
+5.10.19 / 2020-11-30
+====================
+ * fix(query): support passing an array to `$type` in query filters #9577
+ * perf(schema): avoid creating unnecessary objects when casting to array #9588
+ * docs: make example gender neutral #9601 [rehatkathuria](https://github.com/rehatkathuria)
+
 5.10.18 / 2020-11-29
 ====================
  * fix(connection): connect and disconnect can be used destructured #9598 #9597 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

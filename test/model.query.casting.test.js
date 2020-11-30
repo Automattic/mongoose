@@ -204,17 +204,24 @@ describe('model query casting', function() {
     });
   });
 
-  it('works with $type matching', function(done) {
+  it('works with $type matching', function() {
     const B = BlogPostB;
 
-    B.find({ title: { $type: { x: 1 } } }, function(err) {
-      assert.equal(err.message, '$type parameter must be number or string');
+    return co(function*() {
+      yield B.deleteMany({});
 
-      B.find({ title: { $type: 2 } }, function(err, posts) {
-        assert.ifError(err);
-        assert.strictEqual(Array.isArray(posts), true);
-        done();
-      });
+      yield B.collection.insertMany([{ title: 'test' }, { title: 1 }]);
+
+      const err = yield B.find({ title: { $type: { x: 1 } } }).then(() => null, err => err);
+      assert.equal(err.message,
+        '$type parameter must be number, string, or array of numbers and strings');
+
+      let posts = yield B.find({ title: { $type: 2 } });
+      assert.equal(posts.length, 1);
+      assert.equal(posts[0].title, 'test');
+
+      posts = yield B.find({ title: { $type: ['string', 'number'] } });
+      assert.equal(posts.length, 2);
     });
   });
 

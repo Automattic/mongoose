@@ -9754,4 +9754,17 @@ describe('document', function() {
       assert.strictEqual(objB.prop.prop, 1);
     });
   });
+
+  it('sets fields after an undefined field (gh-9585)', function() {
+    const personSchema = new Schema({
+      items: { type: Array },
+      email: { type: String }
+    });
+
+    const Person = db.model('Person', personSchema);
+
+
+    const person = new Person({ items: undefined, email: 'test@gmail.com' });
+    assert.equal(person.email, 'test@gmail.com');
+  });
 });

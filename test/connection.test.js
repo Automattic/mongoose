@@ -1266,4 +1266,20 @@ describe('connections:', function() {
     m.set('overwriteModels', false);
     assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
   });
+
+  it('can use destructured `connect` and `disconnect` (gh-9597)', function() {
+    return co(function* () {
+      const m = new mongoose.Mongoose;
+      const connect = m.connect;
+      const disconnect = m.disconnect;
+
+      yield disconnect();
+
+      const errorOnConnect = yield connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
+      assert.ifError(errorOnConnect);
+
+      const errorOnDisconnect = yield disconnect().then(() => null, err => err);
+      assert.ifError(errorOnDisconnect);
+    });
+  });
 });

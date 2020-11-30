@@ -1,3 +1,24 @@
+5.10.19 / 2020-11-30
+====================
+ * fix(query): support passing an array to `$type` in query filters #9577
+ * perf(schema): avoid creating unnecessary objects when casting to array #9588
+ * docs: make example gender neutral #9601 [rehatkathuria](https://github.com/rehatkathuria)
+
+5.10.18 / 2020-11-29
+====================
+ * fix(connection): connect and disconnect can be used destructured #9598 #9597 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+5.10.17 / 2020-11-27
+====================
+ * fix(document): allow setting fields after an undefined field #9587 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+5.10.16 / 2020-11-25
+====================
+ * fix(connection): copy config options from connection rather than base connection when calling `useDb()` #9569
+ * fix(schema): support `of` for array type definitions to be consistent with maps #9564
+ * docs(dates): fix broken example reference #9557 [kertof](https://github.com/kertof)
+ * docs(virtualtype): remove unintentional h2 tag re: tj/dox#60 #9568
+
 5.10.15 / 2020-11-16
 ====================
  * fix(array): make sure `Array#toObject()` returns a vanilla JavaScript array in Node.js 6+ #9540

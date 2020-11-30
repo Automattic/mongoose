@@ -256,6 +256,7 @@ describe('document.populate', function() {
         assert.ok(!post.fans[0].email);
         assert.ok(!post.fans[1].email);
         assert.ok(!post.fans[0].isInit('email'));
+        assert.ok(!post.fans[0].isInit(['email']));
         assert.ok(!post.fans[1].isInit('email'));
         done();
       });

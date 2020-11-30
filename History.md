@@ -1,3 +1,25 @@
+5.11.0 / 2020-11-30
+===================
+ * feat: add official TypeScript definitions `index.d.ts` file #8108
+ * feat(connection): add bufferTimeoutMS option that configures how long Mongoose will allow commands to buffer #9469
+ * feat(populate): support populate virtuals with `localField` and `foreignField` as arrays #6608
+ * feat(populate+virtual): feat: support getters on populate virtuals, including `get` option for `Schema#virtual()` #9343
+ * feat(populate+schema): add support for `populate` schematype option that sets default populate options #6029
+ * feat(QueryCursor): execute post find hooks for each doc in query cursor #9345
+ * feat(schema): support overwriting cast logic for individual schematype instances #8407
+ * feat(QueryCursor): make cursor `populate()` in batch when using `batchSize` #9366 [biomorgoth](https://github.com/biomorgoth)
+ * chore: remove changelog from published bundle #9404
+ * feat(model+mongoose): add `overwriteModels` option to bypass `OverwriteModelError` globally #9406
+ * feat(model+query): allow defining middleware for all query methods or all document methods, but not other middleware types #9190
+ * feat(document+model): make change tracking skip saving if new value matches last saved value #9396
+ * perf(utils): major speedup for `deepEqual()` on documents and arrays #9396
+ * feat(schema): support passing a TypeScript enum to `enum` validator in schema #9547 #9546 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(debug): #8963 `shell` option for date format (ISODate) #9532 [FlameFractal](https://github.com/FlameFractal)
+ * feat(document): support square bracket indexing for `get()`, `set()` #9375
+ * feat(document): support array and space-delimited syntax for `Document#$isValid()`, `isDirectSelected()`, `isSelected()`, `$isDefault()` #9474
+ * feat(string): make `minLength` and `maxLength` behave the same as `minlength` and `maxlength` #8777 [m-weeks](https://github.com/m-weeks)
+ * feat(document): add `$parent()` as an alias for `parent()` for documents and subdocuments to avoid path name conflicts #9455
+
 5.10.19 / 2020-11-30
 ====================
  * fix(query): support passing an array to `$type` in query filters #9577

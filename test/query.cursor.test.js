@@ -108,7 +108,7 @@ describe('QueryCursor', function() {
       });
     });
 
-    it('with populate', function(done) {
+    describe('with populate', function() {
       const bandSchema = new Schema({
         name: String,
         members: [{ type: mongoose.Schema.ObjectId, ref: 'Person' }]
@@ -117,37 +117,118 @@ describe('QueryCursor', function() {
         name: String
       });
 
-      const Person = db.model('Person', personSchema);
-      const Band = db.model('Band', bandSchema);
+      let Band;
 
-      const people = [
-        { name: 'Axl Rose' },
-        { name: 'Slash' },
-        { name: 'Nikki Sixx' },
-        { name: 'Vince Neil' }
-      ];
-      Person.create(people, function(error, docs) {
-        assert.ifError(error);
-        const bands = [
-          { name: 'Guns N\' Roses', members: [docs[0], docs[1]] },
-          { name: 'Motley Crue', members: [docs[2], docs[3]] }
+      beforeEach(function(done) {
+        const Person = db.model('Person', personSchema);
+        Band = db.model('Band', bandSchema);
+
+        const people = [
+          { name: 'Axl Rose' },
+          { name: 'Slash' },
+          { name: 'Nikki Sixx' },
+          { name: 'Vince Neil' },
+          { name: 'Trent Reznor' },
+          { name: 'Thom Yorke' },
+          { name: 'Billy Corgan' }
         ];
-        Band.create(bands, function(error) {
+        Person.create(people, function(error, docs) {
           assert.ifError(error);
-          const cursor =
-            Band.find().sort({ name: 1 }).populate('members').cursor();
+          const bands = [
+            { name: 'Guns N\' Roses', members: [docs[0], docs[1]] },
+            { name: 'Motley Crue', members: [docs[2], docs[3]] },
+            { name: 'Nine Inch Nails', members: [docs[4]] },
+            { name: 'Radiohead', members: [docs[5]] },
+            { name: 'The Smashing Pumpkins', members: [docs[6]] }
+          ];
+          Band.create(bands, function(error) {
+            assert.ifError(error);
+            done();
+          });
+        });
+      });
+
+      it('with populate without specify batchSize', function(done) {
+        const cursor =
+          Band.find().sort({ name: 1 }).populate('members').cursor();
+        cursor.next(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(cursor.cursor.cursorState.currentLimit, 1);
+          assert.equal(doc.name, 'Guns N\' Roses');
+          assert.equal(doc.members.length, 2);
+          assert.equal(doc.members[0].name, 'Axl Rose');
+          assert.equal(doc.members[1].name, 'Slash');
           cursor.next(function(error, doc) {
             assert.ifError(error);
-            assert.equal(doc.name, 'Guns N\' Roses');
+            assert.equal(cursor.cursor.cursorState.currentLimit, 2);
+            assert.equal(doc.name, 'Motley Crue');
             assert.equal(doc.members.length, 2);
-            assert.equal(doc.members[0].name, 'Axl Rose');
-            assert.equal(doc.members[1].name, 'Slash');
+            assert.equal(doc.members[0].name, 'Nikki Sixx');
+            assert.equal(doc.members[1].name, 'Vince Neil');
             cursor.next(function(error, doc) {
-              assert.equal(doc.name, 'Motley Crue');
-              assert.equal(doc.members.length, 2);
-              assert.equal(doc.members[0].name, 'Nikki Sixx');
-              assert.equal(doc.members[1].name, 'Vince Neil');
-              done();
+              assert.ifError(error);
+              assert.equal(cursor.cursor.cursorState.currentLimit, 3);
+              assert.equal(doc.name, 'Nine Inch Nails');
+              assert.equal(doc.members.length, 1);
+              assert.equal(doc.members[0].name, 'Trent Reznor');
+              cursor.next(function(error, doc) {
+                assert.ifError(error);
+                assert.equal(cursor.cursor.cursorState.currentLimit, 4);
+                assert.equal(doc.name, 'Radiohead');
+                assert.equal(doc.members.length, 1);
+                assert.equal(doc.members[0].name, 'Thom Yorke');
+                cursor.next(function(error, doc) {
+                  assert.ifError(error);
+                  assert.equal(cursor.cursor.cursorState.currentLimit, 5);
+                  assert.equal(doc.name, 'The Smashing Pumpkins');
+                  assert.equal(doc.members.length, 1);
+                  assert.equal(doc.members[0].name, 'Billy Corgan');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+
+      it('with populate using custom batchSize', function(done) {
+        const cursor =
+          Band.find().sort({ name: 1 }).populate('members').batchSize(3).cursor();
+        cursor.next(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(cursor.cursor.cursorState.currentLimit, 3);
+          assert.equal(doc.name, 'Guns N\' Roses');
+          assert.equal(doc.members.length, 2);
+          assert.equal(doc.members[0].name, 'Axl Rose');
+          assert.equal(doc.members[1].name, 'Slash');
+          cursor.next(function(error, doc) {
+            assert.ifError(error);
+            assert.equal(cursor.cursor.cursorState.currentLimit, 3);
+            assert.equal(doc.name, 'Motley Crue');
+            assert.equal(doc.members.length, 2);
+            assert.equal(doc.members[0].name, 'Nikki Sixx');
+            assert.equal(doc.members[1].name, 'Vince Neil');
+            cursor.next(function(error, doc) {
+              assert.ifError(error);
+              assert.equal(cursor.cursor.cursorState.currentLimit, 3);
+              assert.equal(doc.name, 'Nine Inch Nails');
+              assert.equal(doc.members.length, 1);
+              assert.equal(doc.members[0].name, 'Trent Reznor');
+              cursor.next(function(error, doc) {
+                assert.ifError(error);
+                assert.equal(cursor.cursor.cursorState.currentLimit, 5);
+                assert.equal(doc.name, 'Radiohead');
+                assert.equal(doc.members.length, 1);
+                assert.equal(doc.members[0].name, 'Thom Yorke');
+                cursor.next(function(error, doc) {
+                  assert.ifError(error);
+                  assert.equal(cursor.cursor.cursorState.currentLimit, 5);
+                  assert.equal(doc.name, 'The Smashing Pumpkins');
+                  assert.equal(doc.members.length, 1);
+                  assert.equal(doc.members[0].name, 'Billy Corgan');
+                  done();
+                });
+              });
             });
           });
         });
@@ -606,6 +687,28 @@ describe('QueryCursor', function() {
       ];
 
       assert.deepEqual(docsWithIndexes, expected);
+    });
+  });
+
+  it('post hooks (gh-9435)', function() {
+    const schema = new mongoose.Schema({ name: String });
+    schema.post('find', function(doc) {
+      doc.name = doc.name.toUpperCase();
+    });
+    const Movie = db.model('Movie', schema);
+
+    return co(function*() {
+      yield Movie.deleteMany({});
+      yield Movie.create([
+        { name: 'Kickboxer' },
+        { name: 'Ip Man' },
+        { name: 'Enter the Dragon' }
+      ]);
+
+      const arr = [];
+      yield Movie.find().sort({ name: -1 }).cursor().
+        eachAsync(doc => arr.push(doc.name));
+      assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
     });
   });
 });

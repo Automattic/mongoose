@@ -288,19 +288,25 @@ block content
     * `trim`: boolean, whether to always call `.trim()` on the value
     * `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
     * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
-    * `minlength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
-    * `maxlength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
+    * `minLength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
+    * `maxLength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
+    * `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
 
     <h5 id="number-validators">Number</h5>
 
     * `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
     * `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
     * `enum`: Array, creates a [validator](./validation.html) that checks if the value is strictly equal to one of the values in the given array.
+    * `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
 
     <h5>Date</h5>
 
     * `min`: Date
     * `max`: Date
+
+    <h5>ObjectId</h5>
+
+    * `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
 
     <h3 id="usage-notes"><a href="#usage-notes">Usage Notes</a></h3>
 

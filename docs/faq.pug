@@ -300,6 +300,9 @@ block content
     
     // disable colors in debug mode
     mongoose.set('debug', { color: false })
+
+    // get mongodb-shell friendly output (ISODate)
+    mongoose.set('debug', { shell: true })
     ```
 
     All executed collection methods will log output of their arguments to your
@@ -311,26 +314,26 @@ block content
     <a href="#callback_never_executes">**Q**</a>. My `save()` callback never executes. What am I doing wrong?
 
     **A**. All `collection` actions (insert, remove, queries, etc.) are queued
-    until the `connection` opens. It is likely that an error occurred while
-    attempting to connect. Try adding an error handler to your connection.
+    until Mongoose successfully connects to MongoDB. It is likely you haven't called Mongoose's
+    `connect()` or `createConnection()` function yet.
 
-    ```javascript
-    // if connecting on the default mongoose connection
-    mongoose.connect(..);
-    mongoose.connection.on('error', handleError);
+    In Mongoose 5.11, there is a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
+    Mongoose will allow an operation to stay buffered before throwing an error.
 
-    // if connecting on a separate connection
-    const conn = mongoose.createConnection(..);
-    conn.on('error', handleError);
-    ```
-
-    If you want to opt out of mongoose's buffering mechanism across your entire
+    If you want to opt out of Mongoose's buffering mechanism across your entire
     application, set the global `bufferCommands` option to false:
 
     ```javascript
     mongoose.set('bufferCommands', false);
     ```
 
+    Instead of opting out of Mongoose's buffering mechanism, you may want to instead reduce `bufferTimeoutMS`
+    to make Mongoose only buffer for a short time.
+
+    ```javascript
+    // If an operation is buffered for more than 500ms, throw an error.
+    mongoose.set('bufferTimeoutMS', 500);
+    ```
 
     <hr id="creating_connections" />
 

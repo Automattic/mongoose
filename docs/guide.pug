@@ -421,6 +421,7 @@ block content
     - [bufferTimeoutMS](#bufferTimeoutMS)
     - [capped](#capped)
     - [collection](#collection)
+    - [discriminatorKey](#discriminatorKey)
     - [id](#id)
     - [_id](#_id)
     - [minimize](#minimize)
@@ -543,6 +544,25 @@ block content
 
     ```javascript
     const dataSchema = new Schema({..}, { collection: 'data' });
+    ```
+
+    <h3 id="discriminatorKey"><a href="#discriminatorKey">option: discriminatorKey</a></h3>
+
+    When you define a [discriminator](/docs/discriminators.html), Mongoose adds a path to your
+    schema that stores which discriminator a document is an instance of. By default, Mongoose
+    adds an `__t` path, but you can set `discriminatorKey` to overwrite this default.
+
+    ```javascript
+    const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+    const BaseModel = mongoose.model('Test', baseSchema);
+
+    const personSchema = new Schema({ name: String });
+    const PersonModel = BaseModel.discriminator('Person', personSchema);
+
+    const doc = new PersonModel({ name: 'James T. Kirk' });
+    // Without `discriminatorKey`, Mongoose would store the discriminator
+    // key in `__t` instead of `type`
+    doc.type; // 'Person'
     ```
 
     <h3 id="id"><a href="#id">option: id</a></h3>

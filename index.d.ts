@@ -56,7 +56,7 @@ declare module "mongoose" {
   export var connections: Connection[];
 
   /** Creates a Connection instance. */
-  export function createConnection(uri: string, options?: ConnectOptions): Promise<Connection>;
+  export function createConnection(uri: string, options?: ConnectOptions): Connection & Promise<Connection>;
   export function createConnection(): Connection;
   export function createConnection(uri: string, options: ConnectOptions, callback: (err: CallbackError, conn: Connection) => void): void;
 

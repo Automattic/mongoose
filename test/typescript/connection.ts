@@ -9,3 +9,5 @@ conn.openUri('mongodb://localhost:27017/test').then(() => console.log('Connected
 createConnection('mongodb://localhost:27017/test', { useNewUrlParser: true }).then((conn: Connection) => {
   conn.host;
 });
+
+createConnection('mongodb://localhost:27017/test').close();

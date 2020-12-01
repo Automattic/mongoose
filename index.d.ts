@@ -1720,7 +1720,7 @@ declare module "mongoose" {
   } &
     mongodb.RootQuerySelector<T>;
   
-  export type UpdateQuery<T> = mongodb.UpdateQuery<T> & mongodb.MatchKeysAndValues<T>;
+  export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 
   export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>;
 

@@ -140,6 +140,14 @@ describe('typescript syntax', function() {
     assert.equal(errors.length, 1);
     assert.ok(errors[0].messageText.includes('Property \'create\' does not exist'), errors[0].messageText);
   });
+
+  it('objectid', function() {
+    const errors = runTest('objectid.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

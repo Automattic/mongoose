@@ -5,6 +5,7 @@ const schema: Schema = new Schema({ name: { type: 'String' } });
 interface ITest extends Document {
   _id?: Types.ObjectId,
   name?: string;
+  age?: number;
 }
 
 const Test = model<ITest>('Test', schema);
@@ -22,5 +23,7 @@ Test.distinct('name').exec().then((res: Array<any>) => console.log(res[0]));
 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));
+Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: ITest | null) => console.log(res));
+Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));

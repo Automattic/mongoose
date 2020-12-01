@@ -1,3 +1,10 @@
+5.11.1 / 2020-12-01
+===================
+ * fix(index.d.ts): add missing SchemaOptions #9606
+ * fix(index.d.ts): allow using `$set` in updates #9609
+ * fix(index.d.ts): add support for using return value of `createConnection()` as a connection as well as a promise #9612 #9610 [alecgibson](https://github.com/alecgibson)
+ * fix(index.d.ts): allow using `Types.ObjectId()` without `new` in TypeScript #9608
+
 5.11.0 / 2020-11-30
 ===================
  * feat: add official TypeScript definitions `index.d.ts` file #8108

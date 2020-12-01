@@ -1302,9 +1302,20 @@ declare module "mongoose" {
       toObject(options: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
-    class ObjectId extends mongodb.ObjectID {
+    var ObjectId: ObjectIdConstructor;
+
+    class _ObjectId extends mongodb.ObjectID {
       _id?: ObjectId;
     }
+
+    // Expose static methods of `mongodb.ObjectID` and allow calling without `new`
+    type ObjectIdConstructor = typeof _ObjectId & {
+      (val?: string | number): ObjectId;
+    };
+
+    // var objectId: mongoose.Types.ObjectId should reference mongodb.ObjectID not
+    //   the ObjectIdConstructor, so we add the interface below
+    interface ObjectId extends mongodb.ObjectID {}
 
     class Subdocument extends Document {
       $isSingleNested: true;

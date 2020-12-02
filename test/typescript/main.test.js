@@ -2,12 +2,7 @@
 
 const assert = require('assert');
 const typescript = require('typescript');
-
-const tsconfig = {
-  allowSyntheticDefaultImports: true,
-  esModuleInterop: true,
-  outDir: `${__dirname}/dist`
-};
+const tsconfig = require('./tsconfig.json');
 
 describe('typescript syntax', function() {
   this.timeout(5000);

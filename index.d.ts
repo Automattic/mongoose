@@ -70,6 +70,9 @@ declare module "mongoose" {
   export function disconnect(): Promise<void>;
   export function disconnect(cb: (err: CallbackError) => void): void;
 
+  /** Gets mongoose options */
+  export function get(key: string): any;
+
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
@@ -96,6 +99,9 @@ declare module "mongoose" {
 
   /** Getter/setter around function for pluralizing collection names. */
   export function pluralize(fn?: (str: string) => string): (str: string) => string;
+
+  /** Sets mongoose options */
+  export function set(key: string, value: any): void;
 
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)

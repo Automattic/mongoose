@@ -1,3 +1,12 @@
+5.11.2 / 2020-12-02
+===================
+ * fix(index.d.ts): add missing query options and model `findById()` function #9626 #9620
+ * fix(index.d.ts): support defining schema paths as arrays of functions #9617
+ * fix(index.d.ts): add automatic `_id` for Document, support creating Mongoose globals and accessing collection name #9618
+ * fix(index.d.ts): add missing global `get()` and `set()` #9616
+ * fix(index.d.ts): add missing `new` and `returnOriginal` options to QueryOptions, add missing model static properties #9627 #9616 #9615
+ * fix(index.d.ts): allow `useCreateIndex` in connection options #9621
+
 5.11.1 / 2020-12-01
 ===================
  * fix(index.d.ts): add missing SchemaOptions #9606

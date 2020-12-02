@@ -1,10 +1,13 @@
 import { Schema, model, Document } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' } },
-  { collection: 'mytest', versionKey: '_version' });
+const schema: Schema = new Schema({
+  name: { type: 'String' },
+  tags: [String]
+}, { collection: 'mytest', versionKey: '_version' });
 
 interface ITest extends Document {
   name?: string;
+  tags?: string[];
 }
 
 const Test = model<ITest>('Test', schema);

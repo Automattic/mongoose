@@ -24,6 +24,12 @@ declare module "mongoose" {
   export type Mixed = Schema.Types.Mixed;
 
   /**
+   * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
+   * class. Most apps will only use this one instance.
+   */
+  export var Mongoose: new (options?: object | null) => typeof mongoose;
+
+  /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that Mongoose should cast to numbers.
    */
@@ -70,6 +76,9 @@ declare module "mongoose" {
   export function disconnect(): Promise<void>;
   export function disconnect(cb: (err: CallbackError) => void): void;
 
+  /** Gets mongoose options */
+  export function get(key: string): any;
+
   /**
    * Returns true if Mongoose can cast the given value to an ObjectId, or
    * false otherwise.
@@ -97,6 +106,9 @@ declare module "mongoose" {
   /** Getter/setter around function for pluralizing collection names. */
   export function pluralize(fn?: (str: string) => string): (str: string) => string;
 
+  /** Sets mongoose options */
+  export function set(key: string, value: any): void;
+
   /**
    * _Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
    * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
@@ -111,6 +123,8 @@ declare module "mongoose" {
   export type CastError = Error.CastError;
 
   type Mongoose = typeof mongoose;
+
+  interface ClientSession extends mongodb.ClientSession {}
 
   interface ConnectOptions extends mongodb.MongoClientOptions {
     /** Set to false to [disable buffering](http://mongoosejs.com/docs/faq.html#callback_never_executes) on all models associated with this connection. */
@@ -127,6 +141,8 @@ declare module "mongoose" {
     useFindAndModify?: boolean;
     /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
+    /** False by default. If `true`, this connection will use `createIndex()` instead of `ensureIndex()` for automatic index builds via `Model.init()`. */
+    useCreateIndex?: boolean;
   }
 
   class Connection extends events.EventEmitter {
@@ -277,7 +293,9 @@ declare module "mongoose" {
     watch(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
   }
 
-  class Collection {}
+  class Collection {
+    name: string;
+  }
 
   class Document {
     constructor(doc?: any);
@@ -415,11 +433,11 @@ declare module "mongoose" {
      */
     isModified(path?: string | Array<string>): boolean;
 
-    /** Checks if `path` was selected in the source query which initialized this document. */
-    isSelected(path: string): boolean;
-
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
+
+    /** Checks if `path` was selected in the source query which initialized this document. */
+    isSelected(path: string): boolean;
 
     /** Marks the path as having pending changes to write to the db. */
     markModified(path: string, scope?: any): void;
@@ -466,6 +484,9 @@ declare module "mongoose" {
     save(options?: SaveOptions, fn?: (err: CallbackError, doc: this) => void): void;
     save(fn?: (err: CallbackError, doc: this) => void): void;
 
+    /** The document's schema. */
+    schema: Schema;
+
     /** Sets the value of a path, or many paths. */
     set(path: string, val: any, options?: any): this;
     set(path: string, val: any, type: any, options?: any): this;
@@ -494,9 +515,6 @@ declare module "mongoose" {
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
-
-    /** The documents schema. */
-    schema: Schema;
   }
 
   export var Model: Model<any>;
@@ -524,6 +542,9 @@ declare module "mongoose" {
      */
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
+
+    /** Collection the model uses. */
+    collection: Collection;
 
     /** Creates a `count` query: counts the number of documents that match `filter`. */
     count(callback?: (err: any, count: number) => void): Query<number, T>;
@@ -555,6 +576,23 @@ declare module "mongoose" {
     createIndexes(options: any): Promise<void>;
     createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
 
+    /** Connection the model uses. */
+    db: Connection;
+
+    /**
+     * Deletes all of the documents that match `conditions` from the collection.
+     * Behaves like `remove()`, but deletes all documents that match `conditions`
+     * regardless of the `single` option.
+     */
+    deleteMany(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+
+    /**
+     * Deletes the first document that matches `conditions` from the collection.
+     * Behaves like `remove()`, but deletes at most one document regardless of the
+     * `single` option.
+     */
+    deleteOne(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
@@ -567,6 +605,13 @@ declare module "mongoose" {
      * handling.
      */
     events: NodeJS.EventEmitter;
+
+    /**
+     * Finds a single document by its _id field. `findById(id)` is almost*
+     * equivalent to `findOne({ _id: id })`. If you want to query by a document's
+     * `_id`, use `findById()` instead of `findOne()`.
+     */
+    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
 
     /** Finds one document. */
     findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
@@ -692,6 +737,9 @@ declare module "mongoose" {
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
 
+    /** Schema the model uses. */
+    schema: Schema;
+
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
@@ -709,32 +757,62 @@ declare module "mongoose" {
   }
 
   interface QueryOptions {
-    tailable?: number;
-    sort?: any;
-    limit?: number;
-    skip?: number;
-    maxscan?: number;
+    arrayFilters?: { [key: string]: any }[];
     batchSize?: number;
+    collation?: mongodb.CollationDocument;
     comment?: any;
-    snapshot?: any;
-    readPreference?: mongodb.ReadPreferenceMode;
+    context?: string;
+    explain?: any;
+    fields?: any | string;
     hint?: any;
-    upsert?: boolean;
-    writeConcern?: any;
-    timestamps?: boolean;
-    omitUndefined?: boolean;
-    overwriteDiscriminatorKey?: boolean;
+    /**
+     * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
+     */
     lean?: boolean | any;
+    limit?: number;
+    maxTimeMS?: number;
+    maxscan?: number;
+    multi?: boolean;
+    multipleCastError?: boolean;
+    /**
+     * By default, `findOneAndUpdate()` returns the document as it was **before**
+     * `update` was applied. If you set `new: true`, `findOneAndUpdate()` will
+     * instead give you the object after `update` was applied.
+     */
+    new?: boolean;
+    omitUndefined?: boolean;
+    overwrite?: boolean;
+    overwriteDiscriminatorKey?: boolean;
     populate?: string;
     projection?: any;
-    maxTimeMS?: number;
-    useFindAndModify?: boolean;
+    /**
+     * if true, returns the raw result from the MongoDB driver
+     */
     rawResult?: boolean;
-    collation?: mongodb.CollationDocument;
+    readPreference?: mongodb.ReadPreferenceMode;
+    /**
+     * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
+     */
+    returnOriginal?: boolean;
+    runValidators?: boolean;
+    /** The session associated with this query. */
     session?: mongodb.ClientSession;
-    explain?: any;
-    multi?: boolean;
+    setDefaultsOnInsert?: boolean;
+    skip?: number;
+    snapshot?: any;
+    sort?: any;
+    /** overwrites the schema's strict mode option */
     strict?: boolean | string;
+    tailable?: number;
+    /**
+     * If set to `false` and schema-level timestamps are enabled,
+     * skip timestamps for this update. Note that this allows you to overwrite
+     * timestamps. Does nothing if schema-level timestamps are not set.
+     */
+    timestamps?: boolean;
+    upsert?: boolean;
+    useFindAndModify?: boolean;
+    writeConcern?: any;
   }
 
   interface SaveOptions {
@@ -904,6 +982,12 @@ declare module "mongoose" {
     method(name: string, fn: Function, opts?: any): this;
     method(methods: any): this;
 
+    /** Object of currently defined methods on this schema. */
+    methods: any;
+
+    /** The original object passed to the schema constructor */
+    obj: any;
+
     /** Gets/sets schema paths. */
     path(path: string): SchemaType;
     path(path: string, constructor: any): this;
@@ -931,6 +1015,9 @@ declare module "mongoose" {
     pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
+    /** Object of currently defined query helpers on this schema. */
+    query: any;
+
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
 
@@ -946,6 +1033,9 @@ declare module "mongoose" {
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: Function): this;
 
+    /** Object of currently defined statics on this schema. */
+    statics: any;
+
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;
 
@@ -954,7 +1044,7 @@ declare module "mongoose" {
   }
 
   interface SchemaDefinition {
-    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Array<Schema> | Array<SchemaTypeOptions<any>>;
+    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[];
   }
 
   interface SchemaOptions {

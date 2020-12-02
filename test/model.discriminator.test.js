@@ -1645,4 +1645,44 @@ describe('model', function() {
     actions.discriminator('message', Message.schema);
     assert.ok(actions.schema.discriminators['message']);
   });
+
+  it('recursive embedded discriminator using schematype (gh-9600)', function() {
+    const contentSchema = new mongoose.Schema({}, { discriminatorKey: 'type' });
+    const nestedSchema = new mongoose.Schema({
+      body: {
+        children: [contentSchema]
+      }
+    });
+    const childrenArraySchema = nestedSchema.path('body.children');
+    childrenArraySchema.discriminator(
+      'container',
+      new mongoose.Schema({
+        body: { children: childrenArraySchema }
+      })
+    );
+    const Nested = mongoose.model('nested', nestedSchema);
+
+    const nestedDocument = new Nested({
+      body: {
+        children: [
+          { type: 'container', body: { children: [] } },
+          {
+            type: 'container',
+            body: {
+              children: [
+                {
+                  type: 'container',
+                  body: {
+                    children: [{ type: 'container', body: { children: [] } }]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    });
+
+    assert.deepEqual(nestedDocument.body.children[1].body.children[0].body.children[0].body.children, []);
+  });
 });

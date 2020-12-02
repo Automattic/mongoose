@@ -124,6 +124,8 @@ declare module "mongoose" {
 
   type Mongoose = typeof mongoose;
 
+  interface ClientSession extends mongodb.ClientSession {}
+
   interface ConnectOptions extends mongodb.MongoClientOptions {
     /** Set to false to [disable buffering](http://mongoosejs.com/docs/faq.html#callback_never_executes) on all models associated with this connection. */
     bufferCommands?: boolean;
@@ -578,6 +580,20 @@ declare module "mongoose" {
     db: Connection;
 
     /**
+     * Deletes all of the documents that match `conditions` from the collection.
+     * Behaves like `remove()`, but deletes all documents that match `conditions`
+     * regardless of the `single` option.
+     */
+    deleteMany(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+
+    /**
+     * Deletes the first document that matches `conditions` from the collection.
+     * Behaves like `remove()`, but deletes at most one document regardless of the
+     * `single` option.
+     */
+    deleteOne(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+
+    /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
      */
@@ -589,6 +605,13 @@ declare module "mongoose" {
      * handling.
      */
     events: NodeJS.EventEmitter;
+
+    /**
+     * Finds a single document by its _id field. `findById(id)` is almost*
+     * equivalent to `findOne({ _id: id })`. If you want to query by a document's
+     * `_id`, use `findById()` instead of `findOne()`.
+     */
+    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
 
     /** Finds one document. */
     findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
@@ -734,10 +757,13 @@ declare module "mongoose" {
   }
 
   interface QueryOptions {
+    arrayFilters?: { [key: string]: any }[];
     batchSize?: number;
     collation?: mongodb.CollationDocument;
     comment?: any;
+    context?: string;
     explain?: any;
+    fields?: any | string;
     hint?: any;
     /**
      * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
@@ -747,6 +773,7 @@ declare module "mongoose" {
     maxTimeMS?: number;
     maxscan?: number;
     multi?: boolean;
+    multipleCastError?: boolean;
     /**
      * By default, `findOneAndUpdate()` returns the document as it was **before**
      * `update` was applied. If you set `new: true`, `findOneAndUpdate()` will
@@ -754,6 +781,7 @@ declare module "mongoose" {
      */
     new?: boolean;
     omitUndefined?: boolean;
+    overwrite?: boolean;
     overwriteDiscriminatorKey?: boolean;
     populate?: string;
     projection?: any;
@@ -766,8 +794,10 @@ declare module "mongoose" {
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
     returnOriginal?: boolean;
+    runValidators?: boolean;
     /** The session associated with this query. */
     session?: mongodb.ClientSession;
+    setDefaultsOnInsert?: boolean;
     skip?: number;
     snapshot?: any;
     sort?: any;

@@ -525,6 +525,9 @@ declare module "mongoose" {
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
 
+    /** Collection the model uses. */
+    collection: Collection;
+
     /** Creates a `count` query: counts the number of documents that match `filter`. */
     count(callback?: (err: any, count: number) => void): Query<number, T>;
     count(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
@@ -554,6 +557,9 @@ declare module "mongoose" {
      */
     createIndexes(options: any): Promise<void>;
     createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+
+    /** Connection the model uses. */
+    db: Connection;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
@@ -692,6 +698,9 @@ declare module "mongoose" {
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
 
+    /** Schema the model uses. */
+    schema: Schema;
+
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
@@ -709,32 +718,55 @@ declare module "mongoose" {
   }
 
   interface QueryOptions {
-    tailable?: number;
-    sort?: any;
-    limit?: number;
-    skip?: number;
-    maxscan?: number;
     batchSize?: number;
+    collation?: mongodb.CollationDocument;
     comment?: any;
-    snapshot?: any;
-    readPreference?: mongodb.ReadPreferenceMode;
+    explain?: any;
     hint?: any;
-    upsert?: boolean;
-    writeConcern?: any;
-    timestamps?: boolean;
+    /**
+     * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
+     */
+    lean?: boolean | any;
+    limit?: number;
+    maxTimeMS?: number;
+    maxscan?: number;
+    multi?: boolean;
+    /**
+     * By default, `findOneAndUpdate()` returns the document as it was **before**
+     * `update` was applied. If you set `new: true`, `findOneAndUpdate()` will
+     * instead give you the object after `update` was applied.
+     */
+    new?: boolean;
     omitUndefined?: boolean;
     overwriteDiscriminatorKey?: boolean;
-    lean?: boolean | any;
     populate?: string;
     projection?: any;
-    maxTimeMS?: number;
-    useFindAndModify?: boolean;
+    /**
+     * if true, returns the raw result from the MongoDB driver
+     */
     rawResult?: boolean;
-    collation?: mongodb.CollationDocument;
+    readPreference?: mongodb.ReadPreferenceMode;
+    /**
+     * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
+     */
+    returnOriginal?: boolean;
+    /** The session associated with this query. */
     session?: mongodb.ClientSession;
-    explain?: any;
-    multi?: boolean;
+    skip?: number;
+    snapshot?: any;
+    sort?: any;
+    /** overwrites the schema's strict mode option */
     strict?: boolean | string;
+    tailable?: number;
+    /**
+     * If set to `false` and schema-level timestamps are enabled,
+     * skip timestamps for this update. Note that this allows you to overwrite
+     * timestamps. Does nothing if schema-level timestamps are not set.
+     */
+    timestamps?: boolean;
+    upsert?: boolean;
+    useFindAndModify?: boolean;
+    writeConcern?: any;
   }
 
   interface SaveOptions {

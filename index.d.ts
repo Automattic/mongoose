@@ -938,6 +938,9 @@ declare module "mongoose" {
     method(name: string, fn: Function, opts?: any): this;
     method(methods: any): this;
 
+    /** Object of currently defined methods on this schema. */
+    methods: any;
+
     /** The original object passed to the schema constructor */
     obj: any;
 
@@ -997,7 +1000,7 @@ declare module "mongoose" {
   }
 
   interface SchemaDefinition {
-    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Array<Schema> | Array<SchemaTypeOptions<any>>;
+    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[];
   }
 
   interface SchemaOptions {

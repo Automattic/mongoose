@@ -938,6 +938,9 @@ declare module "mongoose" {
     method(name: string, fn: Function, opts?: any): this;
     method(methods: any): this;
 
+    /** The original object passed to the schema constructor */
+    obj: any;
+
     /** Gets/sets schema paths. */
     path(path: string): SchemaType;
     path(path: string, constructor: any): this;
@@ -965,6 +968,9 @@ declare module "mongoose" {
     pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
+    /** Object of currently defined query helpers on this schema. */
+    query: any;
+
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
 
@@ -979,6 +985,9 @@ declare module "mongoose" {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: Function): this;
+
+    /** Object of currently defined statics on this schema. */
+    statics: any;
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;

@@ -24,6 +24,12 @@ declare module "mongoose" {
   export type Mixed = Schema.Types.Mixed;
 
   /**
+   * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
+   * class. Most apps will only use this one instance.
+   */
+  export var Mongoose: new (options?: object | null) => typeof mongoose;
+
+  /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that Mongoose should cast to numbers.
    */
@@ -285,7 +291,9 @@ declare module "mongoose" {
     watch(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
   }
 
-  class Collection {}
+  class Collection {
+    name: string;
+  }
 
   class Document {
     constructor(doc?: any);
@@ -423,11 +431,11 @@ declare module "mongoose" {
      */
     isModified(path?: string | Array<string>): boolean;
 
-    /** Checks if `path` was selected in the source query which initialized this document. */
-    isSelected(path: string): boolean;
-
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
+
+    /** Checks if `path` was selected in the source query which initialized this document. */
+    isSelected(path: string): boolean;
 
     /** Marks the path as having pending changes to write to the db. */
     markModified(path: string, scope?: any): void;
@@ -474,6 +482,9 @@ declare module "mongoose" {
     save(options?: SaveOptions, fn?: (err: CallbackError, doc: this) => void): void;
     save(fn?: (err: CallbackError, doc: this) => void): void;
 
+    /** The document's schema. */
+    schema: Schema;
+
     /** Sets the value of a path, or many paths. */
     set(path: string, val: any, options?: any): this;
     set(path: string, val: any, type: any, options?: any): this;
@@ -502,9 +513,6 @@ declare module "mongoose" {
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
-
-    /** The documents schema. */
-    schema: Schema;
   }
 
   export var Model: Model<any>;

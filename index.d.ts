@@ -127,6 +127,8 @@ declare module "mongoose" {
     useFindAndModify?: boolean;
     /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
+    /** False by default. If `true`, this connection will use `createIndex()` instead of `ensureIndex()` for automatic index builds via `Model.init()`. */
+    useCreateIndex?: boolean;
   }
 
   class Connection extends events.EventEmitter {

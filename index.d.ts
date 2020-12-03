@@ -294,7 +294,11 @@ declare module "mongoose" {
   }
 
   class Collection {
+    /**The name of the collection */
     name: string;
+    
+    /**The name of the collection */
+    collectionName: string;
   }
 
   class Document {

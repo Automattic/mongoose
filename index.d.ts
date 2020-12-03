@@ -293,8 +293,46 @@ declare module "mongoose" {
     watch(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
   }
 
-  class Collection {
+   /*
+   * section collection.js
+   * http://mongoosejs.com/docs/api.html#collection-js
+   */
+  interface CollectionBase extends mongodb.Collection {
+    /*
+      * Abstract methods. Some of these are already defined on the
+      * mongodb.Collection interface so they've been commented out.
+      */
+    ensureIndex(...args: any[]): any;
+    findAndModify(...args: any[]): any;
+    getIndexes(...args: any[]): any;
+
+    /** The collection name */
+    collectionName: string;
+    /** The Connection instance */
+    conn: Connection;
+    /** The collection name */
     name: string;
+  }
+
+  /*
+   * section drivers/node-mongodb-native/collection.js
+   * http://mongoosejs.com/docs/api.html#drivers-node-mongodb-native-collection-js
+   */
+  let Collection: Collection;
+  interface Collection extends CollectionBase {
+    /**
+     * Collection constructor
+     * @param name name of the collection
+     * @param conn A MongooseConnection instance
+     * @param opts optional collection options
+     */
+    new(name: string, conn: Connection, opts?: any): Collection;
+    /** Formatter for debug print args */
+    $format(arg: any): string;
+    /** Debug print helper */
+    $print(name: any, i: any, args: any[]): void;
+    /** Retrieves information about this collections indexes. */
+    getIndexes(): any;
   }
 
   class Document {

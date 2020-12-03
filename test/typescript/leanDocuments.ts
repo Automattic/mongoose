@@ -7,7 +7,6 @@ class Subdoc extends Document {
 }
 
 interface ITest extends Document {
-  _id?: Types.ObjectId,
   name?: string;
   mixed?: any;
   subdoc?: Subdoc;
@@ -36,6 +35,7 @@ void async function main() {
   _doc.subdoc.toObject();
   _doc.name = 'test';
   _doc.mixed = 42;
+  console.log(_doc._id);
 
   const hydrated = Test.hydrate(_doc);
   await hydrated.save();

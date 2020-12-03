@@ -300,6 +300,9 @@ declare module "mongoose" {
   class Document {
     constructor(doc?: any);
 
+    /** This documents _id. */
+    _id: any;
+
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 

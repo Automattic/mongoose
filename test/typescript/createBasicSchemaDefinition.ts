@@ -13,6 +13,7 @@ interface ITest extends Document {
 const Test = model<ITest>('Test', schema);
 
 const doc: ITest = new Test({ name: 'foo' });
+console.log(doc._id);
 doc.name = 'bar';
 
 doc.save().then((doc: ITest) => console.log(doc.name));

@@ -9768,7 +9768,7 @@ describe('document', function() {
     assert.equal(person.email, 'test@gmail.com');
   });
 
-  it('passes document to `default` functions (gh-9633)', function() {
+  it.skip('passes document to `default` functions (gh-9633)', function() {
     let documentFromDefault;
     const userSchema = new Schema({
       name: { type: String },

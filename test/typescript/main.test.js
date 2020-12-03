@@ -2,8 +2,7 @@
 
 const assert = require('assert');
 const typescript = require('typescript');
-
-const tsconfig = require('./ts.config.json');
+const tsconfig = require('./tsconfig.json');
 
 describe('typescript syntax', function() {
   this.timeout(5000);

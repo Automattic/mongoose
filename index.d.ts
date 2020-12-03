@@ -1047,7 +1047,7 @@ declare module "mongoose" {
   }
 
   interface SchemaDefinition {
-    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[];
+    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[] | SchemaDefinition | SchemaDefinition[];
   }
 
   interface SchemaOptions {

@@ -9767,4 +9767,25 @@ describe('document', function() {
     const person = new Person({ items: undefined, email: 'test@gmail.com' });
     assert.equal(person.email, 'test@gmail.com');
   });
+
+  it.skip('passes document to `default` functions (gh-9633)', function() {
+    let documentFromDefault;
+    const userSchema = new Schema({
+      name: { type: String },
+      age: {
+        type: Number,
+        default: function(doc) {
+          documentFromDefault = doc;
+        }
+      }
+
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+
+    assert.ok(documentFromDefault === user);
+    assert.equal(documentFromDefault.name, 'Hafez');
+  });
 });

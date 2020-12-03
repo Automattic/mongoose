@@ -1,3 +1,14 @@
+5.11.3 / 2020-12-03
+===================
+ * fix(schematype): pass document to default functions as first parameter #9636 #9633 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(index.d.ts): make Mongoose collection inherit MongoDB collection #9637 #9630 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(index.d.ts): add `Document#_id` so documents have an id by default #9632
+ * fix(index.d.ts): allow inline schema definitions for nested properties #9639 [Green-Cat](https://github.com/Green-Cat)
+ * fix(index.d.ts): add support for missing error message definitions #9638 [SaifAlsabe](https://github.com/SaifAlsabe)
+ * fix(schema+discriminator): support defining recursive embedded discriminators by passing document array schematype to discriminator #9600
+ * fix(index.d.ts): make it possible to use `LeanDocument` with arrays #9620
+ * fix(index.d.ts): add `ModelUpdateOptions` as alias for `QueryOptions` for backwards compat #9637
+
 5.11.2 / 2020-12-02
 ===================
  * fix(index.d.ts): add missing query options and model `findById()` function #9626 #9620

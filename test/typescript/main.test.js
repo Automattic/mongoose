@@ -3,11 +3,7 @@
 const assert = require('assert');
 const typescript = require('typescript');
 
-const tsconfig = {
-  allowSyntheticDefaultImports: true,
-  esModuleInterop: true,
-  outDir: `${__dirname}/dist`
-};
+const tsconfig = require('./ts.config.json');
 
 describe('typescript syntax', function() {
   this.timeout(5000);
@@ -151,6 +147,14 @@ describe('typescript syntax', function() {
 
   it('global', function() {
     const errors = runTest('global.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
+
+  it('collection', function() {
+    const errors = runTest('collection.ts');
     if (process.env.D && errors.length) {
       console.log(errors);
     }

@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document, LeanDocument } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -7,7 +7,6 @@ class Subdoc extends Document {
 }
 
 interface ITest extends Document {
-  _id?: Types.ObjectId,
   name?: string;
   mixed?: any;
   subdoc?: Subdoc;
@@ -29,14 +28,18 @@ void async function main() {
   const pojo = doc.toObject();
   await pojo.save();
 
-  const _doc = await Test.findOne().lean();
+  const _doc: LeanDocument<ITest> = await Test.findOne().lean();
   await _doc.save();
 
   _doc.testMethod();
   _doc.subdoc.toObject();
   _doc.name = 'test';
   _doc.mixed = 42;
+  console.log(_doc._id);
 
   const hydrated = Test.hydrate(_doc);
   await hydrated.save();
+
+  const _docs: LeanDocument<ITest>[] = await Test.find().lean();
+  _docs[0].mixed = 42;
 }();

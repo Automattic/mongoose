@@ -867,6 +867,9 @@ declare module "mongoose" {
     writeConcern?: any;
   }
 
+  /** Alias for QueryOptions for backwards compatability. */
+  type ModelUpdateOptions = QueryOptions;
+
   interface SaveOptions {
     checkKeys?: boolean;
     validateBeforeSave?: boolean;

@@ -1766,7 +1766,7 @@ declare module "mongoose" {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean(val?: boolean | any): Query<LeanDocument<DocType>, DocType>;
+    lean(val?: boolean | any): Query<LeanDocumentOrArray<ResultType>, DocType>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
@@ -2013,6 +2013,11 @@ declare module "mongoose" {
   };
 
   export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>;
+
+  export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
+    T extends unknown[] ? LeanDocument<T[number]>[] :
+    T extends Document ? LeanDocument<T> :
+    T;
 
   class QueryCursor<DocType extends Document> extends stream.Readable {
     /**

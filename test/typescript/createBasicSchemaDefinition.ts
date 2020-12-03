@@ -2,12 +2,16 @@ import { Schema, model, Document } from 'mongoose';
 
 const schema: Schema = new Schema({
   name: { type: 'String' },
-  tags: [String]
+  tags: [String],
+  author: { name: String },
+  followers: [{ name: String }]
 }, { collection: 'mytest', versionKey: '_version' });
 
 interface ITest extends Document {
   name?: string;
   tags?: string[];
+  authors?: { name: string };
+  followers?: { name: string }[];
 }
 
 const Test = model<ITest>('Test', schema);

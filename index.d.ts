@@ -4,6 +4,14 @@ declare module "mongoose" {
   import mongoose = require('mongoose');
   import stream = require('stream');
 
+  export enum ConnectionStates {
+    disconnected = 0,
+    connected = 1,
+    connecting = 2,
+    disconnecting = 3,
+    uninitialized = 99,
+  }
+
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
   export type Date = Schema.Types.Date;
 
@@ -49,6 +57,9 @@ declare module "mongoose" {
 
   /** The various Mongoose SchemaTypes. */
   export var SchemaTypes: typeof Schema.Types;
+
+  /** Expose connection states for user-land */
+  export var STATES: typeof ConnectionStates;
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
   export function connect(uri: string, options: ConnectOptions, callback: (err: CallbackError) => void): void;

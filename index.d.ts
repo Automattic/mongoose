@@ -124,7 +124,7 @@ declare module "mongoose" {
 
   type Mongoose = typeof mongoose;
 
-  interface ClientSession extends mongodb.ClientSession {}
+  interface ClientSession extends mongodb.ClientSession { }
 
   interface ConnectOptions extends mongodb.MongoClientOptions {
     /** Set to false to [disable buffering](http://mongoosejs.com/docs/faq.html#callback_never_executes) on all models associated with this connection. */
@@ -1203,7 +1203,7 @@ declare module "mongoose" {
      * Determines whether a type set to a POJO becomes
      * a Mixed path or a Subdocument (defaults to true).
      */
-    typePojoToMixed?:boolean;
+    typePojoToMixed?: boolean;
   }
 
   interface SchemaTimestampsConfig {
@@ -1219,7 +1219,7 @@ declare module "mongoose" {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: RegExp | [RegExp, string] | Function;
+    validate?: RegExp | [RegExp, string] | Function | [Function | string];
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string;
@@ -1229,7 +1229,7 @@ declare module "mongoose" {
      * path cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
-    required?: boolean | (() => boolean);
+    required?: boolean | (() => boolean) | [boolean, string];
 
     /**
      * The default value for this path. If a function, Mongoose executes the function
@@ -1332,10 +1332,10 @@ declare module "mongoose" {
     uppercase?: boolean;
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
-    minlength?: number;
+    minlength?: number | [number, string];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
-    maxlength?: number;
+    maxlength?: number | [number, string];
   }
 
   interface IndexOptions {
@@ -1581,7 +1581,7 @@ declare module "mongoose" {
 
     // var objectId: mongoose.Types.ObjectId should reference mongodb.ObjectID not
     //   the ObjectIdConstructor, so we add the interface below
-    interface ObjectId extends mongodb.ObjectID {}
+    interface ObjectId extends mongodb.ObjectID { }
 
     class Subdocument extends Document {
       $isSingleNested: true;
@@ -1709,7 +1709,7 @@ declare module "mongoose" {
 
     /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
-    
+
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
@@ -1977,22 +1977,22 @@ declare module "mongoose" {
 
   export type FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'
-      ? [Extract<T[P], mongodb.ObjectId>] extends [never]
-        ? mongodb.Condition<T[P]>
-        : mongodb.Condition<T[P] | string | { _id: mongodb.ObjectId }>
-      : [Extract<T[P], mongodb.ObjectId>] extends [never]
-      ? mongodb.Condition<T[P]>
-      : mongodb.Condition<T[P] | string>;
+    ? [Extract<T[P], mongodb.ObjectId>] extends [never]
+    ? mongodb.Condition<T[P]>
+    : mongodb.Condition<T[P] | string | { _id: mongodb.ObjectId }>
+    : [Extract<T[P], mongodb.ObjectId>] extends [never]
+    ? mongodb.Condition<T[P]>
+    : mongodb.Condition<T[P] | string>;
   } &
     mongodb.RootQuerySelector<T>;
-  
+
   export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 
   export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
-    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never) 
+    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
   }[keyof T];
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
@@ -2006,10 +2006,10 @@ declare module "mongoose" {
 
   export type _LeanDocument<T> = {
     [K in keyof T]:
-      0 extends (1 & T[K]) ? T[K] : // any
-      T[K] extends unknown[] ? LeanType<T[K][number]>[] : // Array
-      T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
-      T[K];
+    0 extends (1 & T[K]) ? T[K] : // any
+    T[K] extends unknown[] ? LeanType<T[K][number]>[] : // Array
+    T[K] extends Document ? LeanDocument<T[K]> : // Subdocument
+    T[K];
   };
 
   export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>;
@@ -2246,7 +2246,7 @@ declare module "mongoose" {
       type?: string): this;
   }
 
-  class NativeError extends global.Error {}
+  class NativeError extends global.Error { }
   type CallbackError = NativeError | null;
 
   class Error extends global.Error {
@@ -2324,10 +2324,10 @@ declare module "mongoose" {
 
     export class ValidationError extends Error {
       name: 'ValidationError';
-  
-      errors: {[path: string]: ValidatorError | CastError};
+
+      errors: { [path: string]: ValidatorError | CastError };
     }
-  
+
     export class ValidatorError extends Error {
       name: 'ValidatorError';
       properties: {

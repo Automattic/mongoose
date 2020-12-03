@@ -37,8 +37,7 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 1);
-    assert.ok(errors[0].messageText.messageText.includes('not assignable'), errors[0].messageText.messageText);
+    assert.equal(errors.length, 0);
   });
 
   it('subdocuments', function() {

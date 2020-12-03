@@ -171,6 +171,9 @@ declare module "mongoose" {
     /** A hash of the global options that are associated with this connection */
     config: any;
 
+    /** The mongodb.Db instance, set when the connection is opened */
+    db: mongodb.Db;
+
     /**
      * Helper for `createCollection()`. Will explicitly create the given collection
      * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)

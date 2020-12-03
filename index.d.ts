@@ -872,13 +872,14 @@ declare module "mongoose" {
 
   interface SaveOptions {
     checkKeys?: boolean;
+    j?: boolean;
+    safe?: boolean | WriteConcern;
+    session?: ClientSession | null;
+    timestamps?: boolean;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
-    timestamps?: boolean;
-    j?: boolean;
     w?: number | string;
     wtimeout?: number;
-    safe?: boolean | WriteConcern;
   }
 
   interface WriteConcern {

@@ -1219,7 +1219,7 @@ declare module "mongoose" {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: RegExp | [RegExp, string] | Function | [Function | string];
+    validate?: RegExp | [RegExp, string] | Function | [Function , string];
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string;

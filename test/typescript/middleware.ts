@@ -19,7 +19,6 @@ schema.post<Aggregate<any>>('aggregate', async function(res: Array<any>) {
 });
 
 interface ITest extends Document {
-  _id?: Types.ObjectId,
   name?: string;
 }
 

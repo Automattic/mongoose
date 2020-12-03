@@ -1,6 +1,5 @@
 5.11.3 / 2020-12-03
 ===================
- * fix(schematype): pass document to default functions as first parameter #9636 #9633 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix(index.d.ts): make Mongoose collection inherit MongoDB collection #9637 #9630 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix(index.d.ts): add `Document#_id` so documents have an id by default #9632
  * fix(index.d.ts): allow inline schema definitions for nested properties #9639 [Green-Cat](https://github.com/Green-Cat)

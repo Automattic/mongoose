@@ -13,7 +13,7 @@ const schema: Schema = new Schema({
     type: Map,
     of: {
       type: Number,
-      max: 'not a number'
+      max: 44
     }
   }
 });

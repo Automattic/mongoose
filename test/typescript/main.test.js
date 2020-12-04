@@ -2,8 +2,7 @@
 
 const assert = require('assert');
 const typescript = require('typescript');
-
-const tsconfig = require('./ts.config.json');
+const tsconfig = require('./tsconfig.json');
 
 describe('typescript syntax', function() {
   this.timeout(5000);
@@ -38,8 +37,7 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 1);
-    assert.ok(errors[0].messageText.messageText.includes('not assignable'), errors[0].messageText.messageText);
+    assert.equal(errors.length, 0);
   });
 
   it('subdocuments', function() {
@@ -155,6 +153,14 @@ describe('typescript syntax', function() {
 
   it('collection', function() {
     const errors = runTest('collection.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
+
+  it('models', function() {
+    const errors = runTest('models.ts');
     if (process.env.D && errors.length) {
       console.log(errors);
     }

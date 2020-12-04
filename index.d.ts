@@ -171,6 +171,9 @@ declare module "mongoose" {
     /** A hash of the global options that are associated with this connection */
     config: any;
 
+    /** The mongodb.Db instance, set when the connection is opened */
+    db: mongodb.Db;
+
     /**
      * Helper for `createCollection()`. Will explicitly create the given collection
      * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)
@@ -260,7 +263,7 @@ declare module "mongoose" {
 
     /**
      * Connection ready state
-     * 
+     *
      * - 0 = disconnected
      * - 1 = connected
      * - 2 = connecting
@@ -352,6 +355,9 @@ declare module "mongoose" {
     /** This documents _id. */
     _id?: any;
 
+    /** This documents __v. */
+    __v?: number;
+
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 
@@ -412,12 +418,12 @@ declare module "mongoose" {
     db: Connection;
 
     /** Removes this document from the db. */
-    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     delete(options?: QueryOptions): Query<any, this>;
+    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     deleteOne(options?: QueryOptions): Query<any, this>;
+    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Takes a populated field and returns it to its unpopulated state. */
     depopulate(path: string): this;
@@ -510,9 +516,6 @@ declare module "mongoose" {
      */
     overwrite(obj: DocumentDefinition<this>): this;
 
-    /** If this document is a subdocument or populated document, returns the document's parent. Returns `undefined` otherwise. */
-    parent(): Document | undefined;
-
     /**
      * Populates document references, executing the `callback` when complete.
      * If you want to use promises instead, use this function with
@@ -525,8 +528,8 @@ declare module "mongoose" {
     populated(path: string): any;
 
     /** Removes this document from the db. */
-    remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     remove(options?: QueryOptions): Query<any, this>;
+    remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
     replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, this>;
@@ -592,8 +595,8 @@ declare module "mongoose" {
      * if you use `create()`) because with `bulkWrite()` there is only one round
      * trip to MongoDB.
      */
-    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
+    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
 
     /** Collection the model uses. */
     collection: Collection;
@@ -663,10 +666,10 @@ declare module "mongoose" {
      * equivalent to `findOne({ _id: id })`. If you want to query by a document's
      * `_id`, use `findById()` instead of `findOne()`.
      */
-    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
+    findById(id: any, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null) => void): Query<T | null, T>;
 
     /** Finds one document. */
-    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<T | null, T>;
+    findOne(filter?: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: T | null) => void): Query<T | null, T>;
 
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
@@ -699,6 +702,10 @@ declare module "mongoose" {
     listIndexes(callback: (err: CallbackError, res: Array<any>) => void): void;
     listIndexes(): Promise<Array<any>>;
 
+    /** The name of the model */
+    modelName: string;
+
+    /** Populates document references. */
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
 
@@ -751,9 +758,9 @@ declare module "mongoose" {
     exists(filter: FilterQuery<T>, callback: (err: any, res: boolean) => void): void;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: (err: any, count: number) => void): Query<Array<T>, T>;
-    find(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
-    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, count: number) => void): Query<Array<T>, T>;
+    find(callback?: (err: any, docs: T[]) => void): Query<Array<T>, T>;
+    find(filter: FilterQuery<T>, callback?: (err: any, docs: T[]) => void): Query<Array<T>, T>;
+    find(filter: FilterQuery<T>, projection?: any | null, options?: QueryOptions | null, callback?: (err: any, docs: T[]) => void): Query<Array<T>, T>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
@@ -872,13 +879,14 @@ declare module "mongoose" {
 
   interface SaveOptions {
     checkKeys?: boolean;
+    j?: boolean;
+    safe?: boolean | WriteConcern;
+    session?: ClientSession | null;
+    timestamps?: boolean;
     validateBeforeSave?: boolean;
     validateModifiedOnly?: boolean;
-    timestamps?: boolean;
-    j?: boolean;
     w?: number | string;
     wtimeout?: number;
-    safe?: boolean | WriteConcern;
   }
 
   interface WriteConcern {
@@ -997,7 +1005,7 @@ declare module "mongoose" {
     useProjection?: boolean;
   }
 
-  class Schema {
+  class Schema extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1047,6 +1055,11 @@ declare module "mongoose" {
     path(path: string): SchemaType;
     path(path: string, constructor: any): this;
 
+    /** Lists all paths and their type in the schema. */
+    paths: {
+      [key: string]: SchemaType;
+    }
+
     /** Returns the pathType of `path` for this schema. */
     pathType(path: string): string;
 
@@ -1087,6 +1100,7 @@ declare module "mongoose" {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: Function): this;
+    static(obj: { [name: string]: Function }): this;
 
     /** Object of currently defined statics on this schema. */
     statics: any;
@@ -1470,6 +1484,9 @@ declare module "mongoose" {
         static options: { castNonArrays: boolean; };
 
         discriminator(name: string, schema: Schema, tag?: string): any;
+
+        /** The schema used for documents in this array */
+        schema: Schema;
       }
 
       class Map extends SchemaType {
@@ -1507,6 +1524,9 @@ declare module "mongoose" {
       class Embedded extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
+
+        /** The document's schema */
+        schema: Schema;
       }
 
       class String extends SchemaType {
@@ -1749,12 +1769,12 @@ declare module "mongoose" {
     explain(verbose?: string): this;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
-    find(filter: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<DocType>, DocType>;
-    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<Array<DocType>, DocType>;
+    find(callback?: (err: any, docs: DocType[]) => void): Query<Array<DocType>, DocType>;
+    find(filter: FilterQuery<DocType>, callback?: (err: any, docs: DocType[]) => void): Query<Array<DocType>, DocType>;
+    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, docs: DocType[]) => void): Query<Array<DocType>, DocType>;
 
     /** Declares the query a findOne operation. When executed, the first found document is passed to the callback. */
-    findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, count: number) => void): Query<DocType | null, DocType>;
+    findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
@@ -1913,7 +1933,7 @@ declare module "mongoose" {
     /**
      * Declare and/or execute this query as a remove() operation. `remove()` is
      * deprecated, you should use [`deleteOne()`](#query_Query-deleteOne)
-     * or [`deleteMany()`](#query_Query-deleteMany) instead. 
+     * or [`deleteMany()`](#query_Query-deleteMany) instead.
      */
     remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
 
@@ -1946,7 +1966,7 @@ declare module "mongoose" {
     /**
      * Adds a `$set` to this query's update without changing the operation.
      * This is useful for query middleware so you can add an update regardless
-     * of whether you use `updateOne()`, `updateMany()`, `findOneAndUpdate()`, etc. 
+     * of whether you use `updateOne()`, `updateMany()`, `findOneAndUpdate()`, etc.
      */
     set(path: string, value: any): this;
 
@@ -2027,7 +2047,7 @@ declare module "mongoose" {
     wtimeout(ms: number): this;
   }
 
-  export type FilterQuery<T> = {
+  type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'
     ? [Extract<T[P], mongodb.ObjectId>] extends [never]
     ? mongodb.Condition<T[P]>
@@ -2037,6 +2057,8 @@ declare module "mongoose" {
     : mongodb.Condition<T[P] | string>;
   } &
     mongodb.RootQuerySelector<T>;
+
+  export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
 
   export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 

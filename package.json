@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.11.3",
+  "version": "5.11.4",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -76,7 +76,7 @@
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
-    "test": "mocha --exit",
+    "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",

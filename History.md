@@ -1,6 +1,17 @@
+5.11.4 / 2020-12-04
+===================
+ * fix(index.d.ts): add `Document#__v` so documents have a Version by default #9652 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): add missing `session` option to `SaveOptions` #9642
+ * fix(index.d.ts): add `Schema#paths`, `Schema#static(obj)`, `Embedded#schema`, `DocumentArray#schema`, make Schema inherit from EventEmitter #9650
+ * fix(index.d.ts): order when cb is optional in method #9647 [CatsMiaow](https://github.com/CatsMiaow)
+ * fix(index.d.ts): use DocumentDefinition for `FilterQuery` #9649
+ * fix(index.d.ts): correct callback result types for `find()`, `findOne()`, `findById()` #9648
+ * fix(index.d.ts): remove `Document#parent()` method because it conflicts with existing user code #9645
+ * fix(index.d.ts): add missing `Connection#db` property #9643
+ * test(typescript): add `tsconfig.json` file for intellisense #9611 [alecgibson](https://github.com/alecgibson)
+
 5.11.3 / 2020-12-03
 ===================
- * fix(schematype): pass document to default functions as first parameter #9636 #9633 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix(index.d.ts): make Mongoose collection inherit MongoDB collection #9637 #9630 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix(index.d.ts): add `Document#_id` so documents have an id by default #9632
  * fix(index.d.ts): allow inline schema definitions for nested properties #9639 [Green-Cat](https://github.com/Green-Cat)

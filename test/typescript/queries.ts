@@ -5,13 +5,24 @@ const schema: Schema = new Schema({ name: { type: 'String' } });
 interface ITest extends Document {
   name?: string;
   age?: number;
+  parent?: Types.ObjectId;
 }
 
 const Test = model<ITest>('Test', schema);
 
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
 
+Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });
+
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));
+
+Test.find({ name: 'test' }, (err: Error, docs: ITest[]) => {
+  console.log(!!err, docs[0].age);
+});
+
+Test.findOne({ name: 'test' }, (err: Error, doc: ITest) => {
+  console.log(!!err, doc.age);
+});
 
 Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).exec().
   then((res: Array<ITest>) => console.log(res[0].name));

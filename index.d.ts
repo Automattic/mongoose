@@ -263,7 +263,7 @@ declare module "mongoose" {
 
     /**
      * Connection ready state
-     * 
+     *
      * - 0 = disconnected
      * - 1 = connected
      * - 2 = connecting
@@ -415,12 +415,12 @@ declare module "mongoose" {
     db: Connection;
 
     /** Removes this document from the db. */
-    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     delete(options?: QueryOptions): Query<any, this>;
+    delete(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     deleteOne(options?: QueryOptions): Query<any, this>;
+    deleteOne(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Takes a populated field and returns it to its unpopulated state. */
     depopulate(path: string): this;
@@ -528,8 +528,8 @@ declare module "mongoose" {
     populated(path: string): any;
 
     /** Removes this document from the db. */
-    remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
     remove(options?: QueryOptions): Query<any, this>;
+    remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
     replaceOne(replacement?: DocumentDefinition<this>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, this>;
@@ -595,8 +595,8 @@ declare module "mongoose" {
      * if you use `create()`) because with `bulkWrite()` there is only one round
      * trip to MongoDB.
      */
-    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
     bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
+    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
 
     /** Collection the model uses. */
     collection: Collection;
@@ -1917,7 +1917,7 @@ declare module "mongoose" {
     /**
      * Declare and/or execute this query as a remove() operation. `remove()` is
      * deprecated, you should use [`deleteOne()`](#query_Query-deleteOne)
-     * or [`deleteMany()`](#query_Query-deleteMany) instead. 
+     * or [`deleteMany()`](#query_Query-deleteMany) instead.
      */
     remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
 
@@ -1950,7 +1950,7 @@ declare module "mongoose" {
     /**
      * Adds a `$set` to this query's update without changing the operation.
      * This is useful for query middleware so you can add an update regardless
-     * of whether you use `updateOne()`, `updateMany()`, `findOneAndUpdate()`, etc. 
+     * of whether you use `updateOne()`, `updateMany()`, `findOneAndUpdate()`, etc.
      */
     set(path: string, value: any): this;
 

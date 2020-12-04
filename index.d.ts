@@ -1005,7 +1005,7 @@ declare module "mongoose" {
     useProjection?: boolean;
   }
 
-  class Schema extends events.EventEmitter {
+  class Schema<T = any> extends events.EventEmitter {
     /**
      * Create a new schema
      */

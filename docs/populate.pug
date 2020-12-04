@@ -296,8 +296,8 @@ block content
     <h3 id="limit-vs-perDocumentLimit"><a href="#limit-vs-perDocumentLimit">limit vs. perDocumentLimit</a></h3>
 
     Populate does support a `limit` option, however, it currently
-    does **not** limit on a per-document basis. For example, suppose
-    you have 2 stories:
+    does **not** limit on a per-document basis for backwards compatibility. For example,
+    suppose you have 2 stories:
 
     ```javascript
     Story.create([
@@ -310,12 +310,16 @@ block content
     would find that the 2nd story has 0 fans:
 
     ```javascript
-    const stories = Story.find().sort({ name: 1 }).populate({
+    const stories = Story.find().populate({
       path: 'fans',
       options: { limit: 2 }
     });
 
+    stories[0].name; // 'Casino Royale'
     stories[0].fans.length; // 2
+
+    // 2nd story has 0 fans!
+    stories[1].name; // 'Live and Let Die'
     stories[1].fans.length; // 0
     ```
 
@@ -324,17 +328,20 @@ block content
     `numDocuments * limit` as the limit. If you need the correct
     `limit`, you should use the `perDocumentLimit` option (new in Mongoose 5.9.0).
     Just keep in mind that `populate()` will execute a separate query
-    for each story.
+    for each story, which may cause `populate()` to be slower.
 
     ```javascript
-    const stories = await Story.find().sort({ name: 1 }).populate({
+    const stories = await Story.find().populate({
       path: 'fans',
       // Special option that tells Mongoose to execute a separate query
       // for each `story` to make sure we get 2 fans for each story.
       perDocumentLimit: 2
     });
 
+    stories[0].name; // 'Casino Royale'
     stories[0].fans.length; // 2
+
+    stories[1].name; // 'Live and Let Die'
     stories[1].fans.length; // 2
     ```
 

@@ -355,6 +355,9 @@ declare module "mongoose" {
     /** This documents _id. */
     _id?: any;
 
+    /** This documents __v. */
+    __v?: number;
+
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 

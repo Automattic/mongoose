@@ -18,6 +18,7 @@ const Test = model<ITest>('Test', schema);
 
 const doc: ITest = new Test({ name: 'foo' });
 console.log(doc._id);
+console.log(doc.__v);
 doc.name = 'bar';
 
 doc.save().then((doc: ITest) => console.log(doc.name));

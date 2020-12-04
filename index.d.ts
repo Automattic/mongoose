@@ -702,6 +702,10 @@ declare module "mongoose" {
     listIndexes(callback: (err: CallbackError, res: Array<any>) => void): void;
     listIndexes(): Promise<Array<any>>;
 
+    /** The name of the model */
+    modelName: string;
+
+    /** Populates document references. */
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
 
@@ -1001,7 +1005,7 @@ declare module "mongoose" {
     useProjection?: boolean;
   }
 
-  class Schema {
+  class Schema extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1051,6 +1055,11 @@ declare module "mongoose" {
     path(path: string): SchemaType;
     path(path: string, constructor: any): this;
 
+    /** Lists all paths and their type in the schema. */
+    paths: {
+      [key: string]: SchemaType;
+    }
+
     /** Returns the pathType of `path` for this schema. */
     pathType(path: string): string;
 
@@ -1091,6 +1100,7 @@ declare module "mongoose" {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static(name: string, fn: Function): this;
+    static(obj: { [name: string]: Function }): this;
 
     /** Object of currently defined statics on this schema. */
     statics: any;
@@ -1474,6 +1484,9 @@ declare module "mongoose" {
         static options: { castNonArrays: boolean; };
 
         discriminator(name: string, schema: Schema, tag?: string): any;
+
+        /** The schema used for documents in this array */
+        schema: Schema;
       }
 
       class Map extends SchemaType {
@@ -1511,6 +1524,9 @@ declare module "mongoose" {
       class Embedded extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
+
+        /** The document's schema */
+        schema: Schema;
       }
 
       class String extends SchemaType {

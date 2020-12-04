@@ -513,9 +513,6 @@ declare module "mongoose" {
      */
     overwrite(obj: DocumentDefinition<this>): this;
 
-    /** If this document is a subdocument or populated document, returns the document's parent. Returns `undefined` otherwise. */
-    parent(): Document | undefined;
-
     /**
      * Populates document references, executing the `callback` when complete.
      * If you want to use promises instead, use this function with

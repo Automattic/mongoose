@@ -2031,7 +2031,7 @@ declare module "mongoose" {
     wtimeout(ms: number): this;
   }
 
-  export type FilterQuery<T> = {
+  type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'
     ? [Extract<T[P], mongodb.ObjectId>] extends [never]
     ? mongodb.Condition<T[P]>
@@ -2041,6 +2041,8 @@ declare module "mongoose" {
     : mongodb.Condition<T[P] | string>;
   } &
     mongodb.RootQuerySelector<T>;
+
+  export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
 
   export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 

@@ -880,9 +880,6 @@ declare module "mongoose" {
     writeConcern?: any;
   }
 
-  /** Alias for QueryOptions for backwards compatability. */
-  type ModelUpdateOptions = QueryOptions;
-
   interface SaveOptions {
     checkKeys?: boolean;
     j?: boolean;
@@ -2430,5 +2427,31 @@ declare module "mongoose" {
       version: number;
       modifiedPaths: Array<string>;
     }
+  }
+
+  /** Deprecated types for backwards compatibility. */
+
+  /** Alias for QueryOptions for backwards compatability. */
+  type ModelUpdateOptions = QueryOptions;
+
+  /** Backwards support for DefinitelyTyped */
+  interface HookSyncCallback<T> {
+    (this: T, next: HookNextFunction, docs: any[]): Promise<any> | void;
+  }
+
+  interface HookAsyncCallback<T> {
+    (this: T, next: HookNextFunction, done: HookDoneFunction, docs: any[]): Promise<any> | void;
+  }
+
+  interface HookErrorCallback {
+    (error?: Error): any;
+  }
+
+  interface HookNextFunction {
+    (error?: Error): any;
+  }
+
+  interface HookDoneFunction {
+    (error?: Error): any;
   }
 }

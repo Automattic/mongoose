@@ -5,7 +5,7 @@ const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
 
 describe('typescript syntax', function() {
-  this.timeout(5000);
+  this.timeout(10000);
 
   it('create schema and model', function() {
     const errors = runTest('createBasicSchemaDefinition.ts');

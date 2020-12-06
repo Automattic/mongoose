@@ -163,7 +163,7 @@ declare module "mongoose" {
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
-    collection(name: string, options: mongodb.CollectionCreateOptions): Collection;
+    collection(name: string, options?: mongodb.CollectionCreateOptions): Collection;
 
     /** A hash of the collections associated with this connection */
     collections: { [index: string]: Collection };

@@ -9,6 +9,6 @@ connect('mongodb://localhost:27017/test', {
 }).then(mongoose => console.log(mongoose.connect));
 
 // Callback
-connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true }, (err: Error) => {
-  console.log(err.stack);
+connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true }, (err: Error | null) => {
+  console.log(err);
 });

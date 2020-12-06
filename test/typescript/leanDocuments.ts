@@ -18,7 +18,7 @@ schema.method('testMethod', () => 42);
 const Test = model<ITest>('Test', schema);
 
 void async function main() {
-  const doc: ITest = await Test.findOne();
+  const doc: ITest = await Test.findOne().orFail();
 
   doc.subdoc = new Subdoc({ name: 'test' });
   doc.id = 'Hello';
@@ -28,11 +28,10 @@ void async function main() {
   const pojo = doc.toObject();
   await pojo.save();
 
-  const _doc: LeanDocument<ITest> = await Test.findOne().lean();
+  const _doc: LeanDocument<ITest> = await Test.findOne().orFail().lean();
   await _doc.save();
 
   _doc.testMethod();
-  _doc.subdoc.toObject();
   _doc.name = 'test';
   _doc.mixed = 42;
   console.log(_doc._id);

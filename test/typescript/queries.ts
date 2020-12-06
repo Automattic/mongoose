@@ -27,7 +27,7 @@ Test.findOne({ name: 'test' }, (err: Error, doc: ITest) => {
 Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).exec().
   then((res: Array<ITest>) => console.log(res[0].name));
 
-Test.findOne().orFail(new Error('bar')).then((doc: ITest) => console.log('Found! ' + doc.name));
+Test.findOne().orFail(new Error('bar')).then((doc: ITest | null) => console.log('Found! ' + doc));
 
 Test.distinct('name').exec().then((res: Array<any>) => console.log(res[0]));
 
@@ -35,5 +35,6 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITe
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true }).then((res: ITest) => { res.name = 'test4' });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));

@@ -688,8 +688,10 @@ declare module "mongoose" {
     init(callback?: (err: any) => void): Promise<T>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T | InsertManyResult>;
-    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T> | InsertManyResult>;
+    insertMany(doc: T | DocumentDefinition<T>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions): Promise<T>;
+    insertMany(docs: Array<T | DocumentDefinition<T>>, options: InsertManyOptions & { rawResult: true }): Promise<InsertManyResult>;
+    insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions): Promise<Array<T>>;
     insertMany(doc: T | DocumentDefinition<T>, options?: InsertManyOptions, callback?: (err: CallbackError, res: T | InsertManyResult) => void): void;
     insertMany(docs: Array<T | DocumentDefinition<T>>, options?: InsertManyOptions, callback?: (err: CallbackError, res: Array<T> | InsertManyResult) => void): void;
 
@@ -769,6 +771,7 @@ declare module "mongoose" {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
@@ -778,9 +781,11 @@ declare module "mongoose" {
     findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): Query<Array<T>, T>;
@@ -800,6 +805,7 @@ declare module "mongoose" {
     schema: Schema;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option. */
@@ -1783,12 +1789,14 @@ declare module "mongoose" {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Specifies a `$geometry` condition */
@@ -1907,7 +1915,7 @@ declare module "mongoose" {
      * This is handy for integrating with async/await, because `orFail()` saves you
      * an extra `if` statement to check if no document was found.
      */
-    orFail(err?: NativeError | (() => NativeError)): this;
+    orFail(err?: NativeError | (() => NativeError)): Query<NonNullable<ResultType>, DocType>;
 
     /** Specifies a `$polygon` condition */
     polygon(...coordinatePairs: number[][]): this;

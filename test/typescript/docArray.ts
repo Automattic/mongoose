@@ -13,7 +13,7 @@ interface ITest extends Document {
 const Test = model<ITest>('Test', schema);
 
 void async function main() {
-  const doc: ITest = await Test.findOne();
+  const doc: ITest = await Test.findOne().orFail();
 
   doc.tags = new Types.DocumentArray<Subdoc>([]);
   doc.set('tags', []);
@@ -25,7 +25,7 @@ void async function main() {
 
   await doc.save();
 
-  const _doc: LeanDocument<ITest> = await Test.findOne().lean();
+  const _doc: LeanDocument<ITest> = await Test.findOne().orFail().lean();
   _doc.tags[0].name.substr(1);
   _doc.tags.create({ name: 'fail' });
 }();

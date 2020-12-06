@@ -1086,7 +1086,7 @@ declare module "mongoose" {
     post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;

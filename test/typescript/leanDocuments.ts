@@ -11,6 +11,7 @@ interface ITest extends Document {
   mixed?: any;
   subdoc?: Subdoc;
   testMethod: () => number;
+  id: string;
 }
 
 schema.method('testMethod', () => 42);
@@ -34,6 +35,7 @@ void async function main() {
   _doc.testMethod();
   _doc.name = 'test';
   _doc.mixed = 42;
+  _doc.id = 'test2';
   console.log(_doc._id);
 
   const hydrated = Test.hydrate(_doc);

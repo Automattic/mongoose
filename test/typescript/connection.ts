@@ -13,3 +13,4 @@ createConnection('mongodb://localhost:27017/test', { useNewUrlParser: true }).th
 createConnection('mongodb://localhost:27017/test').close();
 
 conn.db.collection('Test').findOne({ name: String }).then(doc => console.log(doc));
+conn.collection('Test').findOne({ name: String }).then(doc => console.log(doc));

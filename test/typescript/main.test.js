@@ -7,6 +7,14 @@ const tsconfig = require('./tsconfig.json');
 describe('typescript syntax', function() {
   this.timeout(10000);
 
+  it('base', function() {
+    const errors = runTest('base.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
+
   it('create schema and model', function() {
     const errors = runTest('createBasicSchemaDefinition.ts');
     if (process.env.D && errors.length) {

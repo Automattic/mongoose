@@ -72,6 +72,8 @@ declare module "mongoose" {
   /** An array containing all connections associated with this Mongoose instance. */
   export var connections: Connection[];
 
+  /** An array containing all models associated with this Mongoose instance. */
+  export var models: { [index: string]: Model<any> };
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Connection & Promise<Connection>;
   export function createConnection(): Connection;
@@ -163,7 +165,7 @@ declare module "mongoose" {
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
-    collection(name: string, options: mongodb.CollectionCreateOptions): Collection;
+    collection(name: string, options?: mongodb.CollectionCreateOptions): Collection;
 
     /** A hash of the collections associated with this connection */
     collections: { [index: string]: Collection };
@@ -1081,7 +1083,7 @@ declare module "mongoose" {
     post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;

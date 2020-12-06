@@ -72,6 +72,8 @@ declare module "mongoose" {
   /** An array containing all connections associated with this Mongoose instance. */
   export var connections: Connection[];
 
+  /** An array containing all models associated with this Mongoose instance. */
+  export var models: { [index: string]: Model<any> };
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Connection & Promise<Connection>;
   export function createConnection(): Connection;

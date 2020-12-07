@@ -2497,4 +2497,7 @@ declare module "mongoose" {
   interface HookDoneFunction {
     (error?: Error): any;
   }
+
+  export type SchemaTypeOpts<T> = SchemaTypeOptions<T>;
+  export type ConnectionOptions = ConnectOptions;
 }

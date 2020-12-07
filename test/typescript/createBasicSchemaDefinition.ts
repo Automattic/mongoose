@@ -8,7 +8,8 @@ const schema: Schema = new Schema({
     type: String,
     validate: {
       validator: v => v.includes('@')
-    }
+    },
+    otherProperty: 42
   },
   followers: [{ name: String }]
 }, { collection: 'mytest', versionKey: '_version' });

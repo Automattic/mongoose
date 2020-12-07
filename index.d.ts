@@ -1420,6 +1420,8 @@ declare module "mongoose" {
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
     maxlength?: number | [number, string];
+
+    [other: string]: any;
   }
 
   interface IndexOptions {

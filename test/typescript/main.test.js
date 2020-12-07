@@ -31,15 +31,6 @@ describe('typescript syntax', function() {
     assert.equal(errors.length, 0);
   });
 
-  it('reports error on invalid getter syntax', function() {
-    const errors = runTest('schemaGettersSetters.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
-    assert.equal(errors.length, 1);
-    assert.ok(errors[0].messageText.messageText.includes('incorrect: number'), errors[0].messageText.messageText);
-  });
-
   it('handles maps', function() {
     const errors = runTest('maps.ts');
     if (process.env.D && errors.length) {

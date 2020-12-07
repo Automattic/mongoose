@@ -956,4 +956,24 @@ describe('Map', function() {
       assert.equal(board.elements.size, 0);
     });
   });
+
+  it('supports `null` in map of subdocuments (gh-9628)', function() {
+    const testSchema = new Schema({
+      messages: { type: Map, of: new Schema({ _id: false, text: String }) }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    return co(function*() {
+      let doc = yield Test.create({
+        messages: { prop1: { text: 'test' }, prop2: null }
+      });
+
+      doc = yield Test.findById(doc);
+
+      assert.deepEqual(doc.messages.get('prop1').toObject(), { text: 'test' });
+      assert.strictEqual(doc.messages.get('prop2'), null);
+      assert.ifError(doc.validateSync());
+    });
+  });
 });

@@ -5,7 +5,15 @@ const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
 
 describe('typescript syntax', function() {
-  this.timeout(5000);
+  this.timeout(10000);
+
+  it('base', function() {
+    const errors = runTest('base.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 
   it('create schema and model', function() {
     const errors = runTest('createBasicSchemaDefinition.ts');
@@ -21,15 +29,6 @@ describe('typescript syntax', function() {
       console.log(errors);
     }
     assert.equal(errors.length, 0);
-  });
-
-  it('reports error on invalid getter syntax', function() {
-    const errors = runTest('schemaGettersSetters.ts');
-    if (process.env.D && errors.length) {
-      console.log(errors);
-    }
-    assert.equal(errors.length, 1);
-    assert.ok(errors[0].messageText.messageText.includes('incorrect: number'), errors[0].messageText.messageText);
   });
 
   it('handles maps', function() {
@@ -119,11 +118,10 @@ describe('typescript syntax', function() {
     if (process.env.D && errors.length) {
       console.log(errors);
     }
-    assert.equal(errors.length, 4);
+    assert.equal(errors.length, 3);
     assert.ok(errors[0].messageText.includes('Property \'save\' does not exist'), errors[0].messageText);
     assert.ok(errors[1].messageText.includes('Property \'save\' does not exist'), errors[1].messageText);
     assert.ok(errors[2].messageText.includes('Property \'testMethod\' does not exist'), errors[2].messageText);
-    assert.ok(errors[3].messageText.includes('Property \'toObject\' does not exist'), errors[3].messageText);
   });
 
   it('doc array', function() {

@@ -1,3 +1,22 @@
+5.11.5 / 2020-12-07
+===================
+ * fix(map): support `null` in maps of subdocs #9628
+ * fix(index.d.ts): support object syntax for `validate` #9667
+ * fix(index.d.ts): Allow number for Schema expires #9670 [alecgibson](https://github.com/alecgibson)
+ * fix(index.d.ts): allow definining arbitrary properties on SchemaTypeOpts for plugins like mongoose-autopopulate #9669
+ * fix(index.d.ts): add mongoose.models #9661 #9660 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(index.d.ts): allow the next() argument to be optional #9665 #9664 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): add missing `VirtualType#applyGetters()` and `applySetters()`, `Schema#virtuals`, `Schema#childSchemas`, `Query#_mongooseOptions` #9658
+ * fix(index.d.ts): add `id` to LeanDocuments in case it is defined in the user's schema #9657
+ * fix(index.d.ts): add missing types for hook functions #9653
+ * fix(index.d.ts): improve support for strict null checks with `upsert` and `orFail()` #9654
+ * fix(index.d.ts): make return values for `insertMany()` more consistent #9662
+ * fix(index.d.ts): Change options in Connection#collection() to be optional #9663 [orgads](https://github.com/orgads)
+ * fix(index.d.ts): add the missing generic declaration for Schema #9655 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): add missing `SchemaTypeOpts` and `ConnectionOptions` aliases for backwards compat
+ * docs(populate): remove `sort()` from `limit` example to avoid potential confusion #9584
+ * docs(compatibility): add MongoDB server 4.4 version compatibility #9641
+
 5.11.4 / 2020-12-04
 ===================
  * fix(index.d.ts): add `Document#__v` so documents have a Version by default #9652 [sahasayan](https://github.com/sahasayan)

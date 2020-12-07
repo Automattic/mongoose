@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
 const schema: Schema = new Schema({ name: { type: 'String' } });
 
@@ -17,4 +17,4 @@ Test.create({ name: 'test' }, { name: 'test2' }).then((doc: ITest) => console.lo
 Test.insertMany({ name: 'test' }).then((doc: ITest) => console.log(doc.name));
 Test.insertMany([{ name: 'test' }], { session: null }).then((docs: ITest[]) => console.log(docs[0].name));
 
-Test.create({ name: 'test' }, { validateBeforeSave: true }).then((doc: ITest) => console.log(doc.name));
+Test.create([{ name: 'test' }], { validateBeforeSave: true }).then((docs: ITest[]) => console.log(docs[0].name));

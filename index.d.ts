@@ -1019,8 +1019,18 @@ declare module "mongoose" {
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition | Schema, prefix?: string): this;
 
+    /**
+     * Array of child schemas (from document arrays and single nested subdocs)
+     * and their corresponding compiled models. Each element of the array is
+     * an object with 2 properties: `schema` and `model`.
+     */
+    childSchemas: { schema: Schema, model: any }[];
+
     /** Returns a copy of this schema */
     clone(): Schema;
+
+    /** Object containing discriminators defined on this schema */
+    discriminators?: { [name: string]: Schema };
 
     /** Iterates the schemas paths similar to Array#forEach. */
     eachPath(fn: (path: string, type: SchemaType) => void): this;
@@ -1112,6 +1122,9 @@ declare module "mongoose" {
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;
+
+    /** Object of currently defined virtuals on this schema */
+    virtuals: any;
 
     /** Returns the virtual type with the given `name`. */
     virtualpath(name: string): VirtualType | null;
@@ -1437,6 +1450,11 @@ declare module "mongoose" {
   }
 
   class VirtualType {
+    /** Applies getters to `value`. */
+    applyGetters(value: any, doc: Document): any;
+    /** Applies setters to `value`. */
+    applySetters(value: any, doc: Document): any;
+
     /** Adds a custom getter to this virtual. */
     get(fn: Function): this;
     /** Adds a custom setter to this virtual. */
@@ -1691,6 +1709,8 @@ declare module "mongoose" {
   }
 
   interface Query<ResultType, DocType extends Document> {
+    _mongooseOptions: QueryOptions;
+
     exec(): Promise<ResultType>;
     exec(callback?: (err: CallbackError, res: ResultType) => void): void;
 

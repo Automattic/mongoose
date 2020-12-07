@@ -1376,7 +1376,7 @@ declare module "mongoose" {
     max?: number | Date;
 
     /** Defines a TTL index on this path. Only allowed for dates. */
-    expires?: Date;
+    expires?: number | Date;
 
     /** If `true`, Mongoose will skip gathering indexes on subpaths. Only allowed for subdocuments and subdocument arrays. */
     excludeIndexes?: boolean;

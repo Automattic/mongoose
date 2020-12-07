@@ -1290,7 +1290,7 @@ declare module "mongoose" {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: RegExp | [RegExp, string] | Function | [Function , string];
+    validate?: RegExp | [RegExp, string] | Function | [Function , string] | ValidateOpts<T>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string;
@@ -1415,6 +1415,25 @@ declare module "mongoose" {
     sparse?: boolean,
     type?: string,
     unique?: boolean
+  }
+
+  interface ValidateFn<T> {
+    (value: T): boolean;
+  }
+
+  interface LegacyAsyncValidateFn<T> {
+    (value: T, done: (result: boolean) => void): void;
+  }
+
+  interface AsyncValidateFn<T> {
+    (value: any): Promise<boolean>;
+  }
+
+  interface ValidateOpts<T> {
+    msg?: string;
+    message?: string;
+    type?: string;
+    validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }
 
   class VirtualType {

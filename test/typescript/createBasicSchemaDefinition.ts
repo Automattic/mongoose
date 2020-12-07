@@ -4,6 +4,12 @@ const schema: Schema = new Schema({
   name: { type: 'String' },
   tags: [String],
   author: { name: String },
+  email: {
+    type: String,
+    validate: {
+      validator: v => v.includes('@')
+    }
+  },
   followers: [{ name: String }]
 }, { collection: 'mytest', versionKey: '_version' });
 

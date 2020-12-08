@@ -2110,7 +2110,10 @@ declare module "mongoose" {
 
   export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 
-  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>;
+  type _AllowStringsForIds<T> = {
+    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
+  };
+  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<T, Exclude<keyof Document, '_id'>>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type

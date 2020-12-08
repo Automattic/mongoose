@@ -13,6 +13,7 @@ const Test = model<ITest>('Test', schema);
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
 
 Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });
+Test.find({ parent: '0'.repeat(24) });
 
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));
 

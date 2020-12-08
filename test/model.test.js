@@ -1603,14 +1603,14 @@ describe('Model', function() {
       let docMiddleware = 0;
       let queryMiddleware = 0;
 
-      schema.pre('remove', { query: true }, function() {
-        assert.ok(this instanceof Model.Query);
+      schema.pre('remove', { query: true, document: false }, function() {
         ++queryMiddleware;
+        assert.ok(this instanceof Model.Query);
       });
 
-      schema.pre('remove', { document: true }, function() {
-        assert.ok(this instanceof Model);
+      schema.pre('remove', { query: false, document: true }, function() {
         ++docMiddleware;
+        assert.ok(this instanceof Model);
       });
 
       const Model = db.model('Test', schema);

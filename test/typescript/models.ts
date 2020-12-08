@@ -21,3 +21,5 @@ const ExpiresSchema = new Schema({
     expires: 3600,
   },
 });
+
+const aggregated: Promise<Document> = Test.aggregate([]).then(res => res[0]);

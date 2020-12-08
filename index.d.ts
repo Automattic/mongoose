@@ -578,8 +578,8 @@ declare module "mongoose" {
   interface Model<T extends Document> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
-    aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
-    aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
+    aggregate<R = T>(pipeline?: any[]): Aggregate<Array<R>>;
+    aggregate<R = T>(pipeline: any[], cb: Function): Promise<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;

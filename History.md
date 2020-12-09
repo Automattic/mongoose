@@ -1,3 +1,12 @@
+5.11.6 / 2020-12-09
+===================
+ * fix(middleware): ensure sync errors in pre hooks always bubble up to the calling code #9659
+ * fix(index.d.ts): allow passing ObjectId properties as strings to `create()` and `findOneAndReplace()` #9676
+ * fix(index.d.ts): allow calling `mongoose.model()` and `Connection#model()` with model as generic param #9685 #9678 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): Fix return type of Model#aggregate() #9680 [orgads](https://github.com/orgads)
+ * fix(index.d.ts): optional next() parameter for post middleware #9683 [isengartz](https://github.com/isengartz)
+ * fix(index.d.ts): allow array of validators in SchemaTypeOptions #9686 [cjroebuck](https://github.com/cjroebuck)
+
 5.11.5 / 2020-12-07
 ===================
  * fix(map): support `null` in maps of subdocs #9628

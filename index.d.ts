@@ -242,6 +242,12 @@ declare module "mongoose" {
 
     /** Defines or retrieves a model. */
     model<T extends Document>(name: string, schema?: Schema, collection?: string): Model<T>;
+    model<T extends Document, U extends Model<T>>(
+      name: string,
+      schema?: Schema,
+      collection?: string,
+      skipInit?: boolean
+    ): U;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;

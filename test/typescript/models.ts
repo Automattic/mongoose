@@ -23,3 +23,17 @@ const ExpiresSchema = new Schema({
 });
 
 const aggregated: Promise<Document> = Test.aggregate([]).then(res => res[0]);
+
+interface IProject extends Document {
+  name: String;
+}
+
+interface ProjectModel extends Model<IProject> {
+  myStatic(): number;
+}
+
+const projectSchema: Schema = new Schema({ name: String });
+projectSchema.statics.myStatic = () => 42;
+
+const Project = connection.model<IProject, ProjectModel>('Project', projectSchema);
+Project.myStatic();

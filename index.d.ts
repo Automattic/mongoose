@@ -99,6 +99,12 @@ declare module "mongoose" {
   export function isValidObjectId(v: any): boolean;
 
   export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T extends Document, U extends Model<T>>(
+    name: string,
+    schema?: Schema,
+    collection?: string,
+    skipInit?: boolean
+  ): U;
 
   /** Returns an array of model names created on this instance of Mongoose. */
   export function modelNames(): Array<string>;
@@ -236,6 +242,12 @@ declare module "mongoose" {
 
     /** Defines or retrieves a model. */
     model<T extends Document>(name: string, schema?: Schema, collection?: string): Model<T>;
+    model<T extends Document, U extends Model<T>>(
+      name: string,
+      schema?: Schema,
+      collection?: string,
+      skipInit?: boolean
+    ): U;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;
@@ -578,8 +590,8 @@ declare module "mongoose" {
   interface Model<T extends Document> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
-    aggregate<R>(pipeline?: any[]): Aggregate<Array<R>>;
-    aggregate<R>(pipeline: any[], cb: Function): Promise<Array<R>>;
+    aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: typeof mongoose;
@@ -1082,12 +1094,12 @@ declare module "mongoose" {
     plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
     post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
 
-    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Document = Document>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
     post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<any> = Model<any>>(method: "insertMany" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
@@ -1303,7 +1315,7 @@ declare module "mongoose" {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: RegExp | [RegExp, string] | Function | [Function , string] | ValidateOpts<T>;
+    validate?: RegExp | [RegExp, string] | Function | [Function , string] | ValidateOpts<T> | ValidateOpts<T>[];
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string;
@@ -2110,7 +2122,10 @@ declare module "mongoose" {
 
   export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 
-  export type DocumentDefinition<T> = Omit<T, Exclude<keyof Document, '_id'>>;
+  type _AllowStringsForIds<T> = {
+    [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
+  };
+  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<T, Exclude<keyof Document, '_id'>>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type

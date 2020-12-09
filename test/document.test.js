@@ -9788,4 +9788,21 @@ describe('document', function() {
     assert.ok(documentFromDefault === user);
     assert.equal(documentFromDefault.name, 'Hafez');
   });
+
+  it('handles pre hook throwing a sync error (gh-9659)', function() {
+    const TestSchema = new Schema({ name: String });
+
+    TestSchema.pre('save', function() {
+      throw new Error('test err');
+    });
+    const TestModel = db.model('Test', TestSchema);
+
+    return co(function*() {
+      const testObject = new TestModel({ name: 't' });
+
+      const err = yield testObject.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.message, 'test err');
+    });
+  });
 });

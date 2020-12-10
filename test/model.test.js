@@ -4726,6 +4726,25 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() sets `isNew` for inserted documents with `ordered = false` (gh-9677)', function() {
+      const schema = new Schema({
+        title: { type: String, required: true, unique: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [{ title: 'The Phantom Menace' }, { title: 'The Phantom Menace' }];
+      const opts = { ordered: false };
+      return co(function*() {
+        yield Movie.init();
+        const err = yield Movie.insertMany(arr, opts).then(() => err, err => err);
+        assert.ok(err);
+        assert.ok(err.insertedDocs);
+
+        assert.equal(err.insertedDocs.length, 1);
+        assert.strictEqual(err.insertedDocs[0].isNew, false);
+      });
+    });
+
     it('insertMany() validation error with ordered true and rawResult true when all documents are invalid', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }

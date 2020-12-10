@@ -9805,4 +9805,13 @@ describe('document', function() {
       assert.equal(err.message, 'test err');
     });
   });
+
+  it('returns undefined rather than entire object when calling `get()` with empty string (gh-9681)', function() {
+    const TestSchema = new Schema({ name: String });
+    const TestModel = db.model('Test', TestSchema);
+
+    const testObject = new TestModel({ name: 't' });
+
+    assert.strictEqual(testObject.get(''), void 0);
+  });
 });

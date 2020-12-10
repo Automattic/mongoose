@@ -1,3 +1,10 @@
+5.11.7 / 2020-12-10
+===================
+ * fix(document): ensure calling `get()` with empty string returns undefined for mongoose-plugin-autoinc #9681
+ * fix(model): set `isNew` to false for documents that were successfully inserted by `insertMany` with `ordered = false` when an error occurred #9677
+ * fix(index.d.ts): add missing Aggregate#skip() & Aggregate#limit() #9692 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): make `Document#id` optional so types that use `id` can use `Model<IMyType & Document>` #9684
+
 5.11.6 / 2020-12-09
 ===================
  * fix(middleware): ensure sync errors in pre hooks always bubble up to the calling code #9659

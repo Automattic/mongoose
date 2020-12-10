@@ -475,7 +475,7 @@ declare module "mongoose" {
     getChanges(): UpdateQuery<this>;
 
     /** The string version of this documents _id. */
-    id: string;
+    id?: string;
 
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
@@ -2236,6 +2236,12 @@ declare module "mongoose" {
     /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
     hint(value: object | string): this;
 
+    /**
+     * Appends a new $limit operator to this aggregate pipeline.
+     * @param num maximum number of records to pass to the next stage
+     */
+    limit(num: number): this;
+                                          
     /** Appends new custom $lookup operator to this aggregate pipeline. */
     lookup(options: any): this;
 
@@ -2265,6 +2271,12 @@ declare module "mongoose" {
 
     /** Sets the session for this aggregation. Useful for [transactions](/docs/transactions.html). */
     session(session: mongodb.ClientSession | null): this;
+    
+    /**
+     * Appends a new $skip operator to this aggregate pipeline.
+     * @param num number of records to skip before next stage
+     */
+    skip(num: number): this;
 
     /** Appends a new $sort operator to this aggregate pipeline. */
     sort(arg: any): this;

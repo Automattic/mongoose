@@ -1,19 +1,37 @@
 import { Schema, Document, Model, connection } from 'mongoose';
 
-interface ITest extends Document {
-  foo: string;
+function conventionalSyntax(): void {
+  interface ITest extends Document {
+    foo: string;
+  }
+  
+  const TestSchema = new Schema({
+    foo: { type: String, required: true },
+  });
+  
+  const Test = connection.model<ITest>('Test', TestSchema);
+  
+  const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
+  
+  bar(Test);
 }
 
-const TestSchema = new Schema({
-  foo: { type: String, required: true },
-});
+function tAndDocSyntax(): void {
+  interface ITest {
+    id: number;
+    foo: string;
+  }
+  
+  const TestSchema = new Schema({
+    foo: { type: String, required: true },
+  });
 
-const Test = connection.model<ITest>('Test', TestSchema);
+  const Test = connection.model<ITest & Document>('Test', TestSchema);
 
-const bar = (SomeModel: Model<ITest>) => // <<<< error here
-  console.log(SomeModel);
+  const aggregated: Promise<Document> = Test.aggregate([]).then(res => res[0]);
 
-bar(Test);
+  const bar = (SomeModel: Model<ITest & Document>) => console.log(SomeModel);
+}
 
 const ExpiresSchema = new Schema({
   ttl: {
@@ -21,8 +39,6 @@ const ExpiresSchema = new Schema({
     expires: 3600,
   },
 });
-
-const aggregated: Promise<Document> = Test.aggregate([]).then(res => res[0]);
 
 interface IProject extends Document {
   name: String;

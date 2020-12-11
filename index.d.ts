@@ -2068,7 +2068,7 @@ declare module "mongoose" {
     then: Promise<ResultType>["then"];
 
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
-    toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<ResultType, DocType>;
+    toConstructor(): new (...args: any[]) => Query<ResultType, DocType>;
 
     /** Declare and/or execute this query as an update() operation. */
     update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;

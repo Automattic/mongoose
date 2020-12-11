@@ -316,7 +316,8 @@ block content
     console.log(axl.name.first + ' ' + axl.name.last); // Axl Rose
     ```
 
-    But concatenating the first and last name every time can get cumbersome.
+    But [concatenating](https://masteringjs.io/tutorials/fundamentals/string-concat) the first and
+    last name every time can get cumbersome.
     And what if you want to do some extra processing on the name, like
     [removing diacritics](https://www.npmjs.com/package/diacritics)? A
     [virtual property getter](./api.html#virtualtype_VirtualType-get) lets you
@@ -363,6 +364,8 @@ block content
 
     Only non-virtual properties work as part of queries and for field selection.
     Since virtuals are not stored in MongoDB, you can't query with them.
+
+    You can [learn more about virtuals here](https://masteringjs.io/tutorials/mongoose/virtuals).
 
     <h3 id="aliases"><a href="#aliases">Aliases</a></h3>
 
@@ -815,7 +818,7 @@ block content
     <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
     Exactly the same as the [toObject](#toObject) option but only applies when
-    the document's `toJSON` method is called.
+    the document's [`toJSON` method](https://thecodebarbarian.com/what-is-the-tojson-function-in-javascript.html) is called.
 
     ```javascript
     const schema = new Schema({ name: String });

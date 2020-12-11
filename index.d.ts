@@ -2125,7 +2125,7 @@ declare module "mongoose" {
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
   };
-  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<T, Exclude<keyof Document, '_id'>>>;
+  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<Omit<T, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type

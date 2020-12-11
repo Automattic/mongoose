@@ -164,6 +164,14 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 0);
   });
+
+  it('methods', function() {
+    const errors = runTest('methods.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file) {

@@ -724,6 +724,8 @@ declare module "mongoose" {
     /** Populates document references. */
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
+    populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
+      callback?: (err: any, res: T) => void): Promise<T>;
 
     /**
      * Makes the indexes in MongoDB match the indexes defined in this model's

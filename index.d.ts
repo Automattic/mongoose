@@ -896,6 +896,8 @@ declare module "mongoose" {
     writeConcern?: any;
   }
 
+  type MongooseQueryOptions = Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">;
+
   interface SaveOptions {
     checkKeys?: boolean;
     j?: boolean;
@@ -1725,7 +1727,7 @@ declare module "mongoose" {
   }
 
   interface Query<ResultType, DocType extends Document> {
-    _mongooseOptions: QueryOptions;
+    _mongooseOptions: MongooseQueryOptions;
 
     exec(): Promise<ResultType>;
     exec(callback?: (err: CallbackError, res: ResultType) => void): void;
@@ -1944,7 +1946,7 @@ declare module "mongoose" {
      * Getter/setter around the current mongoose-specific options for this query
      * Below are the current Mongoose-specific options.
      */
-    mongooseOptions(val?: Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">): Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">;
+    mongooseOptions(val?: MongooseQueryOptions): MongooseQueryOptions;
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne(val: any): this;

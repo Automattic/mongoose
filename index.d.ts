@@ -1653,7 +1653,7 @@ declare module "mongoose" {
       shift(): T;
 
       /** Returns a native js Array. */
-      toObject(options: ToObjectOptions): any;
+      toObject(options?: ToObjectOptions): any;
 
       /** Wraps [`Array#unshift`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/unshift) with proper change tracking. */
       unshift(...args: any[]): number;
@@ -1695,7 +1695,7 @@ declare module "mongoose" {
 
     class Map<V> extends global.Map<string, V> {
       /** Converts a Mongoose map into a vanilla JavaScript map. */
-      toObject(options: ToObjectOptions & { flattenMaps?: boolean }): any;
+      toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
     var ObjectId: ObjectIdConstructor;

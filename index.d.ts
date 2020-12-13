@@ -1448,6 +1448,15 @@ declare module "mongoose" {
     unique?: boolean
   }
 
+  interface ValidatorProps {
+    path: string;
+    value: any;
+  }
+
+  interface ValidatorMessageFn {
+    (props: ValidatorProps): string;
+  }
+
   interface ValidateFn<T> {
     (value: T): boolean;
   }
@@ -1462,7 +1471,7 @@ declare module "mongoose" {
 
   interface ValidateOpts<T> {
     msg?: string;
-    message?: string;
+    message?: string | ValidatorMessageFn;
     type?: string;
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }

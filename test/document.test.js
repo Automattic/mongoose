@@ -9134,4 +9134,39 @@ describe('document', function() {
       assert.ok(!('a' in fromDb));
     });
   });
+
+  it('passes document to `default` functions (gh-9633)', function() {
+    let documentFromDefault;
+    const userSchema = new Schema({
+      name: { type: String },
+      age: {
+        type: Number,
+        default: function(doc) {
+          documentFromDefault = doc;
+        }
+      }
+
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+
+    assert.ok(documentFromDefault === user);
+    assert.equal(documentFromDefault.name, 'Hafez');
+  });
+
+  it('does not pass doc to ObjectId or Date.now (gh-9633) (gh-9636)', function() {
+    const userSchema = new Schema({
+      parentId: { type: Schema.ObjectId, ref: 'User', default: mongoose.Types.ObjectId },
+      createdAt: { type: Date, default: Date.now }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User();
+
+    assert.ok(user.parentId instanceof mongoose.Types.ObjectId);
+    assert.ok(user.createdAt instanceof Date);
+  });
 });

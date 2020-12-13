@@ -363,11 +363,11 @@ declare module "mongoose" {
     getIndexes(): any;
   }
 
-  class Document {
+  class Document<T = any> {
     constructor(doc?: any);
 
     /** This documents _id. */
-    _id?: any;
+    _id?: T;
 
     /** This documents __v. */
     __v?: number;
@@ -456,7 +456,7 @@ declare module "mongoose" {
      * document has an `_id`, in which case this function falls back to using
      * `deepEqual()`.
      */
-    equals(doc: Document): boolean;
+    equals(doc: Document<T>): boolean;
 
     /** Hash containing current validation errors. */
     errors?: Error.ValidationError;

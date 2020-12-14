@@ -1,3 +1,12 @@
+5.11.8 / 2020-12-14
+===================
+ * fix(index.d.ts): add missing single document populate #9696 [YC](https://github.com/YC)
+ * fix(index.d.ts): make options optional for `toObject` #9700
+ * fix(index.d.ts): added missing match and model methods in Aggregate class #9710 [manekshms](https://github.com/manekshms)
+ * fix(index.d.ts): make options optional for `createIndexes()` and `ensureIndexes()` #9706
+ * fix(index.d.ts): support passing a function to `ValidateOpts.message` #9697
+ * docs: add media query for ::before on headings #9705 #9704 [YC](https://github.com/YC)
+
 5.11.7 / 2020-12-10
 ===================
  * fix(document): ensure calling `get()` with empty string returns undefined for mongoose-plugin-autoinc #9681

@@ -363,11 +363,11 @@ declare module "mongoose" {
     getIndexes(): any;
   }
 
-  class Document {
+  class Document<T = any> {
     constructor(doc?: any);
 
     /** This documents _id. */
-    _id?: any;
+    _id?: T;
 
     /** This documents __v. */
     __v?: number;
@@ -456,7 +456,7 @@ declare module "mongoose" {
      * document has an `_id`, in which case this function falls back to using
      * `deepEqual()`.
      */
-    equals(doc: Document): boolean;
+    equals(doc: Document<T>): boolean;
 
     /** Hash containing current validation errors. */
     errors?: Error.ValidationError;
@@ -642,8 +642,7 @@ declare module "mongoose" {
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
      * function.
      */
-    createIndexes(options: any): Promise<void>;
-    createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+    createIndexes(options?: any, callback?: (err: any) => void): Promise<void>;
 
     /** Connection the model uses. */
     db: Connection;
@@ -666,8 +665,7 @@ declare module "mongoose" {
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
      */
-    ensureIndexes(options: any): Promise<void>;
-    ensureIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+    ensureIndexes(options?: any, callback?: (err: any) => void): Promise<void>;
 
     /**
      * Event emitter that reports any errors that occurred. Useful for global error
@@ -724,6 +722,8 @@ declare module "mongoose" {
     /** Populates document references. */
     populate(docs: Array<any>, options: PopulateOptions | Array<PopulateOptions> | string,
       callback?: (err: any, res: T[]) => void): Promise<Array<T>>;
+    populate(doc: any, options: PopulateOptions | Array<PopulateOptions> | string,
+      callback?: (err: any, res: T) => void): Promise<T>;
 
     /**
      * Makes the indexes in MongoDB match the indexes defined in this model's
@@ -893,6 +893,8 @@ declare module "mongoose" {
     useFindAndModify?: boolean;
     writeConcern?: any;
   }
+
+  type MongooseQueryOptions = Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">;
 
   interface SaveOptions {
     checkKeys?: boolean;
@@ -1444,6 +1446,15 @@ declare module "mongoose" {
     unique?: boolean
   }
 
+  interface ValidatorProps {
+    path: string;
+    value: any;
+  }
+
+  interface ValidatorMessageFn {
+    (props: ValidatorProps): string;
+  }
+
   interface ValidateFn<T> {
     (value: T): boolean;
   }
@@ -1458,7 +1469,7 @@ declare module "mongoose" {
 
   interface ValidateOpts<T> {
     msg?: string;
-    message?: string;
+    message?: string | ValidatorMessageFn;
     type?: string;
     validator: ValidateFn<T> | LegacyAsyncValidateFn<T> | AsyncValidateFn<T>;
   }
@@ -1651,7 +1662,7 @@ declare module "mongoose" {
       shift(): T;
 
       /** Returns a native js Array. */
-      toObject(options: ToObjectOptions): any;
+      toObject(options?: ToObjectOptions): any;
 
       /** Wraps [`Array#unshift`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/unshift) with proper change tracking. */
       unshift(...args: any[]): number;
@@ -1693,7 +1704,7 @@ declare module "mongoose" {
 
     class Map<V> extends global.Map<string, V> {
       /** Converts a Mongoose map into a vanilla JavaScript map. */
-      toObject(options: ToObjectOptions & { flattenMaps?: boolean }): any;
+      toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
     var ObjectId: ObjectIdConstructor;
@@ -1723,7 +1734,7 @@ declare module "mongoose" {
   }
 
   interface Query<ResultType, DocType extends Document> {
-    _mongooseOptions: QueryOptions;
+    _mongooseOptions: MongooseQueryOptions;
 
     exec(): Promise<ResultType>;
     exec(callback?: (err: CallbackError, res: ResultType) => void): void;
@@ -1942,7 +1953,7 @@ declare module "mongoose" {
      * Getter/setter around the current mongoose-specific options for this query
      * Below are the current Mongoose-specific options.
      */
-    mongooseOptions(val?: Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">): Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">;
+    mongooseOptions(val?: MongooseQueryOptions): MongooseQueryOptions;
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne(val: any): this;
@@ -2068,7 +2079,7 @@ declare module "mongoose" {
     then: Promise<ResultType>["then"];
 
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
-    toConstructor(): new (filter?: FilterQuery<DocType>, options?: QueryOptions) => Query<ResultType, DocType>;
+    toConstructor(): new (...args: any[]) => Query<ResultType, DocType>;
 
     /** Declare and/or execute this query as an update() operation. */
     update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType>;
@@ -2125,7 +2136,7 @@ declare module "mongoose" {
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
   };
-  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<T, Exclude<keyof Document, '_id'>>>;
+  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<Omit<T, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
@@ -2244,6 +2255,18 @@ declare module "mongoose" {
                                           
     /** Appends new custom $lookup operator to this aggregate pipeline. */
     lookup(options: any): this;
+
+    /**
+     * Appends a new custom $match operator to this aggregate pipeline.
+     * @param arg $match operator contents
+     */
+    match(arg: any): this;
+
+    /**
+     * Binds this aggregate to a model.
+     * @param model the model to which the aggregate is to be bound
+     */
+    model(model: any): this;
 
     /** Returns the current pipeline */
     pipeline(): any[];

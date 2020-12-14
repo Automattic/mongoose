@@ -73,7 +73,7 @@ describe('typescript syntax', function() {
   });
 
   it('discriminators', function() {
-    const errors = runTest('discriminator.ts');
+    const errors = runTest('discriminator.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }
@@ -164,10 +164,18 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 0);
   });
+
+  it('methods', function() {
+    const errors = runTest('methods.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
-function runTest(file) {
-  const program = typescript.createProgram([`${__dirname}/${file}`], tsconfig);
+function runTest(file, configOverride) {
+  const program = typescript.createProgram([`${__dirname}/${file}`], Object.assign({}, tsconfig, configOverride));
 
   const emitResult = program.emit();
 

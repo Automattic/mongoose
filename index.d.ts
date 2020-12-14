@@ -2256,6 +2256,18 @@ declare module "mongoose" {
     /** Appends new custom $lookup operator to this aggregate pipeline. */
     lookup(options: any): this;
 
+    /**
+     * Appends a new custom $match operator to this aggregate pipeline.
+     * @param arg $match operator contents
+     */
+    match(arg: any): this;
+
+    /**
+     * Binds this aggregate to a model.
+     * @param model the model to which the aggregate is to be bound
+     */
+    model(model: any): this;
+
     /** Returns the current pipeline */
     pipeline(): any[];
 

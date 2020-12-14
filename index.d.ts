@@ -642,8 +642,7 @@ declare module "mongoose" {
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
      * function.
      */
-    createIndexes(options: any): Promise<void>;
-    createIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+    createIndexes(options?: any, callback?: (err: any) => void): Promise<void>;
 
     /** Connection the model uses. */
     db: Connection;
@@ -666,8 +665,7 @@ declare module "mongoose" {
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
      */
-    ensureIndexes(options: any): Promise<void>;
-    ensureIndexes(options: any, callback?: (err: any) => void): Promise<void>;
+    ensureIndexes(options?: any, callback?: (err: any) => void): Promise<void>;
 
     /**
      * Event emitter that reports any errors that occurred. Useful for global error

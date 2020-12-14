@@ -209,6 +209,12 @@ pre {
 }
 
 @media (max-width: 1160px) {
+  h2:hover::before, h3:hover::before {
+    position: static;
+    display: inline-block;
+    margin-right: .2em;
+  }
+
   .container {
     width: 100%;
     padding: 0px;

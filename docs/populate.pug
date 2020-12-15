@@ -601,6 +601,9 @@ block content
 
     <h3 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h3>
 
+    You need to enable virtuals on mongoose first :
+    mongoose.set('toJSON', { virtuals: true });
+
     So far you've only populated based on the `_id` field. However, that's
     sometimes not the right choice.
     In particular, [arrays that grow without bound are a MongoDB anti-pattern](https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/).

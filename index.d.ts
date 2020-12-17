@@ -2214,6 +2214,9 @@ declare module "mongoose" {
     /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
     allowDiskUse(value: boolean): this;
 
+    /** Appends new operators to this aggregate pipeline */
+    append(...args: any[]): this;
+
     /**
      * Executes the query returning a `Promise` which will be
      * resolved with either the doc(s) or rejected with the error.

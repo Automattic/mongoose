@@ -2317,6 +2317,9 @@ declare module "mongoose" {
      * or a pipeline object.
      */
     sortByCount(arg: string | any): this;
+
+    /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
+    unwind(...args: any[]): this;
   }
 
   class AggregationCursor extends stream.Readable {

@@ -2138,7 +2138,7 @@ declare module "mongoose" {
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
   };
-  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<Omit<T, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>>;
+  export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
@@ -2162,7 +2162,7 @@ declare module "mongoose" {
     T[K];
   };
 
-  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id'>>, FunctionPropertyNames<T>>;
+  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id'> | '$isSingleNested'>, FunctionPropertyNames<T>>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :
@@ -2540,4 +2540,7 @@ declare module "mongoose" {
 
   export type SchemaTypeOpts<T> = SchemaTypeOptions<T>;
   export type ConnectionOptions = ConnectOptions;
+
+  /* for ts-mongoose */
+  class mquery {}
 }

@@ -9842,4 +9842,31 @@ describe('model: populate:', function() {
       assert.strictEqual(res.child.age, void 0);
     });
   });
+
+  it('avoids propagating lean virtuals to children (gh-9592)', function() {
+    const parentSchema = Schema({
+      child: {
+        type: 'ObjectId',
+        ref: 'Child',
+        populate: { select: 'name' }
+      }
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const childSchema = new Schema({ name: String, age: Number });
+    const findCallOptions = [];
+    childSchema.pre('find', function() {
+      findCallOptions.push(this._mongooseOptions.lean);
+    });
+    const Child = db.model('Child', childSchema);
+
+    return co(function*() {
+      const child = yield Child.create({ name: 'my name', age: 30 });
+      yield Parent.create({ child: child._id });
+
+      yield Parent.findOne().populate('child').lean({ virtuals: ['name', 'child.foo'] });
+      assert.equal(findCallOptions.length, 1);
+      assert.deepEqual(findCallOptions[0].virtuals, ['foo']);
+    });
+  });
 });

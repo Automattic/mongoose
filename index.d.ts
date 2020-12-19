@@ -98,10 +98,10 @@ declare module "mongoose" {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T extends Document>(name: string, schema?: Schema<T>, collection?: string, skipInit?: boolean): Model<T>;
   export function model<T extends Document, U extends Model<T>>(
     name: string,
-    schema?: Schema,
+    schema?: Schema<T, U>,
     collection?: string,
     skipInit?: boolean
   ): U;

@@ -35,6 +35,8 @@
   "devDependencies": {
     "@babel/core": "7.10.5",
     "@babel/preset-env": "7.10.4",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
     "acquit": "1.x",
     "acquit-ignore": "0.1.x",
     "acquit-require": "0.1.x",
@@ -46,7 +48,7 @@
     "cheerio": "1.0.0-rc.2",
     "co": "4.6.0",
     "dox": "0.3.1",
-    "eslint": "7.1.0",
+    "eslint": "^7.1.0",
     "eslint-plugin-mocha-no-only": "1.1.0",
     "highlight.js": "9.18.2",
     "lodash.isequal": "4.5.0",
@@ -102,9 +104,12 @@
   },
   "eslintConfig": {
     "extends": [
-      "eslint:recommended"
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
     ],
     "plugins": [
+      "@typescript-eslint",
       "mocha-no-only"
     ],
     "parserOptions": {

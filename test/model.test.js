@@ -7054,4 +7054,103 @@ describe('Model', function() {
       });
     });
   });
+
+  describe('bulkSave() (gh-9673)', function() {
+    it('saves new documents', function() {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+
+        yield User.bulkSave([
+          new User({ name: 'Hafez1_gh-9673-1' }),
+          new User({ name: 'Hafez2_gh-9673-1' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        assert.deepEqual(
+          users.map(user => user.name),
+          [
+            'Hafez1_gh-9673-1',
+            'Hafez2_gh-9673-1'
+          ]
+        );
+      });
+    });
+
+    it('updates documents', function() {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+
+        yield User.insertMany([
+          new User({ name: 'Hafez1_gh-9673-2' }),
+          new User({ name: 'Hafez2_gh-9673-2' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        users[0].name = 'Hafez1_gh-9673-2-updated';
+        users[1].name = 'Hafez2_gh-9673-2-updated';
+
+        yield User.bulkSave(users);
+
+        const usersAfterUpdate = yield User.find().sort('name');
+
+        assert.deepEqual(
+          usersAfterUpdate.map(user => user.name),
+          [
+            'Hafez1_gh-9673-2-updated',
+            'Hafez2_gh-9673-2-updated'
+          ]
+        );
+      });
+    });
+    it('changes document state from `isNew` `false` to `true`');
+    it('changes documents state');
+    it('throws an error when a document is invalid');
+    it('throws an error when a document throws a unique error');
+
+    it('throws an error if documents is not an array', function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      assert.throws(
+        function() {
+          User.bulkSave(null);
+        },
+        /bulkSave expects an array of documents to be passed/
+      );
+    });
+    it('throws an error if one element is not a document', function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      assert.throws(
+        function() {
+          User.bulkSave([
+            new User({ name: 'Hafez' }),
+            { name: 'I am not a document' }
+          ]);
+        },
+        /documents\.1 was not a mongoose document/
+      );
+    });
+  });
 });

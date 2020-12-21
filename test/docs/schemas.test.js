@@ -3,9 +3,9 @@
 const assert = require('assert');
 const mongoose = require('../../');
 
-describe('Advanced Schemas', function () {
+describe('Advanced Schemas', function() {
   let db;
-  let Schema = mongoose.Schema;
+  const Schema = mongoose.Schema;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');

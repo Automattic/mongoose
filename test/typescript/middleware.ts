@@ -30,6 +30,7 @@ schema.post<ITest>('save', function() {
   console.log(this.name);
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
   console.log(this.name, err.stack);
 });

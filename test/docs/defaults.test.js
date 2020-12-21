@@ -3,7 +3,7 @@
 const assert = require('assert');
 const mongoose = require('../../');
 
-describe('defaults docs', function () {
+describe('defaults docs', function() {
   let db;
   const Schema = mongoose.Schema;
 
@@ -76,7 +76,7 @@ describe('defaults docs', function () {
 
     const BlogPost = db.model('BlogPost', schema);
 
-    const post = new BlogPost({title: '5 Best Arnold Schwarzenegger Movies'});
+    const post = new BlogPost({ title: '5 Best Arnold Schwarzenegger Movies' });
 
     // The post has a default Date set to now
     assert.ok(post.date.getTime() >= Date.now() - 1000);
@@ -99,13 +99,13 @@ describe('defaults docs', function () {
   it('The `setDefaultsOnInsert` option', function(done) {
     const schema = new Schema({
       title: String,
-      genre: {type: String, default: 'Action'}
+      genre: { type: String, default: 'Action' }
     });
 
     const Movie = db.model('Movie', schema);
 
     const query = {};
-    const update = {title: 'The Terminator'};
+    const update = { title: 'The Terminator' };
     const options = {
       // Return the document after updates are applied
       new: true,
@@ -116,7 +116,7 @@ describe('defaults docs', function () {
     };
 
     Movie.
-      findOneAndUpdate(query, update, options, function (error, doc) {
+      findOneAndUpdate(query, update, options, function(error, doc) {
         assert.ifError(error);
         assert.equal(doc.title, 'The Terminator');
         assert.equal(doc.genre, 'Action');

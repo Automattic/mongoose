@@ -1722,7 +1722,7 @@ declare module 'mongoose' {
       toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
-    var ObjectId: ObjectIdConstructor;
+    const ObjectId: ObjectIdConstructor;
 
     class _ObjectId extends mongodb.ObjectID {
       _id?: ObjectId;

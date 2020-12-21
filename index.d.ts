@@ -475,7 +475,7 @@ declare module "mongoose" {
     getChanges(): UpdateQuery<this>;
 
     /** The string version of this documents _id. */
-    id?: string;
+    id?: any;
 
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
@@ -642,6 +642,7 @@ declare module "mongoose" {
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
      * function.
      */
+    createIndexes(callback?: (err: any) => void): Promise<void>;
     createIndexes(options?: any, callback?: (err: any) => void): Promise<void>;
 
     /** Connection the model uses. */
@@ -665,6 +666,7 @@ declare module "mongoose" {
      * Sends `createIndex` commands to mongo for each index declared in the schema.
      * The `createIndex` commands are sent in series.
      */
+    ensureIndexes(callback?: (err: any) => void): Promise<void>;
     ensureIndexes(options?: any, callback?: (err: any) => void): Promise<void>;
 
     /**
@@ -2136,7 +2138,7 @@ declare module "mongoose" {
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
   };
-  export type DocumentDefinition<T> = _AllowStringsForIds<Omit<Omit<T, Exclude<keyof Document, '_id'>>, FunctionPropertyNames<T>>>;
+  export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
@@ -2160,7 +2162,7 @@ declare module "mongoose" {
     T[K];
   };
 
-  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id'>>, FunctionPropertyNames<T>>;
+  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>, FunctionPropertyNames<T>>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :
@@ -2213,6 +2215,9 @@ declare module "mongoose" {
 
     /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
     allowDiskUse(value: boolean): this;
+
+    /** Appends new operators to this aggregate pipeline */
+    append(...args: any[]): this;
 
     /**
      * Executes the query returning a `Promise` which will be
@@ -2312,6 +2317,9 @@ declare module "mongoose" {
      * or a pipeline object.
      */
     sortByCount(arg: string | any): this;
+
+    /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
+    unwind(...args: any[]): this;
   }
 
   class AggregationCursor extends stream.Readable {
@@ -2550,4 +2558,7 @@ declare module "mongoose" {
 
   export type SchemaTypeOpts<T> = SchemaTypeOptions<T>;
   export type ConnectionOptions = ConnectOptions;
+
+  /* for ts-mongoose */
+  class mquery {}
 }

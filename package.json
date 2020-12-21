@@ -104,12 +104,23 @@
   },
   "eslintConfig": {
     "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended"
+      "eslint:recommended"
     ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.{ts,tsx}"
+        ],
+        "extends": [
+          "plugin:@typescript-eslint/eslint-recommended",
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "plugins": [
+          "@typescript-eslint"
+        ]
+      }
+      ],
     "plugins": [
-      "@typescript-eslint",
       "mocha-no-only"
     ],
     "parserOptions": {

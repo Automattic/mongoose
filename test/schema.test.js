@@ -1438,9 +1438,9 @@ describe('schema', function() {
 
       assert.throws(function() {
         new Schema({
-          schema: String
+          reserved_schema: String
         });
-      }, /`schema` may not be used as a schema pathname/);
+      }, /`reserved_schema` may not be used as a schema pathname/);
 
       assert.throws(function() {
         new Schema({

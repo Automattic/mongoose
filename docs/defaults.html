@@ -53,7 +53,7 @@ execute that function and use the return value as the default.</p>
 
 <span class="hljs-keyword">const</span> BlogPost = db.model(<span class="hljs-string">'BlogPost'</span>, schema);
 
-<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">new</span> BlogPost({<span class="hljs-attr">title</span>: <span class="hljs-string">'5 Best Arnold Schwarzenegger Movies'</span>});
+<span class="hljs-keyword">const</span> post = <span class="hljs-keyword">new</span> BlogPost({ <span class="hljs-attr">title</span>: <span class="hljs-string">'5 Best Arnold Schwarzenegger Movies'</span> });
 
 <span class="hljs-comment">// The post has a default Date set to now</span>
 assert.ok(post.date.getTime() &gt;= <span class="hljs-built_in">Date</span>.now() - <span class="hljs-number">1000</span>);
@@ -71,13 +71,13 @@ using MongoDB server &lt; 2.4.0, do <strong>not</strong> use <code>setDefaultsOn
 
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> Schema({
   <span class="hljs-attr">title</span>: <span class="hljs-built_in">String</span>,
-  <span class="hljs-attr">genre</span>: {<span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">'Action'</span>}
+  <span class="hljs-attr">genre</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">default</span>: <span class="hljs-string">'Action'</span> }
 });
 
 <span class="hljs-keyword">const</span> Movie = db.model(<span class="hljs-string">'Movie'</span>, schema);
 
 <span class="hljs-keyword">const</span> query = {};
-<span class="hljs-keyword">const</span> update = {<span class="hljs-attr">title</span>: <span class="hljs-string">'The Terminator'</span>};
+<span class="hljs-keyword">const</span> update = { <span class="hljs-attr">title</span>: <span class="hljs-string">'The Terminator'</span> };
 <span class="hljs-keyword">const</span> options = {
   <span class="hljs-comment">// Return the document after updates are applied</span>
   <span class="hljs-attr">new</span>: <span class="hljs-literal">true</span>,
@@ -88,7 +88,7 @@ using MongoDB server &lt; 2.4.0, do <strong>not</strong> use <code>setDefaultsOn
 };
 
 Movie.
-  findOneAndUpdate(query, update, options, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, doc</span>) </span>{
+  findOneAndUpdate(query, update, options, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc</span>) </span>{
     assert.ifError(error);
     assert.equal(doc.title, <span class="hljs-string">'The Terminator'</span>);
     assert.equal(doc.genre, <span class="hljs-string">'Action'</span>);

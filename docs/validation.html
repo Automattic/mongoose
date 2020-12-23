@@ -233,7 +233,7 @@ toySchema.path(<span class="hljs-string">'name'</span>).validate(<span class="hl
 
 <span class="hljs-keyword">const</span> toy = <span class="hljs-keyword">new</span> Toy({ <span class="hljs-attr">color</span>: <span class="hljs-string">'Green'</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">'Power Ranger'</span> });
 
-toy.save(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+toy.save(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
   <span class="hljs-comment">// `err` is a ValidationError object</span>
   <span class="hljs-comment">// `err.errors.color` is a ValidatorError object</span>
   assert.equal(err.errors.color.message, <span class="hljs-string">'Color `Green` not valid'</span>);
@@ -328,12 +328,12 @@ caveats.</p>
 
 <span class="hljs-keyword">const</span> Toy = db.model(<span class="hljs-string">'Toys'</span>, toySchema);
 
-Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+Toy.schema.path(<span class="hljs-string">'color'</span>).validate(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-regexp">/red|green|blue/i</span>.test(value);
 }, <span class="hljs-string">'Invalid color'</span>);
 
 <span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
-Toy.updateOne({}, { <span class="hljs-attr">color</span>: <span class="hljs-string">'not a color'</span> }, opts, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+Toy.updateOne({}, { <span class="hljs-attr">color</span>: <span class="hljs-string">'not a color'</span> }, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
   assert.equal(err.errors.color.message,
     <span class="hljs-string">'Invalid color'</span>);
 });</code></pre>
@@ -415,7 +415,7 @@ you try to explicitly <code>$unset</code> the key.</p>
 
 <span class="hljs-keyword">const</span> update = { <span class="hljs-attr">color</span>: <span class="hljs-string">'blue'</span> };
 <span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
-Kitten.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+Kitten.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-comment">// Operation succeeds despite the fact that 'name' is not specified</span>
 });
 
@@ -457,7 +457,7 @@ testSchema.path(<span class="hljs-string">'arr'</span>).validate(<span class="hl
 
 <span class="hljs-keyword">let</span> update = { <span class="hljs-attr">$inc</span>: { <span class="hljs-attr">number</span>: <span class="hljs-number">1</span> } };
 <span class="hljs-keyword">const</span> opts = { <span class="hljs-attr">runValidators</span>: <span class="hljs-literal">true</span> };
-Test.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+Test.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-comment">// There will never be a validation error here</span>
   update = { <span class="hljs-attr">$push</span>: [{ <span class="hljs-attr">message</span>: <span class="hljs-string">'hello'</span> }, { <span class="hljs-attr">message</span>: <span class="hljs-string">'world'</span> }] };
   Test.updateOne({}, update, opts, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{

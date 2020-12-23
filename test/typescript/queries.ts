@@ -36,6 +36,6 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITe
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true }).then((res: ITest) => { res.name = 'test4' });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true }).then((res: ITest) => { res.name = 'test4'; });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));

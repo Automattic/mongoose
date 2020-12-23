@@ -1,6 +1,6 @@
-import * as mongoose from 'mongoose'
+import * as mongoose from 'mongoose';
 
-Object.values(mongoose.models).forEach(model=>{
+Object.values(mongoose.models).forEach(model => {
   model.modelName;
-  model.findOne()
+  model.findOne();
 });

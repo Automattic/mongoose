@@ -4,15 +4,15 @@ function conventionalSyntax(): void {
   interface ITest extends Document {
     foo: string;
   }
-  
+
   const TestSchema = new Schema({
-    foo: { type: String, required: true },
+    foo: { type: String, required: true }
   });
-  
+
   const Test = connection.model<ITest>('Test', TestSchema);
-  
+
   const bar = (SomeModel: Model<ITest>) => console.log(SomeModel);
-  
+
   bar(Test);
 }
 
@@ -21,9 +21,9 @@ function tAndDocSyntax(): void {
     id: number;
     foo: string;
   }
-  
+
   const TestSchema = new Schema({
-    foo: { type: String, required: true },
+    foo: { type: String, required: true }
   });
 
   const Test = connection.model<ITest & Document>('Test', TestSchema);
@@ -36,12 +36,12 @@ function tAndDocSyntax(): void {
 const ExpiresSchema = new Schema({
   ttl: {
     type: Date,
-    expires: 3600,
-  },
+    expires: 3600
+  }
 });
 
 interface IProject extends Document {
-  name: String;
+  name: string;
 }
 
 interface ProjectModel extends Model<IProject> {

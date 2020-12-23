@@ -12,12 +12,12 @@ const schema: Schema = new Schema({
   docarr2: [{
     type: childSchema,
     _id: false
-  }],
+  }]
 });
 
 interface ITest extends Document {
-  child1: { name: String },
-  child2: { name: String }
+  child1: { name: string },
+  child2: { name: string }
 }
 
 const Test = model<ITest>('Test', schema);

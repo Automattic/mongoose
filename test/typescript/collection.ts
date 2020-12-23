@@ -10,8 +10,8 @@ interface ITest extends Document {
 const Test = model<ITest>('Test', schema);
 
 Test.collection.collectionName;
-Test.collection.findOne({})
-Test.collection.findOneAndDelete({})
-Test.collection.ensureIndex()
-Test.collection.findAndModify()
-Test.collection.getIndexes()
+Test.collection.findOne({});
+Test.collection.findOneAndDelete({});
+Test.collection.ensureIndex();
+Test.collection.findAndModify();
+Test.collection.getIndexes();

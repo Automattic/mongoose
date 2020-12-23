@@ -48,7 +48,7 @@
     "cheerio": "1.0.0-rc.2",
     "co": "4.6.0",
     "dox": "0.3.1",
-    "eslint": "^7.1.0",
+    "eslint": "7.1.0",
     "eslint-plugin-mocha-no-only": "1.1.0",
     "highlight.js": "9.18.2",
     "lodash.isequal": "4.5.0",
@@ -117,9 +117,12 @@
         ],
         "plugins": [
           "@typescript-eslint"
-        ]
+        ],
+        "rules": {
+          "@typescript-eslint/no-explicit-any": "off"
+        }
       }
-      ],
+    ],
     "plugins": [
       "mocha-no-only"
     ],

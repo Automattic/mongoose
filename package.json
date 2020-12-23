@@ -35,6 +35,8 @@
   "devDependencies": {
     "@babel/core": "7.10.5",
     "@babel/preset-env": "7.10.4",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
     "acquit": "1.x",
     "acquit-ignore": "0.1.x",
     "acquit-require": "0.1.x",
@@ -103,6 +105,23 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.{ts,tsx}"
+        ],
+        "extends": [
+          "plugin:@typescript-eslint/eslint-recommended",
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "plugins": [
+          "@typescript-eslint"
+        ],
+        "rules": {
+          "@typescript-eslint/no-explicit-any": "off"
+        }
+      }
     ],
     "plugins": [
       "mocha-no-only"

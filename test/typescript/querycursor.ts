@@ -8,5 +8,5 @@ interface ITest extends Document {
 
 const Test = model<ITest>('Test', schema);
 
-Test.find().cursor().eachAsync(async (doc: ITest) => console.log(doc.name)).
+Test.find().cursor().eachAsync(async(doc: ITest) => console.log(doc.name)).
   then(() => console.log('Done!'));

@@ -17,13 +17,13 @@ Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).then((res: Array<ITest>) =>
 run().catch((err: Error) => console.log(err.stack));
 
 async function run() {
-  let res: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).exec();
+  const res: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).exec();
   console.log(res[0].name);
 
-  let res2: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
+  const res2: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
   console.log(res2[0].name);
 
-  await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().exec().eachAsync(async (res) => {
+  await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().exec().eachAsync(async(res) => {
     console.log(res);
   });
 }

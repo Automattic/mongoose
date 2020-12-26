@@ -6,12 +6,12 @@ interface ITest extends Document {
 }
 
 const TestSchema = new Schema({
-  foo: { type: String, required: true },
+  foo: { type: String, required: true }
 });
 
 TestSchema.methods.getAnswer = function(): number {
   return 42;
-}
+};
 
 const Test = connection.model<ITest>('Test', TestSchema);
 

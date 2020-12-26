@@ -7,7 +7,7 @@ class InteractsWithDatabase extends Model {
 }
 
 class SourceProvider extends InteractsWithDatabase {
-  static async deleteInstallation (installationId: number): Promise<void> {
+  static async deleteInstallation(installationId: number): Promise<void> {
     await this.findOneAndDelete({ installationId });
   }
 }

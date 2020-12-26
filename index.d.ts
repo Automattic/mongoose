@@ -1,4 +1,4 @@
-declare module "mongoose" {
+declare module 'mongoose' {
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
@@ -35,7 +35,8 @@ declare module "mongoose" {
    * Mongoose constructor. The exports object of the `mongoose` module is an instance of this
    * class. Most apps will only use this one instance.
    */
-  export var Mongoose: new (options?: object | null) => typeof mongoose;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  export const Mongoose: new (options?: object | null) => typeof mongoose;
 
   /**
    * The Mongoose Number [SchemaType](/docs/schematypes.html). Used for
@@ -52,14 +53,14 @@ declare module "mongoose" {
    */
   export type ObjectId = Schema.Types.ObjectId;
 
-  export var Promise: any;
-  export var PromiseProvider: any;
+  export const Promise: any;
+  export const PromiseProvider: any;
 
   /** The various Mongoose SchemaTypes. */
-  export var SchemaTypes: typeof Schema.Types;
+  export const SchemaTypes: typeof Schema.Types;
 
   /** Expose connection states for user-land */
-  export var STATES: typeof ConnectionStates;
+  export const STATES: typeof ConnectionStates;
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
   export function connect(uri: string, options: ConnectOptions, callback: (err: CallbackError) => void): void;
@@ -67,13 +68,13 @@ declare module "mongoose" {
   export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
   /** The Mongoose module's default connection. Equivalent to `mongoose.connections[0]`, see [`connections`](#mongoose_Mongoose-connections). */
-  export var connection: Connection;
+  export const connection: Connection;
 
   /** An array containing all connections associated with this Mongoose instance. */
-  export var connections: Connection[];
+  export const connections: Connection[];
 
   /** An array containing all models associated with this Mongoose instance. */
-  export var models: { [index: string]: Model<any> };
+  export const models: { [index: string]: Model<any> };
   /** Creates a Connection instance. */
   export function createConnection(uri: string, options?: ConnectOptions): Connection & Promise<Connection>;
   export function createConnection(): Connection;
@@ -110,7 +111,7 @@ declare module "mongoose" {
   export function modelNames(): Array<string>;
 
   /** The node-mongodb-native driver Mongoose uses. */
-  export var mongo: typeof mongodb;
+  export const mongo: typeof mongodb;
 
   /**
    * Mongoose uses this function to get the current time when setting
@@ -137,12 +138,13 @@ declare module "mongoose" {
   export function startSession(options: mongodb.SessionOptions, cb: (err: any, session: mongodb.ClientSession) => void): void;
 
   /** The Mongoose version */
-  export var version: string;
+  export const version: string;
 
   export type CastError = Error.CastError;
 
   type Mongoose = typeof mongoose;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface ClientSession extends mongodb.ClientSession { }
 
   interface ConnectOptions extends mongodb.MongoClientOptions {
@@ -354,6 +356,7 @@ declare module "mongoose" {
      * @param conn A MongooseConnection instance
      * @param opts optional collection options
      */
+    // eslint-disable-next-line @typescript-eslint/no-misused-new
     new(name: string, conn: Connection, opts?: any): Collection;
     /** Formatter for debug print args */
     $format(arg: any): string;
@@ -396,7 +399,7 @@ declare module "mongoose" {
      * is handy for passing data to middleware without conflicting with Mongoose
      * internals.
      */
-    $locals: object;
+    $locals: Record<string, unknown>;
 
     /** Marks a path as valid, removing existing validation errors. */
     $markValid(path: string): void;
@@ -420,7 +423,7 @@ declare module "mongoose" {
     $set(value: any): this;
 
     /** Additional properties to attach to the query when calling `save()` and `isNew` is false. */
-    $where: object;
+    $where: Record<string, unknown>;
 
     /** If this is a discriminator model, `baseModelName` is the name of the base model. */
     baseModelName?: string;
@@ -475,7 +478,7 @@ declare module "mongoose" {
     getChanges(): UpdateQuery<this>;
 
     /** The string version of this documents _id. */
-    id?: string;
+    id?: any;
 
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
@@ -586,11 +589,13 @@ declare module "mongoose" {
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
   }
 
-  export var Model: Model<any>;
+  export const Model: Model<any>;
+  // eslint-disable-next-line no-undef
   interface Model<T extends Document> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
+    // eslint-disable-next-line @typescript-eslint/ban-types
     aggregate<R = any>(pipeline: any[], cb: Function): Promise<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
@@ -673,6 +678,7 @@ declare module "mongoose" {
      * Event emitter that reports any errors that occurred. Useful for global error
      * handling.
      */
+    // eslint-disable-next-line no-undef
     events: NodeJS.EventEmitter;
 
     /**
@@ -733,14 +739,14 @@ declare module "mongoose" {
      * the model's schema except the `_id` index, and build any indexes that
      * are in your schema but not in MongoDB.
      */
-    syncIndexes(options?: object): Promise<Array<string>>;
-    syncIndexes(options: object | null, callback: (err: CallbackError, dropped: Array<string>) => void): void;
+    syncIndexes(options?: Record<string, unknown>): Promise<Array<string>>;
+    syncIndexes(options: Record<string, unknown> | null, callback: (err: CallbackError, dropped: Array<string>) => void): void;
 
     /**
      * Starts a [MongoDB session](https://docs.mongodb.com/manual/release-notes/3.6/#client-sessions)
      * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
-     **/
+     * */
     startSession(options?: mongodb.SessionOptions, cb?: (err: any, session: mongodb.ClientSession) => void): Promise<mongodb.ClientSession>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
@@ -748,9 +754,10 @@ declare module "mongoose" {
     validate(optional: any, callback?: (err: any) => void): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
-    watch(pipeline?: Array<object>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
+    watch(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
 
     /** Adds a `$where` clause to this query */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     $where(argument: string | Function): Query<Array<T>, T>;
 
     /** Registered discriminators for this model. */
@@ -820,11 +827,10 @@ declare module "mongoose" {
     /** Schema the model uses. */
     schema: Schema;
 
-    /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
-    findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
-
-    /** Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option. */
+    /**
+     * @deprecated use `updateOne` or `updateMany` instead.
+     * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
+     */
     update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
@@ -896,7 +902,7 @@ declare module "mongoose" {
     writeConcern?: any;
   }
 
-  type MongooseQueryOptions = Pick<QueryOptions, "populate" | "lean" | "omitUndefined" | "strict" | "useFindAndModify">;
+  type MongooseQueryOptions = Pick<QueryOptions, 'populate' | 'lean' | 'omitUndefined' | 'strict' | 'useFindAndModify'>;
 
   interface SaveOptions {
     checkKeys?: boolean;
@@ -933,6 +939,7 @@ declare module "mongoose" {
   }
 
   interface MapReduceOptions<T, Key, Val> {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     map: Function | string;
     reduce: (key: Key, vals: T[]) => Val;
     /** query filter object. */
@@ -1070,10 +1077,12 @@ declare module "mongoose" {
      * [statics](http://mongoosejs.com/docs/guide.html#statics), and
      * [methods](http://mongoosejs.com/docs/guide.html#methods).
      */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     loadClass(model: Function): this;
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
-    method<F extends keyof D>(name: F, fn: D[F]): this;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    method<F extends keyof D>(name: F, fn: D[F], opts?: any): this;
     method(obj: { [F in keyof D]: D[F] }): this;
 
     /** Object of currently defined methods on this schema. */
@@ -1132,7 +1141,9 @@ declare module "mongoose" {
     set(path: string, value: any, _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     static<F extends keyof M>(name: F, fn: M[F]): this;
+    // eslint-disable-next-line @typescript-eslint/ban-types
     static (obj: { [F in keyof M]: M[F] }): this;
 
     /** Object of currently defined statics on this schema. */
@@ -1151,6 +1162,7 @@ declare module "mongoose" {
   }
 
   interface SchemaDefinition {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[] | SchemaDefinition | SchemaDefinition[];
   }
 
@@ -1235,17 +1247,17 @@ declare module "mongoose" {
      * given a shard key which must be present in all insert/update operations. We just need to set this
      * schema option to the same shard key and we'll be all set.
      */
-    shardKey?: object;
+    shardKey?: Record<string, unknown>;
     /**
      * For backwards compatibility, the strict option does not apply to the filter parameter for queries.
      * Mongoose has a separate strictQuery option to toggle strict mode for the filter parameter to queries.
      */
-    strictQuery?: boolean | "throw";
+    strictQuery?: boolean | 'throw';
     /**
      * The strict option, (enabled by default), ensures that values passed to our model constructor that were not
      * specified in our schema do not get saved to the db.
      */
-    strict?: boolean | "throw";
+    strict?: boolean | 'throw';
     /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
     toJSON?: ToObjectOptions;
     /**
@@ -1323,7 +1335,8 @@ declare module "mongoose" {
     alias?: string;
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: RegExp | [RegExp, string] | Function | [Function , string] | ValidateOpts<T> | ValidateOpts<T>[];
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    validate?: RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T> | ValidateOpts<T>[];
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string;
@@ -1418,6 +1431,7 @@ declare module "mongoose" {
     _id?: boolean;
 
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     of?: Function | SchemaTypeOptions<any>;
 
     /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
@@ -1487,8 +1501,10 @@ declare module "mongoose" {
     applySetters(value: any, doc: Document): any;
 
     /** Adds a custom getter to this virtual. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     get(fn: Function): this;
     /** Adds a custom setter to this virtual. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     set(fn: Function): this;
   }
 
@@ -1713,7 +1729,7 @@ declare module "mongoose" {
       toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
-    var ObjectId: ObjectIdConstructor;
+    const ObjectId: ObjectIdConstructor;
 
     class _ObjectId extends mongodb.ObjectID {
       _id?: ObjectId;
@@ -1726,6 +1742,7 @@ declare module "mongoose" {
 
     // var objectId: mongoose.Types.ObjectId should reference mongodb.ObjectID not
     //   the ObjectIdConstructor, so we add the interface below
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface ObjectId extends mongodb.ObjectID { }
 
     class Subdocument extends Document {
@@ -1742,9 +1759,13 @@ declare module "mongoose" {
   interface Query<ResultType, DocType extends Document> {
     _mongooseOptions: MongooseQueryOptions;
 
+    /** Executes the query */
     exec(): Promise<ResultType>;
     exec(callback?: (err: CallbackError, res: ResultType) => void): void;
+    // @todo: this doesn't seem right
+    exec(callback?: (err: any, result: ResultType) => void): Promise<ResultType> | any;
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     $where(argument: string | Function): Query<Array<DocType>, DocType>;
 
     /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
@@ -1768,7 +1789,7 @@ declare module "mongoose" {
      * resolved with either the doc(s) or rejected with the error.
      * Like `.then()`, but only takes a rejection handler.
      */
-    catch: Promise<ResultType>["catch"];
+    catch: Promise<ResultType>['catch'];
 
     /** Specifies a `$center` or `$centerSphere` condition. */
     circle(area: any): this;
@@ -1812,7 +1833,9 @@ declare module "mongoose" {
     distinct(field: string, filter?: FilterQuery<DocType>, callback?: (err: any, count: number) => void): Query<Array<any>, DocType>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     elemMatch(val: Function | any): this;
+    // eslint-disable-next-line @typescript-eslint/ban-types
     elemMatch(path: string, val: Function | any): this;
 
     /**
@@ -1827,9 +1850,6 @@ declare module "mongoose" {
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
     estimatedDocumentCount(options?: QueryOptions, callback?: (err: any, count: number) => void): Query<number, DocType>;
-
-    /** Executes the query */
-    exec(callback?: (err: any, result: ResultType) => void): Promise<ResultType> | any;
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     exists(val: boolean): this;
@@ -2082,7 +2102,7 @@ declare module "mongoose" {
      * Executes the query returning a `Promise` which will be
      * resolved with either the doc(s) or rejected with the error.
      */
-    then: Promise<ResultType>["then"];
+    then: Promise<ResultType>['then'];
 
     /** Converts this query to a customized, reusable query constructor with all arguments and options retained. */
     toConstructor(): new (...args: any[]) => Query<ResultType, DocType>;
@@ -2146,12 +2166,14 @@ declare module "mongoose" {
 
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
+    // eslint-disable-next-line @typescript-eslint/ban-types
     [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
   }[keyof T];
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
-    Date | RegExp | Symbol | Error | BigInt | Types.ObjectId;
+      // eslint-disable-next-line no-undef
+    Date | RegExp | symbol | Error | BigInt | Types.ObjectId;
 
   type LeanType<T> =
     0 extends (1 & T) ? T : // any
@@ -2228,7 +2250,7 @@ declare module "mongoose" {
      * resolved with either the doc(s) or rejected with the error.
      * Like [`.then()`](#query_Query-then), but only takes a rejection handler.
      */
-    catch: Promise<R>["catch"];
+    catch: Promise<R>['catch'];
 
     /** Adds a collation. */
     collation(options: mongodb.CollationDocument): this;
@@ -2239,7 +2261,7 @@ declare module "mongoose" {
     /**
      * Sets the cursor option option for the aggregation query (ignored for < 2.6.0).
      */
-    cursor(options?: object): this;
+    cursor(options?: Record<string, unknown>): this;
 
     /** Executes the aggregate pipeline on the currently bound Model. If cursor option is set, returns a cursor */
     exec(callback?: (err: any, result: R) => void): Promise<R> | any;
@@ -2254,7 +2276,7 @@ declare module "mongoose" {
     graphLookup(options: any): this;
 
     /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
-    hint(value: object | string): this;
+    hint(value: Record<string, unknown> | string): this;
 
     /**
      * Appends a new $limit operator to this aggregate pipeline.
@@ -2296,7 +2318,7 @@ declare module "mongoose" {
     search(options: any): this;
 
     /** Lets you set arbitrary options, for middleware or plugins. */
-    option(value: object): this;
+    option(value: Record<string, unknown>): this;
 
     /** Appends new custom $sample operator to this aggregate pipeline. */
     sample(size: number): this;
@@ -2314,7 +2336,7 @@ declare module "mongoose" {
     sort(arg: any): this;
 
     /** Provides promise for aggregate. */
-    then: Promise<R>["then"];
+    then: Promise<R>['then'];
 
     /**
      * Appends a new $sortByCount operator to this aggregate pipeline. Accepts either a string field name
@@ -2367,6 +2389,7 @@ declare module "mongoose" {
     constructor(path: string, options?: any, instance?: string);
 
     /** Get/set the function used to cast arbitrary values to this type. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     static cast(caster?: Function | boolean): Function;
 
     static checkRequired(checkRequired?: (v: any) => boolean): (v: any) => boolean;
@@ -2384,6 +2407,7 @@ declare module "mongoose" {
     default(val: any): any;
 
     /** Adds a getter to this schematype. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     get(fn: Function): this;
 
     /**
@@ -2411,6 +2435,7 @@ declare module "mongoose" {
     select(val: boolean): this;
 
     /** Adds a setter to this schematype. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     set(fn: Function): this;
 
     /** Declares a sparse index. */
@@ -2426,6 +2451,7 @@ declare module "mongoose" {
     unique(bool: boolean): this;
 
     /** Adds validator(s) for this document path. */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     validate(obj: RegExp | Function | any, errorMsg?: string,
       type?: string): this;
   }
@@ -2444,7 +2470,7 @@ declare module "mongoose" {
     static Messages: any;
   }
 
-  module Error {
+  namespace Error {
     export class CastError extends Error {
       name: 'CastError';
       stringValue: string;

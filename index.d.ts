@@ -99,10 +99,10 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T extends Document>(name: string, schema?: Schema, collection?: string, skipInit?: boolean): Model<T>;
+  export function model<T extends Document>(name: string, schema?: Schema<T>, collection?: string, skipInit?: boolean): Model<T>;
   export function model<T extends Document, U extends Model<T>>(
     name: string,
-    schema?: Schema,
+    schema?: Schema<T, U>,
     collection?: string,
     skipInit?: boolean
   ): U;
@@ -243,10 +243,10 @@ declare module 'mongoose' {
     models: { [index: string]: Model<any> };
 
     /** Defines or retrieves a model. */
-    model<T extends Document>(name: string, schema?: Schema, collection?: string): Model<T>;
+    model<T extends Document>(name: string, schema?: Schema<T>, collection?: string): Model<T>;
     model<T extends Document, U extends Model<T>>(
       name: string,
-      schema?: Schema,
+      schema?: Schema<T, U>,
       collection?: string,
       skipInit?: boolean
     ): U;
@@ -1033,7 +1033,7 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
-  class Schema<T = any> extends events.EventEmitter {
+  class Schema<D extends Document = Document, M extends Model<D> = Model<D>> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1082,11 +1082,13 @@ declare module 'mongoose' {
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    method(name: string, fn: Function, opts?: any): this;
-    method(methods: any): this;
+    method<F extends keyof D>(name: F, fn: D[F], opts?: any): this;
+    method(obj: { [F in keyof D]: D[F] }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: any;
+    methods: {
+      [F in keyof D]: D[F];
+    };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1107,21 +1109,21 @@ declare module 'mongoose' {
     plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T extends Document = Document>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
+    post<T extends Document = D>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
     post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
-    post<T extends Model<any> = Model<any>>(method: 'insertMany' | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
+    post<T extends Model<Document> = M>(method: "insertMany" | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
 
-    post<T extends Document = Document>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
+    post<T extends Document = D>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
     post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
-    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
-    post<T extends Model<any> = Model<any>>(method: 'insertMany' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
+    post<T extends Model<Document> = M>(method: "insertMany" | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = Document>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
+    pre<T extends Document = D>(method: "validate" | "save" | "remove" | "updateOne" | "deleteOne" | "init" | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
     pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Model<any> = Model<any>>(method: 'insertMany' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Aggregate<any> = Aggregate<any>>(method: "aggregate" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Model<Document> = M>(method: "insertMany" | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
     /** Object of currently defined query helpers on this schema. */
     query: any;
@@ -1140,12 +1142,14 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    static(name: string, fn: Function): this;
+    static<F extends keyof M>(name: F, fn: M[F]): this;
     // eslint-disable-next-line @typescript-eslint/ban-types
-    static(obj: { [name: string]: Function }): this;
+    static (obj: { [F in keyof M]: M[F] }): this;
 
     /** Object of currently defined statics on this schema. */
-    statics: any;
+    statics: {
+      [F in keyof M]: M[F];
+    };
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;

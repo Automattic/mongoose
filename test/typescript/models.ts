@@ -6,7 +6,7 @@ function conventionalSyntax(): void {
   }
 
   const TestSchema = new Schema<ITest>({
-    foo: { type: String, required: true };
+    foo: { type: String, required: true }
   });
 
   const Test = connection.model<ITest>('Test', TestSchema);
@@ -23,7 +23,7 @@ function tAndDocSyntax(): void {
   }
 
   const TestSchema = new Schema<ITest & Document>({
-    foo: { type: String, required: true };
+    foo: { type: String, required: true }
   });
 
   const Test = connection.model<ITest & Document>('Test', TestSchema);

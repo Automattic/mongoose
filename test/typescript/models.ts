@@ -51,11 +51,11 @@ interface ProjectModel extends Model<IProject> {
 
 const projectSchema = new Schema<IProject, ProjectModel>({ name: String });
 
-projectSchema.pre('save', function () {
+projectSchema.pre('save', function() {
   // this => IProject
 });
 
-projectSchema.post('save', function () {
+projectSchema.post('save', function() {
   // this => IProject
 });
 

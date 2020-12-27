@@ -9122,7 +9122,7 @@ describe('document', function() {
       testNested: {
         prop: { type: String, default: 'bar' }
       },
-      testArray: [{ prop: { type: String, defualt: 'baz' } }],
+      testArray: [{ prop: { type: String, default: 'baz' } }],
       testSingleNested: new Schema({
         prop: { type: String, default: 'qux' }
       })

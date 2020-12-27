@@ -9825,7 +9825,7 @@ describe('document', function() {
       const m2 = yield Model.findOne({ _id: m1._id });
 
       m2.arr = [];
-      m2.arr = m2.arr.filter(a => true);;
+      m2.arr = m2.arr.filter(() => true);
       m2.arr.push({ abc: 'ghi' });
       yield m2.save();
 

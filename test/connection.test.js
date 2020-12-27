@@ -223,7 +223,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 1000);
+              setTimeout(function() { resolve(); }, 3000);
             });
           }).
           then(function() {

@@ -33,6 +33,22 @@ function tAndDocSyntax(): void {
   const bar = (SomeModel: Model<ITest & Document>) => console.log(SomeModel);
 }
 
+function insertManyTest() {
+  interface ITest {
+    foo: string;
+  }
+
+  const TestSchema = new Schema<ITest & Document>({
+    foo: { type: String, required: true }
+  });
+
+  const Test = connection.model<ITest & Document>('Test', TestSchema);
+
+  Test.insertMany([{ foo: 'bar' }]).then(async res => {
+    res.length;
+  });
+}
+
 const ExpiresSchema = new Schema({
   ttl: {
     type: Date,

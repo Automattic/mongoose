@@ -1931,7 +1931,7 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean(val?: boolean | any): Query<LeanDocumentOrArray<ResultType>, DocType>;
+    lean<LeanResultType = LeanDocumentOrArray<ResultType>>(val?: boolean | any): Query<LeanResultType, DocType>;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;

@@ -6,9 +6,12 @@ class Subdoc extends Document {
   name: string;
 }
 
-interface ITest extends Document {
+interface ITestBase {
   name?: string;
   mixed?: any;
+}
+
+interface ITest extends ITestBase, Document {
   subdoc?: Subdoc;
   testMethod: () => number;
   id: string;
@@ -43,4 +46,6 @@ void async function main() {
 
   const _docs: LeanDocument<ITest>[] = await Test.find().lean();
   _docs[0].mixed = 42;
+
+  const _doc2: ITestBase = await Test.findOne().lean<ITestBase>();
 }();

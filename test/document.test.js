@@ -9814,4 +9814,24 @@ describe('document', function() {
 
     assert.strictEqual(testObject.get(''), void 0);
   });
+
+  it('keeps atomics when assigning array to filtered array (gh-9651)', function() {
+    const Model = db.model('Test', { arr: [{ abc: String }] });
+
+    return co(function*() {
+      const m1 = new Model({ arr: [{ abc: 'old' }] });
+      yield m1.save();
+
+      const m2 = yield Model.findOne({ _id: m1._id });
+
+      m2.arr = [];
+      m2.arr = m2.arr.filter(a => true);;
+      m2.arr.push({ abc: 'ghi' });
+      yield m2.save();
+
+      const fromDb = yield Model.findById(m1._id);
+      assert.equal(fromDb.arr.length, 1);
+      assert.equal(fromDb.arr[0].abc, 'ghi');
+    });
+  });
 });

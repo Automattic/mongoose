@@ -170,14 +170,19 @@ describe('promises docs', function () {
 
     // Use bluebird
     mongoose.Promise = require('bluebird');
-    assert.equal(query.exec().constructor, require('bluebird'));
+    const bluebirdPromise = query.exec();
+    assert.equal(bluebirdPromise.constructor, require('bluebird'));
 
     // Use q. Note that you **must** use `require('q').Promise`.
     mongoose.Promise = require('q').Promise;
-    assert.ok(query.exec() instanceof require('q').makePromise);
+    const qPromise = query.exec();
+    assert.ok(qPromise instanceof require('q').makePromise);
 
     // acquit:ignore:start
-    done();
+    // Wait for promises
+    bluebirdPromise.then(qPromise).then(function () {
+      done();
+    });
     // acquit:ignore:end
   });
 });

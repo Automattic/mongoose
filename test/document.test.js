@@ -9122,7 +9122,7 @@ describe('document', function() {
       testNested: {
         prop: { type: String, default: 'bar' }
       },
-      testArray: [{ prop: { type: String, defualt: 'baz' } }],
+      testArray: [{ prop: { type: String, default: 'baz' } }],
       testSingleNested: new Schema({
         prop: { type: String, default: 'qux' }
       })
@@ -9813,5 +9813,25 @@ describe('document', function() {
     const testObject = new TestModel({ name: 't' });
 
     assert.strictEqual(testObject.get(''), void 0);
+  });
+
+  it('keeps atomics when assigning array to filtered array (gh-9651)', function() {
+    const Model = db.model('Test', { arr: [{ abc: String }] });
+
+    return co(function*() {
+      const m1 = new Model({ arr: [{ abc: 'old' }] });
+      yield m1.save();
+
+      const m2 = yield Model.findOne({ _id: m1._id });
+
+      m2.arr = [];
+      m2.arr = m2.arr.filter(() => true);
+      m2.arr.push({ abc: 'ghi' });
+      yield m2.save();
+
+      const fromDb = yield Model.findById(m1._id);
+      assert.equal(fromDb.arr.length, 1);
+      assert.equal(fromDb.arr[0].abc, 'ghi');
+    });
   });
 });

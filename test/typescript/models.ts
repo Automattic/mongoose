@@ -5,7 +5,7 @@ function conventionalSyntax(): void {
     foo: string;
   }
 
-  const TestSchema = new Schema({
+  const TestSchema = new Schema<ITest>({
     foo: { type: String, required: true }
   });
 
@@ -22,7 +22,7 @@ function tAndDocSyntax(): void {
     foo: string;
   }
 
-  const TestSchema = new Schema({
+  const TestSchema = new Schema<ITest & Document>({
     foo: { type: String, required: true }
   });
 
@@ -31,6 +31,22 @@ function tAndDocSyntax(): void {
   const aggregated: Promise<Document> = Test.aggregate([]).then(res => res[0]);
 
   const bar = (SomeModel: Model<ITest & Document>) => console.log(SomeModel);
+}
+
+function insertManyTest() {
+  interface ITest {
+    foo: string;
+  }
+
+  const TestSchema = new Schema<ITest & Document>({
+    foo: { type: String, required: true }
+  });
+
+  const Test = connection.model<ITest & Document>('Test', TestSchema);
+
+  Test.insertMany([{ foo: 'bar' }]).then(async res => {
+    res.length;
+  });
 }
 
 const ExpiresSchema = new Schema({
@@ -42,14 +58,32 @@ const ExpiresSchema = new Schema({
 
 interface IProject extends Document {
   name: string;
+  myMethod(): number;
 }
 
 interface ProjectModel extends Model<IProject> {
   myStatic(): number;
 }
 
-const projectSchema: Schema = new Schema({ name: String });
+const projectSchema = new Schema<IProject, ProjectModel>({ name: String });
+
+projectSchema.pre('save', function() {
+  // this => IProject
+});
+
+projectSchema.post('save', function() {
+  // this => IProject
+});
+
+projectSchema.methods.myMethod = () => 10;
+
 projectSchema.statics.myStatic = () => 42;
 
 const Project = connection.model<IProject, ProjectModel>('Project', projectSchema);
 Project.myStatic();
+
+Project.create({
+  name: 'mongoose'
+}).then(project => {
+  project.myMethod();
+});

@@ -1,3 +1,17 @@
+5.11.9 / 2020-12-28
+===================
+ * fix(document): keeps atomics when assigning array to filtered array #9651
+ * fix(document): apply `defaults` option to subdocument arrays #9736
+ * fix(index.d.ts): allow passing generic parameter to overwrite `lean()` result type #9728
+ * fix(index.d.ts): add missing pre hook for findOneAndUpdate #9743 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): schema methods & statics types #9725
+ * fix(index.d.ts): allow `id` paths with non-string values in TypeScript #9723
+ * fix(index.d.ts): support calling `createIndexes()` and `ensureIndexes()` with just callback #9706
+ * fix(index.d.ts): include `__v` in LeanDocuments #9687
+ * fix(index.d.ts): add missing `Aggregate#append()` #9714
+ * chore: add eslint typescript support and lint index.d.ts file #9729 [simllll](https://github.com/simllll)
+ * chore: add Github Actions #9688 [YC](https://github.com/YC)
+
 5.11.8 / 2020-12-14
 ===================
  * fix(index.d.ts): add missing single document populate #9696 [YC](https://github.com/YC)

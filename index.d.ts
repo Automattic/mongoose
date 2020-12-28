@@ -539,6 +539,7 @@ declare module 'mongoose' {
      * [`execPopulate()`](#document_Document-execPopulate).
      */
     populate(path: string, callback?: (err: CallbackError, res: this) => void): this;
+    populate(path: string, names: string, callback?: (err: any, res: this) => void): this;
     populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: CallbackError, res: this) => void): this;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */

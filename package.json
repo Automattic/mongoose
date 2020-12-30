@@ -24,7 +24,7 @@
     "kareem": "2.3.2",
     "mongodb": "3.6.3",
     "mongoose-legacy-pluralize": "1.0.2",
-    "mpath": "0.8.2",
+    "mpath": "0.8.3",
     "mquery": "3.2.3",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",

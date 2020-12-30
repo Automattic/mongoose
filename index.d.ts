@@ -2271,6 +2271,9 @@ declare module 'mongoose' {
 
     /** Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection. */
     graphLookup(options: any): this;
+                                          
+    /** Appends new custom $group operator to this aggregate pipeline. */
+    group(arg: any): this;
 
     /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
     hint(value: Record<string, unknown> | string): this;

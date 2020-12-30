@@ -1407,7 +1407,7 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number>
+    enum?: Array<string | number | null>
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number

@@ -1034,6 +1034,8 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
+  type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
+
   class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>> extends events.EventEmitter {
     /**
      * Create a new schema
@@ -1109,18 +1111,18 @@ declare module 'mongoose' {
 
     /** Defines a post hook for the model. */
     post<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
 
     post<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'findOneAndUpdate' | 'init' | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
-    pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 

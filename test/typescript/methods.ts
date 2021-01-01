@@ -2,14 +2,19 @@ import { Schema, Document, connection } from 'mongoose';
 
 interface ITest extends Document {
   foo: string;
+  someArray: string[];
   getAnswer(): number;
 }
 
 const TestSchema = new Schema({
-  foo: { type: String, required: true }
+  foo: { type: String, required: true },
+  someArray: [String]
 });
 
 TestSchema.methods.getAnswer = function(): number {
+  for (const str of this.someArray) {
+    console.log(str);
+  }
   return 42;
 };
 

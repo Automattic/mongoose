@@ -933,6 +933,7 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     session?: mongodb.ClientSession;
+    populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
   interface InsertManyResult extends mongodb.InsertWriteOpResult<any> {

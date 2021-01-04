@@ -539,6 +539,7 @@ declare module 'mongoose' {
      * [`execPopulate()`](#document_Document-execPopulate).
      */
     populate(path: string, callback?: (err: CallbackError, res: this) => void): this;
+    populate(path: string, names: string, callback?: (err: any, res: this) => void): this;
     populate(opts: PopulateOptions | Array<PopulateOptions>, callback?: (err: CallbackError, res: this) => void): this;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
@@ -629,11 +630,11 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
-    create(doc: T | DocumentDefinition<T>): Promise<T>;
-    create(docs: Array<T | DocumentDefinition<T>>, options?: SaveOptions): Promise<Array<T>>;
-    create(...docs: Array<T | DocumentDefinition<T>>): Promise<T>;
-    create(doc: T | DocumentDefinition<T>, callback: (err: CallbackError, doc: T) => void): void;
-    create(docs: Array<T | DocumentDefinition<T>>, callback: (err: CallbackError, docs: Array<T>) => void): void;
+    create<Z = T | DocumentDefinition<T>>(doc: Z): Promise<T>;
+    create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, options?: SaveOptions): Promise<Array<T>>;
+    create<Z = T | DocumentDefinition<T>>(...docs: Array<Z>): Promise<T>;
+    create<Z = T | DocumentDefinition<T>>(doc: Z, callback: (err: CallbackError, doc: T) => void): void;
+    create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, callback: (err: CallbackError, docs: Array<T>) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -932,6 +933,7 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     session?: mongodb.ClientSession;
+    populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
   interface InsertManyResult extends mongodb.InsertWriteOpResult<any> {
@@ -1033,6 +1035,8 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
+  type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
+
   class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>> extends events.EventEmitter {
     /**
      * Create a new schema
@@ -1108,18 +1112,18 @@ declare module 'mongoose' {
 
     /** Defines a post hook for the model. */
     post<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
 
     post<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'findOneAndUpdate' | 'init' | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
-    pre<T extends Query<any, any> = Query<any, any>>(method: string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
@@ -1406,7 +1410,7 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number>
+    enum?: Array<string | number | null>
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number
@@ -2271,6 +2275,9 @@ declare module 'mongoose' {
     /** Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection. */
     graphLookup(options: any): this;
 
+    /** Appends new custom $group operator to this aggregate pipeline. */
+    group(arg: any): this;
+
     /** Sets the hint option for the aggregation query (ignored for < 3.6.0) */
     hint(value: Record<string, unknown> | string): this;
 
@@ -2342,6 +2349,9 @@ declare module 'mongoose' {
 
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: any[]): this;
+
+    /** Appends new custom $project operator to this aggregate pipeline. */
+    project(arg: any): this
   }
 
   class AggregationCursor extends stream.Readable {

@@ -3,7 +3,7 @@
 Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
 
 [![Slack Status](http://slack.mongoosejs.io/badge.svg)](http://slack.mongoosejs.io)
-[![Build Status](https://api.travis-ci.org/Automattic/mongoose.svg?branch=master)](https://travis-ci.org/Automattic/mongoose)
+[![Build Status](https://github.com/Automattic/mongoose/workflows/Test/badge.svg)](https://github.com/Automattic/mongoose)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
 
 [![npm](https://nodei.co/npm/mongoose.png)](https://www.npmjs.com/package/mongoose)

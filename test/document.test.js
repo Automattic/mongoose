@@ -9834,4 +9834,35 @@ describe('document', function() {
       assert.equal(fromDb.arr[0].abc, 'ghi');
     });
   });
+
+  it('supports getting a list of populated docs (gh-9702)', function() {
+    const Child = db.model('Child', Schema({ name: String }));
+    const Parent = db.model('Parent', {
+    children: [{ type: ObjectId, ref: 'Child' }],
+    child: {type: ObjectId, ref: 'Child'}
+    });
+    
+    return co(function*() {
+    const c = yield Child.create({ name: 'test' });
+    yield Parent.create({
+    children: [c._id],
+    child: c._id
+    });
+    
+    const p = yield Parent.findOne().populate('children child');
+    
+    p.children; // [{ _id: '...', name: 'test' }]
+    
+    assert.equal(p.$getPopulatedDocs().length, 1);
+    assert.equal(p.$getPopulatedDocs()[0], p.children[0]);
+    assert.equal(p.$getPopulatedDocs()[0].name, 'test');
+    });
+    });
+
 });
+
+
+
+
+
+  

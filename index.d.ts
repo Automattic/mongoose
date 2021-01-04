@@ -2349,7 +2349,7 @@ declare module 'mongoose' {
 
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: any[]): this;
-                                          
+
     /** Appends new custom $project operator to this aggregate pipeline. */
     project(arg: any): this
   }

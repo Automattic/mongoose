@@ -375,6 +375,9 @@ declare module 'mongoose' {
     /** This documents __v. */
     __v?: number;
 
+    /* Get all subdocs (by bfs) */
+    $getAllSubdocs(): Document[];
+
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 
@@ -2349,9 +2352,6 @@ declare module 'mongoose' {
 
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: any[]): this;
-
-    /** Appends new custom $project operator to this aggregate pipeline. */
-    project(arg: any): this
   }
 
   class AggregationCursor extends stream.Readable {

@@ -1090,7 +1090,7 @@ declare module 'mongoose' {
     method(obj: { [name: string]: Function }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [name: string]: Function };
+    methods: { [name: string]: (this: DocType, ...args: any[]) => void };
 
     /** The original object passed to the schema constructor */
     obj: any;

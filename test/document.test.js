@@ -9856,13 +9856,8 @@ describe('document', function() {
       assert.equal(p.$getPopulatedDocs().length, 2);
       assert.equal(p.$getPopulatedDocs()[0], p.children[0]);
       assert.equal(p.$getPopulatedDocs()[0].name, 'test');
+      assert.equal(p.$getPopulatedDocs()[1],p.child);
+      assert.equal(p.$getPopulatedDocs()[1].name, 'test');
     });
   });
-
 });
-
-
-
-
-
-

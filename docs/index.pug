@@ -32,7 +32,7 @@ block content
     ```javascript
     // getting-started.js
     const mongoose = require('mongoose');
-    mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true});
+    mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true, useUnifiedTopology: true});
     ```
 
     We have a pending connection to the test database running on localhost.

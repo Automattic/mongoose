@@ -7090,7 +7090,7 @@ describe('Model', function() {
           age: Number,
           rank: String
         }));
-        
+
         MyModel.create([
           { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
           { name: 'William Riker', age: 29, rank: 'Commander' },
@@ -7098,7 +7098,7 @@ describe('Model', function() {
           { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
           { name: 'Worf', age: 24, rank: 'Lieutenant' }
         ]);
-        assert.equal(typeof MyModel.exists({}, {explain: true}), 'object');
+        assert.equal(typeof MyModel.exists({}, { explain: true }), 'object');
       });
     });
   });

@@ -1,3 +1,4 @@
+import { ObjectId } from 'bson';
 import { Schema, model, Document } from 'mongoose';
 
 const schema: Schema = new Schema({
@@ -16,7 +17,7 @@ const schema: Schema = new Schema({
 
 interface ITest extends Document {
   name?: string;
-  id?: number;
+  id?: string | ObjectId;
   tags?: string[];
   author?: { name: string };
   followers?: { name: string }[];

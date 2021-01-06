@@ -1,11 +1,11 @@
 'use strict';
 
-var assert = require('assert');
-var mongoose = require('../../');
+const assert = require('assert');
+const mongoose = require('../../');
 
-describe('Advanced Schemas', function () {
-  var db;
-  var Schema = mongoose.Schema;
+describe('Advanced Schemas', function() {
+  let db;
+  const Schema = mongoose.Schema;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
@@ -58,7 +58,7 @@ describe('Advanced Schemas', function () {
     }
 
     schema.loadClass(PersonClass);
-    var Person = db.model('Person', schema);
+    const Person = db.model('Person', schema);
 
     Person.create({ firstName: 'Jon', lastName: 'Snow' }).
       then(doc => {

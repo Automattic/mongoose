@@ -13,6 +13,8 @@ before_script:
   - export PATH=`pwd`/mongodb-linux-x86_64-ubuntu1604-4.0.2/bin/:$PATH
   - sleep 2
   - mongod --version
+  - mkdir ./test/typescript/node_modules
+  - ln -s `pwd` ./test/typescript/node_modules/mongoose
 matrix:
   include:
     - name: "👕Linter"

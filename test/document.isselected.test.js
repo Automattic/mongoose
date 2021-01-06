@@ -170,6 +170,14 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.body'));
     assert.ok(!doc.isSelected('em.nonpath'));
 
+    assert.ok(doc.isSelected('_id test'));
+    assert.ok(doc.isSelected('test nested.nope'));
+    assert.ok(!doc.isSelected('nested.path nested.nope'));
+
+    assert.ok(doc.isSelected(['_id', 'test']));
+    assert.ok(doc.isSelected(['test', 'nested.nope']));
+    assert.ok(!doc.isSelected(['nested.path', 'nested.nope']));
+
     selection = {
       'em.title': 1
     };
@@ -355,5 +363,11 @@ describe('document', function() {
     assert.ok(doc.isDirectSelected('nested.deep'));
     assert.ok(!doc.isDirectSelected('nested.cool'));
     assert.ok(!doc.isDirectSelected('nested'));
+
+    assert.ok(doc.isDirectSelected('nested.deep nested'));
+    assert.ok(!doc.isDirectSelected('nested.cool nested'));
+
+    assert.ok(doc.isDirectSelected(['nested.deep', 'nested']));
+    assert.ok(!doc.isDirectSelected(['nested.cool', 'nested']));
   });
 });

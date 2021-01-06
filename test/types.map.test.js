@@ -434,6 +434,42 @@ describe('Map', function() {
         assert.equal(event.scenes.get('bar').name, 'bar');
       });
     });
+
+    it('handles populating path of subdoc (gh-9359)', function() {
+      const bookSchema = Schema({
+        author: {
+          type: 'ObjectId',
+          ref: 'Person'
+        },
+        title: String
+      }, { _id: false });
+
+      const schema = Schema({
+        books: {
+          type: Map,
+          of: bookSchema
+        }
+      });
+
+      const Person = db.model('Person', Schema({ name: String }));
+      const Test = db.model('Test', schema);
+
+      return co(function*() {
+        const person = yield Person.create({ name: 'Ian Fleming' });
+        yield Test.create({
+          books: {
+            key1: {
+              title: 'Casino Royale',
+              author: person._id
+            }
+          }
+        });
+
+        const doc = yield Test.findOne().populate('books.$*.author');
+
+        assert.equal(doc.books.get('key1').author.name, 'Ian Fleming');
+      });
+    });
   });
 
   it('discriminators', function() {
@@ -897,5 +933,47 @@ describe('Map', function() {
       ]
     });
     return doc.validate();
+  });
+
+  it('persists `.clear()` (gh-9493)', function() {
+    const BoardSchema = new Schema({
+      _id: { type: String },
+      elements: { type: Map, default: new Map() }
+    });
+
+    const BoardModel = db.model('Test', BoardSchema);
+
+    return co(function*() {
+      let board = new BoardModel({ _id: 'test' });
+      board.elements.set('a', 1);
+      yield board.save();
+
+      board = yield BoardModel.findById('test').exec();
+      board.elements.clear();
+      yield board.save();
+
+      board = yield BoardModel.findById('test').exec();
+      assert.equal(board.elements.size, 0);
+    });
+  });
+
+  it('supports `null` in map of subdocuments (gh-9628)', function() {
+    const testSchema = new Schema({
+      messages: { type: Map, of: new Schema({ _id: false, text: String }) }
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    return co(function*() {
+      let doc = yield Test.create({
+        messages: { prop1: { text: 'test' }, prop2: null }
+      });
+
+      doc = yield Test.findById(doc);
+
+      assert.deepEqual(doc.messages.get('prop1').toObject(), { text: 'test' });
+      assert.strictEqual(doc.messages.get('prop2'), null);
+      assert.ifError(doc.validateSync());
+    });
   });
 });

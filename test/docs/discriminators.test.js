@@ -1,32 +1,32 @@
 'use strict';
 
-var assert = require('assert');
-var mongoose = require('../../');
+const assert = require('assert');
+const mongoose = require('../../');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-describe('discriminator docs', function () {
-  var Event;
-  var ClickedLinkEvent;
-  var SignedUpEvent;
-  var db;
+describe('discriminator docs', function() {
+  let Event;
+  let ClickedLinkEvent;
+  let SignedUpEvent;
+  let db;
 
-  before(function (done) {
+  before(function(done) {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
 
-    var eventSchema = new mongoose.Schema({time: Date});
+    const eventSchema = new mongoose.Schema({ time: Date });
     Event = db.model('_event', eventSchema);
 
     ClickedLinkEvent = Event.discriminator('ClickedLink',
-      new mongoose.Schema({url: String}));
+      new mongoose.Schema({ url: String }));
 
     SignedUpEvent = Event.discriminator('SignedUp',
-      new mongoose.Schema({username: String}));
+      new mongoose.Schema({ username: String }));
 
     done();
   });
 
-  after(function (done) {
+  after(function(done) {
     db.close(done);
   });
 
@@ -47,24 +47,24 @@ describe('discriminator docs', function () {
    * key (defaults to the model name). It returns a model whose schema
    * is the union of the base schema and the discriminator schema.
    */
-  it('The `model.discriminator()` function', function (done) {
-    var options = {discriminatorKey: 'kind'};
+  it('The `model.discriminator()` function', function(done) {
+    const options = { discriminatorKey: 'kind' };
 
-    var eventSchema = new mongoose.Schema({time: Date}, options);
-    var Event = mongoose.model('Event', eventSchema);
+    const eventSchema = new mongoose.Schema({ time: Date }, options);
+    const Event = mongoose.model('Event', eventSchema);
 
     // ClickedLinkEvent is a special type of Event that has
     // a URL.
-    var ClickedLinkEvent = Event.discriminator('ClickedLink',
-      new mongoose.Schema({url: String}, options));
+    const ClickedLinkEvent = Event.discriminator('ClickedLink',
+      new mongoose.Schema({ url: String }, options));
 
     // When you create a generic event, it can't have a URL field...
-    var genericEvent = new Event({time: Date.now(), url: 'google.com'});
+    const genericEvent = new Event({ time: Date.now(), url: 'google.com' });
     assert.ok(!genericEvent.url);
 
     // But a ClickedLinkEvent can
-    var clickedEvent =
-      new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
+    const clickedEvent =
+      new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
     assert.ok(clickedEvent.url);
 
     // acquit:ignore:start
@@ -78,16 +78,17 @@ describe('discriminator docs', function () {
    * stored in the same collection as generic events and `ClickedLinkEvent`
    * instances.
    */
-  it('Discriminators save to the Event model\'s collection', function (done) {
-    var event1 = new Event({time: Date.now()});
-    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
-    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
+  it('Discriminators save to the Event model\'s collection', function(done) {
+    const event1 = new Event({ time: Date.now() });
+    const event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    const event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
 
-    var save = function (doc, callback) {
-      doc.save(function (error, doc) {
+    /*
+    const save = function(doc, callback) {
+      doc.save(function(error, doc) {
         callback(error, doc);
       });
-    };
+    }; */
 
     Promise.all([event1.save(), event2.save(), event3.save()]).
       then(() => Event.countDocuments()).
@@ -106,10 +107,10 @@ describe('discriminator docs', function () {
    * to your schemas that it uses to track which discriminator
    * this document is an instance of.
    */
-  it('Discriminator keys', function (done) {
-    var event1 = new Event({time: Date.now()});
-    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
-    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
+  it('Discriminator keys', function(done) {
+    const event1 = new Event({ time: Date.now() });
+    const event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    const event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
 
     assert.ok(!event1.__t);
     assert.equal(event2.__t, 'ClickedLink');
@@ -125,10 +126,10 @@ describe('discriminator docs', function () {
    * to queries. In other words, `find()`, `count()`, `aggregate()`, etc.
    * are smart enough to account for discriminators.
    */
-  it('Discriminators add the discriminator key to queries', function (done) {
-    var event1 = new Event({time: Date.now()});
-    var event2 = new ClickedLinkEvent({time: Date.now(), url: 'google.com'});
-    var event3 = new SignedUpEvent({time: Date.now(), user: 'testuser'});
+  it('Discriminators add the discriminator key to queries', function(done) {
+    const event1 = new Event({ time: Date.now() });
+    const event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    const event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
 
     Promise.all([event1.save(), event2.save(), event3.save()]).
       then(() => ClickedLinkEvent.find({})).
@@ -147,32 +148,32 @@ describe('discriminator docs', function () {
    * However, you can also attach middleware to the discriminator schema
    * without affecting the base schema.
    */
-  it('Discriminators copy pre and post hooks', function (done) {
-    var options = {discriminatorKey: 'kind'};
+  it('Discriminators copy pre and post hooks', function(done) {
+    const options = { discriminatorKey: 'kind' };
 
-    var eventSchema = new mongoose.Schema({time: Date}, options);
-    var eventSchemaCalls = 0;
-    eventSchema.pre('validate', function (next) {
+    const eventSchema = new mongoose.Schema({ time: Date }, options);
+    let eventSchemaCalls = 0;
+    eventSchema.pre('validate', function(next) {
       ++eventSchemaCalls;
       next();
     });
-    var Event = mongoose.model('GenericEvent', eventSchema);
+    const Event = mongoose.model('GenericEvent', eventSchema);
 
-    var clickedLinkSchema = new mongoose.Schema({url: String}, options);
-    var clickedSchemaCalls = 0;
-    clickedLinkSchema.pre('validate', function (next) {
+    const clickedLinkSchema = new mongoose.Schema({ url: String }, options);
+    let clickedSchemaCalls = 0;
+    clickedLinkSchema.pre('validate', function(next) {
       ++clickedSchemaCalls;
       next();
     });
-    var ClickedLinkEvent = Event.discriminator('ClickedLinkEvent',
+    const ClickedLinkEvent = Event.discriminator('ClickedLinkEvent',
       clickedLinkSchema);
 
-    var event1 = new ClickedLinkEvent();
+    const event1 = new ClickedLinkEvent();
     event1.validate(function() {
       assert.equal(eventSchemaCalls, 1);
       assert.equal(clickedSchemaCalls, 1);
 
-      var generic = new Event();
+      const generic = new Event();
       generic.validate(function() {
         assert.equal(eventSchemaCalls, 2);
         assert.equal(clickedSchemaCalls, 1);
@@ -190,15 +191,15 @@ describe('discriminator docs', function () {
    * If a custom _id field is set on the base schema, that will always
    * override the discriminator's _id field, as shown below.
    */
-  it('Handling custom _id fields', function (done) {
-    var options = {discriminatorKey: 'kind'};
+  it('Handling custom _id fields', function(done) {
+    const options = { discriminatorKey: 'kind' };
 
     // Base schema has a custom String `_id` and a Date `time`...
-    var eventSchema = new mongoose.Schema({_id: String, time: Date},
+    const eventSchema = new mongoose.Schema({ _id: String, time: Date },
       options);
-    var Event = mongoose.model('BaseEvent', eventSchema);
+    const Event = mongoose.model('BaseEvent', eventSchema);
 
-    var clickedLinkSchema = new mongoose.Schema({
+    const clickedLinkSchema = new mongoose.Schema({
       url: String,
       time: String
     }, options);
@@ -206,10 +207,10 @@ describe('discriminator docs', function () {
     // implicitly added ObjectId `_id`.
     assert.ok(clickedLinkSchema.path('_id'));
     assert.equal(clickedLinkSchema.path('_id').instance, 'ObjectID');
-    var ClickedLinkEvent = Event.discriminator('ChildEventBad',
+    const ClickedLinkEvent = Event.discriminator('ChildEventBad',
       clickedLinkSchema);
 
-    var event1 = new ClickedLinkEvent({_id: 'custom id', time: '4pm'});
+    const event1 = new ClickedLinkEvent({ _id: 'custom id', time: '4pm' });
     // clickedLinkSchema overwrites the `time` path, but **not**
     // the `_id` path.
     assert.strictEqual(typeof event1._id, 'string');
@@ -225,19 +226,19 @@ describe('discriminator docs', function () {
    * the discriminator key for you.
    */
   it('Using discriminators with `Model.create()`', function(done) {
-    var Schema = mongoose.Schema;
-    var shapeSchema = new Schema({
+    const Schema = mongoose.Schema;
+    const shapeSchema = new Schema({
       name: String
     }, { discriminatorKey: 'kind' });
 
-    var Shape = db.model('Shape', shapeSchema);
+    const Shape = db.model('Shape', shapeSchema);
 
-    var Circle = Shape.discriminator('Circle',
+    const Circle = Shape.discriminator('Circle',
       new Schema({ radius: Number }));
-    var Square = Shape.discriminator('Square',
+    const Square = Shape.discriminator('Square',
       new Schema({ side: Number }));
 
-    var shapes = [
+    const shapes = [
       { name: 'Test' },
       { kind: 'Circle', radius: 5 },
       { kind: 'Square', side: 10 }
@@ -267,17 +268,17 @@ describe('discriminator docs', function () {
    * `post()` after calling `discriminator()`
    */
   it('Embedded discriminators in arrays', function(done) {
-    var eventSchema = new Schema({ message: String },
+    const eventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
 
-    var batchSchema = new Schema({ events: [eventSchema] });
+    const batchSchema = new Schema({ events: [eventSchema] });
 
     // `batchSchema.path('events')` gets the mongoose `DocumentArray`
-    var docArray = batchSchema.path('events');
+    const docArray = batchSchema.path('events');
 
     // The `events` array can contain 2 different types of events, a
     // 'clicked' event that requires an element id that was clicked...
-    var clickedSchema = new Schema({
+    const clickedSchema = new Schema({
       element: {
         type: String,
         required: true
@@ -285,20 +286,20 @@ describe('discriminator docs', function () {
     }, { _id: false });
     // Make sure to attach any hooks to `eventSchema` and `clickedSchema`
     // **before** calling `discriminator()`.
-    var Clicked = docArray.discriminator('Clicked', clickedSchema);
+    const Clicked = docArray.discriminator('Clicked', clickedSchema);
 
     // ... and a 'purchased' event that requires the product that was purchased.
-    var Purchased = docArray.discriminator('Purchased', new Schema({
+    const Purchased = docArray.discriminator('Purchased', new Schema({
       product: {
         type: String,
         required: true
       }
     }, { _id: false }));
 
-    var Batch = db.model('EventBatch', batchSchema);
+    const Batch = db.model('EventBatch', batchSchema);
 
     // Create a new batch of events with different kinds
-    var batch = {
+    const batch = {
       events: [
         { kind: 'Clicked', element: '#hero', message: 'hello' },
         { kind: 'Purchased', product: 'action-figure-1', message: 'world' }
@@ -339,26 +340,26 @@ describe('discriminator docs', function () {
    */
 
   it('Recursive embedded discriminators in arrays', function(done) {
-    var singleEventSchema = new Schema({ message: String },
+    const singleEventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
 
-    var eventListSchema = new Schema({ events: [singleEventSchema] });
+    const eventListSchema = new Schema({ events: [singleEventSchema] });
 
-    var subEventSchema = new Schema({
-       sub_events: [singleEventSchema]
+    const subEventSchema = new Schema({
+      sub_events: [singleEventSchema]
     }, { _id: false });
 
-    var SubEvent = subEventSchema.path('sub_events').
+    const SubEvent = subEventSchema.path('sub_events').
       discriminator('SubEvent', subEventSchema);
     eventListSchema.path('events').discriminator('SubEvent', subEventSchema);
 
-    var Eventlist = db.model('EventList', eventListSchema);
+    const Eventlist = db.model('EventList', eventListSchema);
 
     // Create a new batch of events with different kinds
-    var list = {
+    const list = {
       events: [
-        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[], message:'test1'}], message: 'hello' },
-        { kind: 'SubEvent', sub_events: [{kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test3'}], message:'test2'}], message: 'world' }
+        { kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test1' }], message: 'hello' },
+        { kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test3' }], message: 'test2' }], message: 'world' }
       ]
     };
 
@@ -374,7 +375,7 @@ describe('discriminator docs', function () {
         assert.equal(doc.events[1].message, 'world');
         assert.ok(doc.events[1].sub_events[0].sub_events[0] instanceof SubEvent);
 
-        doc.events.push({kind:'SubEvent', sub_events:[{kind:'SubEvent', sub_events:[], message:'test4'}], message:'pushed'});
+        doc.events.push({ kind: 'SubEvent', sub_events: [{ kind: 'SubEvent', sub_events: [], message: 'test4' }], message: 'pushed' });
         return doc.save();
       }).
       then(function(doc) {

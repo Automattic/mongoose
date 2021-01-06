@@ -168,6 +168,19 @@ describe('utils', function() {
     done();
   });
 
+  it('deepEquals on maps (gh-9549)', function() {
+    const a = new Map([['a', 1], ['b', 2]]);
+    let b = new Map([['a', 1], ['b', 2]]);
+
+    assert.ok(utils.deepEqual(a, b));
+
+    b = new Map([['a', 1]]);
+    assert.ok(!utils.deepEqual(a, b));
+
+    b = new Map([['b', 2], ['a', 1]]);
+    assert.ok(!utils.deepEqual(a, b));
+  });
+
   it('deepEquals on MongooseDocumentArray works', function(done) {
     const A = new Schema({ a: String });
     mongoose.deleteModel(/Test/);
@@ -250,8 +263,6 @@ describe('utils', function() {
       assert.deepEqual(out.arr[0], { a: 42 });
       assert.deepEqual(out.arr[1], {});
       assert.deepEqual(out.arr[2], {});
-
-      return Promise.resolve();
     });
   });
 

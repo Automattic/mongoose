@@ -763,31 +763,35 @@ describe('model', function() {
 
       it('with $meta projection (gh-5859)', function() {
         const eventSchema = new Schema({ eventField: String }, { id: false });
+        eventSchema.index({ eventField: 'text' });
         const Event = db.model('Test', eventSchema);
 
         const trackSchema = new Schema({ trackField: String });
         const Track = Event.discriminator('Track', trackSchema);
 
         const trackedItem = new Track({
-          trackField: 'trackField',
-          eventField: 'eventField'
+          trackField: 'track',
+          eventField: 'event'
         });
 
         return trackedItem.save().
+          then(() => Event.init()).
           then(function() {
-            return Event.find({}).select({ score: { $meta: 'textScore' } });
+            return Event.find({ $text: { $search: 'event' } }).
+              select({ score: { $meta: 'textScore' } });
           }).
           then(function(docs) {
             assert.equal(docs.length, 1);
-            assert.equal(docs[0].trackField, 'trackField');
+            assert.equal(docs[0].trackField, 'track');
           }).
           then(function() {
-            return Track.find({}).select({ score: { $meta: 'textScore' } });
+            return Track.find({ $text: { $search: 'event' } }).
+              select({ score: { $meta: 'textScore' } });
           }).
           then(function(docs) {
             assert.equal(docs.length, 1);
-            assert.equal(docs[0].trackField, 'trackField');
-            assert.equal(docs[0].eventField, 'eventField');
+            assert.equal(docs[0].trackField, 'track');
+            assert.equal(docs[0].eventField, 'event');
           });
       });
 
@@ -1578,6 +1582,55 @@ describe('model', function() {
     assert.ifError(doc.validateSync());
   });
 
+  it('doesnt remove paths at the same level (gh-9362)', function() {
+    const StepSchema = new Schema({
+      view: {
+        url: {
+          type: String,
+          trim: true
+        }
+      }
+    }, { discriminatorKey: 'type' });
+
+    const ClickSchema = new Schema([
+      StepSchema,
+      {
+        view: {
+          clickCount: {
+            type: Number,
+            default: 1,
+            min: 1
+          }
+        }
+      }
+    ], { discriminatorKey: 'type' });
+
+    const Test = db.model('Test', StepSchema);
+    const D = Test.discriminator('Test1', ClickSchema);
+    assert.ok(D.schema.paths['view.url']);
+
+    const doc = new D({ view: { url: 'google.com' } });
+    assert.ifError(doc.validateSync());
+
+    assert.equal(doc.view.url, 'google.com');
+    assert.equal(doc.view.clickCount, 1);
+  });
+
+  it('overwrites if discriminator schema sets a path to single nested but base schema sets to doc array (gh-9354)', function() {
+    const A = db.model('Test', Schema({
+      prop: [{ reqProp: { type: String, required: true } }]
+    }));
+
+    const B = A.discriminator('Test2', Schema({
+      prop: Schema({ name: String })
+    }));
+
+    assert.ok(!B.schema.path('prop').schema.path('reqProp'));
+
+    const doc = new B({ prop: { name: 'test' } });
+    return doc.validate();
+  });
+
   it('can use compiled model schema as a discriminator (gh-9238)', function() {
     const SmsSchema = new mongoose.Schema({ senderNumber: String });
     const EmailSchema = new mongoose.Schema({ fromEmailAddress: String });
@@ -1592,5 +1645,45 @@ describe('model', function() {
 
     actions.discriminator('message', Message.schema);
     assert.ok(actions.schema.discriminators['message']);
+  });
+
+  it('recursive embedded discriminator using schematype (gh-9600)', function() {
+    const contentSchema = new mongoose.Schema({}, { discriminatorKey: 'type' });
+    const nestedSchema = new mongoose.Schema({
+      body: {
+        children: [contentSchema]
+      }
+    });
+    const childrenArraySchema = nestedSchema.path('body.children');
+    childrenArraySchema.discriminator(
+      'container',
+      new mongoose.Schema({
+        body: { children: childrenArraySchema }
+      })
+    );
+    const Nested = mongoose.model('nested', nestedSchema);
+
+    const nestedDocument = new Nested({
+      body: {
+        children: [
+          { type: 'container', body: { children: [] } },
+          {
+            type: 'container',
+            body: {
+              children: [
+                {
+                  type: 'container',
+                  body: {
+                    children: [{ type: 'container', body: { children: [] } }]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    });
+
+    assert.deepEqual(nestedDocument.body.children[1].body.children[0].body.children[0].body.children, []);
   });
 });

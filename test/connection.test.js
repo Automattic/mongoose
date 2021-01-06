@@ -10,6 +10,7 @@ const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
 const co = require('co');
+const mongodb = require('mongodb');
 const server = require('./common').server;
 
 const mongoose = start.mongoose;
@@ -220,7 +221,7 @@ describe('connections:', function() {
           }).
           then(function() {
             return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 1000);
+              setTimeout(function() { resolve(); }, 3000);
             });
           }).
           then(function() {
@@ -1153,6 +1154,94 @@ describe('connections:', function() {
 
       const db2 = mongoose.connection.useDb('gh8267-1');
       assert.equal(db2.config.useCreateIndex, true);
+    });
+  });
+
+  it('allows setting client on a disconnected connection (gh-9164)', function() {
+    return co(function*() {
+      const client = yield mongodb.MongoClient.connect('mongodb://localhost:27017/mongoose_test', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      const conn = mongoose.createConnection().setClient(client);
+
+      assert.equal(conn.readyState, 1);
+
+      yield conn.createCollection('test');
+      const res = yield conn.dropCollection('test');
+      assert.ok(res);
+    });
+  });
+
+  it('connection.then(...) resolves to a connection instance (gh-9496)', function() {
+    return co(function *() {
+      const m = new mongoose.Mongoose;
+
+      m.connect('mongodb://localhost:27017/test_gh9496', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      const conn = yield m.connection;
+
+      assert.ok(conn instanceof m.Connection);
+      assert.ok(conn);
+    });
+  });
+
+  it('connection.then(...) does not throw when passed undefined (gh-9505)', function() {
+    const m = new mongoose.Mongoose;
+
+    const db = m.createConnection('mongodb://localhost:27017/test_gh9505', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    assert.doesNotThrow(() => {
+      db.then(null);
+    });
+  });
+
+  it('allows overwriting models (gh-9406)', function() {
+    const m = new mongoose.Mongoose();
+
+    const M1 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    const M2 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    const M3 = m.connection.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+
+    assert.ok(M1 !== M2);
+    assert.ok(M2 !== M3);
+
+    assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
+  });
+
+  it('allows setting `overwriteModels` globally (gh-9406)', function() {
+    const m = new mongoose.Mongoose();
+    m.set('overwriteModels', true);
+
+    const M1 = m.model('Test', Schema({ name: String }));
+    const M2 = m.model('Test', Schema({ name: String }));
+    const M3 = m.connection.model('Test', Schema({ name: String }));
+
+    assert.ok(M1 !== M2);
+    assert.ok(M2 !== M3);
+
+    m.set('overwriteModels', false);
+    assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
+  });
+
+  it('can use destructured `connect` and `disconnect` (gh-9597)', function() {
+    return co(function* () {
+      const m = new mongoose.Mongoose;
+      const connect = m.connect;
+      const disconnect = m.disconnect;
+
+      yield disconnect();
+
+      const errorOnConnect = yield connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
+      assert.ifError(errorOnConnect);
+
+      const errorOnDisconnect = yield disconnect().then(() => null, err => err);
+      assert.ifError(errorOnDisconnect);
     });
   });
 });

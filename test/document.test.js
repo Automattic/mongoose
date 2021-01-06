@@ -775,6 +775,35 @@ describe('document', function() {
         });
       });
     });
+
+    it('respects child schemas minimize (gh-9405)', function() {
+      const postSchema = new Schema({
+        owner: { type: Schema.Types.ObjectId, ref: 'User' },
+        props: { type: Object, default: {} }
+      });
+      const userSchema = new Schema({
+        firstName: String,
+        props: { type: Object, default: {} }
+      }, { minimize: false });
+
+      const User = db.model('User', userSchema);
+      const Post = db.model('BlogPost', postSchema);
+
+      const user = new User({ firstName: 'test' });
+      const post = new Post({ owner: user });
+
+      let obj = post.toObject();
+      assert.strictEqual(obj.props, void 0);
+      assert.deepEqual(obj.owner.props, {});
+
+      obj = post.toObject({ minimize: false });
+      assert.deepEqual(obj.props, {});
+      assert.deepEqual(obj.owner.props, {});
+
+      obj = post.toObject({ minimize: true });
+      assert.strictEqual(obj.props, void 0);
+      assert.strictEqual(obj.owner.props, void 0);
+    });
   });
 
   describe('toJSON', function() {
@@ -3312,7 +3341,7 @@ describe('document', function() {
       const Parent = db.model('Parent', ParentSchema);
 
       const p = new Parent();
-      assert.equal(p.child.$parent, p);
+      assert.equal(p.child.$parent(), p);
     });
 
     it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', function(done) {
@@ -7837,6 +7866,28 @@ describe('document', function() {
         return doc.validate();
       });
     });
+
+    it('overwrites maps (gh-9549)', function() {
+      const schema = new Schema({
+        name: String,
+        myMap: { type: Map, of: String }
+      });
+      db.deleteModel(/Test/);
+      const Test = db.model('Test', schema);
+
+      let doc = new Test({ name: 'test', myMap: { a: 1, b: 2 } });
+
+      return co(function*() {
+        yield doc.save();
+
+        doc = yield Test.findById(doc);
+        doc.overwrite({ name: 'test2', myMap: { b: 2, c: 3 } });
+        yield doc.save();
+
+        doc = yield Test.findById(doc);
+        assert.deepEqual(Array.from(doc.toObject().myMap.values()), [2, 3]);
+      });
+    });
   });
 
   it('copies virtuals from array subdocs when casting array of docs with same schema (gh-7898)', function() {
@@ -8653,6 +8704,25 @@ describe('document', function() {
     assert.equal(doc.toObject({ transform: true }).arr[0].myDate, '2017');
   });
 
+  it('transforms nested paths (gh-9543)', function() {
+    const schema = Schema({
+      nested: {
+        date: {
+          type: Date,
+          transform: v => v.getFullYear()
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({
+      nested: {
+        date: new Date('2020-06-01')
+      }
+    });
+    assert.equal(doc.toObject({ transform: true }).nested.date, '2020');
+  });
+
   it('handles setting numeric paths with single nested subdocs (gh-8583)', function() {
     const placedItemSchema = Schema({ image: String }, { _id: false });
 
@@ -9033,6 +9103,52 @@ describe('document', function() {
     assert.equal(axl.fullName, 'Axl Rose');
   });
 
+  describe('Document#getChanges(...) (gh-9096)', function() {
+    it('returns an empty object when there are no changes', function() {
+      return co(function*() {
+        const User = db.model('User', { name: String, age: Number, country: String });
+        const user = yield User.create({ name: 'Hafez', age: 25, country: 'Egypt' });
+
+        const changes = user.getChanges();
+        assert.deepEqual(changes, {});
+      });
+    });
+
+    it('returns only the changed paths', function() {
+      return co(function*() {
+        const User = db.model('User', { name: String, age: Number, country: String });
+        const user = yield User.create({ name: 'Hafez', age: 25, country: 'Egypt' });
+
+        user.country = undefined;
+        user.age = 26;
+
+        const changes = user.getChanges();
+        assert.deepEqual(changes, { $set: { age: 26 }, $unset: { country: 1 } });
+      });
+    });
+  });
+
+  it('supports skipping defaults on a document (gh-8271)', function() {
+    const testSchema = new mongoose.Schema({
+      testTopLevel: { type: String, default: 'foo' },
+      testNested: {
+        prop: { type: String, default: 'bar' }
+      },
+      testArray: [{ prop: { type: String, default: 'baz' } }],
+      testSingleNested: new Schema({
+        prop: { type: String, default: 'qux' }
+      })
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test({ testArray: [{}], testSingleNested: {} }, null,
+      { defaults: false });
+    assert.ok(!doc.testTopLevel);
+    assert.ok(!doc.testNested.prop);
+    assert.ok(!doc.testArray[0].prop);
+    assert.ok(!doc.testSingleNested.prop);
+  });
+
   it('throws an error when `transform` returns a promise (gh-9163)', function() {
     const userSchema = new Schema({
       name: {
@@ -9067,6 +9183,18 @@ describe('document', function() {
       }).
       then(doc => Model.findById(doc)).
       then(doc => assert.strictEqual(doc.obj.key, 2));
+  });
+
+  it('supports `useProjection` option for `toObject()` (gh-9118)', function() {
+    const authorSchema = new mongoose.Schema({
+      name: String,
+      hiddenField: { type: String, select: false }
+    });
+
+    const Author = db.model('Author', authorSchema);
+
+    const example = new Author({ name: 'John', hiddenField: 'A secret' });
+    assert.strictEqual(example.toJSON({ useProjection: true }).hiddenField, void 0);
   });
 
   it('clears out priorDoc after overwriting single nested subdoc (gh-9208)', function() {
@@ -9132,6 +9260,591 @@ describe('document', function() {
 
       const fromDb = yield Test.findOne().lean();
       assert.ok(!('a' in fromDb));
+    });
+  });
+
+  it('keeps manually populated paths when setting a nested path to itself (gh-9293)', function() {
+    const StepSchema = Schema({
+      ride: { type: ObjectId, ref: 'Ride' },
+      status: Number
+    });
+
+    const RideSchema = Schema({
+      status: Number,
+      steps: {
+        taxi: [{ type: ObjectId, ref: 'Step' }],
+        rent: [{ type: ObjectId, ref: 'Step' }],
+        vehicle: [{ type: ObjectId, ref: 'Step' }]
+      }
+    });
+
+    const Step = db.model('Step', StepSchema);
+    const Ride = db.model('Ride', RideSchema);
+
+    return co(function*() {
+      let ride = yield Ride.create({ status: 0 });
+      const steps = yield Step.create([
+        { ride: ride, status: 0 },
+        { ride: ride, status: 1 },
+        { ride: ride, status: 2 }
+      ]);
+
+      ride.steps = { taxi: [steps[0]], rent: [steps[1]], vehicle: [steps[2]] };
+      yield ride.save();
+
+      ride = yield Ride.findOne({}).populate('steps.taxi steps.vehicle steps.rent');
+
+      assert.equal(ride.steps.taxi[0].status, 0);
+      assert.equal(ride.steps.rent[0].status, 1);
+      assert.equal(ride.steps.vehicle[0].status, 2);
+
+      ride.steps = ride.steps;
+      assert.equal(ride.steps.taxi[0].status, 0);
+      assert.equal(ride.steps.rent[0].status, 1);
+      assert.equal(ride.steps.vehicle[0].status, 2);
+    });
+  });
+
+  it('doesnt wipe out nested paths when setting a nested path to itself (gh-9313)', function() {
+    const schema = new Schema({
+      nested: {
+        prop1: { type: Number, default: 50 },
+        prop2: {
+          type: String,
+          enum: ['val1', 'val2'],
+          default: 'val1',
+          required: true
+        },
+        prop3: {
+          prop4: { type: Number, default: 0 }
+        }
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      let doc = yield Model.create({});
+
+      doc = yield Model.findById(doc);
+
+      doc.nested = doc.nested;
+
+      assert.equal(doc.nested.prop2, 'val1');
+      yield doc.save();
+
+      const fromDb = yield Model.collection.findOne({ _id: doc._id });
+      assert.equal(fromDb.nested.prop2, 'val1');
+    });
+  });
+
+  it('allows saving after setting document array to itself (gh-9266)', function() {
+    const Model = db.model('Test', Schema({ keys: [{ _id: false, name: String }] }));
+
+    return co(function*() {
+      const document = new Model({});
+
+      document.keys[0] = { name: 'test' };
+      document.keys = document.keys;
+
+      yield document.save();
+
+      const fromDb = yield Model.findOne();
+      assert.deepEqual(fromDb.toObject().keys, [{ name: 'test' }]);
+    });
+  });
+
+  it('allows accessing document values from function default on array (gh-9351) (gh-6155)', function() {
+    const schema = Schema({
+      publisher: String,
+      authors: {
+        type: [String],
+        default: function() {
+          return [this.publisher];
+        }
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({ publisher: 'Mastering JS' });
+    assert.deepEqual(doc.toObject().authors, ['Mastering JS']);
+  });
+
+  it('handles pulling array subdocs when _id is an alias (gh-9319)', function() {
+    const childSchema = Schema({
+      field: {
+        type: String,
+        alias: '_id'
+      }
+    }, { _id: false });
+
+    const parentSchema = Schema({ children: [childSchema] });
+    const Parent = db.model('Parent', parentSchema);
+
+    return co(function*() {
+      yield Parent.create({ children: [{ field: '1' }] });
+      const p = yield Parent.findOne();
+
+      p.children.pull('1');
+      yield p.save();
+
+      assert.equal(p.children.length, 0);
+
+      const fromDb = yield Parent.findOne();
+      assert.equal(fromDb.children.length, 0);
+    });
+  });
+
+  it('allows setting nested path to instance of model (gh-9392)', function() {
+    const def = { test: String };
+    const Child = db.model('Child', def);
+
+    const Parent = db.model('Parent', { nested: def });
+
+    const c = new Child({ test: 'new' });
+
+    const p = new Parent({ nested: { test: 'old' } });
+    p.nested = c;
+
+    assert.equal(p.nested.test, 'new');
+  });
+
+  it('unmarks modified if setting a value to the same value as it was previously (gh-9396)', function() {
+    const schema = new Schema({
+      bar: String
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const foo = new Test({ bar: 'bar' });
+      yield foo.save();
+      assert.ok(!foo.isModified('bar'));
+
+      foo.bar = 'baz';
+      assert.ok(foo.isModified('bar'));
+
+      foo.bar = 'bar';
+      assert.ok(!foo.isModified('bar'));
+    });
+  });
+
+  it('unmarks modified if setting a value to the same subdoc as it was previously (gh-9396)', function() {
+    const schema = new Schema({
+      nested: { bar: String },
+      subdoc: new Schema({ bar: String }, { _id: false })
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const foo = new Test({ nested: { bar: 'bar' }, subdoc: { bar: 'bar' } });
+      yield foo.save();
+      assert.ok(!foo.isModified('nested'));
+      assert.ok(!foo.isModified('subdoc'));
+
+      foo.nested = { bar: 'baz' };
+      foo.subdoc = { bar: 'baz' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+
+      foo.nested = { bar: 'bar' };
+      foo.subdoc = { bar: 'bar' };
+      assert.ok(!foo.isModified('nested'));
+      assert.ok(!foo.isModified('subdoc'));
+      assert.ok(!foo.isModified('subdoc.bar'));
+
+      foo.nested = { bar: 'baz' };
+      foo.subdoc = { bar: 'baz' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+      yield foo.save();
+
+      foo.nested = { bar: 'bar' };
+      foo.subdoc = { bar: 'bar' };
+      assert.ok(foo.isModified('nested'));
+      assert.ok(foo.isModified('subdoc'));
+      assert.ok(foo.isModified('subdoc.bar'));
+    });
+  });
+
+  it('marks path as errored if default function throws (gh-9408)', function() {
+    const jobSchema = new Schema({
+      deliveryAt: Date,
+      subJob: [{
+        deliveryAt: Date,
+        shippingAt: {
+          type: Date,
+          default: () => { throw new Error('Oops!'); }
+        },
+        prop: { type: String, default: 'default' }
+      }]
+    });
+
+    const Job = db.model('Test', jobSchema);
+
+    const doc = new Job({ subJob: [{ deliveryAt: new Date() }] });
+    assert.equal(doc.subJob[0].prop, 'default');
+  });
+
+  it('passes subdoc with initial values set to default function when init-ing (gh-9408)', function() {
+    const jobSchema = new Schema({
+      deliveryAt: Date,
+      subJob: [{
+        deliveryAt: Date,
+        shippingAt: {
+          type: Date,
+          default: function() {
+            return this.deliveryAt;
+          }
+        }
+      }]
+    });
+
+    const Job = db.model('Test', jobSchema);
+
+    const date = new Date();
+    const doc = new Job({ subJob: [{ deliveryAt: date }] });
+
+    assert.equal(doc.subJob[0].shippingAt.valueOf(), date.valueOf());
+  });
+
+  it('passes document as an argument for `required` function in schema definition (gh-9433)', function() {
+    let docFromValidation;
+
+    const userSchema = new Schema({
+      name: {
+        type: String,
+        required: (doc) => {
+          docFromValidation = doc;
+          return doc.age > 18;
+        }
+      },
+      age: Number
+    });
+
+    const User = db.model('User', userSchema);
+    const user = new User({ age: 26 });
+    const err = user.validateSync();
+    assert.ok(err);
+
+    assert.ok(docFromValidation === user);
+  });
+
+  it('works with path named isSelected (gh-9438)', function() {
+    const categorySchema = new Schema({
+      name: String,
+      categoryUrl: { type: String, required: true }, // Makes test fail
+      isSelected: Boolean
+    });
+
+    const siteSchema = new Schema({ categoryUrls: [categorySchema] });
+
+    const Test = db.model('Test', siteSchema);
+    const test = new Test({
+      categoryUrls: [
+        { name: 'A', categoryUrl: 'B', isSelected: false, isModified: false }
+      ]
+    });
+    const err = test.validateSync();
+    assert.ifError(err);
+  });
+
+  it('init tracks cast error reason (gh-9448)', function() {
+    const Test = db.model('Test', Schema({
+      num: Number
+    }));
+
+    const doc = new Test();
+    doc.init({ num: 'not a number' });
+
+    const err = doc.validateSync();
+    assert.ok(err.errors['num'].reason);
+  });
+
+  it('correctly handles setting nested path underneath single nested subdocs (gh-9459)', function() {
+    const preferencesSchema = mongoose.Schema({
+      notifications: {
+        email: Boolean,
+        push: Boolean
+      },
+      keepSession: Boolean
+    }, { _id: false });
+
+    const User = db.model('User', Schema({
+      email: String,
+      username: String,
+      preferences: preferencesSchema
+    }));
+
+    const userFixture = {
+      email: 'foo@bar.com',
+      username: 'foobars',
+      preferences: {
+        keepSession: true,
+        notifications: {
+          email: false,
+          push: false
+        }
+      }
+    };
+
+    let userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications': { email: true }
+    });
+    let testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true });
+
+    userWithEmailNotifications = Object.assign({}, userFixture, {
+      'preferences.notifications.email': true
+    });
+    testUser = new User(userWithEmailNotifications);
+
+    assert.deepEqual(testUser.toObject().preferences.notifications, { email: true, push: false });
+  });
+
+  it('$isValid() with space-delimited and array syntax (gh-9474)', function() {
+    const Test = db.model('Test', Schema({
+      name: String,
+      email: String,
+      age: Number,
+      answer: Number
+    }));
+
+    const doc = new Test({ name: 'test', email: 'test@gmail.com', age: 'bad', answer: 'bad' });
+
+    assert.ok(doc.$isValid('name'));
+    assert.ok(doc.$isValid('email'));
+    assert.ok(!doc.$isValid('age'));
+    assert.ok(!doc.$isValid('answer'));
+
+    assert.ok(doc.$isValid('name email'));
+    assert.ok(doc.$isValid('name age'));
+    assert.ok(!doc.$isValid('age answer'));
+
+    assert.ok(doc.$isValid(['name', 'email']));
+    assert.ok(doc.$isValid(['name', 'age']));
+    assert.ok(!doc.$isValid(['age', 'answer']));
+  });
+
+  it('avoids overwriting array subdocument when setting dotted path that is not selected (gh-9427)', function() {
+    const Test = db.model('Test', Schema({
+      arr: [{ _id: false, val: Number }],
+      name: String,
+      age: Number
+    }));
+
+    return co(function*() {
+      let doc = yield Test.create({
+        name: 'Test',
+        arr: [{ val: 1 }, { val: 2 }],
+        age: 30
+      });
+
+      doc = yield Test.findById(doc._id).select('name');
+      doc.set('arr.0.val', 2);
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc._id);
+      assert.deepEqual(fromDb.toObject().arr, [{ val: 2 }, { val: 2 }]);
+    });
+  });
+
+  it('ignore getters when diffing objects for change tracking (gh-9501)', function() {
+    const schema = new Schema({
+      title: {
+        type: String,
+        required: true
+      },
+      price: {
+        type: Number,
+        min: 0
+      },
+      taxPercent: {
+        type: Number,
+        required: function() {
+          return this.price != null;
+        },
+        min: 0,
+        max: 100,
+        get: value => value || 10
+      }
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({
+        title: 'original'
+      });
+
+      doc.set({
+        title: 'updated',
+        price: 10,
+        taxPercent: 10
+      });
+
+      assert.ok(doc.modifiedPaths().indexOf('taxPercent') !== -1);
+
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.taxPercent, 10);
+    });
+  });
+
+  it('allows defining middleware for all document hooks using regexp (gh-9190)', function() {
+    const schema = Schema({ name: String });
+
+    let called = 0;
+    schema.pre(/.*/, { document: true, query: false }, function() {
+      ++called;
+    });
+    const Model = db.model('Test', schema);
+
+    return co(function*() {
+      yield Model.find();
+      assert.equal(called, 0);
+
+      yield Model.findOne();
+      assert.equal(called, 0);
+
+      yield Model.countDocuments();
+      assert.equal(called, 0);
+
+      const docs = yield Model.create([{ name: 'test' }], { validateBeforeSave: false });
+      assert.equal(called, 1);
+
+      yield docs[0].validate();
+      assert.equal(called, 2);
+
+      yield docs[0].updateOne({ name: 'test2' });
+      assert.equal(called, 3);
+
+      yield Model.aggregate([{ $match: { name: 'test' } }]);
+      assert.equal(called, 3);
+    });
+  });
+
+  it('correctly handles setting nested props to other nested props (gh-9519)', function() {
+    const schemaA = Schema({
+      propX: {
+        nested1: { prop: Number },
+        nested2: { prop: Number },
+        nested3: { prop: Number }
+      },
+      propY: {
+        nested1: { prop: Number },
+        nested2: { prop: Number },
+        nested3: { prop: Number }
+      }
+    });
+
+    const schemaB = Schema({ prop: { prop: Number } });
+
+    const ModelA = db.model('Test1', schemaA);
+    const ModelB = db.model('Test2', schemaB);
+
+    return co(function*() {
+      const saved = yield ModelA.create({
+        propX: {
+          nested1: { prop: 1 },
+          nested2: { prop: 1 },
+          nested3: { prop: 1 }
+        },
+        propY: {
+          nested1: { prop: 2 },
+          nested2: { prop: 2 },
+          nested3: { prop: 2 }
+        }
+      });
+
+      const objA = yield ModelA.findById(saved._id);
+      const objB = new ModelB();
+
+      objB.prop = objA.propX.nested1;
+
+      assert.strictEqual(objB.prop.prop, 1);
+    });
+  });
+
+  it('sets fields after an undefined field (gh-9585)', function() {
+    const personSchema = new Schema({
+      items: { type: Array },
+      email: { type: String }
+    });
+
+    const Person = db.model('Person', personSchema);
+
+
+    const person = new Person({ items: undefined, email: 'test@gmail.com' });
+    assert.equal(person.email, 'test@gmail.com');
+  });
+
+  it.skip('passes document to `default` functions (gh-9633)', function() {
+    let documentFromDefault;
+    const userSchema = new Schema({
+      name: { type: String },
+      age: {
+        type: Number,
+        default: function(doc) {
+          documentFromDefault = doc;
+        }
+      }
+
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User({ name: 'Hafez' });
+
+    assert.ok(documentFromDefault === user);
+    assert.equal(documentFromDefault.name, 'Hafez');
+  });
+
+  it('handles pre hook throwing a sync error (gh-9659)', function() {
+    const TestSchema = new Schema({ name: String });
+
+    TestSchema.pre('save', function() {
+      throw new Error('test err');
+    });
+    const TestModel = db.model('Test', TestSchema);
+
+    return co(function*() {
+      const testObject = new TestModel({ name: 't' });
+
+      const err = yield testObject.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.message, 'test err');
+    });
+  });
+
+  it('returns undefined rather than entire object when calling `get()` with empty string (gh-9681)', function() {
+    const TestSchema = new Schema({ name: String });
+    const TestModel = db.model('Test', TestSchema);
+
+    const testObject = new TestModel({ name: 't' });
+
+    assert.strictEqual(testObject.get(''), void 0);
+  });
+
+  it('keeps atomics when assigning array to filtered array (gh-9651)', function() {
+    const Model = db.model('Test', { arr: [{ abc: String }] });
+
+    return co(function*() {
+      const m1 = new Model({ arr: [{ abc: 'old' }] });
+      yield m1.save();
+
+      const m2 = yield Model.findOne({ _id: m1._id });
+
+      m2.arr = [];
+      m2.arr = m2.arr.filter(() => true);
+      m2.arr.push({ abc: 'ghi' });
+      yield m2.save();
+
+      const fromDb = yield Model.findById(m1._id);
+      assert.equal(fromDb.arr.length, 1);
+      assert.equal(fromDb.arr[0].abc, 'ghi');
     });
   });
 });

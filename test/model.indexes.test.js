@@ -20,7 +20,7 @@ describe('model', function() {
   before(function() {
     db = start();
 
-    return db.createCollection('Test');
+    return db.createCollection('Test').catch(() => {});
   });
 
   after(function(done) {
@@ -465,16 +465,18 @@ describe('model', function() {
     const schema = new Schema({ arr: [childSchema] });
     const Model = db.model('Test', schema);
 
-    return Model.init().
-      then(() => Model.syncIndexes()).
-      then(() => Model.listIndexes()).
-      then(indexes => {
-        assert.equal(indexes.length, 2);
-        assert.ok(indexes[1].partialFilterExpression);
-        assert.deepEqual(indexes[1].partialFilterExpression, {
-          'arr.name': { $exists: true }
-        });
+    return co(function*() {
+      yield Model.init();
+
+      yield Model.syncIndexes();
+      const indexes = yield Model.listIndexes();
+
+      assert.equal(indexes.length, 2);
+      assert.ok(indexes[1].partialFilterExpression);
+      assert.deepEqual(indexes[1].partialFilterExpression, {
+        'arr.name': { $exists: true }
       });
+    });
   });
 
   it('skips automatic indexing on childSchema if autoIndex: false (gh-9150)', function() {
@@ -518,6 +520,7 @@ describe('model', function() {
       const deviceSchema = new Schema({
         _id: { type: Schema.ObjectId, auto: true },
         name: { type: String, unique: true }, // Should become a partial
+        other: { type: String, index: true }, // Should become a partial
         model: { type: String }
       });
 
@@ -530,7 +533,12 @@ describe('model', function() {
         Base.create({}),
         User.create({ emailId: 'val@karpov.io', firstName: 'Val' }),
         Device.create({ name: 'Samsung', model: 'Galaxy' })
-      ]);
+      ]).then(() => Base.listIndexes()).
+        then(indexes => indexes.find(i => i.key.other)).
+        then(index => {
+          assert.deepEqual(index.key, { other: 1 });
+          assert.deepEqual(index.partialFilterExpression, { kind: 'Device' });
+        });
     });
 
     it('decorated discriminator index with syncIndexes (gh-6347)', function() {
@@ -565,7 +573,7 @@ describe('model', function() {
         assert.deepEqual(indexes[1].key, { username: 1 });
         assert.ok(!indexes[1].collation);
 
-        userSchema = new mongoose.Schema({ username: String });
+        userSchema = new mongoose.Schema({ username: String }, { autoIndex: false });
         userSchema.index({ username: 1 }, {
           unique: true,
           collation: {
@@ -576,13 +584,41 @@ describe('model', function() {
         db.deleteModel('User');
         User = db.model('User', userSchema, 'User');
 
-        yield User.init();
         yield User.syncIndexes();
 
         indexes = yield User.listIndexes();
         assert.equal(indexes.length, 2);
         assert.deepEqual(indexes[1].key, { username: 1 });
         assert.ok(!!indexes[1].collation);
+
+        yield User.collection.drop();
+      });
+    });
+
+    it('reports syncIndexes() error (gh-9303)', function() {
+      return co(function*() {
+        let userSchema = new mongoose.Schema({ username: String, email: String });
+        let User = db.model('User', userSchema);
+
+        yield User.createCollection().catch(() => {});
+        let indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 1);
+
+        yield User.create([{ username: 'test', email: 'foo@bar' }, { username: 'test', email: 'foo@bar' }]);
+
+        userSchema = new mongoose.Schema({ username: String, email: String }, { autoIndex: false });
+        userSchema.index({ username: 1 }, { unique: true });
+        userSchema.index({ email: 1 });
+        db.deleteModel('User');
+        User = db.model('User', userSchema, 'User');
+
+        const err = yield User.syncIndexes().then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.code, 11000);
+
+        indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[1].key, { email: 1 });
 
         yield User.collection.drop();
       });

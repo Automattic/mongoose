@@ -9263,6 +9263,7 @@ describe('document', function() {
     });
   });
 
+<<<<<<< HEAD
   it('keeps manually populated paths when setting a nested path to itself (gh-9293)', function() {
     const StepSchema = Schema({
       ride: { type: ObjectId, ref: 'Ride' },
@@ -9782,6 +9783,9 @@ describe('document', function() {
   });
 
   it.skip('passes document to `default` functions (gh-9633)', function() {
+=======
+  it('passes document to `default` functions (gh-9633)', function() {
+>>>>>>> 4183ba73f7eeecb62f984613ad0f6a84937af086
     let documentFromDefault;
     const userSchema = new Schema({
       name: { type: String },
@@ -9846,5 +9850,19 @@ describe('document', function() {
       assert.equal(fromDb.arr.length, 1);
       assert.equal(fromDb.arr[0].abc, 'ghi');
     });
+  });
+
+  it('does not pass doc to ObjectId or Date.now (gh-9633) (gh-9636)', function() {
+    const userSchema = new Schema({
+      parentId: { type: Schema.ObjectId, ref: 'User', default: mongoose.Types.ObjectId },
+      createdAt: { type: Date, default: Date.now }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = new User();
+
+    assert.ok(user.parentId instanceof mongoose.Types.ObjectId);
+    assert.ok(user.createdAt instanceof Date);
   });
 });

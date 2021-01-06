@@ -224,6 +224,19 @@ describe('utils', function() {
     done();
   });
 
+  it('`deepEqual` treats objects with different order of keys as different (gh-9571)', function() {
+    const user1 = {
+      name: 'Hafez',
+      age: 26
+    };
+    const user2 = {
+      age: 26,
+      name: 'Hafez'
+    };
+
+    assert.equal(utils.deepEqual(user1, user2), false);
+  });
+
   describe('clone', function() {
     it('retains RegExp options gh-1355', function(done) {
       const a = new RegExp('hello', 'igm');

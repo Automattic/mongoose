@@ -1417,10 +1417,10 @@ declare module 'mongoose' {
     subtype?: number
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
-    min?: number | Date;
+    min?: number | Date | [number, string] | [Date, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
-    max?: number | Date;
+    max?: number | Date | [number, string] | [Date, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: number | Date;

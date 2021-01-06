@@ -477,8 +477,8 @@ declare module 'mongoose' {
      */
     getChanges(): UpdateQuery<this>;
 
-    /** The string version of this documents _id. */
-    id?: any;
+    /** The string version of this documents _id. Sometimes it's ObjectId when sub-documents were not populated */
+    id?: string | mongodb.ObjectId;
 
     /** Signal that we desire an increment of this documents version. */
     increment(): this;

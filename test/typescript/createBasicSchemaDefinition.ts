@@ -17,7 +17,7 @@ const schema: Schema = new Schema({
 
 interface ITest extends Document {
   name?: string;
-  id?: string | ObjectId;
+  id?: string | ObjectId;
   tags?: string[];
   author?: { name: string };
   followers?: { name: string }[];

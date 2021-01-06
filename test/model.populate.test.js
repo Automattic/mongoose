@@ -9761,7 +9761,7 @@ describe('model: populate:', function() {
       assert.ok(doc.myVirtual.$parent() === doc);
 
       doc = yield Parent.findOne();
-      yield doc.populate('single').execPopulate();
+      yield doc.populate('single');
       assert.ok(doc.single.parent() === doc);
       assert.ok(doc.single.$parent() === doc);
     });

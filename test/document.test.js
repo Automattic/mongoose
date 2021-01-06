@@ -9263,7 +9263,6 @@ describe('document', function() {
     });
   });
 
-<<<<<<< HEAD
   it('keeps manually populated paths when setting a nested path to itself (gh-9293)', function() {
     const StepSchema = Schema({
       ride: { type: ObjectId, ref: 'Ride' },
@@ -9782,10 +9781,7 @@ describe('document', function() {
     assert.equal(person.email, 'test@gmail.com');
   });
 
-  it.skip('passes document to `default` functions (gh-9633)', function() {
-=======
   it('passes document to `default` functions (gh-9633)', function() {
->>>>>>> 4183ba73f7eeecb62f984613ad0f6a84937af086
     let documentFromDefault;
     const userSchema = new Schema({
       name: { type: String },

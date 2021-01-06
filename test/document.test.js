@@ -3341,7 +3341,7 @@ describe('document', function() {
       const Parent = db.model('Parent', ParentSchema);
 
       const p = new Parent();
-      assert.equal(p.child.$parent(), p);
+      assert.equal(p.child.$parent, p);
     });
 
     it('removing parent doc calls remove hooks on subdocs (gh-2348) (gh-4566)', function(done) {

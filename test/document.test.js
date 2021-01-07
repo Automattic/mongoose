@@ -2448,7 +2448,7 @@ describe('document', function() {
         assert.ok(error);
         assert.equal(error.errors['user.email'].kind, 'regexp');
 
-        const nestedUpdate = { name: 'test' };
+        const nestedUpdate = { name: 'test', user: {} };
         const options = { upsert: true };
         Event.updateOne({}, nestedUpdate, options, function(error) {
           assert.ifError(error);

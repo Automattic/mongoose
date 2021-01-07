@@ -7082,7 +7082,8 @@ describe('Model', function() {
         assert.equal(user3.name, 'Hafez2');
       });
     });
-
+  });
+  describe('Setting the explain flag', function() {
     it('should give an object back rather than a boolean (gh-8275)', function() {
       return co(function*() {
         const MyModel = db.model('Character', mongoose.Schema({
@@ -7098,7 +7099,7 @@ describe('Model', function() {
           { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
           { name: 'Worf', age: 24, rank: 'Lieutenant' }
         ]);
-        const res = (yield MyModel.exists({}, { explain: true }));
+        const res = yield MyModel.exists({}, { explain: true });
 
         assert.equal(typeof res, 'object');
       });

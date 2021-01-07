@@ -2240,6 +2240,12 @@ declare module 'mongoose' {
      * future release. */
     addCursorFlag(flag: string, value: boolean): this;
 
+    /**
+     * Appends a new $addFields operator to this aggregate pipeline.
+     * Requires MongoDB v3.4+ to work
+     */
+    addFields(arg: any): this;
+
     /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
     allowDiskUse(value: boolean): this;
 

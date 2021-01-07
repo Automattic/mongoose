@@ -66,7 +66,7 @@ describe('promises docs', function () {
     // acquit:ignore:end
 
     // A query is not a fully-fledged promise, but it does have a `.then()`.
-    query.then(function (doc) {
+    query.then(function(doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -75,7 +75,7 @@ describe('promises docs', function () {
     });
 
     // `.exec()` gives you a fully-fledged promise
-    const promise = query.exec();
+    const promise = Band.findOne({name: "Guns N' Roses"}).exec();
     assert.ok(promise instanceof Promise);
 
     promise.then(function (doc) {
@@ -166,16 +166,14 @@ describe('promises docs', function () {
       return done();
     }
     // acquit:ignore:end
-    const query = Band.findOne({name: "Guns N' Roses"});
-
     // Use bluebird
     mongoose.Promise = require('bluebird');
-    const bluebirdPromise = query.exec();
+    const bluebirdPromise = Band.findOne({name: "Guns N' Roses"}).exec();
     assert.equal(bluebirdPromise.constructor, require('bluebird'));
 
     // Use q. Note that you **must** use `require('q').Promise`.
     mongoose.Promise = require('q').Promise;
-    const qPromise = query.exec();
+    const qPromise = Band.findOne({name: "Guns N' Roses"}).exec();
     assert.ok(qPromise instanceof require('q').makePromise);
 
     // acquit:ignore:start

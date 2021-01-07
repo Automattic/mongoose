@@ -1173,7 +1173,7 @@ describe('connections:', function() {
     });
   });
 
-  it('connection.then(...) resolves to a connection instance (gh-9496)', function() {
+  it('connection.asPromise() resolves to a connection instance (gh-9496)', function() {
     return co(function *() {
       const m = new mongoose.Mongoose;
 
@@ -1181,23 +1181,10 @@ describe('connections:', function() {
         useNewUrlParser: true,
         useUnifiedTopology: true
       });
-      const conn = yield m.connection;
+      const conn = yield m.connection.asPromise();
 
       assert.ok(conn instanceof m.Connection);
       assert.ok(conn);
-    });
-  });
-
-  it('connection.then(...) does not throw when passed undefined (gh-9505)', function() {
-    const m = new mongoose.Mongoose;
-
-    const db = m.createConnection('mongodb://localhost:27017/test_gh9505', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-
-    assert.doesNotThrow(() => {
-      db.then(null);
     });
   });
 

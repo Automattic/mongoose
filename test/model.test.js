@@ -7083,22 +7083,24 @@ describe('Model', function() {
       });
     });
 
-    it('should set the explain flag on the query (gh-8075)', function() {
+    it('should give an object back rather than a boolean (gh-8275)', function() {
       return co(function*() {
-        const MyModel = mongoose.model('Character', mongoose.Schema({
+        const MyModel = db.model('Character', mongoose.Schema({
           name: String,
           age: Number,
           rank: String
         }));
 
-        MyModel.create([
+        yield MyModel.create([
           { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
           { name: 'William Riker', age: 29, rank: 'Commander' },
           { name: 'Deanna Troi', age: 28, rank: 'Lieutenant Commander' },
           { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
           { name: 'Worf', age: 24, rank: 'Lieutenant' }
         ]);
-        assert.equal(typeof MyModel.exists({}, { explain: true }), 'object');
+        const res = (yield MyModel.exists({}, { explain: true }));
+
+        assert.equal(typeof res, 'object');
       });
     });
   });

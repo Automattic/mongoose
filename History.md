@@ -1,4 +1,4 @@
-5.11.10 / 2020-01-04
+5.11.10 / 2021-01-04
 ====================
  * fix(model): support `populate` option for `insertMany()` as a workaround for mongoose-autopopulate #9720
  * perf(schema): avoid creating extra array when initializing array of arrays #9588

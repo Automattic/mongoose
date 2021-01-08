@@ -166,7 +166,7 @@ describe('typescript syntax', function() {
   });
 
   it('methods', function() {
-    const errors = runTest('methods.ts');
+    const errors = runTest('methods.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }

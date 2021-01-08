@@ -5,7 +5,9 @@
 **What is the current behavior?**
 
 **If the current behavior is a bug, please provide the steps to reproduce.**
-<!-- If you can, provide a standalone script / gist to reproduce your issue -->
+<!-- If you can, provide a standalone script / gist to reproduce your issue. -->
+
+<!-- If you are using TypeScript, please include your `tsconfig.json` -->
 
 **What is the expected behavior?**
 

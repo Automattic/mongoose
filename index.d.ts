@@ -387,6 +387,9 @@ declare module 'mongoose' {
     /** Getter/setter, determines whether the document was removed or not. */
     $isDeleted(val?: boolean): boolean;
 
+    /** Returns an array of all populated documents associated with the query */
+    $getPopulatedDocs(): Document[];
+
     /**
      * Returns true if the given path is nullish or only contains empty objects.
      * Useful for determining whether this subdoc will get stripped out by the

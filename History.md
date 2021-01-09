@@ -1,3 +1,23 @@
+5.11.10 / 2020-01-04
+====================
+ * fix(model): support `populate` option for `insertMany()` as a workaround for mongoose-autopopulate #9720
+ * perf(schema): avoid creating extra array when initializing array of arrays #9588
+ * perf(schema): avoid setting `arrayPath` when casting to a non-array, avoid unnecessarily setting atomics #9588
+ * perf(schema): avoid expensive `String#slice()` call when creating a new array #9588
+ * fix(queryhelpers): avoid modifying `lean.virtuals` in place #9754
+ * fix: fall back to legacy treatment for square brackets if square brackets contents aren't a number #9640
+ * fix(document): make fix for #9396 handle null values more gracefully #9709
+ * fix(index.d.ts): add missing overloaded function for Document#populate() #9744 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): allow Model.create param1 overwrite #9753 [hasezoey](https://github.com/hasezoey)
+ * fix(index.d.ts): improve autocomplete for query middleware #9752 [3Aahmednaser94](https://github.com/3Aahmednaser94)
+ * fix(index.d.ts): add missing function for Aggregate#group() #9750 [coro101](https://github.com/coro101)
+ * fix(index.d.ts): add missing `Aggregate#project()` #9763 [vorticalbox](https://github.com/vorticalbox)
+ * fix(index.d.ts): allow `null` as an enum value for schematypes #9746
+ * docs(guide+schema): make schema API docs and guide docs' list of Schema options line up #9749
+ * docs(documents): add some more details about what the `save()` promise resolves to #9689
+ * docs(subdocs): add section about subdocument defaults #7291
+ * chore: run GitHub CI on PRs and update badge #9760 [YC](https://github.com/YC)
+
 5.11.9 / 2020-12-28
 ===================
  * fix(document): keeps atomics when assigning array to filtered array #9651

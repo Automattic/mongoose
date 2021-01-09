@@ -1096,7 +1096,7 @@ declare module 'mongoose' {
     method(obj: { [name: string]: Function }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [name: string]: Function };
+    methods: { [name: string]: (this: DocType, ...args: any[]) => void };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1167,10 +1167,11 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  interface SchemaDefinition {
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    [path: string]: SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[] | SchemaDefinition | SchemaDefinition[];
-  }
+  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[] | SchemaDefinition<T> | SchemaDefinition<T>[];
+
+  type SchemaDefinition<T = undefined> = T extends undefined
+    ? { [path: string]: SchemaDefinitionProperty; }
+    : { [path in keyof T]-?: SchemaDefinitionProperty<T[path]>; };
 
   interface SchemaOptions {
     /**

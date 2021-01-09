@@ -6,5 +6,11 @@ const schema: Schema = new Schema({
     type: String,
     enum: ['Test', null],
     default: null
+  },
+  numberWithMax: {
+    type: Number,
+    required: [true, 'Required'],
+    min: [0, 'MinValue'],
+    max: [24, 'MaxValue']
   }
 });

@@ -1,4 +1,15 @@
-5.11.10 / 2020-01-04
+5.11.11 / 2021-01-08
+====================
+ * fix(model): support calling `create()` with `undefined` as first argument and no callback #9765
+ * fix(index.d.ts): ensure TypeScript knows that `this` refers to `DocType` in schema methods with strict mode #9755
+ * fix(index.d.ts): make SchemaDefinition accept a model generic #9761 [mroohian](https://github.com/mroohian)
+ * fix(index.d.ts): add `Aggregate#addFields()` #9774
+ * fix(index.d.ts): allow setting `min` and `max` to [number, string] and [Date, string] #9762
+ * fix(index.d.ts): improve context and type bindings for `Schema#methods` and `Schema#statics` #9717
+ * docs: add recommended connection option #9768 [Fernando-Lozano](https://github.com/Fernando-Lozano)
+ * chore: correct improper date in History.md #9783 [botv](https://github.com/botv)
+
+5.11.10 / 2021-01-04
 ====================
  * fix(model): support `populate` option for `insertMany()` as a workaround for mongoose-autopopulate #9720
  * perf(schema): avoid creating extra array when initializing array of arrays #9588

@@ -1092,11 +1092,11 @@ declare module 'mongoose' {
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    method(name: string, fn: Function, opts?: any): this;
-    method(obj: { [name: string]: Function }): this;
+    method(name: string, fn: (this: DocType, ...args: any[]) => any, opts?: any): this;
+    method(obj: { [name: string]: (this: DocType, ...args: any[]) => any }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [name: string]: (this: DocType, ...args: any[]) => void };
+    methods: { [F in keyof DocType]: DocType[F] } & { [name: string]: (this: DocType, ...args: any[]) => any };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1150,12 +1150,12 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    static(name: string, fn: Function): this;
+    static(name: string, fn: (this: M, ...args: any[]) => any): this;
     // eslint-disable-next-line @typescript-eslint/ban-types
-    static(obj: { [name: string]: Function }): this;
+    static(obj: { [name: string]: (this: M, ...args: any[]) => any }): this;
 
     /** Object of currently defined statics on this schema. */
-    statics: { [name: string]: Function };
+    statics: { [F in keyof M]: M[F] } & { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;
@@ -1423,10 +1423,10 @@ declare module 'mongoose' {
     subtype?: number
 
     /** The minimum value allowed for this path. Only allowed for numbers and dates. */
-    min?: number | Date;
+    min?: number | Date | [number, string] | [Date, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
-    max?: number | Date;
+    max?: number | Date | [number, string] | [Date, string];
 
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: number | Date;
@@ -2245,6 +2245,12 @@ declare module 'mongoose' {
      * Sets an option on this aggregation. This function will be deprecated in a
      * future release. */
     addCursorFlag(flag: string, value: boolean): this;
+
+    /**
+     * Appends a new $addFields operator to this aggregate pipeline.
+     * Requires MongoDB v3.4+ to work
+     */
+    addFields(arg: any): this;
 
     /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
     allowDiskUse(value: boolean): this;

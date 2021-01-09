@@ -8942,7 +8942,6 @@ describe('document', function() {
     const err = t.validateSync();
     assert.ok(err);
     assert.ok(err.errors);
-    assert.ok(err.errors['test']);
     assert.ok(err.errors['test.1']);
   });
 

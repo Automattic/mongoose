@@ -2168,7 +2168,7 @@ declare module 'mongoose' {
   type FunctionPropertyNames<T> = {
     // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
     // eslint-disable-next-line @typescript-eslint/ban-types
-    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
+    [K in keyof T]: 0 extends (1 & T[K]) ? any : (T[K] extends Function ? K : never)
   }[keyof T];
 
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

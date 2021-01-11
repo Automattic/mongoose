@@ -442,7 +442,7 @@ describe('schema', function() {
         threw = true;
         assert.equal(error.name, 'CastError');
         assert.equal(error.message,
-          'Cast to [Number] failed for value "[["abcd"]]" at path "nums.0"');
+          'Cast to [[Number]] failed for value "[["abcd"]]" at path "nums.0"');
       }
       assert.ok(threw);
 

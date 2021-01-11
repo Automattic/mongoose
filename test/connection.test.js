@@ -11,7 +11,6 @@ const Q = require('q');
 const assert = require('assert');
 const co = require('co');
 const mongodb = require('mongodb');
-const server = require('./common').server;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

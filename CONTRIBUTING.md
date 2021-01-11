@@ -6,22 +6,21 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 
 - Before opening a new issue, look for existing [issues](https://github.com/Automattic/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/Automattic/mongoose/issues/new).
   - Please post any relevant code samples, preferably a standalone script that
-  reproduces your issue. Do **not** describe your issue in prose, show your
-  code.
+  reproduces your issue. Do **not** describe your issue in prose. **Show your code.**
   - If the bug involves an error, please post the stack trace.
-  - Please post the version of mongoose and mongodb that you're using.
-  - Please write bug reports in JavaScript (ES5, ES6, etc) that runs in Node.js, not coffeescript, typescript, etc.
+  - Please post the version of Mongoose and MongoDB that you're using.
+  - Please write bug reports in JavaScript (ES5, ES6, etc) that runs in Node.js, **not** CoffeeScript, TypeScript, JSX, etc.
 
 ### Requesting new features
 
 - Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
 - Please describe a use case for it
-- it would be ideal to include test cases as well
+- Please include test cases if possible
 
 ### Fixing bugs / Adding features
 
 - Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. You can create a new issue [here](https://github.com/learnboost/mongoose/issues/new).
-  - _The source of this project is written in javascript, not coffeescript or typescript. Please write your bug reports in JavaScript that can run in vanilla Node.js_.
+  - _The source of this project is written in JavaScript, not CoffeeScript or TypeScript. Please write your bug reports in JavaScript that can run in vanilla Node.js_.
 - Fork the [repo](https://github.com/Automattic/mongoose) _or_ for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 - Follow the general coding style of the rest of the project:
   - 2 space tabs
@@ -37,7 +36,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 ### Running the tests
 - Open a terminal and navigate to the root of the project
 - execute `npm install` to install the necessary dependencies
-- start a mongodb instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data> --port 27017 --storageEngine mmapv1`. Mongoose tests run much faster on the mmapv1 storage engine as opposed to the WiredTiger storage engine.
+- start a MongoDB instance on port 27017 if one isn't running already. `mongod --dbpath <path to store data>`. We typically use [MongoDB Enterprise](https://www.mongodb.com/try/download/enterprise) with the [in-memory storage engine](https://docs.mongodb.com/manual/core/inmemory/) in order to run tests faster.
 - execute `npm test` to run the tests (we're using [mocha](http://mochajs.org/))
   - or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   - any mocha flags can be specified with `-- <mocha flags here>`
@@ -51,11 +50,12 @@ To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick st
 
 If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
 
+* `npm install`
 * `make docclean`
 * `make gendocs`
 * `node static.js`
 
-Visit `http://localhost:8088` and you should see the docs with your local changes. Make sure you `git reset --hard` before commiting, because changes to `docs/*` should **not** be in PRs.
+Visit `http://localhost:8088` and you should see the docs with your local changes. Make sure you `git reset --hard` before committing, because changes to `docs/*` should **not** be in PRs.
 
 ### Plugins website
 
@@ -83,9 +83,3 @@ Thank you to all our backers! [[Become a backer](https://opencollective.com/mong
 
 <a href="https://opencollective.com/mongoose#backers" target="_blank"><img src="https://opencollective.com/mongoose/backers.svg?width=890"></a>
 
-
-### Sponsors
-
-Thank you to all our sponsors! (please ask your company to also support this open source project by [becoming a sponsor](https://opencollective.com/mongoose#sponsor))
-
-<a href="https://mixmax.com" target="_blank"><img src="http://mongoosejs.com/docs/images/mixmax.png"></a>

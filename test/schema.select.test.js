@@ -324,6 +324,27 @@ describe('schema select option', function() {
     });
   });
 
+  it('should not project in discriminator key if projected in implicitly with .$ (gh-9361)', function() {
+    const eventSchema = new Schema({ message: String },
+      { discriminatorKey: 'kind', _id: false });
+
+    const batchSchema = new Schema({ events: [eventSchema] });
+    batchSchema.path('events').discriminator('Clicked', new Schema({
+      element: String
+    }, { _id: false }));
+    batchSchema.path('events').discriminator('Purchased', new Schema({
+      product: String
+    }, { _id: false }));
+
+    const MyModel = db.model('Test', batchSchema);
+
+    const query = MyModel.find({ 'events.message': 'foo' }).select({ 'events.$': 1 });
+    query._applyPaths();
+
+    assert.equal(Object.keys(query._fields).length, 1);
+    assert.ok(query._fields['events.$']);
+  });
+
   describe('forcing inclusion of a deselected schema path', function() {
     it('works', function(done) {
       const excluded = new Schema({
@@ -481,13 +502,9 @@ describe('schema select option', function() {
     });
 
     const M = db.model('Test', schema);
-    M.find().select('_id -name').exec(function(err) {
-      assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
-
-      M.find().select('_id').exec(function(err) {
-        assert.ifError(err, err && err.stack);
-        done();
-      });
+    M.find().select('_id').exec(function(err) {
+      assert.ifError(err, err && err.stack);
+      done();
     });
   });
 
@@ -497,13 +514,9 @@ describe('schema select option', function() {
     });
 
     const M = db.model('Test', schema);
-    M.find().select('_id -docs.name').exec(function(err) {
-      assert.ok(err instanceof Error, 'conflicting path selection error should be instance of Error');
-
-      M.find().select('_id').exec(function(err) {
-        assert.ifError(err, err && err.stack);
-        done();
-      });
+    M.find().select('_id').exec(function(err) {
+      assert.ifError(err, err && err.stack);
+      done();
     });
   });
 
@@ -529,27 +542,23 @@ describe('schema select option', function() {
     const T = db.model('Test3', schema2);
 
     function useId(M, id, cb) {
-      M.findOne().select('_id -name').exec(function(err, d) {
-        assert.ok(err);
-        assert.ok(!d);
-        M.findOne().select('-_id name').exec(function(err, d) {
-          // mongo special case for exclude _id + include path
+      M.findOne().select('-_id name').exec(function(err, d) {
+        // mongo special case for exclude _id + include path
+        assert.ifError(err);
+        assert.equal(d.id, undefined);
+        assert.equal(d.name, 'ssd');
+        assert.equal(d.age, undefined);
+        M.findOne().select('-_id -name').exec(function(err, d) {
           assert.ifError(err);
           assert.equal(d.id, undefined);
-          assert.equal(d.name, 'ssd');
-          assert.equal(d.age, undefined);
-          M.findOne().select('-_id -name').exec(function(err, d) {
+          assert.equal(d.name, undefined);
+          assert.equal(d.age, 0);
+          M.findOne().select('_id name').exec(function(err, d) {
             assert.ifError(err);
-            assert.equal(d.id, undefined);
-            assert.equal(d.name, undefined);
-            assert.equal(d.age, 0);
-            M.findOne().select('_id name').exec(function(err, d) {
-              assert.ifError(err);
-              assert.equal(d.id, id);
-              assert.equal(d.name, 'ssd');
-              assert.equal(d.age, undefined);
-              cb();
-            });
+            assert.equal(d.id, id);
+            assert.equal(d.name, 'ssd');
+            assert.equal(d.age, undefined);
+            cb();
           });
         });
       });

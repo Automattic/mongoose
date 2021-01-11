@@ -132,6 +132,9 @@ describe('geojson', function() {
     const $geometry = { type: 'Point', coordinates: [-104.8719443, 38.8783536] };
 
     return City.create({ name: 'Denver', location: denver }).
+      // acquit:ignore:start
+      then(() => City.init()).
+      // acquit:ignore:end
       // Without a 2dsphere index, this will error out with:
       // 'unable to find index for $geoNear query"
       then(() => City.findOne({ location: { $near: { $geometry } } })).

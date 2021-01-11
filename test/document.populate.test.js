@@ -196,6 +196,7 @@ describe('document.populate', function() {
         assert.ok(!post.fans[0].email);
         assert.ok(!post.fans[1].email);
         assert.ok(!post.fans[0].isInit('email'));
+        assert.ok(!post.fans[0].isInit(['email']));
         assert.ok(!post.fans[1].isInit('email'));
         done();
       });
@@ -277,13 +278,13 @@ describe('document.populate', function() {
     B.findById(post, function(err, post) {
       assert.ifError(err);
       post.populate('idontexist', function(err) {
-        assert.ifError(err);
+        assert.ok(err);
 
         // stuff an ad-hoc value in
         post.$__setValue('idontexist', user1._id);
 
         // populate the non-schema value by passing an explicit model
-        post.populate({ path: 'idontexist', model: 'User' }, function(err, post) {
+        post.populate({ path: 'idontexist', model: 'User', strictPopulate: false }, function(err, post) {
           assert.ifError(err);
           assert.ok(post);
           assert.equal(user1._id.toString(), post.get('idontexist')._id);
@@ -456,7 +457,7 @@ describe('document.populate', function() {
     });
   });
 
-  it('depopulates when setting `_id` (gh-3308)', function(done) {
+  it('depopulates when setting `_id` (gh-3308)', function() {
     const Person = db.model('Person', {
       name: String
     });
@@ -475,8 +476,6 @@ describe('document.populate', function() {
     const buckethead = new Person({ name: 'Buckethead' });
     gnr.guitarist = buckethead._id;
     assert.ok(!gnr.populated('guitarist'));
-
-    done();
   });
 
   describe('gh-2214', function() {
@@ -757,7 +756,7 @@ describe('document.populate', function() {
     });
   });
 
-  it('does not allow you to call populate() on nested docs (gh-4552)', function(done) {
+  it('does not allow you to call populate() on nested docs (gh-4552)', function() {
     const EmbeddedSchema = new Schema({
       reference: {
         type: mongoose.Schema.ObjectId,
@@ -776,7 +775,6 @@ describe('document.populate', function() {
     assert.throws(function() {
       m.embedded.populate('reference');
     }, /on nested docs/);
-    done();
   });
 
   it('handles pulling from populated array (gh-3579)', function(done) {

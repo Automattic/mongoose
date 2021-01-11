@@ -5,7 +5,7 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -27,9 +27,9 @@ block content
     distinct notions of subdocuments: [arrays of subdocuments](https://masteringjs.io/tutorials/mongoose/array#document-arrays) and single nested
     subdocuments.
     ```javascript
-    var childSchema = new Schema({ name: 'string' });
+    const childSchema = new Schema({ name: 'string' });
 
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       // Array of subdocuments
       children: [childSchema],
       // Single nested subdocuments. Caveat: single nested subdocs only work
@@ -44,6 +44,8 @@ block content
   :markdown
     <ul class="toc">
       <li><a href="#what-is-a-subdocument-">What is a Subdocument?</a></li>
+      <li><a href="#subdocuments-versus-nested-paths">Subdocuments versus Nested Paths</a></li>
+      <li><a href="#subdocument-defaults">Subdocument Defaults</a></li>
       <li><a href="#finding-a-subdocument">Finding a Subdocument</a></li>
       <li><a href="#adding-subdocs-to-arrays">Adding Subdocs to Arrays</a></li>
       <li><a href="#removing-subdocs">Removing Subdocs</a></li>
@@ -61,8 +63,8 @@ block content
     not saved individually, they are saved whenever their top-level parent
     document is saved.
     ```javascript
-    var Parent = mongoose.model('Parent', parentSchema);
-    var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+    const Parent = mongoose.model('Parent', parentSchema);
+    const parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
     parent.children[0].name = 'Matthew';
 
     // `parent.children[0].save()` is a no-op, it triggers middleware but
@@ -84,7 +86,7 @@ block content
       next();
     });
 
-    var parent = new Parent({ children: [{ name: 'invalid' }] });
+    const parent = new Parent({ children: [{ name: 'invalid' }] });
     parent.save(function (err) {
       console.log(err.message) // #sadpanda
     });
@@ -97,7 +99,7 @@ block content
 
     ```javascript
     // Below code will print out 1-4 in order
-    var childSchema = new mongoose.Schema({ name: 'string' });
+    const childSchema = new mongoose.Schema({ name: 'string' });
 
     childSchema.pre('validate', function(next) {
       console.log('2');
@@ -109,9 +111,9 @@ block content
       next();
     });
 
-    var parentSchema = new mongoose.Schema({
-      child: childSchema,
-        });
+    const parentSchema = new mongoose.Schema({
+      child: childSchema
+    });
 
     parentSchema.pre('validate', function(next) {
       console.log('1');
@@ -124,13 +126,126 @@ block content
     });
     ```
 
+    ### Subdocuments versus Nested Paths
+
+    In Mongoose, nested paths are subtly different from subdocuments.
+    For example, below are two schemas: one with `child` as a subdocument,
+    and one with `child` as a nested path.
+
+    ```javascript
+    // Subdocument
+    const subdocumentSchema = new mongoose.Schema({
+      child: new mongoose.Schema({ name: String, age: Number })
+    });
+    const Subdoc = mongoose.model('Subdoc', subdocumentSchema);
+
+    // Nested path
+    const nestedSchema = new mongoose.Schema({
+      child: { name: String, age: Number }
+    });
+    const Nested = mongoose.model('Nested', nestedSchema);
+    ```
+
+    These two schemas look similar, and the documents in MongoDB will
+    have the same structure with both schemas. But there are a few
+    Mongoose-specific differences:
+
+    First, instances of `Nested` never have `child === undefined`.
+    You can always set subproperties of `child`, even if you don't set
+    the `child` property. But instances of `Subdoc` can have `child === undefined`.
+
+    ```javascript
+    const doc1 = new Subdoc({});
+    doc1.child === undefined; // true
+    doc1.child.name = 'test'; // Throws TypeError: cannot read property...
+
+    const doc2 = new Nested({});
+    doc2.child === undefined; // false
+    console.log(doc2.child); // Prints 'MongooseDocument { undefined }'
+    doc2.child.name = 'test'; // Works
+    ```
+
+    Secondly, in Mongoose 5, [`Document#set()`](/docs/api/document.html#document_Document-set)
+    merges when you call it on a nested path, but overwrites when you call
+    it on a subdocument.
+
+    ```javascript
+    const doc1 = new Subdoc({ child: { name: 'Luke', age: 19 } });
+    doc1.set({ child: { age: 21 } });
+    doc1.child; // { age: 21 }
+
+    const doc2 = new Nested({ child: { name: 'Luke', age: 19 } });
+    doc2.set({ child: { age: 21 } });
+    doc2.child; // { name: Luke, age: 21 }
+    ```
+
+    ### Subdocument Defaults
+
+    Subdocument paths are undefined by default, and Mongoose does
+    not apply subdocument defaults unless you set the subdocument
+    path to a non-nullish value.
+
+    ```javascript
+    const subdocumentSchema = new mongoose.Schema({
+      child: new mongoose.Schema({
+        name: String,
+        age: {
+          type: Number,
+          default: 0
+        }
+      })
+    });
+    const Subdoc = mongoose.model('Subdoc', subdocumentSchema);
+
+    // Note that the `age` default has no effect, because `child`
+    // is `undefined`.
+    const doc = new Subdoc();
+    doc.child; // undefined
+    ```
+
+    However, if you set `doc.child` to any object, Mongoose will apply
+    the `age` default if necessary.
+
+    ```javascript
+    doc.child = {};
+    // Mongoose applies the `age` default:
+    doc.child.age; // 0
+    ```
+
+    Mongoose applies defaults recursively, which means there's a nice
+    workaround if you want to make sure Mongoose applies subdocument
+    defaults: make the subdocument path default to an empty object.
+
+    ```javascript
+    const childSchema = new mongoose.Schema({
+      name: String,
+      age: {
+        type: Number,
+        default: 0
+      }
+    });
+    const subdocumentSchema = new mongoose.Schema({
+      child: {
+        type: childSchema,
+        default: () => ({})
+      }
+    });
+    const Subdoc = mongoose.model('Subdoc', subdocumentSchema);
+
+    // Note that Mongoose sets `age` to its default value 0, because
+    // `child` defaults to an empty object and Mongoose applies
+    // defaults to that empty object.
+    const doc = new Subdoc();
+    doc.child; // { age: 0 }
+    ```
+
   h3#finding-a-subdocument Finding a Subdocument
   :markdown
     Each subdocument has an `_id` by default. Mongoose document arrays have a
     special [id](./api.html#types_documentarray_MongooseDocumentArray-id) method
     for searching a document array to find a document with a given `_id`.
     ```javascript
-    var doc = parent.children.id(_id);
+    const doc = parent.children.id(_id);
     ```
   h3#adding-subdocs-to-arrays Adding Subdocs to Arrays
   :markdown
@@ -140,12 +255,12 @@ block content
     [addToSet](./api.html#mongoosearray_MongooseArray-addToSet),
     and others cast arguments to their proper types transparently:
     ```javascript
-    var Parent = mongoose.model('Parent');
-    var parent = new Parent;
+    const Parent = mongoose.model('Parent');
+    const parent = new Parent;
 
     // create a comment
     parent.children.push({ name: 'Liesl' });
-    var subdoc = parent.children[0];
+    const subdoc = parent.children[0];
     console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
     subdoc.isNew; // true
 
@@ -159,7 +274,7 @@ block content
     [create](./api.html#types_documentarray_MongooseDocumentArray.create)
     method of MongooseArrays.
     ```javascript
-    var newdoc = parent.children.create({ name: 'Aaron' });
+    const newdoc = parent.children.create({ name: 'Aaron' });
     ```
   h3#removing-subdocs Removing Subdocs
   :markdown
@@ -222,33 +337,19 @@ block content
 
   h4#altsyntaxarrays Alternate declaration syntax for arrays
   :markdown
-    If you create a schema with an array of objects, mongoose will automatically
+    If you create a schema with an array of objects, Mongoose will automatically
     convert the object to a schema for you:
+
     ```javascript
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       children: [{ name: 'string' }]
     });
     // Equivalent
-    var parentSchema = new Schema({
+    const parentSchema = new Schema({
       children: [new Schema({ name: 'string' })]
     });
     ```
 
-  h4#altsyntaxsingle Alternate declaration syntax for single subdocuments
-  :markdown
-    Similarly, single subdocuments also have a shorthand whereby you can omit
-    wrapping the schema with an instance of Schema.  However, for historical
-    reasons, this alternate declaration must be enabled via an option (either
-    on the parent schema instantiation or on the mongoose instance).
-    ```javascript
-    var parentSchema = new Schema({
-      child: new Schema({ name: 'string' })
-    });
-    // Equivalent
-    var parentSchema = new Schema({
-      child: { type: { name: 'string' } }
-    });
-    ```
   h3#next Next Up
   :markdown
     Now that we've covered Subdocuments, let's take a look at

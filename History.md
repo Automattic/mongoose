@@ -1,3 +1,425 @@
+5.11.11 / 2021-01-08
+====================
+ * fix(model): support calling `create()` with `undefined` as first argument and no callback #9765
+ * fix(index.d.ts): ensure TypeScript knows that `this` refers to `DocType` in schema methods with strict mode #9755
+ * fix(index.d.ts): make SchemaDefinition accept a model generic #9761 [mroohian](https://github.com/mroohian)
+ * fix(index.d.ts): add `Aggregate#addFields()` #9774
+ * fix(index.d.ts): allow setting `min` and `max` to [number, string] and [Date, string] #9762
+ * fix(index.d.ts): improve context and type bindings for `Schema#methods` and `Schema#statics` #9717
+ * docs: add recommended connection option #9768 [Fernando-Lozano](https://github.com/Fernando-Lozano)
+ * chore: correct improper date in History.md #9783 [botv](https://github.com/botv)
+
+5.11.10 / 2021-01-04
+====================
+ * fix(model): support `populate` option for `insertMany()` as a workaround for mongoose-autopopulate #9720
+ * perf(schema): avoid creating extra array when initializing array of arrays #9588
+ * perf(schema): avoid setting `arrayPath` when casting to a non-array, avoid unnecessarily setting atomics #9588
+ * perf(schema): avoid expensive `String#slice()` call when creating a new array #9588
+ * fix(queryhelpers): avoid modifying `lean.virtuals` in place #9754
+ * fix: fall back to legacy treatment for square brackets if square brackets contents aren't a number #9640
+ * fix(document): make fix for #9396 handle null values more gracefully #9709
+ * fix(index.d.ts): add missing overloaded function for Document#populate() #9744 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): allow Model.create param1 overwrite #9753 [hasezoey](https://github.com/hasezoey)
+ * fix(index.d.ts): improve autocomplete for query middleware #9752 [3Aahmednaser94](https://github.com/3Aahmednaser94)
+ * fix(index.d.ts): add missing function for Aggregate#group() #9750 [coro101](https://github.com/coro101)
+ * fix(index.d.ts): add missing `Aggregate#project()` #9763 [vorticalbox](https://github.com/vorticalbox)
+ * fix(index.d.ts): allow `null` as an enum value for schematypes #9746
+ * docs(guide+schema): make schema API docs and guide docs' list of Schema options line up #9749
+ * docs(documents): add some more details about what the `save()` promise resolves to #9689
+ * docs(subdocs): add section about subdocument defaults #7291
+ * chore: run GitHub CI on PRs and update badge #9760 [YC](https://github.com/YC)
+
+5.11.9 / 2020-12-28
+===================
+ * fix(document): keeps atomics when assigning array to filtered array #9651
+ * fix(document): apply `defaults` option to subdocument arrays #9736
+ * fix(index.d.ts): allow passing generic parameter to overwrite `lean()` result type #9728
+ * fix(index.d.ts): add missing pre hook for findOneAndUpdate #9743 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): schema methods & statics types #9725
+ * fix(index.d.ts): allow `id` paths with non-string values in TypeScript #9723
+ * fix(index.d.ts): support calling `createIndexes()` and `ensureIndexes()` with just callback #9706
+ * fix(index.d.ts): include `__v` in LeanDocuments #9687
+ * fix(index.d.ts): add missing `Aggregate#append()` #9714
+ * chore: add eslint typescript support and lint index.d.ts file #9729 [simllll](https://github.com/simllll)
+ * chore: add Github Actions #9688 [YC](https://github.com/YC)
+
+5.11.8 / 2020-12-14
+===================
+ * fix(index.d.ts): add missing single document populate #9696 [YC](https://github.com/YC)
+ * fix(index.d.ts): make options optional for `toObject` #9700
+ * fix(index.d.ts): added missing match and model methods in Aggregate class #9710 [manekshms](https://github.com/manekshms)
+ * fix(index.d.ts): make options optional for `createIndexes()` and `ensureIndexes()` #9706
+ * fix(index.d.ts): support passing a function to `ValidateOpts.message` #9697
+ * docs: add media query for ::before on headings #9705 #9704 [YC](https://github.com/YC)
+
+5.11.7 / 2020-12-10
+===================
+ * fix(document): ensure calling `get()` with empty string returns undefined for mongoose-plugin-autoinc #9681
+ * fix(model): set `isNew` to false for documents that were successfully inserted by `insertMany` with `ordered = false` when an error occurred #9677
+ * fix(index.d.ts): add missing Aggregate#skip() & Aggregate#limit() #9692 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): make `Document#id` optional so types that use `id` can use `Model<IMyType & Document>` #9684
+
+5.11.6 / 2020-12-09
+===================
+ * fix(middleware): ensure sync errors in pre hooks always bubble up to the calling code #9659
+ * fix(index.d.ts): allow passing ObjectId properties as strings to `create()` and `findOneAndReplace()` #9676
+ * fix(index.d.ts): allow calling `mongoose.model()` and `Connection#model()` with model as generic param #9685 #9678 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): Fix return type of Model#aggregate() #9680 [orgads](https://github.com/orgads)
+ * fix(index.d.ts): optional next() parameter for post middleware #9683 [isengartz](https://github.com/isengartz)
+ * fix(index.d.ts): allow array of validators in SchemaTypeOptions #9686 [cjroebuck](https://github.com/cjroebuck)
+
+5.11.5 / 2020-12-07
+===================
+ * fix(map): support `null` in maps of subdocs #9628
+ * fix(index.d.ts): support object syntax for `validate` #9667
+ * fix(index.d.ts): Allow number for Schema expires #9670 [alecgibson](https://github.com/alecgibson)
+ * fix(index.d.ts): allow definining arbitrary properties on SchemaTypeOpts for plugins like mongoose-autopopulate #9669
+ * fix(index.d.ts): add mongoose.models #9661 #9660 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(index.d.ts): allow the next() argument to be optional #9665 #9664 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): add missing `VirtualType#applyGetters()` and `applySetters()`, `Schema#virtuals`, `Schema#childSchemas`, `Query#_mongooseOptions` #9658
+ * fix(index.d.ts): add `id` to LeanDocuments in case it is defined in the user's schema #9657
+ * fix(index.d.ts): add missing types for hook functions #9653
+ * fix(index.d.ts): improve support for strict null checks with `upsert` and `orFail()` #9654
+ * fix(index.d.ts): make return values for `insertMany()` more consistent #9662
+ * fix(index.d.ts): Change options in Connection#collection() to be optional #9663 [orgads](https://github.com/orgads)
+ * fix(index.d.ts): add the missing generic declaration for Schema #9655 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): add missing `SchemaTypeOpts` and `ConnectionOptions` aliases for backwards compat
+ * docs(populate): remove `sort()` from `limit` example to avoid potential confusion #9584
+ * docs(compatibility): add MongoDB server 4.4 version compatibility #9641
+
+5.11.4 / 2020-12-04
+===================
+ * fix(index.d.ts): add `Document#__v` so documents have a Version by default #9652 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): add missing `session` option to `SaveOptions` #9642
+ * fix(index.d.ts): add `Schema#paths`, `Schema#static(obj)`, `Embedded#schema`, `DocumentArray#schema`, make Schema inherit from EventEmitter #9650
+ * fix(index.d.ts): order when cb is optional in method #9647 [CatsMiaow](https://github.com/CatsMiaow)
+ * fix(index.d.ts): use DocumentDefinition for `FilterQuery` #9649
+ * fix(index.d.ts): correct callback result types for `find()`, `findOne()`, `findById()` #9648
+ * fix(index.d.ts): remove `Document#parent()` method because it conflicts with existing user code #9645
+ * fix(index.d.ts): add missing `Connection#db` property #9643
+ * test(typescript): add `tsconfig.json` file for intellisense #9611 [alecgibson](https://github.com/alecgibson)
+
+5.11.3 / 2020-12-03
+===================
+ * fix(index.d.ts): make Mongoose collection inherit MongoDB collection #9637 #9630 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(index.d.ts): add `Document#_id` so documents have an id by default #9632
+ * fix(index.d.ts): allow inline schema definitions for nested properties #9639 [Green-Cat](https://github.com/Green-Cat)
+ * fix(index.d.ts): add support for missing error message definitions #9638 [SaifAlsabe](https://github.com/SaifAlsabe)
+ * fix(schema+discriminator): support defining recursive embedded discriminators by passing document array schematype to discriminator #9600
+ * fix(index.d.ts): make it possible to use `LeanDocument` with arrays #9620
+ * fix(index.d.ts): add `ModelUpdateOptions` as alias for `QueryOptions` for backwards compat #9637
+
+5.11.2 / 2020-12-02
+===================
+ * fix(index.d.ts): add missing query options and model `findById()` function #9626 #9620
+ * fix(index.d.ts): support defining schema paths as arrays of functions #9617
+ * fix(index.d.ts): add automatic `_id` for Document, support creating Mongoose globals and accessing collection name #9618
+ * fix(index.d.ts): add missing global `get()` and `set()` #9616
+ * fix(index.d.ts): add missing `new` and `returnOriginal` options to QueryOptions, add missing model static properties #9627 #9616 #9615
+ * fix(index.d.ts): allow `useCreateIndex` in connection options #9621
+
+5.11.1 / 2020-12-01
+===================
+ * fix(index.d.ts): add missing SchemaOptions #9606
+ * fix(index.d.ts): allow using `$set` in updates #9609
+ * fix(index.d.ts): add support for using return value of `createConnection()` as a connection as well as a promise #9612 #9610 [alecgibson](https://github.com/alecgibson)
+ * fix(index.d.ts): allow using `Types.ObjectId()` without `new` in TypeScript #9608
+
+5.11.0 / 2020-11-30
+===================
+ * feat: add official TypeScript definitions `index.d.ts` file #8108
+ * feat(connection): add bufferTimeoutMS option that configures how long Mongoose will allow commands to buffer #9469
+ * feat(populate): support populate virtuals with `localField` and `foreignField` as arrays #6608
+ * feat(populate+virtual): feat: support getters on populate virtuals, including `get` option for `Schema#virtual()` #9343
+ * feat(populate+schema): add support for `populate` schematype option that sets default populate options #6029
+ * feat(QueryCursor): execute post find hooks for each doc in query cursor #9345
+ * feat(schema): support overwriting cast logic for individual schematype instances #8407
+ * feat(QueryCursor): make cursor `populate()` in batch when using `batchSize` #9366 [biomorgoth](https://github.com/biomorgoth)
+ * chore: remove changelog from published bundle #9404
+ * feat(model+mongoose): add `overwriteModels` option to bypass `OverwriteModelError` globally #9406
+ * feat(model+query): allow defining middleware for all query methods or all document methods, but not other middleware types #9190
+ * feat(document+model): make change tracking skip saving if new value matches last saved value #9396
+ * perf(utils): major speedup for `deepEqual()` on documents and arrays #9396
+ * feat(schema): support passing a TypeScript enum to `enum` validator in schema #9547 #9546 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(debug): #8963 `shell` option for date format (ISODate) #9532 [FlameFractal](https://github.com/FlameFractal)
+ * feat(document): support square bracket indexing for `get()`, `set()` #9375
+ * feat(document): support array and space-delimited syntax for `Document#$isValid()`, `isDirectSelected()`, `isSelected()`, `$isDefault()` #9474
+ * feat(string): make `minLength` and `maxLength` behave the same as `minlength` and `maxlength` #8777 [m-weeks](https://github.com/m-weeks)
+ * feat(document): add `$parent()` as an alias for `parent()` for documents and subdocuments to avoid path name conflicts #9455
+
+5.10.19 / 2020-11-30
+====================
+ * fix(query): support passing an array to `$type` in query filters #9577
+ * perf(schema): avoid creating unnecessary objects when casting to array #9588
+ * docs: make example gender neutral #9601 [rehatkathuria](https://github.com/rehatkathuria)
+
+5.10.18 / 2020-11-29
+====================
+ * fix(connection): connect and disconnect can be used destructured #9598 #9597 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+5.10.17 / 2020-11-27
+====================
+ * fix(document): allow setting fields after an undefined field #9587 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+5.10.16 / 2020-11-25
+====================
+ * fix(connection): copy config options from connection rather than base connection when calling `useDb()` #9569
+ * fix(schema): support `of` for array type definitions to be consistent with maps #9564
+ * docs(dates): fix broken example reference #9557 [kertof](https://github.com/kertof)
+ * docs(virtualtype): remove unintentional h2 tag re: tj/dox#60 #9568
+
+5.10.15 / 2020-11-16
+====================
+ * fix(array): make sure `Array#toObject()` returns a vanilla JavaScript array in Node.js 6+ #9540
+ * fix(connection): make `disconnect()` stop Mongoose if it is trying to reconnect #9531
+ * fix: ensure `Document#overwrite()` correctly overwrites maps #9549
+ * fix(document): make transform work with nested paths #9544 #9543 [jonathan-wilkinson](https://github.com/jonathan-wilkinson)
+ * fix(query): maxTimeMS in count, countDocuments, distinct #9552 [FlameFractal](https://github.com/FlameFractal)
+ * fix(schema): remove warning re: `increment` as a schema path name #9538
+ * fix(model): automatically set `partialFilterExpression` for indexes in discriminator schemas #9542
+
+5.10.14 / 2020-11-12
+====================
+ * fix(update): handle casting immutable object properties with `$setOnInsert` #9537
+ * fix(discriminator): overwrite instead of merge if discriminator schema specifies a path is single nested but base schema has path as doc array #9534
+ * docs(middleware): clarify that you need to set both `document` and `query` on `remove` hooks to get just document middleware #9530 [mustafaKamal-fe](https://github.com/mustafaKamal-fe)
+ * docs(CONTRIBUTING): remove mmapv1 recommendation and clean up a few other details #9529
+ * refactor: remove duplicate function definition #9527 [ksullivan](https://github.com/ksullivan)
+
+5.10.13 / 2020-11-06
+====================
+ * fix: upgrade mongodb driver -> 3.6.3 for Lambda cold start fixes #9521 #9179 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): correctly handle setting props to other nested props #9519
+
+5.10.12 / 2020-11-04
+====================
+ * fix(connection): catch and report sync errors in connection wrappers like `startSession()` #9515
+ * fix(document): ignore getters when diffing values for change tracking #9501
+ * fix(connection): avoid executing promise handler unless it's a function #9507 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(error): throw more helpful error when connecting to a non-SSL MongoDB server with SSL enabled #9511
+ * docs(model+query): clarify that `deleteOne` and `deleteMany` trigger middleware #9504
+ * docs(ssl): add note about `ssl` defaulting to `true` for srv connection strings #9511
+
+5.10.11 / 2020-10-26
+====================
+ * fix(connection): when calling `mongoose.connect()` multiple times in parallel, make 2nd call wait for connection before resolving #9476
+ * fix(map): make `save()` persist `Map#clear()` #9493
+ * fix(document): avoid overwriting array subdocument when setting dotted path that isn't selected #9427
+ * fix(connection): don't throw Atlas error if server discovery doesn't find any servers #9470
+ * docs: update options for Model.findOneAndUpdate #9499 [radamson](https://github.com/radamson)
+
+5.10.10 / 2020-10-23
+====================
+ * fix(schema): handle merging schemas from separate Mongoose module instances when schema has a virtual #9471
+ * fix(connection): make connection.then(...) resolve to a connection instance #9497 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(aggregate): when using $search with discriminators, add `$match` as the 2nd stage in pipeline rather than 1st #9487
+ * fix(query): cast $nor within $elemMatch #9479
+ * docs(connection): add note about 'error' event versus 'disconnected' event #9488 [tareqdayya](https://github.com/tareqdayya)
+
+5.10.9 / 2020-10-09
+===================
+ * fix(update): strip out unused array filters to avoid "filter was not used in the update" error #9468
+ * fix(mongoose): allow setting `autoCreate` as a global option to be consistent with `autoIndex` #9466
+
+5.10.8 / 2020-10-05
+===================
+ * fix(schema): handle setting nested paths underneath single nested subdocs #9459
+ * fix(schema+index): allow calling `mongoose.model()` with schema from a different Mongoose module instance #9449
+ * fix(transaction): fix saving new documents w/ arrays in transactions #9457 [PenguinToast](https://github.com/PenguinToast)
+ * fix(document): track `reason` on cast errors that occur while init-ing a document #9448
+ * fix(model): make `createCollection()` not throw error when collection already exists to be consistent with v5.9 #9447
+ * docs(connections): add SSL connections docs #9443
+ * docs(query_casting): fix typo #9458 [craig-davis](https://github.com/craig-davis)
+
+5.10.7 / 2020-09-24
+===================
+ * fix(schema): set correct path and schema on nested primitive arrays #9429
+ * fix(document): pass document to required validator so `required` can use arrow functions #9435 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): handle required when schema has property named `isSelected` #9438
+ * fix(timestamps): allow using timestamps when schema has a property named 'set' #9428
+ * fix(schema): make `Schema#clone()` use parent Mongoose instance's Schema constructor #9426
+
+5.10.6 / 2020-09-18
+===================
+ * fix(populate): handle `options.perDocumentLimit` option same as `perDocumentLimit` when calling `populate()` #9418
+ * fix(document): invalidate path if default function throws an error #9408
+ * fix: ensure subdocument defaults run after initial values are set when initing #9408
+ * docs(faq+queries): add more detail about duplicate queries, including an faq entry #9386
+ * docs: replace var with let and const in docs and test files #9414 [jmadankumar](https://github.com/jmadankumar)
+ * docs(model+query): document using array of strings as projection #9413
+ * docs(middleware): add missing backtick #9425 [tphobe9312](https://github.com/tphobe9312)
+
+5.10.5 / 2020-09-11
+===================
+ * fix: bump mongodb -> 3.6.2 #9411 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(query+aggregate+cursor): support async iteration over a cursor instance as opposed to a Query or Aggregate instance #9403
+ * fix(document): respect child schema `minimize` if `toObject()` is called without an explicit `minimize` #9405
+ * docs(guide): use const instead of var #9394 [nainardev](https://github.com/nainardev)
+ * docs(query): link to lean, findOneAndUpdate, query casting tutorials from query docs #9410
+
+5.10.4 / 2020-09-09
+===================
+ * fix(document): allow setting nested path to instance of model #9392
+ * fix: handle `findOneAndRemove()` with `orFail()` #9381
+ * fix(schema): support setting `_id` option to `false` after instantiating schema #9390
+ * docs(document): fix formatting on `getChanges()` #9376
+
+5.10.3 / 2020-09-03
+===================
+ * fix: upgrade mongodb -> 3.6.1 #9380 [lamhieu-vk](https://github.com/lamhieu-vk)
+ * fix(populate): allow populating paths underneath subdocument maps #9359
+ * fix(update): handle casting map paths when map is underneath a single nested subdoc #9298
+ * fix(discriminator): avoid removing nested path if both base and discriminator schema have the same nested path #9362
+ * fix(schema): support `Schema#add()` with schematype instances with different paths #9370
+ * docs(api): fix typo in `Query#get()` example #9372 [elainewlin](https://github.com/elainewlin)
+
+5.10.2 / 2020-08-28
+===================
+ * fix(model): avoid uncaught error if `insertMany()` fails due to server selection error #9355
+ * fix(aggregate): automatically convert accumulator function options to strings #9364
+ * fix(document): handle `pull()` on a document array when `_id` is an alias #9319
+ * fix(queryhelpers): avoid path collision error when projecting in discriminator key with `.$` #9361
+ * fix: fix typo in error message thrown by unimplemented createIndex #9367 [timhaley94](https://github.com/timhaley94)
+ * docs(plugins): note that plugins should be applied before you call `mongoose.model()` #7723
+
+5.10.1 / 2020-08-26
+===================
+ * fix(mongoose): fix `.then()` is not a function error when calling `mongoose.connect()` multiple times #9358 #9335 #9331
+ * fix: allow calling `create()` after `bulkWrite()` by clearing internal casting context #9350
+ * fix(model): dont wipe out changes made while `save()` is in-flight #9327
+ * fix(populate): skip checking `refPath` if the path to populate is undefined #9340
+ * fix(document): allow accessing document values from function `default` on array #9351
+ * fix(model): skip applying init hook if called with `schema.pre(..., { document: false })` #9316
+ * fix(populate): support `retainNullValues` when setting `_id` to `false` for subdocument #9337 #9336 [FelixRe0](https://github.com/FelixRe0)
+ * docs: update connect example to avoid deprecation warnings #9332 [moander](https://github.com/moander)
+
+5.10.0 / 2020-08-14
+===================
+ * feat: upgrade to MongoDB driver 3.6 for full MongoDB 4.4 support
+ * feat(connection): add `Connection#transaction()` helper that handles resetting Mongoose document state if the transaction fails #8380
+ * feat(connection): make transaction() helper reset array atomics after failed transaction
+ * feat(schema+model): add `optimisticConcurrency` option to use OCC for `save()` #9001 #5424
+ * feat(aggregate): add `Aggregate#search()` for Atlas Text Search #9115
+ * feat(mongoose): add support for setting `setDefaultsOnInsert` as a global option #9036 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(mongoose): add support for setting `returnOriginal` as a global option #9189 #9183 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(mongoose): allow global option mongoose.set('strictQuery', true) #9016 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): add Document#getChanges #9097 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): support `defaults` option to disable adding defaults to a single document #8271
+ * feat(SingleNestedPath+DocumentArray): add static `set()` function for global options, support setting `_id` globally #8883
+ * feat(query): handle casting `$or` when each clause contains a different discriminator key #9018
+ * feat(query): add overwriteDiscriminatorKey option that allows changing the discriminator key in `findOneAndUpdate()`, `updateOne()`, etc. #6087
+ * fix(connection): make calling `mongoose.connect()` while already connected a no-op #9203
+ * feat(connection): add `getClient()` and `setClient()` function for interacting with a connection's underlying MongoClient instance #9164
+ * feat(document+populate): add `parent()` function that allows you to get the parent document for populated docs #8092
+ * feat(document): add `useProjection` option to `toObject()` and `toJSON()` for hiding deselected fields on newly created documents #9118
+
+5.9.29 / 2020-08-13
+===================
+ * fix(document): support setting nested path to itself when it has nested subpaths #9313
+ * fix(model): make `syncIndexes()` report error if it can't create an index #9303
+ * fix: handle auth error when Atlas username is incorrect #9300
+
+5.9.28 / 2020-08-07
+===================
+ * fix(connection): consistently stop buffering when "reconnected" is emitted #9295
+ * fix(error): ensure `name` and `message` show up on individual ValidatorErrors when calling JSON.stringify() on a ValidationError #9296
+ * fix(document): keeps manually populated paths when setting a nested path to itself #9293
+ * fix(document): allow saving after setting document array to itself #9266
+ * fix(schema): handle `match` schema validator with `/g` flag #9287
+ * docs(guide): refactor transactions examples to async/await #9204
+
+5.9.27 / 2020-07-31
+===================
+ * fix: upgrade mongodb driver -> 3.5.10 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(transactions): make transactions docs use async/await for readability #9204
+
+5.9.26 / 2020-07-27
+===================
+ * fix(document): allow unsetting boolean field by setting the field to `undefined` #9275
+ * fix(document): throw error when overwriting a single nested subdoc changes an immutable path within the subdoc #9281
+ * fix(timestamps): apply timestamps to `bulkWrite()` updates when not using `$set` #9268
+ * fix(browser): upgrade babel to v7 to work around an issue with `extends Error` #9273
+ * fix: make subdocument's `invalidate()` methods have the same return value as top-level document #9271
+ * docs(model): make `create()` docs use async/await, and add another warning about how `create()` with options requires array syntax #9280
+ * docs(connections): clarify that Mongoose can emit 'connected' when reconnecting after losing connectivity #9240
+ * docs(populate): clarify that you can't filter based on foreign document properties when populating #9279
+ * docs(document+model): clarify how `validateModifiedOnly` option works #9263
+ * docs: remove extra poolSize option in comment #9270 [shahvicky](https://github.com/shahvicky)
+ * docs: point bulkWrite() link to mongoose docs instead of localhost #9284
+
+5.9.25 / 2020-07-17
+===================
+ * fix(discriminator): allow passing a compiled model's schema as a parameter to `discriminator()` #9238
+ * fix(connection): throw more readable error when querying db before initial connection when `bufferCommands = false` #9239
+ * fix(indexes): don't unnecessarily drop text indexes when running `syncIndexes()` #9225
+ * fix: make Boolean _castNullish respect omitUndefined #9242 [ehpc](https://github.com/ehpc)
+ * fix(populate): populate single nested discriminator underneath doc array when populated docs have different model but same id #9244
+ * docs(mongoose): correct formatting typo #9247 [JNa0](https://github.com/JNa0)
+
+5.9.24 / 2020-07-13
+===================
+ * fix(connection): respect connection-level `bufferCommands` option if `mongoose.connect()` is called after `mongoose.model()` #9179
+ * fix(document): clear out `priorDoc` after overwriting single nested subdoc so changes after overwrite get persisted correctly #9208
+ * fix(connection): dont overwrite user-specified `bufferMaxEntries` when setting `bufferCommands` #9218
+ * fix(model): allow passing projection to `Model.hydrate()` #9209
+ * fix(schema+document): support adding `null` to schema boolean's `convertToFalse` set #9223
+ * docs(model): make `find` and `findOne()` examples use async/await and clarify `find({})` is find all #9210
+
+4.13.21 / 2020-07-12
+====================
+ * fix(query): delete top-level `_bsontype` property in queries to prevent silent empty queries #8222
+
+5.9.23 / 2020-07-10
+===================
+ * fix(model): fix `syncIndexes()` error when db index has a collation but Mongoose index does not #9224 [clhuang](https://github.com/clhuang)
+ * fix(array): only cast array to proper depth if it contains an non-array value #9217 #9215 [cyrilgandon](https://github.com/cyrilgandon)
+ * docs(schematype): document the `transform` option #9211
+ * docs(mongoose): fix typo #9212 [JNa0](https://github.com/JNa0)
+
+5.9.22 / 2020-07-06
+===================
+ * fix(schema): treat `{ type: mongoose.Schema.Types.Array }` as equivalent to `{ type: Array }` #9194
+ * fix: revert fix for #9107 to avoid issues when calling `connect()` multiple times #9167
+ * fix(update): respect storeSubdocValidationError option with update validators #9172
+ * fix: upgrade to safe-buffer 5.2 #9198
+ * docs: add a note about SSL validation to migration guide #9147
+ * docs(schemas): fix inconsistent header #9196 [samtsai15](https://github.com/samtsai15)
+
+5.9.21 / 2020-07-01
+===================
+ * fix: propagate `typeKey` option to implicitly created schemas from `typePojoToMixed` #9185 [joaoritter](https://github.com/joaoritter)
+ * fix(populate): handle embedded discriminator `refPath` with multiple documents #9153
+ * fix(populate): handle deselected foreign field with `perDocumentLimit` and multiple documents #9175
+ * fix(document): disallow `transform` functions that return promises #9176 #9163 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): use strict equality when checking mixed paths for modifications #9165
+ * docs: add target="_blank" to all edit links #9058
+
+5.9.20 / 2020-06-22
+===================
+ * fix(populate): handle populating primitive array under document array discriminator #9148
+ * fix(connection): make sure to close previous connection when calling `openUri()` on an already open connection #9107
+ * fix(model): fix conflicting $setOnInsert default values with `update` values in bulkWrite #9160 #9157 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(validation): add note about validateBeforeSave and invalidate #9144 [dandv](https://github.com/dandv)
+ * docs: specify the array field syntax for invalidate #9137 [dandv](https://github.com/dandv)
+ * docs: fix several typos and broken references #9024 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: fix minor typo #9143 [dandv](https://github.com/dandv)
+
+5.9.19 / 2020-06-15
+===================
+ * fix: upgrade mongodb driver -> 3.5.9 #9124 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: copy `required` validator on single nested subdoc correctly when calling `Schema#clone()` #8819
+ * fix(discriminator): handle `tiedValue` when casting update on nested paths #9108
+ * fix(model): allow empty arrays for bulkWrite #9132 #9131 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): correctly set partialFilterExpression for nested schema indexes #9091
+ * fix(castArrayFilters): handle casting on all fields of array filter #9122 [lafeuil](https://github.com/lafeuil)
+ * fix(update): handle nested path createdAt when overwriting parent path #9105
+ * docs(subdocs): add some notes on the difference between single nested subdocs and nested paths #9085
+ * docs(subdocs): improve docs on `typePojoToMixed` #9085
+ * docs: add note about connections in `globalSetup` with Jest #9063
+ * docs: add schema and how to set default sub-schema to schematype options #9111 [dfle](https://github.com/dfle)
+ * docs(index): use `const` instead of `var` in examples #9125 [dmcgrouther](https://github.com/dmcgrouther)
+ * docs: corrected markdown typo #9117
+
 5.9.18 / 2020-06-05
 ===================
  * fix: improve atlas error in the event of incorrect password #9095

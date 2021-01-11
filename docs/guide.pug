@@ -5,7 +5,7 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -49,10 +49,10 @@ block content
     collection and defines the shape of the documents within that collection.
 
     ```javascript
-      var mongoose = require('mongoose');
-      var Schema = mongoose.Schema;
+      import mongoose from 'mongoose';
+      const { Schema } = mongoose;
 
-      var blogSchema = new Schema({
+      const blogSchema = new Schema({
         title:  String, // String is shorthand for {type: String}
         author: String,
         body:   String,
@@ -81,8 +81,10 @@ block content
     
     Keys may also be assigned nested objects containing further key/type definitions
     like the `meta` property above.  This will happen whenever a key's value is a POJO
-    that lacks a bona-fide `type` property.  In these cases, only the leaves in a tree
-    are given actual paths in the schema (like `meta.votes` and `meta.favs` above),
+    that doesn't have a `type` property.
+    
+    In these cases, Mongoose only creates actual schema paths for leaves
+    in the tree. (like `meta.votes` and `meta.favs` above),
     and the branches do not have actual paths.  A side-effect of this is that `meta`
     above cannot have its own validation.  If validation is needed up the tree, a path
     needs to be created up the tree - see the [Subdocuments](./subdocs.html) section
@@ -116,7 +118,7 @@ block content
     To do so, we pass it into `mongoose.model(modelName, schema)`:
 
     ```javascript
-      var Blog = mongoose.model('Blog', blogSchema);
+      const Blog = mongoose.model('Blog', blogSchema);
       // ready to go!
     ```
 
@@ -165,7 +167,7 @@ block content
 
     ```javascript
       // define a schema
-      var animalSchema = new Schema({ name: String, type: String });
+      const animalSchema = new Schema({ name: String, type: String });
 
       // assign a function to the "methods" object of our animalSchema
       animalSchema.methods.findSimilarTypes = function(cb) {
@@ -177,10 +179,10 @@ block content
     to them.
 
     ```javascript
-      var Animal = mongoose.model('Animal', animalSchema);
-      var dog = new Animal({ type: 'dog' });
+      const Animal = mongoose.model('Animal', animalSchema);
+      const dog = new Animal({ type: 'dog' });
 
-      dog.findSimilarTypes(function(err, dogs) {
+      dog.findSimilarTypes((err, dogs) => {
         console.log(dogs); // woof
       });
     ```
@@ -203,9 +205,7 @@ block content
         return this.find({ name: new RegExp(name, 'i') });
       };
       // Or, equivalently, you can call `animalSchema.static()`.
-      animalSchema.static('findByBreed', function(breed) {
-        return this.find({ breed });
-      });
+      animalSchema.static('findByBreed', function(breed) { return this.find({ breed }); });
 
       const Animal = mongoose.model('Animal', animalSchema);
       let animals = await Animal.findByName('fido');
@@ -222,16 +222,16 @@ block content
 
     ```javascript
       animalSchema.query.byName = function(name) {
-        return this.where({ name: new RegExp(name, 'i') });
+        return this.where({ name: new RegExp(name, 'i') })
       };
 
-      var Animal = mongoose.model('Animal', animalSchema);
+      const Animal = mongoose.model('Animal', animalSchema);
 
-      Animal.find().byName('fido').exec(function(err, animals) {
+      Animal.find().byName('fido').exec((err, animals) => {
         console.log(animals);
       });
 
-      Animal.findOne().byName('fido').exec(function(err, animal) {
+      Animal.findOne().byName('fido').exec((err, animal) => {
         console.log(animal);
       });
     ```
@@ -244,7 +244,7 @@ block content
     [compound indexes](https://docs.mongodb.com/manual/core/index-compound/).
 
     ```javascript
-      var animalSchema = new Schema({
+      const animalSchema = new Schema({
         name: String,
         type: String,
         tags: { type: [String], index: true } // field level
@@ -275,9 +275,9 @@ block content
       // Will cause an error because mongodb has an _id index by default that
       // is not sparse
       animalSchema.index({ _id: 1 }, { sparse: true });
-      var Animal = mongoose.model('Animal', animalSchema);
+      const Animal = mongoose.model('Animal', animalSchema);
 
-      Animal.on('index', function(error) {
+      Animal.on('index', error => {
         // "_id index cannot be sparse"
         console.log(error.message);
       });
@@ -294,7 +294,7 @@ block content
 
     ```javascript
       // define a schema
-      var personSchema = new Schema({
+      const personSchema = new Schema({
         name: {
           first: String,
           last: String
@@ -302,10 +302,10 @@ block content
       });
 
       // compile our model
-      var Person = mongoose.model('Person', personSchema);
+      const Person = mongoose.model('Person', personSchema);
 
       // create a document
-      var axl = new Person({
+      const axl = new Person({
         name: { first: 'Axl', last: 'Rose' }
       });
     ```
@@ -316,14 +316,15 @@ block content
     console.log(axl.name.first + ' ' + axl.name.last); // Axl Rose
     ```
 
-    But concatenating the first and last name every time can get cumbersome.
+    But [concatenating](https://masteringjs.io/tutorials/fundamentals/string-concat) the first and
+    last name every time can get cumbersome.
     And what if you want to do some extra processing on the name, like
     [removing diacritics](https://www.npmjs.com/package/diacritics)? A
     [virtual property getter](./api.html#virtualtype_VirtualType-get) lets you
     define a `fullName` property that won't get persisted to MongoDB.
 
     ```javascript
-    personSchema.virtual('fullName').get(function () {
+    personSchema.virtual('fullName').get(function() {
       return this.name.first + ' ' + this.name.last;
     });
     ```
@@ -346,7 +347,9 @@ block content
 
     ```javascript
     personSchema.virtual('fullName').
-      get(function() { return this.name.first + ' ' + this.name.last; }).
+      get(function() {
+        return this.name.first + ' ' + this.name.last;
+       }).
       set(function(v) {
         this.name.first = v.substr(0, v.indexOf(' '));
         this.name.last = v.substr(v.indexOf(' ') + 1);
@@ -362,7 +365,9 @@ block content
     Only non-virtual properties work as part of queries and for field selection.
     Since virtuals are not stored in MongoDB, you can't query with them.
 
-    <h5 id="aliases"><a href="#aliases">Aliases</a></h5>
+    You can [learn more about virtuals here](https://masteringjs.io/tutorials/mongoose/virtuals).
+
+    <h3 id="aliases"><a href="#aliases">Aliases</a></h3>
 
     Aliases are a particular type of virtual where the getter and setter
     seamlessly get and set another property. This is handy for saving network
@@ -370,7 +375,7 @@ block content
     into a longer name for code readability.
 
     ```javascript
-    var personSchema = new Schema({
+    const personSchema = new Schema({
       n: {
         type: String,
         // Now accessing `name` will get you the value of `n`, and setting `n` will set the value of `name`
@@ -379,7 +384,7 @@ block content
     });
 
     // Setting `name` will propagate to `n`
-    var person = new Person({ name: 'Val' });
+    const person = new Person({ name: 'Val' });
     console.log(person); // { n: 'Val' }
     console.log(person.toObject({ virtuals: true })); // { n: 'Val', name: 'Val' }
     console.log(person.name); // "Val"
@@ -407,7 +412,7 @@ block content
 
     // or
 
-    var schema = new Schema({..});
+    const schema = new Schema({..});
     schema.set(option, value);
     ```
 
@@ -416,8 +421,10 @@ block content
     - [autoIndex](#autoIndex)
     - [autoCreate](#autoCreate)
     - [bufferCommands](#bufferCommands)
+    - [bufferTimeoutMS](#bufferTimeoutMS)
     - [capped](#capped)
     - [collection](#collection)
+    - [discriminatorKey](#discriminatorKey)
     - [id](#id)
     - [_id](#_id)
     - [minimize](#minimize)
@@ -429,8 +436,10 @@ block content
     - [toJSON](#toJSON)
     - [toObject](#toObject)
     - [typeKey](#typeKey)
+    - [useNestedStrict](#useNestedStrict)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
+    - [optimisticConcurrency](#optimisticConcurrency)
     - [collation](#collation)
     - [selectPopulatedPaths](#selectPopulatedPaths)
     - [skipVersioning](#skipVersioning)
@@ -487,7 +496,7 @@ block content
     to false.
 
     ```javascript
-    var schema = new Schema({..}, { bufferCommands: false });
+    const schema = new Schema({..}, { bufferCommands: false });
     ```
 
     The schema `bufferCommands` option overrides the global `bufferCommands` option.
@@ -495,7 +504,17 @@ block content
     ```javascript
     mongoose.set('bufferCommands', true);
     // Schema option below overrides the above, if the schema option is set.
-    var schema = new Schema({..}, { bufferCommands: false });
+    const schema = new Schema({..}, { bufferCommands: false });
+    ```
+
+    <h3 id="bufferTimeoutMS"><a href="#bufferTimeoutMS">option: bufferTimeoutMS</a></h3>
+
+    If `bufferCommands` is on, this option sets the maximum amount of time Mongoose buffering will wait before
+    throwing an error. If not specified, Mongoose will use 10000 (10 seconds).
+
+    ```javascript
+    // If an operation is buffered for more than 1 second, throw an error.
+    const schema = new Schema({..}, { bufferTimeoutMS: 1000 });
     ```
 
     <h3 id="capped"><a href="#capped">option: capped</a></h3>
@@ -526,7 +545,26 @@ block content
     for your collection.
 
     ```javascript
-    var dataSchema = new Schema({..}, { collection: 'data' });
+    const dataSchema = new Schema({..}, { collection: 'data' });
+    ```
+
+    <h3 id="discriminatorKey"><a href="#discriminatorKey">option: discriminatorKey</a></h3>
+
+    When you define a [discriminator](/docs/discriminators.html), Mongoose adds a path to your
+    schema that stores which discriminator a document is an instance of. By default, Mongoose
+    adds an `__t` path, but you can set `discriminatorKey` to overwrite this default.
+
+    ```javascript
+    const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+    const BaseModel = mongoose.model('Test', baseSchema);
+
+    const personSchema = new Schema({ name: String });
+    const PersonModel = BaseModel.discriminator('Person', personSchema);
+
+    const doc = new PersonModel({ name: 'James T. Kirk' });
+    // Without `discriminatorKey`, Mongoose would store the discriminator
+    // key in `__t` instead of `type`
+    doc.type; // 'Person'
     ```
 
     <h3 id="id"><a href="#id">option: id</a></h3>
@@ -538,15 +576,15 @@ block content
 
     ```javascript
     // default behavior
-    var schema = new Schema({ name: String });
-    var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
+    const schema = new Schema({ name: String });
+    const Page = mongoose.model('Page', schema);
+    const p = new Page({ name: 'mongodb.org' });
     console.log(p.id); // '50341373e894ad16347efe01'
 
     // disabled id
-    var schema = new Schema({ name: String }, { id: false });
-    var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
+    const schema = new Schema({ name: String }, { id: false });
+    const Page = mongoose.model('Page', schema);
+    const p = new Page({ name: 'mongodb.org' });
     console.log(p.id); // undefined
     ```
 
@@ -564,18 +602,18 @@ block content
 
     ```javascript
     // default behavior
-    var schema = new Schema({ name: String });
-    var Page = mongoose.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
+    const schema = new Schema({ name: String });
+    const Page = mongoose.model('Page', schema);
+    const p = new Page({ name: 'mongodb.org' });
     console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
 
     // disabled _id
-    var childSchema = new Schema({ name: String }, { _id: false });
-    var parentSchema = new Schema({ children: [childSchema] });
+    const childSchema = new Schema({ name: String }, { _id: false });
+    const parentSchema = new Schema({ children: [childSchema] });
 
-    var Model = mongoose.model('Model', parentSchema);
+    const Model = mongoose.model('Model', parentSchema);
 
-    Model.create({ children: [{ name: 'Luke' }] }, function(error, doc) {
+    Model.create({ children: [{ name: 'Luke' }] }, (error, doc) => {
       // doc.children[0]._id will be undefined
     });
     ```
@@ -633,11 +671,11 @@ block content
     to all queries derived from a model.
 
     ```javascript
-    var schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
-    var schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
-    var schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
-    var schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
-    var schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
+    const schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
+    const schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
+    const schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
+    const schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
+    const schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
     ```
 
     The alias of each pref is also permitted so instead of having to type out
@@ -654,10 +692,10 @@ block content
 
     ```javascript
     // pings the replset members periodically to track network latency
-    var options = { replset: { strategy: 'ping' }};
+    const options = { replset: { strategy: 'ping' }};
     mongoose.connect(uri, options);
 
-    var schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
+    const schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
     mongoose.model('JellyBean', schema);
     ```
 
@@ -697,23 +735,23 @@ block content
     the db.
 
     ```javascript
-    var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', thingSchema);
-    var thing = new Thing({ iAmNotInTheSchema: true });
+    const thingSchema = new Schema({..})
+    const Thing = mongoose.model('Thing', thingSchema);
+    const thing = new Thing({ iAmNotInTheSchema: true });
     thing.save(); // iAmNotInTheSchema is not saved to the db
 
     // set to false..
-    var thingSchema = new Schema({..}, { strict: false });
-    var thing = new Thing({ iAmNotInTheSchema: true });
+    const thingSchema = new Schema({..}, { strict: false });
+    const thing = new Thing({ iAmNotInTheSchema: true });
     thing.save(); // iAmNotInTheSchema is now saved to the db!!
     ```
 
     This also affects the use of `doc.set()` to set a property value.
 
     ```javascript
-    var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', thingSchema);
-    var thing = new Thing;
+    const thingSchema = new Schema({..})
+    const Thing = mongoose.model('Thing', thingSchema);
+    const thing = new Thing;
     thing.set('iAmNotInTheSchema', true);
     thing.save(); // iAmNotInTheSchema is not saved to the db
     ```
@@ -722,9 +760,9 @@ block content
     boolean argument:
 
     ```javascript
-    var Thing = mongoose.model('Thing');
-    var thing = new Thing(doc, true);  // enables strict mode
-    var thing = new Thing(doc, false); // disables strict mode
+    const Thing = mongoose.model('Thing');
+    const thing = new Thing(doc, true);  // enables strict mode
+    const thing = new Thing(doc, false); // disables strict mode
     ```
 
     The `strict` option may also be set to `"throw"` which will cause errors
@@ -734,9 +772,9 @@ block content
     is always ignored, regardless of schema option._
 
     ```javascript
-    var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', thingSchema);
-    var thing = new Thing;
+    const thingSchema = new Schema({..})
+    const Thing = mongoose.model('Thing', thingSchema);
+    const thing = new Thing;
     thing.iAmNotInTheSchema = true;
     thing.save(); // iAmNotInTheSchema is never saved to the db
     ```
@@ -779,16 +817,16 @@ block content
     <h3 id="toJSON"><a href="#toJSON">option: toJSON</a></h3>
 
     Exactly the same as the [toObject](#toObject) option but only applies when
-    the document's `toJSON` method is called.
+    the document's [`toJSON` method](https://thecodebarbarian.com/what-is-the-tojson-function-in-javascript.html) is called.
 
     ```javascript
-    var schema = new Schema({ name: String });
+    const schema = new Schema({ name: String });
     schema.path('name').get(function (v) {
       return v + ' is my name';
     });
     schema.set('toJSON', { getters: true, virtuals: false });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: 'Max Headroom' });
+    const M = mongoose.model('Person', schema);
+    const m = new M({ name: 'Max Headroom' });
     console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }
     console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
     // since we know toJSON is called whenever a js object is stringified:
@@ -809,13 +847,13 @@ block content
     `toObject` option to `{ getters: true }`:
 
     ```javascript
-    var schema = new Schema({ name: String });
-    schema.path('name').get(function (v) {
+    const schema = new Schema({ name: String });
+    schema.path('name').get(function(v) {
       return v + ' is my name';
     });
     schema.set('toObject', { getters: true });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: 'Max Headroom' });
+    const M = mongoose.model('Person', schema);
+    const m = new M({ name: 'Max Headroom' });
     console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
     ```
 
@@ -828,7 +866,7 @@ block content
 
     ```javascript
     // Mongoose interprets this as 'loc is a String'
-    var schema = new Schema({ loc: { type: String, coordinates: [Number] } });
+    const schema = new Schema({ loc: { type: String, coordinates: [Number] } });
     ```
 
     However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
@@ -836,7 +874,7 @@ block content
     uses to find type declarations, set the 'typeKey' schema option.
 
     ```javascript
-    var schema = new Schema({
+    const schema = new Schema({
       // Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'
       loc: { type: String, coordinates: [Number] },
       // Mongoose interprets this as 'name is a String'
@@ -852,13 +890,13 @@ block content
     validation, you can set `validateBeforeSave` to false.
 
     ```javascript
-    var schema = new Schema({ name: String });
+    const schema = new Schema({ name: String });
     schema.set('validateBeforeSave', false);
     schema.path('name').validate(function (value) {
         return value != null;
     });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: null });
+    const M = mongoose.model('Person', schema);
+    const m = new M({ name: null });
     m.validate(function(err) {
         console.log(err); // Will tell you that null is not allowed.
     });
@@ -887,9 +925,8 @@ block content
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
     ```
 
-    Note that Mongoose versioning is **not** a full [optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control)
-    solution. Use [mongoose-update-if-current](https://github.com/eoin-obrien/mongoose-update-if-current)
-    for OCC support. Mongoose versioning only operates on arrays:
+    Note that Mongoose's default versioning is **not** a full [optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control)
+    solution. Mongoose's default versioning only operates on arrays as shown below.
 
     ```javascript
     // 2 copies of the same document
@@ -906,6 +943,8 @@ block content
     doc2.set('comments.1.body', 'new comment');
     await doc2.save();
     ```
+
+    If you need optimistic concurrency support for `save()`, you can set the [`optimisticConcurrency` option](#optimisticConcurrency)
 
     Document versioning can also be disabled by setting the `versionKey` to
     `false`.
@@ -942,23 +981,87 @@ block content
     });
     ```
 
+    <h3 id="optimisticConcurrency"><a href="#optimisticConcurrency">option: optimisticConcurrency</a></h3>
+
+    [Optimistic concurrency](https://en.wikipedia.org/wiki/Optimistic_concurrency_control) is a strategy to ensure
+    the document you're updating didn't change between when you loaded it using `find()` or `findOne()`, and when
+    you update it using `save()`.
+
+    For example, suppose you have a `House` model that contains a list of `photos`, and a `status` that represents
+    whether this house shows up in searches. Suppose that a house that has status `'APPROVED'` must have at least
+    two `photos`. You might implement the logic of approving a house document as shown below:
+
+    ```javascript
+    async function markApproved(id) {
+      const house = await House.findOne({ _id });
+      if (house.photos.length < 2) {
+        throw new Error('House must have at least two photos!');
+      }
+      
+      house.status = 'APPROVED';
+      await house.save();
+    }
+    ```
+
+    The `markApproved()` function looks right in isolation, but there might be a potential issue: what if another
+    function removes the house's photos between the `findOne()` call and the `save()` call? For example, the below
+    code will succeed:
+
+    ```javascript
+    const house = await House.findOne({ _id });
+    if (house.photos.length < 2) {
+      throw new Error('House must have at least two photos!');
+    }
+
+    const house2 = await House.findOne({ _id });
+    house2.photos = [];
+    await house2.save();
+
+    // Marks the house as 'APPROVED' even though it has 0 photos!
+    house.status = 'APPROVED';
+    await house.save();
+    ```
+
+    If you set the `optimisticConcurrency` option on the `House` model's schema, the above script will throw an
+    error.
+
+    ```javascript
+    const House = mongoose.model('House', Schema({
+      status: String,
+      photos: [String]
+    }, { optimisticConcurrency: true }));
+
+    const house = await House.findOne({ _id });
+    if (house.photos.length < 2) {
+      throw new Error('House must have at least two photos!');
+    }
+
+    const house2 = await House.findOne({ _id });
+    house2.photos = [];
+    await house2.save();
+
+    // Throws 'VersionError: No matching document found for id "..." version 0'
+    house.status = 'APPROVED';
+    await house.save();
+    ```
+
     <h3 id="collation"><a href="#collation">option: collation</a></h3>
 
     Sets a default [collation](https://docs.mongodb.com/manual/reference/collation/)
     for every query and aggregation. [Here's a beginner-friendly overview of collations](http://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations).
 
     ```javascript
-    var schema = new Schema({
+    const schema = new Schema({
       name: String
     }, { collation: { locale: 'en_US', strength: 1 } });
 
-    var MyModel = db.model('MyModel', schema);
+    const MyModel = db.model('MyModel', schema);
 
     MyModel.create([{ name: 'val' }, { name: 'Val' }]).
-      then(function() {
+      then(() => {
         return MyModel.find({ name: 'val' });
       }).
-      then(function(docs) {
+      then((docs) => {
         // `docs` will contain both docs, because `strength: 1` means
         // MongoDB will ignore case when matching.
       });
@@ -1037,6 +1140,45 @@ block content
     });
     ```
 
+<<<<<<< HEAD
+=======
+    <h3 id="useNestedStrict"><a href="#useNestedStrict">option: useNestedStrict</a></h3>
+
+    Write operations like `update()`, `updateOne()`, `updateMany()`,
+    and `findOneAndUpdate()` only check the top-level
+    schema's strict mode setting.
+
+    ```javascript
+    const childSchema = new Schema({}, { strict: false });
+    const parentSchema = new Schema({ child: childSchema }, { strict: 'throw' });
+    const Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, (error) => {
+      // Error because parentSchema has `strict: throw`, even though
+      // `childSchema` has `strict: false`
+    });
+
+    const update = { 'child.name': 'Luke Skywalker' };
+    const opts = { strict: false };
+    Parent.update({}, update, opts, function(error) {
+      // This works because passing `strict: false` to `update()` overwrites
+      // the parent schema.
+    });
+    ```
+
+    If you set `useNestedStrict` to true, mongoose will use the child schema's
+    `strict` option for casting updates.
+
+    ```javascript
+    const childSchema = new Schema({}, { strict: false });
+    const parentSchema = new Schema({ child: childSchema },
+      { strict: 'throw', useNestedStrict: true });
+    const Parent = mongoose.model('Parent', parentSchema);
+    Parent.update({}, { 'child.name': 'Luke Skywalker' }, error => {
+      // Works!
+    });
+    ```
+
+>>>>>>> master
     <h3 id="selectPopulatedPaths">
       <a href="#selectPopulatedPaths">
         option: selectPopulatedPaths

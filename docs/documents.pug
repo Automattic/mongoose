@@ -5,7 +5,7 @@ append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -29,7 +29,8 @@ block content
     <ul class="toc">
       <li><a href="#documents-vs-models">Documents vs Models</a></li>
       <li><a href="#retrieving">Retrieving</a></li>
-      <li><a href="#updating">Updating</a></li>
+      <li><a href="#updating-using-save">Updating Using `save()`</a></li>
+      <li><a href="#updating-using-queries">Updating Using Queries</a></li>
       <li><a href="#validating">Validating</a></li>
       <li><a href="#overwriting">Overwriting</a></li>
     </ul>
@@ -67,7 +68,7 @@ block content
     doc instanceof mongoose.Document; // true
     ```
 
-    ### Updating
+    ### Updating Using `save()`
 
     Mongoose documents track changes. You can modify a document using vanilla
     JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://docs.mongodb.com/manual/reference/operator/update/).
@@ -78,6 +79,15 @@ block content
     // Mongoose sends an `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`
     // to MongoDB.
     await doc.save();
+    ```
+
+    The `save()` method returns a promise. If `save()` succeeds, the promise
+    resolves to the document that was saved.
+
+    ```javascript
+    doc.save().then(savedDoc => {
+      savedDoc === doc; // true
+    });
     ```
 
     If the document with the corresponding `_id` is not found, Mongoose will
@@ -92,6 +102,8 @@ block content
     doc.name = 'foo';
     await doc.save(); // Throws DocumentNotFoundError
     ```
+
+    ### Updating Using Queries
 
     The [`save()`](api.html#model_Model-save) function is generally the right
     way to update a document with Mongoose. With `save()`, you get full

@@ -10,7 +10,7 @@ describe('custom casting', function() {
 
   beforeEach(function() {
     originalCast = mongoose.Number.cast();
-  })
+  });
 
   afterEach(function() {
     mongoose.deleteModel('Test');
@@ -60,5 +60,5 @@ describe('custom casting', function() {
     assert.ifError(err);
     assert.equal(doc.age, 2);
     // acquit:ignore:end
-  });  
+  });
 });

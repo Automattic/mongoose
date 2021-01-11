@@ -5,7 +5,7 @@ block append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -81,11 +81,12 @@ block content
     - [Array](#arrays)
     - [Decimal128](./api.html#mongoose_Mongoose-Decimal128)
     - [Map](#maps)
+    - [Schema](#schemas)
 
     <h4>Example</h4>
 
     ```javascript
-    var schema = new Schema({
+    const schema = new Schema({
       name:    String,
       binary:  Buffer,
       living:  Boolean,
@@ -116,9 +117,9 @@ block content
 
     // example use
 
-    var Thing = mongoose.model('Thing', schema);
+    const Thing = mongoose.model('Thing', schema);
 
-    var m = new Thing;
+    const m = new Thing;
     m.name = 'Statue of Liberty';
     m.age = 125;
     m.updated = new Date;
@@ -195,11 +196,11 @@ block content
     a `type` property.
 
     ```javascript
-    var schema1 = new Schema({
+    const schema1 = new Schema({
       test: String // `test` is a path of type String
     });
 
-    var schema2 = new Schema({
+    const schema2 = new Schema({
       // The `test` object contains the "SchemaType options"
       test: { type: String } // `test` is a path of type string
     });
@@ -209,7 +210,7 @@ block content
     for a path. For example, if you want to lowercase a string before saving:
 
     ```javascript
-    var schema2 = new Schema({
+    const schema2 = new Schema({
       test: {
         type: String,
         lowercase: true // Always convert `test` to lowercase
@@ -237,9 +238,10 @@ block content
     * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
     * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](./guide.html#virtuals) with the given name that gets/sets this path.
     * `immutable`: boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has `isNew: true`.
+    * `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](/docs/api/document.html#document_Document-toJSON) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
 
     ```javascript
-    var numberSchema = new Schema({
+    const numberSchema = new Schema({
       integerOnly: {
         type: Number,
         get: v => Math.round(v),
@@ -248,9 +250,9 @@ block content
       }
     });
 
-    var Number = mongoose.model('Number', numberSchema);
+    const Number = mongoose.model('Number', numberSchema);
 
-    var doc = new Number();
+    const doc = new Number();
     doc.integerOnly = 2.001;
     doc.integerOnly; // 2
     doc.i; // 2
@@ -269,7 +271,7 @@ block content
     * `sparse`: boolean, whether to define a [sparse index](https://docs.mongodb.com/manual/core/index-sparse/) on this property.
 
     ```javascript
-    var schema2 = new Schema({
+    const schema2 = new Schema({
       test: {
         type: String,
         index: true,
@@ -286,19 +288,25 @@ block content
     * `trim`: boolean, whether to always call `.trim()` on the value
     * `match`: RegExp, creates a [validator](./validation.html) that checks if the value matches the given regular expression
     * `enum`: Array, creates a [validator](./validation.html) that checks if the value is in the given array.
-    * `minlength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
-    * `maxlength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
+    * `minLength`: Number, creates a [validator](./validation.html) that checks if the value length is not less than the given number
+    * `maxLength`: Number, creates a [validator](./validation.html) that checks if the value length is not greater than the given number
+    * `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
 
     <h5 id="number-validators">Number</h5>
 
     * `min`: Number, creates a [validator](./validation.html) that checks if the value is greater than or equal to the given minimum.
     * `max`: Number, creates a [validator](./validation.html) that checks if the value is less than or equal to the given maximum.
     * `enum`: Array, creates a [validator](./validation.html) that checks if the value is strictly equal to one of the values in the given array.
+    * `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
 
     <h5>Date</h5>
 
     * `min`: Date
     * `max`: Date
+
+    <h5>ObjectId</h5>
+
+    * `populate`: Object, sets default [populate options](/docs/populate.html#query-conditions)
 
     <h3 id="usage-notes"><a href="#usage-notes">Usage Notes</a></h3>
 
@@ -360,7 +368,7 @@ block content
     [Built-in `Date` methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) are [__not__ hooked into](https://github.com/Automattic/mongoose/issues/1598) the mongoose change tracking logic which in English means that if you use a `Date` in your document and modify it with a method like `setMonth()`, mongoose will be unaware of this change and `doc.save()` will not persist this modification. If you must modify `Date` types using built-in methods, tell mongoose about the change with `doc.markModified('pathToYourDate')` before saving.
 
     ```javascript
-    var Assignment = mongoose.model('Assignment', { dueDate: Date });
+    const Assignment = mongoose.model('Assignment', { dueDate: Date });
     Assignment.findOne(function (err, doc) {
       doc.dueDate.setMonth(3);
       doc.save(callback); // THIS DOES NOT SAVE YOUR CHANGE
@@ -486,8 +494,8 @@ block content
     _document arrays_.
 
     ```javascript
-    var ToySchema = new Schema({ name: String });
-    var ToyBoxSchema = new Schema({
+    const ToySchema = new Schema({ name: String });
+    const ToyBoxSchema = new Schema({
       toys: [ToySchema],
       buffers: [Buffer],
       strings: [String],
@@ -499,14 +507,14 @@ block content
     Arrays are special because they implicitly have a default value of `[]` (empty array).
 
     ```javascript
-    var ToyBox = mongoose.model('ToyBox', ToyBoxSchema);
+    const ToyBox = mongoose.model('ToyBox', ToyBoxSchema);
     console.log((new ToyBox()).toys); // []
     ```
 
     To overwrite this default, you need to set the default value to `undefined`
 
     ```javascript
-    var ToyBoxSchema = new Schema({
+    const ToyBoxSchema = new Schema({
       toys: {
         type: [ToySchema],
         default: undefined
@@ -518,10 +526,10 @@ block content
     `Mixed`:
 
     ```javascript
-    var Empty1 = new Schema({ any: [] });
-    var Empty2 = new Schema({ any: Array });
-    var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
-    var Empty4 = new Schema({ any: [{}] });
+    const Empty1 = new Schema({ any: [] });
+    const Empty2 = new Schema({ any: Array });
+    const Empty3 = new Schema({ any: [Schema.Types.Mixed] });
+    const Empty4 = new Schema({ any: [{}] });
     ```
 
     <h4 id="maps">Maps</h4>
@@ -648,6 +656,28 @@ block content
     schema.path('arr.0.url').get(v => `${root}${v}`);
     ```
 
+    <h3 id="schemas"><a href="#schemas">Schemas</a></h3>
+
+    To declare a path as another [schema](./guide.html#definition),
+    set `type` to the sub-schema's instance.
+
+    To set a default value based on the sub-schema's shape, simply set a default value,
+    and the value will be cast based on the sub-schema's definition before being set
+    during document creation.
+
+    ```javascript
+    const subSchema = new mongoose.Schema({
+      // some schema definition here
+    });
+
+    const schema = new mongoose.Schema({
+      data: {
+        type: subSchema
+        default: {}
+      }
+    });
+    ```
+
     <h3 id="customtypes"><a href="#customtypes">Creating Custom Types</a></h3>
 
     Mongoose can also be extended with [custom SchemaTypes](customschematypes.html). Search the
@@ -667,7 +697,7 @@ block content
     given path.
 
     ```javascript
-    var sampleSchema = new Schema({ name: { type: String, required: true } });
+    const sampleSchema = new Schema({ name: { type: String, required: true } });
     console.log(sampleSchema.path('name'));
     // Output looks like:
     /**

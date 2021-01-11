@@ -5,7 +5,7 @@ block append style
   script(type="text/javascript" src="/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}">
+  <a class="edit-docs-link" href="#{editLink}" target="_blank">
     <img src="/docs/images/pencil.svg" />
   </a>
 
@@ -28,7 +28,14 @@ block content
     [discriminators](http://mongoosejs.com/docs/discriminators.html),
     or any other Mongoose feature other than schemas and validating documents.
 
-    Use the below syntax to access the Mongoose browser library.
+    Mongoose has a pre-built bundle of the browser library. If you're bundling your code with [Webpack](https://webpack.js.org/),
+    you should be able to import Mongoose's browser library as shown below if your Webpack `target` is `'web'`:
+
+    ```javascript
+    import mongoose from 'mongoose';
+    ```
+
+    You can use the below syntax to access the Mongoose browser library from Node.js:
 
     ```javascript
     // Using `require()`
@@ -40,7 +47,6 @@ block content
 
     <ul class="toc">
       <li><a href="#usage">Using the Browser Library</a></li>
-      <li><a href="#webpack">Building With Webpack</a></li>
     </ul>
 
 
@@ -50,7 +56,7 @@ block content
     is validating documents as shown below.
 
     ```javascript
-    import mongoose from 'mongoose/browser';
+    import mongoose from 'mongoose';
 
     // Mongoose's browser library does **not** have models. It only supports
     // schemas and documents. The primary use case is validating documents
@@ -60,23 +66,4 @@ block content
     }));
     // Prints an error because `name` is required.
     console.log(doc.validateSync());
-    ```
-
-    <h2 id="webpack">Building With Webpack</h2>
-
-    Mongoose uses [ES2015 (also known as ES6)](https://www.ecma-international.org/ecma-262/6.0/)
-    syntax, so in order to use Mongoose with older browsers you'll need to use
-    a tool like [Babel](https://www.npmjs.com/package/babel-cli). As of version
-    5.x, Mongoose no longer has an officially supported pre-built browser bundle,
-    you need to compile the browser library yourself.
-
-    To build Mongoose's browser library using Webpack, you'll need to use
-    [`babel-loader`](https://www.npmjs.com/package/babel-loader). Because of
-    how Webpack loads `require()` statements, it pulls in a lot of built-in
-    Node.js modules. In order to avoid this, you need to use the
-    [`node` Webpack config option](https://webpack.js.org/configuration/node/)
-    as shown below.
-
-    ```javascript
-    [require:webpack.*browser build$]
     ```

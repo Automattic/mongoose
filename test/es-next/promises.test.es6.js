@@ -1,11 +1,11 @@
 'use strict';
-var PromiseProvider = require('../../lib/promise_provider');
-var assert = require('assert');
-var mongoose = require('../../');
+const PromiseProvider = require('../../lib/promise_provider');
+const assert = require('assert');
+const mongoose = require('../../');
 
 describe('promises docs', function () {
-  var Band;
-  var db;
+  let Band;
+  let db;
 
   before(function (done) {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
@@ -35,12 +35,12 @@ describe('promises docs', function () {
    * You can also read more about [promises in Mongoose](https://masteringjs.io/tutorials/mongoose/promise).
    */
   it('Built-in Promises', function (done) {
-    var gnr = new Band({
+    const gnr = new Band({
       name: "Guns N' Roses",
       members: ['Axl', 'Slash']
     });
 
-    var promise = gnr.save();
+    const promise = gnr.save();
     assert.ok(promise instanceof Promise);
 
     promise.then(function (doc) {
@@ -58,15 +58,15 @@ describe('promises docs', function () {
    * a fully-fledged promise, use the `.exec()` function.
    */
   it('Queries are not promises', function (done) {
-    var query = Band.findOne({name: "Guns N' Roses"});
+    const query = Band.findOne({name: "Guns N' Roses"});
     assert.ok(!(query instanceof Promise));
 
     // acquit:ignore:start
-    var outstanding = 2;
+    let outstanding = 2;
     // acquit:ignore:end
 
     // A query is not a fully-fledged promise, but it does have a `.then()`.
-    query.then(function (doc) {
+    query.then(function(doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -75,7 +75,7 @@ describe('promises docs', function () {
     });
 
     // `.exec()` gives you a fully-fledged promise
-    var promise = Band.findOne({name: "Guns N' Roses"}).exec();
+    const promise = Band.findOne({name: "Guns N' Roses"}).exec();
     assert.ok(promise instanceof Promise);
 
     promise.then(function (doc) {
@@ -168,16 +168,19 @@ describe('promises docs', function () {
     // acquit:ignore:end
     // Use bluebird
     mongoose.Promise = require('bluebird');
-    assert.equal(Band.findOne({name: "Guns N' Roses"}).exec().constructor,
-      require('bluebird'));
+    const bluebirdPromise = Band.findOne({name: "Guns N' Roses"}).exec();
+    assert.equal(bluebirdPromise.constructor, require('bluebird'));
 
     // Use q. Note that you **must** use `require('q').Promise`.
     mongoose.Promise = require('q').Promise;
-    const Constructor = require('q').makePromise;
-    assert.ok(Band.findOne({name: "Guns N' Roses"}).exec() instanceof Constructor);
+    const qPromise = Band.findOne({name: "Guns N' Roses"}).exec();
+    assert.ok(qPromise instanceof require('q').makePromise);
 
     // acquit:ignore:start
-    done();
+    // Wait for promises
+    bluebirdPromise.then(qPromise).then(function () {
+      done();
+    });
     // acquit:ignore:end
   });
 });

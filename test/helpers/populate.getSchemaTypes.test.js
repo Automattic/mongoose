@@ -49,7 +49,7 @@ describe('getSchemaTypes', function() {
       ]
     };
 
-    const schemaTypes = getSchemaTypes(BundleSchema, doc, 'items.author');
+    const schemaTypes = getSchemaTypes(null, BundleSchema, doc, 'items.author');
 
     assert.ok(Array.isArray(schemaTypes));
     // Make sure we only got the schema paths for Book and EBook, and none
@@ -124,7 +124,7 @@ describe('getSchemaTypes', function() {
         ]
       }
     };
-    const schemaTypes = getSchemaTypes(BundleSchema, doc, 'level2.items.author');
+    const schemaTypes = getSchemaTypes(null, BundleSchema, doc, 'level2.items.author');
 
     assert.ok(Array.isArray(schemaTypes));
     // Make sure we only got the schema paths for Book and EBook, and none
@@ -161,7 +161,7 @@ describe('getSchemaTypes', function() {
     assert.equal(driver.cars[0].name, '1970 Dodge Charger');
     assert.ok(driver.populated('cars'));
 
-    const schematype = getSchemaTypes(DriverSchema, driver, 'cars.producer');
+    const schematype = getSchemaTypes(null, DriverSchema, driver, 'cars.producer');
     assert.equal(schematype.options.ref, 'gh6798_Producer');
 
     done();

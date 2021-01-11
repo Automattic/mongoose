@@ -2427,32 +2427,32 @@ describe('schema', function() {
     assert.ok(!schema.virtuals.id);
   });
 
-  describe('mongoose.set(`strictQuery`, value); (gh-6658)', function() {
-    let strictQueryOriginalValue;
+  describe('mongoose.set(`strict`, value); (gh-6658)', function() {
+    let strictOriginalValue;
 
-    this.beforeEach(() => strictQueryOriginalValue = mongoose.get('strictQuery'));
-    this.afterEach(() => mongoose.set('strictQuery', strictQueryOriginalValue));
+    this.beforeEach(() => strictOriginalValue = mongoose.get('strict'));
+    this.afterEach(() => mongoose.set('strict', strictOriginalValue));
 
-    it('setting `strictQuery` on base sets strictQuery to schema (gh-6658)', function() {
+    it('setting `strict` on base sets strict to schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'some value');
+      mongoose.set('strict', 'some value');
 
       // Act
       const schema = new Schema();
 
       // Assert
-      assert.equal(schema.get('strictQuery'), 'some value');
+      assert.equal(schema.get('strict'), 'some value');
     });
 
-    it('`strictQuery` set on base gets overwritten by option set on schema (gh-6658)', function() {
+    it('`strict` set on base gets overwritten by option set on schema (gh-6658)', function() {
       // Arrange
-      mongoose.set('strictQuery', 'base option');
+      mongoose.set('strict', 'base option');
 
       // Act
-      const schema = new Schema({}, { strictQuery: 'schema option' });
+      const schema = new Schema({}, { strict: 'schema option' });
 
       // Assert
-      assert.equal(schema.get('strictQuery'), 'schema option');
+      assert.equal(schema.get('strict'), 'schema option');
     });
   });
 

@@ -750,17 +750,6 @@ describe('schema', function() {
 
       schema.set('_id', true);
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
-
-      // old options
-      schema = new Schema({
-        name: String
-      }, { noId: false });
-      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
-
-      schema = new Schema({
-        name: String
-      }, { noId: true });
-      assert.equal(schema.path('_id'), undefined);
       done();
     });
   });
@@ -1137,7 +1126,7 @@ describe('schema', function() {
         done();
       });
       it('disabling', function(done) {
-        const schema = new Schema({ name: String }, { noVirtualId: true });
+        const schema = new Schema({ name: String });
         assert.strictEqual(undefined, schema.virtuals.id);
         done();
       });

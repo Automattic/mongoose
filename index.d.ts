@@ -2266,7 +2266,7 @@ declare module 'mongoose' {
     count(countName: string): this;
 
     /**
-     * Sets the cursor option option for the aggregation query (ignored for < 2.6.0).
+     * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
     cursor(options?: Record<string, unknown>): this;
 

@@ -1092,7 +1092,7 @@ declare module 'mongoose' {
     method(obj: { [name: string]: (this: DocType, ...args: any[]) => any }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [F in keyof DocType]: DocType[F] } & { [name: string]: (this: DocType, ...args: any[]) => any };
+    methods: { [F in keyof DocType]?: DocType[F] } & { [name: string]: (this: DocType, ...args: any[]) => any };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1151,7 +1151,7 @@ declare module 'mongoose' {
     static(obj: { [name: string]: (this: M, ...args: any[]) => any }): this;
 
     /** Object of currently defined statics on this schema. */
-    statics: { [F in keyof M]: M[F] } & { [name: string]: (this: M, ...args: any[]) => any };
+    statics: { [F in keyof M]?: M[F] } & { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;

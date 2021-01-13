@@ -2565,4 +2565,14 @@ describe('schema', function() {
     assert.equal(schema.path('tags').caster.instance, 'String');
     assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
   });
+  it('gh-7653', function() {
+    const people = new Schema({
+      name: String
+    });
+    const test = mongoose.model('Person', people);
+    const entry = new test({ name: 'Frank' });
+    console.log(people.path('_id'));
+    console.log(entry);
+    test.findOneAndUpdate({ name: 'John' });
+  });
 });

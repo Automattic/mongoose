@@ -1688,32 +1688,33 @@ describe('model', function() {
   });
 
   describe('Discriminator Key test', function() {
-    it('(gh-9015)', async function() {
-      const baseSchema = new Schema({}, { discriminatorKey: 'type' });
-          const baseModel = db.model('thing', baseSchema);
-          const aSchema = new Schema(
-            {
-              aThing: { type: Number },
-            },
-            { _id: false, id: false },
-          );
-          const aModel = baseModel.discriminator('A', aSchema);
-          const bSchema = new Schema(
-            {
-              bThing: { type: String },
-            },
-            { _id: false, id: false },
-          );
-          const bModel = baseModel.discriminator('B', bSchema);
-          // Model is created as a type A
-          const doc = await baseModel.create({ type: 'A', aThing: 1 });
-          const res = await baseModel.findByIdAndUpdate(
-            doc._id,
-            { type: 'B', bThing: 'one', aThing: '2' },
-            { runValidators: true, overwriteDiscriminatorKey: true, new: true},
-          );
-          assert.equal(res.type, 'A');
+    it('(gh-9015)', function() {
+      return co(function*() {
+        const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+        const baseModel = db.model('thing', baseSchema);
+        const aSchema = new Schema(
+          {
+            aThing: { type: Number }
+          },
+          { _id: false, id: false }
+        );
+        const aModel = baseModel.discriminator('A', aSchema);
+        const bSchema = new Schema(
+          {
+            bThing: { type: String }
+          },
+          { _id: false, id: false }
+        );
+        const bModel = baseModel.discriminator('B', bSchema);
+        // Model is created as a type A
+        const doc = yield baseModel.create({ type: 'A', aThing: 1 });
+        const res = yield baseModel.findByIdAndUpdate(
+          doc._id,
+          { type: 'B', bThing: 'one', aThing: '2' },
+          { runValidators: true, overwriteDiscriminatorKey: true, new: true }
+        );
+        assert.equal(res.type, 'A');
+      });
     });
   });
-
 });

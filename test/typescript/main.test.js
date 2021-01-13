@@ -48,7 +48,7 @@ describe('typescript syntax', function() {
   });
 
   it('queries', function() {
-    const errors = runTest('queries.ts');
+    const errors = runTest('queries.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }

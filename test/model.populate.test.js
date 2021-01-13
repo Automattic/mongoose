@@ -9330,6 +9330,20 @@ describe('model: populate:', function() {
       _id: false
     });
 
+    const noId = { _id: false };
+
+    const NestedDataSchema = Schema({
+      data: Schema({ title: String, description: String }, noId)
+    }, noId);
+
+    const InternalItemSchemaGen = () => Schema({
+      data: {
+        type: ObjectId,
+        refPath: 'list.objectType'
+      }
+    }, noId);
+
+    const externalSchema = Schema({ data: { sourceId: Number } }, noId);
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
     ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
     ExampleSchema.path('list').discriminator('Video', InternalItemSchemaGen());

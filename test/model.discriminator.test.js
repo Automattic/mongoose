@@ -1698,14 +1698,14 @@ describe('model', function() {
           },
           { _id: false, id: false }
         );
-        const aModel = baseModel.discriminator('A', aSchema);
+        baseModel.discriminator('A', aSchema);
         const bSchema = new Schema(
           {
             bThing: { type: String }
           },
           { _id: false, id: false }
         );
-        const bModel = baseModel.discriminator('B', bSchema);
+        baseModel.discriminator('B', bSchema);
         // Model is created as a type A
         const doc = yield baseModel.create({ type: 'A', aThing: 1 });
         const res = yield baseModel.findByIdAndUpdate(

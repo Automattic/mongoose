@@ -1709,10 +1709,10 @@ describe('model', function() {
           const doc = await baseModel.create({ type: 'A', aThing: 1 });
           const res = await baseModel.findByIdAndUpdate(
             doc._id,
-            { type: 'A', bThing: 'one', aThing: '2' },
-            { runValidators: true, overwriteDiscriminatorKey: true },
+            { type: 'B', bThing: 'one', aThing: '2' },
+            { runValidators: true, overwriteDiscriminatorKey: true, new: true},
           );
-          assert.equal(res.type, 'B');
+          assert.equal(res.type, 'A');
     });
   });
 

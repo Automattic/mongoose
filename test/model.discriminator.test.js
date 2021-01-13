@@ -1711,7 +1711,7 @@ describe('model', function() {
         const res = yield baseModel.findByIdAndUpdate(
           doc._id,
           { type: 'B', bThing: 'one', aThing: '2' },
-          { runValidators: true, overwriteDiscriminatorKey: true, new: true }
+          { runValidators: true, /* overwriteDiscriminatorKey: true, */ new: true }
         );
         assert.equal(res.type, 'A');
       });

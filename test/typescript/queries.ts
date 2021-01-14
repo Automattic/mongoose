@@ -1,11 +1,12 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema: Schema = new Schema({ name: { type: 'String' }, tags: [String] });
 
 interface ITest extends Document {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
+  tags?: string[];
 }
 
 const Test = model<ITest>('Test', schema);
@@ -36,6 +37,11 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITe
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true }).then((res: ITest) => { res.name = 'test4'; });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: true }).then((res: ITest) => { res.name = 'test4'; });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => { res.name = 'test4'; });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res) => { console.log(res.ok); });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
+
+Test.findOneAndUpdate({ name: 'test' }, { $addToSet: { tags: 'each' } });
+Test.findOneAndUpdate({ name: 'test' }, { $push: { tags: 'each' } });

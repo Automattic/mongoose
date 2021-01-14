@@ -8942,7 +8942,6 @@ describe('document', function() {
     const err = t.validateSync();
     assert.ok(err);
     assert.ok(err.errors);
-    assert.ok(err.errors['test']);
     assert.ok(err.errors['test.1']);
   });
 
@@ -9832,6 +9831,23 @@ describe('document', function() {
       const fromDb = yield Model.findById(m1._id);
       assert.equal(fromDb.arr.length, 1);
       assert.equal(fromDb.arr[0].abc, 'ghi');
+    });
+  });
+
+  it('handles paths named `db` (gh-9798)', function() {
+    const schema = new Schema({
+      db: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ db: 'foo' });
+      doc.db = 'bar';
+      yield doc.save();
+      yield doc.deleteOne();
+
+      const _doc = yield Test.findOne({ db: 'bar' });
+      assert.ok(!_doc);
     });
   });
 });

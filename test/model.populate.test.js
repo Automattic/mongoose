@@ -9344,7 +9344,6 @@ describe('model: populate:', function() {
     }, noId);
 
     const externalSchema = Schema({ data: { sourceId: Number } }, noId);
-
     const ExampleSchema = Schema({ test: String, list: [ItemSchema] });
     ExampleSchema.path('list').discriminator('Image', InternalItemSchemaGen());
     ExampleSchema.path('list').discriminator('Video', InternalItemSchemaGen());

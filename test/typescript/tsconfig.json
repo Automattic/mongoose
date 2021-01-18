@@ -1,0 +1,10 @@
+{
+  "allowSyntheticDefaultImports": true,
+  "esModuleInterop": true,
+  "outDir": "test/dist",
+  "strictNullChecks": true,
+  "include": [
+    "./**/*.ts",
+    "../../index.d.ts"
+  ]
+}

@@ -10,7 +10,7 @@ const Promise = require('bluebird');
 const Q = require('q');
 const assert = require('assert');
 const co = require('co');
-const server = require('./common').server;
+const mongodb = require('mongodb');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -161,209 +161,6 @@ describe('connections:', function() {
       conn1.model('Test', schema);
       assert.equal(called.length, 1);
       assert.equal(called[0], schema);
-    });
-
-    describe('connection events', function() {
-      beforeEach(function() {
-        this.timeout(60000);
-        return server.start();
-      });
-
-      afterEach(function() {
-        this.timeout(60000);
-        return server.stop().
-          then(function() {
-            return server.purge();
-          });
-      });
-
-      it('disconnected (gh-5498) (gh-5524)', function(done) {
-        this.timeout(60000);
-
-        let numConnected = 0;
-        let numDisconnected = 0;
-        let numReconnected = 0;
-        let numReconnect = 0;
-        let numTimeout = 0;
-        let numClose = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          heartbeatFrequencyMS: 500,
-          useNewUrlParser: true,
-          useUnifiedTopology: true
-        });
-
-        conn.on('connected', function() {
-          ++numConnected;
-        });
-        conn.on('disconnected', function() {
-          ++numDisconnected;
-        });
-        conn.on('reconnect', function() {
-          ++numReconnect;
-        });
-        conn.on('timeout', function() {
-          ++numTimeout;
-        });
-        // Same as `reconnect`, just for backwards compat
-        conn.on('reconnected', function() {
-          ++numReconnected;
-        });
-        conn.on('close', function() {
-          ++numClose;
-        });
-
-        conn.asPromise().
-          then(function() {
-            assert.equal(conn.readyState, conn.states.connected);
-            assert.equal(numConnected, 1);
-            return server.stop();
-          }).
-          then(function() {
-            return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 1000);
-            });
-          }).
-          then(function() {
-            assert.equal(conn.readyState, conn.states.disconnected);
-            assert.equal(numConnected, 1);
-            assert.equal(numDisconnected, 1);
-            assert.equal(numReconnected, 0);
-            assert.equal(numReconnect, 0);
-          }).
-          then(function() {
-            return server.start();
-          }).
-          then(function() {
-            return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 8000);
-            });
-          }).
-          then(function() {
-            assert.equal(conn.readyState, conn.states.connected);
-            assert.equal(numDisconnected, 1);
-            assert.equal(numReconnected, 1);
-            assert.equal(numReconnect, 1);
-            assert.equal(numTimeout, 0);
-            assert.equal(numClose, 0);
-
-            conn.close();
-            done();
-          }).
-          catch(done);
-      });
-
-      it('reconnectFailed (gh-4027)', function(done) {
-        this.timeout(60000);
-
-        let numReconnectFailed = 0;
-        let numConnected = 0;
-        let numDisconnected = 0;
-        let numReconnected = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          reconnectTries: 3,
-          reconnectInterval: 100,
-          useNewUrlParser: true,
-          useUnifiedTopology: false // reconnectFailed doesn't get emitted with 'useUnifiedTopology'
-        });
-
-        conn.on('connected', function() {
-          ++numConnected;
-        });
-        conn.on('disconnected', function() {
-          ++numDisconnected;
-        });
-        conn.on('reconnected', function() {
-          ++numReconnected;
-        });
-        conn.on('reconnectFailed', function() {
-          ++numReconnectFailed;
-        });
-
-        conn.asPromise().
-          then(function() {
-            assert.equal(numConnected, 1);
-            return server.stop();
-          }).
-          then(function() {
-            return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 100);
-            });
-          }).
-          then(function() {
-            assert.equal(numDisconnected, 1);
-            assert.equal(numReconnected, 0);
-            assert.equal(numReconnectFailed, 0);
-          }).
-          then(function() {
-            return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 8000);
-            });
-          }).
-          then(function() {
-            assert.equal(numDisconnected, 1);
-            assert.equal(numReconnected, 0);
-            assert.equal(numReconnectFailed, 1);
-          }).
-          then(function() {
-            return server.start();
-          }).
-          then(function() {
-            return new Promise(function(resolve) {
-              setTimeout(function() { resolve(); }, 2000);
-            });
-          }).
-          then(function() {
-            assert.equal(numDisconnected, 1);
-            assert.equal(numReconnected, 0);
-            assert.equal(numReconnectFailed, 1);
-
-            conn.close();
-            done();
-          }).
-          catch(done);
-      });
-
-      it('timeout (gh-4513)', function() {
-        this.timeout(60000);
-
-        let numTimeout = 0;
-        let numDisconnected = 0;
-        const conn = mongoose.createConnection('mongodb://localhost:27000/mongoosetest', {
-          socketTimeoutMS: 5000,
-          poolSize: 1,
-          useNewUrlParser: true
-        });
-
-        conn.on('timeout', function() {
-          ++numTimeout;
-        });
-
-        conn.on('disconnected', function() {
-          ++numDisconnected;
-        });
-
-        const Model = conn.model('gh4513', new Schema());
-
-        return co(function*() {
-          yield conn.asPromise();
-
-          assert.equal(conn.readyState, conn.states.connected);
-
-          yield Model.create({});
-
-          const error = yield Model.find({ $where: 'sleep(10000) || true' }).
-            then(() => assert.ok(false), err => err);
-          assert.ok(error);
-          assert.ok(error.message.indexOf('timed out'), error.message);
-          // TODO: if autoReconnect is false, we might not actually be
-          // connected. See gh-5634
-          assert.equal(conn.readyState, conn.states.connected);
-          assert.equal(numTimeout, 1);
-          assert.equal(numDisconnected, 0);
-
-          yield conn.close();
-        });
-      });
     });
   });
 
@@ -1153,6 +950,81 @@ describe('connections:', function() {
 
       const db2 = mongoose.connection.useDb('gh8267-1');
       assert.equal(db2.config.useCreateIndex, true);
+    });
+  });
+
+  it('allows setting client on a disconnected connection (gh-9164)', function() {
+    return co(function*() {
+      const client = yield mongodb.MongoClient.connect('mongodb://localhost:27017/mongoose_test', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      const conn = mongoose.createConnection().setClient(client);
+
+      assert.equal(conn.readyState, 1);
+
+      yield conn.createCollection('test');
+      const res = yield conn.dropCollection('test');
+      assert.ok(res);
+    });
+  });
+
+  it('connection.asPromise() resolves to a connection instance (gh-9496)', function() {
+    return co(function *() {
+      const m = new mongoose.Mongoose;
+
+      m.connect('mongodb://localhost:27017/test_gh9496', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
+      const conn = yield m.connection.asPromise();
+
+      assert.ok(conn instanceof m.Connection);
+      assert.ok(conn);
+    });
+  });
+
+  it('allows overwriting models (gh-9406)', function() {
+    const m = new mongoose.Mongoose();
+
+    const M1 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    const M2 = m.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+    const M3 = m.connection.model('Test', Schema({ name: String }), null, { overwriteModels: true });
+
+    assert.ok(M1 !== M2);
+    assert.ok(M2 !== M3);
+
+    assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
+  });
+
+  it('allows setting `overwriteModels` globally (gh-9406)', function() {
+    const m = new mongoose.Mongoose();
+    m.set('overwriteModels', true);
+
+    const M1 = m.model('Test', Schema({ name: String }));
+    const M2 = m.model('Test', Schema({ name: String }));
+    const M3 = m.connection.model('Test', Schema({ name: String }));
+
+    assert.ok(M1 !== M2);
+    assert.ok(M2 !== M3);
+
+    m.set('overwriteModels', false);
+    assert.throws(() => m.model('Test', Schema({ name: String })), /overwrite/);
+  });
+
+  it('can use destructured `connect` and `disconnect` (gh-9597)', function() {
+    return co(function* () {
+      const m = new mongoose.Mongoose;
+      const connect = m.connect;
+      const disconnect = m.disconnect;
+
+      yield disconnect();
+
+      const errorOnConnect = yield connect('mongodb://localhost:27017/test_gh9597').then(() => null, err => err);
+      assert.ifError(errorOnConnect);
+
+      const errorOnDisconnect = yield disconnect().then(() => null, err => err);
+      assert.ifError(errorOnDisconnect);
     });
   });
 });

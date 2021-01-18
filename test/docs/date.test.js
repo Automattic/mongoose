@@ -6,7 +6,7 @@ const start = require('../common');
 
 describe('Date Tutorial', function() {
   let User;
-  let db;
+  // let db;
 
   const mongoose = new start.mongoose.Mongoose();
 
@@ -43,7 +43,7 @@ describe('Date Tutorial', function() {
     user.validateSync().errors['lastActiveAt']; // CastError
     // acquit:ignore:start
     assert.ok(!(user.lastActiveAt instanceof Date));
-    assert.equal(user.validateSync().errors['lastActiveAt'].name, 'CastError')
+    assert.equal(user.validateSync().errors['lastActiveAt'].name, 'CastError');
     // acquit:ignore:end
   });
 

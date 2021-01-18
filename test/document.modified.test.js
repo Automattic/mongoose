@@ -125,9 +125,13 @@ describe('document modified', function() {
   describe('isDefault', function() {
     it('works', function() {
       const MyModel = db.model('Test',
-        { name: { type: String, default: 'Val ' } });
+        { name: { type: String, default: 'Val ' }, other: String });
       const m = new MyModel();
       assert.ok(m.$isDefault('name'));
+      assert.ok(!m.$isDefault('other'));
+
+      assert.ok(m.$isDefault(['name', 'other']));
+      assert.ok(!m.$isDefault(['other']));
     });
   });
 
@@ -200,8 +204,10 @@ describe('document modified', function() {
         post.get('comments')[0].body = 'Woot';
         assert.equal(post.isModified('comments'), true);
         assert.equal(post.isDirectModified('comments'), false);
+        assert.equal(post.isDirectModified(['comments']), false);
         assert.equal(post.isModified('comments.0.body'), true);
         assert.equal(post.isDirectModified('comments.0.body'), true);
+        assert.equal(post.isDirectModified(['comments.0.body', 'comments']), true);
       });
     });
 

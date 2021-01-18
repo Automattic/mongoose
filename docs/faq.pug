@@ -88,10 +88,10 @@ block content
     For example, if MongoDB doesn't already have a unique index on `name`, the below code will not error despite the fact that `unique` is true.
 
     ```javascript
-    var schema = new mongoose.Schema({
+    const schema = new mongoose.Schema({
       name: { type: String, unique: true }
     });
-    var Model = db.model('Test', schema);
+    const Model = db.model('Test', schema);
 
     Model.create([{ name: 'Val' }, { name: 'Val' }], function(err) {
       console.log(err); // No error, unless index was already built
@@ -101,10 +101,10 @@ block content
     However, if you wait for the index to build using the `Model.on('index')` event, attempts to save duplicates will correctly error.
 
     ```javascript
-    var schema = new mongoose.Schema({
+    const schema = new mongoose.Schema({
       name: { type: String, unique: true }
     });
-    var Model = db.model('Test', schema);
+    const Model = db.model('Test', schema);
 
     Model.on('index', function(err) { // <-- Wait for model's indexes to finish
       assert.ifError(err);
@@ -135,12 +135,12 @@ block content
     <a href="#nested-properties">**Q**</a>. When I have a nested property in a schema, mongoose adds empty objects by default. Why?
 
     ```javascript
-    var schema = new mongoose.Schema({
+    const schema = new mongoose.Schema({
       nested: {
         prop: String
       }
     });
-    var Model = db.model('Test', schema);
+    const Model = db.model('Test', schema);
 
     // The below prints `{ _id: /* ... */, nested: {} }`, mongoose assigns
     // `nested` to an empty object `{}` by default.
@@ -198,7 +198,7 @@ block content
     // Do **NOT** use arrow functions as shown below unless you're certain
     // that's what you want. If you're reading this FAQ, odds are you should
     // just be using a conventional function.
-    var schema = new mongoose.Schema({
+    const schema = new mongoose.Schema({
       propWithGetter: {
         type: String,
         get: v => {
@@ -300,6 +300,9 @@ block content
     
     // disable colors in debug mode
     mongoose.set('debug', { color: false })
+
+    // get mongodb-shell friendly output (ISODate)
+    mongoose.set('debug', { shell: true })
     ```
 
     All executed collection methods will log output of their arguments to your
@@ -311,26 +314,26 @@ block content
     <a href="#callback_never_executes">**Q**</a>. My `save()` callback never executes. What am I doing wrong?
 
     **A**. All `collection` actions (insert, remove, queries, etc.) are queued
-    until the `connection` opens. It is likely that an error occurred while
-    attempting to connect. Try adding an error handler to your connection.
+    until Mongoose successfully connects to MongoDB. It is likely you haven't called Mongoose's
+    `connect()` or `createConnection()` function yet.
 
-    ```javascript
-    // if connecting on the default mongoose connection
-    mongoose.connect(..);
-    mongoose.connection.on('error', handleError);
+    In Mongoose 5.11, there is a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
+    Mongoose will allow an operation to stay buffered before throwing an error.
 
-    // if connecting on a separate connection
-    var conn = mongoose.createConnection(..);
-    conn.on('error', handleError);
-    ```
-
-    If you want to opt out of mongoose's buffering mechanism across your entire
+    If you want to opt out of Mongoose's buffering mechanism across your entire
     application, set the global `bufferCommands` option to false:
 
     ```javascript
     mongoose.set('bufferCommands', false);
     ```
 
+    Instead of opting out of Mongoose's buffering mechanism, you may want to instead reduce `bufferTimeoutMS`
+    to make Mongoose only buffer for a short time.
+
+    ```javascript
+    // If an operation is buffered for more than 500ms, throw an error.
+    mongoose.set('bufferTimeoutMS', 500);
+    ```
 
     <hr id="creating_connections" />
 
@@ -355,14 +358,14 @@ block content
     same name, create a new connection and bind the model to the connection.
 
     ```javascript
-    var mongoose = require('mongoose');
-    var connection = mongoose.createConnection(..);
+    const mongoose = require('mongoose');
+    const connection = mongoose.createConnection(..);
 
     // use mongoose.Schema
-    var kittySchema = mongoose.Schema({ name: String });
+    const kittySchema = mongoose.Schema({ name: String });
 
     // use connection.model
-    var Kitten = connection.model('Kitten', kittySchema);
+    const Kitten = connection.model('Kitten', kittySchema);
     ```
 
 
@@ -463,6 +466,31 @@ block content
     [perDocumentLimit](/docs/populate.html#limit-vs-perDocumentLimit) option (new in Mongoose 5.9.0). Just keep in
     mind that populate() will execute a separate query for each document.
 
+    <hr id="duplicate-query" />
+
+    <a href="#duplicate-query">**Q**</a>. My query/update seems to execute twice. Why is this happening?
+
+    **A**. The most common cause of duplicate queries is **mixing callbacks and promises with queries**.
+    That's because passing a callback to a query function, like `find()` or `updateOne()`,
+    immediately executes the query, and calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then)
+    executes the query again.
+
+    Mixing promises and callbacks can lead to duplicate entries in arrays.
+    For example, the below code inserts 2 entries into the `tags` array, **not* just 1.
+
+    ```javascript
+    const BlogPost = mongoose.model('BlogPost', new Schema({
+      title: String,
+      tags: [String]
+    }));
+
+    // Because there's both `await` **and** a callback, this `updateOne()` executes twice
+    // and thus pushes the same string into `tags` twice.
+    const update = { $push: { tags: ['javascript'] } };
+    await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, res) => {
+      console.log(res);
+    });
+    ```
 
     <hr id="add_something" />
 

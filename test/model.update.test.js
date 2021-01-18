@@ -3079,6 +3079,25 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  it('updating a map path underneath a single nested subdoc (gh-9298)', function() {
+    const schema = Schema({
+      cities: {
+        type: Map,
+        of: Schema({ population: Number })
+      }
+    });
+    const Test = db.model('Test', Schema({ country: schema }));
+
+    return co(function*() {
+      yield Test.create({});
+
+      yield Test.updateOne({}, { 'country.cities.newyork.population': '10000' });
+
+      const updated = yield Test.findOne({}).lean();
+      assert.strictEqual(updated.country.cities.newyork.population, 10000);
+    });
+  });
+
   it('overwrite an array with empty (gh-7135)', function() {
     const ElementSchema = Schema({
       a: { type: String, required: true }
@@ -3260,19 +3279,29 @@ describe('model: updateOne: ', function() {
     });
   });
 
-  it('moves $set of immutable properties to $setOnInsert (gh-8467)', function() {
+  it('moves $set of immutable properties to $setOnInsert (gh-8467) (gh-9537)', function() {
+    const childSchema = Schema({ name: String });
     const Model = db.model('Test', Schema({
       name: String,
-      age: { type: Number, default: 25, immutable: true }
+      age: { type: Number, default: 25, immutable: true },
+      child: { type: childSchema, immutable: true }
     }));
 
     const _opts = { upsert: true };
 
     return co(function*() {
-      yield Model.updateOne({ name: 'John' }, { name: 'John', age: 20 }, _opts);
+      yield Model.deleteMany({});
+      yield Model.updateOne({}, { name: 'John', age: 20, child: { name: 'test' } }, _opts);
 
       const doc = yield Model.findOne().lean();
       assert.equal(doc.age, 20);
+      assert.equal(doc.name, 'John');
+      assert.equal(doc.child.name, 'test');
+
+      yield Model.updateOne({}, { name: 'new', age: 29, child: { name: 'new' } }, _opts);
+      assert.equal(doc.age, 20);
+      assert.equal(doc.name, 'John');
+      assert.equal(doc.child.name, 'test');
     });
   });
 
@@ -3428,6 +3457,35 @@ describe('model: updateOne: ', function() {
     });
   });
 
+  describe('overwriteDiscriminatorKey', function() {
+    it('allows changing discriminator key in update (gh-6087)', function() {
+      const baseSchema = new Schema({}, { discriminatorKey: 'type' });
+      const baseModel = db.model('Test', baseSchema);
+
+      const aSchema = Schema({ aThing: Number }, { _id: false, id: false });
+      const aModel = baseModel.discriminator('A', aSchema);
+
+      const bSchema = new Schema({ bThing: String }, { _id: false, id: false });
+      const bModel = baseModel.discriminator('B', bSchema);
+
+      return co(function*() {
+        // Model is created as a type A
+        let doc = yield baseModel.create({ type: 'A', aThing: 1 });
+
+        yield aModel.updateOne(
+          { _id: doc._id },
+          { type: 'B', bThing: 'two' },
+          { runValidators: true, overwriteDiscriminatorKey: true }
+        );
+
+        doc = yield baseModel.findById(doc);
+        assert.equal(doc.type, 'B');
+        assert.ok(doc instanceof bModel);
+        assert.equal(doc.bThing, 'two');
+      });
+    });
+  });
+
   it('update validators respect storeSubdocValidationError (gh-9172)', function() {
     const opts = { storeSubdocValidationError: false };
     const Model = db.model('Test', Schema({
@@ -3443,6 +3501,30 @@ describe('model: updateOne: ', function() {
       assert.ok(err);
       assert.ok(err.errors['nested.arr.0.name']);
       assert.ok(!err.errors['nested']);
+    });
+  });
+
+  it('handles spread docs (gh-9518)', function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      children: [{ name: String }]
+    });
+
+    const Person = db.model('Person', schema);
+
+    return co(function*() {
+      const doc = yield Person.create({
+        name: 'Anakin',
+        children: [{ name: 'Luke' }]
+      });
+
+      doc.children[0].name = 'Luke Skywalker';
+      const update = { 'children.0': Object.assign({}, doc.children[0]) };
+
+      yield Person.updateOne({ _id: doc._id }, update);
+
+      const fromDb = yield Person.findById(doc);
+      assert.equal(fromDb.children[0].name, 'Luke Skywalker');
     });
   });
 });

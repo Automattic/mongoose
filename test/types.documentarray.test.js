@@ -142,13 +142,6 @@ describe('types.documentarray', function() {
     assert.notEqual(a.id({ one: 'rolling', two: 'rock' }).title, 'rock-n-roll');
     assert.equal(a.id({ one: 'rock', two: 'roll' }).title, 'rock-n-roll');
 
-    // test with no _id
-    let NoId = new Schema({
-      title: { type: String }
-    }, { noId: true });
-
-    Subdocument = TestDoc(NoId);
-
     let sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
@@ -160,13 +153,6 @@ describe('types.documentarray', function() {
       threw = err;
     }
     assert.equal(threw, false);
-
-    // test the _id option, noId is deprecated
-    NoId = new Schema({
-      title: { type: String }
-    }, { _id: false });
-
-    Subdocument = TestDoc(NoId);
 
     sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
@@ -705,5 +691,23 @@ describe('types.documentarray', function() {
 
     doc.subDocArray.slice(1, 2)[0].name = 'baz';
     assert.ok(doc.isModified('subDocArray.1.name'));
+  });
+
+  it('supports setting to newly constructed array with no path or parent (gh-8108)', function() {
+    const nestedArraySchema = Schema({
+      name: String,
+      subDocArray: [{ _id: false, name: String }]
+    });
+
+    const Model = db.model('Test', nestedArraySchema);
+
+    const doc = new Model({ name: 'doc1' });
+    doc.subDocArray = new DocumentArray([]);
+
+    doc.subDocArray.push({ name: 'foo' });
+
+    return doc.save().
+      then(() => Model.findById(doc)).
+      then(doc => assert.deepEqual(doc.toObject().subDocArray, [{ name: 'foo' }]));
   });
 });

@@ -21,7 +21,7 @@ block content
     Next install Mongoose from the command line using `npm`:
 
     ```
-    $ npm install mongoose
+    $ npm install mongoose --save
     ```
 
     Now say we like fuzzy kittens and want to record every kitten we ever meet
@@ -32,7 +32,7 @@ block content
     ```javascript
     // getting-started.js
     const mongoose = require('mongoose');
-    mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true});
+    mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true, useUnifiedTopology: true});
     ```
 
     We have a pending connection to the test database running on localhost.

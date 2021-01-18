@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "5.9.26",
+  "version": "5.11.12",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -19,21 +19,24 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@types/mongodb": "^3.5.27",
     "bson": "^1.1.4",
-    "kareem": "2.3.1",
-    "mongodb": "3.5.9",
+    "kareem": "2.3.2",
+    "mongodb": "3.6.3",
     "mongoose-legacy-pluralize": "1.0.2",
-    "mpath": "0.7.0",
-    "mquery": "3.2.2",
+    "mpath": "0.8.3",
+    "mquery": "3.2.3",
     "ms": "2.1.2",
     "regexp-clone": "1.0.0",
     "safe-buffer": "5.2.1",
-    "sliced": "1.0.1",
-    "sift": "7.0.1"
+    "sift": "7.0.1",
+    "sliced": "1.0.1"
   },
   "devDependencies": {
     "@babel/core": "7.10.5",
     "@babel/preset-env": "7.10.4",
+    "@typescript-eslint/eslint-plugin": "4.10.0",
+    "@typescript-eslint/parser": "4.10.0",
     "acquit": "1.x",
     "acquit-ignore": "0.1.x",
     "acquit-require": "0.1.x",
@@ -47,10 +50,10 @@
     "dox": "0.3.1",
     "eslint": "7.1.0",
     "eslint-plugin-mocha-no-only": "1.1.0",
-    "highlight.js": "9.1.0",
+    "highlight.js": "9.18.2",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "marked": "0.6.2",
+    "marked": "1.1.1",
     "mocha": "5.x",
     "moment": "2.x",
     "mongodb-topology-manager": "1.0.11",
@@ -60,6 +63,7 @@
     "pug": "2.0.3",
     "q": "1.5.1",
     "semver": "5.5.0",
+    "typescript": "4.x",
     "uuid": "2.0.3",
     "uuid-parse": "1.0.0",
     "validator": "10.8.0",
@@ -74,7 +78,7 @@
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-legacy": "git pull origin 4.x && git push origin 4.x --tags && npm publish --tag legacy",
-    "test": "mocha --exit",
+    "test": "mocha --exit ./test/*.test.js ./test/typescript/main.test.js",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   },
   "main": "./index.js",
@@ -101,6 +105,24 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.{ts,tsx}"
+        ],
+        "extends": [
+          "plugin:@typescript-eslint/eslint-recommended",
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "plugins": [
+          "@typescript-eslint"
+        ],
+        "rules": {
+          "@typescript-eslint/no-explicit-any": "off",
+          "@typescript-eslint/ban-types": "off"
+        }
+      }
     ],
     "plugins": [
       "mocha-no-only"

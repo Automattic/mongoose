@@ -3,10 +3,10 @@
 const co = require('co');
 
 co(function*() {
-  var ReplSet = require('mongodb-topology-manager').ReplSet;
+  const ReplSet = require('mongodb-topology-manager').ReplSet;
 
   // Create new instance
-  var topology = new ReplSet('mongod', [{
+  const topology = new ReplSet('mongod', [{
     // mongod process options
     options: {
       bind_ip: 'localhost', port: 31000, dbpath: `/data/db/31000`

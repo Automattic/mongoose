@@ -380,12 +380,12 @@ describe('types array', function() {
           const removed = doc.numbers.splice(1, 1, '10');
           assert.deepEqual(removed, [5]);
           assert.equal(typeof doc.numbers[1], 'number');
-          assert.deepEqual(doc.numbers.toObject(), [4, 10, 6, 7]);
+          assert.deepStrictEqual(doc.numbers.toObject(), [4, 10, 6, 7]);
           doc.save(function(err) {
             assert.ifError(err);
             A.findById(a._id, function(err, doc) {
               assert.ifError(err);
-              assert.deepEqual(doc.numbers.toObject(), [4, 10, 6, 7]);
+              assert.deepStrictEqual(doc.numbers.toObject(), [4, 10, 6, 7]);
 
               A.collection.drop(function(err) {
                 assert.ifError(err);
@@ -1769,7 +1769,7 @@ describe('types array', function() {
   });
 
   describe('of number', function() {
-    it('allows nulls', function(done) {
+    it('allows null and undefined', function(done) {
       const schema = new Schema({ x: [Number] });
       const M = db.model('Test', schema);
       let m;
@@ -1778,7 +1778,6 @@ describe('types array', function() {
       m.save(function(err) {
         assert.ifError(err);
 
-        // undefined is not allowed
         m = new M({ x: [1, undefined, 3] });
         m.save(function(err) {
           assert.ifError(err);
@@ -1838,6 +1837,23 @@ describe('types array', function() {
           });
         });
       });
+    });
+
+    it('toObject returns a vanilla JavaScript array (gh-9540)', function() {
+      const schema = new Schema({ arr: [Number] });
+      const M = db.model('Test', schema);
+
+      const doc = new M({ arr: [1, 2, 3] });
+
+      let arr = doc.arr.toObject();
+      assert.ok(Array.isArray(arr));
+      assert.equal(arr.constructor, Array);
+      assert.deepStrictEqual(arr, [1, 2, 3]);
+
+      arr = doc.arr.toObject({ depopulate: true });
+      assert.ok(Array.isArray(arr));
+      assert.equal(arr.constructor, Array);
+      assert.deepStrictEqual(arr, [1, 2, 3]);
     });
 
     it('pushing top level arrays and subarrays works (gh-1073)', function(done) {

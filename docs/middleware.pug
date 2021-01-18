@@ -105,7 +105,7 @@ block content
     middleware calls `next`.
 
     ```javascript
-    var schema = new Schema(..);
+    const schema = new Schema(..);
     schema.pre('save', function(next) {
       // do stuff
       next();
@@ -133,7 +133,7 @@ block content
     to prevent the rest of your middleware function from running when you call `next()`.
 
     ```javascript
-    var schema = new Schema(..);
+    const schema = new Schema(..);
     schema.pre('save', function(next) {
       if (foo()) {
         console.log('calling next!');
@@ -150,7 +150,7 @@ block content
     Middleware are useful for atomizing model logic. Here are some other ideas:
 
     * complex validation
-    * removing dependent documents (removing a user removes all his blogposts)
+    * removing dependent documents (removing a user removes all their blogposts)
     * asynchronous defaults
     * asynchronous tasks that a certain action triggers
 
@@ -261,7 +261,7 @@ block content
     ```
 
     This means that you must add all middleware and [plugins](/docs/plugins.html)
-    **before** calling [`mongoose.model()](/docs/api/mongoose.html#mongoose_Mongoose-model).
+    **before** calling [`mongoose.model()`](/docs/api/mongoose.html#mongoose_Mongoose-model).
     The below script will print out "Hello from pre save":
 
     ```javascript
@@ -329,17 +329,17 @@ block content
     You can pass options to [`Schema.pre()`](/docs/api.html#schema_Schema-pre)
     and [`Schema.post()`](/docs/api.html#schema_Schema-post) to switch whether
     Mongoose calls your `remove()` hook for [`Document.remove()`](/docs/api.html#model_Model-remove)
-    or [`Model.remove()`](/docs/api.html#model_Model.remove):
+    or [`Model.remove()`](/docs/api.html#model_Model.remove). Note here that you need to set both `document` and `query` properties in the passed object:
 
     ```javascript
     // Only document middleware
-    schema.pre('remove', { document: true }, function() {
+    schema.pre('remove', { document: true, query: false }, function() {
       console.log('Removing doc!');
     });
 
     // Only query middleware. This will get called when you do `Model.remove()`
     // but not `doc.remove()`.
-    schema.pre('remove', { query: true }, function() {
+    schema.pre('remove', { query: true, document: false }, function() {
       console.log('Removing!');
     });
     ```
@@ -426,7 +426,7 @@ block content
     Error handling middleware can then transform the error however you want.
 
     ```javascript
-    var schema = new Schema({
+    const schema = new Schema({
       name: {
         type: String,
         // Will trigger a MongoError with code 11000 when
@@ -466,7 +466,7 @@ block content
       }
     });
 
-    var people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+    const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
     Person.create(people, function(error) {
       Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } }, function(error) {
         // `error.message` will be "There was a duplicate key error"

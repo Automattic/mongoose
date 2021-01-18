@@ -2589,25 +2589,5 @@ describe('schema', function() {
         yield Test1.findOneAndUpdate({ _id: undefined }, { name: 'test' }, { upsert: true, new: true });
       });
     });
-    /*
-    it('calls cast (gh-7653b)', function() {
-      const Character = db.model('Character', new mongoose.Schema({
-        name: String,
-        age: Number
-      }));
-
-      return co(function*() {
-        yield Character.create({ name: 'Jean-Luc Picard' });
-        const filter = { name: 'Jean-Luc Picard' };
-        const update = { age: 59 };
-        // `doc` is the document _before_ `update` was applied
-        let doc = yield Character.findOneAndUpdate(filter, update);
-        doc.name; // 'Jean-Luc Picard'
-        doc.age; // undefined
-        doc = yield Character.findOne(filter);
-        doc.age; // 59
-      });
-    });
-    */
   });
 });

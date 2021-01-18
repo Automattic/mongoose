@@ -53,7 +53,7 @@ declare module 'mongoose' {
    */
   export type ObjectId = Schema.Types.ObjectId;
 
-  export const Promise: any;
+  export let Promise: any;
   export const PromiseProvider: any;
 
   /** The various Mongoose SchemaTypes. */

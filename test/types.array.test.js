@@ -1557,7 +1557,7 @@ describe('types array', function() {
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, 2);
-        doc.arr.set(0, { name: 'vdrums' });
+        doc.arr[0] = { name: 'vdrums' };
         assert.equal(doc.arr.length, 2);
         assert.equal(doc.arr[0].name, 'vdrums');
         doc.arr.set(doc.arr.length, { name: 'Restrepo' });

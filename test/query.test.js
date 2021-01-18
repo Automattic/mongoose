@@ -2778,7 +2778,7 @@ describe('Query', function() {
     return co(function*() {
       yield Model.create({ name: 'test' });
       const now = new Date();
-      const res = yield Model.findOne().map(res => {
+      const res = yield Model.findOne().transform(res => {
         res.loadedAt = now;
         return res;
       });

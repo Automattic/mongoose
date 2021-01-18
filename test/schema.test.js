@@ -2565,14 +2565,49 @@ describe('schema', function() {
     assert.equal(schema.path('tags').caster.instance, 'String');
     assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
   });
-  it('gh-7653', function() {
-    const people = new Schema({
-      name: String
+
+  describe('Queries check if _id is null provided _id was created by mongoose', function() {
+    it('throws a cast error when upserting with a `null` _id (gh-7653a)', function() {
+      const Test1 = db.model('Test1', Schema({
+        name: String
+      }));
+
+      const Test2 = db.model('Test2', Schema({
+        _id: Number,
+        name: String
+      }));
+
+      return co(function*() {
+        // This operation should succeed, because `Test2` uses a custom `_id`
+        yield Test2.findOneAndUpdate({ _id: null }, { name: 'test' }, { upsert: true, new: true });
+
+        // This operation should fail with a CastError, because `Test1` uses Mongoose's default `_id` and we don't
+        // want the user to be able to accidentally upsert a document with `_id = null`
+        yield Test1.findOneAndUpdate({ _id: null }, { name: 'test' }, { upsert: true, new: true });
+
+        // This operation should also fail. Be careful of the difference between `{}` and `{ _id: undefined }`
+        yield Test1.findOneAndUpdate({ _id: undefined }, { name: 'test' }, { upsert: true, new: true });
+      });
     });
-    const test = mongoose.model('Person', people);
-    const entry = new test({ name: 'Frank' });
-    console.log(people.path('_id'));
-    console.log(entry);
-    test.findOneAndUpdate({ name: 'John' });
+    /*
+    it('calls cast (gh-7653b)', function() {
+      const Character = db.model('Character', new mongoose.Schema({
+        name: String,
+        age: Number
+      }));
+
+      return co(function*() {
+        yield Character.create({ name: 'Jean-Luc Picard' });
+        const filter = { name: 'Jean-Luc Picard' };
+        const update = { age: 59 };
+        // `doc` is the document _before_ `update` was applied
+        let doc = yield Character.findOneAndUpdate(filter, update);
+        doc.name; // 'Jean-Luc Picard'
+        doc.age; // undefined
+        doc = yield Character.findOne(filter);
+        doc.age; // 59
+      });
+    });
+    */
   });
 });

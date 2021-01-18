@@ -142,13 +142,6 @@ describe('types.documentarray', function() {
     assert.notEqual(a.id({ one: 'rolling', two: 'rock' }).title, 'rock-n-roll');
     assert.equal(a.id({ one: 'rock', two: 'roll' }).title, 'rock-n-roll');
 
-    // test with no _id
-    let NoId = new Schema({
-      title: { type: String }
-    }, { noId: true });
-
-    Subdocument = TestDoc(NoId);
-
     let sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
@@ -160,13 +153,6 @@ describe('types.documentarray', function() {
       threw = err;
     }
     assert.equal(threw, false);
-
-    // test the _id option, noId is deprecated
-    NoId = new Schema({
-      title: { type: String }
-    }, { _id: false });
-
-    Subdocument = TestDoc(NoId);
 
     sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';

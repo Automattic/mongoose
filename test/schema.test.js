@@ -2567,7 +2567,7 @@ describe('schema', function() {
   });
 
   describe('Queries check if _id is null provided _id was created by mongoose', function() {
-    it('throws a cast error when upserting with a `null` _id (gh-7653a)', function() {
+    it('throws a cast error when upserting with a `null` _id (gh-7653)', function() {
       const Test1 = db.model('Test1', Schema({
         name: String
       }));
@@ -2583,10 +2583,14 @@ describe('schema', function() {
 
         // This operation should fail with a CastError, because `Test1` uses Mongoose's default `_id` and we don't
         // want the user to be able to accidentally upsert a document with `_id = null`
-        yield Test1.findOneAndUpdate({ _id: null }, { name: 'test' }, { upsert: true, new: true });
+        let error = yield Test1.findOneAndUpdate({ _id: null }, { name: 'test' }, { upsert: true, new: true })
+          .then(() => null, err => err);
+        assert.ok(error);
 
         // This operation should also fail. Be careful of the difference between `{}` and `{ _id: undefined }`
-        yield Test1.findOneAndUpdate({ _id: undefined }, { name: 'test' }, { upsert: true, new: true });
+        error = yield Test1.findOneAndUpdate({ _id: undefined }, { name: 'test' }, { upsert: true, new: true })
+          .then(() => null, err => err);
+        assert.ok(error);
       });
     });
   });

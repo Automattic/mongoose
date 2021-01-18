@@ -1421,7 +1421,7 @@ describe('types array', function() {
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, '4');
-        doc.arr.set(2, 10);
+        doc.arr[2] = 10;
         assert.equal(doc.arr.length, 4);
         assert.equal(doc.arr[2], '10');
         doc.arr.set(doc.arr.length, '11');
@@ -1629,7 +1629,7 @@ describe('types array', function() {
         doc.arr.set(0, 'THREE');
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
-        doc.arr.set(doc.arr.length, 'FOUR');
+        doc.arr[doc.arr.length] = 'FOUR';
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
         assert.strictEqual('four', doc.arr[2]);

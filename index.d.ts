@@ -2075,7 +2075,7 @@ declare module 'mongoose' {
     set(path: string, value: any): this;
 
     /** Sets query options. Some options only make sense for certain operations. */
-    setOptions(options: QueryOptions, overwrite: boolean): this;
+    setOptions(options: QueryOptions, overwrite?: boolean): this;
 
     /** Sets the query conditions to the provided JSON object. */
     setQuery(val: FilterQuery<DocType> | null): void;

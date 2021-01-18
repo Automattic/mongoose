@@ -20,6 +20,7 @@ const vm = require('vm');
 const co = require('co');
 const Buffer = require('safe-buffer').Buffer;
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
+const { DBRef } = require('bson');
 
 /**
  * Test Document constructor.
@@ -2564,5 +2565,33 @@ describe('schema', function() {
     assert.equal(schema.path('nums').caster.instance, 'Number');
     assert.equal(schema.path('tags').caster.instance, 'String');
     assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
+  });
+
+  it('should use the top-most class\'s getter/setter gh-8892', function() {
+    class C1 {
+      get hello() {
+        return 1;
+      }
+    }
+
+    class C2 extends C1 {
+      get hello() {
+        return 2;
+      }
+    }
+
+    const C1Schema = new mongoose.Schema({});
+    C1Schema.loadClass(C1);
+    const C1Model = db.model('C1', C1Schema);
+    console.log('C1Model', ((new C1Model())).hello); // expected: "1", result: "1"
+
+    const C2Schema = new mongoose.Schema({});
+    C2Schema.loadClass(C2);
+    const C2Model = db.model('C2', C2Schema);
+    console.log('C2Model', ((new C2Model())).hello); // expected: "2", result: "1"
+
+
+    assert.equal((new C1Model()).hello, 1);
+    assert.equal((new C2Model()).hello, 2);
   });
 });

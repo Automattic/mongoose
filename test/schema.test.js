@@ -20,7 +20,6 @@ const vm = require('vm');
 const co = require('co');
 const Buffer = require('safe-buffer').Buffer;
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
-const { DBRef } = require('bson');
 
 /**
  * Test Document constructor.

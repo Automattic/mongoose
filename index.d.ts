@@ -2327,6 +2327,9 @@ declare module 'mongoose' {
     /** Appends a new $redact operator to this aggregate pipeline. */
     redact(expression: any, thenExpr: string | any, elseExpr: string | any): this;
 
+    /** Appends a new $replaceRoot operator to this aggregate pipeline. */
+    replaceRoot(newRoot: object | string): this;
+
     /**
      * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s
      * `$search` stage.

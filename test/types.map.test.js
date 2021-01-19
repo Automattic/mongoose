@@ -976,4 +976,31 @@ describe('Map', function() {
       assert.ifError(doc.validateSync());
     });
   });
+  it('tracks changes correctly (gh-9811)', function() {
+    const SubSchema = Schema({
+      myValue: {
+        type: String
+      }
+    }, { _id: false });
+    const schema = Schema({
+      myMap: {
+        type: Map,
+        of: {
+          type: SubSchema
+        }
+        // required: true
+      }
+    }, { minimize: false, collection: 'test' });
+    const Model = db.model('Test', schema);
+    return co(function*() {
+      const doc = yield Model.create({
+        myMap: new Map()
+      });
+      doc.myMap.set('abc', { myValue: 'some value' });
+      const changes = doc.getChanges();
+      // console.log(changes);
+      assert.ok(!changes.$unset);
+      assert.deepEqual(changes, { $set: { 'myMap.abc': 'some value' } });
+    });
+  });
 });

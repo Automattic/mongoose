@@ -1163,7 +1163,15 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[] | SchemaDefinition<T> | SchemaDefinition<T>[];
+  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
+    Function |
+    string |
+    Schema |
+    Schema[] |
+    SchemaTypeOptions<T extends undefined ? any : T>[] |
+    Function[] |
+    SchemaDefinition<T> |
+    SchemaDefinition<T>[];
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }

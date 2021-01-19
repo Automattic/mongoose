@@ -630,11 +630,11 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
-    create<Z = T | DocumentDefinition<T>>(doc: Z): Promise<T>;
-    create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, options?: SaveOptions): Promise<Array<T>>;
-    create<Z = T | DocumentDefinition<T>>(...docs: Array<Z>): Promise<T>;
-    create<Z = T | DocumentDefinition<T>>(doc: Z, callback: (err: CallbackError, doc: T) => void): void;
-    create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, callback: (err: CallbackError, docs: Array<T>) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,

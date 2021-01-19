@@ -795,7 +795,8 @@ declare module 'mongoose' {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<T>, T>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
@@ -805,11 +806,12 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
+    findOneAndReplace(filter: FilterQuery<T>, replacement: DocumentDefinition<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<T>, T>;
     findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): Query<Array<T>, T>;
@@ -1086,11 +1088,11 @@ declare module 'mongoose' {
 
     /** Adds an instance method to documents constructed from Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    method(name: string, fn: Function, opts?: any): this;
-    method(obj: { [name: string]: Function }): this;
+    method(name: string, fn: (this: DocType, ...args: any[]) => any, opts?: any): this;
+    method(obj: { [name: string]: (this: DocType, ...args: any[]) => any }): this;
 
     /** Object of currently defined methods on this schema. */
-    methods: { [name: string]: (this: DocType, ...args: any[]) => void };
+    methods: { [name: string]: (this: DocType, ...args: any[]) => any };
 
     /** The original object passed to the schema constructor */
     obj: any;
@@ -1144,12 +1146,12 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     // eslint-disable-next-line @typescript-eslint/ban-types
-    static(name: string, fn: Function): this;
+    static(name: string, fn: (this: M, ...args: any[]) => any): this;
     // eslint-disable-next-line @typescript-eslint/ban-types
-    static(obj: { [name: string]: Function }): this;
+    static(obj: { [name: string]: (this: M, ...args: any[]) => any }): this;
 
     /** Object of currently defined statics on this schema. */
-    statics: { [name: string]: Function };
+    statics: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Creates a virtual type with the given name. */
     virtual(name: string, options?: any): VirtualType;
@@ -1757,6 +1759,8 @@ declare module 'mongoose' {
     }
   }
 
+  type ReturnsNewDoc = { new: true } | { returnOriginal: false };
+
   interface Query<ResultType, DocType extends Document> {
     _mongooseOptions: MongooseQueryOptions;
 
@@ -1879,14 +1883,16 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType>;
     findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true }, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Specifies a `$geometry` condition */
@@ -2240,6 +2246,12 @@ declare module 'mongoose' {
      * future release. */
     addCursorFlag(flag: string, value: boolean): this;
 
+    /**
+     * Appends a new $addFields operator to this aggregate pipeline.
+     * Requires MongoDB v3.4+ to work
+     */
+    addFields(arg: any): this;
+
     /** Sets the allowDiskUse option for the aggregation query (ignored for < 2.6.0) */
     allowDiskUse(value: boolean): this;
 
@@ -2260,7 +2272,7 @@ declare module 'mongoose' {
     count(countName: string): this;
 
     /**
-     * Sets the cursor option option for the aggregation query (ignored for < 2.6.0).
+     * Sets the cursor option for the aggregation query (ignored for < 2.6.0).
      */
     cursor(options?: Record<string, unknown>): this;
 

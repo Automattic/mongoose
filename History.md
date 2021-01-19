@@ -1,4 +1,25 @@
-5.11.10 / 2020-01-04
+5.11.12 / 2021-01-14
+====================
+ * fix(document): handle using `db` as a document path #9798
+ * fix(collection): make sure to call `onOpen()` if `autoCreate === false` #9807
+ * fix(index.d.ts): correct query type for `findOneAndUpdate()` and `findByIdAndUpdate()` with `rawResult = true` #9803
+ * fix(index.d.ts): require setting `new: true` or `returnOriginal: false` to skip null check with `findOneAndUpdate()` #9654
+ * fix(index.d.ts): make methods and statics optional on schema #9801
+ * fix(index.d.ts): remove non backwards compatible methods restriction #9801
+ * docs: removed the extra word on comment doc #9794 [HenriqueLBorges](https://github.com/HenriqueLBorges)
+
+5.11.11 / 2021-01-08
+====================
+ * fix(model): support calling `create()` with `undefined` as first argument and no callback #9765
+ * fix(index.d.ts): ensure TypeScript knows that `this` refers to `DocType` in schema methods with strict mode #9755
+ * fix(index.d.ts): make SchemaDefinition accept a model generic #9761 [mroohian](https://github.com/mroohian)
+ * fix(index.d.ts): add `Aggregate#addFields()` #9774
+ * fix(index.d.ts): allow setting `min` and `max` to [number, string] and [Date, string] #9762
+ * fix(index.d.ts): improve context and type bindings for `Schema#methods` and `Schema#statics` #9717
+ * docs: add recommended connection option #9768 [Fernando-Lozano](https://github.com/Fernando-Lozano)
+ * chore: correct improper date in History.md #9783 [botv](https://github.com/botv)
+
+5.11.10 / 2021-01-04
 ====================
  * fix(model): support `populate` option for `insertMany()` as a workaround for mongoose-autopopulate #9720
  * perf(schema): avoid creating extra array when initializing array of arrays #9588

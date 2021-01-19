@@ -8954,7 +8954,6 @@ describe('document', function() {
     const err = t.validateSync();
     assert.ok(err);
     assert.ok(err.errors);
-    assert.ok(err.errors['test']);
     assert.ok(err.errors['test.1']);
   });
 
@@ -9860,5 +9859,22 @@ describe('document', function() {
 
     assert.ok(user.parentId instanceof mongoose.Types.ObjectId);
     assert.ok(user.createdAt instanceof Date);
+  });
+
+  it('handles paths named `db` (gh-9798)', function() {
+    const schema = new Schema({
+      db: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ db: 'foo' });
+      doc.db = 'bar';
+      yield doc.save();
+      yield doc.deleteOne();
+
+      const _doc = yield Test.findOne({ db: 'bar' });
+      assert.ok(!_doc);
+    });
   });
 });

@@ -811,21 +811,21 @@ describe('timestamps', function() {
     return co(function*() {
       yield Parent.deleteMany({});
 
-      yield Parent.create({
+      const _id = yield Parent.create({
         content: {
           a: { nestedA: 'a' },
           b: { nestedB: 'b' }
         }
-      });
+      }).then(doc => doc._id);
 
-      const doc = yield Parent.findOne();
+      const doc = yield Parent.findById(_id);
 
       const ts = doc.content.b.updatedAt;
       doc.content.a.nestedA = 'b';
       yield cb => setTimeout(cb, 10);
       yield doc.save();
 
-      const fromDb = yield Parent.findById(doc);
+      const fromDb = yield Parent.findById(_id);
       assert.strictEqual(fromDb.content.b.updatedAt.valueOf(), ts.valueOf());
     });
   });

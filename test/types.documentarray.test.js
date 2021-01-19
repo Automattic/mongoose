@@ -154,13 +154,6 @@ describe('types.documentarray', function() {
     }
     assert.equal(threw, false);
 
-    // test the _id option, noId is deprecated
-    NoId = new Schema({
-      title: { type: String }
-    }, { _id: false });
-
-    Subdocument = TestDoc(NoId);
-
     sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 

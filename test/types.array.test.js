@@ -1768,7 +1768,7 @@ describe('types array', function() {
   });
 
   describe('of number', function() {
-    it('allows nulls', function(done) {
+    it('allows null and undefined', function(done) {
       const schema = new Schema({ x: [Number] });
       const M = db.model('Test', schema);
       let m;
@@ -1777,7 +1777,6 @@ describe('types array', function() {
       m.save(function(err) {
         assert.ifError(err);
 
-        // undefined is not allowed
         m = new M({ x: [1, undefined, 3] });
         m.save(function(err) {
           assert.ifError(err);

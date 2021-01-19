@@ -632,7 +632,7 @@ declare module 'mongoose' {
     /** Creates a new document or documents */
     create<Z = T | DocumentDefinition<T>>(doc: Z): Promise<T>;
     create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, options?: SaveOptions): Promise<Array<T>>;
-    create<Z = T | DocumentDefinition<T>>(...docs: Array<Z>): Promise<T>;
+    create<Z = T | DocumentDefinition<T>>(...docs: Array<Z>): Promise<Array<T>>;
     create<Z = T | DocumentDefinition<T>>(doc: Z, callback: (err: CallbackError, doc: T) => void): void;
     create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, callback: (err: CallbackError, docs: Array<T>) => void): void;
 

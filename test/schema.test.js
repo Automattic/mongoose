@@ -2618,7 +2618,6 @@ describe('schema', function() {
     const C2Model = db.model('C2', C2Schema);
     console.log('C2Model', ((new C2Model())).hello); // expected: "2", result: "1"
 
-
     assert.equal((new C1Model()).hello, 1);
     assert.equal((new C2Model()).hello, 2);
   });

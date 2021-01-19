@@ -1,3 +1,13 @@
+5.11.12 / 2021-01-14
+====================
+ * fix(document): handle using `db` as a document path #9798
+ * fix(collection): make sure to call `onOpen()` if `autoCreate === false` #9807
+ * fix(index.d.ts): correct query type for `findOneAndUpdate()` and `findByIdAndUpdate()` with `rawResult = true` #9803
+ * fix(index.d.ts): require setting `new: true` or `returnOriginal: false` to skip null check with `findOneAndUpdate()` #9654
+ * fix(index.d.ts): make methods and statics optional on schema #9801
+ * fix(index.d.ts): remove non backwards compatible methods restriction #9801
+ * docs: removed the extra word on comment doc #9794 [HenriqueLBorges](https://github.com/HenriqueLBorges)
+
 5.11.11 / 2021-01-08
 ====================
  * fix(model): support calling `create()` with `undefined` as first argument and no callback #9765

@@ -814,7 +814,7 @@ describe('model', function() {
         Org.create({ name: 'test' }, function(error, doc) {
           assert.ifError(error);
           assert.ok(!doc.__t);
-          Org.findByIdAndUpdate(doc._id, { __t: 'D' }, { new: true }, function(error, doc) {
+          Org.findByIdAndUpdate(doc._id, { __t: 'D' }, { new: true, overwriteDiscriminatorKey: true }, function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.__t, 'D');
             done();

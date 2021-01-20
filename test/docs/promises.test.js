@@ -24,7 +24,7 @@ describe('promises docs', function() {
   });
 
   /**
-   * Mongoose async operations, like `.save()` and queries, return thenables.
+   * Mongoose async operations, like `.save()` and queries, return [thenables](https://masteringjs.io/tutorials/fundamentals/thenable).
    * This means that you can do things like `MyModel.findOne({}).then()` and
    * `await MyModel.findOne({}).exec()` if you're using
    * [async/await](http://thecodebarbarian.com/80-20-guide-to-async-await-in-node.js.html).
@@ -50,9 +50,9 @@ describe('promises docs', function() {
   });
 
   /**
-   * [Mongoose queries](http://mongoosejs.com/docs/queries.html) are **not** promises. They have a `.then()`
-   * function for [co](https://www.npmjs.com/package/co) and async/await as
-   * a convenience. If you need
+   * [Mongoose queries](http://mongoosejs.com/docs/queries.html) are **not** promises. They have a
+   * [`.then()` function](https://masteringjs.io/tutorials/fundamentals/then) for [co](https://www.npmjs.com/package/co)
+   * and async/await as a convenience. If you need
    * a fully-fledged promise, use the `.exec()` function.
    */
   it('Queries are not promises', function(done) {
@@ -86,7 +86,7 @@ describe('promises docs', function() {
   });
 
   /**
-   * Although queries are not promises, queries are [thenables](https://promisesaplus.com/#terminology).
+   * Although queries are not promises, queries are [thenables](https://masteringjs.io/tutorials/fundamentals/thenable).
    * That means they have a `.then()` function, so you can use queries as promises with either
    * promise chaining or [async await](https://asyncawait.net)
    */

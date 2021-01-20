@@ -1,3 +1,15 @@
+5.11.13 / 2021-01-20
+====================
+ * fix(map): handle change tracking on map of arrays #9813
+ * fix(connection): allow passing options to `Connection#transaction()` #9834 [pnutmath](https://github.com/pnutmath)
+ * fix(index.d.ts): make `Query#options#rawResult` take precedence over `new`+`upsert` #9816
+ * fix(index.d.ts): changed setOptions's 'overwrite' argument to optional #9824 [pierissimo](https://github.com/pierissimo)
+ * fix(index.d.ts): allow setting `mongoose.Promise` #9820
+ * fix(index.d.ts): add `Aggregate#replaceRoot()` #9814
+ * fix(index.d.ts): make `Model.create()` with a spread return a promise of array rather than single doc #9817
+ * fix(index.d.ts): use SchemaDefinitionProperty generic for SchemaTypeOptions if specified #9815
+ * docs(populate): add note about setting `toObject` for populate virtuals #9822
+
 5.11.12 / 2021-01-14
 ====================
  * fix(document): handle using `db` as a document path #9798

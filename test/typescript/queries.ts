@@ -40,6 +40,7 @@ Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest |
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: true }).then((res: ITest) => { res.name = 'test4'; });
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => { res.name = 'test4'; });
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res) => { console.log(res.ok); });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res) => { console.log(res.ok); });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 

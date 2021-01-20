@@ -669,16 +669,16 @@ block content
     });
     ```
 
-    Keep in mind that virtuals are _not_ included in `toJSON()` output by default. If you want populate virtuals to show up when using functions
-    that rely on `JSON.stringify()`, like Express'
-    [`res.json()` function](http://expressjs.com/en/4x/api.html#res.json),
+    Keep in mind that virtuals are _not_ included in `toJSON()` and `toObject()` output by default. If you want populate
+    virtuals to show up when using functions that rely on `JSON.stringify()`, like Express'
+    [`res.json()` function](https://masteringjs.io/tutorials/express/json),
     set the `virtuals: true` option on your schema's `toJSON` options.
 
     ```javascript
-    // Set `virtuals: true` so `res.json()` works
-    const BandSchema = new Schema({
-      name: String
-    }, { toJSON: { virtuals: true } });
+    const BandSchema = new Schema({ name: String }, {
+      toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
+      toObject: { virtuals: true } // So `toObject()` output includes virtuals
+    });
     ```
 
     If you're using populate projections, make sure `foreignField` is included

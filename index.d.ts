@@ -53,7 +53,7 @@ declare module 'mongoose' {
    */
   export type ObjectId = Schema.Types.ObjectId;
 
-  export const Promise: any;
+  export let Promise: any;
   export const PromiseProvider: any;
 
   /** The various Mongoose SchemaTypes. */
@@ -630,11 +630,11 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
-    create<Z = T | DocumentDefinition<T>>(doc: Z): Promise<T>;
-    create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, options?: SaveOptions): Promise<Array<T>>;
-    create<Z = T | DocumentDefinition<T>>(...docs: Array<Z>): Promise<T>;
-    create<Z = T | DocumentDefinition<T>>(doc: Z, callback: (err: CallbackError, doc: T) => void): void;
-    create<Z = T | DocumentDefinition<T>>(docs: Array<Z>, callback: (err: CallbackError, docs: Array<T>) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -795,8 +795,8 @@ declare module 'mongoose' {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<T>, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
@@ -810,8 +810,8 @@ declare module 'mongoose' {
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<T>, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     geoSearch(filter?: FilterQuery<T>, options?: GeoSearchOptions, callback?: (err: CallbackError, res: Array<T>) => void): Query<Array<T>, T>;
@@ -1163,7 +1163,15 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<any> | Function | string | Schema | Schema[] | Array<SchemaTypeOptions<any>> | Function[] | SchemaDefinition<T> | SchemaDefinition<T>[];
+  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
+    Function |
+    string |
+    Schema |
+    Schema[] |
+    SchemaTypeOptions<T extends undefined ? any : T>[] |
+    Function[] |
+    SchemaDefinition<T> |
+    SchemaDefinition<T>[];
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -1883,16 +1891,16 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Specifies a `$geometry` condition */
@@ -2075,7 +2083,7 @@ declare module 'mongoose' {
     set(path: string, value: any): this;
 
     /** Sets query options. Some options only make sense for certain operations. */
-    setOptions(options: QueryOptions, overwrite: boolean): this;
+    setOptions(options: QueryOptions, overwrite?: boolean): this;
 
     /** Sets the query conditions to the provided JSON object. */
     setQuery(val: FilterQuery<DocType> | null): void;
@@ -2326,6 +2334,9 @@ declare module 'mongoose' {
 
     /** Appends a new $redact operator to this aggregate pipeline. */
     redact(expression: any, thenExpr: string | any, elseExpr: string | any): this;
+
+    /** Appends a new $replaceRoot operator to this aggregate pipeline. */
+    replaceRoot(newRoot: object | string): this;
 
     /**
      * Helper for [Atlas Text Search](https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/)'s

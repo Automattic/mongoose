@@ -976,4 +976,29 @@ describe('Map', function() {
       assert.ifError(doc.validateSync());
     });
   });
+
+  it('handles map of arrays (gh-9813)', function() {
+    const BudgetSchema = new mongoose.Schema({
+      budgeted: {
+        type: Map,
+        of: [Number]
+      }
+    });
+
+    const Budget = db.model('Test', BudgetSchema);
+
+    return co(function*() {
+      const _id = yield Budget.create({
+        budgeted: new Map([['2020', [100, 200, 300]]])
+      }).then(doc => doc._id);
+
+      const doc = yield Budget.findById(_id);
+      doc.budgeted.get('2020').set(2, 10);
+      assert.deepEqual(doc.getChanges(), { $set: { 'budgeted.2020.2': 10 } });
+      yield doc.save();
+
+      const res = yield Budget.findOne();
+      assert.deepEqual(res.toObject().budgeted.get('2020'), [100, 200, 10]);
+    });
+  });
 });

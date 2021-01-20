@@ -12,3 +12,5 @@ m.STATES.connected;
 m.connect('mongodb://localhost:27017/test').then(() => {
   console.log('Connected!');
 });
+
+mongoose.Promise = Promise;

@@ -879,7 +879,7 @@ declare module 'mongoose' {
      * if true, returns the raw result from the MongoDB driver
      */
     rawResult?: boolean;
-    readPreference?: mongodb.ReadPreferenceMode;
+    readPreference?: string | mongodb.ReadPreferenceModeId;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
@@ -1207,7 +1207,7 @@ declare module 'mongoose' {
      */
     capped?: boolean | number | { size?: number; max?: number; autoIndexId?: boolean; };
     /** Sets a default collation for every query and aggregation. */
-    collation?: mongodb.CollationDocument;
+    collation?: mongodb.CollationOptions;
     /**
      * Mongoose by default produces a collection name by passing the model name to the utils.toCollectionName
      * method. This method pluralizes the name. Set this option if you need a different name for your collection.
@@ -1809,7 +1809,7 @@ declare module 'mongoose' {
     circle(path: string, area: any): this;
 
     /** Adds a collation to this op (MongoDB 3.4 and up) */
-    collation(value: mongodb.CollationDocument): this;
+    collation(value: mongodb.CollationOptions): this;
 
     /** Specifies the `comment` option. */
     comment(val: string): this;
@@ -2033,7 +2033,7 @@ declare module 'mongoose' {
     projection(fields?: any | null): any;
 
     /** Determines the MongoDB nodes from which to read. */
-    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+    read(pref: string | mongodb.ReadPreferenceModeId, tags?: any[]): this;
 
     /** Sets the readConcern option for the query. */
     readConcern(level: string): this;
@@ -2159,6 +2159,16 @@ declare module 'mongoose' {
     wtimeout(ms: number): this;
   }
 
+  type DotAndArrayNotation<AssignableType> = {
+    readonly [key: string]: AssignableType;
+  };
+
+  type ReadonlyPartial<TSchema> = {
+      readonly [key in keyof TSchema]?: TSchema[key];
+  };
+
+  type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
+
   type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'
     ? [Extract<T[P], mongodb.ObjectId>] extends [never]
@@ -2172,7 +2182,7 @@ declare module 'mongoose' {
 
   export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
 
-  export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
+  export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & MatchKeysAndValues<DocumentDefinition<T>>;
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
@@ -2274,7 +2284,7 @@ declare module 'mongoose' {
     catch: Promise<R>['catch'];
 
     /** Adds a collation. */
-    collation(options: mongodb.CollationDocument): this;
+    collation(options: mongodb.CollationOptions): this;
 
     /** Appends a new $count operator to this aggregate pipeline. */
     count(countName: string): this;
@@ -2327,7 +2337,7 @@ declare module 'mongoose' {
     pipeline(): any[];
 
     /** Sets the readPreference option for the aggregation query. */
-    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+    read(pref: string | mongodb.ReadPreferenceModeId, tags?: any[]): this;
 
     /** Sets the readConcern level for the aggregation query. */
     readConcern(level: string): this;

@@ -588,6 +588,40 @@ describe('schema', function() {
         assert.equal(Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[1], 'woot');
         done();
       });
+
+      it('object setters will be applied for each object in array after populate', function(done) {
+        const updatedElID = '123456789012345678901234';
+
+        const ElementSchema = new Schema({
+          name: 'string',
+          nested: [{ type: Schema.Types.ObjectId, ref: 'Nested' }]
+        });
+
+        const NestedSchema = new Schema({});
+
+        const Element = db.model('Test', ElementSchema);
+        const NestedElement = db.model('Nested', NestedSchema);
+
+        const nes = new NestedElement({});
+        nes.save(function(err, nestedValue) {
+          assert.ifError(err);
+          const ele = new Element({ nested: [nestedValue.id], name: 'test' });
+          ele.save(function(err, eleValue) {
+            assert.ifError(err);
+            Element.findById(eleValue._id)
+              .populate({ path: 'nested', model: NestedElement })
+              .exec(function(err, ss) {
+                assert.ifError(err);
+                ss.nested = [updatedElID];
+                ss.save(function(err, result) {
+                  assert.ifError(err);
+                  assert.ok(typeof result.nested[0] !== 'string');
+                  done();
+                });
+              });
+          });
+        });
+      });
     });
 
     describe('string', function() {

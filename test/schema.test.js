@@ -1682,7 +1682,7 @@ describe('schema', function() {
 
   describe('remove()', function() {
     before(function() {
-      this.$__schema = new Schema({
+      this.schema = new Schema({
         a: String,
         b: {
           c: {
@@ -1696,57 +1696,57 @@ describe('schema', function() {
     });
 
     it('returns the schema instance', function() {
-      const ret = this.$__schema.clone().remove('g');
+      const ret = this.schema.clone().remove('g');
       assert.ok(ret instanceof Schema);
     });
 
     it('removes a single path', function(done) {
-      assert.ok(this.$__schema.paths.a);
-      this.$__schema.remove('a');
-      assert.strictEqual(this.$__schema.path('a'), undefined);
-      assert.strictEqual(this.$__schema.paths.a, void 0);
+      assert.ok(this.schema.paths.a);
+      this.schema.remove('a');
+      assert.strictEqual(this.schema.path('a'), undefined);
+      assert.strictEqual(this.schema.paths.a, void 0);
       done();
     });
 
     it('removes a nested path', function(done) {
-      this.$__schema.remove('b.c.d');
-      assert.strictEqual(this.$__schema.path('b'), undefined);
-      assert.strictEqual(this.$__schema.path('b.c'), undefined);
-      assert.strictEqual(this.$__schema.path('b.c.d'), undefined);
+      this.schema.remove('b.c.d');
+      assert.strictEqual(this.schema.path('b'), undefined);
+      assert.strictEqual(this.schema.path('b.c'), undefined);
+      assert.strictEqual(this.schema.path('b.c.d'), undefined);
       done();
     });
 
     it('removes all children of a nested path (gh-2398)', function(done) {
-      this.$__schema.remove('b');
-      assert.strictEqual(this.$__schema.nested['b'], undefined);
-      assert.strictEqual(this.$__schema.nested['b.c'], undefined);
-      assert.strictEqual(this.$__schema.path('b.c.d'), undefined);
+      this.schema.remove('b');
+      assert.strictEqual(this.schema.nested['b'], undefined);
+      assert.strictEqual(this.schema.nested['b.c'], undefined);
+      assert.strictEqual(this.schema.path('b.c.d'), undefined);
       done();
     });
 
     it('removes an array of paths', function(done) {
-      this.$__schema.remove(['e', 'f', 'g']);
-      assert.strictEqual(this.$__schema.path('e'), undefined);
-      assert.strictEqual(this.$__schema.path('f'), undefined);
-      assert.strictEqual(this.$__schema.path('g'), undefined);
+      this.schema.remove(['e', 'f', 'g']);
+      assert.strictEqual(this.schema.path('e'), undefined);
+      assert.strictEqual(this.schema.path('f'), undefined);
+      assert.strictEqual(this.schema.path('g'), undefined);
       done();
     });
 
     it('works properly with virtuals (gh-2398)', function(done) {
-      this.$__schema.remove('a');
-      this.$__schema.virtual('a').get(function() { return 42; });
-      const Test = mongoose.model('gh2398', this.$__schema);
+      this.schema.remove('a');
+      this.schema.virtual('a').get(function() { return 42; });
+      const Test = mongoose.model('gh2398', this.schema);
       const t = new Test();
       assert.equal(t.a, 42);
       done();
     });
 
     it('methods named toString (gh-4551)', function() {
-      this.$__schema.methods.toString = function() {
+      this.schema.methods.toString = function() {
         return 'test';
       };
       assert.doesNotThrow(() => {
-        mongoose.model('gh4551', this.$__schema);
+        mongoose.model('gh4551', this.schema);
       });
     });
 

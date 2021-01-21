@@ -19,7 +19,7 @@ describe('sharding', function() {
       }
     };
     const Stub = function() {
-      this.$__schema = mockSchema;
+      this.schema = mockSchema;
       this.$__ = {};
     };
     Stub.prototype.__proto__ = mongoose.Document.prototype;
@@ -37,7 +37,7 @@ describe('toObject()', function() {
 
   beforeEach(function() {
     Stub = function() {
-      const schema = this.$__schema = {
+      const schema = this.schema = {
         options: { toObject: { minimize: false, virtuals: true } },
         virtuals: { virtual: 'test' }
       };

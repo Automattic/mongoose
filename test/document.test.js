@@ -9850,4 +9850,16 @@ describe('document', function() {
       assert.ok(!_doc);
     });
   });
+  it('handles paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      schema: String,
+      name: String
+    });
+    const Test = db.model('Test', schema);
+    return co(function*() {
+      const doc = yield Test.create({ schema: 'foo' }, { name: 'frank' });
+      yield doc.save();
+      assert.ok(doc);
+    });
+  });
 });

@@ -1052,9 +1052,10 @@ describe('Model', function() {
         a: String
       }));
 
-      TestP.collection.insertOne({ a: null, previous: null }, {}, function(err, f) {
+      const doc = { a: null, previous: null };
+      TestP.collection.insertOne(doc, {}, function(err) {
         assert.ifError(err);
-        TestP.findOne({ _id: f.ops[0]._id }, function(err, found) {
+        TestP.findOne({ _id: doc._id }, function(err, found) {
           assert.ifError(err);
           assert.equal(found.isNew, false);
           assert.strictEqual(found.get('previous'), null);
@@ -3197,8 +3198,8 @@ describe('Model', function() {
         const query = BlogPost.update({ title: 'interoperable update as promise' }, { title: 'interoperable update as promise delta' });
         query.exec(function(err, res) {
           assert.ifError(err);
-          assert.equal(res.n, 1);
-          assert.equal(res.nModified, 1);
+          assert.equal(res.matchedCount, 1);
+          assert.equal(res.modifiedCount, 1);
           BlogPost.count({ title: 'interoperable update as promise delta' }, function(err, count) {
             assert.ifError(err);
             assert.equal(count, 1);
@@ -6819,11 +6820,12 @@ describe('Model', function() {
     const User = db.model('User', userSchema);
 
     return co(function*() {
-      const users = yield User.collection.insertMany([
+      const users = [
         { notInSchema: 1 },
         { notInSchema: 2 },
         { notInSchema: 3 }
-      ]).then(res => res.ops);
+      ];
+      yield User.collection.insertMany(users);
 
       // Act
       yield User.bulkWrite([

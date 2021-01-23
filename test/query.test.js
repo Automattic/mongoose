@@ -1713,7 +1713,7 @@ describe('Query', function() {
         _id: {
           select: false,
           type: Schema.Types.ObjectId,
-          default: mongoose.Types.ObjectId
+          default: () => new mongoose.Types.ObjectId()
         },
         username: String
       });
@@ -2849,7 +2849,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2867,7 +2867,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2885,7 +2885,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2904,7 +2904,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -2923,7 +2923,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -2942,7 +2942,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 

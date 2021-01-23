@@ -50,8 +50,6 @@ server is not registered with an established certificate authority. The solution
 
 ```javascript
 await mongoose.connect('mongodb://localhost:27017/test', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   ssl: true,
   sslValidate: true,
   // For example, see https://medium.com/@rajanmaharjan/secure-your-mongodb-connections-ssl-tls-92e2addb3c89

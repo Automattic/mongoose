@@ -50,8 +50,7 @@ describe('connections:', function() {
 
     it('with autoIndex (gh-5423)', function(done) {
       const promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        autoIndex: false,
-        useNewUrlParser: true
+        autoIndex: false
       }).asPromise();
 
       promise.then(function(conn) {
@@ -102,8 +101,7 @@ describe('connections:', function() {
 
     it('useCreateIndex (gh-6922)', function(done) {
       const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useCreateIndex: true,
-        useNewUrlParser: true
+        useCreateIndex: true
       });
 
       const M = conn.model('Test', new Schema({
@@ -125,15 +123,14 @@ describe('connections:', function() {
 
     it('throws helpful error with undefined uri (gh-6763)', function() {
       assert.throws(function() {
-        mongoose.createConnection(void 0, { useNewUrlParser: true });
+        mongoose.createConnection(void 0);
       }, /string.*createConnection/);
     });
 
     it('resolving with q (gh-5714)', function(done) {
       const bootMongo = Q.defer();
 
-      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
-        { useNewUrlParser: true });
+      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
 
       conn.on('connected', function() {
         bootMongo.resolve(this);
@@ -146,10 +143,8 @@ describe('connections:', function() {
     });
 
     it('connection plugins (gh-7378)', function() {
-      const conn1 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
-        { useNewUrlParser: true });
-      const conn2 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
-        { useNewUrlParser: true });
+      const conn1 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
+      const conn2 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
 
       const called = [];
       conn1.plugin(schema => called.push(schema));
@@ -230,17 +225,6 @@ describe('connections:', function() {
     db.close(done);
   });
 
-  it('should accept unix domain sockets', function() {
-    const host = encodeURIComponent('/tmp/mongodb-27017.sock');
-    const db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`);
-    db.asPromise().catch(() => {});
-    assert.equal(db.name, 'fake');
-    assert.equal(db.host, '/tmp/mongodb-27017.sock');
-    assert.equal(db.pass, 'psw');
-    assert.equal(db.user, 'aaron');
-    db.close();
-  });
-
   describe('errors', function() {
     it('.catch() means error does not get thrown (gh-5229)', function(done) {
       const db = mongoose.createConnection();
@@ -286,7 +270,7 @@ describe('connections:', function() {
 
   describe('connect callbacks', function() {
     it('should return an error if malformed uri passed', function(done) {
-      const db = mongoose.createConnection('mongodb:///fake', { useNewUrlParser: true }, function(err) {
+      const db = mongoose.createConnection('mongodb:///fake', {}, function(err) {
         assert.equal(err.name, 'MongoParseError');
         done();
       });

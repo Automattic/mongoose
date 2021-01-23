@@ -492,8 +492,8 @@ describe('model: update:', function() {
       yield BlogPost.deleteMany({});
       yield BlogPost.create({ title: 'one' }, { title: 'two' }, { title: 'three' });
 
-      const res = yield BlogPost.update({}, { title: 'newtitle' }, { multi: true });
-      assert.equal(res.n, 3);
+      const res = yield BlogPost.updateMany({}, { title: 'newtitle' });
+      assert.equal(res.modifiedCount, 3);
     });
   });
 
@@ -521,7 +521,7 @@ describe('model: update:', function() {
       assert.ifError(err);
       M.update({ _id: doc._id }, { $pull: { comments: { name: 'node 0.8' } } }, function(err, affected) {
         assert.ifError(err);
-        assert.equal(affected.n, 1);
+        assert.equal(affected.modifiedCount, 1);
         done();
       });
     });
@@ -617,9 +617,9 @@ describe('model: update:', function() {
       const doc1 = docs[1];
       const sId0 = doc0._id;
       const sId1 = doc1._id;
-      Some.where({ _id: sId0 }).update({}, { $set: { num: '99' } }, { multi: true }, function(err, cnt) {
+      Some.where({ _id: sId0 }).updateOne({}, { $set: { num: '99' } }, { multi: true }, function(err, cnt) {
         assert.ifError(err);
-        assert.equal(cnt.n, 1);
+        assert.equal(cnt.modifiedCount, 1);
         Some.findById(sId0, function(err, doc0_1) {
           assert.ifError(err);
           assert.equal(doc0_1.num, 99);
@@ -794,70 +794,6 @@ describe('model: update:', function() {
               done();
             });
           });
-      });
-    });
-  });
-
-  describe('{overwrite: true}', function() {
-    it('overwrite works', function(done) {
-      const schema = new Schema({ mixed: {} }, { minimize: false });
-      const M = db.model('Test', schema);
-
-      M.create({ mixed: 'something' }, function(err, created) {
-        assert.ifError(err);
-
-        M.update({ _id: created._id }, { mixed: {} }, { overwrite: true }, function(err) {
-          assert.ifError(err);
-          M.findById(created._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(created.id, doc.id);
-            assert.equal(typeof doc.mixed, 'object');
-            assert.equal(Object.keys(doc.mixed).length, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it('overwrites all properties', function(done) {
-      const sch = new Schema({ title: String, subdoc: { name: String, num: Number } });
-
-      const M = db.model('Test', sch);
-
-      M.create({ subdoc: { name: 'that', num: 1 } }, function(err, doc) {
-        assert.ifError(err);
-
-        M.update({ _id: doc.id }, { title: 'something!' }, { overwrite: true }, function(err) {
-          assert.ifError(err);
-          M.findById(doc.id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.title, 'something!');
-            assert.equal(doc.subdoc.name, undefined);
-            assert.equal(doc.subdoc.num, undefined);
-            done();
-          });
-        });
-      });
-    });
-
-    it('allows users to blow it up', function(done) {
-      const sch = new Schema({ title: String, subdoc: { name: String, num: Number } });
-
-      const M = db.model('Test', sch);
-
-      M.create({ subdoc: { name: 'that', num: 1, title: 'hello' } }, function(err, doc) {
-        assert.ifError(err);
-
-        M.update({ _id: doc.id }, {}, { overwrite: true }, function(err) {
-          assert.ifError(err);
-          M.findById(doc.id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(doc.title, undefined);
-            assert.equal(doc.subdoc.name, undefined);
-            assert.equal(doc.subdoc.num, undefined);
-            done();
-          });
-        });
       });
     });
   });
@@ -1216,8 +1152,7 @@ describe('model: update:', function() {
         { breakfast: { eggs: 2, bacon: 3 } },
         function(error, result) {
           assert.ifError(error);
-          assert.ok(result.ok);
-          assert.equal(result.n, 1);
+          assert.equal(result.modifiedCount, 1);
           M.findOne({ _id: doc._id }, function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.breakfast.eggs, 2);
@@ -1233,10 +1168,9 @@ describe('model: update:', function() {
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
-      M.update({ _id: doc._id }, { notInSchema: 1 }).exec().
+      M.updateOne({ _id: doc._id }, { notInSchema: 1 }).exec().
         then(function(data) {
-          assert.equal(data.ok, 0);
-          assert.equal(data.n, 0);
+          assert.ok(!data.acknowledged);
           done();
         }).
         catch(done);
@@ -1356,38 +1290,6 @@ describe('model: update:', function() {
     });
   });
 
-  it('works with overwrite but no $set (gh-2568)', function(done) {
-    const chapterSchema = {
-      name: String
-    };
-    const bookSchema = {
-      chapters: [chapterSchema],
-      title: String,
-      author: String,
-      id: Number
-    };
-    const Book = db.model('Book', bookSchema);
-
-    const jsonObject = {
-      chapters: [{ name: 'Ursus' }, { name: 'The Comprachicos' }],
-      name: 'The Man Who Laughs',
-      author: 'Victor Hugo',
-      id: 0
-    };
-
-    Book.update({}, jsonObject, { upsert: true, overwrite: true },
-      function(error) {
-        assert.ifError(error);
-        Book.findOne({ id: 0 }, function(error, book) {
-          assert.ifError(error);
-          assert.equal(book.chapters.length, 2);
-          assert.ok(book.chapters[0]._id);
-          assert.ok(book.chapters[1]._id);
-          done();
-        });
-      });
-  });
-
   it('works with undefined date (gh-2833)', function(done) {
     const dateSchema = {
       d: Date
@@ -1481,8 +1383,7 @@ describe('model: update:', function() {
         assert.ifError(error);
         Model.update({}, update, { multi: true }, function(error, res) {
           assert.ifError(error);
-          assert.ok(res.ok);
-          assert.equal(res.nModified, 1);
+          assert.equal(res.modifiedCount, 1);
           done();
         });
       });
@@ -1516,7 +1417,7 @@ describe('model: update:', function() {
           update({ _id: m._id }, { $push: { myArr: { key: 'Value' } } }).
           exec(function(error, res) {
             assert.ifError(error);
-            assert.equal(res.n, 1);
+            assert.equal(res.modifiedCount, 1);
             done();
           });
       });
@@ -1552,10 +1453,10 @@ describe('model: update:', function() {
         assert.ifError(error);
         const update = { $push: { 'attributes.scores.bar': { a: 1 } } };
         Model.
-          update({ _id: m._id }, update).
+          updateOne({ _id: m._id }, update).
           exec(function(error, res) {
             assert.ifError(error);
-            assert.equal(res.n, 1);
+            assert.equal(res.modifiedCount, 1);
             Model.findById(m._id, function(error, doc) {
               assert.ifError(error);
               assert.equal(doc.attributes.scores.bar.length, 1);
@@ -2041,13 +1942,13 @@ describe('model: update:', function() {
       }, { timestamps: true });
 
       const TestModel = db.model('Test', testSchema);
-      const options = { overwrite: true, upsert: true };
+      const options = { upsert: true };
       const update = {
         user: 'John',
         something: 1
       };
 
-      TestModel.update({ user: 'test' }, update, options, function(error) {
+      TestModel.replaceOne({ user: 'test' }, update, options, function(error) {
         assert.ifError(error);
         TestModel.findOne({}, function(error, doc) {
           assert.ifError(error);
@@ -2484,12 +2385,11 @@ describe('model: update:', function() {
 
       const TestModel = db.model('Test', testSchema);
       const options = {
-        overwrite: true,
         upsert: true
       };
 
       const update = { name: 'test' };
-      TestModel.update({ name: 'a' }, update, options, function(error) {
+      TestModel.replaceOne({ name: 'a' }, update, options, function(error) {
         assert.ifError(error);
         TestModel.findOne({}, function(error, doc) {
           assert.ifError(error);
@@ -2523,25 +2423,6 @@ describe('model: update:', function() {
           error.errors['d'].message);
         done();
       });
-    });
-
-    it('with setOptions overwrite (gh-5413)', function(done) {
-      const schema = new mongoose.Schema({
-        _id: String,
-        data: String
-      }, { timestamps: true });
-
-      const Model = db.model('Test', schema);
-
-      Model.
-        where({ _id: 'test' }).
-        setOptions({ overwrite: true, upsert: true }).
-        update({ data: 'test2' }).
-        exec().
-        then(function() {
-          done();
-        }).
-        catch(done);
     });
 
     it('$push with updateValidators and top-level doc (gh-5430)', function(done) {

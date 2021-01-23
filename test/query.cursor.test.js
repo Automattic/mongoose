@@ -153,33 +153,28 @@ describe('QueryCursor', function() {
           Band.find().sort({ name: 1 }).populate('members').cursor();
         cursor.next(function(error, doc) {
           assert.ifError(error);
-          assert.equal(cursor.cursor.cursorState.currentLimit, 1);
           assert.equal(doc.name, 'Guns N\' Roses');
           assert.equal(doc.members.length, 2);
           assert.equal(doc.members[0].name, 'Axl Rose');
           assert.equal(doc.members[1].name, 'Slash');
           cursor.next(function(error, doc) {
             assert.ifError(error);
-            assert.equal(cursor.cursor.cursorState.currentLimit, 2);
             assert.equal(doc.name, 'Motley Crue');
             assert.equal(doc.members.length, 2);
             assert.equal(doc.members[0].name, 'Nikki Sixx');
             assert.equal(doc.members[1].name, 'Vince Neil');
             cursor.next(function(error, doc) {
               assert.ifError(error);
-              assert.equal(cursor.cursor.cursorState.currentLimit, 3);
               assert.equal(doc.name, 'Nine Inch Nails');
               assert.equal(doc.members.length, 1);
               assert.equal(doc.members[0].name, 'Trent Reznor');
               cursor.next(function(error, doc) {
                 assert.ifError(error);
-                assert.equal(cursor.cursor.cursorState.currentLimit, 4);
                 assert.equal(doc.name, 'Radiohead');
                 assert.equal(doc.members.length, 1);
                 assert.equal(doc.members[0].name, 'Thom Yorke');
                 cursor.next(function(error, doc) {
                   assert.ifError(error);
-                  assert.equal(cursor.cursor.cursorState.currentLimit, 5);
                   assert.equal(doc.name, 'The Smashing Pumpkins');
                   assert.equal(doc.members.length, 1);
                   assert.equal(doc.members[0].name, 'Billy Corgan');
@@ -196,33 +191,28 @@ describe('QueryCursor', function() {
           Band.find().sort({ name: 1 }).populate('members').batchSize(3).cursor();
         cursor.next(function(error, doc) {
           assert.ifError(error);
-          assert.equal(cursor.cursor.cursorState.currentLimit, 3);
           assert.equal(doc.name, 'Guns N\' Roses');
           assert.equal(doc.members.length, 2);
           assert.equal(doc.members[0].name, 'Axl Rose');
           assert.equal(doc.members[1].name, 'Slash');
           cursor.next(function(error, doc) {
             assert.ifError(error);
-            assert.equal(cursor.cursor.cursorState.currentLimit, 3);
             assert.equal(doc.name, 'Motley Crue');
             assert.equal(doc.members.length, 2);
             assert.equal(doc.members[0].name, 'Nikki Sixx');
             assert.equal(doc.members[1].name, 'Vince Neil');
             cursor.next(function(error, doc) {
               assert.ifError(error);
-              assert.equal(cursor.cursor.cursorState.currentLimit, 3);
               assert.equal(doc.name, 'Nine Inch Nails');
               assert.equal(doc.members.length, 1);
               assert.equal(doc.members[0].name, 'Trent Reznor');
               cursor.next(function(error, doc) {
                 assert.ifError(error);
-                assert.equal(cursor.cursor.cursorState.currentLimit, 5);
                 assert.equal(doc.name, 'Radiohead');
                 assert.equal(doc.members.length, 1);
                 assert.equal(doc.members[0].name, 'Thom Yorke');
                 cursor.next(function(error, doc) {
                   assert.ifError(error);
-                  assert.equal(cursor.cursor.cursorState.currentLimit, 5);
                   assert.equal(doc.name, 'The Smashing Pumpkins');
                   assert.equal(doc.members.length, 1);
                   assert.equal(doc.members[0].name, 'Billy Corgan');
@@ -475,7 +465,7 @@ describe('QueryCursor', function() {
           assert.ok(closed);
           cursor.next(function(error) {
             assert.ok(error);
-            assert.equal(error.message, 'Cursor is closed');
+            assert.equal(error.name, 'MongoError');
             done();
           });
         });
@@ -502,21 +492,6 @@ describe('QueryCursor', function() {
     });
   });
 
-  it('addCursorFlag (gh-4814)', function(done) {
-    const userSchema = new mongoose.Schema({
-      name: String
-    });
-
-    const User = db.model('User', userSchema);
-
-    const cursor = User.find().cursor().addCursorFlag('noCursorTimeout', true);
-
-    cursor.on('cursor', function() {
-      assert.equal(cursor.cursor.cursorState.cmd.noCursorTimeout, true);
-      done();
-    });
-  });
-
   it('data before close (gh-4998)', function(done) {
     const userSchema = new mongoose.Schema({
       name: String
@@ -526,7 +501,7 @@ describe('QueryCursor', function() {
     const users = [];
     for (let i = 0; i < 100; i++) {
       users.push({
-        _id: mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         name: 'Bob' + (i < 10 ? '0' : '') + i
       });
     }
@@ -546,21 +521,6 @@ describe('QueryCursor', function() {
         done();
       });
     });
-  });
-
-  it('batchSize option (gh-8039)', function() {
-    const User = db.model('gh8039', Schema({ name: String }));
-    let cursor = User.find().cursor({ batchSize: 2000 });
-
-    return new Promise(resolve => cursor.once('cursor', () => resolve())).
-      then(() => assert.equal(cursor.cursor.cursorState.batchSize, 2000)).
-      then(() => {
-        cursor = User.find().batchSize(2001).cursor();
-      }).
-      then(() => new Promise(resolve => cursor.once('cursor', () => resolve()))).
-      then(() => {
-        assert.equal(cursor.cursor.cursorState.batchSize, 2001);
-      });
   });
 
   it('pulls schema-level readPreference (gh-8421)', function() {

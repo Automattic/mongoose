@@ -546,7 +546,7 @@ declare module 'mongoose' {
     populated(path: string): any;
 
     /** Removes this document from the db. */
-    remove(options?: QueryOptions): Query<any, this>;
+    remove(options?: QueryOptions): Promise<this>;
     remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
@@ -1421,7 +1421,7 @@ declare module 'mongoose' {
     set?: (value: T, schematype?: this) => any;
 
     /** array of allowed values for this path. Allowed for strings, numbers, and arrays of strings */
-    enum?: Array<string | number | null>
+    enum?: Array<string | number | null> | { [path: string]: string | number | null };
 
     /** The default [subtype](http://bsonspec.org/spec.html) associated with this buffer when it is stored in MongoDB. Only allowed for buffer paths */
     subtype?: number

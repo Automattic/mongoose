@@ -180,6 +180,14 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 0);
   });
+
+  it('document', function() {
+    const errors = runTest('document.ts', { strict: true });
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file, configOverride) {

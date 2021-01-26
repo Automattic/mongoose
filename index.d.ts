@@ -546,7 +546,7 @@ declare module 'mongoose' {
     populated(path: string): any;
 
     /** Removes this document from the db. */
-    remove(options?: QueryOptions): Query<any, this>;
+    remove(options?: QueryOptions): Promise<this>;
     remove(options?: QueryOptions, cb?: (err: CallbackError, res: any) => void): void;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */

@@ -9859,4 +9859,49 @@ describe('document', function() {
       assert.equal(p.$getPopulatedDocs()[1].name, 'test');
     });
   });
+
+  it('handles paths named `db` (gh-9798)', function() {
+    const schema = new Schema({
+      db: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ db: 'foo' });
+      doc.db = 'bar';
+      yield doc.save();
+      yield doc.deleteOne();
+
+      const _doc = yield Test.findOne({ db: 'bar' });
+      assert.ok(!_doc);
+    });
+  });
+
+  it('object setters will be applied for each object in array after populate (gh-9838)', function() {
+    const updatedElID = '123456789012345678901234';
+
+    const ElementSchema = new Schema({
+      name: 'string',
+      nested: [{ type: Schema.Types.ObjectId, ref: 'Nested' }]
+    });
+
+    const NestedSchema = new Schema({});
+
+    const Element = db.model('Test', ElementSchema);
+    const NestedElement = db.model('Nested', NestedSchema);
+
+    return co(function*() {
+      const nes = new NestedElement({});
+      yield nes.save();
+      const ele = new Element({ nested: [nes.id], name: 'test' });
+      yield ele.save();
+
+      const ss = yield Element.findById(ele._id).populate({ path: 'nested', model: NestedElement });
+      ss.nested = [updatedElID];
+      yield ss.save();
+
+      assert.ok(typeof ss.nested[0] !== 'string');
+      assert.equal(ss.nested[0].toHexString(), updatedElID);
+    });
+  });
 });

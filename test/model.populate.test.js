@@ -9908,7 +9908,7 @@ describe('model: populate:', function() {
 
       const populatedBooks = yield Books.populate(books, populateOptions);
       console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true));
-      assert.ok(!Array.isArray(populatedBooks[0].tags[0].author))
+      assert.ok(!Array.isArray(populatedBooks[0].tags[0].author));
     });
   });
 });

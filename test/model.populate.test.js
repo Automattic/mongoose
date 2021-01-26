@@ -9869,4 +9869,46 @@ describe('model: populate:', function() {
       assert.deepEqual(findCallOptions[0].virtuals, ['foo']);
     });
   });
+  it('gh-9833', function() {
+    const util = require('util');
+    const Books = db.model('books', new Schema({ name: String, tags: [{ type: Schema.Types.ObjectId, ref: 'tags' }] }));
+    const Tags = db.model('tags', new Schema({ author: Schema.Types.ObjectId }));
+    const Authors = db.model('authors', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aTag = new Tags({ author: anAuthor.id });
+      yield aTag.save();
+
+      const aBook = new Books({ name: 'Book1', tags: [aTag.id] });
+      yield aBook.save();
+
+      const aggregateOptions = [
+        { $match: {
+          name: { $in: [aBook.name] }
+        } },
+        { $lookup: {
+          from: 'tags',
+          localField: 'tags',
+          foreignField: '_id',
+          as: 'tags'
+        } }
+      ];
+      const books = yield Books.aggregate(aggregateOptions).exec();
+
+      console.log('books = ' + util.inspect(books, false, null, true));
+
+      const populateOptions = [{
+        path: 'tags.author',
+        model: 'authors',
+        select: '_id name'
+      }];
+
+      const populatedBooks = yield Books.populate(books, populateOptions);
+      console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true));
+      assert.ok(!Array.isArray(populatedBooks[0].tags[0].author))
+    });
+  });
 });

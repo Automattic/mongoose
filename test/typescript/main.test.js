@@ -174,7 +174,7 @@ describe('typescript syntax', function() {
   });
 
   it('schema', function() {
-    const errors = runTest('schema.ts');
+    const errors = runTest('schema.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }

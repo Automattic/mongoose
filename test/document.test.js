@@ -5949,7 +5949,7 @@ describe('document', function() {
         const savedBlogPost = yield BlogPost.collection.
           findOne({ _id: blogPost._id });
         assert.equal(savedBlogPost.comments.length, 1);
-        assert.equal(savedBlogPost.comments[0].constructor.name, 'ObjectID');
+        assert.equal(savedBlogPost.comments[0].constructor.name, 'ObjectId');
         assert.equal(savedBlogPost.comments[0].toString(),
           blogPost.comments[0]._id.toString());
       });
@@ -6725,9 +6725,9 @@ describe('document', function() {
 
     return co(function*() {
       const doc2 = new Model();
-      doc2.field = mongoose.Types.ObjectId();
+      doc2.field = new mongoose.Types.ObjectId();
       doc2.inner.push({
-        innerField: mongoose.Types.ObjectId()
+        innerField: new mongoose.Types.ObjectId()
       });
       doc2.inner[0].innerField = '';
 
@@ -9849,7 +9849,7 @@ describe('document', function() {
 
   it('does not pass doc to ObjectId or Date.now (gh-9633) (gh-9636)', function() {
     const userSchema = new Schema({
-      parentId: { type: Schema.ObjectId, ref: 'User', default: mongoose.Types.ObjectId },
+      parentId: { type: Schema.ObjectId, ref: 'User', default: () => new mongoose.Types.ObjectId() },
       createdAt: { type: Date, default: Date.now }
     });
 

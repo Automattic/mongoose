@@ -35,7 +35,7 @@ describe('castArrayFilters', function() {
       arrayFilters: [{ 'x.text': 123 }, { 'y.date': { $gte: '2018-01-01' } }]
     });
     castArrayFilters(q);
-
+    console.log(q.options.arrayFilters[0]['x.text']);
     assert.strictEqual(q.options.arrayFilters[0]['x.text'], '123');
     assert.ok(q.options.arrayFilters[1]['y.date'].$gte instanceof Date);
 

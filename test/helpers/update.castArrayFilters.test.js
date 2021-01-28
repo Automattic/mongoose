@@ -35,7 +35,6 @@ describe('castArrayFilters', function() {
       arrayFilters: [{ 'x.text': 123 }, { 'y.date': { $gte: '2018-01-01' } }]
     });
     castArrayFilters(q);
-    console.log(q.options.arrayFilters[0]['x.text']);
     assert.strictEqual(q.options.arrayFilters[0]['x.text'], '123');
     assert.ok(q.options.arrayFilters[1]['y.date'].$gte instanceof Date);
 
@@ -180,13 +179,13 @@ describe('castArrayFilters', function() {
     };
 
     q.updateOne({}, p, opts);
-
-    castArrayFilters(q);
-    assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
-
     q.schema.options.strict = true;
     assert.throws(function() {
       castArrayFilters(q);
     }, /Could not find path.*in schema/);
+
+    q.schema.options.strict = false;
+    castArrayFilters(q);
+    assert.strictEqual(q.options.arrayFilters[0]['arr.notInSchema'], '42');
   });
 });

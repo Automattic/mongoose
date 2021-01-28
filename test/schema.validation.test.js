@@ -1190,9 +1190,10 @@ describe('schema', function() {
       });
 
       const Breakfast = mongoose.model('gh2832', breakfast, 'gh2832');
-      Breakfast.create({ description: undefined }, function(error) {
+      const bad = new Breakfast({ description: 'test' });
+      bad.validate(function(error) {
         assert.ok(error);
-        const errorMessage = 'ValidationError: description: Cast to String failed for value "undefined" at path "description"';
+        const errorMessage = 'ValidationError: description: Cast to String failed for value "test" at path "description"';
         assert.equal(errorMessage, error.toString());
         assert.ok(error.errors.description);
         assert.equal(error.errors.description.reason.toString(), 'Error: oops');

@@ -99,10 +99,10 @@ describe('Cast Tutorial', function() {
     await query.exec();
   });
 
-  it('strictQuery true', async function() {
+  it('strict true', async function() {
     mongoose.deleteModel('Character');
     const schema = new mongoose.Schema({ name: String, age: Number }, {
-      strictQuery: true
+      strict: true
     });
     Character = mongoose.model('Character', schema);
 
@@ -115,10 +115,10 @@ describe('Cast Tutorial', function() {
     // acquit:ignore:end
   });
 
-  it('strictQuery throw', async function() {
+  it('strict throw', async function() {
     mongoose.deleteModel('Character');
     const schema = new mongoose.Schema({ name: String, age: Number }, {
-      strictQuery: 'throw'
+      strict: 'throw'
     });
     Character = mongoose.model('Character', schema);
 
@@ -126,12 +126,12 @@ describe('Cast Tutorial', function() {
 
     const err = await query.exec().then(() => null, err => err);
     err.name; // 'StrictModeError'
-    // Path "notInSchema" is not in schema and strictQuery is 'throw'.
+    // Path "notInSchema" is not in schema and strict is 'throw'.
     err.message;
     // acquit:ignore:start
     assert.equal(err.name, 'StrictModeError');
     assert.equal(err.message, 'Path "notInSchema" is not in schema and ' +
-      'strictQuery is \'throw\'.');
+      'strict is \'throw\'.');
     // acquit:ignore:end
   });
 

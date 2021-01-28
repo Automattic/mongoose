@@ -1,3 +1,13 @@
+5.11.14 / 2021-01-28
+====================
+ * fix(populate): avoid inferring `justOne` from parent when populating a POJO with a manually populated path #9833 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): apply setters on each element of the array when setting a populated array #9838
+ * fix(map): handle change tracking on maps of subdocs #9811 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): remove dependency on `documentIsSelected` symbol #9841 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(error): make ValidationError.toJSON to include the error name correctly #9849 [hanzki](https://github.com/hanzki)
+ * fix(index.d.ts): indicate that `Document#remove()` returns a promise, not a query #9826
+ * fix(index.d.ts): allow setting `SchemaType#enum` to TypeScript enum with `required: true` #9546
+
 5.11.13 / 2021-01-20
 ====================
  * fix(map): handle change tracking on map of arrays #9813

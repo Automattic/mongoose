@@ -9880,7 +9880,6 @@ describe('model: populate:', function() {
     });
   });
   it('gh-9833', function() {
-    const util = require('util');
     const Books = db.model('books', new Schema({ name: String, tags: [{ type: Schema.Types.ObjectId, ref: 'tags' }] }));
     const Tags = db.model('tags', new Schema({ author: Schema.Types.ObjectId }));
     const Authors = db.model('authors', new Schema({ name: String }));
@@ -9908,8 +9907,6 @@ describe('model: populate:', function() {
       ];
       const books = yield Books.aggregate(aggregateOptions).exec();
 
-      console.log('books = ' + util.inspect(books, false, null, true));
-
       const populateOptions = [{
         path: 'tags.author',
         model: 'authors',
@@ -9917,7 +9914,6 @@ describe('model: populate:', function() {
       }];
 
       const populatedBooks = yield Books.populate(books, populateOptions);
-      console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true));
       assert.ok(!Array.isArray(populatedBooks[0].tags[0].author));
     });
   });

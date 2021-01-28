@@ -2427,35 +2427,6 @@ describe('schema', function() {
     assert.ok(!schema.virtuals.id);
   });
 
-  describe('mongoose.set(`strict`, value); (gh-6658)', function() {
-    let strictOriginalValue;
-
-    this.beforeEach(() => strictOriginalValue = mongoose.get('strict'));
-    this.afterEach(() => mongoose.set('strict', strictOriginalValue));
-
-    it('setting `strict` on base sets strict to schema (gh-6658)', function() {
-      // Arrange
-      mongoose.set('strict', 'some value');
-
-      // Act
-      const schema = new Schema();
-
-      // Assert
-      assert.equal(schema.get('strict'), 'some value');
-    });
-
-    it('`strict` set on base gets overwritten by option set on schema (gh-6658)', function() {
-      // Arrange
-      mongoose.set('strict', 'base option');
-
-      // Act
-      const schema = new Schema({}, { strict: 'schema option' });
-
-      // Assert
-      assert.equal(schema.get('strict'), 'schema option');
-    });
-  });
-
   it('treats dotted paths with no parent as a nested path (gh-9020)', function() {
     const customerSchema = new Schema({
       'card.brand': String,

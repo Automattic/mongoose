@@ -259,6 +259,7 @@ describe('connections:', function() {
           yield db.openUri('fail connection');
         } catch (err) {
           assert.ok(err);
+          assert.equal(err.name, 'MongoParseError');
           threw = true;
         }
 
@@ -511,7 +512,6 @@ describe('connections:', function() {
       const db2 = db.useDb('mongoose2');
 
       assert.equal('mongoose2', db2.name);
-      assert.equal('mongoose1', db.name);
 
       assert.equal(db2.port, db.port);
       assert.equal(db2.replica, db.replica);

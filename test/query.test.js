@@ -1189,57 +1189,6 @@ describe('Query', function() {
         });
       }, done);
     });
-
-    it('single option, default', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.deleteMany({ name: /Stark/ }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 2);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it.skip('single option, false', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 2);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it.skip('single option, true', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 1);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 1);
-            done();
-          });
-        });
-      });
-    });
   });
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {

@@ -3233,12 +3233,12 @@ describe('model: populate:', function() {
       const User = db.model('User', UserSchema);
 
       const user = {
-        _id: mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         name: 'Arnold'
       };
 
       const post = {
-        _id: mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         comments: [
           {},
           {

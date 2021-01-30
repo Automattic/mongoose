@@ -2073,7 +2073,7 @@ describe('document', function() {
         }
         catch (err) {
           assert.equal(err instanceof DocumentNotFoundError, true);
-          assert.equal(err.message, `No document found for query "{ _id: ${person._id} }" on model "Person"`);
+          assert.equal(err.message, `No document found for query "{ _id: ObjectId("${person._id}") }" on model "Person"`);
           threw = true;
         }
 
@@ -2098,7 +2098,7 @@ describe('document', function() {
         }
         catch (err) {
           assert.equal(err instanceof DocumentNotFoundError, true);
-          assert.equal(err.message, `No document found for query "{ _id: ${person._id} }" on model "Person"`);
+          assert.equal(err.message, `No document found for query "{ _id: ObjectId("${person._id}") }" on model "Person"`);
           threw = true;
         }
 

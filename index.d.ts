@@ -844,6 +844,8 @@ declare module 'mongoose' {
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where(path: string, val?: any): Query<Array<T>, T>;
+    where(obj: object): Query<Array<T>, T>;
+    where(): Query<Array<T>, T>;
   }
 
   interface QueryOptions {
@@ -1785,7 +1787,7 @@ declare module 'mongoose' {
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false };
 
-  interface Query<ResultType, DocType extends Document> {
+  class Query<ResultType, DocType extends Document> {
     _mongooseOptions: MongooseQueryOptions;
 
     /** Executes the query */
@@ -2163,6 +2165,8 @@ declare module 'mongoose' {
 
     /** Specifies a path for use with chaining. */
     where(path: string, val?: any): this;
+    where(obj: object): this;
+    where(): this;
 
     /** Defines a `$within` or `$geoWithin` argument for geo-spatial queries. */
     within(val?: any): this;

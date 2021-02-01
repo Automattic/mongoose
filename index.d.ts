@@ -1045,14 +1045,14 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefModel = undefined> extends events.EventEmitter {
+  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefinitionType = undefined> extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefModel>, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>>, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefModel> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -1184,8 +1184,8 @@ declare module 'mongoose' {
   type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
     Function |
     string |
-    Schema |
-    Schema[] |
+    Schema<T extends Document ? T : Document<any>> |
+    Schema<T extends Document ? T : Document<any>>[] |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     Function[] |
     SchemaDefinition<T> |
@@ -1193,7 +1193,7 @@ declare module 'mongoose' {
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
-    : { [path in keyof T]-?: SchemaDefinitionProperty<T[path]>; };
+    : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 
   interface SchemaOptions {
     /**

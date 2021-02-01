@@ -82,7 +82,7 @@ to create <a href="/docs/guide.html#capped">capped collections</a> or
 
 <p>There are two classes of errors that can occur with a Mongoose connection.</p>
 <ul>
-<li>Error on initial connection. If initial connection fails, Mongoose will <strong>not</strong> attempt to reconnect, it will emit an &#39;error&#39; event, and the promise <code>mongoose.connect()</code> returns will reject.</li>
+<li>Error on initial connection. If initial connection fails, Mongoose will emit an &#39;error&#39; event and the promise <code>mongoose.connect()</code> returns will reject. However, Mongoose will <strong>not</strong> automatically try to reconnect.</li>
 <li>Error after initial connection was established. Mongoose will attempt to reconnect, and it will emit an &#39;error&#39; event.</li>
 </ul>
 <p>To handle initial connection errors, you should use <code>.catch()</code> or <code>try/catch</code> with async/await.</p>
@@ -101,9 +101,8 @@ handle initial connection errors as shown above.</p>
 <pre><code class="language-javascript">mongoose.connection.on(<span class="hljs-string">'error'</span>, err =&gt; {
   logError(err);
 });</code></pre>
-<p>Note that the <code>error</code> event in the code above does not fire when mongoose loses 
-connection after the initial connection was established. You can listen to the
-<code>disconnected</code> event for that purpose.</p>
+<p>Note that Mongoose does not necessarily emit an &#39;error&#39; event if it loses connectivity to MongoDB. You should
+listen to the <code>disconnected</code> event to report when Mongoose is disconnected from MongoDB.</p>
 <h3 id="options"><a href="#options">Options</a></h3>
 
 <p>The <code>connect</code> method also accepts an <code>options</code> object which will be passed

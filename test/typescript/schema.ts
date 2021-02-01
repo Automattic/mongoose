@@ -49,3 +49,23 @@ const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
   profile: ProfileSchema2
 };
+
+async function gh9857() {
+  interface User {
+    name: number;
+    active: boolean;
+    points: number;
+  }
+
+  type UserDocument = Document<User>;
+  type UserSchemaDefinition = SchemaDefinition<User>;
+  type UserModel = Model<UserDocument>;
+
+  const schemaDefinition: UserSchemaDefinition = {
+    name: String,
+    active: Boolean,
+    points: Number
+  };
+
+  const schema = new Schema<UserDocument, UserModel, User>(schemaDefinition);
+}

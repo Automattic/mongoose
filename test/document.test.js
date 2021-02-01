@@ -9879,9 +9879,6 @@ describe('document', function() {
     });
   });
   it('gh9884', function() {
-    // mongoose.set('useFindAndModify', false);
-    // run().catch(err => console.log(err));
-
     return co(function*() {
 
       const obi = new Schema({
@@ -9929,10 +9926,9 @@ describe('document', function() {
       };
 
       const Model = db.model('Test', schema);
-      console.log('Here');
       yield Model.create(newDoc);
-
-      console.log('Done', yield Model.findOne(), new Date());
+      const doc = yield Model.findOne();
+      assert.ok(doc);
     });
   });
 });

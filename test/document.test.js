@@ -9878,4 +9878,61 @@ describe('document', function() {
       assert.equal(ss.nested[0].toHexString(), updatedElID);
     });
   });
+  it('gh9884', function() {
+    // mongoose.set('useFindAndModify', false);
+    // run().catch(err => console.log(err));
+
+    return co(function*() {
+
+      const obi = new Schema({
+        eType: {
+          type: String,
+          required: true,
+          uppercase: true
+        },
+        eOrigin: {
+          type: String,
+          required: true
+        },
+        eIds: [
+          {
+            type: String
+          }
+        ]
+      }, { _id: false });
+
+      const schema = new Schema({
+        name: String,
+        description: String,
+        isSelected: {
+          type: Boolean,
+          default: false
+        },
+        wan: {
+          type: [obi],
+          default: undefined,
+          required: true
+        }
+      });
+
+      const newDoc = {
+        name: 'name',
+        description: 'new desc',
+        isSelected: true,
+        wan: [
+          {
+            eType: 'X',
+            eOrigin: 'Y',
+            eIds: ['Y', 'Z']
+          }
+        ]
+      };
+
+      const Model = db.model('Test', schema);
+      console.log('Here');
+      yield Model.create(newDoc);
+
+      console.log('Done', yield Model.findOne(), new Date());
+    });
+  });
 });

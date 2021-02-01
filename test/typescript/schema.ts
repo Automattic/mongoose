@@ -1,16 +1,27 @@
 import { Schema } from 'mongoose';
 
-const schema: Schema = new Schema({
-  name: String,
-  enumWithNull: {
+enum Genre {
+  Action,
+  Adventure,
+  Comedy
+}
+
+const movieSchema: Schema = new Schema({
+  title: String,
+  featuredIn: {
     type: String,
-    enum: ['Test', null],
+    enum: ['Favorites', null],
     default: null
   },
-  numberWithMax: {
+  rating: {
     type: Number,
     required: [true, 'Required'],
     min: [0, 'MinValue'],
-    max: [24, 'MaxValue']
+    max: [5, 'MaxValue']
+  },
+  genre: {
+    type: String,
+    enum: Genre,
+    required: true
   }
 });

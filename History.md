@@ -1,3 +1,35 @@
+5.11.14 / 2021-01-28
+====================
+ * fix(populate): avoid inferring `justOne` from parent when populating a POJO with a manually populated path #9833 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): apply setters on each element of the array when setting a populated array #9838
+ * fix(map): handle change tracking on maps of subdocs #9811 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): remove dependency on `documentIsSelected` symbol #9841 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(error): make ValidationError.toJSON to include the error name correctly #9849 [hanzki](https://github.com/hanzki)
+ * fix(index.d.ts): indicate that `Document#remove()` returns a promise, not a query #9826
+ * fix(index.d.ts): allow setting `SchemaType#enum` to TypeScript enum with `required: true` #9546
+
+5.11.13 / 2021-01-20
+====================
+ * fix(map): handle change tracking on map of arrays #9813
+ * fix(connection): allow passing options to `Connection#transaction()` #9834 [pnutmath](https://github.com/pnutmath)
+ * fix(index.d.ts): make `Query#options#rawResult` take precedence over `new`+`upsert` #9816
+ * fix(index.d.ts): changed setOptions's 'overwrite' argument to optional #9824 [pierissimo](https://github.com/pierissimo)
+ * fix(index.d.ts): allow setting `mongoose.Promise` #9820
+ * fix(index.d.ts): add `Aggregate#replaceRoot()` #9814
+ * fix(index.d.ts): make `Model.create()` with a spread return a promise of array rather than single doc #9817
+ * fix(index.d.ts): use SchemaDefinitionProperty generic for SchemaTypeOptions if specified #9815
+ * docs(populate): add note about setting `toObject` for populate virtuals #9822
+
+5.11.12 / 2021-01-14
+====================
+ * fix(document): handle using `db` as a document path #9798
+ * fix(collection): make sure to call `onOpen()` if `autoCreate === false` #9807
+ * fix(index.d.ts): correct query type for `findOneAndUpdate()` and `findByIdAndUpdate()` with `rawResult = true` #9803
+ * fix(index.d.ts): require setting `new: true` or `returnOriginal: false` to skip null check with `findOneAndUpdate()` #9654
+ * fix(index.d.ts): make methods and statics optional on schema #9801
+ * fix(index.d.ts): remove non backwards compatible methods restriction #9801
+ * docs: removed the extra word on comment doc #9794 [HenriqueLBorges](https://github.com/HenriqueLBorges)
+
 5.11.11 / 2021-01-08
 ====================
  * fix(model): support calling `create()` with `undefined` as first argument and no callback #9765

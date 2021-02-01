@@ -18,6 +18,10 @@ schema.post<Aggregate<any>>('aggregate', async function(res: Array<any>) {
   console.log('Pipeline', this.pipeline(), res[0]);
 });
 
+schema.pre(['save', 'validate'], { query: false, document: true }, async function applyChanges() {
+  await Test.findOne({});
+});
+
 interface ITest extends Document {
   name?: string;
 }

@@ -48,7 +48,7 @@ describe('typescript syntax', function() {
   });
 
   it('queries', function() {
-    const errors = runTest('queries.ts');
+    const errors = runTest('queries.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }
@@ -174,7 +174,15 @@ describe('typescript syntax', function() {
   });
 
   it('schema', function() {
-    const errors = runTest('schema.ts');
+    const errors = runTest('schema.ts', { strict: true });
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
+
+  it('document', function() {
+    const errors = runTest('document.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }

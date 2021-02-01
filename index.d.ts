@@ -1045,14 +1045,14 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>> extends events.EventEmitter {
+  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefModel = undefined> extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<SchemaDefModel>, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefModel> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)

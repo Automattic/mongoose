@@ -9967,9 +9967,10 @@ describe('document', function() {
         // ... and retrieve it
         Test.findOne({
           _id: doc._id
-        }, ( err, updatedDoc) => {
+        }, (err, updatedDoc) => {
 
           // now, this is interesting:
+          err;
           updatedDoc.id; // 'document id'
           updatedDoc.nestedProp; // 'MongooseDocument { null }'
 
@@ -9978,6 +9979,7 @@ describe('document', function() {
             prop: 'Test 3',
             nestedProp: updatedDoc.nestedProp
           });
+          failing;
         });
         done();
       });

@@ -9980,8 +9980,8 @@ describe('document', function() {
             nestedProp: updatedDoc.nestedProp
           });
           failing;
+          done();
         });
-        done();
       });
     });
   });

@@ -9898,7 +9898,7 @@ describe('model: populate:', function() {
       ];
       const books = yield Books.aggregate(aggregateOptions).exec();
 
-      console.log('books = ' + util.inspect(books, false, null, true));
+      // console.log('books = ' + util.inspect(books, false, null, true));
 
       const populateOptions = [{
         path: 'tags.author',
@@ -9907,7 +9907,7 @@ describe('model: populate:', function() {
       }];
 
       const populatedBooks = yield Books.populate(books, populateOptions);
-      console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true));
+      // console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true));
       assert.ok(!Array.isArray(populatedBooks[0].tags[0].author));
     });
   });

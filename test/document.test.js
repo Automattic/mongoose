@@ -9967,14 +9967,14 @@ describe('document', function() {
         // ... and retrieve it
         Test.findOne({
           _id: doc._id
-        }, (err, updatedDoc) => {
+        }, (/* err, */ updatedDoc) => {
 
           // now, this is interesting:
-          // console.log(updatedDoc.id); // 'document id'
+          updatedDoc.id; // 'document id'
           // console.log(updatedDoc.nestedProp); // 'MongooseDocument { null }'
 
           // now this will throw a TypeError:
-         /* const failing = new Test({
+          /* const failing = new Test({
             prop: 'Test 3',
             nestedProp: updatedDoc.nestedProp
           }); */

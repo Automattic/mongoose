@@ -1381,7 +1381,7 @@ declare module 'mongoose' {
      * path cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
-    required?: boolean | (() => boolean) | [boolean, string];
+    required?: boolean | (() => boolean) | [boolean, string] | [() => boolean, string];
 
     /**
      * The default value for this path. If a function, Mongoose executes the function

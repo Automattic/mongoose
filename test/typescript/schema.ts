@@ -23,6 +23,15 @@ const movieSchema: Schema = new Schema({
     type: String,
     enum: Genre,
     required: true
+  },
+  actionIntensity: {
+    type: Number,
+    required: [
+      function(this: { genre: Genre }) {
+        return this.genre === Genre.Action;
+      },
+      'Action intensity required for action genre'
+    ]
   }
 });
 

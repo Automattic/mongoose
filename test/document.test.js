@@ -9933,7 +9933,7 @@ describe('document', function() {
   });
   it('gh9880', function(done) {
     const testSchema = new Schema({
-      prop:  String,
+      prop: String,
       nestedProp: {
         prop: String
       }
@@ -9948,10 +9948,10 @@ describe('document', function() {
       // console.log(doc.nestedProp);
 
       // let's clone this document:
-      const clone = new Test({
-        prop: 'Test 2',
-        nestedProp: doc.nestedProp
-      });
+      // const clone = new Test({
+      //   prop: 'Test 2',
+      //   nestedProp: doc.nestedProp
+      // });
 
       // so far, so good:
       // console.log(clone.id); // 'cloned document id'
@@ -9962,7 +9962,7 @@ describe('document', function() {
         _id: doc._id
       }, {
         nestedProp: null
-      }, (err) => {
+      }, (/* err */) => {
 
         // ... and retrieve it
         Test.findOne({
@@ -9974,10 +9974,10 @@ describe('document', function() {
           // console.log(updatedDoc.nestedProp); // 'MongooseDocument { null }'
 
           // now this will throw a TypeError:
-          const failing = new Test({
+         /* const failing = new Test({
             prop: 'Test 3',
             nestedProp: updatedDoc.nestedProp
-          });
+          }); */
         });
         done();
       });

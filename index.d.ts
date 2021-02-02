@@ -753,6 +753,7 @@ declare module 'mongoose' {
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: (err: any) => void): Promise<void>;
     validate(optional: any, callback?: (err: any) => void): Promise<void>;
+    validate(optional: any, pathsToValidate: string[], callback?: (err: any) => void): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
     watch(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;

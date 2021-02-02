@@ -9931,4 +9931,51 @@ describe('document', function() {
       assert.ok(doc);
     });
   });
+  it('gh-9885', function() {
+    const SubSchema = new Schema({
+      myValue: {
+        type: String
+      }
+    }, {});
+    SubSchema.pre('remove', function(){
+      console.log('Subdoc got removed!');
+    });
+
+    const thisSchema = new Schema({
+      foo: {
+        type: String,
+        required: true
+      },
+      mySubdoc: {
+        type: [SubSchema],
+        required: true
+      }
+    }, {minimize: false, collection: 'test'});
+
+    const Model = db.model('TestModel',thisSchema);
+    const test = co(function*(){
+      yield Model.deleteMany({}); // remove all existing documents
+      const newModel = {
+        foo: 'bar',
+        mySubdoc: [{myValue: 'some value'}]
+      };
+      const document = yield Model.create(newModel);
+      console.log('Created Document');
+      console.log('document', document);
+      console.log('Removing subDocument');
+      document.mySubdoc[0].remove();
+      console.log('Saving document');
+      yield document.save().catch((error) => {
+        console.error(error);
+        process.exit(1);
+      });
+    console.log('document: ',document);
+    console.log(`Notice that SubSchema.pre('remove') never ran`);
+    });
+    const main = co(function*(){
+      yield test;
+      process.exit(0);
+    });
+    main;
+  });
 });

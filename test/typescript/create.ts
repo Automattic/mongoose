@@ -19,3 +19,10 @@ Test.insertMany({ name: 'test' }).then((doc: ITest) => console.log(doc.name));
 Test.insertMany([{ name: 'test' }], { session: null }).then((docs: ITest[]) => console.log(docs[0].name));
 
 Test.create([{ name: 'test' }], { validateBeforeSave: true }).then((docs: ITest[]) => console.log(docs[0].name));
+
+(async() => {
+  const [t1] = await Test.create([{ name: 'test' }]);
+  const [t2, t3, t4] = await Test.create({ name: 'test' }, { name: 'test' }, { name: 'test' });
+  (await Test.create([{ name: 'test' }]))[0];
+  (await Test.create({ name: 'test' }))._id;
+})();

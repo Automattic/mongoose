@@ -9937,9 +9937,9 @@ describe('document', function() {
         type: String
       }
     }, {});
-    SubSchema.pre('remove', function(){
+    SubSchema.pre('remove', co.wrap(function*(){
       console.log('Subdoc got removed!');
-    });
+    }));
 
     const thisSchema = new Schema({
       foo: {
@@ -9965,17 +9965,19 @@ describe('document', function() {
       console.log('Removing subDocument');
       document.mySubdoc[0].remove();
       console.log('Saving document');
-      yield document.save().catch((error) => {
+      // had to remove yield for the rest to execute but now saying error.
+      document.save().catch((error) => {
         console.error(error);
         process.exit(1);
       });
-    console.log('document: ',document);
+    console.log('document: ', document);
     console.log(`Notice that SubSchema.pre('remove') never ran`);
     });
-    const main = co(function*(){
-      yield test;
-      process.exit(0);
+    const main = co.wrap(function*(){
+      return yield test;
     });
-    main;
+    main(true).then(function(){
+      process.exit(1);
+    });
   });
 });

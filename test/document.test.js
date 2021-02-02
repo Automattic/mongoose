@@ -9944,40 +9944,40 @@ describe('document', function() {
       prop: 'Test',
       nestedProp: null
     }).save((err, doc) => {
-      // console.log(doc.id);
-      // console.log(doc.nestedProp);
+      doc.id;
+      doc.nestedProp;
 
       // let's clone this document:
-      // const clone = new Test({
-      //   prop: 'Test 2',
-      //   nestedProp: doc.nestedProp
-      // });
+      const clone = new Test({
+        prop: 'Test 2',
+        nestedProp: doc.nestedProp
+      });
 
       // so far, so good:
-      // console.log(clone.id); // 'cloned document id'
-      // console.log(clone.nestedProp); // '{}'
+      clone.id; // 'cloned document id'
+      clone.nestedProp; // '{}'
 
       // let's update the document:
       Test.updateOne({
         _id: doc._id
       }, {
         nestedProp: null
-      }, (/* err */) => {
+      }, (err) => {
 
         // ... and retrieve it
         Test.findOne({
           _id: doc._id
-        }, (/* err, */ updatedDoc) => {
+        }, ( err, updatedDoc) => {
 
           // now, this is interesting:
           updatedDoc.id; // 'document id'
-          // console.log(updatedDoc.nestedProp); // 'MongooseDocument { null }'
+          updatedDoc.nestedProp; // 'MongooseDocument { null }'
 
           // now this will throw a TypeError:
-          /* const failing = new Test({
+          const failing = new Test({
             prop: 'Test 3',
             nestedProp: updatedDoc.nestedProp
-          }); */
+          });
         });
         done();
       });

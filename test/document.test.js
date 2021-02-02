@@ -9931,4 +9931,63 @@ describe('document', function() {
       assert.ok(doc);
     });
   });
+  it('gh9880', function() {
+    const mongoose = require('mongoose');
+    const { Schema } = mongoose;
+    mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true, useUnifiedTopology: true});
+
+    return co(function*() {
+      const testSchema = new Schema({
+        prop:  String,
+        nestedProp: {
+          prop: String
+        }
+      });
+
+
+      const Test = mongoose.model('Test', testSchema);
+
+      new Test({
+        prop: 'Test',
+        nestedProp: null
+      }).save((err, doc) => {
+        console.log(doc.id)
+        console.log(doc.nestedProp)
+
+        // let's clone this document:
+        const clone = new Test({
+          prop: 'Test 2',
+          nestedProp: doc.nestedProp
+        })
+
+        // so far, so good:
+        console.log(clone.id) // 'cloned document id'
+        console.log(clone.nestedProp) // '{}'
+
+        // let's update the document:
+        Test.updateOne({
+          _id: doc._id
+        }, {
+          nestedProp: null
+        }, (err) => {
+
+          // ... and retrieve it
+          Test.findOne({
+            _id: doc._id
+          }, (err, updatedDoc) => {
+
+            // now, this is interesting:
+            console.log(updatedDoc.id) // 'document id'
+            console.log(updatedDoc.nestedProp) // 'MongooseDocument { null }'
+
+            // now this will throw a TypeError:
+            const failing = new Test({
+              prop: 'Test 3',
+              nestedProp: updatedDoc.nestedProp
+            });
+          });
+        });
+      });
+    });
+  });
 });

@@ -1740,8 +1740,9 @@ declare module 'mongoose' {
       toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface ObjectId extends mongodb.ObjectId { }
+    class ObjectId extends mongodb.ObjectId {
+      _id: this;
+    }
 
     class Subdocument extends Document {
       $isSingleNested: true;
@@ -2218,12 +2219,14 @@ declare module 'mongoose' {
   };
 
   type ReadonlyPartial<TSchema> = {
-      readonly [key in keyof TSchema]?: TSchema[key];
+    readonly [key in keyof TSchema]?: TSchema[key];
   };
 
   type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
 
-  type Condition<T> = T | QuerySelector<T>;
+  type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
+
+  type Condition<T> = AllowRegexpForStrings<T> | QuerySelector<T>;
 
   type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'

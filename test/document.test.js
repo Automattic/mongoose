@@ -9963,7 +9963,7 @@ describe('document', function() {
       }, {
         nestedProp: null
       }, (err) => {
-
+        err;
         // ... and retrieve it
         Test.findOne({
           _id: doc._id

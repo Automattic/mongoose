@@ -9878,7 +9878,7 @@ describe('document', function() {
       assert.equal(ss.nested[0].toHexString(), updatedElID);
     });
   });
-  it('gh9884', function(done) {
+  it('gh9884', function() {
     return co(function*() {
 
       const obi = new Schema({
@@ -9932,55 +9932,55 @@ describe('document', function() {
     });
   });
   it('gh9880', function(done) {
-      const testSchema = new Schema({
-        prop:  String,
-        nestedProp: {
-          prop: String
-        }
-      });
-      const Test = db.model('Test', testSchema);
+    const testSchema = new Schema({
+      prop:  String,
+      nestedProp: {
+        prop: String
+      }
+    });
+    const Test = db.model('Test', testSchema);
 
-      new Test({
-        prop: 'Test',
+    new Test({
+      prop: 'Test',
+      nestedProp: null
+    }).save((err, doc) => {
+      // console.log(doc.id);
+      // console.log(doc.nestedProp);
+
+      // let's clone this document:
+      const clone = new Test({
+        prop: 'Test 2',
+        nestedProp: doc.nestedProp
+      });
+
+      // so far, so good:
+      // console.log(clone.id); // 'cloned document id'
+      // console.log(clone.nestedProp); // '{}'
+
+      // let's update the document:
+      Test.updateOne({
+        _id: doc._id
+      }, {
         nestedProp: null
-      }).save((err, doc) => {
-        // console.log(doc.id);
-        // console.log(doc.nestedProp);
+      }, (err) => {
 
-        // let's clone this document:
-        const clone = new Test({
-          prop: 'Test 2',
-          nestedProp: doc.nestedProp
-        });
-
-        // so far, so good:
-        // console.log(clone.id); // 'cloned document id'
-        // console.log(clone.nestedProp); // '{}'
-
-        // let's update the document:
-        Test.updateOne({
+        // ... and retrieve it
+        Test.findOne({
           _id: doc._id
-        }, {
-          nestedProp: null
-        }, (err) => {
+        }, (err, updatedDoc) => {
 
-          // ... and retrieve it
-          Test.findOne({
-            _id: doc._id
-          }, (err, updatedDoc) => {
+          // now, this is interesting:
+          // console.log(updatedDoc.id); // 'document id'
+          // console.log(updatedDoc.nestedProp); // 'MongooseDocument { null }'
 
-            // now, this is interesting:
-            // console.log(updatedDoc.id); // 'document id'
-            // console.log(updatedDoc.nestedProp); // 'MongooseDocument { null }'
-
-            // now this will throw a TypeError:
-            const failing = new Test({
-              prop: 'Test 3',
-              nestedProp: updatedDoc.nestedProp
-            });
+          // now this will throw a TypeError:
+          const failing = new Test({
+            prop: 'Test 3',
+            nestedProp: updatedDoc.nestedProp
           });
-        done();
         });
+        done();
       });
+    });
   });
 });

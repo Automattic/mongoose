@@ -9931,16 +9931,18 @@ describe('document', function() {
       assert.ok(doc);
     });
   });
-  it('gh-9885', function() {
+  it('Makes sure pre remove hook is executed gh-9885', function() {
+    const tracker = new assert.CallTracker();
     const SubSchema = new Schema({
       myValue: {
         type: String
       }
     }, {});
-    SubSchema.pre('remove', co.wrap(function*(){
-      console.log('Subdoc got removed!');
-    }));
-
+    let count = 0;
+    SubSchema.pre('remove', function(next) {
+      count++;
+      next();
+    });
     const thisSchema = new Schema({
       foo: {
         type: String,
@@ -9953,31 +9955,19 @@ describe('document', function() {
     }, {minimize: false, collection: 'test'});
 
     const Model = db.model('TestModel',thisSchema);
-    const test = co(function*(){
+
+    return co(function*() {
       yield Model.deleteMany({}); // remove all existing documents
       const newModel = {
         foo: 'bar',
         mySubdoc: [{myValue: 'some value'}]
       };
       const document = yield Model.create(newModel);
-      console.log('Created Document');
-      console.log('document', document);
-      console.log('Removing subDocument');
       document.mySubdoc[0].remove();
-      console.log('Saving document');
-      // had to remove yield for the rest to execute but now saying error.
-      document.save().catch((error) => {
+      yield document.save().catch((error) => {
         console.error(error);
-        process.exit(1);
       });
-    console.log('document: ', document);
-    console.log(`Notice that SubSchema.pre('remove') never ran`);
-    });
-    const main = co.wrap(function*(){
-      return yield test;
-    });
-    main(true).then(function(){
-      process.exit(1);
+      assert.equal(count,1);
     });
   });
 });

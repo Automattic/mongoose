@@ -9931,6 +9931,7 @@ describe('document', function() {
       assert.ok(doc);
     });
   });
+
   it('gh9880', function(done) {
     const testSchema = new Schema({
       prop: String,
@@ -9953,33 +9954,20 @@ describe('document', function() {
         nestedProp: doc.nestedProp
       });
 
-      // so far, so good:
-      clone.id; // 'cloned document id'
-      clone.nestedProp; // '{}'
-
-      // let's update the document:
       Test.updateOne({
         _id: doc._id
       }, {
         nestedProp: null
       }, (err) => {
-        err;
-        // ... and retrieve it
+        assert.ifError(err);
         Test.findOne({
           _id: doc._id
         }, (err, updatedDoc) => {
-
-          // now, this is interesting:
-          err;
-          updatedDoc.id; // 'document id'
-          updatedDoc.nestedProp; // 'MongooseDocument { null }'
-
-          // now this will throw a TypeError:
+          assert.ifError(err);
           const failing = new Test({
             prop: 'Test 3',
             nestedProp: updatedDoc.nestedProp
           });
-          failing;
           done();
         });
       });

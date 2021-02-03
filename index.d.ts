@@ -630,11 +630,11 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -753,6 +753,7 @@ declare module 'mongoose' {
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: (err: any) => void): Promise<void>;
     validate(optional: any, callback?: (err: any) => void): Promise<void>;
+    validate(optional: any, pathsToValidate: string[], callback?: (err: any) => void): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
     watch(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
@@ -1381,7 +1382,7 @@ declare module 'mongoose' {
      * path cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
-    required?: boolean | (() => boolean) | [boolean, string];
+    required?: boolean | (() => boolean) | [boolean, string] | [() => boolean, string];
 
     /**
      * The default value for this path. If a function, Mongoose executes the function

@@ -9949,7 +9949,7 @@ describe('document', function() {
       doc.nestedProp;
 
       // let's clone this document:
-      const clone = new Test({
+      new Test({
         prop: 'Test 2',
         nestedProp: doc.nestedProp
       });
@@ -9964,7 +9964,7 @@ describe('document', function() {
           _id: doc._id
         }, (err, updatedDoc) => {
           assert.ifError(err);
-          const failing = new Test({
+          new Test({
             prop: 'Test 3',
             nestedProp: updatedDoc.nestedProp
           });

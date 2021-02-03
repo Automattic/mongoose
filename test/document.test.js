@@ -9931,4 +9931,46 @@ describe('document', function() {
       assert.ok(doc);
     });
   });
+
+  it('gh9880', function(done) {
+    const testSchema = new Schema({
+      prop: String,
+      nestedProp: {
+        prop: String
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    new Test({
+      prop: 'Test',
+      nestedProp: null
+    }).save((err, doc) => {
+      doc.id;
+      doc.nestedProp;
+
+      // let's clone this document:
+      const clone = new Test({
+        prop: 'Test 2',
+        nestedProp: doc.nestedProp
+      });
+
+      Test.updateOne({
+        _id: doc._id
+      }, {
+        nestedProp: null
+      }, (err) => {
+        assert.ifError(err);
+        Test.findOne({
+          _id: doc._id
+        }, (err, updatedDoc) => {
+          assert.ifError(err);
+          const failing = new Test({
+            prop: 'Test 3',
+            nestedProp: updatedDoc.nestedProp
+          });
+          done();
+        });
+      });
+    });
+  });
 });

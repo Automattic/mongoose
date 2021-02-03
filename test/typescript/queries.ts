@@ -1,6 +1,14 @@
 import { Schema, model, Document, Types, Query } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' }, tags: [String] });
+interface QueryHelpers {
+  byName(name: string): Query<Array<ITest>, ITest, QueryHelpers>;
+}
+
+const schema: Schema<ITest, QueryHelpers> = new Schema({ name: { type: 'String' }, tags: [String] });
+
+schema.query.byName = function(name: string): Query<Array<ITest>, ITest, QueryHelpers> {
+  return this.find({ name });
+};
 
 interface ITest extends Document {
   name?: string;
@@ -9,7 +17,9 @@ interface ITest extends Document {
   tags?: string[];
 }
 
-const Test = model<ITest>('Test', schema);
+const Test = model<ITest, QueryHelpers>('Test', schema);
+
+Test.find().byName('test').orFail().exec().then(console.log);
 
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
 

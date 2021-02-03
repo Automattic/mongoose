@@ -590,15 +590,26 @@ declare module 'mongoose' {
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
   }
 
-  type CreateDoc<T> = {
-    [P in keyof T as
-      T[P] extends Function
-      ? never
-      : P
-    ]: T[P] extends infer R
-      ? CreateDoc<R>
-      : T[P];
-  };
+  type CreateDoc<T> = Omit<
+    {
+      [P in keyof T as
+        T[P] extends Function
+        ? never
+        : P
+      ]: T[P] extends infer R
+        ? CreateDoc<R>
+        : T[P];
+    },
+    | '$locals'
+    | '$op'
+    | '$where'
+    | 'db'
+    | 'isNew'
+    | 'modelName'
+    | 'schema'
+    | 'baseModelName'
+    | 'errors'
+  >;
 
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
@@ -640,11 +651,11 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T, TQueryHelpers>;
 
     /** Creates a new document or documents */
-    create<DocContents = T | DocumentDefinition<T>>(docs: CreateDoc<T | DocumentDefinition<T> | DocContents>[], options?: SaveOptions): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(doc: CreateDoc<T | DocumentDefinition<T> | DocContents>): Promise<T>;
-    create<DocContents = T | DocumentDefinition<T>>(...docs: CreateDoc<T | DocumentDefinition<T> | DocContents>[]): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(docs: CreateDoc<T | DocumentDefinition<T> | DocContents>[], callback: (err: CallbackError, docs: T[]) => void): void;
-    create<DocContents = T | DocumentDefinition<T>>(doc: CreateDoc<T | DocumentDefinition<T> | DocContents>, callback: (err: CallbackError, doc: T) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(docs: CreateDoc<DocContents>[], options?: SaveOptions): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(doc: CreateDoc<DocContents>): Promise<T>;
+    create<DocContents = T | DocumentDefinition<T>>(...docs: CreateDoc<DocContents>[]): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(docs: CreateDoc<DocContents>[], callback: (err: CallbackError, docs: T[]) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(doc: CreateDoc<DocContents>, callback: (err: CallbackError, doc: T) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,

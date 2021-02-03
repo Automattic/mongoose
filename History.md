@@ -1,3 +1,16 @@
+5.11.15 / 2021-02-03
+====================
+ * fix(document): fix issues with `isSelected` as an path in a nested schema #9884 #9873 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(index.d.ts): better support for `SchemaDefinition` generics when creating schema #9863 #9862 #9789
+ * fix(index.d.ts): allow required function in array definition #9888 [Ugzuzg](https://github.com/Ugzuzg)
+ * fix(index.d.ts): reorder create typings to allow array desctructuring #9890 [Ugzuzg](https://github.com/Ugzuzg)
+ * fix(index.d.ts): add missing overload to Model.validate #9878 #9877 [jonamat](https://github.com/jonamat)
+ * fix(index.d.ts): throw compiler error if schema says path is a String, but interface says path is a number #9857
+ * fix(index.d.ts): make `Query` a class, allow calling `Query#where()` with object argument and with no arguments #9856
+ * fix(index.d.ts): support calling `Schema#pre()` and `Schema#post()` with options and array of hooked function names #9844
+ * docs(faq): mention other debug options than console #9887 [dandv](https://github.com/dandv)
+ * docs(connections): clarify that Mongoose can emit 'error' both during initial connection and after initial connection #9853
+
 5.11.14 / 2021-01-28
 ====================
  * fix(populate): avoid inferring `justOne` from parent when populating a POJO with a manually populated path #9833 [IslandRhythms](https://github.com/IslandRhythms)

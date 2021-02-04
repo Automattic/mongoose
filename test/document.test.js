@@ -9905,4 +9905,99 @@ describe('document', function() {
       assert.equal(ss.nested[0].toHexString(), updatedElID);
     });
   });
+  it('gh9884', function() {
+    return co(function*() {
+
+      const obi = new Schema({
+        eType: {
+          type: String,
+          required: true,
+          uppercase: true
+        },
+        eOrigin: {
+          type: String,
+          required: true
+        },
+        eIds: [
+          {
+            type: String
+          }
+        ]
+      }, { _id: false });
+
+      const schema = new Schema({
+        name: String,
+        description: String,
+        isSelected: {
+          type: Boolean,
+          default: false
+        },
+        wan: {
+          type: [obi],
+          default: undefined,
+          required: true
+        }
+      });
+
+      const newDoc = {
+        name: 'name',
+        description: 'new desc',
+        isSelected: true,
+        wan: [
+          {
+            eType: 'X',
+            eOrigin: 'Y',
+            eIds: ['Y', 'Z']
+          }
+        ]
+      };
+
+      const Model = db.model('Test', schema);
+      yield Model.create(newDoc);
+      const doc = yield Model.findOne();
+      assert.ok(doc);
+    });
+  });
+
+  it('gh9880', function(done) {
+    const testSchema = new Schema({
+      prop: String,
+      nestedProp: {
+        prop: String
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    new Test({
+      prop: 'Test',
+      nestedProp: null
+    }).save((err, doc) => {
+      doc.id;
+      doc.nestedProp;
+
+      // let's clone this document:
+      new Test({
+        prop: 'Test 2',
+        nestedProp: doc.nestedProp
+      });
+
+      Test.updateOne({
+        _id: doc._id
+      }, {
+        nestedProp: null
+      }, (err) => {
+        assert.ifError(err);
+        Test.findOne({
+          _id: doc._id
+        }, (err, updatedDoc) => {
+          assert.ifError(err);
+          new Test({
+            prop: 'Test 3',
+            nestedProp: updatedDoc.nestedProp
+          });
+          done();
+        });
+      });
+    });
+  });
 });

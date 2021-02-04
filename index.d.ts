@@ -630,11 +630,11 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
-    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], callback: (err: CallbackError, docs: T[]) => void): void;
+    create<DocContents = T | DocumentDefinition<T>>(doc: DocContents, callback: (err: CallbackError, doc: T) => void): void;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -753,6 +753,7 @@ declare module 'mongoose' {
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: (err: any) => void): Promise<void>;
     validate(optional: any, callback?: (err: any) => void): Promise<void>;
+    validate(optional: any, pathsToValidate: string[], callback?: (err: any) => void): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://docs.mongodb.com/manual/changeStreams/). */
     watch(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream;
@@ -844,6 +845,8 @@ declare module 'mongoose' {
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where(path: string, val?: any): Query<Array<T>, T>;
+    where(obj: object): Query<Array<T>, T>;
+    where(): Query<Array<T>, T>;
   }
 
   interface QueryOptions {
@@ -1037,16 +1040,20 @@ declare module 'mongoose' {
     useProjection?: boolean;
   }
 
+  type MongooseDocumentMiddleware = 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init';
   type MongooseQueryMiddleware = 'count' | 'deleteMany' | 'deleteOne' | 'find' | 'findOne' | 'findOneAndDelete' | 'findOneAndRemove' | 'findOneAndUpdate' | 'remove' | 'update' | 'updateOne' | 'updateMany';
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>> extends events.EventEmitter {
+  type SchemaPreOptions = { document?: boolean, query?: boolean };
+  type SchemaPostOptions = { document?: boolean, query?: boolean };
+
+  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefinitionType = undefined> extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition, options?: SchemaOptions);
+    constructor(definition?: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>>, options?: SchemaOptions);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<DocumentDefinition<SchemaDefinitionType>> | Schema, prefix?: string): this;
 
     /**
      * Array of child schemas (from document arrays and single nested subdocs)
@@ -1113,21 +1120,33 @@ declare module 'mongoose' {
     plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
-    post<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
+    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: (this: T, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: (this: T, res: any, next: (err: CallbackError) => void) => void): this;
 
-    post<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
-    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
+    post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: any, next: (err?: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
     post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
+    post<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: Array<any>, next: (err: CallbackError) => void) => void): this;
     post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
+    post<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: (this: T, err: NativeError, res: any, next: (err: CallbackError) => void) => void): this;
 
     /** Defines a pre hook for the model. */
-    pre<T extends Document = DocType>(method: 'validate' | 'save' | 'remove' | 'updateOne' | 'deleteOne' | 'init' | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
-    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
+    pre<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void) => void): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
     /** Object of currently defined query helpers on this schema. */
     query: any;
@@ -1163,11 +1182,17 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
+  type SchemaDefinitionWithBuiltInClass<T> = T extends number
+    ? (typeof Number | 'number' | 'Number')
+    : T extends string
+    ? (typeof String | 'string' | 'String')
+    : (Function | string);
+
   type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
-    Function |
-    string |
-    Schema |
-    Schema[] |
+    SchemaDefinitionWithBuiltInClass<T> |
+    typeof SchemaType |
+    Schema<T extends Document ? T : Document<any>> |
+    Schema<T extends Document ? T : Document<any>>[] |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     Function[] |
     SchemaDefinition<T> |
@@ -1175,7 +1200,7 @@ declare module 'mongoose' {
 
   type SchemaDefinition<T = undefined> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
-    : { [path in keyof T]-?: SchemaDefinitionProperty<T[path]>; };
+    : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 
   interface SchemaOptions {
     /**
@@ -1340,7 +1365,7 @@ declare module 'mongoose' {
   }
 
   interface SchemaTypeOptions<T> {
-    type?: T;
+    type: T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -1357,7 +1382,7 @@ declare module 'mongoose' {
      * path cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
-    required?: boolean | (() => boolean) | [boolean, string];
+    required?: boolean | (() => boolean) | [boolean, string] | [() => boolean, string];
 
     /**
      * The default value for this path. If a function, Mongoose executes the function
@@ -1769,7 +1794,7 @@ declare module 'mongoose' {
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false };
 
-  interface Query<ResultType, DocType extends Document> {
+  class Query<ResultType, DocType extends Document> {
     _mongooseOptions: MongooseQueryOptions;
 
     /** Executes the query */
@@ -2147,6 +2172,8 @@ declare module 'mongoose' {
 
     /** Specifies a path for use with chaining. */
     where(path: string, val?: any): this;
+    where(obj: object): this;
+    where(): this;
 
     /** Defines a `$within` or `$geoWithin` argument for geo-spatial queries. */
     within(val?: any): this;

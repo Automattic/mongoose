@@ -118,7 +118,7 @@ block content
 
     There are two classes of errors that can occur with a Mongoose connection.
 
-    - Error on initial connection. If initial connection fails, Mongoose will **not** attempt to reconnect, it will emit an 'error' event, and the promise `mongoose.connect()` returns will reject.
+    - Error on initial connection. If initial connection fails, Mongoose will emit an 'error' event and the promise `mongoose.connect()` returns will reject. However, Mongoose will **not** automatically try to reconnect.
     - Error after initial connection was established. Mongoose will attempt to reconnect, and it will emit an 'error' event.
 
     To handle initial connection errors, you should use `.catch()` or `try/catch` with async/await.
@@ -145,9 +145,8 @@ block content
     });
     ```
 
-    Note that the `error` event in the code above does not fire when mongoose loses 
-    connection after the initial connection was established. You can listen to the
-    `disconnected` event for that purpose.
+    Note that Mongoose does not necessarily emit an 'error' event if it loses connectivity to MongoDB. You should
+    listen to the `disconnected` event to report when Mongoose is disconnected from MongoDB.
 
     <h3 id="options"><a href="#options">Options</a></h3>
 

@@ -37,9 +37,7 @@ describe('types.document', function() {
     Dummy.prototype.$__setSchema(new Schema);
 
     function _Subdocument() {
-      const arr = new DocumentArray;
-      arr.$path = () => 'jsconf.ar';
-      arr.$parent = () => new Dummy;
+      const arr = new DocumentArray([], 'jsconf.ar', new Dummy);
       arr[0] = this;
       ArraySubdocument.call(this, {}, arr);
     }

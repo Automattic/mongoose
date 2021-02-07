@@ -596,8 +596,8 @@ declare module 'mongoose' {
         T[P] extends Function
         ? never
         : P
-      ]: T[P] extends infer R
-        ? CreateDoc<R>
+      ]: T[P] extends (Array<any> | Record<string, any>)
+        ? CreateDoc<T[P]>
         : T[P];
     },
     | '$locals'

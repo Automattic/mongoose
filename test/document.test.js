@@ -9931,6 +9931,7 @@ describe('document', function() {
       assert.ok(doc);
     });
   });
+
   it('Makes sure pre remove hook is executed gh-9885', function() {
     const SubSchema = new Schema({
       myValue: {
@@ -9967,6 +9968,48 @@ describe('document', function() {
         console.error(error);
       });
       assert.equal(count, 1);
+    });
+  });  
+    
+  it('gh9880', function(done) {
+    const testSchema = new Schema({
+      prop: String,
+      nestedProp: {
+        prop: String
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    new Test({
+      prop: 'Test',
+      nestedProp: null
+    }).save((err, doc) => {
+      doc.id;
+      doc.nestedProp;
+
+      // let's clone this document:
+      new Test({
+        prop: 'Test 2',
+        nestedProp: doc.nestedProp
+      });
+
+      Test.updateOne({
+        _id: doc._id
+      }, {
+        nestedProp: null
+      }, (err) => {
+        assert.ifError(err);
+        Test.findOne({
+          _id: doc._id
+        }, (err, updatedDoc) => {
+          assert.ifError(err);
+          new Test({
+            prop: 'Test 3',
+            nestedProp: updatedDoc.nestedProp
+          });
+          done();
+        });
+      });
     });
   });
 });

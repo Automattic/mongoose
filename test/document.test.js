@@ -9932,6 +9932,45 @@ describe('document', function() {
     });
   });
 
+  it('Makes sure pre remove hook is executed gh-9885', function() {
+    const SubSchema = new Schema({
+      myValue: {
+        type: String
+      }
+    }, {});
+    let count = 0;
+    SubSchema.pre('remove', function(next) {
+      count++;
+      next();
+    });
+    const thisSchema = new Schema({
+      foo: {
+        type: String,
+        required: true
+      },
+      mySubdoc: {
+        type: [SubSchema],
+        required: true
+      }
+    }, { minimize: false, collection: 'test' });
+
+    const Model = db.model('TestModel', thisSchema);
+
+    return co(function*() {
+      yield Model.deleteMany({}); // remove all existing documents
+      const newModel = {
+        foo: 'bar',
+        mySubdoc: [{ myValue: 'some value' }]
+      };
+      const document = yield Model.create(newModel);
+      document.mySubdoc[0].remove();
+      yield document.save().catch((error) => {
+        console.error(error);
+      });
+      assert.equal(count, 1);
+    });
+  });  
+    
   it('gh9880', function(done) {
     const testSchema = new Schema({
       prop: String,

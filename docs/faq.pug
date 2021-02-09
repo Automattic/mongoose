@@ -293,9 +293,10 @@ block content
 
     <a href="#enable_debugging">**Q**</a>. How can I enable debugging?
 
-    **A**. Set the `debug` option to `true`:
+    **A**. Set the `debug` option:
 
     ```javascript
+    // all executed methods log output to console
     mongoose.set('debug', true)
     
     // disable colors in debug mode
@@ -305,8 +306,7 @@ block content
     mongoose.set('debug', { shell: true })
     ```
 
-    All executed collection methods will log output of their arguments to your
-    console.
+    For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](./api.html#mongoose_Mongoose-set).
 
 
     <hr id="callback_never_executes" />

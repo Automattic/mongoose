@@ -6602,7 +6602,7 @@ describe('Model', function() {
       return Model.create({ name: 'foo' }).
         then(() => Model.exists({ name: 'bar' })).
         then(res => assert.ok(!res)).
-        then(() => Model.exists({ otherProp: 'foo' })).
+        then(() => Model.exists({ otherProp: 'foo' }, { strict: false })).
         then(res => assert.ok(!res));
     });
 

@@ -3260,11 +3260,11 @@ describe('Query', function() {
     });
   });
 
-  it('strictQuery option (gh-4136) (gh-7178)', function() {
+  it('strict option (gh-4136) (gh-7178)', function() {
     const modelSchema = new Schema({
       field: Number,
       nested: { path: String }
-    }, { strictQuery: 'throw' });
+    }, { strict: 'throw' });
 
     const Model = db.model('Test', modelSchema);
 
@@ -3272,7 +3272,7 @@ describe('Query', function() {
       // `find()` on a top-level path not in the schema
       let err = yield Model.find({ notInschema: 1 }).then(() => null, e => e);
       assert.ok(err);
-      assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+      assert.ok(err.message.indexOf('strict') !== -1, err.message);
 
       // Shouldn't throw on nested path re: gh-7178
       yield Model.create({ nested: { path: 'a' } });
@@ -3282,12 +3282,12 @@ describe('Query', function() {
       // `find()` on a nested path not in the schema
       err = yield Model.find({ 'nested.bad': 'foo' }).then(() => null, e => e);
       assert.ok(err);
-      assert.ok(err.message.indexOf('strictQuery') !== -1, err.message);
+      assert.ok(err.message.indexOf('strict') !== -1, err.message);
     });
   });
 
-  it('strictQuery = true (gh-6032)', function() {
-    const modelSchema = new Schema({ field: Number }, { strictQuery: true });
+  it('strict = true (gh-6032)', function() {
+    const modelSchema = new Schema({ field: Number }, { strict: true });
 
     return co(function*() {
       const Model = db.model('Test', modelSchema);

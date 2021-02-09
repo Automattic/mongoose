@@ -1189,57 +1189,6 @@ describe('Query', function() {
         });
       }, done);
     });
-
-    it('single option, default', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.deleteMany({ name: /Stark/ }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 2);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it.skip('single option, false', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: false }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 2);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 0);
-            done();
-          });
-        });
-      });
-    });
-
-    it.skip('single option, true', function(done) {
-      const Test = db.model('Person', new Schema({ name: String }));
-
-      Test.create([{ name: 'Eddard Stark' }, { name: 'Robb Stark' }], function(error) {
-        assert.ifError(error);
-        Test.remove({ name: /Stark/ }).setOptions({ single: true }).exec(function(error, res) {
-          assert.ifError(error);
-          assert.equal(res.n, 1);
-          Test.countDocuments({}, function(error, count) {
-            assert.ifError(error);
-            assert.equal(count, 1);
-            done();
-          });
-        });
-      });
-    });
   });
 
   describe('querying/updating with model instance containing embedded docs should work (#454)', function() {
@@ -1713,7 +1662,7 @@ describe('Query', function() {
         _id: {
           select: false,
           type: Schema.Types.ObjectId,
-          default: mongoose.Types.ObjectId
+          default: () => new mongoose.Types.ObjectId()
         },
         username: String
       });
@@ -2849,7 +2798,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.deleteMany({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2867,7 +2816,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.deleteOne({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2885,7 +2834,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.remove({ name: 'Test' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.deletedCount, 1);
       });
     });
 
@@ -2904,7 +2853,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.update({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -2923,7 +2872,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.updateMany({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 
@@ -2942,7 +2891,7 @@ describe('Query', function() {
 
         // Shouldn't throw
         const res = yield Model.updateOne({}, { name: 'Test2' }).orFail(new Error('Oops'));
-        assert.equal(res.n, 1);
+        assert.equal(res.modifiedCount, 1);
       });
     });
 

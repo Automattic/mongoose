@@ -1239,23 +1239,6 @@ describe('aggregate: ', function() {
       catch(done);
   });
 
-  it('ability to add noCursorTimeout option (gh-4241)', function(done) {
-    const MyModel = db.model('Test', {
-      name: String
-    });
-
-    const cursor = MyModel.
-      aggregate([{ $match: { name: 'test' } }]).
-      option({ noCursorTimeout: true }).
-      cursor().
-      exec();
-
-    cursor.once('cursor', cursor => {
-      assert.ok(cursor.cursorState.cmd.noCursorTimeout);
-      done();
-    });
-  });
-
   it('query by document (gh-4866)', function(done) {
     const MyModel = db.model('Test', {
       name: String

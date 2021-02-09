@@ -15,9 +15,7 @@ const Schema = mongoose.Schema;
 
 const uri = 'mongodb://localhost:27017/mongoose_test';
 
-const options = {
-  useNewUrlParser: true
-};
+const options = {};
 
 describe('mongoose module:', function() {
   describe('default connection works', function() {
@@ -101,11 +99,9 @@ describe('mongoose module:', function() {
     const mongoose = new Mongoose();
 
     mongoose.set('runValidators', 'b');
-    mongoose.set('useNewUrlParser', 'c');
 
     assert.equal(mongoose.get('runValidators'), 'b');
     assert.equal(mongoose.set('runValidators'), 'b');
-    assert.equal(mongoose.get('useNewUrlParser'), 'c');
   });
 
   it('allows `const { model } = mongoose` (gh-3768)', function() {
@@ -755,7 +751,8 @@ describe('mongoose module:', function() {
 
     it('connect with url doesnt cause unhandled rejection (gh-6997)', function(done) {
       const m = new mongoose.Mongoose;
-      m.connect('mongodb://doesnotexist:27009/test', options, function(error) {
+      const _options = Object.assign({}, options, { serverSelectionTimeoutMS: 100 });
+      m.connect('mongodb://doesnotexist:27009/test', _options, function(error) {
         assert.ok(error);
         done();
       });

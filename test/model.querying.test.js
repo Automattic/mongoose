@@ -394,10 +394,11 @@ describe('model: querying:', function() {
         });
       });
 
-      post.collection.insertOne({ meta: { visitors: 9898, a: null } }, {}, function(err, b) {
+      const doc = { meta: { visitors: 9898, a: null } };
+      post.collection.insertOne(doc, {}, function(err) {
         assert.ifError(err);
 
-        BlogPostA.findOne({ _id: b.ops[0]._id }, function(err, found) {
+        BlogPostA.findOne({ _id: doc._id }, function(err, found) {
           cb();
           assert.ifError(err);
           assert.equal(found.get('meta.visitors'), 9898);
@@ -1926,10 +1927,11 @@ describe('model: querying:', function() {
   it('with previously existing null values in the db', function(done) {
     const post = new BlogPostB();
 
-    post.collection.insertOne({ meta: { visitors: 9898, a: null } }, {}, function(err, b) {
+    const doc = { meta: { visitors: 9898, a: null } };
+    post.collection.insertOne(doc, {}, function(err) {
       assert.ifError(err);
 
-      BlogPostB.findOne({ _id: b.ops[0]._id }, function(err, found) {
+      BlogPostB.findOne({ _id: doc._id }, function(err, found) {
         assert.ifError(err);
         assert.equal(found.get('meta.visitors').valueOf(), 9898);
         done();
@@ -1940,10 +1942,11 @@ describe('model: querying:', function() {
   it('with unused values in the db', function(done) {
     const post = new BlogPostB();
 
-    post.collection.insertOne({ meta: { visitors: 9898, color: 'blue' } }, {}, function(err, b) {
+    const doc = { meta: { visitors: 9898, color: 'blue' } };
+    post.collection.insertOne(doc, {}, function(err) {
       assert.ifError(err);
 
-      BlogPostB.findOne({ _id: b.ops[0]._id }, function(err, found) {
+      BlogPostB.findOne({ _id: doc._id }, function(err, found) {
         assert.ifError(err);
         assert.equal(found.get('meta.visitors').valueOf(), 9898);
         found.save(function(err) {

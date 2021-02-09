@@ -134,8 +134,8 @@ declare module 'mongoose' {
    * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
    * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
    */
-  export function startSession(options?: mongodb.SessionOptions): Promise<mongodb.ClientSession>;
-  export function startSession(options: mongodb.SessionOptions, cb: (err: any, session: mongodb.ClientSession) => void): void;
+  export function startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
+  export function startSession(options: mongodb.ClientSessionOptions, cb: (err: any, session: mongodb.ClientSession) => void): void;
 
   /** The Mongoose version */
   export const version: string;
@@ -173,7 +173,7 @@ declare module 'mongoose' {
     close(force?: boolean): Promise<void>;
 
     /** Retrieves a collection, creating it if not cached. */
-    collection(name: string, options?: mongodb.CollectionCreateOptions): Collection;
+    collection(name: string, options?: mongodb.CreateCollectionOptions): Collection;
 
     /** A hash of the collections associated with this connection */
     collections: { [index: string]: Collection };
@@ -189,9 +189,9 @@ declare module 'mongoose' {
      * with specified options. Used to create [capped collections](https://docs.mongodb.com/manual/core/capped-collections/)
      * and [views](https://docs.mongodb.com/manual/core/views/) from mongoose.
      */
-    createCollection<T = any>(name: string, options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<T>>;
-    createCollection<T = any>(name: string, cb: (err: CallbackError, collection: mongodb.Collection<T>) => void): void;
-    createCollection<T = any>(name: string, options: mongodb.CollectionCreateOptions, cb?: (err: CallbackError, collection: mongodb.Collection) => void): Promise<mongodb.Collection<T>>;
+    createCollection<T = any>(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection>;
+    createCollection<T = any>(name: string, cb: (err: CallbackError, collection: mongodb.Collection) => void): void;
+    createCollection<T = any>(name: string, options: mongodb.CreateCollectionOptions, cb?: (err: CallbackError, collection: mongodb.Collection) => void): Promise<mongodb.Collection>;
 
     /**
      * Removes the model named `name` from this connection, if it exists. You can
@@ -302,8 +302,8 @@ declare module 'mongoose' {
      * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      */
-    startSession(options?: mongodb.SessionOptions): Promise<mongodb.ClientSession>;
-    startSession(options: mongodb.SessionOptions, cb: (err: any, session: mongodb.ClientSession) => void): void;
+    startSession(options?: mongodb.ClientSessionOptions): Promise<mongodb.ClientSession>;
+    startSession(options: mongodb.ClientSessionOptions, cb: (err: any, session: mongodb.ClientSession) => void): void;
 
     /**
      * _Requires MongoDB >= 3.6.0._ Executes the wrapped async function
@@ -615,8 +615,8 @@ declare module 'mongoose' {
      * if you use `create()`) because with `bulkWrite()` there is only one round
      * trip to MongoDB.
      */
-    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
-    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteOpResultObject) => void): void;
+    bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions): Promise<mongodb.BulkWriteResult>;
+    bulkWrite(writes: Array<any>, options?: mongodb.BulkWriteOptions, cb?: (err: any, res: mongodb.BulkWriteResult) => void): void;
 
     /** Collection the model uses. */
     collection: Collection;
@@ -641,8 +641,8 @@ declare module 'mongoose' {
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection(options?: mongodb.CollectionCreateOptions): Promise<mongodb.Collection<T>>;
-    createCollection(options: mongodb.CollectionCreateOptions | null, callback: (err: CallbackError, collection: mongodb.Collection<T>) => void): void;
+    createCollection(options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection>;
+    createCollection(options: mongodb.CreateCollectionOptions | null, callback: (err: CallbackError, collection: mongodb.Collection) => void): void;
 
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#createIndex)
@@ -748,7 +748,7 @@ declare module 'mongoose' {
      * for benefits like causal consistency, [retryable writes](https://docs.mongodb.com/manual/core/retryable-writes/),
      * and [transactions](http://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
      * */
-    startSession(options?: mongodb.SessionOptions, cb?: (err: any, session: mongodb.ClientSession) => void): Promise<mongodb.ClientSession>;
+    startSession(options?: mongodb.ClientSessionOptions, cb?: (err: any, session: mongodb.ClientSession) => void): Promise<mongodb.ClientSession>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(callback?: (err: any) => void): Promise<void>;
@@ -796,7 +796,7 @@ declare module 'mongoose' {
     findByIdAndRemove(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<T>, T>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, T>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
@@ -811,7 +811,7 @@ declare module 'mongoose' {
     findOneAndReplace(filter?: FilterQuery<T>, replacement?: DocumentDefinition<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<T>, T>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, T>;
     findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): Query<T, T>;
     findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): Query<T | null, T>;
 
@@ -852,7 +852,7 @@ declare module 'mongoose' {
   interface QueryOptions {
     arrayFilters?: { [key: string]: any }[];
     batchSize?: number;
-    collation?: mongodb.CollationDocument;
+    collation?: mongodb.CollationOptions;
     comment?: any;
     context?: string;
     explain?: any;
@@ -882,7 +882,7 @@ declare module 'mongoose' {
      * if true, returns the raw result from the MongoDB driver
      */
     rawResult?: boolean;
-    readPreference?: mongodb.ReadPreferenceMode;
+    readPreference?: string | mongodb.ReadPreferenceModeId;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
      */
@@ -941,7 +941,7 @@ declare module 'mongoose' {
     populate?: string | string[] | PopulateOptions | PopulateOptions[];
   }
 
-  interface InsertManyResult extends mongodb.InsertWriteOpResult<any> {
+  interface InsertManyResult extends mongodb.InsertManyResult {
     mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> }
   }
 
@@ -1232,7 +1232,7 @@ declare module 'mongoose' {
      */
     capped?: boolean | number | { size?: number; max?: number; autoIndexId?: boolean; };
     /** Sets a default collation for every query and aggregation. */
-    collation?: mongodb.CollationDocument;
+    collation?: mongodb.CollationOptions;
     /**
      * Mongoose by default produces a collection name by passing the model name to the utils.toCollectionName
      * method. This method pluralizes the name. Set this option if you need a different name for your collection.
@@ -1765,21 +1765,9 @@ declare module 'mongoose' {
       toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }
 
-    const ObjectId: ObjectIdConstructor;
-
-    class _ObjectId extends mongodb.ObjectID {
-      _id?: ObjectId;
+    class ObjectId extends mongodb.ObjectId {
+      _id: this;
     }
-
-    // Expose static methods of `mongodb.ObjectID` and allow calling without `new`
-    type ObjectIdConstructor = typeof _ObjectId & {
-      (val?: string | number): ObjectId;
-    };
-
-    // var objectId: mongoose.Types.ObjectId should reference mongodb.ObjectID not
-    //   the ObjectIdConstructor, so we add the interface below
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface ObjectId extends mongodb.ObjectID { }
 
     class Subdocument extends Document {
       $isSingleNested: true;
@@ -1834,7 +1822,7 @@ declare module 'mongoose' {
     circle(path: string, area: any): this;
 
     /** Adds a collation to this op (MongoDB 3.4 and up) */
-    collation(value: mongodb.CollationDocument): this;
+    collation(value: mongodb.CollationOptions): this;
 
     /** Specifies the `comment` option. */
     comment(val: string): this;
@@ -1916,7 +1904,7 @@ declare module 'mongoose' {
     findOneAndRemove(filter?: FilterQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType>;
+    findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, DocType>;
     findOneAndUpdate(filter: FilterQuery<DocType>, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findOneAndUpdate(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
@@ -1924,7 +1912,7 @@ declare module 'mongoose' {
     findByIdAndDelete(id?: mongodb.ObjectId | any, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<DocType>, res: any) => void): Query<mongodb.FindAndModifyWriteOpResultObject<DocType>, DocType>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: any, res: any) => void): Query<any, DocType>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<DocType>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: DocType, res: any) => void): Query<DocType, DocType>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: any, doc: DocType | null, res: any) => void): Query<DocType | null, DocType>;
 
@@ -2058,7 +2046,7 @@ declare module 'mongoose' {
     projection(fields?: any | null): any;
 
     /** Determines the MongoDB nodes from which to read. */
-    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+    read(pref: string | mongodb.ReadPreferenceModeId, tags?: any[]): this;
 
     /** Sets the readConcern option for the query. */
     readConcern(level: string): this;
@@ -2072,7 +2060,7 @@ declare module 'mongoose' {
      * deprecated, you should use [`deleteOne()`](#query_Query-deleteOne)
      * or [`deleteMany()`](#query_Query-deleteMany) instead.
      */
-    remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.WriteOpResult['result']) => void): Query<mongodb.WriteOpResult['result'], DocType>;
+    remove(filter?: FilterQuery<DocType>, callback?: (err: CallbackError, res: mongodb.UpdateResult) => void): Query<mongodb.UpdateResult, DocType>;
 
     /**
      * Declare and/or execute this query as a replaceOne() operation. Same as
@@ -2186,20 +2174,203 @@ declare module 'mongoose' {
     wtimeout(ms: number): this;
   }
 
+  export type QuerySelector<T> = {
+    // Comparison
+    $eq?: T;
+    $gt?: T;
+    $gte?: T;
+    $in?: T[];
+    $lt?: T;
+    $lte?: T;
+    $ne?: T;
+    $nin?: T[];
+    // Logical
+    $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
+    // Element
+    /**
+     * When `true`, `$exists` matches the documents that contain the field,
+     * including documents where the field value is null.
+     */
+    $exists?: boolean;
+    $type?: string | number;
+    // Evaluation
+    $expr?: any;
+    $jsonSchema?: any;
+    $mod?: T extends number ? [number, number] : never;
+    $regex?: T extends string ? RegExp | string : never;
+    $options?: T extends string ? string : never;
+    // Geospatial
+    // TODO: define better types for geo queries
+    $geoIntersects?: { $geometry: object };
+    $geoWithin?: object;
+    $near?: object;
+    $nearSphere?: object;
+    $maxDistance?: number;
+    // Array
+    // TODO: define better types for $all and $elemMatch
+    $all?: T extends ReadonlyArray<infer U> ? any[] : never;
+    $elemMatch?: T extends ReadonlyArray<infer U> ? object : never;
+    $size?: T extends ReadonlyArray<infer U> ? number : never;
+    // Bitwise
+    $bitsAllClear?: number | mongodb.Binary | number[];
+    $bitsAllSet?: number | mongodb.Binary | number[];
+    $bitsAnyClear?: number | mongodb.Binary | number[];
+    $bitsAnySet?: number | mongodb.Binary | number[];
+  };
+
+  export type RootQuerySelector<T> = {
+    /** @see https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
+    $and?: Array<FilterQuery<T>>;
+    /** @see https://docs.mongodb.com/manual/reference/operator/query/nor/#op._S_nor */
+    $nor?: Array<FilterQuery<T>>;
+    /** @see https://docs.mongodb.com/manual/reference/operator/query/or/#op._S_or */
+    $or?: Array<FilterQuery<T>>;
+    /** @see https://docs.mongodb.com/manual/reference/operator/query/text */
+    $text?: {
+        $search: string;
+        $language?: string;
+        $caseSensitive?: boolean;
+        $diacriticSensitive?: boolean;
+    };
+    /** @see https://docs.mongodb.com/manual/reference/operator/query/where/#op._S_where */
+    $where?: string | Function;
+    /** @see https://docs.mongodb.com/manual/reference/operator/query/comment/#op._S_comment */
+    $comment?: string;
+    // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
+    // this will mark all unrecognized properties as any (including nested queries)
+    [key: string]: any;
+  };
+
+  type DotAndArrayNotation<AssignableType> = {
+    readonly [key: string]: AssignableType;
+  };
+
+  type ReadonlyPartial<TSchema> = {
+    readonly [key in keyof TSchema]?: TSchema[key];
+  };
+
+  type MatchKeysAndValues<TSchema> = ReadonlyPartial<TSchema> & DotAndArrayNotation<any>;
+
+  type AllowRegexpForStrings<T> = T extends string ? T | RegExp : T;
+
+  type Condition<T> = AllowRegexpForStrings<T> | QuerySelector<T>;
+
   type _FilterQuery<T> = {
     [P in keyof T]?: P extends '_id'
     ? [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? mongodb.Condition<T[P]>
-    : mongodb.Condition<T[P] | string | { _id: mongodb.ObjectId }>
+    ? Condition<T[P]>
+    : Condition<T[P] | string | { _id: mongodb.ObjectId }>
     : [Extract<T[P], mongodb.ObjectId>] extends [never]
-    ? mongodb.Condition<T[P]>
-    : mongodb.Condition<T[P] | string>;
+    ? Condition<T[P]>
+    : Condition<T[P] | string>;
   } &
-    mongodb.RootQuerySelector<T>;
+    RootQuerySelector<T>;
 
   export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
 
-  export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
+  type Unpacked<Type> = Type extends ReadonlyArray<infer Element> ? Element : Type;
+
+  type AddToSetOperators<Type> = {
+    $each: Type;
+  };
+
+  type SortValues = -1 | 1 | 'asc' | 'desc';
+
+  type ArrayOperator<Type> = {
+    $each: Type;
+    $slice?: number;
+    $position?: number;
+    $sort?: SortValues | Record<string, SortValues>;
+  };
+
+  type SetFields<TSchema> = ({
+    readonly [key in KeysOfAType<TSchema, ReadonlyArray<any> | undefined>]?:
+      | Unpacked<TSchema[key]>
+      | AddToSetOperators<Unpacked<TSchema[key]>[]>;
+  } &
+    NotAcceptedFields<TSchema, ReadonlyArray<any> | undefined>) & {
+      readonly [key: string]: AddToSetOperators<any> | any;
+    };
+
+  type PushOperator<TSchema> = ({
+    readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
+      | Unpacked<TSchema[key]>
+      | ArrayOperator<Unpacked<TSchema[key]>[]>;
+  } &
+      NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
+      readonly [key: string]: ArrayOperator<any> | any;
+  };
+
+  type ObjectQuerySelector<T> = T extends object ? { [key in keyof T]?: QuerySelector<T[key]> } : QuerySelector<T>;
+
+  type PullOperator<TSchema> = ({
+      readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
+          | Partial<Unpacked<TSchema[key]>>
+          | ObjectQuerySelector<Unpacked<TSchema[key]>>;
+  } &
+      NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
+      readonly [key: string]: QuerySelector<any> | any;
+  };
+
+  type PullAllOperator<TSchema> = ({
+      readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?: TSchema[key];
+  } &
+      NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
+      readonly [key: string]: any[];
+  };
+
+  type KeysOfAType<TSchema, Type> = {
+    [key in keyof TSchema]: NonNullable<TSchema[key]> extends Type ? key : never;
+  }[keyof TSchema];
+  type KeysOfOtherType<TSchema, Type> = {
+    [key in keyof TSchema]: NonNullable<TSchema[key]> extends Type ? never : key;
+  }[keyof TSchema];
+
+  type AcceptedFields<TSchema, FieldType, AssignableType> = {
+    readonly [key in KeysOfAType<TSchema, FieldType>]?: AssignableType;
+  };
+
+  /** It avoid uses fields of non Type */
+  type NotAcceptedFields<TSchema, FieldType> = {
+    readonly [key in KeysOfOtherType<TSchema, FieldType>]?: never;
+  };
+
+  type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldType> = AcceptedFields<
+      TSchema,
+      FieldType,
+      AssignableType
+  > &
+      NotAcceptedFields<TSchema, FieldType> &
+      DotAndArrayNotation<AssignableType>;
+
+  type NumericTypes = number | Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
+
+  type _UpdateQuery<TSchema> = {
+    /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
+    $currentDate?: OnlyFieldsOfType<TSchema, Date, true | { $type: 'date' | 'timestamp' }>;
+    $inc?: OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $min?: MatchKeysAndValues<TSchema>;
+    $max?: MatchKeysAndValues<TSchema>;
+    $mul?: OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $rename?: { [key: string]: string };
+    $set?: MatchKeysAndValues<TSchema>;
+    $setOnInsert?: MatchKeysAndValues<TSchema>;
+    $unset?: OnlyFieldsOfType<TSchema, any, '' | 1 | true>;
+
+    /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
+    $addToSet?: SetFields<TSchema>;
+    $pop?: OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
+    $pull?: PullOperator<TSchema>;
+    $push?: PushOperator<TSchema>;
+    $pullAll?: PullAllOperator<TSchema>;
+
+    /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
+    $bit?: {
+        [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
+    };
+  };
+
+  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & MatchKeysAndValues<DocumentDefinition<T>>;
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;
@@ -2301,7 +2472,7 @@ declare module 'mongoose' {
     catch: Promise<R>['catch'];
 
     /** Adds a collation. */
-    collation(options: mongodb.CollationDocument): this;
+    collation(options: mongodb.CollationOptions): this;
 
     /** Appends a new $count operator to this aggregate pipeline. */
     count(countName: string): this;
@@ -2354,7 +2525,7 @@ declare module 'mongoose' {
     pipeline(): any[];
 
     /** Sets the readPreference option for the aggregation query. */
-    read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
+    read(pref: string | mongodb.ReadPreferenceModeId, tags?: any[]): this;
 
     /** Sets the readConcern level for the aggregation query. */
     readConcern(level: string): this;

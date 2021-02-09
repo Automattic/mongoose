@@ -18,9 +18,7 @@ describe('Date Tutorial', function() {
     });
     User = mongoose.model('User', userSchema);
 
-    return mongoose.connect('mongodb://localhost:27017/mongoose', {
-      useNewUrlParser: true
-    });
+    return mongoose.connect('mongodb://localhost:27017/mongoose');
   });
 
   it('Example 1.2: casts strings to dates', function() {

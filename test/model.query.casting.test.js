@@ -818,7 +818,7 @@ describe('model query casting', function() {
 
   describe('$elemMatch', function() {
     it('should cast String to ObjectId in $elemMatch', function(done) {
-      const commentId = mongoose.Types.ObjectId(111);
+      const commentId = new mongoose.Types.ObjectId(111);
 
       const post = new BlogPostB({ comments: [{ _id: commentId }] });
       const id = post._id.toString();
@@ -836,7 +836,7 @@ describe('model query casting', function() {
     });
 
     it('should cast String to ObjectId in $elemMatch inside $not', function(done) {
-      const commentId = mongoose.Types.ObjectId(111);
+      const commentId = new mongoose.Types.ObjectId(111);
 
       const post = new BlogPostB({ comments: [{ _id: commentId }] });
       const id = post._id.toString();

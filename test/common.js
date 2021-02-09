@@ -23,9 +23,6 @@ if (process.env.PRINT_COLLECTIONS) {
 
 // For 3.1.3 deprecations
 mongoose.set('useCreateIndex', true);
-mongoose.set('useNewUrlParser', true);
-// 3.3.x deprecations
-mongoose.set('useUnifiedTopology', true);
 
 /**
  * Override all Collection related queries to keep count

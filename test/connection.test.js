@@ -50,8 +50,7 @@ describe('connections:', function() {
 
     it('with autoIndex (gh-5423)', function(done) {
       const promise = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        autoIndex: false,
-        useNewUrlParser: true
+        autoIndex: false
       }).asPromise();
 
       promise.then(function(conn) {
@@ -102,8 +101,7 @@ describe('connections:', function() {
 
     it('useCreateIndex (gh-6922)', function(done) {
       const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest', {
-        useCreateIndex: true,
-        useNewUrlParser: true
+        useCreateIndex: true
       });
 
       const M = conn.model('Test', new Schema({
@@ -125,15 +123,14 @@ describe('connections:', function() {
 
     it('throws helpful error with undefined uri (gh-6763)', function() {
       assert.throws(function() {
-        mongoose.createConnection(void 0, { useNewUrlParser: true });
+        mongoose.createConnection(void 0);
       }, /string.*createConnection/);
     });
 
     it('resolving with q (gh-5714)', function(done) {
       const bootMongo = Q.defer();
 
-      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
-        { useNewUrlParser: true });
+      const conn = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
 
       conn.on('connected', function() {
         bootMongo.resolve(this);
@@ -146,10 +143,8 @@ describe('connections:', function() {
     });
 
     it('connection plugins (gh-7378)', function() {
-      const conn1 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
-        { useNewUrlParser: true });
-      const conn2 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest',
-        { useNewUrlParser: true });
+      const conn1 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
+      const conn2 = mongoose.createConnection('mongodb://localhost:27017/mongoosetest');
 
       const called = [];
       conn1.plugin(schema => called.push(schema));
@@ -230,29 +225,6 @@ describe('connections:', function() {
     db.close(done);
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27017/fake', function(done) {
-    const opts = { useNewUrlParser: true, useUnifiedTopology: false };
-    const db = mongoose.createConnection('mongodb://aaron:psw@localhost:27017/fake', opts, () => {
-      db.close(done);
-    });
-    assert.equal(db.pass, 'psw');
-    assert.equal(db.user, 'aaron');
-    assert.equal(db.name, 'fake');
-    assert.equal(db.host, 'localhost');
-    assert.equal(db.port, 27017);
-  });
-
-  it('should accept unix domain sockets', function() {
-    const host = encodeURIComponent('/tmp/mongodb-27017.sock');
-    const db = mongoose.createConnection(`mongodb://aaron:psw@${host}/fake`, { useNewUrlParser: true });
-    db.asPromise().catch(() => {});
-    assert.equal(db.name, 'fake');
-    assert.equal(db.host, '/tmp/mongodb-27017.sock');
-    assert.equal(db.pass, 'psw');
-    assert.equal(db.user, 'aaron');
-    db.close();
-  });
-
   describe('errors', function() {
     it('.catch() means error does not get thrown (gh-5229)', function(done) {
       const db = mongoose.createConnection();
@@ -287,6 +259,7 @@ describe('connections:', function() {
           yield db.openUri('fail connection');
         } catch (err) {
           assert.ok(err);
+          assert.equal(err.name, 'MongoParseError');
           threw = true;
         }
 
@@ -298,39 +271,12 @@ describe('connections:', function() {
 
   describe('connect callbacks', function() {
     it('should return an error if malformed uri passed', function(done) {
-      const db = mongoose.createConnection('mongodb:///fake', { useNewUrlParser: true }, function(err) {
+      const db = mongoose.createConnection('mongodb:///fake', {}, function(err) {
         assert.equal(err.name, 'MongoParseError');
         done();
       });
       db.close();
       assert.ok(!db.options);
-    });
-  });
-
-  describe('errors', function() {
-    it('event fires with one listener', function(done) {
-      this.timeout(1500);
-      const db = mongoose.createConnection('mongodb://bad.notadomain/fakeeee?connectTimeoutMS=100', {
-        useNewUrlParser: true,
-        useUnifiedTopology: false // Workaround re: NODE-2250
-      });
-      db.asPromise().catch(() => {});
-      db.on('error', function() {
-        // this callback has no params which triggered the bug #759
-        db.close();
-        done();
-      });
-    });
-
-    it('should occur without hanging when password with special chars is used (gh-460)', function(done) {
-      const opts = {
-        useNewUrlParser: true,
-        useUnifiedTopology: false
-      };
-      mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', opts, function(err) {
-        assert.ok(err);
-        done();
-      });
     });
   });
 
@@ -566,7 +512,6 @@ describe('connections:', function() {
       const db2 = db.useDb('mongoose2');
 
       assert.equal('mongoose2', db2.name);
-      assert.equal('mongoose1', db.name);
 
       assert.equal(db2.port, db.port);
       assert.equal(db2.replica, db.replica);
@@ -898,8 +843,6 @@ describe('connections:', function() {
 
   it('throws a MongooseServerSelectionError on server selection timeout (gh-8451)', () => {
     const opts = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 100
     };
     const uri = 'mongodb://baddomain:27017/test';
@@ -917,8 +860,6 @@ describe('connections:', function() {
 
     return co(function*() {
       const opts = {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         replicaSet: process.env.REPLICA_SET
       };
       const conn = yield mongoose.createConnection('mongodb://localhost:27017/gh8425', opts);
@@ -955,10 +896,7 @@ describe('connections:', function() {
 
   it('allows setting client on a disconnected connection (gh-9164)', function() {
     return co(function*() {
-      const client = yield mongodb.MongoClient.connect('mongodb://localhost:27017/mongoose_test', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
+      const client = yield mongodb.MongoClient.connect('mongodb://localhost:27017/mongoose_test');
       const conn = mongoose.createConnection().setClient(client);
 
       assert.equal(conn.readyState, 1);
@@ -973,10 +911,7 @@ describe('connections:', function() {
     return co(function *() {
       const m = new mongoose.Mongoose;
 
-      m.connect('mongodb://localhost:27017/test_gh9496', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
+      m.connect('mongodb://localhost:27017/test_gh9496');
       const conn = yield m.connection.asPromise();
 
       assert.ok(conn instanceof m.Connection);

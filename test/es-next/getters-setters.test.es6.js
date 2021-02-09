@@ -10,7 +10,7 @@ const Schema = mongoose.Schema;
 
 describe('getters/setters', function() {
   before(async function() {
-    await mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true });
+    await mongoose.connect('mongodb://localhost:27017/test');
   });
 
   beforeEach(function() {

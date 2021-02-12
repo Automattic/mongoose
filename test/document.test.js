@@ -5892,7 +5892,8 @@ describe('document', function() {
         assert.equal(called, 1);
 
         called = 0;
-        doc = yield Test.findById(doc);
+        doc = yield Test.findById(doc._id);
+        assert.ok(doc);
         assert.equal(called, 0);
       });
     });

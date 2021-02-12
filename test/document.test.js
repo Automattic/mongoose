@@ -9989,8 +9989,8 @@ describe('document', function() {
       });
       assert.equal(count, 1);
     });
-  });  
-    
+  });
+
   it('gh9880', function(done) {
     const testSchema = new Schema({
       prop: String,

@@ -5853,6 +5853,26 @@ describe('document', function() {
       assert.equal(doc.totalValue, 5);
     });
 
+    it('calls array getters (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          ref: 'Doesnt Matter',
+          get: () => {
+            ++called;
+            return 42;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      const doc = new Test({ arr: [new mongoose.Types.ObjectId()] });
+      assert.deepEqual(doc.toObject({ getters: true }).arr, [42]);
+      assert.equal(called, 1);
+    });
+
     it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {

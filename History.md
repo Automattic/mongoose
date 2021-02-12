@@ -1,3 +1,12 @@
+5.11.16 / 2021-02-12
+====================
+ * fix(document): skip applying array element setters when init-ing an array #9889
+ * fix: upgrade to mongodb driver 3.6.4 #9893 [jooeycheng](https://github.com/jooeycheng)
+ * fix: avoid copying Object.prototype properties when cloning #9876
+ * fix(aggregate): automatically convert functions to strings when using `$function` operator #9897
+ * fix: call pre-remove hooks for subdocuments #9895 #9885 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: fix confusing sentence in Schema docs #9914 [namenyi](https://github.com/namenyi)
+
 5.11.15 / 2021-02-03
 ====================
  * fix(document): fix issues with `isSelected` as an path in a nested schema #9884 #9873 [IslandRhythms](https://github.com/IslandRhythms)

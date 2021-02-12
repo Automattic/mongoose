@@ -5853,6 +5853,51 @@ describe('document', function() {
       assert.equal(doc.totalValue, 5);
     });
 
+    it('calls array getters (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          ref: 'Doesnt Matter',
+          get: () => {
+            ++called;
+            return 42;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      const doc = new Test({ arr: [new mongoose.Types.ObjectId()] });
+      assert.deepEqual(doc.toObject({ getters: true }).arr, [42]);
+      assert.equal(called, 1);
+    });
+
+    it('doesnt call setters when init-ing an array (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          set: v => {
+            ++called;
+            return v;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      return co(function*() {
+        let doc = yield Test.create({ arr: [new mongoose.Types.ObjectId()] });
+        assert.equal(called, 1);
+
+        called = 0;
+        doc = yield Test.findById(doc._id);
+        assert.ok(doc);
+        assert.equal(called, 0);
+      });
+    });
+
     it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {
@@ -9929,6 +9974,45 @@ describe('document', function() {
       yield Model.create(newDoc);
       const doc = yield Model.findOne();
       assert.ok(doc);
+    });
+  });
+
+  it('Makes sure pre remove hook is executed gh-9885', function() {
+    const SubSchema = new Schema({
+      myValue: {
+        type: String
+      }
+    }, {});
+    let count = 0;
+    SubSchema.pre('remove', function(next) {
+      count++;
+      next();
+    });
+    const thisSchema = new Schema({
+      foo: {
+        type: String,
+        required: true
+      },
+      mySubdoc: {
+        type: [SubSchema],
+        required: true
+      }
+    }, { minimize: false, collection: 'test' });
+
+    const Model = db.model('TestModel', thisSchema);
+
+    return co(function*() {
+      yield Model.deleteMany({}); // remove all existing documents
+      const newModel = {
+        foo: 'bar',
+        mySubdoc: [{ myValue: 'some value' }]
+      };
+      const document = yield Model.create(newModel);
+      document.mySubdoc[0].remove();
+      yield document.save().catch((error) => {
+        console.error(error);
+      });
+      assert.equal(count, 1);
     });
   });
 

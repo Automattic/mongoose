@@ -5873,6 +5873,30 @@ describe('document', function() {
       assert.equal(called, 1);
     });
 
+    it('doesnt call setters when init-ing an array (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          set: v => {
+            ++called;
+            return v;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      return co(function*() {
+        let doc = yield Test.create({ arr: [new mongoose.Types.ObjectId()] });
+        assert.equal(called, 1);
+
+        called = 0;
+        doc = yield Test.findById(doc);
+        assert.equal(called, 0);
+      });
+    });
+
     it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {

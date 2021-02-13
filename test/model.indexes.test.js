@@ -569,7 +569,6 @@ describe('model', function() {
         let indexes = yield User.listIndexes();
         assert.equal(indexes.length, 2);
         assert.deepEqual(indexes[1].key, { username: 1 });
-        console.log(indexes);
         assert.ok(indexes[1].collation);
         assert.equal(indexes[1].collation.strength, 2);
 

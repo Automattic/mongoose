@@ -556,17 +556,17 @@ describe('model', function() {
       return co(function*() {
         yield db.db.collection('User').drop().catch(() => {});
 
-        let userSchema = new mongoose.Schema({ username: String }, {
+        const userSchema = new mongoose.Schema({ username: String }, {
           collation: {
             locale: 'en',
             strength: 2
           }
         });
         userSchema.index({ username: 1 }, { unique: true });
-        let User = db.model('User', userSchema, 'User');
+        const User = db.model('User', userSchema, 'User');
 
         yield User.init();
-        let indexes = yield User.listIndexes();
+        const indexes = yield User.listIndexes();
         assert.equal(indexes.length, 2);
         assert.deepEqual(indexes[1].key, { username: 1 });
         assert.ok(indexes[1].collation);

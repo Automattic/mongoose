@@ -99,8 +99,8 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T extends Document, TQueryHelpers = {}>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T, TQueryHelpers>;
-  export function model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = {}>(
+  export function model<T extends Document, TQueryHelpers = Record<string, any>>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T, TQueryHelpers>;
+  export function model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = Record<string, any>>(
     name: string,
     schema?: Schema<T, U, TQueryHelpers>,
     collection?: string,
@@ -613,7 +613,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
-  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter {
+  interface Model<T extends Document, TQueryHelpers = Record<string, any>> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
@@ -1067,7 +1067,7 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, TQueryHelpers = {}, SchemaDefinitionType = undefined> extends events.EventEmitter {
+  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefinitionType = undefined, TQueryHelpers = Record<string, any>> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1815,7 +1815,7 @@ declare module 'mongoose' {
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false };
 
-  class Query<ResultType, DocType extends Document, THelpers = {}> {
+  class Query<ResultType, DocType extends Document, THelpers = Record<string, any>> {
     _mongooseOptions: MongooseQueryOptions;
 
     /** Executes the query */

@@ -243,16 +243,17 @@ describe('ValidationError', function() {
   });
 
   describe('when user code defines a r/o Error#toJSON', function() {
-    it('shoud not fail', function() {
+    it('should not fail', function(done) {
       const err = [];
       const child = require('child_process')
-        .fork('./test/isolated/project-has-error.toJSON.js', { silent: true });
+        .fork('./test/isolated/project-has-error.toJSON.js', ['--no-warnings'], { silent: true });
 
       child.stderr.on('data', function(buf) { err.push(buf); });
       child.on('exit', function(code) {
-        const stderr = err.join('');
+        const stderr = err.filter(line => !line.includes('Warning: ')).join('');
         assert.equal(stderr, '');
         assert.equal(code, 0);
+        done();
       });
     });
   });

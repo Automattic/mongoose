@@ -45,7 +45,7 @@ describe('types array', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   it('behaves and quacks like an Array', function(done) {
-    const a = new MongooseArray;
+    const a = new MongooseArray([]);
 
     assert.ok(a instanceof Array);
     assert.ok(a.isMongooseArray);

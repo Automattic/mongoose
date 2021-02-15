@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const DocumentArray = require('../lib/types/documentarray');
+const DocumentArray = require('../lib/types/DocumentArray');
 const ArraySubdocument = require('../lib/types/ArraySubdocument');
 const assert = require('assert');
 const co = require('co');

@@ -45,7 +45,7 @@ describe('types array', function() {
   afterEach(() => require('./util').stopRemainingOps(db));
 
   it('behaves and quacks like an Array', function(done) {
-    const a = new MongooseArray;
+    const a = new MongooseArray([]);
 
     assert.ok(a instanceof Array);
     assert.ok(a.isMongooseArray);
@@ -60,6 +60,7 @@ describe('types array', function() {
     const doc = new Test({ arr: ['test'] });
 
     assert.deepEqual(doc.arr, new MongooseArray(['test']));
+    assert.deepEqual(doc.arr, ['test']);
 
     done();
   });
@@ -1420,7 +1421,7 @@ describe('types array', function() {
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, '4');
-        doc.arr.set(2, 10);
+        doc.arr[2] = 10;
         assert.equal(doc.arr.length, 4);
         assert.equal(doc.arr[2], '10');
         doc.arr.set(doc.arr.length, '11');
@@ -1556,7 +1557,7 @@ describe('types array', function() {
       save(m, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.arr.length, 2);
-        doc.arr.set(0, { name: 'vdrums' });
+        doc.arr[0] = { name: 'vdrums' };
         assert.equal(doc.arr.length, 2);
         assert.equal(doc.arr[0].name, 'vdrums');
         doc.arr.set(doc.arr.length, { name: 'Restrepo' });
@@ -1628,7 +1629,7 @@ describe('types array', function() {
         doc.arr.set(0, 'THREE');
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
-        doc.arr.set(doc.arr.length, 'FOUR');
+        doc.arr[doc.arr.length] = 'FOUR';
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
         assert.strictEqual('four', doc.arr[2]);

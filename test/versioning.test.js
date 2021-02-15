@@ -270,7 +270,8 @@ describe('versioning', function() {
       a.meta.numbers.pull(2);
       b.meta.numbers.push(10);
 
-      yield [a.save(), b.save()];
+      yield a.save();
+      yield b.save();
 
       a = yield BlogPost.findById(a);
       assert.deepEqual(a.toObject().meta.numbers, [4, 6, 8, 10]);

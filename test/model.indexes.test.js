@@ -559,6 +559,30 @@ describe('model', function() {
         then(dropped => assert.equal(dropped.length, 0));
     });
 
+    it('uses schema-level collation by default (gh-9912)', function() {
+      return co(function*() {
+        yield db.db.collection('User').drop().catch(() => {});
+
+        const userSchema = new mongoose.Schema({ username: String }, {
+          collation: {
+            locale: 'en',
+            strength: 2
+          }
+        });
+        userSchema.index({ username: 1 }, { unique: true });
+        const User = db.model('User', userSchema, 'User');
+
+        yield User.init();
+        const indexes = yield User.listIndexes();
+        assert.equal(indexes.length, 2);
+        assert.deepEqual(indexes[1].key, { username: 1 });
+        assert.ok(indexes[1].collation);
+        assert.equal(indexes[1].collation.strength, 2);
+
+        yield User.collection.drop();
+      });
+    });
+
     it('different collation with syncIndexes() (gh-8521)', function() {
       return co(function*() {
         yield db.db.collection('User').drop().catch(() => {});

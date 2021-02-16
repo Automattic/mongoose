@@ -5879,6 +5879,51 @@ describe('document', function() {
       assert.equal(doc.totalValue, 5);
     });
 
+    it('calls array getters (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          ref: 'Doesnt Matter',
+          get: () => {
+            ++called;
+            return 42;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      const doc = new Test({ arr: [new mongoose.Types.ObjectId()] });
+      assert.deepEqual(doc.toObject({ getters: true }).arr, [42]);
+      assert.equal(called, 1);
+    });
+
+    it('doesnt call setters when init-ing an array (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          set: v => {
+            ++called;
+            return v;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      return co(function*() {
+        let doc = yield Test.create({ arr: [new mongoose.Types.ObjectId()] });
+        assert.equal(called, 1);
+
+        called = 0;
+        doc = yield Test.findById(doc._id);
+        assert.ok(doc);
+        assert.equal(called, 0);
+      });
+    });
+
     it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {
@@ -9959,6 +10004,45 @@ describe('document', function() {
     });
   });
 
+  it('Makes sure pre remove hook is executed gh-9885', function() {
+    const SubSchema = new Schema({
+      myValue: {
+        type: String
+      }
+    }, {});
+    let count = 0;
+    SubSchema.pre('remove', function(next) {
+      count++;
+      next();
+    });
+    const thisSchema = new Schema({
+      foo: {
+        type: String,
+        required: true
+      },
+      mySubdoc: {
+        type: [SubSchema],
+        required: true
+      }
+    }, { minimize: false, collection: 'test' });
+
+    const Model = db.model('TestModel', thisSchema);
+
+    return co(function*() {
+      yield Model.deleteMany({}); // remove all existing documents
+      const newModel = {
+        foo: 'bar',
+        mySubdoc: [{ myValue: 'some value' }]
+      };
+      const document = yield Model.create(newModel);
+      document.mySubdoc[0].remove();
+      yield document.save().catch((error) => {
+        console.error(error);
+      });
+      assert.equal(count, 1);
+    });
+  });
+
   it('gh9880', function(done) {
     const testSchema = new Schema({
       prop: String,
@@ -9998,6 +10082,32 @@ describe('document', function() {
           done();
         });
       });
+    });
+  });
+
+  it('handles directly setting embedded document array element with projection (gh-9909)', function() {
+    const schema = Schema({
+      elements: [{
+        text: String,
+        subelements: [{
+          text: String
+        }]
+      }]
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      let doc = yield Test.create({ elements: [{ text: 'hello' }] });
+      doc = yield Test.findById(doc).select('elements');
+
+      doc.elements[0].subelements[0] = { text: 'my text' };
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.elements.length, 1);
+      assert.equal(fromDb.elements[0].subelements.length, 1);
+      assert.equal(fromDb.elements[0].subelements[0].text, 'my text');
     });
   });
 });

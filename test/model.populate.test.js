@@ -9869,6 +9869,7 @@ describe('model: populate:', function() {
       assert.deepEqual(findCallOptions[0].virtuals, ['foo']);
     });
   });
+
   it('gh-9833', function() {
     const Books = db.model('books', new Schema({ name: String, tags: [{ type: Schema.Types.ObjectId, ref: 'tags' }] }));
     const Tags = db.model('tags', new Schema({ author: Schema.Types.ObjectId }));
@@ -9905,6 +9906,79 @@ describe('model: populate:', function() {
 
       const populatedBooks = yield Books.populate(books, populateOptions);
       assert.ok(!Array.isArray(populatedBooks[0].tags[0].author));
+    });
+  });
+
+  it('sets not-found values to null for paths that are not in the schema (gh-9913)', function() {
+    const Books = db.model('books', new Schema({ name: String, tags: [{ type: 'ObjectId', ref: 'tags' }] }));
+    const Tags = db.model('tags', new Schema({ authors: [{ author: 'ObjectId' }] }));
+    const Authors = db.model('authors', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aTag = new Tags({ authors: [{ author: anAuthor.id }, { author: new mongoose.Types.ObjectId() }] });
+      yield aTag.save();
+
+      const aBook = new Books({ name: 'Book1', tags: [aTag.id] });
+      yield aBook.save();
+
+      const aggregateOptions = [
+        { $match: {
+          name: { $in: [aBook.name] }
+        } },
+        { $lookup: {
+          from: 'tags',
+          localField: 'tags',
+          foreignField: '_id',
+          as: 'tags'
+        } }
+      ];
+      const books = yield Books.aggregate(aggregateOptions).exec();
+
+      const populateOptions = [{
+        path: 'tags.authors.author',
+        model: 'authors',
+        select: '_id name'
+      }];
+
+      const populatedBooks = yield Books.populate(books, populateOptions);
+      assert.strictEqual(populatedBooks[0].tags[0].authors[0].author.name, 'Author1');
+      assert.strictEqual(populatedBooks[0].tags[0].authors[1].author, null);
+    });
+  });
+
+  it('handles perDocumentLimit where multiple documents reference the same populated doc (gh-9906)', function() {
+    const postSchema = new Schema({
+      title: String,
+      commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+    });
+    const Post = db.model('Post', postSchema);
+
+    const commentSchema = new Schema({ content: String });
+    const Comment = db.model('Comment', commentSchema);
+
+    return co(function*() {
+      const commonComment = new Comment({ content: 'Im used in two posts' });
+      yield commonComment.save();
+
+      const comments = yield Comment.create([
+        { content: 'Nice first post' },
+        { content: 'Nice second post' }
+      ]);
+
+      let posts = yield Post.create([
+        { title: 'First post', commentsIds: [commonComment, comments[0]] },
+        { title: 'Second post', commentsIds: [commonComment, comments[1]] }
+      ]);
+
+      posts = yield Post.find().populate({ path: 'commentsIds', perDocumentLimit: 2, sort: { content: 1 } });
+      assert.equal(posts.length, 2);
+      assert.ok(!Array.isArray(posts[0].commentsIds[0]));
+
+      assert.deepEqual(posts[0].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice first post']);
+      assert.deepEqual(posts[1].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice second post']);
     });
   });
 });

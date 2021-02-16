@@ -9909,6 +9909,46 @@ describe('model: populate:', function() {
     });
   });
 
+  it('sets not-found values to null for paths that are not in the schema (gh-9913)', function() {
+    const Books = db.model('books', new Schema({ name: String, tags: [{ type: 'ObjectId', ref: 'tags' }] }));
+    const Tags = db.model('tags', new Schema({ authors: [{ author: 'ObjectId' }] }));
+    const Authors = db.model('authors', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aTag = new Tags({ authors: [{ author: anAuthor.id }, { author: new mongoose.Types.ObjectId() }] });
+      yield aTag.save();
+
+      const aBook = new Books({ name: 'Book1', tags: [aTag.id] });
+      yield aBook.save();
+
+      const aggregateOptions = [
+        { $match: {
+          name: { $in: [aBook.name] }
+        } },
+        { $lookup: {
+          from: 'tags',
+          localField: 'tags',
+          foreignField: '_id',
+          as: 'tags'
+        } }
+      ];
+      const books = yield Books.aggregate(aggregateOptions).exec();
+
+      const populateOptions = [{
+        path: 'tags.authors.author',
+        model: 'authors',
+        select: '_id name'
+      }];
+
+      const populatedBooks = yield Books.populate(books, populateOptions);
+      assert.strictEqual(populatedBooks[0].tags[0].authors[0].author.name, 'Author1');
+      assert.strictEqual(populatedBooks[0].tags[0].authors[1].author, null);
+    });
+  });
+
   it('handles perDocumentLimit where multiple documents reference the same populated doc (gh-9906)', function() {
     const postSchema = new Schema({
       title: String,

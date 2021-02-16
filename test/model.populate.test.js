@@ -9869,6 +9869,7 @@ describe('model: populate:', function() {
       assert.deepEqual(findCallOptions[0].virtuals, ['foo']);
     });
   });
+
   it('gh-9833', function() {
     const Books = db.model('books', new Schema({ name: String, tags: [{ type: Schema.Types.ObjectId, ref: 'tags' }] }));
     const Tags = db.model('tags', new Schema({ author: Schema.Types.ObjectId }));
@@ -9905,6 +9906,39 @@ describe('model: populate:', function() {
 
       const populatedBooks = yield Books.populate(books, populateOptions);
       assert.ok(!Array.isArray(populatedBooks[0].tags[0].author));
+    });
+  });
+
+  it('handles perDocumentLimit where multiple documents reference the same populated doc (gh-9906)', function() {
+    const postSchema = new Schema({
+      title: String,
+      commentsIds: [{ type: Schema.ObjectId, ref: 'Comment' }]
+    });
+    const Post = db.model('Post', postSchema);
+
+    const commentSchema = new Schema({ content: String });
+    const Comment = db.model('Comment', commentSchema);
+
+    return co(function*() {
+      const commonComment = new Comment({ content: 'Im used in two posts' });
+      yield commonComment.save();
+
+      const comments = yield Comment.create([
+        { content: 'Nice first post' },
+        { content: 'Nice second post' }
+      ]);
+
+      let posts = yield Post.create([
+        { title: 'First post', commentsIds: [commonComment, comments[0]] },
+        { title: 'Second post', commentsIds: [commonComment, comments[1]] }
+      ]);
+
+      posts = yield Post.find().populate({ path: 'commentsIds', perDocumentLimit: 2, sort: { content: 1 } });
+      assert.equal(posts.length, 2);
+      assert.ok(!Array.isArray(posts[0].commentsIds[0]));
+
+      assert.deepEqual(posts[0].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice first post']);
+      assert.deepEqual(posts[1].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice second post']);
     });
   });
 });

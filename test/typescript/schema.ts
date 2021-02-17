@@ -71,7 +71,7 @@ async function gh9857() {
   type UserModel = Model<UserDocument>;
 
   const schemaDefinition: UserSchemaDefinition = {
-    name: String,
+    name: { type: String },
     active: Boolean,
     points: Number
   };

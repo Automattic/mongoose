@@ -608,6 +608,32 @@ block content
     Keys in a BSON object are ordered, so this means the [insertion order](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Description)
     property of maps is maintained.
 
+    Mongoose supports a special `$*` syntax to [populate](/docs/populate.html) all elements in a map.
+    For example, suppose your `socialMediaHandles` map contains a `ref`:
+
+    ```javascript
+    const userSchema = new Schema({
+      socialMediaHandles: {
+        type: Map,
+        of: new Schema({
+          handle: String,
+          oauth: {
+            type: ObjectId,
+            ref: 'OAuth'
+          }
+        })
+      }
+    });
+    const User = mongoose.model('User', userSchema);
+    ```
+
+    To populate every `socialMediaHandles` entry's `oauth` property, you should populate
+    on `socialMediaHandles.$*.oauth`:
+
+    ```javascript
+    const user = await User.findOne().populate('socialMediaHandles.$*.oauth');
+    ```
+
     <h3 id="getters"><a href="#getters">Getters</a></h3>
 
     Getters are like virtuals for paths defined in your schema. For example,

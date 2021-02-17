@@ -1,3 +1,14 @@
+5.11.17 / 2021-02-17
+====================
+ * fix(populate): handle `perDocumentLimit` when multiple documents reference the same populated doc #9906
+ * fix(document): handle directly setting embedded document array element with projection #9909
+ * fix(map): cast ObjectId to string inside of MongooseMap #9938 [HunterKohler](https://github.com/HunterKohler)
+ * fix(model): use schema-level default collation for indexes if index doesn't have collation #9912
+ * fix(index.d.ts): make `SchemaTypeOptions#type` optional again to allow alternative typeKeys #9927
+ * fix(index.d.ts): support `{ type: String }` in schema definition when using SchemaDefinitionType generic #9911
+ * docs(populate+schematypes): document the `$*` syntax for populating every entry in a map #9907
+ * docs(connection): clarify that `Connection#transaction()` promise resolves to a command result #9919
+
 5.11.16 / 2021-02-12
 ====================
  * fix(document): skip applying array element setters when init-ing an array #9889

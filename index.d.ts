@@ -1365,7 +1365,7 @@ declare module 'mongoose' {
   }
 
   interface SchemaTypeOptions<T> {
-    type: T;
+    type?: T | SchemaDefinitionWithBuiltInClass<T>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

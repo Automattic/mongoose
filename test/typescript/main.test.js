@@ -180,7 +180,7 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 1);
     const messageText = errors[0].messageText.messageText;
-    assert.ok(/Type 'StringConstructor' is not assignable to type.*number/.test(messageText), messageText);
+    assert.ok(/Type '.*StringConstructor.*' is not assignable to type.*number/.test(messageText), messageText);
   });
 
   it('document', function() {

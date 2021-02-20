@@ -1,3 +1,46 @@
+5.11.17 / 2021-02-17
+====================
+ * fix(populate): handle `perDocumentLimit` when multiple documents reference the same populated doc #9906
+ * fix(document): handle directly setting embedded document array element with projection #9909
+ * fix(map): cast ObjectId to string inside of MongooseMap #9938 [HunterKohler](https://github.com/HunterKohler)
+ * fix(model): use schema-level default collation for indexes if index doesn't have collation #9912
+ * fix(index.d.ts): make `SchemaTypeOptions#type` optional again to allow alternative typeKeys #9927
+ * fix(index.d.ts): support `{ type: String }` in schema definition when using SchemaDefinitionType generic #9911
+ * docs(populate+schematypes): document the `$*` syntax for populating every entry in a map #9907
+ * docs(connection): clarify that `Connection#transaction()` promise resolves to a command result #9919
+
+5.11.16 / 2021-02-12
+====================
+ * fix(document): skip applying array element setters when init-ing an array #9889
+ * fix: upgrade to mongodb driver 3.6.4 #9893 [jooeycheng](https://github.com/jooeycheng)
+ * fix: avoid copying Object.prototype properties when cloning #9876
+ * fix(aggregate): automatically convert functions to strings when using `$function` operator #9897
+ * fix: call pre-remove hooks for subdocuments #9895 #9885 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: fix confusing sentence in Schema docs #9914 [namenyi](https://github.com/namenyi)
+
+5.11.15 / 2021-02-03
+====================
+ * fix(document): fix issues with `isSelected` as an path in a nested schema #9884 #9873 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(index.d.ts): better support for `SchemaDefinition` generics when creating schema #9863 #9862 #9789
+ * fix(index.d.ts): allow required function in array definition #9888 [Ugzuzg](https://github.com/Ugzuzg)
+ * fix(index.d.ts): reorder create typings to allow array desctructuring #9890 [Ugzuzg](https://github.com/Ugzuzg)
+ * fix(index.d.ts): add missing overload to Model.validate #9878 #9877 [jonamat](https://github.com/jonamat)
+ * fix(index.d.ts): throw compiler error if schema says path is a String, but interface says path is a number #9857
+ * fix(index.d.ts): make `Query` a class, allow calling `Query#where()` with object argument and with no arguments #9856
+ * fix(index.d.ts): support calling `Schema#pre()` and `Schema#post()` with options and array of hooked function names #9844
+ * docs(faq): mention other debug options than console #9887 [dandv](https://github.com/dandv)
+ * docs(connections): clarify that Mongoose can emit 'error' both during initial connection and after initial connection #9853
+
+5.11.14 / 2021-01-28
+====================
+ * fix(populate): avoid inferring `justOne` from parent when populating a POJO with a manually populated path #9833 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): apply setters on each element of the array when setting a populated array #9838
+ * fix(map): handle change tracking on maps of subdocs #9811 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): remove dependency on `documentIsSelected` symbol #9841 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(error): make ValidationError.toJSON to include the error name correctly #9849 [hanzki](https://github.com/hanzki)
+ * fix(index.d.ts): indicate that `Document#remove()` returns a promise, not a query #9826
+ * fix(index.d.ts): allow setting `SchemaType#enum` to TypeScript enum with `required: true` #9546
+
 5.11.13 / 2021-01-20
 ====================
  * fix(map): handle change tracking on map of arrays #9813

@@ -1,9 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const stringifyAccumulatorOptions = require('../../lib/helpers/aggregate/stringifyAccumulatorOptions');
+const stringifyFunctionOperators = require('../../lib/helpers/aggregate/stringifyFunctionOperators');
 
-describe('stringifyAccumulatorOptions', function() {
+describe('stringifyFunctionOperators', function() {
   it('converts accumulator args to strings (gh-9364)', function() {
     const pipeline = [{
       $group: {
@@ -35,11 +35,31 @@ describe('stringifyAccumulatorOptions', function() {
       }
     }];
 
-    stringifyAccumulatorOptions(pipeline);
+    stringifyFunctionOperators(pipeline);
 
     assert.equal(typeof pipeline[0].$group.avgCopies.$accumulator.init, 'string');
     assert.equal(typeof pipeline[0].$group.avgCopies.$accumulator.accumulate, 'string');
     assert.equal(typeof pipeline[0].$group.avgCopies.$accumulator.merge, 'string');
     assert.equal(typeof pipeline[0].$group.avgCopies.$accumulator.finalize, 'string');
+  });
+
+  it('converts function args to strings (gh-9897)', function() {
+    const pipeline = [{
+      $addFields: {
+        newField: {
+          $function: {
+            body: function() {
+              return true;
+            },
+            args: ['$oldField'],
+            lang: 'js'
+          }
+        }
+      }
+    }];
+
+    stringifyFunctionOperators(pipeline);
+
+    assert.equal(typeof pipeline[0].$addFields.newField.$function.body, 'string');
   });
 });

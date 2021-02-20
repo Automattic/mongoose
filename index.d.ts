@@ -1188,8 +1188,7 @@ declare module 'mongoose' {
     ? (typeof String | 'string' | 'String')
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
-    SchemaDefinitionWithBuiltInClass<T> |
+  type SchemaDefinitionProperty<T = undefined> = T extends string | number ? SchemaDefinitionWithBuiltInClass<T> : SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
     Schema<T extends Document ? T : Document<any>> |
     Schema<T extends Document ? T : Document<any>>[] |

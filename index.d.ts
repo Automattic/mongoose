@@ -2258,12 +2258,13 @@ declare module 'mongoose' {
     close(callback: (err: CallbackError) => void): void;
 
     /**
-     * Execute `fn` for every document in the cursor. If `fn` returns a promise,
+     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
+     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -2423,12 +2424,13 @@ declare module 'mongoose' {
     close(callback: (err: CallbackError) => void): void;
 
     /**
-     * Execute `fn` for every document in the cursor. If `fn` returns a promise,
+     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
+     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved

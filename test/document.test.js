@@ -9922,6 +9922,60 @@ describe('document', function() {
     });
   });
 
+  it('handles paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      schema: String,
+      name: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ schema: 'test', name: 'test' });
+      yield doc.save();
+      assert.ok(doc);
+      assert.equal(doc.schema, 'test');
+      assert.equal(doc.name, 'test');
+
+      const fromDb = yield Test.findById(doc);
+      assert.equal(fromDb.schema, 'test');
+      assert.equal(fromDb.name, 'test');
+
+      doc.schema = 'test2';
+      yield doc.save();
+
+      yield fromDb.remove();
+      doc.name = 'test3';
+      const err = yield doc.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'DocumentNotFoundError');
+    });
+  });
+
+  it('handles nested paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      nested: {
+        schema: String
+      },
+      name: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { schema: 'test' }, name: 'test' });
+      yield doc.save();
+      assert.ok(doc);
+      assert.equal(doc.nested.schema, 'test');
+      assert.equal(doc.name, 'test');
+
+      const fromDb = yield Test.findById(doc);
+      assert.equal(fromDb.nested.schema, 'test');
+      assert.equal(fromDb.name, 'test');
+
+      doc.nested.schema = 'test2';
+      yield doc.save();
+    });
+  });
+
   it('object setters will be applied for each object in array after populate (gh-9838)', function() {
     const updatedElID = '123456789012345678901234';
 

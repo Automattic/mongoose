@@ -9981,4 +9981,101 @@ describe('model: populate:', function() {
       assert.deepEqual(posts[1].toObject().commentsIds.map(c => c.content), ['Im used in two posts', 'Nice second post']);
     });
   });
+
+  it('supports `transform` option (gh-3375)', function() {
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: 'ObjectId', ref: 'Child' }],
+      child: { type: 'ObjectId', ref: 'Child' }
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const Child = db.model('Child', Schema({ name: String }));
+
+    return co(function*() {
+      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+      let p = yield Parent.create({
+        name: 'Anakin',
+        children: children,
+        child: children[0]._id
+      });
+
+      let called = [];
+
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 2);
+      assert.equal(called[0].doc.name, 'Luke');
+      assert.equal(called[0].id.toHexString(), children[0]._id.toHexString());
+
+      assert.equal(called[1].doc.name, 'Leia');
+      assert.equal(called[1].id.toHexString(), children[1]._id.toHexString());
+
+      called = [];
+      p = yield Parent.findById(p).populate({
+        path: 'child',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 1);
+      assert.equal(called[0].doc.name, 'Luke');
+      assert.equal(called[0].id.toHexString(), children[0]._id.toHexString());
+
+      const newId = new mongoose.Types.ObjectId();
+      yield Parent.updateOne({ _id: p._id }, { $push: { children: newId } });
+
+      called = [];
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+      assert.equal(called.length, 3);
+      assert.strictEqual(called[2].doc, null);
+      assert.equal(called[2].id.toHexString(), newId.toHexString());
+
+      assert.equal(p.children[2].toHexString(), newId.toHexString());
+
+      yield Parent.updateOne({ _id: p._id }, { $set: { child: newId } });
+      called = [];
+      p = yield Parent.findById(p).populate({
+        path: 'child',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 1);
+      assert.strictEqual(called[0].doc, null);
+      assert.equal(called[0].id.toHexString(), newId.toHexString());
+    });
+  });
 });

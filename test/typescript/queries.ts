@@ -4,7 +4,7 @@ interface QueryHelpers {
   byName(name: string): Query<Array<ITest>, ITest, QueryHelpers>;
 }
 
-const schema: Schema<ITest, Model<ITest>, undefined, QueryHelpers> = new Schema({ name: { type: 'String' }, tags: [String] });
+const schema: Schema<ITest, Model<ITest>> = new Schema({ name: { type: 'String' }, tags: [String] });
 
 schema.query.byName = function(name: string): Query<Array<ITest>, ITest, QueryHelpers> {
   return this.find({ name });

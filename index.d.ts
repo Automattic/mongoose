@@ -99,10 +99,10 @@ declare module 'mongoose' {
    */
   export function isValidObjectId(v: any): boolean;
 
-  export function model<T extends Document, TQueryHelpers = Record<string, any>>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T, TQueryHelpers>;
-  export function model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = Record<string, any>>(
+  export function model<T extends Document, TQueryHelpers = any>(name: string, schema?: Schema<any>, collection?: string, skipInit?: boolean): Model<T, TQueryHelpers>;
+  export function model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = any>(
     name: string,
-    schema?: Schema<T, U, TQueryHelpers>,
+    schema?: Schema<T, U>,
     collection?: string,
     skipInit?: boolean
   ): U;
@@ -592,30 +592,9 @@ declare module 'mongoose' {
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
   }
 
-  type CreateDoc<T> = Omit<
-    {
-      [P in keyof T as
-        T[P] extends Function
-        ? never
-        : P
-      ]: T[P] extends (Array<any> | Record<string, any>)
-        ? CreateDoc<T[P]>
-        : T[P];
-    },
-    | '$locals'
-    | '$op'
-    | '$where'
-    | 'db'
-    | 'isNew'
-    | 'modelName'
-    | 'schema'
-    | 'baseModelName'
-    | 'errors'
-  >;
-
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
-  interface Model<T extends Document, TQueryHelpers = Record<string, any>> extends NodeJS.EventEmitter {
+  interface Model<T extends Document, TQueryHelpers = any> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
@@ -1073,7 +1052,7 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefinitionType = undefined, TQueryHelpers = Record<string, any>> extends events.EventEmitter {
+  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefinitionType = undefined> extends events.EventEmitter {
     /**
      * Create a new schema
      */
@@ -1176,7 +1155,7 @@ declare module 'mongoose' {
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: TQueryHelpers;
+    query: { [name: string]: (this: M, ...args: any[]) => any };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;

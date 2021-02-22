@@ -1501,6 +1501,26 @@ declare module 'mongoose' {
     [other: string]: any;
   }
 
+  export type RefType =
+    | number
+    | string
+    | Buffer
+    | undefined
+    | mongoose.Types.ObjectId
+    | mongoose.Types.Buffer
+    | typeof mongoose.Schema.Types.Number
+    | typeof mongoose.Schema.Types.String
+    | typeof mongoose.Schema.Types.Buffer
+    | typeof mongoose.Schema.Types.ObjectId;
+
+  /**
+   * Reference another Model
+   */
+  export type PopulatedDoc<
+    PopulatedType,
+    RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : mongoose.Types.ObjectId) | undefined
+    > = PopulatedType | RawId;
+
   interface IndexOptions {
     background?: boolean,
     expires?: number | string

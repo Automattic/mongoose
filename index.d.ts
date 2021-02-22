@@ -665,14 +665,14 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes all documents that match `conditions`
      * regardless of the `single` option.
      */
-    deleteMany(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T>;
 
     /**
      * Deletes the first document that matches `conditions` from the collection.
      * Behaves like `remove()`, but deletes at most one document regardless of the
      * `single` option.
      */
-    deleteOne(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T>;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
@@ -841,13 +841,13 @@ declare module 'mongoose' {
      * @deprecated use `updateOne` or `updateMany` instead.
      * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
      */
-    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<mongodb.WriteOpResult['result'], T>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<mongodb.UpdateWriteOpResult['result'], T>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<mongodb.UpdateWriteOpResult['result'], T>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where(path: string, val?: any): Query<Array<T>, T>;
@@ -1188,14 +1188,15 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
     ? (typeof Number | 'number' | 'Number')
     : T extends string
     ? (typeof String | 'string' | 'String')
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
-    SchemaDefinitionWithBuiltInClass<T> |
+  type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
+    ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
+    SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
     Schema<T extends Document ? T : Document<any>> |
     Schema<T extends Document ? T : Document<any>>[] |
@@ -1371,7 +1372,7 @@ declare module 'mongoose' {
   }
 
   interface SchemaTypeOptions<T> {
-    type?: T | SchemaDefinitionWithBuiltInClass<T>;
+    type?: T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> : T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

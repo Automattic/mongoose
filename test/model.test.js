@@ -4726,6 +4726,35 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() populate option (gh-9720)', function() {
+      const schema = new Schema({
+        name: { type: String, required: true }
+      });
+      const Movie = db.model('Movie', schema);
+      const Person = db.model('Person', Schema({
+        name: String,
+        favoriteMovie: {
+          type: 'ObjectId',
+          ref: 'Movie'
+        }
+      }));
+
+      return co(function*() {
+        const movies = yield Movie.create([
+          { name: 'The Empire Strikes Back' },
+          { name: 'Jingle All The Way' }
+        ]);
+        const people = yield Person.insertMany([
+          { name: 'Test1', favoriteMovie: movies[1]._id },
+          { name: 'Test2', favoriteMovie: movies[0]._id }
+        ], { populate: 'favoriteMovie' });
+
+        assert.equal(people.length, 2);
+        assert.equal(people[0].favoriteMovie.name, 'Jingle All The Way');
+        assert.equal(people[1].favoriteMovie.name, 'The Empire Strikes Back');
+      });
+    });
+
     it('insertMany() sets `isNew` for inserted documents with `ordered = false` (gh-9677)', function() {
       const schema = new Schema({
         title: { type: String, required: true, unique: true }

@@ -5,7 +5,7 @@ connect('mongodb://localhost:27017/test', {
   useNewUrlParser: true,
   useFindAndModify: true,
   useCreateIndex: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 }).then(mongoose => console.log(mongoose.connect));
 
 // Callback

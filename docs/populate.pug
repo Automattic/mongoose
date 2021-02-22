@@ -74,6 +74,7 @@ block content
       <li><a href="#dynamic-ref">Dynamic References via `refPath`</a></li>
       <li><a href="#populate-virtuals">Populate Virtuals</a></li>
       <li><a href="#count">Populate Virtuals: The Count Option</a></li>
+      <li><a href="#populating-maps">Populating Maps</a></li>
       <li><a href="#populate-middleware">Populate in Middleware</a></li>
     </ul>
 
@@ -669,16 +670,16 @@ block content
     });
     ```
 
-    Keep in mind that virtuals are _not_ included in `toJSON()` output by default. If you want populate virtuals to show up when using functions
-    that rely on `JSON.stringify()`, like Express'
-    [`res.json()` function](http://expressjs.com/en/4x/api.html#res.json),
+    Keep in mind that virtuals are _not_ included in `toJSON()` and `toObject()` output by default. If you want populate
+    virtuals to show up when using functions that rely on `JSON.stringify()`, like Express'
+    [`res.json()` function](https://masteringjs.io/tutorials/express/json),
     set the `virtuals: true` option on your schema's `toJSON` options.
 
     ```javascript
-    // Set `virtuals: true` so `res.json()` works
-    const BandSchema = new Schema({
-      name: String
-    }, { toJSON: { virtuals: true } });
+    const BandSchema = new Schema({ name: String }, {
+      toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
+      toObject: { virtuals: true } // So `toObject()` output includes virtuals
+    });
     ```
 
     If you're using populate projections, make sure `foreignField` is included
@@ -726,6 +727,76 @@ block content
     const doc = await Band.findOne({ name: 'Motley Crue' }).
       populate('numMembers');
     doc.numMembers; // 2
+    ```
+
+    <h3 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h3>
+
+    [Maps](/docs/schematypes.html#maps) are a type that represents an object with arbitrary
+    string keys. For example, in the below schema, `members` is a map from strings to ObjectIds.
+
+    ```javascript
+    const BandSchema = new Schema({
+      name: String,
+      members: {
+        type: Map,
+        of: {
+          type: 'ObjectId',
+          ref: 'Person'
+        }
+      }
+    });
+    const Band = mongoose.model('Band', bandSchema);
+    ```
+
+    This map has a `ref`, which means you can use `populate()` to populate all the ObjectIds
+    in the map. Suppose you have the below `band` document:
+
+    ```
+    const person1 = new Person({ name: 'Vince Neil' });
+    const person2 = new Person({ name: 'Mick Mars' });
+
+    const band = new Band({
+      name: 'Motley Crue',
+      members: {
+        'singer': person1._id,
+        'guitarist': person2._id
+      }
+    });
+    ```
+
+    You can `populate()` every element in the map by populating the special path `members.$*`.
+    `$*` is a special syntax that tells Mongoose to look at every key in the map.
+
+    ```javascript
+    const band = await Band.findOne({ name: 'Motley Crue' }).populate('members.$*');
+
+    band.members.get('singer'); // { _id: ..., name: 'Vince Neil' }
+    ```
+
+    You can also populate paths in maps of subdocuments using `$*`. For example, suppose you
+    have the below `librarySchema`:
+
+    ```javascript
+    const librarySchema = new Schema({
+      name: String,
+      books: {
+        type: Map,
+        of: new Schema({
+          title: String,
+          author: {
+            type: 'ObjectId',
+            ref: 'Person'
+          }
+        })
+      }
+    });
+    const Library = mongoose.model('Library, librarySchema');
+    ```
+
+    You can `populate()` every book's author by populating `books.$*.author`:
+
+    ```javascript
+    const libraries = await Library.find().populate('books.$*.author');
     ```
 
     <h3 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h3>

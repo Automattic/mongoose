@@ -215,6 +215,7 @@ after(function(done) {
 });
 
 module.exports.server = server = new Server('mongod', {
+  bind_ip: '127.0.0.1',
   port: 27000,
   dbpath: './data/db/27000'
 });

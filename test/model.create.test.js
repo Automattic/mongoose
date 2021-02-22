@@ -17,7 +17,7 @@ const DocumentObjectId = mongoose.Types.ObjectId;
  */
 
 const schema = new Schema({
-  title: { type: String, required: true }
+  title: { type: String }
 });
 
 describe('model', function() {
@@ -186,6 +186,14 @@ describe('model', function() {
             done();
           }).
           catch(done);
+      });
+
+      it('treats undefined first arg as doc rather than callback (gh-9765)', function() {
+        return B.create(void 0).
+          then(function(doc) {
+            assert.ok(doc);
+            assert.ok(doc._id);
+          });
       });
     });
   });

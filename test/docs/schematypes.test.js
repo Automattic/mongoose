@@ -2,9 +2,9 @@
 const assert = require('assert');
 const mongoose = require('../../');
 
-describe('schemaTypes', function () {
+describe('schemaTypes', function() {
   let db;
-  let Schema = mongoose.Schema;
+  const Schema = mongoose.Schema;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');

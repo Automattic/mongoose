@@ -5,7 +5,7 @@ const typescript = require('typescript');
 const tsconfig = require('./tsconfig.json');
 
 describe('typescript syntax', function() {
-  this.timeout(10000);
+  this.timeout(60000);
 
   it('base', function() {
     const errors = runTest('base.ts');
@@ -48,7 +48,7 @@ describe('typescript syntax', function() {
   });
 
   it('queries', function() {
-    const errors = runTest('queries.ts');
+    const errors = runTest('queries.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }
@@ -166,7 +166,25 @@ describe('typescript syntax', function() {
   });
 
   it('methods', function() {
-    const errors = runTest('methods.ts');
+    const errors = runTest('methods.ts', { strict: true });
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
+
+  it('schema', function() {
+    const errors = runTest('schema.ts', { strict: true });
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 1);
+    const messageText = errors[0].messageText.messageText;
+    assert.ok(/Type '.*StringConstructor.*' is not assignable to type.*number/.test(messageText), messageText);
+  });
+
+  it('document', function() {
+    const errors = runTest('document.ts', { strict: true });
     if (process.env.D && errors.length) {
       console.log(errors);
     }

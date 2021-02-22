@@ -1,3 +1,113 @@
+5.11.17 / 2021-02-17
+====================
+ * fix(populate): handle `perDocumentLimit` when multiple documents reference the same populated doc #9906
+ * fix(document): handle directly setting embedded document array element with projection #9909
+ * fix(map): cast ObjectId to string inside of MongooseMap #9938 [HunterKohler](https://github.com/HunterKohler)
+ * fix(model): use schema-level default collation for indexes if index doesn't have collation #9912
+ * fix(index.d.ts): make `SchemaTypeOptions#type` optional again to allow alternative typeKeys #9927
+ * fix(index.d.ts): support `{ type: String }` in schema definition when using SchemaDefinitionType generic #9911
+ * docs(populate+schematypes): document the `$*` syntax for populating every entry in a map #9907
+ * docs(connection): clarify that `Connection#transaction()` promise resolves to a command result #9919
+
+5.11.16 / 2021-02-12
+====================
+ * fix(document): skip applying array element setters when init-ing an array #9889
+ * fix: upgrade to mongodb driver 3.6.4 #9893 [jooeycheng](https://github.com/jooeycheng)
+ * fix: avoid copying Object.prototype properties when cloning #9876
+ * fix(aggregate): automatically convert functions to strings when using `$function` operator #9897
+ * fix: call pre-remove hooks for subdocuments #9895 #9885 [IslandRhythms](https://github.com/IslandRhythms)
+ * docs: fix confusing sentence in Schema docs #9914 [namenyi](https://github.com/namenyi)
+
+5.11.15 / 2021-02-03
+====================
+ * fix(document): fix issues with `isSelected` as an path in a nested schema #9884 #9873 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(index.d.ts): better support for `SchemaDefinition` generics when creating schema #9863 #9862 #9789
+ * fix(index.d.ts): allow required function in array definition #9888 [Ugzuzg](https://github.com/Ugzuzg)
+ * fix(index.d.ts): reorder create typings to allow array desctructuring #9890 [Ugzuzg](https://github.com/Ugzuzg)
+ * fix(index.d.ts): add missing overload to Model.validate #9878 #9877 [jonamat](https://github.com/jonamat)
+ * fix(index.d.ts): throw compiler error if schema says path is a String, but interface says path is a number #9857
+ * fix(index.d.ts): make `Query` a class, allow calling `Query#where()` with object argument and with no arguments #9856
+ * fix(index.d.ts): support calling `Schema#pre()` and `Schema#post()` with options and array of hooked function names #9844
+ * docs(faq): mention other debug options than console #9887 [dandv](https://github.com/dandv)
+ * docs(connections): clarify that Mongoose can emit 'error' both during initial connection and after initial connection #9853
+
+5.11.14 / 2021-01-28
+====================
+ * fix(populate): avoid inferring `justOne` from parent when populating a POJO with a manually populated path #9833 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): apply setters on each element of the array when setting a populated array #9838
+ * fix(map): handle change tracking on maps of subdocs #9811 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(document): remove dependency on `documentIsSelected` symbol #9841 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(error): make ValidationError.toJSON to include the error name correctly #9849 [hanzki](https://github.com/hanzki)
+ * fix(index.d.ts): indicate that `Document#remove()` returns a promise, not a query #9826
+ * fix(index.d.ts): allow setting `SchemaType#enum` to TypeScript enum with `required: true` #9546
+
+5.11.13 / 2021-01-20
+====================
+ * fix(map): handle change tracking on map of arrays #9813
+ * fix(connection): allow passing options to `Connection#transaction()` #9834 [pnutmath](https://github.com/pnutmath)
+ * fix(index.d.ts): make `Query#options#rawResult` take precedence over `new`+`upsert` #9816
+ * fix(index.d.ts): changed setOptions's 'overwrite' argument to optional #9824 [pierissimo](https://github.com/pierissimo)
+ * fix(index.d.ts): allow setting `mongoose.Promise` #9820
+ * fix(index.d.ts): add `Aggregate#replaceRoot()` #9814
+ * fix(index.d.ts): make `Model.create()` with a spread return a promise of array rather than single doc #9817
+ * fix(index.d.ts): use SchemaDefinitionProperty generic for SchemaTypeOptions if specified #9815
+ * docs(populate): add note about setting `toObject` for populate virtuals #9822
+
+5.11.12 / 2021-01-14
+====================
+ * fix(document): handle using `db` as a document path #9798
+ * fix(collection): make sure to call `onOpen()` if `autoCreate === false` #9807
+ * fix(index.d.ts): correct query type for `findOneAndUpdate()` and `findByIdAndUpdate()` with `rawResult = true` #9803
+ * fix(index.d.ts): require setting `new: true` or `returnOriginal: false` to skip null check with `findOneAndUpdate()` #9654
+ * fix(index.d.ts): make methods and statics optional on schema #9801
+ * fix(index.d.ts): remove non backwards compatible methods restriction #9801
+ * docs: removed the extra word on comment doc #9794 [HenriqueLBorges](https://github.com/HenriqueLBorges)
+
+5.11.11 / 2021-01-08
+====================
+ * fix(model): support calling `create()` with `undefined` as first argument and no callback #9765
+ * fix(index.d.ts): ensure TypeScript knows that `this` refers to `DocType` in schema methods with strict mode #9755
+ * fix(index.d.ts): make SchemaDefinition accept a model generic #9761 [mroohian](https://github.com/mroohian)
+ * fix(index.d.ts): add `Aggregate#addFields()` #9774
+ * fix(index.d.ts): allow setting `min` and `max` to [number, string] and [Date, string] #9762
+ * fix(index.d.ts): improve context and type bindings for `Schema#methods` and `Schema#statics` #9717
+ * docs: add recommended connection option #9768 [Fernando-Lozano](https://github.com/Fernando-Lozano)
+ * chore: correct improper date in History.md #9783 [botv](https://github.com/botv)
+
+5.11.10 / 2021-01-04
+====================
+ * fix(model): support `populate` option for `insertMany()` as a workaround for mongoose-autopopulate #9720
+ * perf(schema): avoid creating extra array when initializing array of arrays #9588
+ * perf(schema): avoid setting `arrayPath` when casting to a non-array, avoid unnecessarily setting atomics #9588
+ * perf(schema): avoid expensive `String#slice()` call when creating a new array #9588
+ * fix(queryhelpers): avoid modifying `lean.virtuals` in place #9754
+ * fix: fall back to legacy treatment for square brackets if square brackets contents aren't a number #9640
+ * fix(document): make fix for #9396 handle null values more gracefully #9709
+ * fix(index.d.ts): add missing overloaded function for Document#populate() #9744 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): allow Model.create param1 overwrite #9753 [hasezoey](https://github.com/hasezoey)
+ * fix(index.d.ts): improve autocomplete for query middleware #9752 [3Aahmednaser94](https://github.com/3Aahmednaser94)
+ * fix(index.d.ts): add missing function for Aggregate#group() #9750 [coro101](https://github.com/coro101)
+ * fix(index.d.ts): add missing `Aggregate#project()` #9763 [vorticalbox](https://github.com/vorticalbox)
+ * fix(index.d.ts): allow `null` as an enum value for schematypes #9746
+ * docs(guide+schema): make schema API docs and guide docs' list of Schema options line up #9749
+ * docs(documents): add some more details about what the `save()` promise resolves to #9689
+ * docs(subdocs): add section about subdocument defaults #7291
+ * chore: run GitHub CI on PRs and update badge #9760 [YC](https://github.com/YC)
+
+5.11.9 / 2020-12-28
+===================
+ * fix(document): keeps atomics when assigning array to filtered array #9651
+ * fix(document): apply `defaults` option to subdocument arrays #9736
+ * fix(index.d.ts): allow passing generic parameter to overwrite `lean()` result type #9728
+ * fix(index.d.ts): add missing pre hook for findOneAndUpdate #9743 [sahasayan](https://github.com/sahasayan)
+ * fix(index.d.ts): schema methods & statics types #9725
+ * fix(index.d.ts): allow `id` paths with non-string values in TypeScript #9723
+ * fix(index.d.ts): support calling `createIndexes()` and `ensureIndexes()` with just callback #9706
+ * fix(index.d.ts): include `__v` in LeanDocuments #9687
+ * fix(index.d.ts): add missing `Aggregate#append()` #9714
+ * chore: add eslint typescript support and lint index.d.ts file #9729 [simllll](https://github.com/simllll)
+ * chore: add Github Actions #9688 [YC](https://github.com/YC)
+
 5.11.8 / 2020-12-14
 ===================
  * fix(index.d.ts): add missing single document populate #9696 [YC](https://github.com/YC)

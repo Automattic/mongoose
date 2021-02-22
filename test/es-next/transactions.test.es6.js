@@ -419,4 +419,21 @@ describe('transactions', function() {
     const createdDoc = await Test.collection.findOne();
     assert.deepEqual(createdDoc.arr, ['foo']);
   });
+
+  it('can save a new document with an array and read within transaction', async function () {
+    const schema = Schema({ arr: [String] });
+
+    const Test = db.model('new_doc_array', schema);
+
+    await Test.createCollection();
+    const doc = new Test({ arr: ['foo'] });
+    await db.transaction(
+      async (session) => {
+        await doc.save({ session });
+        const testDocs = await Test.collection.find({}).session(session);
+        assert.deepStrictEqual(testDocs.length, 1);
+      },
+      { readPreference: 'primary' }
+    );
+  });
 });

@@ -6,7 +6,7 @@ const Promise = global.Promise || require('bluebird');
 
 describe('validation docs', function() {
   let db;
-  let Schema = mongoose.Schema;
+  const Schema = mongoose.Schema;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test', {
@@ -280,7 +280,7 @@ describe('validation docs', function() {
 
     const toy = new Toy({ color: 'Green', name: 'Power Ranger' });
 
-    toy.save(function (err) {
+    toy.save(function(err) {
       // `err` is a ValidationError object
       // `err.errors.color` is a ValidatorError object
       assert.equal(err.errors.color.message, 'Color `Green` not valid');
@@ -399,12 +399,12 @@ describe('validation docs', function() {
 
     const Toy = db.model('Toys', toySchema);
 
-    Toy.schema.path('color').validate(function (value) {
+    Toy.schema.path('color').validate(function(value) {
       return /red|green|blue/i.test(value);
     }, 'Invalid color');
 
     const opts = { runValidators: true };
-    Toy.updateOne({}, { color: 'not a color' }, opts, function (err) {
+    Toy.updateOne({}, { color: 'not a color' }, opts, function(err) {
       assert.equal(err.errors.color.message,
         'Invalid color');
       // acquit:ignore:start
@@ -517,7 +517,7 @@ describe('validation docs', function() {
 
     const update = { color: 'blue' };
     const opts = { runValidators: true };
-    Kitten.updateOne({}, update, opts, function(err) {
+    Kitten.updateOne({}, update, opts, function() {
       // Operation succeeds despite the fact that 'name' is not specified
       // acquit:ignore:start
       --outstanding || done();
@@ -570,7 +570,7 @@ describe('validation docs', function() {
 
     let update = { $inc: { number: 1 } };
     const opts = { runValidators: true };
-    Test.updateOne({}, update, opts, function(error) {
+    Test.updateOne({}, update, opts, function() {
       // There will never be a validation error here
       update = { $push: [{ message: 'hello' }, { message: 'world' }] };
       Test.updateOne({}, update, opts, function(error) {

@@ -5853,6 +5853,51 @@ describe('document', function() {
       assert.equal(doc.totalValue, 5);
     });
 
+    it('calls array getters (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          ref: 'Doesnt Matter',
+          get: () => {
+            ++called;
+            return 42;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      const doc = new Test({ arr: [new mongoose.Types.ObjectId()] });
+      assert.deepEqual(doc.toObject({ getters: true }).arr, [42]);
+      assert.equal(called, 1);
+    });
+
+    it('doesnt call setters when init-ing an array (gh-9889)', function() {
+      let called = 0;
+      const testSchema = new mongoose.Schema({
+        arr: [{
+          type: 'ObjectId',
+          set: v => {
+            ++called;
+            return v;
+          }
+        }]
+      });
+
+      const Test = db.model('Test', testSchema);
+
+      return co(function*() {
+        let doc = yield Test.create({ arr: [new mongoose.Types.ObjectId()] });
+        assert.equal(called, 1);
+
+        called = 0;
+        doc = yield Test.findById(doc._id);
+        assert.ok(doc);
+        assert.equal(called, 0);
+      });
+    });
+
     it('nested virtuals + nested toJSON (gh-6294)', function() {
       const schema = mongoose.Schema({
         nested: {
@@ -8942,7 +8987,6 @@ describe('document', function() {
     const err = t.validateSync();
     assert.ok(err);
     assert.ok(err.errors);
-    assert.ok(err.errors['test']);
     assert.ok(err.errors['test.1']);
   });
 
@@ -9122,7 +9166,7 @@ describe('document', function() {
       testNested: {
         prop: { type: String, default: 'bar' }
       },
-      testArray: [{ prop: { type: String, defualt: 'baz' } }],
+      testArray: [{ prop: { type: String, default: 'baz' } }],
       testSingleNested: new Schema({
         prop: { type: String, default: 'qux' }
       })
@@ -9813,5 +9857,230 @@ describe('document', function() {
     const testObject = new TestModel({ name: 't' });
 
     assert.strictEqual(testObject.get(''), void 0);
+  });
+
+  it('keeps atomics when assigning array to filtered array (gh-9651)', function() {
+    const Model = db.model('Test', { arr: [{ abc: String }] });
+
+    return co(function*() {
+      const m1 = new Model({ arr: [{ abc: 'old' }] });
+      yield m1.save();
+
+      const m2 = yield Model.findOne({ _id: m1._id });
+
+      m2.arr = [];
+      m2.arr = m2.arr.filter(() => true);
+      m2.arr.push({ abc: 'ghi' });
+      yield m2.save();
+
+      const fromDb = yield Model.findById(m1._id);
+      assert.equal(fromDb.arr.length, 1);
+      assert.equal(fromDb.arr[0].abc, 'ghi');
+    });
+  });
+
+  it('handles paths named `db` (gh-9798)', function() {
+    const schema = new Schema({
+      db: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ db: 'foo' });
+      doc.db = 'bar';
+      yield doc.save();
+      yield doc.deleteOne();
+
+      const _doc = yield Test.findOne({ db: 'bar' });
+      assert.ok(!_doc);
+    });
+  });
+
+  it('object setters will be applied for each object in array after populate (gh-9838)', function() {
+    const updatedElID = '123456789012345678901234';
+
+    const ElementSchema = new Schema({
+      name: 'string',
+      nested: [{ type: Schema.Types.ObjectId, ref: 'Nested' }]
+    });
+
+    const NestedSchema = new Schema({});
+
+    const Element = db.model('Test', ElementSchema);
+    const NestedElement = db.model('Nested', NestedSchema);
+
+    return co(function*() {
+      const nes = new NestedElement({});
+      yield nes.save();
+      const ele = new Element({ nested: [nes.id], name: 'test' });
+      yield ele.save();
+
+      const ss = yield Element.findById(ele._id).populate({ path: 'nested', model: NestedElement });
+      ss.nested = [updatedElID];
+      yield ss.save();
+
+      assert.ok(typeof ss.nested[0] !== 'string');
+      assert.equal(ss.nested[0].toHexString(), updatedElID);
+    });
+  });
+  it('gh9884', function() {
+    return co(function*() {
+
+      const obi = new Schema({
+        eType: {
+          type: String,
+          required: true,
+          uppercase: true
+        },
+        eOrigin: {
+          type: String,
+          required: true
+        },
+        eIds: [
+          {
+            type: String
+          }
+        ]
+      }, { _id: false });
+
+      const schema = new Schema({
+        name: String,
+        description: String,
+        isSelected: {
+          type: Boolean,
+          default: false
+        },
+        wan: {
+          type: [obi],
+          default: undefined,
+          required: true
+        }
+      });
+
+      const newDoc = {
+        name: 'name',
+        description: 'new desc',
+        isSelected: true,
+        wan: [
+          {
+            eType: 'X',
+            eOrigin: 'Y',
+            eIds: ['Y', 'Z']
+          }
+        ]
+      };
+
+      const Model = db.model('Test', schema);
+      yield Model.create(newDoc);
+      const doc = yield Model.findOne();
+      assert.ok(doc);
+    });
+  });
+
+  it('Makes sure pre remove hook is executed gh-9885', function() {
+    const SubSchema = new Schema({
+      myValue: {
+        type: String
+      }
+    }, {});
+    let count = 0;
+    SubSchema.pre('remove', function(next) {
+      count++;
+      next();
+    });
+    const thisSchema = new Schema({
+      foo: {
+        type: String,
+        required: true
+      },
+      mySubdoc: {
+        type: [SubSchema],
+        required: true
+      }
+    }, { minimize: false, collection: 'test' });
+
+    const Model = db.model('TestModel', thisSchema);
+
+    return co(function*() {
+      yield Model.deleteMany({}); // remove all existing documents
+      const newModel = {
+        foo: 'bar',
+        mySubdoc: [{ myValue: 'some value' }]
+      };
+      const document = yield Model.create(newModel);
+      document.mySubdoc[0].remove();
+      yield document.save().catch((error) => {
+        console.error(error);
+      });
+      assert.equal(count, 1);
+    });
+  });
+
+  it('gh9880', function(done) {
+    const testSchema = new Schema({
+      prop: String,
+      nestedProp: {
+        prop: String
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    new Test({
+      prop: 'Test',
+      nestedProp: null
+    }).save((err, doc) => {
+      doc.id;
+      doc.nestedProp;
+
+      // let's clone this document:
+      new Test({
+        prop: 'Test 2',
+        nestedProp: doc.nestedProp
+      });
+
+      Test.updateOne({
+        _id: doc._id
+      }, {
+        nestedProp: null
+      }, (err) => {
+        assert.ifError(err);
+        Test.findOne({
+          _id: doc._id
+        }, (err, updatedDoc) => {
+          assert.ifError(err);
+          new Test({
+            prop: 'Test 3',
+            nestedProp: updatedDoc.nestedProp
+          });
+          done();
+        });
+      });
+    });
+  });
+
+  it('handles directly setting embedded document array element with projection (gh-9909)', function() {
+    const schema = Schema({
+      elements: [{
+        text: String,
+        subelements: [{
+          text: String
+        }]
+      }]
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      let doc = yield Test.create({ elements: [{ text: 'hello' }] });
+      doc = yield Test.findById(doc).select('elements');
+
+      doc.elements[0].subelements[0] = { text: 'my text' };
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.elements.length, 1);
+      assert.equal(fromDb.elements[0].subelements.length, 1);
+      assert.equal(fromDb.elements[0].subelements[0].text, 'my text');
+    });
   });
 });

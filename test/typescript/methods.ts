@@ -5,13 +5,14 @@ interface ITest extends Document {
   getAnswer(): number;
 }
 
-const TestSchema = new Schema({
-  foo: { type: String, required: true },
+const TestSchema = new Schema<ITest>({
+  foo: { type: String, required: true }
 });
 
 TestSchema.methods.getAnswer = function(): number {
+  console.log(this.foo.trim());
   return 42;
-}
+};
 
 const Test = connection.model<ITest>('Test', TestSchema);
 

@@ -567,9 +567,11 @@ declare module 'mongoose' {
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON(options?: ToObjectOptions): LeanDocument<this>;
+    toJSON<T>(options?: ToObjectOptions): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject(options?: ToObjectOptions): LeanDocument<this>;
+    toObject<T>(options?: ToObjectOptions): T;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;
@@ -1725,6 +1727,7 @@ declare module 'mongoose' {
 
       /** Returns a native js Array. */
       toObject(options?: ToObjectOptions): any;
+      toObject<T>(options?: ToObjectOptions): T;
 
       /** Wraps [`Array#unshift`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/unshift) with proper change tracking. */
       unshift(...args: any[]): number;

@@ -10057,4 +10057,30 @@ describe('document', function() {
       });
     });
   });
+
+  it('handles directly setting embedded document array element with projection (gh-9909)', function() {
+    const schema = Schema({
+      elements: [{
+        text: String,
+        subelements: [{
+          text: String
+        }]
+      }]
+    });
+
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      let doc = yield Test.create({ elements: [{ text: 'hello' }] });
+      doc = yield Test.findById(doc).select('elements');
+
+      doc.elements[0].subelements[0] = { text: 'my text' };
+      yield doc.save();
+
+      const fromDb = yield Test.findById(doc).lean();
+      assert.equal(fromDb.elements.length, 1);
+      assert.equal(fromDb.elements[0].subelements.length, 1);
+      assert.equal(fromDb.elements[0].subelements[0].text, 'my text');
+    });
+  });
 });

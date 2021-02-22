@@ -1188,14 +1188,15 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T> = T extends number
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
     ? (typeof Number | 'number' | 'Number')
     : T extends string
     ? (typeof String | 'string' | 'String')
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
-    SchemaDefinitionWithBuiltInClass<T> |
+  type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
+    ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
+    SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
     Schema<T extends Document ? T : Document<any>> |
     Schema<T extends Document ? T : Document<any>>[] |
@@ -1371,7 +1372,7 @@ declare module 'mongoose' {
   }
 
   interface SchemaTypeOptions<T> {
-    type?: T | SchemaDefinitionWithBuiltInClass<T>;
+    type?: T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> : T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

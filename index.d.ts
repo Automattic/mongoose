@@ -630,6 +630,10 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
+    create(doc: T | DocumentDefinition<T>): Promise<T>;
+    create(docs: (T | DocumentDefinition<T>)[], options?: SaveOptions): Promise<T[]>;
+    create(docs: (T | DocumentDefinition<T>)[], callback: (err: CallbackError, docs: T[]) => void): void;
+    create(doc: T | DocumentDefinition<T>, callback: (err: CallbackError, doc: T) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
     create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;

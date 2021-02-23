@@ -3722,4 +3722,22 @@ describe('Query', function() {
       assert.equal(err.path, '$nor.0');
     });
   });
+
+  it('includes `undefined` in filters (gh-3944)', function() {
+    const userSchema = new Schema({ name: String, pwd: String });
+    const Person = db.model('Person', userSchema);
+
+    return co(function*() {
+      yield Person.create([
+        { name: 'test1', pwd: 'my secret' },
+        { name: 'test2', pwd: null }
+      ]);
+
+      let res = yield Person.findOne({ name: 'test1', pwd: void 0 });
+      assert.equal(res, null);
+
+      res = yield Person.findOne({ name: 'test2', pwd: void 0 });
+      assert.equal(res.name, 'test2');
+    });
+  });
 });

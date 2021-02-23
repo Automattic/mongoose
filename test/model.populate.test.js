@@ -9983,7 +9983,9 @@ describe('model: populate:', function() {
         { title: 'Second post', commentsIds: [commonComment, comments[1]] }
       ]);
 
-      posts = yield Post.find().populate({ path: 'commentsIds', perDocumentLimit: 2, sort: { content: 1 } });
+      posts = yield Post.find().
+        sort({ title: 1 }).
+        populate({ path: 'commentsIds', perDocumentLimit: 2, sort: { content: 1 } });
       assert.equal(posts.length, 2);
       assert.ok(!Array.isArray(posts[0].commentsIds[0]));
 

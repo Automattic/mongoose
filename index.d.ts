@@ -567,9 +567,11 @@ declare module 'mongoose' {
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON(options?: ToObjectOptions): LeanDocument<this>;
+    toJSON<T>(options?: ToObjectOptions): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject(options?: ToObjectOptions): LeanDocument<this>;
+    toObject<T>(options?: ToObjectOptions): T;
 
     /** Clears the modified state on the specified path. */
     unmarkModified(path: string): void;
@@ -630,6 +632,10 @@ declare module 'mongoose' {
     countDocuments(filter: FilterQuery<T>, callback?: (err: any, count: number) => void): Query<number, T>;
 
     /** Creates a new document or documents */
+    create(doc: T | DocumentDefinition<T>): Promise<T>;
+    create(docs: (T | DocumentDefinition<T>)[], options?: SaveOptions): Promise<T[]>;
+    create(docs: (T | DocumentDefinition<T>)[], callback: (err: CallbackError, docs: T[]) => void): void;
+    create(doc: T | DocumentDefinition<T>, callback: (err: CallbackError, doc: T) => void): void;
     create<DocContents = T | DocumentDefinition<T>>(docs: DocContents[], options?: SaveOptions): Promise<T[]>;
     create<DocContents = T | DocumentDefinition<T>>(doc: DocContents): Promise<T>;
     create<DocContents = T | DocumentDefinition<T>>(...docs: DocContents[]): Promise<T[]>;
@@ -659,14 +665,14 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes all documents that match `conditions`
      * regardless of the `single` option.
      */
-    deleteMany(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T>;
 
     /**
      * Deletes the first document that matches `conditions` from the collection.
      * Behaves like `remove()`, but deletes at most one document regardless of the
      * `single` option.
      */
-    deleteOne(filter?: any, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<any, T>;
+    deleteOne(filter?: FilterQuery<T>, options?: QueryOptions, callback?: (err: CallbackError) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }, T>;
 
     /**
      * Sends `createIndex` commands to mongo for each index declared in the schema.
@@ -835,13 +841,13 @@ declare module 'mongoose' {
      * @deprecated use `updateOne` or `updateMany` instead.
      * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
      */
-    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<mongodb.WriteOpResult['result'], T>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<mongodb.UpdateWriteOpResult['result'], T>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<any, T>;
+    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): Query<mongodb.UpdateWriteOpResult['result'], T>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where(path: string, val?: any): Query<Array<T>, T>;
@@ -1182,14 +1188,15 @@ declare module 'mongoose' {
     virtualpath(name: string): VirtualType | null;
   }
 
-  type SchemaDefinitionWithBuiltInClass<T> = T extends number
-    ? (typeof Number | 'number' | 'Number')
+  type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
+    ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
-    ? (typeof String | 'string' | 'String')
+    ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
     : (Function | string);
 
-  type SchemaDefinitionProperty<T = undefined> = SchemaTypeOptions<T extends undefined ? any : T> |
-    SchemaDefinitionWithBuiltInClass<T> |
+  type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function
+    ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
+    SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
     Schema<T extends Document ? T : Document<any>> |
     Schema<T extends Document ? T : Document<any>>[] |
@@ -1365,7 +1372,7 @@ declare module 'mongoose' {
   }
 
   interface SchemaTypeOptions<T> {
-    type?: T | SchemaDefinitionWithBuiltInClass<T>;
+    type?: T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> : T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;
@@ -1493,6 +1500,26 @@ declare module 'mongoose' {
 
     [other: string]: any;
   }
+
+  export type RefType =
+    | number
+    | string
+    | Buffer
+    | undefined
+    | mongoose.Types.ObjectId
+    | mongoose.Types.Buffer
+    | typeof mongoose.Schema.Types.Number
+    | typeof mongoose.Schema.Types.String
+    | typeof mongoose.Schema.Types.Buffer
+    | typeof mongoose.Schema.Types.ObjectId;
+
+  /**
+   * Reference another Model
+   */
+  export type PopulatedDoc<
+    PopulatedType,
+    RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : mongoose.Types.ObjectId) | undefined
+    > = PopulatedType | RawId;
 
   interface IndexOptions {
     background?: boolean,
@@ -1721,6 +1748,7 @@ declare module 'mongoose' {
 
       /** Returns a native js Array. */
       toObject(options?: ToObjectOptions): any;
+      toObject<T>(options?: ToObjectOptions): T;
 
       /** Wraps [`Array#unshift`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/unshift) with proper change tracking. */
       unshift(...args: any[]): number;

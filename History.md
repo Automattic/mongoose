@@ -1,3 +1,15 @@
+5.11.18 / 2021-02-23
+====================
+ * fix(connection): set connection state to `disconnected` if connecting string failed to parse #9921
+ * fix(connection): remove `db` events deprecation warning if `useUnifiedTopology = true` #9930
+ * fix(connection): fix promise chaining for openUri #9960 [lantw44](https://github.com/lantw44)
+ * fix(index.d.ts): add `PopulatedDoc` type to make it easier to define populated docs in interfaces #9818
+ * fix(index.d.ts): allow explicitly overwriting `toObject()` return type for backwards compatibility #9944
+ * fix(index.d.ts): correctly throw error when interface path type doesn't line up with schema path type #9958 [ShadiestGoat](https://github.com/ShadiestGoat)
+ * fix(index.d.ts): remove `any` from `deleteX()` and `updateX()` query params and return values #9959 [btd](https://github.com/btd)
+ * fix(index.d.ts): add non-generic versions of `Model.create()` for better autocomplete #9928
+ * docs: correctly handle multiple `&gt` in API descriptions #9940
+
 5.11.17 / 2021-02-17
 ====================
  * fix(populate): handle `perDocumentLimit` when multiple documents reference the same populated doc #9906

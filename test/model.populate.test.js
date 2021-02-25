@@ -10078,4 +10078,88 @@ describe('model: populate:', function() {
       assert.equal(called[0].id.toHexString(), newId.toHexString());
     });
   });
+
+  it('transform with virtual populate, justOne = true (gh-3375)', function() {
+    const parentSchema = new Schema({
+      name: String
+    });
+    parentSchema.virtual('child', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: true
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
+
+    return co(function*() {
+      let p = yield Parent.create({ name: 'Anakin' });
+      const child = yield Child.create({ name: 'Luke', parentId: p._id });
+
+      let called = [];
+
+      p = yield Parent.findById(p).populate({
+        path: 'child',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 1);
+      assert.strictEqual(called[0].doc.parentId.toHexString(), p._id.toHexString());
+      assert.equal(called[0].id.toHexString(), p._id.toHexString());
+    });
+  });
+
+  it('transform with virtual populate, justOne = false (gh-3375) XYZ', function() {
+    const parentSchema = new Schema({
+      name: String
+    });
+    parentSchema.virtual('children', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      justOne: false
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const Child = db.model('Child', Schema({ name: String, parentId: 'ObjectId' }));
+
+    return co(function*() {
+      let p = yield Parent.create({ name: 'Anakin' });
+      const children = yield Child.create([
+        { name: 'Luke', parentId: p._id },
+        { name: 'Leia', parentId: p._id }
+      ]);
+
+      let called = [];
+
+      p = yield Parent.findById(p).populate({
+        path: 'children',
+        transform: function(doc, id) {
+          called.push({
+            doc: doc,
+            id: id
+          });
+
+          return id;
+        }
+      });
+
+      assert.equal(called.length, 2);
+      assert.deepEqual(called.map(c => c.doc.name).sort(), ['Leia', 'Luke']);
+
+      assert.strictEqual(called[0].doc.parentId.toHexString(), p._id.toHexString());
+      assert.equal(called[0].id.toHexString(), p._id.toHexString());
+
+      assert.strictEqual(called[1].doc.parentId.toHexString(), p._id.toHexString());
+      assert.equal(called[1].id.toHexString(), p._id.toHexString());
+    });
+  });
 });

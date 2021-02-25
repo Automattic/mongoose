@@ -1189,9 +1189,9 @@ declare module 'mongoose' {
   }
 
   type SchemaDefinitionWithBuiltInClass<T extends number | string | Function> = T extends number
-    ? (typeof Number | 'number' | 'Number')
+    ? (typeof Number | 'number' | 'Number' | typeof Schema.Types.Number)
     : T extends string
-    ? (typeof String | 'string' | 'String')
+    ? (typeof String | 'string' | 'String' | typeof Schema.Types.String)
     : (Function | string);
 
   type SchemaDefinitionProperty<T = undefined> = T extends string | number | Function

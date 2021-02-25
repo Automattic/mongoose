@@ -3736,7 +3736,7 @@ describe('Query', function() {
       let res = yield Person.findOne({ name: 'test1', pwd: void 0 });
       assert.equal(res, null);
 
-      res = yield Person.findOne({ name: 'test2', pwd: void 0 });
+      res = yield Person.findOne({ name: 'test2', pwd: { $eq: void 0 } });
       assert.equal(res.name, 'test2');
     });
   });

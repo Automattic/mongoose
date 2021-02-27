@@ -7084,6 +7084,99 @@ describe('Model', function() {
     });
   });
 
+  describe('buildBulkWriteOperations', () => {
+    it('builds write operations', () => {
+      return co(function*() {
+
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+        const users = [
+          new User({ name: 'Hafez1_gh-9673-1' }),
+          new User({ name: 'Hafez2_gh-9673-1' }),
+          new User({ name: 'I am the third name' })
+        ];
+
+        yield users[2].save();
+        users[2].name = 'I am the updated third name';
+
+        const writeOperations = User.buildBulkWriteOperations(users);
+
+        const desiredWriteOperations = [
+          { insertOne: { document: users[0] } },
+          { insertOne: { document: users[1] } },
+          { updateOne: { filter: { _id: users[2]._id }, update: { $set: { name: 'I am the updated third name' } } } }
+        ];
+
+        assert.deepEqual(
+          writeOperations,
+          desiredWriteOperations
+        );
+      });
+    });
+
+    it('throws an error when one document is invalid', () => {
+      const userSchema = new Schema({
+        name: { type: String, minLength: 5 }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const users = [
+        new User({ name: 'a' }),
+        new User({ name: 'Hafez2_gh-9673-1' }),
+        new User({ name: 'b' })
+      ];
+
+      let err;
+      try {
+        User.buildBulkWriteOperations(users);
+      } catch (error) {
+        err = error;
+      }
+
+
+      assert.ok(err);
+    });
+
+    it('throws an error if documents is not an array', function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      assert.throws(
+        function() {
+          User.buildBulkWriteOperations(null);
+        },
+        /bulkSave expects an array of documents to be passed/
+      );
+    });
+    it('throws an error if one element is not a document', function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      assert.throws(
+        function() {
+          User.buildBulkWriteOperations([
+            new User({ name: 'Hafez' }),
+            { name: 'I am not a document' }
+          ]);
+        },
+        /documents\.1 was not a mongoose document/
+      );
+    });
+  });
+
   describe('bulkSave() (gh-9673)', function() {
     it('saves new documents', function() {
       return co(function* () {
@@ -7143,43 +7236,55 @@ describe('Model', function() {
         );
       });
     });
+
+    it('returns writeResult on success, err is null', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String }
+        });
+
+        const User = db.model('User', userSchema);
+
+
+        yield User.insertMany([
+          new User({ name: 'Hafez1_gh-9673-2' }),
+          new User({ name: 'Hafez2_gh-9673-2' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        users[0].name = 'Hafez1_gh-9673-2-updated';
+        users[1].name = 'Hafez2_gh-9673-2-updated';
+
+        const writeResult = yield User.bulkSave(users);
+        assert.ok(writeResult);
+      });
+    });
+    it('returns err on failure, writeResult is null', () => {
+      return co(function* () {
+        const userSchema = new Schema({
+          name: { type: String, unique: true }
+        });
+
+        const User = db.model('User', userSchema);
+        yield User.init();
+
+        yield User.insertMany([
+          new User({ name: 'Hafez1_gh-9673-2' }),
+          new User({ name: 'Hafez2_gh-9673-2' })
+        ]);
+
+        const users = yield User.find().sort('name');
+
+        users[0].name = 'duplicate-name';
+        users[1].name = 'duplicate-name';
+
+        const err = yield User.bulkSave(users).then(() => null, err => err);
+        assert.ok(err);
+      });
+    });
+    it('throws an error when a document throws a unique error');
     it('changes document state from `isNew` `false` to `true`');
     it('changes documents state');
-    it('throws an error when a document is invalid');
-    it('throws an error when a document throws a unique error');
-
-    it('throws an error if documents is not an array', function() {
-      const userSchema = new Schema({
-        name: { type: String }
-      });
-
-      const User = db.model('User', userSchema);
-
-
-      assert.throws(
-        function() {
-          User.bulkSave(null);
-        },
-        /bulkSave expects an array of documents to be passed/
-      );
-    });
-    it('throws an error if one element is not a document', function() {
-      const userSchema = new Schema({
-        name: { type: String }
-      });
-
-      const User = db.model('User', userSchema);
-
-
-      assert.throws(
-        function() {
-          User.bulkSave([
-            new User({ name: 'Hafez' }),
-            { name: 'I am not a document' }
-          ]);
-        },
-        /documents\.1 was not a mongoose document/
-      );
-    });
   });
 });

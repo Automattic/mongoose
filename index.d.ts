@@ -1371,8 +1371,13 @@ declare module 'mongoose' {
     currentTime?: () => (Date | number);
   }
 
+  type Unpacked<T> = T extends (infer U)[] ? U : T;
+
   interface SchemaTypeOptions<T> {
-    type?: T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> : T;
+    type?:
+      T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
+      T extends object[] ? T | Schema<Unpacked<T> & Document>[] :
+      T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

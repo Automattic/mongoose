@@ -2545,15 +2545,21 @@ describe('document', function() {
       });
     });
 
-    it('filters out validation on unmodified paths when validateModifiedOnly set (gh-7421)', function(done) {
-      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+    it('filters out validation on unmodified paths when validateModifiedOnly set (gh-7421) (gh-9963)', function(done) {
+      const testSchema = new Schema({
+        title: { type: String, required: true },
+        other: String,
+        subdocs: [{ name: { type: String, required: true } }]
+      });
 
       const Test = db.model('Test', testSchema);
 
-      Test.create([{}], { validateBeforeSave: false }, function(createError, docs) {
+      const doc = { subdocs: [{ name: null }, { name: 'test' }] };
+      Test.create([doc], { validateBeforeSave: false }, function(createError, docs) {
         assert.equal(createError, null);
         const doc = docs[0];
         doc.other = 'something';
+        doc.subdocs[1].name = 'test2';
         assert.equal(doc.validateSync(undefined, { validateModifiedOnly: true }), null);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.equal(error, null);

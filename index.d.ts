@@ -244,7 +244,7 @@ declare module 'mongoose' {
 
     /** Defines or retrieves a model. */
     model<T extends Document>(name: string, schema?: Schema<T>, collection?: string): Model<T>;
-    model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = undefined>(
+    model<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, U, TQueryHelpers>,
       collection?: string,

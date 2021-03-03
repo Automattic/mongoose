@@ -594,7 +594,7 @@ declare module 'mongoose' {
 
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
-  interface Model<T extends Document, TQueryHelpers = undefined> extends NodeJS.EventEmitter {
+  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter {
     new(doc?: any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;

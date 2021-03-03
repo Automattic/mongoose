@@ -2566,4 +2566,22 @@ describe('schema', function() {
     assert.equal(schema.path('tags').caster.instance, 'String');
     assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
   });
+
+  it('handles loadClass with inheritted getters (gh-9975)', function() {
+    class User {
+      get displayAs() {
+        return null;
+      }
+    }
+
+    class TechnicalUser extends User {
+      get displayAs() {
+        return this.name;
+      }
+    }
+
+    const schema = new Schema({ name: String }).loadClass(TechnicalUser);
+
+    assert.equal(schema.virtuals.displayAs.applyGetters(null, { name: 'test' }), 'test');
+  });
 });

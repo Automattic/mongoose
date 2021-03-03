@@ -1052,7 +1052,7 @@ declare module 'mongoose' {
   type SchemaPreOptions = { document?: boolean, query?: boolean };
   type SchemaPostOptions = { document?: boolean, query?: boolean };
 
-  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<DocType>, SchemaDefinitionType = undefined> extends events.EventEmitter {
+  class Schema<DocType extends Document = Document, M extends Model<DocType> = Model<any>, SchemaDefinitionType = undefined> extends events.EventEmitter {
     /**
      * Create a new schema
      */

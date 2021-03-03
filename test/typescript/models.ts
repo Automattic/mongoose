@@ -1,4 +1,4 @@
-import { Schema, Document, Model, connection } from 'mongoose';
+import { Schema, Document, Model, connection, model } from 'mongoose';
 
 function conventionalSyntax(): void {
   interface ITest extends Document {
@@ -47,6 +47,21 @@ function insertManyTest() {
   Test.insertMany([{ foo: 'bar' }]).then(async res => {
     res.length;
   });
+}
+
+function schemaStaticsWithoutGenerics() {
+  const UserSchema = new Schema({});
+  UserSchema.statics.static1 = function() { return ''; };
+
+  interface IUserDocument extends Document {
+    instanceField: string;
+  }
+  interface IUserModel extends Model<IUserDocument> {
+    static1: () => string;
+  }
+
+  const UserModel: IUserModel = model<IUserDocument, IUserModel>('User', UserSchema);
+  UserModel.static1();
 }
 
 const ExpiresSchema = new Schema({

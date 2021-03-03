@@ -17,7 +17,7 @@ interface ITest extends Document {
   tags?: string[];
 }
 
-const Test = model<ITest, QueryHelpers>('Test', schema);
+const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
 Test.find().byName('test').orFail().exec().then(console.log);
 

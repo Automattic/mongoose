@@ -1827,7 +1827,7 @@ declare module 'mongoose' {
 
   type ReturnsNewDoc = { new: true } | { returnOriginal: false };
 
-  class Query<ResultType, DocType extends Document, THelpers = Record<string, any>> {
+  class Query<ResultType, DocType extends Document, THelpers = any> {
     _mongooseOptions: MongooseQueryOptions;
 
     /** Executes the query */
@@ -1935,9 +1935,9 @@ declare module 'mongoose' {
     explain(verbose?: string): this;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find(callback?: (err: any, docs: DocType[]) => void): Query<Array<DocType>, DocType, THelpers> & THelpers;
-    find(filter: FilterQuery<DocType>, callback?: (err: any, docs: DocType[]) => void): Query<Array<DocType>, DocType, THelpers> & THelpers;
-    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, docs: DocType[]) => void): Query<Array<DocType>, DocType, THelpers> & THelpers;
+    find(callback?: (err: any, docs: DocType[]) => void): Query<Array<DocType>, DocType, THelpers>;
+    find(filter: FilterQuery<DocType>, callback?: (err: any, docs: DocType[]) => void): Query<Array<DocType>, DocType, THelpers>;
+    find(filter: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, docs: DocType[]) => void): Query<Array<DocType>, DocType, THelpers>;
 
     /** Declares the query a findOne operation. When executed, the first found document is passed to the callback. */
     findOne(filter?: FilterQuery<DocType>, projection?: any | null, options?: QueryOptions | null, callback?: (err: CallbackError, doc: DocType | null) => void): Query<DocType | null, DocType, THelpers>;

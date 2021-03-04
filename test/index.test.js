@@ -530,7 +530,13 @@ describe('mongoose module:', function() {
           cb();
         });
 
+        const events = [];
+        mong.events.on('createConnection', conn => events.push(conn));
+
         const db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri, options);
+
+        assert.equal(events.length, 1);
+        assert.equal(events[0], db2);
 
         db2.on('open', function() {
           connections++;

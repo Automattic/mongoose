@@ -3670,4 +3670,58 @@ describe('Query', function() {
       assert.equal(err.path, '$nor.0');
     });
   });
+
+  it('handles push with array filters (gh-9977)', function() {
+    const questionSchema = new Schema({
+      question_type: { type: String, enum: ['mcq', 'essay'] }
+    }, { discriminatorKey: 'question_type' });
+
+    const quizSchema = new Schema({ quiz_title: String, questions: [questionSchema] });
+    const Quiz = db.model('Test', quizSchema);
+
+    const mcqQuestionSchema = new Schema({
+      text: String,
+      choices: [{ choice_text: String, is_correct: Boolean }]
+    });
+
+    quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
+
+    const id1 = new mongoose.Types.ObjectId();
+    const id2 = new mongoose.Types.ObjectId();
+
+    return co(function*() {
+      let quiz = yield Quiz.create({
+        quiz_title: 'quiz',
+        questions: [
+          {
+            _id: id1,
+            question_type: 'mcq',
+            text: 'A or B?',
+            choices: [
+              { choice_text: 'A', is_correct: false },
+              { choice_text: 'B', is_correct: true }
+            ]
+          },
+          {
+            _id: id2,
+            question_type: 'mcq'
+          }
+        ]
+      });
+
+      const filter = { questions: { $elemMatch: { _id: id2, question_type: 'mcq' } } };
+      yield Quiz.updateOne(filter, {
+        $push: {
+          'questions.$.choices': {
+            choice_text: 'choice 1',
+            is_correct: false
+          }
+        }
+      });
+
+      quiz = yield Quiz.findById(quiz);
+      assert.equal(quiz.questions[1].choices.length, 1);
+      assert.equal(quiz.questions[1].choices[0].choice_text, 'choice 1');
+    });
+  });
 });

@@ -164,7 +164,7 @@ function parse() {
 
       ctx.description = prop.description.full.
         replace(/<br \/>/ig, ' ').
-        replace(/&gt;/i, '>');
+        replace(/&gt;/ig, '>');
       ctx.description = highlight(ctx.description);
 
       data.props.push(ctx);

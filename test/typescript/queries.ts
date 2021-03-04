@@ -1,6 +1,14 @@
-import { Schema, model, Document, Types, Query } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' }, tags: [String] });
+interface QueryHelpers {
+  byName(name: string): Query<Array<ITest>, ITest, QueryHelpers>;
+}
+
+const schema: Schema<ITest, Model<ITest>> = new Schema({ name: { type: 'String' }, tags: [String] });
+
+schema.query.byName = function(name: string): Query<Array<ITest>, ITest, QueryHelpers> {
+  return this.find({ name });
+};
 
 interface ITest extends Document {
   name?: string;
@@ -9,7 +17,9 @@ interface ITest extends Document {
   tags?: string[];
 }
 
-const Test = model<ITest>('Test', schema);
+const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
+
+Test.find().byName('test').orFail().exec().then(console.log);
 
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
 
@@ -41,8 +51,8 @@ Test.findOneAndUpdate({ name: 'test' }, { $set: { name: 'test2' } }).then((res: 
 Test.findOneAndUpdate({ name: 'test' }, { $inc: { age: 2 } }).then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: true }).then((res: ITest) => { res.name = 'test4'; });
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => { res.name = 'test4'; });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res) => { console.log(res.ok); });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res) => { console.log(res.ok); });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => { console.log(res.ok); });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => { console.log(res.ok); });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 

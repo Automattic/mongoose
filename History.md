@@ -1,3 +1,15 @@
+5.11.19 / 2021-03-05
+====================
+ * fix(document): skip validating array elements that aren't modified when `validateModifiedOnly` is set #9963
+ * fix(timestamps): apply timestamps on `findOneAndReplace()` #9951
+ * fix(schema): correctly handle trailing array filters when looking up schema paths #9977
+ * fix(schema): load child class getter for virtuals instead of base class when using `loadClass()` #9975
+ * fix(index.d.ts): allow creating statics without passing generics to `Schema` constructor #9969
+ * fix(index.d.ts): add QueryHelpers generic to schema and model, make all query methods instead return QueryWithHelpers #9850
+ * fix(index.d.ts): support setting `type` to an array of schemas when using SchemaDefinitionType #9962
+ * fix(index.d.ts): add generic to plugin schema definition #9968 [emiljanitzek](https://github.com/emiljanitzek)
+ * docs: small typo fix #9964 [KrishnaMoorthy12](https://github.com/KrishnaMoorthy12)
+
 5.11.18 / 2021-02-23
 ====================
  * fix(connection): set connection state to `disconnected` if connecting string failed to parse #9921

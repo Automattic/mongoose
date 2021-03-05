@@ -6,7 +6,23 @@ enum Genre {
   Comedy
 }
 
-const movieSchema: Schema = new Schema({
+interface Actor {
+  name: string,
+  age: number
+}
+const actorSchema =
+  new Schema<Actor & Document, Model<Actor & Document>, Actor>({ name: { type: String }, age: { type: Number } });
+
+interface Movie {
+  title?: string,
+  featuredIn?: string,
+  rating?: number,
+  genre?: string,
+  actionIntensity?: number,
+  actors?: Actor[]
+}
+
+const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
   title: String,
   featuredIn: {
     type: String,
@@ -32,6 +48,10 @@ const movieSchema: Schema = new Schema({
       },
       'Action intensity required for action genre'
     ]
+  },
+  actors: {
+    type: [actorSchema],
+    default: undefined
   }
 });
 

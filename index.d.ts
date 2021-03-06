@@ -1205,7 +1205,7 @@ declare module 'mongoose' {
     SchemaDefinition<T> |
     SchemaDefinition<T>[];
 
-  type SchemaDefinition<T = undefined> = T extends undefined
+  type SchemaDefinition<T = undefined> = T extends DocumentDefinition<undefined>
     ? { [path: string]: SchemaDefinitionProperty; }
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path]>; };
 

@@ -1,11 +1,11 @@
 'use strict';
 
-require('./common');
+require('../common');
 
-const Query = require('../lib/query');
-const Schema = require('../lib/schema');
+const Query = require('../../lib/query');
+const Schema = require('../../lib/schema');
 const assert = require('assert');
-const selectPopulatedFields = require('../lib/helpers/query/selectPopulatedFields');
+const selectPopulatedFields = require('../../lib/helpers/query/selectPopulatedFields');
 
 describe('Query helpers', function() {
   describe('selectPopulatedFields', function() {

@@ -812,5 +812,26 @@ describe('mongoose module:', function() {
         assert.ok(!movie.genre);
       });
     });
+    it('should prevent non-hexadecimal strings (gh-9996)', function() {
+      return co(function* () {
+        const m = new mongoose.Mongoose();
+        const db = yield m.connect('mongodb://localhost:27017', {
+          useNewUrlParser: true,
+          useUnigiedTOpology: true
+        });
+        const boardSchema = new m.Schema({
+          name: { type: String, required: true },
+          ownerId: { type: Schema.ObjectId, required: true, ref: 'User' }
+        });
+        const Board = db.model('Board', boardSchema);
+        const badIdString = '6029f05a87016a5662304t6e';
+        yield Board.create({ name: 'Test', ownerId: '123456789012' });
+        const board = yield Board.findOne({ name: 'Test' });
+        if (mongoose.isValidObjectId(badIdString)) {
+          board.ownerId = badIdString;
+        }
+        yield board.save();
+      });
+    });
   });
 });

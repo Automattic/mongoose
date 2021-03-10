@@ -314,7 +314,7 @@ declare module 'mongoose' {
     transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<any>;
 
     /** Switches to a different database using the same connection pool. */
-    useDb(name: string, options?: { useCache?: boolean }): Connection;
+    useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
 
     /** The username specified in the URI */
     user: string;

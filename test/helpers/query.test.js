@@ -2,98 +2,42 @@
 
 require('../common');
 
-const Query = require('../../lib/query');
-const Schema = require('../../lib/schema');
 const assert = require('assert');
 const selectPopulatedFields = require('../../lib/helpers/query/selectPopulatedFields');
 
 describe('Query helpers', function() {
   describe('selectPopulatedFields', function() {
     it('handles nested populate if parent key is projected in (gh-5669)', function(done) {
-      const schema = new Schema({
-        nested: {
-          key1: String,
-          key2: String
-        }
-      });
+      const fields = { nested: 1 };
+      selectPopulatedFields(fields, { nested: 1 }, { 'nested.key1': true });
 
-      const q = new Query({});
-      q.schema = schema;
-
-      assert.strictEqual(q._fields, void 0);
-
-      q.select('nested');
-      q.populate('nested.key1');
-      assert.deepEqual(q._fields, { nested: 1 });
-
-      selectPopulatedFields(q);
-
-      assert.deepEqual(q._fields, { nested: 1 });
+      assert.deepEqual(fields, { nested: 1 });
 
       done();
     });
 
     it('handles nested populate if parent key is projected out (gh-5669)', function(done) {
-      const schema = new Schema({
-        nested: {
-          key1: String,
-          key2: String
-        }
-      });
+      const fields = { nested: 0 };
+      selectPopulatedFields(fields, { nested: 0 }, { 'nested.key1': true });
 
-      const q = new Query({});
-      q.schema = schema;
-
-      assert.strictEqual(q._fields, void 0);
-
-      q.select('-nested');
-      q.populate('nested.key1');
-      assert.deepEqual(q._fields, { nested: 0 });
-
-      selectPopulatedFields(q);
-
-      assert.deepEqual(q._fields, { nested: 0 });
+      assert.deepEqual(fields, { nested: 0 });
 
       done();
     });
 
     it('handle explicitly excluded paths (gh-7383)', function(done) {
-      const schema = new Schema({
-        name: String,
-        other: String
-      });
+      const fields = { name: 1, other: 0 };
+      selectPopulatedFields(fields, Object.assign({}, fields), { other: 1 });
 
-      const q = new Query({});
-      q.schema = schema;
-
-      assert.strictEqual(q._fields, void 0);
-
-      q.select({ name: 1, other: 0 });
-      q.populate('other');
-      assert.deepEqual(q._fields, { name: 1, other: 0 });
-
-      selectPopulatedFields(q);
-
-      assert.deepEqual(q._fields, { name: 1 });
+      assert.deepEqual(fields, { name: 1 });
 
       done();
     });
 
     it('handles paths selected with elemMatch (gh-9973)', function(done) {
-      const schema = new Schema({
-        name: String,
-        arr: [{ el: String }]
-      });
-
-      const q = new Query({});
-      q.schema = schema;
-
-      assert.strictEqual(q._fields, void 0);
-
-      q.select({ 'arr.$': 1 });
-      q.populate('arr.el');
-      selectPopulatedFields(q);
-      assert.deepEqual(q._fields, { 'arr.$': 1 });
+      const fields = { 'arr.$': 1 };
+      selectPopulatedFields(fields, Object.assign({}, fields), { 'arr.el': 1 });
+      assert.deepEqual(fields, { 'arr.$': 1 });
 
       done();
     });

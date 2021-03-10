@@ -78,5 +78,24 @@ describe('Query helpers', function() {
 
       done();
     });
+
+    it('handles paths selected with elemMatch (gh-9973)', function(done) {
+      const schema = new Schema({
+        name: String,
+        arr: [{ el: String }]
+      });
+
+      const q = new Query({});
+      q.schema = schema;
+
+      assert.strictEqual(q._fields, void 0);
+
+      q.select({ 'arr.$': 1 });
+      q.populate('arr.el');
+      selectPopulatedFields(q);
+      assert.deepEqual(q._fields, { 'arr.$': 1 });
+
+      done();
+    });
   });
 });

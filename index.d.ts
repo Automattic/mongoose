@@ -1129,7 +1129,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): this;
+    plugin(fn: (schema: Schema<DocType, Model<DocType>, SchemaDefinitionType>, opts?: any) => void, opts?: any): this;
 
     /** Defines a post hook for the model. */
     post<T extends Document = DocType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, fn: (this: T, res: any, next: (err?: CallbackError) => void) => void): this;
@@ -2240,7 +2240,50 @@ declare module 'mongoose' {
 
   export type FilterQuery<T> = _FilterQuery<DocumentDefinition<T>>;
 
-  export type UpdateQuery<T> = mongodb.UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
+  type NumericTypes = number | mongodb.Decimal128 | mongodb.Double | mongodb.Int32 | mongodb.Long;
+
+  type KeysOfAType<TSchema, Type> = {
+    [key in keyof TSchema]: NonNullable<TSchema[key]> extends Type ? key : never;
+  }[keyof TSchema];
+
+  type PullOperator<TSchema> = {
+      [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
+          | Partial<Unpacked<TSchema[key]>>
+          | mongodb.ObjectQuerySelector<Unpacked<TSchema[key]>>
+          // Doesn't look like TypeScript has good support for creating an
+          // object containing dotted keys:
+          // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
+          | mongodb.QuerySelector<any>
+          | any;
+  };
+
+  /** @see https://docs.mongodb.com/manual/reference/operator/update */
+  type _UpdateQuery<TSchema> = {
+    /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, Date | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
+    $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $min?: mongodb.MatchKeysAndValues<TSchema>;
+    $max?: mongodb.MatchKeysAndValues<TSchema>;
+    $mul?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
+    $rename?: { [key: string]: string };
+    $set?: mongodb.MatchKeysAndValues<TSchema>;
+    $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, '' | 1 | true>;
+
+    /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
+    $addToSet?: mongodb.SetFields<TSchema>;
+    $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
+    $pull?: PullOperator<TSchema>;
+    $push?: mongodb.PushOperator<TSchema>;
+    $pullAll?: mongodb.PullAllOperator<TSchema>;
+
+    /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
+    $bit?: {
+        [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
+    };
+  };
+
+  export type UpdateQuery<T> = _UpdateQuery<DocumentDefinition<T>> & mongodb.MatchKeysAndValues<DocumentDefinition<T>>;
 
   type _AllowStringsForIds<T> = {
     [K in keyof T]: [Extract<T[K], mongodb.ObjectId>] extends [never] ? T[K] : T[K] | string;

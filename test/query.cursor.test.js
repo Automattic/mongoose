@@ -712,7 +712,7 @@ describe('QueryCursor', function() {
     });
   });
   it('returns array for schema hooks gh-9982', () => {
-  const testSchema = new mongoose.Schema({ name: String });
+    const testSchema = new mongoose.Schema({ name: String });
     testSchema.post('find', (result) => {
       assert.ok(Array.isArray(result));
     });
@@ -720,9 +720,9 @@ describe('QueryCursor', function() {
     return co(function*() {
       yield Movie.deleteMany({});
       yield Movie.create({ name: 'Daniel' }, { name: 'Val' }, { name: 'Daniel' });
-      yield Movie.find({name: 'Daniel'}).cursor().eachAsync(doc => {
-      assert.ok(Array.isArray(doc));
-    });
+      yield Movie.find({ name: 'Daniel' }).cursor().eachAsync(doc => {
+        assert.ok(Array.isArray(doc));
+      });
     });
   });
 });

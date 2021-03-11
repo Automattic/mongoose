@@ -1,3 +1,16 @@
+5.12.0 / 2021-03-11
+===================
+ * feat(populate): add `transform` option that Mongoose will call on every populated doc #3775
+ * feat(query): make `Query#pre()` and `Query#post()` public #9784
+ * feat(document): add `Document#getPopulatedDocs()` to return an array of all populated documents in a document #9702 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(document): add `Document#getAllSubdocs()` to return an array of all single nested and array subdocuments #9764 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(schema): allow `schema` as a schema path name #8798 [IslandRhythms](https://github.com/IslandRhythms)
+ * feat(QueryCursor): Add batch processing for eachAsync #9902 [khaledosama999](https://github.com/khaledosama999)
+ * feat(connection): add `noListener` option to help with use cases where you're using `useDb()` on every request #9961
+ * feat(index): emit 'createConnection' event when user calls `mongoose.createConnection()` #9985
+ * feat(connection+index): emit 'model' and 'deleteModel' events on connections when creating and deleting models #9983
+ * feat(query): allow passing `explain` option to `Model.exists()` #8098 [IslandRhythms](https://github.com/IslandRhythms)
+
 5.11.20 / 2021-03-11
 ====================
  * fix(query+populate): avoid unnecessarily projecting in subpath when populating a path that uses an elemMatch projection #9973

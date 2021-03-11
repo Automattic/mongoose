@@ -3724,4 +3724,21 @@ describe('Query', function() {
       assert.equal(quiz.questions[1].choices[0].choice_text, 'choice 1');
     });
   });
+
+  it('Query#pre() (gh-9784)', function() {
+    const Question = db.model('Test', Schema({ answer: Number }));
+    return co(function*() {
+      const q1 = Question.find({ answer: 42 });
+      const called = [];
+      q1.pre(function middleware() {
+        called.push(this.getFilter());
+      });
+      yield q1.exec();
+      assert.equal(called.length, 1);
+      assert.deepEqual(called[0], { answer: 42 });
+
+      yield Question.find({ answer: 42 });
+      assert.equal(called.length, 1);
+    });
+  });
 });

@@ -1438,12 +1438,6 @@ describe('schema', function() {
 
       assert.throws(function() {
         new Schema({
-          schema: String
-        });
-      }, /`schema` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
           isNew: String
         });
       }, /`isNew` may not be used as a schema pathname/);

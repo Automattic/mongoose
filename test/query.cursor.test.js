@@ -711,4 +711,18 @@ describe('QueryCursor', function() {
       assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
     });
   });
+  it('returns array for schema hooks gh-9982', () => {
+  const testSchema = new mongoose.Schema({ name: String });
+    testSchema.post('find', (result) => {
+      assert.ok(Array.isArray(result));
+    });
+    const Movie = db.model('Movie', testSchema);
+    return co(function*() {
+      yield Movie.deleteMany({});
+      yield Movie.create({ name: 'Daniel' }, { name: 'Val' }, { name: 'Daniel' });
+      yield Movie.find({name: 'Daniel'}).cursor().eachAsync(doc => {
+      assert.ok(Array.isArray(doc));
+    });
+    });
+  });
 });

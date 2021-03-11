@@ -814,7 +814,7 @@ describe('mongoose module:', function() {
     });
     it('should prevent non-hexadecimal strings (gh-9996)', function() {
       const badIdString = 'z'.repeat(24);
-      assert.deepStrictEqual(mongoose.isValidObjectId(badIdString),false);
+      assert.deepStrictEqual(mongoose.isValidObjectId(badIdString), false);
       const goodIdString = '1'.repeat(24);
       assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString), true);
       const goodIdString2 = '1'.repeat(12);

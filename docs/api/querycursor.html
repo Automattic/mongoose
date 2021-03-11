@@ -40,6 +40,7 @@
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Marks this cursor as closed. Will stop streaming and subsequent calls to <code>next()</code> will error.</p>  </div><hr class="separate-api-elements"><h3 id="querycursor_QueryCursor-eachAsync"><a href="#querycursor_QueryCursor-eachAsync">QueryCursor.prototype.eachAsync()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
 <span class="method-type">&laquo;Function&raquo;</span> </li><li class="param">[options]
 <span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li>[options.parallel]
+<<<<<<< HEAD
 <span class="method-type">&laquo;Number&raquo;</span> the number of promises to execute in parallel. Defaults to 1.</p>
 </li></ul><li class="param">[callback]
 <span class="method-type">&laquo;Function&raquo;</span> executed when all docs have been processed</p>
@@ -55,6 +56,13 @@ Thing.
     doc.foo = doc.bar + i;
     <span class="hljs-keyword">await</span> doc.save();
   })</code></pre>  </div><hr class="separate-api-elements"><h3 id="querycursor_QueryCursor-map"><a href="#querycursor_QueryCursor-map">QueryCursor.prototype.map()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
+=======
+<span class="method-type">&laquo;Number&raquo;</span> the number of promises to execute in parallel. Defaults to 1.
+<span class="method-type">&laquo;Object&raquo;</span><ul style="margin-top: 0.5em"><li>[options.batchSize]
+  <span class="method-type">&laquo;Number&raquo;</span> The size of documents processed by the passed in function to eachAsync (works with the parallel option)</li></ul>
+</li></ul><li class="param">[callback]
+<span class="method-type">&laquo;Function&raquo;</span> executed when all docs have been processed</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Execute <code>fn</code> for every document in the cursor. If <code>fn</code> returns a promise, will wait for the promise to resolve before iterating on to the next one. Returns a promise that resolves when done.</p>  </div><hr class="separate-api-elements"><h3 id="querycursor_QueryCursor-map"><a href="#querycursor_QueryCursor-map">QueryCursor.prototype.map()</a></h3><h5>Parameters</h5><ul class="params"><li class="param">fn
+>>>>>>> master
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;QueryCursor&raquo;</span> </li></ul><div><p>Registers a transform function which subsequently maps documents retrieved via the streams interface or <code>.next()</code></p>
 
 <h4>Example</h4>

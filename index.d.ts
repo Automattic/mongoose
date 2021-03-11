@@ -314,7 +314,7 @@ declare module 'mongoose' {
     transaction(fn: (session: mongodb.ClientSession) => Promise<any>): Promise<any>;
 
     /** Switches to a different database using the same connection pool. */
-    useDb(name: string, options?: { useCache?: boolean }): Connection;
+    useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
 
     /** The username specified in the URI */
     user: string;
@@ -375,6 +375,9 @@ declare module 'mongoose' {
     /** This documents __v. */
     __v?: number;
 
+    /* Get all subdocs (by bfs) */
+    $getAllSubdocs(): Document[];
+
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 
@@ -383,6 +386,9 @@ declare module 'mongoose' {
 
     /** Getter/setter, determines whether the document was removed or not. */
     $isDeleted(val?: boolean): boolean;
+
+    /** Returns an array of all populated documents associated with the query */
+    $getPopulatedDocs(): Document[];
 
     /**
      * Returns true if the given path is nullish or only contains empty objects.
@@ -2330,12 +2336,13 @@ declare module 'mongoose' {
     close(callback: (err: CallbackError) => void): void;
 
     /**
-     * Execute `fn` for every document in the cursor. If `fn` returns a promise,
+     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
+     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType) => any, options?: { parallel?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
+    eachAsync(fn: (doc: DocType| [DocType]) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved
@@ -2478,9 +2485,6 @@ declare module 'mongoose' {
 
     /** Appends new custom $unwind operator(s) to this aggregate pipeline. */
     unwind(...args: any[]): this;
-
-    /** Appends new custom $project operator to this aggregate pipeline. */
-    project(arg: any): this
   }
 
   class AggregationCursor extends stream.Readable {
@@ -2498,12 +2502,13 @@ declare module 'mongoose' {
     close(callback: (err: CallbackError) => void): void;
 
     /**
-     * Execute `fn` for every document in the cursor. If `fn` returns a promise,
+     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
+     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
      * will wait for the promise to resolve before iterating on to the next one.
      * Returns a promise that resolves when done.
      */
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number }): Promise<void>;
-    eachAsync(fn: (doc: any) => any, options?: { parallel?: number }, cb?: (err: CallbackError) => void): void;
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }): Promise<void>;
+    eachAsync(fn: (doc: any) => any, options?: { parallel?: number, batchSize?: number }, cb?: (err: CallbackError) => void): void;
 
     /**
      * Registers a transform function which subsequently maps documents retrieved

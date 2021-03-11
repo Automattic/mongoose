@@ -1,3 +1,9 @@
+5.11.20 / 2021-03-11
+====================
+ * fix(query+populate): avoid unnecessarily projecting in subpath when populating a path that uses an elemMatch projection #9973
+ * fix(connection): avoid `db` events deprecation warning with 'close' events #10004 #9930
+ * fix(index.d.ts): make `$pull` more permissive to allow dotted paths #9993
+
 5.11.19 / 2021-03-05
 ====================
  * fix(document): skip validating array elements that aren't modified when `validateModifiedOnly` is set #9963

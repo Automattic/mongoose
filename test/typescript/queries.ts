@@ -4,17 +4,26 @@ interface QueryHelpers {
   byName(name: string): Query<Array<ITest>, ITest, QueryHelpers>;
 }
 
-const schema: Schema<ITest, Model<ITest>> = new Schema({ name: { type: 'String' }, tags: [String] });
+const schema: Schema<ITest, Model<ITest>> = new Schema({
+  name: { type: 'String' },
+  tags: [String],
+  docs: [{ nested: { id: Number } }]
+});
 
 schema.query.byName = function(name: string): Query<Array<ITest>, ITest, QueryHelpers> {
   return this.find({ name });
 };
+
+interface ISubdoc extends Document {
+  id?: number;
+}
 
 interface ITest extends Document {
   name?: string;
   age?: number;
   parent?: Types.ObjectId;
   tags?: string[];
+  docs?: ISubdoc[];
 }
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
@@ -58,6 +67,7 @@ Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'tes
 
 Test.findOneAndUpdate({ name: 'test' }, { $addToSet: { tags: 'each' } });
 Test.findOneAndUpdate({ name: 'test' }, { $push: { tags: 'each' } });
+Test.findOneAndUpdate({ name: 'test' }, { $pull: { docs: { 'nested.id': 1 } } });
 
 const query: Query<ITest | null, ITest> = Test.findOne();
 query instanceof Query;

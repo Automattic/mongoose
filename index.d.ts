@@ -1161,7 +1161,7 @@ declare module 'mongoose' {
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: { [name: string]: (this: M, ...args: any[]) => any };
+    query: { [name: string]: <T extends Query<any, any, any> = Query<any, any, any>>(this: T, ...args: any[]) => any };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;

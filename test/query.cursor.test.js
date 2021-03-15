@@ -714,15 +714,19 @@ describe('QueryCursor', function() {
   it('returns array for schema hooks gh-9982', () => {
     const testSchema = new mongoose.Schema({ name: String });
     testSchema.post('find', (result) => {
-      assert.ok(Array.isArray(result));
+      
+      console.log('result', result);
+      console.log(new Error().stack);
+      //assert.ok(Array.isArray(result));
     });
     const Movie = db.model('Movie', testSchema);
     return co(function*() {
       yield Movie.deleteMany({});
       yield Movie.create({ name: 'Daniel' }, { name: 'Val' }, { name: 'Daniel' });
-      yield Movie.find({ name: 'Daniel' }).cursor().eachAsync(doc => {
-        assert.ok(Array.isArray(doc));
-      });
+     const test = Movie.find({ name: 'Daniel' }).cursor();
+     test.next().then(doc => {
+       console.log('doc', doc);
+     });
     });
   });
 });

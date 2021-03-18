@@ -810,6 +810,7 @@ declare module 'mongoose' {
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<T>, T, TQueryHelpers>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): QueryWithHelpers<T, T, TQueryHelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */

@@ -1204,8 +1204,8 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<T extends Document ? T : Document<any>> |
-    Schema<T extends Document ? T : Document<any>>[] |
+    Schema<any> |
+    Schema<any>[] |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     Function[] |
     SchemaDefinition<T> |
@@ -1382,7 +1382,8 @@ declare module 'mongoose' {
   interface SchemaTypeOptions<T> {
     type?:
       T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends object[] ? T | Schema<Unpacked<T> & Document>[] :
+      T extends Schema<any> ? T :
+      T extends object[] ? Schema<Document<Unpacked<T>>>[] :
       T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
@@ -1845,14 +1846,14 @@ declare module 'mongoose' {
     exec(callback?: (err: any, result: ResultType) => void): Promise<ResultType> | any;
 
     // eslint-disable-next-line @typescript-eslint/ban-types
-    $where(argument: string | Function): Query<Array<DocType>, DocType, THelpers>;
+    $where(argument: string | Function): Query<DocType[], DocType, THelpers>;
 
     /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     all(val: Array<any>): this;
     all(path: string, val: Array<any>): this;
 
     /** Specifies arguments for an `$and` condition. */
-    and(array: Array<FilterQuery<DocType>>): this;
+    and(array: FilterQuery<DocType>[]): this;
 
     /** Specifies the batchSize option. */
     batchSize(val: number): this;
@@ -2290,12 +2291,6 @@ declare module 'mongoose' {
   };
   export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
-  type FunctionPropertyNames<T> = {
-    // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
-  }[keyof T];
-
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
       // eslint-disable-next-line no-undef
@@ -2314,7 +2309,7 @@ declare module 'mongoose' {
     T[K];
   };
 
-  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>, FunctionPropertyNames<T>>;
+  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :

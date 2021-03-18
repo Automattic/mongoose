@@ -85,6 +85,6 @@ function testGenericQuery(): void {
   }
 
   async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
-    return model.findOne({something: 'test'}).orFail().exec();
+    return model.findOne({ something: 'test' }).orFail().exec();
   }
 }

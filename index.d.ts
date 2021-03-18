@@ -2540,7 +2540,7 @@ declare module 'mongoose' {
     OptionsConstructor: typeof SchemaTypeOptions;
 
     /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
-    cast(val: any, doc: Document<any>, init: boolean): any;
+    cast(val: any, doc: Document<any>, init: boolean, prev?: any, options?: any): any;
 
     /** Sets a default value for this SchemaType. */
     default(val: any): any;

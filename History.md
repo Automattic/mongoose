@@ -1,3 +1,17 @@
+5.12.1 / 2021-03-18
+===================
+ * fix: update mongodb -> 3.6.5 to fix circular dependency warning #9900
+ * fix(document): make `toObject()` use child schema `flattenMaps` option by default #9995
+ * fix(ObjectId): make `isValidObjectId()` check that length 24 strings are hex chars only #10010 #9996 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): correctly cast embedded discriminator paths when discriminator key is specified in array filter #9977
+ * fix(schema): skip `populated()` check when calling `applyGetters()` with a POJO for mongoose-lean-getters support #9986
+ * fix(populate): support populating dotted subpath of a populated doc that has the same id as a populated doc #10005
+ * fix(index.d.ts): correct `this` for query helpers #10028 [francescov1](https://github.com/francescov1)
+ * fix(index.d.ts): avoid omitting function property keys in LeanDocuments, because TS can't accurately infer what's a function if using generic functions #9989
+ * fix(index.d.ts): correct type definition for `SchemaType#cast()` #10039 #9980
+ * fix(index.d.ts): make SchemaTypeOptions a class, add missing `SchemaType#OptionsConstructor` #10001
+ * fix(index.d.ts): support calling `findByIdAndUpdate()` with filter, update, callback params #9981
+
 5.12.0 / 2021-03-11
 ===================
  * feat(populate): add `transform` option that Mongoose will call on every populated doc #3775

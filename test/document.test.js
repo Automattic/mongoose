@@ -10169,4 +10169,41 @@ describe('document', function() {
       assert.equal(fromDb.elements[0].subelements[0].text, 'my text');
     });
   });
+
+  it('toObject() uses child schema `flattenMaps` option by default (gh-9995)', function() {
+    const MapSchema = new Schema({
+      value: { type: Number }
+    }, { _id: false });
+
+    const ChildSchema = new Schema({
+      map: { type: Map, of: MapSchema }
+    });
+    ChildSchema.set('toObject', { flattenMaps: true });
+
+    const ParentSchema = new Schema({
+      child: { type: Schema.ObjectId, ref: 'Child' }
+    });
+
+    const ChildModel = db.model('Child', ChildSchema);
+    const ParentModel = db.model('Parent', ParentSchema);
+
+    return co(function*() {
+      const childDocument = new ChildModel({
+        map: { first: { value: 1 }, second: { value: 2 } }
+      });
+      yield childDocument.save();
+
+      const parentDocument = new ParentModel({ child: childDocument });
+      yield parentDocument.save();
+
+      const resultDocument = yield ParentModel.findOne().populate('child').exec();
+
+      let resultObject = resultDocument.toObject();
+      assert.ok(resultObject.child.map);
+      assert.ok(!(resultObject.child.map instanceof Map));
+
+      resultObject = resultDocument.toObject({ flattenMaps: false });
+      assert.ok(resultObject.child.map instanceof Map);
+    });
+  });
 });

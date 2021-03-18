@@ -31,6 +31,7 @@ const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 Test.find().byName('test').orFail().exec().then(console.log);
 
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
+Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 
 // ObjectId casting
 Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });
@@ -69,9 +70,23 @@ Test.findOneAndUpdate({ name: 'test' }, { $addToSet: { tags: 'each' } });
 Test.findOneAndUpdate({ name: 'test' }, { $push: { tags: 'each' } });
 Test.findOneAndUpdate({ name: 'test' }, { $pull: { docs: { 'nested.id': 1 } } });
 
+Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err, doc) => console.log(doc));
+
 const query: Query<ITest | null, ITest> = Test.findOne();
 query instanceof Query;
 
 // Chaining
 Test.findOne().where({ name: 'test' });
 Test.where().find({ name: 'test' });
+
+// Super generic query
+function testGenericQuery(): void {
+  interface CommonInterface<T> extends Document {
+    something: string;
+    content: T;
+  }
+
+  async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
+    return model.findOne({ something: 'test' }).orFail().exec();
+  }
+}

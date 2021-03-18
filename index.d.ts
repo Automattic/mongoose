@@ -810,6 +810,7 @@ declare module 'mongoose' {
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { rawResult: true }, callback?: (err: any, doc: mongodb.FindAndModifyWriteOpResultObject<T>, res: any) => void): QueryWithHelpers<mongodb.FindAndModifyWriteOpResultObject<T>, T, TQueryHelpers>;
     findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, options: QueryOptions & { upsert: true } & ReturnsNewDoc, callback?: (err: any, doc: T, res: any) => void): QueryWithHelpers<T, T, TQueryHelpers>;
+    findByIdAndUpdate(id: mongodb.ObjectId | any, update: UpdateQuery<T>, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
     findByIdAndUpdate(id?: mongodb.ObjectId | any, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, doc: T | null, res: any) => void): QueryWithHelpers<T | null, T, TQueryHelpers>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
@@ -1161,7 +1162,7 @@ declare module 'mongoose' {
     pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
 
     /** Object of currently defined query helpers on this schema. */
-    query: { [name: string]: (this: M, ...args: any[]) => any };
+    query: { [name: string]: <T extends Query<any, any, any> = Query<any, any, any>>(this: T, ...args: any[]) => any };
 
     /** Adds a method call to the queue. */
     queue(name: string, args: any[]): this;
@@ -1204,8 +1205,8 @@ declare module 'mongoose' {
     ? (SchemaDefinitionWithBuiltInClass<T> | SchemaTypeOptions<T>) :
     SchemaTypeOptions<T extends undefined ? any : T> |
     typeof SchemaType |
-    Schema<T extends Document ? T : Document<any>> |
-    Schema<T extends Document ? T : Document<any>>[] |
+    Schema<any> |
+    Schema<any>[] |
     SchemaTypeOptions<T extends undefined ? any : T>[] |
     Function[] |
     SchemaDefinition<T> |
@@ -1379,10 +1380,11 @@ declare module 'mongoose' {
 
   type Unpacked<T> = T extends (infer U)[] ? U : T;
 
-  interface SchemaTypeOptions<T> {
+  export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends object[] ? T | Schema<Unpacked<T> & Document>[] :
+      T extends Schema<any> ? T :
+      T extends object[] ? Schema<Document<Unpacked<T>>>[] :
       T;
 
     /** Defines a virtual with the given name that gets/sets this path. */
@@ -1845,14 +1847,14 @@ declare module 'mongoose' {
     exec(callback?: (err: any, result: ResultType) => void): Promise<ResultType> | any;
 
     // eslint-disable-next-line @typescript-eslint/ban-types
-    $where(argument: string | Function): Query<Array<DocType>, DocType, THelpers>;
+    $where(argument: string | Function): Query<DocType[], DocType, THelpers>;
 
     /** Specifies an `$all` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     all(val: Array<any>): this;
     all(path: string, val: Array<any>): this;
 
     /** Specifies arguments for an `$and` condition. */
-    and(array: Array<FilterQuery<DocType>>): this;
+    and(array: FilterQuery<DocType>[]): this;
 
     /** Specifies the batchSize option. */
     batchSize(val: number): this;
@@ -2290,12 +2292,6 @@ declare module 'mongoose' {
   };
   export type DocumentDefinition<T> = _AllowStringsForIds<LeanDocument<T>>;
 
-  type FunctionPropertyNames<T> = {
-    // The 1 & T[K] check comes from: https://stackoverflow.com/questions/55541275/typescript-check-for-the-any-type
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    [K in keyof T]: 0 extends (1 & T[K]) ? never : (T[K] extends Function ? K : never)
-  }[keyof T];
-
   type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
   type TreatAsPrimitives = actualPrimitives |
       // eslint-disable-next-line no-undef
@@ -2314,7 +2310,7 @@ declare module 'mongoose' {
     T[K];
   };
 
-  export type LeanDocument<T> = Omit<Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>, FunctionPropertyNames<T>>;
+  export type LeanDocument<T> = Omit<_LeanDocument<T>, Exclude<keyof Document, '_id' | 'id' | '__v'> | '$isSingleNested'>;
 
   export type LeanDocumentOrArray<T> = 0 extends (1 & T) ? T :
     T extends unknown[] ? LeanDocument<T[number]>[] :
@@ -2540,8 +2536,11 @@ declare module 'mongoose' {
     /** Attaches a getter for all instances of this schema type. */
     static get(getter: (value: any) => any): void;
 
-    /** Get/set the function used to cast arbitrary values to this type. */
-    cast(caster: (v: any) => any): (v: any) => any;
+    /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
+    OptionsConstructor: typeof SchemaTypeOptions;
+
+    /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
+    cast(val: any, doc: Document<any>, init: boolean, prev?: any, options?: any): any;
 
     /** Sets a default value for this SchemaType. */
     default(val: any): any;

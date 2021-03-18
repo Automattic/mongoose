@@ -10160,4 +10160,44 @@ describe('model: populate:', function() {
       assert.equal(called[1].id.toHexString(), p._id.toHexString());
     });
   });
+
+  it('supports populating dotted subpath of a populated doc that has the same id as a populated doc (gh-10005)', function() {
+    const ModelASchema = new mongoose.Schema({
+      _modelB: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Test1'
+      },
+      _rootModel: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Test'
+      }
+    });
+
+    const ModelBSchema = new mongoose.Schema({
+      _rootModel: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Test'
+      }
+    });
+
+    const RootModelSchema = new mongoose.Schema({ name: String });
+
+    return co(function*() {
+      const ModelA = db.model('Test2', ModelASchema);
+      const ModelB = db.model('Test1', ModelBSchema);
+      const RootModel = db.model('Test', RootModelSchema);
+
+      const rootModel = new RootModel({ name: 'my name' });
+      const modelB = new ModelB({ _rootModel: rootModel });
+      const modelA = new ModelA({ _rootModel: rootModel, _modelB: modelB });
+
+      yield Promise.all([rootModel.save(), modelB.save(), modelA.save()]);
+
+      const modelA1 = yield ModelA.findById(modelA._id);
+      yield modelA1.populate('_modelB _rootModel').execPopulate();
+      yield modelA1.populate('_modelB._rootModel').execPopulate();
+
+      assert.equal(modelA1._modelB._rootModel.name, 'my name');
+    });
+  });
 });

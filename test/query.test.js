@@ -3674,15 +3674,18 @@ describe('Query', function() {
   it('handles push with array filters (gh-9977)', function() {
     const questionSchema = new Schema({
       question_type: { type: String, enum: ['mcq', 'essay'] }
-    }, { discriminatorKey: 'question_type' });
+    }, { discriminatorKey: 'question_type', strict: 'throw' });
 
-    const quizSchema = new Schema({ quiz_title: String, questions: [questionSchema] });
+    const quizSchema = new Schema({
+      quiz_title: String,
+      questions: [questionSchema]
+    }, { strict: 'throw' });
     const Quiz = db.model('Test', quizSchema);
 
     const mcqQuestionSchema = new Schema({
       text: String,
       choices: [{ choice_text: String, is_correct: Boolean }]
-    });
+    }, { strict: 'throw' });
 
     quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
 
@@ -3722,6 +3725,19 @@ describe('Query', function() {
       quiz = yield Quiz.findById(quiz);
       assert.equal(quiz.questions[1].choices.length, 1);
       assert.equal(quiz.questions[1].choices[0].choice_text, 'choice 1');
+
+      yield Quiz.updateOne({ questions: { $elemMatch: { _id: id2 } } }, {
+        $push: {
+          'questions.$[q].choices': {
+            choice_text: 'choice 3',
+            is_correct: false
+          }
+        }
+      }, { arrayFilters: [{ 'q.question_type': 'mcq' }] });
+
+      quiz = yield Quiz.findById(quiz);
+      assert.equal(quiz.questions[1].choices.length, 2);
+      assert.equal(quiz.questions[1].choices[1].choice_text, 'choice 3');
     });
   });
 

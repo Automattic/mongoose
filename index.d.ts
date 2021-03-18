@@ -2535,8 +2535,8 @@ declare module 'mongoose' {
     /** Attaches a getter for all instances of this schema type. */
     static get(getter: (value: any) => any): void;
 
-    /** Get/set the function used to cast arbitrary values to this type. */
-    cast(caster: (v: any) => any): (v: any) => any;
+    /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
+    cast(val: any, doc: Document<any>, init: boolean): any;
 
     /** Sets a default value for this SchemaType. */
     default(val: any): any;

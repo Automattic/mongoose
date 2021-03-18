@@ -1380,7 +1380,7 @@ declare module 'mongoose' {
 
   type Unpacked<T> = T extends (infer U)[] ? U : T;
 
-  interface SchemaTypeOptions<T> {
+  export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
       T extends Schema<any> ? T :
@@ -2535,6 +2535,9 @@ declare module 'mongoose' {
 
     /** Attaches a getter for all instances of this schema type. */
     static get(getter: (value: any) => any): void;
+
+    /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
+    OptionsConstructor: typeof SchemaTypeOptions;
 
     /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
     cast(val: any, doc: Document<any>, init: boolean): any;

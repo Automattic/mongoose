@@ -692,8 +692,8 @@ describe('QueryCursor', function() {
 
   it('post hooks (gh-9435)', function() {
     const schema = new mongoose.Schema({ name: String });
-    schema.post('find', function(doc) {
-      doc.name = doc.name.toUpperCase();
+    schema.post('find', function(docs) {
+      docs.forEach(doc => { doc.name = doc.name.toUpperCase(); });
     });
     const Movie = db.model('Movie', schema);
 
@@ -709,21 +709,6 @@ describe('QueryCursor', function() {
       yield Movie.find().sort({ name: -1 }).cursor().
         eachAsync(doc => arr.push(doc.name));
       assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
-    });
-  });
-  it('returns array for schema hooks gh-9982', () => {
-    const testSchema = new mongoose.Schema({ name: String });
-    testSchema.post('find', (result) => {
-      assert.ok(Array.isArray(result));
-    });
-    const Movie = db.model('Movie', testSchema);
-    return co(function*() {
-      yield Movie.deleteMany({});
-      yield Movie.create({ name: 'Daniel' }, { name: 'Val' }, { name: 'Daniel' });
-     const test = Movie.find({ name: 'Daniel' }).cursor();
-     test.next().then(doc => {
-       assert.ok(doc,doc);
-     });
     });
   });
 });

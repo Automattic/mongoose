@@ -127,25 +127,25 @@ describe('transactions', function() {
     await User.createCollection();
     // acquit:ignore:end
     const session = await db.startSession();
-    session.startTransaction();
 
-    await User.create({ name: 'foo' });
+    await session.withTransaction(async () => {
+      await User.create({ name: 'foo' });
 
-    const user = await User.findOne({ name: 'foo' }).session(session);
-    // Getter/setter for the session associated with this document.
-    assert.ok(user.$session());
-    user.name = 'bar';
-    // By default, `save()` uses the associated session
-    await user.save();
+      const user = await User.findOne({ name: 'foo' }).session(session);
+      // Getter/setter for the session associated with this document.
+      assert.ok(user.$session());
+      user.name = 'bar';
+      // By default, `save()` uses the associated session
+      await user.save();
 
-    // Won't find the doc because `save()` is part of an uncommitted transaction
-    let doc = await User.findOne({ name: 'bar' });
-    assert.ok(!doc);
+      // Won't find the doc because `save()` is part of an uncommitted transaction
+      const doc = await User.findOne({ name: 'bar' });
+      assert.ok(!doc);
+    });
 
-    await session.commitTransaction();
     session.endSession();
 
-    doc = await User.findOne({ name: 'bar' });
+    const doc = await User.findOne({ name: 'bar' });
     assert.ok(doc);
   });
 
@@ -174,35 +174,35 @@ describe('transactions', function() {
     await Event.createCollection();
     // acquit:ignore:end
     const session = await db.startSession();
-    session.startTransaction();
+    
+    await session.withTransaction(async () => {
+      await Event.insertMany([
+        { createdAt: new Date('2018-06-01') },
+        { createdAt: new Date('2018-06-02') },
+        { createdAt: new Date('2017-06-01') },
+        { createdAt: new Date('2017-05-31') }
+      ], { session: session });
+  
+      const res = await Event.aggregate([
+        {
+          $group: {
+            _id: {
+              month: { $month: '$createdAt' },
+              year: { $year: '$createdAt' }
+            },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
+      ]).session(session);
+  
+      assert.deepEqual(res, [
+        { _id: { month: 6, year: 2018 }, count: 2 },
+        { _id: { month: 6, year: 2017 }, count: 1 },
+        { _id: { month: 5, year: 2017 }, count: 1 }
+      ]);
+    });
 
-    await Event.insertMany([
-      { createdAt: new Date('2018-06-01') },
-      { createdAt: new Date('2018-06-02') },
-      { createdAt: new Date('2017-06-01') },
-      { createdAt: new Date('2017-05-31') }
-    ], { session: session });
-
-    const res = await Event.aggregate([
-      {
-        $group: {
-          _id: {
-            month: { $month: '$createdAt' },
-            year: { $year: '$createdAt' }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
-    ]).session(session);
-
-    assert.deepEqual(res, [
-      { _id: { month: 6, year: 2018 }, count: 2 },
-      { _id: { month: 6, year: 2017 }, count: 1 },
-      { _id: { month: 5, year: 2017 }, count: 1 }
-    ]);
-
-    await session.commitTransaction();
     session.endSession();
   });
 
@@ -372,12 +372,15 @@ describe('transactions', function() {
 
   it('can save document after aborted transaction (gh-8380)', async function() {
     const schema = Schema({ name: String, arr: [String], arr2: [String] });
+    // acquit:ignore:start
+    db.deleteModel(/Test/);
+    // acquit:ignore:end
 
-    const Test = db.model('gh8380', schema);
+    const Test = db.model('Test', schema);
 
     await Test.createCollection();
-    await Test.create({ name: 'foo', arr: ['bar'], arr2: ['foo'] });
-    const doc = await Test.findOne();
+    let doc = await Test.create({ name: 'foo', arr: ['bar'], arr2: ['foo'] });
+    doc = await Test.findById(doc);
     await db.
       transaction(async (session) => {
         doc.arr.pull('bar');
@@ -391,7 +394,7 @@ describe('transactions', function() {
         assert.equal(err.message, 'Oops');
       });
 
-    const changes = doc.$__delta()[1];
+    const changes = doc.getChanges();
     assert.equal(changes.$set.name, 'baz');
     assert.deepEqual(changes.$pullAll.arr, ['bar']);
     assert.deepEqual(changes.$push.arr2, { $each: ['bar'] });
@@ -399,7 +402,7 @@ describe('transactions', function() {
 
     await doc.save({ session: null });
 
-    const newDoc = await Test.collection.findOne();
+    const newDoc = await Test.findById(doc);
     assert.equal(newDoc.name, 'baz');
     assert.deepEqual(newDoc.arr, []);
     assert.deepEqual(newDoc.arr2, ['foo', 'bar']);
@@ -408,7 +411,7 @@ describe('transactions', function() {
   it('can save a new document with an array', async function () {
     const schema = Schema({ arr: [String] });
 
-    const Test = db.model('new_doc_array', schema);
+    const Test = db.model('new_doc_array1', schema);
 
     await Test.createCollection();
     const doc = new Test({ arr: ['foo'] });
@@ -423,14 +426,14 @@ describe('transactions', function() {
   it('can save a new document with an array and read within transaction', async function () {
     const schema = Schema({ arr: [String] });
 
-    const Test = db.model('new_doc_array', schema);
+    const Test = db.model('new_doc_array2', schema);
 
     await Test.createCollection();
     const doc = new Test({ arr: ['foo'] });
     await db.transaction(
       async (session) => {
         await doc.save({ session });
-        const testDocs = await Test.collection.find({}).session(session);
+        const testDocs = await Test.find({}).session(session);
         assert.deepStrictEqual(testDocs.length, 1);
       },
       { readPreference: 'primary' }

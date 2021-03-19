@@ -692,8 +692,8 @@ describe('QueryCursor', function() {
 
   it('post hooks (gh-9435)', function() {
     const schema = new mongoose.Schema({ name: String });
-    schema.post('find', function(doc) {
-      doc.name = doc.name.toUpperCase();
+    schema.post('find', function(docs) {
+      docs.forEach(doc => { doc.name = doc.name.toUpperCase(); });
     });
     const Movie = db.model('Movie', schema);
 

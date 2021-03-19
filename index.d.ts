@@ -1383,9 +1383,9 @@ declare module 'mongoose' {
   export class SchemaTypeOptions<T> {
     type?:
       T extends string | number | Function ? SchemaDefinitionWithBuiltInClass<T> :
-      T extends Schema<any> ? T :
+      T extends Schema ? T :
       T extends object[] ? Schema<Document<Unpacked<T>>>[] :
-      T;
+      T | typeof SchemaType | Schema;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string;

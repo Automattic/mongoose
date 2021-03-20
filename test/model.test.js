@@ -5780,6 +5780,35 @@ describe('Model', function() {
           assert.equal(people[3].age, 30);
         });
       });
+
+      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea', function() {
+        const schema = new Schema({ name: String }, { timestamps: false });
+        const Model = db.model('Test', schema);
+
+        return co(function*() {
+          yield Model.create({ name: 'test' });
+
+          yield Model.bulkWrite([
+            {
+              insertOne: {
+                document: { name: 'insertOne-test' }
+              }
+            },
+            {
+              replaceOne: {
+                filter: { name: 'test' },
+                replacement: { name: 'replaceOne-test' }
+              }
+            }
+          ]);
+
+          for (const name of ['insertOne-test', 'replaceOne-test']) {
+            const doc = yield Model.findOne({ name });
+            assert.strictEqual(doc.createdAt, undefined);
+            assert.strictEqual(doc.updatedAt, undefined);
+          }
+        });
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {

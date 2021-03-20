@@ -5781,7 +5781,7 @@ describe('Model', function() {
         });
       });
 
-      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea', function() {
+      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea (gh-10048)', function() {
         const schema = new Schema({ name: String }, { timestamps: false });
         const Model = db.model('Test', schema);
 

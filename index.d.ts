@@ -848,18 +848,23 @@ declare module 'mongoose' {
      * @deprecated use `updateOne` or `updateMany` instead.
      * Creates a `update` query: updates one or many documents that match `filter` with `update`, based on the `multi` option.
      */
-    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<mongodb.WriteOpResult['result'], T, TQueryHelpers>;
+    update(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, T, TQueryHelpers>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<mongodb.UpdateWriteOpResult['result'], T, TQueryHelpers>;
+    updateMany(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, T, TQueryHelpers>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<mongodb.UpdateWriteOpResult['result'], T, TQueryHelpers>;
+    updateOne(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions | null, callback?: (err: any, res: any) => void): QueryWithHelpers<UpdateWriteOpResult, T, TQueryHelpers>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where(path: string, val?: any): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
     where(obj: object): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
     where(): QueryWithHelpers<Array<T>, T, TQueryHelpers>;
+  }
+
+  type _UpdateWriteOpResult = mongodb.UpdateWriteOpResult['result'];
+  interface UpdateWriteOpResult extends _UpdateWriteOpResult {
+    upserted?: Array<{index: number, _id: any}>;
   }
 
   interface QueryOptions {
@@ -2191,7 +2196,7 @@ declare module 'mongoose' {
     toConstructor(): new (...args: any[]) => Query<ResultType, DocType, THelpers>;
 
     /** Declare and/or execute this query as an update() operation. */
-    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType, THelpers>;
+    update(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): Query<UpdateWriteOpResult, DocType, THelpers>;
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
@@ -2199,13 +2204,13 @@ declare module 'mongoose' {
      * `filter` (as opposed to just the first one) regardless of the value of
      * the `multi` option.
      */
-    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType, THelpers>;
+    updateMany(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): Query<UpdateWriteOpResult, DocType, THelpers>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
-    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: any) => void): Query<any, DocType, THelpers>;
+    updateOne(filter?: FilterQuery<DocType>, update?: UpdateQuery<DocType>, options?: QueryOptions | null, callback?: (err: CallbackError, res: UpdateWriteOpResult) => void): Query<UpdateWriteOpResult, DocType, THelpers>;
 
     /**
      * Sets the specified number of `mongod` servers, or tag set of `mongod` servers,

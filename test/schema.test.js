@@ -2578,4 +2578,20 @@ describe('schema', function() {
 
     assert.equal(schema.virtuals.displayAs.applyGetters(null, { name: 'test' }), 'test');
   });
+
+  it('supports setting `ref` on array SchemaType (gh-10029)', function() {
+    const testSchema = new mongoose.Schema({
+      doesntpopulate: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'features'
+      },
+      populatescorrectly: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'features'
+      }]
+    });
+
+    assert.equal(testSchema.path('doesntpopulate.$').options.ref, 'features');
+    assert.equal(testSchema.path('populatescorrectly.$').options.ref, 'features');
+  });
 });

@@ -1,16 +1,16 @@
-import { Schema, model, Document, Types, Query, Model } from 'mongoose';
+import { Schema, model, Document, Types, Query, Model, QueryWithHelpers } from 'mongoose';
 
 interface QueryHelpers {
-  byName(name: string): Query<Array<ITest>, ITest, QueryHelpers>;
+  byName(name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
 
-const schema: Schema<ITest, Model<ITest>> = new Schema({
+const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
   name: { type: 'String' },
   tags: [String],
   docs: [{ nested: { id: Number } }]
 });
 
-schema.query.byName = function(name: string): Query<Array<ITest>, ITest, QueryHelpers> {
+schema.query.byName = function(name: string): Query<any, ITest, QueryHelpers> & QueryHelpers {
   return this.find({ name });
 };
 
@@ -28,7 +28,7 @@ interface ITest extends Document {
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
-Test.find().byName('test').orFail().exec().then(console.log);
+Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
 Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
 Test.findOne({ 'docs.id': 42 }).exec().then(console.log);

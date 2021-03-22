@@ -1,3 +1,17 @@
+5.12.2 / 2021-03-22
+===================
+ * fix(QueryCursor): consistently execute `post('find')` hooks with an array of docs #10015 #9982 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(schema): support setting `ref` as an option on an array SchemaType #10029
+ * fix(query): apply schema-level `select` option from array schematypes #10029
+ * fix(schema): avoid possible prototype pollution with `Schema()` constructor #10035 [zpbrent](https://github.com/zpbrent)
+ * fix(model): make bulkWrite skip timestamps with timestamps: false #10050 [SoftwareSing](https://github.com/SoftwareSing)
+ * fix(index.d.ts): make query methods return `QueryWithHelpers` so query helpers pass through chaining #10040
+ * fix(index.d.ts): add `upserted` array to `updateOne()`, `updateMany()`, `update()` result #10042
+ * fix(index.d.ts): add back `Aggregate#project()` types that were mistakenly removed in 5.12.0 #10043
+ * fix(index.d.ts): always allow setting `type` in Schema to a SchemaType class or a Schema instance #10030
+ * docs(transactions): introduce `session.withTransaction()` before `session.startTransaction()` because `withTransaction()` is the recommended approach #10008
+ * docs(mongoose+browser): fix broken links to info about `mongoose.Types` #10016
+
 5.12.1 / 2021-03-18
 ===================
  * fix: update mongodb -> 3.6.5 to fix circular dependency warning #9900

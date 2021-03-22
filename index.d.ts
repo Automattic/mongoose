@@ -2439,6 +2439,9 @@ declare module 'mongoose' {
     /** Returns the current pipeline */
     pipeline(): any[];
 
+    /** Appends a new $project operator to this aggregate pipeline. */
+    project(arg: string | Object): this;
+
     /** Sets the readPreference option for the aggregation query. */
     read(pref: string | mongodb.ReadPreferenceMode, tags?: any[]): this;
 

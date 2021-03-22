@@ -3757,4 +3757,23 @@ describe('Query', function() {
       assert.equal(called.length, 1);
     });
   });
+
+  it('applies schema-level `select` on arrays (gh-10029)', function() {
+    const testSchema = new mongoose.Schema({
+      doesntpopulate: {
+        type: [mongoose.Schema.Types.ObjectId],
+        select: false
+      },
+      populatescorrectly: [{
+        type: mongoose.Schema.Types.ObjectId,
+        select: false
+      }]
+    });
+    const Test = db.model('Test', testSchema);
+
+    const q = Test.find();
+    q._applyPaths();
+
+    assert.deepEqual(q._fields, { doesntpopulate: 0, populatescorrectly: 0 });
+  });
 });

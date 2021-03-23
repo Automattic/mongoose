@@ -782,6 +782,7 @@ declare module 'mongoose' {
 
     /** Adds a discriminator type. */
     discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
+    discriminator<T extends Document, U extends Model<T, TQueryHelpers>, TQueryHelpers = {}>(name: string, schema: Schema<T, U>, value?: string): U;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, T, TQueryHelpers>;

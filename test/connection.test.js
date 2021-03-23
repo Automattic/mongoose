@@ -1299,4 +1299,11 @@ describe('connections:', function() {
       assert.ifError(errorOnDisconnect);
     });
   });
+  it('Connection id should be scoped per Mongoose Instance (gh-10025)', function() {
+    const mongoose = require('mongoose');
+    //console.log(new Error().stack);
+    const m = new mongoose.Mongoose();
+    //console.log(new Error().stack);
+    assert.deepStrictEqual(m.connection.id,0);
+  });
 });

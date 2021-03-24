@@ -1301,9 +1301,19 @@ describe('connections:', function() {
   });
   it('Connection id should be scoped per Mongoose Instance (gh-10025)', function() {
     const m = new mongoose.Mongoose;
-    console.log(m.connection.id);
+    // console.log('First Instance', m.connection.id); // should be x
+    const conn = m.createConnection();
+    // console.log(conn.id); // should be x + 1
     const m1 = new mongoose.Mongoose;
-    console.log(m1.connection.id);
+    // console.log('Second Instance', m1.connection.id); // should be y
+    const conn2 = m1.createConnection();
+    // console.log(conn2.id); // should be y + 1;
+    const conn3 = m.createConnection();
+    // console.log('Back to First Instance', conn3.id); // should be x + 2
+    assert.deepStrictEqual(m.connection.id, 0);
+    assert.deepStrictEqual(conn.id, m.connection.id + 1);
     assert.deepStrictEqual(m1.connection.id, 0);
+    assert.deepStrictEqual(conn2.id, m1.connection.id + 1);
+    assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
 });

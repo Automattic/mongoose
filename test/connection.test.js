@@ -1300,10 +1300,10 @@ describe('connections:', function() {
     });
   });
   it('Connection id should be scoped per Mongoose Instance (gh-10025)', function() {
-    const mongoose = require('mongoose');
-    console.log(mongoose.connection.id);
-    const m = new mongoose.Mongoose();
+    const m = new mongoose.Mongoose;
     console.log(m.connection.id);
-    assert.deepStrictEqual(m.connection.id,0);
+    const m1 = new mongoose.Mongoose;
+    console.log(m1.connection.id);
+    assert.deepStrictEqual(m1.connection.id, 0);
   });
 });

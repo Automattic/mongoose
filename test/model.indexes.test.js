@@ -668,8 +668,6 @@ describe('model', function() {
     });
     it('should prevent collation on text indexes (gh-10044)', function() {
       return co(function*() {
-        yield db.db.collection('User').drop().catch(() => {});
-
         const userSchema = new mongoose.Schema({ username: String }, {
           collation: {
             locale: 'en',

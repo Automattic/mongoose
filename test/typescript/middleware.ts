@@ -39,4 +39,27 @@ schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
   console.log(this.name, err.stack);
 });
 
+schema.pre<Model<ITest>>('insertMany', function() {
+  return Promise.resolve(this.name);
+});
+
+schema.pre<Model<ITest>>('insertMany', { document: false, query: false }, function() {
+  console.log(this.name);
+});
+
+schema.pre<Model<ITest>>('insertMany', function(next) {
+  console.log(this.name);
+  next();
+});
+
+schema.pre<Model<ITest>>('insertMany', function(next, doc: ITest) {
+  console.log(this.name, doc);
+  next();
+});
+
+schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
+  console.log(this.name, docs);
+  next();
+});
+
 const Test = model<ITest>('Test', schema);

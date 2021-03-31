@@ -666,5 +666,22 @@ describe('model', function() {
         ]);
       });
     });
+    it('should prevent collation on text indexes (gh-10044)', function() {
+      return co(function*() {
+        const userSchema = new mongoose.Schema({ username: String }, {
+          collation: {
+            locale: 'en',
+            strength: 2
+          }
+        });
+        userSchema.index({ username: 'text' }, { unique: true });
+        const User = db.model('User', userSchema, 'User');
+
+        yield User.init();
+        const indexes = yield User.listIndexes();
+        assert.ok(!indexes[1].collation);
+        yield User.collection.drop();
+      });
+    });
   });
 });

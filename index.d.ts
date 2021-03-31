@@ -782,6 +782,7 @@ declare module 'mongoose' {
 
     /** Adds a discriminator type. */
     discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, T, TQueryHelpers>;
@@ -1035,6 +1036,8 @@ declare module 'mongoose' {
      * always set `path` to a document. Inferred from schema by default.
      */
     justOne?: boolean;
+    /** transform function to call on every populated doc */
+    transform?: (doc: any, id: any) => any;
   }
 
   interface ToObjectOptions {
@@ -1165,8 +1168,8 @@ declare module 'mongoose' {
     pre<T extends Query<any, any> = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | string | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
     pre<T extends Aggregate<any> = Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err: CallbackError) => void) => void): this;
-    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err: CallbackError) => void) => void): this;
+    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void): this;
+    pre<T extends Model<DocType> = M>(method: 'insertMany' | RegExp, options: SchemaPreOptions, fn: (this: T, next: (err?: CallbackError) => void, docs: any | Array<any>) => void): this;
 
     /** Object of currently defined query helpers on this schema. */
     query: { [name: string]: <T extends QueryWithHelpers<any, DocType, ExtractQueryHelpers<M>> = QueryWithHelpers<any, DocType, ExtractQueryHelpers<M>>>(this: T, ...args: any[]) => any };
@@ -2713,6 +2716,8 @@ declare module 'mongoose' {
 
   /** Alias for QueryOptions for backwards compatability. */
   type ModelUpdateOptions = QueryOptions;
+
+  type DocumentQuery<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers>;
 
   /** Backwards support for DefinitelyTyped */
   interface HookSyncCallback<T> {

@@ -1,3 +1,15 @@
+5.12.3 / 2021-03-31
+===================
+ * fix: avoid setting schema-level collation on text indexes #10044 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(query): add `writeConcern()` method to avoid writeConcern deprecation warning #10009
+ * fix(connection): use queueing instead of event emitter for `createCollection()` and other helpers to avoid event emitter warning #9778
+ * fix(connection): scope `Connection#id` to Mongoose instance so id always lines up with `mongoose.connections` index #10025 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix: avoid throwing in `promiseOrCallback()` if 3rd param isn't an EventEmitter #10055 [emrebass](https://github.com/emrebass)
+ * fix(index.d.ts): add Model as 2nd generic param to `Model.discriminator()` #10054 [coro101](https://github.com/coro101)
+ * fix(index.d.ts): add docs to `next()` callback for `pre('insertMany')` hooks #10078 #10072 [pezzu](https://github.com/pezzu)
+ * fix(index.d.ts): add `transform` to PopulateOptions interface #10061
+ * fix(index.d.ts): add DocumentQuery type for backwards compatibility #10036
+
 5.12.2 / 2021-03-22
 ===================
  * fix(QueryCursor): consistently execute `post('find')` hooks with an array of docs #10015 #9982 [IslandRhythms](https://github.com/IslandRhythms)

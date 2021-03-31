@@ -3776,4 +3776,16 @@ describe('Query', function() {
 
     assert.deepEqual(q._fields, { doesntpopulate: 0, populatescorrectly: 0 });
   });
+
+  it('sets `writeConcern` option correctly (gh-10009)', function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+    const Test = db.model('Test', testSchema);
+
+    const q = Test.find();
+    q.writeConcern({ w: 'majority', wtimeout: 1000 });
+
+    assert.deepEqual(q.options.writeConcern, { w: 'majority', wtimeout: 1000 });
+  });
 });

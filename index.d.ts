@@ -1036,6 +1036,8 @@ declare module 'mongoose' {
      * always set `path` to a document. Inferred from schema by default.
      */
     justOne?: boolean;
+    /** transform function to call on every populated doc */
+    transform?: (doc: any, id: any) => any;
   }
 
   interface ToObjectOptions {

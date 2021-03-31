@@ -2715,6 +2715,8 @@ declare module 'mongoose' {
   /** Alias for QueryOptions for backwards compatability. */
   type ModelUpdateOptions = QueryOptions;
 
+  type DocumentQuery<ResultType, DocType extends Document, THelpers = {}> = Query<ResultType, DocType, THelpers>;
+
   /** Backwards support for DefinitelyTyped */
   interface HookSyncCallback<T> {
     (this: T, next: HookNextFunction, docs: any[]): Promise<any> | void;

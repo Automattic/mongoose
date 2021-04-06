@@ -598,9 +598,15 @@ declare module 'mongoose' {
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
   }
 
+  interface AcceptsDiscriminator {
+    /** Adds a discriminator type. */
+    discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
+  }
+
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
-  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter {
+  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
@@ -779,10 +785,6 @@ declare module 'mongoose' {
 
     /** Translate any aliases fields/conditions so the final query or document object is pure */
     translateAliases(raw: any): any;
-
-    /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, T, TQueryHelpers>;
@@ -1596,13 +1598,14 @@ declare module 'mongoose' {
 
   namespace Schema {
     namespace Types {
-      class Array extends SchemaType {
+      class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string): any;
+        discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1652,13 +1655,14 @@ declare module 'mongoose' {
         static schemaName: string;
       }
 
-      class DocumentArray extends SchemaType {
+      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string): any;
+        discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;

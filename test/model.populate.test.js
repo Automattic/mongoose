@@ -10275,7 +10275,8 @@ describe('model: populate:', function() {
           }]
       }]
       */
-      !assert.equal(populatedBooksAgain[0].contributors[0].author, 'null');
+     console.log('hi', populatedBooksAgain[0].contributors[0].author);
+      assert.equal(populatedBooksAgain[0].contributors[0].author, 'Author1');
     });
   });
 });

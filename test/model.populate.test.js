@@ -10200,4 +10200,34 @@ describe('model: populate:', function() {
       assert.equal(modelA1._modelB._rootModel.name, 'my name');
     });
   });
+  it('fix transform gh-10064', function () {
+    const Child = db.model('Child', new Schema({ name: String }));
+    const Parent = db.model('Parent', new Schema({
+      child: { type: 'ObjectId', ref: 'Child' },
+      children: [{ type: 'ObjectId', ref: 'Child' }]
+    }));
+    return co(function*() {
+      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+    
+    let doc = yield Parent.create({ children, child: children[0] });
+    
+    doc = yield Parent.findById(doc).populate([
+      {
+        path: 'child',
+        transform: getName
+      },
+      {
+        path: 'children',
+        options: { retainNullValues: true },
+        transform: getName
+      }
+    ]);
+    
+    function getName(doc) {
+      return doc == null ? null : doc.name;
+    }
+    
+      console.log(doc.child); // undefined
+    });  
+  });
 });

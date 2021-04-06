@@ -10209,25 +10209,25 @@ describe('model: populate:', function() {
     return co(function*() {
       const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
     
-    let doc = yield Parent.create({ children, child: children[0] });
-    
-    doc = yield Parent.findById(doc).populate([
-      {
-        path: 'child',
-        transform: getName
-      },
-      {
-        path: 'children',
-        options: { retainNullValues: true },
-        transform: getName
+      let doc = yield Parent.create({ children, child: children[0] });
+      
+      doc = yield Parent.findById(doc).populate([
+        {
+          path: 'child',
+          transform: getName
+        },
+        {
+          path: 'children',
+          options: { retainNullValues: true },
+          transform: getName
+        }
+      ]);
+      
+      function getName(doc) {
+        return doc == null ? null : doc.name;
       }
-    ]);
     
-    function getName(doc) {
-      return doc == null ? null : doc.name;
-    }
-    
-      console.log(doc.child); // undefined
+      assert.equal(doc.child, 'Luke'); // undefined
     });  
   });
 });

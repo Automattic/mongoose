@@ -10250,7 +10250,7 @@ describe('model: populate:', function() {
           }]
       }]
       */
-
+      console.log('hi 1st', populatedBooks[0].contributors[0].author);
       //now, we try to populate the array to get the remaining author that was not previously populated for aBook2
       const populatedBooksAgain = yield Books.populate(populatedBooks, populateOptions);
       //console.log('populatedBooksAgain = ' + util.inspect(populatedBooks, false, null, true))
@@ -10275,8 +10275,8 @@ describe('model: populate:', function() {
           }]
       }]
       */
-     console.log('hi', populatedBooksAgain[0].contributors[0].author);
-      assert.equal(populatedBooksAgain[0].contributors[0].author, 'Author1');
+     console.log('hi 2nd', populatedBooksAgain[0].contributors[0].author);
+      assert.equal(populatedBooksAgain[0].contributors[0].author.name, 'Author1');
     });
   });
 });

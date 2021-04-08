@@ -10202,10 +10202,10 @@ describe('model: populate:', function() {
   });
   it('prevents already populated fields from becoming null gh-10068', function() {
     return co(function*() {
-      const Books = db.model('books', new Schema({ name: String, contributors: [{ author: Schema.Types.ObjectId} ] }));
-      const Authors = db.model('authors', new Schema({name: String}));
+      const Books = db.model('books', new Schema({ name: String, contributors: [{ author: Schema.Types.ObjectId }] }));
+      const Authors = db.model('authors', new Schema({ name: String }));
 
-      const anAuthor = new Authors({name: 'Author1'});
+      const anAuthor = new Authors({ name: 'Author1' });
       yield anAuthor.save();
 
       const aBook1 = new Books({ name: 'Book1', contributors: [{ author: anAuthor.id }] });
@@ -10217,16 +10217,15 @@ describe('model: populate:', function() {
         path: 'contributors.author', // *Note the array of objects - regular objects work as expected
         model: 'authors',
         select: '_id name'
-        }
-      ];
+      }];
 
       // Get the books and make book2 author in contributors just an id instead of an object
       const populatedBooks = (yield Books.find().populate(populateOptions)).map(aBook => {
-          aBook = aBook.toObject();
-          if (!aBook._id.equals(aBook1.id)) {
-              aBook.contributors[0].author = aBook.contributors[0].author._id;
-          }
-          return aBook;
+        aBook = aBook.toObject();
+        if (!aBook._id.equals(aBook1.id)) {
+          aBook.contributors[0].author = aBook.contributors[0].author._id;
+        }
+        return aBook;
       });
 
       // console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true))

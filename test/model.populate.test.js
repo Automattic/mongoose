@@ -10226,8 +10226,9 @@ describe('model: populate:', function() {
       function getName(doc) {
         return doc == null ? null : doc.name;
       }
-    
+      //console.log(doc.child.child);
       assert.equal(doc.child, 'Luke'); // undefined
+      assert.equal(doc.children, 'Luke,Leia');
     });  
   });
 });

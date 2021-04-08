@@ -10202,36 +10202,36 @@ describe('model: populate:', function() {
   });
   it('prevents already populated fields from becoming null gh-10068', function() {
     return co(function*() {
-      const Books = db.model('books', new Schema({name: String, contributors: [{author: Schema.Types.ObjectId}]}))
-      const Authors = db.model('authors', new Schema({name: String}))
+      const Books = db.model('books', new Schema({ name: String, contributors: [{ author: Schema.Types.ObjectId} ] }));
+      const Authors = db.model('authors', new Schema({name: String}));
 
-      const anAuthor = new Authors({name: 'Author1'})
-      yield anAuthor.save()
+      const anAuthor = new Authors({name: 'Author1'});
+      yield anAuthor.save();
 
-      const aBook1 = new Books({name: 'Book1', contributors: [{author: anAuthor.id}]})
-      yield aBook1.save()
-      const aBook2 = new Books({name: 'Book2', contributors: [{author: anAuthor.id}]})
-      yield aBook2.save()
+      const aBook1 = new Books({ name: 'Book1', contributors: [{ author: anAuthor.id }] });
+      yield aBook1.save();
+      const aBook2 = new Books({ name: 'Book2', contributors: [{ author: anAuthor.id }] });
+      yield aBook2.save();
 
       const populateOptions = [{
-              path: 'contributors.author', //*Note the array of objects - regular objects work as expected
-              model: 'authors',
-              select: '_id name'
-          }
-      ]
+        path: 'contributors.author', // *Note the array of objects - regular objects work as expected
+        model: 'authors',
+        select: '_id name'
+        }
+      ];
 
-      //Get the books and make book2 author in contributors just an id instead of an object
+      // Get the books and make book2 author in contributors just an id instead of an object
       const populatedBooks = (yield Books.find().populate(populateOptions)).map(aBook => {
-          aBook = aBook.toObject()
+          aBook = aBook.toObject();
           if (!aBook._id.equals(aBook1.id)) {
-              aBook.contributors[0].author = aBook.contributors[0].author._id
+              aBook.contributors[0].author = aBook.contributors[0].author._id;
           }
-          return aBook
+          return aBook;
       });
 
-      //console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true))
-      //after population and some manipulation, populatedBooks array:
-      /*const populatedBooks = [{
+      // console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true))
+      // after population and some manipulation, populatedBooks array:
+      /* const populatedBooks = [{
           _id: aBook1.id,
           name: aBook1.name
           contributors: [{
@@ -10250,12 +10250,12 @@ describe('model: populate:', function() {
           }]
       }]
       */
-      //now, we try to populate the array to get the remaining author that was not previously populated for aBook2
+      // now, we try to populate the array to get the remaining author that was not previously populated for aBook2
       const populatedBooksAgain = yield Books.populate(populatedBooks, populateOptions);
-      //console.log('populatedBooksAgain = ' + util.inspect(populatedBooks, false, null, true))
+      // console.log('populatedBooksAgain = ' + util.inspect(populatedBooks, false, null, true))
 
-      //after population, populatedBooksAgain array:
-      /*const populatedBooksAgain = [{
+      // after population, populatedBooksAgain array:
+      /* const populatedBooksAgain = [{
           _id: aBook1.id,
           name: aBook1.name
           contributors: [{
@@ -10268,7 +10268,7 @@ describe('model: populate:', function() {
           contributors: [{
               _id: ObjectId
               author: {
-                  _id: anAuthor.id, 
+                  _id: anAuthor.id,
                   name: anAuthor.name
               }
           }]

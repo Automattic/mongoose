@@ -22,6 +22,7 @@ const EmbeddedDocument = mongoose.Types.Embedded;
 const MongooseError = mongoose.Error;
 
 describe('Model', function() {
+
   let db;
   let Comments;
   let BlogPost;
@@ -5780,6 +5781,35 @@ describe('Model', function() {
           assert.equal(people[3].age, 30);
         });
       });
+
+      it('insertOne and replaceOne should not throw an error when set `timestamps: false` in schmea (gh-10048)', function() {
+        const schema = new Schema({ name: String }, { timestamps: false });
+        const Model = db.model('Test', schema);
+
+        return co(function*() {
+          yield Model.create({ name: 'test' });
+
+          yield Model.bulkWrite([
+            {
+              insertOne: {
+                document: { name: 'insertOne-test' }
+              }
+            },
+            {
+              replaceOne: {
+                filter: { name: 'test' },
+                replacement: { name: 'replaceOne-test' }
+              }
+            }
+          ]);
+
+          for (const name of ['insertOne-test', 'replaceOne-test']) {
+            const doc = yield Model.findOne({ name });
+            assert.strictEqual(doc.createdAt, undefined);
+            assert.strictEqual(doc.updatedAt, undefined);
+          }
+        });
+      });
     });
 
     it('insertMany with Decimal (gh-5190)', function(done) {
@@ -7397,4 +7427,29 @@ describe('Model', function() {
       });
     });
   });
+
+  describe('Setting the explain flag', function() {
+    it('should give an object back rather than a boolean (gh-8275)', function() {
+      return co(function*() {
+        const MyModel = db.model('Character', mongoose.Schema({
+          name: String,
+          age: Number,
+          rank: String
+        }));
+
+        yield MyModel.create([
+          { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
+          { name: 'William Riker', age: 29, rank: 'Commander' },
+          { name: 'Deanna Troi', age: 28, rank: 'Lieutenant Commander' },
+          { name: 'Geordi La Forge', age: 29, rank: 'Lieutenant' },
+          { name: 'Worf', age: 24, rank: 'Lieutenant' }
+        ]);
+        const res = yield MyModel.exists({}, { explain: true });
+
+        assert.equal(typeof res, 'object');
+      });
+    });
+  });
 });
+
+

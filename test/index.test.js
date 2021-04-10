@@ -530,7 +530,13 @@ describe('mongoose module:', function() {
           cb();
         });
 
+        const events = [];
+        mong.events.on('createConnection', conn => events.push(conn));
+
         const db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri, options);
+
+        assert.equal(events.length, 1);
+        assert.equal(events[0], db2);
 
         db2.on('open', function() {
           connections++;
@@ -811,6 +817,14 @@ describe('mongoose module:', function() {
         const movie = yield Movie.findOne({ title: 'The Man From Earth' }).lean();
         assert.ok(!movie.genre);
       });
+    });
+    it('should prevent non-hexadecimal strings (gh-9996)', function() {
+      const badIdString = 'z'.repeat(24);
+      assert.deepStrictEqual(mongoose.isValidObjectId(badIdString), false);
+      const goodIdString = '1'.repeat(24);
+      assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString), true);
+      const goodIdString2 = '1'.repeat(12);
+      assert.deepStrictEqual(mongoose.isValidObjectId(goodIdString2), true);
     });
   });
 });

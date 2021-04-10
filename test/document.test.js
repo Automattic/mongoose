@@ -2519,15 +2519,21 @@ describe('document', function() {
       });
     });
 
-    it('filters out validation on unmodified paths when validateModifiedOnly set (gh-7421)', function(done) {
-      const testSchema = new Schema({ title: { type: String, required: true }, other: String });
+    it('filters out validation on unmodified paths when validateModifiedOnly set (gh-7421) (gh-9963)', function(done) {
+      const testSchema = new Schema({
+        title: { type: String, required: true },
+        other: String,
+        subdocs: [{ name: { type: String, required: true } }]
+      });
 
       const Test = db.model('Test', testSchema);
 
-      Test.create([{}], { validateBeforeSave: false }, function(createError, docs) {
+      const doc = { subdocs: [{ name: null }, { name: 'test' }] };
+      Test.create([doc], { validateBeforeSave: false }, function(createError, docs) {
         assert.equal(createError, null);
         const doc = docs[0];
         doc.other = 'something';
+        doc.subdocs[1].name = 'test2';
         assert.equal(doc.validateSync(undefined, { validateModifiedOnly: true }), null);
         doc.save({ validateModifiedOnly: true }, function(error) {
           assert.equal(error, null);
@@ -9879,6 +9885,32 @@ describe('document', function() {
     });
   });
 
+  it('supports getting a list of populated docs (gh-9702)', function() {
+    const Child = db.model('Child', Schema({ name: String }));
+    const Parent = db.model('Parent', {
+      children: [{ type: ObjectId, ref: 'Child' }],
+      child: { type: ObjectId, ref: 'Child' }
+    });
+
+    return co(function*() {
+      const c = yield Child.create({ name: 'test' });
+      yield Parent.create({
+        children: [c._id],
+        child: c._id
+      });
+
+      const p = yield Parent.findOne().populate('children child');
+
+      p.children; // [{ _id: '...', name: 'test' }]
+
+      assert.equal(p.$getPopulatedDocs().length, 2);
+      assert.equal(p.$getPopulatedDocs()[0], p.children[0]);
+      assert.equal(p.$getPopulatedDocs()[0].name, 'test');
+      assert.equal(p.$getPopulatedDocs()[1], p.child);
+      assert.equal(p.$getPopulatedDocs()[1].name, 'test');
+    });
+  });
+
   it('handles paths named `db` (gh-9798)', function() {
     const schema = new Schema({
       db: String
@@ -9893,6 +9925,60 @@ describe('document', function() {
 
       const _doc = yield Test.findOne({ db: 'bar' });
       assert.ok(!_doc);
+    });
+  });
+
+  it('handles paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      schema: String,
+      name: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ schema: 'test', name: 'test' });
+      yield doc.save();
+      assert.ok(doc);
+      assert.equal(doc.schema, 'test');
+      assert.equal(doc.name, 'test');
+
+      const fromDb = yield Test.findById(doc);
+      assert.equal(fromDb.schema, 'test');
+      assert.equal(fromDb.name, 'test');
+
+      doc.schema = 'test2';
+      yield doc.save();
+
+      yield fromDb.remove();
+      doc.name = 'test3';
+      const err = yield doc.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'DocumentNotFoundError');
+    });
+  });
+
+  it('handles nested paths named `schema` gh-8798', function() {
+    const schema = new Schema({
+      nested: {
+        schema: String
+      },
+      name: String
+    });
+    const Test = db.model('Test', schema);
+
+    return co(function*() {
+      const doc = yield Test.create({ nested: { schema: 'test' }, name: 'test' });
+      yield doc.save();
+      assert.ok(doc);
+      assert.equal(doc.nested.schema, 'test');
+      assert.equal(doc.name, 'test');
+
+      const fromDb = yield Test.findById(doc);
+      assert.equal(fromDb.nested.schema, 'test');
+      assert.equal(fromDb.name, 'test');
+
+      doc.nested.schema = 'test2';
+      yield doc.save();
     });
   });
 
@@ -10081,6 +10167,43 @@ describe('document', function() {
       assert.equal(fromDb.elements.length, 1);
       assert.equal(fromDb.elements[0].subelements.length, 1);
       assert.equal(fromDb.elements[0].subelements[0].text, 'my text');
+    });
+  });
+
+  it('toObject() uses child schema `flattenMaps` option by default (gh-9995)', function() {
+    const MapSchema = new Schema({
+      value: { type: Number }
+    }, { _id: false });
+
+    const ChildSchema = new Schema({
+      map: { type: Map, of: MapSchema }
+    });
+    ChildSchema.set('toObject', { flattenMaps: true });
+
+    const ParentSchema = new Schema({
+      child: { type: Schema.ObjectId, ref: 'Child' }
+    });
+
+    const ChildModel = db.model('Child', ChildSchema);
+    const ParentModel = db.model('Parent', ParentSchema);
+
+    return co(function*() {
+      const childDocument = new ChildModel({
+        map: { first: { value: 1 }, second: { value: 2 } }
+      });
+      yield childDocument.save();
+
+      const parentDocument = new ParentModel({ child: childDocument });
+      yield parentDocument.save();
+
+      const resultDocument = yield ParentModel.findOne().populate('child').exec();
+
+      let resultObject = resultDocument.toObject();
+      assert.ok(resultObject.child.map);
+      assert.ok(!(resultObject.child.map instanceof Map));
+
+      resultObject = resultDocument.toObject({ flattenMaps: false });
+      assert.ok(resultObject.child.map instanceof Map);
     });
   });
 });

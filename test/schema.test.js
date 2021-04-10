@@ -1438,12 +1438,6 @@ describe('schema', function() {
 
       assert.throws(function() {
         new Schema({
-          schema: String
-        });
-      }, /`schema` may not be used as a schema pathname/);
-
-      assert.throws(function() {
-        new Schema({
           isNew: String
         });
       }, /`isNew` may not be used as a schema pathname/);
@@ -2565,5 +2559,39 @@ describe('schema', function() {
     assert.equal(schema.path('nums').caster.instance, 'Number');
     assert.equal(schema.path('tags').caster.instance, 'String');
     assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
+  });
+
+  it('handles loadClass with inheritted getters (gh-9975)', function() {
+    class User {
+      get displayAs() {
+        return null;
+      }
+    }
+
+    class TechnicalUser extends User {
+      get displayAs() {
+        return this.name;
+      }
+    }
+
+    const schema = new Schema({ name: String }).loadClass(TechnicalUser);
+
+    assert.equal(schema.virtuals.displayAs.applyGetters(null, { name: 'test' }), 'test');
+  });
+
+  it('supports setting `ref` on array SchemaType (gh-10029)', function() {
+    const testSchema = new mongoose.Schema({
+      doesntpopulate: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'features'
+      },
+      populatescorrectly: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'features'
+      }]
+    });
+
+    assert.equal(testSchema.path('doesntpopulate.$').options.ref, 'features');
+    assert.equal(testSchema.path('populatescorrectly.$').options.ref, 'features');
   });
 });

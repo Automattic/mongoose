@@ -27,53 +27,17 @@ block content
     in isolation and potentially undo all the operations if one of them fails.
     This guide will get you started using transactions with Mongoose.
 
-    ## Your First Transaction
+    ## Getting Started with Transactions
 
-    [MongoDB currently only supports transactions on replica sets](https://docs.mongodb.com/manual/replication/#transactions),
-    not standalone servers. To run a
-    [local replica set for development](http://thecodebarbarian.com/introducing-run-rs-zero-config-mongodb-runner.html)
-    on macOS, Linux or Windows, use npm to install
-    [run-rs](https://www.npmjs.com/package/run-rs) globally and run
-    `run-rs --version 4.0.0`. Run-rs will download MongoDB 4.0.0 for you.
-
-    To use transactions with Mongoose, you should use Mongoose `>= 5.2.0`. To
-    check your current version of Mongoose, run `npm list | grep "mongoose"`
-    or check the [`mongoose.version` property](http://mongoosejs.com/docs/api.html#mongoose_Mongoose-version).
-
-    Transactions are built on [MongoDB sessions](https://docs.mongodb.com/manual/reference/server-sessions/).
-    To start a transaction, you first need to call [`startSession()`](/docs/api.html#startsession_startSession)
-    and then call the session's `startTransaction()` function. To execute an
-    operation in a transaction, you need to pass the `session` as an option.
+    To create a transaction, you first need to create a session using or [`Mongoose#startSession`](/docs/api/mongoose.html#mongoose_Mongoose-startSession)
+    or [`Connection#startSession()`](/docs/api/connection.html#connection_Connection-startSession).
 
     ```javascript
-    [require:transactions.*basic example]
+    const session = await mongoose.startSession();
     ```
 
-    In the above example, `session` is an instance of the
-    [MongoDB Node.js driver's `ClientSession` class](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html).
-    Please refer to the [MongoDB driver docs](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html)
-    for more information on what methods `session` has.
-
-    ## Aborting a Transaction
-
-    The most important feature of transactions is the ability to roll back _all_
-    operations in the transaction using the [`abortTransaction()` function](https://docs.mongodb.com/manual/reference/method/Session.abortTransaction/).
-
-    Think about [modeling a bank account in Mongoose](https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html#transactions-with-mongoose).
-    To transfer money from account `A` to account `B`, you would decrement
-    `A`'s balance and increment `B`'s balance. However, if `A` only has a balance
-    of $5 and you try to transfer $10, you want to abort the transaction and undo
-    incrementing `B`'s balance.
-
-    ```javascript
-    [require:transactions.*abort]
-    ```
-
-    ## The `withTransaction()` Helper
-
-    The previous examples explicitly create a transaction and commits it. In
-    practice, you'll want to use the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction)
-    instead. The `session.withTransaction()` helper handles:
+    In practice, you should use either the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction)
+    or Mongoose's `Connection#transaction()` function to run a transaction. The `session.withTransaction()` helper handles:
     
     - Creating a transaction
     - Committing the transaction if it succeeds
@@ -86,6 +50,14 @@ block content
 
     For more information on the `ClientSession#withTransaction()` function, please see
     [the MongoDB Node.js driver docs](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction). 
+
+    Mongoose's `Connection#transaction()` function is a wrapper around `withTransaction()` that
+    integrates Mongoose change tracking with transactions. For example, the `Connection#transaction()`
+    function handles resetting a document if you `save()` that document in a transaction that later fails.
+
+    ```javascript
+    [require:transactions.*can save document after aborted transaction]
+    ```
 
     ## With Mongoose Documents and `save()`
 
@@ -108,4 +80,19 @@ block content
 
     ```javascript
     [require:transactions.*aggregate]
+    ```
+
+    ## Advanced Usage
+
+    Advanced users who want more fine-grained control over when they commit or abort transactions
+    can use `session.startTransaction()` to start a transaction:
+
+    ```javascript
+    [require:transactions.*basic example]
+    ```
+
+    You can also use `session.abortTransaction()` to abort a transaction:
+
+    ```javascript
+    [require:transactions.*abort]
     ```

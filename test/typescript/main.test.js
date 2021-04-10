@@ -190,6 +190,14 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 0);
   });
+
+  it('populate', function() {
+    const errors = runTest('populate.ts', { strict: true });
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file, configOverride) {

@@ -1435,7 +1435,7 @@ declare module 'mongoose' {
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
      * build an index on this path when the model is compiled.
      */
-    index?: boolean | number | IndexOptions | "2d" | "2dsphere" | "hashed" | "text";
+    index?: boolean | number | IndexOptions | '2d' | '2dsphere' | 'hashed' | 'text';
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose

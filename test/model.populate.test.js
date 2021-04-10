@@ -10077,6 +10077,38 @@ describe('model: populate:', function() {
     });
   });
 
+  it('transform to primitive (gh-10064)', function() {
+    const Child = db.model('Child', mongoose.Schema({ name: String }));
+    const Parent = db.model('Parent', mongoose.Schema({
+      child: { type: 'ObjectId', ref: 'Child' },
+      children: [{ type: 'ObjectId', ref: 'Child' }]
+    }));
+
+    return co(function*() {
+      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+
+      let doc = yield Parent.create({ children, child: children[0] });
+      doc = yield Parent.findById(doc).populate([
+        {
+          path: 'child',
+          transform: getName
+        },
+        {
+          path: 'children',
+          options: { retainNullValues: true },
+          transform: getName
+        }
+      ]);
+
+      function getName(doc) {
+        return doc == null ? null : doc.name;
+      }
+
+      assert.equal(doc.child, 'Luke');
+      assert.deepEqual(doc.toObject().children.sort().reverse(), ['Luke', 'Leia']);
+    });
+  });
+
   it('transform with virtual populate, justOne = true (gh-3375)', function() {
     const parentSchema = new Schema({
       name: String

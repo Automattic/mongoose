@@ -2280,7 +2280,7 @@ declare module 'mongoose' {
     $rename?: { [key: string]: string };
     $set?: mongodb.MatchKeysAndValues<TSchema>;
     $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, '' | 1 | true>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: mongodb.SetFields<TSchema>;

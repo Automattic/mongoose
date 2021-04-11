@@ -7,7 +7,8 @@ interface QueryHelpers {
 const schema: Schema<ITest, Model<ITest, QueryHelpers>> = new Schema({
   name: { type: 'String' },
   tags: [String],
-  docs: [{ nested: { id: Number } }]
+  docs: [{ nested: { id: Number } }],
+  endDate: Date
 });
 
 schema.query.byName = function(name: string): Query<any, ITest, QueryHelpers> & QueryHelpers {
@@ -24,6 +25,7 @@ interface ITest extends Document {
   parent?: Types.ObjectId;
   tags?: string[];
   docs?: ISubdoc[];
+  endDate?: Date;
 }
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
@@ -72,6 +74,8 @@ Test.findOneAndUpdate({ name: 'test' }, { $pull: { docs: { 'nested.id': 1 } } })
 
 const update = Math.random() > 0.5 ? { $unset: { 'docs.0': 1 } } : { age: 55 };
 Test.findOneAndUpdate({ name: 'test' }, update);
+
+Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
 
 Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err, doc) => console.log(doc));
 

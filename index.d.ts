@@ -13,6 +13,7 @@ declare module 'mongoose' {
   }
 
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
+  class NativeDate extends global.Date {}
   export type Date = Schema.Types.Date;
 
   /**
@@ -2272,7 +2273,7 @@ declare module 'mongoose' {
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, Date | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
     $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
     $min?: mongodb.MatchKeysAndValues<TSchema>;
     $max?: mongodb.MatchKeysAndValues<TSchema>;

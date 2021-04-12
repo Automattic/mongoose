@@ -23,7 +23,10 @@ interface Movie {
 }
 
 const movieSchema = new Schema<Document<Movie>, Model<Document<Movie>>, Movie>({
-  title: String,
+  title: {
+    type: String,
+    index: 'text'
+  },
   featuredIn: {
     type: String,
     enum: ['Favorites', null],

@@ -10077,6 +10077,38 @@ describe('model: populate:', function() {
     });
   });
 
+  it('transform to primitive (gh-10064)', function() {
+    const Child = db.model('Child', mongoose.Schema({ name: String }));
+    const Parent = db.model('Parent', mongoose.Schema({
+      child: { type: 'ObjectId', ref: 'Child' },
+      children: [{ type: 'ObjectId', ref: 'Child' }]
+    }));
+
+    return co(function*() {
+      const children = yield Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
+
+      let doc = yield Parent.create({ children, child: children[0] });
+      doc = yield Parent.findById(doc).populate([
+        {
+          path: 'child',
+          transform: getName
+        },
+        {
+          path: 'children',
+          options: { retainNullValues: true },
+          transform: getName
+        }
+      ]);
+
+      function getName(doc) {
+        return doc == null ? null : doc.name;
+      }
+
+      assert.equal(doc.child, 'Luke');
+      assert.deepEqual(doc.toObject().children.sort().reverse(), ['Luke', 'Leia']);
+    });
+  });
+
   it('transform with virtual populate, justOne = true (gh-3375)', function() {
     const parentSchema = new Schema({
       name: String
@@ -10198,6 +10230,38 @@ describe('model: populate:', function() {
       yield modelA1.populate('_modelB._rootModel').execPopulate();
 
       assert.equal(modelA1._modelB._rootModel.name, 'my name');
+    });
+  });
+
+  it('populates lean subdoc with `_id` property (gh-10069)', function() {
+    const Books = db.model('Book', new Schema({ name: String, author: Schema.Types.ObjectId }));
+    const Authors = db.model('Person', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aBook1 = new Books({ name: 'Book1', author: anAuthor.id });
+      yield aBook1.save();
+      const aBook2 = new Books({ name: 'Book2', author: anAuthor.id });
+      yield aBook2.save();
+
+      const populateOptions = [{
+        path: 'author',
+        model: 'Person'
+      }];
+
+      const books = (yield Books.find().lean()).map(aBook => {
+        if (!aBook._id.equals(aBook1.id)) {
+          aBook.author = { _id: aBook.author };
+        }
+        return aBook;
+      });
+
+      const populatedBooks = yield Books.populate(books, populateOptions);
+      assert.equal(populatedBooks.length, 2);
+      assert.equal(populatedBooks[0].author.name, 'Author1');
+      assert.equal(populatedBooks[1].author.name, 'Author1');
     });
   });
 });

@@ -2260,15 +2260,15 @@ declare module 'mongoose' {
   }[keyof TSchema];
 
   type PullOperator<TSchema> = {
-      [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
-          | Partial<Unpacked<TSchema[key]>>
-          | mongodb.ObjectQuerySelector<Unpacked<TSchema[key]>>
-          // Doesn't look like TypeScript has good support for creating an
-          // object containing dotted keys:
-          // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
-          | mongodb.QuerySelector<any>
-          | any;
-  };
+    [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
+        | Partial<Unpacked<TSchema[key]>>
+        | mongodb.ObjectQuerySelector<Unpacked<TSchema[key]>>
+        // Doesn't look like TypeScript has good support for creating an
+        // object containing dotted keys:
+        // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
+        | mongodb.QuerySelector<any>
+        | any;
+  } | any; // Because TS doesn't have good support for creating an object with dotted keys, including `.$.` re: #10075
 
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
@@ -2292,7 +2292,7 @@ declare module 'mongoose' {
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
-        [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
+      [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
     };
   };
 

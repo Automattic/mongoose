@@ -13,6 +13,7 @@ declare module 'mongoose' {
   }
 
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
+  class NativeDate extends global.Date {}
   export type Date = Schema.Types.Date;
 
   /**
@@ -1435,7 +1436,7 @@ declare module 'mongoose' {
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
      * build an index on this path when the model is compiled.
      */
-    index?: boolean | number | IndexOptions;
+    index?: boolean | number | IndexOptions | '2d' | '2dsphere' | 'hashed' | 'text';
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose
@@ -2272,7 +2273,7 @@ declare module 'mongoose' {
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, Date | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
     $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
     $min?: mongodb.MatchKeysAndValues<TSchema>;
     $max?: mongodb.MatchKeysAndValues<TSchema>;
@@ -2280,7 +2281,7 @@ declare module 'mongoose' {
     $rename?: { [key: string]: string };
     $set?: mongodb.MatchKeysAndValues<TSchema>;
     $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, '' | 1 | true>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: mongodb.SetFields<TSchema>;

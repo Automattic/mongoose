@@ -10232,4 +10232,36 @@ describe('model: populate:', function() {
       assert.equal(modelA1._modelB._rootModel.name, 'my name');
     });
   });
+
+  it('populates lean subdoc with `_id` property (gh-10069)', function() {
+    const Books = db.model('Book', new Schema({ name: String, author: Schema.Types.ObjectId }));
+    const Authors = db.model('Person', new Schema({ name: String }));
+
+    return co(function*() {
+      const anAuthor = new Authors({ name: 'Author1' });
+      yield anAuthor.save();
+
+      const aBook1 = new Books({ name: 'Book1', author: anAuthor.id });
+      yield aBook1.save();
+      const aBook2 = new Books({ name: 'Book2', author: anAuthor.id });
+      yield aBook2.save();
+
+      const populateOptions = [{
+        path: 'author',
+        model: 'Person'
+      }];
+
+      const books = (yield Books.find().lean()).map(aBook => {
+        if (!aBook._id.equals(aBook1.id)) {
+          aBook.author = { _id: aBook.author };
+        }
+        return aBook;
+      });
+
+      const populatedBooks = yield Books.populate(books, populateOptions);
+      assert.equal(populatedBooks.length, 2);
+      assert.equal(populatedBooks[0].author.name, 'Author1');
+      assert.equal(populatedBooks[1].author.name, 'Author1');
+    });
+  });
 });

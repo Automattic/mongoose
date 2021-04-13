@@ -1855,6 +1855,13 @@ declare module 'mongoose' {
   class Query<ResultType, DocType extends Document, THelpers = {}> {
     _mongooseOptions: MongooseQueryOptions;
 
+    /**
+     * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
+     * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
+     * This is equivalent to calling `.cursor()` with no arguments.
+     */
+    [Symbol.asyncIterator]: QueryCursor<DocType>;
+
     /** Executes the query */
     exec(): Promise<ResultType>;
     exec(callback?: (err: CallbackError, res: ResultType) => void): void;

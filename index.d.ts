@@ -374,7 +374,7 @@ declare module 'mongoose' {
     _id?: T;
 
     /** This documents __v. */
-    __v?: number;
+    __v?: any;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];

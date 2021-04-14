@@ -10246,12 +10246,10 @@ describe('model: populate:', function() {
       yield aBook2.save();
 
       const populateOptions = [{
-        path: 'contributors.author', // *Note the array of objects - regular objects work as expected
+        path: 'contributors.author',
         model: 'authors',
         select: '_id name'
       }];
-
-      // Get the books and make book2 author in contributors just an id instead of an object
       const populatedBooks = (yield Books.find().populate(populateOptions)).map(aBook => {
         aBook = aBook.toObject();
         if (!aBook._id.equals(aBook1.id)) {
@@ -10260,51 +10258,8 @@ describe('model: populate:', function() {
         return aBook;
       });
 
-      // console.log('populatedBooks = ' + util.inspect(populatedBooks, false, null, true))
-      // after population and some manipulation, populatedBooks array:
-      /* const populatedBooks = [{
-          _id: aBook1.id,
-          name: aBook1.name
-          contributors: [{
-              _id: ObjectId
-              author: {
-                  _id: anAuthor.id,
-                  name: anAuthor.name
-              }
-          }]
-      }, {
-          _id: aBook2.id,
-          name: aBook2.name
-          contributors: [{
-              _id: ObjectId
-              author: anAuthor.id
-          }]
-      }]
-      */
-      // now, we try to populate the array to get the remaining author that was not previously populated for aBook2
       const populatedBooksAgain = yield Books.populate(populatedBooks, populateOptions);
-      // console.log('populatedBooksAgain = ' + util.inspect(populatedBooks, false, null, true))
 
-      // after population, populatedBooksAgain array:
-      /* const populatedBooksAgain = [{
-          _id: aBook1.id,
-          name: aBook1.name
-          contributors: [{
-              _id: ObjectId
-              author: null //*this should NOT be null - it should be the same object going into populate (and it was in 5.2.10)
-          }]
-      }, {
-          _id: aBook2.id,
-          name: aBook2.name
-          contributors: [{
-              _id: ObjectId
-              author: {
-                  _id: anAuthor.id,
-                  name: anAuthor.name
-              }
-          }]
-      }]
-      */
       assert.equal(populatedBooksAgain[0].contributors[0].author.name, 'Author1');
     });
   });

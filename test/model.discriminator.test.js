@@ -1646,6 +1646,42 @@ describe('model', function() {
     assert.ok(actions.schema.discriminators['message']);
   });
 
+  it('embedded discriminator array of arrays (gh-9984)', function() {
+    const enemySchema = new Schema({
+      name: String,
+      level: Number
+    });
+    const Enemy = db.model('Enemy', enemySchema);
+
+    const mapSchema = new Schema({
+      tiles: [[new Schema({}, { discriminatorKey: 'kind', _id: false })]]
+    });
+
+    const contentPath = mapSchema.path('tiles');
+
+    contentPath.discriminator('Enemy', new Schema({
+      enemy: { type: Schema.Types.ObjectId, ref: 'Enemy' }
+    }));
+    contentPath.discriminator('Wall', new Schema({ color: String }));
+
+    const Map = db.model('Map', mapSchema);
+
+    return co(function*() {
+      const e = yield Enemy.create({
+        name: 'Bowser',
+        level: 10
+      });
+
+      let map = yield Map.create({
+        tiles: [[{ kind: 'Enemy', enemy: e._id }, { kind: 'Wall', color: 'Blue' }]]
+      });
+
+      map = yield Map.findById(map).populate({ path: 'tiles.enemy' });
+      console.log(map.tiles);
+      assert.equal(map.tiles[0][0].enemy.name, 'Bowser');
+    });
+  });
+
   it('recursive embedded discriminator using schematype (gh-9600)', function() {
     const contentSchema = new mongoose.Schema({}, { discriminatorKey: 'type' });
     const nestedSchema = new mongoose.Schema({

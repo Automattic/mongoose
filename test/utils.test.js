@@ -365,4 +365,47 @@ describe('utils', function() {
       assert.deepEqual(out, o);
     });
   });
+  describe('errorToPOJO(...)', () => {
+    it('converts an error to a POJO', () => {
+      // Arrange
+      const err = new Error('Something bad happened.');
+      err.metadata = { hello: 'world' };
+
+      // Act
+      const pojoError = utils.errorToPOJO(err);
+
+      // Assert
+      assert.equal(pojoError.message, 'Something bad happened.');
+      assert.ok(pojoError.stack);
+      assert.deepEqual(pojoError.metadata, { hello: 'world' });
+    });
+    it('throws an error when argument is not an error object', () => {
+      let errorWhenConverting;
+      try {
+        utils.errorToPOJO({ message: 'I am a POJO', stack: 'Does not matter' });
+      } catch (_err) {
+        errorWhenConverting = _err;
+      }
+      assert.equal(errorWhenConverting.message, '`error` must be `instanceof Error`.');
+    });
+    it('works with classes that extend `Error`', () => {
+      // Arrange
+      class OperationalError extends Error {
+        constructor(message) {
+          super(message);
+        }
+      }
+
+      const err = new OperationalError('Something bad happened.');
+      err.metadata = { hello: 'world' };
+
+      // Act
+      const pojoError = utils.errorToPOJO(err);
+
+      // Assert
+      assert.equal(pojoError.message, 'Something bad happened.');
+      assert.ok(pojoError.stack);
+      assert.deepEqual(pojoError.metadata, { hello: 'world' });
+    });
+  });
 });

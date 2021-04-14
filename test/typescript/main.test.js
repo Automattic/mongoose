@@ -198,6 +198,14 @@ describe('typescript syntax', function() {
     }
     assert.equal(errors.length, 0);
   });
+
+  it('generics', function() {
+    const errors = runTest('generics.ts');
+    if (process.env.D && errors.length) {
+      console.log(errors);
+    }
+    assert.equal(errors.length, 0);
+  });
 });
 
 function runTest(file, configOverride) {

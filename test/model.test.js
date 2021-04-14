@@ -4774,6 +4774,31 @@ describe('Model', function() {
       });
     });
 
+    it('insertMany() returns only inserted docs with `ordered = true`', function() {
+      const schema = new Schema({
+        name: { type: String, required: true, unique: true }
+      });
+      const Movie = db.model('Movie', schema);
+
+      const arr = [
+        { name: 'The Phantom Menace' },
+        { name: 'The Empire Strikes Back' },
+        { name: 'The Phantom Menace' },
+        { name: 'Jingle All The Way' }
+      ];
+      const opts = { ordered: true };
+      return co(function*() {
+        yield Movie.init();
+        const err = yield Movie.insertMany(arr, opts).then(() => err, err => err);
+        assert.ok(err);
+        assert.ok(err.insertedDocs);
+
+        assert.equal(err.insertedDocs.length, 2);
+        assert.strictEqual(err.insertedDocs[0].name, 'The Phantom Menace');
+        assert.strictEqual(err.insertedDocs[1].name, 'The Empire Strikes Back');
+      });
+    });
+
     it('insertMany() validation error with ordered true and rawResult true when all documents are invalid', function(done) {
       const schema = new Schema({
         name: { type: String, required: true }
@@ -7132,6 +7157,30 @@ describe('Model', function() {
 
         assert.equal(typeof res, 'object');
       });
+    });
+  });
+
+  it('saves all error object properties to paths with type `Mixed` (gh-10126)', () => {
+    return co(function*() {
+      const userSchema = new Schema({ err: Schema.Types.Mixed });
+
+      const User = db.model('User', userSchema);
+
+      const err = new Error('I am a bad error');
+      err.metadata = { reasons: ['Cloudflare is down', 'DNS'] };
+
+      const user = yield User.create({ err });
+      const userFromDB = yield User.findOne({ _id: user._id });
+
+      assertErrorProperties(user);
+      assertErrorProperties(userFromDB);
+
+
+      function assertErrorProperties(user) {
+        assert.equal(user.err.message, 'I am a bad error');
+        assert.ok(user.err.stack);
+        assert.deepEqual(user.err.metadata, { reasons: ['Cloudflare is down', 'DNS'] });
+      }
     });
   });
 });

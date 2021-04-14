@@ -11,6 +11,7 @@ const Q = require('q');
 const assert = require('assert');
 const co = require('co');
 const mongodb = require('mongodb');
+const MongooseError = require('../lib/error/index');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -960,6 +961,135 @@ describe('connections:', function() {
 
       const errorOnDisconnect = yield disconnect().then(() => null, err => err);
       assert.ifError(errorOnDisconnect);
+    });
+  });
+
+  describe('when connecting with a secondary read preference(gh-9374)', function() {
+    describe('mongoose.connect', function() {
+      it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred', function() {
+        const secondaryURI =
+                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+
+        return co(function* () {
+          const m = new mongoose.Mongoose();
+          yield m.connect(secondaryURI);
+
+          assert.strictEqual(m.connection.get('autoIndex'), false);
+          assert.strictEqual(m.connection.get('autoCreate'), false);
+          assert.strictEqual(
+            m.connection.get('useCreateIndex'),
+            false
+          );
+
+          assert.strictEqual(m.connection.get('autoIndex'), false);
+          assert.strictEqual(m.connection.get('autoCreate'), false);
+          assert.strictEqual(
+            m.connection.get('useCreateIndex'),
+            false
+          );
+
+          yield m.disconnect();
+        });
+      });
+
+      it('throws if options try to set autoIndex to true', function() {
+        const secondaryURI =
+                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const opts = {
+          autoIndex: true
+        };
+
+        const err = new MongooseError(
+          'MongoDB prohibits index creation on connections that read from ' +
+                        'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
+                        '"secondaryPreferred" may not opt-in to the following connection options: ' +
+                        'autoCreate, autoIndex, useCreateIndex'
+        );
+        const m = new mongoose.Mongoose();
+
+        assert.rejects(() => m.connect(secondaryURI, opts), err);
+      });
+
+      it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
+        const secondaryURI =
+                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const opts = {
+          autoIndex: false,
+          config: {
+            autoIndex: true
+          }
+        };
+        const err = new MongooseError(
+          'MongoDB prohibits index creation on connections that read from ' +
+                        'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
+                        '"secondaryPreferred" may not opt-in to the following connection options: ' +
+                        'autoCreate, autoIndex, useCreateIndex'
+        );
+        const m = new mongoose.Mongoose();
+        assert.rejects(m.connect(secondaryURI, opts), err);
+      });
+    });
+
+    describe('mongoose.createConnection', function() {
+      it('forces autoIndex & autoCreate to be false if read preference is secondary or secondaryPreferred (gh-9374)', function() {
+        const secondaryURI =
+                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const secondaryPrefURI =
+                    'mongodb://localhost:27017/test_gh9374_2?readPreference=secondaryPreferred';
+
+        const conn = new mongoose.createConnection(secondaryURI);
+
+        assert.equal(conn.get('autoIndex'), false);
+        assert.equal(conn.get('autoCreate'), false);
+        assert.equal(conn.get('useCreateIndex'), false);
+
+        const conn2 = new mongoose.createConnection(secondaryPrefURI);
+
+        assert.equal(conn2.get('autoIndex'), false);
+        assert.equal(conn2.get('autoCreate'), false);
+        assert.equal(conn2.get('useCreateIndex'), false);
+      });
+
+      it('throws if options try to set autoIndex to true', function() {
+        const secondaryURI =
+                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const opts = {
+          autoIndex: true
+        };
+        const err = new MongooseError(
+          'MongoDB prohibits index creation on connections that read from ' +
+                        'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
+                        '"secondaryPreferred" may not opt-in to the following connection options: ' +
+                        'autoCreate, autoIndex, useCreateIndex'
+        );
+        const m = new mongoose.Mongoose();
+        return assert.throws(
+          () => m.createConnection(secondaryURI, opts),
+          err
+        );
+      });
+
+      it('throws if options.config.autoIndex is true, even if options.autoIndex is false', function() {
+        const secondaryURI =
+                    'mongodb://localhost:27017/test_gh9374_1?readPreference=secondary';
+        const opts = {
+          autoIndex: false,
+          config: {
+            autoIndex: true
+          }
+        };
+        const err = new MongooseError(
+          'MongoDB prohibits index creation on connections that read from ' +
+                        'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
+                        '"secondaryPreferred" may not opt-in to the following connection options: ' +
+                        'autoCreate, autoIndex, useCreateIndex'
+        );
+
+        assert.throws(
+          () => mongoose.createConnection(secondaryURI, opts),
+          err
+        );
+      });
     });
   });
 });

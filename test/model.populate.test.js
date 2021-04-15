@@ -10258,7 +10258,7 @@ describe('model: populate:', function() {
         }
         return aBook;
       });
-      
+
       const populatedBooksAgain = yield Books.populate(populatedBooks, populateOptions);
 
       assert.equal(populatedBooksAgain[0].contributors[0].author.name, 'Author1');

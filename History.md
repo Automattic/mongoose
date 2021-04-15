@@ -1,3 +1,22 @@
+5.12.4 / 2021-04-15
+===================
+ * fix: upgrade mongodb driver -> 3.6.6 #10079
+ * fix: store fields set with select:false at schema-level when saving a new document #10101 [ptantiku](https://github.com/ptantiku)
+ * fix(populate): avoid turning already populated field to null when populating an existing lean document #10068 [IslandRhythms](https://github.com/IslandRhythms)
+ * fix(populate): correctly populate lean subdocs with `_id` property #10069
+ * fix(model): insertedDocs may contain docs that weren't inserted #10098 [olnazx](https://github.com/olnazx)
+ * fix(schemaType): make type Mixed cast error objects to pojos #10131 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): support populating embedded discriminators in nested arrays #9984
+ * fix(populate): handle populating map paths using trailing `.$*` #10123
+ * fix(populate): allow returning primitive from `transform()` function for single conventional populate #10064
+ * fix(index.d.ts): allow generic classes of `T` to use `T & Document` internally #10046
+ * fix(index.d.ts): allow `$pull` with `$` paths #10075
+ * fix(index.d.ts): use correct `Date` type for `$currentDate` #10058
+ * fix(index.d.ts): add missing asyncInterator to Query type def #10094 [borfig](https://github.com/borfig)
+ * fix(index.d.ts): allow RHS of `$unset` properties to be any value #10066
+ * fix(index.d.ts): allow setting SchemaType `index` property to a string #10077
+ * refactor(index.d.ts): move discriminator() to common interface #10109 [LoneRifle](https://github.com/LoneRifle)
+
 5.12.3 / 2021-03-31
 ===================
  * fix: avoid setting schema-level collation on text indexes #10044 [IslandRhythms](https://github.com/IslandRhythms)

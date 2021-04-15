@@ -37,7 +37,7 @@ describe('collections: capped:', function() {
   });
 
   it('creation', function() {
-    this.timeout(30000);
+    this.timeout(15000);
 
     return co(function*() {
       yield db.dropCollection('Test').catch(() => {});

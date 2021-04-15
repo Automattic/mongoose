@@ -13,6 +13,7 @@ declare module 'mongoose' {
   }
 
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
+  class NativeDate extends global.Date {}
   export type Date = Schema.Types.Date;
 
   /**
@@ -373,7 +374,7 @@ declare module 'mongoose' {
     _id?: T;
 
     /** This documents __v. */
-    __v?: number;
+    __v?: any;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
@@ -598,9 +599,15 @@ declare module 'mongoose' {
     validateSync(pathsToValidate?: Array<string>, options?: any): NativeError | null;
   }
 
+  interface AcceptsDiscriminator {
+    /** Adds a discriminator type. */
+    discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
+    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
+  }
+
   export const Model: Model<any>;
   // eslint-disable-next-line no-undef
-  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter {
+  interface Model<T extends Document, TQueryHelpers = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: any): T;
 
     aggregate<R = any>(pipeline?: any[]): Aggregate<Array<R>>;
@@ -779,10 +786,6 @@ declare module 'mongoose' {
 
     /** Translate any aliases fields/conditions so the final query or document object is pure */
     translateAliases(raw: any): any;
-
-    /** Adds a discriminator type. */
-    discriminator<D extends Document>(name: string, schema: Schema, value?: string): Model<D>;
-    discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct(field: string, filter?: FilterQuery<T>, callback?: (err: any, count: number) => void): QueryWithHelpers<Array<any>, T, TQueryHelpers>;
@@ -1435,7 +1438,7 @@ declare module 'mongoose' {
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
      * build an index on this path when the model is compiled.
      */
-    index?: boolean | number | IndexOptions;
+    index?: boolean | number | IndexOptions | '2d' | '2dsphere' | 'hashed' | 'text';
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose
@@ -1596,13 +1599,14 @@ declare module 'mongoose' {
 
   namespace Schema {
     namespace Types {
-      class Array extends SchemaType {
+      class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string): any;
+        discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -1652,13 +1656,14 @@ declare module 'mongoose' {
         static schemaName: string;
       }
 
-      class DocumentArray extends SchemaType {
+      class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
         static options: { castNonArrays: boolean; };
 
-        discriminator(name: string, schema: Schema, tag?: string): any;
+        discriminator<D extends Document>(name: string, schema: Schema<D>, value?: string): Model<D>;
+        discriminator<T extends Document, U extends Model<T>>(name: string, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
         schema: Schema;
@@ -1849,6 +1854,13 @@ declare module 'mongoose' {
 
   class Query<ResultType, DocType extends Document, THelpers = {}> {
     _mongooseOptions: MongooseQueryOptions;
+
+    /**
+     * Returns a wrapper around a [mongodb driver cursor](http://mongodb.github.io/node-mongodb-native/2.1/api/Cursor.html).
+     * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
+     * This is equivalent to calling `.cursor()` with no arguments.
+     */
+    [Symbol.asyncIterator]: QueryCursor<DocType>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;
@@ -2259,20 +2271,20 @@ declare module 'mongoose' {
   }[keyof TSchema];
 
   type PullOperator<TSchema> = {
-      [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
-          | Partial<Unpacked<TSchema[key]>>
-          | mongodb.ObjectQuerySelector<Unpacked<TSchema[key]>>
-          // Doesn't look like TypeScript has good support for creating an
-          // object containing dotted keys:
-          // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
-          | mongodb.QuerySelector<any>
-          | any;
-  };
+    [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?:
+        | Partial<Unpacked<TSchema[key]>>
+        | mongodb.ObjectQuerySelector<Unpacked<TSchema[key]>>
+        // Doesn't look like TypeScript has good support for creating an
+        // object containing dotted keys:
+        // https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object
+        | mongodb.QuerySelector<any>
+        | any;
+  } | any; // Because TS doesn't have good support for creating an object with dotted keys, including `.$.` re: #10075
 
   /** @see https://docs.mongodb.com/manual/reference/operator/update */
   type _UpdateQuery<TSchema> = {
     /** @see https://docs.mongodb.com/manual/reference/operator/update-field/ */
-    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, Date | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
+    $currentDate?: mongodb.OnlyFieldsOfType<TSchema, NativeDate | mongodb.Timestamp, true | { $type: 'date' | 'timestamp' }>;
     $inc?: mongodb.OnlyFieldsOfType<TSchema, NumericTypes | undefined>;
     $min?: mongodb.MatchKeysAndValues<TSchema>;
     $max?: mongodb.MatchKeysAndValues<TSchema>;
@@ -2280,7 +2292,7 @@ declare module 'mongoose' {
     $rename?: { [key: string]: string };
     $set?: mongodb.MatchKeysAndValues<TSchema>;
     $setOnInsert?: mongodb.MatchKeysAndValues<TSchema>;
-    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, '' | 1 | true>;
+    $unset?: mongodb.OnlyFieldsOfType<TSchema, any, any>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-array/ */
     $addToSet?: mongodb.SetFields<TSchema>;
@@ -2291,7 +2303,7 @@ declare module 'mongoose' {
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */
     $bit?: {
-        [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
+      [key: string]: { [key in 'and' | 'or' | 'xor']?: number };
     };
   };
 

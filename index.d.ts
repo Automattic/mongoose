@@ -2300,7 +2300,7 @@ declare module 'mongoose' {
     $addToSet?: mongodb.SetFields<TSchema>;
     $pop?: mongodb.OnlyFieldsOfType<TSchema, ReadonlyArray<any>, 1 | -1>;
     $pull?: PullOperator<TSchema>;
-    $push?: mongodb.PushOperator<TSchema>;
+    $push?: mongodb.PushOperator<TSchema> | any;
     $pullAll?: mongodb.PullAllOperator<TSchema>;
 
     /** @see https://docs.mongodb.com/manual/reference/operator/update-bitwise/ */

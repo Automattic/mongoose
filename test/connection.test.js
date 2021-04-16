@@ -1193,7 +1193,7 @@ describe('connections:', function() {
     });
   });
 
-  it('useDB inherits config from default conneciton (gh-8267)', function() {
+  it('useDB inherits config from default connection (gh-8267)', function() {
     return co(function*() {
       yield mongoose.connect('mongodb://localhost:27017/gh8267-0', { useCreateIndex: true });
 
@@ -1312,7 +1312,7 @@ describe('connections:', function() {
     assert.deepStrictEqual(conn2.id, m1.connection.id + 1);
     assert.deepStrictEqual(conn3.id, m.connection.id + 2);
   });
-  it('should not have a deprecation message pop up (gh-8267) part 2', function() {
+  it('should not have a deprecation message pop up (gh-8267-2)', function() {
     return co(function*() {
       const m = new mongoose.Mongoose();
       yield connect('mongodb://localhost:27017/test', {
@@ -1330,10 +1330,6 @@ describe('connections:', function() {
       console.log('newDb again', newDb.config);
       const Model = newDb.model('Test', schema);
       yield Model.init();
-      process.on('warning', (warning) => {
-        console.log('hi');
-        console.log(warning.stack);
-      });
       assert.match(JSON.stringify(newDb.config), /useCreateIndex/);
     });
   });
